@@ -24,50 +24,45 @@
     <driver name="JAXPDriver">
         <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.AlfrescoInternalAPIDriver"/>
         <param name="description" value="Alfresco Internal API"/>
-   
-    	<param name="japex.numberOfThreads" value="32"/> 
-    	<param name="japex.threadRampupTime" value="60"/>
+
+    	<param name="japex.numberOfThreads" value="64"/> 
+    	<param name="japex.threadRampupTime" value="120"/>
     	<param name="japex.includeWarmupRun" value="false"/>
     	
     </driver>
 
     <testCase name="Read Content">
-    
-        <!-- Usage Profile -->
+
         <param name="alfresco.usageProfile.readContent" value="100"/>
         <param name="alfresco.usageProfile.readProperties" value="0"/>
 		<param name="alfresco.usageProfile.createContent" value="0"/>		
         <param name="alfresco.usageProfile.createVersion" value="0"/>
         <param name="alfresco.usageProfile.createFolder" value="0"/>
-        
-        <!-- Repository Profile -->
+
         <param name="alfrsco.repositoryProfile.folderDepth.average" value="3"/>
         <param name="alfrsco.repositoryProfile.folderDepth.variation" value="1"/>
         <param name="alfrsco.repositoryProfile.documentsInFolderCount.average" value="5"/>
         <param name="alfrsco.repositoryProfile.documentsInFolderCount.variation" value="1"/>
         <param name="alfrsco.repositoryProfile.subFoldersCount.average" value="3"/>
         <param name="alfrsco.repositoryProfile.subFoldersCount.variation" value="1"/>      
-        
-        <!-- Number of available users -->
+
         <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
-    
+
         <param name="japex.warmupIterations" value="0"/>            
     	<param name="japex.runIterations" value="60"/> 
     	<param name="japex.runDelay" value="15"/>
     	<param name="japex.runDelayVariation" value="10"/>
     	
-    </testCase>
+    </testCase> 
 
     <testCase name="Read Properties">
     
-        <!-- Usage Profile -->
         <param name="alfresco.usageProfile.readContent" value="0"/>
         <param name="alfresco.usageProfile.readProperties" value="100"/>
 		<param name="alfresco.usageProfile.createContent" value="0"/>		
         <param name="alfresco.usageProfile.createVersion" value="0"/>
         <param name="alfresco.usageProfile.createFolder" value="0"/>
         
-        <!-- Repository Profile -->
         <param name="alfrsco.repositoryProfile.folderDepth.average" value="3"/>
         <param name="alfrsco.repositoryProfile.folderDepth.variation" value="1"/>
         <param name="alfrsco.repositoryProfile.documentsInFolderCount.average" value="5"/>
@@ -75,15 +70,14 @@
         <param name="alfrsco.repositoryProfile.subFoldersCount.average" value="3"/>
         <param name="alfrsco.repositoryProfile.subFoldersCount.variation" value="1"/>      
         
-        <!-- Number of available users -->
-        <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
+        <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
         <param name="japex.warmupIterations" value="0"/>            
     	<param name="japex.runIterations" value="60"/> 
     	<param name="japex.runDelay" value="15"/>
     	<param name="japex.runDelayVariation" value="10"/>
     	
-    </testCase>
+    </testCase>     
 
     <testCase name="Create Content">
     

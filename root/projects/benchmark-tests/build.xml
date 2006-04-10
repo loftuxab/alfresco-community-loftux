@@ -9,7 +9,7 @@
     <property name="config" value="config/testConfig.xml"/>
 
     <path id="class.path">
-        <fileset dir="./lib/japex" includes="*.jar"/>
+        <fileset dir="../benchmark-framework/lib/japex" includes="*.jar"/>
     </path>
 
     <target name="compile-java" depends="init" description="Compiles the Java source code">

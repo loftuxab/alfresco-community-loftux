@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testSuite name="ParsingPerformance" xmlns="http://www.sun.com/japex/testSuite">
 
-    <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/lib/jdsl/*.jar"/>
+    param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/lib/jdsl/*.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/lib/*.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/build/classes"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/config"/>
@@ -22,23 +22,17 @@
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-tests/config"/>
 
     <driver name="JAXPDriver">
-        <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.AlfrescoInternalAPIDriver"/>
-        <param name="description" value="Alfresco Internal API"/>   
-    	<param name="japex.numberOfThreads" value="2"/> 
-    	<param name="japex.threadRampupTime" value="60"/>
-    	<param name="japex.includeWarmupRun" value="false"/>
+        <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.AlfrescoBulkLoadDriver"/>
+        <param name="description" value="Alfresco Internal API"/>
 
+    	<param name="japex.numberOfThreads" value="1"/> 
+    	<param name="japex.threadRampupTime" value="0"/>
+    	<param name="japex.includeWarmupRun" value="false"/>
+    	
     </driver>
 
-    <testCase name="testConfig">
-
-        <!-- Usage Profile -->
-        <param name="alfresco.usageProfile.readContent" value="0"/>
-        <param name="alfresco.usageProfile.readProperties" value="0"/>
-        <param name="alfresco.usageProfile.createContent" value="100"/>
-        <param name="alfresco.usageProfile.createVersion" value="0"/>
-        <param name="alfresco.usageProfile.createFolder" value="0"/>
-
+    <testCase name="Bulk Load">
+    
         <!-- Repository Profile -->
         <param name="alfrsco.repositoryProfile.folderDepth.average" value="3"/>
         <param name="alfrsco.repositoryProfile.folderDepth.variation" value="1"/>
@@ -50,12 +44,13 @@
         <!-- Number of available users -->
         <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
     
+    	<!-- Number of objects to bulk load in each test -->
+    	<param name="alfresco.loadCount" value="5000"/>
+    
         <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runTime" value="00:30"/> 
-<!--    	<param name="japex.runIterations" value="20"/>-->
-    	
+    	<param name="japex.runIterations" value="2"/> 
     	<param name="japex.runDelay" value="0"/>
     	<param name="japex.runDelayVariation" value="0"/>
     </testCase>
-
+    
 </testSuite>

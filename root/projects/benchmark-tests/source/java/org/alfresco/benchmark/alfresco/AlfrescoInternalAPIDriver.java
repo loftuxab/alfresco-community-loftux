@@ -18,196 +18,29 @@ package org.alfresco.benchmark.alfresco;
 
 import java.io.File;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.alfresco.benchmark.framework.BaseAlfrescoBenchmarkDriver;
-import org.alfresco.benchmark.framework.DataLoaderComponent;
+import org.alfresco.benchmark.framework.UnitsOfWork;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
-import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
-import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
-import org.alfresco.benchmark.framework.dataprovider.PropertyProfile.PropertyType;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.security.PermissionService;
-import org.alfresco.service.cmr.security.PersonService;
-import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.service.transaction.TransactionService;
 
 import com.sun.japex.TestCase;
 
 /**
  * @author Roy Wetherall
  */
-public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
-{    
-    private NodeService nodeService;
-    private ContentService contentService;
-    private VersionService versionService;
-    private AuthenticationComponent authenticationComponent;
-    private TransactionService transactionService;
-    private PersonService personService;
-    private PermissionService permissionService;
-    
-    private DataLoaderComponent dataLoaderComponent;
-    
-    private Map<String, Object> contentPropertyValues; 
-    private Map<String, Object> folderPropertyValues;
-    private NodeRef rootFolder;
-    private NodeRef contentNodeRef;
-    private NodeRef folderNodeRef;
-    private String userName;
-    
-    private static boolean usersPrepaired = false;
-    
-    @Override
-    public void initializeDriver()
-    {
-        // Get the required services
-        this.nodeService = (NodeService)AlfrescoUtils.getApplicationContext().getBean("NodeService");
-        this.contentService = (ContentService)AlfrescoUtils.getApplicationContext().getBean("ContentService");
-        this.authenticationComponent = (AuthenticationComponent)AlfrescoUtils.getApplicationContext().getBean("authenticationComponent");
-        this.transactionService = (TransactionService)AlfrescoUtils.getApplicationContext().getBean("transactionComponent");
-        this.versionService = (VersionService)AlfrescoUtils.getApplicationContext().getBean("VersionService");
-        this.personService = (PersonService)AlfrescoUtils.getApplicationContext().getBean("PersonService");
-        this.permissionService = (PermissionService)AlfrescoUtils.getApplicationContext().getBean("PermissionService");
-        
-        this.dataLoaderComponent = (DataLoaderComponent)AlfrescoUtils.getApplicationContext().getBean("dataLoaderComponent");
-    }
-    
-    @Override
-    public synchronized void prepare(final TestCase tc)
-    {
-        try
-        {    
-            super.prepare(tc);             
-            
-            // Set the authentication
-            this.authenticationComponent.setSystemUserAsCurrentUser();
-            
-            try
-            {           
-                // Get the test case folder node ref
-                this.rootFolder = AlfrescoUtils.getTestCaseRootFolder(
-                        this.dataLoaderComponent, 
-                        this.nodeService, 
-                        this.repositoryProfile, 
-                        tc);
-                
-                if (AlfrescoInternalAPIDriver.usersPrepaired == false)
-                {
-                    System.out.println("Preparing useres");
-                    TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
-                    {
-                        public Object doWork() throws Exception
-                        { 
-                            // Get the number of available users
-                            int numberOfAvailableUsers = DEFAULT_NUMBER_OF_AVAILABLE_USERS;
-                            if (tc.hasParam(PARAM_NUMBER_OF_AVAILABLE_USERS) == true)
-                            {
-                                numberOfAvailableUsers = tc.getIntParam(PARAM_NUMBER_OF_AVAILABLE_USERS);
-                            }
-                            
-                            // Get a list of the users and ensure they all have permissions on the root node
-                            List<String> users = AlfrescoUtils.prepairUsers(
-                                    AlfrescoInternalAPIDriver.this.dataLoaderComponent, 
-                                    AlfrescoInternalAPIDriver.this.personService, 
-                                    AlfrescoInternalAPIDriver.this.nodeService,
-                                    numberOfAvailableUsers);
-                            for (String userName : users)
-                            {
-                                // TODO how do we check this without doing it over and over again!!
-                                AlfrescoInternalAPIDriver.this.permissionService.setPermission(AlfrescoInternalAPIDriver.this.rootFolder, userName, PermissionService.FULL_CONTROL, true);   
-                            }
-                            if (AlfrescoInternalAPIDriver.this.permissionService.getInheritParentPermissions(AlfrescoInternalAPIDriver.this.rootFolder) == false)
-                            {
-                                AlfrescoInternalAPIDriver.this.permissionService.setInheritParentPermissions(AlfrescoInternalAPIDriver.this.rootFolder, true);
-                            }
-                            
-                            AlfrescoInternalAPIDriver.usersPrepaired = true;
-                            
-                            return null;
-                        }
-                    });
-                    
-                    System.out.println("Prepare complete");
-                }
-            }
-            finally
-            {
-                //this.authenticationComponent.clearCurrentSecurityContext();
-            }
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }
-    }    
-    
-    @Override
-    public void preRun(TestCase testCase)
-    {
-        this.authenticationComponent.setSystemUserAsCurrentUser();
-        try
-        {
-            // Get content property values
-            this.contentPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                    this.repositoryProfile, 
-                    AlfrescoUtils.getContentPropertyProfiles());
-            
-            // Get folder property values
-            List<PropertyProfile> folderPropertyProfiles = new ArrayList<PropertyProfile>();
-            
-            PropertyProfile name = new PropertyProfile();
-            name.setPropertyName(ContentModel.PROP_NAME.toString());
-            name.setPropertyType(PropertyType.TEXT);
-            folderPropertyProfiles.add(name);
-            this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                    this.repositoryProfile, 
-                    folderPropertyProfiles);
-           
-            // Get the folder and content node references
-            this.folderNodeRef = AlfrescoUtils.getRandomFolder(testCase);
-            this.contentNodeRef = AlfrescoUtils.getRandomContent(testCase);
-            
-            // Get the user name to use for this run
-            this.userName = AlfrescoUtils.getUserName();            
-        }
-        finally
-        {
-            this.authenticationComponent.clearCurrentSecurityContext();
-        }
-    }
-    
-    @Override
-    public void postRun(TestCase tc)
-    {
-        // Store the user name for later use
-        tc.setParam(PARAM_USER_NAME, AlfrescoInternalAPIDriver.this.userName);
-        
-        // Release the user
-        AlfrescoUtils.releaseUserName(AlfrescoInternalAPIDriver.this.userName);
-    }
-    
-    @Override
-    public void finish(TestCase testCase) 
-    {
-        super.finish(testCase);
-        usersPrepaired = false;
-    }
-
-    @Override
-    protected void doCreateContentBenchmark(final TestCase tc)
+public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements UnitsOfWork
+{
+    /**
+     * @see org.alfresco.benchmark.framework.UnitsOfWork#doCreateContentBenchmark(com.sun.japex.TestCase)
+     */
+    public void doCreateContentBenchmark(final TestCase tc)
     {
         try
         {
@@ -253,8 +86,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
         }       
     }
 
-    @Override
-    protected void doReadContentBenchmark(final TestCase tc)
+    public void doReadContentBenchmark(final TestCase tc)
     {
         try
         {
@@ -293,8 +125,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
         }         
     }
 
-    @Override
-    protected void doCreateFolder(TestCase tc)
+    public void doCreateFolder(TestCase tc)
     {
         try
         {
@@ -333,8 +164,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
         
     }
 
-    @Override
-    protected void doCreateVersion(TestCase tc)
+    public void doCreateVersion(TestCase tc)
     {   
         try
         {
@@ -382,8 +212,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoBenchmarkDriver
         
     }
 
-    @Override
-    protected void doReadProperties(TestCase tc)
+    public void doReadProperties(TestCase tc)
     {  
         try
         {

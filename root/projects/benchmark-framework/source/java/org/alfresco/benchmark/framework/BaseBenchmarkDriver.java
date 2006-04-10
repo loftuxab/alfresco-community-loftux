@@ -27,7 +27,7 @@ import com.sun.japex.TestCase;
 /**
  * @author Roy Wetherall
  */
-public abstract class BaseAlfrescoBenchmarkDriver extends JapexDriverBase
+public abstract class BaseBenchmarkDriver extends JapexDriverBase
 {        
     public static final String PARAM_ALFRESCO_BENCHAMRK_TYPE = "alfresco.bechmarkType";    
     public static final String PARAM_CONTENT_SIZE = "alfresco.contentSize";
@@ -139,53 +139,58 @@ public abstract class BaseAlfrescoBenchmarkDriver extends JapexDriverBase
     @Override
     public void run(final TestCase tc)
     {
-        try
+        if (this instanceof UnitsOfWork)
         {
-            BenchmarkType benchmarkType = getNextBenchmarkType();
-            
-            if (benchmarkType == null)
+            try
             {
-                throw new RuntimeException("Unable to determine the next benchmark type.  Has a usage policy been specified in the test case config?");
+                BenchmarkType benchmarkType = getNextBenchmarkType();
+                
+                if (benchmarkType == null)
+                {
+                    throw new RuntimeException("Unable to determine the next benchmark type.  Has a usage policy been specified in the test case config?");
+                }
+                
+                // Reset content size and mimetype
+                tc.setParam(PARAM_CONTENT_SIZE, "");
+                tc.setParam(PARAM_CONTENT_MIMETYPE, "");
+                
+                tc.setParam(PARAM_ALFRESCO_BENCHAMRK_TYPE, benchmarkType.toString());
+                switch (benchmarkType)
+                {            
+                    case CREATE_CONTENT:
+                    {
+                        ((UnitsOfWork)this).doCreateContentBenchmark(tc);
+                        break;
+                    }
+                    case READ_CONTENT:
+                    {
+                        ((UnitsOfWork)this).doReadContentBenchmark(tc);
+                        break;
+                    }
+                    case CREATE_FOLDER:
+                    {
+                        ((UnitsOfWork)this).doCreateFolder(tc);
+                        break;
+                    }
+                    case CREATE_VERSION:
+                    {
+                        ((UnitsOfWork)this).doCreateVersion(tc);
+                        break;
+                    }
+                    case READ_PROPERTIES:
+                    {
+                        ((UnitsOfWork)this).doReadProperties(tc);
+                        break;
+                    }
+                }
             }
-            
-            // Reset content size and mimetype
-            tc.setParam(PARAM_CONTENT_SIZE, "");
-            tc.setParam(PARAM_CONTENT_MIMETYPE, "");
-            
-            tc.setParam(PARAM_ALFRESCO_BENCHAMRK_TYPE, benchmarkType.toString());
-            switch (benchmarkType)
-            {            
-                case CREATE_CONTENT:
-                {
-                    doCreateContentBenchmark(tc);
-                    break;
-                }
-                case READ_CONTENT:
-                {
-                    doReadContentBenchmark(tc);
-                    break;
-                }
-                case CREATE_FOLDER:
-                {
-                    doCreateFolder(tc);
-                    break;
-                }
-                case CREATE_VERSION:
-                {
-                    doCreateVersion(tc);
-                    break;
-                }
-                case READ_PROPERTIES:
-                {
-                    doReadProperties(tc);
-                    break;
-                }
+            catch (Throwable exception)
+            {
+                exception.printStackTrace();
             }
         }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }        
+        
+        // Otherwise do nothing, leaving it up to the implementation of the driver to sort it out
     }
     
     @Override
@@ -193,14 +198,4 @@ public abstract class BaseAlfrescoBenchmarkDriver extends JapexDriverBase
     {
         ReportFactory.generate(testCase);
     }
-    
-    protected abstract void doCreateContentBenchmark(TestCase tc);
-    
-    protected abstract void doReadContentBenchmark(TestCase tc);
-    
-    protected abstract void doCreateFolder(TestCase tc);
-    
-    protected abstract void doCreateVersion(TestCase tc);
-    
-    protected abstract void doReadProperties(TestCase tc);
 }

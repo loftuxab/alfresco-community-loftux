@@ -31,6 +31,30 @@ public class PropertyProfile
     private Map<PropertyRestriction, Object> restrictions = new HashMap<PropertyRestriction, Object>();
     
     /**
+     * Helper method to create a property profile for the small test property
+     * 
+     * @param name
+     * @return
+     */
+    public static PropertyProfile createSmallTextProperty(String name)
+    {
+        // Rely on the default constraints to provide a small text string
+        return new PropertyProfile(name, PropertyType.TEXT);
+    }
+    
+    /**
+     * Constructor
+     * 
+     * @param name  the name of the property
+     * @param type  the type of the property
+     */
+    public PropertyProfile(String name, PropertyType type)
+    {
+        this.name = name;
+        this.type = type;
+    }
+    
+    /**
      * Set the property name
      * 
      * @param name  the property name

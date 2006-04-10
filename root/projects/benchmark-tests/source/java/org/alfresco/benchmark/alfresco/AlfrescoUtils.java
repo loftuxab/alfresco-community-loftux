@@ -163,60 +163,21 @@ public class AlfrescoUtils
             contentPropertyProfiles = new ArrayList<PropertyProfile>();
             
             // cm:content properties
-            PropertyProfile name = new PropertyProfile();
-            name.setPropertyName(ContentModel.PROP_NAME.toString());
-            name.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(name);
-            PropertyProfile content = new PropertyProfile();
-            content.setPropertyName(ContentModel.PROP_CONTENT.toString());
-            content.setPropertyType(PropertyType.CONTENT);
-            contentPropertyProfiles.add(content);
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString()));
+            contentPropertyProfiles.add(new PropertyProfile(ContentModel.PROP_CONTENT.toString(), PropertyType.CONTENT));
             
             // cm:dublincore properties
-            PropertyProfile publisher = new PropertyProfile();
-            publisher.setPropertyName(AlfrescoUtils.DC_PUBLISHER.toString());
-            publisher.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(publisher);
-            PropertyProfile contributer = new PropertyProfile();
-            contributer.setPropertyName(AlfrescoUtils.DC_CONTRIBUTER.toString());
-            contributer.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(contributer);
-            PropertyProfile type = new PropertyProfile();
-            type.setPropertyName(AlfrescoUtils.DC_TYPE.toString());
-            type.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(type);
-            PropertyProfile identifier = new PropertyProfile();
-            identifier.setPropertyName(AlfrescoUtils.DC_IDENTIFIER.toString());
-            identifier.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(identifier);
-            PropertyProfile dcsource = new PropertyProfile();
-            dcsource.setPropertyName(AlfrescoUtils.DC_DCSOURCE.toString());
-            dcsource.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(dcsource);
-            PropertyProfile coverage = new PropertyProfile();
-            coverage.setPropertyName(AlfrescoUtils.DC_COVERAGE.toString());
-            coverage.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(coverage);
-            PropertyProfile rights = new PropertyProfile();
-            rights.setPropertyName(AlfrescoUtils.DC_RIGHTS.toString());
-            rights.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(rights);
-            PropertyProfile subject = new PropertyProfile();
-            subject.setPropertyName(AlfrescoUtils.DC_SUBJECT.toString());
-            subject.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(subject);
-            PropertyProfile author = new PropertyProfile();
-            author.setPropertyName(AlfrescoUtils.DC_AUTHOR.toString());
-            author.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(author);
-            PropertyProfile title = new PropertyProfile();
-            title.setPropertyName(ContentModel.PROP_TITLE.toString());
-            title.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(title);
-            PropertyProfile description = new PropertyProfile();
-            description.setPropertyName(ContentModel.PROP_DESCRIPTION.toString());
-            description.setPropertyType(PropertyType.TEXT);
-            contentPropertyProfiles.add(description);
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_PUBLISHER.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_CONTRIBUTER.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_TYPE.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_IDENTIFIER.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_DCSOURCE.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_COVERAGE.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_RIGHTS.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_SUBJECT.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(AlfrescoUtils.DC_AUTHOR.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(ContentModel.PROP_TITLE.toString()));
+            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(ContentModel.PROP_DESCRIPTION.toString()));
         }
         
         return contentPropertyProfiles;
@@ -234,16 +195,14 @@ public class AlfrescoUtils
         
         if (nameValue == null)
         {
-            PropertyProfile name = new PropertyProfile();
-            name.setPropertyName(ContentModel.PROP_NAME.toString());
-            name.setPropertyType(PropertyType.TEXT);
-            folderPropertyProfiles.add(name);
+            folderPropertyProfiles.add(PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString()));
             Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(
                     repositoryProfile, 
                     folderPropertyProfiles);
             
             nameValue = (String)propertyValues.get(ContentModel.PROP_NAME.toString());
         }
+        
         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
         folderProps.put(ContentModel.PROP_NAME, nameValue);
         return nodeService.createNode(

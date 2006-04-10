@@ -16,11 +16,14 @@
  */
 package org.alfresco.benchmark.framework.dataprovider;
 
+import java.io.FileInputStream;
+import java.util.Properties;
+
 import com.sun.japex.TestCase;
 
 public class RepositoryProfile
 {
-    private static final String PARAM_PREFIX = "alfrsco.repositoryProfile.";
+    private static final String PARAM_PREFIX = "repositoryProfile.";
     private static final String PARAM_FOLDER_DEPTH_AVERAGE = PARAM_PREFIX + "folderDepth.average";
     private static final String PARAM_FOLDER_DEPTH_VARIATION = PARAM_PREFIX + "folderDepth.variation";
     private static final String PARAM_DOCUMENTS_IN_FOLDER_COUNT_AVERAGE = PARAM_PREFIX + "documentsInFolderCount.average";
@@ -67,6 +70,53 @@ public class RepositoryProfile
             repositoryProfile.setSubFoldersCountVariation(testCase.getIntParam(PARAM_SUB_FOLDERS_COUNT_VARIATION));
         }
         
+        return repositoryProfile;
+    }
+    
+    public static RepositoryProfile createRepositoryProfile(String propertyFileLocation)
+    {
+        RepositoryProfile repositoryProfile = new RepositoryProfile();
+        try
+        {
+            Properties props = new Properties();
+            props.load(new FileInputStream(propertyFileLocation));
+            
+            // Set the various attribute values
+            String folderDepthAverageValue = props.getProperty(PARAM_FOLDER_DEPTH_AVERAGE);
+            if (folderDepthAverageValue != null)
+            {
+                repositoryProfile.setFolderDepthAverage(Integer.valueOf(folderDepthAverageValue));
+            }
+            String folderDepthVariationValue = props.getProperty(PARAM_FOLDER_DEPTH_VARIATION);
+            if (folderDepthVariationValue != null)
+            {
+                repositoryProfile.setFolderDepthVariation(Integer.valueOf(folderDepthVariationValue));
+            }
+            String docsInFolderCountAverageValue = props.getProperty(PARAM_DOCUMENTS_IN_FOLDER_COUNT_AVERAGE);
+            if (docsInFolderCountAverageValue != null)
+            {
+                repositoryProfile.setDocumentsInFolderCountAverage(Integer.valueOf(docsInFolderCountAverageValue));
+            }
+            String docsInFolderCountVariationValue = props.getProperty(PARAM_DOCUMENTS_IN_FOLDER_COUNT_VARIATION);
+            if (docsInFolderCountVariationValue != null)
+            {
+                repositoryProfile.setDocumentsInFolderCountVariation(Integer.valueOf(docsInFolderCountVariationValue));
+            }
+            String subFoldersCountAverageValue = props.getProperty(PARAM_SUB_FOLDERS_COUNT_AVERAGE);
+            if (subFoldersCountAverageValue != null)
+            {
+                repositoryProfile.setSubFoldersCountAverage(Integer.valueOf(subFoldersCountAverageValue));
+            }
+            String subFolderCountVariationValue = props.getProperty(PARAM_SUB_FOLDERS_COUNT_VARIATION);
+            if (subFolderCountVariationValue != null)
+            {
+                repositoryProfile.setSubFoldersCountVariation(Integer.valueOf(subFolderCountVariationValue));
+            }
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException("Unable to create repository profile from propeties file " + propertyFileLocation);
+        }
         return repositoryProfile;
     }
     
