@@ -50,6 +50,9 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     protected PersonService personService;
     protected PermissionService permissionService;
     
+    protected NodeService smallNodeService;
+    protected ContentService smallContentService;
+    
     protected DataLoaderComponent dataLoaderComponent;
     
     protected Map<String, Object> contentPropertyValues; 
@@ -72,6 +75,9 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         this.versionService = (VersionService)AlfrescoUtils.getApplicationContext().getBean("VersionService");
         this.personService = (PersonService)AlfrescoUtils.getApplicationContext().getBean("PersonService");
         this.permissionService = (PermissionService)AlfrescoUtils.getApplicationContext().getBean("PermissionService");
+        
+        this.smallNodeService = (NodeService)AlfrescoUtils.getApplicationContext().getBean("nodeService");
+        this.smallContentService = (ContentService)AlfrescoUtils.getApplicationContext().getBean("contentService");
         
         this.dataLoaderComponent = (DataLoaderComponent)AlfrescoUtils.getApplicationContext().getBean("dataLoaderComponent");
     }

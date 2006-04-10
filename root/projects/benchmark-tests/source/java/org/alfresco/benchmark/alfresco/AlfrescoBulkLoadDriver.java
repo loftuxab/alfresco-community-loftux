@@ -115,7 +115,7 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
         String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
         folderProps.put(ContentModel.PROP_NAME, nameValue);
-        NodeRef bulkLoadFolder = nodeService.createNode(
+        NodeRef bulkLoadFolder = smallNodeService.createNode(
                 this.folderNodeRef, 
                 ContentModel.ASSOC_CONTAINS, 
                 QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
@@ -128,7 +128,7 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
             String contentName = "bulkLoad_" + i;
             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
             properties.put(ContentModel.PROP_NAME, contentName);
-            NodeRef contentNodeRef = nodeService.createNode(
+            NodeRef contentNodeRef = smallNodeService.createNode(
                     bulkLoadFolder, 
                     ContentModel.ASSOC_CONTAINS, 
                     QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, contentName),
@@ -139,7 +139,7 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
             ContentData contentData = this.contentData[i];
             
             // Upload the content
-            ContentWriter contentWriter = this.contentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);           
+            ContentWriter contentWriter = this.smallContentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);           
             contentWriter.setEncoding(contentData.getEncoding());
             contentWriter.setMimetype(contentData.getMimetype());
             contentWriter.putContent(contentData.getFile());
