@@ -1,12 +1,10 @@
-<project name="BenchmarkFramework" default="run"  basedir=".">
+<project name="BenchmarkFramework" default="build"  basedir=".">
 
    <path id="path.common" path="${basedir}/../../common"/>
    <property name="dir.common" refid="path.common"/>
    <import file="${dir.common}/common.xml"/>
 
     <property environment="env"/>
-    
-    <property name="config" value="config/testConfig.xml"/>
 
     <path id="class.path">
         <fileset dir="./lib/japex" includes="*.jar"/>   
@@ -28,36 +26,6 @@
               </patternset>
           </fileset>
       </copy>
-    </target>
-
-    <target name="run">
-        <java dir="." fork="true" classname="com.sun.japex.Japex">
-            <jvmarg value="-server"/>
-            <jvmarg value="-Xms512m"/>
-            <jvmarg value="-Xmx1024m"/>
-            <jvmarg value="-Xss64k"/>
-            <classpath refid="class.path"/>
-            <arg line="${config}"/>
-        </java>
-    </target>
-    
-    <target name="debug-nb">
-        <property name="src.folders" value="./src:./src/binding:../../src:../../src/binding"/>
-        <path id="cp">
-            <pathelement location="../../build/classes"/>
-            <path refid="class.path"/>
-        </path>
-        <nbjpdastart addressproperty="jpda.address" name="Japex" transport="dt_socket">
-            <classpath refid="cp"/>
-        </nbjpdastart>
-        <java classname="com.sun.japex.Japex" fork="true">
-            <classpath refid="cp"/>
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Djava.compiler=none"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-            <arg line="${config}"/>
-        </java>
-    </target>
+    </target>    
     
 </project>
