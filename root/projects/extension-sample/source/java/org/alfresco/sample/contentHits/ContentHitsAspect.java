@@ -6,6 +6,8 @@ import org.alfresco.repo.content.ContentServicePolicies;
 import org.alfresco.repo.node.NodeServicePolicies;
 import org.alfresco.repo.policy.JavaBehaviour;
 import org.alfresco.repo.policy.PolicyComponent;
+import org.alfresco.repo.policy.Behaviour.NotificationFrequency;
+import org.alfresco.service.cmr.repository.InvalidNodeRefException;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.NamespaceService;
@@ -63,15 +65,15 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
         this.policyComponent.bindClassBehaviour(
                                  QName.createQName(NamespaceService.ALFRESCO_URI, "onAddAspect"),
                                  ASPECT_CONTENT_HITS,
-                                 new JavaBehaviour(this, "onAddAspect"));
+                                 new JavaBehaviour(this, "onAddAspect", NotificationFrequency.FIRST_EVENT));
         this.policyComponent.bindClassBehaviour(
                                  ContentServicePolicies.ON_CONTENT_READ,
                                  ASPECT_CONTENT_HITS,
-                                 new JavaBehaviour(this, "onContentRead"));
+                                 new JavaBehaviour(this, "onContentRead", NotificationFrequency.TRANSACTION_COMMIT));
         this.policyComponent.bindClassBehaviour(
                                  ContentServicePolicies.ON_CONTENT_UPDATE,
                                  ASPECT_CONTENT_HITS,
-                                 new JavaBehaviour(this, "onContentUpdate"));
+                                 new JavaBehaviour(this, "onContentUpdate", NotificationFrequency.TRANSACTION_COMMIT));
     }
 
     /**
@@ -85,11 +87,8 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
      */
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
-        if (aspectTypeQName.equals(ASPECT_CONTENT_HITS) == true)
-        {
-            // Set the count started date
-            this.nodeService.setProperty(nodeRef, PROP_COUNT_STARTED_DATE, new Date());
-        }
+        // Set the count started date
+        this.nodeService.setProperty(nodeRef, PROP_COUNT_STARTED_DATE, new Date());
     }
     
     /**
@@ -124,8 +123,15 @@ public class ContentHitsAspect implements ContentServicePolicies.OnContentReadPo
     public void onContentUpdate(NodeRef nodeRef, boolean newContent)
     {
         // Increment the update count property value
-        Integer currentValue = (Integer)this.nodeService.getProperty(nodeRef, PROP_UPDATE_COUNT);
-        int newValue = currentValue.intValue() + 1;
-        this.nodeService.setProperty(nodeRef, PROP_UPDATE_COUNT, newValue);        
+        try
+        {
+            Integer currentValue = (Integer)this.nodeService.getProperty(nodeRef, PROP_UPDATE_COUNT);
+            int newValue = currentValue.intValue() + 1;
+            this.nodeService.setProperty(nodeRef, PROP_UPDATE_COUNT, newValue);
+        }
+        catch(InvalidNodeRefException e)
+        {
+            // Note: just in case node has been deleted
+        }
     }    
 }

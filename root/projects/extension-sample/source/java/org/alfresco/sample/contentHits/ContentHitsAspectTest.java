@@ -20,69 +20,122 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.transaction.UserTransaction;
+
+import junit.framework.TestCase;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseAlfrescoSpringTest;
+import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.util.ApplicationContextHelper;
+import org.springframework.context.ApplicationContext;
 
 /**
  * Content hits apsect sample unit test.
  * 
  * @author Roy Wetherall
  */
-public class ContentHitsAspectTest extends BaseAlfrescoSpringTest
+public class ContentHitsAspectTest extends TestCase
 {
+    private static ApplicationContext applicationContext = ApplicationContextHelper.getApplicationContext();
+    protected NodeService nodeService;
+    protected ContentService contentService;
+    protected TransactionService transactionService;
+    protected AuthenticationComponent authenticationComponent;
+
+    
+    @Override
+    public void setUp()
+    {
+        nodeService = (NodeService)applicationContext.getBean("nodeService");
+        contentService = (ContentService)applicationContext.getBean("contentService");
+        authenticationComponent = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
+        transactionService = (TransactionService)applicationContext.getBean("transactionComponent");
+    
+        // Authenticate as the system user
+        authenticationComponent.setSystemUserAsCurrentUser();
+    }
+
+    @Override
+    public void tearDown()
+    {
+        authenticationComponent.clearCurrentSecurityContext();
+    }
+    
+    
     /**
      * Test the contentHits aspect behaviour
      */
     public void testContentHitsApsectBehaviour()
+        throws Exception
     {
-        // Get the node and content services
-        NodeService nodeService = (NodeService)this.applicationContext.getBean("nodeService");
-        ContentService contentService = (ContentService)this.applicationContext.getBean("contentService");
+        NodeRef nodeRef = null;
         
-        // Create the content node
-        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
-        properties.put(ContentModel.PROP_NAME, "contentHits.txt");
-        NodeRef nodeRef = nodeService.createNode(
-                this.rootNodeRef,
-                ContentModel.ASSOC_CHILDREN,
-                QName.createQName("{contentHitsAspectTest}countedContent"),
-                ContentModel.TYPE_CONTENT,
-                properties).getChildRef();
+        UserTransaction userTransaction1 = transactionService.getUserTransaction();
+        try
+        {
+            userTransaction1.begin();
         
-        // Apply the content hits aspect
-        nodeService.addAspect(nodeRef, ContentHitsAspect.ASPECT_CONTENT_HITS, null);
-        
-        // Check the count hit values
-        checkHitCountValues(nodeService, nodeRef, 0, 0);
-        
-        // Add some content to the node
-        ContentWriter contentWriter = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
-        contentWriter.setEncoding("UTF-8");
-        contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        contentWriter.putContent("Putting some initial content onto the node.");
-        
-        // Check the content hit values
-        checkHitCountValues(nodeService, nodeRef, 1, 0);
-        
-        // Read the content a couple of times
-        contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
-        contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
-        
-        // Check the content hit values
-        checkHitCountValues(nodeService, nodeRef, 1, 2);
-        
-        // Update the content again
-        ContentWriter contentWriter2 = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
-        contentWriter2.putContent("Updating the existing content.");
-        
-        // Check the content hit values
-        checkHitCountValues(nodeService, nodeRef, 2, 2);
+            // Create the store and get the root node
+            StoreRef storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "Test_" + System.currentTimeMillis());
+            NodeRef rootNodeRef = this.nodeService.getRootNode(storeRef);
+
+            // Create the content node
+            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+            properties.put(ContentModel.PROP_NAME, "contentHits.txt");
+            nodeRef = nodeService.createNode(rootNodeRef, ContentModel.ASSOC_CHILDREN, QName.createQName("{contentHitsAspectTest}countedContent"),
+                    ContentModel.TYPE_CONTENT, properties).getChildRef();
+            
+            // Apply the content hits aspect
+            nodeService.addAspect(nodeRef, ContentHitsAspect.ASPECT_CONTENT_HITS, null);
+            
+            // Check the count hit values
+            checkHitCountValues(nodeService, nodeRef, 0, 0);
+            
+            // Add some content to the node
+            ContentWriter contentWriter = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+            contentWriter.setEncoding("UTF-8");
+            contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+            contentWriter.putContent("Putting some initial content onto the node.");
+            
+            // Read the content a couple of times
+            contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
+            contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
+            
+            // Update the content again
+            ContentWriter contentWriter2 = contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+            contentWriter2.putContent("Updating the existing content.");
+
+            // Check the content hit values
+            checkHitCountValues(nodeService, nodeRef, 0, 0);
+
+            userTransaction1.commit();
+        }
+        catch(Exception e)
+        {
+            try { userTransaction1.rollback(); } catch (IllegalStateException ee) {}
+            throw e;
+        }        
+
+        UserTransaction userTransaction2 = transactionService.getUserTransaction();
+        try
+        {
+            userTransaction2.begin();
+            checkHitCountValues(nodeService, nodeRef, 1, 1);
+            userTransaction2.rollback();
+        }
+        catch(Exception e)
+        {
+            try { userTransaction2.rollback(); } catch (IllegalStateException ee) {}
+            throw e;
+        }        
     }
     
     /**
