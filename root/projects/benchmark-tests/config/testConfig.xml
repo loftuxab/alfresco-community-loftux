@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testSuite name="ParsingPerformance" xmlns="http://www.sun.com/japex/testSuite">
 
+    <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/core/build/classes"/>       
+
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/lib/jdsl/*.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/lib/*.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-framework/build/classes"/>
@@ -14,7 +16,6 @@
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/3rd-party/lib/treecache/*.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/3rd-party/lib/openoffice/*.jar"/>
 
-    <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/core/build/dist/core.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/repository/build/dist/repository.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/repository/config"/>
 
@@ -49,13 +50,14 @@
         
         <!-- Number of available users -->
         <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
-    
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runTime" value="00:30"/> 
+
+        <param name="japex.warmupIterations" value="0"/>
+    	<param name="japex.runTime" value="00:30"/>
 <!--    	<param name="japex.runIterations" value="20"/>-->
-    	
+
     	<param name="japex.runDelay" value="0"/>
     	<param name="japex.runDelayVariation" value="0"/>
+
     </testCase>
 
 </testSuite>
