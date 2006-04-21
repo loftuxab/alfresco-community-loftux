@@ -32,8 +32,6 @@ import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.security.AuthorityService;
@@ -48,9 +46,6 @@ import org.alfresco.util.GUID;
  */
 public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
 {
-    /** The spaces store reference */
-    private StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
-    
     /** The node service */
     private NodeService nodeService;
     
@@ -160,8 +155,7 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     public LoadedData loadData(RepositoryProfile repositoryProfile)
     {   
         // Get the company home node
-        ResultSet rs = this.searchService.query(this.storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home");
-        final NodeRef companyHomeNodeRef = rs.getNodeRef(0);
+        final NodeRef companyHomeNodeRef = AlfrescoUtils.getCompanyHomeNodeRef(this.searchService, AlfrescoUtils.storeRef);
         
         // Create a folder in company home within which we will create all the test data
         final Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
@@ -174,7 +168,7 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                 return AlfrescoDataLoaderComponentImpl.this.nodeService.createNode(
                         companyHomeNodeRef, 
                         ContentModel.ASSOC_CONTAINS, 
-                        QName.createQName(NamespaceService.APP_MODEL_1_0_URI, "test_data_" + System.currentTimeMillis()),
+                        QName.createQName(NamespaceService.APP_MODEL_1_0_URI, DataLoaderComponent.BENCHMARK_OBJECT_PREFIX + System.currentTimeMillis()),
                         ContentModel.TYPE_FOLDER,
                         folderProps).getChildRef();
             }           
@@ -275,7 +269,7 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                     // Create the users home folder
                     NodeRef companyHome = AlfrescoUtils.getCompanyHomeNodeRef(
                                                         AlfrescoDataLoaderComponentImpl.this.searchService,
-                                                        AlfrescoDataLoaderComponentImpl.this.storeRef);
+                                                        AlfrescoUtils.storeRef);
                     NodeRef homeFolder = AlfrescoUtils.createFolderNode(
                                                         AlfrescoDataLoaderComponentImpl.this.nodeService,
                                                         new RepositoryProfile(),

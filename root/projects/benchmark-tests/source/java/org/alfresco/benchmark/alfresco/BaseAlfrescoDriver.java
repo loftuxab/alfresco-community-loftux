@@ -30,6 +30,7 @@ import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.version.VersionService;
@@ -49,6 +50,7 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     protected TransactionService transactionService;
     protected PersonService personService;
     protected PermissionService permissionService;
+    protected SearchService searchService;
     
     protected NodeService smallNodeService;
     protected ContentService smallContentService;
@@ -57,10 +59,11 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     
     protected Map<String, Object> contentPropertyValues; 
     protected Map<String, Object> folderPropertyValues;
-    protected NodeRef rootFolder;
+    //protected NodeRef rootFolder;
     protected NodeRef contentNodeRef;
     protected NodeRef folderNodeRef;
     protected String userName;
+    
     
     private static boolean usersPrepaired = false;
     
@@ -69,6 +72,7 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     {
         // Get the required services
         this.nodeService = (NodeService)AlfrescoUtils.getApplicationContext().getBean("NodeService");
+        this.searchService = (SearchService)AlfrescoUtils.getApplicationContext().getBean("SearchService");
         this.contentService = (ContentService)AlfrescoUtils.getApplicationContext().getBean("ContentService");
         this.authenticationComponent = (AuthenticationComponent)AlfrescoUtils.getApplicationContext().getBean("authenticationComponent");
         this.transactionService = (TransactionService)AlfrescoUtils.getApplicationContext().getBean("transactionComponent");
@@ -90,16 +94,11 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
             super.prepare(tc);             
             
             // Set the authentication
-            this.authenticationComponent.setSystemUserAsCurrentUser();
-            
+            this.authenticationComponent.setSystemUserAsCurrentUser();            
             try
             {           
-                // Get the test case folder node ref
-                this.rootFolder = AlfrescoUtils.getTestCaseRootFolder(
-                        this.dataLoaderComponent, 
-                        this.nodeService, 
-                        this.repositoryProfile, 
-                        tc);
+                // Get the root folders
+                final List<NodeRef> rootFolders = AlfrescoUtils.getRootFolders(this.searchService, this.nodeService);
                 
                 if (BaseAlfrescoDriver.usersPrepaired == false)
                 {
@@ -121,14 +120,18 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                                     BaseAlfrescoDriver.this.personService, 
                                     BaseAlfrescoDriver.this.nodeService,
                                     numberOfAvailableUsers);
-                            for (String userName : users)
+                            
+                            for (NodeRef rootFolder : rootFolders)
                             {
-                                // TODO how do we check this without doing it over and over again!!
-                                BaseAlfrescoDriver.this.permissionService.setPermission(BaseAlfrescoDriver.this.rootFolder, userName, PermissionService.FULL_CONTROL, true);   
-                            }
-                            if (BaseAlfrescoDriver.this.permissionService.getInheritParentPermissions(BaseAlfrescoDriver.this.rootFolder) == false)
-                            {
-                                BaseAlfrescoDriver.this.permissionService.setInheritParentPermissions(BaseAlfrescoDriver.this.rootFolder, true);
+                                for (String userName : users)
+                                {
+                                    // TODO how do we check this without doing it over and over again!!
+                                    BaseAlfrescoDriver.this.permissionService.setPermission(rootFolder, userName, PermissionService.FULL_CONTROL, true);   
+                                }
+                                if (BaseAlfrescoDriver.this.permissionService.getInheritParentPermissions(rootFolder) == false)
+                                {
+                                    BaseAlfrescoDriver.this.permissionService.setInheritParentPermissions(rootFolder, true);
+                                }
                             }
                             
                             BaseAlfrescoDriver.usersPrepaired = true;
@@ -176,8 +179,8 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                     folderPropertyProfiles);
            
             // Get the folder and content node references
-            this.folderNodeRef = AlfrescoUtils.getRandomFolder(testCase);
-            this.contentNodeRef = AlfrescoUtils.getRandomContent(testCase);
+            this.folderNodeRef = AlfrescoUtils.getRandomFolder(this.searchService, this.nodeService);
+            this.contentNodeRef = AlfrescoUtils.getRandomContent(this.searchService, this.nodeService);
             
             // Get the user name to use for this run
             this.userName = AlfrescoUtils.getUserName();            

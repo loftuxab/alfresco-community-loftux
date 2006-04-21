@@ -25,7 +25,6 @@ import java.util.Set;
 
 import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.DataLoaderComponent;
-import org.alfresco.benchmark.framework.LoadedData;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
@@ -43,10 +42,9 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.namespace.RegexQNamePattern;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import com.sun.japex.TestCase;
 
 /**
  * @author Roy Wetherall
@@ -57,11 +55,13 @@ public class AlfrescoUtils
     
     private static List<PropertyProfile> contentPropertyProfiles;
     
-    private static Map<String, NodeRef> testCaseFolder = new HashMap<String, NodeRef>(5);
-    private static Map<String, List<NodeRef>> testCaseFolders = new HashMap<String, List<NodeRef>>(5);
-    private static Map<String, List<NodeRef>> testCaseContent = new HashMap<String, List<NodeRef>>(5);
+    //private static Map<String, NodeRef> testCaseFolder = new HashMap<String, NodeRef>(5);
+    //private static Map<String, List<NodeRef>> testCaseFolders = new HashMap<String, List<NodeRef>>(5);
+    //private static Map<String, List<NodeRef>> testCaseContent = new HashMap<String, List<NodeRef>>(5);
     
-    private static List<String> availableUsers;       
+    private static List<String> availableUsers;    
+    
+    public static StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     
     // Model constants
     public static QName DC_PUBLISHER = QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "publisher");
@@ -82,70 +82,83 @@ public class AlfrescoUtils
         }
         
         return applicationContext;
-    }
+    }    
     
-    public static synchronized NodeRef getTestCaseRootFolder(
-            DataLoaderComponent dataLoaderComponent,
-            NodeService nodeService, 
-            RepositoryProfile repositoryProfile, 
-            TestCase testCase)
+    private static List<NodeRef> rootFolders;
+    
+    public static synchronized List<NodeRef> getRootFolders(SearchService searchService, NodeService nodeService)
     {
-        NodeRef result = testCaseFolder.get(testCase.getName());
-        if (result == null)
+        if (rootFolders == null)
         {
-            LoadedData loadedData = dataLoaderComponent.loadData(repositoryProfile);
-            NodeRef rootFolder = new NodeRef(loadedData.getRootFolder());
+            NodeRef companyHome = getCompanyHomeNodeRef(searchService, storeRef);
             
-            List<NodeRef> folders = new ArrayList<NodeRef>(50);
-            List<NodeRef> content = new ArrayList<NodeRef>(200);
-            getFolderAndContentLists(nodeService, folders, content, rootFolder);
-            
-            testCaseFolder.put(testCase.getName(), rootFolder);
-            testCaseFolders.put(testCase.getName(), folders);
-            testCaseContent.put(testCase.getName(), content);
-            result = rootFolder;
+            List<ChildAssociationRef> assocs = nodeService.getChildAssocs(companyHome, RegexQNamePattern.MATCH_ALL, new RegexQNamePattern(NamespaceService.APP_MODEL_1_0_URI, AlfrescoDataLoaderComponentImpl.BENCHMARK_OBJECT_PREFIX + ".*"));
+            if (assocs.size() == 0)
+            {
+                throw new RuntimeException("There is no benchmark data loaded in to the repository.");
+            }
+            rootFolders = new ArrayList<NodeRef>(assocs.size());
+            for (ChildAssociationRef assoc : assocs)
+            {
+                rootFolders.add(assoc.getChildRef());
+            }
         }
-        return result;
+        return rootFolders;
     }
    
-    public static synchronized NodeRef getRandomFolder(TestCase testCase)
-    {
-        List<NodeRef> folders = testCaseFolders.get(testCase.getName());
-        if (folders == null)
-        {
-            throw new RuntimeException("The test case folders list has not been populated");
-        }
-        int randValue = BenchmarkUtils.rand.nextInt(folders.size());
-        return folders.get(randValue);
+    public static NodeRef getRandomFolder(SearchService searchService, NodeService nodeService)
+    {       
+        List<NodeRef> folders = new ArrayList<NodeRef>(); 
+        getRandomFolder(nodeService, getRootFolders(searchService, nodeService), folders);
+        NodeRef folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));
+        return folder;
     }
     
-    public static synchronized NodeRef getRandomContent(TestCase testCase)
+    private static void getRandomFolder(NodeService nodeService, List<NodeRef> folders, List<NodeRef> result)
     {
-        List<NodeRef> content = testCaseContent.get(testCase.getName());
-        if (content == null)
+        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
+        NodeRef folder = folders.get(randIndex);
+        result.add(folder);
+
+        // Get the sub-folders of the folder
+        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(folder);
+        List<NodeRef> subFolders = new ArrayList<NodeRef>(assocs.size());
+        for (ChildAssociationRef assoc : assocs)
         {
-            throw new RuntimeException("The test case content list has not been populated");
+            NodeRef subFolder = assoc.getChildRef();
+            
+            if (nodeService.getType(subFolder).getLocalName().equals("folder") == true)
+            {
+                subFolders.add(subFolder);
+            }
         }
-        int randValue = BenchmarkUtils.rand.nextInt(content.size());
-        return content.get(randValue);
-    }
-    
-    private static void getFolderAndContentLists(NodeService nodeService, List<NodeRef> folders, List<NodeRef> content, NodeRef folder)
-    {
-        folders.add(folder);
         
-        for (ChildAssociationRef childAssoc : nodeService.getChildAssocs(folder))
+        if (subFolders.size() != 0)
         {
-            NodeRef childNodeRef = childAssoc.getChildRef();
-            if (nodeService.getType(childNodeRef).toString().contains("folder") == true)
+            getRandomFolder(nodeService, subFolders, result);
+        }
+    }
+    
+    public static synchronized NodeRef getRandomContent(SearchService searchService, NodeService nodeService)
+    {
+        List<NodeRef> contentList = new ArrayList<NodeRef>();
+        
+        while (contentList.size() == 0)
+        {
+            NodeRef folder = getRandomFolder(searchService, nodeService);
+            
+            for (ChildAssociationRef assoc : nodeService.getChildAssocs(folder))
             {
-                getFolderAndContentLists(nodeService, folders, content, childNodeRef);
+                NodeRef child = assoc.getChildRef();
+                if (nodeService.getType(child).getLocalName().equals("content") == true)
+                {
+                    contentList.add(child);
+                }
             }
-            else if (nodeService.getType(childNodeRef).toString().contains("content") == true)
-            {
-                content.add(childNodeRef);
-            }
-        }         
+        }
+        
+        NodeRef content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
+        return content;
     }
     
     public static NodeRef getCompanyHomeNodeRef(SearchService searchService, StoreRef storeRef)
