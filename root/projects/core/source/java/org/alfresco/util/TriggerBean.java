@@ -16,66 +16,62 @@
  */
 package org.alfresco.util;
 
-import java.text.ParseException;
-import java.util.Calendar;
+import java.util.Date;
 
-import org.springframework.scheduling.quartz.SimpleTriggerBean;
+import org.quartz.Scheduler;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
 
-/**
- * Extended trigger bean to allow the setting of first firing
- * using hours past midnight and minutes past the hour.
- * <p>
- * The default start time for the trigger will be next midnight
- * after the bean is initialised.  The <code>delay</code> property
- * can still be used as an offset from this time.
- * 
- * @author Derek Hulley
- */
-public class TriggerBean extends SimpleTriggerBean
+public class TriggerBean extends AbstractTriggerBean
 {
-    private static final long serialVersionUID = 6526305743899044951L;
+    public long startDelay = 0;
 
-    private int hour = 0;
-    private int minute = 0;
+    public long repeatInterval = 0;
 
-    /**
-     * @param hour the hour in the day: 0 - 23.
-     */
-    public void setHour(int hour)
+    public int repeatCount = SimpleTrigger.REPEAT_INDEFINITELY;
+
+    public TriggerBean()
     {
-        this.hour = hour;
+        super();
     }
-    
-    /**
-     * @param minute the minute in the hour: 0 - 59.
-     */
-    public void setMinute(int minute)
+
+    public int getRepeatCount()
     {
-        this.minute = minute;
+        return repeatCount;
     }
-    
+
+    public void setRepeatCount(int repeatCount)
+    {
+        this.repeatCount = repeatCount;
+    }
+
+    public long getRepeatInterval()
+    {
+        return repeatInterval;
+    }
+
+    public void setRepeatInterval(long repeatInterval)
+    {
+        this.repeatInterval = repeatInterval;
+    }
+
+    public long getStartDelay()
+    {
+        return startDelay;
+    }
+
+    public void setStartDelay(long startDelay)
+    {
+        this.startDelay = startDelay;
+    }
+
     @Override
-    public void afterPropertiesSet() throws ParseException
+    public Trigger getTrigger() throws Exception
     {
-        // set the start time
-        Calendar calendar = Calendar.getInstance();
-        calendar.setLenient(true);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
-        int nowMinute = calendar.get(Calendar.MINUTE);
-        
-        // advance the day if the hour and minute are behind the current
-        if (hour < nowHour || (hour == nowHour && minute <= nowMinute))
-        {
-            calendar.set(Calendar.DAY_OF_MONTH, day + 1);
-        }
-        // set the hour and minute
-        calendar.set(Calendar.HOUR_OF_DAY, hour);
-        calendar.set(Calendar.MINUTE, minute);
-        // set the bean start time
-        setStartTime(calendar.getTime());
-        
-        // now do the default start
-        super.afterPropertiesSet();
+        SimpleTrigger trigger = new SimpleTrigger(getBeanName(), Scheduler.DEFAULT_GROUP);
+        trigger.setStartTime(new Date(System.currentTimeMillis() + this.startDelay));
+        trigger.setRepeatCount(repeatCount);
+        trigger.setRepeatInterval(repeatInterval);
+        return trigger;
     }
 }
