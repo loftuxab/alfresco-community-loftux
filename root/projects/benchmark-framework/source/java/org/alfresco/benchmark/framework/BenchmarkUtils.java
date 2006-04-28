@@ -34,7 +34,8 @@ import com.sun.japex.TestCase;
  */
 public class BenchmarkUtils
 {    
-    public static final Random rand = new Random();
+    // Make repeatable
+    public static final Random rand = new Random(0);
  
     private static boolean propertiesLoaded = false;
     
