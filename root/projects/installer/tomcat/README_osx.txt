@@ -1,8 +1,8 @@
 ======================
-Alfresco 1.2.0 Release
+Alfresco 1.3.0 Release
 ======================
 
-Welcome to the Alfresco 1.2.0 Release.
+Welcome to the Alfresco 1.3.0 Release.
 
 
 ===================
@@ -108,7 +108,7 @@ Running the Alfresco Server
 ===========================
 
 Ensure that the MySQL server is running, then navigate to the '/opt/alfresco' directory
-- Run 'alfresco.sh start'
+- Run './alfresco.sh start'
 - You can now try Alfresco by visiting:
 
 http://localhost:8080/alfresco
@@ -129,7 +129,7 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 
 
 =============================
-Upgrading from V1.x to V1.2.0
+Upgrading from V1.x to V1.3.0
 =============================
 
 Details can be found at http://www.alfresco.org/mediawiki/index.php/Upgrading_1.2

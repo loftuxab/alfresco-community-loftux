@@ -1,8 +1,8 @@
 ======================
-Alfresco 1.2.0 Release
+Alfresco 1.3.0 Release
 ======================
 
-Welcome to the Alfresco 1.2.0 Release.
+Welcome to the Alfresco 1.3.0 Release.
 
 
 ===================
@@ -137,7 +137,7 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 
 
 ==============================
-Upgrading from V1.1x to V1.2.0
+Upgrading from V1.1x to V1.3.0
 ==============================
 
 Details can be found at http://www.alfresco.org/mediawiki/index.php/Upgrading_1.2

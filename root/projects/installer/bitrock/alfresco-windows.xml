@@ -1,0 +1,652 @@
+<project>
+	<fullName>Alfresco ECM - Community Network</fullName>
+	<shortName>alfresco</shortName>
+	<version>1.2.1</version>
+	<installerFilename>${product_shortname}-${product_version}-${platform_name}-community.${platform_exec_suffix}</installerFilename>
+	<readmeFile>README.txt</readmeFile>
+	<licenseFile>licenses/license.txt</licenseFile>
+	<wrapLicenseFileText>1</wrapLicenseFileText>
+	<leftImage>leftImage.png</leftImage>
+	<logoImage>logo.png</logoImage>
+	<splashImage>splash.png</splashImage>
+	<defaultLanguage>en</defaultLanguage>
+	<allowLanguageSelection>0</allowLanguageSelection>
+	<description>One-line description of your software</description>
+	<outputDirectory>${installbuilder_install_root}/output</outputDirectory>
+	<projectSchemaVersion>1.0</projectSchemaVersion>
+	<saveRelativePaths>1</saveRelativePaths>
+	<slideShowLoop>1</slideShowLoop>
+	<slideShowTiming>5</slideShowTiming>
+	<startMenuGroupName>${product_fullname}</startMenuGroupName>
+	<style>standard</style>
+	<summary>Alfresco is an open source, open-standards content repository built by the most experienced content management team that includes the co-founder of Documentum.</summary>
+	<uninstallerDirectory>${installdir}</uninstallerDirectory>
+	<vendor>Alfresco Software</vendor>
+	
+	<componentList>
+		<component>
+			<name>programfiles</name>
+			<description>Alfresco Program Files</description>
+			<canBeEdited>0</canBeEdited>
+			<detailedDescription>Alfresco Program Files</detailedDescription>
+			<selected>1</selected>
+			<show>1</show>
+			<folderList>
+				<folder>
+					<description>Program Files</description>
+					<destination>${installdir}</destination>
+					<name>programfileswindows</name>
+					<platforms>windows</platforms>
+					<actionList>
+						<substitute>
+
+<files>*/tomcat/bin/service.bat;*/mysql/my.ini;*/alfresco.bat;*/run.bat;*/servicerun.bat;*/serviceinstall.bat;*/custom-repository.properties;*/tempfile;*/re_startstop.bat;*/db_setup.bat;*/db_remove.bat;*/start_oo.bat;*/custom-runtime-context.xml</files>
+							<type>exact</type>
+							<substitutionList>
+								<substitution>
+									<pattern>@@BITROCK_ALFRESCO_MYSQLDIR@@</pattern>
+									<value>${installdir}/mysql</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_DBPORT@@</pattern>
+									<value>${dbport}</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_MYSQL_PORT@@</pattern>
+									<value>${dbport}</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_MYSQL_PASSWD@@</pattern>
+									<value>${dbrootpasswd}</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_ALFRESCO_INSTALLDIR@@</pattern>
+									<value>${installdir}</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_ALFRESCO_INSTALLDIR_JAVA@@</pattern>
+									<value>${installdir.unix}</value>
+								</substitution>
+								<substitution>
+								        <pattern>stop_oo.bat</pattern>
+									<value>${installdir.unix}\bin\stop_oo.bat</value>
+								</substitution>
+								<substitution>
+									<pattern>cmd /c start_oo.bat</pattern>
+	     			      					<value>${installdir.dos}\bin\start_oo.bat</value>
+								</substitution>
+								<substitution>
+									<pattern>//US//%SERVICE_NAME% --JvmOptions</pattern>
+										<value>//US//%SERVICE_NAME% --Startup auto --JvmOptions</value>
+								</substitution>
+								<substitution>
+									<pattern>set CATALINA_HOME=C:\alfresco\tomcat</pattern>
+									<value>set CATALINA_HOME=${installdir.dos}\tomcat</value>
+								</substitution>
+								<substitution>
+								         <pattern>%OPENOFFICE_PATH%</pattern>
+									 <value>${installdir.dos}\openoffice\openoffice\program</value>
+								</substitution>
+							</substitutionList>
+						</substitute>
+						<substitute>
+							<files>*/tomcat/conf/server.xml;*/file-servers-custom.xml</files>
+							<type>exact</type>
+							<substitutionList>
+								<substitution>
+									<pattern>@@BITROCK_TOMCAT_PORT@@</pattern>
+									<value>${tomcatport}</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_TOMCAT_SHUTDOWN_PORT@@</pattern>
+									<value>${tomcatshutdownport}</value>
+								</substitution>
+								<substitution>
+									<pattern>@@BITROCK_ALFRESCO_MACHINE@@</pattern>
+									<value>${machine_hostname}</value>
+									<!--<value>${alfserver}</value> -->
+								</substitution>
+							</substitutionList>
+						</substitute>
+						<addDirectoryToPath>
+							<path>${installdir}/bin</path>
+						</addDirectoryToPath>
+					</actionList>
+					<distributionFileList>
+						<distributionDirectory>
+							<origin>bin</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>mysql</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>licenses</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>java</origin>
+						</distributionDirectory>
+						<distributionDirectory>
+							<origin>tomcat</origin>
+						</distributionDirectory>
+						<distributionFile>
+							<origin>README.txt</origin>
+						</distributionFile>
+						<distributionDirectory>
+							<origin>alfresco</origin>
+						</distributionDirectory>
+					</distributionFileList>
+				</folder>
+			</folderList>
+					<startMenuShortcutList>
+				<startMenuLinkShortcut>
+					<comment>Readme</comment>
+					<name>Readme</name>
+					<url>${installdir}/readme.txt</url>
+					<windowsIcon></windowsIcon>
+				</startMenuLinkShortcut>
+                
+				<startMenuFolder>
+					<name>Alfresco Service</name>
+					<platforms>windows</platforms>
+					<startMenuShortcutList>
+						<startMenuShortcut>
+							<comment>Install ${product_fullname} as service</comment>
+							<name>Install ${product_fullname} as service</name>
+							<windowsExec>${installdir}/alfresco/serviceinstall.bat</windowsExec>
+							<windowsExecArgs>INSTALL</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>Start ${product_fullname} service</comment>
+							<name>Start ${product_fullname} service</name>
+							<windowsExec>${installdir}/alfresco/servicerun.bat</windowsExec>
+							<windowsExecArgs>START</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>Stop ${product_fullname} service</comment>
+							<name>Stop ${product_fullname} service</name>
+							<windowsExec>${installdir}/alfresco/servicerun.bat</windowsExec>
+							<windowsExecArgs>STOP</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>Uninstall ${product_fullname} as serivce</comment>
+							<name>Uninstall ${product_fullname} as service</name>
+							<windowsExec>${installdir}/alfresco/serviceinstall.bat</windowsExec>
+							<windowsExecArgs>UNINSTALL</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+					</startMenuShortcutList>
+				</startMenuFolder>
+				<startMenuFolder>
+					<name>Run Alfresco</name>
+					<platforms>windows</platforms>
+					<startMenuShortcutList>
+						<startMenuShortcut>
+							<comment>Start ${product_fullname}</comment>
+							<name>Start ${product_fullname}</name>
+							<windowsExec>${installdir}\alfresco\run.bat</windowsExec>
+							<windowsExecArgs>start</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>Stop ${product_fullname}</comment>
+							<name>Stop ${product_fullname}</name>
+							<windowsExec>${installdir}\alfresco\run.bat</windowsExec>
+							<windowsExecArgs>stop</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>Restart ${product_fullname}</comment>
+							<name>Restart ${product_fullname}</name>
+							<windowsExec>${installdir}\alfresco\run.bat</windowsExec>
+							<windowsExecArgs>restart</windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+					</startMenuShortcutList>
+				</startMenuFolder>
+
+				<startMenuLinkShortcut>
+					<comment>Alfresco Web Client</comment>
+					<name>Alfresco Web Client</name>
+					<!--                    <url>http://${alfserver}:${tomcatport}/alfresco</url> -->
+					<url>http://${machine_hostname}:${tomcatport}/alfresco</url>
+					<windowsIcon></windowsIcon>
+				</startMenuLinkShortcut>
+				<startMenuLinkShortcut>
+					<comment>${product_shortname} Website</comment>
+					<name>Alfresco Website</name>
+					<url>http://www.alfresco.org</url>
+					<windowsIcon></windowsIcon>
+				</startMenuLinkShortcut>
+				<startMenuShortcut>
+					<comment>Uninstall ${product_fullname}</comment>
+					<name>Uninstall ${product_fullname}</name>
+					<windowsExec>${installdir}\uninstall.exe</windowsExec>
+					<windowsExecArgs></windowsExecArgs>
+					<windowsIcon></windowsIcon>
+					<windowsPath>${installdir}</windowsPath>
+				</startMenuShortcut>
+			</startMenuShortcutList>
+		</component>
+		<component>
+			<name>openoffice</name>
+			<description>Open Office</description>
+			<canBeEdited>1</canBeEdited>
+			<detailedDescription>OpenOffice 2.0 Program Files</detailedDescription>
+			<selected>1</selected>
+			<show>1</show>
+			<desktopShortcutList/>
+			<folderList>
+				<folder>
+					<description>Program Files</description>
+					<destination>${installdir}</destination>
+					<name>programfiles</name>
+					<platforms>all</platforms>
+					<actionList>
+					    <substitute>
+					         <files>*/bootstrap.ini</files>
+					         <type>exact</type>
+					         <substitutionList>
+						         <substitution>
+							     <pattern>@@BITROCK_OPENOFFICE_SETTINGSDIR@@</pattern>
+							     <value>UserInstallation=file:///${installdir.dos.unix}/openoffice/settings</value>
+							 </substitution>
+						  </substitutionList>
+    					    </substitute>
+					</actionList>
+					<distributionFileList>
+						<distributionDirectory>
+							<origin>openoffice</origin>
+						</distributionDirectory>
+					</distributionFileList>
+				</folder>
+			</folderList>
+			<startMenuShortcutList>
+				<startMenuFolder>
+					<name>OpenOffice</name>
+					<platforms>windows</platforms>
+					<startMenuShortcutList>
+						<startMenuShortcut>
+							<comment>Start OpenOffice service</comment>
+							<name>Start OpenOffice service</name>
+							<windowsExec>${installdir}/alfresco/bin/start_oo.bat</windowsExec>
+							<windowsExecArgs></windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>Stop OpenOffice service</comment>
+							<name>Stop OpenOffice service</name>
+							<windowsExec>${installdir}/alfresco/bin/stop_oo.bat</windowsExec>
+							<windowsExecArgs></windowsExecArgs>
+							<windowsIcon>${installdir}/alfresco/alfresco.ico</windowsIcon>
+							<windowsPath>${installdir}/</windowsPath>
+						</startMenuShortcut>
+						<startMenuShortcut>
+							<comment>OpenOffice</comment>
+							<name>OpenOffice</name>
+							<windowsExec>${installdir}/openoffice/PortableOpenOffice.exe</windowsExec>
+							<windowsExecArgs></windowsExecArgs>
+							<windowsIcon>${installdir}/openoffice/openoffice.ico</windowsIcon>
+							<windowsPath>${installdir}</windowsPath>
+						</startMenuShortcut>
+						<startMenuLinkShortcut>
+							<comment>OpenOffice Website</comment>
+							<name>OpenOffice Website</name>
+							<url>http://www.openoffice.org</url>
+							<windowsIcon></windowsIcon>
+						</startMenuLinkShortcut>
+					</startMenuShortcutList>
+				</startMenuFolder>
+			</startMenuShortcutList>
+		</component>
+	</componentList>
+	
+	<finalPageActionList>
+		<actionGroup>
+			<progressText>Launch ${product_fullname} now?</progressText>
+			<actionList>
+				<runProgram>
+					<program>${installdir}/alfresco/run.bat</program>
+					<programArguments>start</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+					<ruleList>
+						<compareText>
+							<logic>does_not_equal</logic>
+							<text>${installservice}</text>
+							<value>1</value>
+						</compareText>
+						<compareText>
+							<logic>equals</logic>
+							<text>${platform_name}</text>
+							<value>windows</value>
+						</compareText>
+					</ruleList>
+				</runProgram>
+				<runProgram>
+					<program>${installdir}/alfresco/servicerun.bat</program>
+					<programArguments>START</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+					<ruleList>
+						<compareText>
+							<logic>equals</logic>
+							<text>${installservice}</text>
+							<value>1</value>
+						</compareText>
+						<compareText>
+							<logic>equals</logic>
+							<text>${platform_name}</text>
+							<value>windows</value>
+						</compareText>
+					</ruleList>
+				</runProgram>
+				<wait>
+					<ms>10000</ms>
+					<ruleList>
+						<compareText>
+							<logic>equals</logic>
+							<text>${installer_ui}</text>
+							<value>gui</value>
+						</compareText>
+					</ruleList>
+				</wait>
+				<launchBrowser>
+					<url>http://${machine_hostname}:${tomcatport}/alfresco</url>
+					<ruleList>
+						<compareText>
+							<logic>equals</logic>
+							<text>${installer_ui}</text>
+							<value>gui</value>
+						</compareText>
+					</ruleList>
+				</launchBrowser>
+			</actionList>
+		</actionGroup>
+	</finalPageActionList>
+	
+	<parameterList>
+        <directoryParameter>
+		<name>installdir</name>
+		<title></title>
+		<description>Installation directory</description>
+		<explanation>Please specify the directory where ${product_fullname} will be installed</explanation>
+		<value>${platform_install_prefix}/${product_shortname}-${product_version}</value>
+		<default>${platform_install_prefix}/${product_shortname}-${product_version}</default>
+		<allowEmptyValue>0</allowEmptyValue>
+		<ask>yes</ask>
+		<cliOptionName>prefix</cliOptionName>
+		<leftImage></leftImage>
+		<mustBeWritable>yes</mustBeWritable>
+		<mustExist>0</mustExist>
+		<width>40</width>
+		<validationActionList>
+			<throwError>
+				<text>The path length seems larger than 92 characters. Correct this to avoid problems with OpenOffice, which is included in this installation.</text>
+				<ruleList>
+					<compareTextLength>
+						<length>92</length>
+						<logic>greater_or_equal</logic>
+						<text>"${installdir}/openoffice/"</text>
+					</compareTextLength>
+				</ruleList>
+			</throwError>
+		</validationActionList>
+	</directoryParameter>
+        
+	<passwordParameter>
+		<name>dbrootpasswd</name>
+		<title>MySQL Password</title>
+		<description>Password</description>
+		<explanation>Initial password for the root and anonymous user accounts created during the MySQL database installation.</explanation>
+		<value></value>
+		<default></default>
+		<allowEmptyValue>1</allowEmptyValue>
+		<ask>yes</ask>
+		<cliOptionName></cliOptionName>
+		<descriptionRetype>Re-enter</descriptionRetype>
+		<leftImage></leftImage>
+		<width>40</width>
+		<validationActionList>
+			<throwError>
+			<text>You need to provide a non-empty password</text>
+				<ruleList>
+					<compareText>
+						<logic>equals</logic>
+						<text>${dbrootpasswd}</text>
+						<value></value>
+					</compareText>
+				</ruleList>
+			</throwError>
+		</validationActionList>
+        </passwordParameter>
+
+	<stringParameter>
+		<name>dbport</name>
+		<title>DB Port</title>
+		<description>MySQL database Port</description>
+		<explanation>Please enter the port for your MySQL database.</explanation>
+		<value>3306</value>
+		<default>3306</default>
+		<allowEmptyValue>1</allowEmptyValue>
+		<ask>1</ask>
+		<cliOptionName></cliOptionName>
+		<leftImage></leftImage>
+		<width>40</width>
+		<ruleList>
+			<portTest>
+				<condition>cannot_bind</condition>
+				<port>${dbport}</port>
+			</portTest>
+		</ruleList>
+		<validationActionList>
+			<throwError>
+				<text>Unable to bind to the given port number. Please select another one.</text>
+				<ruleList>
+					<portTest>
+						<condition>cannot_bind</condition>
+						<port>${dbport}</port>
+					</portTest>
+				</ruleList>
+			</throwError>
+		</validationActionList>
+        </stringParameter>
+	
+	<!--
+        <stringParameter>
+		<name>alfserver</name>
+		<title>Server Name</title>
+		<description>Name of this server</description>
+		<explanation>Please enter the name or IP address of this server.  Only use an IP address if it is fixed for this server.</explanation>
+		<value>${machine_hostname}</value>
+		<default>${machine_hostname}</default>
+		<allowEmptyValue>1</allowEmptyValue>
+		<ask>1</ask>
+		<cliOptionName></cliOptionName>
+		<leftImage></leftImage>
+		<width>40</width>
+	</stringParameter>
+        -->
+	
+	<stringParameter>
+		<name>tomcatport</name>
+		<title>HTTP Port</title>
+		<description>Tomcat HTTP Port</description>
+		<explanation>Please enter the port for your Tomcat HTTP server.</explanation>
+		<value>8080</value>
+		<default>8080</default>
+		<allowEmptyValue>1</allowEmptyValue>
+		<ask>1</ask>
+		<cliOptionName></cliOptionName>
+		<leftImage></leftImage>
+		<width>40</width>
+		<ruleList>
+			<portTest>
+				<condition>cannot_bind</condition>
+				<port>${tomcatport}</port>
+			</portTest>
+		</ruleList>
+		<validationActionList>
+			<throwError>
+				<text>Unable to bind to the given port number. Please select another one.</text>
+				<ruleList>
+					<portTest>
+						<condition>cannot_bind</condition>
+						<port>${tomcatport}</port>
+					</portTest>
+				</ruleList>
+			</throwError>
+		</validationActionList>
+        </stringParameter>
+	
+	<stringParameter>
+		<name>tomcatshutdownport</name>
+		<title>Management Port</title>
+		<description>Tomcat Management Port</description>
+		<explanation>Please enter the port used for Tomcat Management.</explanation>
+		<value>8005</value>
+		<default>8005</default>
+		<allowEmptyValue>1</allowEmptyValue>
+		<ask>1</ask>
+		<cliOptionName></cliOptionName>
+		<leftImage></leftImage>
+		<width>40</width>
+		<ruleList>
+			<portTest>
+				<condition>cannot_bind</condition>
+				<port>${tomcatshutdownport}</port>
+			</portTest>
+		</ruleList>
+		<validationActionList>
+			<throwError>
+				<text>Unable to bind to the given port number. Please select another one.</text>
+				<ruleList>
+					<portTest>
+						<condition>cannot_bind</condition>
+						<port>${tomcatshutdownport}</port>
+					</portTest>
+				</ruleList>
+			</throwError>
+		</validationActionList>
+	</stringParameter>
+	
+	<booleanParameter>
+		<name>installservice</name>
+		<title>Install as a service</title>
+		<description>Install service</description>
+		<explanation>You can optionally register ${product_fullname} as a service.
+This way it will automatically be started every time the machine is restarted.
+Install ${product_fullname} as a service?.</explanation>
+		<value>1</value>
+		<default>1</default>
+		<ask>1</ask>
+		<cliOptionName></cliOptionName>
+		<leftImage></leftImage>
+		<ruleList>
+			<compareText>
+				<logic>equals</logic>
+				<text>${platform_name}</text>
+				<value>windows</value>
+			</compareText>
+		</ruleList>
+	</booleanParameter>
+	</parameterList>
+	
+	<postInstallationActionList>
+		<actionGroup>
+			<actionList>
+				<runProgram>
+					<program>${installdir}/mysql/bin/mysqld.exe</program>
+					<programArguments>--defaults-file=${installdir.dos.unix}/mysql/my.ini &amp;</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+				</runProgram>
+				<wait>
+					<ms>10000</ms>
+				</wait>
+				<writeFile>
+					<path>${installdir}/mysql/bin/alfrescoinit.bat</path>
+					<text>@echo off
+${installdir.dos}\mysql\bin\mysql.exe --defaults-file="${installdir.dos.unix}/mysql/my.ini" -u root &lt;${installdir.dos.unix}/bin/db_setup.sql
+${installdir.dos}\mysql\bin\mysql.exe --defaults-file="${installdir.dos.unix}/mysql/my.ini" -u root -e "UPDATE mysql.user SET Password=PASSWORD('%1') WHERE User='root';"
+${installdir.dos}\mysql\bin\mysql.exe --defaults-file="${installdir.dos.unix}/mysql/my.ini" -u root -e "UPDATE mysql.user SET Password=PASSWORD('%1') WHERE User='';"
+${installdir.dos}\mysql\bin\mysql.exe --defaults-file="${installdir.dos.unix}/mysql/my.ini" -u root -e "FLUSH PRIVILEGES;"
+					</text>
+				</writeFile>
+				<runProgram>
+					<program>${installdir}/mysql/bin/alfrescoinit.bat</program>
+					<programArguments>${dbrootpasswd}</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+				</runProgram>
+				<wait>
+					<ms>4000</ms>
+				</wait>
+				<runProgram>
+					<program>${installdir}/mysql/bin/mysqladmin.exe</program>
+					<programArguments>--defaults-file=${installdir.dos.unix}/mysql/my.ini shutdown</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+				</runProgram>
+				<wait>
+					<ms>4000</ms>
+				</wait>
+				<runProgram>
+					<program>${installdir}/alfresco/serviceinstall.bat</program>
+					<programArguments>INSTALL</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+					<ruleList>
+						<compareText>
+							<logic>equals</logic>
+							<text>${installservice}</text>
+							<value>1</value>
+						</compareText>
+					</ruleList>
+				</runProgram>
+			</actionList>
+			<ruleList>
+				<compareText>
+					<logic>equals</logic>
+					<text>${platform_name}</text>
+					<value>windows</value>
+				</compareText>
+			</ruleList>
+		</actionGroup>
+	</postInstallationActionList>
+	<preUninstallationActionList>
+		<actionGroup>
+			<actionList>
+				<runProgram>
+					<program>${installdir}/alfresco/run.bat</program>
+					<programArguments>stop</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+				</runProgram>
+				<runProgram>
+					<program>${installdir}/alfresco/serviceinstall.bat</program>
+					<programArguments>REMOVE</programArguments>
+					<runAs></runAs>
+					<workingDirectory></workingDirectory>
+				</runProgram>
+			</actionList>
+			<ruleList>
+				<compareText>
+					<logic>equals</logic>
+					<text>${platform_name}</text>
+					<value>windows</value>
+				</compareText>
+			</ruleList>
+		</actionGroup>
+	</preUninstallationActionList>
+</project>

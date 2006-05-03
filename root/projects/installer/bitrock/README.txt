@@ -1,10 +1,12 @@
 ======================
-Alfresco 1.2.0 Release
+Alfresco 1.2.1 Release
 ======================
 
-Welcome to the Alfresco 1.2.0 Release.
+Welcome to the Alfresco 1.2.1 Release.
 
-If you installed Alfresco as a service, you will now need to start them.  There is an option to start the services from the Windows Start menu.  To test the installation, use the Alfresco Web Client option from the Start menu.
+The first time OpenOffice is run, you may need complete the registration and then close OpenOffice.  You must also ensure that the OpenOffice System Tray is set to not automatically load on Windows startup and that it is closed before starting the OpenOffice Service.  To do this, right-click the OpenOffice Quickstarter icon in the System Tray and uncheck 'Load OpenOffice.org during system start-up' and then select 'Exit quickstarter'.
+
+There are options in the Start menu for starting and stopping the Alfresco Server either as a service or directly.  There is also an option to start the Alfresco Web Client option from the Start menu.  If you are running Alfresco as a service and wish to use OpenOffice document transformation, please start the OpenOffice Service manually from the Start menu.
 
 For release notes, please visit http://www.alfresco.org/mediawiki/index.php/Release_1.2
 
@@ -14,11 +16,6 @@ For information and help, please visit http://www.alfresco.org/forums
 =====================================
 Using the CIFS (Shared Folder) Server
 =====================================
-
-To enable the CIFS server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin'
-needs to be copied into a folder on the system path, such as 'c:\windows\system32'.  The 
-Alfresco server will need to be re-started once the dll has been copied.
-Or you could add 'C:\alfresco\bin' to your path.
 
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
 drive to it.  The name to use for the mapping is based on the name of the server on which
@@ -51,9 +48,8 @@ You will need to restart the Alfresco server for this to take effect.
 Image Manipulation
 ==================
 
-To enable image manipulation on a Windows platform, the 'imconvert.exe' in
-'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'.
-Or you could add 'C:\alfresco\bin' to your path.
+If you encounter problems with image manipulation on a Windows platform, the 'imconvert.exe' in
+'C:\alfresco\bin' may need to be copied into a folder on the system path, such as 'C:\windows\system32', or you could add 'C:\alfresco\bin' to your path.
 
 
 ================
@@ -69,14 +65,6 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
   http://www.alfresco.org/forums/viewtopic.php?t=7
   and in this forum generally:
   http://www.alfresco.org/forums/viewforum.php?f=8
-
-- WAR file name is called alfresco.war
-  NOTE: If you deployed the war previously then you must clear out the web-client files 
-  before deploying the new WAR file, having first copied any configurations made:
-
-  Delete <tomcat-home>/webapps/alfresco.war
-  Delete <tomcat-home>/webapps/alfresco
-  Delete <tomcat-home>/work/alfresco
 
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:

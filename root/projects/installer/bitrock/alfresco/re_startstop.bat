@@ -47,12 +47,12 @@ goto tomcat_start
 
 :tomcat_start
 
-call "@@BITROCK_ALFRESCO_INSTALLDIR@@/alfresco.bat" start
+call "@@BITROCK_ALFRESCO_INSTALLDIR@@\bin\alfresco.bat" start
 if ""%2"" == ""start"" goto end
 goto end
 
 :tomcat_stop
-call "@@BITROCK_ALFRESCO_INSTALLDIR@@/alfresco.bat" stop
+call "@@BITROCK_ALFRESCO_INSTALLDIR@@\bin\alfresco.bat" stop
 if ""%2"" == ""stop"" goto end
 ping localhost -n 4 >NUL 
 if ""%2"" == ""restart"" goto tomcat_start

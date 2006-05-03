@@ -3,7 +3,10 @@ rem ---------------------------------------------------------------------------
 rem Start script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
-set JBOSS_HOME=C:\alfresco\jboss
+rem set Alfresco home (includes trailing \ e.g. c:\alfresco\)
+set ALF_HOME=%~dp0
+
+set JBOSS_HOME=%ALF_HOME%jboss
 
 rem Set any default JVM options
 set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server
@@ -19,7 +22,7 @@ call SetPaths.bat
 del SetPaths.bat
 
 :start
-set PATH=%JAVA_HOME%/bin:%PATH%
+set PATH=%JAVA_HOME%/bin;%ALF_HOME%bin;%PATH%
 rem ---------------------------------------
 rem Start Components
 rem ---------------------------------------
