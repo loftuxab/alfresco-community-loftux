@@ -15,7 +15,6 @@
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.jcr}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}"/>
    </target>
@@ -24,21 +23,35 @@
    <!-- ** Building targets ** -->
    <!-- ********************** -->
    
-   <target name="build-jboss" depends="init, clean, incremental-jboss" 
-           description="Builds the projects for use in JBoss Portal after cleaning"/>
-   
-   <target name="build-tomcat" depends="init, clean, incremental-tomcat" 
-           description="Builds the projects for use in Tomcat after cleaning"/>
+   <target name="build-jboss" depends="init, clean, incremental-jboss"
+           description="Clean build and deploy in JBoss Portal"/>
 
-   <target name="incremental-jboss" depends="init" description="Builds the projects for use in JBoss">
+   <target name="build-tomcat" depends="init, clean, incremental-tomcat"
+           description="Clean build and deploy in Tomcat"/>
+
+   <target name="build-war" depends="init, clean" description="Clean build of war packages">
+      <subant target="incremental">
+         <property name="server" value="tomcat"/>
+         <filelist refid="files.project.build"/>
+      </subant>
+   </target>
+
+   <target name="incremental-war" depends="init" description="Incremental build of war packages">
+      <subant target="incremental">
+         <property name="server" value="tomcat"/>
+         <filelist refid="files.project.build"/>
+      </subant>
+   </target>
+
+   <target name="incremental-jboss" depends="init" description="Incremental build and deploy in JBoss Portal">
       <subant target="incremental">
          <property name="server" value="jboss"/>
          <filelist refid="files.project.build"/>
       </subant>
       <antcall target="deploy-jboss" />
    </target>
-   
-   <target name="incremental-tomcat" depends="init" description="Builds the projects for use in Tomcat">
+
+   <target name="incremental-tomcat" depends="init" description="Incremental build and deploy in Tomcat">
       <subant target="incremental">
          <property name="server" value="tomcat"/>
          <filelist refid="files.project.build"/>
@@ -190,7 +203,6 @@
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.root}" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.repository}/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.remote-api}/alf_data" />
-      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.jcr}/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${home.tomcat}/bin/alf_data" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${home.jboss}/bin/alf_data" />
    </target>  
