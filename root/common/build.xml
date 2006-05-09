@@ -82,9 +82,6 @@
       <copy todir="${dir.javadoc}/${dir.name.repository}">
          <fileset dir="${dir.project.repository}/build/docs/java"/>
       </copy>
-      <copy todir="${dir.javadoc}/${dir.name.repository}-service-api">
-         <fileset dir="${dir.project.repository}/build/docs/java-public-service-api"/>
-      </copy>
       <copy todir="${dir.javadoc}/${dir.name.webclient}">
          <fileset dir="${dir.project.webclient}/build/docs/java"/>
       </copy>

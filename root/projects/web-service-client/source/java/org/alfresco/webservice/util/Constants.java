@@ -36,8 +36,10 @@ public class Constants
     public static final String PROP_CONTENT =           createQNameString(NAMESPACE_CONTENT_MODEL, "content");
     public static final String ASSOC_CONTAINS =         createQNameString(NAMESPACE_CONTENT_MODEL, "contains");
     public static final String ASPECT_VERSIONABLE =     createQNameString(NAMESPACE_CONTENT_MODEL, "versionable");
+    public static final String ASPECT_TITLED =          createQNameString(NAMESPACE_CONTENT_MODEL, "titled");
     public static final String PROP_CREATED =           createQNameString(NAMESPACE_CONTENT_MODEL, "created");
     public static final String PROP_DESCRIPTION =       createQNameString(NAMESPACE_CONTENT_MODEL, "description");    
+    public static final String PROP_TITLE =             createQNameString(NAMESPACE_CONTENT_MODEL, "title");    
     public static final String TYPE_FOLDER =            createQNameString(NAMESPACE_CONTENT_MODEL, "folder");
     public static final String ASPECT_CLASSIFIABLE =    createQNameString(NAMESPACE_CONTENT_MODEL, "classifiable"); 
     

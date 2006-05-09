@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<!--
+       This shows the common minimum configuration overrides.
+       By default, the content and indexes are located at a relative location, which should only
+       be used when doing a quick preview of the Alfresco server.
+-->
+<beans>
+   
+    <!-- overriding to point to custom properties -->
+    <bean id="repository-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+        <property name="locations">
+            <list>
+                <value>classpath:alfresco/repository.properties</value>
+                <value>classpath:alfresco/version.properties</value>
+                <value>classpath:alfresco/domain/transaction.properties</value>
+
+                <!-- Override repository properties -->
+                <value>classpath:alfresco/extension/custom-repository.properties</value>
+            </list>
+        </property>
+    </bean>
+    
+</beans>

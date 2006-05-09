@@ -17,10 +17,11 @@
    <!-- *********************** -->
    <!-- ** Top level targets ** -->
    <!-- *********************** -->
-   
+
    <target name="continuous" depends="init" description="Target called by the continuous build to create distribution bundles">
       <ant antfile="${file.name.build}" target="reset-database"/>
       <ant antfile="${file.name.build}" target="test"/>
+      <ant antfile="${file.name.build}" target="compile-docs"/>
       <antcall target="distribute"/>
    </target>
 
@@ -28,19 +29,20 @@
       <ant antfile="${file.name.build}" target="reset-database"/>
       <ant antfile="${file.name.build}" target="test"/>
       <antcall target="distribute-source"/>
-      
+
       <!-- replace the version number in the file name with the date -->
       <move file="${dir.dist}/${file.name.dist.src}.zip" tofile="${dir.dist}/${file.name.dist.src.nightly}.zip"/>
       <move file="${dir.dist}/${file.name.dist.src}.tar.gz" tofile="${dir.dist}/${file.name.dist.src.nightly}.tar.gz"/>
-      
+
       <ant antfile="${file.name.build}" target="compile-docs"/>
    </target>
 
-   <target name="distribute" 
-           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-source, distribute-php, distribute-web-service-client"
+   <!-- TODO: Do we still need to distribute php and web service client -->
+   <target name="distribute"
+           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-source, distribute-php, distribute-web-service-client"
            description="Creates the distribution files for all platforms for all appservers"/>
 
-   <target name="generate-checksums" depends="init" 
+   <target name="generate-checksums" depends="init"
            description="Generates checksum files for the distibution files">
       <delete>
          <fileset dir="${dir.dist}" includes="*.MD5"/>
@@ -169,7 +171,7 @@
          <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
-      
+
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.assemble.tomcat}/tomcat/webapps">
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}" />
@@ -178,24 +180,24 @@
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
-      <copy tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages/${file.name.langpack.readme}" 
+      <copy tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages/${file.name.langpack.readme}"
                   file="${file.langpack.readme}" />
-      
+
       <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
       <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}" />
       <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}/tomcat/bin" />
-         
+
       <!-- rename model files ready for use -->
       <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml.sample"
             tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml" />
       <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/exampleModel.xml.sample"
                   tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/exampleModel.xml" />
    </target>
-   
+
    <!-- ***************** -->
    <!-- ** WAR targets ** -->
    <!-- ***************** -->
-   
+
    <target name="distribute-war" depends="assemble-war-common"
            description="Creates the WAR file distribution for all platforms">
       <mkdir dir="${dir.dist}" />
@@ -204,14 +206,14 @@
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
       </zip>
-      
+
       <tar destfile="${dir.dist}/${file.name.dist.war}.tar" longfile="gnu">
          <tarfileset dir="${dir.assemble.war}" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.war}.tar.gz" src="${dir.dist}/${file.name.dist.war}.tar" />
       <delete file="${dir.dist}/${file.name.dist.war}.tar" />
    </target>
-   
+
    <target name="assemble-war-common" depends="init">
       <mkdir dir="${dir.assemble.war}"/>
       <copy todir="${dir.assemble.war}">
@@ -219,7 +221,7 @@
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
       </copy>
    </target>
-   
+
    <!-- ***************** -->
    <!-- ** PHP targets ** -->
    <!-- ***************** -->
@@ -259,24 +261,179 @@
       <gzip zipfile="${dir.dist}/${file.name.dist.webserviceclient}.tar.gz" src="${dir.dist}/${file.name.dist.webserviceclient}.tar" />
       <delete file="${dir.dist}/${file.name.dist.webserviceclient}.tar" />
    </target>
-   
+
    <!-- ******************** -->
    <!-- ** Source targets ** -->
    <!-- ******************** -->
-   
+
    <target name="distribute-source" depends="init"
            description="Creates the source distribution file for all platforms">
       <mkdir dir="${dir.dist}" />
-      
+
       <zip destfile="${dir.dist}/${file.name.dist.src}.zip">
          <zipfileset dir="${dir.product.root}" excludes="${excludes.dist.src}" />
       </zip>
-      
+
       <tar destfile="${dir.dist}/${file.name.dist.src}.tar" longfile="gnu">
          <tarfileset dir="${dir.product.root}" excludes="${excludes.dist.src}" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.src}.tar.gz" src="${dir.dist}/${file.name.dist.src}.tar" />
       <delete file="${dir.dist}/${file.name.dist.src}.tar" />
+   </target>
+
+   <target name="assemble-sdk" depends="init">
+      <mkdir dir="${dir.dist}" />
+      <mkdir dir="${dir.assemble.sdk}" />
+
+      <!-- -->
+      <!-- Readme -->
+      <!-- -->
+      <copy file="${dir.project.sdk}/readme.txt" todir="${dir.assemble.sdk}" />
+
+      <!-- -->
+      <!-- Binaries -->
+      <!-- -->
+      <mkdir dir="${dir.assemble.sdk}/bin" />
+      <copy todir="${dir.assemble.sdk}/bin">
+         <fileset dir="${dir.project.netbios}/dll" includes="*.dll" />
+         <fileset dir="${dir.project.installer}" includes=".hotspot_compiler,db_setup.sql" />
+      </copy>
+
+      <!-- -->
+      <!-- Documentation -->
+      <!-- -->
+      <mkdir dir="${dir.assemble.sdk}/doc" />
+
+      <!-- Javadoc -->
+      <mkdir dir="${dir.assemble.sdk}/doc/api" />
+      <zip destfile="${dir.assemble.sdk}/doc/api/core-doc.zip">
+         <zipfileset dir="${dir.project.core}/build/docs/java" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/doc/api/repository-doc.zip">
+         <zipfileset dir="${dir.project.repository}/build/docs/java" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/doc/api/remote-api-doc.zip">
+         <zipfileset dir="${dir.project.remoteapi}/build/docs/java" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/doc/api/web-client-doc.zip">
+         <zipfileset dir="${dir.project.webclient}/build/docs/java" />
+      </zip>
+
+      <!-- Taglib -->
+      <mkdir dir="${dir.assemble.sdk}/doc/taglib" />
+      <zip destfile="${dir.assemble.sdk}/doc/taglib/alfresco-taglib-doc.zip">
+         <zipfileset dir="${dir.project.webclient}/build/docs/taglib" />
+      </zip>
+
+      <!-- -->
+      <!-- Libraries -->
+      <!-- -->
+      <mkdir dir="${dir.assemble.sdk}/lib" />
+
+      <!-- Remote API Libraries -->
+      <mkdir dir="${dir.assemble.sdk}/lib/remote" />
+      <copy file="${dir.project.webserviceclient}/build/dist/web-service-client.jar" todir="${dir.assemble.sdk}/lib/remote" />
+      <mkdir dir="${dir.assemble.sdk}/lib/remote/wsdl" />
+      <copy todir="${dir.assemble.sdk}/lib/remote/wsdl">
+         <fileset dir="${dir.project.remoteapi}/source/wsdl" includes="*.wsdl,*.xsd" />
+      </copy>
+
+      <!-- Server Libraries -->
+      <mkdir dir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.core}/build/dist/core.jar" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.repository}/build/dist/repository.jar" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.remoteapi}/build/dist/remote-api.jar" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.webclient}/build/dist/web-client.jar" todir="${dir.assemble.sdk}/lib/server" />
+
+      <!-- Package configuration as a .jar -->
+      <!-- TODO: configuration should ideally live in each of the above .jars -->
+      <mkdir dir="${dir.assemble.sdk}/config" />
+      <copy todir="${dir.assemble.sdk}/config" includeEmptyDirs="false">
+         <fileset dir="${dir.config.repository}" excludes="**/extension/*" />
+         <fileset dir="${dir.config.webclient}" excludes="**/extension/*" />
+      </copy>
+      <delete>
+         <fileset dir="${dir.assemble.sdk}/config/alfresco/messages">
+            <include name="*_en_US.properties" />
+         </fileset>
+      </delete>
+      <copy todir="${dir.assemble.sdk}/config/alfresco/messages">
+         <fileset dir="${dir.assemble.sdk}/config/alfresco/messages"/>
+         <mapper type="glob" from="*.properties" to="*_en_US.properties"/>
+      </copy>
+      <zip destfile="${dir.assemble.sdk}/lib/server/config.jar">
+         <zipfileset dir="${dir.assemble.sdk}/config" />
+      </zip>
+      <delete dir="${dir.assemble.sdk}/config" />
+
+      <!-- Dependencies -->
+      <mkdir dir="${dir.assemble.sdk}/lib/server/dependencies" />
+      <copy todir="${dir.assemble.sdk}/lib/server/dependencies">
+         <fileset dir="${dir.project.3rdparty}/lib" includes="**/*.jar" />
+      </copy>
+
+      <!-- -->
+      <!-- Source -->
+      <!-- -->
+      <mkdir dir="${dir.assemble.sdk}/src" />
+      <zip destfile="${dir.assemble.sdk}/src/core-src.zip">
+         <zipfileset dir="${dir.project.core}/source" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/src/remote-api-src.zip">
+         <zipfileset dir="${dir.project.remoteapi}/source" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/src/repository-src.zip">
+         <zipfileset dir="${dir.project.repository}/source" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/src/web-client-service-src.zip">
+         <zipfileset dir="${dir.project.webserviceclient}/source/java" />
+         <zipfileset dir="${dir.project.webserviceclient}/source/generated" />
+      </zip>
+      <zip destfile="${dir.assemble.sdk}/src/web-client-src.zip">
+         <zipfileset dir="${dir.project.webclient}/source" />
+      </zip>
+
+      <!-- -->
+      <!-- License -->
+      <!-- -->
+      <copy file="${dir.project.installer}/licenses/notice.txt" todir="${dir.assemble.sdk}" />
+      <copy file="${dir.project.installer}/licenses/license.txt" todir="${dir.assemble.sdk}" />
+      <mkdir dir="${dir.assemble.sdk}/licenses" />
+      <copy todir="${dir.assemble.sdk}/licenses">
+         <fileset dir="${dir.project.installer}/licenses/3rd-party" includes="*.*" />
+      </copy>
+
+      <!-- -->
+      <!-- Samples -->
+      <!-- -->
+
+      <!-- Library Eclipse Projects -->
+      <copy file="${dir.project.sdk}/sdk-projects/server/.project" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.sdk}/sdk-projects/server/.classpath" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.sdk}/sdk-projects/remote/.project" todir="${dir.assemble.sdk}/lib/remote" />
+      <copy file="${dir.project.sdk}/sdk-projects/remote/.classpath" todir="${dir.assemble.sdk}/lib/remote" />
+
+      <!-- Sample Projects -->
+      <mkdir dir="${dir.assemble.sdk}/samples" />
+      <copy todir="${dir.assemble.sdk}/samples">
+         <fileset dir="${dir.project.sdk}/samples" excludes="**/build/**" />
+      </copy>
+
+   </target>
+
+   <target name="distribute-sdk" depends="init"
+           description="Creates the sdk distribution file for all platforms">
+      <mkdir dir="${dir.dist}" />
+
+      <zip destfile="${dir.dist}/${file.name.dist.sdk}.zip">
+         <zipfileset dir="${dir.assemble.sdk}" />
+      </zip>
+
+      <tar destfile="${dir.dist}/${file.name.dist.sdk}.tar" longfile="gnu">
+         <tarfileset dir="${dir.assemble.sdk}" />
+      </tar>
+      <gzip zipfile="${dir.dist}/${file.name.dist.sdk}.tar.gz" src="${dir.dist}/${file.name.dist.sdk}.tar" />
+      <delete file="${dir.dist}/${file.name.dist.sdk}.tar" />
    </target>
 
 </project>

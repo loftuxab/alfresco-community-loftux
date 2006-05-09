@@ -1,0 +1,61 @@
+12:34:18,843 INFO  [org.alfresco.repo.admin.patch.PatchExecuter] Checking for patches to apply ...
+12:34:18,890 INFO  [org.alfresco.repo.admin.patch.PatchExecuter] No patches were required.
+12:34:19,062 INFO  [org.alfresco.service.descriptor.DescriptorService] Alfresco JVM - v1.5.0_06-b05; maximum heap size 63.563MB
+12:34:19,062 WARN  [org.alfresco.service.descriptor.DescriptorService] Alfresco JVM - WARNING - maximum heap size 63.563MB is less than recommended 512MB
+12:34:19,062 INFO  [org.alfresco.service.descriptor.DescriptorService] Alfresco started (Community Network): Current version 1.3.0 (dev) schema 13 - Installed version 1.3.0 (dev) schema 13
+12:36:15,546 ERROR [org.quartz.core.JobRunShell] Job DEFAULT.ftsIndexerJobDetail threw an unhandled Exception: 
+java.lang.NullPointerException
+	at org.apache.lucene.store.FSDirectory.create(FSDirectory.java:174)
+	at org.apache.lucene.store.FSDirectory.<init>(FSDirectory.java:151)
+	at org.apache.lucene.store.FSDirectory.getDirectory(FSDirectory.java:116)
+	at org.alfresco.repo.search.impl.lucene.LuceneBase.initialiseFSDirectory(LuceneBase.java:245)
+	at org.alfresco.repo.search.impl.lucene.LuceneBase.initialise(LuceneBase.java:152)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerImpl.getUpdateIndexer(LuceneIndexerImpl.java:467)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.createIndexer(LuceneIndexerAndSearcherFactory.java:342)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.getThreadLocalIndexer(LuceneIndexerAndSearcherFactory.java:299)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.getIndexer(LuceneIndexerAndSearcherFactory.java:283)
+	at org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexerImpl.index(FullTextSearchIndexerImpl.java:164)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:335)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:181)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:148)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:170)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:176)
+	at $Proxy5.index(Unknown Source)
+	at org.alfresco.repo.search.impl.lucene.fts.FTSIndexerJob.execute(FTSIndexerJob.java:36)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:191)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:516)
+12:36:15,546 ERROR [org.quartz.core.ErrorLogger] Job (DEFAULT.ftsIndexerJobDetail threw an exception.
+org.quartz.SchedulerException: Job threw an unhandled exception. [See nested exception: java.lang.NullPointerException]
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:202)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:516)
+* Nested Exception (Underlying Cause) ---------------
+java.lang.NullPointerException
+	at org.apache.lucene.store.FSDirectory.create(FSDirectory.java:174)
+	at org.apache.lucene.store.FSDirectory.<init>(FSDirectory.java:151)
+	at org.apache.lucene.store.FSDirectory.getDirectory(FSDirectory.java:116)
+	at org.alfresco.repo.search.impl.lucene.LuceneBase.initialiseFSDirectory(LuceneBase.java:245)
+	at org.alfresco.repo.search.impl.lucene.LuceneBase.initialise(LuceneBase.java:152)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerImpl.getUpdateIndexer(LuceneIndexerImpl.java:467)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.createIndexer(LuceneIndexerAndSearcherFactory.java:342)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.getThreadLocalIndexer(LuceneIndexerAndSearcherFactory.java:299)
+	at org.alfresco.repo.search.impl.lucene.LuceneIndexerAndSearcherFactory.getIndexer(LuceneIndexerAndSearcherFactory.java:283)
+	at org.alfresco.repo.search.impl.lucene.fts.FullTextSearchIndexerImpl.index(FullTextSearchIndexerImpl.java:164)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+	at java.lang.reflect.Method.invoke(Method.java:585)
+	at org.springframework.aop.support.AopUtils.invokeJoinpointUsingReflection(AopUtils.java:335)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.invokeJoinpoint(ReflectiveMethodInvocation.java:181)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:148)
+	at org.springframework.transaction.interceptor.TransactionInterceptor.invoke(TransactionInterceptor.java:96)
+	at org.springframework.aop.framework.ReflectiveMethodInvocation.proceed(ReflectiveMethodInvocation.java:170)
+	at org.springframework.aop.framework.JdkDynamicAopProxy.invoke(JdkDynamicAopProxy.java:176)
+	at $Proxy5.index(Unknown Source)
+	at org.alfresco.repo.search.impl.lucene.fts.FTSIndexerJob.execute(FTSIndexerJob.java:36)
+	at org.quartz.core.JobRunShell.run(JobRunShell.java:191)
+	at org.quartz.simpl.SimpleThreadPool$WorkerThread.run(SimpleThreadPool.java:516)
