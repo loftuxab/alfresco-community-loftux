@@ -421,7 +421,7 @@
 
    </target>
 
-   <target name="distribute-sdk" depends="init"
+   <target name="distribute-sdk" depends="assemble-sdk"
            description="Creates the sdk distribution file for all platforms">
       <mkdir dir="${dir.dist}" />
 
