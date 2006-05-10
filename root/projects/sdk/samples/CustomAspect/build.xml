@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+<project name="Custom Aspect Build File" default="package" basedir=".">
+	
+	<property name="project.dir" value="."/>
+	<property name="build.dir" value="${project.dir}/build"/>
+	<property name="package.file" value="${build.dir}/custom-aspect.jar"/>
+	
+	<target name="package">
+		<jar destfile="${package.file}">
+			<fileset dir="${build.dir}" excludes="**/custom*,**/*Test*"/>
+		</jar>
+	</target>
+	
+</project>	
