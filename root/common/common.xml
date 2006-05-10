@@ -37,7 +37,7 @@
 
     <target name="compile-javadocs" depends="init" description="Creates the JavaDocs for the project">
         <mkdir dir="${dir.javadoc}" />
-        <javadoc maxmemory="1024m" sourcepath="${dir.src.java}" destdir="${dir.javadoc}" packagenames="${javadoc.packages.include}"
+        <javadoc maxmemory="512m" sourcepath="${dir.src.java}" destdir="${dir.javadoc}" packagenames="${javadoc.packages.include}"
                  excludepackagenames="${javadoc.packages.exclude}" author="true" version="true" doctitle="${javadoc.title.document}"
                  windowtitle="${javadoc.title.window}" classpathref="classpath.compile" bottom="${javadoc.copyright}"/>
     </target>
