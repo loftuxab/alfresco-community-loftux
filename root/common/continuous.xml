@@ -369,7 +369,11 @@
       <!-- Dependencies -->
       <mkdir dir="${dir.assemble.sdk}/lib/server/dependencies" />
       <copy todir="${dir.assemble.sdk}/lib/server/dependencies">
-         <fileset dir="${dir.project.3rdparty}/lib" includes="**/*.jar" />
+         <fileset dir="${dir.project.3rdparty}/lib" includes="${dir.assemble.sdk.server.jars}" />
+      </copy>
+      <mkdir dir="${dir.assemble.sdk}/lib/remote/dependencies" />
+      <copy todir="${dir.assemble.sdk}/lib/remote/dependencies" flatten="true">
+         <fileset dir="${dir.project.3rdparty}/lib" includes="${dir.assemble.sdk.remote.jars}" />
       </copy>
 
       <!-- -->

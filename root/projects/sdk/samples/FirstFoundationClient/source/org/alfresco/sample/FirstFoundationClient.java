@@ -99,7 +99,7 @@ public class FirstFoundationClient
         //
         
         // assign name
-        String name = "Created by Foundation API at " + System.currentTimeMillis();
+        String name = "Foundation API sample (" + System.currentTimeMillis() + ")";
         Map<QName, Serializable> contentProps = new HashMap<QName, Serializable>();
         contentProps.put(ContentModel.PROP_NAME, name);
 

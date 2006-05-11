@@ -66,7 +66,7 @@ public class FirstJCRClient
 	        Node companyHome = rootNode.getNode("app:company_home");
 	
 	        // create the content node
-	        String name = "Created by JCR at " + System.currentTimeMillis();
+	        String name = "JCR sample (" + System.currentTimeMillis() + ")";
 	        Node content = companyHome.addNode("cm:" + name, "cm:content");
 	        content.setProperty("cm:name", name);
 

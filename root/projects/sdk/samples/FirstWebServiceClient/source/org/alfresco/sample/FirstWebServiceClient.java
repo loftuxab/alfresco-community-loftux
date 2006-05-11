@@ -16,8 +16,6 @@
  */
 package org.alfresco.sample;
 
-import java.util.Date;
-
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.content.ContentServiceSoapBindingStub;
 import org.alfresco.webservice.repository.UpdateResult;
@@ -63,7 +61,7 @@ public class FirstWebServiceClient
             ParentReference companyHomeParent = new ParentReference(storeRef, null, "/app:company_home", Constants.ASSOC_CONTAINS, null);
 
             // Assign name
-            String name = "File created by Web Services: " + new Date().toString();
+            String name = "Web Services sample (" + System.currentTimeMillis() + ")";
             companyHomeParent.setChildName("cm:" + name);
             
             // Construct CML statement to create content node
@@ -98,6 +96,10 @@ public class FirstWebServiceClient
             ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
             Content contentRef = contentService.write(content, Constants.PROP_CONTENT, text.getBytes(), contentFormat);
             System.out.println("Content Length: " + contentRef.getLength());
+        }
+        catch(Throwable e)
+        {
+            System.out.println(e.toString());
         }
         finally
         {
