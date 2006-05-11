@@ -45,9 +45,9 @@ Install MySQL
 
 - If you wish to use other databases, please visit the forums and wiki at
   www.alfresco.org for guidelines
-- If you already have MySQL 4.1 installed, skip to "Install Alfresco"
+- If you already have MySQL 4.1 or higher installed, skip to "Install Alfresco"
 
-- Browse to http://dev.mysql.com/downloads/mysql/4.1.html
+- Browse to http://dev.mysql.com/downloads
 - Download the "Windows (x86)" option (~37M)
 - Install once downloaded (run setup.exe)
 - Use Typical setup type
@@ -70,14 +70,6 @@ Install Alfresco Tomcat Bundle
 - Download the "Alfresco Windows Tomcat Bundle" option
 - Create a folder 'C:\alfresco'
 - Unzip alfresco-tomcat-xxxxx.zip in C:\alfresco
-
-
-Set Paths
----------
-
-Edit 'alfresco.bat' and check the variable is set to the location where Tomcat is
-installed:
-- For the Tomcat bundle, this will be 'C:\alfresco\tomcat
 
 
 Create Database
@@ -106,7 +98,6 @@ done at any point after Alfresco has been installed.
 - Download the Windows version
 - Install OpenOffice with defaults (except file associations, unless you wish to)
 - Start one of the OpenOffice programs to go through initial registration, then close it
-- Rename the 'zstart_oo.bat' in 'C:\alfresco' to 'start_oo.bat'
 - Stop and restart the Alfresco server if it is already running
 
 
@@ -136,20 +127,17 @@ Closing the Alfresco Server
 
 Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 
+
 =============================
 Upgrading from V1.x to V1.3.0
 =============================
 
-Details can be found at http://www.alfresco.org/mediawiki/index.php/Upgrading_1.2
+Details can be found at http://wiki.alfresco.com/wiki/Upgrading_to_1.3.0
+
 
 =====================
 Using the CIFS Server
 =====================
-
-To enable the CIFS server on a Windows platform, the Win32NetBIOS.dll in 'C:\alfresco\bin'
-needs to be copied into a folder on the system path, such as 'c:\windows\system32'.  The 
-Alfresco server will need to be re-started once the dll has been copied.
-Or you could add 'C:\alfresco\bin' to your path.
 
 Once the Alfresco server is running, it should be possible to connect to it by mapping a
 drive to it.  The name to use for the mapping is based on the name of the server on which
@@ -178,36 +166,14 @@ so that it is something like:
 You will need to restart the Alfresco server for this to take effect.
 
 
-==================
-Image Manipulation
-==================
-
-To enable image manipulation on a Windows platform, the 'imconvert.exe' in
-'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'.
-Or you could add 'C:\alfresco\bin' to your path.
-
-
 ================
 Trouble-Shooting
 ================
 
 If you have problems with your installation, please look for help on the Installation
-forum at http://www.alfresco.org/forums and ask for any additional help you may need.
+forum at http://forums.alfresco.com and ask for any additional help you may need.
 
 - The JAVA_HOME variable must be set correctly to your Java5 installation.
-
-- Most installation issues can be resolved by following advice in this forum article:
-  http://www.alfresco.org/forums/viewtopic.php?t=7
-  and in this forum generally:
-  http://www.alfresco.org/forums/viewforum.php?f=8
-
-- WAR file name is called alfresco.war
-  NOTE: If you deployed the war previously then you must clear out the web-client files 
-  before deploying the new WAR file, having first copied any configurations made:
-
-  Delete <tomcat-home>/webapps/alfresco.war
-  Delete <tomcat-home>/webapps/alfresco  <-- make sure any configurations are copied
-  Delete <tomcat-home>/work/alfresco
 
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
@@ -216,10 +182,6 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
 
   These are not issues which will cause the server to fail. Alfresco is reporting that 
   various external document transformation engines are not available for use by the server.   
-  Either follow the instructions at the bottom of the Release Notes Wiki page:
-  http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
-  or remove the transformer references completely if you don't require them:
-  http://www.alfresco.org/forums/viewtopic.php?t=90
 
 - If you see this error on server startup:
   ERROR [protocol] FTP Socket error

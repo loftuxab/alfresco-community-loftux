@@ -129,9 +129,9 @@ Shut down your application server.  You may also wish to stop the OpenOffice pro
 the command for this depends on your platform.
 
 
-=============================
-Upgrading from V1.0 to V1.1.2
-=============================
+=================
+Upgrading to V1.3
+=================
 
 In V1.1.2 some of the configuration has been changed.
 In order to deploy V1.1.2 over the top of an existing V1.0 installation the following steps must be taken:

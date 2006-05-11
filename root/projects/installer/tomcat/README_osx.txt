@@ -49,9 +49,9 @@ Install MySQL
 
 - If you wish to use other databases, please visit the forums and wiki at
   www.alfresco.org for guidelines
-- If you already have MySQL 4.1 installed, skip to "Create Database"
+- If you already have MySQL 4.1 or higher installed, skip to "Create Database"
 
-- Browse to http://dev.mysql.com/downloads/mysql/4.1.html
+- Browse to http://dev.mysql.com/downloads
 - Download the approprate MySQL Max for your platform
 - Install by following MySQL's installation instructions
   (for ease, we recommend installing the included StartupItem package too)
@@ -95,7 +95,7 @@ Alfresco, you need to install OpenOffice.  This is entirely optional and can be
 done at any point after Alfresco has been installed.  
 
 - Browse to http://download.openoffice.org
-- Download the OS X version (version 1.1.1.4 or above)
+- Download the OS X version
 - Install OpenOffice
 - Start one of the OpenOffice programs to go through initial registration, then close it
 - Rename '/opt/alfresco/zstart_oo.sh' to '/opt/alfresco/start_oo.sh'
@@ -132,7 +132,8 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 Upgrading from V1.x to V1.3.0
 =============================
 
-Details can be found at http://www.alfresco.org/mediawiki/index.php/Upgrading_1.2
+Details can be found at http://wiki.alfresco.com/wiki/Upgrading_to_1.3.0
+
 
 =====================
 Using the CIFS Server
@@ -175,9 +176,7 @@ Image Manipulation
 
 To enable image manipulation on a Linux platform, the ImageMagick package needs to be installed.  On
 many Linux distributions it is already available.  To check, try running the 'convert' command, which 
-is part of ImageMagick and usually found in /usr/bin.  To enable Alfresco to use 'convert', a symbolic
-link named 'imconvert' to it needs to be created somewhere on the path.  For example, in '/usr/bin'
-use the command 'ln -s convert imconvert'.
+is part of ImageMagick and usually found in /usr/bin.  
 
 
 ================
@@ -189,31 +188,13 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
 
 - The JAVA_HOME variable must be set correctly to your Java5 installation.
 
-- Most installation issues can be resolved by following advice in this forum article:
-  http://www.alfresco.org/forums/viewtopic.php?t=7
-  and in this forum generally:
-  http://www.alfresco.org/forums/viewforum.php?f=8
-
-- WAR file name is now called alfresco.war
-  NOTE: If you deployed the war previously then you must clear out the web-client files 
-  before deploying the new WAR file, having first copied any configurations made:
-
-  Previous release was PR6 or later:
-  Delete <tomcat-home>/webapps/alfresco.war
-  Delete <tomcat-home>/webapps/alfresco  <-- make sure any configurations are copied
-  Delete <tomcat-home>/work/alfresco
-
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
   ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available:
-  Failed to execute command: imconvert ...
+  Failed to execute command: convert ...
 
   These are not issues which will cause the server to fail. Alfresco is reporting that 
   various external document transformation engines are not available for use by the server.   
-  Either follow the instructions at the bottom of the Release Notes Wiki page:
-  http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
-  or remove the transformer references completely if you don't require them:
-  http://www.alfresco.org/forums/viewtopic.php?t=90
 
 - If you see this error on server startup:
   ERROR [protocol] FTP Socket error
