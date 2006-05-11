@@ -192,7 +192,7 @@ public class ReportFactory
             for (Map.Entry<String, BenchmarkTypeData> entry : dataSummary.entrySet())
             {
                 int count = entry.getValue().getCount();
-                double totalDuration = entry.getValue().getTotalDuration()/1000;
+                double totalDuration = entry.getValue().getTotalDuration()/1000000000;
                 double average = totalDuration/count;
                 double rps = 1/average;
                 
