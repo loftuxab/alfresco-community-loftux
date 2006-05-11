@@ -22,7 +22,6 @@ import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-
 import com.Ostermiller.util.CSVParser;
 import com.sun.japex.TestCase;
 
