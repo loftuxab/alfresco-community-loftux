@@ -21,7 +21,6 @@
    <target name="continuous" depends="init" description="Target called by the continuous build to create distribution bundles">
       <ant antfile="${file.name.build}" target="reset-database"/>
       <ant antfile="${file.name.build}" target="test"/>
-      <ant antfile="${file.name.build}" target="compile-docs"/>
       <antcall target="distribute"/>
    </target>
 
@@ -302,6 +301,7 @@
       <!-- -->
       <!-- Documentation -->
       <!-- -->
+      <ant antfile="${file.name.build}" target="compile-docs"/>
       <mkdir dir="${dir.assemble.sdk}/doc" />
 
       <!-- Javadoc -->
