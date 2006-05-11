@@ -16,6 +16,9 @@
  */
 package org.alfresco.benchmark.alfresco;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -157,6 +160,9 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
         // Get the company home node
         final NodeRef companyHomeNodeRef = AlfrescoUtils.getCompanyHomeNodeRef(this.searchService, AlfrescoUtils.storeRef);
         
+        List<String> loadedFolders = new ArrayList<String>();
+        List<String> loadedContent = new ArrayList<String>();
+        
         // Create a folder in company home within which we will create all the test data
         final Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
         folderProps.put(ContentModel.PROP_NAME, BENCHMARK_OBJECT_PREFIX + System.currentTimeMillis());
@@ -174,11 +180,24 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
             }           
         });
         
+        loadedFolders.add(dataFolderNodeRef.toString());
+        
         LoadedData loadedData = new LoadedData(dataFolderNodeRef.toString());
         
         List<NodeRef> folders = new ArrayList<NodeRef>(1);
         folders.add(dataFolderNodeRef);
-        populateFolders(loadedData, repositoryProfile, folders, 0);
+        populateFolders(loadedData, repositoryProfile, folders, 0, loadedFolders, loadedContent);
+        
+        try
+        {
+            //  Serialise the loaded folder and content lists
+            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_folders.bin")).writeObject(loadedFolders);
+            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_content.bin")).writeObject(loadedContent);
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException(exception);
+        }
         
         return loadedData;
     }
@@ -191,7 +210,13 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
      * @param folderNodeRefs    the folder nore references
      * @param depth             the current depth
      */
-    private void populateFolders(final LoadedData loadedData, final RepositoryProfile repositoryProfile, final List<NodeRef> folderNodeRefs, int depth)
+    private void populateFolders(
+            final LoadedData loadedData, 
+            final RepositoryProfile repositoryProfile, 
+            final List<NodeRef> folderNodeRefs, 
+            int depth,
+            final List<String> loadedFolders,
+            final List<String> loadedContent)
     {
         System.out.println("depth=" + depth + "; list_size=" + folderNodeRefs.size());
         
@@ -219,11 +244,12 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                     // Create content
                     for (int i = 0; i < numberOfContentNodes; i++)
                     {
-                        AlfrescoUtils.createContentNode( 
+                        NodeRef contentNode = AlfrescoUtils.createContentNode( 
                                 AlfrescoDataLoaderComponentImpl.this.nodeService, 
                                 AlfrescoDataLoaderComponentImpl.this.contentService, 
                                 repositoryProfile, 
                                 folderNodeRef);
+                        loadedContent.add(contentNode.toString());
                     }
                     loadedData.incrementContentCount(numberOfContentNodes);
                     
@@ -238,6 +264,7 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                                     folderNodeRef);
                             subFolders.add(subFolderNodeRef);
                             loadedData.incrementFolderCount(1);
+                            loadedFolders.add(subFolderNodeRef.toString());
                         }
                     }                                             
                 }
@@ -249,7 +276,7 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
         if (subFolders.size() > 0)
         {
             // Populate the sub folders
-            populateFolders(loadedData, repositoryProfile, subFolders, newDepth);
+            populateFolders(loadedData, repositoryProfile, subFolders, newDepth, loadedFolders, loadedContent);
         }
     }
 

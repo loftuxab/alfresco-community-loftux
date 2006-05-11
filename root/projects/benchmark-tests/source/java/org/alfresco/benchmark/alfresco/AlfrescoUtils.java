@@ -16,6 +16,9 @@
  */
 package org.alfresco.benchmark.alfresco;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,6 +89,50 @@ public class AlfrescoUtils
         return applicationContext;
     }   
     
+    private static List<String> folders;
+    private static List<String> content;
+    
+    @SuppressWarnings("unchecked")
+    public static synchronized NodeRef getRandomFolder()
+    {
+        try
+        {
+            if (folders == null)
+            {
+                folders = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_folders.bin")).readObject();            
+            }
+            
+            int size = folders.size();
+            int rand = BenchmarkUtils.rand.nextInt(size);
+            return new NodeRef(folders.get(rand));
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException("Unable to get random folder path", exception);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static synchronized NodeRef getRandomContent()
+    {
+        try
+        {
+            if (content == null)
+            {
+                content = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_content.bin")).readObject();            
+            }
+            
+            int size = content.size();
+            int rand = BenchmarkUtils.rand.nextInt(size);
+            return new NodeRef(content.get(rand));
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException("Unable to get random content path", exception);
+        }
+    } 
+    
+    
     private static List<NodeRef> rootFolders;
     
     public static synchronized List<NodeRef> getRootFolders(SearchService searchService, NodeService nodeService)
@@ -108,60 +155,60 @@ public class AlfrescoUtils
         return rootFolders;
     }
    
-    public static NodeRef getRandomFolder(SearchService searchService, NodeService nodeService)
-    {       
-        List<NodeRef> folders = new ArrayList<NodeRef>(); 
-        getRandomFolder(nodeService, getRootFolders(searchService, nodeService), folders);
-        NodeRef folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));
-        return folder;
-    }
-    
-    private static void getRandomFolder(NodeService nodeService, List<NodeRef> folders, List<NodeRef> result)
-    {
-        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
-        NodeRef folder = folders.get(randIndex);
-        result.add(folder);
-
-        // Get the sub-folders of the folder
-        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(folder);
-        List<NodeRef> subFolders = new ArrayList<NodeRef>(assocs.size());
-        for (ChildAssociationRef assoc : assocs)
-        {
-            NodeRef subFolder = assoc.getChildRef();
-            
-            if (nodeService.getType(subFolder).getLocalName().equals("folder") == true)
-            {
-                subFolders.add(subFolder);
-            }
-        }
-        
-        if (subFolders.size() != 0)
-        {
-            getRandomFolder(nodeService, subFolders, result);
-        }
-    }
-    
-    public static synchronized NodeRef getRandomContent(SearchService searchService, NodeService nodeService)
-    {
-        List<NodeRef> contentList = new ArrayList<NodeRef>();
-        
-        while (contentList.size() == 0)
-        {
-            NodeRef folder = getRandomFolder(searchService, nodeService);
-            
-            for (ChildAssociationRef assoc : nodeService.getChildAssocs(folder))
-            {
-                NodeRef child = assoc.getChildRef();
-                if (nodeService.getType(child).getLocalName().equals("content") == true)
-                {
-                    contentList.add(child);
-                }
-            }
-        }
-        
-        NodeRef content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
-        return content;
-    }
+//    public static NodeRef getRandomFolder(SearchService searchService, NodeService nodeService)
+//    {       
+//        List<NodeRef> folders = new ArrayList<NodeRef>(); 
+//        getRandomFolder(nodeService, getRootFolders(searchService, nodeService), folders);
+//        NodeRef folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));
+//        return folder;
+//    }
+//    
+//    private static void getRandomFolder(NodeService nodeService, List<NodeRef> folders, List<NodeRef> result)
+//    {
+//        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
+//        NodeRef folder = folders.get(randIndex);
+//        result.add(folder);
+//
+//        // Get the sub-folders of the folder
+//        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(folder);
+//        List<NodeRef> subFolders = new ArrayList<NodeRef>(assocs.size());
+//        for (ChildAssociationRef assoc : assocs)
+//        {
+//            NodeRef subFolder = assoc.getChildRef();
+//            
+//            if (nodeService.getType(subFolder).getLocalName().equals("folder") == true)
+//            {
+//                subFolders.add(subFolder);
+//            }
+//        }
+//        
+//        if (subFolders.size() != 0)
+//        {
+//            getRandomFolder(nodeService, subFolders, result);
+//        }
+//    }
+//    
+//    public static synchronized NodeRef getRandomContent(SearchService searchService, NodeService nodeService)
+//    {
+//        List<NodeRef> contentList = new ArrayList<NodeRef>();
+//        
+//        while (contentList.size() == 0)
+//        {
+//            NodeRef folder = getRandomFolder(searchService, nodeService);
+//            
+//            for (ChildAssociationRef assoc : nodeService.getChildAssocs(folder))
+//            {
+//                NodeRef child = assoc.getChildRef();
+//                if (nodeService.getType(child).getLocalName().equals("content") == true)
+//                {
+//                    contentList.add(child);
+//                }
+//            }
+//        }
+//        
+//        NodeRef content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
+//        return content;
+//    }
     
     public static NodeRef getCompanyHomeNodeRef(SearchService searchService, StoreRef storeRef)
     {

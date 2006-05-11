@@ -137,7 +137,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
                 // Get the content and write into a tempory file
                 Node resourceNode = content.getNode("jcr:content");                
                 InputStream is = resourceNode.getProperty("jcr:data").getStream();
-                FileOutputStream os = new FileOutputStream(File.createTempFile("jcrbm", ".txt"));
+                FileOutputStream os = new FileOutputStream(File.createTempFile(BenchmarkUtils.getGUID(), ".txt"));
                 BenchmarkUtils.copy(is, os);
             }                                   
             finally

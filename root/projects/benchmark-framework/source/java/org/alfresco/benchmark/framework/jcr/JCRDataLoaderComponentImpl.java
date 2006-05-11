@@ -80,6 +80,16 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
             throw new RuntimeException("Unable to load data", exception);
         }
         
+        try
+        {
+            //  Serialise the loaded folder and content lists
+            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_folders.bin")).writeObject(loadedFolders);
+            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_content.bin")).writeObject(loadedContent);
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException(exception);
+        }
         
         
         return loadedData;
@@ -142,11 +152,7 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
                 }
             }                                             
         }         
-        
-        // Serialise the loaded folder and content lists
-        new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_folders.bin")).writeObject(loadedFolders);
-        new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_content.bin")).writeObject(loadedContent);
-        
+                
         if (subFolders.size() > 0)
         {
             // Populate the sub folders

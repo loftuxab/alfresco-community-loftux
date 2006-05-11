@@ -179,8 +179,8 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                     folderPropertyProfiles);
            
             // Get the folder and content node references
-            this.folderNodeRef = AlfrescoUtils.getRandomFolder(this.searchService, this.nodeService);
-            this.contentNodeRef = AlfrescoUtils.getRandomContent(this.searchService, this.nodeService);
+            this.folderNodeRef = AlfrescoUtils.getRandomFolder();
+            this.contentNodeRef = AlfrescoUtils.getRandomContent();
             
             // Get the user name to use for this run
             this.userName = AlfrescoUtils.getUserName();            
