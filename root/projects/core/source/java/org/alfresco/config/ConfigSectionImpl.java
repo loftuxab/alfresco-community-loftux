@@ -37,6 +37,17 @@ public class ConfigSectionImpl implements ConfigSection
         this.condition = condition;
         this.replace = replace;
         this.configElements = new ArrayList<ConfigElement>();
+        
+        // don't allow empty strings
+        if (this.evaluator != null && this.evaluator.length() == 0)
+        {
+           throw new ConfigException("The 'evaluator' attribute must have a value if it is present");
+        }
+        
+        if (this.condition != null && this.condition.length() == 0)
+        {
+           throw new ConfigException("The 'condition' attribute must have a value if it is present");
+        }
     }
 
     /**
@@ -80,10 +91,7 @@ public class ConfigSectionImpl implements ConfigSection
     {
         boolean global = false;
 
-        if (this.evaluator == null
-                || this.evaluator.length() == 0
-                || this.condition == null
-                || this.condition.length() == 0)
+        if (this.evaluator == null && this.condition == null)
         {
             global = true;
         }
