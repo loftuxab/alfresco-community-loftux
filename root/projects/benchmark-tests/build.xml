@@ -40,7 +40,7 @@
         </java>
     </target>
 	
-	<target name="load-benchmark-data" description="Pre-populates the repo with benchmark data">
+	<target name="load-benchmark-data" description="Populates the repo with benchmark data">
         <java dir="." fork="true" classname="org.alfresco.benchmark.alfresco.AlfrescoDataLoaderComponentImpl">
             <jvmarg value="-server"/>
             <jvmarg value="-Xms512m"/>
@@ -61,7 +61,36 @@
 				<fileset dir="../3rd-party/lib">
         			<include name="**/*.jar"/>
       			</fileset>
-				<pathelement path="../repository/build/dist/repository.jar"/> 
+				<pathelement path="../repository/build/classes"/> 
+				<pathelement path="../repository/config"/>
+				
+			</classpath>
+            <arg line="${respository-profile}"/>
+        </java>
+    </target>
+	
+	<target name="load-jcr-benchmark-data" description="Populates the repo with JCR benchmark data">
+        <java dir="." fork="true" classname="org.alfresco.benchmark.alfresco.jcr.AlfrescoJCRDataLoaderComponentImpl">
+            <jvmarg value="-server"/>
+            <jvmarg value="-Xms512m"/>
+            <jvmarg value="-Xmx1024m"/>
+            <jvmarg value="-Xss64k"/>
+			<classpath>
+				<pathelement path="../core/build/classes"/> 
+      			<pathelement path="./build/classes"/>
+      			<pathelement path="./config"/>				
+				<fileset dir="./lib">
+    				<include name="**/*.jar"/>
+  				</fileset>      			
+				<pathelement path="../benchmark-framework/build/classes"/>   
+				<pathelement path="../benchmark-framework/config"/>   
+				<fileset dir="../benchmark-framework/lib">
+        			<include name="**/*.jar"/>
+      			</fileset>				
+				<fileset dir="../3rd-party/lib">
+        			<include name="**/*.jar"/>
+      			</fileset>
+				<pathelement path="../repository/build/classes"/> 
 				<pathelement path="../repository/config"/>
 				
 			</classpath>

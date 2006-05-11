@@ -16,7 +16,7 @@
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/3rd-party/lib/treecache/*.jar"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/3rd-party/lib/openoffice/*.jar"/>
 
-    <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/repository/build/dist/repository.jar"/>
+    <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/repository/build/classes"/>
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/repository/config"/>
 
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-tests/build/classes"/>
