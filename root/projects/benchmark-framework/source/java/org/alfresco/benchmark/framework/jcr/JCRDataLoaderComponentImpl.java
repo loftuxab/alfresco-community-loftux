@@ -16,8 +16,13 @@
  */
 package org.alfresco.benchmark.framework.jcr;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.jcr.Node;
 import javax.jcr.Repository;
@@ -44,6 +49,8 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
     public LoadedData loadData(RepositoryProfile repositoryProfile)
     {           
         LoadedData loadedData = null;
+        List<String> loadedFolders = new ArrayList<String>();
+        List<String> loadedContent = new ArrayList<String>();
         
         try
         {
@@ -57,7 +64,9 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
                 List<Node> folderNodes = new ArrayList<Node>(10);
                 folderNodes.add(rootFolder);
                 
-                populateFolders(loadedData, repositoryProfile, folderNodes, 0);
+                loadedFolders.add(rootFolder.getPath());
+                
+                populateFolders(loadedData, repositoryProfile, folderNodes, 0, loadedFolders, loadedContent);
                 
                 session.save();
             }
@@ -72,6 +81,7 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
         }
         
         
+        
         return loadedData;
     }
     
@@ -83,7 +93,13 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
      * @param folderNodes    the folder nore references
      * @param depth             the current depth
      */
-    private void populateFolders(final LoadedData loadedData, final RepositoryProfile repositoryProfile, final List<Node> folderNodes, int depth)
+    private void populateFolders(
+            final LoadedData loadedData, 
+            final RepositoryProfile repositoryProfile, 
+            final List<Node> folderNodes, 
+            int depth,
+            List<String> loadedFolders,
+            List<String> loadedContent)
         throws Exception
     {
         System.out.println("depth=" + depth + "; list_size=" + folderNodes.size());
@@ -109,7 +125,8 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
             // Create content
             for (int i = 0; i < numberOfContentNodes; i++)
             {
-                JCRUtils.createFile(repositoryProfile, folderNode);
+                Node content = JCRUtils.createFile(repositoryProfile, folderNode);
+                loadedContent.add(content.getPath());
             }
             loadedData.incrementContentCount(numberOfContentNodes);
             
@@ -120,15 +137,20 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
                 {
                     Node subFolderNode = JCRUtils.createFolder(repositoryProfile, folderNode);
                     subFolders.add(subFolderNode);
+                    loadedFolders.add(subFolderNode.getPath());
                     loadedData.incrementFolderCount(1);
                 }
             }                                             
-        }                 
+        }         
+        
+        // Serialise the loaded folder and content lists
+        new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_folders.bin")).writeObject(loadedFolders);
+        new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_content.bin")).writeObject(loadedContent);
         
         if (subFolders.size() > 0)
         {
             // Populate the sub folders
-            populateFolders(loadedData, repositoryProfile, subFolders, newDepth);
+            populateFolders(loadedData, repositoryProfile, subFolders, newDepth, loadedFolders, loadedContent);
         }
     }
 

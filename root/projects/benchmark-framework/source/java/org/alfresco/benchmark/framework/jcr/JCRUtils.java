@@ -16,7 +16,11 @@
  */
 package org.alfresco.benchmark.framework.jcr;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -113,7 +117,7 @@ public class JCRUtils
         lastModified.setTimeInMillis (contentData.getFile().lastModified ());
         resNode.setProperty ("jcr:lastModified", lastModified);
         
-        return resNode;
+        return fileNode;
     }
     
     public static Node createFolder(RepositoryProfile repositoryProfile, Node parentNode)
@@ -145,63 +149,106 @@ public class JCRUtils
         
         return rootFolders;
     }
-   
-    public static Node getRandomFolder(Node rootNode)
-        throws Exception
-    {       
-        List<Node> folders = new ArrayList<Node>(); 
-        getRandomFolder(getRootFolders(rootNode), folders);
-        
-        Node folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));        
-        return folder;
-    }
     
-    private static void getRandomFolder(List<Node> folders, List<Node> result)
-        throws Exception
+    private static List<String> folders;
+    private static List<String> content;
+    
+    @SuppressWarnings("unchecked")
+    public static synchronized String getRandomFolder()
     {
-        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
-        Node folder = folders.get(randIndex);
-        result.add(folder);
-
-        // Get the sub-folders of the folder
-        NodeIterator children = folder.getNodes();
-        List<Node> subFolders = new ArrayList<Node>();
-        while(children.hasNext() == true)
+        try
         {
-            Node child = children.nextNode();
-            if (child.getPrimaryNodeType().getName().equals("nt:folder") == true)
+            if (folders == null)
             {
-                subFolders.add(child);
+                folders = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_folders.bin")).readObject();            
             }
-        }
-        
-        if (subFolders.size() != 0)
-        {
-            getRandomFolder(subFolders, result);
-        }
-    }
-    
-    public static Node getRandomContent(Node rootNode)
-        throws Exception
-    {
-        List<Node> contentList = new ArrayList<Node>();
-        
-        while (contentList.size() == 0)
-        {
-            Node folder = getRandomFolder(rootNode);
             
-            NodeIterator children = folder.getNodes();
-            while(children.hasNext() == true)
-            {
-                Node child = children.nextNode();
-                if (child.getPrimaryNodeType().getName().equals("nt:file") == true)
-                {
-                    contentList.add(child);
-                }
-            }
+            int size = folders.size();
+            int rand = BenchmarkUtils.rand.nextInt(size);
+            return folders.get(rand);
         }
-        
-        Node content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
-        return content;
-   }
+        catch (Exception exception)
+        {
+            throw new RuntimeException("Unable to get random folder path", exception);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static synchronized String getRandomContent()
+    {
+        try
+        {
+            if (content == null)
+            {
+                content = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_content.bin")).readObject();            
+            }
+            
+            int size = content.size();
+            int rand = BenchmarkUtils.rand.nextInt(size);
+            return content.get(rand);
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException("Unable to get random content path", exception);
+        }
+    } 
+    
+//    public static Node getRandomFolder(Node rootNode)
+//        throws Exception
+//    {       
+//        List<Node> folders = new ArrayList<Node>(); 
+//        getRandomFolder(getRootFolders(rootNode), folders);
+//        
+//        Node folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));        
+//        return folder;
+//    }
+//    
+//    private static void getRandomFolder(List<Node> folders, List<Node> result)
+//        throws Exception
+//    {
+//        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
+//        Node folder = folders.get(randIndex);
+//        result.add(folder);
+//
+//        // Get the sub-folders of the folder
+//        NodeIterator children = folder.getNodes();
+//        List<Node> subFolders = new ArrayList<Node>();
+//        while(children.hasNext() == true)
+//        {
+//            Node child = children.nextNode();
+//            if (child.getPrimaryNodeType().getName().equals("nt:folder") == true)
+//            {
+//                subFolders.add(child);
+//            }
+//        }
+//        
+//        if (subFolders.size() != 0)
+//        {
+//            getRandomFolder(subFolders, result);
+//        }
+//    }
+//    
+//    public static Node getRandomContent(Node rootNode)
+//        throws Exception
+//    {
+//        List<Node> contentList = new ArrayList<Node>();
+//        
+//        while (contentList.size() == 0)
+//        {
+//            Node folder = getRandomFolder(rootNode);
+//            
+//            NodeIterator children = folder.getNodes();
+//            while(children.hasNext() == true)
+//            {
+//                Node child = children.nextNode();
+//                if (child.getPrimaryNodeType().getName().equals("nt:file") == true)
+//                {
+//                    contentList.add(child);
+//                }
+//            }
+//        }
+//        
+//        Node content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
+//        return content;
+//   }
 }

@@ -69,28 +69,9 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
                 this.repositoryProfile, 
                 folderPropertyProfiles);
-       
-        try
-        {
-            // Get the folder and content node references
-            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-            try 
-            {            
-                Node node = JCRUtils.getRandomFolder(session.getRootNode());
-                this.folderPath = node.getPath();           
-                
-                Node content = JCRUtils.getRandomContent(session.getRootNode());
-                this.contentPath = content.getPath();
-            }
-            finally
-            {
-                session.logout();
-            }
-        }
-        catch (Throwable exception)
-        {
-            throw new RuntimeException("Unable to get the folder and content nodes for the test", exception);
-        }
+        
+        this.folderPath = JCRUtils.getRandomFolder();
+        this.contentPath = JCRUtils.getRandomContent();
     }
     
     @Override

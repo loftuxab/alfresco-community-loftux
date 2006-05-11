@@ -69,6 +69,11 @@ public class BenchmarkUtils
         return value;
     }
     
+    public static synchronized String getOutputFileLocation()
+    {
+        return outputFolderLocation;
+    }
+    
     public static synchronized String getOutputFileLocation(TestCase testCase)
     {
         String location = testCaseOutputLocation.get(testCase.getName());
