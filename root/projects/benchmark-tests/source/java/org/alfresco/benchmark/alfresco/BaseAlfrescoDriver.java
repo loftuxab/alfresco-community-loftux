@@ -166,34 +166,39 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
         testCase.setParam(PARAM_CONTENT_MIMETYPE, "");
         
-        this.authenticationComponent.setSystemUserAsCurrentUser();
-        try
+        if (this.useUsers == true)
         {
-            // Get content property values
-            this.contentPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                    this.repositoryProfile, 
-                    AlfrescoUtils.getContentPropertyProfiles());
-            
-            // Get folder property values
-            List<PropertyProfile> folderPropertyProfiles = new ArrayList<PropertyProfile>();
-            
-            PropertyProfile name = PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString());
-            folderPropertyProfiles.add(name);
-            this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                    this.repositoryProfile, 
-                    folderPropertyProfiles);
-           
-            // Get the folder and content node references
-            this.folderNodeRef = AlfrescoUtils.getRandomFolder();
-            this.contentNodeRef = AlfrescoUtils.getRandomContent();
-            
-            // Get the user name to use for this run
-            this.userName = AlfrescoUtils.getUserName();            
+            this.authenticationComponent.setSystemUserAsCurrentUser();
+            try
+            {
+                // Get content property values
+                this.contentPropertyValues = DataProviderComponent.getInstance().getPropertyData(
+                        this.repositoryProfile, 
+                        AlfrescoUtils.getContentPropertyProfiles());
+                
+                // Get folder property values
+                List<PropertyProfile> folderPropertyProfiles = new ArrayList<PropertyProfile>();
+                
+                PropertyProfile name = PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString());
+                folderPropertyProfiles.add(name);
+                this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
+                        this.repositoryProfile, 
+                        folderPropertyProfiles);
+               
+                
+                
+                // Get the user name to use for this run
+                this.userName = AlfrescoUtils.getUserName();            
+            }
+            finally
+            {
+                this.authenticationComponent.clearCurrentSecurityContext();
+            }
         }
-        finally
-        {
-            this.authenticationComponent.clearCurrentSecurityContext();
-        }
+        
+        // Get the folder and content node references
+        this.folderNodeRef = AlfrescoUtils.getRandomFolder();
+        this.contentNodeRef = AlfrescoUtils.getRandomContent();
     }
     
     @Override
