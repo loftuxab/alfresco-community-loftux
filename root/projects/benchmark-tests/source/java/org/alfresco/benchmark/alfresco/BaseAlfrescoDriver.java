@@ -64,6 +64,8 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     protected NodeRef folderNodeRef;
     protected String userName;
     
+    protected boolean useUsers = true;
+    
     
     private static boolean usersPrepaired = false;
     
@@ -91,61 +93,64 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     {
         try
         {    
-            super.prepare(tc);             
+            super.prepare(tc);
             
-            // Set the authentication
-            this.authenticationComponent.setSystemUserAsCurrentUser();            
-            try
-            {           
-                // Get the root folders
-                final List<NodeRef> rootFolders = AlfrescoUtils.getRootFolders(this.searchService, this.nodeService);
-                
-                if (BaseAlfrescoDriver.usersPrepaired == false)
-                {
-                    System.out.println("Preparing useres");
-                    TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
-                    {
-                        public Object doWork() throws Exception
-                        { 
-                            // Get the number of available users
-                            int numberOfAvailableUsers = DEFAULT_NUMBER_OF_AVAILABLE_USERS;
-                            if (tc.hasParam(PARAM_NUMBER_OF_AVAILABLE_USERS) == true)
-                            {
-                                numberOfAvailableUsers = tc.getIntParam(PARAM_NUMBER_OF_AVAILABLE_USERS);
-                            }
-                            
-                            // Get a list of the users and ensure they all have permissions on the root node
-                            List<String> users = AlfrescoUtils.prepairUsers(
-                                    BaseAlfrescoDriver.this.dataLoaderComponent, 
-                                    BaseAlfrescoDriver.this.personService, 
-                                    BaseAlfrescoDriver.this.nodeService,
-                                    numberOfAvailableUsers);
-                            
-                            for (NodeRef rootFolder : rootFolders)
-                            {
-                                for (String userName : users)
-                                {
-                                    // TODO how do we check this without doing it over and over again!!
-                                    BaseAlfrescoDriver.this.permissionService.setPermission(rootFolder, userName, PermissionService.FULL_CONTROL, true);   
-                                }
-                                if (BaseAlfrescoDriver.this.permissionService.getInheritParentPermissions(rootFolder) == false)
-                                {
-                                    BaseAlfrescoDriver.this.permissionService.setInheritParentPermissions(rootFolder, true);
-                                }
-                            }
-                            
-                            BaseAlfrescoDriver.usersPrepaired = true;
-                            
-                            return null;
-                        }
-                    });
+            if (this.useUsers == true)
+            {            
+                // Set the authentication
+                this.authenticationComponent.setSystemUserAsCurrentUser();            
+                try
+                {           
+                    // Get the root folders
+                    final List<NodeRef> rootFolders = AlfrescoUtils.getRootFolders(this.searchService, this.nodeService);
                     
-                    System.out.println("Prepare complete");
+                    if (BaseAlfrescoDriver.usersPrepaired == false)
+                    {
+                        System.out.println("Preparing useres");
+                        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+                        {
+                            public Object doWork() throws Exception
+                            { 
+                                // Get the number of available users
+                                int numberOfAvailableUsers = DEFAULT_NUMBER_OF_AVAILABLE_USERS;
+                                if (tc.hasParam(PARAM_NUMBER_OF_AVAILABLE_USERS) == true)
+                                {
+                                    numberOfAvailableUsers = tc.getIntParam(PARAM_NUMBER_OF_AVAILABLE_USERS);
+                                }
+                                
+                                // Get a list of the users and ensure they all have permissions on the root node
+                                List<String> users = AlfrescoUtils.prepairUsers(
+                                        BaseAlfrescoDriver.this.dataLoaderComponent, 
+                                        BaseAlfrescoDriver.this.personService, 
+                                        BaseAlfrescoDriver.this.nodeService,
+                                        numberOfAvailableUsers);
+                                
+                                for (NodeRef rootFolder : rootFolders)
+                                {
+                                    for (String userName : users)
+                                    {
+                                        // TODO how do we check this without doing it over and over again!!
+                                        BaseAlfrescoDriver.this.permissionService.setPermission(rootFolder, userName, PermissionService.FULL_CONTROL, true);   
+                                    }
+                                    if (BaseAlfrescoDriver.this.permissionService.getInheritParentPermissions(rootFolder) == false)
+                                    {
+                                        BaseAlfrescoDriver.this.permissionService.setInheritParentPermissions(rootFolder, true);
+                                    }
+                                }
+                                
+                                BaseAlfrescoDriver.usersPrepaired = true;
+                                
+                                return null;
+                            }
+                        });
+                        
+                        System.out.println("Prepare complete");
+                    }
                 }
-            }
-            finally
-            {
-                this.authenticationComponent.clearCurrentSecurityContext();
+                finally
+                {
+                    this.authenticationComponent.clearCurrentSecurityContext();
+                }            
             }
         }
         catch (Throwable exception)
