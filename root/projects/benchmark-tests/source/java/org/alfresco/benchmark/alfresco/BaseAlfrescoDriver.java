@@ -204,11 +204,14 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     @Override
     public void postRun(TestCase tc)
     {
-        // Store the user name for later use
-        tc.setParam(PARAM_USER_NAME, BaseAlfrescoDriver.this.userName);
+        if (this.useUsers == true)
+        {
+            // Store the user name for later use
+            tc.setParam(PARAM_USER_NAME, BaseAlfrescoDriver.this.userName);
         
-        // Release the user
-        AlfrescoUtils.releaseUserName(BaseAlfrescoDriver.this.userName);
+            // Release the user
+            AlfrescoUtils.releaseUserName(BaseAlfrescoDriver.this.userName);
+        }
     }
     
     @Override
