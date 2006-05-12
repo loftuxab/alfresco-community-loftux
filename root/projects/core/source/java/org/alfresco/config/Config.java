@@ -16,7 +16,6 @@
  */
 package org.alfresco.config;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -35,22 +34,13 @@ public interface Config
      * @return The ConfigElement object or null if it doesn't exist
      */
     public ConfigElement getConfigElement(String name);
-
-    /**
-     * Returns the given config element as a list.
-     * 
-     * @param name Name of the config element to retrieve
-     * @return A list of the config elements with the given name 
-     *         or null if it doesn't exist
-     */
-    public List<ConfigElement> getConfigElementList(String name);
     
     /**
      * Returns all the config elements
      * 
      * @return All the config elements
      */
-    public Map<String, Object> getConfigElements();
+    public Map<String, ConfigElement> getConfigElements();
 
     /**
      * Determines whether the given config element exists
@@ -59,8 +49,4 @@ public interface Config
      * @return true if the config element exists
      */
     public boolean hasConfigElement(String name);
-    
-    // TODO: Add more methods to this interface to allow for easier client
-    // access to the results i.e. by using an XPath expression for
-    // example?
 }

@@ -411,7 +411,7 @@ public class XMLConfigServiceTest extends BaseTest
         assertNotNull("Replace Test should not be null", replaceTestCfg);
         
         // make sure there are 9 elements in the replaced section (including the global section)
-        Map<String, Object> elements = replaceTestCfg.getConfigElements();
+        Map<String, ConfigElement> elements = replaceTestCfg.getConfigElements();
         assertEquals("number of elements", 9, elements.size());
         
         // make sure first-item is different
