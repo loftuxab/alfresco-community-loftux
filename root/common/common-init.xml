@@ -1,5 +1,18 @@
 <project name="common-init">
 
+    <!-- ***************************** -->
+    <!-- ** Common Task definitions ** -->
+    <!-- ***************************** -->
+
+    <!-- ant-contrib:  <if>,<then>,<else>,<for>,<throw>, etc.                    -->
+    <!-- See also:     http://ant-contrib.sourceforge.net/tasks/tasks/index.html -->
+
+    <taskdef resource="net/sf/antcontrib/antlib.xml"
+             classpath="${dir.common}/../projects/3rd-party/lib/ant-contrib.jar"/>
+
+
+
+
     <!-- *************************** -->
     <!-- ** Common initialisation ** -->
     <!-- *************************** -->
