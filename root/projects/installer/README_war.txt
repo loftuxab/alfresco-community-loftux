@@ -1,8 +1,8 @@
 ======================
-Alfresco 1.1.2 Release
+Alfresco 1.3.0 Release
 ======================
 
-Welcome to the Alfresco 1.1.2 Release.
+Welcome to the Alfresco 1.3.0 Release.
 
 
 ===================
@@ -104,6 +104,12 @@ done at any point after Alfresco has been installed.
   soffice "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
 
 
+Configure the Database Connection and Data Locations
+----------------------------------------------------
+
+Details can be found at http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
+
+
 ===========================
 Running the Alfresco Server
 ===========================
@@ -129,31 +135,11 @@ Shut down your application server.  You may also wish to stop the OpenOffice pro
 the command for this depends on your platform.
 
 
-=================
-Upgrading to V1.3
-=================
+=============================
+Upgrading from V1.x to V1.3.0
+=============================
 
-In V1.1.2 some of the configuration has been changed.
-In order to deploy V1.1.2 over the top of an existing V1.0 installation the following steps must be taken:
-
-Note: Your existing Database and 'alf_data' directory will be preserved.
-
-*** Any Configuration changes that you have made need to be noted. ***
-
-*** Tomcat ***
-For Tomcat, the 'alfresco' directory within 'Tomcat/webapps' needs to be deleted
-Copy the V1.1.2 'alfresco.war' file into 'Tomcat/webapps' - either from downloading the WAR or the Tomcat Bundle
-Start Tomcat, so that the 'alfresco' directory within 'Tomcat/webapps' is created
-Stop Tomcat
-Modify any configuration files that need changing
-Start Tomcat
-
-*** Jboss ***
-For Jboss the 'Jboss/server/default/deploy/' and the 'Jboss/server/default/config/alfresco' directories need to be deleted.
-Copy the V1.1.2 'alfresco.war' file from the V1.1.2 Jboss Bundle into 'Jboss/server/default/deploy/'
-Copy the V1.1.2 'alfresco' config directory ('Jboss/server/default/config/alfresco') from the V1.1.2 Jboss Bundle into your existing 'Jboss/server/default/config/alfresco' directory
-Modify any configuration files that need changing
-Start Jboss
+Details can be found at http://wiki.alfresco.com/wiki/Upgrading_to_1.3.0
 
 
 =====================

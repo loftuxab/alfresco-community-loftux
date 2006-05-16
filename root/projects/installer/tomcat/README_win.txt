@@ -101,6 +101,12 @@ done at any point after Alfresco has been installed.
 - Stop and restart the Alfresco server if it is already running
 
 
+Configure the Database Connection and Data Locations
+----------------------------------------------------
+
+Details can be found at http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
+
+
 ===========================
 Running the Alfresco Server
 ===========================
