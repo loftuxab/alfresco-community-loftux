@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Remote API"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Repository"/>
+	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Web-Client"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
