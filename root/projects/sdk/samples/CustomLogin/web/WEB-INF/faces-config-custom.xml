@@ -3,14 +3,6 @@
                               "http://java.sun.com/dtd/web-facesconfig_1_1.dtd">
 <faces-config>
 
-   <navigation-rule>
-      <from-view-id>/jsp/*</from-view-id>
-      <navigation-case>
-         <from-outcome>logout</from-outcome>
-         <to-view-id>/jsp/extension/login.jsp</to-view-id>
-      </navigation-case>
-   </navigation-rule>
-
    <managed-bean>
       <description>
          The bean that backs up the Login screen

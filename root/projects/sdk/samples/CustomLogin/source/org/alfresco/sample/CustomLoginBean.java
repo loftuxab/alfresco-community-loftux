@@ -16,7 +16,13 @@ public class CustomLoginBean extends LoginBean
       String outcome = super.login();
       
       // log to the console who logged in and when
-      logger.info(this.getUsername() + " has logged in at " + new Date());
+      String username = this.getUsername();
+      if (username == null)
+      {
+         username = "Guest";
+      }
+      
+      logger.info(username + " has logged in at " + new Date());
       
       return outcome;
    }
@@ -27,7 +33,13 @@ public class CustomLoginBean extends LoginBean
       String outcome = super.logout();
       
       // log to the console who logged out and when
-      logger.info(this.getUsername() + " logged out at " + new Date());
+      String username = this.getUsername();
+      if (username == null)
+      {
+         username = "Guest";
+      }
+      
+      logger.info(username + " logged out at " + new Date());
       
       return outcome;
    }
