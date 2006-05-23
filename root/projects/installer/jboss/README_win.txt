@@ -93,6 +93,8 @@ If you would like to have a range of document transformations available from wit
 Alfresco, you need to install OpenOffice.  This is entirely optional and can be
 done at any point after Alfresco has been installed.
 
+*** There are known issues with OpenOffice 2.0.1 and 2.0.2, we recommend 2.0.0 ***
+
 - Browse to http://download.openoffice.org
 - Download the Windows version
 - Install OpenOffice with defaults (except file associations, unless you wish to)
