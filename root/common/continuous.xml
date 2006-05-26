@@ -8,10 +8,9 @@
    <import file="${dir.common}/common-init.xml" />
 
    <target name="init" depends="common-init.init">
-      <property name="file.name.start" value="alfresco"/>
+      <property name="file.name.start" value="alfresco-community"/>
       <property file="continuous.properties"/>
       <property name="file.name.build" value="build.xml"/>
-      <property name="excludes.dist.src" value="${excludes.dist.src.open}"/>
    </target>
 
    <!-- *********************** -->
@@ -38,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-source, distribute-php, distribute-web-service-client"
+           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-php, distribute-web-service-client"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
