@@ -31,13 +31,13 @@ public class RepositoryProfile
     private static final String PARAM_SUB_FOLDERS_COUNT_AVERAGE = PARAM_PREFIX + "subFoldersCount.average";
     private static final String PARAM_SUB_FOLDERS_COUNT_VARIATION = PARAM_PREFIX + "subFoldersCount.variation";
     
-    private int folderDepthAverage = 3;
+    private int folderDepthAverage = 5;
     private int folderDepthVariation = 1;
     
-    private int documentsInFolderCountAverage = 5;
-    private int documentsInFolderCountVariation = 1;
+    private int documentsInFolderCountAverage = 1;
+    private int documentsInFolderCountVariation = 0;
     
-    private int subFoldersCountAverage = 3;
+    private int subFoldersCountAverage = 6;
     private int subFoldersCountVariation = 1;
     
     public static RepositoryProfile createRespoitoryProfile(TestCase testCase)
