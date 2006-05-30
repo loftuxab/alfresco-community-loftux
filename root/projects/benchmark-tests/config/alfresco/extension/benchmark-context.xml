@@ -88,7 +88,39 @@
       </property>
    </bean>
 
-   <bean id="permissionServiceImpl" class="org.alfresco.repo.security.permissions.impl.AllowPermissionServiceImpl" />
+   <bean id="permissionServiceImpl" class="org.alfresco.repo.security.permissions.impl.AllowPermissionServiceImpl" >
+        <property name="nodeService">
+            <ref bean="nodeService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="dictionaryService" />
+        </property>
+        <property name="permissionsDaoComponent">
+            <ref bean="permissionsDaoComponent" />
+        </property>
+        <property name="modelDAO">
+            <ref bean="permissionsModelDAO" />
+        </property>
+        <property name="authenticationComponent">
+            <ref bean="authenticationComponentImpl" />
+        </property>
+        <property name="authorityService">
+            <ref bean="authorityService" />
+        </property>
+        <property name="accessCache">
+            <ref bean="permissionsAccessCache" />
+        </property>
+        <!-- Dynamic authorites are evaluated in the context of a store/node etc -->
+        <!-- as opposed to being fixed like user name and groups.                -->
+        <!-- There are two dynamic authorities, the ower of a node and the owner -->
+        <!-- of a lock on a node.                                                -->
+        <property name="dynamicAuthorities">
+            <list>
+                <ref bean="ownerDynamicAuthority" />
+                <ref bean="lockOwnerDynamicAuthority" />
+            </list>
+        </property>
+    </bean>
 
    <bean id="fileServerConfiguration" class="java.util.ArrayList" />
    <bean id="cifsServer" class="java.util.ArrayList" />
