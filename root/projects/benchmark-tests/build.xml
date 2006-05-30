@@ -33,7 +33,7 @@
         <java dir="." fork="true" classname="com.sun.japex.Japex">
             <jvmarg value="-server"/>
             <jvmarg value="-Xms512m"/>
-            <jvmarg value="-Xmx1024m"/>
+            <jvmarg value="-Xmx1536m"/>
             <jvmarg value="-Xss64k"/>
             <classpath refid="class.path"/>
             <arg line="${config}"/>
