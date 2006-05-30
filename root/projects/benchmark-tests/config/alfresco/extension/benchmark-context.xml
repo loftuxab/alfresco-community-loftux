@@ -88,6 +88,8 @@
       </property>
    </bean>
 
+   <bean id="permissionServiceImpl" class="org.alfresco.repo.security.permissions.impl.AllowPermissionServiceImpl" />
+
    <bean id="fileServerConfiguration" class="java.util.ArrayList" />
    <bean id="cifsServer" class="java.util.ArrayList" />
    <bean id="ftpServer" class="java.util.ArrayList" />
