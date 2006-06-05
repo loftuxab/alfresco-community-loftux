@@ -71,11 +71,9 @@
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-fileupload-1.1-dev.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-io-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-logging.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/commons/commons-pool.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.2.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odf_utils.jar"/>
-	<classpathentry kind="lib" path="lib/commons/commons-dbcp-1.2.1.jar"/>
 	<classpathentry exported="true" sourcepath="src/myfaces_src.zip" kind="lib" path="lib/myfaces-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/myfaces-impl.jar"/>
 	<classpathentry exported="true" sourcepath="src/hibernate-3.1.2-src.zip" kind="lib" path="lib/hibernate-3.1.2.jar"/>
@@ -84,5 +82,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-1.2.1.jar"/>
 	<classpathentry exported="true" sourcepath="src/rhino-js-1.62R2-src.zip" kind="lib" path="lib/rhino-js-1.6R2.jar"/>
 	<classpathentry exported="true" sourcepath="src/ehcache-1.2-patched-src.zip" kind="lib" path="lib/ehcache-1.2-patched.jar"/>
+	<classpathentry kind="lib" path="lib/c3p0-0.9.1-pre6.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
