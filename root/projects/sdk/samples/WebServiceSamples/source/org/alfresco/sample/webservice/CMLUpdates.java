@@ -26,6 +26,7 @@ import org.alfresco.webservice.types.ParentReference;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 
 /**
@@ -56,7 +57,7 @@ public class CMLUpdates extends SamplesBase
             // When executed this cml update query will create a new content node beneth the tutorial folder and the add the
             // versionable aspect to the newly created node
             ParentReference parentReference = new ParentReference(STORE, null, "/app:company_home/cm:sample_folder", Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);            
-            NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_WebServiceSample4.txt")};
+            NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_WebServiceSample4.txt")};
             CMLCreate create = new CMLCreate("id1", parentReference, Constants.TYPE_CONTENT, properties);        
             CMLAddAspect addAspect = new CMLAddAspect(Constants.ASPECT_VERSIONABLE, null, null, "id1");
             CML cml = new CML();

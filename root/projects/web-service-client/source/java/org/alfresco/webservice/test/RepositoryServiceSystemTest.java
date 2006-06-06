@@ -16,6 +16,10 @@
  */
 package org.alfresco.webservice.test;
 
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+
 import org.alfresco.webservice.repository.Association;
 import org.alfresco.webservice.repository.AssociationDirectionEnum;
 import org.alfresco.webservice.repository.QueryResult;
@@ -24,7 +28,10 @@ import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLAddAspect;
 import org.alfresco.webservice.types.CMLCreate;
+import org.alfresco.webservice.types.CMLDelete;
+import org.alfresco.webservice.types.CMLUpdate;
 import org.alfresco.webservice.types.ClassDefinition;
+import org.alfresco.webservice.types.ContentFormat;
 import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.Node;
 import org.alfresco.webservice.types.NodeDefinition;
@@ -39,7 +46,10 @@ import org.alfresco.webservice.types.ResultSet;
 import org.alfresco.webservice.types.ResultSetRow;
 import org.alfresco.webservice.types.ResultSetRowNode;
 import org.alfresco.webservice.types.Store;
+import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.Constants;
+import org.alfresco.webservice.util.ContentUtils;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -455,7 +465,9 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         create.setProperty(new NamedValue[] {
                         new NamedValue(
                                 Constants.PROP_NAME,
-                                "name")});
+                                false,
+                                "name",
+                                null)});
         
         CMLAddAspect aspect = new CMLAddAspect();
         aspect.setAspect(Constants.ASPECT_VERSIONABLE);
@@ -493,5 +505,112 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
             logger.debug("Root node property " + prop.getName() + " = " + prop.getValue());
         }
         
+    }
+    
+    public void testPropertySetGet() throws Exception
+    {
+        // Load a custom model using the cm:dictionaryModel type
+        CMLCreate create = new CMLCreate();
+        create.setId("id1");
+        create.setType(Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "dictionaryModel"));
+
+        ParentReference parentReference = new ParentReference(new Store(StoreEnum.workspace, "SpacesStore"), null, "/app:company_home", Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);                    
+        
+        create.setParent(parentReference);
+        create.setProperty(new NamedValue[] {
+                        new NamedValue(
+                                Constants.PROP_NAME,
+                                false,
+                                "testModel.xml",
+                                null),
+                        new NamedValue(
+                                Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "modelActive"),
+                                false,
+                                "true",
+                                null)});
+        
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{create});
+        UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);
+        Reference model = results[0].getDestination();
+        
+        // Now add the content to the model
+        InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/propertymodel.xml");
+        byte[] bytes = ContentUtils.convertToByteArray(viewStream);
+        this.contentService.write(model, Constants.PROP_CONTENT, bytes, new ContentFormat(Constants.MIMETYPE_XML, "UTF-8"));
+        
+        try
+        {
+            // Now create a node of the type specified in the model
+            ParentReference parentReference2 = new ParentReference();
+            parentReference2.setAssociationType(Constants.ASSOC_CHILDREN);
+            parentReference2.setChildName(Constants.ASSOC_CHILDREN);
+            parentReference2.setStore(BaseWebServiceSystemTest.store);
+            parentReference2.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+            create = new CMLCreate();
+            create.setId("id1");
+            create.setType(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "testproperties"));
+            create.setParent(parentReference2);
+            cml = new CML();
+            cml.setCreate(new CMLCreate[]{create});
+            UpdateResult[] results2 = WebServiceFactory.getRepositoryService().update(cml);
+            Reference reference = results2[0].getDestination();
+            
+            Collection<String> list = new ArrayList<String>();
+            list.add("Filrst sadf d");
+            list.add("Seconf sdfasdf");
+            System.out.println(list.toString());
+            
+            
+            System.out.println(new String[] {"firstValue", "secondValue", "thirdValue"}.toString());
+            
+            // Now we can try and set all the various different types of properties
+            NamedValue[] properties = new NamedValue[]{
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "textProp"), "some text"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "intProp"), "12"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "longProp"), "1234567890"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "floatProp"), "12.345"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "doubleProp"), "12.345"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "dateProp"), "2005-09-16T00:00:00.000+00:00"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "datetimeProp"), "2005-09-16T17:01:03.456+01:00"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "booleanProp"), "false"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "qnameProp"), "{http://www.alfresco.org/model/webservicetestmodel/1.0}testProperties"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "noderefProp"), "workspace://SpacesStore/123123123"),
+                    Utils.createNamedValue(Constants.createQNameString("http://www.alfresco.org/model/webservicetestmodel/1.0", "textMultiProp"), new String[] {"firstValue", "secondValue", "thirdValue"}),                    
+            };
+            CMLUpdate cmlUpdate = new CMLUpdate(properties, new Predicate(new Reference[]{reference}, null, null), null);
+            cml = new CML();
+            cml.setUpdate(new CMLUpdate[]{cmlUpdate});
+            WebServiceFactory.getRepositoryService().update(cml);
+            
+            // Output all the set property values for visual inspection
+            Node[] nodes = WebServiceFactory.getRepositoryService().get(new Predicate(new Reference[]{reference}, null, null));
+            Node node = nodes[0];            
+            for(NamedValue namedValue : node.getProperties())
+            {
+                if (namedValue.getIsMultiValue() == null || namedValue.getIsMultiValue() == false)
+                {
+                    System.out.println(namedValue.getName() + " = " + namedValue.getValue());
+                }
+                else
+                {
+                    System.out.print(namedValue.getName() + " = ");
+                    for (String value : namedValue.getValues())
+                    {
+                        System.out.print(value + " ");
+                    }
+                    System.out.println("");
+                }
+            }            
+        }
+        finally
+        {
+            // Need to delete the model from the spaces store to tidy things up
+            Predicate where = new Predicate(new Reference[]{model}, null, null);
+            CMLDelete cmlDelete = new CMLDelete(where);
+            cml = new CML();
+            cml.setDelete(new CMLDelete[]{cmlDelete});
+            WebServiceFactory.getRepositoryService().update(cml);
+        }
     }
 }

@@ -149,7 +149,7 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         assertNull(actions1);
         
         // Create a new action
-        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", Constants.ASPECT_VERSIONABLE)};        
+        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", false, Constants.ASPECT_VERSIONABLE, null)};        
         Action newAction1 = new Action();
         newAction1.setActionName("add-features");
         newAction1.setTitle("Add the versionable aspect to the node.");
@@ -215,7 +215,7 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         }
         
         // Create the action to add the versionable aspect
-        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", Constants.ASPECT_VERSIONABLE)};        
+        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", false, Constants.ASPECT_VERSIONABLE, null)};        
         Action newAction1 = new Action();
         newAction1.setActionName("add-features");
         newAction1.setTitle("Add the versionable aspect to the node.");
@@ -259,7 +259,7 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         assertNull(rules1);
         
         // Create the action
-        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", Constants.ASPECT_CLASSIFIABLE)};        
+        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", false, Constants.ASPECT_CLASSIFIABLE, null)};        
         Action newAction = new Action();
         newAction.setActionName("add-features");
         newAction.setParameters(parameters);

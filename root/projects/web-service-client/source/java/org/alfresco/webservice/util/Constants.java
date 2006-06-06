@@ -54,7 +54,8 @@ public class Constants
     
     /** Mime types */
     public static final String MIMETYPE_TEXT_PLAIN  = "text/plain";
-    public static final String MIMETYPE_TEXT_CSS    = "text/css";   
+    public static final String MIMETYPE_TEXT_CSS    = "text/css";  
+    public static final String MIMETYPE_XML = "text/xml";
     
     /** Permission prefixes for role's and group's */
     public static final String ROLE_PREFIX      = "ROLE_";    

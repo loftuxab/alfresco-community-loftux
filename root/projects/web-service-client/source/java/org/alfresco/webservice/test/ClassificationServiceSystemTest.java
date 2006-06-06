@@ -63,7 +63,7 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
             
             // Create the node that will contain the category import file
             ParentReference categoryParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testContent");
-            NamedValue[] categoryProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "categories.acp")};
+            NamedValue[] categoryProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "categories.acp", null)};
             CMLCreate createCategory = new CMLCreate("categoryImport", categoryParentRef, Constants.TYPE_CONTENT, categoryProperties);
             CML cml2 = new CML();
             cml2.setCreate(new CMLCreate[]{createCategory});            
@@ -82,8 +82,8 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
             Action importAction = new Action();
             importAction.setActionName("import");
             NamedValue[] params = new NamedValue[]{
-                    new NamedValue("encoding", "UTF-8"),
-                    new NamedValue("destination", rootNodeRef)
+                    new NamedValue("encoding", false, "UTF-8", null),
+                    new NamedValue("destination", false, rootNodeRef, null)
             };
             importAction.setParameters(params);
             

@@ -154,7 +154,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
     private NamedValue[] getVersionComments()
     {
         NamedValue[] comments = new NamedValue[1];
-        comments[0] = new NamedValue("description", VALUE_DESCRIPTION);
+        comments[0] = new NamedValue("description", false, VALUE_DESCRIPTION, null);
         return comments;
     }
 

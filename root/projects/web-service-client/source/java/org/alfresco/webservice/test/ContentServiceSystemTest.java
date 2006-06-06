@@ -17,7 +17,6 @@
 package org.alfresco.webservice.test;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.InputStream;
 
 import org.alfresco.webservice.content.Content;
@@ -31,8 +30,6 @@ import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
-
-import freemarker.log.Logger;
 
 public class ContentServiceSystemTest extends BaseWebServiceSystemTest
 {
@@ -50,7 +47,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
        parentRef.setChildName(Constants.ASSOC_CHILDREN);
        
-       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, this.fileName)};
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, this.fileName, null)};
        CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});
@@ -170,7 +167,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        parentRef.setChildName(Constants.ASSOC_CHILDREN);
        
        // Create the content
-       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "quick.doc")};
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "quick.doc", null)};
        CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});
@@ -212,7 +209,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        parentRef.setChildName(Constants.ASSOC_CHILDREN);
        
        // Create the content
-       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "test.jpg")};
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "test.jpg", null)};
        CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});

@@ -107,12 +107,12 @@ public abstract class BaseWebServiceSystemTest extends TestCase
 
             // Create test content
             ParentReference contentParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testContent");
-            NamedValue[] contentProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, CONTENT_NAME)};
+            NamedValue[] contentProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, CONTENT_NAME, null)};
             CMLCreate createContent = new CMLCreate("testContent", contentParentRef, Constants.TYPE_CONTENT, contentProperties);
             
             // Create test folder
             ParentReference folderParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testFolder");            
-            NamedValue[] folderProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, FOLDER_NAME)};
+            NamedValue[] folderProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, FOLDER_NAME, null)};
             CMLCreate createFolder = new CMLCreate("testFolder", folderParentRef, Constants.TYPE_FOLDER, folderProperties);
             
             CML cml = new CML();
@@ -153,7 +153,7 @@ public abstract class BaseWebServiceSystemTest extends TestCase
         parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
         parentRef.setChildName("{test}test" + System.currentTimeMillis());
         
-        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, name)};
+        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, name, null)};
         CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
         CML cml = new CML();
         cml.setCreate(new CMLCreate[]{create});

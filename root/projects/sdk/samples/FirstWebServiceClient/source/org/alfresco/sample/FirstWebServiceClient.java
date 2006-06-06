@@ -30,6 +30,7 @@ import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 
 
@@ -68,13 +69,13 @@ public class FirstWebServiceClient
             // Note: Assign "1" as a local id, so we can refer to it in subsequent
             //       CML statements within the same CML block
             NamedValue[] contentProps = new NamedValue[1]; 
-            contentProps[0] = new NamedValue(Constants.PROP_NAME, name); 
+            contentProps[0] = Utils.createNamedValue(Constants.PROP_NAME, name); 
             CMLCreate create = new CMLCreate("1", companyHomeParent, Constants.TYPE_CONTENT, contentProps);
             
             // Construct CML statement to add titled aspect
             NamedValue[] titledProps = new NamedValue[2];
-            titledProps[0] = new NamedValue(Constants.PROP_TITLE, name);
-            titledProps[1] = new NamedValue(Constants.PROP_DESCRIPTION, name);
+            titledProps[0] = Utils.createNamedValue(Constants.PROP_TITLE, name);
+            titledProps[1] = Utils.createNamedValue(Constants.PROP_DESCRIPTION, name);
             CMLAddAspect addAspect = new CMLAddAspect(Constants.ASPECT_TITLED, titledProps, null, "1");
             
             // Construct CML Block

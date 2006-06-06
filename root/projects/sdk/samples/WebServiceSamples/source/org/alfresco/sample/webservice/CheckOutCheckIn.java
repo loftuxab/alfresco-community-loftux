@@ -34,6 +34,7 @@ import org.alfresco.webservice.types.VersionHistory;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 
 /**
@@ -85,7 +86,7 @@ public class CheckOutCheckIn extends SamplesBase
             
             // Now check the working copy in with a description of the change made that will be recorded in the version history
             Predicate predicate = new Predicate(new Reference[]{workingCopyReference}, null, null);
-            NamedValue[] comments = new NamedValue[]{new NamedValue("description", "The content has been updated")};
+            NamedValue[] comments = new NamedValue[]{Utils.createNamedValue("description", "The content has been updated")};
             authoringService.checkin(predicate, comments, false);
             
             // Output the updated content

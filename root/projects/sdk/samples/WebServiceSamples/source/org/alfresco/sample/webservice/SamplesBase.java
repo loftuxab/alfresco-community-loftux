@@ -27,6 +27,7 @@ import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.Constants;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 
 /**
@@ -61,7 +62,7 @@ public class SamplesBase
                     Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "sample_folder"));
 
             // Create folder
-            NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "Web Service Sample Folder")};
+            NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "Web Service Sample Folder")};
             CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_FOLDER, properties);
             CML cml = new CML();
             cml.setCreate(new CMLCreate[]{create});
@@ -77,7 +78,7 @@ public class SamplesBase
                     Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "sample_content"));
             
             // Create content
-            NamedValue[] properties2 = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "SampleContent.txt")};
+            NamedValue[] properties2 = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "SampleContent.txt")};
             CMLCreate create2 = new CMLCreate("1", parentReference2, Constants.TYPE_CONTENT, properties2);
             CML cml2 = new CML();
             cml2.setCreate(new CMLCreate[]{create2});

@@ -31,6 +31,7 @@ import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 
 /**
@@ -95,7 +96,7 @@ public class ContentReadAndWrite extends SamplesBase
             ParentReference parentReference = new ParentReference(reference.getStore(), reference.getUuid(), null, ASSOC_CONTAINS, ASSOC_CONTAINS);
             
             // Create the content
-            NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, "test.jpg")};
+            NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "test.jpg")};
             CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_CONTENT, properties);
             CML cml = new CML();
             cml.setCreate(new CMLCreate[]{create});
@@ -138,7 +139,7 @@ public class ContentReadAndWrite extends SamplesBase
         // Define the content format for the content we are adding
         ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
         
-        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_" + name)};
+        NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_" + name)};
         CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_CONTENT, properties);
         CML cml = new CML();
         cml.setCreate(new CMLCreate[]{create});

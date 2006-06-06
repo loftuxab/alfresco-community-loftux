@@ -288,12 +288,12 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
     {
         // Create the new user objects
         return new NamedValue[] {
-                new NamedValue(Constants.PROP_USER_HOMEFOLDER, homeFolder),
-                new NamedValue(Constants.PROP_USER_FIRSTNAME, firstName),
-                new NamedValue(Constants.PROP_USER_MIDDLENAME, middleName),
-                new NamedValue(Constants.PROP_USER_LASTNAME, lastName),
-                new NamedValue(Constants.PROP_USER_EMAIL, email),
-                new NamedValue(Constants.PROP_USER_ORGID, orgId) };
+                new NamedValue(Constants.PROP_USER_HOMEFOLDER, false, homeFolder, null),
+                new NamedValue(Constants.PROP_USER_FIRSTNAME, false, firstName, null),
+                new NamedValue(Constants.PROP_USER_MIDDLENAME, false, middleName, null),
+                new NamedValue(Constants.PROP_USER_LASTNAME, false, lastName, null),
+                new NamedValue(Constants.PROP_USER_EMAIL, false, email, null),
+                new NamedValue(Constants.PROP_USER_ORGID, false, orgId, null)};
     }
 
 }
