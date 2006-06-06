@@ -37,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-php, distribute-web-service-client"
+           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
@@ -218,25 +218,6 @@
          <fileset dir="${dir.project.installer}" includes="*.sql,licenses/**,AlfrescoTest.pdf, README_war.txt" />
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
       </copy>
-   </target>
-
-   <!-- ***************** -->
-   <!-- ** PHP targets ** -->
-   <!-- ***************** -->
-   
-   <target name="distribute-php" depends="init"
-           description="Creates the PHP distribution file for all platforms">
-      <mkdir dir="${dir.dist}" />
-      
-      <zip destfile="${dir.dist}/${file.name.dist.php}.zip">
-         <zipfileset dir="${dir.php}" />
-      </zip>
-      
-      <tar destfile="${dir.dist}/${file.name.dist.php}.tar" longfile="gnu">
-         <tarfileset dir="${dir.php}" />
-      </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.php}.tar.gz" src="${dir.dist}/${file.name.dist.php}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.php}.tar" />
    </target>
    
    <!-- ***************** -->
