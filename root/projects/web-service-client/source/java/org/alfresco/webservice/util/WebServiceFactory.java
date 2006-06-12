@@ -375,7 +375,7 @@ public final class WebServiceFactory
     private static String getEndpointAddress()
     {
         String endPoint = DEFAULT_ENDPOINT_ADDRESS;
-        
+
         InputStream is = ClassLoader.getSystemResourceAsStream(PROPERTY_FILE_NAME);
         if (is != null)
         {
@@ -384,6 +384,11 @@ public final class WebServiceFactory
             {
                 props.load(is);            
                 endPoint = props.getProperty(REPO_LOCATION);
+                
+                if (logger.isDebugEnabled() == true)
+                {
+                    logger.debug("Using endpoint " + endPoint);
+                }
             }
             catch (Exception e)
             {
