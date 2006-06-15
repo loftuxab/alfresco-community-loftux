@@ -93,7 +93,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode(this.folderPath.substring(1));
+                final Node folder = rootNode.getNode(this.folderPath.substring(0));
                 
                 this.folderPath = rootNode.getPath();
                 

@@ -46,10 +46,10 @@
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
     	<!-- Number of objects to bulk load in each test -->
-    	<param name="alfresco.loadCount" value="5000"/>
+    	<param name="alfresco.loadCount" value="1000"/>
     
         <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="100"/>
+    	<param name="japex.runIterations" value="69"/>
     	<param name="japex.runDelay" value="0"/>
     	<param name="japex.runDelayVariation" value="0"/>
     </testCase>

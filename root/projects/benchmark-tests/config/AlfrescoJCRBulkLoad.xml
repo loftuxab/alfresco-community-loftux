@@ -23,7 +23,7 @@
     <param name="japex.classPath" value="${ALFRESCO_PROJECTS}/benchmark-tests/config"/>
 
     <driver name="JAXPDriver">
-        <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.JCR.AlfrescoJCRBulkLoadDriver"/>
+        <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.jcr.AlfrescoJCRBulkLoadDriver"/>
         <param name="description" value="JCR Bulk Load Test"/>
 
     	<param name="japex.numberOfThreads" value="1"/>
@@ -38,10 +38,11 @@
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
     	<!-- Number of objects to bulk load in each test -->
-    	<param name="alfresco.loadCount" value="10"/>
+    	<param name="alfresco.loadCount" value="1000"/>
     
+        <!-- 100k in -->
         <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="2"/>
+    	<param name="japex.runIterations" value="100"/>
     	<param name="japex.runDelay" value="0"/>
     	<param name="japex.runDelayVariation" value="0"/>
     </testCase>

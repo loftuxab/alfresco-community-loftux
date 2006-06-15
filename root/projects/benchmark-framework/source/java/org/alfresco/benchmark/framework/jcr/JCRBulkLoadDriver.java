@@ -33,7 +33,7 @@ import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile.PropertyType;
-import org.alfresco.benchmark.framework.jcr.JCRUtils;
+import org.apache.log4j.Logger;
 
 import com.sun.japex.TestCase;
 
@@ -42,6 +42,8 @@ import com.sun.japex.TestCase;
  */
 public class JCRBulkLoadDriver extends BaseBenchmarkDriver
 {
+	private static final Logger logger = Logger.getLogger(JCRBulkLoadDriver.class);
+	
     protected Repository repository;
         
     public static final String PARAM_LOAD_COUNT = "alfresco.loadCount";
@@ -122,14 +124,18 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
                 // Save
                 session.save();
             }
+            catch (Throwable e)
+            {
+            	logger.error(e);
+            }
             finally
             {
-                session.logout();
+            	try {session.logout(); } catch (Throwable e) {logger.error(e); }
             }
         }
         catch (Throwable exception)
         {
-            exception.printStackTrace();
+        	logger.error(exception);
         }
     }
 }

@@ -27,7 +27,7 @@
         <param name="description" value="Alfresco Internal API"/>
 
     	<param name="japex.numberOfThreads" value="4"/>
-    	<param name="japex.threadRampupTime" value="0"/>
+    	<param name="japex.threadRampupTime" value="60"/>
     	<param name="japex.includeWarmupRun" value="false"/>
     	
     </driver>
@@ -42,10 +42,10 @@
 
         <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
 
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="50"/>
-    	<param name="japex.runDelay" value="0"/>
-    	<param name="japex.runDelayVariation" value="0"/>
+        <param name="japex.warmupIterations" value="1"/>            
+    	<param name="japex.runIterations" value="10"/>
+    	<param name="japex.runDelay" value="15"/>
+    	<param name="japex.runDelayVariation" value="10"/>
     	
     </testCase> 
 
@@ -59,10 +59,10 @@
 
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="50"/>
-    	<param name="japex.runDelay" value="0"/>
-    	<param name="japex.runDelayVariation" value="0"/>
+        <param name="japex.warmupIterations" value="1"/>            
+    	<param name="japex.runIterations" value="10"/>
+    	<param name="japex.runDelay" value="15"/>
+    	<param name="japex.runDelayVariation" value="10"/>
     	
     </testCase>     
 
@@ -77,28 +77,10 @@
 
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="50"/>
-    	<param name="japex.runDelay" value="0"/>
-    	<param name="japex.runDelayVariation" value="0"/>
-    	
-    </testCase>
-
-    <testCase name="Create Version">
-    
-        <!-- Usage Profile -->
-        <param name="alfresco.usageProfile.readContent" value="0"/>
-        <param name="alfresco.usageProfile.readProperties" value="0"/>
-		<param name="alfresco.usageProfile.createContent" value="0"/>		
-        <param name="alfresco.usageProfile.createVersion" value="100"/>
-        <param name="alfresco.usageProfile.createFolder" value="0"/>
-
-        <param name="alfresco.numberOfAvailableUsers" value="50"/>
-    
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="50"/>
-    	<param name="japex.runDelay" value="0"/>
-    	<param name="japex.runDelayVariation" value="0"/>
+        <param name="japex.warmupIterations" value="1"/>            
+    	<param name="japex.runIterations" value="10"/>
+    	<param name="japex.runDelay" value="15"/>
+    	<param name="japex.runDelayVariation" value="10"/>
     	
     </testCase>
 
@@ -113,10 +95,10 @@
 
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="50"/>
-    	<param name="japex.runDelay" value="0"/>
-    	<param name="japex.runDelayVariation" value="0"/>
+        <param name="japex.warmupIterations" value="1"/>            
+    	<param name="japex.runIterations" value="10"/>
+    	<param name="japex.runDelay" value="15"/>
+    	<param name="japex.runDelayVariation" value="10"/>
     	
     </testCase>
 
@@ -131,10 +113,10 @@
 
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
-        <param name="japex.warmupIterations" value="0"/>            
-    	<param name="japex.runIterations" value="50"/>
-    	<param name="japex.runDelay" value="0"/>
-    	<param name="japex.runDelayVariation" value="0"/>
+        <param name="japex.warmupIterations" value="1"/>            
+    	<param name="japex.runIterations" value="10"/>
+    	<param name="japex.runDelay" value="15"/>
+    	<param name="japex.runDelayVariation" value="10"/>
     </testCase>
     
 </testSuite>
