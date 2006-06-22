@@ -20,7 +20,6 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/cryptix-jce-provider.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/dom4j-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/freemarker.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/hrtlib.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/htmlparser-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jakarta-oro-2.0.8.jar"/>
@@ -91,5 +90,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-jmx.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/c3p0-0.9.1-pre6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/ehcache-1.2-patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/ant.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
