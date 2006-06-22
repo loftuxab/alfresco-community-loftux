@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.jcr.Repository;
-
 import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.DataLoaderComponent;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;

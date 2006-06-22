@@ -30,14 +30,12 @@ import org.alfresco.benchmark.framework.DataLoaderComponent;
 import org.alfresco.benchmark.framework.LoadedData;
 import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.cmr.security.AuthorityService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
@@ -55,9 +53,6 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     /** The search service */
     private SearchService searchService;
     
-    /** The authentication service */
-    private AuthenticationComponent authenticationComponent;
-    
     /** The content service */
     private ContentService contentService;
     
@@ -69,8 +64,6 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     
     /** The person service */
     private PersonService personService;
-    
-    private AuthorityService authorityService;
     
     /**
      * Set the node service 
@@ -90,16 +83,6 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     public void setSearchService(SearchService searchService)
     {
         this.searchService = searchService;
-    }
-    
-    /**
-     * Set the authentication service
-     * 
-     * @param authenticationComponent   the suthentication component
-     */
-    public void setAuthenticationComponent(AuthenticationComponent authenticationComponent)
-    {
-        this.authenticationComponent = authenticationComponent;
     }
     
     /**
@@ -140,16 +123,6 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     public void setPersonService(PersonService personService)
     {
         this.personService = personService;
-    }
-    
-    /**
-     * Set the authority service
-     * 
-     * @param authorityService      the authority service
-     */
-    public void setAuthorityService(AuthorityService authorityService)
-    {
-        this.authorityService = authorityService;
     }
     
     /**
