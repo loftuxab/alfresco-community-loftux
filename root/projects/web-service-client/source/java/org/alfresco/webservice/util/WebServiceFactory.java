@@ -35,6 +35,8 @@ import org.alfresco.webservice.classification.ClassificationServiceLocator;
 import org.alfresco.webservice.classification.ClassificationServiceSoapBindingStub;
 import org.alfresco.webservice.content.ContentServiceLocator;
 import org.alfresco.webservice.content.ContentServiceSoapBindingStub;
+import org.alfresco.webservice.dictionary.DictionaryServiceLocator;
+import org.alfresco.webservice.dictionary.DictionaryServiceSoapBindingStub;
 import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.apache.commons.logging.Log;
@@ -68,6 +70,7 @@ public final class WebServiceFactory
     private static final String ACTION_SERVICE_ADDRESS          = "/alfresco/api/ActionService";
     private static final String ACCESS_CONTROL_ADDRESS          = "/alfresco/api/AccessControlService";
     private static final String ADMINISTRATION_ADDRESS          = "/alfresco/api/AdministrationService";
+    private static final String DICTIONARY_SERVICE_ADDRESS      = "/alfresco/api/DictionaryService";
     
     /** Services */
     private static AuthenticationServiceSoapBindingStub authenticationService   = null;
@@ -78,6 +81,7 @@ public final class WebServiceFactory
     private static ActionServiceSoapBindingStub         actionService           = null;
     private static AccessControlServiceSoapBindingStub  accessControlService    = null;
     private static AdministrationServiceSoapBindingStub administrationService   = null;
+    private static DictionaryServiceSoapBindingStub     dictionaryService       = null;
     
     /**
      * Get the authentication service
@@ -365,6 +369,42 @@ public final class WebServiceFactory
         }        
         
         return administrationService;
+    }
+
+    /**
+     * Get the dictionary service
+     * 
+     * @return  the dictionary service
+     */
+    public static DictionaryServiceSoapBindingStub getDictionaryService()
+    {
+        if (dictionaryService == null)
+        {            
+            try 
+            {
+                // Get the dictionary service
+                DictionaryServiceLocator locator = new DictionaryServiceLocator(AuthenticationUtils.getEngineConfiguration());
+                locator.setDictionaryServiceEndpointAddress(getEndpointAddress() + DICTIONARY_SERVICE_ADDRESS);                
+                dictionaryService = (DictionaryServiceSoapBindingStub)locator.getDictionaryService();
+            }
+            catch (ServiceException jre) 
+            {
+                if (logger.isDebugEnabled() == true)
+                {
+                    if (jre.getLinkedCause() != null)
+                    {
+                        jre.getLinkedCause().printStackTrace();
+                    }
+                }
+   
+                throw new WebServiceException("Error creating dictionary service: " + jre.getMessage(), jre);
+            }        
+            
+            // Time out after a minute
+            dictionaryService.setTimeout(60000);
+        }        
+        
+        return dictionaryService;
     }
     
     /**

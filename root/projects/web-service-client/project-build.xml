@@ -58,7 +58,7 @@
         </delete>
     </target>
         
-    <target name="gen-all-service-clients" depends="gen-auth-service-client, gen-repo-service-client, gen-content-service-client, gen-authoring-service-client, gen-classification-service-client, gen-action-service-client, gen-access-control-service-client, gen-administration-service-client" />
+    <target name="gen-all-service-clients" depends="gen-auth-service-client, gen-repo-service-client, gen-content-service-client, gen-authoring-service-client, gen-classification-service-client, gen-action-service-client, gen-access-control-service-client, gen-administration-service-client, gen-dictionay-service-client" />
 
     <target name="gen-auth-service-client" depends="init">
         <mkdir dir="${dir.src.java.generated}${package.dir}/authentication" />
@@ -81,6 +81,17 @@
             <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="${package.path}.types" />
             <mapping namespace="http://www.alfresco.org/ws/cml/1.0" package="${package.path}.types" />
             <mapping namespace="http://www.alfresco.org/ws/headers/1.0" package="${package.path}.types" />
+        </wsdl2java>
+    </target>
+
+    <target name="gen-dictionay-service-client" depends="init">
+        <mkdir dir="${dir.src.java.generated}${package.dir}/dictionary" />
+        <delete>
+            <fileset dir="${dir.src.java.generated}${package.dir}/dictionary" />
+        </delete>
+        <wsdl2java url="${dir.wsdl}/dictionary-service.wsdl" output="${dir.src.java.generated}" testcase="no" all="true">
+            <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" package="${package.path}.dictionary" />
+            <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="${package.path}.types" />
         </wsdl2java>
     </target>
 
