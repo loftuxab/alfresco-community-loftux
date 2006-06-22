@@ -19,10 +19,8 @@ package org.alfresco.benchmark.framework.jcr;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.jcr.Node;
 import javax.jcr.Repository;

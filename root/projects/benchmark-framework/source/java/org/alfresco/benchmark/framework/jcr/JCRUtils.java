@@ -18,9 +18,7 @@ package org.alfresco.benchmark.framework.jcr;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -31,7 +29,6 @@ import javax.jcr.NodeIterator;
 import javax.jcr.Repository;
 
 import org.alfresco.benchmark.framework.BenchmarkUtils;
-import org.alfresco.benchmark.framework.DataLoaderComponent;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
