@@ -42,17 +42,11 @@ public class DataProviderComponent
         if (instance == null)
         {
             instance = new DataProviderComponent();
-            
-            // Load the content details into the cache
-            instance.cacheContentData();
         }
         return instance;
     }
     
-    /**
-     * Cache the content data
-     */
-    private void cacheContentData()
+    public DataProviderComponent()
     {
         this.contentCache = new ArrayList<ContentData>();
                
@@ -75,7 +69,7 @@ public class DataProviderComponent
             throw new RuntimeException("Unable to find folder at location " + location);
         }
         
-        System.out.println("Folder location: " + location);
+        //System.out.println("Folder location: " + location);
         for (File file : folder.listFiles())
         {
             if (file.isDirectory() == true)
@@ -90,6 +84,8 @@ public class DataProviderComponent
                 //String mimetype = this.mimetypeMap.guessMimetype(file.getName());
                 //String extension = this.mimetypeMap.getExtension(mimetype);
                
+                //System.out.println("Found file: " + file.getPath());
+                
                 // TODO need to sort this out ...
                 String mimetype = "text/plain";
                 String extension = ".txt";
@@ -139,11 +135,20 @@ public class DataProviderComponent
             result.put(propertyProfile.getPropertyName(), value);
         }
         
-        return result;        
+        return result; 
     }
     
     private ContentData getContentPropertyData(PropertyProfile propertyProfile)
     {
+        if (this.contentCache == null || this.contentCache.size() == 0)
+        {
+            if (this.contentCache == null)
+            {
+                System.out.println("WARNING:  the content cache is null");
+            }
+            throw new RuntimeException("There is no content data available.  Please place some in one of the content folders specified.");
+        }
+        
         int randPos = BenchmarkUtils.rand.nextInt(this.contentCache.size());
         return this.contentCache.get(randPos);
     }

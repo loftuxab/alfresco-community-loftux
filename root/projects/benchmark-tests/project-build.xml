@@ -1,0 +1,42 @@
+<project name="alfresco-benchmark" default="build"  basedir=".">
+
+   <path id="path.common" path="${basedir}/../../common"/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
+
+    <property environment="env"/>
+
+	<path id="class.path">			
+		<fileset dir="../benchmark-framework/lib">
+			<include name="**/*.jar"/>
+		</fileset>				    	
+        <fileset dir="../benchmark-framework/lib/japex" includes="*.jar"/>
+    </path>
+
+    <target name="compile-java" depends="init" description="Compiles the Java source code">
+      <mkdir dir="${dir.classes}" />
+      <javac destdir="${dir.classes}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
+          <src path="${dir.src.java}" />
+          <classpath refid="classpath.compile" />
+          <classpath refid="class.path"/>
+      </javac>
+
+      <copy todir="${dir.classes}">
+          <fileset dir="${dir.src.java}">
+              <patternset>
+                  <exclude name="**/*.java" />
+              </patternset>
+          </fileset>
+      </copy>
+    </target>    
+	
+    <target name="package-jar"  depends="compile-java" description="Packages the JAR file">
+        <mkdir dir="${dir.dist}" />
+        <jar jarfile="${dir.dist}/${file.name.jar}">
+        	<fileset dir="${dir.classes}">
+        		<exclude name="**/*.properties"/>
+        	</fileset> 
+        </jar>
+    </target>
+    
+</project>

@@ -33,7 +33,7 @@ import org.alfresco.service.namespace.QName;
 import com.sun.japex.TestCase;
 
 /**
- * @author Roy Wetherall
+ * @author Roy Wetherall 
  */
 public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implements UnitsOfWork
 {

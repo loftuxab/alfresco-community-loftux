@@ -37,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client"
+           depends="init, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
@@ -239,6 +239,65 @@
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.webserviceclient}.tar.gz" src="${dir.dist}/${file.name.dist.webserviceclient}.tar" />
       <delete file="${dir.dist}/${file.name.dist.webserviceclient}.tar" />
+   </target>
+   
+   <!-- ******************** -->
+   <!-- ** Benchmark targets ** -->
+   <!-- ******************** -->
+   
+   <target name="assemble-benchmark" depends="init">
+      
+      <!-- Create the required directory structure -->
+      <mkdir dir="${dir.dist}" />
+      <mkdir dir="${dir.assemble.benchmark}" />
+
+      <!-- Get the jars -->
+      <mkdir dir="${dir.assemble.benchmark}/lib" />
+      <copy todir="${dir.assemble.benchmark}/lib">
+         <fileset dir="${dir.project.benchmark-framework}/lib" includes="**/*.jar" />
+         <fileset dir="${dir.project.benchmark-tests}/lib" includes="**/*.jar" />
+         <fileset dir="${dir.project.benchmark-framework}/build/dist" includes="benchmark-framework.jar"/>
+         <fileset dir="${dir.project.benchmark-tests}/build/dist" includes="alfresco-benchmark.jar"/>
+      </copy>
+
+      <!-- Get the configuration files -->
+      <mkdir dir="${dir.assemble.benchmark}/config" />
+      <copy todir="${dir.assemble.benchmark}/config">
+         <fileset dir="${dir.project.benchmark-framework}/config" includes="repository-profile*.properties" />
+         <fileset dir="${dir.project.benchmark-tests}/config" includes="**/*.xml" />
+      </copy>
+      <copy file="${dir.project.benchmark-tests}/config/classpath.config.dist" tofile="${dir.assemble.benchmark}/config/classpath.config" />
+      <copy file="${dir.project.benchmark-framework}/config/benchmark-config.properties.dist" tofile="${dir.assemble.benchmark}/config/benchmark-config.properties" />
+
+      <!-- Create the data folders -->
+      <mkdir dir="${dir.assemble.benchmark}/data" />
+      <mkdir dir="${dir.assemble.benchmark}/data/output" />
+      <mkdir dir="${dir.assemble.benchmark}/data/content" />
+      <copy file="${dir.project.benchmark-framework}/data/content/SmallTextDocument.java" todir="${dir.assemble.benchmark}/data/content" />
+
+      <!-- Get the documentation -->
+      <!-- TODO -->
+      
+      <!-- Get the ant file -->
+      <copy file="${dir.project.benchmark-tests}/build.xml" todir="${dir.assemble.benchmark}" />
+      <copy file="${dir.project.benchmark-tests}/build-common.xml.dist" tofile="${dir.assemble.benchmark}/build-common.xml" />
+      <copy file="${dir.project.benchmark-tests}/build-classpath.xml.dist" tofile="${dir.assemble.benchmark}/build-classpath.xml" />
+
+   </target>
+   
+   <target name="distribute-benchmark" depends="assemble-benchmark"
+           description="Creates the Alfresco benchmark distribution file for all platforms">
+      <mkdir dir="${dir.dist}" />
+
+      <zip destfile="${dir.dist}/${file.name.dist.benchmark}.zip">
+         <zipfileset dir="${dir.assemble.benchmark}" />
+      </zip>
+
+      <tar destfile="${dir.dist}/${file.name.dist.benchmark}.tar" longfile="gnu">
+         <tarfileset dir="${dir.assemble.benchmark}" />
+      </tar>
+      <gzip zipfile="${dir.dist}/${file.name.dist.benchmark}.tar.gz" src="${dir.dist}/${file.name.dist.benchmark}.tar" />
+      <delete file="${dir.dist}/${file.name.dist.benchmark}.tar" />
    </target>
 
    <!-- ******************** -->

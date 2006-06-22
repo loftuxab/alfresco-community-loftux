@@ -16,7 +16,9 @@
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}"/>
+                       ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.benchmark-framework}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.benchmark-tests}/${file.name.project.build}"/>
    </target>
 
    <!-- ********************** -->

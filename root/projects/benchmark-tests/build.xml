@@ -1,32 +1,16 @@
-<project name="BenchmarkTests" default="benchmark"  basedir=".">
-
-   <path id="path.common" path="${basedir}/../../common"/>
-   <property name="dir.common" refid="path.common"/>
-   <import file="${dir.common}/common.xml"/>
-
-    <property environment="env"/>
+<project name="alfresco-benchmarks" default="benchmark"  basedir=".">
+	
+	<!-- Import the generated and common classpath files -->
+	<import file="build-common.xml"/>
+	<import file="build-classpath.xml"/>
     
     <property name="config" value="config/testConfig.xml"/>
-
-    <path id="class.path">
-        <fileset dir="../benchmark-framework/lib/japex" includes="*.jar"/>
-    </path>
-
-    <target name="compile-java" depends="init" description="Compiles the Java source code">
-      <mkdir dir="${dir.classes}" />
-      <javac destdir="${dir.classes}" fork="true" deprecation="on" debug="on" target="1.5" source="1.5">
-          <src path="${dir.src.java}" />
-          <classpath refid="classpath.compile" />
-          <classpath refid="class.path"/>
-      </javac>
-
-      <copy todir="${dir.classes}">
-          <fileset dir="${dir.src.java}">
-              <patternset>
-                  <exclude name="**/*.java" />
-              </patternset>
-          </fileset>
-      </copy>
+	
+	<target name="generate-classpath" description="Generate the classpath from the common configuration">
+        <java dir="." fork="true" classname="org.alfresco.benchmark.framework.util.GenerateAntClasspath">
+            <jvmarg value="-server"/>
+            <classpath refid="class.path"/>
+        </java>
     </target>
 
     <target name="benchmark" description="Run benchmark tests (-Dconfig=config-file)">
@@ -50,25 +34,7 @@
             <jvmarg value="-Xms512m"/>
             <jvmarg value="-Xmx1024m"/>
             <jvmarg value="-Xss64k"/>
-			<classpath>
-				<pathelement path="../core/build/classes"/> 
-      			<pathelement path="./build/classes"/>
-      			<pathelement path="./config"/>				
-				<fileset dir="./lib">
-    				<include name="**/*.jar"/>
-  				</fileset>      			
-				<pathelement path="../benchmark-framework/build/classes"/>   
-				<pathelement path="../benchmark-framework/config"/>   
-				<fileset dir="../benchmark-framework/lib">
-        			<include name="**/*.jar"/>
-      			</fileset>				
-				<fileset dir="../3rd-party/lib">
-        			<include name="**/*.jar"/>
-      			</fileset>
-				<pathelement path="../repository/build/classes"/> 
-				<pathelement path="../repository/config"/>
-				
-			</classpath>
+            <classpath refid="path.generated"/>
             <arg line="${respository-profile}"/>
         </java>
     </target>
@@ -79,25 +45,8 @@
             <jvmarg value="-Xms512m"/>
             <jvmarg value="-Xmx1024m"/>
             <jvmarg value="-Xss64k"/>
-			<classpath>
-				<pathelement path="../core/build/classes"/> 
-      			<pathelement path="./build/classes"/>
-      			<pathelement path="./config"/>				
-				<fileset dir="./lib">
-    				<include name="**/*.jar"/>
-  				</fileset>      			
-				<pathelement path="../benchmark-framework/build/classes"/>   
-				<pathelement path="../benchmark-framework/config"/>   
-				<fileset dir="../benchmark-framework/lib">
-        			<include name="**/*.jar"/>
-      			</fileset>				
-				<fileset dir="../3rd-party/lib">
-        			<include name="**/*.jar"/>
-      			</fileset>
-				<pathelement path="../repository/build/classes"/> 
-				<pathelement path="../repository/config"/>
-				
-			</classpath>
+
+            <classpath refid="path.generated"/>
             <arg line="${respository-profile}"/>
         </java>
     </target>

@@ -80,7 +80,23 @@ public class BenchmarkUtils
         if (location == null)
         {
             loadProperties();
-            location = outputFolderLocation + File.separator + "testCase_" + testCase.getName() + "_" + System.currentTimeMillis() + ".csv";
+            String filePath = testCase.getParam("alfresco.config-file-name");
+            if (filePath == null)
+            {
+                filePath = "";
+            }
+            else
+            {
+                int index = filePath.lastIndexOf(File.separator);
+                if (index == -1)
+                {
+                    index = filePath.lastIndexOf("/");
+                }
+                index ++;
+                int end = filePath.indexOf(".");
+                filePath = filePath.substring(index, end) + "_";
+            }
+            location = outputFolderLocation + File.separator + filePath + testCase.getName() + "_" + System.currentTimeMillis() + ".csv";
             testCaseOutputLocation.put(testCase.getName(), location);
         }
         return location;
