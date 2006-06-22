@@ -58,7 +58,7 @@
         </delete>
     </target>
         
-    <target name="gen-all-service-clients" depends="gen-auth-service-client, gen-repo-service-client, gen-content-service-client, gen-authoring-service-client, gen-classification-service-client, gen-action-service-client, gen-access-control-service-client, gen-administration-service-client, gen-dictionay-service-client" />
+    <target name="gen-all-service-clients" depends="gen-auth-service-client, gen-repo-service-client, gen-content-service-client, gen-authoring-service-client, gen-classification-service-client, gen-action-service-client, gen-access-control-service-client, gen-administration-service-client, gen-dictionary-service-client" />
 
     <target name="gen-auth-service-client" depends="init">
         <mkdir dir="${dir.src.java.generated}${package.dir}/authentication" />
@@ -84,7 +84,7 @@
         </wsdl2java>
     </target>
 
-    <target name="gen-dictionay-service-client" depends="init">
+    <target name="gen-dictionary-service-client" depends="init">
         <mkdir dir="${dir.src.java.generated}${package.dir}/dictionary" />
         <delete>
             <fileset dir="${dir.src.java.generated}${package.dir}/dictionary" />

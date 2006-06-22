@@ -73,36 +73,6 @@ public class DictionaryServiceSoapBindingStub extends org.apache.axis.client.Stu
             java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
             java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
             java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "LocaleConfiguration");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.www.ws.headers._1_0.LocaleConfiguration.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "NamespaceConfiguration");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.www.ws.headers._1_0.NamespaceConfigurationInner[].class;
-            cachedSerClasses.add(cls);
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "NamespaceConfigurationInner");
-            qName2 = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "mapping");
-            cachedSerFactories.add(new org.apache.axis.encoding.ser.ArraySerializerFactory(qName, qName2));
-            cachedDeserFactories.add(new org.apache.axis.encoding.ser.ArrayDeserializerFactory());
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "NamespaceConfigurationInner");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.www.ws.headers._1_0.NamespaceConfigurationInner.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/headers/1.0", "QueryConfiguration");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.www.ws.headers._1_0.QueryConfiguration.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(beansf);
-            cachedDeserFactories.add(beandf);
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">ContentFormat>encoding");
             cachedSerQNames.add(qName);
             cls = java.lang.String.class;
