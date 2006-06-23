@@ -16,6 +16,9 @@
 	   <property name="transactionService">
 	   	  <ref bean="transactionComponent" />
 	   </property>
+	   <property name="authenticationService">
+	   	  <ref bean="authenticationService" />
+	   </property>
 	   <property name="personService">
 	   	  <ref bean="personService" />
 	   </property>
