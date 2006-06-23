@@ -68,6 +68,9 @@
          <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/README_win.txt" fullpath="README.txt" />
+         <zipfileset dir="${dir.project.installer}/upgrade" includes="upgrade_win.txt" fullpath="upgrade/upgrade.txt" />
+         <zipfileset dir="${dir.project.installer}/upgrade" prefix="upgrade" includes="db_upgrade_1.2.1_to_1.3.0.bat" />
+         <zipfileset dir="${dir.project.installer}/upgrade/scripts" prefix="upgrade/scripts" />
          <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
@@ -82,6 +85,9 @@
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_osx.txt" fullpath="README_osx.txt" />
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}/upgrade" includes="upgrade_linux.txt" fullpath="upgrade/upgrade.txt" />
+         <tarfileset dir="${dir.project.installer}/upgrade" prefix="upgrade" includes="db_upgrade_1.2.1_to_1.3.0.sh" />
+         <tarfileset dir="${dir.project.installer}/upgrade/scripts" prefix="upgrade/scripts" />
          <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
       </tar>
@@ -139,6 +145,9 @@
          <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/README_win.txt" fullpath="README.txt" />
+         <zipfileset dir="${dir.project.installer}/upgrade" includes="upgrade_win.txt" fullpath="upgrade/upgrade.txt" />
+         <zipfileset dir="${dir.project.installer}/upgrade" prefix="upgrade" includes="db_upgrade_1.2.1_to_1.3.0.bat" />
+         <zipfileset dir="${dir.project.installer}/upgrade/scripts" prefix="upgrade/scripts" />
          <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
@@ -153,6 +162,9 @@
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_osx.txt" fullpath="README_osx.txt" />
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}/upgrade" includes="upgrade_linux.txt" fullpath="upgrade/upgrade.txt" />
+         <tarfileset dir="${dir.project.installer}/upgrade" prefix="upgrade" includes="db_upgrade_1.2.1_to_1.3.0.sh" />
+         <tarfileset dir="${dir.project.installer}/upgrade/scripts" prefix="upgrade/scripts" />
          <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
       </tar>
@@ -203,10 +215,16 @@
          <zipfileset dir="${dir.assemble.war}" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
+         <zipfileset dir="${dir.project.installer}/upgrade" includes="upgrade_win.txt" fullpath="upgrade/upgrade.txt" />
+         <zipfileset dir="${dir.project.installer}/upgrade" prefix="upgrade" includes="db_upgrade_1.2.1_to_1.3.0.bat" />
+         <zipfileset dir="${dir.project.installer}/upgrade/scripts" prefix="upgrade/scripts" />
       </zip>
 
       <tar destfile="${dir.dist}/${file.name.dist.war}.tar" longfile="gnu">
          <tarfileset dir="${dir.assemble.war}" />
+         <tarfileset dir="${dir.project.installer}/upgrade" includes="upgrade_linux.txt" fullpath="upgrade/upgrade.txt" />
+         <tarfileset dir="${dir.project.installer}/upgrade" prefix="upgrade" includes="db_upgrade_1.2.1_to_1.3.0.sh" />
+         <tarfileset dir="${dir.project.installer}/upgrade/scripts" prefix="upgrade/scripts" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.war}.tar.gz" src="${dir.dist}/${file.name.dist.war}.tar" />
       <delete file="${dir.dist}/${file.name.dist.war}.tar" />
