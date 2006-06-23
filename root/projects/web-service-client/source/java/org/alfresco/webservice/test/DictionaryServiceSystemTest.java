@@ -17,7 +17,9 @@
 package org.alfresco.webservice.test;
 
 import org.alfresco.webservice.dictionary.ClassPredicate;
+import org.alfresco.webservice.types.AssociationDefinition;
 import org.alfresco.webservice.types.ClassDefinition;
+import org.alfresco.webservice.types.PropertyDefinition;
 import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -95,4 +97,31 @@ public class DictionaryServiceSystemTest extends BaseWebServiceSystemTest
         assertNotNull(classDefs);
         assertTrue(classDefs.length > 1);
     }
+    
+    public void testGetProperties() throws Exception
+    {
+        PropertyDefinition[] propDefs = WebServiceFactory.getDictionaryService().getProperties(new String[] {"cm:modified", "cm:creator"});
+        assertNotNull(propDefs);
+        assertTrue(propDefs.length == 2);
+        assertEquals("{http://www.alfresco.org/model/content/1.0}modified", propDefs[0].getName());
+        assertEquals("{http://www.alfresco.org/model/content/1.0}creator", propDefs[1].getName());
+    }
+    
+    public void testGetAssociations() throws Exception
+    {
+        AssociationDefinition[] assocDefs = WebServiceFactory.getDictionaryService().getAssociations(new String[] {"sys:children", "cm:contains"});
+        assertNotNull(assocDefs);
+        assertTrue(assocDefs.length == 2);
+        assertEquals("{http://www.alfresco.org/model/system/1.0}children", assocDefs[0].getName());
+        assertEquals("{http://www.alfresco.org/model/content/1.0}contains", assocDefs[1].getName());
+    }
+
+    public void testisSubClass() throws Exception
+    {
+        boolean test1 = WebServiceFactory.getDictionaryService().isSubClass("cm:content", "sys:base");
+        assertTrue(test1);
+        boolean test2 = WebServiceFactory.getDictionaryService().isSubClass("sys:base", "cm:content");
+        assertTrue(!test2);
+    }
+    
 }
