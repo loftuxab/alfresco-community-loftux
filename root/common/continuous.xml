@@ -115,11 +115,7 @@
       </copy>
       <copy tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/messages/${file.name.langpack.readme}" 
             file="${file.langpack.readme}" />
-      
-      <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
-      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.jboss}" />
-      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.jboss}/jboss/bin" />
-      
+
       <!-- rename model files ready for use -->
       <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml.sample"
             tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml" />
@@ -192,10 +188,6 @@
       </copy>
       <copy tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages/${file.name.langpack.readme}"
                   file="${file.langpack.readme}" />
-
-      <!-- copy the hotspot compiler file to the root of the bundle and the bin directory -->
-      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}" />
-      <copy file="${dir.project.installer}/.hotspot_compiler" todir="${dir.assemble.tomcat}/tomcat/bin" />
 
       <!-- rename model files ready for use -->
       <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml.sample"

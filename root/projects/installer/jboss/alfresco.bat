@@ -9,7 +9,7 @@ set ALF_HOME=%~dp0
 set JBOSS_HOME=%ALF_HOME%jboss
 
 rem Set any default JVM options
-set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server
+set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody
 
 rem --- If SetPaths.bat already exists - assume set by hand and use as is
 if not exist "SetPaths.bat" goto getpaths 
