@@ -228,6 +228,10 @@
          <fileset dir="${dir.project.installer}" includes="*.sql,licenses/**,AlfrescoTest.pdf, README_war.txt" />
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
       </copy>
+      <copy todir="${dir.assemble.war}/extension">
+         <fileset dir="${dir.config.repository}/alfresco/extension" />
+         <fileset dir="${dir.config.webclient}/alfresco/extension" />
+      </copy>
    </target>
    
    <!-- ***************** -->

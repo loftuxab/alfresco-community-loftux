@@ -30,6 +30,7 @@
             <fileset dir="${dir.src.java}">
                 <patternset>
                     <exclude name="**/*.java" />
+                    <exclude name="log4j.properties" />
                 </patternset>
             </fileset>
         </copy>
