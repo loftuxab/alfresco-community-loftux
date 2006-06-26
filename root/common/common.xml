@@ -32,6 +32,9 @@
                     <exclude name="**/*.java" />
                     <exclude name="log4j.properties" />
                 </patternset>
+               <!-- exclude tests which need special path fix up -->
+               <exclude name="**/AlfrescoDataLoaderComponentImplTest.java" />
+               <exclude name="**/CreationProfileTest.java" />
             </fileset>
         </copy>
     </target>
