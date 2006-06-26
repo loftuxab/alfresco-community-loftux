@@ -113,10 +113,13 @@
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
-      <copy tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/messages/${file.name.langpack.readme}" 
-            file="${file.langpack.readme}" />
+      <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/messages">
+         <fileset dir="${dir.project.installer}/messages" />
+      </copy>
 
       <!-- rename model files ready for use -->
+      <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/web-client-config-custom.xml.sample"
+            tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/web-client-config-custom.xml" />
       <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml.sample"
             tofile="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/customModel.xml" />
       <move file="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension/exampleModel.xml.sample"
@@ -186,10 +189,13 @@
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
       </copy>
-      <copy tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages/${file.name.langpack.readme}"
-                  file="${file.langpack.readme}" />
+      <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages">
+         <fileset dir="${dir.project.installer}/messages" />
+      </copy>
 
       <!-- rename model files ready for use -->
+      <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/web-client-config-custom.xml.sample"
+            tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/web-client-config-custom.xml" />
       <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml.sample"
             tofile="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/customModel.xml" />
       <move file="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension/exampleModel.xml.sample"
@@ -237,7 +243,7 @@
    <!-- ***************** -->
    <!-- ** Web Service Client targets ** -->
    <!-- ***************** -->
-   
+
    <target name="distribute-web-service-client" depends="init"
            description="Creates the web service client distribution file for all platforms">
       <mkdir dir="${dir.dist}" />
