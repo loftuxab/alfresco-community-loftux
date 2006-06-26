@@ -429,7 +429,6 @@ create table node_status
        guid varchar2(36) not null,
        node_id number(19,0),
        change_txn_id varchar2(56) not null,
-       deleted number(1,0) not null,
        primary key (protocol, identifier, guid)
 );
 
@@ -492,10 +491,10 @@ insert into version_count
 
 insert into node_status
   (
-    protocol, identifier, guid, node_id, change_txn_id, deleted
+    protocol, identifier, guid, node_id, change_txn_id
   )
   select
-    protocol, identifier, guid, node_id, change_txn_id, deleted
+    protocol, identifier, guid, node_id, change_txn_id
   from
     T_node_status;
 

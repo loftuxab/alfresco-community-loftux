@@ -478,7 +478,6 @@ CREATE TABLE `node_status` (
   `guid` varchar(36) NOT NULL,
   `node_id` bigint(20) default NULL,
   `change_txn_id` varchar(56) NOT NULL,
-  `deleted` bit(1) NOT NULL,
   PRIMARY KEY  (`protocol`,`identifier`,`guid`),
   KEY `FK38ECB8CF7F2C8017` (`node_id`),
   CONSTRAINT `FK38ECB8CF7F2C8017` FOREIGN KEY (`node_id`) REFERENCES `node` (`id`)
@@ -541,10 +540,10 @@ insert into version_count
 
 insert into node_status
   (
-    protocol, identifier, guid, node_id, change_txn_id, deleted
+    protocol, identifier, guid, node_id, change_txn_id
   )
   select
-    protocol, identifier, guid, node_id, change_txn_id, deleted
+    protocol, identifier, guid, node_id, change_txn_id
   from
     T_node_status;
 
