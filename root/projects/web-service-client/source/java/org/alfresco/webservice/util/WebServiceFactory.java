@@ -416,7 +416,7 @@ public final class WebServiceFactory
     {
         String endPoint = DEFAULT_ENDPOINT_ADDRESS;
 
-        InputStream is = ClassLoader.getSystemResourceAsStream(PROPERTY_FILE_NAME);
+        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROPERTY_FILE_NAME); 
         if (is != null)
         {
             Properties props = new Properties();
