@@ -345,10 +345,10 @@ public class Base64
         }   // end catch
         finally
         {
-            try{ oos.close();   } catch( Exception e ){}
-            try{ gzos.close();  } catch( Exception e ){}
-            try{ b64os.close(); } catch( Exception e ){}
-            try{ baos.close();  } catch( Exception e ){}
+            try{ if (oos != null) { oos.close(); } } catch( Exception e ){}
+            try{ if (gzos != null) { gzos.close(); } } catch( Exception e ){}
+            try{ if (b64os != null) { b64os.close(); } } catch( Exception e ){}
+            try{ if (baos != null) { baos.close(); } } catch( Exception e ){}
         }   // end finally
         
         // Return value according to relevant encoding.
@@ -928,7 +928,7 @@ public class Base64
         }   // end catch: IOException
         finally
         {
-            try{ bis.close(); } catch( Exception e) {}
+            try{ if (bis != null) {bis.close();} } catch( Exception e) {}
         }   // end finally
         
         return decodedData;

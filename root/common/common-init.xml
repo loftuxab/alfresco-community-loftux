@@ -79,6 +79,7 @@
         <echo level="info">version.number = ${version.number}</echo>
         <echo level="info">home.jboss = ${home.jboss}</echo>
         <echo level="info">home.tomcat = ${home.tomcat}</echo>
+        <echo level="info">home.findbugs = ${home.findbugs}</echo>
         <echo level="info">ant.home = ${ant.home}</echo>
     </target>
 

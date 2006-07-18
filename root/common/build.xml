@@ -175,6 +175,12 @@
          <filelist refid="files.project.build"/>
       </subant>
    </target>
+   
+   <target name="analyse-bugs" depends="init" description="Analyses bugs for all the projects">
+      <subant target="analyse-bugs">
+         <filelist refid="files.project.build"/>
+      </subant>
+   </target>
 
    <!-- ********************** -->
    <!-- ** Database targets ** -->
