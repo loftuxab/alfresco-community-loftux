@@ -12,6 +12,9 @@
               <entry key="Linux">
                   <value>rm -rf ${dir}</value>
               </entry>
+              <entry key="Mac OS X">
+                  <value>rm -rf ${dir}</value>
+              </entry>
               <entry key=".*">
                   <value>wibble</value>
               </entry>

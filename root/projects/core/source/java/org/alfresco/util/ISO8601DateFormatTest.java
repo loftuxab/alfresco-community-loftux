@@ -22,14 +22,18 @@ import junit.framework.TestCase;
 
 public class ISO8601DateFormatTest extends TestCase
 {
-    
     public void testConversion()
     {
-        System.out.println(Math.PI);
         String test = "2005-09-16T17:01:03.456+01:00";
+        // convert to a date
         Date date = ISO8601DateFormat.parse(test);
+        // get the string form
         String strDate = ISO8601DateFormat.format(date);
-        assertEquals(test, strDate);
+        // convert back to a date from the converted string
+        Date dateAfter = ISO8601DateFormat.parse(strDate);
+        // make sure the date objects match, test this instead of the
+        // string as the string form will be different in different
+        // locales
+        assertEquals(date, dateAfter);
     }
-    
 }

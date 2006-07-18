@@ -43,6 +43,7 @@ public class AlfrescoRuntimeExceptionTest extends TestCase
     protected void setUp() throws Exception
     {
         // Re-set the current locale to be the default
+        Locale.setDefault(Locale.ENGLISH);
         I18NUtil.setLocale(Locale.getDefault());
     }
     

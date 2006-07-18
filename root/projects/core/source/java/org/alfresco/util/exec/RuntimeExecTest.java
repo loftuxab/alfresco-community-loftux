@@ -69,6 +69,7 @@ public class RuntimeExecTest extends TestCase
         Map<String, String> commandMap = new HashMap<String, String>(3, 1.0f);
         commandMap.put("Windows.*", "dir \"${path}\"");
         commandMap.put("Linux", "ls '${path}'");
+        commandMap.put("Mac OS X", "ls '${path}'");
         commandMap.put("*", "wibble ${path}");
         exec.setCommandMap(commandMap);
         
@@ -89,7 +90,7 @@ public class RuntimeExecTest extends TestCase
             defaultCommandCheck = "dir \".\"";
             dynamicCommandCheck = "dir \"./\"";
         }
-        else if (os.equals("Linux"))
+        else if (os.equals("Linux") || os.equals("Mac OS X"))
         {
             defaultCommandCheck = "ls '.'";
             dynamicCommandCheck = "ls './'";
