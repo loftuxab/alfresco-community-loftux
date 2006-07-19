@@ -23,6 +23,7 @@ CREATE TABLE `T_access_control_entry` (
   `allowed` bit(1) NOT NULL,
   PRIMARY KEY  (`id`)
 );
+ALTER TABLE `T_access_control_entry` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
 CREATE TABLE `T_access_control_list` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -32,6 +33,7 @@ CREATE TABLE `T_access_control_list` (
   `inherits` bit(1) NOT NULL,
   PRIMARY KEY  (`id`)
 );
+ALTER TABLE `T_access_control_list` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
 CREATE TABLE `T_applied_patch` (
   `id` varchar(32) NOT NULL,
@@ -72,6 +74,8 @@ CREATE TABLE `T_child_assoc` (
   `assoc_index` int(11) default NULL,
   PRIMARY KEY  (`id`)
 );
+ALTER TABLE `T_child_assoc` ADD INDEX `IDX_REF_PARENT`(`parent_protocol`, `parent_identifier`, `parent_uuid`);
+ALTER TABLE `T_child_assoc` ADD INDEX `IDX_REF_CHILD`(`child_protocol`, `child_identifier`, `child_uuid`);
 
 CREATE TABLE `T_node` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -82,6 +86,7 @@ CREATE TABLE `T_node` (
   `type_qname` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
 );
+ALTER TABLE `T_node` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
 CREATE TABLE `T_node_aspects` (
   `protocol` varchar(50) NOT NULL,
@@ -90,6 +95,7 @@ CREATE TABLE `T_node_aspects` (
   `node_id` bigint(20),
   `qname` varchar(200) default NULL
 );
+ALTER TABLE `T_node_aspects` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
 CREATE TABLE `T_node_assoc` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -104,6 +110,8 @@ CREATE TABLE `T_node_assoc` (
   `type_qname` varchar(255) NOT NULL,
   PRIMARY KEY  (`id`)
 );
+ALTER TABLE `T_node_assoc` ADD INDEX `IDX_REF_SOURCE`(`source_protocol`, `source_identifier`, `source_uuid`);
+ALTER TABLE `T_node_assoc` ADD INDEX `IDX_REF_TARGET`(`target_protocol`, `target_identifier`, `target_uuid`);
 
 CREATE TABLE `T_node_properties` (
   `protocol` varchar(50) NOT NULL,
@@ -121,6 +129,7 @@ CREATE TABLE `T_node_properties` (
   `serializable_value` blob,
   `qname` varchar(200) NOT NULL
 );
+ALTER TABLE `t_node_properties` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
 CREATE TABLE `T_node_status` (
   `protocol` varchar(50) NOT NULL,
@@ -130,6 +139,7 @@ CREATE TABLE `T_node_status` (
   `change_txn_id` varchar(56) NOT NULL,
   `deleted` bit(1) NOT NULL
 );
+ALTER TABLE `t_node_status` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `guid`);
 
 CREATE TABLE `T_permission` (
   `id` bigint(20) NOT NULL auto_increment,
@@ -143,6 +153,7 @@ CREATE TABLE `T_store` (
   `identifier` varchar(100) NOT NULL,
   `root_node_id` bigint(20) default NULL
 );
+ALTER TABLE `t_store` ADD INDEX `IDX_STORE_REF`(`protocol`, `identifier`);
 
 CREATE TABLE `T_version_count` (
   `protocol` varchar(50) NOT NULL,
@@ -351,6 +362,8 @@ update T_access_control_entry tentry
       where
         tauthority.recipient = tentry.recipient
     );
+delete from T_access_control_list where id not in (select distinct(acl_id) id from t_access_control_entry where acl_id is not null);
+delete from T_access_control_entry where acl_id is null;
 
 --
 -- Create New schema (MySQL)
