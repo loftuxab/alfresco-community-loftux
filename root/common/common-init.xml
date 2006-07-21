@@ -56,7 +56,7 @@
 
         <!-- load the JIBX task definition -->
         <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask"
-                 classpath="${dir.common.lib}/jibx/jibx-bind.jar;${dir.common.lib}/jibx/jibx-run.jar;${dir.common.lib}/bcel.jar;${dir.common.lib}/xpp3.jar" />
+                 classpath="${dir.common.lib}/jibx/jibx-bind.jar;${dir.common.lib}/jibx/jibx-run.jar;${dir.common.lib}/bcel.jar;${dir.common.lib}/xpp3-1.1.3_8.jar" />
 
         <echo level="info">${startup.message}</echo>
     </target>
