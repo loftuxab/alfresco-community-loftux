@@ -22,7 +22,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/bcel.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
 	<classpathentry exported="true" sourcepath="src/poi-2.5.1.zip" kind="lib" path="lib/poi-2.5.1_patched.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
+	<classpathentry exported="true" sourcepath="src/acegi-security-0.8.2_patched-src.zip" kind="lib" path="lib/acegi-security-0.8.2_patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/dom4j-1.6.1.jar"/>
@@ -70,7 +70,7 @@
 	<classpathentry exported="true" sourcepath="src/tlc-src.zip" kind="lib" path="lib/tlc124.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-1.2.1.jar"/>
 	<classpathentry exported="true" sourcepath="src/rhino-js-1.62R2-src.zip" kind="lib" path="lib/rhino-js-1.6R2.jar"/>
-	<classpathentry exported="true" sourcepath="src/ehcache-1.2-patched-src.zip" kind="lib" path="lib/ehcache-1.2-patched.jar"/>
+	<classpathentry exported="true" sourcepath="src/ehcache-1.2_patched2-src.zip" kind="lib" path="lib/ehcache-1.2_patched2.jar"/>
 	<classpathentry kind="lib" path="lib/c3p0-0.9.1-pre6.jar"/>
 	<classpathentry exported="true" sourcepath="src/hibernate-3.1.3-src.zip" kind="lib" path="lib/hibernate-3.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/ant.jar"/>
