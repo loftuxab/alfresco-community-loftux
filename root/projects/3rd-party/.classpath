@@ -21,7 +21,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-bind.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/bcel.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jibx/jibx-run.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/poi-2.5.1.jar"/>
+	<classpathentry exported="true" sourcepath="src/poi-2.5.1.zip" kind="lib" path="lib/poi-2.5.1_patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/acegi-security-0.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/mail.jar"/>
