@@ -107,9 +107,7 @@
       <copy file="${file.hotspotcompiler}" todir="${home.jboss}/bin" />
    </target>
 
-   <target name="deploy-tomcat" depends="init" description="Deploys to Tomcat">
-      <delete dir="${dir.deploy.tomcat}/alfresco" includeEmptyDirs="true" quiet="yes" />
-      <delete dir="${home.tomcat}/work/catalina/localhost/alfresco" includeEmptyDirs="true" quiet="yes" />
+   <target name="deploy-tomcat" depends="clean-tomcat" description="Deploys to Tomcat">
       <copy file="${file.deploy}" todir="${dir.deploy.tomcat}" />
       <!-- ensure mysql drivers are present -->
       <delete>
@@ -229,6 +227,12 @@
    <target name="clean-war" depends="init" description="Cleans just the WAR file">
       <delete file="${file.deploy}" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.webclient}/build/assemble" />
+   </target>
+   
+   <target name="clean-tomcat" depends="init" description="Cleans the Alfresco application from Tomcat">
+      <delete dir="${dir.deploy.tomcat}/alfresco" includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat}/${file.name.war.alfresco}" />
+      <delete dir="${home.tomcat}/work/catalina/localhost/alfresco" includeEmptyDirs="true" quiet="yes" />
    </target>
 
    <!-- *************** -->
