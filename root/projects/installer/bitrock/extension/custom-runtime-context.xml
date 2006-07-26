@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+   <bean id="startOpenOffice" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandMap">
+          <map>
+              <entry key="Windows.*">
+                  <value>cmd /c start_oo.bat</value>
+              </entry>
+              <entry key="Linux">
+                  <value>start_oo.sh</value>
+              </entry>
+          </map>
+      </property>
+   </bean>
+   <bean id="stopOpenOffice" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandMap">
+          <map>
+              <entry key="Windows.*">
+                  <value>stop_oo.bat</value>
+              </entry>
+              <entry key="Linux">
+                  <value>stop_oo.sh</value>
+              </entry>
+          </map>
+      </property>
+   </bean>
+
+   <bean id="startupCommands" class="org.alfresco.util.exec.RuntimeExecBootstrapBean" >
+      <property name="startupCommands">
+          <list>
+              <ref bean="startOpenOffice" />
+          </list>
+      </property>
+   </bean>
+	
+   <bean id="shutdownCommands" class="org.alfresco.util.exec.RuntimeExecShutdownBean" >
+      <property name="shutdownCommands">
+          <list>
+              <ref bean="stopOpenOffice" />
+          </list>
+      </property>
+   </bean>
+	
+</beans>
