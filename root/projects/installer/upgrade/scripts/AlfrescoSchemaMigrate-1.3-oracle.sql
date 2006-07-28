@@ -606,4 +606,20 @@ alter table node_assoc add constraint FK5BAEF398A8FC7769 foreign key (target_nod
 alter table node_status add constraint FK38ECB8CF7F2C8017 foreign key (node_id) references node;
 alter table store add constraint FK68AF8E122DBA5BA foreign key (root_node_id) references node;
 
+-- Add additional indexes
+CREATE INDEX FKF064DF7560601995 ON access_control_entry (permission_id);
+CREATE INDEX FKF064DF75B25A50BF ON access_control_entry (authority_id);
+CREATE INDEX FKF064DF75B9553F6C ON access_control_entry (acl_id);
+CREATE INDEX FK31D3BA097B7FDE43 ON auth_ext_keys (id);
+CREATE INDEX FKC6EFFF3274173FF4 ON child_assoc (child_node_id);
+CREATE INDEX FKC6EFFF328E50E582 ON child_assoc (parent_node_id);
+CREATE INDEX FK33AE02B9553F6C ON node (acl_id);
+CREATE INDEX FK33AE02D24ADD25 ON node (protocol, identifier);
+CREATE INDEX FK2B91A9DE7F2C8017 ON node_aspects (node_id);
+CREATE INDEX FK5BAEF398B69C43F3 ON node_assoc (source_node_id);
+CREATE INDEX FK5BAEF398A8FC7769 ON node_assoc (target_node_id);
+CREATE INDEX FKC962BF907F2C8017 ON node_properties (node_id);
+CREATE INDEX FK38ECB8CF7F2C8017 ON node_status (node_id);
+CREATE INDEX FK68AF8E122DBA5BA ON store (root_node_id);
+
 ALTER TABLE applied_patch MODIFY id varchar(64);
