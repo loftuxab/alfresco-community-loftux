@@ -30,6 +30,7 @@ CREATE TABLE T_access_control_entry (
   allowed number(1, 0) NOT NULL,
   PRIMARY KEY (id)
 );
+CREATE INDEX IDX_ACE_REF ON T_access_control_entry (protocol, identifier, uuid);
 
 CREATE TABLE T_access_control_list
 (
@@ -40,6 +41,7 @@ CREATE TABLE T_access_control_list
   inherits number(1,0) NOT NULL,
   PRIMARY KEY (id)
 );
+CREATE INDEX IDX_ACL_REF ON T_access_control_list (protocol, identifier, uuid);
 
 create table T_auth_ext_keys
 (
@@ -71,6 +73,8 @@ CREATE TABLE T_child_assoc
   assoc_index number(10,0) default NULL,
   PRIMARY KEY (id)
 );
+CREATE INDEX IDX_CA_PARENT ON T_child_assoc(parent_protocol, parent_identifier, parent_uuid);
+CREATE INDEX IDX_CA_CHILD ON T_child_assoc(child_protocol, child_identifier, child_uuid);
 
 CREATE TABLE T_node
 (
@@ -82,6 +86,7 @@ CREATE TABLE T_node
   type_qname varchar2(255) NOT NULL,
   PRIMARY KEY  (id)
 );
+CREATE INDEX IDX_NODE_REF ON T_node(protocol, identifier, uuid);
 
 CREATE TABLE T_node_aspects
 (
@@ -91,6 +96,7 @@ CREATE TABLE T_node_aspects
   node_id number(19,0),
   qname varchar2(200) default NULL
 );
+CREATE INDEX IDX_ASPECTS_REF ON T_node_aspects(protocol, identifier, uuid);
 
 CREATE TABLE T_node_assoc
 (
@@ -106,6 +112,8 @@ CREATE TABLE T_node_assoc
   type_qname varchar2(255) NOT NULL,
   PRIMARY KEY (id)
 );
+CREATE INDEX IDX_NA_SOURCE on T_node_assoc(source_protocol, source_identifier, source_uuid);
+CREATE INDEX IDX_NA_TARGET on T_node_assoc(target_protocol, target_identifier, target_uuid);
 
 CREATE TABLE T_node_status
 (
@@ -334,6 +342,8 @@ update T_access_control_entry tentry
       where
         tauthority.recipient = tentry.recipient
     );
+delete from T_access_control_list where id not in (select distinct(acl_id) id from t_access_control_entry where acl_id is not null);
+delete from T_access_control_entry where acl_id is null;
 
 --
 -- Create New schema (Oracle)
