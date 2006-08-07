@@ -22,8 +22,8 @@ import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.alfresco.webservice.types.Category;
 import org.alfresco.webservice.types.Classification;
 import org.alfresco.webservice.types.Query;
-import org.alfresco.webservice.types.QueryLanguageEnum;
 import org.alfresco.webservice.util.AuthenticationUtils;
+import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ISO9075;
 import org.alfresco.webservice.util.WebServiceFactory;
 
@@ -112,7 +112,7 @@ public class Categories extends SamplesBase
             System.out.println("Query path: " + pathQuery.toString());
             
             // Call the repository service to do search based on category 
-            Query query = new Query(QueryLanguageEnum.lucene, pathQuery.toString()); 
+            Query query = new Query(Constants.QUERY_LANG_LUCENE, pathQuery.toString()); 
     
             // Execute the query 
             QueryResult queryResult = repositoryService.query(STORE, query, true); 

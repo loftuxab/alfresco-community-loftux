@@ -28,7 +28,6 @@ import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.Store;
-import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.types.Version;
 import org.alfresco.webservice.types.VersionHistory;
 import org.alfresco.webservice.util.AuthenticationUtils;
@@ -90,7 +89,7 @@ public class CheckOutCheckIn extends SamplesBase
             authoringService.checkin(predicate, comments, false);
             
             // Output the updated content
-            Store store = new Store(StoreEnum.workspace, "SpacesStore");
+            Store store = new Store(Constants.WORKSPACE_STORE, "SpacesStore");
             Content[] readResult = contentService.read(
                             new Predicate(new Reference[]{contentReference}, store, null), 
                             Constants.PROP_CONTENT);

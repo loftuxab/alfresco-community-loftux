@@ -25,11 +25,11 @@ import org.alfresco.webservice.repository.RepositoryFault;
 import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.Query;
-import org.alfresco.webservice.types.QueryLanguageEnum;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.ResultSet;
 import org.alfresco.webservice.types.ResultSetRow;
 import org.alfresco.webservice.util.AuthenticationUtils;
+import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
 
 /**
@@ -83,7 +83,7 @@ public class Query1 extends SamplesBase
         RepositoryServiceSoapBindingStub repositoryService = WebServiceFactory.getRepositoryService();         
         
         // Create a query object, looking for all items with alfresco in the name of text
-        Query query = new Query(QueryLanguageEnum.lucene, "TEXT:'alfresco development team'");
+        Query query = new Query(Constants.QUERY_LANG_LUCENE, "TEXT:'alfresco development team'");
         
         // Execute the query
         QueryResult queryResult = repositoryService.query(STORE, query, false);

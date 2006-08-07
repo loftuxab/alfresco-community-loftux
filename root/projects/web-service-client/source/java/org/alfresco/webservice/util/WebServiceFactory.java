@@ -42,8 +42,6 @@ import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.sun.org.apache.bcel.internal.util.ClassLoader;
-
 /**
  * 
  * 
@@ -59,18 +57,18 @@ public final class WebServiceFactory
     private static final String REPO_LOCATION = "repository.location";
     
     /** Default endpoint address **/
-    private static final String DEFAULT_ENDPOINT_ADDRESS = "http://localhost:8080";
+    private static final String DEFAULT_ENDPOINT_ADDRESS = "http://localhost:8080/alfresco/api";
     
     /** Service addresses */
-    private static final String AUTHENTICATION_SERVICE_ADDRESS  = "/alfresco/api/AuthenticationService";
-    private static final String REPOSITORY_SERVICE_ADDRESS      = "/alfresco/api/RepositoryService";
-    private static final String CONTENT_SERVICE_ADDRESS         = "/alfresco/api/ContentService";
-    private static final String AUTHORING_SERVICE_ADDRESS       = "/alfresco/api/AuthoringService";
-    private static final String CLASSIFICATION_SERVICE_ADDRESS  = "/alfresco/api/ClassificationService";
-    private static final String ACTION_SERVICE_ADDRESS          = "/alfresco/api/ActionService";
-    private static final String ACCESS_CONTROL_ADDRESS          = "/alfresco/api/AccessControlService";
-    private static final String ADMINISTRATION_ADDRESS          = "/alfresco/api/AdministrationService";
-    private static final String DICTIONARY_SERVICE_ADDRESS      = "/alfresco/api/DictionaryService";
+    private static final String AUTHENTICATION_SERVICE_ADDRESS  = "/AuthenticationService";
+    private static final String REPOSITORY_SERVICE_ADDRESS      = "/RepositoryService";
+    private static final String CONTENT_SERVICE_ADDRESS         = "/ContentService";
+    private static final String AUTHORING_SERVICE_ADDRESS       = "/AuthoringService";
+    private static final String CLASSIFICATION_SERVICE_ADDRESS  = "/ClassificationService";
+    private static final String ACTION_SERVICE_ADDRESS          = "/ActionService";
+    private static final String ACCESS_CONTROL_ADDRESS          = "/AccessControlService";
+    private static final String ADMINISTRATION_ADDRESS          = "/AdministrationService";
+    private static final String DICTIONARY_SERVICE_ADDRESS      = "/DictionaryService";
     
     /** Services */
     private static AuthenticationServiceSoapBindingStub authenticationService   = null;

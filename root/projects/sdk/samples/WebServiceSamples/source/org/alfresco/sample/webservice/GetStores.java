@@ -59,7 +59,7 @@ public class GetStores extends SamplesBase
                 System.out.println("The following stores are available in the repository:");
                 for (Store store : stores)
                 {
-                    System.out.println(store.getAddress());
+                    System.out.println(store.getScheme() + "://" + store.getAddress());
                 }
             }
         }

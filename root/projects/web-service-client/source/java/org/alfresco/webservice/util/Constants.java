@@ -24,6 +24,12 @@ package org.alfresco.webservice.util;
  */
 public class Constants
 {
+    /** Space Schemes */
+    public static final String WORKSPACE_STORE = "workspace";
+    
+    /** Query language names */
+    public static final String QUERY_LANG_LUCENE = "lucene";
+    
     /** Namespace constants */
     public static final String NAMESPACE_SYSTEM_MODEL   = "http://www.alfresco.org/model/system/1.0";
     public static final String NAMESPACE_CONTENT_MODEL  = "http://www.alfresco.org/model/content/1.0";

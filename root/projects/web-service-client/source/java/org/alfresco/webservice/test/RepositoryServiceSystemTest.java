@@ -40,13 +40,11 @@ import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.PropertyDefinition;
 import org.alfresco.webservice.types.Query;
 import org.alfresco.webservice.types.QueryConfiguration;
-import org.alfresco.webservice.types.QueryLanguageEnum;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.ResultSet;
 import org.alfresco.webservice.types.ResultSetRow;
 import org.alfresco.webservice.types.ResultSetRowNode;
 import org.alfresco.webservice.types.Store;
-import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
 import org.alfresco.webservice.util.Utils;
@@ -85,7 +83,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     public void testQuery() throws Exception
     {
         //Query query = new Query(QueryLanguageEnum.lucene, "*");
-        Query query = new Query(QueryLanguageEnum.lucene,
+        Query query = new Query(Constants.QUERY_LANG_LUCENE,
                 "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
 
         QueryResult queryResult = WebServiceFactory.getRepositoryService().query(BaseWebServiceSystemTest.store, query,
@@ -125,7 +123,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     public void testQuerySession() throws Exception
     {
         // define a query that will return a lot of hits i.e. EVERYTHING
-        Query query = new Query(QueryLanguageEnum.lucene, "*");
+        Query query = new Query(Constants.QUERY_LANG_LUCENE, "*");
 
         // add the query configuration header to the call
         int batchSize = 5;
@@ -273,7 +271,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     {
         // get hold of a node we know some info about so we can test the
         // returned values (the Alfresco Tutorial PDF)
-        Query query = new Query(QueryLanguageEnum.lucene,
+        Query query = new Query(Constants.QUERY_LANG_LUCENE,
                 "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
         QueryResult queryResult = this.repositoryService.query(BaseWebServiceSystemTest.store, query,
                 false);
@@ -346,7 +344,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
                 aspect1.getName());
         assertTrue("Aspect1 should be an aspect", aspect1.isIsAspect());
         assertNotNull("Aspect1 should have properties", aspect1.getProperties());
-        assertEquals("Aspect1 has wrong number of properties", 3, aspect1
+        assertEquals("Aspect1 has wrong number of properties", 4, aspect1
                 .getProperties().length);
 
         // check the second aspect
@@ -369,7 +367,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     {
         // define a query to add to the predicate (get everything that mentions
         // 'test')
-        Query query = new Query(QueryLanguageEnum.lucene,
+        Query query = new Query(Constants.QUERY_LANG_LUCENE,
                 "( +@\\{http\\://www.alfresco.org/1.0\\}name:test*) OR  TEXT:test*");
 
         Predicate predicate = new Predicate();
@@ -514,7 +512,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         create.setId("id1");
         create.setType(Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, "dictionaryModel"));
 
-        ParentReference parentReference = new ParentReference(new Store(StoreEnum.workspace, "SpacesStore"), null, "/app:company_home", Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);                    
+        ParentReference parentReference = new ParentReference(new Store(Constants.WORKSPACE_STORE, "SpacesStore"), null, "/app:company_home", Constants.ASSOC_CONTAINS, Constants.ASSOC_CONTAINS);                    
         
         create.setParent(parentReference);
         create.setProperty(new NamedValue[] {

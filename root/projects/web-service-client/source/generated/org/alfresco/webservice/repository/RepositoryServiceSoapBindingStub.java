@@ -25,7 +25,7 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
         oper.setName("createStore");
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "scheme"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "StoreEnum"), org.alfresco.webservice.types.StoreEnum.class, false, false);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "scheme"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "address"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
         oper.addParameter(param);
@@ -478,13 +478,6 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "QueryLanguageEnum");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.webservice.types.QueryLanguageEnum.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(enumsf);
-            cachedDeserFactories.add(enumdf);
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.types.Reference.class;
@@ -526,13 +519,6 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "StoreEnum");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.webservice.types.StoreEnum.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(enumsf);
-            cachedDeserFactories.add(enumdf);
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "UUID");
             cachedSerQNames.add(qName);
@@ -663,7 +649,7 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         }
     }
 
-    public org.alfresco.webservice.types.Store createStore(org.alfresco.webservice.types.StoreEnum scheme, java.lang.String address) throws java.rmi.RemoteException, org.alfresco.webservice.repository.RepositoryFault {
+    public org.alfresco.webservice.types.Store createStore(java.lang.String scheme, java.lang.String address) throws java.rmi.RemoteException, org.alfresco.webservice.repository.RepositoryFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }

@@ -25,7 +25,6 @@ import org.alfresco.webservice.types.ParentReference;
 import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.Store;
-import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
@@ -40,7 +39,7 @@ public class SamplesBase
     protected static final String PASSWORD = "admin";
     
     /** The store used throughout the samples */
-    protected static final Store STORE = new Store(StoreEnum.workspace, "SpacesStore");
+    protected static final Store STORE = new Store(Constants.WORKSPACE_STORE, "SpacesStore");
     
     protected static final Reference SAMPLE_FOLDER = new Reference(STORE, null, "/app:company_home/cm:sample_folder"); 
     

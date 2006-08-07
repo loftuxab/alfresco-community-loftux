@@ -11,7 +11,6 @@ import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.Node;
 import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Query;
-import org.alfresco.webservice.types.QueryLanguageEnum;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.ResultSet;
 import org.alfresco.webservice.types.ResultSetRow;
@@ -66,7 +65,7 @@ public class Query2 extends SamplesBase
                 
                 // Create a query object, looking for all items with alfresco in the name of text
                 Query query = new Query(
-                        QueryLanguageEnum.lucene, 
+                        Constants.QUERY_LANG_LUCENE, 
                         "+PARENT:\"workspace://SpacesStore/"+ nodes[0].getReference().getUuid() + "\" +TEXT:\"" + searchValue + "\"");
                 
                 // Execute the query

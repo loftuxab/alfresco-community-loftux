@@ -27,7 +27,6 @@ import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.ParentReference;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.Store;
-import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.Utils;
@@ -58,7 +57,7 @@ public class FirstWebServiceClient
         try
         {
         	// Create a reference to the parent where we want to create content
-            Store storeRef = new Store(StoreEnum.workspace, "SpacesStore");
+            Store storeRef = new Store(Constants.WORKSPACE_STORE, "SpacesStore");
             ParentReference companyHomeParent = new ParentReference(storeRef, null, "/app:company_home", Constants.ASSOC_CONTAINS, null);
 
             // Assign name

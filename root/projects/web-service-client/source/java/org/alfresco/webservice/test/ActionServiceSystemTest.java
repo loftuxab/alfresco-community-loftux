@@ -154,7 +154,6 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         newAction1.setActionName("add-features");
         newAction1.setTitle("Add the versionable aspect to the node.");
         newAction1.setDescription("This will add the verisonable aspect to the node and thus create a version history.");
-        newAction1.setExecuteAsynchronously(false);
         newAction1.setParameters(parameters);
         
         // Save the action
@@ -164,18 +163,16 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         Action savedAction1 = saveResults1[0];
         assertNotNull(savedAction1);
         assertNotNull(savedAction1.getId());
-        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), savedAction1.getReference().getUuid());
         assertEquals("add-features", savedAction1.getActionName());
         assertEquals("Add the versionable aspect to the node.", savedAction1.getTitle());
         assertEquals("This will add the verisonable aspect to the node and thus create a version history.", savedAction1.getDescription());
-        assertFalse(savedAction1.isExecuteAsynchronously());
         
         // Check the parameters of the saved action
         // TODO
         
         // Update the action
         savedAction1.setTitle("The title has been updated");
-        savedAction1.setExecuteAsynchronously(true);
+
         
         // Save the action
         Action[] saveResults2 = this.actionService.saveActions(BaseWebServiceSystemTest.contentReference, new Action[]{savedAction1});
@@ -184,11 +181,9 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         Action savedAction2 = saveResults2[0];
         assertNotNull(savedAction2);
         assertEquals(savedAction2.getId(), savedAction2.getId());
-        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), savedAction2.getReference().getUuid());
         assertEquals("add-features", savedAction2.getActionName());
         assertEquals("The title has been updated", savedAction2.getTitle());
         assertEquals("This will add the verisonable aspect to the node and thus create a version history.", savedAction2.getDescription());
-        assertTrue(savedAction2.isExecuteAsynchronously());
         
         // TODO test action filters
         
@@ -220,7 +215,6 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         newAction1.setActionName("add-features");
         newAction1.setTitle("Add the versionable aspect to the node.");
         newAction1.setDescription("This will add the verisonable aspect to the node and thus create a version history.");
-        newAction1.setExecuteAsynchronously(false);
         newAction1.setParameters(parameters);        
         
         // Execute the action
@@ -266,9 +260,9 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         
         // Create the rule
         Rule newRule = new Rule();
-        newRule.setRuleType("incomming");
+        newRule.setRuleTypes(new String[]{"incomming"});
         newRule.setTitle("This rule adds the classificable aspect");
-        newRule.setActions(new Action[]{newAction});
+        newRule.setAction(newAction);
         
         // Save the rule
         Rule[] saveResults1 = this.actionService.saveRules(BaseWebServiceSystemTest.contentReference, new Rule[]{newRule});
@@ -276,9 +270,10 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals(1, saveResults1.length);
         Rule savedRule1 = saveResults1[0];
         assertNotNull(savedRule1);
-        assertNotNull(savedRule1.getId());
-        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), savedRule1.getReference().getUuid());
-        assertEquals("incomming", savedRule1.getRuleType());
+        assertNotNull(savedRule1.getRuleReference());
+        assertNotNull(savedRule1.getOwningReference());
+        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), savedRule1.getOwningReference().getUuid());
+        assertEquals("incomming", savedRule1.getRuleTypes()[0]);
         assertEquals("This rule adds the classificable aspect", savedRule1.getTitle());
         assertFalse(savedRule1.isExecuteAsynchronously());
         
@@ -295,9 +290,9 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals(1, saveResults2.length);
         Rule savedRule2 = saveResults2[0];
         assertNotNull(savedRule2);
-        assertEquals(savedRule2.getId(), savedRule2.getId());
-        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), savedRule2.getReference().getUuid());
-        assertEquals("incomming", savedRule2.getRuleType());
+        assertEquals(savedRule2.getRuleReference().getUuid(), savedRule2.getRuleReference().getUuid());
+        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), savedRule2.getOwningReference().getUuid());
+        assertEquals("incomming", savedRule2.getRuleTypes()[0]);
         assertEquals("The title has been updated", savedRule2.getTitle());
         assertTrue(savedRule2.isExecuteAsynchronously());
         

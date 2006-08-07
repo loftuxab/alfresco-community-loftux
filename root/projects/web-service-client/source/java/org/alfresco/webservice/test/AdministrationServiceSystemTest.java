@@ -48,7 +48,7 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
                 queryCfg);
         
         // Get the details of the new users
-        String homeFolder = store.getScheme().getValue() + "://" + store.getAddress() + "/" + folderReference.getUuid();
+        String homeFolder = store.getScheme() + "://" + store.getAddress() + "/" + folderReference.getUuid();
         String one = Long.toString(System.currentTimeMillis());
         String two = one + "2";        
         NewUserDetails[] newUsers = new NewUserDetails[] {
@@ -110,7 +110,7 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
         }
         
         // Get the details of the new users
-        String homeFolder = store.getScheme().getValue() + "://" + store.getAddress() + "/" + folderReference.getUuid();
+        String homeFolder = store.getScheme() + "://" + store.getAddress() + "/" + folderReference.getUuid();
         String one = Long.toString(System.currentTimeMillis());
         String two = one + "2";        
         NewUserDetails[] newUsers = new NewUserDetails[] {
@@ -236,7 +236,7 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
     public void testCreateAndAuthenticateNewUser() throws Exception
     {
         // Get the details of the new user
-        String homeFolder = store.getScheme().getValue() + "://" + store.getAddress() + "/" + folderReference.getUuid();
+        String homeFolder = store.getScheme() + "://" + store.getAddress() + "/" + folderReference.getUuid();
         String one = Long.toString(System.currentTimeMillis());
         NewUserDetails[] newUsers = new NewUserDetails[] 
         {

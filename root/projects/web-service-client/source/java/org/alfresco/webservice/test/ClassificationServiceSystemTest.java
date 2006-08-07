@@ -78,7 +78,7 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
                     new ContentFormat("application/acp", "UTF-8"));
             
             // Create an action to import the categories
-            String rootNodeRef = store.getScheme().getValue() + "://" + store.getAddress() + "/" + rootReference.getUuid();
+            String rootNodeRef = store.getScheme() + "://" + store.getAddress() + "/" + rootReference.getUuid();
             Action importAction = new Action();
             importAction.setActionName("import");
             NamedValue[] params = new NamedValue[]{

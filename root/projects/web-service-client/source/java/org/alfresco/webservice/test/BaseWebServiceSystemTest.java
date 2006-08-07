@@ -31,7 +31,6 @@ import org.alfresco.webservice.types.ParentReference;
 import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.types.Store;
-import org.alfresco.webservice.types.StoreEnum;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
@@ -91,7 +90,7 @@ public abstract class BaseWebServiceSystemTest extends TestCase
         if (BaseWebServiceSystemTest.store == null)
         {
             // Create the store
-            BaseWebServiceSystemTest.store = WebServiceFactory.getRepositoryService().createStore(StoreEnum.workspace, "Test" + System.currentTimeMillis());
+            BaseWebServiceSystemTest.store = WebServiceFactory.getRepositoryService().createStore(Constants.WORKSPACE_STORE, "Test" + System.currentTimeMillis());
             
             // Get the root node reference
             Predicate predicate = new Predicate(null, BaseWebServiceSystemTest.store, null);

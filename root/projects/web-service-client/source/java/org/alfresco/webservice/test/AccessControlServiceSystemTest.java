@@ -51,7 +51,7 @@ public class AccessControlServiceSystemTest extends BaseWebServiceSystemTest
         this.userName2 = "user2" + System.currentTimeMillis();
         
         // Create some users we can user in the tests
-        String homeFolder = store.getScheme().getValue() + "://" + store.getAddress() + "/" + folderReference.getUuid();      
+        String homeFolder = store.getScheme() + "://" + store.getAddress() + "/" + folderReference.getUuid();      
         NewUserDetails[] newUsers = new NewUserDetails[] {
                 new NewUserDetails(
                         this.userName1, 

@@ -356,13 +356,6 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "QueryLanguageEnum");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.webservice.types.QueryLanguageEnum.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(enumsf);
-            cachedDeserFactories.add(enumdf);
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.types.Reference.class;
@@ -404,13 +397,6 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
-
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "StoreEnum");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.webservice.types.StoreEnum.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(enumsf);
-            cachedDeserFactories.add(enumdf);
 
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "UUID");
             cachedSerQNames.add(qName);
