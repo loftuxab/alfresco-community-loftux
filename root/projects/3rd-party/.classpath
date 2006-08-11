@@ -65,7 +65,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/jgroups/jgroups-2.2.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odf_utils.jar"/>
 	<classpathentry exported="true" sourcepath="src/myfaces_src.zip" kind="lib" path="lib/myfaces-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/myfaces-impl.jar"/>
+	<classpathentry exported="true" sourcepath="src/myfaces_src.zip" kind="lib" path="lib/myfaces-impl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-codec-1.3.jar"/>
 	<classpathentry exported="true" sourcepath="src/tlc-src.zip" kind="lib" path="lib/tlc124.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/joda-time-1.2.1.jar"/>
