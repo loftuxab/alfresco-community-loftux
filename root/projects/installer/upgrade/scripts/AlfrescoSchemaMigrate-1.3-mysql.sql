@@ -1,4 +1,4 @@
--- ------------------------------------------------------
+﻿-- ------------------------------------------------------
 -- Alfresco Schema conversion V1.2.1 to V1.3
 -- 
 -- Author: Derek Hulley
@@ -364,6 +364,7 @@ update T_access_control_entry tentry
     );
 delete from T_access_control_list where id not in (select distinct(acl_id) id from t_access_control_entry where acl_id is not null);
 delete from T_access_control_entry where acl_id is null;
+update T_node set acl_id = null where acl_id not in (select id from t_access_control_list);
 
 --
 -- Create New schema (MySQL)
