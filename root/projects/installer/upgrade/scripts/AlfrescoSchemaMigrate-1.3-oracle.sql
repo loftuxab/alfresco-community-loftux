@@ -268,6 +268,12 @@ insert into T_access_control_list
   select
       hibernate_sequence.nextval, protocol, identifier, guid, inherits
     from node_permission;
+update T_node tnode set acl_id =
+  (select tacl.id from T_access_control_list tacl where
+    tacl.protocol = tnode.protocol and
+    tacl.identifier = tnode.identifier and
+    tacl.uuid = tnode.uuid
+  );
 
 insert into T_auth_ext_keys
   (
@@ -338,12 +344,6 @@ update T_access_control_entry tentry
     );
 delete from T_access_control_list where id not in (select distinct(acl_id) id from t_access_control_entry where acl_id is not null);
 delete from T_access_control_entry where acl_id is null;
-update T_node tnode set acl_id =
-  (select tacl.id from T_access_control_list tacl where
-    tacl.protocol = tnode.protocol and
-    tacl.identifier = tnode.identifier and
-    tacl.uuid = tnode.uuid
-  );
 
 --
 -- Create New schema (Oracle)
