@@ -1,8 +1,10 @@
-======================
-Alfresco 1.3.0 Release
-======================
+============================
+Alfresco 1.4 Release Preview
+============================
 
-Welcome to the Alfresco 1.3.0 Release.
+Welcome to the Alfresco 1.4 Release Preview.  This software is for evaluation purposes only and cannot 
+be used against an existing Alfresco repository.  There will not be an upgrade path from this
+Release Preview to the final 1.4 release.
 
 
 ===================
@@ -136,11 +138,12 @@ Closing the Alfresco Server
 Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 
 
-=============================
-Upgrading from V1.x to V1.3.0
-=============================
+===========================
+Upgrading from V1.x to V1.4
+===========================
 
-Details can be found at http://wiki.alfresco.com/wiki/Upgrading_to_1.3.0
+Not yet available.
+
 
 =====================
 Using the CIFS Server
