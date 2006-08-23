@@ -45,7 +45,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-jmx.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-system.jar"/>
-	<classpathentry kind="lib" path="lib/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry exported="true" sourcepath="src/jcr_src.zip" kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/freemarker.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.1.jar"/>
@@ -89,5 +88,6 @@
 	<classpathentry kind="lib" path="lib/jstl.jar"/>
 	<classpathentry kind="lib" path="lib/standard.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-fileupload-1.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/mysql-connector-java-5.0.3-bin.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
