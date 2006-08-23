@@ -3,7 +3,7 @@
 # Set the following to where JBoss is installed
 APPSERVER=/opt/alfresco/jboss
 # Set any default JVM values
-export JAVA_OPTS="-Xms128m -Xmx512m -server -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader\$1,doBody"
+export JAVA_OPTS='-Xms128m -Xmx512m -server -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader\$1,doBody'
 #
 if [ "$1" = "start" ]; then
   "$APPSERVER"/bin/run.sh
