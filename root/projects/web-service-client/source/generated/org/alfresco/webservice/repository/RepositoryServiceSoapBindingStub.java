@@ -308,6 +308,13 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", ">CML>writeContent");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.webservice.types.CMLWriteContent.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/cml/1.0", "CML");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.types.CML.class;
