@@ -149,13 +149,6 @@ public class DictionaryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", ">Store>address");
-            cachedSerQNames.add(qName);
-            cls = java.lang.String.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(org.apache.axis.encoding.ser.BaseSerializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleSerializerFactory.class, cls, qName));
-            cachedDeserFactories.add(org.apache.axis.encoding.ser.BaseDeserializerFactory.createFactory(org.apache.axis.encoding.ser.SimpleDeserializerFactory.class, cls, qName));
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "AssociationDefinition");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.types.AssociationDefinition.class;
