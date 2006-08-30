@@ -96,7 +96,7 @@ UPDATE child_assoc
 ALTER TABLE child_assoc
   ADD UNIQUE INDEX IDX_CHILD_NAMECRC(parent_node_id, type_qname, child_node_name_crc);
 ALTER TABLE child_assoc
-  ADD UNIQUE INDEX IDX_ASSOC(parent_node_id, type_qname, child_node_id);
+  ADD UNIQUE INDEX IDX_ASSOC(parent_node_id, type_qname, qname, child_node_id);
 
 -- Apply unique index for node associations
 ALTER TABLE node_assoc
