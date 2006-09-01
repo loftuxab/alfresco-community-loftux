@@ -31,6 +31,22 @@ public class AlfrescoRuntimeException extends RuntimeException
     private static final long serialVersionUID = 3834594313622859827L;
 
     /**
+     * Helper factory method making use of variable argument numbers
+     */
+    public static AlfrescoRuntimeException create(String msgId, Object ...objects)
+    {
+        return new AlfrescoRuntimeException(msgId, objects);
+    }
+
+    /**
+     * Helper factory method making use of variable argument numbers
+     */
+    public static AlfrescoRuntimeException create(Throwable cause, String msgId, Object ...objects)
+    {
+        return new AlfrescoRuntimeException(msgId, objects, cause);
+    }
+    
+    /**
      * Constructor
      * 
      * @param msgId     the message id
