@@ -44,11 +44,13 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
 {
     public static final String PARAM_FOLDER_COUNT = "alfresco.folderCount";
     public static final String PARAM_FILE_COUNT = "alfresco.fileCount";
-    public static final int DEFAULT_FOLDER_COUNT = 1000;
-    public static final int DEFAULT_FILE_COUNT = 1;
+    public static final int    DEFAULT_FOLDER_COUNT = 1;
+    public static final int    DEFAULT_FILE_COUNT = 1000;
     
     private int folderCount = DEFAULT_FOLDER_COUNT;
-    private int fileCount = DEFAULT_FILE_COUNT;
+    private int fileCount =   DEFAULT_FILE_COUNT;
+    
+    private boolean createFolder = true;
     
     private ContentData[] contentData;
     
@@ -61,6 +63,11 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
         if (tc.hasParam(PARAM_FOLDER_COUNT) == true)
         {
             this.folderCount = tc.getIntParam(PARAM_FOLDER_COUNT);
+            if (this.folderCount == 0)
+            {
+                this.folderCount = 1;
+                this.createFolder = false;
+            }
         }
         if (tc.hasParam(PARAM_FILE_COUNT) == true)
         {
@@ -124,22 +131,30 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
         
         int contentPropIndex = 0;
         for (int folderIndex = 0; folderIndex < this.folderCount; folderIndex++)
-        {        
-            // Create the folder to load the data into
-            String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
-            Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
-            folderProps.put(ContentModel.PROP_NAME, nameValue);
-            NodeRef bulkLoadFolder = smallNodeService.createNode(
-                    folderNodeRef, 
-                    ContentModel.ASSOC_CONTAINS, 
-                    QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
-                    ContentModel.TYPE_FOLDER,
-                    folderProps).getChildRef();
+        {   
+            NodeRef bulkLoadFolder = null;
+            if (this.createFolder == true)
+            {
+                // Create the folder to load the data into
+                String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
+                Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
+                folderProps.put(ContentModel.PROP_NAME, nameValue);
+                bulkLoadFolder = smallNodeService.createNode(
+                        folderNodeRef, 
+                        ContentModel.ASSOC_CONTAINS, 
+                        QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
+                        ContentModel.TYPE_FOLDER,
+                        folderProps).getChildRef();
+            }
+            else
+            {
+                bulkLoadFolder = folderNodeRef;
+            }
             
             for (int fileIndex = 0; fileIndex < this.fileCount; fileIndex++)
             {
                 // Create a new content object
-                String contentName = "bulkLoad_" + fileIndex;
+                String contentName = "bulkLoad_" + BenchmarkUtils.getGUID();
                 Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
                 properties.put(ContentModel.PROP_NAME, contentName);
                 NodeRef contentNodeRef = smallNodeService.createNode(
