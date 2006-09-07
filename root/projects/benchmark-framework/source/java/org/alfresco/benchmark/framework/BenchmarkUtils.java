@@ -37,7 +37,7 @@ import com.sun.japex.TestCase;
 public class BenchmarkUtils
 {    
     // Make repeatable
-    public static final Random rand = new Random(0);
+    public static Random rand = new Random(0);
     
     public static final int BUFFER_SIZE = 4096;
  
@@ -96,7 +96,7 @@ public class BenchmarkUtils
                     index = filePath.lastIndexOf("/");
                 }
                 index ++;
-                int end = filePath.indexOf(".");
+                int end = filePath.lastIndexOf(".");
                 filePath = filePath.substring(index, end) + "_";
             }
             location = outputFolderLocation + File.separator + filePath + testCase.getName() + "_" + System.currentTimeMillis() + ".csv";
@@ -140,6 +140,9 @@ public class BenchmarkUtils
                 
                 dataContentLocations = props.getProperty("benchmark.data_content_location").split(";");
                 outputFolderLocation = props.getProperty("benchmark.output_folder");
+                
+                String randomSeedStr = props.getProperty("benchmark.random_seed", "" + System.currentTimeMillis());
+                rand = new Random(Long.parseLong(randomSeedStr));
             }
             catch (IOException exception)
             {
