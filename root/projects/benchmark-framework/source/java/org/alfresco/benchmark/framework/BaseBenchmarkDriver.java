@@ -32,6 +32,7 @@ public abstract class BaseBenchmarkDriver extends JapexDriverBase
     public static final String PARAM_CONTENT_MIMETYPE = "alfresco.contentMimetype";
     public static final String PARAM_USER_NAME = "alfresco.userName";
     public static final String PARAM_NUMBER_OF_AVAILABLE_USERS  = "alfresco.numberOfAvailableUsers";
+    public static final String PARAM_LOAD_DEPTH = "alfresco.loadDepth";
     
     public static final int DEFAULT_NUMBER_OF_AVAILABLE_USERS = 50; 
     

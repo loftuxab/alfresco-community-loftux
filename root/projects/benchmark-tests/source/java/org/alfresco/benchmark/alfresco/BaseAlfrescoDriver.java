@@ -182,9 +182,22 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                 folderPropertyProfiles);
         
         // Get the random file and folder paths
+        int loadDepth = 0;
+        if (testCase.hasParam(PARAM_LOAD_DEPTH) == true)
+        {
+            loadDepth = testCase.getIntParam(PARAM_LOAD_DEPTH);
+        }
         RepositoryProfile repositoryProfile = AlfrescoUtils.getRepositoryProfile(this.authenticationComponent, this.searchService, this.nodeService);
-        this.randomFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
-        this.randomFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+        if (loadDepth == 0)
+        {
+            this.randomFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
+            this.randomFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+        }
+        else
+        {
+            this.randomFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
+            this.randomFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth, true);
+        }
         
         //System.out.println("File path = " + this.randomFilePath);
         //System.out.println("Folder path = " + this.randomFolderPath);
