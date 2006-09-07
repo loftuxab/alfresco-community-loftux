@@ -8,7 +8,7 @@
 	<import file="build-common.xml"/>
 	<import file="build-classpath.xml"/>
     
-    <property name="config" value="config/testConfig.xml"/>
+	<property name="config" value="config/testConfig-native-bulk.xml"/>
 	<property name="repositoryProfile" value="5,5,5,5,0,5"/>
 	
 	<target name="generate-classpath" description="Generate the classpath from the common configuration">
