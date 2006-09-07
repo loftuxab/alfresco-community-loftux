@@ -35,21 +35,17 @@ public class AlfrescoJCRDataLoaderComponentImpl extends JCRDataLoaderComponentIm
     
     public static void main(String[] args)
     {
-        RepositoryProfile repositoryProfile = new RepositoryProfile();
-        if (args != null)
-        {
-            String repositoryProfileLocation = args[0];
-            if (repositoryProfileLocation != null)
-            {
-                // Load the repository profile details from the properties file
-            }
-        }
+        String repositoryProfileValue = "3,5,3,5,0,5";
+        if (args != null && args.length != 0 && args[0] != null)
+        {            
+            repositoryProfileValue = args[0];
+        } 
         
         // Get data loader component
         DataLoaderComponent dataLoaderComponent = new AlfrescoJCRDataLoaderComponentImpl();
         
         // Load the data into the repo
-        LoadedData loadedData = dataLoaderComponent.loadData(repositoryProfile);
+        LoadedData loadedData = dataLoaderComponent.loadData(new RepositoryProfile(repositoryProfileValue));
         
         // Report the data loaded
         System.out.println("The data has been loaded into folder " + loadedData.getRootFolder() + " :");

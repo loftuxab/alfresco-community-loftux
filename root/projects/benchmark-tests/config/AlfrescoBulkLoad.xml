@@ -12,20 +12,13 @@
     </driver>
 
     <testCase name="Bulk Load">
-    
-        <!-- Repository Profile -->
-        <param name="alfresco.repositoryProfile.folderDepth.average" value="3"/>
-        <param name="alfresco.repositoryProfile.folderDepth.variation" value="1"/>
-        <param name="alfresco.repositoryProfile.documentsInFolderCount.average" value="5"/>
-        <param name="alfresco.repositoryProfile.documentsInFolderCount.variation" value="1"/>
-        <param name="alfresco.repositoryProfile.subFoldersCount.average" value="3"/>
-        <param name="alfresco.repositoryProfile.subFoldersCount.variation" value="1"/>
         
         <!-- Number of available users -->
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
     	<!-- Number of objects to bulk load in each test -->
-    	<param name="alfresco.loadCount" value="1000"/>
+ 	    <param name="alfresco.folderCount" value="1"/>
+    	<param name="alfresco.fileCount" value="1000"/>
     
         <param name="japex.warmupIterations" value="0"/>            
     	<param name="japex.runIterations" value="69"/>

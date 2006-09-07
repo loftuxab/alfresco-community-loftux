@@ -46,43 +46,65 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
 	
     protected Repository repository;
         
-    public static final String PARAM_LOAD_COUNT = "alfresco.loadCount";
-    public static final int DEFAULT_LOAD_COUNT = 1000;
+    public static final String PARAM_FOLDER_COUNT = "alfresco.folderCount";
+    public static final String PARAM_FILE_COUNT = "alfresco.fileCount";
+    public static final int DEFAULT_FOLDER_COUNT = 1000;
+    public static final int DEFAULT_FILE_COUNT = 1;
     
-    private int loadCount = DEFAULT_LOAD_COUNT;
+    private int folderCount = DEFAULT_FOLDER_COUNT;
+    private int fileCount = DEFAULT_FILE_COUNT;
     
     private ContentData[] contentData;
     
     @Override
     public synchronized void prepare(TestCase tc)
     {
-        super.prepare(tc);
-        
-        // Get the load count
-        if (tc.hasParam(PARAM_LOAD_COUNT) == true)
+        try
         {
-            this.loadCount = tc.getIntParam(PARAM_LOAD_COUNT);
+            super.prepare(tc);
+            
+            // Get the folder and file count vlaues
+            if (tc.hasParam(PARAM_FOLDER_COUNT) == true)
+            {
+                this.folderCount = tc.getIntParam(PARAM_FOLDER_COUNT);
+            }
+            if (tc.hasParam(PARAM_FILE_COUNT) == true)
+            {
+                this.fileCount = tc.getIntParam(PARAM_FILE_COUNT);
+            }
+        }
+        catch (Throwable exception)
+        {
+            logger.error(exception);
         }
     }
     
     @Override
     public void preRun(TestCase testCase)
     {
-        super.preRun(testCase);
-        
-        testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
-        
-        this.contentData = new ContentData[this.loadCount];
-        
-        // Get the content data to be used in the test
-        List<PropertyProfile> contentPropertyProfiles = new ArrayList<PropertyProfile>();
-        contentPropertyProfiles.add(new PropertyProfile(JCRUtils.PROP_CONTENT, PropertyType.CONTENT));
-        
-        for (int i = 0; i < loadCount; i++)
+        try
         {
-            Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(this.repositoryProfile, contentPropertyProfiles);
-            this.contentData[i] = (ContentData)propertyValues.get(JCRUtils.PROP_CONTENT);
-        }        
+            super.preRun(testCase);
+        
+            testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
+        
+            int contentCount = this.fileCount*this.folderCount;
+            this.contentData = new ContentData[contentCount];;
+            
+            // Get the content data to be used in the test
+            List<PropertyProfile> contentPropertyProfiles = new ArrayList<PropertyProfile>();
+            contentPropertyProfiles.add(new PropertyProfile(JCRUtils.PROP_CONTENT, PropertyType.CONTENT));
+            
+            for (int i = 0; i < contentCount; i++)
+            {
+                Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(contentPropertyProfiles);
+                this.contentData[i] = (ContentData)propertyValues.get(JCRUtils.PROP_CONTENT);
+            }
+        }
+        catch (Throwable exception)
+        {
+            logger.error(exception);
+        }
     }
     
     @Override
@@ -96,29 +118,35 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
                 // TODO pick the parent node from the available set
                 Node parentNode = session.getRootNode();
                 
-                // Create the folder to load the data into
-                String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
-                Node folderNode = parentNode.addNode (nameValue, "nt:folder");  
-                
-                for (int i = 0; i < this.loadCount; i++)
-                {
-                    String contentName = "bulkLoad_" + i;
-                    ContentData contentData = this.contentData[i];                    
-                    Node fileNode = folderNode.addNode(contentName, "nt:file");
-                
-                    // Add the content
-                    Node resNode = fileNode.addNode ("jcr:content", "nt:resource");
-                    resNode.setProperty ("jcr:mimeType", contentData.getMimetype());
-                    resNode.setProperty ("jcr:encoding", contentData.getEncoding());
-                    resNode.setProperty ("jcr:data", new FileInputStream(contentData.getFile()));
+                int contentPropIndex = 0;
+                for (int folderIndex = 0; folderIndex < this.folderCount; folderIndex++)
+                {                    
+                    // Create the folder to load the data into
+                    String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
+                    Node folderNode = parentNode.addNode (nameValue, "nt:folder");  
                     
-                    // Need to set the mandatory 'lastModified' property
-                    Calendar lastModified = Calendar.getInstance ();
-                    lastModified.setTimeInMillis (contentData.getFile().lastModified ());
-                    resNode.setProperty ("jcr:lastModified", lastModified);
+                    for (int fileIndex = 0; fileIndex < this.fileCount; fileIndex++)
+                    {
+                        String contentName = "bulkLoad_" + fileIndex;
+                        ContentData contentData = this.contentData[contentPropIndex];                    
+                        Node fileNode = folderNode.addNode(contentName, "nt:file");
                     
-                    // Store the content size for later use
-                    testCase.setLongParam(PARAM_CONTENT_SIZE, testCase.getLongParam(PARAM_CONTENT_SIZE) + contentData.getSize());                        
+                        // Add the content
+                        Node resNode = fileNode.addNode ("jcr:content", "nt:resource");
+                        resNode.setProperty ("jcr:mimeType", contentData.getMimetype());
+                        resNode.setProperty ("jcr:encoding", contentData.getEncoding());
+                        resNode.setProperty ("jcr:data", new FileInputStream(contentData.getFile()));
+                        
+                        // Need to set the mandatory 'lastModified' property
+                        Calendar lastModified = Calendar.getInstance ();
+                        lastModified.setTimeInMillis (contentData.getFile().lastModified ());
+                        resNode.setProperty ("jcr:lastModified", lastModified);
+                        
+                        // Store the content size for later use
+                        testCase.setLongParam(PARAM_CONTENT_SIZE, testCase.getLongParam(PARAM_CONTENT_SIZE) + contentData.getSize());     
+                        
+                        contentPropIndex++;
+                    }
                 }
                 
                 // Save

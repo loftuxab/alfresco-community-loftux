@@ -1,0 +1,9 @@
+<!--  Uncomment if using jProfiler
+<jvmarg value="-agentlib:jprofilerti=port=8849"/>
+<jvmarg value="-Xbootclasspath/a:c:\jprofiler4\bin\agent.jar"/>
+-->
+
+<jvmarg value="-server"/>
+<jvmarg value="-Xms512m"/>
+<jvmarg value="-Xmx1024m"/>
+<jvmarg value="-Xss64k"/>

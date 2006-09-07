@@ -16,9 +16,6 @@
  */
 package org.alfresco.benchmark.alfresco;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -128,13 +125,10 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     /**
      * @see org.alfresco.benchmark.framework.DataLoaderComponent#loadData(org.alfresco.benchmark.framework.dataprovider.RepositoryProfile)
      */
-    public LoadedData loadData(RepositoryProfile repositoryProfile)
+    public LoadedData loadData(final RepositoryProfile repositoryProfile)
     {   
         // Get the company home node
         final NodeRef companyHomeNodeRef = AlfrescoUtils.getCompanyHomeNodeRef(this.searchService, AlfrescoUtils.storeRef);
-        
-        List<String> loadedFolders = new ArrayList<String>();
-        List<String> loadedContent = new ArrayList<String>();
         
         // Create a folder in company home within which we will create all the test data
         final Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
@@ -144,33 +138,31 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
         {
             public NodeRef doWork() throws Exception
             {
-                return AlfrescoDataLoaderComponentImpl.this.nodeService.createNode(
+                // Create the root 
+                NodeRef nodeRef = AlfrescoDataLoaderComponentImpl.this.nodeService.createNode(
                         companyHomeNodeRef, 
                         ContentModel.ASSOC_CONTAINS, 
                         QName.createQName(NamespaceService.APP_MODEL_1_0_URI, DataLoaderComponent.BENCHMARK_OBJECT_PREFIX + System.currentTimeMillis()),
                         ContentModel.TYPE_FOLDER,
                         folderProps).getChildRef();
+                
+                // Add the repository profile aspect setting the appropraite details
+                Map<QName, Serializable> profileProperties = new HashMap<QName, Serializable>(1);
+                profileProperties.put(QName.createQName("http://www.alfresco.org/model/benchmark/1.0", "repositoryProfile"), repositoryProfile.getProfileString());
+                AlfrescoDataLoaderComponentImpl.this.nodeService.addAspect(
+                        nodeRef, 
+                        QName.createQName("http://www.alfresco.org/model/benchmark/1.0", "repositoryProfile"), 
+                        profileProperties);
+                
+                return nodeRef;
             }           
         });
-        
-        loadedFolders.add(dataFolderNodeRef.toString());
         
         LoadedData loadedData = new LoadedData(dataFolderNodeRef.toString());
         
         List<NodeRef> folders = new ArrayList<NodeRef>(1);
         folders.add(dataFolderNodeRef);
-        populateFolders(loadedData, repositoryProfile, folders, 0, loadedFolders, loadedContent);
-        
-        try
-        {
-            //  Serialise the loaded folder and content lists
-            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_folders.bin")).writeObject(loadedFolders);
-            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_content.bin")).writeObject(loadedContent);
-        }
-        catch (Exception exception)
-        {
-            throw new RuntimeException(exception);
-        }
+        populateFolders(loadedData, repositoryProfile, folders, 1);
         
         return loadedData;
     }
@@ -187,69 +179,60 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
             final LoadedData loadedData, 
             final RepositoryProfile repositoryProfile, 
             final List<NodeRef> folderNodeRefs, 
-            int depth,
-            final List<String> loadedFolders,
-            final List<String> loadedContent)
+            final int depth)
     {
-        System.out.println("depth=" + depth + "; list_size=" + folderNodeRefs.size());
-        
-        // Increment the depth
-        final int newDepth = depth + 1;
-        final List<NodeRef> subFolders = new ArrayList<NodeRef>(10);
-        
-        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object> ()
-        {
-            public Object doWork() throws Exception
+        if (depth <= repositoryProfile.getDetails().size())
+        {            
+            // Get the repository profile details
+            RepositoryProfile.RespoitoryProfileDetail profileDetails = repositoryProfile.getDetails().get(depth-1);
+            final int numberOfContentNodes = profileDetails.getFileCount();
+            final int numberOfSubFolderNodes = profileDetails.getFolderCount();
+            
+            System.out.println("depth=" + depth + "; folder count=" + numberOfSubFolderNodes + "; file count=" + numberOfContentNodes);        
+            
+            // Increment the depth
+            final int newDepth = depth + 1;
+            final List<NodeRef> subFolders = new ArrayList<NodeRef>(10);            
+            
+            for (NodeRef folderNodeRef : folderNodeRefs)
             {
-                for (NodeRef folderNodeRef : folderNodeRefs)
+                final NodeRef finalFolderNodeRef = folderNodeRef;
+                TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object> ()
                 {
-                    // Now start adding data to the test data folder
-                    int numberOfContentNodes = BenchmarkUtils.nextGaussianInteger(
-                                                                repositoryProfile.getDocumentsInFolderCountAverage(), 
-                                                                repositoryProfile.getDocumentsInFolderCountVariation());
-                    int numberOfSubFolderNodes = BenchmarkUtils.nextGaussianInteger(
-                                                                repositoryProfile.getSubFoldersCountAverage(),
-                                                                repositoryProfile.getSubFoldersCountVariation());
-                    int folderDepth = BenchmarkUtils.nextGaussianInteger(
-                                                                repositoryProfile.getFolderDepthAverage(),
-                                                                repositoryProfile.getFolderDepthVariation());
-                    
-                    // Create content
-                    for (int i = 0; i < numberOfContentNodes; i++)
+                    public Object doWork() throws Exception
                     {
-                        NodeRef contentNode = AlfrescoUtils.createContentNode( 
-                                AlfrescoDataLoaderComponentImpl.this.nodeService, 
-                                AlfrescoDataLoaderComponentImpl.this.contentService, 
-                                repositoryProfile, 
-                                folderNodeRef);
-                        loadedContent.add(contentNode.toString());
-                    }
-                    loadedData.incrementContentCount(numberOfContentNodes);
-                    
-                    // Create folders
-                    for (int i = 0; i < numberOfSubFolderNodes; i++)
-                    {
-                        if (newDepth <= folderDepth)
+                        // Create content
+                        for (int i = 0; i < numberOfContentNodes; i++)
+                        {
+                            AlfrescoUtils.createContentNode( 
+                                    AlfrescoDataLoaderComponentImpl.this.nodeService, 
+                                    AlfrescoDataLoaderComponentImpl.this.contentService,  
+                                    finalFolderNodeRef,
+                                    BenchmarkUtils.getFileName(depth, i));
+                        }
+                        loadedData.incrementContentCount(numberOfContentNodes);
+                        
+                        // Create folders
+                        for (int i = 0; i < numberOfSubFolderNodes; i++)
                         {
                             NodeRef subFolderNodeRef = AlfrescoUtils.createFolderNode( 
                                     AlfrescoDataLoaderComponentImpl.this.nodeService, 
-                                    repositoryProfile, 
-                                    folderNodeRef);
+                                    finalFolderNodeRef,
+                                    BenchmarkUtils.getFolderName(depth, i));
                             subFolders.add(subFolderNodeRef);
                             loadedData.incrementFolderCount(1);
-                            loadedFolders.add(subFolderNodeRef.toString());
-                        }
-                    }                                             
-                }
-                
-                return null;
-            }                   
-        });    
-        
-        if (subFolders.size() > 0)
-        {
-            // Populate the sub folders
-            populateFolders(loadedData, repositoryProfile, subFolders, newDepth, loadedFolders, loadedContent);
+                        }                                                                                     
+                    
+                        return null;
+                    }                   
+                });
+            }
+            
+            if (subFolders.size() > 0)
+            {
+                // Populate the sub folders
+                populateFolders(loadedData, repositoryProfile, subFolders, newDepth); 
+            }
         }
     }
 
@@ -272,7 +255,6 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
                                                         AlfrescoUtils.storeRef);
                     NodeRef homeFolder = AlfrescoUtils.createFolderNode(
                                                         AlfrescoDataLoaderComponentImpl.this.nodeService,
-                                                        new RepositoryProfile(),
                                                         companyHome,
                                                         "userHome_" + GUID.generate());
                     
@@ -300,21 +282,17 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
     
     public static void main(String[] args)
     {
-        RepositoryProfile repositoryProfile = new RepositoryProfile();
-        if (args != null)
-        {
-            String repositoryProfileLocation = args[0];
-            if (repositoryProfileLocation != null)
-            {
-                // Load the repository profile details from the properties file
-            }
-        }
+        String repositoryProfileValue = "3,5,3,5,0,5";
+        if (args != null && args.length != 0 && args[0] != null)
+        {            
+            repositoryProfileValue = args[0];
+        }        
         
         // Get data loader component
         DataLoaderComponent dataLoaderComponent = (DataLoaderComponent)AlfrescoUtils.getApplicationContext().getBean("dataLoaderComponent");
         
         // Load the data into the repo
-        LoadedData loadedData = dataLoaderComponent.loadData(repositoryProfile);
+        LoadedData loadedData = dataLoaderComponent.loadData(new RepositoryProfile(repositoryProfileValue));
         
         // Report the data loaded
         System.out.println("The data has been loaded into folder " + loadedData.getRootFolder() + " :");

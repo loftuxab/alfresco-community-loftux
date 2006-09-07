@@ -27,6 +27,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -61,11 +62,13 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                         AlfrescoBasicInternalAPIDriver.this.authenticationComponent.setSystemUserAsCurrentUser();  
                         try
                         {
+                            NodeRef folderNodeRef = getFolderNodeRef();
+                            
                             AlfrescoUtils.createContentNode(
                                     AlfrescoBasicInternalAPIDriver.this.nodeService, 
                                     AlfrescoBasicInternalAPIDriver.this.contentService, 
                                     AlfrescoBasicInternalAPIDriver.this.contentPropertyValues, 
-                                    AlfrescoBasicInternalAPIDriver.this.folderNodeRef);
+                                    folderNodeRef);
                             
                             // Store the content size for later use
                             ContentData contentData = (ContentData)AlfrescoBasicInternalAPIDriver.this.contentPropertyValues.get(ContentModel.PROP_CONTENT.toString());
@@ -105,9 +108,11 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                     AlfrescoBasicInternalAPIDriver.this.authenticationComponent.setSystemUserAsCurrentUser();   
                     try
                     {
+                        NodeRef contentNodeRef = getFileNodeRef();
+                        
                         // Read the content
                         ContentReader contentReader = AlfrescoBasicInternalAPIDriver.this.contentService.getReader(
-                                AlfrescoBasicInternalAPIDriver.this.contentNodeRef, 
+                                contentNodeRef, 
                                 ContentModel.PROP_CONTENT);
                         contentReader.getContent(File.createTempFile("benchmark", "temp"));
                         
@@ -144,12 +149,14 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                     AlfrescoBasicInternalAPIDriver.this.authenticationComponent.setSystemUserAsCurrentUser();   
                     try
                     {
+                        NodeRef folderNodeRef = getFolderNodeRef();
+                        
                         // Create a named folder
                         String nameValue = (String)AlfrescoBasicInternalAPIDriver.this.folderPropertyValues.get(ContentModel.PROP_NAME.toString());
                         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
                         folderProps.put(ContentModel.PROP_NAME, nameValue);
                         nodeService.createNode(
-                                AlfrescoBasicInternalAPIDriver.this.folderNodeRef, 
+                                folderNodeRef, 
                                 ContentModel.ASSOC_CONTAINS, 
                                 QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
                                 ContentModel.TYPE_FOLDER,
@@ -183,14 +190,16 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                     AlfrescoBasicInternalAPIDriver.this.authenticationComponent.setSystemUserAsCurrentUser();   
                     try
                     {
-                        if (AlfrescoBasicInternalAPIDriver.this.nodeService.hasAspect(AlfrescoBasicInternalAPIDriver.this.contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
+                        NodeRef contentNodeRef = getFileNodeRef();
+                        
+                        if (AlfrescoBasicInternalAPIDriver.this.nodeService.hasAspect(contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
                         {
                             // Add the versionable aspect, turning off auto-version to avoid unexpected behaviour
                             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(2);
                             properties.put(ContentModel.PROP_AUTO_VERSION, false);
                             properties.put(ContentModel.PROP_INITIAL_VERSION, false);
                             AlfrescoBasicInternalAPIDriver.this.nodeService.addAspect(
-                                    AlfrescoBasicInternalAPIDriver.this.contentNodeRef,
+                                    contentNodeRef,
                                     ContentModel.ASPECT_VERSIONABLE,
                                     properties);
                         }
@@ -199,7 +208,7 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                         Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
                         versionProperties.put(VersionImpl.PROP_DESCRIPTION, "This is the description of the version change.");
                         AlfrescoBasicInternalAPIDriver.this.versionService.createVersion(
-                               AlfrescoBasicInternalAPIDriver.this.contentNodeRef,
+                               contentNodeRef,
                                versionProperties);
                     }
                     finally
@@ -232,7 +241,8 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                     try
                     {
                         // Read all the properties of the content node
-                        AlfrescoBasicInternalAPIDriver.this.nodeService.getProperties(AlfrescoBasicInternalAPIDriver.this.contentNodeRef);
+                        NodeRef contentNodeRef = getFileNodeRef();
+                        AlfrescoBasicInternalAPIDriver.this.nodeService.getProperties(contentNodeRef);
                     }
                     finally
                     {

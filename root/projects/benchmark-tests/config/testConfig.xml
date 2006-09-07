@@ -2,9 +2,9 @@
 <testSuite name="ParsingPerformance" xmlns="http://www.sun.com/japex/testSuite">
     
     <driver name="JAXPDriver">
-        <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.AlfrescoInternalAPIDriver"/>
+        <param name="japex.driverClass" value="org.alfresco.benchmark.alfresco.jcr.AlfrescoJCRBulkLoadDriver"/>
         <param name="description" value="Alfresco Internal API"/>   
-    	<param name="japex.numberOfThreads" value="10"/> 
+    	<param name="japex.numberOfThreads" value="1"/> 
     	<param name="japex.threadRampupTime" value="0"/>
     	<param name="japex.includeWarmupRun" value="false"/>
 
@@ -13,26 +13,21 @@
     <testCase name="testConfig">
 
         <!-- Usage Profile -->
-        <param name="alfresco.usageProfile.readContent" value="0"/>
-        <param name="alfresco.usageProfile.readProperties" value="0"/>
-        <param name="alfresco.usageProfile.createContent" value="100"/>
+        <param name="alfresco.usageProfile.readContent" value="25"/>
+        <param name="alfresco.usageProfile.readProperties" value="25"/>
+        <param name="alfresco.usageProfile.createContent" value="25"/>
         <param name="alfresco.usageProfile.createVersion" value="0"/>
-        <param name="alfresco.usageProfile.createFolder" value="0"/>
-
-        <!-- Repository Profile -->
-        <param name="alfrsco.repositoryProfile.folderDepth.average" value="3"/>
-        <param name="alfrsco.repositoryProfile.folderDepth.variation" value="1"/>
-        <param name="alfrsco.repositoryProfile.documentsInFolderCount.average" value="5"/>
-        <param name="alfrsco.repositoryProfile.documentsInFolderCount.variation" value="1"/>
-        <param name="alfrsco.repositoryProfile.subFoldersCount.average" value="3"/>
-        <param name="alfrsco.repositoryProfile.subFoldersCount.variation" value="1"/>      
+        <param name="alfresco.usageProfile.createFolder" value="25"/>
         
         <!-- Number of available users -->
         <param name="alfresco.numberOfAvailableUsers" value="50"/>                                       
 
         <param name="japex.warmupIterations" value="0"/>
-    	<param name="japex.runTime" value="00:30"/>
-<!--    	<param name="japex.runIterations" value="20"/>-->
+ <!--   	<param name="japex.runTime" value="01:00"/> -->
+    	<param name="japex.runIterations" value="5"/>
+    	
+    	<param name="alfresco.fileCount" value="10"/>
+    	<param name="alfresco.folderCount" value="2"/>
 
     	<param name="japex.runDelay" value="0"/>
     	<param name="japex.runDelayVariation" value="0"/>

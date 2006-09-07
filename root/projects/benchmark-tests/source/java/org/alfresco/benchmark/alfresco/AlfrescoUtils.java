@@ -16,9 +16,6 @@
  */
 package org.alfresco.benchmark.alfresco;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,6 +31,9 @@ import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
 import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile.PropertyType;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -58,10 +58,6 @@ public class AlfrescoUtils
     
     private static List<PropertyProfile> contentPropertyProfiles;
     
-    //private static Map<String, NodeRef> testCaseFolder = new HashMap<String, NodeRef>(5);
-    //private static Map<String, List<NodeRef>> testCaseFolders = new HashMap<String, List<NodeRef>>(5);
-    //private static Map<String, List<NodeRef>> testCaseContent = new HashMap<String, List<NodeRef>>(5);
-    
     private static List<String> availableUsers;    
     
     public static StoreRef storeRef = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
@@ -85,129 +81,72 @@ public class AlfrescoUtils
         }
         
         return applicationContext;
-    }   
+    }  
     
-    private static List<String> folders;
-    private static List<String> content;
+    private static NodeRef rootTestDataFolder;
     
-    @SuppressWarnings("unchecked")
-    public static synchronized NodeRef getRandomFolder()
+    /**
+     * Get a list of the available test data root folders
+     * 
+     * @param searchService
+     * @param nodeService
+     * @return
+     */
+    public static synchronized NodeRef getRootTestDataFolder(SearchService searchService, NodeService nodeService)
     {
-        try
-        {
-            if (folders == null)
-            {
-                folders = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_folders.bin")).readObject();            
-            }
-            
-            int size = folders.size();
-            int rand = BenchmarkUtils.rand.nextInt(size);
-            return new NodeRef(folders.get(rand));
-        }
-        catch (Exception exception)
-        {
-            throw new RuntimeException("Unable to get random folder path", exception);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public static synchronized NodeRef getRandomContent()
-    {
-        try
-        {
-            if (content == null)
-            {
-                content = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "alf_loaded_content.bin")).readObject();            
-            }
-            
-            int size = content.size();
-            int rand = BenchmarkUtils.rand.nextInt(size);
-            return new NodeRef(content.get(rand));
-        }
-        catch (Exception exception)
-        {
-            throw new RuntimeException("Unable to get random content path", exception);
-        }
-    } 
-    
-    
-    private static List<NodeRef> rootFolders;
-    
-    public static synchronized List<NodeRef> getRootFolders(SearchService searchService, NodeService nodeService)
-    {
-        if (rootFolders == null)
+        if (rootTestDataFolder == null)
         {
             NodeRef companyHome = getCompanyHomeNodeRef(searchService, storeRef);
             
             List<ChildAssociationRef> assocs = nodeService.getChildAssocs(companyHome, RegexQNamePattern.MATCH_ALL, new RegexQNamePattern(NamespaceService.APP_MODEL_1_0_URI, AlfrescoDataLoaderComponentImpl.BENCHMARK_OBJECT_PREFIX + ".*"));
             if (assocs.size() == 0)
             {
-                throw new RuntimeException("There is no benchmark data loaded in to the repository.");
+                throw new RuntimeException("ERROR:  There is no test data available to execute the benchmark tests against.  Please execute the load-benchmark-data ant task.");
             }
-            rootFolders = new ArrayList<NodeRef>(assocs.size());
-            for (ChildAssociationRef assoc : assocs)
+            
+            // Get the folder node ref
+            rootTestDataFolder = assocs.get(0).getChildRef();
+            
+            if (assocs.size() > 1)
             {
-                rootFolders.add(assoc.getChildRef());
-            }
+                System.out.println("WARNING:  More that one root test data folder has been found.  Using '" + nodeService.getProperty(rootTestDataFolder, ContentModel.PROP_NAME) + "'");
+            }                
         }
-        return rootFolders;
+        
+        return rootTestDataFolder;
     }
-   
-//    public static NodeRef getRandomFolder(SearchService searchService, NodeService nodeService)
-//    {       
-//        List<NodeRef> folders = new ArrayList<NodeRef>(); 
-//        getRandomFolder(nodeService, getRootFolders(searchService, nodeService), folders);
-//        NodeRef folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));
-//        return folder;
-//    }
-//    
-//    private static void getRandomFolder(NodeService nodeService, List<NodeRef> folders, List<NodeRef> result)
-//    {
-//        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
-//        NodeRef folder = folders.get(randIndex);
-//        result.add(folder);
-//
-//        // Get the sub-folders of the folder
-//        List<ChildAssociationRef> assocs = nodeService.getChildAssocs(folder);
-//        List<NodeRef> subFolders = new ArrayList<NodeRef>(assocs.size());
-//        for (ChildAssociationRef assoc : assocs)
-//        {
-//            NodeRef subFolder = assoc.getChildRef();
-//            
-//            if (nodeService.getType(subFolder).getLocalName().equals("folder") == true)
-//            {
-//                subFolders.add(subFolder);
-//            }
-//        }
-//        
-//        if (subFolders.size() != 0)
-//        {
-//            getRandomFolder(nodeService, subFolders, result);
-//        }
-//    }
-//    
-//    public static synchronized NodeRef getRandomContent(SearchService searchService, NodeService nodeService)
-//    {
-//        List<NodeRef> contentList = new ArrayList<NodeRef>();
-//        
-//        while (contentList.size() == 0)
-//        {
-//            NodeRef folder = getRandomFolder(searchService, nodeService);
-//            
-//            for (ChildAssociationRef assoc : nodeService.getChildAssocs(folder))
-//            {
-//                NodeRef child = assoc.getChildRef();
-//                if (nodeService.getType(child).getLocalName().equals("content") == true)
-//                {
-//                    contentList.add(child);
-//                }
-//            }
-//        }
-//        
-//        NodeRef content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
-//        return content;
-//    }
     
+    private static RepositoryProfile repositoryProfile;
+    
+    public static RepositoryProfile getRepositoryProfile(
+            final AuthenticationComponent authenticationComponent, 
+            final SearchService searchService, 
+            final NodeService nodeService)
+    {
+        if (repositoryProfile == null)
+        {
+            AuthenticationUtil.runAs(new RunAsWork<Object>()
+            {
+                public Object doWork() throws Exception
+                {
+                    NodeRef rootNodeRef = getRootTestDataFolder(searchService, nodeService);
+                    String repositoryProfileValue = (String)nodeService.getProperty(rootNodeRef, QName.createQName("http://www.alfresco.org/model/benchmark/1.0", "repositoryProfile"));
+                    repositoryProfile = new RepositoryProfile(repositoryProfileValue);
+                    return null;
+                }
+                
+            }, AuthenticationUtil.getSystemUserName());
+        }
+        return repositoryProfile;
+    }
+    
+    /**
+     * Get the company home node reference
+     * 
+     * @param searchService
+     * @param storeRef
+     * @return
+     */
     public static NodeRef getCompanyHomeNodeRef(SearchService searchService, StoreRef storeRef)
     {
         // Get the company home node
@@ -215,6 +154,11 @@ public class AlfrescoUtils
         return rs.getNodeRef(0);
     }
     
+    /**
+     * Get a list of the property profiles for a content node
+     * 
+     * @return
+     */
     public static synchronized List<PropertyProfile> getContentPropertyProfiles()
     {
         if (contentPropertyProfiles == null)
@@ -243,12 +187,27 @@ public class AlfrescoUtils
         return contentPropertyProfiles;
     }
     
-    public static NodeRef createFolderNode(NodeService nodeService, RepositoryProfile repositoryProfile, NodeRef folderNodeRef)
+    /**
+     * Create a folder node
+     * ]
+     * @param nodeService
+     * @param folderNodeRef
+     * @return
+     */
+    public static NodeRef createFolderNode(NodeService nodeService, NodeRef folderNodeRef)
     {
-        return createFolderNode(nodeService, repositoryProfile, folderNodeRef, null);
+        return createFolderNode(nodeService, folderNodeRef, null);
     }
         
-    public static NodeRef createFolderNode(NodeService nodeService, RepositoryProfile repositoryProfile, NodeRef folderNodeRef, String nameValue)
+    /**
+     * Create a folder node
+     * 
+     * @param nodeService
+     * @param folderNodeRef
+     * @param nameValue
+     * @return
+     */
+    public static NodeRef createFolderNode(NodeService nodeService, NodeRef folderNodeRef, String nameValue)
     {
         // Get folder property data
         List<PropertyProfile> folderPropertyProfiles = new ArrayList<PropertyProfile>();
@@ -257,7 +216,6 @@ public class AlfrescoUtils
         {
             folderPropertyProfiles.add(PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString()));
             Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(
-                    repositoryProfile, 
                     folderPropertyProfiles);
             
             nameValue = (String)propertyValues.get(ContentModel.PROP_NAME.toString());
@@ -268,31 +226,87 @@ public class AlfrescoUtils
         return nodeService.createNode(
                 folderNodeRef, 
                 ContentModel.ASSOC_CONTAINS, 
-                QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, nameValue),
                 ContentModel.TYPE_FOLDER,
                 folderProps).getChildRef();
     }
     
-    public static NodeRef createContentNode(NodeService nodeService, ContentService contentService, RepositoryProfile repositoryProfile, NodeRef folderNodeRef)
+    public static NodeRef createContentNode(NodeService nodeService, ContentService contentService, NodeRef folderNodeRef)
+    {
+        return createContentNode(nodeService, contentService, folderNodeRef, null);
+    }
+    
+    /**
+     * Create a content node
+     * 
+     * @param nodeService
+     * @param contentService
+     * @param folderNodeRef
+     * @return
+     */
+    public static NodeRef createContentNode(NodeService nodeService, ContentService contentService, NodeRef folderNodeRef, String fileName)
     {        
         // Get the test data                    
         Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(
-                                                                        repositoryProfile, 
                                                                         AlfrescoUtils.getContentPropertyProfiles());
 
-        return createContentNode(nodeService, contentService, propertyValues, folderNodeRef);   
+        return createContentNode(nodeService, contentService, propertyValues, folderNodeRef, true, fileName);   
     }
     
+    /**
+     * Create a content node
+     * 
+     * @param nodeService
+     * @param contentService
+     * @param propertyValues
+     * @param folderNodeRef
+     * @return
+     */
     public static NodeRef createContentNode(NodeService nodeService, ContentService contentService, Map<String, Object> propertyValues, NodeRef folderNodeRef)
     {
-        return createContentNode(nodeService, contentService, propertyValues, folderNodeRef, true);
+        return createContentNode(nodeService, contentService, propertyValues, folderNodeRef, true, null);
     }
     
+    /**
+     * Create a content node
+     * 
+     * @param nodeService
+     * @param contentService
+     * @param propertyValues
+     * @param folderNodeRef
+     * @param addAspect
+     * @return
+     */
     public static NodeRef createContentNode(NodeService nodeService, ContentService contentService, Map<String, Object> propertyValues, NodeRef folderNodeRef, boolean addAspect)
+    {
+        return createContentNode(nodeService, contentService, propertyValues, folderNodeRef, true, null);
+    }
+    
+    /**
+     * Create a content node
+     * 
+     * @param nodeService
+     * @param contentService
+     * @param propertyValues
+     * @param folderNodeRef
+     * @param addAspect
+     * @param contentName
+     * @return
+     */
+    public static NodeRef createContentNode(NodeService nodeService, ContentService contentService, Map<String, Object> propertyValues, NodeRef folderNodeRef, boolean addAspect, String contentName)
     {
         // Create a new node at the root of the store
         ContentData contentData = (ContentData)propertyValues.get(ContentModel.PROP_CONTENT.toString());
-        String name = contentData.getName();
+        
+        String name = null;
+        if (contentName == null)
+        {
+            name = contentData.getName();
+        }
+        else
+        {
+            name = contentName;
+        }
         
         Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
         properties.put(ContentModel.PROP_NAME, (Serializable)name);
@@ -331,6 +345,15 @@ public class AlfrescoUtils
     
     private static Object mutex = new Object();
     
+    /**
+     * Prepare the users ready for the benchmark tests.
+     * 
+     * @param dataLoaderComponent
+     * @param personService
+     * @param nodeService
+     * @param numberOfUsers
+     * @return
+     */
     public static List<String> prepairUsers(
             DataLoaderComponent dataLoaderComponent, 
             PersonService personService, 
@@ -366,6 +389,12 @@ public class AlfrescoUtils
         }
     }
     
+    /**
+     * Get a user that can be used with a benchmark test.  This removes a user from the available user list, releaseUserName must be called 
+     * to ensure the tests do not run out of avilable users.
+     * 
+     * @return
+     */
     public static String getUserName()
     {
         synchronized (mutex)
@@ -392,6 +421,11 @@ public class AlfrescoUtils
         }
     }
     
+    /**
+     * Releases a user name once the benchmark test has finished with it.
+     * 
+     * @param userName
+     */
     public static void releaseUserName(String userName)
     {
         synchronized (mutex)

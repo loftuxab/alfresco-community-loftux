@@ -16,9 +16,6 @@
  */
 package org.alfresco.benchmark.framework.jcr;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,8 +44,6 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
     public LoadedData loadData(RepositoryProfile repositoryProfile)
     {           
         LoadedData loadedData = null;
-        List<String> loadedFolders = new ArrayList<String>();
-        List<String> loadedContent = new ArrayList<String>();
         
         try
         {
@@ -58,13 +53,21 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
             {
                 Node rootFolder = session.getRootNode().addNode (JCR_BENCHMARK_OBJECT_PREFIX + BenchmarkUtils.getGUID(), "nt:folder");
                 
+                if (rootFolder.canAddMixin("ben:repositoryProfile") == true)
+                {
+                    rootFolder.addMixin("ben:repositoryProfile");
+                    rootFolder.setProperty("ben:repositoryProfile", repositoryProfile.getProfileString());
+                }
+                else
+                {
+                    System.out.println("WARNING:  Unable to add mixin 'ben:repositoryProfile' to root test data node.");
+                }
+                
                 loadedData = new LoadedData(rootFolder.getPath());
                 List<Node> folderNodes = new ArrayList<Node>(10);
                 folderNodes.add(rootFolder);
                 
-                loadedFolders.add(rootFolder.getPath());
-                
-                populateFolders(loadedData, repositoryProfile, folderNodes, 0, loadedFolders, loadedContent);
+                populateFolders(loadedData, repositoryProfile, folderNodes, 1);
                 
                 session.save();
             }
@@ -76,19 +79,7 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
         catch (Exception exception)
         {
             throw new RuntimeException("Unable to load data", exception);
-        }
-        
-        try
-        {
-            //  Serialise the loaded folder and content lists
-            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_folders.bin")).writeObject(loadedFolders);
-            new ObjectOutputStream(new FileOutputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_content.bin")).writeObject(loadedContent);
-        }
-        catch (Exception exception)
-        {
-            throw new RuntimeException(exception);
-        }
-        
+        }        
         
         return loadedData;
     }
@@ -105,56 +96,44 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
             final LoadedData loadedData, 
             final RepositoryProfile repositoryProfile, 
             final List<Node> folderNodes, 
-            int depth,
-            List<String> loadedFolders,
-            List<String> loadedContent)
+            int depth)
         throws Exception
     {
-        System.out.println("depth=" + depth + "; list_size=" + folderNodes.size());
-        
-        // Increment the depth
-        final int newDepth = depth + 1;
-        final List<Node> subFolders = new ArrayList<Node>(10);
-        
-
-        for (Node folderNode : folderNodes)
+        if (depth <= repositoryProfile.getDetails().size())
         {
-            // Now start adding data to the test data folder
-            int numberOfContentNodes = BenchmarkUtils.nextGaussianInteger(
-                                                        repositoryProfile.getDocumentsInFolderCountAverage(), 
-                                                        repositoryProfile.getDocumentsInFolderCountVariation());
-            int numberOfSubFolderNodes = BenchmarkUtils.nextGaussianInteger(
-                                                        repositoryProfile.getSubFoldersCountAverage(),
-                                                        repositoryProfile.getSubFoldersCountVariation());
-            int folderDepth = BenchmarkUtils.nextGaussianInteger(
-                                                        repositoryProfile.getFolderDepthAverage(),
-                                                        repositoryProfile.getFolderDepthVariation());
+            RepositoryProfile.RespoitoryProfileDetail profile = repositoryProfile.getDetails().get(depth-1);
+            final int numberOfContentNodes = profile.getFileCount();
+            final int numberOfSubFolderNodes = profile.getFolderCount();
             
-            // Create content
-            for (int i = 0; i < numberOfContentNodes; i++)
-            {
-                Node content = JCRUtils.createFile(repositoryProfile, folderNode);
-                loadedContent.add(content.getPath());
-            }
-            loadedData.incrementContentCount(numberOfContentNodes);
+            // Increment the depth
+            final int newDepth = depth + 1;
+            final List<Node> subFolders = new ArrayList<Node>(10);
             
-            // Create folders
-            for (int i = 0; i < numberOfSubFolderNodes; i++)
+            System.out.println("depth=" + depth + "; list_size=" + folderNodes.size());
+            
+            for (Node folderNode : folderNodes)
             {
-                if (newDepth <= folderDepth)
+                // Create content
+                for (int i = 0; i < numberOfContentNodes; i++)
                 {
-                    Node subFolderNode = JCRUtils.createFolder(repositoryProfile, folderNode);
-                    subFolders.add(subFolderNode);
-                    loadedFolders.add(subFolderNode.getPath());
-                    loadedData.incrementFolderCount(1);
+                    JCRUtils.createFile(folderNode, BenchmarkUtils.getFileName(depth, i));
                 }
-            }                                             
-        }         
+                loadedData.incrementContentCount(numberOfContentNodes);
                 
-        if (subFolders.size() > 0)
-        {
-            // Populate the sub folders
-            populateFolders(loadedData, repositoryProfile, subFolders, newDepth, loadedFolders, loadedContent);
+                // Create folders
+                for (int i = 0; i < numberOfSubFolderNodes; i++)
+                {
+                    Node subFolderNode = JCRUtils.createFolder(folderNode, BenchmarkUtils.getFolderName(depth, i));
+                    subFolders.add(subFolderNode);
+                    loadedData.incrementFolderCount(1);
+                }                                             
+            }         
+                    
+            if (subFolders.size() > 0)
+            {
+                // Populate the sub folders
+                populateFolders(loadedData, repositoryProfile, subFolders, newDepth);
+            }
         }
     }
 

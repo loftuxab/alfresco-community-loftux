@@ -280,6 +280,7 @@
       <copy todir="${dir.assemble.benchmark}/config">
          <fileset dir="${dir.project.benchmark-framework}/config" includes="repository-profile*.properties" />
          <fileset dir="${dir.project.benchmark-tests}/config" includes="**/*.xml" />
+         <fileset dir="${dir.project.benchmark-tests}/config" includes="**/*.sample" />
       </copy>
       <copy file="${dir.project.benchmark-tests}/config/classpath.config.dist" tofile="${dir.assemble.benchmark}/config/classpath.config" />
       <copy file="${dir.project.benchmark-framework}/config/benchmark-config.properties.dist" tofile="${dir.assemble.benchmark}/config/benchmark-config.properties" />
@@ -295,6 +296,7 @@
       
       <!-- Get the ant file -->
       <copy file="${dir.project.benchmark-tests}/build.xml" todir="${dir.assemble.benchmark}" />
+      <copy file="${dir.project.benchmark-tests}/build-jvm-args.xml" todir="${dir.assemble.benchmark}" />
       <copy file="${dir.project.benchmark-tests}/build-common.xml.dist" tofile="${dir.assemble.benchmark}/build-common.xml" />
       <copy file="${dir.project.benchmark-tests}/build-classpath.xml.dist" tofile="${dir.assemble.benchmark}/build-classpath.xml" />
 

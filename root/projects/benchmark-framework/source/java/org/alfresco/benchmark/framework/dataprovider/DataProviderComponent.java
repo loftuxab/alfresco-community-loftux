@@ -104,7 +104,6 @@ public class DataProviderComponent
      * @see org.alfresco.benchmark.framework.dataprovider.DataProviderComponent#getPropertyData(org.alfresco.benchmark.framework.dataprovider.RepositoryProfile, java.util.List)
      */
     public Map<String, Object> getPropertyData(
-            RepositoryProfile repositoryProfile,
             List<PropertyProfile> propertyProfiles)
     {
         // TODO need to consider the repository profile ??

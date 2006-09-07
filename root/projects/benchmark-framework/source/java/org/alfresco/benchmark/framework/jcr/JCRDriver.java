@@ -58,7 +58,6 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         
         // Get content property values
         this.contentPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                this.repositoryProfile, 
                 JCRUtils.getContentPropertyProfiles());
         
         // Get folder property values
@@ -67,11 +66,20 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         PropertyProfile name = PropertyProfile.createSmallTextProperty(JCRUtils.PROP_NAME);
         folderPropertyProfiles.add(name);
         this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                this.repositoryProfile, 
                 folderPropertyProfiles);
-        
-        this.folderPath = JCRUtils.getRandomFolder();
-        this.contentPath = JCRUtils.getRandomContent();
+        try
+        {            
+            RepositoryProfile repositoryProfile = JCRUtils.getRepositoryProfile();
+            this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, false);
+            this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+            
+            System.out.println("Content JCR path: " + this.contentPath);
+            System.out.println("Folder JCR path: " + this.folderPath);
+        }
+        catch (Exception exception)
+        {
+            throw new RuntimeException("Unable to get the repository profile", exception);
+        }        
     }
     
     @Override
@@ -93,9 +101,9 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode(this.folderPath.substring(0));
+                final Node folder = rootNode.getNode(this.folderPath);
                 
-                this.folderPath = rootNode.getPath();
+                //this.folderPath = rootNode.getPath();
                 
                 try
                 {
@@ -132,7 +140,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the content that we are going to read
                 Node rootNode = session.getRootNode();      
-                final Node content = rootNode.getNode(this.contentPath.substring(1));
+                final Node content = rootNode.getNode(this.contentPath);
                
                 // Get the content and write into a tempory file
                 Node resourceNode = content.getNode("jcr:content");                
@@ -162,14 +170,14 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode(this.folderPath.substring(1));
+                final Node folder = rootNode.getNode(this.folderPath);
                 
-                this.folderPath = rootNode.getPath();
+                //this.folderPath = rootNode.getPath();
                 
                 try
                 {
                     // Create the new file in the folder
-                    JCRUtils.createFolder(new RepositoryProfile(), folder);
+                    JCRUtils.createFolder(folder);
                 }
                 catch (Exception exception)
                 {
@@ -249,7 +257,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the content that we are going to read
                 Node rootNode = session.getRootNode();                  
-                final Node content = rootNode.getNode(this.contentPath.substring(1));                
+                final Node content = rootNode.getNode(this.contentPath);                
                
                 // Get all the properties of the content node
                 content.getProperties();

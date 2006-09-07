@@ -21,9 +21,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.benchmark.framework.BaseBenchmarkDriver;
+import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.DataLoaderComponent;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
+import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.repo.transaction.TransactionUtil;
@@ -34,6 +36,7 @@ import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.cmr.security.PersonService;
 import org.alfresco.service.cmr.version.VersionService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.transaction.TransactionService;
 
 import com.sun.japex.TestCase;
@@ -51,6 +54,7 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     protected PersonService personService;
     protected PermissionService permissionService;
     protected SearchService searchService;
+    protected NamespaceService namespaceService;
     
     protected NodeService smallNodeService;
     protected ContentService smallContentService;
@@ -59,9 +63,10 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     
     protected Map<String, Object> contentPropertyValues; 
     protected Map<String, Object> folderPropertyValues;
-    //protected NodeRef rootFolder;
-    protected NodeRef contentNodeRef;
-    protected NodeRef folderNodeRef;
+   
+    protected NodeRef rootDataNodeRef;
+    protected String randomFolderPath;
+    protected String randomFilePath;
     protected String userName;
     
     protected boolean useUsers = true;
@@ -81,6 +86,7 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         this.versionService = (VersionService)AlfrescoUtils.getApplicationContext().getBean("VersionService");
         this.personService = (PersonService)AlfrescoUtils.getApplicationContext().getBean("PersonService");
         this.permissionService = (PermissionService)AlfrescoUtils.getApplicationContext().getBean("PermissionService");
+        this.namespaceService = (NamespaceService)AlfrescoUtils.getApplicationContext().getBean("NamespaceService");
         
         this.smallNodeService = (NodeService)AlfrescoUtils.getApplicationContext().getBean("nodeService");
         this.smallContentService = (ContentService)AlfrescoUtils.getApplicationContext().getBean("contentService");
@@ -101,12 +107,12 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                 this.authenticationComponent.setSystemUserAsCurrentUser();            
                 try
                 {           
-                    // Get the root folders
-                    final List<NodeRef> rootFolders = AlfrescoUtils.getRootFolders(this.searchService, this.nodeService);
+                    // Get the root folder
+                    this.rootDataNodeRef = AlfrescoUtils.getRootTestDataFolder(this.searchService, this.nodeService);
                     
                     if (BaseAlfrescoDriver.usersPrepaired == false)
                     {
-                        System.out.println("Preparing useres");
+                        System.out.println("\nPreparing Users ...");
                         TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
                         {
                             public Object doWork() throws Exception
@@ -125,17 +131,14 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                                         BaseAlfrescoDriver.this.nodeService,
                                         numberOfAvailableUsers);
                                 
-                                for (NodeRef rootFolder : rootFolders)
+                                for (String userName : users)
                                 {
-                                    for (String userName : users)
-                                    {
-                                        // TODO how do we check this without doing it over and over again!!
-                                        BaseAlfrescoDriver.this.permissionService.setPermission(rootFolder, userName, PermissionService.FULL_CONTROL, true);   
-                                    }
-                                    if (BaseAlfrescoDriver.this.permissionService.getInheritParentPermissions(rootFolder) == false)
-                                    {
-                                        BaseAlfrescoDriver.this.permissionService.setInheritParentPermissions(rootFolder, true);
-                                    }
+                                    // TODO how do we check this without doing it over and over again!!
+                                    BaseAlfrescoDriver.this.permissionService.setPermission(BaseAlfrescoDriver.this.rootDataNodeRef, userName, PermissionService.FULL_CONTROL, true);   
+                                }
+                                if (BaseAlfrescoDriver.this.permissionService.getInheritParentPermissions(BaseAlfrescoDriver.this.rootDataNodeRef) == false)
+                                {
+                                    BaseAlfrescoDriver.this.permissionService.setInheritParentPermissions(BaseAlfrescoDriver.this.rootDataNodeRef, true);
                                 }
                                 
                                 BaseAlfrescoDriver.usersPrepaired = true;
@@ -168,7 +171,6 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         
         // Get content property values
         this.contentPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                this.repositoryProfile, 
                 AlfrescoUtils.getContentPropertyProfiles());
         
         // Get folder property values
@@ -177,12 +179,15 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         PropertyProfile name = PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString());
         folderPropertyProfiles.add(name);
         this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
-                this.repositoryProfile, 
                 folderPropertyProfiles);
         
-        // Get the folder and content node references
-        this.folderNodeRef = AlfrescoUtils.getRandomFolder();
-        this.contentNodeRef = AlfrescoUtils.getRandomContent();
+        // Get the random file and folder paths
+        RepositoryProfile repositoryProfile = AlfrescoUtils.getRepositoryProfile(this.authenticationComponent, this.searchService, this.nodeService);
+        this.randomFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
+        this.randomFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+        
+        //System.out.println("File path = " + this.randomFilePath);
+        //System.out.println("Folder path = " + this.randomFolderPath);
         
         if (this.useUsers == true)
         {
@@ -209,5 +214,35 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     {
         super.finish(testCase);
         usersPrepaired = false;
+    }
+    
+    protected NodeRef getFolderNodeRef()
+    {
+        return resolvePath(this.randomFolderPath);
+    }
+    
+    protected NodeRef getFileNodeRef()
+    {
+        return resolvePath(this.randomFilePath);
+    }
+    
+    private NodeRef resolvePath(String path)
+    {
+        NodeRef nodeRef = null;
+        List<NodeRef> nodeRefs = this.searchService.selectNodes(
+                this.rootDataNodeRef,
+                path,
+                null,
+                this.namespaceService,
+                false);
+        if (nodeRefs.size() == 1)
+        {
+            nodeRef = nodeRefs.get(0);
+        }
+        else
+        {
+            throw new RuntimeException("Unable to resolve path (path=" + this.randomFolderPath + ")");
+        }
+        return nodeRef;
     }
 }

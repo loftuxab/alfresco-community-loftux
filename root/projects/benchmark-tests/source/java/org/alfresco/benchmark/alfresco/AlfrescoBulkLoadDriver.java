@@ -42,10 +42,13 @@ import com.sun.japex.TestCase;
  */
 public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
 {
-    public static final String PARAM_LOAD_COUNT = "alfresco.loadCount";
-    public static final int DEFAULT_LOAD_COUNT = 1000;
+    public static final String PARAM_FOLDER_COUNT = "alfresco.folderCount";
+    public static final String PARAM_FILE_COUNT = "alfresco.fileCount";
+    public static final int DEFAULT_FOLDER_COUNT = 1000;
+    public static final int DEFAULT_FILE_COUNT = 1;
     
-    private int loadCount = DEFAULT_LOAD_COUNT;
+    private int folderCount = DEFAULT_FOLDER_COUNT;
+    private int fileCount = DEFAULT_FILE_COUNT;
     
     private ContentData[] contentData;
     
@@ -54,10 +57,14 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
     {
         super.prepare(tc);
         
-        // Get the load count
-        if (tc.hasParam(PARAM_LOAD_COUNT) == true)
+        // Get the folder and file count vlaues
+        if (tc.hasParam(PARAM_FOLDER_COUNT) == true)
         {
-            this.loadCount = tc.getIntParam(PARAM_LOAD_COUNT);
+            this.folderCount = tc.getIntParam(PARAM_FOLDER_COUNT);
+        }
+        if (tc.hasParam(PARAM_FILE_COUNT) == true)
+        {
+            this.fileCount = tc.getIntParam(PARAM_FILE_COUNT);
         }
     }
     
@@ -66,15 +73,16 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
     {
         super.preRun(testCase);
         
-        this.contentData = new ContentData[this.loadCount];
+        int contentCount = this.fileCount*this.folderCount;
+        this.contentData = new ContentData[contentCount];
         
         // Get the content data to be used in the test
         List<PropertyProfile> contentPropertyProfiles = new ArrayList<PropertyProfile>();
         contentPropertyProfiles.add(new PropertyProfile(ContentModel.PROP_CONTENT.toString(), PropertyType.CONTENT));
         
-        for (int i = 0; i < loadCount; i++)
+        for (int i = 0; i < contentCount; i++)
         {
-            Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(this.repositoryProfile, contentPropertyProfiles);
+            Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(contentPropertyProfiles);
             this.contentData[i] = (ContentData)propertyValues.get(ContentModel.PROP_CONTENT.toString());
         }        
     }
@@ -111,41 +119,50 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
     
     private void doBulkUpload(TestCase testCase)
     {
-        // Create the folder to load the data into
-        String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
-        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
-        folderProps.put(ContentModel.PROP_NAME, nameValue);
-        NodeRef bulkLoadFolder = smallNodeService.createNode(
-                this.folderNodeRef, 
-                ContentModel.ASSOC_CONTAINS, 
-                QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
-                ContentModel.TYPE_FOLDER,
-                folderProps).getChildRef();
+        // Get the folder
+        NodeRef folderNodeRef = getFolderNodeRef();
         
-        for (int i = 0; i < this.loadCount; i++)
-        {
-            // Create a new content object
-            String contentName = "bulkLoad_" + i;
-            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
-            properties.put(ContentModel.PROP_NAME, contentName);
-            NodeRef contentNodeRef = smallNodeService.createNode(
-                    bulkLoadFolder, 
+        int contentPropIndex = 0;
+        for (int folderIndex = 0; folderIndex < this.folderCount; folderIndex++)
+        {        
+            // Create the folder to load the data into
+            String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
+            Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
+            folderProps.put(ContentModel.PROP_NAME, nameValue);
+            NodeRef bulkLoadFolder = smallNodeService.createNode(
+                    folderNodeRef, 
                     ContentModel.ASSOC_CONTAINS, 
-                    QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, contentName),
-                    ContentModel.TYPE_CONTENT,
-                    properties).getChildRef();
+                    QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
+                    ContentModel.TYPE_FOLDER,
+                    folderProps).getChildRef();
             
-            // Get the content details
-            ContentData contentData = this.contentData[i];
-            
-            // Upload the content
-            ContentWriter contentWriter = this.smallContentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);           
-            contentWriter.setEncoding(contentData.getEncoding());
-            contentWriter.setMimetype(contentData.getMimetype());
-            contentWriter.putContent(contentData.getFile());
-            
-            // Store the content size for later use
-            testCase.setLongParam(PARAM_CONTENT_SIZE, testCase.getLongParam(PARAM_CONTENT_SIZE) + contentData.getSize());                        
+            for (int fileIndex = 0; fileIndex < this.fileCount; fileIndex++)
+            {
+                // Create a new content object
+                String contentName = "bulkLoad_" + fileIndex;
+                Map<QName, Serializable> properties = new HashMap<QName, Serializable>(1);
+                properties.put(ContentModel.PROP_NAME, contentName);
+                NodeRef contentNodeRef = smallNodeService.createNode(
+                        bulkLoadFolder, 
+                        ContentModel.ASSOC_CONTAINS, 
+                        QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, contentName),
+                        ContentModel.TYPE_CONTENT,
+                        properties).getChildRef();
+                
+                // Get the content details
+                ContentData contentData = this.contentData[contentPropIndex];
+                
+                // Upload the content
+                ContentWriter contentWriter = this.smallContentService.getWriter(contentNodeRef, ContentModel.PROP_CONTENT, true);           
+                contentWriter.setEncoding(contentData.getEncoding());
+                contentWriter.setMimetype(contentData.getMimetype());
+                contentWriter.putContent(contentData.getFile());
+                
+                // Store the content size for later use
+                testCase.setLongParam(PARAM_CONTENT_SIZE, testCase.getLongParam(PARAM_CONTENT_SIZE) + contentData.getSize());   
+                
+                contentPropIndex++;
+            }
         }
     }
 }

@@ -19,8 +19,6 @@ package org.alfresco.benchmark.framework;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
-
 import com.sun.japex.JapexDriverBase;
 import com.sun.japex.TestCase;
 
@@ -36,8 +34,6 @@ public abstract class BaseBenchmarkDriver extends JapexDriverBase
     public static final String PARAM_NUMBER_OF_AVAILABLE_USERS  = "alfresco.numberOfAvailableUsers";
     
     public static final int DEFAULT_NUMBER_OF_AVAILABLE_USERS = 50; 
-    
-    protected RepositoryProfile repositoryProfile;
     
     private Map<BenchmarkType, Integer> usageProfile;
     
@@ -108,10 +104,7 @@ public abstract class BaseBenchmarkDriver extends JapexDriverBase
     
     @Override
     public void prepare(TestCase testCase)
-    {      
-        // Set the repository profile
-        this.repositoryProfile = RepositoryProfile.createRespoitoryProfile(testCase);
-        
+    {              
         // Set the usage profile for this test case
         this.usageProfile = new HashMap<BenchmarkType, Integer>();
         for (BenchmarkType benchmarkType : BenchmarkType.values())

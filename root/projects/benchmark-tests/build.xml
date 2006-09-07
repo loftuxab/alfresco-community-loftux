@@ -1,3 +1,7 @@
+<!DOCTYPE project [
+	<!ENTITY jvm-args SYSTEM "build-jvm-args.xml">
+]>
+
 <project name="alfresco-benchmarks" default="benchmark"  basedir=".">
 	
 	<!-- Import the generated and common classpath files -->
@@ -5,6 +9,7 @@
 	<import file="build-classpath.xml"/>
     
     <property name="config" value="config/testConfig.xml"/>
+	<property name="repositoryProfile" value="5,5,5,5,0,5"/>
 	
 	<target name="generate-classpath" description="Generate the classpath from the common configuration">
         <java dir="." fork="true" classname="org.alfresco.benchmark.framework.util.GenerateAntClasspath">
@@ -15,14 +20,7 @@
 
     <target name="benchmark" description="Run benchmark tests (-Dconfig=config-file)">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
-<!--
-            <jvmarg value="-agentlib:jprofilerti=port=8849"/>
-            <jvmarg value="-Xbootclasspath/a:c:\jprofiler4\bin\agent.jar"/>
--->
-            <jvmarg value="-server"/>
-            <jvmarg value="-Xms512m"/>
-            <jvmarg value="-Xmx1024m"/>
-            <jvmarg value="-Xss64k"/>
+			&jvm-args;
             <classpath refid="class.path"/>
             <arg line="${config}"/>
         </java>
@@ -30,24 +28,17 @@
 	
 	<target name="load-benchmark-data" description="Populates the repo with benchmark data">
         <java dir="." fork="true" classname="org.alfresco.benchmark.alfresco.AlfrescoDataLoaderComponentImpl">
-            <jvmarg value="-server"/>
-            <jvmarg value="-Xms512m"/>
-            <jvmarg value="-Xmx1024m"/>
-            <jvmarg value="-Xss64k"/>
+        	&jvm-args;
             <classpath refid="path.generated"/>
-            <arg line="${respository-profile}"/>
+            <arg line="${repositoryProfile}"/>
         </java>
     </target>
 	
 	<target name="load-jcr-benchmark-data" description="Populates the repo with JCR benchmark data">
         <java dir="." fork="true" classname="org.alfresco.benchmark.alfresco.jcr.AlfrescoJCRDataLoaderComponentImpl">
-            <jvmarg value="-server"/>
-            <jvmarg value="-Xms512m"/>
-            <jvmarg value="-Xmx1024m"/>
-            <jvmarg value="-Xss64k"/>
-
+        	&jvm-args;
             <classpath refid="path.generated"/>
-            <arg line="${respository-profile}"/>
+            <arg line="${repositoryProfile}"/>
         </java>
     </target>
     

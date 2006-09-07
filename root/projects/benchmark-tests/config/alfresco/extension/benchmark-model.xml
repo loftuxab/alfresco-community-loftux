@@ -1,0 +1,29 @@
+<model name="ben:benchmarkmodel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+   <description>Alfresco Benchmark Model</description>
+   <author>Alfresco</author>
+   <published>2005-07-04</published>
+   <version>1.0</version>
+
+   <imports>
+      <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+      <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+   </imports>
+   
+   <namespaces>
+      <namespace uri="http://www.alfresco.org/model/benchmark/1.0" prefix="ben"/>
+   </namespaces>
+
+	<aspects>
+   
+      <aspect name="ben:repositoryProfile">
+         <properties>
+            <property name="ben:repositoryProfile">
+               <type>d:text</type>
+            </property>
+         </properties>
+      </aspect>
+   
+	</aspects>
+	
+</model>

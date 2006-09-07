@@ -16,9 +16,7 @@
  */
 package org.alfresco.benchmark.framework.jcr;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -27,6 +25,8 @@ import java.util.Map;
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.Repository;
+import javax.jcr.Session;
+import javax.jcr.SimpleCredentials;
 
 import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
@@ -58,6 +58,11 @@ public class JCRUtils
     protected static Repository repository;
     protected static List<PropertyProfile> contentPropertyProfiles;
     
+    /**
+     * Get a list of the content property profiles
+     * 
+     * @return
+     */
     public static synchronized List<PropertyProfile> getContentPropertyProfiles()
     {
         if (contentPropertyProfiles == null)
@@ -86,20 +91,71 @@ public class JCRUtils
         return contentPropertyProfiles;
     }
     
-    public static Node createFile(RepositoryProfile repositoryProfile, Node parentNode)
-        throws Exception
+    public static String getRandomFolderPath()
     {
-        Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(repositoryProfile, getContentPropertyProfiles());
-        return createFile(propertyValues, parentNode);
+        return null;
     }
     
+    public static String getRandomFilePath()
+    {
+        return null;
+    }
+    
+    public static Node createFile(Node parentNode)
+    throws Exception
+    {
+        return createFile(parentNode, null);
+    }
+    
+    /**
+     * Create file
+     * 
+     * @param parentNode
+     * @return
+     * @throws Exception
+     */
+    public static Node createFile(Node parentNode, String folderName)
+        throws Exception
+    {
+        Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(getContentPropertyProfiles());
+        return createFile(propertyValues, parentNode, folderName);
+    }
+    
+    /**
+     * Create file
+     * 
+     * @param propertyValues
+     * @param parentNode
+     * @return
+     * @throws Exception
+     */
     public static Node createFile(Map<String, Object> propertyValues, Node parentNode)
+    throws Exception
+    {
+        return createFile(propertyValues, parentNode, null);
+    }
+    
+    /**
+     * Create file
+     * 
+     * @param propertyValues
+     * @param parentNode
+     * @param fileName
+     * @return
+     * @throws Exception
+     */
+    public static Node createFile(Map<String, Object> propertyValues, Node parentNode, String fileName)
         throws Exception
     {
         ContentData contentData = (ContentData)propertyValues.get(PROP_CONTENT);
+        String name = fileName;
+        if (name == null)
+        {
+            name = contentData.getName();
+        }
         
         // Create the file node
-        Node fileNode = parentNode.addNode(contentData.getName(), "nt:file");
+        Node fileNode = parentNode.addNode(name, "nt:file");
     
         // Add the content
         Node resNode = fileNode.addNode ("jcr:content", "nt:resource");
@@ -117,17 +173,49 @@ public class JCRUtils
         return fileNode;
     }
     
-    public static Node createFolder(RepositoryProfile repositoryProfile, Node parentNode)
+    /**
+     * Create folder
+     * 
+     * @param parentNode
+     * @return
+     * @throws Exception
+     */
+    public static Node createFolder(Node parentNode)
         throws Exception
     {
-        return parentNode.addNode (BenchmarkUtils.getGUID(), "nt:folder");        
+        return createFolder(parentNode, null);
     }
     
-    public static synchronized List<Node> getRootFolders(Node rootNode)
+    /**
+     * Create folder 
+     * 
+     * @param parentNode
+     * @return
+     * @throws Exception
+     */
+    public static Node createFolder(Node parentNode, String folderName)
         throws Exception
     {
+        String name = folderName;
+        if (name ==  null)
+        {
+            name = BenchmarkUtils.getGUID();
+        }
+        return parentNode.addNode(name, "nt:folder");        
+    }
+    
+    /**
+     * Get the test data root folders
+     * 
+     * @param rootNode
+     * @return
+     * @throws Exception
+     */
+    public static Node getRootTestDataFolder(Node rootNode)
+        throws Exception
+    {
+        Node rootFolder = null;
         NodeIterator nodes = rootNode.getNodes();
-        List<Node> rootFolders = new ArrayList<Node>();
         
         while (nodes.hasNext() == true)
         {
@@ -135,117 +223,64 @@ public class JCRUtils
             
             if (node.getName().startsWith(JCRDataLoaderComponentImpl.JCR_BENCHMARK_OBJECT_PREFIX) == true)
             {
-                rootFolders.add(node);
+                rootFolder = node;
+                break;
             }
         }
         
-        if (rootFolders.size() == 0)
+        if (rootFolder == null)
         {
-            throw new RuntimeException("No JCR benchamrk data has been loaded into the repository");
+            throw new RuntimeException("ERROR:  No JCR benchamrk data has been loaded into the repository");
         }
         
-        return rootFolders;
-    }
-    
-    private static List<String> folders;
-    private static List<String> content;
-    
-    @SuppressWarnings("unchecked")
-    public static synchronized String getRandomFolder()
-    {
-        try
-        {
-            if (folders == null)
-            {
-                folders = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_folders.bin")).readObject();            
-            }
-            
-            int size = folders.size();
-            int rand = BenchmarkUtils.rand.nextInt(size);
-            return folders.get(rand);
-        }
-        catch (Exception exception)
-        {
-            throw new RuntimeException("Unable to get random folder path", exception);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    public static synchronized String getRandomContent()
-    {
-        try
-        {
-            if (content == null)
-            {
-                content = (List<String>)new ObjectInputStream(new FileInputStream(BenchmarkUtils.getOutputFileLocation() + File.separator + "loaded_content.bin")).readObject();            
-            }
-            
-            int size = content.size();
-            int rand = BenchmarkUtils.rand.nextInt(size);
-            return content.get(rand);
-        }
-        catch (Exception exception)
-        {
-            throw new RuntimeException("Unable to get random content path", exception);
-        }
+        return rootFolder;
     } 
     
-//    public static Node getRandomFolder(Node rootNode)
-//        throws Exception
-//    {       
-//        List<Node> folders = new ArrayList<Node>(); 
-//        getRandomFolder(getRootFolders(rootNode), folders);
-//        
-//        Node folder = folders.get(BenchmarkUtils.rand.nextInt(folders.size()));        
-//        return folder;
-//    }
-//    
-//    private static void getRandomFolder(List<Node> folders, List<Node> result)
-//        throws Exception
-//    {
-//        int randIndex = BenchmarkUtils.rand.nextInt(folders.size());
-//        Node folder = folders.get(randIndex);
-//        result.add(folder);
-//
-//        // Get the sub-folders of the folder
-//        NodeIterator children = folder.getNodes();
-//        List<Node> subFolders = new ArrayList<Node>();
-//        while(children.hasNext() == true)
-//        {
-//            Node child = children.nextNode();
-//            if (child.getPrimaryNodeType().getName().equals("nt:folder") == true)
-//            {
-//                subFolders.add(child);
-//            }
-//        }
-//        
-//        if (subFolders.size() != 0)
-//        {
-//            getRandomFolder(subFolders, result);
-//        }
-//    }
-//    
-//    public static Node getRandomContent(Node rootNode)
-//        throws Exception
-//    {
-//        List<Node> contentList = new ArrayList<Node>();
-//        
-//        while (contentList.size() == 0)
-//        {
-//            Node folder = getRandomFolder(rootNode);
-//            
-//            NodeIterator children = folder.getNodes();
-//            while(children.hasNext() == true)
-//            {
-//                Node child = children.nextNode();
-//                if (child.getPrimaryNodeType().getName().equals("nt:file") == true)
-//                {
-//                    contentList.add(child);
-//                }
-//            }
-//        }
-//        
-//        Node content = contentList.get(BenchmarkUtils.rand.nextInt(contentList.size())); 
-//        return content;
-//   }
+    private static String rootNodeName;
+    private static RepositoryProfile repositoryProfile;
+    
+    public static RepositoryProfile getRepositoryProfile()
+        throws Exception
+    {
+        if (repositoryProfile == null)
+        {
+            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            try 
+            {            
+                // Get the root node and the folder that we are going to create the new node within
+                Node rootNode = session.getRootNode(); 
+                Node dataRootNode = getRootTestDataFolder(rootNode);
+                String repositoryProfileValue = dataRootNode.getProperty("ben:repositoryProfile").getString();
+                repositoryProfile = new RepositoryProfile(repositoryProfileValue);
+            }                                   
+            finally
+            {
+                // Close the session
+                session.logout();
+            }
+        }
+        return repositoryProfile;
+    }
+    
+    public static String getRootNodeName()
+        throws Exception
+    {
+        if (rootNodeName == null)
+        {
+            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            try 
+            {            
+                // Get the root node and the folder that we are going to create the new node within
+                Node rootNode = session.getRootNode(); 
+                Node dataRootNode = getRootTestDataFolder(rootNode);
+                rootNodeName = dataRootNode.getName();
+            }                                   
+            finally
+            {
+                // Close the session
+                session.logout();
+            }
+        }
+        return rootNodeName;
+    }
 }

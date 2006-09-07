@@ -37,7 +37,6 @@ import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
-import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile.PropertyType;
 import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
@@ -95,8 +94,6 @@ public class CreationProfileTest extends TestCase {
 
 	private static final int THREADS = 4;
 
-	private RepositoryProfile repositoryProfile = new RepositoryProfile();
-
 	public CreationProfileTest() {
 		super();
 	}
@@ -107,8 +104,7 @@ public class CreationProfileTest extends TestCase {
 
 	public void setUp() {
 		contentPropertyValues = DataProviderComponent.getInstance()
-				.getPropertyData(repositoryProfile,
-						getContentPropertyProfiles());
+				.getPropertyData(getContentPropertyProfiles());
 	}
 
 	public void testJCRCreateContent() {

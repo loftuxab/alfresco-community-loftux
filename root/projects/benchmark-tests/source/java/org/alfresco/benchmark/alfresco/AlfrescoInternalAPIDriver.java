@@ -27,6 +27,7 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 
@@ -53,11 +54,12 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                         AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                         try
                         {
+                            NodeRef folderNodeRef = getFolderNodeRef();
                             AlfrescoUtils.createContentNode(
                                     AlfrescoInternalAPIDriver.this.nodeService, 
                                     AlfrescoInternalAPIDriver.this.contentService, 
                                     AlfrescoInternalAPIDriver.this.contentPropertyValues, 
-                                    AlfrescoInternalAPIDriver.this.folderNodeRef);
+                                    folderNodeRef);
                             
                             // Store the content size for later use
                             ContentData contentData = (ContentData)AlfrescoInternalAPIDriver.this.contentPropertyValues.get(ContentModel.PROP_CONTENT.toString());
@@ -97,9 +99,11 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
+                        NodeRef contentNodeRef = getFileNodeRef();
+                        
                         // Read the content
                         ContentReader contentReader = AlfrescoInternalAPIDriver.this.contentService.getReader(
-                                AlfrescoInternalAPIDriver.this.contentNodeRef, 
+                                contentNodeRef, 
                                 ContentModel.PROP_CONTENT);
                         contentReader.getContent(File.createTempFile("benchmark", "temp"));
                         
@@ -136,12 +140,14 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
+                        NodeRef folderNodeRef = getFolderNodeRef();
+                        
                         // Create a named folder
                         String nameValue = (String)AlfrescoInternalAPIDriver.this.folderPropertyValues.get(ContentModel.PROP_NAME.toString());
                         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
                         folderProps.put(ContentModel.PROP_NAME, nameValue);
                         nodeService.createNode(
-                                AlfrescoInternalAPIDriver.this.folderNodeRef, 
+                                folderNodeRef, 
                                 ContentModel.ASSOC_CONTAINS, 
                                 QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
                                 ContentModel.TYPE_FOLDER,
@@ -175,14 +181,16 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
-                        if (AlfrescoInternalAPIDriver.this.nodeService.hasAspect(AlfrescoInternalAPIDriver.this.contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
+                        NodeRef contentNodeRef = getFileNodeRef();
+                        
+                        if (AlfrescoInternalAPIDriver.this.nodeService.hasAspect(contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
                         {
                             // Add the versionable aspect, turning off auto-version to avoid unexpected behaviour
                             Map<QName, Serializable> properties = new HashMap<QName, Serializable>(2);
                             properties.put(ContentModel.PROP_AUTO_VERSION, false);
                             properties.put(ContentModel.PROP_INITIAL_VERSION, false);
                             AlfrescoInternalAPIDriver.this.nodeService.addAspect(
-                                    AlfrescoInternalAPIDriver.this.contentNodeRef,
+                                    contentNodeRef,
                                     ContentModel.ASPECT_VERSIONABLE,
                                     properties);
                         }
@@ -191,7 +199,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                         Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
                         versionProperties.put(VersionImpl.PROP_DESCRIPTION, "This is the description of the version change.");
                         AlfrescoInternalAPIDriver.this.versionService.createVersion(
-                               AlfrescoInternalAPIDriver.this.contentNodeRef,
+                               contentNodeRef,
                                versionProperties);
                     }
                     finally
@@ -224,7 +232,8 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     try
                     {
                         // Read all the properties of the content node
-                        AlfrescoInternalAPIDriver.this.nodeService.getProperties(AlfrescoInternalAPIDriver.this.contentNodeRef);
+                        NodeRef contentNodeRef = getFileNodeRef();
+                        AlfrescoInternalAPIDriver.this.nodeService.getProperties(contentNodeRef);
                     }
                     finally
                     {

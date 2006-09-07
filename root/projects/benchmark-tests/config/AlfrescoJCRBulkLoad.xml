@@ -17,7 +17,8 @@
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
     	<!-- Number of objects to bulk load in each test -->
-    	<param name="alfresco.loadCount" value="1000"/>
+    	<param name="alfresco.folderCount" value="1"/>
+    	<param name="alfresco.fileCount" value="1000"/>
     
         <!-- 100k in -->
         <param name="japex.warmupIterations" value="0"/>            

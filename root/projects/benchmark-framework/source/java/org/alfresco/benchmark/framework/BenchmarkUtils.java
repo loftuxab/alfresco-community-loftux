@@ -26,6 +26,7 @@ import java.util.Properties;
 import java.util.Random;
 
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
+import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.doomdark.uuid.UUIDGenerator;
 
 import com.sun.japex.TestCase;
@@ -37,6 +38,8 @@ public class BenchmarkUtils
 {    
     // Make repeatable
     public static final Random rand = new Random(0);
+    
+    public static final int BUFFER_SIZE = 4096;
  
     private static boolean propertiesLoaded = false;
     
@@ -102,17 +105,29 @@ public class BenchmarkUtils
         return location;
     }
     
+    /**
+     * Generate a GUID
+     * 
+     * @return  a string GUID
+     */
     public static synchronized String getGUID()
     {
         return UUIDGenerator.getInstance().generateTimeBasedUUID().toString();       
     }
     
+    /**
+     * Get the content data locations from the property file
+     * @return
+     */
     public static String[] getDataContentLocations()
     {
         loadProperties();
         return dataContentLocations;
     }
     
+    /**
+     * Load the property details from the property file
+     */
     private static void loadProperties()
     {
         if (propertiesLoaded == false)
@@ -133,16 +148,24 @@ public class BenchmarkUtils
             propertiesLoaded = true;
         }
     }
-    
-    public static final int BUFFER_SIZE = 4096;
-    
+        
+    /**
+     * Utility method to copy one stream to another
+     * 
+     * @param in
+     * @param out
+     * @return
+     * @throws IOException
+     */
     public static int copy(InputStream in, OutputStream out) throws IOException 
     {
-        try {
+        try 
+        {
             int byteCount = 0;
             byte[] buffer = new byte[BUFFER_SIZE];
             int bytesRead = -1;
-            while ((bytesRead = in.read(buffer)) != -1) {
+            while ((bytesRead = in.read(buffer)) != -1) 
+            {
                 out.write(buffer, 0, bytesRead);
                 byteCount += bytesRead;
             }
@@ -167,6 +190,139 @@ public class BenchmarkUtils
             {
                 
             }
+        }
+    }
+    
+    /**
+     * Get a file name based on its depth and index
+     * 
+     * @param depth
+     * @param index
+     * @return
+     */
+    public static String getFolderName(int depth, int index)
+    {
+        return "folder" + depth + "-" + index;
+    }
+    
+    /**
+     * Get a folder name based on its depth and index
+     * 
+     * @param depth
+     * @param index
+     * @return
+     */
+    public static String getFileName(int depth, int index)
+    {
+        return "file" + depth + "-" + index + ".bin";
+    }
+    
+    public static String getRandomFolderPath(RepositoryProfile repositoryProfile, boolean includeAlfrescoNamespace)
+    {
+        if (repositoryProfile.getContainsFolders().size() == 0)
+        {
+            throw new RuntimeException("ERROR:  There are no folders available in the test data to build a random path for. (repository-profile=" + repositoryProfile.getProfileString() + ")");
+        }
+        
+        int randPos = BenchmarkUtils.rand.nextInt(repositoryProfile.getContainsFolders().size());
+        RepositoryProfile.RespoitoryProfileDetail detail = repositoryProfile.getContainsFolders().get(randPos);
+        int atDepth = detail.getDepth(); 
+        
+        return getRandomFolderPathImpl(repositoryProfile, atDepth, includeAlfrescoNamespace);
+    }
+    
+    public static String getRandomFolderPath(RepositoryProfile repositoryProfile, int atDepth, boolean includeAlfrescoNamespace)
+    {
+        return getRandomFolderPathImpl(repositoryProfile, atDepth, includeAlfrescoNamespace);
+    }    
+    
+    private static String getRandomFolderPathImpl(RepositoryProfile repositoryProfile, int currentDepth, boolean includeAlfrescoNamespace)
+    {
+        RepositoryProfile.RespoitoryProfileDetail detail = null;
+        String path = "";
+        
+        if (currentDepth > 0)
+        {        
+            int currentDepthIndex = currentDepth-1;
+            
+            detail = repositoryProfile.getDetails().get(currentDepthIndex);
+            if (detail.getFolderCount() == 0)
+            {
+                throw new RuntimeException("ERROR:  Unable to build random folder path as profile indicates parent has no folders (repository-profile=" + repositoryProfile.getProfileString() + ")");
+            }                   
+            
+            int folderCount = detail.getFolderCount();
+            int index = BenchmarkUtils.rand.nextInt(folderCount);
+
+            if (currentDepth > 1)
+            {
+                path = path + "/";            
+            }
+            path = path + getNamespace(includeAlfrescoNamespace) + BenchmarkUtils.getFolderName(currentDepth, index);       
+            
+            int newDepth = currentDepth-1;
+            if (newDepth != 0)
+            {
+                path = getRandomFolderPath(repositoryProfile, newDepth, includeAlfrescoNamespace) + path;
+            }
+        }
+        
+        return path;
+    }
+    
+    public static String getRandomFilePath(RepositoryProfile repositoryProfile, boolean includeAlfrescoNamespace)
+    {
+        return getRandomFilePath(repositoryProfile, 0, includeAlfrescoNamespace);
+    }
+    
+    public static String getRandomFilePath(RepositoryProfile repositoryProfile, int atDepth, boolean includeAlfrescoNamespace)
+    {
+        RepositoryProfile.RespoitoryProfileDetail detail = null;
+        String path = "";
+        
+        if (atDepth > 0)
+        {   
+            detail = repositoryProfile.getDetails().get(atDepth-1);
+            if (detail.getFileCount() == 0)
+            {
+                throw new RuntimeException("ERROR:  The specified depth in the repository profile does not have any available files. (atDepth=" + atDepth + "; repository-profile=" + repositoryProfile.getProfileString() + ")");
+            }
+        }
+        else
+        {
+            if (repositoryProfile.getContainsDocuments().size() == 0)
+            {
+                throw new RuntimeException("ERROR:  There are no file available in the test data to build a random path for. (repository-profile=" + repositoryProfile.getProfileString() + ")");
+            }
+            
+            int randPos = BenchmarkUtils.rand.nextInt(repositoryProfile.getContainsDocuments().size());
+            detail = repositoryProfile.getContainsDocuments().get(randPos);
+            atDepth = detail.getDepth(); 
+        }
+        
+        int fileCount = detail.getFileCount();
+        int index = BenchmarkUtils.rand.nextInt(fileCount);
+        int newDepth = atDepth -1;             
+        
+        path = getRandomFolderPathImpl(repositoryProfile, newDepth, includeAlfrescoNamespace);
+        if (atDepth > 1)
+        {
+            path = path + "/";            
+        }
+        path = path + getNamespace(includeAlfrescoNamespace) + BenchmarkUtils.getFileName(atDepth, index);
+        
+        return path;
+    } 
+    
+    private static String getNamespace(boolean includeNamespace)
+    {
+        if (includeNamespace == true)
+        {
+            return "cm:";
+        }
+        else
+        {
+            return "";
         }
     }
 }
