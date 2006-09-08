@@ -32,6 +32,8 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.sun.japex.TestCase;
 
@@ -40,11 +42,20 @@ import com.sun.japex.TestCase;
  */
 public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements UnitsOfWork
 {
+    private static final Log logger = LogFactory.getLog(AlfrescoInternalAPIDriver.class);
+    
     /**
      * @see org.alfresco.benchmark.framework.UnitsOfWork#doCreateContentBenchmark(com.sun.japex.TestCase)
      */
     public void doCreateContentBenchmark(final TestCase tc)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Creating content using Alfresco internal API: \n" +
+                    "   TestCase: " + tc + "\n" +
+                    "   Driver: " + this);
+        }
         try
         {
             TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
@@ -62,11 +73,6 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                                     AlfrescoInternalAPIDriver.this.contentService, 
                                     AlfrescoInternalAPIDriver.this.contentPropertyValues, 
                                     folderNodeRef);
-                            
-                            // Store the content size for later use
-                            ContentData contentData = (ContentData)AlfrescoInternalAPIDriver.this.contentPropertyValues.get(ContentModel.PROP_CONTENT.toString());
-                            tc.setParam(PARAM_CONTENT_SIZE, Integer.toString(contentData.getSize()));
-                            tc.setParam(PARAM_CONTENT_MIMETYPE, contentData.getMimetype());                                                       
                         }
                         catch (Throwable exception)
                         {
@@ -92,6 +98,13 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
 
     public void doReadContentBenchmark(final TestCase tc)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Reading content using Alfresco internal API: \n" +
+                    "   TestCase: " + tc + "\n" +
+                    "   Driver: " + this);
+        }
         try
         {
             TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
@@ -109,10 +122,6 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                                 ContentModel.PROP_CONTENT);
                         contentReader = FileContentReader.getSafeContentReader(contentReader, "File missing");
                         contentReader.getContent(File.createTempFile("benchmark", "temp"));
-                        
-                        // Store the content size for later use
-                        tc.setParam(PARAM_CONTENT_SIZE, Long.toString(contentReader.getSize()));
-                        tc.setParam(PARAM_CONTENT_MIMETYPE, contentReader.getMimetype());
                         
                         // Do nothing on return 
                         return null;
@@ -134,6 +143,13 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
 
     public void doCreateFolder(TestCase tc)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Creating folder using Alfresco internal API: \n" +
+                    "   TestCase: " + tc + "\n" +
+                    "   Driver: " + this);
+        }
         try
         {
             TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
@@ -175,6 +191,13 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
 
     public void doCreateVersion(TestCase tc)
     {   
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Creating version using Alfresco internal API: \n" +
+                    "   TestCase: " + tc + "\n" +
+                    "   Driver: " + this);
+        }
         try
         {
             TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
@@ -225,6 +248,13 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
 
     public void doReadProperties(TestCase tc)
     {  
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Reading properties using Alfresco internal API: \n" +
+                    "   TestCase: " + tc + "\n" +
+                    "   Driver: " + this);
+        }
         try
         {
             TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()

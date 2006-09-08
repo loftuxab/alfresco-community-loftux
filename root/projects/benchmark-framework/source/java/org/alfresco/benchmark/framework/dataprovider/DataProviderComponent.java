@@ -46,7 +46,7 @@ public class DataProviderComponent
         return instance;
     }
     
-    public DataProviderComponent()
+    private DataProviderComponent()
     {
         this.contentCache = new ArrayList<ContentData>();
                
@@ -80,12 +80,26 @@ public class DataProviderComponent
             }
             else
             {
-                //String mimetype = this.mimetypeMap.guessMimetype(file.getName());
-                //String extension = this.mimetypeMap.getExtension(mimetype);
-               
+                String filename = file.getName();
+                String mimetype = "application/octet-stream";
+                String extension = ".bin";
                 // TODO need to sort this out ...
-                String mimetype = "text/plain";
-                String extension = ".txt";
+                if (filename.endsWith(".txt"))
+                {
+                    mimetype = "text/plain";
+                    extension  = ".txt";
+                }
+                else if (filename.endsWith(".doc"))
+                {
+                    mimetype = "application/msword";
+                    extension  = ".txt";
+                }
+                else if (filename.endsWith(".pdf"))
+                {
+                    mimetype = "application/pdf";
+                    extension  = ".pdf";
+                }
+               
                 ContentData contentData = new ContentData(file.getPath(),
                                                           mimetype,
                                                           "UTF-8",

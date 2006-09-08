@@ -245,17 +245,15 @@ public class AlfrescoDataLoaderComponentImpl implements DataLoaderComponent
         {
             public List<String> doWork() throws Exception
             {
+                NodeRef baseHomeFolder = AlfrescoUtils.getUsersHomeNodeRef(searchService, nodeService, AlfrescoUtils.storeRef);
                 List<String> users = new ArrayList<String>(count);
                 
                 for (int i = 0; i < count; i++)
                 {
                     // Create the users home folder
-                    NodeRef companyHome = AlfrescoUtils.getCompanyHomeNodeRef(
-                                                        AlfrescoDataLoaderComponentImpl.this.searchService,
-                                                        AlfrescoUtils.storeRef);
                     NodeRef homeFolder = AlfrescoUtils.createFolderNode(
                                                         AlfrescoDataLoaderComponentImpl.this.nodeService,
-                                                        companyHome,
+                                                        baseHomeFolder,
                                                         "userHome_" + GUID.generate());
                     
                     // Create the authentication

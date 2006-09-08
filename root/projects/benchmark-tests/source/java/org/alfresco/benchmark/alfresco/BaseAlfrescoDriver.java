@@ -166,10 +166,6 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     @Override
     public void preRun(TestCase testCase)
     {
-        // Clear the parameter values
-        testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
-        testCase.setParam(PARAM_CONTENT_MIMETYPE, "");
-        
         // Get content property values
         this.contentPropertyValues = DataProviderComponent.getInstance().getPropertyData(
                 AlfrescoUtils.getContentPropertyProfiles());
@@ -192,13 +188,11 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         if (loadDepth <= 0)
         {
             this.randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
-//            this.randomTargetFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
             this.randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
         }
         else
         {
             this.randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
-//            this.randomTargetFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth, true);
             this.randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth - 1, true);
         }
         
@@ -214,9 +208,6 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     {
         if (this.useUsers == true)
         {
-            // Store the user name for later use
-            tc.setParam(PARAM_USER_NAME, BaseAlfrescoDriver.this.userName);
-        
             // Release the user
             AlfrescoUtils.releaseUserName(BaseAlfrescoDriver.this.userName);
         }

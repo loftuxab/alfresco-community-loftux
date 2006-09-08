@@ -142,10 +142,6 @@ public class AlfrescoUtils
     
     /**
      * Get the company home node reference
-     * 
-     * @param searchService
-     * @param storeRef
-     * @return
      */
     public static NodeRef getCompanyHomeNodeRef(SearchService searchService, StoreRef storeRef)
     {
@@ -155,9 +151,29 @@ public class AlfrescoUtils
     }
     
     /**
+     * Get (possibly by creating) a location to put all benchmark users' home folders in
+     */
+    public static NodeRef getUsersHomeNodeRef(SearchService searchService, NodeService nodeService, StoreRef storeRef)
+    {
+        // get the benchmark users' home location
+        ResultSet rs = searchService.query(storeRef, SearchService.LANGUAGE_XPATH, "/app:company_home/cm:bm_users_home");
+        NodeRef usersHomeNodeRef = null;
+        if (rs.length() == 0)
+        {
+            // need to create it
+            // Get the company home node
+            NodeRef companyHomeNodeRef = getCompanyHomeNodeRef(searchService, storeRef);
+            usersHomeNodeRef = createFolderNode(nodeService, companyHomeNodeRef, "bm_users_home");
+        }
+        else
+        {
+            usersHomeNodeRef = rs.getNodeRef(0);
+        }
+        return usersHomeNodeRef;
+    }
+    
+    /**
      * Get a list of the property profiles for a content node
-     * 
-     * @return
      */
     public static synchronized List<PropertyProfile> getContentPropertyProfiles()
     {

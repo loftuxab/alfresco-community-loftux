@@ -17,8 +17,16 @@
             <classpath refid="class.path"/>
         </java>
     </target>
-
-    <target name="benchmark" description="Run benchmark tests (-Dconfig=config-file)">
+	
+    <target name="run-repo" depends="generate-classpath" description="Initialize repository as standalone application (-Duser=user -Dpwd=password)">
+        <java dir="." fork="true" classname="org.alfresco.tools.Repository">
+			&jvm-args;
+            <classpath refid="path.generated"/>
+            <arg line="-user ${user} -pwd ${pwd}"/>
+        </java>
+    </target>
+	
+    <target name="benchmark" depends="generate-classpath" description="Run benchmark tests (-Dconfig=config-file)">
         <java dir="." fork="true" classname="com.sun.japex.Japex">
 			&jvm-args;
             <classpath refid="class.path"/>
@@ -26,15 +34,15 @@
         </java>
     </target>
 	
-	<target name="load-benchmark-data" description="Populates the repo with benchmark data">
+    <target name="load-benchmark-data" depends="generate-classpath" description="Populates the repo with benchmark data">
         <java dir="." fork="true" classname="org.alfresco.benchmark.alfresco.AlfrescoDataLoaderComponentImpl">
-        	&jvm-args;
+            &jvm-args;
             <classpath refid="path.generated"/>
             <arg line="${repositoryProfile}"/>
         </java>
     </target>
 	
-	<target name="load-jcr-benchmark-data" description="Populates the repo with JCR benchmark data">
+	<target name="load-jcr-benchmark-data" depends="generate-classpath" description="Populates the repo with JCR benchmark data">
         <java dir="." fork="true" classname="org.alfresco.benchmark.alfresco.jcr.AlfrescoJCRDataLoaderComponentImpl">
         	&jvm-args;
             <classpath refid="path.generated"/>

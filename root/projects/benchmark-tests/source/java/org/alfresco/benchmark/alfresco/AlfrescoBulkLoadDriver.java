@@ -34,6 +34,8 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.sun.japex.TestCase;
 
@@ -42,6 +44,8 @@ import com.sun.japex.TestCase;
  */
 public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
 {
+    private static final Log logger = LogFactory.getLog(AlfrescoBulkLoadDriver.class);
+    
     public static final String PARAM_FOLDER_COUNT = "alfresco.folderCount";
     public static final String PARAM_FILE_COUNT = "alfresco.fileCount";
     public static final int    DEFAULT_FOLDER_COUNT = 1;
@@ -57,6 +61,14 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
     @Override
     public synchronized void prepare(TestCase tc)
     {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug(
+                    "Driver preparing: \n" +
+                    "   TestCase: " + tc + "\n" +
+                    "   Driver: " + this);
+        }
+        
         super.prepare(tc);
         
         // Get the folder and file count vlaues
@@ -172,9 +184,6 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
                 contentWriter.setEncoding(contentData.getEncoding());
                 contentWriter.setMimetype(contentData.getMimetype());
                 contentWriter.putContent(contentData.getFile());
-                
-                // Store the content size for later use
-                testCase.setLongParam(PARAM_CONTENT_SIZE, testCase.getLongParam(PARAM_CONTENT_SIZE) + contentData.getSize());   
                 
                 contentPropIndex++;
             }

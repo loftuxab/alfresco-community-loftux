@@ -15,4 +15,7 @@
 <jvmarg value="-server"/>
 <jvmarg value="-Xms512m"/>
 <jvmarg value="-Xmx1024m"/>
-<jvmarg value="-Xss64k"/>
+
+<jvmarg value="-XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody"/>
+<jvmarg value="-XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeIndexes"/>
+<jvmarg value="-XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeDeletions"/>

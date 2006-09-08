@@ -86,7 +86,7 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
         {
             super.preRun(testCase);
         
-            testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
+//            testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
         
             int contentCount = this.fileCount*this.folderCount;
             this.contentData = new ContentData[contentCount];;
@@ -141,9 +141,6 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
                         Calendar lastModified = Calendar.getInstance ();
                         lastModified.setTimeInMillis (contentData.getFile().lastModified ());
                         resNode.setProperty ("jcr:lastModified", lastModified);
-                        
-                        // Store the content size for later use
-                        testCase.setLongParam(PARAM_CONTENT_SIZE, testCase.getLongParam(PARAM_CONTENT_SIZE) + contentData.getSize());     
                         
                         contentPropIndex++;
                     }

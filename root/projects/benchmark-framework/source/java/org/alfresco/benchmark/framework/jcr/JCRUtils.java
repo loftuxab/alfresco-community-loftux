@@ -57,7 +57,28 @@ public class JCRUtils
     @SuppressWarnings("unused")
     protected static Repository repository;
     protected static List<PropertyProfile> contentPropertyProfiles;
-    
+    static
+    {
+        // Prepare the property profile data
+        contentPropertyProfiles = new ArrayList<PropertyProfile>();
+        
+        // content properties
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_NAME.toString()));
+        contentPropertyProfiles.add(new PropertyProfile(JCRUtils.PROP_CONTENT.toString(), PropertyType.CONTENT));
+        
+        // dublincore properties
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_PUBLISHER.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_CONTRIBUTER.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_TYPE.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_IDENTIFIER.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_DCSOURCE.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_COVERAGE.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_RIGHTS.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_SUBJECT.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_AUTHOR.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_TITLE.toString()));
+        contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DESCRIPTION.toString()));
+    }
     /**
      * Get a list of the content property profiles
      * 
@@ -65,31 +86,9 @@ public class JCRUtils
      */
     public static synchronized List<PropertyProfile> getContentPropertyProfiles()
     {
-        if (contentPropertyProfiles == null)
-        {
-            // Prepare the property profile data
-            contentPropertyProfiles = new ArrayList<PropertyProfile>();
-            
-            // content properties
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_NAME.toString()));
-            contentPropertyProfiles.add(new PropertyProfile(JCRUtils.PROP_CONTENT.toString(), PropertyType.CONTENT));
-            
-            // dublincore properties
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_PUBLISHER.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_CONTRIBUTER.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_TYPE.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_IDENTIFIER.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_DCSOURCE.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_COVERAGE.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_RIGHTS.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_SUBJECT.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DC_AUTHOR.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_TITLE.toString()));
-            contentPropertyProfiles.add(PropertyProfile.createSmallTextProperty(JCRUtils.PROP_DESCRIPTION.toString()));
-        }
-        
         return contentPropertyProfiles;
     }
+    
     
     public static String getRandomFolderPath()
     {
