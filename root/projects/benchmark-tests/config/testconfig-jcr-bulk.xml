@@ -24,7 +24,7 @@
         <!-- Number of available users -->
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
         
-        <param name="alfresco.loadDepth" value="5"/>
+        <param name="alfresco.loadDepth" value="2"/>
 
         <param name="japex.warmupIterations" value="0"/>
  <!--   	<param name="japex.runTime" value="01:00"/> -->

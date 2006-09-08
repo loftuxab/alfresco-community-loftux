@@ -67,11 +67,28 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         folderPropertyProfiles.add(name);
         this.folderPropertyValues = DataProviderComponent.getInstance().getPropertyData(
                 folderPropertyProfiles);
+        
+        // Get the random file and folder paths
+        int loadDepth = 0;
+        if (testCase.hasParam(PARAM_LOAD_DEPTH) == true)
+        {
+            loadDepth = testCase.getIntParam(PARAM_LOAD_DEPTH);
+        }
+        
         try
         {            
             RepositoryProfile repositoryProfile = JCRUtils.getRepositoryProfile();
-            this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, false);
-            this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+            if (loadDepth <= 0)
+            {
+            	this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, false);
+                this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+            }
+            else
+            {
+            	this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, false);
+                this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth-1, false);
+            }
+            
         }
         catch (Exception exception)
         {
@@ -99,8 +116,6 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode();                  
                 final Node folder = rootNode.getNode(this.folderPath);
-                
-                //this.folderPath = rootNode.getPath();
                 
                 try
                 {
@@ -142,8 +157,16 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
                 // Get the content and write into a tempory file
                 Node resourceNode = content.getNode("jcr:content");                
                 InputStream is = resourceNode.getProperty("jcr:data").getStream();
-                FileOutputStream os = new FileOutputStream(File.createTempFile(BenchmarkUtils.getGUID(), ".txt"));
-                BenchmarkUtils.copy(is, os);
+                File tempFile = File.createTempFile(BenchmarkUtils.getGUID(), ".txt");
+                try
+                {
+                    FileOutputStream os = new FileOutputStream(tempFile);
+                    BenchmarkUtils.copy(is, os);
+                }
+                finally
+                {
+                    tempFile.delete();
+                }
             }                                   
             finally
             {

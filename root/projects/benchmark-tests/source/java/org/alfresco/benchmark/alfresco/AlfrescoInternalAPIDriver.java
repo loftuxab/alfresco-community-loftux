@@ -32,6 +32,7 @@ import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.util.TempFileProvider;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -121,7 +122,8 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                                 contentNodeRef, 
                                 ContentModel.PROP_CONTENT);
                         contentReader = FileContentReader.getSafeContentReader(contentReader, "File missing");
-                        contentReader.getContent(File.createTempFile("benchmark", "temp"));
+                        File tempFile = TempFileProvider.createTempFile("benchmark", ".tmp"); 
+                        contentReader.getContent(tempFile);
                         
                         // Do nothing on return 
                         return null;

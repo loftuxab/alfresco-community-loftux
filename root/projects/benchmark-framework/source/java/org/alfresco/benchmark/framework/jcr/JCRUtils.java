@@ -89,16 +89,26 @@ public class JCRUtils
         return contentPropertyProfiles;
     }
     
-    
-    public static String getRandomFolderPath()
-    {
-        return null;
-    }
-    
-    public static String getRandomFilePath()
-    {
-        return null;
-    }
+//    
+//    public static String getRandomFolderPath(RepositoryProfile repositoryProfile)
+//    {
+//    	return BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+//    }
+//    
+//    public static String getRandomFolderPath(RepositoryProfile repositoryProfile, int atDepth)
+//    {
+//    	return BenchmarkUtils.getRandomFolderPath(repositoryProfile, atDepth, false);
+//    }
+//    
+//    public static String getRandomFilePath(RepositoryProfile repositoryProfile)
+//    {
+//        return null;
+//    }
+//    
+//    public static String getRandomFilePath(RepositoryProfile repositoryProfile, int atDepth)
+//    {
+//        return null;
+//    }
     
     public static Node createFile(Node parentNode)
     throws Exception
@@ -168,6 +178,8 @@ public class JCRUtils
         Calendar lastModified = Calendar.getInstance ();
         lastModified.setTimeInMillis (contentData.getFile().lastModified ());
         resNode.setProperty ("jcr:lastModified", lastModified);
+        
+        //System.out.println(resNode.getPath());
         
         return fileNode;
     }

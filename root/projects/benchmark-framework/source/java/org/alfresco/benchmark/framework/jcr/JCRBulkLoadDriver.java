@@ -24,6 +24,7 @@ import java.util.Map;
 
 import javax.jcr.Node;
 import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
@@ -32,6 +33,7 @@ import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
+import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile.PropertyType;
 import org.apache.log4j.Logger;
 
@@ -53,6 +55,8 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
     
     private int folderCount = DEFAULT_FOLDER_COUNT;
     private int fileCount = DEFAULT_FILE_COUNT;
+    private boolean createFolder = true;
+    private String folderPath;
     
     private ContentData[] contentData;
     
@@ -67,6 +71,11 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
             if (tc.hasParam(PARAM_FOLDER_COUNT) == true)
             {
                 this.folderCount = tc.getIntParam(PARAM_FOLDER_COUNT);
+                if (this.folderCount == 0)
+                {
+                    this.folderCount = 1;
+                    this.createFolder = false;
+                }
             }
             if (tc.hasParam(PARAM_FILE_COUNT) == true)
             {
@@ -86,7 +95,30 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
         {
             super.preRun(testCase);
         
-//            testCase.setLongParam(PARAM_CONTENT_SIZE, 0);
+            // Get the folder path
+            int loadDepth = 0;
+            if (testCase.hasParam(PARAM_LOAD_DEPTH) == true)
+            {
+                loadDepth = testCase.getIntParam(PARAM_LOAD_DEPTH);
+            }
+            
+            try
+            {            
+                RepositoryProfile repositoryProfile = JCRUtils.getRepositoryProfile();
+                if (loadDepth <= 0)
+                {
+                    this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+                }
+                else
+                {
+                    this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth-1, false);
+                }
+                
+            }
+            catch (Exception exception)
+            {
+                throw new RuntimeException("Unable to get the repository profile", exception);
+            }
         
             int contentCount = this.fileCount*this.folderCount;
             this.contentData = new ContentData[contentCount];;
@@ -107,29 +139,45 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
         }
     }
     
+    private Session getSession() throws RepositoryException
+    {
+        Repository repository = this.repository;
+        Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+        return session;
+    }
+    
     @Override
     public void run(final TestCase testCase)
     {
         try
         {
-            Session session = this.repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            Session session = getSession();
             try
             {     
-                // TODO pick the parent node from the available set
-                Node parentNode = session.getRootNode();
+                Node rootNode = session.getRootNode();
+                Node parentNode = rootNode.getNode(this.folderPath);
                 
                 int contentPropIndex = 0;
                 for (int folderIndex = 0; folderIndex < this.folderCount; folderIndex++)
                 {                    
                     // Create the folder to load the data into
                     String nameValue = "bulkLoad_" + BenchmarkUtils.getGUID();
-                    Node folderNode = parentNode.addNode (nameValue, "nt:folder");  
+                    Node bulkLoadFolder = null;
+                    if (this.createFolder == true)
+                    {
+                        Node folderNode = parentNode.addNode (nameValue, "nt:folder");
+                        bulkLoadFolder = folderNode;
+                    }
+                    else
+                    {
+                        bulkLoadFolder = parentNode;
+                    }
                     
                     for (int fileIndex = 0; fileIndex < this.fileCount; fileIndex++)
                     {
                         String contentName = "bulkLoad_" + fileIndex;
                         ContentData contentData = this.contentData[contentPropIndex];                    
-                        Node fileNode = folderNode.addNode(contentName, "nt:file");
+                        Node fileNode = bulkLoadFolder.addNode(contentName, "nt:file");
                     
                         // Add the content
                         Node resNode = fileNode.addNode ("jcr:content", "nt:resource");

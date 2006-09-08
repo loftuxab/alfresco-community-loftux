@@ -21,6 +21,7 @@ import java.util.List;
 
 import javax.jcr.Node;
 import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
@@ -38,20 +39,26 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
     
     protected abstract Repository getRepository();
     
+    private Session getSession() throws RepositoryException
+    {
+        Repository repository = getRepository();
+        Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+        return session;
+    }
+    
     /**
      * @see org.alfresco.benchmark.framework.DataLoaderComponent#loadData(org.alfresco.benchmark.framework.dataprovider.RepositoryProfile)
      */
     public LoadedData loadData(RepositoryProfile repositoryProfile)
     {           
         LoadedData loadedData = null;
-        
+        Node rootFolder = null;
         try
         {
-            Repository repository = getRepository();
-            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            Session session = getSession();
             try
             {
-                Node rootFolder = session.getRootNode().addNode (JCR_BENCHMARK_OBJECT_PREFIX + BenchmarkUtils.getGUID(), "nt:folder");
+                rootFolder = session.getRootNode().addNode (JCR_BENCHMARK_OBJECT_PREFIX + BenchmarkUtils.getGUID(), "nt:folder");
                 
                 if (rootFolder.canAddMixin("ben:repositoryProfile") == true)
                 {
@@ -62,19 +69,17 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
                 {
                     System.out.println("WARNING:  Unable to add mixin 'ben:repositoryProfile' to root test data node.");
                 }
-                
                 loadedData = new LoadedData(rootFolder.getPath());
-                List<Node> folderNodes = new ArrayList<Node>(10);
-                folderNodes.add(rootFolder);
-                
-                populateFolders(loadedData, repositoryProfile, folderNodes, 1);
-                
+
                 session.save();
             }
             finally
             {
                 session.logout();
             }
+            List<Node> folderNodes = new ArrayList<Node>(10);
+            folderNodes.add(rootFolder);
+            populateFolders(loadedData, repositoryProfile, folderNodes, 1);
         }
         catch (Exception exception)
         {
@@ -101,33 +106,41 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
     {
         if (depth <= repositoryProfile.getDetails().size())
         {
+            final List<Node> subFolders = new ArrayList<Node>(10);
+            // Increment the depth
+            final int newDepth = depth + 1;
+            System.out.println("depth=" + depth + "; list_size=" + folderNodes.size());
+
             RepositoryProfile.RespoitoryProfileDetail profile = repositoryProfile.getDetails().get(depth-1);
             final int numberOfContentNodes = profile.getFileCount();
             final int numberOfSubFolderNodes = profile.getFolderCount();
             
-            // Increment the depth
-            final int newDepth = depth + 1;
-            final List<Node> subFolders = new ArrayList<Node>(10);
-            
-            System.out.println("depth=" + depth + "; list_size=" + folderNodes.size());
-            
             for (Node folderNode : folderNodes)
             {
-                // Create content
-                for (int i = 0; i < numberOfContentNodes; i++)
+                Session session = getSession();
+                try
                 {
-                    JCRUtils.createFile(folderNode, BenchmarkUtils.getFileName(depth, i));
+                    // Create content
+                    for (int i = 0; i < numberOfContentNodes; i++)
+                    {
+                        JCRUtils.createFile(folderNode, BenchmarkUtils.getFileName(depth, i));
+                    }
+                    loadedData.incrementContentCount(numberOfContentNodes);
+                    
+                    // Create folders
+                    for (int i = 0; i < numberOfSubFolderNodes; i++)
+                    {
+                        Node subFolderNode = JCRUtils.createFolder(folderNode, BenchmarkUtils.getFolderName(depth, i));
+                        subFolders.add(subFolderNode);
+                        loadedData.incrementFolderCount(1);
+                    }                                             
+                    session.save();
                 }
-                loadedData.incrementContentCount(numberOfContentNodes);
-                
-                // Create folders
-                for (int i = 0; i < numberOfSubFolderNodes; i++)
+                finally
                 {
-                    Node subFolderNode = JCRUtils.createFolder(folderNode, BenchmarkUtils.getFolderName(depth, i));
-                    subFolders.add(subFolderNode);
-                    loadedData.incrementFolderCount(1);
-                }                                             
-            }         
+                    session.logout();
+                }
+            }
                     
             if (subFolders.size() > 0)
             {
