@@ -21,6 +21,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.UnitsOfWork;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.model.ContentModel;
@@ -152,7 +153,7 @@ public class AlfrescoBasicInternalAPIDriver extends BaseAlfrescoDriver implement
                         NodeRef folderNodeRef = getFolderNodeRef();
                         
                         // Create a named folder
-                        String nameValue = (String)AlfrescoBasicInternalAPIDriver.this.folderPropertyValues.get(ContentModel.PROP_NAME.toString());
+                        String nameValue = "folder_" + BenchmarkUtils.getGUID();
                         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
                         folderProps.put(ContentModel.PROP_NAME, nameValue);
                         nodeService.createNode(

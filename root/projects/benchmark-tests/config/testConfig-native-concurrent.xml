@@ -48,6 +48,8 @@
         <param name="alfresco.usageProfile.createVersion" value="0"/>
         <param name="alfresco.usageProfile.createFolder" value="0"/>
 
+        <param name="alfresco.loadDepth" value="2"/>
+
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
         <param name="japex.warmupIterations" value="1"/>            
@@ -63,6 +65,8 @@
         <param name="alfresco.usageProfile.createVersion" value="0"/>
         <param name="alfresco.usageProfile.createFolder" value="100"/>
 
+        <param name="alfresco.loadDepth" value="2"/>
+
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     
         <param name="japex.warmupIterations" value="1"/>            
@@ -77,6 +81,8 @@
         <param name="alfresco.usageProfile.createContent" value="15"/>		
         <param name="alfresco.usageProfile.createVersion" value="15"/>
         <param name="alfresco.usageProfile.createFolder" value="5"/>
+
+        <param name="alfresco.loadDepth" value="2"/>
 
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
     

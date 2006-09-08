@@ -209,16 +209,9 @@ public class AlfrescoUtils
      */
     public static NodeRef createFolderNode(NodeService nodeService, NodeRef folderNodeRef, String nameValue)
     {
-        // Get folder property data
-        List<PropertyProfile> folderPropertyProfiles = new ArrayList<PropertyProfile>();
-        
         if (nameValue == null)
         {
-            folderPropertyProfiles.add(PropertyProfile.createSmallTextProperty(ContentModel.PROP_NAME.toString()));
-            Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(
-                    folderPropertyProfiles);
-            
-            nameValue = (String)propertyValues.get(ContentModel.PROP_NAME.toString());
+            nameValue = "folder_" + BenchmarkUtils.getGUID();
         }
         
         Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
