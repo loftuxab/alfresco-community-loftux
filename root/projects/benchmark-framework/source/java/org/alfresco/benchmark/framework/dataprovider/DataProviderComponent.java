@@ -69,7 +69,6 @@ public class DataProviderComponent
             throw new RuntimeException("Unable to find folder at location " + location);
         }
         
-        //System.out.println("Folder location: " + location);
         for (File file : folder.listFiles())
         {
             if (file.isDirectory() == true)
@@ -84,8 +83,6 @@ public class DataProviderComponent
                 //String mimetype = this.mimetypeMap.guessMimetype(file.getName());
                 //String extension = this.mimetypeMap.getExtension(mimetype);
                
-                //System.out.println("Found file: " + file.getPath());
-                
                 // TODO need to sort this out ...
                 String mimetype = "text/plain";
                 String extension = ".txt";

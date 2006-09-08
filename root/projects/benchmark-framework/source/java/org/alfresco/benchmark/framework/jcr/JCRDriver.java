@@ -72,9 +72,6 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             RepositoryProfile repositoryProfile = JCRUtils.getRepositoryProfile();
             this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, false);
             this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
-            
-            System.out.println("Content JCR path: " + this.contentPath);
-            System.out.println("Folder JCR path: " + this.folderPath);
         }
         catch (Exception exception)
         {

@@ -10,12 +10,21 @@
 
     </driver>
 
+    <!--
+       This bulk load will load
+          1 thread
+          5 iterations
+          10 files and 2 folders per iteration
+       This is loaded as the 5th level against a 5 level structure e.g.:
+          10,0,10,0,10,0,10,0,0,1 
+     -->
+
     <testCase name="testConfig">
 
         <!-- Number of available users -->
         <param name="alfresco.numberOfAvailableUsers" value="50"/>
         
-        <param name="alfresco.loadDepth" value="2"/>
+        <param name="alfresco.loadDepth" value="5"/>
 
         <param name="japex.warmupIterations" value="0"/>
  <!--   	<param name="japex.runTime" value="01:00"/> -->

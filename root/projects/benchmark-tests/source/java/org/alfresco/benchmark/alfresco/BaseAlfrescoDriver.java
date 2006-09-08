@@ -65,8 +65,9 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     protected Map<String, Object> folderPropertyValues;
    
     protected NodeRef rootDataNodeRef;
-    protected String randomFolderPath;
-    protected String randomFilePath;
+    private String randomParentFolderPath;
+//    private String randomTargetFolderPath;
+    private String randomTargetFilePath;
     protected String userName;
     
     protected boolean useUsers = true;
@@ -188,19 +189,18 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
             loadDepth = testCase.getIntParam(PARAM_LOAD_DEPTH);
         }
         RepositoryProfile repositoryProfile = AlfrescoUtils.getRepositoryProfile(this.authenticationComponent, this.searchService, this.nodeService);
-        if (loadDepth == 0)
+        if (loadDepth <= 0)
         {
-            this.randomFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
-            this.randomFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+            this.randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
+//            this.randomTargetFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+            this.randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
         }
         else
         {
-            this.randomFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
-            this.randomFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth, true);
+            this.randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
+//            this.randomTargetFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth, true);
+            this.randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth - 1, true);
         }
-        
-        //System.out.println("File path = " + this.randomFilePath);
-        //System.out.println("Folder path = " + this.randomFolderPath);
         
         if (this.useUsers == true)
         {
@@ -229,14 +229,14 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         usersPrepaired = false;
     }
     
-    protected NodeRef getFolderNodeRef()
+    protected NodeRef getRandomParentFolderNodeRef()
     {
-        return resolvePath(this.randomFolderPath);
+        return resolvePath(this.randomParentFolderPath);
     }
     
-    protected NodeRef getFileNodeRef()
+    protected NodeRef getRandomTargetFileNodeRef()
     {
-        return resolvePath(this.randomFilePath);
+        return resolvePath(this.randomTargetFilePath);
     }
     
     private NodeRef resolvePath(String path)
@@ -254,7 +254,7 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
         }
         else
         {
-            throw new RuntimeException("Unable to resolve path (path=" + this.randomFolderPath + ")");
+            throw new RuntimeException("Unable to resolve path: path");
         }
         return nodeRef;
     }

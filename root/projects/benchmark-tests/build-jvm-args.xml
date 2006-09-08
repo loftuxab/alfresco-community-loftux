@@ -1,14 +1,14 @@
 <!--  Uncomment if using jProfiler -->
 <!--
-<jvmarg value="-agentlib:jprofilerti=port=8849"/>
-<jvmarg value="-Xbootclasspath/a:c:\jprofiler4\bin\agent.jar"/>
+   <jvmarg value="-agentlib:jprofilerti=port=8849"/>
+   <jvmarg value="-Xbootclasspath/a:c:\jprofiler4\bin\agent.jar"/>
 -->
 
 <!-- Uncomment to enable remote debugging -->
 <!--
-            <jvmarg value="-Xdebug"/>
-            <jvmarg value="-Xnoagent"/>
-            <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,address=8787,suspend=y"/>
+   <jvmarg value="-Xdebug"/>
+   <jvmarg value="-Xnoagent"/>
+   <jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,address=8787,suspend=y"/>
 -->
 
 

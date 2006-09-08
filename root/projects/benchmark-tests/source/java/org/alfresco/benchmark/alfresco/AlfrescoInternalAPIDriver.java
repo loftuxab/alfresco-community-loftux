@@ -25,6 +25,7 @@ import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.UnitsOfWork;
 import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.repo.transaction.TransactionUtil;
 import org.alfresco.repo.version.common.VersionImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
@@ -55,7 +56,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                         AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                         try
                         {
-                            NodeRef folderNodeRef = getFolderNodeRef();
+                            NodeRef folderNodeRef = getRandomParentFolderNodeRef();
                             AlfrescoUtils.createContentNode(
                                     AlfrescoInternalAPIDriver.this.nodeService, 
                                     AlfrescoInternalAPIDriver.this.contentService, 
@@ -100,12 +101,13 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
-                        NodeRef contentNodeRef = getFileNodeRef();
+                        NodeRef contentNodeRef = getRandomTargetFileNodeRef();
                         
                         // Read the content
                         ContentReader contentReader = AlfrescoInternalAPIDriver.this.contentService.getReader(
                                 contentNodeRef, 
                                 ContentModel.PROP_CONTENT);
+                        contentReader = FileContentReader.getSafeContentReader(contentReader, "File missing");
                         contentReader.getContent(File.createTempFile("benchmark", "temp"));
                         
                         // Store the content size for later use
@@ -141,7 +143,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
-                        NodeRef folderNodeRef = getFolderNodeRef();
+                        NodeRef folderNodeRef = getRandomParentFolderNodeRef();
                         
                         // Create a named folder
                         String nameValue = "folder_" + BenchmarkUtils.getGUID();
@@ -182,7 +184,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
-                        NodeRef contentNodeRef = getFileNodeRef();
+                        NodeRef contentNodeRef = getRandomTargetFileNodeRef();
                         
                         if (AlfrescoInternalAPIDriver.this.nodeService.hasAspect(contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
                         {
@@ -233,7 +235,7 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     try
                     {
                         // Read all the properties of the content node
-                        NodeRef contentNodeRef = getFileNodeRef();
+                        NodeRef contentNodeRef = getRandomTargetFileNodeRef();
                         AlfrescoInternalAPIDriver.this.nodeService.getProperties(contentNodeRef);
                     }
                     finally

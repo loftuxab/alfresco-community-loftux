@@ -127,7 +127,7 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
     private void doBulkUpload(TestCase testCase)
     {
         // Get the folder
-        NodeRef folderNodeRef = getFolderNodeRef();
+        NodeRef folderNodeRef = getRandomParentFolderNodeRef();
         
         int contentPropIndex = 0;
         for (int folderIndex = 0; folderIndex < this.folderCount; folderIndex++)
