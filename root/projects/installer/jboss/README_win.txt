@@ -1,9 +1,10 @@
-============================
-Alfresco 1.4 Release Preview
-============================
+================================
+Alfresco 1.4 Release Candidate 1
+================================
 
-Welcome to the Alfresco 1.4 Release Preview.  This software is for evaluation purposes only and cannot be used against an existing Alfresco repository.  There will not be an upgrade path from this
-Release Preview to the final 1.4 release.
+Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+purposes only and cannot be used against an existing Alfresco repository.  There
+will not be an upgrade path from this Candidate Release to the final 1.4 release.
 
 
 ===================
@@ -37,7 +38,7 @@ Install JDK 5.0
 
 - Browse to http://java.sun.com/j2se/1.5.0/download.jsp
 - Select the "JDK 5.0 Update x" option
-- Download the Windows Offline Installation" option (~55M)
+- Download the "Windows Offline Installation" option (~55M)
 - Install once downloaded
 
 
@@ -57,6 +58,7 @@ Install MySQL
   - for demo, choose default selected options
   - for non-English or non-West European languages, choose UTF8 Character set
   - install as a Windows service
+  - include MySQL in path
 - Test MySQL is installed and running by opening a command prompt and entering:
   'mysql -u root -p'
 - When prompted, give the password you set during installation.  If no errors
@@ -94,7 +96,7 @@ If you would like to have a range of document transformations available from wit
 Alfresco, you need to install OpenOffice.  This is entirely optional and can be
 done at any point after Alfresco has been installed.
 
-*** There are known issues with OpenOffice 2.0.1 and 2.0.2, we recommend 2.0.0 ***
+*** There are known issues with OpenOffice 2.0.1 and 2.0.2 ***
 
 - Browse to http://download.openoffice.org
 - Download the Windows version
@@ -169,8 +171,8 @@ from a Command Prompt.  One of the listed names should be the CIFS server name.
 
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
 to configure the domain for CIFS to use.  You will need to have started the Alfresco server
-at least once to be able to do this.  To set the domain, edit the 'file-servers.xml' 
-file in the 'c:\alfresco\jboss\server\default\conf\alfresco' directory and add the 
+at least once to be able to do this.  To set the domain, edit the 'file-servers-custom.xml' 
+file in the 'c:\alfresco\jboss\server\default\conf\alfresco\extension' directory and add the 
 domain into the following line:
    <host name="${localname}_A"/>
 so that it is something like:

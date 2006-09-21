@@ -1,10 +1,10 @@
-============================
-Alfresco 1.4 Release Preview
-============================
+================================
+Alfresco 1.4 Release Candidate 1
+================================
 
-Welcome to the Alfresco 1.4 Release Preview.  This software is for evaluation purposes only and cannot 
-be used against an existing Alfresco repository.  There will not be an upgrade path from this
-Release Preview to the final 1.4 release.
+Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+purposes only and cannot be used against an existing Alfresco repository.  There
+will not be an upgrade path from this Candidate Release to the final 1.4 release.
 
 
 ===================
@@ -22,7 +22,7 @@ Requirements:
 - Mac OS X 10.4 or above
 - Java Development Kit available from http://www.apple.com
 - MySQL Database available from http://www.mysql.com (other databases are supported)
-- Alfresco available from http://www.alfresco.org
+- Alfresco available from http://www.alfresco.com
 
 Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
@@ -51,8 +51,8 @@ Install MySQL
 -------------
 
 - If you wish to use other databases, please visit the forums and wiki at
-  www.alfresco.org for guidelines
-- If you already have MySQL 4.1 or higher installed, skip to "Create Database"
+  www.alfresco.com for guidelines
+- If you already have MySQL 4.1 or higher installed, skip to "Install Alfresco JBoss Bundle"
 
 - Browse to http://dev.mysql.com/downloads
 - Download the approprate MySQL Max for your platform
@@ -63,7 +63,7 @@ Install MySQL
 Install Alfresco JBoss Bundle
 -----------------------------
 
-- Browse to http://www.alfresco.org/downloads
+- Browse to http://www.alfresco.com/downloads
 - Download the "Alfresco Linux JBoss Bundle" option
 - Create a directory in '/opt' named 'alfresco'
 - Tar uncompress alfresco-jboss-xxxxxx.tar.gz in the '/opt/alfresco' directory
@@ -72,7 +72,7 @@ Install Alfresco JBoss Bundle
 Set Paths
 ---------
 
-Edit 'alfresco.sh' and check the variables are to the location where JBoss
+Edit 'alfresco.sh' and check the variables are pointing to the location where JBoss
 is installed:
 - For the JBoss bundle, this will be '/opt/alfresco/jboss'
 
@@ -96,7 +96,7 @@ If you would like to have a range of document transformations available from wit
 Alfresco, you need to install OpenOffice.  This is entirely optional and can be
 done at any point after Alfresco has been installed.
 
-*** There are known issues with OpenOffice 2.0.1 and 2.0.2, we recommend 2.0.0 ***
+*** There are known issues with OpenOffice 2.0.1 and 2.0.2 ***
 
 - Browse to http://download.openoffice.org
 - Download the OS X version
@@ -134,7 +134,7 @@ both set to 'admin'.
 
 To test the installation, you may wish to follow the tutorial, available from:
 
-http://www.alfresco.org/downloads or from the company space from within the Web Client.
+http://www.alfresco.com/downloads or from the company space from within the Web Client.
 
 
 ===========================
@@ -176,8 +176,8 @@ To check the CIFS server is running, try connecting from the Alfresco server usi
 
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
 to configure the domain for CIFS to use.  You will need to have started the Alfresco server
-at least once to be able to do this.  To set the domain, edit the 'file-servers.xml' 
-file in the '/opt/alfresco/tomcat/webapps/alfresco/WEB-INF/classes/alfresco' directory and add the 
+at least once to be able to do this.  To set the domain, edit the 'file-servers-custom.xml' 
+file in the '<alfresco>/jboss/server/default/conf/alfresco/extension' directory and add the 
 domain into the following line:
    <host name="${localname}_A"/>
 so that it is something like:

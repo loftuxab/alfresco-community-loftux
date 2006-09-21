@@ -48,7 +48,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        parentRef.setChildName(Constants.ASSOC_CHILDREN);
        
        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, this.fileName, null)};
-       CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
+       CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});
        UpdateResult[] result = this.repositoryService.update(cml);     
@@ -168,7 +168,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        
        // Create the content
        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "quick.doc", null)};
-       CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
+       CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});
        UpdateResult[] result = this.repositoryService.update(cml);     
@@ -210,7 +210,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        
        // Create the content
        NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "test.jpg", null)};
-       CMLCreate create = new CMLCreate("1", parentRef, Constants.TYPE_CONTENT, properties);
+       CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
        CML cml = new CML();
        cml.setCreate(new CMLCreate[]{create});
        UpdateResult[] result = this.repositoryService.update(cml);     

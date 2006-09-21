@@ -33,7 +33,7 @@ import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
+/** 
  * @author Roy Wetherall
  */
 public class AccessControlServiceSystemTest extends BaseWebServiceSystemTest

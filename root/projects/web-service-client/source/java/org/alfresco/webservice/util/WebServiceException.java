@@ -16,7 +16,7 @@
  */
 package org.alfresco.webservice.util;
 
-/**
+/** 
  * @author Roy Wetherall
  */
 public class WebServiceException extends RuntimeException

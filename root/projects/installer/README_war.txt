@@ -1,9 +1,10 @@
-============================
-Alfresco 1.4 Release Preview
-============================
+================================
+Alfresco 1.4 Release Candidate 1
+================================
 
-Welcome to the Alfresco 1.4 Release Preview.  This software is for evaluation purposes only and cannot be used against an existing Alfresco repository.  There will not be an upgrade path from this
-Release Preview to the final 1.4 release.
+Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+purposes only and cannot be used against an existing Alfresco repository.  There
+will not be an upgrade path from this Candidate Release to the final 1.4 release.
 
 
 ===================
@@ -20,7 +21,7 @@ Alfresco WAR Installation
 Requirements:
 - Java Development Kit available from http://java.sun.com
 - MySQL Database available from http://www.mysql.com (other databases are supported)
-- Alfresco available from http://www.alfresco.org
+- Alfresco available from http://www.alfresco.com
 
 Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
@@ -45,10 +46,10 @@ Install MySQL
 -------------
 
 - If you wish to use other databases, please visit the forums and wiki at
-  www.alfresco.org for guidelines
-- If you already have MySQL 4.1 installed, skip to "Install Alfresco"
+  www.alfresco.com for guidelines
+- If you already have MySQL 4.1 or above installed, skip to "Install Alfresco WAR Bundle"
 
-- Browse to http://dev.mysql.com/downloads/mysql/4.1.html
+- Browse to http://dev.mysql.com/downloads/mysql
 - Download the appropriate package for your platform
 - Install once downloaded
 - Use Typical setup type
@@ -62,10 +63,10 @@ Install MySQL
   are reported, then it is installed and running.  Enter 'quit' to exit.
 
 
-Install Alfresco Tomcat Bundle
-------------------------------
+Install Alfresco WAR Bundle
+---------------------------
 
-- Browse to http://www.alfresco.org/downloads
+- Browse to http://www.alfresco.com/downloads
 - Download the "Alfresco WAR Bundle" option
 - Unzip alfresco-war-xxxxx.zip to a new directory or folder
 - Copy the alfresco.war file to the appropriate location for your application server
@@ -76,8 +77,8 @@ Install Alfresco Tomcat Bundle
 Add MySQL Database Connector
 ----------------------------
 
-- Down the MySQL Java Database Connector http://dev.mysql.com/downloads/connector/j/3.1.html
-- Copy the JAR file into /jakarta-tomcat/common/lib
+- Download the MySQL Java Database Connector http://dev.mysql.com/downloads/connector/j/
+- Copy the JAR file into <container>/common/lib or <container>/server/default/lib
 
 
 Create Database
@@ -98,7 +99,7 @@ If you would like to have a range of document transformations available from wit
 Alfresco, you need to install OpenOffice.  This is entirely optional and can be
 done at any point after Alfresco has been installed.
 
-*** There are known issues with OpenOffice 2.0.1 and 2.0.2, we recommend 2.0.0 ***
+*** There are known issues with OpenOffice 2.0.1 and 2.0.2 ***
 
 - Browse to http://download.openoffice.org
 - Download the appropriate version
@@ -127,7 +128,7 @@ both set to 'admin'.
 
 To test the installation, you may wish to follow the tutorial, available from:
 
-http://www.alfresco.org/downloads or from the company space from within the Web Client.
+http://www.alfresco.com/downloads or from the company space from within the Web Client.
 
 
 ===========================
@@ -170,8 +171,8 @@ from a Command Prompt.  One of the listed names should be the CIFS server name.
 
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
 to configure the domain for CIFS to use.  You will need to have started the Alfresco server
-at least once to be able to do this.  To set the domain, edit the 'file-servers.xml' 
-file in the '<config>/alfresco' directory and add the 
+at least once to be able to do this.  To set the domain, edit the 'file-servers-custom.xml' 
+file in the '<config>/alfresco/extension' directory and add the 
 domain into the following line:
    <host name="${localname}_A"/>
 so that it is something like:
@@ -194,23 +195,9 @@ Trouble-Shooting
 ================
 
 If you have problems with your installation, please look for help on the Installation
-forum at http://www.alfresco.org/forums and ask for any additional help you may need.
+forum at http://forums.alfresco.com and ask for any additional help you may need.
 
 - The JAVA_HOME variable must be set correctly to your Java5 installation.
-
-- Most installation issues can be resolved by following advice in this forum article:
-  http://www.alfresco.org/forums/viewtopic.php?t=7
-  and in this forum generally:
-  http://www.alfresco.org/forums/viewforum.php?f=8
-
-- WAR file name is called alfresco.war
-  NOTE: If you deployed the war previously then you must clear out the web-client files 
-  before deploying the new WAR file, having first copied any configurations made:
-
-  Previous release was PR6 or later:
-  Delete <tomcat-home>/webapps/alfresco.war
-  Delete <tomcat-home>/webapps/alfresco  <-- make sure any configurations are copied
-  Delete <tomcat-home>/work/alfresco
 
 - If the following errors are reported on the console:
   ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
@@ -219,10 +206,6 @@ forum at http://www.alfresco.org/forums and ask for any additional help you may 
 
   These are not issues which will cause the server to fail. Alfresco is reporting that 
   various external document transformation engines are not available for use by the server.   
-  Either follow the instructions at the bottom of the Release Notes Wiki page:
-  http://www.alfresco.org/mediawiki/index.php/Preview_Release_5
-  or remove the transformer references completely if you don't require them:
-  http://www.alfresco.org/forums/viewtopic.php?t=90
 
 - If you see this error on server startup:
   ERROR [protocol] FTP Socket error

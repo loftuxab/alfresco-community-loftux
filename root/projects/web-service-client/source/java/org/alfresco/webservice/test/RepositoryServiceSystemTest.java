@@ -20,6 +20,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.Association;
 import org.alfresco.webservice.repository.AssociationDirectionEnum;
 import org.alfresco.webservice.repository.QueryResult;
@@ -27,9 +28,11 @@ import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
 import org.alfresco.webservice.types.CMLAddAspect;
+import org.alfresco.webservice.types.CMLCopy;
 import org.alfresco.webservice.types.CMLCreate;
 import org.alfresco.webservice.types.CMLDelete;
 import org.alfresco.webservice.types.CMLUpdate;
+import org.alfresco.webservice.types.CMLWriteContent;
 import org.alfresco.webservice.types.ClassDefinition;
 import org.alfresco.webservice.types.ContentFormat;
 import org.alfresco.webservice.types.NamedValue;
@@ -464,20 +467,69 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
                         new NamedValue(
                                 Constants.PROP_NAME,
                                 false,
-                                "name",
+                                "name.txt",
                                 null)});
+        
+        // Create a folder used for later tests
+        CMLCreate createFolder = new CMLCreate();
+        createFolder.setId("folder1");
+        createFolder.setType(Constants.TYPE_FOLDER);
+        createFolder.setParent(parentReference);
+        createFolder.setProperty(new NamedValue[] {
+                new NamedValue(
+                        Constants.PROP_NAME,
+                        false,
+                        "tempFolder",
+                        null)});
         
         CMLAddAspect aspect = new CMLAddAspect();
         aspect.setAspect(Constants.ASPECT_VERSIONABLE);
         aspect.setWhere_id("id1");
 
+        ContentFormat format = new ContentFormat(Constants.MIMETYPE_TEXT_PLAIN, "UTF-8");
+        
+        CMLWriteContent write = new CMLWriteContent();
+        write.setProperty(Constants.PROP_CONTENT);
+        write.setContent("this is a test".getBytes());
+        write.setFormat(format);
+        write.setWhere_id("id1");
+        
         CML cml = new CML();
-        cml.setCreate(new CMLCreate[]{create});
+        cml.setCreate(new CMLCreate[]{create, createFolder});
         cml.setAddAspect(new CMLAddAspect[]{aspect});
+        cml.setWriteContent(new CMLWriteContent[]{write});
         
         UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);
         assertNotNull(results);
-        assertEquals(2, results.length);
+        assertEquals(4, results.length);
+        
+        // Get a reference to the create node
+        Reference reference = results[0].getDestination();
+        Reference folderReference = results[1].getDestination();
+        
+        // Check that the content has been set successfully
+        Content[] content = WebServiceFactory.getContentService().read(new Predicate(new Reference[]{reference}, null, null), Constants.PROP_CONTENT);
+        assertNotNull(content);
+        assertEquals(1, content.length);
+        assertEquals("this is a test", ContentUtils.getContentAsString(content[0]));
+
+        // Try and copy the reference into the folder
+        CMLCopy copy = new CMLCopy();
+        copy.setTo(new ParentReference(folderReference.getStore(), folderReference.getUuid(), null, Constants.ASSOC_CONTAINS, "{test}name.txt"));
+        copy.setWhere(new Predicate(new Reference[]{reference}, null, null));
+        CML cmlCopy = new CML();
+        cmlCopy.setCopy(new CMLCopy[]{copy});
+        
+        UpdateResult[] results2 = WebServiceFactory.getRepositoryService().update(cmlCopy);
+        assertNotNull(results2);
+        assertEquals(1, results2.length);        
+        Reference newCopy = results2[0].getDestination();
+        assertNotNull(newCopy);
+        
+        // Check that the folder does indeed have the copied reference
+        QueryResult result = this.repositoryService.queryChildren(folderReference);
+        assertEquals(1, result.getResultSet().getTotalRowCount());
+        
     }
     
     public void testGet() 

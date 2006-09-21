@@ -1,9 +1,10 @@
-============================
-Alfresco 1.4 Release Preview
-============================
+================================
+Alfresco 1.4 Release Candidate 1
+================================
 
-Welcome to the Alfresco 1.4 Release Preview.  This software is for evaluation purposes only and cannot be used against an existing Alfresco repository.  There will not be an upgrade path from this
-Release Preview to the final 1.4 release.
+Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+purposes only and cannot be used against an existing Alfresco repository.  There
+will not be an upgrade path from this Candidate Release to the final 1.4 release.
 
 
 ===================
@@ -26,9 +27,9 @@ Optional:
 - OpenOffice for document transformation available from http://www.openoffice.org
 
 
-==========================
-Installation on Windows XP
-==========================
+=================================
+Simple Installation on Windows XP
+=================================
 
 Install JDK 5.0
 ---------------
@@ -45,7 +46,7 @@ Install MySQL
 -------------
 
 - If you wish to use other databases, please visit the forums and wiki at
-  www.alfresco.org for guidelines
+  www.alfresco.com for guidelines
 - If you already have MySQL 4.1 or higher installed, skip to "Install Alfresco"
 
 - Browse to http://dev.mysql.com/downloads
@@ -95,7 +96,7 @@ If you would like to have a range of document transformations available from wit
 Alfresco, you need to install OpenOffice.  This is entirely optional and can be
 done at any point after Alfresco has been installed.  
 
-*** There are known issues with OpenOffice 2.0.1 and 2.0.2, we recommend 2.0.0 ***
+*** There are known issues with OpenOffice 2.0.1 and 2.0.2 ***
 
 - Browse to http://download.openoffice.org
 - Download the Windows version
@@ -127,7 +128,7 @@ both set to 'admin'.
 
 To test the installation, you may wish to follow the tutorial, available from:
 
-http://www.alfresco.org/downloads or from the company space from within the Web Client.
+http://www.alfresco.com/downloads or from the company space from within the Web Client.
 
 
 ===========================
@@ -165,8 +166,8 @@ from a Command Prompt.  One of the listed names should be the CIFS server name.
 
 If you are unable to connect to the CIFS server, then depending on your network, you may need 
 to configure the domain for CIFS to use.  You will need to have started the Alfresco server
-at least once to be able to do this.  To set the domain, edit the 'file-servers.xml' 
-file in the 'c:\alfresco\tomcat\webapps\alfresco\WEB-INF\classes\alfresco' directory and add the 
+at least once to be able to do this.  To set the domain, edit the 'file-servers-custom.xml' 
+file in the 'c:\alfresco\tomcat\shared\classes\alfresco\extension' directory and add the 
 domain into the following line:
    <host name="${localname}_A"/>
 so that it is something like:

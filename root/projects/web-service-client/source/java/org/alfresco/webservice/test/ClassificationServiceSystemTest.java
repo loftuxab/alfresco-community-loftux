@@ -64,7 +64,7 @@ public class ClassificationServiceSystemTest extends BaseWebServiceSystemTest
             // Create the node that will contain the category import file
             ParentReference categoryParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testContent");
             NamedValue[] categoryProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "categories.acp", null)};
-            CMLCreate createCategory = new CMLCreate("categoryImport", categoryParentRef, Constants.TYPE_CONTENT, categoryProperties);
+            CMLCreate createCategory = new CMLCreate("categoryImport", categoryParentRef, null, null, null, Constants.TYPE_CONTENT, categoryProperties);
             CML cml2 = new CML();
             cml2.setCreate(new CMLCreate[]{createCategory});            
             UpdateResult[] updateResult = this.repositoryService.update(cml2);
