@@ -8,7 +8,7 @@
    <import file="${dir.common}/common-init.xml" />
 
    <target name="init" depends="common-init.init">
-      <property name="file.name.start" value="alfresco-enterprise"/>
+      <property name="file.name.start" value="alfresco-community"/>
       <property file="continuous.properties"/>
       <property name="file.name.build" value="build.xml"/>
    </target>
