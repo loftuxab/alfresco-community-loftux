@@ -722,13 +722,13 @@ JNIEXPORT jstring JNICALL Java_org_alfresco_filesys_netbios_win32_Win32NetBIOS_G
 	(JNIEnv* jnienv, jclass jthis) {
 
 	BOOL sts;
-	wchar_t nameBuf[16];
+	wchar_t nameBuf[MAX_COMPUTERNAME_LENGTH + 1];
 	unsigned int nameLen;
 
 	/*
 	 *	Get the local Windows NetBIOS name
 	 */
-	nameLen = 16;
+	nameLen = sizeof(nameBuf);
 	sts = GetComputerName((LPTSTR) nameBuf, (LPDWORD) &nameLen);
 
 	/*
@@ -945,8 +945,8 @@ void parseMultiSz( const wchar_t* buf, wchar_t* outbuf) {
 		 *	Append the current string to the output buffer
 		 */
 
-		wcscat( outbuf, &buf[bufpos]);
-		wcscat( outbuf, L",");
+		wcscat_s( outbuf, wcslen( &buf[bufpos]), &buf[bufpos]);
+		wcscat_s( outbuf, 1, L",");
 
 		/*
 		 *	Move the buffer pointer to the next string, or end of string list marker
@@ -1342,7 +1342,7 @@ void throwWinsockException(JNIEnv* jnienv, int winsockErr, const char* msg) {
 	 * Create the error message using the status code
 	 */
 
-	sprintf(msgbuf, "%u:%s", winsockErr, msg);
+	sprintf_s(msgbuf, sizeof( msgbuf), "%u:%s", winsockErr, msg);
 
 	/*
 	 * Create the Winsock NetBIOS exception object

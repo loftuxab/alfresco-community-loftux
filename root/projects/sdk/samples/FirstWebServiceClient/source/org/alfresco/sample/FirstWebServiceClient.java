@@ -69,7 +69,7 @@ public class FirstWebServiceClient
             //       CML statements within the same CML block
             NamedValue[] contentProps = new NamedValue[1]; 
             contentProps[0] = Utils.createNamedValue(Constants.PROP_NAME, name); 
-            CMLCreate create = new CMLCreate("1", companyHomeParent, Constants.TYPE_CONTENT, contentProps);
+            CMLCreate create = new CMLCreate("1", companyHomeParent, null, null, null, Constants.TYPE_CONTENT, contentProps);
             
             // Construct CML statement to add titled aspect
             NamedValue[] titledProps = new NamedValue[2];

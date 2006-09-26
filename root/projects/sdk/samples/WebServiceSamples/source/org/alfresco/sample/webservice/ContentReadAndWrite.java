@@ -97,7 +97,7 @@ public class ContentReadAndWrite extends SamplesBase
             
             // Create the content
             NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "test.jpg")};
-            CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_CONTENT, properties);
+            CMLCreate create = new CMLCreate("1", parentReference, null, null, null, Constants.TYPE_CONTENT, properties);
             CML cml = new CML();
             cml.setCreate(new CMLCreate[]{create});
             UpdateResult[] result = WebServiceFactory.getRepositoryService().update(cml);     
@@ -140,7 +140,7 @@ public class ContentReadAndWrite extends SamplesBase
         ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
         
         NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_" + name)};
-        CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_CONTENT, properties);
+        CMLCreate create = new CMLCreate("1", parentReference, null, null, null, Constants.TYPE_CONTENT, properties);
         CML cml = new CML();
         cml.setCreate(new CMLCreate[]{create});
         UpdateResult[] result = WebServiceFactory.getRepositoryService().update(cml);     

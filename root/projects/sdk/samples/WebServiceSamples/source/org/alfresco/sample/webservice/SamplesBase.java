@@ -62,7 +62,7 @@ public class SamplesBase
 
             // Create folder
             NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "Web Service Sample Folder")};
-            CMLCreate create = new CMLCreate("1", parentReference, Constants.TYPE_FOLDER, properties);
+            CMLCreate create = new CMLCreate("1", parentReference, null, null, null, Constants.TYPE_FOLDER, properties);
             CML cml = new CML();
             cml.setCreate(new CMLCreate[]{create});
             UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);                
@@ -78,7 +78,7 @@ public class SamplesBase
             
             // Create content
             NamedValue[] properties2 = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "SampleContent.txt")};
-            CMLCreate create2 = new CMLCreate("1", parentReference2, Constants.TYPE_CONTENT, properties2);
+            CMLCreate create2 = new CMLCreate("1", parentReference2, null, null, null, Constants.TYPE_CONTENT, properties2);
             CML cml2 = new CML();
             cml2.setCreate(new CMLCreate[]{create2});
             UpdateResult[] results2 = WebServiceFactory.getRepositoryService().update(cml2);  
