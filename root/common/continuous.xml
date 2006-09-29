@@ -419,6 +419,7 @@
       <copy todir="${dir.assemble.sdk}/config" includeEmptyDirs="false">
          <fileset dir="${dir.config.repository}" excludes="**/extension/*" />
          <fileset dir="${dir.config.webclient}" excludes="**/extension/*" />
+         <fileset dir="${dir.project.core}/source/java" includes="log4j.properties" />
       </copy>
       <delete>
          <fileset dir="${dir.assemble.sdk}/config/alfresco/messages">

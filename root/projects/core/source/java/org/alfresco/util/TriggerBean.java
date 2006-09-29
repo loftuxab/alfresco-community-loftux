@@ -55,6 +55,11 @@ public class TriggerBean extends AbstractTriggerBean
         this.repeatInterval = repeatInterval;
     }
 
+    public void setRepeatIntervalMinutes(long repeatIntervalMinutes)
+    {
+        this.repeatInterval = repeatIntervalMinutes * 60L * 1000L;
+    }
+
     public long getStartDelay()
     {
         return startDelay;
@@ -63,6 +68,11 @@ public class TriggerBean extends AbstractTriggerBean
     public void setStartDelay(long startDelay)
     {
         this.startDelay = startDelay;
+    }
+
+    public void setStartDelayMinutes(long startDelayMinutes)
+    {
+        this.startDelay = startDelayMinutes * 60L * 1000L;
     }
 
     @Override

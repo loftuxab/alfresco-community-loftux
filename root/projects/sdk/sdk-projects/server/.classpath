@@ -6,7 +6,6 @@
 	<classpathentry exported="true" kind="lib" path="remote-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="web-client.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/acegi-security-0.8.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/antlr-2.7.5H3.jar"/>
@@ -28,7 +27,6 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jcr-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jid3lib-0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/joda-time-1.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/jooconverter.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jstl.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jta.jar"/>
@@ -39,12 +37,10 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/mail.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/myfaces-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/myfaces-impl.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/mysql-connector-java-3.1.12-bin.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/odf_utils.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/pdfbox-0.7.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/poi-2.5.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/portlet-api-lib.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/quartz.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R2.jar"/>
@@ -61,7 +57,6 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/wss4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/xpp3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/yguard.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-beanutils-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-codec-1.3.jar"/>
@@ -69,19 +64,13 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-digester-1.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-discovery-0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-el.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-fileupload-1.1-dev.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-io-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-logging.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-validator.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jgroups/jgroups-2.2.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jibx/jibx-run.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jmagick/JMagick.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/juh.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/jurt.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/jut.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/ridl.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/sandbox.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/unoil.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/swarmcache/swarmcache-1.0RC2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/treecache/concurrent.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-system.jar"/>
@@ -89,8 +78,24 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-common.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-jmx.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/c3p0-0.9.1-pre6.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/ehcache-1.2-patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/ant.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/acegi-security-0.8.2_patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-fileupload-1.1.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/ehcache-1.2.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jooconverter-2.0.0-patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-juh-2.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-jurt-2.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/poi-2.5.1_patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-ridl-2.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-sandbox-2.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-unoil-2.0.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/xstream-1.1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/xpp3-1.1.3_8.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/bsh-1.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-3.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-identity-3.1.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/springmodules-jbpm31.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
