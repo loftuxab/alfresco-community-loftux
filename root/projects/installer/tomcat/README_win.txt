@@ -1,10 +1,10 @@
-================================
-Alfresco 1.4 Release Candidate 1
-================================
+====================
+Alfresco 1.4 Preview
+====================
 
-Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+Welcome to the Alfresco 1.4 Preview Release.  This software is for evaluation 
 purposes only and cannot be used against an existing Alfresco repository.  There
-will not be an upgrade path from this Candidate Release to the final 1.4 release.
+will not be an upgrade path from this Preview Release to the final 1.4 release.
 
 
 ===================
@@ -20,10 +20,10 @@ Alfresco Tomcat Bundled Installation
 
 Requirements:
 - Java Development Kit available from http://java.sun.com
-- MySQL Database available from http://www.mysql.com (other databases are supported)
 - Alfresco available from http://www.alfresco.org
 
 Optional:
+- MySQL Database available from http://www.mysql.com (or other database)
 - OpenOffice for document transformation available from http://www.openoffice.org
 
 
@@ -34,35 +34,12 @@ Simple Installation on Windows XP
 Install JDK 5.0
 ---------------
 
-- If you already have J2SE Development Kit 5.0 installed, skip to "Install MySQL"
+- If you already have J2SE Development Kit 5.0 installed, skip to "Install Alfresco Tomcat Bundle"
 
 - Browse to http://java.sun.com/j2se/1.5.0/download.jsp
 - Select the "JDK 5.0 Update x" option
 - Download the "Windows Offline Installation" option (~55M)
 - Install once downloaded
-
-
-Install MySQL
--------------
-
-- If you wish to use other databases, please visit the forums and wiki at
-  www.alfresco.com for guidelines
-- If you already have MySQL 4.1 or higher installed, skip to "Install Alfresco"
-
-- Browse to http://dev.mysql.com/downloads
-- Download the "Windows (x86)" option (~37M)
-- Install once downloaded (run setup.exe)
-- Use Typical setup type
-- You may skip the MySQL.com sign-up
-- Configure using options appropriate to required use
-  - for demo, choose default selected options
-  - for non-English or non-West European languages, choose UTF8 Character set
-  - install as a Windows service
-  - include MySQL in path
-- Test MySQL is installed and running by opening a command prompt and entering:
-  'mysql -u root -p'
-- When prompted, give the password you set during installation.  If no errors
-  are reported, then it is installed and running.  Enter 'quit' to exit.
 
 
 Install Alfresco Tomcat Bundle
@@ -74,16 +51,17 @@ Install Alfresco Tomcat Bundle
 - Unzip alfresco-tomcat-xxxxx.zip in C:\alfresco
 
 
-Create Database
----------------
+Optional Install of Database
+----------------------------
 
-Navigate to the 'C:\alfresco' folder and run 'db_setup.bat'.  
+Alfresco is pre-configured to use the HSQL database, but can easily be
+configured to use other databases, please visit the forums and wiki at
+www.alfresco.com for guidelines
 
-This creates a MySQL database named 'alfresco' with a user account and password
-of 'alfresco'.  If db_setup fails, this may be because the MySQL service is not
-running or that the mysql command cannot be found.  Either correct this or setup 
-the Alfresco database and user manually by loading the 'db_setup.sql' file into
-MySQL, for example, 'mysql -u root -p <db_setup.sql'.
+- See 'README-mysql.txt' for details on configuring for use with MySQL.
+
+General configuration details can be found at:
+http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
 
 
 You have now installed all the components needed to run the Alfresco server.
@@ -103,12 +81,6 @@ done at any point after Alfresco has been installed.
 - Install OpenOffice with defaults (except file associations, unless you wish to)
 - Start one of the OpenOffice programs to go through initial registration, then close it
 - Stop and restart the Alfresco server if it is already running
-
-
-Configure the Database Connection and Data Locations
-----------------------------------------------------
-
-Details can be found at http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
 
 
 ===========================

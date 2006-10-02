@@ -72,6 +72,7 @@
          <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/README_win.txt" fullpath="README.txt" />
+         <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
@@ -86,6 +87,7 @@
          <tarfileset dir="${dir.project.installer}" includes="${files.installer.linux}" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_linux.txt" fullpath="README.txt" />
+         <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_osx.txt" fullpath="README_osx.txt" />
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
@@ -103,7 +105,7 @@
       
       <!-- make sure the MySQL connector & HSQLDB is present and up to date -->
       <delete>
-         <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*,hsqldb.jar" excludes="${file.name.mysql.connector}"/>
+         <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
       
@@ -118,7 +120,9 @@
       <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension">
          <fileset dir="${dir.project.installer}/extension" />
       </copy>
+      <!--
       <copy todir="${dir.assemble.jboss}/jboss/server/default/lib" file="${dir.project.installer}/hsqldb.jar" />
+      -->
       <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/messages">
          <fileset dir="${dir.project.installer}/messages" />
       </copy>
@@ -150,6 +154,7 @@
          <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/README_win.txt" fullpath="README.txt" />
+         <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
@@ -164,6 +169,7 @@
          <tarfileset dir="${dir.project.installer}" includes="${files.installer.linux}" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_linux.txt" fullpath="README.txt" />
+         <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_osx.txt" fullpath="README_osx.txt" />
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
@@ -196,7 +202,9 @@
       <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.installer}/extension" />
       </copy>
+      <!--
       <copy todir="${dir.assemble.tomcat}/tomcat/common/lib" file="${dir.project.installer}/hsqldb.jar" />
+      -->
       <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages">
          <fileset dir="${dir.project.installer}/messages" />
       </copy>
@@ -363,7 +371,7 @@
       <mkdir dir="${dir.assemble.sdk}/bin" />
       <copy todir="${dir.assemble.sdk}/bin">
          <fileset dir="${dir.project.netbios}/dll" includes="*.dll" />
-         <fileset dir="${dir.project.installer}" includes=".hotspot_compiler,db_setup.sql" />
+         <fileset dir="${dir.project.installer}" includes=".hotspot_compiler" />
       </copy>
 
       <!-- -->
@@ -500,10 +508,12 @@
 
       <zip destfile="${dir.dist}/${file.name.dist.sdk}.zip">
          <zipfileset dir="${dir.assemble.sdk}" />
+         <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
       </zip>
 
       <tar destfile="${dir.dist}/${file.name.dist.sdk}.tar" longfile="gnu">
          <tarfileset dir="${dir.assemble.sdk}" />
+         <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.sdk}.tar.gz" src="${dir.dist}/${file.name.dist.sdk}.tar" />
       <delete file="${dir.dist}/${file.name.dist.sdk}.tar" />

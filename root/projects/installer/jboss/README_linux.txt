@@ -1,8 +1,8 @@
-================================
-Alfresco 1.4 Release Candidate 1
-================================
+============================
+Alfresco 1.4 Preview Release
+============================
 
-Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+Welcome to the Alfresco 1.4 Preview Release.  This software is for evaluation
 purposes only and cannot be used against an existing Alfresco repository.  There
 will not be an upgrade path from this Candidate Release to the final 1.4 release.
 
@@ -20,10 +20,10 @@ Alfresco JBoss Bundled Installation
 
 Requirements:
 - Java Development Kit available from http://java.sun.com
-- MySQL Database available from http://www.mysql.com (other databases are supported)
 - Alfresco available from http://www.alfresco.com
 
 Optional:
+- MySQL Database available from http://www.mysql.com (or other database)
 - OpenOffice for document transformation available from http://www.openoffice.org
 
 
@@ -48,18 +48,6 @@ Install JDK 5.0
 - Ensure the JAVA_HOME variable is set
 
 
-Install MySQL
--------------
-
-- If you wish to use other databases, please visit the forums and wiki at
-  www.alfresco.com for guidelines
-- If you already have MySQL 4.1 or higher installed, skip to "Install Alfresco JBoss Bundle"
-
-- Browse to http://dev.mysql.com/downloads
-- Download the approprate MySQL Max for your platform
-- Install by following MySQL's installation instructions
-
-
 Install Alfresco JBoss Bundle
 -----------------------------
 
@@ -77,14 +65,18 @@ is installed:
 - For the JBoss bundle, this will be '/opt/alfresco/jboss'
 
 
-Create Database
----------------
+Optional Install of Database
+----------------------------
 
-Navigate to the '/opt/alfresco' folder and run the 'db_setup.sql' script in
-MySQL: 'mysql -u root -p <db_setup.sql'.  
+Alfresco is pre-configured to use the HSQL database, but can easily be
+configured to use other databases, please visit the forums and wiki at
+www.alfresco.com for guidelines
 
-This creates a MySQL database named 'alfresco' with a user 
-account and password of 'alfresco'.
+- See 'README-mysql.txt' for details on configuring for use with MySQL.
+
+General configuration details can be found at:
+http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
+
 
 You have now installed all the components needed to run the Alfresco server.
 
@@ -107,17 +99,10 @@ done at any point after Alfresco has been installed.
 - Stop and restart the Alfresco server if it is already running
 
 
-Configure the Database Connection and Data Locations
-----------------------------------------------------
-
-Details can be found at http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
-
-
 ===========================
 Running the Alfresco Server
 ===========================
 
-Ensure that the MySQL server is running.
 Open a new command window and navigate to the '/opt/alfresco' directory
 - Run 'alfresco.sh start'
 - You can now try Alfresco by visiting:
