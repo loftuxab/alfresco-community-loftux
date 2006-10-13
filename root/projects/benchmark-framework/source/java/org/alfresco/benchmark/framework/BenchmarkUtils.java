@@ -325,7 +325,7 @@ public class BenchmarkUtils
         }
         else
         {
-            return "";
+            return "*:";
         }
     }
 }
