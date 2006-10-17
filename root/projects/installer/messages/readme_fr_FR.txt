@@ -2,7 +2,7 @@
 Alfresco Language Pack
 ======================
 
-Pour la version : 1.3.0dev
+Pour la version : 1.4.0RC1
 
 Pour la langue : fr_FR
 
@@ -12,8 +12,10 @@ Contenu de ce Language Pack
 ===========================
 
 *_fr_FR.properties, reflétant les modifications du language pack en_US
-Les fichiers XLIFF et diff sont uniquement inclus dans le language pack fr_FR et ne sont pas reconduits dans celui-ci.
+Les fichiers XLIFF et diff sont uniquement inclus dans le language pack en_US et ne sont pas reconduits dans celui-ci.
 
+
+La traduction de ces fichiers est réalisée par l'outil open-source Attesoro (http://attesoro.org/).
 
 ============
 Installation

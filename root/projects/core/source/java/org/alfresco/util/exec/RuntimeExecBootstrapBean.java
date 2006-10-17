@@ -20,12 +20,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.AbstractLifecycleBean;
 import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Application bootstrap bean that is able to execute one or more
@@ -33,7 +32,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * 
  * @author Derek Hulley
  */
-public class RuntimeExecBootstrapBean implements ApplicationListener
+public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
 {
     private static Log logger = LogFactory.getLog(RuntimeExecBootstrapBean.class);
     
@@ -58,16 +57,9 @@ public class RuntimeExecBootstrapBean implements ApplicationListener
         this.startupCommands = startupCommands;
     }
 
-    /**
-     * Listens for the the context refresh and executes the startup commands.
-     * Any failure of the commands will lead to context initialization failure.
-     */
-    public void onApplicationEvent(ApplicationEvent event)
+    @Override
+    protected void onBootstrap(ApplicationEvent event)
     {
-        if (!(event instanceof ContextRefreshedEvent))
-        {
-            return;
-        }
         // execute
         for (RuntimeExec command : startupCommands)
         {
@@ -83,5 +75,11 @@ public class RuntimeExecBootstrapBean implements ApplicationListener
         {
             logger.debug("Bootstrap execution of " + startupCommands.size() + " commands was successful");
         }
+    }
+
+    @Override
+    protected void onShutdown(ApplicationEvent event)
+    {
+        // NOOP
     }
 }

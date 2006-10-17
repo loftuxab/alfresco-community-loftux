@@ -33,8 +33,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class VmShutdownListener
 {
-    private static Log logger = LogFactory.getLog(VmShutdownListener.class);
-    
+    private Log logger;
     private boolean vmShuttingDown;
     
     /**
@@ -43,6 +42,8 @@ public class VmShutdownListener
      */
     public VmShutdownListener(final String name)
     {
+        logger = LogFactory.getLog(VmShutdownListener.class);
+        
         vmShuttingDown = false;
         Runnable shutdownRunnable = new Runnable()
         {

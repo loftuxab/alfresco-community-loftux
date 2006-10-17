@@ -19,13 +19,11 @@ package org.alfresco.util.exec;
 import java.util.Collections;
 import java.util.List;
 
+import org.alfresco.util.AbstractLifecycleBean;
 import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextClosedEvent;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * This bean executes a list of shutdown commands when either the VM shuts down
@@ -34,7 +32,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * 
  * @author Derek Hulley
  */
-public class RuntimeExecShutdownBean implements ApplicationListener
+public class RuntimeExecShutdownBean extends AbstractLifecycleBean
 {
     private static Log logger = LogFactory.getLog(RuntimeExecShutdownBean.class);
     
@@ -65,49 +63,6 @@ public class RuntimeExecShutdownBean implements ApplicationListener
         this.shutdownCommands = startupCommands;
     }
 
-    /**
-     * Listens for the the context refresh and executes the startup commands.
-     * Any failure of the commands will lead to context initialization failure.
-     */
-    public synchronized void onApplicationEvent(ApplicationEvent event)
-    {
-        if (event instanceof ContextRefreshedEvent)
-        {
-            // register shutdown hook
-            shutdownHook = new ShutdownThread();
-            Runtime.getRuntime().addShutdownHook(shutdownHook);
-
-            if (logger.isDebugEnabled())
-            {
-                logger.debug("Registered shutdown hook");
-            }
-        }
-        else if (event instanceof ContextClosedEvent)
-        {
-            // remove shutdown hook and execute
-            if (shutdownHook != null)
-            {
-                // execute
-                execute();
-                // remove hook
-                try
-                {
-                    Runtime.getRuntime().removeShutdownHook(shutdownHook);
-                }
-                catch (IllegalStateException e)
-                {
-                    // VM is already shutting down
-                }
-                shutdownHook = null;
-                
-                if (logger.isDebugEnabled())
-                {
-                    logger.debug("Deregistered shutdown hook");
-                }
-            }
-        }
-    }
-    
     private synchronized void execute()
     {
         // have we already done this?
@@ -150,6 +105,46 @@ public class RuntimeExecShutdownBean implements ApplicationListener
             execute();
         }
     }
+
+    @Override
+    protected void onBootstrap(ApplicationEvent event)
+    {
+        // register shutdown hook
+        shutdownHook = new ShutdownThread();
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Registered shutdown hook");
+        }
+    }
+
+    @Override
+    protected void onShutdown(ApplicationEvent event)
+    {
+        // remove shutdown hook and execute
+        if (shutdownHook != null)
+        {
+            // execute
+            execute();
+            // remove hook
+            try
+            {
+                Runtime.getRuntime().removeShutdownHook(shutdownHook);
+            }
+            catch (IllegalStateException e)
+            {
+                // VM is already shutting down
+            }
+            shutdownHook = null;
+            
+            if (logger.isDebugEnabled())
+            {
+                logger.debug("Deregistered shutdown hook");
+            }
+        }
+    }
+    
 }
 
 
