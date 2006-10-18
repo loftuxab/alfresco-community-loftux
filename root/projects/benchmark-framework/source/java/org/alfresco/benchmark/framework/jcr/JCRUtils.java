@@ -52,7 +52,7 @@ public class JCRUtils
     public static String PROP_DC_SUBJECT =       "subject";
     public static String PROP_DC_AUTHOR =        "author";
     public static String PROP_TITLE =            "title";
-    public static String PROP_DESCRIPTION =      "description";
+    public static String PROP_DESCRIPTION =      "description";    
     
     @SuppressWarnings("unused")
     protected static Repository repository;
@@ -88,27 +88,6 @@ public class JCRUtils
     {
         return contentPropertyProfiles;
     }
-    
-//    
-//    public static String getRandomFolderPath(RepositoryProfile repositoryProfile)
-//    {
-//    	return BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
-//    }
-//    
-//    public static String getRandomFolderPath(RepositoryProfile repositoryProfile, int atDepth)
-//    {
-//    	return BenchmarkUtils.getRandomFolderPath(repositoryProfile, atDepth, false);
-//    }
-//    
-//    public static String getRandomFilePath(RepositoryProfile repositoryProfile)
-//    {
-//        return null;
-//    }
-//    
-//    public static String getRandomFilePath(RepositoryProfile repositoryProfile, int atDepth)
-//    {
-//        return null;
-//    }
     
     public static Node createFile(Node parentNode)
     throws Exception
@@ -165,6 +144,9 @@ public class JCRUtils
         
         // Create the file node
         Node fileNode = parentNode.addNode(name, "nt:file");
+        
+        // Add the lockable mixin to the file
+        fileNode.addMixin("mix:lockable");
     
         // Add the content
         Node resNode = fileNode.addNode ("jcr:content", "nt:resource");
@@ -179,7 +161,7 @@ public class JCRUtils
         lastModified.setTimeInMillis (contentData.getFile().lastModified ());
         resNode.setProperty ("jcr:lastModified", lastModified);
         
-        //System.out.println(resNode.getPath());
+        //System.out.println(fileNode.getPath());
         
         return fileNode;
     }
@@ -212,7 +194,10 @@ public class JCRUtils
         {
             name = BenchmarkUtils.getGUID();
         }
-        return parentNode.addNode(name, "nt:folder");        
+        Node folderNode = parentNode.addNode(name, "nt:folder");
+        folderNode.addMixin("mix:lockable");
+        
+        return folderNode;
     }
     
     /**
@@ -247,8 +232,8 @@ public class JCRUtils
         return rootFolder;
     } 
     
-    private static String rootNodeName;
-    private static RepositoryProfile repositoryProfile;
+    protected static String rootNodeName;
+    protected static RepositoryProfile repositoryProfile;
     
     public static RepositoryProfile getRepositoryProfile()
         throws Exception
@@ -261,7 +246,18 @@ public class JCRUtils
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode(); 
                 Node dataRootNode = getRootTestDataFolder(rootNode);
-                String repositoryProfileValue = dataRootNode.getProperty("ben:repositoryProfile").getString();
+                
+                String repositoryProfileValue = null;
+                if (BenchmarkUtils.getJCRType().equals("Alfresco") == true)
+                {
+                    repositoryProfileValue = dataRootNode.getProperty("ben:repositoryProfile").getString();
+                }
+                else
+                {
+                    String name = dataRootNode.getName();
+                    String[] values = name.split("_");
+                    repositoryProfileValue = values[values.length-1];
+                }
                 repositoryProfile = new RepositoryProfile(repositoryProfileValue);
             }                                   
             finally

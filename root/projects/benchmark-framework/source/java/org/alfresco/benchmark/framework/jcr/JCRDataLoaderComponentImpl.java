@@ -55,30 +55,37 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
         Node rootFolder = null;
         try
         {
+            List<SerializedNode> folderNodes = new ArrayList<SerializedNode>(10);
+            
             Session session = getSession();
             try
             {
-                rootFolder = session.getRootNode().addNode (JCR_BENCHMARK_OBJECT_PREFIX + BenchmarkUtils.getGUID(), "nt:folder");
                 
-                if (rootFolder.canAddMixin("ben:repositoryProfile") == true)
+                rootFolder = session.getRootNode().addNode (getRootName(repositoryProfile), "nt:folder");
+                
+                if (BenchmarkUtils.getJCRType().equals("Alfresco") == true)
                 {
-                    rootFolder.addMixin("ben:repositoryProfile");
-                    rootFolder.setProperty("ben:repositoryProfile", repositoryProfile.getProfileString());
+                    if (rootFolder.canAddMixin("ben:repositoryProfile") == true)
+                    {
+                        rootFolder.addMixin("ben:repositoryProfile");
+                        rootFolder.setProperty("ben:repositoryProfile", repositoryProfile.getProfileString());
+                    }
+                    else
+                    {
+                        System.out.println("WARNING:  Unable to add mixin 'ben:repositoryProfile' to root test data node.");
+                    }
                 }
-                else
-                {
-                    System.out.println("WARNING:  Unable to add mixin 'ben:repositoryProfile' to root test data node.");
-                }
+                
                 loadedData = new LoadedData(rootFolder.getPath());
-
+                folderNodes.add(new SerializedNode(rootFolder));
+                
                 session.save();
             }
             finally
             {
                 session.logout();
             }
-            List<Node> folderNodes = new ArrayList<Node>(10);
-            folderNodes.add(rootFolder);
+ 
             populateFolders(loadedData, repositoryProfile, folderNodes, 1);
         }
         catch (Exception exception)
@@ -87,6 +94,11 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
         }        
         
         return loadedData;
+    }
+    
+    protected String getRootName(RepositoryProfile repositoryProfile)
+    {
+        return JCR_BENCHMARK_OBJECT_PREFIX + BenchmarkUtils.getGUID();
     }
     
     /**
@@ -100,13 +112,13 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
     private void populateFolders(
             final LoadedData loadedData, 
             final RepositoryProfile repositoryProfile, 
-            final List<Node> folderNodes, 
+            final List<SerializedNode> folderNodes, 
             int depth)
         throws Exception
     {
         if (depth <= repositoryProfile.getDetails().size())
         {
-            final List<Node> subFolders = new ArrayList<Node>(10);
+            final List<SerializedNode> subFolders = new ArrayList<SerializedNode>(10);
             // Increment the depth
             final int newDepth = depth + 1;
             System.out.println("depth=" + depth + "; list_size=" + folderNodes.size());
@@ -115,11 +127,13 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
             final int numberOfContentNodes = profile.getFileCount();
             final int numberOfSubFolderNodes = profile.getFolderCount();
             
-            for (Node folderNode : folderNodes)
+            for (SerializedNode serializedNode : folderNodes)
             {
                 Session session = getSession();
                 try
                 {
+                    Node folderNode = serializedNode.getNode(session.getRootNode());
+                    
                     // Create content
                     for (int i = 0; i < numberOfContentNodes; i++)
                     {
@@ -131,7 +145,7 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
                     for (int i = 0; i < numberOfSubFolderNodes; i++)
                     {
                         Node subFolderNode = JCRUtils.createFolder(folderNode, BenchmarkUtils.getFolderName(depth, i));
-                        subFolders.add(subFolderNode);
+                        subFolders.add(new SerializedNode(subFolderNode));
                         loadedData.incrementFolderCount(1);
                     }                                             
                     session.save();
@@ -156,5 +170,22 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
     public List<String> createUsers(final int count)
     {
         return null;
+    }
+    
+    private class SerializedNode
+    {
+        private String path;
+        
+        public SerializedNode(Node node)
+            throws RepositoryException
+        {
+            this.path = node.getPath();
+        }
+        
+        public Node getNode(Node rootNode)
+           throws RepositoryException
+        {
+            return rootNode.getNode(this.path.substring(1));
+        }
     }
 }

@@ -115,7 +115,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode(this.folderPath);
+                final Node folder = rootNode.getNode("./" + this.folderPath);
                 
                 try
                 {
@@ -152,7 +152,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the content that we are going to read
                 Node rootNode = session.getRootNode();      
-                final Node content = rootNode.getNode(this.contentPath);
+                final Node content = rootNode.getNode("./" + this.contentPath);
                
                 // Get the content and write into a tempory file
                 Node resourceNode = content.getNode("jcr:content");                
@@ -190,7 +190,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the folder that we are going to create the new node within
                 Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode(this.folderPath);
+                final Node folder = rootNode.getNode("./" + this.folderPath);
                 
                 //this.folderPath = rootNode.getPath();
                 
@@ -277,7 +277,7 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
             {            
                 // Get the root node and the content that we are going to read
                 Node rootNode = session.getRootNode();                  
-                final Node content = rootNode.getNode(this.contentPath);                
+                final Node content = rootNode.getNode("./" + this.contentPath);                
                
                 // Get all the properties of the content node
                 content.getProperties();

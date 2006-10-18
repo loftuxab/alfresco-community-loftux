@@ -49,6 +49,8 @@ public class BenchmarkUtils
     
     private static String outputFolderLocation;
     
+    private static String JCRType;
+    
     /**
      * Gets a random number from a normal distribution where the numbers center arouns the 'mean' interger
      * and the 90% of the generated numbers will fall within the range [mean-(2*variation)<=x<=mean+(2*variation)] and 70%
@@ -125,6 +127,12 @@ public class BenchmarkUtils
         return dataContentLocations;
     }
     
+    public static String getJCRType()
+    {
+        loadProperties();
+        return JCRType;
+    }
+    
     /**
      * Load the property details from the property file
      */
@@ -140,6 +148,7 @@ public class BenchmarkUtils
                 
                 dataContentLocations = props.getProperty("benchmark.data_content_location").split(";");
                 outputFolderLocation = props.getProperty("benchmark.output_folder");
+                JCRType = props.getProperty("benchmark.JCR.type");
                 
                 String randomSeedStr = props.getProperty("benchmark.random_seed", "" + System.currentTimeMillis());
                 rand = new Random(Long.parseLong(randomSeedStr));
