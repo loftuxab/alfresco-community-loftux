@@ -1,10 +1,8 @@
-====================
-Alfresco 1.4 Preview
-====================
+============
+Alfresco 1.4
+============
 
-Welcome to the Alfresco 1.4 Preview Release.  This software is for evaluation
-purposes only and cannot be used against an existing Alfresco repository.  There
-will not be an upgrade path from this Preview Release to the final 1.4 release.
+Welcome to the Alfresco 1.4 Release.  
 
 
 ===================
@@ -42,7 +40,7 @@ Install JDK 5.0
 
 - If you already have J2SE Development Kit 5.0 installed, skip to "Install Alfresco Tomcat Bundle"
 
-- Browse to http://www.apple.com/support/downloads/java2se50release1.html
+- Browse to http://www.apple.com/support/downloads/java2se50release3.html
 - Install once downloaded
 - Ensure the JAVA_HOME variable is set correctly
 
@@ -127,7 +125,7 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 Upgrading from V1.x to V1.4
 ===========================
 
-Not yet available.
+http://wiki.alfresco.com/wiki/Upgrading_to_1.4.0
 
 
 =====================
