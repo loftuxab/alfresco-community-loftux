@@ -150,6 +150,19 @@ public class BenchmarkUtils
                 outputFolderLocation = props.getProperty("benchmark.output_folder");
                 JCRType = props.getProperty("benchmark.JCR.type");
                 
+                if (dataContentLocations == null)
+                {
+                    throw new RuntimeException("Property 'benchmark.data_content_location' not set");
+                }
+                if (outputFolderLocation == null)
+                {
+                    throw new RuntimeException("Property 'benchmark.output_folder' not set");
+                }
+                if (JCRType == null)
+                {
+                    throw new RuntimeException("Property 'benchmark.JCR.type' not set");
+                }
+                
                 String randomSeedStr = props.getProperty("benchmark.random_seed", "" + System.currentTimeMillis());
                 rand = new Random(Long.parseLong(randomSeedStr));
             }
