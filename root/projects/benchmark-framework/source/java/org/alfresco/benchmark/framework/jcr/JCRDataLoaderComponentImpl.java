@@ -88,9 +88,10 @@ public abstract class JCRDataLoaderComponentImpl implements DataLoaderComponent
  
             populateFolders(loadedData, repositoryProfile, folderNodes, 1);
         }
-        catch (Exception exception)
+        catch (Throwable e)
         {
-            throw new RuntimeException("Unable to load data", exception);
+            e.printStackTrace();
+            throw new RuntimeException("Unable to load data", e);
         }        
         
         return loadedData;
