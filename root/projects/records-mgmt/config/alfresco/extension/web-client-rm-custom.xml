@@ -1,6 +1,5 @@
 <alfresco-config>
-   
-   
+      
    <config evaluator="string-compare" condition="Action Wizards">
       <!-- The list of aspects to show in the add/remove features action -->
       <!-- and the has-aspect condition -->

@@ -19,36 +19,40 @@
                         <sys:node-uuid>rm:reviewPeriod-1</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Annually</cm:name>
+                        <cm:name>Bi-Annually</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-2</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Calendar Year End</cm:name>
+                        <cm:name>Annually</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-3</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Fiscal Year End</cm:name>
+                        <cm:name>Calendar Year End</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-4</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Semi-Annually</cm:name>
+                        <cm:name>Fiscal Year End</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-5</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Quarterly</cm:name>
+                        <cm:name>Semi-Annually</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-6</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Monthly</cm:name>
+                        <cm:name>Quarterly</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-7</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Weekly</cm:name>
+                        <cm:name>Monthly</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-8</sys:node-uuid>
                     </cm:category>
                     <cm:category>
-                        <cm:name>Daily</cm:name>
+                        <cm:name>Weekly</cm:name>
                         <sys:node-uuid>rm:reviewPeriod-9</sys:node-uuid>
+                    </cm:category>
+                    <cm:category>
+                        <cm:name>Daily</cm:name>
+                        <sys:node-uuid>rm:reviewPeriod-10</sys:node-uuid>
                     </cm:category>
 
                 </cm:subcategories>

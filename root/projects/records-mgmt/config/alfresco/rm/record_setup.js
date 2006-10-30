@@ -10,24 +10,6 @@
   * (c) 2006 Alfresco Software, Inc.
   */
 
-var logfile = ""; // Set to the name of your logfile if you want debugging
-var logger = null;
-
-/**
- * Pad a string with zero's to the specified length
- * s   - the string to pad
- * len - the length of the string to pad to
- */
-function pad(s, len)
-{
-   var result = s;
-   for (var i=0; i<(len - s.length); i++)
-   {
-      result = "0" + result;
-   }
-   return result;
-}
-
 var dbid = "";
 var catid;
 var recordCounter = 0;
@@ -51,66 +33,74 @@ var lifeCycle = false;
 
 var filePlan = document.parent;
 
-if (logfile != "") {
-   logger = companyhome.childByNamePath(logfile); // put in companyhome to avoid making a record
-   if (logger == null)
-    logger = companyhome.createFile(logfile);
-}
+logger.log(document.name + ": " +"My name is '" + name + "'");
+logger.log(document.name + ": " +"Mimetype='" + document.properties.content.mimetype + "'");
+logger.log(document.name + ": " +"Email=" + document.hasAspect("cm:emailed"));
 
-if (logger != null) logger.content += document.name + ": " +"My name is '" + name + "'" + " \r\n";
-if (logger != null) logger.content += document.name + ": " +"Mimetype='" + document.properties.content.mimetype + "'" + " \r\n";
-if (logger != null) logger.content += document.name + ": " +"Email=" + document.hasAspect("cm:emailed") + " \r\n";
-
-if (document.name.substring(0, 1) != "~" && document.name != logfile) {
-
-   if (logger != null) if (logger != null) logger.content += document.name + ": " +"Adding record aspect" + " \r\n";
-   document.addAspect("rma:record"); // Add just to be sure
+if (document.name.substring(0, 1) != "~") 
+{
+   if (document.hasAspect("rma:record") == false) 
+   {
+      // Add the record aspect if its missing 
+      logger.log(document.name + ": " +"Adding record aspect");
+      document.addAspect("rma:record");
+   }
 
    // Handle record id
    // Use the system id if there is no fileplan container
 
-   filePlan = document.parent; // this should be space, but that seems to be the space that rules are in.
-   if (filePlan.hasAspect("rma:filePlan")) {
-      if (logger != null) logger.content += document.name + ": " +"filePlan.filePlan" + " \r\n";
+   // this should be space, but that seems to be the space that rules are in.
+   filePlan = document.parent; 
+   if (filePlan.hasAspect("rma:filePlan") == true) 
+   {
+      logger.log(document.name + ": " +"filePlan.filePlan");
 
       lifeCycle = true; // Set up a life cycle on the document
 
       catid = filePlan.properties["rma:recordCategoryIdentifier"];
       if (filePlan.hasAspect("rma:record"))
+      {
          catid = filePlan.properties["rma:recordIdentifier"];
-
-      // need to check for permissions here, otherwise use node-dbid
-      recordCounter = filePlan.properties["rma:recordCounter"];
-      filePlan.properties["rma:recordCounter"] = recordCounter + 1;
-      filePlan.save();
-      dbid = pad (String(recordCounter), 4);
+      }
+      
+      // Get the current record count
+      var countAction = actions.create("counter");
+      countAction.execute(filePlan);
+      recordCounter = filePlan.properties["cm:counter"];      
+      dbid = utils.pad(String(recordCounter), 4);
 
       document.properties["rma:recordIdentifier"] = catid + "-" + dbid;
       document.properties["cm:title"] = document.properties["cm:name"];
       document.properties["cm:name"] = catid + "-" + dbid + " " + document.properties["cm:name"];
    }
-   else if (filePlan.parent.hasAspect("rma:filePlan")) {
-      if (logger != null) logger.content += document.name + ": " +"filePlan.parent.filePlan" + " \r\n";
+   else if (filePlan.parent.hasAspect("rma:filePlan") == true) 
+   {
+      logger.log(document.name + ": " +"filePlan.parent.filePlan");
 
-      lifeCycle = false; // Don't set up a life cycle since this is in a record folder
+      // Don't set up a life cycle since this is in a record folder 
+      lifeCycle = false; 
 
-      if (filePlan.hasAspect("rma:record")) {
+      if (filePlan.hasAspect("rma:record")) 
+      {
          catid = filePlan.properties["rma:recordIdentifier"];
-         if (logger != null) logger.content += document.name + ": " + filePlan.name + ".recordIdentifier=" + catid + " \r\n";
+         logger.log(document.name + ": " + filePlan.name + ".recordIdentifier=" + catid);
       }
-      else {
+      else 
+      {
          catid = filePlan.parent.properties["rma:recordCategoryIdentifier"];
-         if (logger != null) logger.content += document.name + ": " + filePlan.parent.name + ".recordCategoryIdentifier=" + catid + " \r\n";
+         logger.log(document.name + ": " + filePlan.parent.name + ".recordCategoryIdentifier=" + catid);
       }
-      dbid = pad (String(document.properties["sys:node-dbid"]), 5);
+      
+      dbid = utils.pad(String(document.properties["sys:node-dbid"]), 5);
       filePlan = filePlan.parent;
 
       document.properties["rma:recordIdentifier"] = catid + "-" + dbid;
       document.properties["cm:title"] = document.properties["cm:name"];
       document.properties["cm:name"] = catid + "-" + dbid + " " + document.properties["cm:name"];
    }
-   else {
-      if (logger != null) logger.content += document.name + ": " +"other.filePlan" + " \r\n";
+   else 
+   {
+      logger.log(document.name + ": " +"other.filePlan");
 
       lifeCycle = false; // Don't set up a life cycle since this is in a record folder
 
@@ -134,10 +124,11 @@ if (document.name.substring(0, 1) != "~" && document.name != logfile) {
    // User-defined Data - currently privacy information
    document.properties["rma:privacyActSystem"] = filePlan.properties["rma:privacyActSystem"];
 
-   if (logger != null) logger.content += document.name + ": " +"Setting up description" + " \r\n";
+   logger.log(document.name + ": " +"Setting up description");
 
    // setup the description
-   if (description == "" || description == null) {
+   if (description == "" || description == null) 
+   {
       description = title;
       document.properties["cm:description"] = description;
    }
@@ -152,69 +143,91 @@ if (document.name.substring(0, 1) != "~" && document.name != logfile) {
    /*
    ** Process receipt information for emails and documents
    */
-   if (document.hasAspect("cm:emailed")) {
+   if (document.hasAspect("cm:emailed")) 
+   {
       document.properties["rma:dateReceived"] = document.properties["cm:sentdate"];
       if (document.properties["rma:dateReceived"] == null)
+      {
          document.properties["rma:dateReceived"] = document.properties["cm:modified"];
+      }
+      
       originator = document.properties["cm:originator"];
       if (originator == null || originator == "")
+      {
           document.properties["rma:originator"] = document.properties["cm:author"] = person.name;
+      }
       else
+      {
           document.properties["rma:originator"] = document.properties["cm:author"] = originator;
+      }
+      
       if (document.properties["cm:subjectline"] != null)
+      {
          document.properties["rma:subject"] = document.properties["cm:description"] = document.properties["cm:subjectline"];
+      }
+      
       var addressees = "";
       var strarray = document.properties["cm:addressees"];
-      if (strarray != null) {
-         for (var i = 0; i<strarray.length; i++) {
+      if (strarray != null) 
+      {
+         for (var i = 0; i<strarray.length; i++) 
+         {
             if (i != 0) addressees += "; ";
             addressees += strarray[i];
          }
       }
-      else {
+      else 
+      {
          addressees = document.properties["cm:addressee"];
       }
+      
       if (addressees == "")
+      {
          document.properties["rma:addressee"] = document.properties["cm:creator"];
+      }
       else
+      {
          document.properties["rma:addressee"] = addressees;
+      }
    }
-   else {
-      if (document.properties["cm:author"] == null || document.properties["cm:author"] == "") {
+   else 
+   {
+      if (document.properties["cm:author"] == null || document.properties["cm:author"] == "") 
+      {
          document.properties["rma:originator"] = document.properties["cm:creator"];
          document.properties["rma:addressee"] = document.properties["cm:creator"];
       }
-      else {
+      else 
+      {
          document.properties["rma:originator"] = document.properties["cm:author"];
          document.properties["rma:addressee"] = document.properties["cm:author"];
       }
 
       document.properties["rma:dateReceived"] = document.properties["cm:modified"].getTime();
 
-      if (logger != null) logger.content += document.name + ": " +"Person='" + person.username + "'" + " \r\n";
-      if (logger != null) logger.content += document.name + ": " +"Creator='" + document.properties["cm:creator"] + "'" + " \r\n";
-      if (logger != null) logger.content += document.name + ": " +"Author='" + document.properties["cm:author"] + "'" + " \r\n";
-      if (logger != null) logger.content += document.name + ": " +"Addressee='" + document.properties["rma:addressee"] + "'" + " \r\n";
-      if (logger != null) logger.content += document.name + ": " +"originator='" + originator + "'" + " \r\n";
+      logger.log(document.name + ": " +"Person='" + person.username + "'");
+      logger.log(document.name + ": " +"Creator='" + document.properties["cm:creator"] + "'");
+      logger.log(document.name + ": " +"Author='" + document.properties["cm:author"] + "'");
+      logger.log(document.name + ": " +"Addressee='" + document.properties["rma:addressee"] + "'");
+      logger.log(document.name + ": " +"originator='" + originator + "'");
 
    }
 
-   if (logger != null) logger.content += document.name + ": " +"About to save (properties)" + " \r\n";
+   logger.log(document.name + ": " +"About to save (properties)");
    document.save();
-   if (logger != null) logger.content += document.name + ": " +"Saved (properties)" + " \r\n";
-   if (logger != null) logger.save();
+   logger.log(document.name + ": " +"Saved (properties)");
 
    // Process Life Cycle on a Document
-
-   if (lifeCycle) {
+   if (lifeCycle) 
+   {
       // If there is a vital record indicator, then set up review
 
-      if (logger != null) logger.content += document.name + ": " +"Setting up vital record" + " \r\n";
-      if (logger != null) logger.content += document.name + ": " +"vital=" + filePlan.properties["rma:vitalRecordIndicator"] + " \r\n";
+      logger.log(document.name + ": " +"Setting up vital record");
+      logger.log(document.name + ": " +"vital=" + filePlan.properties["rma:vitalRecordIndicator"]);
 
-      if (filePlan.properties["rma:vitalRecordIndicator"] == true) {
-
-         if (logger != null) logger.content += document.name + ": " +"Adding vital record" + " \r\n";
+      if (filePlan.properties["rma:vitalRecordIndicator"] == true) 
+      {
+         logger.log(document.name + ": " +"Adding vital record");
 
          document.addAspect("rma:vitalrecord"); // Set-up the aspect
 
@@ -227,74 +240,86 @@ if (document.name.substring(0, 1) != "~" && document.name != logfile) {
          reviewYear = reviewPeriod.getFullYear();
          reviewMonth = reviewPeriod.getMonth();
 
-         if (logger != null) logger.content += document.name + ": " +"reviewInterval=\"" + reviewInterval + "\" \r\n";
-         if (logger != null) logger.content += document.name + ": " +"reviewYear=" + reviewYear + " \r\n";
-         if (logger != null) logger.content += document.name + ": " +"reviewMonth=" + reviewMonth + " \r\n";
+         logger.log(document.name + ": " +"reviewInterval=\"" + reviewInterval);
+         logger.log(document.name + ": " +"reviewYear=" + reviewYear);
+         logger.log(document.name + ": " +"reviewMonth=" + reviewMonth);
 
-         if (reviewInterval == "Bi-annually") {
-            if (logger != null) logger.content += document.name + ": Bi-annually \r\n";
+         if (reviewInterval == "Bi-annually") 
+         {
+            logger.log(document.name + ": Bi-annually");
             reviewYear += 2;
          }
-         else if (reviewInterval == "Annually" || reviewInterval == "Fiscal Year End" || reviewInterval == "Calendar Year") {
-            if (logger != null) logger.content += document.name + ": Annually \r\n";
+         else if (reviewInterval == "Annually" || reviewInterval == "Fiscal Year End" || reviewInterval == "Calendar Year") 
+         {
+            logger.log(document.name + ": Annually");
             // TODO: Proper calculation of fiscal year end (US Govt) and Calendar Year End
             reviewYear += 1;
          }
-         else if (reviewInterval == "Semi-annually") {
-            if (logger != null) logger.content += document.name + ": Semi-annually \r\n";
-            if (reviewMonth >= 6) {
+         else if (reviewInterval == "Semi-annually") 
+         {
+            logger.log(document.name + ": Semi-annually");
+            if (reviewMonth >= 6) 
+            {
                reviewYear += 1;
                reviewMonth -= 6;
             }
-            else {
+            else 
+            {
                reviewMonth += 6;
             }
          }
-         else if (reviewInterval == "Quarterly") {
-            if (logger != null) logger.content += document.name + ": Quarterly \r\n";
-            if (reviewMonth >= 9) {
+         else if (reviewInterval == "Quarterly") 
+         {
+            logger.log(document.name + ": Quarterly");
+            if (reviewMonth >= 9) 
+            {
                reviewYear += 1;
                reviewMonth -= 9;
             }
-            else {
+            else 
+            {
                reviewMonth += 3;
             }
          }
-         else if (reviewInterval == "Monthly") {
-            if (logger != null) logger.content += document.name + ": Monthly \r\n";
-            if (reviewMonth >= 11) {
+         else if (reviewInterval == "Monthly") 
+         {
+            logger.log(document.name + ": Monthly");
+            if (reviewMonth >= 11) 
+            {
                reviewYear += 1;
                reviewMonth -= 11;
             }
-            else {
+            else 
+            {
                reviewMonth += 1;
             }
          }
-         else {
+         else 
+         {
             reviewYear += 0;
             reviewMonth += 0;
          }
 
-         if (logger != null) logger.content += document.name + ": " +"Updated reviewInterval=" + reviewInterval + " \r\n";
-         if (logger != null) logger.content += document.name + ": " +"Updated reviewYear=" + reviewYear + " \r\n";
-         if (logger != null) logger.content += document.name + ": " +"Updated reviewMonth=" + reviewMonth + " \r\n";
+         logger.log(document.name + ": " +"Updated reviewInterval=" + reviewInterval);
+         logger.log(document.name + ": " +"Updated reviewYear=" + reviewYear);
+         logger.log(document.name + ": " +"Updated reviewMonth=" + reviewMonth);
 
          reviewPeriod.setMonth(reviewMonth);
          reviewPeriod.setYear(reviewYear);
          document.properties["rma:nextReviewDate"] = reviewPeriod.getTime();
 
-         if (logger != null) logger.content += document.name + ": " +"About to save (vital)" + " \r\n";
+         logger.log(document.name + ": " +"About to save (vital)");
          document.save();
-         if (logger != null) logger.content += document.name + ": " +"Saved (vital)" + " \r\n";
-         if (logger != null) logger.save();
+         logger.log(document.name + ": " +"Saved (vital)");
       }
 
-      if (logger != null) logger.content += document.name + ": " +"Setting up cutoff" + " \r\n";
-      if (logger != null) logger.content += document.name + ": " +"cutoff=" + filePlan.properties["rma:processCutoff"] + " \r\n";
+      logger.log(document.name + ": " +"Setting up cutoff");
+      logger.log(document.name + ": " +"cutoff=" + filePlan.properties["rma:processCutoff"]);
 
-      if (filePlan.properties["rma:processCutoff"] == true) {
+      if (filePlan.properties["rma:processCutoff"] == true) 
+      {
 
-         if (logger != null) logger.content += document.name + ": " +"Setting up cutoff" + " \r\n";
+         logger.log(document.name + ": " +"Setting up cutoff");
 
          document.addAspect("rma:cutoffable");
          document.properties["rma:cutoffEvent"] = filePlan.properties["rma:eventTrigger"];
@@ -307,70 +332,78 @@ if (document.name.substring(0, 1) != "~" && document.name != logfile) {
          cutoffYear = cutoffPeriod.getFullYear();
          cutoffMonth = cutoffPeriod.getMonth();
 
-         if (logger != null) logger.content += document.name + ": " +"cutoffInterval=\"" + cutoffInterval + "\" \r\n";
-         if (logger != null) logger.content += document.name + ": " +"cutoffYear=" + cutoffYear + " \r\n";
-         if (logger != null) logger.content += document.name + ": " +"cutoffMonth=" + cutoffMonth + " \r\n";
+         logger.log(document.name + ": " +"cutoffInterval=\"" + cutoffInterval);
+         logger.log(document.name + ": " +"cutoffYear=" + cutoffYear);
+         logger.log(document.name + ": " +"cutoffMonth=" + cutoffMonth);
 
-         if (cutoffInterval == "Bi-annually") {
-            if (logger != null) logger.content += document.name + ": Bi-annually \r\n";
+         if (cutoffInterval == "Bi-annually") 
+         {
+            logger.log(document.name + ": Bi-annually");
             cutoffYear += 2;
          }
-         else if (cutoffInterval == "Annually" || cutoffInterval == "Fiscal Year End" || cutoffInterval == "Calendar Year") {
+         else if (cutoffInterval == "Annually" || cutoffInterval == "Fiscal Year End" || cutoffInterval == "Calendar Year") 
+         {
             // TODO: Proper calculation of fiscal year end (US Govt) and Calendar Year End
-            if (logger != null) logger.content += document.name + ": Annually \r\n";
+            logger.log(document.name + ": Annually");
             cutoffYear += 1;
          }
-         else if (cutoffInterval == "Semi-annually") {
-            if (logger != null) logger.content += document.name + ": Semi-annually \r\n";
-            if (cutoffMonth >= 6) {
+         else if (cutoffInterval == "Semi-annually") 
+         {
+            logger.log(document.name + ": Semi-annually");
+            if (cutoffMonth >= 6) 
+            {
                cutoffYear += 1;
                cutoffMonth -= 6;
             }
-            else {
+            else 
+            {
                cutoffMonth += 6;
             }
          }
-         else if (cutoffInterval == "Quarterly") {
-            if (logger != null) logger.content += document.name + ": Quarterly \r\n";
-            if (cutoffMonth >= 9) {
+         else if (cutoffInterval == "Quarterly") 
+         {
+            logger.log(document.name + ": Quarterly");
+            if (cutoffMonth >= 9) 
+            {
                cutoffYear += 1;
                cutoffMonth -= 9;
             }
-            else {
+            else 
+            {
                cutoffMonth += 3;
             }
          }
-         else if (cutoffInterval == "Monthly") {
-            if (logger != null) logger.content += document.name + ": Monthly \r\n";
-            if (cutoffMonth >= 11) {
+         else if (cutoffInterval == "Monthly") 
+         {
+            logger.log(document.name + ": Monthly");
+            if (cutoffMonth >= 11) 
+            {
                cutoffYear += 1;
                cutoffMonth -= 11;
             }
-            else {
+            else 
+            {
                cutoffMonth += 1;
             }
          }
-         else {
-            if (logger != null) logger.content += document.name + ": No change \r\n";
+         else 
+         {
+            logger.log(document.name + ": No change");
             cutoffYear += 0;
             cutoffMonth += 0;
          }
          cutoffPeriod.setMonth(cutoffMonth);
          cutoffPeriod.setFullYear(cutoffYear);
 
-         if (logger != null) logger.content += document.name + ": " +"Updated cutoffInterval=" + cutoffInterval + " \r\n";
-         if (logger != null) logger.content += document.name + ": " +"Updated cutoffYear=" + cutoffYear + " \r\n";
-         if (logger != null) logger.content += document.name + ": " +"Updated cutoffMonth=" + cutoffMonth + " \r\n";
+         logger.log(document.name + ": " +"Updated cutoffInterval=" + cutoffInterval);
+         logger.log(document.name + ": " +"Updated cutoffYear=" + cutoffYear);
+         logger.log(document.name + ": " +"Updated cutoffMonth=" + cutoffMonth);
 
          document.properties["rma:cutoffDateTime"] = cutoffPeriod.getTime();
 
-         if (logger != null) logger.content += document.name + ": " +"Complete cutoff" + " \r\n";
-         if (logger != null) logger.save();
+         logger.log(document.name + ": " +"Complete cutoff");
       } 
    }
 
-   if (logger != null) logger.content += document.name + ": " +"About to save (last)" + " \r\n";
    document.save();
-   if (logger != null) logger.content += document.name + ": " +"Saved (last)" + " \r\n";
-   if (logger != null) logger.save();
 }

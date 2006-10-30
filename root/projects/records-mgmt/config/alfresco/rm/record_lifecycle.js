@@ -8,9 +8,6 @@
   * (c) 2006 Alfresco Software, Inc.
   */
 
-var logfile = ""; // Set to the name of your logfile if you want debugging
-var logger = null;
-
 var reviewPeriod = new Date();
 var reviewInterval = "";
 var yearPeriod = 0.0;
@@ -25,68 +22,65 @@ var processDestroy = false;
 
 var filePlan = document.parent; // this should be space, but that seems to be the space that rules are in.
 
+logger.log(document.name + ": " +"Update on '" + document.name + "'");
+logger.log(document.name + ": " +"rma:record=" + document.hasAspect("rma:record"));
+logger.log(document.name + ": " +"rma:cutoffable=" + document.hasAspect("rma:cutoffable"));
+logger.log(document.parent.name + ": " +"rma:record=" + document.parent.hasAspect("rma:record"));
 
-if (logfile != null && logfile != "") {
-   logger = companyhome.childByNamePath(logfile); // put in company home to avoid creating a record
-   if (logger == null)
-    logger = companyhome.createFile(logfile);
-}
-
-if (logger != null) logger.content += document.name + ": " +"Update on '" + document.name + "'" + " \r\n";
-if (logger != null) logger.content += document.name + ": " +"rma:record=" + document.hasAspect("rma:record") + " \r\n";
-if (logger != null) logger.content += document.name + ": " +"rma:cutoffable=" + document.hasAspect("rma:cutoffable") + " \r\n";
-if (logger != null) logger.content += document.parent.name + ": " +"rma:record=" + document.parent.hasAspect("rma:record") + " \r\n";
-
-if (document.hasAspect("rma:cutoffable") && filePlan.hasAspect("rma:filePlan")) {
+if (document.hasAspect("rma:cutoffable") && filePlan.hasAspect("rma:filePlan")) 
+{
 
    // Handle record id
    // Use the system id if there is no fileplan container
 
    // Process Life Cycle on a Document
 
-   if (logger != null) logger.content += document.name + ": " +"Checking cutoff=" + document.properties["rma:cutoffExecuted"] + " \r\n";
+   logger.log(document.name + ": " +"Checking cutoff=" + document.properties["rma:cutoffExecuted"]);
 
-   processCutoff = false; // Assume don't process cut-off
+   processCutoff = false; // Assume don't process cut-off   
 
-// Line 50 
-
-   if (document.properties["rma:cutoffExecuted"] == false) {
+   if (document.properties["rma:cutoffExecuted"] == false) 
+   {
 
       // If now cutoff has been executed, but conditions set off cutoff
       // then execute: Hold, Transfer or Destroy in that order
 
-      if (logger != null) logger.content += document.name + ": " +"Setting up cutoff" + " \r\n";
+      logger.log(document.name + ": " +"Setting up cutoff");
 
-      if (logger != null) logger.content += document.name + ": " +"Obsolete=(" + filePlan.properties["rma:cutoffOnObsolete"] +","+ document.properties["rma:isObsolete"] + ") \r\n";
+      logger.log(document.name + ": " +"Obsolete=(" + filePlan.properties["rma:cutoffOnObsolete"] +","+ document.properties["rma:isObsolete"] + ")");
       if (filePlan.properties["rma:cutoffOnObsolete"] && document.properties["rma:isObsolete"])
+      {
          processCutoff = true;
+      }
 
-      if (logger != null) logger.content += document.name + ": " +"Superseded=(" + filePlan.properties["rma:cutoffOnsuperseded"] +","+ (document.assocs["rma:superseded"] != null) + ") \r\n";
+      logger.log(document.name + ": " +"Superseded=(" + filePlan.properties["rma:cutoffOnsuperseded"] +","+ (document.assocs["rma:superseded"] != null) + ")");
       if (filePlan.properties["rma:cutoffOnsuperseded"] & document.assocs["rma:superseded"] != null)
+      {
          processCutoff = true;
-
+      }
    }
 
-   if (logger != null) logger.content += document.name + ": " +"processCutoff=" + processCutoff + " \r\n";
+   logger.log(document.name + ": " +"processCutoff=" + processCutoff);
 
    if (processCutoff) {
 
       document.properties["rma:cutoffExecuted"] = true;
 
-      if (logger != null) logger.content += document.name + ": " +"Processing cutoff" + " \r\n";
+      logger.log(document.name + ": " +"Processing cutoff");
 
       // Is next state Hold?
 
-      if (logger != null) logger.content += document.name + ": " + "rma:processHold=" + filePlan.properties["rma:processHold"] + " \r\n";
-      if (logger != null) logger.content += document.name + ": " + "rma:holdable=" + document.hasAspect("rma:holdable") + " \r\n";
-      if (logger != null) logger.content += document.name + ": " + "rma:processTransfer=" + filePlan.properties["rma:processTransfer"] + " \r\n";
-      if (logger != null) logger.content += document.name + ": " + "rma:tranferable=" + document.hasAspect("rma:tranferable") + " \r\n";
-      if (logger != null) logger.content += document.name + ": " + "rma:processDestruction=" + filePlan.properties["rma:processDestruction"] + " \r\n";
-      if (logger != null) logger.content += document.name + ": " + "rma:tranferable=" + document.hasAspect("rma:destroyable") + " \r\n";
+      logger.log(document.name + ": " + "rma:processHold=" + filePlan.properties["rma:processHold"]);
+      logger.log(document.name + ": " + "rma:holdable=" + document.hasAspect("rma:holdable"));
+      logger.log(document.name + ": " + "rma:processTransfer=" + filePlan.properties["rma:processTransfer"]);
+      logger.log(document.name + ": " + "rma:tranferable=" + document.hasAspect("rma:tranferable"));
+      logger.log(document.name + ": " + "rma:processDestruction=" + filePlan.properties["rma:processDestruction"]);
+      logger.log(document.name + ": " + "rma:tranferable=" + document.hasAspect("rma:destroyable"));
 
-      if (filePlan.properties["rma:processHold"]) {
+      if (filePlan.properties["rma:processHold"]) 
+      {
 
-         if (logger != null) logger.content += document.name + ": " +"Setting up hold" + " \r\n";
+         logger.log(document.name + ": " +"Setting up hold");
 
          document.addAspect("rma:holdable");
          document.properties["rma:holdExecuted"] = true;
@@ -99,17 +93,16 @@ if (document.hasAspect("rma:cutoffable") && filePlan.hasAspect("rma:filePlan")) 
          cutoffDateTime = nextReview;
          document.properties["rma:holdUntil"] = cutoffDateTime ;
      
-         if (logger != null) logger.content += document.name + ": " +"About to save (hold)" + " \r\n";
          document.save();
-         if (logger != null) logger.content += document.name + ": " +"Saved (hold)" + " \r\n";
 
-         if (logger != null) logger.content += document.name + ": " + "Hold complete" + " \r\n";
+         logger.log(document.name + ": " + "Hold complete");
       }
-      else if (filePlan.properties["rma:processTransfer"]) {
+      else if (filePlan.properties["rma:processTransfer"]) 
+      {
 
          // If hold wasn't executed, then a transfer defined should be immediate upon the cutoff event.
 
-         if (logger != null) logger.content += document.name + ": " +"Setting up transfer" + " \r\n";
+         logger.log(document.name + ": " +"Setting up transfer");
 
          document.addAspect("rma:transferable");
 
@@ -120,18 +113,17 @@ if (document.hasAspect("rma:cutoffable") && filePlan.hasAspect("rma:filePlan")) 
          cutoffDateTime = nextReview;
          document.properties["rma:transferDate"] = cutoffDateTime;
 
-         if (logger != null) logger.content += document.name + ": " +"About to save (transfer)" + " \r\n";
          document.save();
-         if (logger != null) logger.content += document.name + ": " +"Saved (transfer)" + " \r\n";
 
-         if (logger != null) logger.content += document.name + ": " + "Transfer complete" + " \r\n";
+         logger.log(document.name + ": " + "Transfer complete");
       }
 
-      else if (filePlan.properties["rma:processDestruction"]) {
+      else if (filePlan.properties["rma:processDestruction"]) 
+      {
 
          // If hold wasn't executed, then a transfer defined should be immediate upon the cutoff event.
 
-         if (logger != null) logger.content += document.name + ": " +"Setting up destruction" + " \r\n";
+         logger.log(document.name + ": " +"Setting up destruction");
 
          document.addAspect("rma:destroyable");
 
@@ -141,19 +133,15 @@ if (document.hasAspect("rma:cutoffable") && filePlan.hasAspect("rma:filePlan")) 
          cutoffDateTime = nextReview;
          document.properties["rma:destructionDate"] = cutoffDateTime;
 
-         if (logger != null) logger.content += document.name + ": " +"About to save (destruction)" + " \r\n";
          document.save();
-         if (logger != null) logger.content += document.name + ": " +"Saved (destruction)" + " \r\n";
 
-         if (logger != null) logger.content += document.name + ": " + "Destruction set-up complete" + " \r\n";
+         logger.log(document.name + ": " + "Destruction set-up complete");
       }
 
       // TODO: Accession
 
    }
 
-   if (logger != null) logger.content += document.name + ": " +"About to save (last)" + " \r\n";
+   // Save document
    document.save();
-   if (logger != null) logger.content += document.name + ": " +"Saved (last)" + " \r\n";
-
 }
