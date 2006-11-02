@@ -65,10 +65,10 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     protected Map<String, Object> folderPropertyValues;
    
     protected NodeRef rootDataNodeRef;
-    private String randomParentFolderPath;
-//    private String randomTargetFolderPath;
-    private String randomTargetFilePath;
     protected String userName;
+
+    private NodeRef randomParentFolderNodeRef;
+    private NodeRef randomTargetFileNodeRef;
     
     protected boolean useUsers = true;
     
@@ -185,16 +185,20 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
             loadDepth = testCase.getIntParam(PARAM_LOAD_DEPTH);
         }
         RepositoryProfile repositoryProfile = AlfrescoUtils.getRepositoryProfile(this.authenticationComponent, this.searchService, this.nodeService);
+        String randomTargetFilePath = null;
+        String randomParentFolderPath = null;
         if (loadDepth <= 0)
         {
-            this.randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
-            this.randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+            randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, true);
+            randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, true);
         }
         else
         {
-            this.randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
-            this.randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth - 1, true);
+            randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth - 1, true);
+            randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
         }
+        this.randomParentFolderNodeRef = resolvePath(randomParentFolderPath);
+        this.randomTargetFileNodeRef = resolvePath(randomTargetFilePath);
         
         if (this.useUsers == true)
         {
@@ -222,12 +226,12 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     
     protected NodeRef getRandomParentFolderNodeRef()
     {
-        return resolvePath(this.randomParentFolderPath);
+        return randomParentFolderNodeRef;
     }
     
     protected NodeRef getRandomTargetFileNodeRef()
     {
-        return resolvePath(this.randomTargetFilePath);
+        return randomTargetFileNodeRef;
     }
     
     private NodeRef resolvePath(String path)

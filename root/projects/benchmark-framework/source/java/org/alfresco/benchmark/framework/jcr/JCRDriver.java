@@ -35,6 +35,7 @@ import org.alfresco.benchmark.framework.UnitsOfWork;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
 import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
+import org.apache.log4j.Logger;
 
 import com.sun.japex.TestCase;
 
@@ -43,13 +44,39 @@ import com.sun.japex.TestCase;
  */
 public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
 {
+    private static final Logger logger = Logger.getLogger(JCRDriver.class);
+    
     protected Repository repository;
     
     protected Map<String, Object> contentPropertyValues;
     protected Map<String, Object> folderPropertyValues;
     
-    protected String folderPath;
-    protected String contentPath;
+    protected String folderUuid;
+    protected String contentUuid;
+//    protected String folderPath;
+//    protected String contentPath;
+    
+    private String getUuid(String path) throws RepositoryException
+    {
+        Session session = getSession();
+        try
+        {
+            Node rootNode = session.getRootNode();
+            Node node = rootNode.getNode(path);
+            return node.getUUID();
+        }
+        finally
+        {
+            try {session.logout(); } catch (Throwable e) {logger.error(e); }
+        }
+    }
+    
+    private Session getSession() throws RepositoryException
+    {
+        Repository repository = this.repository;
+        Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+        return session;
+    }
     
     @Override
     public void preRun(TestCase testCase)
@@ -76,19 +103,22 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         }
         
         try
-        {            
+        {
+            String folderPath = null;
+            String contentPath = null;
             RepositoryProfile repositoryProfile = JCRUtils.getRepositoryProfile();
             if (loadDepth <= 0)
             {
-            	this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, false);
-                this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+            	contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, false);
+                folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
             }
             else
             {
-            	this.contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, false);
-                this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth-1, false);
+            	contentPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, false);
+                folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth-1, false);
             }
-            
+            this.folderUuid = getUuid(folderPath);
+            this.contentUuid = getUuid(contentPath);
         }
         catch (Exception exception)
         {
@@ -110,12 +140,11 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         try
         {
             // Start the session
-            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            Session session = getSession();
             try 
             {            
                 // Get the root node and the folder that we are going to create the new node within
-                Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode("./" + this.folderPath);
+                final Node folder = session.getNodeByUUID(folderUuid);
                 
                 try
                 {
@@ -147,12 +176,11 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         try
         {
             // Start the session
-            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            Session session = getSession();
             try 
             {            
                 // Get the root node and the content that we are going to read
-                Node rootNode = session.getRootNode();      
-                final Node content = rootNode.getNode("./" + this.contentPath);
+                final Node content = session.getNodeByUUID(contentUuid);
                
                 // Get the content and write into a tempory file
                 Node resourceNode = content.getNode("jcr:content");                
@@ -185,14 +213,11 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         try
         {
             // Start the session
-            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            Session session = getSession();
             try 
             {            
                 // Get the root node and the folder that we are going to create the new node within
-                Node rootNode = session.getRootNode();                  
-                final Node folder = rootNode.getNode("./" + this.folderPath);
-                
-                //this.folderPath = rootNode.getPath();
+                final Node folder = session.getNodeByUUID(folderUuid);
                 
                 try
                 {
@@ -221,49 +246,6 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
 
     public void doCreateVersion(TestCase tc)
     {
-//        try
-//        {
-//            // Start the session
-//            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
-//            try 
-//            {   
-//                try
-//                {
-//                    // Get the root node and the content that we are going to read
-//                    Node rootNode = session.getRootNode();                  
-//                    final Node content = rootNode.getNode(this.contentPath.substring(1));
-//                   
-//                    // Add the versionable mix-in if it is required
-//                    if (content.isNodeType("mix:versionable") == false)
-//                    {
-//                        content.addMixin("mix:versionable");                        
-//                    }
-//                    else
-//                    {
-//                        content.checkout();
-//                    }
-//                    
-//                    // Check-in and check-out
-//                    content.checkin();
-//                
-//                    // Save the session
-//                    session.save();
-//                }
-//                catch (Throwable exception)
-//                {
-//                    exception.printStackTrace();
-//                }
-//            }                                   
-//            finally
-//            {
-//                // Close the session
-//                session.logout();
-//            }
-//        }
-//        catch (Throwable exception)
-//        {
-//            throw new RuntimeException("Unable to execute test", exception);
-//        }
     }
 
     public void doReadProperties(TestCase tc)
@@ -272,12 +254,11 @@ public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
         try
         {
             // Start the session
-            Session session = repository.login(new SimpleCredentials("admin", "admin".toCharArray()));
+            Session session = getSession();
             try 
             {            
                 // Get the root node and the content that we are going to read
-                Node rootNode = session.getRootNode();                  
-                final Node content = rootNode.getNode("./" + this.contentPath);                
+                final Node content = session.getNodeByUUID(contentUuid);               
                
                 // Get all the properties of the content node
                 content.getProperties();

@@ -56,7 +56,7 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
     private int folderCount = DEFAULT_FOLDER_COUNT;
     private int fileCount = DEFAULT_FILE_COUNT;
     private boolean createFolder = true;
-    private String folderPath;
+    private String folderUuid;
     
     private ContentData[] contentData;
     
@@ -105,15 +105,17 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
             try
             {            
                 RepositoryProfile repositoryProfile = JCRUtils.getRepositoryProfile();
+                String folderPath = null;
                 if (loadDepth <= 0)
                 {
-                    this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
+                    folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, false);
                 }
                 else
                 {
-                    this.folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth-1, false);
+                    folderPath = JCRUtils.getRootNodeName() + "/" + BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth-1, false);
                 }
-                
+                // get the uuid
+                this.folderUuid = getUuid(folderPath);
             }
             catch (Exception exception)
             {
@@ -139,6 +141,21 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
         }
     }
     
+    private String getUuid(String path) throws RepositoryException
+    {
+        Session session = getSession();
+        try
+        {
+            Node rootNode = session.getRootNode();
+            Node node = rootNode.getNode(path);
+            return node.getUUID();
+        }
+        finally
+        {
+            try {session.logout(); } catch (Throwable e) {logger.error(e); }
+        }
+    }
+    
     private Session getSession() throws RepositoryException
     {
         Repository repository = this.repository;
@@ -154,8 +171,7 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
             Session session = getSession();
             try
             {     
-                Node rootNode = session.getRootNode();
-                Node parentNode = rootNode.getNode(this.folderPath);
+                Node parentNode = session.getNodeByUUID(folderUuid);
                 
                 int contentPropIndex = 0;
                 for (int folderIndex = 0; folderIndex < this.folderCount; folderIndex++)

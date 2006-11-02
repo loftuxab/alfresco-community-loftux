@@ -16,7 +16,13 @@
  */
 package org.alfresco.benchmark.framework.dataprovider;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,6 +73,30 @@ public class DataProviderComponent
         if (folder == null)
         {
             throw new RuntimeException("Unable to find folder at location " + location);
+        }
+        
+        if (!folder.exists())
+        {
+            folder.mkdirs();
+        }
+        
+        if (folder.listFiles().length == 0)
+        {
+            File newFile = new File(folder, "xyz.txt");
+            OutputStream os = null;
+            try
+            {
+                os = new BufferedOutputStream(new FileOutputStream(newFile));
+                os.write("content".getBytes());
+            }
+            catch (IOException e)
+            {
+                throw new RuntimeException(e);
+            }
+            finally
+            {
+                try { os.close(); } catch (Throwable e) {}
+            }
         }
         
         for (File file : folder.listFiles())

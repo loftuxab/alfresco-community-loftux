@@ -23,7 +23,6 @@ import java.util.Map;
 
 import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.UnitsOfWork;
-import org.alfresco.benchmark.framework.dataprovider.ContentData;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.filestore.FileContentReader;
 import org.alfresco.repo.transaction.TransactionUtil;

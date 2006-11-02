@@ -147,6 +147,9 @@ public class JCRUtils
         
         // Add the lockable mixin to the file
         fileNode.addMixin("mix:lockable");
+        
+        // Add referenceable aspect
+        fileNode.addMixin("mix:referenceable");
     
         // Add the content
         Node resNode = fileNode.addNode ("jcr:content", "nt:resource");
@@ -197,6 +200,9 @@ public class JCRUtils
         Node folderNode = parentNode.addNode(name, "nt:folder");
         folderNode.addMixin("mix:lockable");
         
+        // Add referenceable aspect
+        folderNode.addMixin("mix:referenceable");
+    
         return folderNode;
     }
     
