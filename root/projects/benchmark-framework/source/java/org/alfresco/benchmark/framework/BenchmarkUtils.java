@@ -107,14 +107,10 @@ public class BenchmarkUtils
         return location;
     }
     
-    /**
-     * Generate a GUID
-     * 
-     * @return  a string GUID
-     */
-    public static synchronized String getGUID()
+    private static final UUIDGenerator UUID_GENERATOR = UUIDGenerator.getInstance();
+    public static String getGUID()
     {
-        return UUIDGenerator.getInstance().generateTimeBasedUUID().toString();       
+        return UUID_GENERATOR.generateTimeBasedUUID().toString();       
     }
     
     /**

@@ -180,9 +180,10 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
                         bulkLoadFolder = parentNode;
                     }
                     
+                    String uuid = BenchmarkUtils.getGUID();
                     for (int fileIndex = 0; fileIndex < this.fileCount; fileIndex++)
                     {
-                        String contentName = "bulkLoad_" + fileIndex;
+                        String contentName = "bulkLoad-" + fileIndex + "-" + uuid;
                         ContentData contentData = this.contentData[contentPropIndex];                    
                         Node fileNode = bulkLoadFolder.addNode(contentName, "nt:file");
                     
