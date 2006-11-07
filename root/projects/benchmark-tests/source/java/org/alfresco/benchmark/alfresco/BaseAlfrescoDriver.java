@@ -97,9 +97,7 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
     
     @Override
     public synchronized void prepare(final TestCase tc)
-    {
-        try
-        {    
+    {  
             super.prepare(tc);
             
             if (this.useUsers == true)
@@ -156,11 +154,6 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
                     this.authenticationComponent.clearCurrentSecurityContext();
                 }            
             }
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }
     }    
     
     @Override

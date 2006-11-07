@@ -181,6 +181,7 @@ public abstract class BaseBenchmarkDriver extends JapexDriverBase
             catch (Throwable exception)
             {
                 exception.printStackTrace();
+                throw new RuntimeException(exception.getMessage(), exception);
             }
         }
         

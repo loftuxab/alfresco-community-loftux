@@ -56,44 +56,38 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     "   TestCase: " + tc + "\n" +
                     "   Driver: " + this);
         }
-        try
+
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
         {
-            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
-            {
-                public Object doWork() throws Exception
-                {                    
+            public Object doWork() throws Exception
+            {                    
+                try
+                {
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
                     try
                     {
-                        AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
-                        try
-                        {
-                            NodeRef folderNodeRef = getRandomParentFolderNodeRef();
-                            AlfrescoUtils.createContentNode(
-                                    AlfrescoInternalAPIDriver.this.nodeService, 
-                                    AlfrescoInternalAPIDriver.this.contentService, 
-                                    AlfrescoInternalAPIDriver.this.contentPropertyValues, 
-                                    folderNodeRef);
-                        }
-                        catch (Throwable exception)
-                        {
-                            exception.printStackTrace();
-                        }
+                        NodeRef folderNodeRef = getRandomParentFolderNodeRef();
+                        AlfrescoUtils.createContentNode(
+                                AlfrescoInternalAPIDriver.this.nodeService, 
+                                AlfrescoInternalAPIDriver.this.contentService, 
+                                AlfrescoInternalAPIDriver.this.contentPropertyValues, 
+                                folderNodeRef);
                     }
-                    finally
+                    catch (Throwable exception)
                     {
-                        AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                        exception.printStackTrace();
                     }
-                    
-                    // Do nothing on return 
-                    return null;
                 }
-        
-            });            
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }       
+                finally
+                {
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                }
+                
+                // Do nothing on return 
+                return null;
+            }
+    
+        });                   
     }
 
     public void doReadContentBenchmark(final TestCase tc)
@@ -105,41 +99,35 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     "   TestCase: " + tc + "\n" +
                     "   Driver: " + this);
         }
-        try
+
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
         {
-            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+            public Object doWork() throws Exception
             {
-                public Object doWork() throws Exception
+                AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
+                try
                 {
-                    AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
-                    try
-                    {
-                        NodeRef contentNodeRef = getRandomTargetFileNodeRef();
-                        
-                        // Read the content
-                        ContentReader contentReader = AlfrescoInternalAPIDriver.this.contentService.getReader(
-                                contentNodeRef, 
-                                ContentModel.PROP_CONTENT);
-                        contentReader = FileContentReader.getSafeContentReader(contentReader, "File missing");
-                        File tempFile = TempFileProvider.createTempFile("benchmark", ".tmp"); 
-                        contentReader.getContent(tempFile);
-                        
-                        // Do nothing on return 
-                        return null;
-                    }
-                    finally
-                    {
-                        AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
-                    }
+                    NodeRef contentNodeRef = getRandomTargetFileNodeRef();
                     
+                    // Read the content
+                    ContentReader contentReader = AlfrescoInternalAPIDriver.this.contentService.getReader(
+                            contentNodeRef, 
+                            ContentModel.PROP_CONTENT);
+                    contentReader = FileContentReader.getSafeContentReader(contentReader, "File missing");
+                    File tempFile = TempFileProvider.createTempFile("benchmark", ".tmp"); 
+                    contentReader.getContent(tempFile);
+                    
+                    // Do nothing on return 
+                    return null;
                 }
-        
-            });            
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }         
+                finally
+                {
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                }
+                
+            }
+    
+        });                     
     }
 
     public void doCreateFolder(TestCase tc)
@@ -151,43 +139,36 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     "   TestCase: " + tc + "\n" +
                     "   Driver: " + this);
         }
-        try
+
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
         {
-            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+            public Object doWork() throws Exception
             {
-                public Object doWork() throws Exception
+                AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
+                try
                 {
-                    AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
-                    try
-                    {
-                        NodeRef folderNodeRef = getRandomParentFolderNodeRef();
-                        
-                        // Create a named folder
-                        String nameValue = "folder_" + BenchmarkUtils.getGUID();
-                        Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
-                        folderProps.put(ContentModel.PROP_NAME, nameValue);
-                        nodeService.createNode(
-                                folderNodeRef, 
-                                ContentModel.ASSOC_CONTAINS, 
-                                QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
-                                ContentModel.TYPE_FOLDER,
-                                folderProps).getChildRef();
-                    }
-                    finally
-                    {
-                        AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
-                    }
-                    // Do nothing on return 
-                    return null;
+                    NodeRef folderNodeRef = getRandomParentFolderNodeRef();
+                    
+                    // Create a named folder
+                    String nameValue = "folder_" + BenchmarkUtils.getGUID();
+                    Map<QName, Serializable> folderProps = new HashMap<QName, Serializable>();
+                    folderProps.put(ContentModel.PROP_NAME, nameValue);
+                    nodeService.createNode(
+                            folderNodeRef, 
+                            ContentModel.ASSOC_CONTAINS, 
+                            QName.createQName(NamespaceService.APP_MODEL_1_0_URI, nameValue),
+                            ContentModel.TYPE_FOLDER,
+                            folderProps).getChildRef();
                 }
-        
-            });            
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        } 
-        
+                finally
+                {
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                }
+                // Do nothing on return 
+                return null;
+            }
+    
+        });                    
     }
 
     public void doCreateVersion(TestCase tc)
@@ -199,52 +180,45 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     "   TestCase: " + tc + "\n" +
                     "   Driver: " + this);
         }
-        try
+        
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
         {
-            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+            public Object doWork() throws Exception
             {
-                public Object doWork() throws Exception
+                AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
+                try
                 {
-                    AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
-                    try
+                    NodeRef contentNodeRef = getRandomTargetFileNodeRef();
+                    
+                    if (AlfrescoInternalAPIDriver.this.nodeService.hasAspect(contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
                     {
-                        NodeRef contentNodeRef = getRandomTargetFileNodeRef();
-                        
-                        if (AlfrescoInternalAPIDriver.this.nodeService.hasAspect(contentNodeRef, ContentModel.ASPECT_VERSIONABLE) == false)
-                        {
-                            // Add the versionable aspect, turning off auto-version to avoid unexpected behaviour
-                            Map<QName, Serializable> properties = new HashMap<QName, Serializable>(2);
-                            properties.put(ContentModel.PROP_AUTO_VERSION, false);
-                            properties.put(ContentModel.PROP_INITIAL_VERSION, false);
-                            AlfrescoInternalAPIDriver.this.nodeService.addAspect(
-                                    contentNodeRef,
-                                    ContentModel.ASPECT_VERSIONABLE,
-                                    properties);
-                        }
-                        
-                        // Create a version in the version history of this node
-                        Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
-                        versionProperties.put(VersionImpl.PROP_DESCRIPTION, "This is the description of the version change.");
-                        AlfrescoInternalAPIDriver.this.versionService.createVersion(
-                               contentNodeRef,
-                               versionProperties);
-                    }
-                    finally
-                    {
-                        AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                        // Add the versionable aspect, turning off auto-version to avoid unexpected behaviour
+                        Map<QName, Serializable> properties = new HashMap<QName, Serializable>(2);
+                        properties.put(ContentModel.PROP_AUTO_VERSION, false);
+                        properties.put(ContentModel.PROP_INITIAL_VERSION, false);
+                        AlfrescoInternalAPIDriver.this.nodeService.addAspect(
+                                contentNodeRef,
+                                ContentModel.ASPECT_VERSIONABLE,
+                                properties);
                     }
                     
-                    // Do nothing on return 
-                    return null;
+                    // Create a version in the version history of this node
+                    Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
+                    versionProperties.put(VersionImpl.PROP_DESCRIPTION, "This is the description of the version change.");
+                    AlfrescoInternalAPIDriver.this.versionService.createVersion(
+                           contentNodeRef,
+                           versionProperties);
                 }
-        
-            });            
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        } 
-        
+                finally
+                {
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                }
+                
+                // Do nothing on return 
+                return null;
+            }
+    
+        });                    
     }
 
     public void doReadProperties(TestCase tc)
@@ -256,33 +230,27 @@ public class AlfrescoInternalAPIDriver extends BaseAlfrescoDriver implements Uni
                     "   TestCase: " + tc + "\n" +
                     "   Driver: " + this);
         }
-        try
+
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
         {
-            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionUtil.TransactionWork<Object>()
+            public Object doWork() throws Exception
             {
-                public Object doWork() throws Exception
+                AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
+                try
                 {
-                    AlfrescoInternalAPIDriver.this.authenticationComponent.setCurrentUser(AlfrescoInternalAPIDriver.this.userName);  
-                    try
-                    {
-                        // Read all the properties of the content node
-                        NodeRef contentNodeRef = getRandomTargetFileNodeRef();
-                        AlfrescoInternalAPIDriver.this.nodeService.getProperties(contentNodeRef);
-                    }
-                    finally
-                    {
-                        AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
-                    }
-                    
-                    // Do nothing on return 
-                    return null;
+                    // Read all the properties of the content node
+                    NodeRef contentNodeRef = getRandomTargetFileNodeRef();
+                    AlfrescoInternalAPIDriver.this.nodeService.getProperties(contentNodeRef);
                 }
-        
-            });            
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }         
+                finally
+                {
+                    AlfrescoInternalAPIDriver.this.authenticationComponent.clearCurrentSecurityContext();                        
+                }
+                
+                // Do nothing on return 
+                return null;
+            }
+    
+        });                    
     }
 }

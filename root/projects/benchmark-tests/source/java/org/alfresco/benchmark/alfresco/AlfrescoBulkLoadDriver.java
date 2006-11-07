@@ -108,32 +108,25 @@ public class AlfrescoBulkLoadDriver extends BaseAlfrescoDriver
     
     @Override
     public void run(final TestCase testCase)
-    {
-        try
+    {        
+        TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionWork<Object>()
         {
-            TransactionUtil.executeInUserTransaction(this.transactionService, new TransactionWork<Object>()
+            public Object doWork() throws Exception
             {
-                public Object doWork() throws Exception
+                AlfrescoBulkLoadDriver.this.authenticationComponent.setSystemUserAsCurrentUser();
+                try
+                {                    
+                    // Do bulk load
+                    doBulkUpload(testCase);
+                }
+                finally
                 {
-                    AlfrescoBulkLoadDriver.this.authenticationComponent.setSystemUserAsCurrentUser();
-                    try
-                    {                    
-                        // Do bulk load
-                        doBulkUpload(testCase);
-                    }
-                    finally
-                    {
-                        AlfrescoBulkLoadDriver.this.authenticationComponent.clearCurrentSecurityContext();
-                    }
-                    
-                    return null;
-                }            
-            });
-        }
-        catch (Throwable exception)
-        {
-            exception.printStackTrace();
-        }
+                    AlfrescoBulkLoadDriver.this.authenticationComponent.clearCurrentSecurityContext();
+                }
+                
+                return null;
+            }            
+        });        
     }
     
     private void doBulkUpload(TestCase testCase)

@@ -35,7 +35,6 @@ import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
 import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile.PropertyType;
-import org.apache.log4j.Logger;
 
 import com.sun.japex.TestCase;
 
@@ -43,9 +42,7 @@ import com.sun.japex.TestCase;
  * @author Roy Wetherall
  */
 public class JCRBulkLoadDriver extends BaseBenchmarkDriver
-{
-	private static final Logger logger = Logger.getLogger(JCRBulkLoadDriver.class);
-	
+{	
     protected Repository repository;
         
     public static final String PARAM_FOLDER_COUNT = "alfresco.folderCount";
@@ -84,15 +81,14 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
         }
         catch (Throwable exception)
         {
-            logger.error(exception);
+            exception.printStackTrace();
+            throw new RuntimeException(exception.getMessage(), exception);
         }
     }
     
     @Override
     public void preRun(TestCase testCase)
     {
-        try
-        {
             super.preRun(testCase);
         
             // Get the folder path
@@ -134,11 +130,6 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
                 Map<String, Object> propertyValues = DataProviderComponent.getInstance().getPropertyData(contentPropertyProfiles);
                 this.contentData[i] = (ContentData)propertyValues.get(JCRUtils.PROP_CONTENT);
             }
-        }
-        catch (Throwable exception)
-        {
-            logger.error(exception);
-        }
     }
     
     private String getUuid(String path) throws RepositoryException
@@ -152,7 +143,7 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
         }
         finally
         {
-            try {session.logout(); } catch (Throwable e) {logger.error(e); }
+            session.logout();
         }
     }
     
@@ -164,7 +155,7 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
     }
     
     @Override
-    public void run(final TestCase testCase)
+    public void run(final TestCase testCase) 
     {
         try
         {
@@ -213,18 +204,14 @@ public class JCRBulkLoadDriver extends BaseBenchmarkDriver
                 // Save
                 session.save();
             }
-            catch (Throwable e)
-            {
-            	logger.error(e);
-            }
             finally
             {
-            	try {session.logout(); } catch (Throwable e) {logger.error(e); }
+            	session.logout();
             }
         }
-        catch (Throwable exception)
+        catch (Exception exception)
         {
-        	logger.error(exception);
+            throw new RuntimeException(exception.getMessage(), exception);
         }
     }
 }
