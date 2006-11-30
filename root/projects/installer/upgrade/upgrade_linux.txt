@@ -1,0 +1,42 @@
+======================
+Alfresco 1.3.0 Upgrade
+======================
+
+If you have an existing installation of Alfresco that you wish to upgrade, then you
+will need to run a database upgrade script.  The steps for upgrading a MySQL installation
+of Alfresco is described below.  Similar steps are needed for other database systems.
+
+
+Step 1
+------
+
+Ensure you have upgraded to Alfresco 1.2.1 before starting the 1.3.0 upgrade.  Then back-up
+all data (database and content store) and stop the Alfresco server.
+
+
+Step 2
+------
+
+Run the appropriate upgrade script for your installation.  A sample script is provided for
+MySQL and can be executed by running 'db_upgrade_1.2.1_to_1.3.0.sh'.  Make sure your
+database is running before executing the script.
+
+The script will prompt you for the MySQL password for Alfresco (originally 'alfresco') and then
+run the database script.  The script may take some time to run: it depends on the volume
+of data you have.
+
+
+Step 3
+------
+
+Make sure you have made copies of any extensions or customizations to your Alfresco installation.
+Typically, these are in the <shared config>/classes/alfresco/extension directory.
+
+Deploy the 1.3.0 WAR file to your application server (e.g. Tomcat or JBoss), replacing the old
+'alfresco.war' file.  Then restart the Alfresco server.
+
+
+Additional Information
+----------------------
+
+You can find updated sample extension configurations in the Tomcat or JBoss bundles.

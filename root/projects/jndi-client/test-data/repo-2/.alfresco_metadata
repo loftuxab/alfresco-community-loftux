@@ -1,0 +1,4 @@
+<alfresco_metadata  repo_parent_path = "repo-2:/" 
+                    hostname="bob"
+                    docroot="repo-2:/repo-2/bob/appBase/avm_webapps">
+</alfresco_metadata>

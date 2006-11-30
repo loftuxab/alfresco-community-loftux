@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+   <!--                                 -->
+   <!-- Workflow Service Implementation -->
+   <!--                                 -->
+
+   <bean id="workflowDeployer" class="org.alfresco.repo.workflow.WorkflowDeployer" abstract="true">
+      <property name="transactionService" ref="transactionComponent"/>
+      <property name="authenticationComponent" ref="authenticationComponent" />
+      <property name="workflowService" ref="WorkflowService" />
+      <property name="dictionaryDAO" ref="dictionaryDAO"/>
+   </bean>
+   
+   <bean id="workflowServiceImpl" class="org.alfresco.repo.workflow.WorkflowServiceImpl">
+      <property name="BPMEngineRegistry" ref="bpm_engineRegistry"/>
+      <property name="workflowPackageComponent" ref="workflowPackageImpl"/>
+   </bean>
+
+   <bean id="workflowPackageImpl" class="org.alfresco.repo.workflow.WorkflowPackageImpl">
+      <property name="importerBootstrap" ref="spacesBootstrap"/>
+      <property name="searchService" ref="searchService"/>
+      <property name="nodeService" ref="nodeService"/>
+      <property name="permissionService" ref="permissionService"/>
+      <property name="namespaceService" ref="namespaceService"/>
+   </bean>
+
+   <bean id="workflowInterpreter" class="org.alfresco.repo.workflow.WorkflowInterpreter">
+      <property name="workflowService" ref="WorkflowService"/>
+      <property name="AVMService" ref="AVMService"/>
+      <property name="AVMSyncService" ref="AVMSyncService"/>
+      <property name="nodeService" ref="NodeService"/>
+      <property name="namespaceService" ref="namespaceService"/>
+      <property name="personService" ref="PersonService"/>
+   </bean>
+
+   <bean id="workflowInterpreterHelp" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+        <property name="resourceBundles">
+            <list>
+                <value>alfresco.messages.workflow-interpreter-help</value>
+            </list>
+        </property>
+   </bean>
+
+   <!--                 -->
+   <!-- Workflow Action -->
+   <!--                 -->
+
+   <bean id="start-workflow" class="org.alfresco.repo.workflow.StartWorkflowActionExecuter" parent="action-executer">
+      <property name="publicAction"><value>false</value></property>
+      <property name="namespaceService" ref="NamespaceService"/>
+      <property name="nodeService" ref="NodeService"/>
+      <property name="workflowService" ref="WorkflowService"/>
+   </bean>
+
+   <!--                       -->
+   <!-- Alfresco BPM Registry -->
+   <!--                       -->
+
+   <bean id="bpm_engineRegistry" class="org.alfresco.repo.workflow.BPMEngineRegistry">
+   </bean>
+
+   <bean id="bpm_engine" class="org.alfresco.repo.workflow.BPMEngine" abstract="true">
+      <property name="BPMEngineRegistry" ref="bpm_engineRegistry"/>
+   </bean>
+
+   <!--                     -->
+   <!-- jBPM Implementation -->
+   <!--                     -->
+
+   <bean id="jbpm_configuration" class="org.springmodules.workflow.jbpm31.LocalJbpmConfigurationFactoryBean">
+      <property name="sessionFactory" ref="sessionFactory"/>
+      <property name="configuration" value="classpath:org/alfresco/repo/workflow/jbpm/jbpm.cfg.xml"/>
+   </bean>
+
+   <bean id="jbpm_template" class="org.alfresco.repo.workflow.jbpm.JBPMTransactionTemplate">
+      <constructor-arg index="0" ref="jbpm_configuration"/>
+   </bean>
+
+   <bean id="jbpm_engine" class="org.alfresco.repo.workflow.jbpm.JBPMEngine" parent="bpm_engine">
+      <property name="engineId" value="jbpm"/>
+      <property name="JBPMTemplate" ref="jbpm_template"/>
+      <property name="dictionaryService" ref="DictionaryService"/>
+      <property name="namespaceService" ref="namespaceService"/>
+      <property name="nodeService" ref="nodeService"/>
+      <property name="personService" ref="personService"/>
+      <property name="serviceRegistry" ref="ServiceRegistry"/>
+   </bean>
+
+</beans>

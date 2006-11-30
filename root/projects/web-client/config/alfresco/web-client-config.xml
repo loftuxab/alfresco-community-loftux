@@ -1,0 +1,364 @@
+<alfresco-config>
+
+   <plug-ins>
+      <evaluators>
+         <evaluator id="node-type" class="org.alfresco.web.config.NodeTypeEvaluator" />
+         <evaluator id="aspect-name" class="org.alfresco.web.config.AspectEvaluator" />
+      </evaluators>
+      <element-readers>
+         <element-reader element-name="client" class="org.alfresco.web.config.ClientElementReader"/>
+         <element-reader element-name="property-sheet" class="org.alfresco.web.config.PropertySheetElementReader"/>
+         <element-reader element-name="navigation" class="org.alfresco.web.config.NavigationElementReader" />
+         <element-reader element-name="languages" class="org.alfresco.web.config.LanguagesElementReader" />
+         <element-reader element-name="command-servlet" class="org.alfresco.web.config.CommandServletElementReader" />
+         <element-reader element-name="advanced-search" class="org.alfresco.web.config.AdvancedSearchElementReader" />
+         <element-reader element-name="views" class="org.alfresco.web.config.ViewsElementReader" />
+         <element-reader element-name="actions" class="org.alfresco.web.config.ActionsElementReader" />
+         <element-reader element-name="dialogs" class="org.alfresco.web.config.DialogsElementReader"/>
+         <element-reader element-name="wizards" class="org.alfresco.web.config.WizardsElementReader"/>
+         <element-reader element-name="dashboards" class="org.alfresco.web.config.DashboardsElementReader"/>
+      </element-readers>
+   </plug-ins>
+   
+   <config>
+      <admin>
+         <initial-password>admin</initial-password>
+      </admin>
+      <client>
+         <!-- the error page the client will use -->
+         <error-page>/jsp/error.jsp</error-page>
+         
+         <!-- the login page the client will use -->
+         <login-page>/jsp/login.jsp</login-page>   
+         
+         <!-- the maximum number of items to show in the recent spaces shelf component -->
+         <recent-spaces-items>6</recent-spaces-items>
+         
+         <!-- Shelf component default visibility, set to false to hide the shelf by default -->
+         <shelf-visible>true</shelf-visible>
+         
+         <!-- the minimum number of characters required for a valid search string -->
+         <search-minimum>3</search-minimum>
+         
+         <!-- set this value to true to enable AND text terms for simple/advanced search by default -->
+         <search-and-terms>false</search-and-terms>
+          
+         <!-- Limit search results. -1 for unlimited. -->
+         <search-max-results>-1</search-max-results>
+         
+         <!-- Limit search results within selectors, -1 for unlimited. -->
+         <selectors-search-max-results>500</selectors-search-max-results>
+         
+         <!-- The default permissions to apply to a new users Home Space when first created -->
+         <!-- this permission is for other users attempting to access that Home Space -->
+         <!-- generally set to "Consumer" or empty value to indicate a private hidden space. -->
+         <!-- see org.alfresco.service.cmr.security.PermissionService for allowed values -->
+         <home-space-permission>Consumer</home-space-permission>
+         
+         <!-- The default location to display when the browse screen is first shown -->
+         <!-- This value should be one of 'myalfresco', 'userhome', 'companyhome' or 'guesthome' -->
+         <initial-location>myalfresco</initial-location>
+         
+         <!-- the URL to the client Help file -->
+         <help-url>http://www.alfresco.org/help/webclient</help-url>
+         
+         <!-- the type of edit link to use, NOTE: inline editable will always take precedence -->
+         <!-- can be: http|webdav|cifs -->
+         <edit-link-type>http</edit-link-type>
+         
+         <!-- the from address to use when sending emails from the client -->
+         <from-email-address>alfresco@alfresco.org</from-email-address>
+         
+         <!-- WCM domain and port for virtualisation server -->
+         <wcm-domain>127-0-0-1.ip.alfrescodemo.net</wcm-domain>
+         <wcm-port>8180</wcm-port>
+      </client>
+   </config>
+
+   <config evaluator="string-compare" condition="Languages">
+      <!-- the list of available language files -->
+      <languages>
+         <language locale="en_US">English</language>
+      </languages>
+   </config>
+   
+   <config evaluator="string-compare" condition="Views">
+      <!-- the views available in the client -->
+      <views>
+         <view-impl>org.alfresco.web.ui.common.renderer.data.RichListRenderer$DetailsViewRenderer</view-impl>
+         <view-impl>org.alfresco.web.ui.common.renderer.data.RichListRenderer$IconViewRenderer</view-impl>
+         <view-impl>org.alfresco.web.ui.common.renderer.data.RichListRenderer$ListViewRenderer</view-impl>
+         <view-impl>org.alfresco.web.bean.forums.ForumsBean$TopicBubbleViewRenderer</view-impl>
+         
+         <!-- default values for the views available in the client -->
+         <view-defaults>
+            <browse>
+               <!-- allowable values: list|details|icons -->
+               <view>icons</view>
+               <page-size>
+                  <list>10</list>
+                  <details>10</details>
+                  <icons>9</icons>
+               </page-size>
+            </browse>
+            <forums>
+               <!-- allowable values: list|details|icons -->
+               <view>list</view>
+               <page-size>
+                  <list>20</list>
+                  <details>20</details>
+                  <icons>20</icons>
+               </page-size>
+            </forums>
+            <forum>
+               <!-- allowable values: details -->
+               <view>details</view>
+               <page-size>
+                  <details>20</details>
+               </page-size>
+            </forum>
+            <topic>
+               <!-- allowable values: details|bubble -->
+               <view>bubble</view>
+               <sort-column>created</sort-column>
+               <!-- allowable values: ascending|descending -->
+               <sort-direction>descending</sort-direction>
+               <page-size>
+                  <bubble>5</bubble>
+                  <details>20</details>
+               </page-size>
+            </topic>
+         </view-defaults>
+      </views>
+   </config>
+   
+   <config evaluator="string-compare" condition="Node Event Listeners">
+      <!-- Managed beans that wish to be notified of Node events from the BrowseBean -->
+      <!-- Example - bean must implement org.alfresco.web.bean.NodeEventListener
+      <node-event-listeners>
+         <listener>ForumsBean</listener>
+      </node-event-listeners> -->
+   </config>
+   
+   <config evaluator="string-compare" condition="Command Servlet">
+      <!-- The list of registered servlet command processors -->
+      <!-- Command processors implement org.alfresco.web.app.servlet.command.CommandProcessor -->
+      <!-- They register a class impl against a unique name. All calls to the command servlet -->
+      <!-- which match the name are forwared to the class instance -->
+      <command-servlet>
+         <command-processor name="workflow" class="org.alfresco.web.app.servlet.command.WorkflowCommandProcessor" />
+         <command-processor name="task" class="org.alfresco.web.app.servlet.command.TaskCommandProcessor" />
+         <command-processor name="script" class="org.alfresco.web.app.servlet.command.ScriptCommandProcessor" />
+      </command-servlet>
+   </config>
+   
+   <config evaluator="string-compare" condition="Advanced Search">
+      <!-- advanced search custom attribute config -->
+      <!-- see http://wiki.alfresco.com/wiki/Advanced_Search_Custom_Attributes -->
+      <advanced-search>
+         <!-- type constraint drop-down -->
+         <content-types>
+            <!-- cm:content type is implicit in this list -->
+            <!-- types must extend cm:content for display in the Alfresco web-client -->
+            <type name="fm:post" />
+         </content-types>
+         <folder-types>
+            <!-- cm:folder type is implicit in this list -->
+            <!-- types must extend cm:folder for display in the Alfresco web-client -->
+            <type name="fm:forums" />
+         </folder-types>
+      </advanced-search>
+   </config>
+   
+   <config evaluator="string-compare" condition="Dashboards">
+      <!-- Dashboard layouts and available dashlets for the My Alfresco pages -->
+      <dashboards>
+         <layouts>
+            <!-- the mandatory "default" layout - will be used for all users initially -->
+            <layout id="default" columns="1" column-length="5" image="/images/icons/layout_single_column.gif"
+                  label-id="layout_single_label" description-id="layout_single_desc"
+                  jsp="/jsp/dashboards/layouts/single-column.jsp" />
+            <layout id="narrow-right-2column" columns="2" column-length="4" image="/images/icons/layout_narrow_right_2column.gif"
+                  label-id="layout_narrow_right_label" description-id="layout_narrow_right_desc"
+                  jsp="/jsp/dashboards/layouts/narrow-right-2column.jsp" />
+            <layout id="narrow-left-2column" columns="2" column-length="4" image="/images/icons/layout_narrow_left_2column.gif"
+                  label-id="layout_narrow_left_label" description-id="layout_narrow_left_desc"
+                  jsp="/jsp/dashboards/layouts/narrow-left-2column.jsp" />
+            <layout id="three-column" columns="3" column-length="4" image="/images/icons/layout_three_column.gif"
+                  label-id="layout_three_column_label" description-id="layout_three_column_desc"
+                  jsp="/jsp/dashboards/layouts/three-column.jsp" />
+         </layouts>
+         <dashlets>
+            <!-- this is the default dashlet shown in the default layout initially -->
+            <!-- the default dashlet must have the id of 'getting-started' -->
+            <dashlet id="getting-started" label-id="dashlet_gettingstarted_label"
+                  description-id="dashlet_gettingstarted_desc"
+                  jsp="/jsp/dashboards/dashlets/getting-started.jsp" allow-narrow="false" />
+            <!-- this dashlet 'tasks-todo' is also shown by default for all users -->
+            <dashlet id="tasks-todo" label-id="my_tasks_todo_title" description-id="my_tasks_todo_desc"
+                  jsp="/jsp/workflow/tasks-todo-dashlet.jsp" allow-narrow="false" />
+            <dashlet id="tasks-completed" label-id="my_tasks_completed_title" description-id="my_tasks_completed_desc"
+                  jsp="/jsp/workflow/tasks-completed-dashlet.jsp" allow-narrow="false" />
+            <dashlet id="my-docs-template" label-id="dashlet_mydocuments"
+                  description-id="dashlet_mydocuments_desc"
+                  jsp="/jsp/dashboards/dashlets/my-docs.jsp" allow-narrow="true" />
+            <dashlet id="content-checkedout" label-id="dashlet_checkedoutdocs"
+                  description-id="dashlet_checkedoutdocs_desc"
+                  jsp="/jsp/dashboards/dashlets/checkedout-docs.jsp" allow-narrow="false" />
+            <dashlet id="my-images" label-id="dashlet_myimages"
+                  description-id="dashlet_myimages_desc"
+                  jsp="/jsp/dashboards/dashlets/my-images.jsp" allow-narrow="false" />
+         </dashlets>
+         <!-- set true allow the Guest user to configure the dashboard view - false by default -->
+         <allow-guest-config>false</allow-guest-config>
+      </dashboards>
+   </config>
+   
+   <config evaluator="string-compare" condition="Space Wizards">
+      <!-- The list of custom folder types to show in the advanced space wizard -->
+      <folder-types>
+         <type name="fm:forums" icon="/images/icons/forums.gif" description-id="forums_desc" />
+      </folder-types>
+   </config>
+   
+   <config evaluator="string-compare" condition="Content Wizards">
+      <!-- The list of custom content types to show in the content wizards -->
+      <content-types>
+      </content-types>
+      
+      <!-- The list of mime types that can be created inline -->
+      <create-mime-types>
+         <mime-type name="text/html" />
+         <mime-type name="text/plain" />
+         <mime-type name="text/xml" />
+      </create-mime-types>
+      
+      <!-- Controls the message regarding property editing after the content is created -->
+      <other-properties user-choice-visible="true" user-choice-default="true" /> 
+   </config>
+   
+   <config evaluator="string-compare" condition="Action Wizards">
+      <!-- The list of types shown in the is-subtype condition -->
+      <subtypes>
+         <type name="folder" display-label-id="space"/>
+         <type name="content"/>
+      </subtypes>
+      <!-- The list of content and/or folder types shown in the specialise-type action -->
+      <specialise-types>
+      </specialise-types>
+      
+      <!-- The list of aspects to show in the add/remove features action -->
+      <!-- and the has-aspect condition -->
+      <aspects>
+         <aspect name="generalclassifiable"/>
+         <aspect name="complianceable"/>
+         <aspect name="dublincore"/>
+         <aspect name="effectivity"/>
+         <aspect name="summarizable"/>
+         <aspect name="versionable"/>
+         <aspect name="templatable"/>
+         <aspect name="translatable"/>
+         <aspect name="localizable"/>
+         <aspect name="emailed"/>
+      </aspects>
+      <!-- List of aspects to only show in the add features action -->
+      <aspects-add>
+      </aspects-add>
+      <!-- List of aspects to only show in the remove features action -->
+      <aspects-remove>
+      </aspects-remove>
+      <!-- List of aspects to only show in the has aspect condition -->
+      <aspects-test>
+      </aspects-test>
+
+      <!-- The list of transformers to show in the transform actions -->
+      <transformers>
+         <transformer name="application/vnd.oasis.opendocument.text"/>
+         <transformer name="application/vnd.oasis.opendocument.presentation"/>
+         <transformer name="application/vnd.oasis.opendocument.spreadsheet"/>
+         <transformer name="application/rtf"/>
+         <transformer name="text/html"/>
+         <transformer name="application/pdf"/>
+         <transformer name="text/plain"/>
+         <transformer name="text/xml"/>
+         <transformer name="application/x-shockwave-flash"/>
+         <transformer name="image/gif"/>
+         <transformer name="image/jpeg"/>
+         <transformer name="application/msword"/>
+         <transformer name="application/vnd.excel"/>
+         <transformer name="application/vnd.powerpoint"/>
+      </transformers>
+      <image-transformers>
+         <transformer name="image/gif"/>
+         <transformer name="image/jpeg"/>
+         <transformer name="image/png"/>
+      </image-transformers>
+
+      <!-- The classes used to handle actions -->
+      <action-handlers>
+         <handler name="add-features" class="org.alfresco.web.bean.actions.handlers.AddFeaturesHandler" />
+         <handler name="check-in" class="org.alfresco.web.bean.actions.handlers.CheckInHandler" />
+         <handler name="check-out" class="org.alfresco.web.bean.actions.handlers.CheckOutHandler" />
+         <handler name="copy" class="org.alfresco.web.bean.actions.handlers.CopyHandler" />
+         <handler name="import" class="org.alfresco.web.bean.actions.handlers.ImportHandler" />
+         <handler name="link-category" class="org.alfresco.web.bean.actions.handlers.LinkCategoryHandler" />
+         <handler name="mail" class="org.alfresco.web.bean.actions.handlers.MailHandler" />
+         <handler name="move" class="org.alfresco.web.bean.actions.handlers.MoveHandler" />
+         <handler name="remove-features" class="org.alfresco.web.bean.actions.handlers.RemoveFeaturesHandler" />
+         <handler name="script" class="org.alfresco.web.bean.actions.handlers.ScriptHandler" />
+         <handler name="simple-workflow" class="org.alfresco.web.bean.actions.handlers.SimpleWorkflowHandler" />
+         <handler name="specialise-type" class="org.alfresco.web.bean.actions.handlers.SpecialiseTypeHandler" />
+         <handler name="transform" class="org.alfresco.web.bean.actions.handlers.TransformHandler" />
+         <handler name="transform-image" class="org.alfresco.web.bean.actions.handlers.TransformImageHandler" />
+      </action-handlers>
+
+      <!-- The classes used to handle conditions -->
+      <condition-handlers>
+         <handler name="compare-mime-type" class="org.alfresco.web.bean.rules.handlers.CompareMimeTypeHandler" />
+         <handler name="compare-property-value" class="org.alfresco.web.bean.rules.handlers.PropertyValueHandler" />
+         <handler name="has-aspect" class="org.alfresco.web.bean.rules.handlers.HasAspectHandler" />
+         <handler name="in-category" class="org.alfresco.web.bean.rules.handlers.InCategoryHandler" />
+         <handler name="is-subtype" class="org.alfresco.web.bean.rules.handlers.IsSubTypeHandler" />
+      </condition-handlers>
+   </config>
+
+   <!-- This config sections below hold all the icons choices -->
+   <!-- displayed to users when creating various types of spaces -->
+   <!-- in the client. -->
+
+   <!-- NOTE: The conditions below are all string based and -->
+   <!-- will therefore not be found when using Node based -->
+   <!-- lookups, this also means the cm: can not be presumed. -->
+
+   <config evaluator="string-compare" condition="cm:folder icons">
+      <icons>
+         <icon name="space-icon-default" path="/images/icons/space-icon-default.gif" />
+         <icon name="space-icon-star" path="/images/icons/space-icon-star.gif" />
+         <icon name="space-icon-doc" path="/images/icons/space-icon-doc.gif" />
+         <icon name="space-icon-pen" path="/images/icons/space-icon-pen.gif" />
+         <icon name="space-icon-cd" path="/images/icons/space-icon-cd.gif" />
+         <icon name="space-icon-image" path="/images/icons/space-icon-image.gif" />
+      </icons>
+   </config>
+
+   <config evaluator="string-compare" condition="fm:forums icons">
+      <icons>
+         <icon name="forums" path="/images/icons/forums.gif" />
+      </icons>
+   </config>
+
+   <config evaluator="string-compare" condition="fm:forum icons">
+      <icons>
+         <icon name="forum" path="/images/icons/forum.gif" />
+      </icons>
+   </config>
+
+   <config evaluator="string-compare" condition="fm:topic icons">
+      <icons>
+         <icon name="topic" path="/images/icons/topic.gif" />
+         <icon name="topic_exclamation" path="/images/icons/topic_exclamation.gif" />
+         <icon name="topic_question" path="/images/icons/topic_question.gif" />
+      </icons>
+   </config>
+
+</alfresco-config>

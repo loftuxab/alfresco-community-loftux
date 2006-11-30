@@ -1,0 +1,54 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <bean id="indexRecoveryComponentBase" abstract="true" >
+      <property name="authenticationComponent">
+         <ref bean="authenticationComponentImpl" />
+      </property>
+      <property name="transactionComponent">
+         <ref bean="transactionComponent" />
+      </property>
+      <property name="indexer">
+         <ref bean="indexerComponent" />
+      </property>
+      <property name="ftsIndexer">
+         <ref bean="LuceneFullTextSearchIndexer" />
+      </property>
+      <property name="searcher">
+         <ref bean="searchService" />
+      </property>
+      <property name="nodeService">
+          <ref bean="nodeService" />
+      </property>
+      <property name="nodeDaoService">
+          <ref bean="nodeDaoService" />
+      </property>
+   </bean>
+   
+   <!-- index recovery and validation -->
+   <!--
+      Recovery types are:
+         NONE:     Ignore
+         VALIDATE: Checks that the last transaction for each store is represented in the indexes
+         AUTO:     Validates and auto-recovers if validation fails
+         FULL:     Full index rebuild, processing all transactions in order.  The server is temporarily suspended.
+   -->
+   <bean
+         id="indexRecoveryComponent"
+         class="org.alfresco.repo.node.index.FullIndexRecoveryComponent"
+         parent="indexRecoveryComponentBase">
+      <property name="recoveryMode">
+          <value>${index.recovery.mode}</value>
+      </property>
+   </bean>
+
+   <!-- Bean that attempts to index content that was previously missing -->
+   <bean
+         id="missingContentReindexComponent"
+         class="org.alfresco.repo.node.index.MissingContentReindexComponent"
+         parent="indexRecoveryComponentBase">
+   </bean>
+
+</beans>

@@ -1,0 +1,7 @@
+<alfresco_metadata  repo_parent_path="repo-1:/"
+                    hostname="alice"
+                    docroot="repo-1:/repo-1/alice/appBase/avm_webapps">
+
+  <!-- nothing here, but see test-data/repo-2/.alfresco_metadata --> 
+
+</alfresco_metadata>

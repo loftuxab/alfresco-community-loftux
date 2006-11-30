@@ -1,0 +1,158 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    '-//Hibernate/Hibernate Mapping DTD 3.0//EN' 
+    'http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd'>
+
+<hibernate-mapping>
+
+   <class
+         name="org.alfresco.repo.domain.hibernate.TransactionImpl"
+         proxy="org.alfresco.repo.domain.Transaction"
+         table="alf_transaction"
+         dynamic-update="false"
+         dynamic-insert="false"
+         select-before-update="false" 
+         lazy="true" 
+         optimistic-lock="version"  >
+      <!-- auto-generated ID -->
+      <id name="id" column="id" type="long" >
+         <generator class="native" />
+      </id>
+      <!-- forward assoc to server IP -->
+      <many-to-one
+            name="server"
+            class="org.alfresco.repo.domain.hibernate.ServerImpl"
+            column="server_id"
+            lazy="proxy"
+            fetch="select"
+            unique="false"
+            not-null="false"
+            cascade="none" />
+      <property name="changeTxnId" column="change_txn_id" type="string" length="56" not-null="true" />
+   </class>
+
+   <class
+         name="org.alfresco.repo.domain.hibernate.ServerImpl"
+         proxy="org.alfresco.repo.domain.Server"
+         table="alf_server"
+         dynamic-update="false"
+         dynamic-insert="false"
+         select-before-update="false" 
+         lazy="true" 
+         optimistic-lock="version"  >
+      <!-- auto-generated ID -->
+      <id name="id" column="id" type="long" >
+         <generator class="native" />
+      </id>
+      <natural-id>
+         <property name="ipAddress" column="ip_address" type="string" length="15" not-null="true" />
+      </natural-id>
+   </class>
+
+   <query name="server.getServerByIpAddress">
+      select
+         server
+      from
+         org.alfresco.repo.domain.hibernate.ServerImpl as server
+      where
+         server.ipAddress = :ipAddress
+   </query>
+
+   <query name="txn.GetLastTxnIdForStore">
+      select
+         max(txn.id)
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+         join status.transaction as txn
+      where
+         status.key.protocol = :protocol and
+         status.key.identifier = :identifier
+   </query>
+   
+   <query name="txn.GetLastTxnId">
+      select
+         max(txn.id)
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+         join status.transaction as txn
+   </query>
+   
+   <query name="txn.CountTransactions">
+      select
+         count(txn.id)
+      from
+         org.alfresco.repo.domain.hibernate.TransactionImpl as txn
+   </query>
+
+   <query name="txn.GetNextTxns">
+      <![CDATA[
+      select
+         txn
+      from
+         org.alfresco.repo.domain.hibernate.TransactionImpl as txn
+      where
+         txn.id > :lastTxnId
+      order by
+         txn.id
+      ]]>
+   </query>
+
+   <query name="txn.GetNextRemoteTxns">
+      <![CDATA[
+      select
+         txn
+      from
+         org.alfresco.repo.domain.hibernate.TransactionImpl as txn
+         join txn.server as server
+      where
+         txn.id > :lastTxnId and
+         server.ipAddress != :serverIpAddress
+      order by
+         txn.id
+      ]]>
+   </query>
+
+   <query name="txn.GetTxnUpdateCountForStore">
+      select
+         count(status.key.guid)
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+         join status.transaction as txn
+      where
+         txn.id = :txnId and
+         status.node is not null
+   </query>
+
+   <query name="txn.GetTxnDeleteCountForStore">
+      select
+         count(status.key.guid)
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+         join status.transaction as txn
+      where
+         txn.id = :txnId and
+         status.node is null
+   </query>
+
+   <query name="txn.GetTxnChangesForStore">
+      select
+         status
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+      where
+         status.transaction.id = :txnId and
+         status.key.protocol = :protocol and
+         status.key.identifier = :identifier
+   </query>
+
+   <query name="txn.GetTxnChanges">
+      select
+         status
+      from
+         org.alfresco.repo.domain.hibernate.NodeStatusImpl as status
+      where
+         status.transaction.id = :txnId
+   </query>
+
+</hibernate-mapping>

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified">
+  <xs:simpleType name="promo_type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="car-insurance"/>
+      <xs:enumeration value="pet-insurance"/>
+      <xs:enumeration value="home-insurance"/>
+      <xs:enumeration value="travel-insurance"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="mainsplash">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="promo_1" type="promo_type"/>
+        <xs:element name="promo_2" type="promo_type"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

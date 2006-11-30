@@ -1,0 +1,22 @@
+<html>
+<head>
+<title>Virgin Money Credit card</title>
+<script language="javascript">
+	url = 'https://www.bankcardservices.co.uk/NASApp/NetAccessXX/WelcomeScreen?country=uk&language=en&org=142'
+	location.replace(url);
+</script>
+<script language="javascript" type="text/javascript">
+<!--
+// Copyright Clickstream Technologies (C) 2004
+// Version:12 Date: 09/12/04
+var CSv14=12;var CSv19="";var CSv20="2oSjvYS-";
+var CSv21=true;var CSv22="2093oj00c";
+function CSunload(){};function CSload(){};
+//-->
+</script>
+<script language="javascript" type="text/javascript" src="/clickstream/clickstream.js"></script>
+</head>
+<body bgcolor="#FFFFFF" text="#000000" onload="CSload();" onunload="CSunload();" >
+
+</body>
+</html>
