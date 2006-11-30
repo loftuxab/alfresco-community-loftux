@@ -30,7 +30,7 @@ CREATE TABLE T_access_control_entry (
   allowed number(1, 0) NOT NULL,
   PRIMARY KEY (id)
 );
-CREATE INDEX IDX_T_ACE_REF ON T_access_control_entry (protocol, identifier, uuid);
+CREATE INDEX IDX_ACE_REF ON T_access_control_entry (protocol, identifier, uuid);
 
 CREATE TABLE T_access_control_list
 (
@@ -41,7 +41,7 @@ CREATE TABLE T_access_control_list
   inherits number(1,0) NOT NULL,
   PRIMARY KEY (id)
 );
-CREATE INDEX IDX_T_ACL_REF ON T_access_control_list (protocol, identifier, uuid);
+CREATE INDEX IDX_ACL_REF ON T_access_control_list (protocol, identifier, uuid);
 
 create table T_auth_ext_keys
 (
@@ -73,8 +73,8 @@ CREATE TABLE T_child_assoc
   assoc_index number(10,0) default NULL,
   PRIMARY KEY (id)
 );
-CREATE INDEX IDX_T_CA_PARENT ON T_child_assoc(parent_protocol, parent_identifier, parent_uuid);
-CREATE INDEX IDX_T_CA_CHILD ON T_child_assoc(child_protocol, child_identifier, child_uuid);
+CREATE INDEX IDX_CA_PARENT ON T_child_assoc(parent_protocol, parent_identifier, parent_uuid);
+CREATE INDEX IDX_CA_CHILD ON T_child_assoc(child_protocol, child_identifier, child_uuid);
 
 CREATE TABLE T_node
 (
@@ -86,7 +86,7 @@ CREATE TABLE T_node
   type_qname varchar2(255) NOT NULL,
   PRIMARY KEY  (id)
 );
-CREATE INDEX IDX_T_NODE_REF ON T_node(protocol, identifier, uuid);
+CREATE INDEX IDX_NODE_REF ON T_node(protocol, identifier, uuid);
 
 CREATE TABLE T_node_aspects
 (
@@ -96,7 +96,7 @@ CREATE TABLE T_node_aspects
   node_id number(19,0),
   qname varchar2(200) default NULL
 );
-CREATE INDEX IDX_T_ASPECTS_REF ON T_node_aspects(protocol, identifier, uuid);
+CREATE INDEX IDX_ASPECTS_REF ON T_node_aspects(protocol, identifier, uuid);
 
 CREATE TABLE T_node_assoc
 (
@@ -112,8 +112,8 @@ CREATE TABLE T_node_assoc
   type_qname varchar2(255) NOT NULL,
   PRIMARY KEY (id)
 );
-CREATE INDEX IDX_T_NA_SOURCE on T_node_assoc(source_protocol, source_identifier, source_uuid);
-CREATE INDEX IDX_T_NA_TARGET on T_node_assoc(target_protocol, target_identifier, target_uuid);
+CREATE INDEX IDX_NA_SOURCE on T_node_assoc(source_protocol, source_identifier, source_uuid);
+CREATE INDEX IDX_NA_TARGET on T_node_assoc(target_protocol, target_identifier, target_uuid);
 
 CREATE TABLE T_node_status
 (
@@ -153,16 +153,6 @@ CREATE TABLE T_version_count
 
 create sequence hibernate_sequence;
 
---
--- Add indexes to 1.2.1 tables
---
-CREATE INDEX IDX_CA_PARENT ON child_assoc(parent_protocol, parent_identifier, parent_guid);
-CREATE INDEX IDX_CA_CHILD ON child_assoc(child_protocol, child_identifier, child_guid);
-CREATE INDEX IDX_NA_SOURCE on node_assoc(source_protocol, source_identifier, source_guid);
-CREATE INDEX IDX_NA_TARGET on node_assoc(target_protocol, target_identifier, target_guid);
-CREATE INDEX IDX_ASPECTS_REF ON node_aspects(protocol, identifier, guid);
-CREATE INDEX IDX_NPE_REF ON node_perm_entry (protocol, identifier, guid);
-CREATE INDEX IDX_CHANGE_TXN_ID ON node_status (change_txn_id);
 
 --
 -- Copy data from old tables to intermediate tables
@@ -185,10 +175,10 @@ update T_store tstore set root_node_id =
     )
   );
 
-insert into T_version_count (protocol, identifier, version_count)
+insert into t_version_count (protocol, identifier, version_count)
   select protocol, identifier, version_count from version_count;
 
-insert into T_node_status (protocol, identifier, guid, change_txn_id, deleted)
+insert into t_node_status (protocol, identifier, guid, change_txn_id, deleted)
   select protocol, identifier, guid, change_txn_id, deleted from node_status;
 update T_node_status tstatus set node_id =
   (select tnode.id from T_node tnode where
@@ -292,7 +282,7 @@ insert into T_auth_ext_keys
   select
     id, externalKey
   from
-    externalKeys;
+    externalkeys;
 
 insert into T_authority
   (
@@ -315,7 +305,7 @@ insert into T_access_control_entry
     e.typeUri, e.typeName, e.name,
     e.recipient,
     e.allowed
-  from node_perm_entry e join T_node n on e.protocol = n.protocol and e.identifier = n.identifier and e.guid = n.uuid
+  from node_perm_entry e join t_node n on e.protocol = n.protocol and e.identifier = n.identifier and e.guid = n.uuid
   ;
 
 update T_access_control_entry tentry
@@ -352,9 +342,9 @@ update T_access_control_entry tentry
       where
         tauthority.recipient = tentry.recipient
     );
-delete from T_access_control_list where id not in (select distinct(acl_id) id from T_access_control_entry where acl_id is not null);
+delete from T_access_control_list where id not in (select distinct(acl_id) id from t_access_control_entry where acl_id is not null);
 delete from T_access_control_entry where acl_id is null;
-update T_node set acl_id = null where acl_id not in (select id from T_access_control_list);
+update T_node set acl_id = null where acl_id not in (select id from t_access_control_list);
 
 --
 -- Create New schema (Oracle)
@@ -478,25 +468,6 @@ create table version_count
        primary key (protocol, identifier)
 );
 
-alter table node_properties add (node_id number(19,0));
-
---
--- Add additional indexes
---
-CREATE INDEX FKF064DF7560601995 ON access_control_entry (permission_id);
-CREATE INDEX FKF064DF75B25A50BF ON access_control_entry (authority_id);
-CREATE INDEX FKF064DF75B9553F6C ON access_control_entry (acl_id);
-CREATE INDEX FK31D3BA097B7FDE43 ON auth_ext_keys (id);
-CREATE INDEX FKC6EFFF3274173FF4 ON child_assoc (child_node_id);
-CREATE INDEX FKC6EFFF328E50E582 ON child_assoc (parent_node_id);
-CREATE INDEX FK33AE02B9553F6C ON node (acl_id);
-CREATE INDEX FK33AE02D24ADD25 ON node (protocol, identifier);
-CREATE INDEX FK2B91A9DE7F2C8017 ON node_aspects (node_id);
-CREATE INDEX FK5BAEF398B69C43F3 ON node_assoc (source_node_id);
-CREATE INDEX FK5BAEF398A8FC7769 ON node_assoc (target_node_id);
-CREATE INDEX FKC962BF907F2C8017 ON node_properties (node_id);
-CREATE INDEX FK38ECB8CF7F2C8017 ON node_status (node_id);
-CREATE INDEX FK68AF8E122DBA5BA ON store (root_node_id);
 
 --
 -- Copy data into new schema
@@ -537,6 +508,9 @@ insert into node_status
     protocol, identifier, guid, node_id, change_txn_id
   from
     T_node_status;
+
+
+alter table node_properties add (node_id number(19,0));
 
 update node_properties tproperties set node_id =
   (select tnode.id from T_node tnode where
@@ -625,26 +599,8 @@ insert into access_control_entry
   from
     T_access_control_entry;
 
---
--- Delete intermediate tables
---
 
-DROP TABLE T_access_control_entry;
-DROP TABLE T_access_control_list;
-DROP TABLE T_auth_ext_keys;
-DROP TABLE T_authority;
-DROP TABLE T_child_assoc;
-DROP TABLE T_node;
-DROP TABLE T_node_aspects;
-DROP TABLE T_node_assoc;
-DROP TABLE T_node_status;
-DROP TABLE T_permission;
-DROP TABLE T_store;
-DROP TABLE T_version_count;
-
---
 -- Enable constraints
---
 
 alter table access_control_entry add constraint FKF064DF7560601995 foreign key (permission_id) references permission;
 alter table access_control_entry add constraint FKF064DF75B25A50BF foreign key (authority_id) references authority;
@@ -661,7 +617,20 @@ alter table node_assoc add constraint FK5BAEF398A8FC7769 foreign key (target_nod
 alter table node_status add constraint FK38ECB8CF7F2C8017 foreign key (node_id) references node;
 alter table store add constraint FK68AF8E122DBA5BA foreign key (root_node_id) references node;
 
---
--- Modify patch table id length
---
+-- Add additional indexes
+CREATE INDEX FKF064DF7560601995 ON access_control_entry (permission_id);
+CREATE INDEX FKF064DF75B25A50BF ON access_control_entry (authority_id);
+CREATE INDEX FKF064DF75B9553F6C ON access_control_entry (acl_id);
+CREATE INDEX FK31D3BA097B7FDE43 ON auth_ext_keys (id);
+CREATE INDEX FKC6EFFF3274173FF4 ON child_assoc (child_node_id);
+CREATE INDEX FKC6EFFF328E50E582 ON child_assoc (parent_node_id);
+CREATE INDEX FK33AE02B9553F6C ON node (acl_id);
+CREATE INDEX FK33AE02D24ADD25 ON node (protocol, identifier);
+CREATE INDEX FK2B91A9DE7F2C8017 ON node_aspects (node_id);
+CREATE INDEX FK5BAEF398B69C43F3 ON node_assoc (source_node_id);
+CREATE INDEX FK5BAEF398A8FC7769 ON node_assoc (target_node_id);
+CREATE INDEX FKC962BF907F2C8017 ON node_properties (node_id);
+CREATE INDEX FK38ECB8CF7F2C8017 ON node_status (node_id);
+CREATE INDEX FK68AF8E122DBA5BA ON store (root_node_id);
+
 ALTER TABLE applied_patch MODIFY id varchar(64);

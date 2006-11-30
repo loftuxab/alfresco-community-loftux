@@ -1,0 +1,57 @@
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<script type="text/javascript" src="/assets/js/vm_common2005.js"></script>
+<script type="text/javascript">
+
+function openSWApp() {
+var w = '770' ;
+var h = '450';
+var NewWin;
+var cookieString = document.cookie;
+cookieStrPos = cookieString.indexOf('SWBanner-life');
+
+if (cookieStrPos !=-1 )
+{
+newCookieString= cookieString.slice(cookieStrPos + 9);
+
+
+CookieAry = newCookieString.split(';');
+SWCookie = CookieAry[0];
+EqPos = SWCookie.indexOf('=');
+
+SWCookieSplit = SWCookie.split('1AA');
+SWCookie = SWCookieSplit[0] + 'LWO' + SWCookieSplit[1]
+
+url = SWCookie.substring(EqPos +1);
+CleanUrl = url.replace('customerID=none/',"customerID=none");
+CleanUrl = CleanUrl.replace('customerID=none',"customerID=");
+location.replace(CleanUrl);
+
+}
+else
+{
+url = 'https://protect.virginmoney.com/HTTPGateway/HTTPGateway?serviceName=Lon%20Join%20from%20London%20Life%20Website&&#97;&#100;BannerCode=VM-LC-unattsite&offerType=LWO&customerID=';
+location.replace(url);
+}
+}
+</script>
+<script language="javascript" type="text/javascript">
+<!--
+// Copyright Clickstream Technologies (C) 2004
+// Version:12 Date: 09/12/04
+var CSv14=12;var CSv19="";var CSv20="u6PASh0";
+var CSv21=true;var CSv22="L30965T01D";
+function CSunload(){};function CSload(){};
+//-->
+</script>
+<script language="javascript" type="text/javascript" src="/clickstream/clickstream.js"></script>
+</head>
+<body onload="openSWApp();CSload();" onunload="CSunload();"                           >
+
+<div style="background-color:#F1F1F1;text-align:center;font-family:Arial, Helvetica, sans-serif">If you are not redirected automatically, please click on the link below.<br>
+<br/>
+<a href="https://protect.virginmoney.com/HTTPGateway/HTTPGateway?serviceName=Lon%20Join%20from%20London%20Life%20Website&&#97;&#100;BannerCode=NonAuto&offerType=LWO&customerID=">Click here</a> </div>
+
+</body>
+</html>

@@ -1,8 +1,10 @@
-============
-Alfresco 1.4
-============
+============================
+Alfresco 1.4 Preview Release
+============================
 
-Welcome to the Alfresco 1.4 Release.  
+Welcome to the Alfresco 1.4 Preview Release.  This software is for evaluation
+purposes only and cannot be used against an existing Alfresco repository.  There
+will not be an upgrade path from this Candidate Release to the final 1.4 release.
 
 
 ===================
@@ -126,7 +128,7 @@ Navigate to the '/opt/alfresco' directory and run 'alfresco.sh stop'
 Upgrading from V1.x to V1.4
 ===========================
 
-http://wiki.alfresco.com/wiki/Upgrading_to_1.4.0
+Not yet available.
 
 
 =====================

@@ -1,8 +1,10 @@
-============
-Alfresco 1.4
-============
+====================
+Alfresco 1.4 Preview
+====================
 
-Welcome to the Alfresco 1.4 Release.
+Welcome to the Alfresco 1.4 Preview Release.  This software is for evaluation 
+purposes only and cannot be used against an existing Alfresco repository.  There
+will not be an upgrade path from this Preview Release to the final 1.4 release.
 
 
 ===================
@@ -112,7 +114,7 @@ Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'
 Upgrading from V1.x to V1.4
 ===========================
 
-http://wiki.alfresco.com/wiki/Upgrading_to_1.4.0
+Not yet available.
 
 
 =====================

@@ -1,7 +1,3 @@
-7. August 2006 / Henning Kristensen, Højbjerg:
-
-1.3.0 oversat.
-
 6. November 2005 / Henning Kristensen, Højbjerg:
 
 1.0.0 oversat.

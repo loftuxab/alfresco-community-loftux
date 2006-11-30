@@ -1,0 +1,156 @@
+#header {
+width:760px;
+height:90px;
+background-color:#cc0000;
+background-repeat:no-repeat; 
+background-position: left bottom;
+float:left;
+}
+
+#subheader-main {
+float:left;
+width:537px;
+}
+
+#subheader {
+border-top:3px #FFFFFF solid;
+height:126px;
+clear:left;
+}
+
+.content-width {
+background-color:#006699;
+width:760px;
+}
+
+#lifestyle {
+height:126px;
+width:223px;
+background-image: url(/Images/home-page_tcm17-5990.jpg);  
+background-repeat: no-repeat;
+background-position: left bottom;
+float:left;
+}
+
+#leftpanel {
+float:left;
+width:220px;
+padding-top:10px;
+padding-bottom:10px;
+border-color: #FFFFFF black black; text-align: center; border-style: solid; border-top-width: 3px; border-right-width: 0px; border-bottom-width: 0px; border-left-width: 0px}
+
+.block-button {
+margin-left:10px;
+margin-right:10px;
+border: #000000; 
+background-color: #CC0000; 
+border-style: solid; 
+border-top-width: 2px; 
+border-right-width: 2px; 
+border-bottom-width: 2px; 
+border-left-width: 2px;
+float:left;
+clear:both;
+}
+
+.block-button-over {
+margin-left:10px;
+margin-right:10px;
+border: #000000; 
+background-color: #CCCCCC; 
+border-style: solid; 
+border-top-width: 2px; 
+border-right-width: 2px; 
+border-bottom-width: 2px; 
+border-left-width: 2px;
+float:left;
+clear:both;
+}
+
+.leftblocklinks {  
+margin-left:35px;
+margin-right:10px;
+font-size: 12px; 
+line-height: 16px;
+font-weight: bold; 
+margin-top:-2px;
+margin-bottom:2px;
+}
+
+.leftblocknolink {  
+margin-left:35px;
+margin-right:10px;
+font-size: 12px; 
+line-height: 16px;
+font-weight: bold;
+text-decoration:underline;
+color:#FFFFFF;
+text-transform: uppercase;
+margin-top:-2px;
+margin-bottom:2px;
+}
+
+.leftpanel-block-button {
+margin-left:10px;
+margin-right:10px;
+border: #FFFFFF;  
+background-color: #CC0000; 
+border-style: solid; 
+border-top-width: 2px; 
+border-right-width: 2px; 
+border-bottom-width: 2px; 
+border-left-width: 2px;
+float:left;
+clear:both;
+}
+
+.leftpanel-block-button-over {
+margin-left:10px;
+margin-right:10px;
+border: #FFFFFF;
+background-color: #CCCCCC;
+border-style: solid; 
+border-top-width: 2px; 
+border-right-width: 2px; 
+border-bottom-width: 2px; 
+border-left-width: 2px;
+float:left;
+clear:both;
+}
+
+.left-block-button {
+background-color: #CC0000; 
+border: #FFFFFF; 
+border-style: solid; 
+border-top-width: 2px; 
+border-right-width: 2px; 
+border-bottom-width: 2px; 
+border-left-width: 2px;
+clear:left;
+}
+
+.left-block-button-over {
+background-color: #CC0000; 
+border: #000000; 
+border-style: solid; 
+border-top-width: 2px; 
+border-right-width: 2px; 
+border-bottom-width: 2px; 
+border-left-width: 2px;
+clear:left;
+}
+
+.tableheader {
+background-color:#880000;
+padding:3px;
+border: solid 1px #F1F1F1;
+margin:0px;
+color:#FFFFFF
+}
+
+.tablecontent {
+background-color:#DDDDDD;
+padding:3px;
+border: solid 1px #F1F1F1;
+margin:0px;
+}

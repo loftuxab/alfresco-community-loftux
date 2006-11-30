@@ -1,0 +1,58 @@
+#home-content-width-with-bg {
+background-color:#396b6b;
+}
+
+#content-width-with-bg {
+background-color:#f1f8f8;
+}
+
+#content-width-with-bg-home {
+background-color:#f1f8f8;
+background-image: url(/Images/panel-cancer_tcm19-12976.gif); 
+}
+
+#content-width {
+background-color:#f1f8f8;
+}
+
+#right-panel {
+background-color:#c5e0e0;
+}
+
+.info-widget {
+background-color:#c5e0e0;
+}
+
+.info-image {
+background-color:#c5e0e0;
+}
+
+.product-info {
+background-color:#c5e0e0;
+}
+
+#right-panel #apply-panel {
+background-color:#396b6b;
+}
+
+th {
+background-color:#396b6b;
+color:#FFFFFF;
+}
+
+th.light-header {
+background-color:#c5e0e0;
+color:#555555;
+}
+
+.table-column {
+background-color:#c5e0e0;
+}
+
+h2.popup {
+color:#ffffff;
+}
+
+.pop-header {
+background-color:#396b6b;
+}

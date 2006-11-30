@@ -77,6 +77,9 @@
       <javac destdir="${dir.classes}" fork="true" deprecation="on" debug="on" 
              target="1.5" source="1.5" memorymaximumsize="512M">
          <src path="${dir.src.java.core}" />
+         <src path="${dir.src.java.catalinavirtual}" />
+         <src path="${dir.src.java.jndiclient}" />
+         <src path="${dir.src.java.mbeans}" />
          <src path="${dir.src.java.repository}" />
          <src path="${dir.src.java.remote}" />
          <src path="${dir.src.java.remote.generated}" />
@@ -95,6 +98,15 @@
       <!-- copy any properties files that are in the source tree -->
       <copy todir="${dir.classes}" overwrite="yes">
          <fileset dir="${dir.src.java.core}">
+            <patternset refid="patternset.source" />
+         </fileset>
+         <fileset dir="${dir.src.java.catalinavirtual}">
+            <patternset refid="patternset.source" />
+         </fileset>
+         <fileset dir="${dir.src.java.jndiclient}">
+            <patternset refid="patternset.source" />
+         </fileset>
+         <fileset dir="${dir.src.java.mbeans}">
             <patternset refid="patternset.source" />
          </fileset>
          <fileset dir="${dir.src.java.repository}">
@@ -127,6 +139,9 @@
       <!-- copy all the test resources files -->
       <copy todir="${dir.test.resources}">
          <fileset dir="${dir.src.test.core}" />
+         <fileset dir="${dir.src.test.catalinavirtual}"/>
+         <fileset dir="${dir.src.test.jndiclient}" />
+         <fileset dir="${dir.src.test.mbeans}" />
          <fileset dir="${dir.src.test.repository}" />
          <fileset dir="${dir.src.test.remote}" />
          <fileset dir="${dir.src.test.web}" />
@@ -140,6 +155,15 @@
          <formatter type="xml" />
          <batchtest todir="${dir.test.results}">
             <fileset dir="${dir.src.java.core}">
+               <patternset refid="patternset.tests" />
+            </fileset>
+            <fileset dir="${dir.src.java.catalinavirtual}">
+               <patternset refid="patternset.tests" />
+            </fileset>
+            <fileset dir="${dir.src.java.jndiclient}">
+               <patternset refid="patternset.tests" />
+            </fileset>
+            <fileset dir="${dir.src.java.mbeans}">
                <patternset refid="patternset.tests" />
             </fileset>
             <fileset dir="${dir.src.java.repository}">

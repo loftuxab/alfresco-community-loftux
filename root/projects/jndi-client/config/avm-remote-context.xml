@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
+	"http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+    <!-- load common properties -->
+    <bean id="repository-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+        <property name="locations">
+            <list>
+                <value>file:${catalina.base}/conf/alfresco-shared.properties</value>
+                <value>file:${catalina.base}/conf/alfresco-virtserver.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!-- Remote Alfresco RMI Proxy bean -->
+    <bean id="avmRemote" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl">
+            <value>rmi://${avm.remote.host}:${avm.remote.port}/avm</value>
+        </property>
+
+        <property name="serviceInterface">
+            <value>org.alfresco.repo.avm.AVMRemote</value>
+        </property>
+
+        <property name="refreshStubOnConnectFailure">
+            <value>true</value>
+        </property>
+    </bean>
+
+
+    <!-- Info for peer/peer MBean registration with remote Alfresco server -->
+    <bean id="virtServerInfo" 
+          class="org.alfresco.mbeans.VirtServerInfo"
+          lazy-init="true">
+
+        <!-- local virtualization server hostname -->
+        <property name="virtServerJmxRmiHost">
+            <value>${alfresco.virtserver.host}</value>
+        </property>
+
+        <!-- local virtualization server JMX RMI port  -->
+        <property name="virtServerJmxRmiPort">
+            <value>${alfresco.virtserver.port}</value>
+        </property>
+
+
+        <!-- remote Alfresco server hostname -->
+        <property name="alfrescoJmxRmiHost">
+            <value>${avm.remote.host}</value>
+        </property>
+
+        <!-- remote Alfresco server JMX RMI port -->
+        <property name="alfrescoJmxRmiPort">
+            <value>${avm.jmxrmi.port}</value>
+        </property>
+
+    </bean>
+
+</beans>

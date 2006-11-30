@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Benchmark Framework"/>
+	<classpathentry kind="lib" path="/Repository/config"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

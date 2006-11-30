@@ -15,11 +15,13 @@
         </property>
         <property name="locations">
             <list>
+                <value>classpath:alfresco/alfresco-shared.properties</value>
                 <value>classpath:alfresco/repository.properties</value>
                 <value>classpath:alfresco/version.properties</value>
                 <value>classpath:alfresco/domain/transaction.properties</value>
 
                 <!-- Override repository properties -->
+                <value>classpath:alfresco/extension/custom-alfresco-shared.properties</value>
                 <value>classpath:alfresco/extension/custom-repository.properties</value>
             </list>
         </property>

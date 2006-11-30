@@ -1,0 +1,12 @@
+# Exclude Files From All Robots: 
+
+User-agent: OmniExplorer_Bot/1.18 
+Disallow: /
+
+User-agent: OmniExplorer_Bot/1.07
+Disallow: /
+
+User-agent: OmniExplorer_Bot
+Disallow: /
+
+# End robots.txt file

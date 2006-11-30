@@ -13,8 +13,11 @@
       
       <filelist id="files.project.build" dir="${dir.product.root}"
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.mbeans}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.jndiclient}/${file.name.project.build}
+                       ${dir.name.projects}/${dir.name.catalinavirtual}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.benchmark-framework}/${file.name.project.build}
@@ -87,6 +90,15 @@
       <copy todir="${dir.javadoc}/${dir.name.webclient}">
          <fileset dir="${dir.project.webclient}/build/docs/java"/>
       </copy>
+      <copy todir="${dir.javadoc}/${dir.name.catalinavirtual}">
+          <fileset dir="${dir.project.catalinavirtual}/build/docs/java"/>
+      </copy>
+      <copy todir="${dir.javadoc}/${dir.name.jndiclient}">
+          <fileset dir="${dir.project.jndiclient}/build/docs/java"/>
+      </copy>
+      <copy todir="${dir.javadoc}/${dir.name.mbeans}">
+          <fileset dir="${dir.project.mbeans}/build/docs/java"/>
+      </copy>
       <copy todir="${dir.taglibdoc}">
          <fileset dir="${dir.project.webclient}/build/docs/taglib"/>
       </copy>  
@@ -103,17 +115,34 @@
          <fileset dir="${home.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${dir.deploy.jboss}/../lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
+
       <!-- copy the hotspot_compiler file to bin directory -->
       <copy file="${file.hotspotcompiler}" todir="${home.jboss}/bin" />
    </target>
 
-   <target name="deploy-tomcat" depends="clean-tomcat" description="Deploys to Tomcat">
+   <target name="deploy-virtual-tomcat" depends="init" description="Deploys to Virtual Tomcat (the virtualization server)">
+      <!-- Make sure virtualization server config is up to date -->
+      <copy todir="${home.virtualtomcat}/server/lib"  file="${dir.project.catalinavirtual}/build/dist/alfresco-catalina-virtual.jar"/>
+      <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.jndiclient}/build/dist/alfresco-jndi-client.jar"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.repository}/config/alfresco/alfresco-shared.properties"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.password"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.access"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.jndiclient}/config/avm-remote-context.xml"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.jndiclient}/config/alfresco-virtserver.properties"/>
+      <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.repository}/build/dist/repository.jar"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.virtual}/config/server.xml" overwrite="yes"/>
+      <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.core}/build/dist/core.jar"/>
+      <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.3rdparty}/lib/spring.jar"/>
+   </target>
+
+   <target name="deploy-tomcat" depends="clean-tomcat, deploy-virtual-tomcat" description="Deploys to Tomcat">
       <copy file="${file.deploy}" todir="${dir.deploy.tomcat}" />
       <!-- ensure mysql drivers are present -->
       <delete>
          <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${home.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
+
       <!-- copy the hotspot_compiler file to bin directory -->
       <copy file="${file.hotspotcompiler}" todir="${home.tomcat}/bin" />
    </target>

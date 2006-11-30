@@ -53,7 +53,7 @@
                     <platforms>windows</platforms>
                     <actionList>
                         <substitute>
-                            <files>*/tomcat/bin/service.bat;*/mysql/my.ini;*/alfresco.bat;*/run.bat;*/servicerun.bat;*/serviceinstall.bat;*/custom-repository.properties;*/tempfile;*/re_startstop.bat;*/db_setup.bat;*/db_remove.bat;*/start_oo.bat</files>
+                            <files>*/tomcat/bin/service.bat;*/mysql/my.ini;*/alfresco.bat;*/run.bat;*/servicerun.bat;*/serviceinstall.bat;*/custom-alfresco-shared.properties;*/custom-repository.properties;*/tempfile;*/re_startstop.bat;*/db_setup.bat;*/db_remove.bat;*/start_oo.bat</files>
                             <type>exact</type>
                             <substitutionList>
                                 <substitution>

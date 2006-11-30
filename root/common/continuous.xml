@@ -37,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, set-build-number, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
+           depends="init, set-build-number, prepare-virtual, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
@@ -49,15 +49,36 @@
          <fileset dir="${dir.dist}"/>
       </checksum>
    </target>
-   
+
    <target name="set-build-number" if="build.release">
       <replace file="${dir.config.repository}/alfresco/version.properties" token="@build-number@" value="${label}" />
    </target>
-   
+
+   <target name="prepare-virtual" depends="init">
+      <!-- prepare virtualization server -->
+      <delete>
+         <fileset dir="${dir.distribution.virtualtomcat}"/>
+      </delete>
+      <copy todir="${dir.distribution.virtualtomcat}">
+         <fileset dir="${dir.distribution.tomcat}" />
+      </copy>
+      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.virtual}/build/dist/alfresco-catalina-virtual.jar" />
+      <copy todir="${dir.distribution.virtualtomcat}/server/lib" file="${dir.project.jndi}/build/dist/alfresco-jndi-client.jar" />
+      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-shared.properties"/>
+      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.password"/>
+      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.access"/>
+      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.jndi}/config/avm-remote-context.xml" />
+      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.jndi}/config/alfresco-virtserver.properties" />
+      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.virtual}/config/server.xml" overwrite="yes"/>
+      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.core}/build/dist/core.jar" />
+      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.repository}/build/dist/repository.jar" />
+      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.3rdparty}/lib/spring.jar" />
+   </target>
+
    <!-- ******************* -->
    <!-- ** JBoss targets ** -->
    <!-- ******************* -->
-   
+
    <target name="distribute-jboss" depends="init" description="Creates the distibution files for JBoss">
       <ant antfile="${file.name.build}" target="clean-war" />
       <ant antfile="${file.name.build}" target="incremental-jboss" />
@@ -65,7 +86,7 @@
       <antcall target="distribute-jboss-windows" />
       <antcall target="distribute-jboss-linux" />
    </target>
-   
+
    <target name="distribute-jboss-windows" depends="init">
       <zip destfile="${dir.dist}/${file.name.dist.jboss}.zip">
          <zipfileset dir="${dir.assemble.jboss}" />
@@ -75,6 +96,8 @@
          <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
+         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
@@ -92,6 +115,8 @@
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
       </tar>
@@ -103,11 +128,12 @@
       <mkdir dir="${dir.dist}" />
       <mkdir dir="${dir.assemble.jboss}" />
       
-      <!-- make sure the MySQL connector & HSQLDB is present and up to date -->
+      <!-- make sure the MySQL connector is present and up to date -->
       <delete>
          <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
+
       
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.assemble.jboss}/jboss/server/default/deploy">
@@ -120,9 +146,6 @@
       <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension">
          <fileset dir="${dir.project.installer}/extension" />
       </copy>
-      <!--
-      <copy todir="${dir.assemble.jboss}/jboss/server/default/lib" file="${dir.project.installer}/hsqldb.jar" />
-      -->
       <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/messages">
          <fileset dir="${dir.project.installer}/messages" />
       </copy>
@@ -157,12 +180,15 @@
          <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
+         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
+         <zipfileset dir="${dir.distribution.virtualtomcat}" prefix="virtual-tomcat" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
       </zip>
    </target>
-   
+
    <target name="distribute-tomcat-linux" depends="init">
       <tar destfile="${dir.dist}/${file.name.dist.tomcat}.tar" longfile="gnu">
          <tarfileset dir="${dir.assemble.tomcat}" />
@@ -174,7 +200,10 @@
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${dir.distribution.virtualtomcat}" prefix="virtual-tomcat" />
          <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.tomcat}.tar.gz" src="${dir.dist}/${file.name.dist.tomcat}.tar" />
@@ -184,7 +213,7 @@
    <target name="assemble-tomcat-common" depends="init">
       <mkdir dir="${dir.dist}" />
       <mkdir dir="${dir.assemble.tomcat}" />
-      
+
       <!-- make sure the MySQL connector is present and up to date -->
       <delete>
          <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
@@ -202,9 +231,6 @@
       <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.installer}/extension" />
       </copy>
-      <!--
-      <copy todir="${dir.assemble.tomcat}/tomcat/common/lib" file="${dir.project.installer}/hsqldb.jar" />
-      -->
       <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/messages">
          <fileset dir="${dir.project.installer}/messages" />
       </copy>
@@ -371,7 +397,7 @@
       <mkdir dir="${dir.assemble.sdk}/bin" />
       <copy todir="${dir.assemble.sdk}/bin">
          <fileset dir="${dir.project.netbios}/dll" includes="*.dll" />
-         <fileset dir="${dir.project.installer}" includes=".hotspot_compiler" />
+         <fileset dir="${dir.project.installer}" includes=".hotspot_compiler,db_setup.sql" />
       </copy>
 
       <!-- -->

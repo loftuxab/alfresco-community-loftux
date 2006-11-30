@@ -8,157 +8,157 @@
 -- Create temporary 1.3 schema
 --
 
-CREATE TABLE T_access_control_entry (
-  id bigint(20) NOT NULL auto_increment,
-  protocol varchar(50) default NULL,
-  identifier varchar(100) default NULL,
-  uuid varchar(36) default NULL,
-  typeUri varchar(100) default NULL,
-  typeName varchar(100) default NULL,
-  name varchar(100) default NULL,
-  recipient varchar(100) default NULL,
-  acl_id bigint(20),
-  permission_id bigint(20),
-  authority_id varchar(100),
-  allowed bit(1) NOT NULL,
-  PRIMARY KEY  (id)
+CREATE TABLE `T_access_control_entry` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `protocol` varchar(50) default NULL,
+  `identifier` varchar(100) default NULL,
+  `uuid` varchar(36) default NULL,
+  `typeUri` varchar(100) default NULL,
+  `typeName` varchar(100) default NULL,
+  `name` varchar(100) default NULL,
+  `recipient` varchar(100) default NULL,
+  `acl_id` bigint(20),
+  `permission_id` bigint(20),
+  `authority_id` varchar(100),
+  `allowed` bit(1) NOT NULL,
+  PRIMARY KEY  (`id`)
 );
-ALTER TABLE T_access_control_entry ADD INDEX IDX_T_REF(protocol, identifier, uuid);
+ALTER TABLE `T_access_control_entry` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
-CREATE TABLE T_access_control_list (
-  id bigint(20) NOT NULL auto_increment,
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  uuid varchar(36) NOT NULL,
-  inherits bit(1) NOT NULL,
-  PRIMARY KEY  (id)
+CREATE TABLE `T_access_control_list` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `inherits` bit(1) NOT NULL,
+  PRIMARY KEY  (`id`)
 );
-ALTER TABLE T_access_control_list ADD INDEX IDX_T_REF(protocol, identifier, uuid);
+ALTER TABLE `T_access_control_list` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
 
-CREATE TABLE T_applied_patch (
-  id varchar(32) NOT NULL,
-  description text,
-  fixes_from_schema int(11) default NULL,
-  fixes_to_schema int(11) default NULL,
-  applied_to_schema int(11) default NULL,
-  target_schema int(11) default NULL,
-  applied_on_date datetime default NULL,
-  applied_to_server varchar(64) default NULL,
-  was_executed bit(1) default NULL,
-  succeeded bit(1) default NULL,
-  report text
-);
-
-CREATE TABLE T_auth_ext_keys (
-  id varchar(100) NOT NULL,
-  externalKey varchar(100) NOT NULL
+CREATE TABLE `T_applied_patch` (
+  `id` varchar(32) NOT NULL,
+  `description` text,
+  `fixes_from_schema` int(11) default NULL,
+  `fixes_to_schema` int(11) default NULL,
+  `applied_to_schema` int(11) default NULL,
+  `target_schema` int(11) default NULL,
+  `applied_on_date` datetime default NULL,
+  `applied_to_server` varchar(64) default NULL,
+  `was_executed` bit(1) default NULL,
+  `succeeded` bit(1) default NULL,
+  `report` text
 );
 
-CREATE TABLE T_authority (
-  recipient varchar(100) NOT NULL
+CREATE TABLE `T_auth_ext_keys` (
+  `id` varchar(100) NOT NULL,
+  `externalKey` varchar(100) NOT NULL
 );
 
-CREATE TABLE T_child_assoc (
-  id bigint(20) NOT NULL auto_increment,
-  parent_node_id bigint(20) default NULL,
-  parent_protocol varchar(50) default NULL,
-  parent_identifier varchar(100) default NULL,
-  parent_uuid varchar(36) default NULL,
-  child_node_id bigint(20) default NULL,
-  child_protocol varchar(50) default NULL,
-  child_identifier varchar(100) default NULL,
-  child_uuid varchar(36) default NULL,
-  type_qname varchar(255) NOT NULL,
-  qname varchar(255) NOT NULL,
-  is_primary bit(1) default NULL,
-  assoc_index int(11) default NULL,
-  PRIMARY KEY  (id)
-);
-ALTER TABLE T_child_assoc ADD INDEX IDX_T_REF_PARENT(parent_protocol, parent_identifier, parent_uuid);
-ALTER TABLE T_child_assoc ADD INDEX IDX_T_REF_CHILD(child_protocol, child_identifier, child_uuid);
-
-CREATE TABLE T_node (
-  id bigint(20) NOT NULL auto_increment,
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  uuid varchar(36) NOT NULL,
-  acl_id bigint(20) default NULL,
-  type_qname varchar(255) NOT NULL,
-  PRIMARY KEY  (id)
-);
-ALTER TABLE T_node ADD INDEX IDX_T_REF(protocol, identifier, uuid);
-
-CREATE TABLE T_node_aspects (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  uuid varchar(36) NOT NULL,
-  node_id bigint(20),
-  qname varchar(200) default NULL
-);
-ALTER TABLE T_node_aspects ADD INDEX IDX_T_REF(protocol, identifier, uuid);
-
-CREATE TABLE T_node_assoc (
-  id bigint(20) NOT NULL auto_increment,
-  source_node_id bigint(20) default NULL,
-  source_protocol varchar(50) default NULL,
-  source_identifier varchar(100) default NULL,
-  source_uuid varchar(36) default NULL,
-  target_node_id bigint(20) default NULL,
-  target_protocol varchar(50) default NULL,
-  target_identifier varchar(100) default NULL,
-  target_uuid varchar(36) default NULL,
-  type_qname varchar(255) NOT NULL,
-  PRIMARY KEY  (id)
-);
-ALTER TABLE T_node_assoc ADD INDEX IDX_T_REF_SOURCE(source_protocol, source_identifier, source_uuid);
-ALTER TABLE T_node_assoc ADD INDEX IDX_T_REF_TARGET(target_protocol, target_identifier, target_uuid);
-
-CREATE TABLE T_node_properties (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  uuid varchar(36) NOT NULL,
-  node_id bigint(20),
-  actual_type varchar(15) NOT NULL,
-  multi_valued bit(1) NOT NULL,
-  persisted_type varchar(15) NOT NULL,
-  boolean_value bit(1) default NULL,
-  long_value bigint(20) default NULL,
-  float_value float default NULL,
-  double_value double default NULL,
-  string_value text,
-  serializable_value blob,
-  qname varchar(200) NOT NULL
-);
-ALTER TABLE T_node_properties ADD INDEX IDX_T_REF(protocol, identifier, uuid);
-
-CREATE TABLE T_node_status (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  guid varchar(36) NOT NULL,
-  node_id bigint(20) default NULL,
-  change_txn_id varchar(56) NOT NULL,
-  deleted bit(1) NOT NULL
-);
-ALTER TABLE T_node_status ADD INDEX IDX_T_REF(protocol, identifier, guid);
-
-CREATE TABLE T_permission (
-  id bigint(20) NOT NULL auto_increment,
-  type_qname varchar(200) NOT NULL,
-  name varchar(100) NOT NULL,
-  PRIMARY KEY  (id)
+CREATE TABLE `T_authority` (
+  `recipient` varchar(100) NOT NULL
 );
 
-CREATE TABLE T_store (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  root_node_id bigint(20) default NULL
+CREATE TABLE `T_child_assoc` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `parent_node_id` bigint(20) default NULL,
+  `parent_protocol` varchar(50) default NULL,
+  `parent_identifier` varchar(100) default NULL,
+  `parent_uuid` varchar(36) default NULL,
+  `child_node_id` bigint(20) default NULL,
+  `child_protocol` varchar(50) default NULL,
+  `child_identifier` varchar(100) default NULL,
+  `child_uuid` varchar(36) default NULL,
+  `type_qname` varchar(255) NOT NULL,
+  `qname` varchar(255) NOT NULL,
+  `is_primary` bit(1) default NULL,
+  `assoc_index` int(11) default NULL,
+  PRIMARY KEY  (`id`)
 );
-ALTER TABLE T_store ADD INDEX IDX_T_STORE_REF(protocol, identifier);
+ALTER TABLE `T_child_assoc` ADD INDEX `IDX_REF_PARENT`(`parent_protocol`, `parent_identifier`, `parent_uuid`);
+ALTER TABLE `T_child_assoc` ADD INDEX `IDX_REF_CHILD`(`child_protocol`, `child_identifier`, `child_uuid`);
 
-CREATE TABLE T_version_count (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  version_count int(11) NOT NULL
+CREATE TABLE `T_node` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `acl_id` bigint(20) default NULL,
+  `type_qname` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+ALTER TABLE `T_node` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
+
+CREATE TABLE `T_node_aspects` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `node_id` bigint(20),
+  `qname` varchar(200) default NULL
+);
+ALTER TABLE `T_node_aspects` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
+
+CREATE TABLE `T_node_assoc` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `source_node_id` bigint(20) default NULL,
+  `source_protocol` varchar(50) default NULL,
+  `source_identifier` varchar(100) default NULL,
+  `source_uuid` varchar(36) default NULL,
+  `target_node_id` bigint(20) default NULL,
+  `target_protocol` varchar(50) default NULL,
+  `target_identifier` varchar(100) default NULL,
+  `target_uuid` varchar(36) default NULL,
+  `type_qname` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+ALTER TABLE `T_node_assoc` ADD INDEX `IDX_REF_SOURCE`(`source_protocol`, `source_identifier`, `source_uuid`);
+ALTER TABLE `T_node_assoc` ADD INDEX `IDX_REF_TARGET`(`target_protocol`, `target_identifier`, `target_uuid`);
+
+CREATE TABLE `T_node_properties` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `node_id` bigint(20),
+  `actual_type` varchar(15) NOT NULL,
+  `multi_valued` bit(1) NOT NULL,
+  `persisted_type` varchar(15) NOT NULL,
+  `boolean_value` bit(1) default NULL,
+  `long_value` bigint(20) default NULL,
+  `float_value` float default NULL,
+  `double_value` double default NULL,
+  `string_value` text,
+  `serializable_value` blob,
+  `qname` varchar(200) NOT NULL
+);
+ALTER TABLE `t_node_properties` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `uuid`);
+
+CREATE TABLE `T_node_status` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `guid` varchar(36) NOT NULL,
+  `node_id` bigint(20) default NULL,
+  `change_txn_id` varchar(56) NOT NULL,
+  `deleted` bit(1) NOT NULL
+);
+ALTER TABLE `t_node_status` ADD INDEX `IDX_REF`(`protocol`, `identifier`, `guid`);
+
+CREATE TABLE `T_permission` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `type_qname` varchar(200) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY  (`id`)
+);
+
+CREATE TABLE `T_store` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `root_node_id` bigint(20) default NULL
+);
+ALTER TABLE `t_store` ADD INDEX `IDX_STORE_REF`(`protocol`, `identifier`);
+
+CREATE TABLE `T_version_count` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `version_count` int(11) NOT NULL
 );
 
 --
@@ -182,10 +182,10 @@ update T_store tstore set root_node_id =
     )
   );
 
-insert into T_version_count (protocol, identifier, version_count)
+insert into t_version_count (protocol, identifier, version_count)
   select protocol, identifier, version_count from version_count;
 
-insert into T_node_status (protocol, identifier, guid, change_txn_id, deleted)
+insert into t_node_status (protocol, identifier, guid, change_txn_id, deleted)
   select protocol, identifier, guid, change_txn_id, deleted from node_status;
 update T_node_status tstatus set node_id =
   (select tnode.id from T_node tnode where
@@ -304,7 +304,7 @@ insert into T_auth_ext_keys
   select
     id, externalKey
   from
-    externalKeys;
+    externalkeys;
 
 insert into T_authority
   (
@@ -362,9 +362,8 @@ update T_access_control_entry tentry
       where
         tauthority.recipient = tentry.recipient
     );
-delete from T_access_control_list where id not in (select distinct(acl_id) id from T_access_control_entry where acl_id is not null);
+delete from T_access_control_list where id not in (select distinct(acl_id) id from t_access_control_entry where acl_id is not null);
 delete from T_access_control_entry where acl_id is null;
-update T_node set acl_id = null where acl_id not in (select id from T_access_control_list);
 
 --
 -- Create New schema (MySQL)
@@ -386,139 +385,139 @@ DROP TABLE permission_ref;
 DROP TABLE recipient;
 DROP TABLE externalKeys;
 
-CREATE TABLE access_control_entry (
-  id bigint(20) NOT NULL auto_increment,
-  acl_id bigint(20) NOT NULL,
-  permission_id bigint(20) NOT NULL,
-  authority_id varchar(100) NOT NULL,
-  allowed bit(1) NOT NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY acl_id (acl_id,permission_id,authority_id),
-  KEY FKF064DF7560601995 (permission_id),
-  KEY FKF064DF75B25A50BF (authority_id),
-  KEY FKF064DF75B9553F6C (acl_id),
-  CONSTRAINT FKF064DF75B9553F6C FOREIGN KEY (acl_id) REFERENCES access_control_list (id),
-  CONSTRAINT FKF064DF7560601995 FOREIGN KEY (permission_id) REFERENCES permission (id),
-  CONSTRAINT FKF064DF75B25A50BF FOREIGN KEY (authority_id) REFERENCES authority (recipient)
+CREATE TABLE `access_control_entry` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `acl_id` bigint(20) NOT NULL,
+  `permission_id` bigint(20) NOT NULL,
+  `authority_id` varchar(100) NOT NULL,
+  `allowed` bit(1) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `acl_id` (`acl_id`,`permission_id`,`authority_id`),
+  KEY `FKF064DF7560601995` (`permission_id`),
+  KEY `FKF064DF75B25A50BF` (`authority_id`),
+  KEY `FKF064DF75B9553F6C` (`acl_id`),
+  CONSTRAINT `FKF064DF75B9553F6C` FOREIGN KEY (`acl_id`) REFERENCES `access_control_list` (`id`),
+  CONSTRAINT `FKF064DF7560601995` FOREIGN KEY (`permission_id`) REFERENCES `permission` (`id`),
+  CONSTRAINT `FKF064DF75B25A50BF` FOREIGN KEY (`authority_id`) REFERENCES `authority` (`recipient`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE access_control_list (
-  id bigint(20) NOT NULL auto_increment,
-  inherits bit(1) NOT NULL,
-  PRIMARY KEY  (id)
+CREATE TABLE `access_control_list` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `inherits` bit(1) NOT NULL,
+  PRIMARY KEY  (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE auth_ext_keys (
-  id varchar(100) NOT NULL,
-  externalKey varchar(100) NOT NULL,
-  PRIMARY KEY  (id,externalKey),
-  KEY FK31D3BA097B7FDE43 (id),
-  CONSTRAINT FK31D3BA097B7FDE43 FOREIGN KEY (id) REFERENCES authority (recipient)
+CREATE TABLE `auth_ext_keys` (
+  `id` varchar(100) NOT NULL,
+  `externalKey` varchar(100) NOT NULL,
+  PRIMARY KEY  (`id`,`externalKey`),
+  KEY `FK31D3BA097B7FDE43` (`id`),
+  CONSTRAINT `FK31D3BA097B7FDE43` FOREIGN KEY (`id`) REFERENCES `authority` (`recipient`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE authority (
-  recipient varchar(100) NOT NULL,
-  PRIMARY KEY  (recipient)
+CREATE TABLE `authority` (
+  `recipient` varchar(100) NOT NULL,
+  PRIMARY KEY  (`recipient`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE child_assoc (
-  id bigint(20) NOT NULL auto_increment,
-  parent_node_id bigint(20) default NULL,
-  child_node_id bigint(20) default NULL,
-  type_qname varchar(255) NOT NULL,
-  qname varchar(255) NOT NULL,
-  is_primary bit(1) default NULL,
-  assoc_index int(11) default NULL,
-  PRIMARY KEY  (id),
-  KEY FKFFC5468E74173FF4 (child_node_id),
-  KEY FKFFC5468E8E50E582 (parent_node_id),
-  CONSTRAINT FKFFC5468E8E50E582 FOREIGN KEY (parent_node_id) REFERENCES node (id),
-  CONSTRAINT FKFFC5468E74173FF4 FOREIGN KEY (child_node_id) REFERENCES node (id)
+CREATE TABLE `child_assoc` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `parent_node_id` bigint(20) default NULL,
+  `child_node_id` bigint(20) default NULL,
+  `type_qname` varchar(255) NOT NULL,
+  `qname` varchar(255) NOT NULL,
+  `is_primary` bit(1) default NULL,
+  `assoc_index` int(11) default NULL,
+  PRIMARY KEY  (`id`),
+  KEY `FKC6EFFF3274173FF4` (`child_node_id`),
+  KEY `FKC6EFFF328E50E582` (`parent_node_id`),
+  CONSTRAINT `FKC6EFFF328E50E582` FOREIGN KEY (`parent_node_id`) REFERENCES `node` (`id`),
+  CONSTRAINT `FKC6EFFF3274173FF4` FOREIGN KEY (`child_node_id`) REFERENCES `node` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE node (
-  id bigint(20) NOT NULL auto_increment,
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  uuid varchar(36) NOT NULL,
-  type_qname varchar(255) NOT NULL,
-  acl_id bigint(20) default NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY protocol (protocol,identifier,uuid),
-  KEY FK33AE02D24ADD25 (protocol,identifier),
-  CONSTRAINT FK33AE02D24ADD25 FOREIGN KEY (protocol, identifier) REFERENCES store (protocol, identifier),
-  CONSTRAINT FK33AE02B9553F6C FOREIGN KEY (acl_id) REFERENCES access_control_list (id)
+CREATE TABLE `node` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `uuid` varchar(36) NOT NULL,
+  `type_qname` varchar(255) NOT NULL,
+  `acl_id` bigint(20) default NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `protocol` (`protocol`,`identifier`,`uuid`),
+  KEY `FK33AE02D24ADD25` (`protocol`,`identifier`),
+  CONSTRAINT `FK33AE02D24ADD25` FOREIGN KEY (`protocol`, `identifier`) REFERENCES `store` (`protocol`, `identifier`),
+  CONSTRAINT `FK33AE02B9553F6C` FOREIGN KEY (`acl_id`) REFERENCES `access_control_list` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE node_aspects (
-  node_id bigint(20) NOT NULL,
-  qname varchar(200) default NULL,
-  KEY FK2B91A9DE7F2C8017 (node_id),
-  CONSTRAINT FK2B91A9DE7F2C8017 FOREIGN KEY (node_id) REFERENCES node (id)
+CREATE TABLE `node_aspects` (
+  `node_id` bigint(20) NOT NULL,
+  `qname` varchar(200) default NULL,
+  KEY `FK2B91A9DE7F2C8017` (`node_id`),
+  CONSTRAINT `FK2B91A9DE7F2C8017` FOREIGN KEY (`node_id`) REFERENCES `node` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE node_assoc (
-  id bigint(20) NOT NULL auto_increment,
-  source_node_id bigint(20) default NULL,
-  target_node_id bigint(20) default NULL,
-  type_qname varchar(255) NOT NULL,
-  PRIMARY KEY  (id),
-  KEY FK5BAEF398B69C43F3 (source_node_id),
-  KEY FK5BAEF398A8FC7769 (target_node_id),
-  CONSTRAINT FK5BAEF398A8FC7769 FOREIGN KEY (target_node_id) REFERENCES node (id),
-  CONSTRAINT FK5BAEF398B69C43F3 FOREIGN KEY (source_node_id) REFERENCES node (id)
+CREATE TABLE `node_assoc` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `source_node_id` bigint(20) default NULL,
+  `target_node_id` bigint(20) default NULL,
+  `type_qname` varchar(255) NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `FK5BAEF398B69C43F3` (`source_node_id`),
+  KEY `FK5BAEF398A8FC7769` (`target_node_id`),
+  CONSTRAINT `FK5BAEF398A8FC7769` FOREIGN KEY (`target_node_id`) REFERENCES `node` (`id`),
+  CONSTRAINT `FK5BAEF398B69C43F3` FOREIGN KEY (`source_node_id`) REFERENCES `node` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE node_properties (
-  node_id bigint(20) NOT NULL,
-  actual_type varchar(15) NOT NULL,
-  multi_valued bit(1) NOT NULL,
-  persisted_type varchar(15) NOT NULL,
-  boolean_value bit(1) default NULL,
-  long_value bigint(20) default NULL,
-  float_value float default NULL,
-  double_value double default NULL,
-  string_value text,
-  serializable_value blob,
-  qname varchar(200) NOT NULL,
-  PRIMARY KEY  (node_id,qname),
-  KEY FKC962BF907F2C8017 (node_id),
-  CONSTRAINT FKC962BF907F2C8017 FOREIGN KEY (node_id) REFERENCES node (id)
+CREATE TABLE `node_properties` (
+  `node_id` bigint(20) NOT NULL,
+  `actual_type` varchar(15) NOT NULL,
+  `multi_valued` bit(1) NOT NULL,
+  `persisted_type` varchar(15) NOT NULL,
+  `boolean_value` bit(1) default NULL,
+  `long_value` bigint(20) default NULL,
+  `float_value` float default NULL,
+  `double_value` double default NULL,
+  `string_value` text,
+  `serializable_value` blob,
+  `qname` varchar(200) NOT NULL,
+  PRIMARY KEY  (`node_id`,`qname`),
+  KEY `FKC962BF907F2C8017` (`node_id`),
+  CONSTRAINT `FKC962BF907F2C8017` FOREIGN KEY (`node_id`) REFERENCES `node` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE node_status (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  guid varchar(36) NOT NULL,
-  node_id bigint(20) default NULL,
-  change_txn_id varchar(56) NOT NULL,
-  PRIMARY KEY  (protocol,identifier,guid),
-  KEY FK38ECB8CF7F2C8017 (node_id),
-  CONSTRAINT FK38ECB8CF7F2C8017 FOREIGN KEY (node_id) REFERENCES node (id)
+CREATE TABLE `node_status` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `guid` varchar(36) NOT NULL,
+  `node_id` bigint(20) default NULL,
+  `change_txn_id` varchar(56) NOT NULL,
+  PRIMARY KEY  (`protocol`,`identifier`,`guid`),
+  KEY `FK38ECB8CF7F2C8017` (`node_id`),
+  CONSTRAINT `FK38ECB8CF7F2C8017` FOREIGN KEY (`node_id`) REFERENCES `node` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE permission (
-  id bigint(20) NOT NULL auto_increment,
-  type_qname varchar(200) NOT NULL,
-  name varchar(100) NOT NULL,
-  PRIMARY KEY  (id),
-  UNIQUE KEY type_qname (type_qname,name)
+CREATE TABLE `permission` (
+  `id` bigint(20) NOT NULL auto_increment,
+  `type_qname` varchar(200) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  PRIMARY KEY  (`id`),
+  UNIQUE KEY `type_qname` (`type_qname`,`name`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE store (
-  protocol varchar(50) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  root_node_id bigint(20) default NULL,
-  PRIMARY KEY  (protocol,identifier),
-  KEY FK68AF8E122DBA5BA (root_node_id),
-  CONSTRAINT FK68AF8E122DBA5BA FOREIGN KEY (root_node_id) REFERENCES node (id)
+CREATE TABLE `store` (
+  `protocol` varchar(50) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `root_node_id` bigint(20) default NULL,
+  PRIMARY KEY  (`protocol`,`identifier`),
+  KEY `FK68AF8E122DBA5BA` (`root_node_id`),
+  CONSTRAINT `FK68AF8E122DBA5BA` FOREIGN KEY (`root_node_id`) REFERENCES `node` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-CREATE TABLE version_count (
-  protocol varchar(100) NOT NULL,
-  identifier varchar(100) NOT NULL,
-  version_count int(11) NOT NULL,
-  PRIMARY KEY  (protocol,identifier)
+CREATE TABLE `version_count` (
+  `protocol` varchar(100) NOT NULL,
+  `identifier` varchar(100) NOT NULL,
+  `version_count` int(11) NOT NULL,
+  PRIMARY KEY  (`protocol`,`identifier`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 --
@@ -644,30 +643,9 @@ insert into access_control_entry
   from
     T_access_control_entry;
 
---
--- Delete intermediate tables
---
-DROP TABLE T_access_control_entry;
-DROP TABLE T_access_control_list;
-DROP TABLE T_applied_patch;
-DROP TABLE T_auth_ext_keys;
-DROP TABLE T_authority;
-DROP TABLE T_child_assoc;
-DROP TABLE T_node;
-DROP TABLE T_node_aspects;
-DROP TABLE T_node_assoc;
-DROP TABLE T_node_properties;
-DROP TABLE T_node_status;
-DROP TABLE T_permission;
-DROP TABLE T_store;
-DROP TABLE T_version_count;
-
---
--- Enable FK relationships
---
 SET FOREIGN_KEY_CHECKS = 1;
 
---
+
 -- Allow longer patch identifiers
---
+
 ALTER TABLE applied_patch MODIFY id varchar(64) not null;

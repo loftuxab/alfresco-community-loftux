@@ -1,0 +1,36 @@
+#home-content-width-with-bg {
+background-color:#ddae52;
+}
+
+#content-width-with-bg {
+background-color:#fcf7ef;
+}
+
+#content-width-with-bg-home {
+background-color:#fcf7ef;
+background-image: url(/Images/panel-pension_tcm19-12980.gif); 
+}
+
+#content-width {
+background-color:#fcf7ef;
+}
+
+#right-panel {
+background-color:#efd9af;
+}
+
+.info-widget {
+background-color:#efd9af;
+}
+
+.info-image {
+background-color:#efd9af;
+}
+
+.product-info {
+background-color:#efd9af;
+}
+
+#right-panel #apply-panel {
+background-color:#ddae52;
+}
