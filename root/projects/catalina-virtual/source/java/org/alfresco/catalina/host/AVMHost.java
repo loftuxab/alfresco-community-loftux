@@ -21,24 +21,14 @@
 
 package org.alfresco.catalina.host;
 
-
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.management.Attribute;
-import javax.management.MBeanServer;
-import javax.management.MBeanServerConnection;
 import javax.management.ObjectName;
-import javax.management.remote.JMXConnector;
-import javax.management.remote.JMXConnectorFactory;
-import javax.management.remote.JMXServiceURL;
 import org.alfresco.jndi.AVMFileDirContext;
-import org.alfresco.mbeans.VirtServerInfoMBean;
+import org.alfresco.mbeans.VirtServerRegistrationThread;
 import org.alfresco.repo.avm.AVMRemote;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -50,8 +40,6 @@ import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.Valve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.modeler.Registry;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
-
 
 /**
 *  This class implements a Catalina virtual Host;  it can be 
@@ -186,7 +174,10 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         org.apache.commons.logging.LogFactory.getLog( AVMHost.class );
 
     static String AVMFileDirAppBase_ = AVMFileDirContext.getAVMFileDirAppBase();
-    static FileSystemXmlApplicationContext SpringContext_ = null;
+
+    // Repeatedly re-registers this Host with the Alfresco server
+    // (e.g.: every 10 seconds or so).
+    protected VirtServerRegistrationThread registrationThread_ = null;
 
 
     // Because this is private, not protected in the base class,
@@ -388,9 +379,8 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             // When this virt server gets a message to update a virtual webapp,
             // a recursive classloader reload is triggered for that webapp.
 
-            registerVirtServerWithAvmServer();  
-
-
+            registrationThread_ = new VirtServerRegistrationThread();
+            registrationThread_.start();
 
 
             // Use a custom deployer that knows how to access AVMRemote
@@ -452,96 +442,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         }
     }
 
-
-    /**
-    *  Registers this virtualization server with an AVM server.
-    *  Later, when the AVM server does something that will
-    *  require this virtualization server to do a recursive
-    *  classloader reload, the AVM server will send back a 
-    *  message to the virtualization server, telling it
-    *  which virtual webapp to reload.
-    *
-    *  TODO:  This should be in its own thread that re-registers
-    *         the Host every 10 (or so) seconds.  This will handle 
-    *         the case when the Alfrseco server dies, dropping 
-    *         the list of all registered listeners along with its 
-    *         associated MBeanServer
-    */
-    private void registerVirtServerWithAvmServer()
-    {
-        SpringContext_   = AVMFileDirContext.GetSpringApplicationContext();
-
-        VirtServerInfoMBean serverInfo = 
-            (VirtServerInfoMBean)  
-                SpringContext_.getBean("virtServerInfo");
-
-        String catalina_base;
-        catalina_base = System.getProperty("catalina.base");
-        if ( catalina_base == null)
-        {   
-            catalina_base = System.getProperty("catalina.home");
-        }
-        if ( catalina_base != null)
-        {   
-            if ( ! catalina_base.endsWith("/") )
-            {   
-                catalina_base = catalina_base + "/";
-            }
-        }
-        else { catalina_base = ""; }
-
-
-        String password_file = catalina_base + "conf/alfresco-jmxrmi.password";
-        Properties passwordProps = new Properties();
-        String jmxrmi_password   = null;
-
-        try 
-        {
-            passwordProps.load( new FileInputStream( password_file ) );
-            jmxrmi_password = passwordProps.getProperty("controlRole");
-
-            // Create a JMXServiceURL to connect to the Alfresco JMX RMI server
-            // These urls tend to look like:
-            // 
-            //  "service:jmx:rmi://ignored/jndi/rmi://localhost:50500/alfresco/jmxrmi"
-            //
-            JMXServiceURL url = 
-              new JMXServiceURL("service:jmx:rmi://ignored/jndi/rmi://" +
-                                 serverInfo.getAlfrescoJmxRmiHost()     +
-                                 ":"                                    +
-                                  serverInfo.getAlfrescoJmxRmiPort()    +
-                                 "/alfresco/jmxrmi"
-                               );
-
-             Map<String,Object> env = new HashMap<String,Object>();
-             String[] cred = new String[] { "controlRole", jmxrmi_password };
-             env.put("jmx.remote.credentials", cred );
-             JMXConnector conn = JMXConnectorFactory.connect(url, env);
-             MBeanServerConnection mbsc = conn.getMBeanServerConnection();
-             ObjectName virt_registry = ObjectName.getInstance(
-                 "Alfresco:Name=VirtServerRegistry,Type=VirtServerRegistry");
-
-
-             String virt_url = "service:jmx:rmi://ignored/jndi/rmi://" + 
-                               serverInfo.getVirtServerJmxRmiHost()    + 
-                               ":"                                     +
-                               serverInfo.getVirtServerJmxRmiPort()    + 
-                               "/alfresco/jmxrmi";
-                                
-             Attribute virt_server_attrib = 
-                new Attribute("VirtServer", virt_url );
-
-             mbsc.setAttribute( virt_registry, virt_server_attrib);
-        }
-        catch (Exception e)
-        {
-            log.error(
-              "Could not find password file for remote Alfresco JXM Server",e);
-        }
-
-    }
-
-
     /**
      * Start this host.
      *
@@ -555,6 +455,13 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         if( started ) { return; }
 
         if( ! initialized ) { init(); }
+
+        if  ( registrationThread_ == null )
+        {
+            // Re-register this virtualization host with the Alfresco server
+            registrationThread_ = new VirtServerRegistrationThread();
+            registrationThread_.start();
+        }
 
    
         // Look for a realm - that may have been configured earlier. 
@@ -638,6 +545,12 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
     public synchronized void stop() throws LifecycleException 
     {
+        // Tell the registration thread it can exit
+        if ( registrationThread_  != null )
+        {
+            registrationThread_.setDone();
+            registrationThread_ = null;
+        }
 
         AVMFileDirContext.ReleaseAVMRemote();
 

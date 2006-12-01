@@ -58,7 +58,57 @@
         <property name="alfrescoJmxRmiPort">
             <value>${avm.jmxrmi.port}</value>
         </property>
+    </bean>
 
+
+    <!-- Custom MBeanServer                                    -->
+    <!--                                                       -->
+    <!-- Note:                                                 --> 
+    <!--   The Alfresco servlet container performs callbacks   -->
+    <!--   to this MBeanServer when critical events happen,    -->
+    <!--   such as a modification to a jar/class in WEB-INF,   -->
+    <!--   or a change to a webapp's WEB-INF/web.xml;          -->
+    <!--   when this happens, the virtualization server        -->
+    <!--   needs to reload the webapp, and any webapps         -->
+    <!--   that depend on it (e.g.: webapps corresponding      -->
+    <!--   to sandboxes that aren't "staging").                -->
+    <bean id="virtServerMBeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
+
+    <bean id="virtServerRegistry"   class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
+        <property name="port" value="${alfresco.virtserver.port}"/>
+    </bean>
+
+    <!-- MBeanServer Connector (registers itself with custom virtServerMBeanServer) -->
+    <bean id="serverConnector" 
+          class="org.springframework.jmx.support.ConnectorServerFactoryBean"
+          depends-on="virtServerRegistry">
+
+        <property name="server"      ref="virtServerMBeanServer"/>
+        <property name="objectName"  value="connector:name=rmi"/>
+        <property name="serviceUrl"  value="service:jmx:rmi://localhost/jndi/rmi://localhost:${alfresco.virtserver.port}/alfresco/jmxrmi" />
+
+        <property name="environment">
+            <map>
+                <!-- The following keys are only valid when sun jmx is used -->
+                <entry key="jmx.remote.x.password.file" value="${catalina.base}/conf/alfresco-jmxrmi.password"/>
+                <entry key="jmx.remote.x.access.file"   value="${catalina.base}/conf/alfresco-jmxrmi.access"/>
+            </map>
+        </property>
+    </bean>
+
+    <bean id="virtServerExporter" class="org.springframework.jmx.export.MBeanExporter">
+       <property name="server" ref="virtServerMBeanServer"/>
+       <property name="beans">
+         <map>
+           <!-- MBeans to register with virtServerMBeanServer -->
+           <entry key="Alfresco:Name=VirtWebappRegistry,Type=VirtWebappRegistry" value-ref="virtWebappRegistry"/>
+         </map>
+       </property>
+     </bean>
+
+    <!-- MBeans registered with virtServerMBeanServer -->
+    <bean id="virtWebappRegistry" class="org.alfresco.mbeans.VirtWebappRegistry">
+        <property name="moo" value="1"/>
     </bean>
 
 </beans>
