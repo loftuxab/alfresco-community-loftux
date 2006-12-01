@@ -32,6 +32,11 @@ public class VirtWebappRegistry implements VirtWebappRegistryMBean
     private int moo_ = 1;
     private String [] virtWebapps_ = { "totally", "bogus", "example", "of", "list" };
 
+    public VirtWebappRegistry()
+    {
+        System.out.println("------VirtWebappRegistry ctor: " + this);
+    }
+
     public void setMoo(int moo)
     {
         moo_ = moo;
