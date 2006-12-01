@@ -71,7 +71,7 @@
         <junit printsummary="yes" fork="yes" maxmemory="512M" haltonfailure="no" dir="${basedir}">
             <jvmarg value="-server"/>
             <classpath refid="classpath.unit.test" />
-            <formatter type="plain" />
+            <formatter type="xml" />
             <batchtest todir="${dir.test.results}">
                 <fileset dir="${dir.src.java}">
                     <include name="**/*Test.java" />
