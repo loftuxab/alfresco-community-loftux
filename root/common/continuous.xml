@@ -37,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, set-build-number, prepare-virtual, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
+           depends="init, set-build-number, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
@@ -82,6 +82,7 @@
    <target name="distribute-jboss" depends="init" description="Creates the distibution files for JBoss">
       <ant antfile="${file.name.build}" target="clean-war" />
       <ant antfile="${file.name.build}" target="incremental-jboss" />
+      <antcall target="prepare-virtual" />
       <antcall target="assemble-jboss-common" />
       <antcall target="distribute-jboss-windows" />
       <antcall target="distribute-jboss-linux" />
@@ -166,6 +167,7 @@
    <target name="distribute-tomcat" depends="init" description="Creates the distibution files for Tomcat">
       <ant antfile="${file.name.build}" target="clean-war"/>
       <ant antfile="${file.name.build}" target="incremental-tomcat"/>
+      <antcall target="prepare-virtual" />
       <antcall target="assemble-tomcat-common" />
       <antcall target="distribute-tomcat-windows" />
       <antcall target="distribute-tomcat-linux" />
