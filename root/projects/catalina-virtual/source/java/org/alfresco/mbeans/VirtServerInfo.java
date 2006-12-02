@@ -31,6 +31,11 @@ public class VirtServerInfo implements VirtServerInfoMBean
     String alfrescoJmxRmiHost_;
     int    alfrescoJmxRmiPort_;
 
+    // Admin user name on Alfresco server.
+    String alfrescoServerUser_;
+    
+    // Admin user password on Alfresco server.
+    String alfrescoServerPassword_;
 
     public VirtServerInfo() { }
 
@@ -45,4 +50,12 @@ public class VirtServerInfo implements VirtServerInfoMBean
 
     public int      getAlfrescoJmxRmiPort()              { return alfrescoJmxRmiPort_; }
     public void     setAlfrescoJmxRmiPort(int port)      { alfrescoJmxRmiPort_ = port; }
+    
+    public String   getAlfrescoServerUser()              { return alfrescoServerUser_; }
+    public void     setAlfrescoServerUser(String user)   { alfrescoServerUser_ = user; }
+
+    public String   getAlfrescoServerPassword()          { return alfrescoServerPassword_; }
+    public void     setAlfrescoServerPassword(String password)   
+                                                         { alfrescoServerPassword_ = 
+                                                                                 password; }
 }

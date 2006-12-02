@@ -96,7 +96,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.ResourceBundle;
 
 import javax.naming.NameAlreadyBoundException;
 import javax.naming.NamingEnumeration;
@@ -112,9 +111,10 @@ import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
 
 import org.alfresco.repo.avm.AVMRemote;
-import org.alfresco.repo.avm.AVMRemoteInputStream;
 import org.alfresco.repo.avm.AVMNodeType;
+import org.alfresco.repo.avm.clt.ClientTicketHolder;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 
@@ -236,6 +236,22 @@ public class AVMFileDirContext extends
                                      "conf/avm-remote-context.xml");
 
                     Service_ = (AVMRemote)Context_.getBean("avmRemote");
+                    
+                    // Get the authentication service.
+                    AuthenticationService authService =
+                        (AuthenticationService)Context_.getBean("authenticationService");
+                    
+                    // Get the info bean for the user name and password.
+                    JndiInfoBean info = 
+                        (JndiInfoBean)Context_.getBean("jndiInfoBean");
+                    
+                    // Authenticate once,
+                    authService.authenticate(info.getAlfrescoServerUser(), 
+                                             info.getAlfrescoServerPassword().toCharArray());
+                    
+                    // and set the ticket.
+                    ClientTicketHolder.SetTicket(authService.getCurrentTicket());
+
                     done_trying = true;
                 }
                 catch (org.springframework.beans.factory.BeanCreationException e)
@@ -2192,15 +2208,8 @@ public class AVMFileDirContext extends
             //    is being used, but for AVMRemote, it should
             //    be an node descriptor..
 
-            return new AVMRemoteInputStream(AVMFileDirContext.Service_.getInputHandle(root_version_,
-                                                                                      resource_path_),
-                                            AVMFileDirContext.Service_);
-            /*
-            return AVMFileDirContext.Service_.getFileInputStream(
-                       root_version_,  
-                       resource_path_ 
-                  );
-            */
+            return AVMFileDirContext.Service_.getFileInputStream(root_version_,
+                                                                 resource_path_);
         }
     }
 }
