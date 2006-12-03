@@ -110,10 +110,10 @@ import javax.naming.directory.SearchControls;
 import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
 
-import org.alfresco.repo.avm.AVMRemote;
 import org.alfresco.repo.avm.AVMNodeType;
-import org.alfresco.repo.avm.clt.ClientTicketHolder;
+import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
+import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 

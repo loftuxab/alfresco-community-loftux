@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
 import javax.management.ObjectName;
 import org.alfresco.jndi.AVMFileDirContext;
 import org.alfresco.mbeans.VirtServerRegistrationThread;
-import org.alfresco.repo.avm.AVMRemote;
+import org.alfresco.service.cmr.remote.AVMRemote;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
 import org.apache.catalina.core.StandardEngine;

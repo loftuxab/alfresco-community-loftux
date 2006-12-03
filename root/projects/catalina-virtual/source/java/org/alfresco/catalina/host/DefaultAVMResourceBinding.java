@@ -22,8 +22,8 @@ package org.alfresco.catalina.host;
 import java.util.Map;
 import java.util.regex.Matcher;
 import org.alfresco.jndi.AVMFileDirContext;
-import org.alfresco.repo.avm.AVMRemote;
 import org.alfresco.repo.domain.PropertyValue;
+import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.namespace.QName;
 
 public class      DefaultAVMResourceBinding 
