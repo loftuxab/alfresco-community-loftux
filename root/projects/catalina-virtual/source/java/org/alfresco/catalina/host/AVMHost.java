@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import javax.management.ObjectName;
 import org.alfresco.jndi.AVMFileDirContext;
 import org.alfresco.mbeans.VirtServerRegistrationThread;
+import org.alfresco.mbeans.VirtWebappRegistryMBean;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.apache.catalina.Container;
 import org.apache.catalina.Context;
@@ -40,6 +41,7 @@ import org.apache.catalina.startup.HostConfig;
 import org.apache.catalina.Valve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.modeler.Registry;
+import org.springframework.context.ApplicationContext;
 
 /**
 *  This class implements a Catalina virtual Host;  it can be 
@@ -371,6 +373,27 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
             AVMFileDirContext.InitAVMRemote();
 
+            // Use a custom deployer that knows how to access AVMRemote
+            // Tell the AVMHostContext what appBase was given within 
+            // the server.xml file.
+             
+            AVMHostConfig deployer = new AVMHostConfig( super.getAppBase() );
+            ApplicationContext springContext =  
+                AVMFileDirContext.GetSpringApplicationContext();
+
+
+            // Register the AVMHostConfig deployer with the 
+            // webapp registry.  This enables remote updates
+            // to the VirtWebappRegistryMBean (from the Alfersco server)
+            // to callback into the AVMHostconfig, which then does the
+            // recusive load,reload, or unload of the appropriate webapps.
+
+            VirtWebappRegistryMBean  virtWebappRegistry = 
+                (VirtWebappRegistryMBean)  springContext.getBean("virtWebappRegistry");
+
+            virtWebappRegistry.setDeployer( deployer );
+
+
             // Give AVM server the info it needs to perform callbacks
             // to this virtualization server when major event occur.
             // Examples:   WEB-INF is updated, the AVM server stops/starts.
@@ -382,12 +405,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             registrationThread_ = new VirtServerRegistrationThread();
             registrationThread_.start();
 
-
-            // Use a custom deployer that knows how to access AVMRemote
-            // Tell the AVMHostContext what appBase was given within 
-            // the server.xml file.
-             
-            HostConfig deployer = new AVMHostConfig( super.getAppBase() );
 
             addLifecycleListener(deployer);                
 

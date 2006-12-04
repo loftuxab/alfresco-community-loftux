@@ -416,6 +416,15 @@ public class AVMHostConfig extends HostConfig
         return;
     }
 
+    public void updateVirtualWebapp(int version, String repoPath)
+    {
+        // RESUME HERE
+        log.info("AVMHostConfig update from JMX: " + 
+                                           version + 
+                                           " "     +
+                                           repoPath);
+    }
+
 
 
     //   There are 2 code paths that end up calling this function:
