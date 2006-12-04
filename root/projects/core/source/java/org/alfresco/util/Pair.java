@@ -81,4 +81,13 @@ public final class Pair<F, S> implements Serializable
     {
         return fFirst.hashCode() + fSecond.hashCode();
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return '(' + fFirst.toString() + ", " + fSecond.toString() + ')';
+    }
 }
