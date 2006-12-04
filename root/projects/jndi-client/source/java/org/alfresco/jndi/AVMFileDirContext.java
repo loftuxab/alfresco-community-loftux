@@ -116,6 +116,7 @@ import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
 
 
 // Had to use:   new Exception("Stack trace").printStackTrace();
@@ -282,12 +283,12 @@ public class AVMFileDirContext extends
     }
 
     /**
-    *  Fetches the Spring FileSystemXmlApplicationContext associated
+    *  Fetches the Spring ApplicationContext associated
     *  with this virtualization server.   
     *  <p>
     *  This function assumesInitAVMRemote has been called previously.
     */
-    static public FileSystemXmlApplicationContext 
+    static public ApplicationContext 
     GetSpringApplicationContext()
     {
         return Context_;

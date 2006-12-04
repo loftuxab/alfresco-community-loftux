@@ -52,8 +52,7 @@
         </property>
     </bean>
 
-    <!-- The JNDI info bean for jndi-client specific property
-         access -->
+    <!-- The JNDI info bean for jndi-client specific property access -->
     <bean id="jndiInfoBean" class="org.alfresco.jndi.JndiInfoBean">
     	<property name="alfrescoServerUser">
     	    <value>${alfresco.server.user}</value>
@@ -88,7 +87,6 @@
         <property name="alfrescoJmxRmiPort">
             <value>${avm.jmxrmi.port}</value>
         </property>
-        
     </bean>
 
 

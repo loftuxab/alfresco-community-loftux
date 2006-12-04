@@ -26,11 +26,13 @@ import javax.management.MBeanServer;
 import javax.management.MBeanServerFactory;
 import javax.management.ObjectName;
 import java.util.ArrayList;
+import org.alfresco.catalina.host.AVMHostConfig;
 
 public class VirtWebappRegistry implements VirtWebappRegistryMBean 
 {
     private int moo_ = 1;
     private String [] virtWebapps_ = { "totally", "bogus", "example", "of", "list" };
+    private AVMHostConfig deployer_;
 
     public VirtWebappRegistry()
     {
@@ -48,9 +50,22 @@ public class VirtWebappRegistry implements VirtWebappRegistryMBean
     public void setVirtWebapp(String virtWebapp)
     {
         System.out.println("TODO: reset virtWebapp: " + virtWebapp);
+        if ( deployer_ != null )
+        {
+            // NEON: TODO:  remove the hard-codeing of "-1" here.
+            deployer_.updateVirtualWebapp(-1, virtWebapp);
+        }
     }
     public String[] getVirtWebapps()
     {
         return virtWebapps_;
+    }
+
+    /** Sets AVMHostConfig webapp deployer 
+    *  The deployer handles the actual load/reload/unload of webapps
+    */
+    public void setDeployer(AVMHostConfig deployer)
+    {
+        deployer_ = deployer;
     }
 }

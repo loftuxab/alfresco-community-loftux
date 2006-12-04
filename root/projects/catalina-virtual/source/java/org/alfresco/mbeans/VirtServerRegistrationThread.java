@@ -32,7 +32,7 @@ import javax.management.remote.JMXConnector;
 import javax.management.remote.JMXConnectorFactory;
 import javax.management.remote.JMXServiceURL;
 import org.alfresco.mbeans.VirtServerInfoMBean;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.springframework.context.ApplicationContext;
 import java.util.Map;
 import java.util.HashMap;
 
@@ -54,7 +54,7 @@ public class VirtServerRegistrationThread extends Thread
     private static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( VirtServerRegistrationThread.class );
 
-    FileSystemXmlApplicationContext springContext_;
+    ApplicationContext springContext_;
     JMXServiceURL      url_;
     Map<String,Object> env_;
     String             virt_url_;

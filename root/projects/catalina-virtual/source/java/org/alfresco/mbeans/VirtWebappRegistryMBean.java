@@ -22,10 +22,13 @@
 
 package org.alfresco.mbeans;
 
+import org.alfresco.catalina.host.AVMHostConfig;
+
 public interface VirtWebappRegistryMBean
 {
     public void setMoo(int moo);
     public int  getMoo();
     public void setVirtWebapp(String virtWebapp);
     public String[] getVirtWebapps();
+    public void setDeployer(AVMHostConfig deployer);
 }
