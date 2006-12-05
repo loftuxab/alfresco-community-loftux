@@ -5,7 +5,8 @@
 <beans>
 
     <!-- load common properties -->
-    <bean id="repository-properties" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean id="virtserver-properties" 
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders">
             <value>true</value>
         </property>
@@ -17,18 +18,18 @@
         </property>
     </bean>
 
-	<!-- The remote authentication service. -->
-	<bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-	    <property name="serviceUrl">
-	        <value>rmi://${avm.remote.host}:${avm.remote.port}/authentication</value>
-	    </property>
-	    <property name="serviceInterface">
-	        <value>org.alfresco.service.cmr.security.AuthenticationService</value>
-	    </property>
+    <!-- The remote authentication service. -->
+    <bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl">
+            <value>rmi://${avm.remote.host}:${avm.remote.port}/authentication</value>
+        </property>
+        <property name="serviceInterface">
+            <value>org.alfresco.service.cmr.security.AuthenticationService</value>
+        </property>
         <property name="refreshStubOnConnectFailure">
             <value>true</value>
         </property>
-	</bean>
+    </bean>
 
     <!-- Remote Alfresco RMI Proxy bean -->
     <bean id="avmRemote" class="org.alfresco.repo.remote.AVMRemoteImpl">
