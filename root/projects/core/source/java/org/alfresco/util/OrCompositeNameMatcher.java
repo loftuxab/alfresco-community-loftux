@@ -3,6 +3,7 @@
  */
 package org.alfresco.util;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
@@ -10,8 +11,10 @@ import java.util.List;
  * matchers match.
  * @author britt
  */
-public class OrCompositeNameMatcher implements NameMatcher 
+public class OrCompositeNameMatcher implements NameMatcher, Serializable
 {
+    private static final long serialVersionUID = 8751285104404230814L;
+
     /**
      * The NameMatchers this is composed of.
      */

@@ -3,6 +3,7 @@
  */
 package org.alfresco.util;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -12,8 +13,10 @@ import java.util.regex.Pattern;
  * A name matcher that matches any of a list of regular expressions.
  * @author britt
  */
-public class RegexNameMatcher implements NameMatcher 
+public class RegexNameMatcher implements NameMatcher, Serializable
 {
+    private static final long serialVersionUID = 2686220370729761489L;
+
     /**
      * The regular expressions that can match.
      */
