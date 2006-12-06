@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.alfresco.webservice.content.Content;
-import org.alfresco.webservice.repository.Association;
-import org.alfresco.webservice.repository.AssociationDirectionEnum;
 import org.alfresco.webservice.repository.QueryResult;
 import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.repository.UpdateResult;
