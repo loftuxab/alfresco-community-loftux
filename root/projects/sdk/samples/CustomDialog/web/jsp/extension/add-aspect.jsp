@@ -21,5 +21,5 @@
             
 <h:outputText value="#{msg.aspect}: " />
 <h:selectOneMenu value="#{DialogManager.bean.aspect}">
-   <f:selectItems value="#{RunActionWizard.aspects}" />
+   <f:selectItems value="#{RunActionWizard.testableAspects}" />
 </h:selectOneMenu>
