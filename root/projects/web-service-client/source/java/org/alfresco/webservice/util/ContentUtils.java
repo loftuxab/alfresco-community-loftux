@@ -16,13 +16,18 @@
  */
 package org.alfresco.webservice.util;
 
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 
 import org.alfresco.webservice.content.Content;
 import org.springframework.util.FileCopyUtils;
@@ -114,6 +119,126 @@ public class ContentUtils
         {
             throw new WebServiceException("Unable to get content as inputStream.", exception);
         }
+    }
+    
+    /**
+     * Streams content into the repository.  Once done a content details string is returned and this can be used to update 
+     * a content property in a CML statement.
+     * 
+     * Uses the repository host and port details currently set in the WebServiceFactory based on the end point address.
+     * 
+     * @param file  the file to stream into the repository
+     * @return      the content data that can be used to set the content property in a CML statement  
+     */
+    public static String putContent(File file)
+    {
+        return putContent(file, WebServiceFactory.getHost(), WebServiceFactory.getPort());
+    }
+    
+    /**
+     * Streams content into the repository.  Once done a content details string is returned and this can be used to update 
+     * a content property in a CML statement.
+     * 
+     * @param file  the file to stream into the repository
+     * @param host  the host name of the destination repository
+     * @param port  the port name of the destination repository
+     * @return      the content data that can be used to set the content property in a CML statement  
+     */
+    @SuppressWarnings("deprecation")
+    public static String putContent(File file, String host, int port)
+    {      
+        String result = null;
+        
+        try 
+        {
+            String url = "/alfresco/upload/" + 
+                         URLEncoder.encode(file.getName(), "UTF-8") + 
+                         "?ticket=" + AuthenticationUtils.getCurrentTicket();
+            
+            String request = "PUT " + url + " HTTP/1.1\n" +
+                          "Content-Length: " + file.length() + "\n" +
+                          "Host: " + host + ":" + port + "\n" +
+                          "Connection: Keep-Alive\n" +
+                          "\n";
+            
+            // Open sockets and streams
+            Socket socket = new Socket(host, port);
+            DataOutputStream os = new DataOutputStream(socket.getOutputStream());
+            DataInputStream is = new DataInputStream(socket.getInputStream());
+              
+            try
+            {
+                if (socket != null && os != null && is != null) 
+                {            
+                    // Write the request header
+                    os.writeBytes(request);
+                    
+                    // Stream the content onto the server
+                    InputStream fileInputStream = new FileInputStream(file);
+                    int byteCount = 0;
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    int bytesRead = -1;
+                    while ((bytesRead = fileInputStream.read(buffer)) != -1) 
+                    {
+                        os.write(buffer, 0, bytesRead);
+                        byteCount += bytesRead;
+                    }
+                    os.flush();
+                    fileInputStream.close();
+                
+                    // Read the response and deal with any errors that might occur
+                    boolean firstLine = true;
+                    String responseLine;
+                    while ((responseLine = is.readLine()) != null) 
+                    {
+                        if (firstLine == true)
+                        {
+                            if (responseLine.contains("200") == true)
+                            {
+                                firstLine = false;
+                            }
+                            else if (responseLine.contains("401") == true)
+                            {
+                                throw new RuntimeException("Content could not be uploaded because invalid credentials have been supplied.");
+                            }
+                            else if (responseLine.contains("403") == true)
+                            {
+                                throw new RuntimeException("Content could not be uploaded because user does not have sufficient priveledges.");
+                            }
+                            else
+                            {
+                                throw new RuntimeException("Error returned from upload servlet (" + responseLine + ")");
+                            }
+                        }
+                        else if (responseLine.contains("contentUrl") == true)
+                        {
+                            result = responseLine;
+                            break;
+                        }
+                    }      
+                }
+            }
+            finally
+            {
+                try
+                {
+                    // Close the streams and socket
+                    if (os != null) { os.close(); }
+                    if (is != null) { is.close(); }
+                    if (socket != null) { socket.close(); }
+                }
+                catch (Exception e)
+                {
+                    throw new RuntimeException("Error closing sockets and streams", e);
+                }
+            }
+        } 
+        catch (Exception e) 
+        {
+            throw new RuntimeException("Error writing content to repository server", e);
+        } 
+        
+        return result;
     }
     
     /**

@@ -17,6 +17,8 @@
 package org.alfresco.webservice.util;
 
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
@@ -41,6 +43,8 @@ import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.sun.star.uno.RuntimeException;
 
 /**
  * 
@@ -80,6 +84,42 @@ public final class WebServiceFactory
     private static AccessControlServiceSoapBindingStub  accessControlService    = null;
     private static AdministrationServiceSoapBindingStub administrationService   = null;
     private static DictionaryServiceSoapBindingStub     dictionaryService       = null;
+    
+    /**
+     * Get the current endpoints host
+     * 
+     * @return  the current endpoint host name
+     */
+    public static String getHost()
+    {
+        try
+        {
+            URL url = new URL(getEndpointAddress());
+            return url.getHost();
+        }
+        catch (MalformedURLException exception)
+        {
+            throw new RuntimeException("Unable to get host string", exception);
+        }
+    }
+    
+    /**
+     * Get the current endpoints port
+     * 
+     * @return  the current endpoint port number
+     */
+    public static int getPort()
+    {
+        try
+        {
+            URL url = new URL(getEndpointAddress());
+            return url.getPort();
+        }
+        catch (MalformedURLException exception)
+        {
+            throw new RuntimeException("Unable to get host string", exception);
+        }
+    }
     
     /**
      * Get the authentication service

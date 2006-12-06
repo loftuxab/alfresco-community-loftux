@@ -17,6 +17,7 @@
 package org.alfresco.webservice.test;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 
 import org.alfresco.webservice.content.Content;
@@ -30,6 +31,7 @@ import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
+import org.alfresco.webservice.util.Utils;
 
 public class ContentServiceSystemTest extends BaseWebServiceSystemTest
 {
@@ -235,5 +237,56 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        System.out.println(tempFile.getPath());
        ContentUtils.copyContentToFile(content, tempFile);
 
+   }
+   
+   /**
+    * Test the content upload servlet
+    * 
+    * @throws Exception
+    */
+   public void testContentUploadServlet()
+       throws Exception
+   {
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/test.jpg");
+       File testFile = File.createTempFile("testImage", ".jpg");
+       FileOutputStream fos = new FileOutputStream(testFile);
+       ContentUtils.copy(viewStream, fos);
+       viewStream.close();
+       fos.close();
+       
+       assertTrue(testFile.exists());       
+       
+       // Put the content onto the server
+       String contentData = ContentUtils.putContent(testFile);
+       assertNotNull(contentData);
+       
+       // Create the parent reference
+       ParentReference parentRef = new ParentReference();
+       parentRef.setStore(BaseWebServiceSystemTest.store);
+       parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+       parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
+       parentRef.setChildName(Constants.ASSOC_CHILDREN);
+       
+       String myFile = "test.jpg";
+       
+       // Create the content
+       NamedValue[] properties = new NamedValue[]
+       {
+           Utils.createNamedValue(Constants.PROP_NAME, myFile),
+           Utils.createNamedValue(Constants.PROP_CONTENT, contentData)
+       };
+       CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
+       CML cml = new CML();
+       cml.setCreate(new CMLCreate[]{create});
+       UpdateResult[] result = this.repositoryService.update(cml); 
+       
+       // Try and get the content, saving it to a file
+       Content[] contents = this.contentService.read(convertToPredicate(result[0].getDestination()), Constants.PROP_CONTENT);
+       assertNotNull(contents);
+       assertEquals(1, contents.length);
+       Content content = contents[0];
+       File tempFile = File.createTempFile("testText", ".jpg");
+       System.out.println(tempFile.getPath());
+       ContentUtils.copyContentToFile(content, tempFile);
    }
 }
