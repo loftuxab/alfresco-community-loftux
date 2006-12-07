@@ -68,7 +68,7 @@
 
     <target name="run-tests" depends="package-jar" description="Runs the projects unit tests">
         <mkdir dir="${dir.test.results}" />
-        <junit printsummary="yes" fork="yes" maxmemory="512M" haltonfailure="no" dir="${basedir}">
+        <junit printsummary="yes" fork="yes" maxmemory="512M" haltonfailure="yes" dir="${basedir}">
             <jvmarg value="-server"/>
             <classpath refid="classpath.unit.test" />
             <formatter type="xml" />
