@@ -1,6 +1,8 @@
 package org.alfresco.i18n;
 
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 import junit.framework.TestCase;
 
@@ -95,7 +97,39 @@ public class I18NUtilTest extends TestCase
         // Check the default value
         assertEquals(VALUE_FR_PARAMS, I18NUtil.getMessage(MSG_PARAMS, new Object[]{PARAM_VALUE}));       
         
-        // Check values when overriding the locale    
+        // Check values when overriding the locale
         assertEquals(VALUE_PARAMS, I18NUtil.getMessage(MSG_PARAMS, Locale.getDefault(), new Object[]{PARAM_VALUE}));
+    }
+    
+    public void testLocaleMatching()
+    {
+        Set<Locale> options = new HashSet<Locale>(13);
+        options.add(Locale.FRENCH);                 // fr
+        options.add(Locale.FRANCE);                 // fr_FR
+        options.add(Locale.CANADA);                 // en_CA
+        options.add(Locale.CANADA_FRENCH);          // fr_CA
+        options.add(Locale.CHINESE);                // zh
+        options.add(Locale.TRADITIONAL_CHINESE);    // zh_TW
+        options.add(Locale.SIMPLIFIED_CHINESE);     // zh_CN
+        // add some variants
+        Locale fr_FR_1 = new Locale("fr", "FR", "1");
+        Locale zh_CN_1 = new Locale("zh", "CN", "1");
+        Locale zh_CN_2 = new Locale("zh", "CN", "2");
+        Locale zh_CN_3 = new Locale("zh", "CN", "3");
+        options.add(zh_CN_1);                       // zh_CN_1
+        options.add(zh_CN_2);                       // zh_CN_2
+        
+        // check
+        assertEquals(Locale.CHINA, I18NUtil.getNearestLocale(Locale.CHINA, options));
+        assertEquals(Locale.CHINESE, I18NUtil.getNearestLocale(Locale.CHINESE, options));
+        assertEquals(zh_CN_1, I18NUtil.getNearestLocale(zh_CN_1, options));
+        assertEquals(zh_CN_2, I18NUtil.getNearestLocale(zh_CN_2, options));
+        assertEquals(zh_CN_2, I18NUtil.getNearestLocale(zh_CN_3, options));         // must match the last variant
+        assertEquals(Locale.FRANCE, I18NUtil.getNearestLocale(fr_FR_1, options));
+        
+        // now test the match for just anything
+        Locale na_na_na = new Locale("", "", "");
+        Locale check = I18NUtil.getNearestLocale(na_na_na, options);
+        assertNotNull("Expected some kind of value back", check);
     }
 }

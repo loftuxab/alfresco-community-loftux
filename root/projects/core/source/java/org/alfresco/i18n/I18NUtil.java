@@ -4,6 +4,7 @@ import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -72,6 +73,104 @@ public class I18NUtil
             locale = Locale.getDefault();
         }
         return locale;
+    }
+    
+    /**
+     * Searches for the nearest locale from the available options.  To match any locale, pass in
+     * <tt>null</tt>.
+     * 
+     * @param templateLocale the template to search for or <tt>null</tt> to match any locale
+     * @param options the available locales to search from
+     * @return Returns the best match from the available options, or the <tt>null</tt> if
+     *      all matches fail
+     */
+    public static Locale getNearestLocale(Locale templateLocale, Set<Locale> options)
+    {
+        if (options.isEmpty())                          // No point if there are no options
+        {
+            return null;
+        }
+        else if (templateLocale == null)
+        {
+            for (Locale locale : options)
+            {
+                return locale;
+            }
+        }
+        else if (options.contains(templateLocale))      // First see if there is an exact match
+        {
+            return templateLocale;
+        }
+        // make a copy of the set
+        Set<Locale> remaining = new HashSet<Locale>(options);
+        
+        // eliminate those without matching languages
+        Locale lastMatchingOption = null;
+        String templateLanguage = templateLocale.getLanguage();
+        if (templateLanguage != null && !templateLanguage.equals(""))
+        {
+            Iterator<Locale> iterator = remaining.iterator();
+            while (iterator.hasNext())
+            {
+                Locale option = iterator.next();
+                if (!templateLanguage.equals(option.getLanguage()))
+                {
+                    iterator.remove();                  // It doesn't match, so remove
+                }
+                else
+                {
+                    lastMatchingOption = option;       // Keep a record of the last match
+                }
+            }
+        }
+        if (remaining.isEmpty())
+        {
+            return null;
+        }
+        else if (remaining.size() == 1 && lastMatchingOption != null)
+        {
+            return lastMatchingOption;
+        }
+        
+        // eliminate those without matching country codes
+        lastMatchingOption = null;
+        String templateCountry = templateLocale.getCountry();
+        if (templateCountry != null && !templateCountry.equals(""))
+        {
+            Iterator<Locale> iterator = remaining.iterator();
+            while (iterator.hasNext())
+            {
+                Locale option = iterator.next();
+                if (!templateCountry.equals(option.getCountry()))
+                {
+                    // It doesn't match language - remove
+                    iterator.remove();
+                }
+                else
+                {
+                    lastMatchingOption = option;       // Keep a record of the last match
+                }
+            }
+        }
+        if (remaining.isEmpty())
+        {
+            return null;
+        }
+        else if (remaining.size() == 1 && lastMatchingOption != null)
+        {
+            return lastMatchingOption;
+        }
+        else
+        {
+            // We have done an earlier equality check, so there isn't a matching variant
+            // Also, we know that there are multiple options at this point, either of which will do.
+            for (Locale locale : remaining)
+            {
+                return locale;
+            }
+        }
+        // The logic guarantees that this code can't be called
+        throw new RuntimeException("Logic should not allow code to get here.");
     }
     
     /**
