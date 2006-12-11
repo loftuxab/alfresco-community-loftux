@@ -34,10 +34,7 @@ public class VirtWebappRegistry implements VirtWebappRegistryMBean
     private String [] virtWebapps_ = { "totally", "bogus", "example", "of", "list" };
     private AVMHostConfig deployer_;
 
-    public VirtWebappRegistry()
-    {
-        System.out.println("------VirtWebappRegistry ctor: " + this);
-    }
+    public VirtWebappRegistry() { }
 
     public void setMoo(int moo)
     {

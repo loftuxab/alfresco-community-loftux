@@ -126,7 +126,7 @@ public class VirtServerRegistrationThread extends Thread
         catch (Exception e)
         {
             log.error(
-              "Could not find password file for remote Alfresco JXM Server",e);
+              "Could not find password file for remote Alfresco JMX Server",e);
         }
     }
 
@@ -157,7 +157,7 @@ public class VirtServerRegistrationThread extends Thread
         catch (Exception e)
         {
             log.error(
-              "Could not connect to JXM Server within remote Alfresco webapp " + 
+              "Could not connect to JMX Server within remote Alfresco webapp " + 
               "(this may be a transient error.  Retrying...)");
         }
     }
