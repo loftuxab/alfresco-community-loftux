@@ -456,8 +456,29 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         try
         {
             // Reinvoke the whole request recursively
+            //
 
-            adapter.service(req, response.getCoyoteResponse() );
+            org.apache.coyote.Response  resp = response.getCoyoteResponse();
+
+            // If you try to do set a header here:
+            //   if (...) { resp.setHeader("Cache-Control","max=4");}
+            // the service might set a different value for the header;
+            // this would override your settting here.
+            //
+
+            adapter.service(req, resp );
+
+            //
+            // If you try to set headers afterwards,
+            // thw isCommitted() flag might be set,
+            // and the output already sent to the 
+            // any browser.   Therefore, it's better
+            // do fiddle with most output headers
+            // in a Filter (other than Location).
+            // Filters are more portable anyhow, because
+            // they're part of the J2EE spec 
+            // (sadly, the Valve construct isn't)
+
 
             // The Mapper will redirect a path to a DirContext
             // that does not end in '/' to one that does.

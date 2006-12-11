@@ -213,7 +213,7 @@ public class AVMFileDirContext extends
             else { catalina_base = ""; }
 
             // Using the Spring framework load the application context:
-            //   conf/alfresco-catalina-virtual-avm-context.xml"
+            //   conf/alfresco-virtserver-context.xml"
             // which assocates
             //   "avmService" 
             // with
@@ -234,7 +234,7 @@ public class AVMFileDirContext extends
                         new FileSystemXmlApplicationContext(
                                      "file:"              +   // non-obvious Spring-ism!
                                      catalina_base        + 
-                                     "conf/avm-remote-context.xml");
+                                     "conf/alfresco-virtserver-context.xml");
 
                     Service_ = (AVMRemote)Context_.getBean("avmRemote");
                     

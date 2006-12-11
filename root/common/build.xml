@@ -127,10 +127,11 @@
       <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.repository}/config/alfresco/alfresco-shared.properties"/>
       <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.password"/>
       <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.access"/>
-      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.jndiclient}/config/avm-remote-context.xml"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.jndiclient}/config/alfresco-virtserver-context.xml"/>
       <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.jndiclient}/config/alfresco-virtserver.properties"/>
       <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.repository}/build/dist/repository.jar"/>
       <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.virtual}/config/server.xml" overwrite="yes"/>
+      <copy todir="${home.virtualtomcat}/conf"        file="${dir.project.virtual}/config/web.xml"    overwrite="yes"/>
       <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.core}/build/dist/core.jar"/>
       <copy todir="${home.virtualtomcat}/common/lib"  file="${dir.project.3rdparty}/lib/spring.jar"/>
    </target>

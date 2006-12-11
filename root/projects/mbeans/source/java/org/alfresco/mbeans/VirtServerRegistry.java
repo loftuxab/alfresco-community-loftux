@@ -180,7 +180,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
         catch (Exception e)
         {
             log.error(
-              "Could not connect to JXM Server within remote virtualization server " + 
+              "Could not connect to JMX Server within remote virtualization server " + 
               "(this may be a transient error.)");
 
             // NEON:

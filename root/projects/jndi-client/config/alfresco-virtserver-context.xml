@@ -5,7 +5,7 @@
 <beans>
 
     <!-- load common properties -->
-    <bean id="virtserver-properties" 
+    <bean id="virtserver-properties"
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders">
             <value>true</value>
@@ -37,7 +37,7 @@
             <ref bean="avmRemoteTransport"/>
         </property>
     </bean>
-    
+
     <!-- The underlying transport. -->
     <bean id="avmRemoteTransport" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
@@ -64,7 +64,7 @@
     </bean>
 
     <!-- Info for peer/peer MBean registration with remote Alfresco server -->
-    <bean id="virtServerInfo" 
+    <bean id="virtServerInfo"
           class="org.alfresco.mbeans.VirtServerInfo"
           lazy-init="true">
 
@@ -93,7 +93,7 @@
 
     <!-- Custom MBeanServer                                    -->
     <!--                                                       -->
-    <!-- Note:                                                 --> 
+    <!-- Note:                                                 -->
     <!--   The Alfresco servlet container performs callbacks   -->
     <!--   to this MBeanServer when critical events happen,    -->
     <!--   such as a modification to a jar/class in WEB-INF,   -->
@@ -109,7 +109,7 @@
     </bean>
 
     <!-- MBeanServer Connector (registers itself with custom virtServerMBeanServer) -->
-    <bean id="serverConnector" 
+    <bean id="serverConnector"
           class="org.springframework.jmx.support.ConnectorServerFactoryBean"
           depends-on="virtServerRegistry">
 
@@ -139,6 +139,68 @@
     <!-- MBeans registered with virtServerMBeanServer -->
     <bean id="virtWebappRegistry" class="org.alfresco.mbeans.VirtWebappRegistry">
         <property name="moo" value="1"/>
+    </bean>
+
+
+    <!--
+         The virtualization server forces different HTTP "Cache-Control" headers
+         into its response, depending upon which virtual host being accessed.
+
+         The goal is to balance performance/freshness without requiring
+         the user to tune their browser's cache settings.
+
+         Note that:
+
+            o  When looking at a "...preview" virtual host, the files that
+               tend to change the most rapidly are often the exactly those
+               files that the user wants to see.  Thus, forcing a short
+               max-age is a good idea; otherwise, users would need to hit
+               "refresh" every time they look at a "fresh preview"
+               (which is unfriendly).
+
+            o  While the contents within "...staging" virtual host might
+               change quite often too, seeing something that's slightly
+               more "stale" every so often in exchange for much better
+               average case performance is a good trade-off.  If the user
+               needs to be sure they're not seeing content from their
+               browser's cache, they can always hit "refresh".
+
+
+         For details on "Cache-Control" see RFC 2616 (section 14):
+         http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
+
+
+         Note:
+
+            o  Each "key" within "cacheControlRules" property is a PCRE-style
+               regex that matches virtual hosts (i.e.: there's no implicit '^'
+               regex prefix  or '$' regex suffix).
+
+            o  Each "value" is the corresponding "Cache-Control" HTTP header
+               value that's set in the virtualization server's response to
+               this host.
+
+            o  All "max-age" time values are given in seconds.
+
+            o  Rules are processed in order.
+               The first match (if any) wins.
+    -->
+    <bean id="cacheControlInfo"
+          class="org.alfresco.filter.CacheControlFilterInfoBean">
+
+        <property name="cacheControlRules">
+            <map>
+                <entry key="preview\.avm\."
+                       value="max-age=${alfresco.virtserver.cache-control.max-age.preview}"/>
+
+                <entry key="staging\.avm\."
+                       value="max-age=${alfresco.virtserver.cache-control.max-age.staging}"/>
+
+                <!-- Default rule (user work areas) -->
+                <entry key="\.avm\."
+                       value="max-age=${alfresco.virtserver.cache-control.max-age.default}"/>
+            </map>
+        </property>
     </bean>
 
 </beans>
