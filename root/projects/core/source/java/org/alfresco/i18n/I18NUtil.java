@@ -9,6 +9,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -171,6 +172,49 @@ public class I18NUtil
         }
         // The logic guarantees that this code can't be called
         throw new RuntimeException("Logic should not allow code to get here.");
+    }
+    
+    /**
+     * Factory method to create a Locale from a <tt>lang_country_variant</tt> string.
+     * 
+     * @param localeStr e.g. fr_FR
+     * @return Returns the locale instance
+     */
+    public static Locale parseLocale(String localeStr)
+    {
+        StringTokenizer tokenizer = new StringTokenizer(
+                localeStr + "___",              // Ensure the minimum number of tokens
+                "_",
+                true);
+        String language = "";
+        String country = "";
+        String variant = "";
+        
+        String token = tokenizer.nextToken();
+        // Get the language
+        while (!token.equals("_"))
+        {
+            language = token;
+            token = tokenizer.nextToken();
+        }
+        // Get the country
+        token = tokenizer.nextToken();
+        while (!token.equals("_"))
+        {
+            country = token;
+            token = tokenizer.nextToken();
+        }
+        // Get the variant
+        token = tokenizer.nextToken();
+        while (!token.equals("_"))
+        {
+            variant = token;
+            token = tokenizer.nextToken();
+        }
+        // Create instance
+        Locale locale = new Locale(language, country, variant);
+        // done
+        return locale;
     }
     
     /**
