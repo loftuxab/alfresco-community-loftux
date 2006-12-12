@@ -96,6 +96,16 @@
         </junit>
     </target>
 
+    <!-- Run a junit test without the irritatingly dumb junit task output in memory buffering -->
+    <target name="run-junit" depends="package-jar" description="Runs a single unit test bypassing the junit task.">
+        <java fork="yes" classname="junit.textui.TestRunner" output="${testcase}.out">
+            <jvmarg value="-Xmx512m"/>
+            <jvmarg value="-server"/>
+            <arg value="${testcase}"/>
+            <classpath refid="classpath.unit.test"/>
+        </java>
+    </target>
+
     <!-- *********************** -->
     <!-- ** Packaging targets ** -->
     <!-- *********************** -->
