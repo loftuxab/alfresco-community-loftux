@@ -132,4 +132,13 @@ public class I18NUtilTest extends TestCase
         Locale check = I18NUtil.getNearestLocale(na_na_na, options);
         assertNotNull("Expected some kind of value back", check);
     }
+    
+    public void testLocaleParsing()
+    {
+        assertEquals(Locale.FRANCE, I18NUtil.parseLocale("fr_FR"));
+        assertEquals(new Locale("en", "", "cockney"), I18NUtil.parseLocale("en__cockney"));
+        assertEquals(new Locale("", "", ""), I18NUtil.parseLocale(""));
+        assertEquals(new Locale("", "", ""), I18NUtil.parseLocale("_"));
+        assertEquals(new Locale("", "", ""), I18NUtil.parseLocale("__"));
+    }
 }
