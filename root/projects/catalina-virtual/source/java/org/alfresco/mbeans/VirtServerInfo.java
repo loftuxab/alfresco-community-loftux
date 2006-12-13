@@ -24,8 +24,9 @@ package org.alfresco.mbeans;
 public class VirtServerInfo implements VirtServerInfoMBean
 {
     // Local virtualization server info
-    String virtJmxRmiHost_;
+    String virtDomain_;
     int    virtJmxRmiPort_;
+    int    virtHttpPort_;
 
     // Remote Alfresco server info
     String alfrescoJmxRmiHost_;
@@ -39,8 +40,11 @@ public class VirtServerInfo implements VirtServerInfoMBean
 
     public VirtServerInfo() { }
 
-    public String   getVirtServerJmxRmiHost()            { return virtJmxRmiHost_; }
-    public void     setVirtServerJmxRmiHost(String host) { virtJmxRmiHost_ = host; }
+    public String   getVirtServerDomain()                { return virtDomain_; }
+    public void     setVirtServerDomain(String host)     { virtDomain_ = host; }
+
+    public int      getVirtServerHttpPort()              { return virtHttpPort_; }
+    public void     setVirtServerHttpPort(int port)      { virtHttpPort_ = port; }
 
     public int      getVirtServerJmxRmiPort()            { return virtJmxRmiPort_; }
     public void     setVirtServerJmxRmiPort(int port)    { virtJmxRmiPort_ = port; }
@@ -54,8 +58,9 @@ public class VirtServerInfo implements VirtServerInfoMBean
     public String   getAlfrescoServerUser()              { return alfrescoServerUser_; }
     public void     setAlfrescoServerUser(String user)   { alfrescoServerUser_ = user; }
 
-    public String   getAlfrescoServerPassword()          { return alfrescoServerPassword_; }
-    public void     setAlfrescoServerPassword(String password)   
-                                                         { alfrescoServerPassword_ = 
-                                                                                 password; }
+    public String   getAlfrescoServerPassword()
+                    { return alfrescoServerPassword_; }
+
+    public void     setAlfrescoServerPassword(String password)
+                    { alfrescoServerPassword_ = password; }
 }

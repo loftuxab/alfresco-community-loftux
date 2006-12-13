@@ -45,8 +45,10 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     private static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( VirtServerRegistry.class );
 
-    private int         moo_ = 1;
-    private String      virtServer_;
+    private String      virtServerJmxUrl_;
+    private String      virtServerFQDN_;
+    private Integer     virtServerHttpPort_;
+
     private String      passwordFile_;
     private String      accessFile_;
     private ObjectName  virtWebappRegistry_;
@@ -96,8 +98,6 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     }
 
     // interface method implementations
-    public void setMoo(int moo)                { moo_ = moo ; }
-    public int  getMoo()                       { return moo_; }
 
     public void   setPasswordFile(String path) { passwordFile_ = path;}
     public String getPasswordFile()            { return passwordFile_;}
@@ -105,50 +105,77 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     public void   setAccessFile(String path)   { accessFile_   = path;}
     public String getAccessFile()              { return accessFile_; }
 
+    public Integer getVirtServerHttpPort()     { return virtServerHttpPort_;}
+    public String  getVirtServerFQDN()         { return virtServerFQDN_;    }
+
     /**
     *  Accepts the registration of a remote virtualization server's 
-    *  JMXServiceURL.  This is later used to broadcast updates regarding 
-    *  the WEB-INF directory, and start/stop events.
+    *  JMXServiceURL, FQDN, and HTTP port.   The JMXServiceURL is 
+    *  used to broadcast updates regarding the WEB-INF directory, 
+    *  and start/stop events.  The FQDN and HTTP port are used
+    *  to create URLs for viewing virtualized content.
     *  
     *  Note:  a JMXServiceURL tends to look something like this:
     *  service:jmx:rmi:///jndi/rmi://some-remote-hostname:50501/alfresco/jmxrmi
     */
-    public void   setVirtServer(String virtServer) 
-    { 
+    public void registerVirtServerInfo( String  virtServerJmxUrl,
+                                        String  virtServerFQDN,
+                                        Integer virtServerHttpPort
+                                      )
+    {
         synchronized( this )
         {
-            if  ( virtServer_ != null  && 
-                  ! virtServer_.equals( virtServer )
+            if  (   virtServerJmxUrl_ != null  && 
+                  ! virtServerJmxUrl_.equals( virtServerJmxUrl )
                 )
             {
                 jmxServiceUrl_ = null;
             }
-            virtServer_ = virtServer; 
+            virtServerJmxUrl_ = virtServerJmxUrl; 
+
+            virtServerFQDN_      = virtServerFQDN;
+            virtServerHttpPort_  = virtServerHttpPort;
         }
     }
+
+
+    // public void   setVirtServerJmxUrl(String virtServerJmxUrl) 
+    // { 
+    //     synchronized( this )
+    //     {
+    //         if  (   virtServerJmxUrl_ != null  && 
+    //               ! virtServerJmxUrl_.equals( virtServerJmxUrl )
+    //             )
+    //         {
+    //             jmxServiceUrl_ = null;
+    //         }
+    //         virtServerJmxUrl_ = virtServerJmxUrl; 
+    //     }
+    // }
 
     synchronized 
     JMXServiceURL getJMXServiceURL()
     {
-        if ( jmxServiceUrl_ != null) { return jmxServiceUrl_; }
-        if ( virtServer_  == null )  { return null; } 
-        try { jmxServiceUrl_ = new JMXServiceURL( virtServer_ ); }
+        if ( jmxServiceUrl_ != null)       { return jmxServiceUrl_; }
+        if ( virtServerJmxUrl_  == null )  { return null; } 
+
+        try { jmxServiceUrl_ = new JMXServiceURL( virtServerJmxUrl_ ); }
         catch (Exception e)
         {
-            log.error("Could not create JMXServiceURL from: " + virtServer_);
+            log.error("Could not create JMXServiceURL from: " + virtServerJmxUrl_);
             jmxServiceUrl_ = null;
         }
         return jmxServiceUrl_;
     }
     
-    public String getVirtServer()                  { return virtServer_; }
+    public String getVirtServerJmxUrl()                  { return virtServerJmxUrl_; }
 
     public boolean webappUpdated(int version, String pathToWebapp)
     {
         // Typically:
         //  "service:jmx:rmi://ignored/jndi/rmi://localhost:50501/alfresco/jmxrmi"
 
-        if ( getVirtServer() == null )
+        if ( getVirtServerJmxUrl() == null )
         { 
             log.error("No virtualization servers have registered as listeners");
             return false ; 
@@ -167,7 +194,9 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             }
             catch (Exception e)
             {
-                log.error("Could not connect to virtualization server: " + getVirtServer() );
+                log.error("Could not connect to virtualization server: " + 
+                          getVirtServerJmxUrl() );
+
                 return false;
             }
         }

@@ -58,6 +58,9 @@ public class VirtServerRegistrationThread extends Thread
     JMXServiceURL      url_;
     Map<String,Object> env_;
     String             virt_url_;
+    String             virt_domain_;
+    String             virt_fqdn_;
+    int                virt_http_port_;
     ObjectName         virt_registry_;
     Attribute          virt_server_attrib_;
     boolean            done_  = false;
@@ -99,29 +102,41 @@ public class VirtServerRegistrationThread extends Thread
             // These urls tend to look like:
             // 
             //  "service:jmx:rmi://ignored/jndi/rmi://localhost:50500/alfresco/jmxrmi"
+
+            String avm_jmx_url = "service:jmx:rmi://ignored/jndi/rmi://" +
+                                  serverInfo.getAlfrescoJmxRmiHost()     +
+                                  ":"                                    +
+                                  serverInfo.getAlfrescoJmxRmiPort()     +
+                                  "/alfresco/jmxrmi";
+
+            url_ = new JMXServiceURL( avm_jmx_url );
+
+            env_ = new HashMap<String,Object>();
+
+            String[] cred = new String[] { "controlRole", jmxrmi_password };
+            env_.put("jmx.remote.credentials", cred );
+
+            virt_registry_ = ObjectName.getInstance(
+                "Alfresco:Name=VirtServerRegistry,Type=VirtServerRegistry");
+
+            virt_domain_    = serverInfo.getVirtServerDomain();
+            virt_fqdn_      = "avm." + virt_domain_;
+            virt_http_port_ = serverInfo.getVirtServerHttpPort();
+
+
+            // The FQDN of the virtualization server is always:
             //
-            url_ = new JMXServiceURL("service:jmx:rmi://ignored/jndi/rmi://" +
-                                      serverInfo.getAlfrescoJmxRmiHost()     +
-                                      ":"                                    +
-                                       serverInfo.getAlfrescoJmxRmiPort()    +
-                                      "/alfresco/jmxrmi"
-                                    );
+            //           avm.${alfresco.virtserver.domain}
+            //
+            // See: $VIRTUAL_TOMCAT_HOME/conf/alfresco-virtserver.properties
 
-             env_ = new HashMap<String,Object>();
+            virt_url_ = "service:jmx:rmi://ignored/jndi/rmi://" + 
+                        virt_fqdn_                              + 
+                        ":"                                     +
+                        serverInfo.getVirtServerJmxRmiPort()    + 
+                        "/alfresco/jmxrmi";
 
-             String[] cred = new String[] { "controlRole", jmxrmi_password };
-             env_.put("jmx.remote.credentials", cred );
-
-             virt_registry_ = ObjectName.getInstance(
-                 "Alfresco:Name=VirtServerRegistry,Type=VirtServerRegistry");
-
-             virt_url_ = "service:jmx:rmi://ignored/jndi/rmi://" + 
-                         serverInfo.getVirtServerJmxRmiHost()    + 
-                         ":"                                     +
-                         serverInfo.getVirtServerJmxRmiPort()    + 
-                         "/alfresco/jmxrmi";
-                                
-             virt_server_attrib_ = new Attribute("VirtServer", virt_url_ );
+            virt_server_attrib_ = new Attribute("VirtServerJmxUrl", virt_url_ );
         }
         catch (Exception e)
         {
@@ -152,7 +167,21 @@ public class VirtServerRegistrationThread extends Thread
         {
             JMXConnector conn = JMXConnectorFactory.connect(url_, env_);
             MBeanServerConnection mbsc = conn.getMBeanServerConnection();
-            mbsc.setAttribute( virt_registry_, virt_server_attrib_);
+
+            // mbsc.setAttribute( virt_registry_, virt_server_attrib_);
+
+            mbsc.invoke( virt_registry_, 
+                         "registerVirtServerInfo", 
+                         new Object [] { virt_url_ , 
+                                         virt_fqdn_,
+                                         new Integer( virt_http_port_ )
+                                       },
+                         new String [] { "java.lang.String",
+                                         "java.lang.String",      
+                                         "java.lang.Integer"
+                                       }
+                       );
+
         }
         catch (Exception e)
         {

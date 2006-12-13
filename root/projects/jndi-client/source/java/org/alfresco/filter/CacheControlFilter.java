@@ -101,17 +101,6 @@ public class CacheControlFilter implements Filter
             String key = e.getKey();
             try 
             {
-                // Regexes should behave like a normal PCRE regex;
-                // however, the Java regex library implicitly 
-                // prepends '^' and appends '$' by default
-                // and does not have the decency to provide a switch 
-                // to disable this non-standard behavior.
-                //
-                // Undo that little bit of insanity here.
-
-                if ( key.charAt(0) != '^')                  { key = ".*" + key; } 
-                if ( key.charAt( key.length() -1 ) != '$')  { key =  key + ".*"; } 
-
                 CacheControlHeader_[i] = e.getValue();
                 HostPattern_[i]        = Pattern.compile( 
                                              key, Pattern.CASE_INSENSITIVE );
@@ -143,7 +132,10 @@ public class CacheControlFilter implements Filter
 
         for (int i=0; i< HostPattern_.length; i++)
         {
-            if ( HostPattern_[i].matcher( serverName  ).matches() )
+            // Use find(), not match().
+            // We don't want implicit '^' and '$' anchors in regex.
+           
+            if ( HostPattern_[i].matcher( serverName  ).find() )
             {
                 res.setHeader("Cache-Control", CacheControlHeader_[i] );
                 break;
