@@ -18,6 +18,7 @@
         </property>
     </bean>
 
+
     <!-- The remote authentication service. -->
     <bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
@@ -31,12 +32,14 @@
         </property>
     </bean>
 
+
     <!-- Remote Alfresco RMI Proxy bean -->
     <bean id="avmRemote" class="org.alfresco.repo.remote.AVMRemoteImpl">
         <property name="avmRemoteTransport">
             <ref bean="avmRemoteTransport"/>
         </property>
     </bean>
+
 
     <!-- The underlying transport. -->
     <bean id="avmRemoteTransport" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
@@ -53,6 +56,7 @@
         </property>
     </bean>
 
+
     <!-- The JNDI info bean for jndi-client specific property access -->
     <bean id="jndiInfoBean" class="org.alfresco.jndi.JndiInfoBean">
     	<property name="alfrescoServerUser">
@@ -63,19 +67,29 @@
         </property>
     </bean>
 
+
     <!-- Info for peer/peer MBean registration with remote Alfresco server -->
     <bean id="virtServerInfo"
           class="org.alfresco.mbeans.VirtServerInfo"
           lazy-init="true">
 
-        <!-- local virtualization server hostname -->
-        <property name="virtServerJmxRmiHost">
-            <value>${alfresco.virtserver.host}</value>
+        <!-- local virtualization server domain  -->
+        <!-- Note: the actual virtualization server hostname used -->
+        <!--       in URLs created by the Alfreseco webapp will   -->
+        <!--       be:    avm.${alfresco.virtserver.domain}       -->
+        <!--                                                      -->
+        <property name="virtServerDomain">
+            <value>${alfresco.virtserver.domain}</value>
+        </property>
+
+        <!-- local virtualization server HTT port  -->
+        <property name="virtServerHttpPort">
+            <value>${alfresco.virtserver.http.port}</value>
         </property>
 
         <!-- local virtualization server JMX RMI port  -->
         <property name="virtServerJmxRmiPort">
-            <value>${alfresco.virtserver.port}</value>
+            <value>${alfresco.virtserver.jmxrmi.port}</value>
         </property>
 
 
@@ -104,9 +118,11 @@
     <!--   to sandboxes that aren't "staging").                -->
     <bean id="virtServerMBeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
 
+
     <bean id="virtServerRegistry"   class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
-        <property name="port" value="${alfresco.virtserver.port}"/>
+        <property name="port" value="${alfresco.virtserver.jmxrmi.port}"/>
     </bean>
+
 
     <!-- MBeanServer Connector (registers itself with custom virtServerMBeanServer) -->
     <bean id="serverConnector"
@@ -115,7 +131,8 @@
 
         <property name="server"      ref="virtServerMBeanServer"/>
         <property name="objectName"  value="connector:name=rmi"/>
-        <property name="serviceUrl"  value="service:jmx:rmi://localhost/jndi/rmi://localhost:${alfresco.virtserver.port}/alfresco/jmxrmi" />
+        <property name="serviceUrl"  
+                  value="service:jmx:rmi://localhost/jndi/rmi://localhost:${alfresco.virtserver.jmxrmi.port}/alfresco/jmxrmi" />
 
         <property name="environment">
             <map>
@@ -126,6 +143,7 @@
         </property>
     </bean>
 
+
     <bean id="virtServerExporter" class="org.springframework.jmx.export.MBeanExporter">
        <property name="server" ref="virtServerMBeanServer"/>
        <property name="beans">
@@ -135,6 +153,7 @@
          </map>
        </property>
      </bean>
+
 
     <!-- MBeans registered with virtServerMBeanServer -->
     <bean id="virtWebappRegistry" class="org.alfresco.mbeans.VirtWebappRegistry">

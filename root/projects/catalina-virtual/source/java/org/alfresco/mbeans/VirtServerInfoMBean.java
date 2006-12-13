@@ -29,8 +29,10 @@ package org.alfresco.mbeans;
 public interface VirtServerInfoMBean
 {
     // Local virtualization server info
-    public String   getVirtServerJmxRmiHost(); 
-    public void     setVirtServerJmxRmiHost(String host);
+    public String   getVirtServerDomain(); 
+    public void     setVirtServerDomain(String host);
+    public int      getVirtServerHttpPort();
+    public void     setVirtServerHttpPort(int port);
     public int      getVirtServerJmxRmiPort();
     public void     setVirtServerJmxRmiPort(int port);
 

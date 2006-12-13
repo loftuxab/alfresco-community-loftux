@@ -25,10 +25,17 @@ public interface VirtServerRegistryMBean
 {
     public void initialize();
 
-    public void setMoo(int moo);
-    public int  getMoo();
-    public void setVirtServer(String virtServer);
-    public String getVirtServer();
+    // public void   setVirtServerJmxUrl(String virtServerJmxUrl);
+    public String    getVirtServerJmxUrl();
+
+    public Integer getVirtServerHttpPort();
+    public String  getVirtServerFQDN();
+
+    public void registerVirtServerInfo( String  virtServerJmxUrl,
+                                        String  virtServerFQDN,
+                                        Integer virtServerHttpPort
+                                      );  
+
 
     /**  Sets password file used to access virt server */
     public void   setPasswordFile(String path);
