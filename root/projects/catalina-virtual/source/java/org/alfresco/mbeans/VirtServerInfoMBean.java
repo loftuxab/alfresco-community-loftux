@@ -36,6 +36,24 @@ public interface VirtServerInfoMBean
     public int      getVirtServerJmxRmiPort();
     public void     setVirtServerJmxRmiPort(int port);
 
+    /** 
+    *  Get the number of milliseconds the virtualization server will
+    *  wait before retrying a failed connection to the Alfresco server.
+    *  This allows the virtualization server to recover from a temporary
+    *  network outage, a restart of the Alfresco webapp, the vagaries
+    *  of daemon startup order, etc.
+    */
+    public int      getVirtServerConnectionRetryInterval();
+
+    /** 
+    *  Set the number of milliseconds the virtualization server will
+    *  wait before retrying a failed connection to the Alfresco server.
+    *  This allows the virtualization server to recover from a temporary
+    *  network outage, a restart of the Alfresco webapp, the vagaries
+    *  of daemon startup order, etc.
+    */
+    public void     setVirtServerConnectionRetryInterval(int milliseconds);
+
 
     // Remote Alfresco server info
     public String   getAlfrescoJmxRmiHost(); 

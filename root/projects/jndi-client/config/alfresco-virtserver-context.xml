@@ -102,6 +102,12 @@
         <property name="alfrescoJmxRmiPort">
             <value>${avm.jmxrmi.port}</value>
         </property>
+
+        <!-- retry interval when network connections fail (in milliseconds)  -->
+        <property name="virtServerConnectionRetryInterval">
+            <value>${alfresco.virtserver.connection.retry.interval}</value>
+        </property>
+
     </bean>
 
 
