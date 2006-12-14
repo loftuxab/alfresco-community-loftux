@@ -30,29 +30,30 @@ import org.alfresco.catalina.host.AVMHostConfig;
 
 public class VirtWebappRegistry implements VirtWebappRegistryMBean 
 {
-    private int moo_ = 1;
     private String [] virtWebapps_ = { "totally", "bogus", "example", "of", "list" };
     private AVMHostConfig deployer_;
 
     public VirtWebappRegistry() { }
 
-    public void setMoo(int moo)
+    public Boolean virtualWebappUpdated(Integer version, String pathToWebapp)
     {
-        moo_ = moo;
-    }
-    public int  getMoo()
-    {
-        return moo_;
-    }
-    public void setVirtWebapp(String virtWebapp)
-    {
-        System.out.println("TODO: reset virtWebapp: " + virtWebapp);
         if ( deployer_ != null )
         {
-            // NEON: TODO:  remove the hard-codeing of "-1" here.
-            deployer_.updateVirtualWebapp(-1, virtWebapp);
+            return deployer_.updateVirtualWebapp(version.intValue(), pathToWebapp);
         }
+        return false;
     }
+
+    public Boolean virtualWebappRemoved(Integer version, String pathToWebapp)
+    {
+        if ( deployer_ != null )
+        {
+            return deployer_.removeVirtualWebapp(version.intValue(), pathToWebapp);
+        }
+        return false;
+    }
+
+
     public String[] getVirtWebapps()
     {
         return virtWebapps_;

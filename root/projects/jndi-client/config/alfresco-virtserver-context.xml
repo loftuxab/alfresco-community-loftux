@@ -156,10 +156,7 @@
 
 
     <!-- MBeans registered with virtServerMBeanServer -->
-    <bean id="virtWebappRegistry" class="org.alfresco.mbeans.VirtWebappRegistry">
-        <property name="moo" value="1"/>
-    </bean>
-
+    <bean id="virtWebappRegistry" class="org.alfresco.mbeans.VirtWebappRegistry"/>
 
     <!--
          The virtualization server forces different HTTP "Cache-Control" headers
