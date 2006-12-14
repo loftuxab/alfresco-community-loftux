@@ -416,13 +416,24 @@ public class AVMHostConfig extends HostConfig
         return;
     }
 
-    public void updateVirtualWebapp(int version, String repoPath)
+    public boolean  updateVirtualWebapp(int version, String repoPath)
     {
         // RESUME HERE
         log.info("AVMHostConfig update from JMX: " + 
                                            version + 
                                            " "     +
                                            repoPath);
+        return true;
+    }
+
+    public boolean  removeVirtualWebapp(int version, String repoPath)
+    {
+        // RESUME HERE
+        log.info("AVMHostConfig remove from JMX: " + 
+                                           version + 
+                                           " "     +
+                                           repoPath);
+        return true;
     }
 
 

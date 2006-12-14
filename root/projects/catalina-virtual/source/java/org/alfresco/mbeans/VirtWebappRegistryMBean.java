@@ -26,9 +26,10 @@ import org.alfresco.catalina.host.AVMHostConfig;
 
 public interface VirtWebappRegistryMBean
 {
-    public void setMoo(int moo);
-    public int  getMoo();
-    public void setVirtWebapp(String virtWebapp);
+    public Boolean virtualWebappUpdated(Integer version, String pathToWebapp);
+    public Boolean virtualWebappRemoved(Integer version, String pathToWebapp);
+
+
     public String[] getVirtWebapps();
     public void setDeployer(AVMHostConfig deployer);
 }

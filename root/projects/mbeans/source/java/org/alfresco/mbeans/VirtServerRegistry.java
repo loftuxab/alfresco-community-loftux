@@ -118,39 +118,33 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *  Note:  a JMXServiceURL tends to look something like this:
     *  service:jmx:rmi:///jndi/rmi://some-remote-hostname:50501/alfresco/jmxrmi
     */
-    public void registerVirtServerInfo( String  virtServerJmxUrl,
-                                        String  virtServerFQDN,
-                                        Integer virtServerHttpPort
-                                      )
+    public synchronized 
+    void registerVirtServerInfo( String  virtServerJmxUrl,
+                                 String  virtServerFQDN,
+                                 Integer virtServerHttpPort
+                               )
     {
-        synchronized( this )
+        if  (   virtServerJmxUrl_ != null  && 
+              ! virtServerJmxUrl_.equals( virtServerJmxUrl )
+            )
         {
-            if  (   virtServerJmxUrl_ != null  && 
-                  ! virtServerJmxUrl_.equals( virtServerJmxUrl )
-                )
-            {
-                jmxServiceUrl_ = null;
-            }
-            virtServerJmxUrl_ = virtServerJmxUrl; 
-
-            virtServerFQDN_      = virtServerFQDN;
-            virtServerHttpPort_  = virtServerHttpPort;
+            jmxServiceUrl_ = null;
         }
+        virtServerJmxUrl_    = virtServerJmxUrl; 
+        virtServerFQDN_      = virtServerFQDN;
+        virtServerHttpPort_  = virtServerHttpPort;
     }
 
 
-    // public void   setVirtServerJmxUrl(String virtServerJmxUrl) 
+    // public synchronized void   setVirtServerJmxUrl(String virtServerJmxUrl) 
     // { 
-    //     synchronized( this )
+    //     if  (   virtServerJmxUrl_ != null  && 
+    //           ! virtServerJmxUrl_.equals( virtServerJmxUrl )
+    //         )
     //     {
-    //         if  (   virtServerJmxUrl_ != null  && 
-    //               ! virtServerJmxUrl_.equals( virtServerJmxUrl )
-    //             )
-    //         {
-    //             jmxServiceUrl_ = null;
-    //         }
-    //         virtServerJmxUrl_ = virtServerJmxUrl; 
+    //         jmxServiceUrl_ = null;
     //     }
+    //     virtServerJmxUrl_ = virtServerJmxUrl; 
     // }
 
     synchronized 
@@ -170,9 +164,34 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     
     public String getVirtServerJmxUrl()                  { return virtServerJmxUrl_; }
 
+
+    /**
+    *  Notifies remote listener that a AVM-based webapp has been "updated".
+    *  An "update" is any change to (or creation of) contents within
+    *  WEB-INF/classes  WEB-INF/lib, WEB-INF/web.xml of a webapp.
+    */
     public boolean webappUpdated(int version, String pathToWebapp)
     {
-        // Typically:
+        return jmxRmiWebappNotification( "virtualWebappUpdated",
+                                          version,
+                                          pathToWebapp
+                                       );
+    }
+
+    /**
+    *  Notifies remote listener that a AVM-based webapp has been removed.
+    */
+    public boolean webappRemoved(int version, String pathToWebapp)
+    {
+        return jmxRmiWebappNotification( "virtualWebappRemoved",
+                                          version,
+                                          pathToWebapp
+                                       );
+    }
+
+    protected boolean verifyJmxRmiConnection()
+    {
+        // Typically the JMXServiceURL looks something like this:
         //  "service:jmx:rmi://ignored/jndi/rmi://localhost:50501/alfresco/jmxrmi"
 
         if ( getVirtServerJmxUrl() == null )
@@ -180,10 +199,6 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             log.error("No virtualization servers have registered as listeners");
             return false ; 
         }
-
-        // NEON:  fix this to include version info  & multiple listeners
-        log.info("webappUpdated:  version=" + version + 
-                               "  path=" + pathToWebapp);
 
         if ( conn_ == null)
         {
@@ -200,11 +215,38 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
                 return false;
             }
         }
+        return true;
+    }
+
+    protected boolean 
+    jmxRmiWebappNotification( String  action,
+                              int     version, 
+                              String  pathToWebapp 
+                            )
+    {
+        if  ( ! verifyJmxRmiConnection() ) { return false; }
 
         try
         {
-            Attribute updatedWebapp = new Attribute("VirtWebapp", pathToWebapp );
-            mbsc_.setAttribute( virtWebappRegistry_, updatedWebapp );
+            Boolean result = 
+                (Boolean) mbsc_.invoke( virtWebappRegistry_, 
+                                        action,
+                                        new Object [] { new Integer( version ),
+                                                        pathToWebapp
+                                                      },
+                                        new String [] { "java.lang.Integer",
+                                                        "java.lang.String"
+                                                      }
+                                      );
+           
+            if ( ! result.booleanValue() ) 
+            { 
+                log.error("Action failed: " + action + "  Version: " + version  + 
+                          "  Webapp: " + pathToWebapp );
+
+                return false; 
+            }
+            return true;
         }
         catch (Exception e)
         {
@@ -225,14 +267,6 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
 
             return false;
         }
-
-        return true;
-    }
-
-    public boolean webappRemoved(int version, String pathToWebapp)
-    {
-        // TODO: fix this
-        return true;
     }
 
     // How to register w/o Spring (continued): 
