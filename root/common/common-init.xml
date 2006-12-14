@@ -41,6 +41,21 @@
             </fileset>
         </path>
 
+
+        <path id="classpath.javadoc">
+            <path refid="classpath.compile"/>
+
+            <!-- TODO:                                                      -->
+            <!--                                                            -->
+            <!-- Unless the following jars are added here, javadoc fails    -->
+            <!-- This would not be the case if they were moved to 3rd-party -->
+            <!-- Is there any reason why this should not be done?           -->
+
+            <pathelement location="${dir.project.benchmark-framework}/lib/japex/japex.jar"/>  
+            <pathelement location="${dir.project.benchmark-framework}/lib/ostermillerutils_1_06_00.jar"/>  
+        </path>
+
+
         <path id="classpath.unit.test">
             <dirset dir="${dir.projects}">
                 <include name="**/build/classes" />

@@ -47,7 +47,7 @@
                  version="true" 
                  doctitle="${javadoc.title.document}"
                  windowtitle="${javadoc.title.window}" 
-                 classpathref="classpath.compile" 
+                 classpathref="classpath.javadoc" 
                  bottom="${javadoc.copyright}">
 
                 <!-- doclet that hides public classes/members via @exclude -->
