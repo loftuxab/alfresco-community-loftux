@@ -27,6 +27,7 @@ public class VirtServerInfo implements VirtServerInfoMBean
     String virtDomain_;
     int    virtJmxRmiPort_;
     int    virtHttpPort_;
+    int    retryInterval_;  // in milliseconds
 
     // Remote Alfresco server info
     String alfrescoJmxRmiHost_;
@@ -63,4 +64,10 @@ public class VirtServerInfo implements VirtServerInfoMBean
 
     public void     setAlfrescoServerPassword(String password)
                     { alfrescoServerPassword_ = password; }
+
+    public int      getVirtServerConnectionRetryInterval() 
+                    { return retryInterval_; }
+
+    public void     setVirtServerConnectionRetryInterval(int milliseconds)
+                    { retryInterval_ = milliseconds; }
 }

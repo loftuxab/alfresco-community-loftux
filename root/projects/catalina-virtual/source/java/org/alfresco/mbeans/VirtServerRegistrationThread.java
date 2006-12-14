@@ -61,6 +61,7 @@ public class VirtServerRegistrationThread extends Thread
     String             virt_domain_;
     String             virt_fqdn_;
     int                virt_http_port_;
+    int                virt_connect_retry_interval_;
     ObjectName         virt_registry_;
     Attribute          virt_server_attrib_;
     boolean            done_  = false;
@@ -97,6 +98,10 @@ public class VirtServerRegistrationThread extends Thread
         {
             passwordProps.load( new FileInputStream( password_file ) );
             jmxrmi_password = passwordProps.getProperty("controlRole");
+
+            virt_connect_retry_interval_ = 
+                serverInfo.getVirtServerConnectionRetryInterval();
+
 
             // Create a JMXServiceURL to connect to the Alfresco JMX RMI server
             // These urls tend to look like:
@@ -152,7 +157,7 @@ public class VirtServerRegistrationThread extends Thread
             registerVirtServer();
 
             // Take a nap.  
-            try { Thread.sleep( 10000 ); } 
+            try { Thread.sleep( virt_connect_retry_interval_ ); } 
             catch (Exception e) 
             {
                 // Not much you can do about an exception here, just ignore it.
@@ -191,6 +196,16 @@ public class VirtServerRegistrationThread extends Thread
         }
     }
 
+    /** 
+    * Called by org.alfresco.catalina.host.AVMHost.stop()
+    * so that the registration thread exists and the server
+    * can shut down cleanly.
+    */
     public void setDone()    { done_ = true; }
+
+    /**
+    *  Called within this thread's run() method to
+    *  determine if it's time to end gracefully.
+    */
     public boolean getDone() { return done_ ;}
 }
