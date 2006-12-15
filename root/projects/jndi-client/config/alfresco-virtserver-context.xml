@@ -32,7 +32,47 @@
         </property>
     </bean>
 
+	<!-- Advice for automatic reauthentication. -->
+    <bean id="reauthenticatingAdvice" class="org.alfresco.repo.remote.ReauthenticatingAdvice">
+        <property name="authenticationService">
+            <ref bean="authenticationService"/>
+        </property>
+        <property name="user">
+            <value>${alfresco.server.user}</value>
+        </property>
+        <property name="password">
+            <value>${alfresco.server.password}</value>
+        </property>
+        <property name="retryInterval">
+            <value>${alfresco.virtserver.connection.retry.interval}</value>
+        </property>
+    </bean>
 
+    <bean id="avmReauthenticatingAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice">
+            <ref bean="reauthenticatingAdvice"/>
+        </property>
+        <property name="pointcut">
+            <bean class="org.springframework.aop.TruePointcut"/>
+        </property>
+    </bean>
+
+    <bean id="avmRemoteTransport" class="org.springframework.aop.framework.ProxyFactoryBean">
+    	<property name="proxyInterfaces">
+    	    <list>
+    	        <value>org.alfresco.service.cmr.remote.AVMRemoteTransport</value>
+    	    </list>
+    	</property>
+        <property name="target">
+            <ref bean="avmRemoteTransportRaw"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>avmReauthenticatingAdvisor</value>
+            </list>
+        </property>
+    </bean>
+    
     <!-- Remote Alfresco RMI Proxy bean -->
     <bean id="avmRemote" class="org.alfresco.repo.remote.AVMRemoteImpl">
         <property name="avmRemoteTransport">
@@ -40,9 +80,8 @@
         </property>
     </bean>
 
-
     <!-- The underlying transport. -->
-    <bean id="avmRemoteTransport" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+    <bean id="avmRemoteTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
             <value>rmi://${avm.remote.host}:${avm.remote.port}/avm</value>
         </property>
