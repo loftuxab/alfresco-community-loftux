@@ -65,7 +65,7 @@ public class JndiTest extends TestCase
 
         loader.snapshot();
 
-        List<AVMStoreDescriptor> repositories = service.getAVMStores();
+        List<AVMStoreDescriptor> repositories = service.getStores();
 
         for (AVMStoreDescriptor rdesc : repositories  )
         {
