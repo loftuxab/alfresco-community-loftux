@@ -329,7 +329,7 @@ public class AVMHostConfig extends HostConfig
         HashMap<String, AVMWebappDescriptor> webapp_descriptors =  
                    new HashMap<String, AVMWebappDescriptor>();
 
-        List<AVMStoreDescriptor> repositories = AVMRemote_.getAVMStores();
+        List<AVMStoreDescriptor> repositories = AVMRemote_.getStores();
         LinkedList<String>     avm_webapp_paths = new LinkedList<String>();
 
         try 

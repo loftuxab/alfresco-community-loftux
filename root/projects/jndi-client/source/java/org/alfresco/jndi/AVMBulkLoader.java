@@ -709,7 +709,7 @@ public class AVMBulkLoader
 
         String repo_name = basepath.substring(0,colon_index);
 
-        try { service_.createAVMStore( repo_name ); }
+        try { service_.createStore( repo_name ); }
         catch (AVMExistsException e )  { /* ok */ }
 
         if (service_.lookup(-1, basepath) == null) // start off optimistic
