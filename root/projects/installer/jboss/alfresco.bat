@@ -39,7 +39,7 @@ start "JBoss Server" cmd /c %JBOSS_HOME%\bin\run.bat
 rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" call "start_oo.bat"
+if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
 
 goto nostop
 :nostart
@@ -57,6 +57,6 @@ call %JBOSS_HOME%\bin\shutdown.bat -S
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" c:\windows\system32\taskkill /f /im soffice.bin
+if not "%OPENOFFICE_PATH%" == "" %ALF_HOME%bin\process -k soffice.bin soffice.bin
 
 :nostop

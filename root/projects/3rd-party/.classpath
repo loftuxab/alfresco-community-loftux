@@ -39,11 +39,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/wss4j.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.2.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/treecache/concurrent.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-cache.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-common.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-jmx.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/treecache/jboss-system.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jcr-1.0.jar" sourcepath="src/jcr_src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/freemarker.jar"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.1.jar"/>
