@@ -343,7 +343,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals("There should be 2 aspects", 2, aspects.length);
 
         // check the first aspect
-        ClassDefinition aspect1 = aspects[0];
+        ClassDefinition aspect1 = aspects[1];
         assertEquals("Aspect1 name is incorrect",
                 "{http://www.alfresco.org/model/system/1.0}referenceable",
                 aspect1.getName());
@@ -353,7 +353,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
                 .getProperties().length);
 
         // check the second aspect
-        ClassDefinition aspect2 = aspects[1];
+        ClassDefinition aspect2 = aspects[0];
         assertEquals("Aspect2 name is incorrect",
                 "{http://www.alfresco.org/model/content/1.0}auditable", aspect2
                         .getName());
