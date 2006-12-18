@@ -39,7 +39,7 @@ call "%CATALINA_HOME%\bin\startup.bat"
 rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" call "start_oo.bat"
+if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
 
 goto nostop
 :nostart
@@ -56,6 +56,6 @@ call "%CATALINA_HOME%\bin\shutdown.bat"
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" c:\windows\system32\taskkill /f /im soffice.bin
+if not "%OPENOFFICE_PATH%" == "" %ALF_HOME%bin\process -k soffice.bin soffice.bin
 
 :nostop
