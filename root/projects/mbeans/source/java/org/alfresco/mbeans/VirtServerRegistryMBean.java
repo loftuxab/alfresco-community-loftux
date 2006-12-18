@@ -51,24 +51,62 @@ public interface VirtServerRegistryMBean
 
 
     /** 
-    *  Tells the virtualization server to load (or reload) 
-    *  the specified webapp.  Typically, version == -1  
-    *  (i.e.: HEAD), and  the pathToWebapp looks something like:
-    *     some-repo-name:/appBase/avm_webapps/SomeWebappName
+    *  Notifies remote listener that a AVM-based webapp has been updated;
+    *  an "update" is any change to (or creation of) contents within
+    *  WEB-INF/classes  WEB-INF/lib, WEB-INF/web.xml of a webapp.
     *
-    *  Note: if this virtual webapp has other virtual webapps 
-    *  that depend on it, then the dependees are reloaded too.
-    *  For example, if you reload a virtual webapp that 
-    *  corresponds to the "staging" area,  every author sandbox
-    *  that overlays it is a dependee (due to the classloader
-    *  hierarchy).   Thus, it's good to only load/reload webapps
-    *  when you absolutely must (such as when the classes or jars
-    *  in WEB-INF change, or when web.xml changes).
+    * @param version      The version of the webapp being updated.
+    *                     Typically, this is set to -1, which corresponds
+    *                     to the very latest version ("HEAD").
+    *                     If versinon != -1, you might want to consider
+    *                     setting the 'isRecursive' parameter to false.
+    *                     <p>
+    *
+    * @param pathToWebapp The full AVM path to the webapp being updated.
+    *                     For example:  repoName:/appBase/avm_webapps/your_webapp
+    *                     <p>
+    *
+    * @param isRecursive  When true, update all webapps that depend on this one.
+    *                     For example, an author's webapps share jar/class files
+    *                     with the master version in staging; thus, the author's
+    *                     webapp "depends" on the webapp in staging.   Similarly,
+    *                     webapps in an author's preview area depend on the ones
+    *                     in the "main" layer of the author's sandbox.   
+    *                     You might wish to set this parameter to 'false' if 
+    *                     the goal is to bring a non-HEAD version of a staging 
+    *                     area online, without forcing the virtualization server 
+    *                     to load all the author sandboxes for this archived 
+    *                     version as well.
     */
-    public boolean webappUpdated(int version, String pathToWebapp);
+    public boolean 
+    webappUpdated(int version, String pathToWebapp, boolean isRecursive);
 
     /**
-    *  Tell shte 
+    *  Notifies remote listener that a AVM-based webapp has been removed.
+    *
+    * @param version      The version of the webapp being removed.
+    *                     Typically, this is set to -1, which corresponds
+    *                     to the very latest version ("HEAD").
+    *                     If versinon != -1, you might want to consider
+    *                     setting the 'isRecursive' parameter to false.
+    *                     <p>
+    *
+    * @param pathToWebapp The full AVM path to the webapp being removed.
+    *                     For example:  repoName:/appBase/avm_webapps/your_webapp
+    *                     <p>
+    *
+    * @param isRecursive  When true, remove all webapps that depend on this one.
+    *                     For example, an author's webapps share jar/class files
+    *                     with the master version in staging; thus, the author's
+    *                     webapp "depends" on the webapp in staging.   Similarly,
+    *                     webapps in an author's preview area depend on the ones
+    *                     in the "main" layer of the author's sandbox.   
+    *                     You might wish to set this parameter to 'false' if 
+    *                     the goal is to bring a non-HEAD version of a staging 
+    *                     area online, without forcing the virtualization server 
+    *                     to load all the author sandboxes for this archived 
+    *                     version as well.
     */
-    public boolean webappRemoved(int version, String pathToWebapp);
+    public boolean 
+    webappRemoved(int version, String pathToWebapp, boolean isRecursive );
 }
