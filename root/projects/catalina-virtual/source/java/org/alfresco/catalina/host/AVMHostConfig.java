@@ -416,7 +416,10 @@ public class AVMHostConfig extends HostConfig
         return;
     }
 
-    public boolean  updateVirtualWebapp(int version, String repoPath)
+    public boolean  updateVirtualWebapp( int version, 
+                                         String repoPath, 
+                                         boolean isRecursive
+                                       )
     {
         // RESUME HERE
         log.info("AVMHostConfig update from JMX: " + 
@@ -426,13 +429,17 @@ public class AVMHostConfig extends HostConfig
         return true;
     }
 
-    public boolean  removeVirtualWebapp(int version, String repoPath)
+    public boolean  removeVirtualWebapp( int    version, 
+                                         String repoPath,
+                                         boolean isRecursive
+                                       )
     {
         // RESUME HERE
         log.info("AVMHostConfig remove from JMX: " + 
                                            version + 
                                            " "     +
-                                           repoPath);
+                                           repoPath +
+                                           " isRecursive: " + isRecursive);
         return true;
     }
 

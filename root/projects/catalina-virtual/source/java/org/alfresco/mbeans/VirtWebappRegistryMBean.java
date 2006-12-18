@@ -26,8 +26,15 @@ import org.alfresco.catalina.host.AVMHostConfig;
 
 public interface VirtWebappRegistryMBean
 {
-    public Boolean virtualWebappUpdated(Integer version, String pathToWebapp);
-    public Boolean virtualWebappRemoved(Integer version, String pathToWebapp);
+    public Boolean virtualWebappUpdated( Integer version, 
+                                         String  pathToWebapp, 
+                                         Boolean isRecursive
+                                       );
+
+    public Boolean virtualWebappRemoved( Integer version, 
+                                         String  pathToWebapp,
+                                         Boolean isRecursive
+                                       );
 
 
     public String[] getVirtWebapps();
