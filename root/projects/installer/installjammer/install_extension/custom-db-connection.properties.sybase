@@ -1,0 +1,15 @@
+#
+# Sample database connection properties
+#
+
+#db.username=alfresco
+#db.password=alfresco
+#db.pool.initial=10
+#db.pool.max=100
+
+#
+# Sybase connection (requires jconn2d.jar or equivalent jar in shared libraries location)
+#
+db.driver=com.sybase.jdbc2.jdbc.SybDriver
+db.url=jdbc:sybase:Tds:localhost:2638/alfresco
+

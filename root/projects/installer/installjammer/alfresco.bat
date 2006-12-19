@@ -11,12 +11,13 @@ set CATALINA_HOME=%ALF_HOME%tomcat
 set JAVA_HOME=%ALF_HOME%java
 set OPENOFFICE_PATH=%ALF_HOME%OpenOfficePortable
 
-
 rem Set any default JVM options
-set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody
+set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server
+rem The following options are only required for Sun JVMs prior to 1.5 update 8
+set JAVA_OPTS=%JAVA_OPTS% -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeIndexes -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeDeletions
 
 :start
-set PATH=%JAVA_HOME%/bin;%ALF_HOME%bin;%PATH%
+set PATH="%JAVA_HOME%/bin";"%ALF_HOME%bin";%PATH%
 rem ---------------------------------------
 rem Start Components
 rem ---------------------------------------
@@ -33,7 +34,7 @@ call "%CATALINA_HOME%\bin\startup.bat"
 rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" call "start_oo.bat"
+if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\OpenOfficePortable.exe" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
 
 goto nostop
 :nostart
@@ -50,6 +51,6 @@ call "%CATALINA_HOME%\bin\shutdown.bat"
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" c:\windows\system32\taskkill /f /im soffice.bin
+if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
 :nostop

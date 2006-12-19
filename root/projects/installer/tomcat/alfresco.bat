@@ -58,6 +58,6 @@ call "%CATALINA_HOME%\bin\shutdown.bat"
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" %ALF_HOME%bin\process -k soffice.bin soffice.bin
+if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
 :nostop
