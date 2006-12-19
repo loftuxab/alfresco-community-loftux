@@ -62,6 +62,7 @@ public final class WebServiceFactory
     
     /** Default endpoint address **/
     private static final String DEFAULT_ENDPOINT_ADDRESS = "http://localhost:8080/alfresco/api";
+    private static String endPointAddress;
     
     /** Service addresses */
     private static final String AUTHENTICATION_SERVICE_ADDRESS  = "/AuthenticationService";
@@ -74,16 +75,15 @@ public final class WebServiceFactory
     private static final String ADMINISTRATION_ADDRESS          = "/AdministrationService";
     private static final String DICTIONARY_SERVICE_ADDRESS      = "/DictionaryService";
     
-    /** Services */
-    private static AuthenticationServiceSoapBindingStub authenticationService   = null;
-    private static RepositoryServiceSoapBindingStub     repositoryService       = null;
-    private static ContentServiceSoapBindingStub        contentService          = null;
-    private static AuthoringServiceSoapBindingStub      authoringService        = null;
-    private static ClassificationServiceSoapBindingStub classificationService   = null;
-    private static ActionServiceSoapBindingStub         actionService           = null;
-    private static AccessControlServiceSoapBindingStub  accessControlService    = null;
-    private static AdministrationServiceSoapBindingStub administrationService   = null;
-    private static DictionaryServiceSoapBindingStub     dictionaryService       = null;
+    /**
+     * Sets the endpoint address manually, overwrites the current value
+     * 
+     * @param endPointAddress	the end point address
+     */
+    public static void setEndpointAddress(String endPointAddress)
+    {
+    	WebServiceFactory.endPointAddress = endPointAddress;
+    }
     
     /**
      * Get the current endpoints host
@@ -128,33 +128,36 @@ public final class WebServiceFactory
      */
     public static AuthenticationServiceSoapBindingStub getAuthenticationService()
     {
-        if (authenticationService == null)
-        {            
-            try 
+    	AuthenticationServiceSoapBindingStub authenticationService = null;
+        try 
+        {
+            // Get the authentication service
+            AuthenticationServiceLocator locator = new AuthenticationServiceLocator();
+            locator.setAuthenticationServiceEndpointAddress(getEndpointAddress() + AUTHENTICATION_SERVICE_ADDRESS);                
+            authenticationService = (AuthenticationServiceSoapBindingStub)locator.getAuthenticationService();
+        }
+        catch (ServiceException jre) 
+        {
+        	if (logger.isDebugEnabled() == true)
             {
-                // Get the authentication service
-                AuthenticationServiceLocator locator = new AuthenticationServiceLocator();
-                locator.setAuthenticationServiceEndpointAddress(getEndpointAddress() + AUTHENTICATION_SERVICE_ADDRESS);                
-                authenticationService = (AuthenticationServiceSoapBindingStub)locator.getAuthenticationService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
+        		if (jre.getLinkedCause() != null)
                 {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
+        			jre.getLinkedCause().printStackTrace();
                 }
+            }
    
-                throw new WebServiceException("Error creating authentication service: " + jre.getMessage(), jre);
-            }        
-            
-            // Time out after a minute
-            authenticationService.setTimeout(60000);
+            throw new WebServiceException("Error creating authentication service: " + jre.getMessage(), jre);
         }        
         
+        // Time out after a minute
+        authenticationService.setTimeout(60000);
+        
         return authenticationService;
+    }
+    
+    public static RepositoryServiceSoapBindingStub getRepositoryService()
+    {
+    	return getRepositoryService(getEndpointAddress());
     }
     
     /**
@@ -162,35 +165,38 @@ public final class WebServiceFactory
      * 
      * @return
      */
-    public static RepositoryServiceSoapBindingStub getRepositoryService()
+    public static RepositoryServiceSoapBindingStub getRepositoryService(String endpointAddress)
     {
-        if (repositoryService == null)
-        {            
-            try 
-            {
-                // Get the repository service
-                RepositoryServiceLocator locator = new RepositoryServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setRepositoryServiceEndpointAddress(getEndpointAddress() + REPOSITORY_SERVICE_ADDRESS);                
-                repositoryService = (RepositoryServiceSoapBindingStub)locator.getRepositoryService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
+    	RepositoryServiceSoapBindingStub repositoryService = null;           
+		try 
+		{
+		    // Get the repository service
+		    RepositoryServiceLocator locator = new RepositoryServiceLocator(AuthenticationUtils.getEngineConfiguration());
+		    locator.setRepositoryServiceEndpointAddress(endpointAddress + REPOSITORY_SERVICE_ADDRESS);                
+		    repositoryService = (RepositoryServiceSoapBindingStub)locator.getRepositoryService();
+		 }
+		 catch (ServiceException jre) 
+		 {
+			 if (logger.isDebugEnabled() == true)
+		     {
+                if (jre.getLinkedCause() != null)
                 {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
+                    jre.getLinkedCause().printStackTrace();
                 }
-   
-                throw new WebServiceException("Error creating repositoryService service: " + jre.getMessage(), jre);
-            }        
-            
-            // Time out after a minute
-            repositoryService.setTimeout(60000);
-        }        
+		     }
+		   
+			 throw new WebServiceException("Error creating repositoryService service: " + jre.getMessage(), jre);
+		}        
+	
+		// Time out after a minute
+		repositoryService.setTimeout(60000);      
         
         return repositoryService;
+    }
+    
+    public static AuthoringServiceSoapBindingStub getAuthoringService()
+    {
+    	return getAuthoringService(getEndpointAddress());
     }
     
     /**
@@ -198,35 +204,39 @@ public final class WebServiceFactory
      * 
      * @return
      */
-    public static AuthoringServiceSoapBindingStub getAuthoringService()
+    public static AuthoringServiceSoapBindingStub getAuthoringService(String endpointAddress)
     {
-        if (authoringService == null)
-        {            
-            try 
+    	AuthoringServiceSoapBindingStub authoringService = null;
+                  
+        try 
+        {
+            // Get the authoring service
+            AuthoringServiceLocator locator = new AuthoringServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setAuthoringServiceEndpointAddress(endpointAddress + AUTHORING_SERVICE_ADDRESS);                
+            authoringService = (AuthoringServiceSoapBindingStub)locator.getAuthoringService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
             {
-                // Get the authoring service
-                AuthoringServiceLocator locator = new AuthoringServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setAuthoringServiceEndpointAddress(getEndpointAddress() + AUTHORING_SERVICE_ADDRESS);                
-                authoringService = (AuthoringServiceSoapBindingStub)locator.getAuthoringService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
+                if (jre.getLinkedCause() != null)
                 {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
+                    jre.getLinkedCause().printStackTrace();
                 }
+            }
    
-                throw new WebServiceException("Error creating authoring service: " + jre.getMessage(), jre);
-            }        
-            
-            // Time out after a minute
-            authoringService.setTimeout(60000);
+            throw new WebServiceException("Error creating authoring service: " + jre.getMessage(), jre);
         }        
         
+        // Time out after a minute
+        authoringService.setTimeout(60000);       
+        
         return authoringService;
+    }
+    
+    public static ClassificationServiceSoapBindingStub getClassificationService()
+    {
+    	return getClassificationService(getEndpointAddress());
     }
     
     /**
@@ -234,35 +244,39 @@ public final class WebServiceFactory
      * 
      * @return
      */
-    public static ClassificationServiceSoapBindingStub getClassificationService()
+    public static ClassificationServiceSoapBindingStub getClassificationService(String endpointAddress)
     {
-        if (classificationService == null)
-        {            
-            try 
-            {
-                // Get the classification service
-                ClassificationServiceLocator locator = new ClassificationServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setClassificationServiceEndpointAddress(getEndpointAddress() + CLASSIFICATION_SERVICE_ADDRESS);                
-                classificationService = (ClassificationServiceSoapBindingStub)locator.getClassificationService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
-                {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
-                }
-   
-                throw new WebServiceException("Error creating classification service: " + jre.getMessage(), jre);
-            }        
+    	ClassificationServiceSoapBindingStub classificationService = null;
             
-            // Time out after a minute
-            classificationService.setTimeout(60000);
+        try 
+        {
+            // Get the classification service
+            ClassificationServiceLocator locator = new ClassificationServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setClassificationServiceEndpointAddress(endpointAddress + CLASSIFICATION_SERVICE_ADDRESS);                
+            classificationService = (ClassificationServiceSoapBindingStub)locator.getClassificationService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
+            {
+                if (jre.getLinkedCause() != null)
+                {
+                    jre.getLinkedCause().printStackTrace();
+                }
+            }
+   
+            throw new WebServiceException("Error creating classification service: " + jre.getMessage(), jre);
         }        
         
+        // Time out after a minute
+        classificationService.setTimeout(60000);        
+        
         return classificationService;
+    }
+    
+    public static ActionServiceSoapBindingStub getActionService()
+    {
+    	return getActionService(getEndpointAddress());
     }
     
     /**
@@ -270,35 +284,39 @@ public final class WebServiceFactory
      * 
      * @return
      */
-    public static ActionServiceSoapBindingStub getActionService()
+    public static ActionServiceSoapBindingStub getActionService(String endpointAddress)
     {
-        if (actionService == null)
-        {            
-            try 
-            {
-                // Get the action service
-                ActionServiceLocator locator = new ActionServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setActionServiceEndpointAddress(getEndpointAddress() + ACTION_SERVICE_ADDRESS);                
-                actionService = (ActionServiceSoapBindingStub)locator.getActionService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
-                {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
-                }
-   
-                throw new WebServiceException("Error creating action service: " + jre.getMessage(), jre);
-            }        
+    	ActionServiceSoapBindingStub actionService = null;
             
-            // Time out after a minute
-            actionService.setTimeout(60000);
+        try 
+        {
+            // Get the action service
+            ActionServiceLocator locator = new ActionServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setActionServiceEndpointAddress(endpointAddress + ACTION_SERVICE_ADDRESS);                
+            actionService = (ActionServiceSoapBindingStub)locator.getActionService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
+            {
+                if (jre.getLinkedCause() != null)
+                {
+                    jre.getLinkedCause().printStackTrace();
+                }
+            }
+   
+            throw new WebServiceException("Error creating action service: " + jre.getMessage(), jre);
         }        
+            
+        // Time out after a minute
+        actionService.setTimeout(60000);      
         
         return actionService;
+    }
+    
+    public static ContentServiceSoapBindingStub getContentService()
+    {
+    	return getContentService(getEndpointAddress());
     }
     
     /**
@@ -306,35 +324,38 @@ public final class WebServiceFactory
      * 
      * @return  the content service
      */
-    public static ContentServiceSoapBindingStub getContentService()
+    public static ContentServiceSoapBindingStub getContentService(String endpointAddress)
     {
-        if (contentService == null)
-        {            
-            try 
+    	ContentServiceSoapBindingStub contentService = null;           
+        try 
+        {
+            // Get the content service
+            ContentServiceLocator locator = new ContentServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setContentServiceEndpointAddress(endpointAddress + CONTENT_SERVICE_ADDRESS);                
+            contentService = (ContentServiceSoapBindingStub)locator.getContentService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
             {
-                // Get the content service
-                ContentServiceLocator locator = new ContentServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setContentServiceEndpointAddress(getEndpointAddress() + CONTENT_SERVICE_ADDRESS);                
-                contentService = (ContentServiceSoapBindingStub)locator.getContentService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
+                if (jre.getLinkedCause() != null)
                 {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
+                    jre.getLinkedCause().printStackTrace();
                 }
+            }
    
-                throw new WebServiceException("Error creating content service: " + jre.getMessage(), jre);
-            }        
-            
-            // Time out after a minute
-            contentService.setTimeout(60000);
+            throw new WebServiceException("Error creating content service: " + jre.getMessage(), jre);
         }        
         
+        // Time out after a minute
+        contentService.setTimeout(60000);       
+        
         return contentService;
+    }
+    
+    public static AccessControlServiceSoapBindingStub getAccessControlService()
+    {
+    	return getAccessControlService(getEndpointAddress());
     }
     
     /**
@@ -342,35 +363,38 @@ public final class WebServiceFactory
      * 
      * @return  the access control service
      */
-    public static AccessControlServiceSoapBindingStub getAccessControlService()
+    public static AccessControlServiceSoapBindingStub getAccessControlService(String enpointAddress)
     {
-        if (accessControlService == null)
-        {            
-            try 
+    	AccessControlServiceSoapBindingStub accessControlService = null;           
+        try 
+        {
+            // Get the access control service
+            AccessControlServiceLocator locator = new AccessControlServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setAccessControlServiceEndpointAddress(enpointAddress + ACCESS_CONTROL_ADDRESS);                
+            accessControlService = (AccessControlServiceSoapBindingStub)locator.getAccessControlService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
             {
-                // Get the access control service
-                AccessControlServiceLocator locator = new AccessControlServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setAccessControlServiceEndpointAddress(getEndpointAddress() + ACCESS_CONTROL_ADDRESS);                
-                accessControlService = (AccessControlServiceSoapBindingStub)locator.getAccessControlService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
+                if (jre.getLinkedCause() != null)
                 {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
+                    jre.getLinkedCause().printStackTrace();
                 }
+            }
    
-                throw new WebServiceException("Error creating access control service: " + jre.getMessage(), jre);
-            }        
-            
-            // Time out after a minute
-            accessControlService.setTimeout(60000);
+            throw new WebServiceException("Error creating access control service: " + jre.getMessage(), jre);
         }        
+            
+        // Time out after a minute
+        accessControlService.setTimeout(60000);
         
         return accessControlService;
+    }
+    
+    public static AdministrationServiceSoapBindingStub getAdministrationService()
+    {
+    	return getAdministrationService(getEndpointAddress());
     }
     
     /**
@@ -378,35 +402,39 @@ public final class WebServiceFactory
      * 
      * @return  the administration service
      */
-    public static AdministrationServiceSoapBindingStub getAdministrationService()
+    public static AdministrationServiceSoapBindingStub getAdministrationService(String endpointAddress)
     {
-        if (administrationService == null)
-        {            
-            try 
-            {
-                // Get the adminstration service
-                AdministrationServiceLocator locator = new AdministrationServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setAdministrationServiceEndpointAddress(getEndpointAddress() + ADMINISTRATION_ADDRESS);                
-                administrationService = (AdministrationServiceSoapBindingStub)locator.getAdministrationService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
-                {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
-                }
-   
-                throw new WebServiceException("Error creating administration service: " + jre.getMessage(), jre);
-            }        
+    	AdministrationServiceSoapBindingStub administrationService = null;
             
-            // Time out after a minute
-            administrationService.setTimeout(60000);
+        try 
+        {
+            // Get the adminstration service
+            AdministrationServiceLocator locator = new AdministrationServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setAdministrationServiceEndpointAddress(endpointAddress + ADMINISTRATION_ADDRESS);                
+            administrationService = (AdministrationServiceSoapBindingStub)locator.getAdministrationService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
+            {
+                if (jre.getLinkedCause() != null)
+                {
+                    jre.getLinkedCause().printStackTrace();
+                }
+            }
+   
+            throw new WebServiceException("Error creating administration service: " + jre.getMessage(), jre);
         }        
         
+        // Time out after a minute
+        administrationService.setTimeout(60000);       
+        
         return administrationService;
+    }
+    
+    public static DictionaryServiceSoapBindingStub getDictionaryService()
+    {
+    	return getDictionaryService(getEndpointAddress());
     }
 
     /**
@@ -414,34 +442,33 @@ public final class WebServiceFactory
      * 
      * @return  the dictionary service
      */
-    public static DictionaryServiceSoapBindingStub getDictionaryService()
+    public static DictionaryServiceSoapBindingStub getDictionaryService(String endpointAddress)
     {
-        if (dictionaryService == null)
-        {            
-            try 
+    	DictionaryServiceSoapBindingStub dictionaryService = null;
+           
+        try 
+        {
+            // Get the dictionary service
+            DictionaryServiceLocator locator = new DictionaryServiceLocator(AuthenticationUtils.getEngineConfiguration());
+            locator.setDictionaryServiceEndpointAddress(endpointAddress + DICTIONARY_SERVICE_ADDRESS);                
+            dictionaryService = (DictionaryServiceSoapBindingStub)locator.getDictionaryService();
+        }
+        catch (ServiceException jre) 
+        {
+            if (logger.isDebugEnabled() == true)
             {
-                // Get the dictionary service
-                DictionaryServiceLocator locator = new DictionaryServiceLocator(AuthenticationUtils.getEngineConfiguration());
-                locator.setDictionaryServiceEndpointAddress(getEndpointAddress() + DICTIONARY_SERVICE_ADDRESS);                
-                dictionaryService = (DictionaryServiceSoapBindingStub)locator.getDictionaryService();
-            }
-            catch (ServiceException jre) 
-            {
-                if (logger.isDebugEnabled() == true)
+                if (jre.getLinkedCause() != null)
                 {
-                    if (jre.getLinkedCause() != null)
-                    {
-                        jre.getLinkedCause().printStackTrace();
-                    }
+                    jre.getLinkedCause().printStackTrace();
                 }
+            }
    
-                throw new WebServiceException("Error creating dictionary service: " + jre.getMessage(), jre);
-            }        
-            
-            // Time out after a minute
-            dictionaryService.setTimeout(60000);
+            throw new WebServiceException("Error creating dictionary service: " + jre.getMessage(), jre);
         }        
         
+        // Time out after a minute
+        dictionaryService.setTimeout(60000);
+
         return dictionaryService;
     }
     
@@ -452,32 +479,35 @@ public final class WebServiceFactory
      */
     private static String getEndpointAddress()
     {
-        String endPoint = DEFAULT_ENDPOINT_ADDRESS;
-
-        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROPERTY_FILE_NAME); 
-        if (is != null)
-        {
-            Properties props = new Properties();
-            try
-            {
-                props.load(is);            
-                endPoint = props.getProperty(REPO_LOCATION);
-                
-                if (logger.isDebugEnabled() == true)
-                {
-                    logger.debug("Using endpoint " + endPoint);
-                }
-            }
-            catch (Exception e)
-            {
-                // Do nothing, just use the default endpoint
-                if (logger.isDebugEnabled() == true)
-                {
-                    logger.debug("Unable to file web service client proerties file.  Using default.");
-                }
-            }
-        }
+    	if (endPointAddress == null)
+    	{
+    		endPointAddress = DEFAULT_ENDPOINT_ADDRESS;
+	
+	        InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(PROPERTY_FILE_NAME); 
+	        if (is != null)
+	        {
+	            Properties props = new Properties();
+	            try
+	            {
+	                props.load(is);            
+	                endPointAddress = props.getProperty(REPO_LOCATION);
+	                
+	                if (logger.isDebugEnabled() == true)
+	                {
+	                    logger.debug("Using endpoint " + endPointAddress);
+	                }
+	            }
+	            catch (Exception e)
+	            {
+	                // Do nothing, just use the default endpoint
+	                if (logger.isDebugEnabled() == true)
+	                {
+	                    logger.debug("Unable to file web service client proerties file.  Using default.");
+	                }
+	            }
+	        }
+    	}
         
-        return endPoint;
+        return endPointAddress;
     }
 }
