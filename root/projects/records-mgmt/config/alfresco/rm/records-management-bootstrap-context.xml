@@ -1,0 +1,52 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+	<!-- Bootstrap -->
+
+    <bean id="rm.bootstrapViews" parent="storeImporterViews">
+        <property name="importer" ref="spacesBootstrap"/>
+        <property name="bootstrapViews">
+            <list>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.content.childname}</prop>
+                    <prop key="location">alfresco/rm/bootstrap/rm_templates.xml</prop>
+                </props>
+                <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.scripts.childname}</prop>
+                    <prop key="location">alfresco/rm/bootstrap/rm_javascripts.xml</prop>
+                </props>
+                <props>
+                    <prop key="path">/cm:categoryRoot/cm:generalclassifiable</prop>
+                    <prop key="location">alfresco/rm/bootstrap/rm_categories.xml</prop>
+                </props>
+                <!-- <props>
+                    <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.childname}</prop>
+                    <prop key="location">alfresco/rm/bootstrap/rm_file_plan.xml</prop>
+                </props> -->
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="rm.bootstrapGroups" parent="storeImporterViews">
+        <property name="importer" ref="userBootstrap"/>
+        <property name="bootstrapViews">
+            <list>
+                <props>
+                    <prop key="path">/${alfresco_user_store.system_container.childname}/sys:authorities</prop>
+                    <prop key="location">alfresco/rm/bootstrap/rm_groups.xml</prop>
+                </props>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="rm.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                <value>alfresco/rm/model/recordsModel.xml</value>
+            </list>
+        </property>
+    </bean>
+    
+</beans>

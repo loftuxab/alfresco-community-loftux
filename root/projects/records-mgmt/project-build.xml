@@ -1,0 +1,22 @@
+<project name="rm" default="package-war">
+
+   <path id="path.common" path="${basedir}/../../common"/>
+   <property name="dir.common" refid="path.common"/>
+   <import file="${dir.common}/common.xml"/>
+
+   <!-- we want to build a WAR file in this project -->
+   <target name="package" depends="package-war" />
+	
+   <property name="project.dir" value="."/>
+   <property name="config.dir" value="${project.dir}/config" />	
+   <property name="package.file.jar" value="${project.dir}/build/dist/rm.jar"/>
+	
+   <target name="package-war" depends="package-jar">
+   	  <echo>Integrating records management features into: ${dir.project.webclient}/build/dist/${file.name.war.alfresco}</echo>
+   	  <zip destfile="${dir.project.webclient}/build/dist/${file.name.war.alfresco}" update="true">
+   	     <zipfileset file="${package.file.jar}" prefix="WEB-INF/lib"/>
+   	     <zipfileset dir="${config.dir}" prefix="WEB-INF/classes"/>
+   	  </zip>
+   </target>
+   
+</project>
