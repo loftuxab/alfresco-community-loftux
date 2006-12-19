@@ -50,17 +50,25 @@ public class TempFileProvider
     }
 
     /**
-     * @return Returns a temporary directory, i.e. <code>isDir == true</code>
+     * @return Returns the system temporary directory i.e. <code>isDir == true</code>
      */
-    public static File getTempDir()
+    public static File getSystemTempDir()
     {
-        // get the temp directory
         String systemTempDirPath = System.getProperty(SYSTEM_KEY_TEMP_DIR);
         if (systemTempDirPath == null)
         {
             throw new AlfrescoRuntimeException("System property not available: " + SYSTEM_KEY_TEMP_DIR);
         }
         File systemTempDir = new File(systemTempDirPath);
+        return systemTempDir;
+    }
+    
+    /**
+     * @return Returns a temporary directory, i.e. <code>isDir == true</code>
+     */
+    public static File getTempDir()
+    {
+        File systemTempDir = getSystemTempDir();
 //        if (!systemTempDir.isDirectory())
 //        {
 //            throw new AlfrescoRuntimeException("System property does not point to a directory: \n" +
