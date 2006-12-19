@@ -60,6 +60,7 @@
             <dirset dir="${dir.projects}">
                 <include name="**/build/classes" />
             </dirset>
+            <pathelement location="${user.home}"/>
             <pathelement location="${dir.project.repository}/${dir.name.config}"/>
             <pathelement location="${dir.project.webclient}/${dir.name.config}"/>
             <pathelement location="${dir.project.jcr}/${dir.name.config}"/>
