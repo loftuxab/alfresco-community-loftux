@@ -141,7 +141,7 @@ public class WIKIExample
             contentNode.setProperty("cm:name", "Dog");
             contentNode.setProperty("cm:description", "");
             contentNode.setProperty("cm:title", "My dog at New Year party");
-            ClassPathResource resource = new ClassPathResource("org/alfresco/jcr/example/wikiImage.gif");
+            ClassPathResource resource = new ClassPathResource("org/alfresco/sample/jcr/wikiImage.gif");
             contentNode.setProperty("cm:content", resource.getInputStream());
             
             session.save();
