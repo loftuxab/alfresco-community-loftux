@@ -27,6 +27,7 @@ import org.alfresco.config.ConfigLookupContext;
 import org.alfresco.config.source.ClassPathConfigSource;
 import org.alfresco.config.source.FileConfigSource;
 import org.alfresco.config.source.HTTPConfigSource;
+import org.alfresco.config.source.JarConfigSource;
 import org.alfresco.config.source.UrlConfigSource;
 import org.alfresco.util.BaseTest;
 
@@ -231,6 +232,63 @@ public class XMLConfigServiceTest extends BaseTest
         
         Config config = svc.getGlobalConfig();
         assertNotNull(config);
+    }
+    
+    /**
+     * Tests loading config from a known JAR file
+     */
+    public void testJarSource()
+    {
+       String resDir = this.getResourcesDir();
+       String jarFile = "jar:file:/" + resDir + "custom-config.jar!/META-INF/web-client-config-custom.xml";
+       JarConfigSource source = new JarConfigSource(jarFile);
+       XMLConfigService svc = new XMLConfigService(source);
+       svc.init();
+      
+       // make sure the global config is present
+       Config config = svc.getGlobalConfig();
+       assertNotNull(config);
+       
+       // make sure the from address is present and correct
+       ConfigElement clientElem = config.getConfigElement("client");
+       assertNotNull(clientElem);
+       ConfigElement fromAddressElem = clientElem.getChild("from-email-address");
+       assertNotNull(fromAddressElem);
+       String fromAddress = fromAddressElem.getValue();
+       assertEquals("From address should be 'me@somewhere.net'", "me@somewhere.net", fromAddress);
+    }
+    
+    /**
+     * Tests loading a file from within any JAR file on the classpath
+     * 
+     * TODO: This needs the JAR file to be in the classpath when run via ant i.e.
+     *       the continuous build, so until we have a way to include adhoc items
+     *       disable this test.
+     */
+    public void xtestMultiJarSource()
+    {
+       List<String> configFiles = new ArrayList<String>(2);
+       configFiles.add("file:" + getResourcesDir() + "config.xml");
+       configFiles.add("jar:*!/META-INF/web-client-config-custom.xml");
+       UrlConfigSource configSrc = new UrlConfigSource(configFiles);
+       XMLConfigService svc = new XMLConfigService(configSrc);
+       svc.init();
+       
+       // try and get the global config section
+       Config globalSection = svc.getGlobalConfig();
+
+       // try and get items from the global section defined in each file
+       ConfigElement globalItem = globalSection.getConfigElement("global-item");
+       assertNotNull("globalItem should not be null", globalItem);
+       assertEquals("The global-item value should be 'The global value'", "The global value", globalItem.getValue());
+       
+       // make sure the from address is present and correct
+       ConfigElement clientElem = globalSection.getConfigElement("client");
+       assertNotNull(clientElem);
+       ConfigElement fromAddressElem = clientElem.getChild("from-email-address");
+       assertNotNull(fromAddressElem);
+       String fromAddress = fromAddressElem.getValue();
+       assertEquals("From address should be 'me@somewhere.net'", "me@somewhere.net", fromAddress);
     }
     
     /**
