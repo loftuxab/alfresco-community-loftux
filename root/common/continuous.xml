@@ -144,6 +144,7 @@
       <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension">
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
+         <fileset dir="${dir.config.rm}/alfresco/extension" />
       </copy>
       <copy todir="${dir.assemble.jboss}/jboss/server/default/conf/alfresco/extension">
          <fileset dir="${dir.project.installer}/extension" />
@@ -230,6 +231,7 @@
       <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension">
          <fileset dir="${dir.config.repository}/alfresco/extension" />
          <fileset dir="${dir.config.webclient}/alfresco/extension" />
+       	 <fileset dir="${dir.config.rm}/alfresco/extension" />
       </copy>
       <copy todir="${dir.assemble.tomcat}/tomcat/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.installer}/extension" />
