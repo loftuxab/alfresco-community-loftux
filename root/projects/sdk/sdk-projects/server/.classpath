@@ -4,8 +4,9 @@
 	<classpathentry exported="true" kind="lib" path="config.jar"/>
 	<classpathentry exported="true" kind="lib" path="core.jar"/>
 	<classpathentry exported="true" kind="lib" path="remote-api.jar"/>
-	<classpathentry exported="true" kind="lib" path="repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="web-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="repository.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/antlr-2.7.5H3.jar"/>
@@ -72,18 +73,11 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jmagick/JMagick.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/jut.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/swarmcache/swarmcache-1.0RC2.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/treecache/concurrent.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-system.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-cache.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-common.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/treecache/jboss-jmx.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/c3p0-0.9.1-pre6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/acegi-security-0.8.2_patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-fileupload-1.1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/ehcache-1.2.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/jooconverter-2.0.0-patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-juh-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-jurt-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/mysql-connector-java-5.0.3-bin.jar"/>
@@ -97,5 +91,8 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-3.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/jbpm-identity-3.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jbpm/springmodules-jbpm31.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-dbcp-1.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-pool-1.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/jooconverter-2.1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>

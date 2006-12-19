@@ -454,7 +454,7 @@
       <!-- TODO: configuration should ideally live in each of the above .jars -->
       <mkdir dir="${dir.assemble.sdk}/config" />
       <copy todir="${dir.assemble.sdk}/config" includeEmptyDirs="false">
-         <fileset dir="${dir.config.repository}" excludes="**/extension/*" />
+         <fileset dir="${dir.config.repository}" excludes="**/extension/*,**/desktop/*" />
          <fileset dir="${dir.config.webclient}" excludes="**/extension/*" />
          <fileset dir="${dir.project.core}/source/java" includes="log4j.properties" />
       </copy>
@@ -476,6 +476,10 @@
       <mkdir dir="${dir.assemble.sdk}/lib/server/dependencies" />
       <copy todir="${dir.assemble.sdk}/lib/server/dependencies">
          <fileset dir="${dir.project.3rdparty}/lib" includes="${dir.assemble.sdk.server.jars}" />
+      </copy>
+      <mkdir dir="${dir.assemble.sdk}/lib/server/alfresco/desktop" />
+      <copy todir="${dir.assemble.sdk}/lib/server/alfresco/desktop">
+         <fileset dir="${dir.config.repository}/alfresco/desktop" />
       </copy>
       <mkdir dir="${dir.assemble.sdk}/lib/remote/dependencies" />
       <copy todir="${dir.assemble.sdk}/lib/remote/dependencies" flatten="true">
