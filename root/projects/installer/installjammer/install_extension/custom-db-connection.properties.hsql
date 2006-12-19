@@ -1,0 +1,10 @@
+#
+# Sample database connection properties
+#
+
+#
+# HSQL connection
+#
+db.driver=org.hsqldb.jdbcDriver
+db.url=jdbc:hsqldb:file:alf_data/hsql_data/alfresco;ifexists=true;shutdown=true;
+

@@ -59,6 +59,6 @@ call %JBOSS_HOME%\bin\shutdown.bat -S
 rem ---------------------------------------
 rem Stop OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" %ALF_HOME%bin\process -k soffice.bin soffice.bin
+if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
 :nostop
