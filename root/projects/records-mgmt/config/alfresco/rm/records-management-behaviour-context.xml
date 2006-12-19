@@ -1,0 +1,212 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+	<bean id="onCreateNode_rmaFilePlan" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onCreateNode</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}filePlan</value>
+        </property> 	        	     
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onCreateNode_rmaFilePlan.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+
+    <bean id="onCreateChildAssociation_rmaFilePlan_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
+        <property name="policyNames">
+           <list>
+        	  <value>{http://www.alfresco.org}onCreateChildAssociation</value>
+              <value>{http://www.alfresco.org}onCreateNodeAssociation</value>
+           </list>
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}filePlan</value>
+        </property> 	        	   
+        <property name="associationType">
+            <value>{http://www.alfresco.org/model/content/1.0}contains</value>
+        </property>    
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onCreateChildAssociation_rmaFilePlan_cmContains.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+    <bean id="onAddAspect_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}record</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaRecord.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+    <bean id="onAddAspect_rmaVitalRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}vitalrecord</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaVitalRecord.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+    <bean id="onAddAspect_rmaCutoffSchedule" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}cutoffSchedule</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaCutoffSchedule.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+    <bean id="onAddAspect_rmaObsolete" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}obsolete</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaObsolete.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>    
+    
+    <bean id="onAddAspect_rmaSuperseded" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}superseded</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaSuperseded.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>     
+    
+    <bean id="onAddAspect_rmaCutoff" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}cutoff</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaCutoff.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>         
+    
+    <bean id="onAddAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}held</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onAddAspect_rmaHeld.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+    <bean id="onRemoveAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onRemoveAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/record/1.0}held</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/rm/script/onRemoveAspect_rmaHeld.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+</beans>

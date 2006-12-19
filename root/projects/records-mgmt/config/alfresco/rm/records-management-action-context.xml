@@ -1,0 +1,75 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+    <!-- Action defintions -->
+    
+    <bean id="transferDispositionAction" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/rm/script/action/dispositionAction_transfer.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+    
+    <bean id="destroyDispositionAction" class="org.alfresco.rm.action.DestroyDispositionAction" parent="action-executer">
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
+        <property name="versionService">
+            <ref bean="VersionService" />
+        </property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+    
+    <bean id="accessionDispositionAction" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/rm/script/action/dispositionAction_accession.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+        
+    <bean id="scheduledCutoff" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/rm/script/action/action_scheduledCutoff.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+        
+    <bean id="scheduledRemoveHold" parent="script">
+        <property name="scriptLocation">
+        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+            	<constructor-arg>
+            		<value>alfresco/rm/script/action/action_scheduledRemoveHold.js</value>
+            	</constructor-arg>
+            </bean>
+		</property>
+	    <property name="publicAction">
+	         <value>false</value>
+	     </property>
+    </bean>
+    
+    <!-- Scheduled action defintions -->
+    
+    
+</beans>
