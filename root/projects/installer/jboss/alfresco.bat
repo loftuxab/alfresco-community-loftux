@@ -24,7 +24,7 @@ call SetPaths.bat
 del SetPaths.bat
 
 :start
-set PATH=%JAVA_HOME%/bin;%ALF_HOME%bin;%PATH%
+set PATH=%JAVA_HOME%\bin;%ALF_HOME%bin;%PATH%
 rem ---------------------------------------
 rem Start Components
 rem ---------------------------------------

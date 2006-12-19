@@ -119,6 +119,11 @@ public class RuntimeExec
                     break;
                 }
             }
+            // if there is still no command, then check for the wildcard
+            if (command == null)
+            {
+                command = commandsByOS.get(KEY_OS_DEFAULT);
+            }
         }
         // check
         if (command == null)

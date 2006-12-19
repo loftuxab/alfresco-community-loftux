@@ -1,7 +1,7 @@
 const author              = "Team Alfresco";
 const displayName         = "Alfresco Extension";
 const name                = "alfrescoext";
-const version             = "0.8";
+const version             = "0.91";
 
 const jarName             = name + ".jar";
 const existsInApplication = File.exists(getFolder(getFolder("chrome"), jarName));

@@ -31,23 +31,27 @@ import junit.framework.TestCase;
  */
 public class RuntimeExecTest extends TestCase
 {
-    /**
-     * execute a statement and catch the output
-     */
     public void testStreams() throws Exception
     {
         RuntimeExec exec = new RuntimeExec();
-        exec.setCommand("find abc");
+        
+        // This test will return different results on Windows and Linux!
+        // note that some Unix variants will error without a path
+        HashMap<String, String> commandMap = new HashMap<String, String>(5);
+        commandMap.put("*", "find / -maxdepth 1 -name var");
+        commandMap.put("Windows.*", "find /?");
+        exec.setCommandMap(commandMap);
+        // execute
         ExecutionResult ret = exec.execute();
-        assertTrue("Expected error code", ret.getExitValue() != 0);
         
         String out = ret.getStdOut();
         String err = ret.getStdErr();
         
-        assertTrue("Didn't expect any non-error output", out.length() == 0);
-        assertTrue("No error output found", err.length() > 0);
+        assertEquals("Didn't expect error code", 0, ret.getExitValue());
+        assertEquals("Didn't expect any error output", 0, err.length());
+        assertTrue("No output found", out.length() > 0);
     }
-    
+
     public void testWildcard() throws Exception
     {
         RuntimeExec exec = new RuntimeExec();
