@@ -9,7 +9,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/junit.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/odmg-3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/quartz.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/spring.jar" sourcepath="src/spring-1.2.6-src.zip"/>
@@ -87,7 +86,8 @@
 	<classpathentry exported="true" kind="lib" path="lib/lucene-core-2.0.0.jar" sourcepath="src/lucene-2.0.0-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-analyzers-2.0.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/lucene-snowball-2.0.0.jar"/>
-	<classpathentry exported="true" sourcepath="src/jooconverter-2.1.0-src.zip" kind="lib" path="lib/jooconverter-2.1.0.jar"/>
-	<classpathentry exported="true" sourcepath="src/hibernate-3.2.1-src.zip" kind="lib" path="lib/hibernate-3.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/jooconverter-2.1.0.jar" sourcepath="src/jooconverter-2.1.0-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/hibernate-3.2.1.jar" sourcepath="src/hibernate-3.2.1-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/quartz-1.6.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
