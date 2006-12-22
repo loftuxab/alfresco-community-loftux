@@ -125,15 +125,25 @@ public class VirtServerRegistrationThread extends Thread
                 "Alfresco:Name=VirtServerRegistry,Type=VirtServerRegistry");
 
             virt_domain_    = serverInfo.getVirtServerDomain();
-            virt_fqdn_      = "avm." + virt_domain_;
+            virt_fqdn_      = virt_domain_;
             virt_http_port_ = serverInfo.getVirtServerHttpPort();
 
 
             // The FQDN of the virtualization server is always:
             //
-            //           avm.${alfresco.virtserver.domain}
+            //           ${alfresco.virtserver.domain}
+            //
+            // The invariant are: 
+            //
+            //    [1]  The virtualization domain:   ${alfresco.virtserver.domain} 
+            //         and all its subdomains:    *.${alfresco.virtserver.domain}
+            //         must resolve to the same IP address.
+            //
+            //    [2]  The IP address resolved in [1] must be equal to the
+            //         IP address that the virtualization server listens on.
             //
             // See: $VIRTUAL_TOMCAT_HOME/conf/alfresco-virtserver.properties
+            //
 
             virt_url_ = "service:jmx:rmi://ignored/jndi/rmi://" + 
                         virt_fqdn_                              + 

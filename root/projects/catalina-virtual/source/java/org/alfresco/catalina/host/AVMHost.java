@@ -28,6 +28,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.management.ObjectName;
 import org.alfresco.jndi.AVMFileDirContext;
+import org.alfresco.mbeans.VirtServerInfoMBean;
 import org.alfresco.mbeans.VirtServerRegistrationThread;
 import org.alfresco.mbeans.VirtWebappRegistryMBean;
 import org.alfresco.service.cmr.remote.AVMRemote;
@@ -68,7 +69,7 @@ import org.springframework.context.ApplicationContext;
 *    <td><tt><strong>reverseProxyBinding</strong></tt>
 *       <dd>A regex that binds reverse proxy names to this Host.<br>
 *           <em>Default:</em>&nbsp;&nbsp;
-*           "^www-([^.]+)(?:\\.v-([\\d]+))?\\.avm(?:\\..*)?$"
+*           "^(.+)\\.www--sandbox\\.(?:version--v(-?[\\d]+)\\.)?.*$"
 *       </dd>
 *    </td>
 *    <td><tt><br><strong>resourceBindingClassName</strong></tt>
@@ -106,8 +107,8 @@ import org.springframework.context.ApplicationContext;
 *    repository (rather than the file system).  
 *    <p>
 *    For example, suppose the default Catalina virtual host is 
-*    named "localhost",  and it's accessed via DNS wildcarding
-*    using some other name (e.g.: "www-repo-1.avm.localhost").
+*    named "localhost",  and it's accessed via DNS wildcarding using
+*    some other name (e.g.: "alice.mysite.www--sandbox.avm.localhost").
 *    What's needed is a way to say "every DNS wildcard name that
 *    matches a regex pattern (<tt>reverseProxyBinding='...'</tt>) should 
 *    act as a reverse proxy for a particular AVMHost-based virtual 
@@ -115,11 +116,11 @@ import org.springframework.context.ApplicationContext;
 *    a <tt>reverseProxyBinding</tt> attribute explicitly, the following 
 *    pattern will be used:
 *    <pre>
-*           "^www-([^.]+)(?:\\.v-([\\d]+))?\\.avm(?:\\..*)?$"
-*                  -----          ------
-*                    ^              ^
-*                    |              |
-*                 group 1        group 2
+*           "^(.+)\\.www--sandbox\\.(?:version--v(-?[\\d]+)\\.)?.*$"
+*              ---                                --------
+*               ^                                    ^
+*               |                                    |
+*             group 1                             group 2
 *    </pre>
 *    By default, the repository name will be taken from "group 1", 
 *    and the optional version will be taken from "group 2"
@@ -135,10 +136,15 @@ import org.springframework.context.ApplicationContext;
 *    <tt>reverseProxyBinding</tt>
 *    and associates it with the appBase "avm_webapps", while the second
 *    binds avm2.localhost to non-default reverse proxy names
-*    ("www2-..."), and the appBase "avm_webapps2"  (it also states 
+*    ("www2--sandbox and the appBase "avm_webapps2"  (it also states 
 *    explicitly that the 
 *    org.alfresco.catalina.host.DefaultAVMResourceBinding should be
 *    used to parse the results of the <tt>reverseProxyBinding</tt>).
+*
+*    <p>
+*       <font color='red'>Note: the second example is not supported yet.</font>
+*    <p>
+*
 * <pre>
 *       &lt;Host name="avm.localhost"
 *             className           ="org.alfresco.catalina.host.AVMHost"
@@ -151,7 +157,7 @@ import org.springframework.context.ApplicationContext;
 *
 *       &lt;Host name="avm2.localhost"
 *             className                ="org.alfresco.catalina.host.AVMHost"
-*             reverseProxyBinding      ="^www2-([^.]+)(?:\\.v-([\\d]+))?\\.avm\\..*"
+*             reverseProxyBinding      = "^(.+)\\.www2--sandbox\\.(?:version--v(-?[\\d]+)\\.)?.*$"
 *             resourceBindingClassName ="org.alfresco.catalina.host.DefaultAVMResourceBinding"
 *             appBase                  ="avm_webapps2"
 *             unpackWARs               ="true"
@@ -205,12 +211,13 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         "org.alfresco.jndi.AVMHost/1.0";
 
 
+    String reverse_proxy_binding_;
+
+
     public AVMHost()
     {
         super();
     }
-
-
 
     /**
     */
@@ -222,7 +229,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     { 
         reverse_proxy_binding_ = binding;
     }
-    String reverse_proxy_binding_  = "^www-([^.]+)(?:\\.v-([\\d]+))?\\.avm(?:\\..*)?$";
 
     public String getResourceBindingClassName()
     {
@@ -348,15 +354,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
         org.apache.catalina.LifecycleListener[]  listen = findLifecycleListeners();
 
-        // Register this AVMHost with the static list of all AVMHosts
-        // This allows the AVMUrlValve to map forward proxy names
-        // to the backend AVMHost that will service them.
-        //
-        ReverseProxies_.add( 
-            new ReverseProxyBinding( this, reverse_proxy_binding_)
-        );
-
-        // already registered.
         try 
         {
             // Register with the Engine
@@ -380,6 +377,35 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             AVMHostConfig deployer = new AVMHostConfig( super.getAppBase() );
             ApplicationContext springContext =  
                 AVMFileDirContext.GetSpringApplicationContext();
+
+
+            if ( reverse_proxy_binding_ == null )
+            {
+                // VirtServerInfoMBean serverInfo =
+                //     (VirtServerInfoMBean) springContext.getBean("virtServerInfo");
+                //
+                // String virt_domain = serverInfo.getVirtServerDomain();
+
+
+                reverse_proxy_binding_ = "^(.+)\\." + 
+                                         "www--sandbox\\." +
+                                         "(?:version--v(-?[\\d]+)\\.)?" +
+                                         ".*$";
+            }
+
+            System.out.println("Reverse proxy binding: " + reverse_proxy_binding_ );
+
+            // Register this AVMHost with the static list of all AVMHosts
+            // This allows the AVMUrlValve to map forward proxy names
+            // to the backend AVMHost that will service them.
+            //
+            ReverseProxies_.add( 
+                new ReverseProxyBinding( this, reverse_proxy_binding_)
+            );
+
+
+
+
 
 
             // Register the AVMHostConfig deployer with the 
