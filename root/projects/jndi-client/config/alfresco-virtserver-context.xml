@@ -233,9 +233,20 @@
 
          Note:
 
-            o  Each "key" within "cacheControlRules" property is a PCRE-style
-               regex that matches virtual hosts (i.e.: there's no implicit '^'
-               regex prefix  or '$' regex suffix).
+            o  Each key='...' within "cacheControlRules" property 
+               is a java/PCRE regex that matches virtual hosts;   
+               there's no implicit '^' regex prefix  or '$' regex 
+               suffix, so if you want to anchor something to the
+               starting or ending position of a FQDN, do so explicitly.
+
+            o  For more details on the regular expression grammar, see:
+               http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html
+               However, note that in this context, when you want to escape
+               a character that's a part of the regex grammar, use a single 
+               '\', not '\\' (unlike what the web page mentined above says).
+               Thus, to compose a regex that inclues the literal dot-character,
+               you'd do something like this "moo\.cow", not "moo\\.cow"
+               (see the <entry> key strings below for more examples).
 
             o  Each "value" is the corresponding "Cache-Control" HTTP header
                value that's set in the virtualization server's response to
@@ -243,10 +254,7 @@
 
             o  All "max-age" time values are given in seconds.
 
-            o  Rules are processed in order.
-               The first match (if any) wins.
-
-            o  The 
+            o  Rules are processed in order; the first match (if any) wins.
 
     -->
     <bean id="cacheControlInfo"
@@ -254,17 +262,17 @@
 
         <property name="cacheControlRules">
             <map>
-                <entry key="^preview\\."
+                <entry key="^preview\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.preview}"/>
 
-                <entry key="^[^.]+\\.[^.]+\\.www--sandbox\\."
+                <entry key="^[^.]+\.[^.]+\.www--sandbox\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.workarea}"/>
 
-                <entry key="^[^.]+\\.www--sandbox\\."
+                <entry key="^[^.]+\.www--sandbox\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.staging}"/>
 
                 <!-- Default rule (user work areas) -->
-                <entry key="\\."
+                <entry key="\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.default}"/>
             </map>
         </property>
