@@ -212,14 +212,14 @@
 
          Note that:
 
-            o  When looking at a "...preview" virtual host, the files that
+            o  When looking at a "preview" virtual host, the files that
                tend to change the most rapidly are often the exactly those
                files that the user wants to see.  Thus, forcing a short
                max-age is a good idea; otherwise, users would need to hit
                "refresh" every time they look at a "fresh preview"
                (which is unfriendly).
 
-            o  While the contents within "...staging" virtual host might
+            o  While the contents within "staging" virtual host might
                change quite often too, seeing something that's slightly
                more "stale" every so often in exchange for much better
                average case performance is a good trade-off.  If the user
@@ -245,20 +245,26 @@
 
             o  Rules are processed in order.
                The first match (if any) wins.
+
+            o  The 
+
     -->
     <bean id="cacheControlInfo"
           class="org.alfresco.filter.CacheControlFilterInfoBean">
 
         <property name="cacheControlRules">
             <map>
-                <entry key="preview\.avm\."
+                <entry key="^preview\\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.preview}"/>
 
-                <entry key="staging\.avm\."
+                <entry key="^[^.]+\\.[^.]+\\.www--sandbox\\."
+                       value="max-age=${alfresco.virtserver.cache-control.max-age.workarea}"/>
+
+                <entry key="^[^.]+\\.www--sandbox\\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.staging}"/>
 
                 <!-- Default rule (user work areas) -->
-                <entry key="\.avm\."
+                <entry key="\\."
                        value="max-age=${alfresco.virtserver.cache-control.max-age.default}"/>
             </map>
         </property>
