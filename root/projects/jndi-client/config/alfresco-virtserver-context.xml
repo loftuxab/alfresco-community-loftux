@@ -121,7 +121,7 @@
             <value>${alfresco.virtserver.domain}</value>
         </property>
 
-        <!-- local virtualization server HTT port  -->
+        <!-- local virtualization server HTTP port  -->
         <property name="virtServerHttpPort">
             <value>${alfresco.virtserver.http.port}</value>
         </property>
@@ -130,6 +130,24 @@
         <property name="virtServerJmxRmiPort">
             <value>${alfresco.virtserver.jmxrmi.port}</value>
         </property>
+
+
+        <!-- local CIFS automount props -->
+        <property name="virtServerCifsAvmVersionTreeWin">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.win}</value>
+        </property>
+        <property name="virtServerCifsAvmVersionTreeWinAutomount">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.win.automount}</value>
+        </property>
+        <property name="virtServerCifsAvmVersionTreeUnix">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.unix}</value>
+        </property>
+        <property name="virtServerCifsAvmVersionTreeUnixAutomount">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.unix.automount}</value>
+        </property>
+
+
+
 
 
         <!-- remote Alfresco server hostname -->
@@ -147,7 +165,9 @@
             <value>${alfresco.virtserver.connection.retry.interval}</value>
         </property>
 
+
     </bean>
+
 
 
     <!-- Custom MBeanServer                                    -->

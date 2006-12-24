@@ -29,6 +29,13 @@ public class VirtServerInfo implements VirtServerInfoMBean
     int    virtHttpPort_;
     int    retryInterval_;  // in milliseconds
 
+    String   virtCifsAvmVersionTreeWin_;
+    boolean  virtCifsAvmVersionTreeWinAutomount_;
+    String   virtCifsAvmVersionTreeUnix_;
+    boolean  virtCifsAvmVersionTreeUnixAutomount_;
+
+    String   virtOsName_;
+
     // Remote Alfresco server info
     String alfrescoJmxRmiHost_;
     int    alfrescoJmxRmiPort_;
@@ -49,6 +56,44 @@ public class VirtServerInfo implements VirtServerInfoMBean
 
     public int      getVirtServerJmxRmiPort()            { return virtJmxRmiPort_; }
     public void     setVirtServerJmxRmiPort(int port)    { virtJmxRmiPort_ = port; }
+
+
+    // local CIFS automount props
+
+    public String   getVirtServerCifsAvmVersionTreeWin()  
+                    { return virtCifsAvmVersionTreeWin_;}
+
+    public void     setVirtServerCifsAvmVersionTreeWin(String mountPoint)
+                    { virtCifsAvmVersionTreeWin_ = mountPoint;}
+
+    public boolean  getVirtServerCifsAvmVersionTreeWinAutomount()
+                    { return virtCifsAvmVersionTreeWinAutomount_; }
+
+    public void     setVirtServerCifsAvmVersionTreeWinAutomount(boolean doAutomount)
+                    { virtCifsAvmVersionTreeWinAutomount_ = doAutomount; }
+
+    public String   getVirtServerCifsAvmVersionTreeUnix()
+                    { return  virtCifsAvmVersionTreeUnix_; }
+
+    public void     setVirtServerCifsAvmVersionTreeUnix(String mountPoint)
+                    {  virtCifsAvmVersionTreeUnix_ = mountPoint; }
+
+    public boolean  getVirtServerCifsAvmVersionTreeUnixAutomount()
+                    { return virtCifsAvmVersionTreeUnixAutomount_; }
+
+    public void     setVirtServerCifsAvmVersionTreeUnixAutomount(boolean doAutomount)
+                    { virtCifsAvmVersionTreeUnixAutomount_ = doAutomount; }
+
+   
+    /**   Fetches the value of os.name on the Virtualization server. */
+    public String   getVirtServerOsName()                { return  virtOsName_; }
+
+    /**   Sets virtualization server's exposed value for OS name. 
+    *     Note:  this method is only called from within the virtualzation server itself,
+    *     not remote JMXRMI clients. 
+    */
+    public void     setVirtServerOsName(String osName)   { virtOsName_ = osName; }
+
 
     public String   getAlfrescoJmxRmiHost()              { return alfrescoJmxRmiHost_; }
     public void     setAlfrescoJmxRmiHost(String host)   { alfrescoJmxRmiHost_ = host; }

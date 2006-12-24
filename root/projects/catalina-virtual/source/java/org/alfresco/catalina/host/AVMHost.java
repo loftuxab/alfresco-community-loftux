@@ -181,7 +181,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     private static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( AVMHost.class );
 
-    static String AVMFileDirAppBase_ = AVMFileDirContext.getAVMFileDirAppBase();
+    static String AVMFileDirAppBase_;
 
     // Repeatedly re-registers this Host with the Alfresco server
     // (e.g.: every 10 seconds or so).
@@ -317,7 +317,46 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     */
     public String getAppBase() 
     { 
-        return AVMFileDirAppBase_  + this.name;
+        // Help make JNDI paths line up with CIFS paths
+        // Thus instead of something like:
+        //
+        //      return AVMFileDirAppBase_  + this.name;
+        //
+        // Just pass back whatever AVMFileDirAppBase_ 
+        // was as the host's appBase.
+        //
+        // TODO:  Perhaps the CIFS mount path could be augmented
+        //        augmented to include the virtual hosts's name.
+        //        Entirely possible via automount; however, consider
+        //        be sure to consider scenarios where both the
+        //        Alfresco webapp and the virt server want to setup
+        //        CIFS.  How important is sharing the mount point
+        //        in terms of caching?  Investigate.
+        //
+        // NOTE:
+        //        The 'work' dir depents on the virtual host's name,
+        //        not the application base.  Thus, the work dir remains 
+        //        the same no mater what you do.  For example, if the host 
+        //        is "avm.alfresco.localhost" then the workdir created is:
+        //
+        //        $VIRTUAL_TOMCAT_HOME/work/Catalina/avm.alfresco.localhost
+        //
+        //        The host "avm.alfresco.localhost" is where AVMUrlValve 
+        //        reverse proxies to by default.  AVMHost itself knows 
+        //        nothing of the wildcard DNS shennanagins that made the
+        //        client's request map to the IP address that the AVMHost's
+        //        connector is listening on.   When AVMUrlValve issues its
+        //        internal subrequest to avm.alfresco.localhost, all the
+        //        interesting information for JNDI has been tunneled into
+        //        the 1st segment of the request path.  In a very real sense,
+        //        the only "actual" virtual host is avm.alfresco.localhost
+        //        (hence, that's the only Alfreco-related "work" dir created).
+        //
+        //        As for JNDI, AVMFileDirContext.setDocBase() now just gets:
+        //         <AvmFileDirAppBase>/<value-determined-by-AVMHostConfig>
+        //
+
+        return AVMFileDirAppBase_;
     }
 
     /**
@@ -333,6 +372,23 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     {
         if( initialized ) return;
         initialized=true;
+
+        AVMFileDirContext.InitAVMRemote();
+
+        // Create the registration thread early, but don't start it yet.
+        // The creation of this object configures various attributes
+        // in the VirtServerInfoMBean, and sets up AVMFileDirContext
+        // so it can yield a meaningul AVMFileDirAppBase.
+        //
+        registrationThread_ = new VirtServerRegistrationThread();
+
+        // AVMHostConfig will need to call getAppBase() on its
+        // container (i.e.: this AVMHost).  Therefore, we need
+        // to prepare for that prior to the AVMHostConfig start()
+        // occurs.
+        //
+        AVMFileDirAppBase_  = AVMFileDirContext.getAVMFileDirAppBase();
+
 
         try 
         {
@@ -368,7 +424,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                 }
             }
 
-            AVMFileDirContext.InitAVMRemote();
 
             // Use a custom deployer that knows how to access AVMRemote
             // Tell the AVMHostContext what appBase was given within 
@@ -405,9 +460,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
 
 
-
-
-
             // Register the AVMHostConfig deployer with the 
             // webapp registry.  This enables remote updates
             // to the VirtWebappRegistryMBean (from the Alfersco server)
@@ -428,7 +480,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             // When this virt server gets a message to update a virtual webapp,
             // a recursive classloader reload is triggered for that webapp.
 
-            registrationThread_ = new VirtServerRegistrationThread();
             registrationThread_.start();
 
 
@@ -496,6 +547,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         // new Exception("Stack trace").printStackTrace();
 
         if( started ) { return; }
+
 
         if( ! initialized ) { init(); }
 
