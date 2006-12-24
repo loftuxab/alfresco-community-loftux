@@ -760,6 +760,9 @@ public class AVMHostConfig extends HostConfig
             context.setPath(contextPath);  // e.g.: /$-1$repo-3$my_webapp
 
 
+            // Move from:  /media/alfresco/cifs/v/$-1$mysite--guest:/appBase/avm_webapps/ROOT
+            // To:         /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/appBase/avm_webapps/ROOT
+            //
             // Example of webapp_fullpath:
             //      "repo-3:/appBase/avm_webapps/my_webapp"
 

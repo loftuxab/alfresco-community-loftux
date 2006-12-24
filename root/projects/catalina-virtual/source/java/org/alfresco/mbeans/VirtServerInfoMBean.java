@@ -55,9 +55,74 @@ public interface VirtServerInfoMBean
     public void     setVirtServerConnectionRetryInterval(int milliseconds);
 
 
+
+    /** Get the CIFS version tree automount path on Windows-based platforms. */
+    public String   getVirtServerCifsAvmVersionTreeWin();
+
+    /** Set the CIFS version tree automount path on Windows-based platforms. */
+    public void     setVirtServerCifsAvmVersionTreeWin(String mountPoint);
+
+    /** True if attempt is made to automount CIFS on Windows. */
+    public boolean  getVirtServerCifsAvmVersionTreeWinAutomount();
+
+    /** Set whether attempt is made to automount CIFS on Windows. */
+    public void     setVirtServerCifsAvmVersionTreeWinAutomount(boolean doAutomount);
+
+
+    /** Get the CIFS version tree automount path on UNIX-style platforms. */
+    public String   getVirtServerCifsAvmVersionTreeUnix();
+
+    /** Set the CIFS version tree automount path on UNIX-style platforms. */
+    public void     setVirtServerCifsAvmVersionTreeUnix(String mountPoint);
+
+    /** True if attempt is made to automount CIFS on UNIX-style platforms.. */
+    public boolean  getVirtServerCifsAvmVersionTreeUnixAutomount();
+
+    /** Set whether attempt is made to automount CIFS on UNIX-style platforms.. */
+    public void     setVirtServerCifsAvmVersionTreeUnixAutomount(boolean doAutomount);
+
+    /** 
+    *   Fetches the value of os.name on the Virtualization server.
+    *   Note:  all Windows-style platforms start with the string "Windows".
+    *   In case you're curious, here's a list of common values for "os.name":
+    *
+    *   <pre>
+    *        AIX
+    *        Digital Unix
+    *        FreeBSD
+    *        HP-UX
+    *        Irix
+    *        Linux
+    *        Mac OS
+    *        Mac OS X
+    *        MPE/iX
+    *        NetWare
+    *        OpenVMS
+    *        OS/2
+    *        OS/390
+    *        OSF1
+    *        Solaris
+    *        SunOS
+    *        Windows 2000
+    *        Windows 2003
+    *        Windows 95
+    *        Windows 98
+    *        Windows CE
+    *        Windows Me
+    *        Windows NT
+    *        Windows XP
+    *   </pre>
+    */
+    public String   getVirtServerOsName();
+
+    /** Sets the OS name of the machine hosting the virtualization server */
+    public void     setVirtServerOsName(String osName);
+
+
     // Remote Alfresco server info
     public String   getAlfrescoJmxRmiHost(); 
     public void     setAlfrescoJmxRmiHost(String host);
     public int      getAlfrescoJmxRmiPort();
     public void     setAlfrescoJmxRmiPort(int port);
+
 }

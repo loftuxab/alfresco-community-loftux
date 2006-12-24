@@ -115,9 +115,8 @@ import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 import org.springframework.context.ApplicationContext;
-
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 // Had to use:   new Exception("Stack trace").printStackTrace();
 // and read a lot of tomcat source to figure out what was actually 
@@ -133,12 +132,12 @@ import org.springframework.context.ApplicationContext;
 public class AVMFileDirContext extends  
              org.apache.naming.resources.FileDirContext  
 {
-    // AVMFileDirAppBase  is used by AVMHost as a prefix
+    // AVMFileDirAppBase_  is used by AVMHost as a prefix
     // for the host appBase.  This makes it easy for JNDI
     // to recognize all paths (from all AVMHost-based 
     // virtual hosts) that belong to it.
     //
-    // AVMHost uses the appDir:  <AVMFileDirAppBase>/<hostname>
+    // AVMHost uses the appDir:  <AVMFileDirAppBase_>/<hostname>
     // For example:              /alfresco.avm/avm.alfresco.localhost
     //
     // Because of how StandardContext.getBasePath() works,
@@ -146,14 +145,20 @@ public class AVMFileDirContext extends
     // gets prepended (e.g.: on windows "c:/alfresco-.../virtual-tomcat")
     // Therefore, a little extra fancy footwork is in order here:
     //
-    static final protected String AVMFileDirAppBase  =  
-               (File.separatorChar == '/') 
-               ?  "/alfresco.avm/"              // Unix
-               :  "c:\\alfresco.avm\\";         // Windows
+    static protected String AVMFileDirAppBase_;
 
 
     // Force initialization order among modules
-    public static final String getAVMFileDirAppBase() { return AVMFileDirAppBase; }
+    public static final String getAVMFileDirAppBase() { return AVMFileDirAppBase_; }
+
+    /** 
+    *  @exclude
+    *  Sets the base dir for JNDI paths.   
+    *  Typically, this function is only called at startup time
+    *  by the VirtServerRegistrationThread.
+    */
+    public static final void  setAVMFileDirAppBase( String mount_point)
+    { AVMFileDirAppBase_ = mount_point; }
 
     // Given a call to setDocBase() with a value:
     //   /alfresco.avm/somehost/$-1$repo-1:/repo-1/alice/appBase/avm_webapps/xyz
@@ -235,6 +240,7 @@ public class AVMFileDirContext extends
                                      "file:"              +   // non-obvious Spring-ism!
                                      catalina_base        + 
                                      "conf/alfresco-virtserver-context.xml");
+
 
                     Service_ = (AVMRemote)Context_.getBean("avmRemote");
                     
@@ -493,8 +499,49 @@ public class AVMFileDirContext extends
      */
     public void setDocBase(String docBase) 
     {
+        // Called once for every virtual webapp
+        //
         // new Exception("AVMFileDirContext setDocBase Stack trace: " + 
-        //                docBase).printStackTrace();
+        //               docBase).printStackTrace();
+        //
+        //  java.lang.Exception: AVMFileDirContext setDocBase Stack trace: 
+        //
+        //    /alfresco.avm/avm.alfresco.localhost/$-1$mysite--preview:/appBase/avm_webapps/ROOT
+        //
+        //
+        //        at org.alfresco.jndi.AVMFileDirContext.setDocBase(AVMFileDirContext.java:496)
+        //        at org.apache.catalina.core.StandardContext.resourcesStart(StandardContext.java:3812)
+        //        at org.apache.catalina.core.StandardContext.start(StandardContext.java:3983)
+        //        at org.alfresco.catalina.context.AVMStandardContext.start(AVMStandardContext.java:64)
+        //        at org.apache.catalina.core.ContainerBase.addChildInternal(ContainerBase.java:759)
+        //        at org.apache.catalina.core.ContainerBase.addChild(ContainerBase.java:739)
+        //        at org.apache.catalina.core.StandardHost.addChild(StandardHost.java:524)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployAVMdirectory(AVMHostConfig.java:788)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployAVMwebapp(AVMHostConfig.java:609)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployAVMWebappDescriptorTree(AVMHostConfig.java:546)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployAVMWebappDescriptorTree(AVMHostConfig.java:556)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployAVMWebappsInDependencyOrder(AVMHostConfig.java:539)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployAllAVMwebappsInRepository(AVMHostConfig.java:414)
+        //        at org.alfresco.catalina.host.AVMHostConfig.deployApps(AVMHostConfig.java:323)
+        //        at org.apache.catalina.startup.HostConfig.start(HostConfig.java:1118)
+        //        at org.alfresco.catalina.host.AVMHostConfig.start(AVMHostConfig.java:281)
+        //        at org.apache.catalina.startup.HostConfig.lifecycleEvent(HostConfig.java:310)
+        //        at org.apache.catalina.util.LifecycleSupport.fireLifecycleEvent(LifecycleSupport.java:119)
+        //        at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1020)
+        //        at org.apache.catalina.core.StandardHost.start(StandardHost.java:718)
+        //        at org.alfresco.catalina.host.AVMHost.start(AVMHost.java:586)
+        //        at org.apache.catalina.core.ContainerBase.start(ContainerBase.java:1012)
+        //        at org.apache.catalina.core.StandardEngine.start(StandardEngine.java:442)
+        //        at org.apache.catalina.core.StandardService.start(StandardService.java:450)
+        //        at org.apache.catalina.core.StandardServer.start(StandardServer.java:700)
+        //        at org.apache.catalina.startup.Catalina.start(Catalina.java:551)
+        //        at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+        //        at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+        //        at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:25)
+        //        at java.lang.reflect.Method.invoke(Method.java:585)
+        //        at org.apache.catalina.startup.Bootstrap.start(Bootstrap.java:275)
+        //        at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:413)
+        //
         //
         //
         // Given  /opt/tomcat -> /opt/apache-tomcat-5.5.15/
@@ -511,6 +558,20 @@ public class AVMFileDirContext extends
         //      /opt/apache-tomcat-5.5.15/server/webapps/manager
         //      /opt/apache-tomcat-5.5.15/server/webapps/host-manager
 
+        // Current docBase::
+        //  /alfresco.avm/avm.alfresco.localhost/$-1$mysite:/appBase/avm_webapps/ROOT
+        //
+        // Desired docBase:
+        // <mount>/<repo-name>/VERSION/v<version>/DATA/appBase/avm_webapps/ROOT
+        // /foo/cifs/mysite--x/VERSION/v123456789/DATA/appBase/avm_webapps/ROOT
+        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~              ~~~~~~~~~~~~~~~~~
+        //    ^         ^                   ^                        ^
+        //    |         |                   |                        |
+        // <mount>  <repo-name>         <version>       <path-to-webabapps-dir>
+        //
+
+
+
         log.info("AVMFileDirContext:  setDocBase(): " + docBase);
 
         // Validate the format of the proposed document root
@@ -520,7 +581,7 @@ public class AVMFileDirContext extends
         }
 
         if ( infer_webresources_from_docBase_  && 
-             docBase.startsWith( AVMFileDirAppBase )
+             docBase.startsWith( AVMFileDirAppBase_ )
            )
         {
             log.info("AVMFileDirContext:  USING AVM for: " + docBase );

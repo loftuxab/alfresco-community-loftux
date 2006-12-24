@@ -74,6 +74,59 @@ public class VirtServerRegistrationThread extends Thread
             (VirtServerInfoMBean)  
                 springContext_.getBean("virtServerInfo");
 
+        // Get info pertaining to the CIFS mount path
+        // Also, expose the virtualization server's OS
+        // for the remote Alfresco server.  This could
+        // come in handy sharing a CIFS mount and/or debugging.
+
+        String os_name = System.getProperty("os.name");
+        serverInfo.setVirtServerOsName( os_name );
+
+
+        // There *has* to be a mount path, even if it's bogus.
+        // The "mount_path" forms the basis for JNDI asset names.
+        // Users will probably leave these settings alone, because
+        // if the automounting is not wanted, they can control that
+        // via: alfresco.virtserver.cifs.avm.versiontree.win.automount
+        // or :  alfresco.virtserver.cifs.avm.versiontree.unix.automount
+        // (depending on whether they're on Windows or Unix/Mac)
+        //
+        // In any event, because of the criticality of having a non-null 
+        // value, there's a check for a null mount location, just to be safe.
+
+        String mount_path;
+
+        if ( os_name.startsWith("Windows") )
+        {
+            mount_path = 
+              serverInfo.getVirtServerCifsAvmVersionTreeWin();
+
+            if ( mount_path == null )
+            {
+                mount_path = "c:\\alfresco.avm\\";
+            }
+            else
+            {
+                if (mount_path.length() == 1 )
+                {
+                    mount_path = mount_path + ":";
+                }
+            }
+        }
+        else
+        {
+            mount_path = 
+              serverInfo.getVirtServerCifsAvmVersionTreeUnix();
+            if ( mount_path == null )
+            {
+                mount_path = "/alfresco.avm/";   
+            }
+        }
+
+        AVMFileDirContext.setAVMFileDirAppBase( mount_path );
+
+
+
         String catalina_base;
         catalina_base = System.getProperty("catalina.base");
         if ( catalina_base == null)
