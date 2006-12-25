@@ -178,7 +178,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                     <p>
     *
     * @param pathToWebapp The full AVM path to the webapp being updated.
-    *                     For example:  repoName:/appBase/avm_webapps/your_webapp
+    *                     For example:  repoName:/www/avm_webapps/your_webapp
     *                     <p>
     *
     * @param isRecursive  When true, update all webapps that depend on this one.
@@ -215,7 +215,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                     <p>
     *
     * @param pathToWebapp The full AVM path to the webapp being removed.
-    *                     For example:  repoName:/appBase/avm_webapps/your_webapp
+    *                     For example:  repoName:/www/avm_webapps/your_webapp
     *                     <p>
     *
     * @param isRecursive  When true, remove all webapps that depend on this one.

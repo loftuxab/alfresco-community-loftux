@@ -80,16 +80,6 @@ import org.springframework.context.ApplicationContext;
 *    </td> 
 *  </dl>
 *
-*  Also, the interpretation of the following attribute is different:
-*  <dl>
-*    <td><tt><strong>appBase</strong></tt>
-*       <dd>The folder within each AVM repository used to compose a virtual appBase<br>
-*           (see {@link AVMHostConfig}).
-*       </dd>
-*    </td>
-*  </dl>
-*  &nbsp;
-*  <p>
 *
 *  <h3>Details</h3>
 *    The <tt>reverseProxyBinding</tt> regular expression allows 
@@ -101,11 +91,6 @@ import org.springframework.context.ApplicationContext;
 *    <pre>
 *         className ="org.alfresco.catalina.host.AVMHost"
 *    </pre>
-*    This can be useful, because each <tt>&lt;Host&gt;</tt> can have its
-*    own "appBase" attribute.  Thus, you can have multiple 
-*    virtual hosts that use different portions of Alfresco's 
-*    repository (rather than the file system).  
-*    <p>
 *    For example, suppose the default Catalina virtual host is 
 *    named "localhost",  and it's accessed via DNS wildcarding using
 *    some other name (e.g.: "alice.mysite.www--sandbox.avm.localhost").
@@ -125,48 +110,6 @@ import org.springframework.context.ApplicationContext;
 *    By default, the repository name will be taken from "group 1", 
 *    and the optional version will be taken from "group 2"
 *    (see: {@link org.alfresco.catalina.host.DefaultAVMResourceBinding}).
-*    <p>
-*    If you have multiple AVMHost-based virtual hosts, the 
-*    <tt>reverseProxyBinding</tt> regexes will be processed in the 
-*    order of their appearance. 
-*    <p>
-*    Here's a snippet from 
-*    $CATALINA_HOME/conf/server.xml that illustrates two 
-*    <tt>&lt;Host&gt;</tt> tags;  the first uses the default 
-*    <tt>reverseProxyBinding</tt>
-*    and associates it with the appBase "avm_webapps", while the second
-*    binds avm2.localhost to non-default reverse proxy names
-*    ("www2--sandbox and the appBase "avm_webapps2"  (it also states 
-*    explicitly that the 
-*    org.alfresco.catalina.host.DefaultAVMResourceBinding should be
-*    used to parse the results of the <tt>reverseProxyBinding</tt>).
-*
-*    <p>
-*       <font color='red'>Note: the second example is not supported yet.</font>
-*    <p>
-*
-* <pre>
-*       &lt;Host name="avm.localhost"
-*             className           ="org.alfresco.catalina.host.AVMHost"
-*             appBase             ="avm_webapps"
-*             unpackWARs          ="true"
-*             autoDeploy          ="true"
-*             xmlValidation       ="false"
-*             xmlNamespaceAware   ="false"&gt;
-*       &lt;/Host&gt;
-*
-*       &lt;Host name="avm2.localhost"
-*             className                ="org.alfresco.catalina.host.AVMHost"
-*             reverseProxyBinding      = "^(.+)\\.www2--sandbox\\.(?:version--v(-?[\\d]+)\\.)?.*$"
-*             resourceBindingClassName ="org.alfresco.catalina.host.DefaultAVMResourceBinding"
-*             appBase                  ="avm_webapps2"
-*             unpackWARs               ="true"
-*             autoDeploy               ="true"
-*             xmlValidation            ="false"
-*             xmlNamespaceAware        ="false"&gt;
-*       &lt;/Host&gt;
-*
-* </pre>
 *
 * The <tt>resourceBindingClassName</tt> attribute allows you to customize
 * how a request to a reverse proxy maps to resources within the AVM repository.
