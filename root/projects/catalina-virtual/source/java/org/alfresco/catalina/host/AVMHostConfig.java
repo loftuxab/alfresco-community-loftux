@@ -661,8 +661,17 @@ public class AVMHostConfig extends HostConfig
             //
             // Example of webapp_fullpath:
             //      "repo-3:/www/avm_webapps/my_webapp"
+            //
+            // context.setDocBase( "$" + version + "$" + webapp_fullpath );
 
-            context.setDocBase( "$" + version + "$" + webapp_fullpath );
+            int repo_delim = webapp_fullpath.indexOf(':');
+
+            context.setDocBase(  
+                webapp_fullpath.substring(0,repo_delim)  + 
+                "/VERSION/v" + version                   + 
+                "/DATA"                                  + 
+                webapp_fullpath.substring(repo_delim +1 ,webapp_fullpath.length() ) );
+
 
             // Make Constants.ApplicationContextXml == "META-INF/context.xml";
             // on all platforms, because we're reaching into AVM, not native

@@ -123,12 +123,8 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 // happening.  Hopefully, I won't be guilty of the same thing! ;)
 
 /**
- * AVM + Filesystem Directory Context implementation helper class.
- *
- * @author Jon Cox
- *
- */
-
+* AVMFileDirContext corresponds to a directory within a webapp.
+*/
 public class AVMFileDirContext extends  
              org.apache.naming.resources.FileDirContext  
 {
@@ -137,17 +133,21 @@ public class AVMFileDirContext extends
     // to recognize all paths (from all AVMHost-based 
     // virtual hosts) that belong to it.
     //
-    // AVMHost uses the appDir:  <AVMFileDirAppBase_>/<hostname>
-    // For example:              /alfresco.avm/avm.alfresco.localhost
-    //
     // Because of how StandardContext.getBasePath() works,
     // if the following dir isn't "absolute", then the application base
-    // gets prepended (e.g.: on windows "c:/alfresco-.../virtual-tomcat")
-    // Therefore, a little extra fancy footwork was in order here:
+    // gets prepended (e.g.: on windows "c:/alfresco-.../virtual-tomcat").
+    //
+    // A little extra fancy footwork is neede here because of the
+    // order in which various services come up.  For this resson, 
     // AVMFileDirAppBase_ is actually set via a call to 
     // setAVMFileDirAppBase() within VirtServerRegistrationThread.
-
-    static protected String AVMFileDirAppBase_; 
+    //
+    //
+    // Examples:
+    //                UNIX:  "/media/alfresco/cifs/v"
+    //            Windows :  "v:"
+    //
+    static protected String   AVMFileDirAppBase_; 
 
 
     public static final String getAVMFileDirAppBase() { return AVMFileDirAppBase_; }
@@ -162,9 +162,9 @@ public class AVMFileDirContext extends
     { AVMFileDirAppBase_ = mount_point; }
 
     // Given a call to setDocBase() with a value:
-    //   /alfresco.avm/somehost/$-1$repo-1:/www/avm_webapps/xyz
+    //   /media/alfresco/cifs/v/$-1$mysite--guest:/www/avm_webapps/ROOT
     //
-    // The avmDocBase_ == "repo-1:/www/avm_webapps/xyz"
+    // The avmDocBase_ == "mysite--guest:/www/avm_webapps/xyz" 
     // and avmVersion_ == -1
     //
     String avmDocBase_;
@@ -238,9 +238,9 @@ public class AVMFileDirContext extends
                 {
                     Context_ = 
                         new FileSystemXmlApplicationContext(
-                                     "file:"              +   // non-obvious Spring-ism!
-                                     catalina_base        + 
-                                     "conf/alfresco-virtserver-context.xml");
+                                "file:"              +
+                                catalina_base        + 
+                                "conf/alfresco-virtserver-context.xml");
 
 
                     Service_ = (AVMRemote)Context_.getBean("avmRemote");
@@ -254,8 +254,10 @@ public class AVMFileDirContext extends
                         (JndiInfoBean)Context_.getBean("jndiInfoBean");
                     
                     // Authenticate once,
-                    authService.authenticate(info.getAlfrescoServerUser(), 
-                                             info.getAlfrescoServerPassword().toCharArray());
+                    authService.authenticate(
+                        info.getAlfrescoServerUser(), 
+                        info.getAlfrescoServerPassword().toCharArray()
+                    );
                     
                     // and set the ticket.
                     ClientTicketHolder.SetTicket(authService.getCurrentTicket());
@@ -561,10 +563,13 @@ public class AVMFileDirContext extends
         // Desired docBase:
         // <mount>/<repo-name>/VERSION/v<version>/DATA/www/avm_webapps/ROOT
         // /foo/cifs/mysite--x/VERSION/v123456789/DATA/www/avm_webapps/ROOT
-        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~          ~~~~~~~~~~~~~~~~~
-        //    ^         ^                   ^                    ^
-        //    |         |                   |                    |
-        // <mount>  <repo-name>         <version>       <path-to-webabapps-dir>
+        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~       ~~~ ~~~~~~~~~~~ ~~~~
+        //    ^         ^                   ^           ^        ^       ^
+        //    |         |                   |           |        |       |
+        // <mount>  <repo-name>         <version>  <www_base> <app_base> <doc_base>
+        //    ^
+        //    |
+        // AVMFileDirAppBase_
         //
 
 
@@ -643,22 +648,54 @@ public class AVMFileDirContext extends
         // The avmDocBase_ == "repo-1:/www/avm_webapps/xyz"
         // and avmVersion_ == -1
         //
+        //
+        // Now we're given a call to setDocBase() with a value:
+        //     /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
+        //
+        // But again we want:
+        //     avmDocBase      == "mysite--guest:/www/avm_webapps/ROOT"
+        //     and avmVersion_ == -1
+        //      
 
-        int vers_head = docBase.indexOf('$',0);
+        int     repo_head = AVMFileDirAppBase_.length() + 1;
+        int     repo_tail = docBase.indexOf('/', repo_head);
+        String  repo_name = docBase.substring(repo_head,repo_tail);
+        int     vers_head = repo_tail + "/VERSION/v".length();
+
         if ( vers_head < 0) 
         {
             throw new IllegalArgumentException(
                         sm.getString("fileResources.base", docBase));
         }
 
-        int vers_tail = docBase.indexOf('$',vers_head +1);
+        int     vers_tail = docBase.indexOf('/', vers_head );
+
         if ( vers_tail < 0) 
         {
             throw new IllegalArgumentException(
                         sm.getString("fileResources.base", docBase));
         }
 
-        avmDocBase_ = docBase.substring(vers_tail +1);
+
+        try 
+        {
+            String vers_string =   docBase.substring( vers_head, vers_tail);
+            avmRootVersion_ = Integer.parseInt( vers_string);
+        }
+        catch (Exception e ) 
+        { 
+            // If malformed, assume -1  (HEAD)
+            // TODO:  issue a warning here?
+            //
+            avmRootVersion_ = -1; 
+        }
+
+        String repo_relpath = docBase.substring( vers_tail + "/DATA".length(),
+                                                 docBase.length()
+                                                );
+
+        avmDocBase_  = repo_name + ":" + repo_relpath;
+
 
         // Within the AVM, the file seperator char is '/'.
         // Therefore, on Windows, make sure that the avmDocBase_
@@ -669,20 +706,6 @@ public class AVMFileDirContext extends
             avmDocBase_ = avmDocBase_.replace(  File.separatorChar , '/');
         }
 
-
-        try 
-        {
-            avmRootVersion_ = Integer.parseInt( 
-                docBase.substring( vers_head+1, vers_tail) 
-            );
-        }
-        catch (Exception e ) 
-        { 
-            // If malformed, assume -1  (HEAD)
-            // TODO:  issue a warning here?
-            //
-            avmRootVersion_ = -1; 
-        }
 
         log.info("AVMFileDirContext.setDocBase avmDocBase_    : " + avmDocBase_);
         log.info("AVMFileDirContext.setDocBase avmRootVersion_: " + avmRootVersion_);
