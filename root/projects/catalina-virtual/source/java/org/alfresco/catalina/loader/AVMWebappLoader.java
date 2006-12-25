@@ -1081,7 +1081,7 @@ public class AVMWebappLoader
             //
             //    AVMWebappLoader absoluteLibPath 
             //         /alfresco.avm/avm.alfresco.localhost/
-            //          $-1$repo-1:/repo-1/alice/appBase/
+            //          $-1$repo-1:/repo-1/alice/www/
             //          avm_webapps/jcox.alfresco/WEB-INF/lib
             //   
             //    AVMWebappLoader workDir:
@@ -1181,7 +1181,7 @@ public class AVMWebappLoader
                         // Example destFile :
                         //
                         //    /alfresco.avm/avm.alfresco.localhost/$-1$repo-1:/
-                        //       repo-1/alice/appBase/avm_webapps/jcox.alfresco/
+                        //       repo-1/alice/www/avm_webapps/jcox.alfresco/
                         //       WEB-INF/lib/foo.jar
                         //
 

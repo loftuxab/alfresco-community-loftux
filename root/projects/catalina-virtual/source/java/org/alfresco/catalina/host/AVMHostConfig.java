@@ -47,35 +47,12 @@ import org.apache.catalina.startup.Constants;
 import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.HostConfig;
 
+import org.alfresco.config.JNDIConstants;
+
+
 /**
 *  Configures an {@link AVMHost} at startup time.<br>
 *  Note: applications never use AVMHostConfig directly.
-*  <p>
-*  Alfresco's super repository (i.e.: container for virtual repositories)
-*  is organized so that each {@link AVMHost}-based virtual host within Catalina
-*  can have its own <tt>appBase</tt>.   For example, suppose we had only one 
-*  {@link AVMHost}-based Catalina virtual host, and its <tt>appBase</tt> 
-*  is "avm_webapps":
-*
-*  <pre>
-*      &lt;Host name              = "avm.alfresco.localhost"
-*            className         = "org.alfresco.catalina.host.AVMHost"
-*            <strong>appBase           = "avm_webapps"</strong>
-*            unpackWARs        = "true"
-*            autoDeploy        = "true"
-*            xmlValidation     = "false"
-*            xmlNamespaceAware = "false"&gt;
-*      &lt;/Host&gt;
-*  </pre>
-*
-*  Suppose we had a set of virtual repositories within the 
-*  AVM "super repository", and that it contained data from
-*  two users, "alice" and "bob"
-*  (note: the '<tt><~~~</tt>' symbol denotes a 
-*  <a href='http://wiki.alfresco.com/wiki/Transparent_Layers'>
-*  transparent layer</a> in the 
-*  <a href='http://wiki.alfresco.com/wiki/Versioned_Directories'>
-*  versioned directory</a> system supported by the AVM repository):
 *
 *  <pre>
 *
@@ -85,7 +62,7 @@ import org.apache.catalina.startup.HostConfig;
 *              repo1:      repo2:          repo3:       repo4:
 *                /           /               /            /
 *                |           |               |            |
-*            appBase <~~~ appBase         appBase <~~~ appBase
+*               www   <~~~  www             www   <~~~   www
 *                |                           |
 *            <strong>avm_webapps                avm_webapps
 *             /  |  \                    /  |  \
@@ -99,89 +76,6 @@ import org.apache.catalina.startup.HostConfig;
 *  version of <tt>avm_webapps</tt> by name-mangling the
 *  webapps within each repository containing an <tt>avm_webapps</tt>
 *  directory in the appropriate location.  
-*  <p>
-*  If we were to have multiple AVMHost-based virtual hosts
-*  we might see repository data like this:
-*
-*  <pre>
-*                 repo1:                              repo2:
-*                    /                                   /
-*                    |                                   |
-*                 appBase                             appBase
-*                /       \                           /       \
-*        avm_webapps     avm2_webapps         avm_webapps   avm2_webapps 
-*         /   |            /   |              /    |          /   |    \
-*   my_webapp ROOT       xyz  ROOT       my_webapp ROOT     xyz   ROOT 
-*       |                |                 |                 |            
-*   moo.txt          cow.txt             moo.txt         cow.txt           
-*
-*  </pre>
-*
-*  The AVMHostConfig would only load data from the <tt>appBase</tt> of its 
-*  owning AVMHost (e.g.: either the <tt>avm_webapps</tt> or <tt>avm2_webapps</tt>
-*  trees of alice & bob).
-*  <p>
-*  This is configurable in $CATALINA_HOME/conf/server.xml.<br>
-*  Note that avm.localhost  only loads <tt>avm_webapps</tt> trees,<br>
-*  and  that avm2.localhost only loads <tt>avm2_webapps</tt> trees.
-* 
-*  <pre>
-*      &lt;!-- Default AVMHost --&gt;
-*      &lt;Host name                = "avm.localhost"
-*            className           = "org.alfresco.catalina.host.AVMHost"
-*            <strong>appBase             = "avm_webapps"</strong>
-*            unpackWARs          = "true"
-*            autoDeploy          = "true"
-*            xmlValidation       = "false"
-*            xmlNamespaceAware   = "false"&gt;
-*      &lt;/Host&gt;
-*    
-*      &lt;!-- Another AVMHost --&gt;
-*      &lt;Host name                = "avm2.localhost"
-*            className           = "org.alfresco.catalina.host.AVMHost"
-*            reverseProxyBinding = "^www2-([^.]+)(?:\\.v-([\\d]+))?\\.avm\\..*"
-*            <strong>appBase             = "avm2_webapps"</strong>
-*            unpackWARs          = "true"
-*            autoDeploy          = "true"
-*            xmlValidation       = "false"
-*            xmlNamespaceAware   = "false"&gt;
-*      &lt;/Host&gt;
-*  </pre>
-*
-*  Because the {@link AVMHost} named <tt>avm2.localhost</tt>,
-*  has an <tt>appBase</tt> of <tt>avm2_webapps</tt>,
-*  AVMHostConfig creates a virtualized composite 
-*  application base for it out of the directories shown in bold (see below):
-*
-*  <pre>
-*
-*                  repo1                               repo2:
-*                    /                                   /
-*                    |                                   |
-*                 appBase                             appBase
-*                /       \                           /       \
-*        avm_webapps     <strong>avm2_webapps</strong>         avm_webapps   <strong>avm2_webapps</strong>
-*         /   |    |       /   |              /    |          /   |    \
-*   my_webapp ROOT       <strong>xyz  ROOT</strong>       my_webapp ROOT     <strong>xyz   ROOT</strong>
-*       |                |                 |                 |            
-*   moo.txt          <strong>cow.txt</strong>             moo.txt         <strong>cow.txt</strong>
-*
-*  </pre>
-*
-* Thus we have the following mappings from requests to repositories: 
-*  <dl>
-*       <td><tt>http://www-repo-1.avm.localhost:8080/my_webapp/moo.txt</tt>
-*       <dd>Serviced by <tt>avm.localhost</tt> via <tt>repo-1</tt>.</dd>
-*
-*       <td><br><tt>http://www-repo-2.avm.localhost:8080/my_webapp/moo.txt</tt>
-*       <dd>Serviced by <tt>avm.localhost</tt> via <tt>repo-2</tt>.</dd>
-*
-*       <td><br><tt>http://www2-repo-1.avm.localhost:8080/xyz/cow.txt</tt>
-*       <dd>Serviced by <tt>avm2.localhost</tt> via <tt>repo-1</tt>.</dd>
-*
-*       <td><br><tt>http://www2-repo-2.avm.localhost:8080/xyz/cow.txt</tt>
-*       <dd>Serviced by <tt>avm2.localhost</tt> via <tt>repo-2</tt>.</dd>
-*  </dl>
 */
 public class AVMHostConfig extends HostConfig
 {
@@ -209,11 +103,12 @@ public class AVMHostConfig extends HostConfig
            AVMFileDirContext.getAVMRemote();
 
 
-    //
     // Here's where the virual Host's relative appBase parameter
     // is stored for this AVMHost.
-
-    String AVMHostRelativeAppBase_ = "avm_webapps";   // Default value
+    //
+    // e.g.: "avm_webapps"
+    //
+    String AVMHostRelativeAppBase_ = JNDIConstants.DIR_DEFAULT_APPBASE;
 
     /**
     * @exclude
@@ -257,7 +152,8 @@ public class AVMHostConfig extends HostConfig
 
         if (AVMHostRelativeAppBase == null )
         {
-            AVMHostRelativeAppBase = "avm_webapps";
+            // e.g.: "avm_webapps";
+            AVMHostRelativeAppBase = JNDIConstants.DIR_DEFAULT_APPBASE;
         }
         if ( AVMHostRelativeAppBase.startsWith("/") )
         {
@@ -265,7 +161,7 @@ public class AVMHostConfig extends HostConfig
         }
         if ( AVMHostRelativeAppBase.equals("") )
         {
-            AVMHostRelativeAppBase = "avm_webapps";
+            AVMHostRelativeAppBase =  JNDIConstants.DIR_DEFAULT_APPBASE;   // "avm_webapps";
         }
 
         AVMHostRelativeAppBase_ = AVMHostRelativeAppBase;
@@ -353,7 +249,7 @@ public class AVMHostConfig extends HostConfig
                 //  Example values:
                 //    repo_name     =  "repo-2"
                 //    dns_name      =  ".dns.bob"
-                //    dns_repo_path =  "repo-2:/appBase/avm_webapps"
+                //    dns_repo_path =  "repo-2:/www/avm_webapps"
 
                 if (  (dns_repo_path == null) || 
                      ! dns_repo_path.endsWith( AVMHostRelativeAppBase_ ) )
@@ -368,7 +264,7 @@ public class AVMHostConfig extends HostConfig
                 Map<String, AVMNodeDescriptor> webapp_entries = null;
                 try 
                 {
-                    // e.g.:   -1, "repo-3:/appBase/avm_webapps"
+                    // e.g.:   -1, "repo-3:/www/avm_webapps"
                     webapp_entries = 
                        AVMRemote_.getDirectoryListing(-1, dns_repo_path );
                 }
@@ -393,7 +289,7 @@ public class AVMHostConfig extends HostConfig
                                         // this gets the indirection path even if, physically,
                                         // the path is not a layered directory, as long as the
                                         // path is in a layered context.
-                        dns_repo_path,  // repo-3:/appBase/avm_webapps
+                        dns_repo_path,  // repo-3:/www/avm_webapps
                         webapp_name     // my_webapp
                     );
 
@@ -572,7 +468,7 @@ public class AVMHostConfig extends HostConfig
         // Examle params:
         //     version:         -1
         //     repo_name:       repo-3
-        //     avm_appBase:     repo-3:/appBase/avm_webapps
+        //     avm_appBase:     repo-3:/www/avm_webapps
         //     webapp_leafname  my_webapp
         //     context_path     /$-1$repo-3$my_webapp
 
@@ -622,17 +518,17 @@ public class AVMHostConfig extends HostConfig
     @SuppressWarnings("unchecked")
     protected void deployAVMdirectory(
        int    version,              // -1
-       String avmAppBase,           // repo-3:/appBase/avm_webapps
+       String avmAppBase,           // repo-3:/www/avm_webapps
        String webapp_leafname,      // my_webapp
        String contextPath,          // e.g.:   /$-1$repo-3$my_webapp
        String parent_context_path)  // possibly null
     {
-        // repo-3:/appBase/avm_webapps/my_webapp
+        // repo-3:/www/avm_webapps/my_webapp
         String webapp_fullpath = avmAppBase + "/" + webapp_leafname;
 
         // Example params:
         //   version:         -1 
-        //   webapp_fullpath: repo-3:/appBase/avm_webapps/my_webapps
+        //   webapp_fullpath: repo-3:/www/avm_webapps/my_webapps
         //   webapp_leafname: my_webapps
         //   contextPath      /$-1$repo-3$my_webapp
         
@@ -760,11 +656,11 @@ public class AVMHostConfig extends HostConfig
             context.setPath(contextPath);  // e.g.: /$-1$repo-3$my_webapp
 
 
-            // Move from:  /media/alfresco/cifs/v/$-1$mysite--guest:/appBase/avm_webapps/ROOT
-            // To:         /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/appBase/avm_webapps/ROOT
+            // Move from:  /media/alfresco/cifs/v/$-1$mysite--guest:/www/avm_webapps/ROOT
+            // To:         /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
             //
             // Example of webapp_fullpath:
-            //      "repo-3:/appBase/avm_webapps/my_webapp"
+            //      "repo-3:/www/avm_webapps/my_webapp"
 
             context.setDocBase( "$" + version + "$" + webapp_fullpath );
 
@@ -773,7 +669,7 @@ public class AVMHostConfig extends HostConfig
             // file system.
             //
             // Example configFile: 
-            //   "repo-3:/appBase/avm_webapps/my_webapp" + 
+            //   "repo-3:/www/avm_webapps/my_webapp" + 
             //          "/META-INF/context.xml"
             //
             String configFile = webapp_fullpath + "/" + "META-INF/context.xml";
@@ -863,7 +759,7 @@ public class AVMHostConfig extends HostConfig
     {
         // Example params:
         //    app:     contextPath,  {avm_path,timestamp},{avm_path,timestamp},...
-        //    webapp_fullpath: repo-3:/appBase/avm_webapps/my_webapps
+        //    webapp_fullpath: repo-3:/www/avm_webapps/my_webapps
 
         String[] watchedResources = context.findWatchedResources();
 
@@ -956,8 +852,8 @@ public class AVMHostConfig extends HostConfig
         // resource_desc
         //
         // The resources fetched within app look like this:
-        //      repo-3:/appBase/avm_webapps/my_webapp
-        //      repo-3:/appBase/avm_webapps/my_webapp/META-INF/context.xml
+        //      repo-3:/www/avm_webapps/my_webapp
+        //      repo-3:/www/avm_webapps/my_webapp/META-INF/context.xml
         //      ...
 
         new Exception("debug stack trace for checkResources").printStackTrace();
@@ -976,7 +872,7 @@ public class AVMHostConfig extends HostConfig
             avm_appBase = ((AVMDeployedApplication)app).getAvmAppBase();
         }
 
-        //         AVMHostConfig checkResources using appBase: alfreco-staging:/appBase/avm_webapps
+        //         AVMHostConfig checkResources using appBase: alfreco-staging:/www/avm_webapps
         log.debug("AVMHostConfig checkResources using appBase: "  + avm_appBase);
 
     	// Any modification of the specified (static) resources will cause a 
@@ -1061,7 +957,7 @@ public class AVMHostConfig extends HostConfig
                     {
                         //  For example:  
                         //    resources[j] == 
-                        //        "repo-3:/appBase/avm_webapps/my_webapp"
+                        //        "repo-3:/www/avm_webapps/my_webapp"
 
                         try 
                         {
@@ -1298,7 +1194,7 @@ public class AVMHostConfig extends HostConfig
         int     version_;            // -1
         String  repo_name_;          // "repo-3"
         String  indirection_name_;   // not null iff not an overlay nor a layer
-        String  avm_appBase_;        // "repo-3:/appBase/avm_webapps"
+        String  avm_appBase_;        // "repo-3:/www/avm_webapps"
         String  webapp_leafname_;    // "my_webapp"
 
         String  context_path_;           // "/$-1$repo-3$my_webapp"

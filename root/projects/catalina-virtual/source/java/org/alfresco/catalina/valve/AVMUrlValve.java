@@ -329,7 +329,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         //           <repoName>:
         //               /
         //               |
-        //            appBase
+        //              www
         //               |
         //            avm_webapps
         //                      |

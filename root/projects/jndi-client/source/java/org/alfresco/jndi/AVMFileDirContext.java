@@ -143,12 +143,13 @@ public class AVMFileDirContext extends
     // Because of how StandardContext.getBasePath() works,
     // if the following dir isn't "absolute", then the application base
     // gets prepended (e.g.: on windows "c:/alfresco-.../virtual-tomcat")
-    // Therefore, a little extra fancy footwork is in order here:
-    //
-    static protected String AVMFileDirAppBase_;
+    // Therefore, a little extra fancy footwork was in order here:
+    // AVMFileDirAppBase_ is actually set via a call to 
+    // setAVMFileDirAppBase() within VirtServerRegistrationThread.
+
+    static protected String AVMFileDirAppBase_; 
 
 
-    // Force initialization order among modules
     public static final String getAVMFileDirAppBase() { return AVMFileDirAppBase_; }
 
     /** 
@@ -161,9 +162,9 @@ public class AVMFileDirContext extends
     { AVMFileDirAppBase_ = mount_point; }
 
     // Given a call to setDocBase() with a value:
-    //   /alfresco.avm/somehost/$-1$repo-1:/repo-1/alice/appBase/avm_webapps/xyz
+    //   /alfresco.avm/somehost/$-1$repo-1:/www/avm_webapps/xyz
     //
-    // The avmDocBase_ == "repo-1:/repo-1/alice/appBase/avm_webapps/xyz"
+    // The avmDocBase_ == "repo-1:/www/avm_webapps/xyz"
     // and avmVersion_ == -1
     //
     String avmDocBase_;
@@ -404,11 +405,7 @@ public class AVMFileDirContext extends
         // when Tomcat calls setDocBase() the path it will provide will
         // look something like this:
         //
-        //         /alfresco.avm/avm.alfresco.localhost/...
-        //               ^        ^
-        //               |        |   
-        //               |        `--- AVM appBase also includes the hostname
-        //               `---leading prefix for all AVMHost appBase dirs
+        //         /<cifs-mount>/www/avm_webapps
         //
         // Only in cases like this do we need to infer whether to fetch files 
         // from the file system or AVMRemote by looking at the docBase path, 
@@ -506,7 +503,7 @@ public class AVMFileDirContext extends
         //
         //  java.lang.Exception: AVMFileDirContext setDocBase Stack trace: 
         //
-        //    /alfresco.avm/avm.alfresco.localhost/$-1$mysite--preview:/appBase/avm_webapps/ROOT
+        //    /alfresco.avm/avm.alfresco.localhost/$-1$mysite--preview:/www/avm_webapps/ROOT
         //
         //
         //        at org.alfresco.jndi.AVMFileDirContext.setDocBase(AVMFileDirContext.java:496)
@@ -559,14 +556,14 @@ public class AVMFileDirContext extends
         //      /opt/apache-tomcat-5.5.15/server/webapps/host-manager
 
         // Current docBase::
-        //  /alfresco.avm/avm.alfresco.localhost/$-1$mysite:/appBase/avm_webapps/ROOT
+        //  /alfresco.avm/avm.alfresco.localhost/$-1$mysite:/www/avm_webapps/ROOT
         //
         // Desired docBase:
-        // <mount>/<repo-name>/VERSION/v<version>/DATA/appBase/avm_webapps/ROOT
-        // /foo/cifs/mysite--x/VERSION/v123456789/DATA/appBase/avm_webapps/ROOT
-        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~              ~~~~~~~~~~~~~~~~~
-        //    ^         ^                   ^                        ^
-        //    |         |                   |                        |
+        // <mount>/<repo-name>/VERSION/v<version>/DATA/www/avm_webapps/ROOT
+        // /foo/cifs/mysite--x/VERSION/v123456789/DATA/www/avm_webapps/ROOT
+        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~          ~~~~~~~~~~~~~~~~~
+        //    ^         ^                   ^                    ^
+        //    |         |                   |                    |
         // <mount>  <repo-name>         <version>       <path-to-webabapps-dir>
         //
 
@@ -641,9 +638,9 @@ public class AVMFileDirContext extends
         log.info("AVMFileDirContext:  setDocBase() using AVMRemote for: " + docBase);
 
         // Given a call to setDocBase() with a value:
-        //   /alfresco.avm/somehost/$-1$repo-1:/repo-1/alice/appBase/avm_webapps/xyz
+        //   /alfresco.avm/somehost/$-1$repo-1:/www/avm_webapps/xyz
         //
-        // The avmDocBase_ == "repo-1:/repo-1/alice/appBase/avm_webapps/xyz"
+        // The avmDocBase_ == "repo-1:/www/avm_webapps/xyz"
         // and avmVersion_ == -1
         //
 
