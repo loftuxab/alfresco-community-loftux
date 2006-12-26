@@ -65,6 +65,7 @@ public class VirtServerRegistrationThread extends Thread
     ObjectName         virt_registry_;
     Attribute          virt_server_attrib_;
     boolean            done_  = false;
+    JMXConnector       conn_;
 
     public VirtServerRegistrationThread()
     {
@@ -103,7 +104,18 @@ public class VirtServerRegistrationThread extends Thread
 
             if ( mount_path == null )
             {
-                mount_path = "c:\\alfresco.avm\\";
+                // The mount point name ends up in logfiles.
+                // Therefore, make it something so that even
+                // if a person who fails to show an admin all
+                // their config files, the reason why they can't
+                // access their JSPs via CIFS will be obvious.
+                // 
+                // It's also nice to provide context-free search
+                // phrases that can be entered into search engines
+                // like google, so that one question/answer post
+                // helps everybody.
+
+                mount_path = "c:\\alfresco_no_cifs\\";
             }
             else
             {
@@ -125,7 +137,7 @@ public class VirtServerRegistrationThread extends Thread
               serverInfo.getVirtServerCifsAvmVersionTreeUnix();
             if ( mount_path == null )
             {
-                mount_path = "/alfresco.avm/";   
+                mount_path = "/alfresco_no_cifs/";   
             }
         }
 
@@ -232,6 +244,14 @@ public class VirtServerRegistrationThread extends Thread
                 // Not much you can do about an exception here, just ignore it.
             }
         }
+
+        // Good night.
+        if (conn_ != null  ) 
+        { 
+            try                  { conn_.close(); }
+            catch (Exception io) {;}
+            finally              { conn_ = null; }
+        }
     }
 
     private void registerVirtServer()
@@ -239,8 +259,12 @@ public class VirtServerRegistrationThread extends Thread
         // System.out.println("Re-registering url: " + virt_url_ );
         try
         {
-            JMXConnector conn = JMXConnectorFactory.connect(url_, env_);
-            MBeanServerConnection mbsc = conn.getMBeanServerConnection();
+            if (conn_ == null  ) 
+            { 
+                conn_ = JMXConnectorFactory.connect(url_, env_); 
+            }
+
+            MBeanServerConnection mbsc = conn_.getMBeanServerConnection();
 
             // mbsc.setAttribute( virt_registry_, virt_server_attrib_);
 
@@ -262,6 +286,14 @@ public class VirtServerRegistrationThread extends Thread
             log.error(
               "Could not connect to JMX Server within remote Alfresco webapp " + 
               "(this may be a transient error.  Retrying...)");
+
+            // Better luck next time...
+            if (conn_ != null ) 
+            {
+                try                  { conn_.close(); }
+                catch (Exception io) {;}
+                finally              { conn_ = null; }
+            }
         }
     }
 
