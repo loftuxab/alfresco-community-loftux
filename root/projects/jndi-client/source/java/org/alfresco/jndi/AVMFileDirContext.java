@@ -39,7 +39,7 @@
 //  ---------------------------------------------------------------
 //  AVMFileDirContext:  getAttributes(): /xxx.jsp
 //  AVMFileDirContext:  lookup(): /xxx.jsp
-//  AVMFileDirContext:  getAttributes(): /avm.alfresco.localdomain/my_webapp/xxx.jsp
+//  AVMFileDirContext:  getAttributes(): /<path-to-webapp>/my_webapp/xxx.jsp
 //  AVMFileDirContext:  lookup(): /WEB-INF/classes/org/apache/jasper/runtime/JspSourceDependent.class
 //  AVMFileDirContext:  lookup(): /WEB-INF/classes/org/apache/jasper/runtime/HttpJspBase.class
 //  AVMFileDirContext:  lookup(): /WEB-INF/classes/javax/servlet/Servlet.class
@@ -145,7 +145,9 @@ public class AVMFileDirContext extends
     //
     // Examples:
     //                UNIX:  "/media/alfresco/cifs/v"
-    //            Windows :  "v:"
+    //
+    //            Windows :  "v" or "v:" or "v:/"
+    //                       (where 'v' is any drive letter)
     //
     static protected String   AVMFileDirAppBase_; 
 
@@ -161,11 +163,16 @@ public class AVMFileDirContext extends
     public static final void  setAVMFileDirAppBase( String mount_point)
     { AVMFileDirAppBase_ = mount_point; }
 
-    // Given a call to setDocBase() with a value:
-    //   /media/alfresco/cifs/v/$-1$mysite--guest:/www/avm_webapps/ROOT
+    // setDocBase() examples:
     //
-    // The avmDocBase_ == "mysite--guest:/www/avm_webapps/xyz" 
-    // and avmVersion_ == -1
+    //   Unix:
+    //     /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
+    //
+    //   Windows
+    //     v:/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
+    //
+    // Either case, the avmDocBase_ == "mysite--guest:/www/avm_webapps/xyz" 
+    //              and avmVersion_ == -1
     //
     String avmDocBase_;
     int    avmRootVersion_;
@@ -503,10 +510,7 @@ public class AVMFileDirContext extends
         // new Exception("AVMFileDirContext setDocBase Stack trace: " + 
         //               docBase).printStackTrace();
         //
-        //  java.lang.Exception: AVMFileDirContext setDocBase Stack trace: 
-        //
-        //    /alfresco.avm/avm.alfresco.localhost/$-1$mysite--preview:/www/avm_webapps/ROOT
-        //
+        //  Here's the convoluted way this function is called at startup:
         //
         //        at org.alfresco.jndi.AVMFileDirContext.setDocBase(AVMFileDirContext.java:496)
         //        at org.apache.catalina.core.StandardContext.resourcesStart(StandardContext.java:3812)
@@ -542,7 +546,6 @@ public class AVMFileDirContext extends
         //        at org.apache.catalina.startup.Bootstrap.main(Bootstrap.java:413)
         //
         //
-        //
         // Given  /opt/tomcat -> /opt/apache-tomcat-5.5.15/
         // Here's an example of the docBase values seen:
         //
@@ -571,7 +574,6 @@ public class AVMFileDirContext extends
         //    |
         // AVMFileDirAppBase_
         //
-
 
 
         log.info("AVMFileDirContext:  setDocBase(): " + docBase);
@@ -629,36 +631,27 @@ public class AVMFileDirContext extends
         //    Change the document root property
         this.docBase = docBase;
 
-        // TODO:
-        //      Validate path within AVMRemote
-        //
-        //  using AVMRemote for:  /opt/apache-tomcat-5.5.15/avm_webapps/ROOT/WEB-INF/lib
-        //  using AVMRemote for:  /opt/tomcat/avm_webapps/jcox.alfresco
-        //  using AVMRemote for:  /opt/apache-tomcat-5.5.15/avm_webapps/jcox.alfresco/WEB-INF/classes
-        //
-        //  Example: /opt/tomcat/avm_webapps/jcox.alfresco
-        //  Uses:    jcox.alfresco:/...
-        // 
-
         log.info("AVMFileDirContext:  setDocBase() using AVMRemote for: " + docBase);
 
         // Given a call to setDocBase() with a value:
-        //   /alfresco.avm/somehost/$-1$repo-1:/www/avm_webapps/xyz
         //
-        // The avmDocBase_ == "repo-1:/www/avm_webapps/xyz"
-        // and avmVersion_ == -1
+        // On Unix:
+        //   /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
         //
+        // On Windows:
+        //   v:\mysite--guest\VERSION\v-1\DATA\www\avm_webapps\ROOT
         //
-        // Now we're given a call to setDocBase() with a value:
-        //     /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
-        //
-        // But again we want:
+        // We want:
         //     avmDocBase      == "mysite--guest:/www/avm_webapps/ROOT"
         //     and avmVersion_ == -1
-        //      
 
-        int     repo_head = AVMFileDirAppBase_.length() + 1;
-        int     repo_tail = docBase.indexOf('/', repo_head);
+        int repo_head = AVMFileDirAppBase_.length();
+        if  (AVMFileDirAppBase_.charAt( repo_head -1 ) != File.separatorChar)
+        {
+            repo_head += 1;
+        }
+
+        int     repo_tail = docBase.indexOf( File.separatorChar, repo_head);
         String  repo_name = docBase.substring(repo_head,repo_tail);
         int     vers_head = repo_tail + "/VERSION/v".length();
 
@@ -668,7 +661,7 @@ public class AVMFileDirContext extends
                         sm.getString("fileResources.base", docBase));
         }
 
-        int     vers_tail = docBase.indexOf('/', vers_head );
+        int vers_tail = docBase.indexOf( File.separatorChar , vers_head );
 
         if ( vers_tail < 0) 
         {
@@ -781,7 +774,9 @@ public class AVMFileDirContext extends
      */
     public Object lookup(String name) throws NamingException 
     {
-        // Example:   /opt/apache-tomcat-5.5.15/avm_webapps/servlets-examples + /WEB-INF/classes/RequestInfoExample.class
+        // Example:   /opt/apache-tomcat-5.5.15/avm_webapps/servlets-examples + 
+        //                /WEB-INF/classes/RequestInfoExample.class
+        //
         // where this.base was set by setDocBase()
 
         if (! use_AVMRemote_ ) 

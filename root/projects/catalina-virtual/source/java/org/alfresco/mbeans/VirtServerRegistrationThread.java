@@ -107,9 +107,15 @@ public class VirtServerRegistrationThread extends Thread
             }
             else
             {
-                if (mount_path.length() == 1 )
+                if (mount_path.length() == 1 )  // drive letter
                 {
-                    mount_path = mount_path + ":";
+                    mount_path = mount_path + ":\\";
+                }
+                else if ( (mount_path.length() == 2) &&
+                          (mount_path.charAt(1) == ':')
+                        )
+                {
+                    mount_path = mount_path + "\\";
                 }
             }
         }
