@@ -46,7 +46,7 @@ import java.util.HashMap;
 *  which virtual webapp to reload.
 *
 *  The registration is done repeatedly (every N seconds where n == 20 for now)
-*  to deal with the possiblity of the alfresco server restarting.
+*  to deal with the possibility of the alfresco server restarting.
 */
 
 public class VirtServerRegistrationThread extends Thread
@@ -245,13 +245,11 @@ public class VirtServerRegistrationThread extends Thread
             }
         }
 
-        // Good night.
-        if (conn_ != null  ) 
-        { 
-            try                  { conn_.close(); }
-            catch (Exception io) {;}
-            finally              { conn_ = null; }
-        }
+        // Say goodbye to the server (this time for good).
+        
+        JMXConnectorCloseThread conn_close = new JMXConnectorCloseThread(conn_);
+        conn_close.start();                // async close
+        conn_ = null;                      // prep for new connection
     }
 
     private void registerVirtServer()
@@ -262,6 +260,7 @@ public class VirtServerRegistrationThread extends Thread
             if (conn_ == null  ) 
             { 
                 conn_ = JMXConnectorFactory.connect(url_, env_); 
+                log.info("Connected to remote Alfresco JMX Server");
             }
 
             MBeanServerConnection mbsc = conn_.getMBeanServerConnection();
@@ -283,17 +282,46 @@ public class VirtServerRegistrationThread extends Thread
         }
         catch (Exception e)
         {
-            log.error(
-              "Could not connect to JMX Server within remote Alfresco webapp " + 
-              "(this may be a transient error.  Retrying...)");
+            log.error("Connection failure to remote Alfresco JMX Server: " + e.getMessage());
+            log.info("Connection failure to remote Alfresco JMX server may be transient.  Retrying...");
 
-            // Better luck next time...
-            if (conn_ != null ) 
-            {
-                try                  { conn_.close(); }
-                catch (Exception io) {;}
-                finally              { conn_ = null; }
-            }
+            // The server isn't responding.  If the server crashed,
+            // we could get stuck in a network timeout here that's 
+            // much longer than our normal periodic retry
+            // (depending on the socket options that were set).
+            //
+            // Therefore, do an async close. 
+            //
+            // Worst case analysis:
+            //
+            //    Even if we're retrying every few seconds, the
+            //    async close is still ok because the number of 
+            //    spawned threads does not grow without bound.
+            //    As soon as the first timeout occurs, the subsequent 
+            //    ones in the "close pipeline" die at the same rate 
+            //    they're being spawned by the retry logic.
+            //    Thus, everything works as long as the system can
+            //    a spike of <network-timeout-in-sec>/<retry-in-sec>
+            //    extra threads can be allocated.
+            //
+            //    Given:
+            //
+            //        Max timeout    ~ 4 min == 240 sec
+            //        Default retry  ~ 5 sec
+            //
+            //    Max expected (worst case):  48 thread pipeline
+            //
+            //    You could only really even get this with a network
+            //    that had totally flipped out; typically, the response
+            //    would be very fast after the 1st failed connect.
+            //
+            //    Hence, the "worst case" is unlikely and unproblematic.
+            
+            JMXConnectorCloseThread conn_close = 
+                new JMXConnectorCloseThread(conn_);
+
+            conn_close.start();         // async close
+            conn_ = null;               // prep for new connection
         }
     }
 
@@ -309,4 +337,31 @@ public class VirtServerRegistrationThread extends Thread
     *  determine if it's time to end gracefully.
     */
     public boolean getDone() { return done_ ;}
+
+    /**
+    *  Allow the close operation on a thread to be async;
+    *  closing a connection is a potentially slow operation. 
+    *  <p>
+    *  If the server has crashed, the close operation might 
+    *  have to wait for a network protocol timeout.  This 
+    *  class lets the calling thread avoid blocking.
+    */
+    protected class JMXConnectorCloseThread extends Thread
+    {
+        JMXConnector connection_;
+
+        public  JMXConnectorCloseThread( JMXConnector connection  )
+        {
+            connection_ = connection;
+        }
+
+        public void run()
+        {
+            if ( connection_ != null )         // Here's where we might need
+            {                                  // to wait out a lengthy network
+                try { connection_.close(); }   // timout.  Ignore any errors;
+                catch  (Exception e) { ; }     // they're meaningless here.
+            }
+        }
+    }
 }
