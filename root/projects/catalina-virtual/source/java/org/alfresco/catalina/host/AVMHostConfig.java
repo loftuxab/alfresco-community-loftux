@@ -187,12 +187,12 @@ public class AVMHostConfig extends HostConfig
 
 
 
+    /**
+    *  Does a soft webapp undeploy (removes webapp entries from host).
+    */
     protected void undeployApps() 
     {
         super.undeployApps();
-
-        // RESUME HERE
-        
     }
 
     /**
