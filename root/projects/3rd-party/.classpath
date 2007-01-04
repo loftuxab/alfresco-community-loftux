@@ -43,7 +43,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/swarmcache/swarmcache-1.0RC2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-beanutils-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-collections-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-digester-1.5.jar"/>
