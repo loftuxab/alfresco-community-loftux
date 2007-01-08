@@ -136,9 +136,9 @@ public class I18NUtilTest extends TestCase
     public void testLocaleParsing()
     {
         assertEquals(Locale.FRANCE, I18NUtil.parseLocale("fr_FR"));
-        assertEquals(new Locale("en", "", "cockney"), I18NUtil.parseLocale("en__cockney"));
-        assertEquals(new Locale("", "", ""), I18NUtil.parseLocale(""));
-        assertEquals(new Locale("", "", ""), I18NUtil.parseLocale("_"));
-        assertEquals(new Locale("", "", ""), I18NUtil.parseLocale("__"));
+        assertEquals(new Locale("en", "GB", "cockney"), I18NUtil.parseLocale("en_GB_cockney"));
+        assertEquals(new Locale("en", "GB", ""), I18NUtil.parseLocale("en_GB"));
+        assertEquals(new Locale("en", "", ""), I18NUtil.parseLocale("en"));
+        assertEquals(Locale.getDefault(), I18NUtil.parseLocale(""));
     }
 }

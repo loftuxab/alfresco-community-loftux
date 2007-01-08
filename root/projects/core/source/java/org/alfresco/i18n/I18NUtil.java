@@ -178,42 +178,28 @@ public class I18NUtil
      * Factory method to create a Locale from a <tt>lang_country_variant</tt> string.
      * 
      * @param localeStr e.g. fr_FR
-     * @return Returns the locale instance
+     * @return Returns the locale instance, or the {@link Locale#getDefault() default} if the
+     *      string is invalid
      */
     public static Locale parseLocale(String localeStr)
     {
-        StringTokenizer tokenizer = new StringTokenizer(
-                localeStr + "___",              // Ensure the minimum number of tokens
-                "_",
-                true);
-        String language = "";
-        String country = "";
-        String variant = "";
+        Locale locale = Locale.getDefault();
         
-        String token = tokenizer.nextToken();
-        // Get the language
-        while (!token.equals("_"))
+        StringTokenizer t = new StringTokenizer(localeStr, "_");
+        int tokens = t.countTokens();
+        if (tokens == 1)
         {
-            language = token;
-            token = tokenizer.nextToken();
+           locale = new Locale(t.nextToken());
         }
-        // Get the country
-        token = tokenizer.nextToken();
-        while (!token.equals("_"))
+        else if (tokens == 2)
         {
-            country = token;
-            token = tokenizer.nextToken();
+           locale = new Locale(t.nextToken(), t.nextToken());
         }
-        // Get the variant
-        token = tokenizer.nextToken();
-        while (!token.equals("_"))
+        else if (tokens == 3)
         {
-            variant = token;
-            token = tokenizer.nextToken();
+           locale = new Locale(t.nextToken(), t.nextToken(), t.nextToken());
         }
-        // Create instance
-        Locale locale = new Locale(language, country, variant);
-        // done
+        
         return locale;
     }
     
