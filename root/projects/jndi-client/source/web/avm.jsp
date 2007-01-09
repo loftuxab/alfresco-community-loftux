@@ -1,6 +1,6 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
 "http://www.w3.org/TR/html4/loose.dtd">
-<%@ page import="java.util.*,java.io.*,org.alfresco.repo.avm.*,org.alfresco.repo.avm.util.*,org.alfresco.service.cmr.avm.*,org.alfresco.service.cmr.repository.*,org.alfresco.repo.security.authentication.*,org.alfresco.service.cmr.avmsync.*" %>
+<%@ page import="java.util.*,java.io.*,org.alfresco.repo.avm.*,org.alfresco.repo.avm.util.*,org.alfresco.service.cmr.avm.*,org.alfresco.service.cmr.repository.*,org.alfresco.repo.security.authentication.*,org.alfresco.service.cmr.avmsync.*,org.alfresco.service.cmr.security.*" %>
 <html>
 <head>
 <%!
@@ -69,7 +69,7 @@
        long start = System.currentTimeMillis();
        String data = request.getParameter("data");
        data = data + "\n\n";
-       ((AuthenticationComponent)RawServices.Instance().getContext().getBean("authenticationComponent")).authenticate("admin", "admin".toCharArray());
+       ((AuthenticationService)RawServices.Instance().getContext().getBean("AuthenticationService")).authenticate("admin", "admin".toCharArray());
        BufferedReader in = new BufferedReader(new StringReader(data));
        String result = fgInterpreter.interpretCommand(command, in);
        out.println(EscapeForHTML(command));
