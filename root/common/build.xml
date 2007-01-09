@@ -142,8 +142,11 @@
       <!-- ensure mysql drivers are present -->
       <delete>
          <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
+         <fileset dir="${home.tomcat}/common/endorsed" includes="xalan*" excludes="${file.name.xalan},${file.name.xalan.serializer}"/>
       </delete>
       <copy todir="${home.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
+      <copy todir="${home.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
+      <copy todir="${home.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
 
       <!-- copy the hotspot_compiler file to bin directory -->
       <copy file="${file.hotspotcompiler}" todir="${home.tomcat}/bin" />
