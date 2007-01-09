@@ -1,0 +1,13 @@
+<customUI xmlns="http://schemas.microsoft.com/office/2006/01/customui" onLoad="OnLoad" loadImage="GetImage">
+  <ribbon>
+    <tabs>
+      <tab id="Alfresco" label="Alfresco" >
+        <group id="Group1" label="Alfreco Actions" visible ="1">
+          <button id="ToggleAlfresco" label="Show/Hide Alfresco Pane" 
+           onAction="AlfrescoButtonClick" 
+           image="alfresco.ico"/>
+        </group>
+      </tab>
+     </tabs>
+  </ribbon>
+</customUI>
