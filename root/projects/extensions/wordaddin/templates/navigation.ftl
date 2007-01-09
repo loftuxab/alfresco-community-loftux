@@ -7,6 +7,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
    <#elseif child.name = "search.ftl"><#assign office_search = child.id>
    <#elseif child.name = "document_details.ftl"><#assign office_details = child.id>
    <#elseif child.name = "version_history.ftl"><#assign office_history = child.id>
+   <#elseif child.name = "doc_actions.js"><#assign doc_actions = child.id>
    </#if>
 </#list>
 <#if document.isDocument>
@@ -17,11 +18,59 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <html>
 <head>
 <title>Basic Navigation</title>
-
+ 
 <link rel="stylesheet" type="text/css"
 href="/alfresco/css/taskpane.css" />
 
 <script type="text/javascript">
+
+var xmlHttp
+
+function showStatus(url)
+{
+   xmlHttp=GetXmlHttpObject()
+   if (xmlHttp==null)
+   {
+       alert ("Browser does not support HTTP Request")
+       return
+   }        
+   xmlHttp.onreadystatechange=stateChanged 
+   xmlHttp.open("GET",url,true)
+   xmlHttp.send(null)
+} 
+
+function stateChanged() 
+{ 
+   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+   { 
+      document.getElementById("statusArea").innerHTML=xmlHttp.responseText 
+      window.location.reload();
+   } 
+} 
+
+function GetXmlHttpObject()
+{ 
+   var objXMLHttp=null
+   if (window.XMLHttpRequest)
+   {
+     objXMLHttp=new XMLHttpRequest()
+   }
+   else if (window.ActiveXObject)
+  {
+     objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+  }
+   return objXMLHttp
+} 
+
+   function runAction(Action, Doc, Msg)
+   {
+      if (Msg != "" && !confirm(Msg))
+      {
+          return;
+      }
+      document.getElementById("statusArea").innerHTML="Running action...";
+      showStatus("/alfresco/command/script/execute/workspace/SpacesStore/${doc_actions}/workspace/SpacesStore/" + Doc + "?action=" + Action);
+   }
 
 		function getWindowHeight() {
 			var windowHeight = 0;
@@ -240,7 +289,8 @@ href="/alfresco/css/taskpane.css" />
 		${child.properties.description}<br/>
 </#if>
                 Modified: ${child.properties.modified?datetime}, Size: ${child.size / 1024} Kb<br/>
-                <a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Check Out"></a><a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Move to..."></a><a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Copy to..."></a>
+
+                <a href="#" onClick="javascript:runAction('checkout','${child.id}', '');"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Check Out"></a><a href="#" onClick="javascript:runAction('makepdf','${child.id}', '');"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Make PDF..."></a><a href="#" onClick="javascript:runAction('delete','${child.id}', 'Are you sure you want to delete this document?');"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Delete..."></a>
                 </td>
             </tr>
             <!-- lb: end repeat -->
@@ -249,6 +299,7 @@ href="/alfresco/css/taskpane.css" />
            </tbody>
           </table>
 </div>
+<spanid="statusArea">&nbsp;</span>
 <div id="bottomMargin">&nbsp;</div>
 
 
