@@ -25,8 +25,12 @@ package org.alfresco.util;
 *  Given a JNDI directory mount point and absolute AVM+CIFS-style JNDI path,
 *  this class is able to return the associated AVM absolute path and version.
 *  It is assumed that mount_point is the leading substring of jndi_path.
+*  <p>
+*  The easiest way to get the value of mount_point is to call the static 
+*  method:  org.alfresco.jndi.AVMFileDirContext.getAVMFileDirMountPoint()
 *
 *   <pre>
+*
 *   EXAMPLE:
 *
 *     On UNIX, if the constructor args are:
