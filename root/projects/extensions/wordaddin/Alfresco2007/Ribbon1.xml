@@ -3,8 +3,11 @@
     <tabs>
       <tab id="Alfresco" label="Alfresco" >
         <group id="Group1" label="Alfreco Actions" visible ="1">
-          <button id="ToggleAlfresco" label="Show/Hide Alfresco Pane" 
-           onAction="AlfrescoButtonClick" 
+          <button id="ShowAlfresco" label="Show Alfresco Pane" 
+           onAction="AlfrescoShowClick" 
+           image="alfresco.ico"/>
+          <button id="HideAlfresco" label="Hide Alfresco Pane" 
+           onAction="AlfrescoHideClick" 
            image="alfresco.ico"/>
         </group>
       </tab>

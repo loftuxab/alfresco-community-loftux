@@ -127,7 +127,7 @@ function GetXmlHttpObject()
       <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
       <li style="padding-right:6px;"><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_search}"><img src="/alfresco/images/taskpane/search.gif" border="0" alt="Search Alfresco" /></a></li>
       <li id="current"><a href="#"><img src="/alfresco/images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
-      <li><a href="#"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_history}"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
     </ul>
   </div>
 
@@ -144,12 +144,6 @@ function GetXmlHttpObject()
                        </td>
                        <td style="line-height:16px;" width="100%">
                        <span style="font-weight:bold;">${document.name}</span><br/>
- <#if document.properties.description?exists>
-		      ${document.properties.description}<br/>
-<#else>
-                      Description:<br/>
-</#if>
-                       Name: ${document.name}<br/>
 <#if document.properties.title?exists>
 		      Title: ${document.properties.title}<br/>
 <#else>
@@ -160,10 +154,11 @@ function GetXmlHttpObject()
 <#else>
                       Description:<br/>
 </#if>
-                       Creator: ${child.properties.creator}<br/>
-                       Created: ${child.properties.created?datetime}<br/>
-                       Modifier: ${child.properties.modifier}<br/>
-                       Modified:${child.properties.modified?datetime}, Size:${child.size / 1024} Kb<br/>
+                       Creator: ${document.properties.creator}<br/>
+                       Created: ${document.properties.created?datetime}<br/>
+                       Modifier: ${document.properties.modifier}<br/>
+                       Modified:${document.properties.modified?datetime}<br/>
+                       Size:${document.size / 1024} Kb<br/>
                        Categories: [category], [category]<br/>
 <#else>
                        The current document is not managed by Alfresco.
@@ -180,7 +175,7 @@ function GetXmlHttpObject()
 <#if document.isDocument && document != template>
 <ul>
     <li><a href="#" onClick="javascript:runAction('checkout','${document.id}', '');"><img src="/alfresco/images/taskpane/checkout.gif" border="0" style="padding-right:6px;" alt="Check Out">Check Out</a></li>
-    <li><a href="#" onClick="javascript:runAction('makepdf'',${document.id}', '');"><img src="/alfresco/images/taskpane/transform_to_pdf.gif" border="0" style="padding-right:6px;" alt="Transform to PDF">Transform to PDF</a></li>
+    <li><a href="#" onClick="javascript:runAction('makepdf','${document.id}', '');"><img src="/alfresco/images/taskpane/makepdf.gif" border="0" style="padding-right:6px;" alt="Transform to PDF">Transform to PDF</a></li>
 </ul>
 </div>
 

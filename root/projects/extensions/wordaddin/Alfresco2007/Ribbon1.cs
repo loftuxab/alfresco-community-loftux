@@ -57,23 +57,19 @@ namespace Alfresco2007
     public class Ribbon1 : Office.IRibbonExtensibility
     {
         private Office.IRibbonUI ribbon;
-        private bool alfrescoControlExists;
 
         public Ribbon1()
         {
         }
 
-        public void AlfrescoButtonClick(Office.IRibbonControl control)
+        public void AlfrescoShowClick(Office.IRibbonControl control)
         {
-            if (!alfrescoControlExists)
-            {
-                Globals.ThisAddIn.AddAlfrescoTaskPane();
-            }
-            else
-            {
-                Globals.ThisAddIn.RemoveAlfrescoTaskPane();
-            }
-            alfrescoControlExists = !alfrescoControlExists;
+            Globals.ThisAddIn.AddAlfrescoTaskPane();
+        }
+
+        public void AlfrescoHideClick(Office.IRibbonControl control)
+        {
+            Globals.ThisAddIn.RemoveAlfrescoTaskPane();
         }
 
         public stdole.IPictureDisp GetImage(string imageName)

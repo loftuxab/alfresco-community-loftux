@@ -1,3 +1,12 @@
+<#list template.parent.children as child>
+   <#if child.name = "my_alfresco.ftl"><#assign office_home = child.id>
+   <#elseif child.name = "navigation.ftl"><#assign office_browse = child.id>
+   <#elseif child.name = "search.ftl"><#assign office_search = child.id>
+   <#elseif child.name = "document_details.ftl"><#assign office_details = child.id>
+   <#elseif child.name = "version_history.ftl"><#assign office_history = child.id>
+   <#elseif child.name = "doc_actions.js"><#assign doc_actions = child.id>
+   </#if>
+</#list>
 <!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -6,19 +15,71 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <title>Version History</title>
 
 <link rel="stylesheet" type="text/css"
-href="css/taskpane.css" />
+href="/alfresco/css/taskpane.css" />
 
-<!-- lb: start of local styles -->
-<style type="text/css">
-
-
-
-</style>
-<!-- lb: end of local styles -->
 
 <script type="text/javascript">
 
-		function getWindowHeight() {
+var xmlHttp
+
+function GetXmlHttpObject()
+{ 
+   var objXMLHttp=null;
+   if (window.XMLHttpRequest)
+   {
+      objXMLHttp=new XMLHttpRequest()
+   }
+   else if (window.ActiveXObject)
+   {
+       objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+   }
+
+   return objXMLHttp;
+} 
+
+function showStatus(url)
+{
+   xmlHttp=GetXmlHttpObject();
+   if (xmlHttp==null)
+   {
+       alert("Browser does not support HTTP Request");
+       return;
+   }        
+   xmlHttp.onreadystatechange=stateChanged;
+   xmlHttp.open("GET",url+"&sid="+Math.random(),true);
+   xmlHttp.send(null);
+} 
+
+function stateChanged() 
+{ 
+   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+   { 
+      if (xmlHttp.responseText.indexOf("System Error") > 0)
+      {
+          var myWindow = window.open("", "_blank", "scrollbars,height=500,width=400");
+          myWindow.document.write(xmlHttp.responseText);
+          document.getElementById("statusArea").innerHTML=""; 
+      }
+      else
+      {
+          document.getElementById("statusArea").innerHTML=xmlHttp.responseText; 
+          window.location.reload();
+      }
+   } 
+} 
+
+function runAction(Action, Doc, Msg)
+{
+   if (Msg != "" && !confirm(Msg))
+   {
+       return;
+   }
+   document.getElementById("statusArea").innerHTML="Running action...";
+   showStatus("/alfresco/command/script/execute/workspace/SpacesStore/${doc_actions}/workspace/SpacesStore/" + Doc + "?action=" + Action);
+}
+
+
+function getWindowHeight() {
 			var windowHeight = 0;
 			if (typeof(window.innerHeight) == 'number') {
 				windowHeight = window.innerHeight;
@@ -43,17 +104,14 @@ href="css/taskpane.css" />
 					var versionListElement = document.getElementById('versionList');
 					var tabBarElement = document.getElementById('tabBar');
                                         var bottomMarginElement = document.getElementById('bottomMargin');
-                                        var documentActionsElement = document.getElementById('documentActions');
-
+ 
 					var versionListHeight = versionListElement.offsetHeight;
 					var versionListHeaderHeight = versionListHeaderElement.offsetHeight;
 					var tabBarHeight = tabBarElement.offsetHeight;
 					var bottomMarginHeight = bottomMarginElement.offsetHeight;
-                                        var documentActionsHeight = documentActionsElement.offsetHeight;
-
+ 
 					if (windowHeight > 0) {
-						versionListElement.style.height = (windowHeight- (tabBarHeight + versionListHeaderHeight + documentActionsHeight + bottomMarginHeight)) /2 + 'px';
-						documentActionsElement.style.height = (windowHeight- (tabBarHeight + versionListHeaderHeight + documentActionsHeight + bottomMarginHeight)) /2 + 'px';
+						versionListElement.style.height = (windowHeight- (tabBarHeight + versionListHeaderHeight + bottomMarginHeight)) + 'px';
 					}
 
 				}
@@ -148,90 +206,58 @@ href="css/taskpane.css" />
 
 <div id="tabBar">
     <ul>
-      <li><a href="/alfresco/template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/office/my_alfresco.ftl&contextPath=/Company%20Home/Data%20Dictionary/Presentation%20Templates"><img src="images/taskpane/my_alfresco.gif" border="0" alt="My Alfresco" /></a></li>
-      <li><a href="/alfresco/template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/office/navigation.ftl&contextPath=/Company%20Home/Data%20Dictionary/Presentation%20Templates"><img src="images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
-      <li style="padding-right:6px;"><a href="/alfresco/template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/office/search.ftl&contextPath=/Company%20Home/Data%20Dictionary/Presentation%20Templates"><img src="images/taskpane/search.gif" border="0" alt="Search Alfresco" /></a></li>
-      <li><a href="/alfresco/template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/office/document_details.ftl&contextPath=/Company%20Home/Data%20Dictionary/Presentation%20Templates"><img src="images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
-      <li id="current"><a href="#"><img src="images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
-      <li><a href="#"><img src="images/taskpane/workflow.gif" border="0" alt="View Workflow Info" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_home}"><img src="/alfresco/images/taskpane/my_alfresco.gif" border="0" alt="My Alfresco" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
+      <li style="padding-right:6px;"><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_search}"><img src="/alfresco/images/taskpane/search.gif" border="0" alt="Search Alfresco" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_details}"><img src="/alfresco/images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
+      <li id="current"><a href="#"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
     </ul>
   </div>
 
-<div id="versionListHeader"><span style="font-weight:bold">Version History for [name]</span></div>
+<div id="versionListHeader"><span style="font-weight:bold">Version History for ${document.name}</span></div>
 
 <div id="versionList">
           <table>
                  <tbody>
+<#if document.isDocument >
+   <#if hasAspect(document, "cm:versionable") == 1 >
                  <!-- lb: start repeat row -->
+      <#list document.versionHistory as record>
+         <#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('%2F', '/') />
                    <tr>
                        <td valign="top">
-                       <a href="#"><img src="images/taskpane/document.gif" border="0" alt="Open [doc name](version)"/></a>
+                       <a href="#" onClick="window.external.openDocument('${webdavPath}')"><img src="/alfresco/images/taskpane/document.gif" border="0" alt="Open ${record.versionLabel}"/></a>
                        </td>
                        <td style="line-height:16px;" width="100%">
-                       <a href="#" title="Open [doc name](version)"><span style="font-weight:bold;">Version 1.3 (Current)</span></a><br/>
-                       Author: [name]<br/>
-                       Date: [date]<br/>
+                       <a href="#" title="Open ${record.versionLabel}"><span style="font-weight:bold;">${record.versionLabel}</span></a><br/>
+                       Author: ${record.creator}<br/>
+                       Date: ${record.createdDate?datetime}<br/>
                        Notes: [notes]<br/>
                        </td>
                    </tr>
-                   <!-- lb: end repeat row -->
-                 <!-- lb: start repeat row -->
+      </#list>
+   <#else>
                    <tr>
                        <td valign="top">
-                       <a href="#"><img src="images/taskpane/document.gif" border="0" alt="Open [doc name](version)"/></a>
-                       </td>
-                       <td style="line-height:16px;" width="100%">
-                       <a href="#" title="Open [doc name](version)"><span style="font-weight:bold;">Version 1.2</span></a><br/>
-                       Author: [name]<br/>
-                       Date: [date]<br/>
-                       Notes: [notes]<br/>
+The current document is not versioned.<br>
+<a href="#" onClick="javascript:runAction('makeversion','${document.id}', '');">Make Versionable</a>
                        </td>
                    </tr>
+   </#if>
                    <!-- lb: end repeat row -->
-                   <!-- lb: start repeat row -->
+<#else>
                    <tr>
                        <td valign="top">
-                       <a href="#"><img src="images/taskpane/document.gif" border="0" alt="Open [doc name](version)"/></a>
-                       </td>
-                       <td style="line-height:16px;" width="100%">
-                       <a href="#" title="Open [doc name](version)"><span style="font-weight:bold;">Version 1.1</span></a><br/>
-                       Author: [name]<br/>
-                       Date: [date]<br/>
-                       Notes: [notes]<br/>
+The current document is not being managed by Alfresco.
                        </td>
                    </tr>
-                   <!-- lb: end repeat row -->
-                   <!-- lb: start repeat row -->
-                   <tr>
-                       <td valign="top">
-                       <a href="#"><img src="images/taskpane/document.gif" border="0" alt="Open [doc name](version)"/></a>
-                       </td>
-                       <td style="line-height:16px;" width="100%">
-                       <a href="#" title="Open [doc name](version)"><span style="font-weight:bold;">Version 1.0</span></a><br/>
-                       Author: [name]<br/>
-                       Date: [date]<br/>
-                       Notes: [notes]<br/>
-                       </td>
-                   </tr>
-                   <!-- lb: end repeat row -->
+</#if>
                  </tbody>
           </table>
 </div>
 
-<div id="documentActions">
-<span style="font-weight:bold;">Document Actions</span><br/>
-<ul>
-    <li><a href="#"><img src="images/taskpane/checkout.gif" border="0" style="padding-right:6px;" alt="Check out">Checkout</a></li>
-    <li><a href="#"><img src="images/taskpane/update.gif" border="0" style="padding-right:6px;" alt="Update Alfresco Copy">Update Alfresco Copy</a></li>
-    <li><a href="#"><img src="images/taskpane/edit_properties.gif" border="0" style="padding-right:6px;" alt="Edit Properties">Edit Properties</a></li>
-    <li><a href="#"><img src="images/taskpane/start_workflow.gif" border="0" style="padding-right:6px;" alt="Start Workflow">Start Workflow</a></li>
-    <li><a href="#"><img src="images/taskpane/transform_to_pdf.gif" border="0" style="padding-right:6px;" alt="Transform to PDF">Transform to PDF</a></li>
-    <li><a href="#"><img src="images/taskpane/run_script.gif" border="0" style="padding-right:6px;" alt="Run a script">Run a Script</a></li>
-    <li><a href="#"><img src="images/taskpane/add_aspect.gif" border="0" style="padding-right:6px;" alt="Add aspect">Add Aspect</a></li>
-</ul>
+<div id="bottomMargin" style="height:24px; padding-left:6px;"><span id="statusArea">&nbsp;</span>
 </div>
-
-<div id="bottomMargin">&nbsp;</div>
 
 
 </body>

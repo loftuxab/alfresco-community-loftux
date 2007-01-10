@@ -26,53 +26,66 @@ href="/alfresco/css/taskpane.css" />
 
 var xmlHttp
 
+function GetXmlHttpObject()
+{ 
+   var objXMLHttp=null;
+   if (window.XMLHttpRequest)
+   {
+      objXMLHttp=new XMLHttpRequest()
+   }
+   else if (window.ActiveXObject)
+   {
+       objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+   }
+
+   return objXMLHttp;
+} 
+
 function showStatus(url)
 {
-   xmlHttp=GetXmlHttpObject()
+   xmlHttp=GetXmlHttpObject();
    if (xmlHttp==null)
    {
-       alert ("Browser does not support HTTP Request")
-       return
+       alert("Browser does not support HTTP Request");
+       return;
    }        
-   xmlHttp.onreadystatechange=stateChanged 
-   xmlHttp.open("GET",url,true)
-   xmlHttp.send(null)
+   xmlHttp.onreadystatechange=stateChanged;
+   xmlHttp.open("GET",url+"&sid="+Math.random(),true);
+   xmlHttp.send(null);
 } 
 
 function stateChanged() 
 { 
    if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
    { 
-      document.getElementById("statusArea").innerHTML=xmlHttp.responseText 
-      window.location.reload();
+      if (xmlHttp.responseText.indexOf("System Error") > 0)
+      {
+          var myWindow = window.open("", "_blank", "scrollbars,height=500,width=400");
+          myWindow.document.write(xmlHttp.responseText);
+          document.getElementById("statusArea").innerHTML=""; 
+      }
+      else
+      {
+          document.getElementById("statusArea").innerHTML=xmlHttp.responseText; 
+          window.location.reload();
+      }
    } 
 } 
 
-function GetXmlHttpObject()
-{ 
-   var objXMLHttp=null
-   if (window.XMLHttpRequest)
-   {
-     objXMLHttp=new XMLHttpRequest()
-   }
-   else if (window.ActiveXObject)
-  {
-     objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
-  }
-   return objXMLHttp
-} 
 
-   function runAction(Action, Doc, Msg)
-   {
-      if (Msg != "" && !confirm(Msg))
-      {
-          return;
-      }
-      document.getElementById("statusArea").innerHTML="Running action...";
-      showStatus("/alfresco/command/script/execute/workspace/SpacesStore/${doc_actions}/workspace/SpacesStore/" + Doc + "?action=" + Action);
-   }
 
-		function getWindowHeight() {
+
+function runAction(Action, Doc, Msg)
+{
+   if (Msg != "" && !confirm(Msg))
+   {
+       return;
+   }
+   document.getElementById("statusArea").innerHTML="Running action...";
+   showStatus("/alfresco/command/script/execute/workspace/SpacesStore/${doc_actions}/workspace/SpacesStore/" + Doc + "?action=" + Action);
+}
+
+function getWindowHeight() {
 			var windowHeight = 0;
 			if (typeof(window.innerHeight) == 'number') {
 				windowHeight = window.innerHeight;
@@ -100,6 +113,7 @@ function GetXmlHttpObject()
                                         var spaceListHeaderElement = document.getElementById('spaceListHeader');
                                         var contentListHeaderElement = document.getElementById('contentListHeader');
                                         var bottomMarginElement = document.getElementById('bottomMargin');
+                                        var documentActionsElement = document.getElementById('documentActions');
 
 					var spaceListHeight = spaceListElement.offsetHeight;
 					var contentListHeight = contentListElement.offsetHeight;
@@ -108,11 +122,11 @@ function GetXmlHttpObject()
 					var spaceListHeaderHeight = spaceListHeaderElement.offsetHeight;
 					var contentListHeaderHeight = contentListHeaderElement.offsetHeight;
 					var bottomMarginHeight = bottomMarginElement.offsetHeight;
-
+                                        var documentActionsHeight = documentActionsElement.offsetHeight;
 
 					if (windowHeight > 0) {
-						spaceListElement.style.height = (windowHeight- (tabBarHeight + currentSpaceInfoHeight + spaceListHeaderHeight + contentListHeaderHeight + bottomMarginHeight)) /2 + 'px';
-						contentListElement.style.height = (windowHeight- (tabBarHeight + currentSpaceInfoHeight + spaceListHeaderHeight + contentListHeaderHeight + bottomMarginHeight)) /2 + 'px';
+						spaceListElement.style.height = (windowHeight- (tabBarHeight + currentSpaceInfoHeight + spaceListHeaderHeight + contentListHeaderHeight + documentActionsHeight  + bottomMarginHeight)) /2 + 'px';
+						contentListElement.style.height = (windowHeight- (tabBarHeight + currentSpaceInfoHeight + spaceListHeaderHeight + contentListHeaderHeight + documentActionsHeight  + bottomMarginHeight)) /2 + 'px';
 					}
 
 				}
@@ -126,6 +140,7 @@ function GetXmlHttpObject()
 		window.onresize = function() {
 			setContent();
 		}
+
 		</script>
 
              <script type="text/javascript">
@@ -278,7 +293,7 @@ function GetXmlHttpObject()
 <#list thisSpace.children as child>
    <#if child.isDocument>
             <!-- lb: start repeat -->
-<#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('%2F', '/') />
+<#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('\\', '/') />
             <tr>
                 <td>
                 <a href="#" onClick="window.external.openDocument('${webdavPath}')"><img src="/alfresco${child.icon32}" border="0" alt="Open ${child.name}" /></a>
@@ -289,8 +304,17 @@ function GetXmlHttpObject()
 		${child.properties.description}<br/>
 </#if>
                 Modified: ${child.properties.modified?datetime}, Size: ${child.size / 1024} Kb<br/>
-
-                <a href="#" onClick="javascript:runAction('checkout','${child.id}', '');"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Check Out"></a><a href="#" onClick="javascript:runAction('makepdf','${child.id}', '');"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Make PDF..."></a><a href="#" onClick="javascript:runAction('delete','${child.id}', 'Are you sure you want to delete this document?');"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Delete..."></a>
+<#if child.isLocked >
+                <img src="/alfresco/images/taskpane/lock.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Locked">
+<#elseif hasAspect(child, "cm:workingcopy") == 1>
+                <a href="#" onClick="javascript:runAction('checkin','${child.id}', '');"><img src="/alfresco/images/taskpane/checkin.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Check In" title="Check In"></a>
+<#else>
+                <a href="#" onClick="javascript:runAction('checkout','${child.id}', '');"><img src="/alfresco/images/taskpane/checkout.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Check Out" title="Check Out"></a>
+</#if>
+<a href="#" onClick="javascript:runAction('makepdf','${child.id}', '');"><img src="/alfresco/images/taskpane/makepdf.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Make PDF..." title="Make PDF"></a>
+<#if !child.isLocked >
+<a href="#" onClick="javascript:runAction('delete','${child.id}', 'Are you sure you want to delete this document?');"><img src="/alfresco/images/taskpane/delete.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Delete..." title="Delete"></a>
+</#if>
                 </td>
             </tr>
             <!-- lb: end repeat -->
@@ -299,8 +323,18 @@ function GetXmlHttpObject()
            </tbody>
           </table>
 </div>
-<spanid="statusArea">&nbsp;</span>
-<div id="bottomMargin">&nbsp;</div>
+
+<div id="documentActions">
+<span style="font-weight:bold;">Document Actions</span><br/>
+<ul>
+<#assign currentPath = thisSpace.displayPath  + '/' + thisSpace.name />
+<#assign webdavPath = currentPath?substring(13)?url('ISO-8859-1')?replace('%2F', '/') />
+    <li><a href="#" onClick="window.external.saveToAlfresco('${webdavPath}')"><img src="/alfresco/images/taskpane/save_to_alfresco.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco">Save to Alfresco</a></li>
+</ul>
+</div>
+
+<div id="bottomMargin" style="height:24px; padding-left:6px;"><span id="statusArea">&nbsp;</span>
+</div>
 
 
 </body>

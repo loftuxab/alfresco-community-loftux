@@ -4,16 +4,19 @@
    <#elseif child.name = "search.ftl"><#assign office_search = child.id>
    <#elseif child.name = "document_details.ftl"><#assign office_details = child.id>
    <#elseif child.name = "version_history.ftl"><#assign office_history = child.id>
-   </#if>
+   <#elseif child.name = "doc_actions.js"><#assign doc_actions = child.id>   </#if>
 </#list>
-<#if document?exists>
+<#if document.isDocument>
    <#if document = template>
-      <#assign thisContext = companyhome.id>
+      <#assign thisContext = companyhome>
+      <#assign thisSpace = thisContext >
     <#else>
-      <#assign thisContext = document.id>
+      <#assign thisContext = document>
+      <#assign thisSpace = thisContext .parent>
    </#if>
 <#else>
-   <#assign thisContext = space.id>
+   <#assign thisSpace = document>
+   <#assign thisContext = document>
 </#if>  
 <!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -27,7 +30,66 @@ href="/alfresco/css/taskpane.css" />
 
 <script type="text/javascript">
 
-		function getWindowHeight() {
+var xmlHttp
+
+function GetXmlHttpObject()
+{ 
+   var objXMLHttp=null;
+   if (window.XMLHttpRequest)
+   {
+      objXMLHttp=new XMLHttpRequest()
+   }
+   else if (window.ActiveXObject)
+   {
+       objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+   }
+
+   return objXMLHttp;
+} 
+
+function showStatus(url)
+{
+   xmlHttp=GetXmlHttpObject();
+   if (xmlHttp==null)
+   {
+       alert("Browser does not support HTTP Request");
+       return;
+   }        
+   xmlHttp.onreadystatechange=stateChanged;
+   xmlHttp.open("GET",url+"&sid="+Math.random(),true);
+   xmlHttp.send(null);
+} 
+
+function stateChanged() 
+{ 
+   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+   { 
+      if (xmlHttp.responseText.indexOf("System Error") > 0)
+      {
+          var myWindow = window.open("", "_blank", "scrollbars,height=500,width=400");
+          myWindow.document.write(xmlHttp.responseText);
+          document.getElementById("statusArea").innerHTML=""; 
+      }
+      else
+      {
+          document.getElementById("statusArea").innerHTML=xmlHttp.responseText; 
+          window.location.reload();
+      }
+   } 
+} 
+
+function runAction(Action, Doc, Msg)
+{
+   if (Msg != "" && !confirm(Msg))
+   {
+       return;
+   }
+   document.getElementById("statusArea").innerHTML="Running action...";
+   showStatus("/alfresco/command/script/execute/workspace/SpacesStore/${doc_actions}/workspace/SpacesStore/" + Doc + "?action=" + Action);
+}
+
+
+function getWindowHeight() {
 			var windowHeight = 0;
 			if (typeof(window.innerHeight) == 'number') {
 				windowHeight = window.innerHeight;
@@ -161,11 +223,10 @@ href="/alfresco/css/taskpane.css" />
 <div id="tabBar">
     <ul>
       <li id="current"><a href="#"><img src="/alfresco/images/taskpane/my_alfresco.gif" border="0" alt="My Alfresco" /></a></li>
-      <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
-      <li style="padding-right:6px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext}/workspace/SpacesStore/${office_search}"><img src="/alfresco/images/taskpane/search.gif" border="0" alt="Search Alfresco" /></a></li>
-      <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext}/workspace/SpacesStore/${office_details}"><img src="/alfresco/images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
-      <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext}/workspace/SpacesStore/${office_history}"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
-      <li><a href="#"><img src="/alfresco/images/taskpane/workflow.gif" border="0" alt="View Workflow Info" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
+      <li style="padding-right:6px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_search}"><img src="/alfresco/images/taskpane/search.gif" border="0" alt="Search Alfresco" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_details}"><img src="/alfresco/images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_history}"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
     </ul>
   </div>
 
@@ -188,7 +249,8 @@ href="/alfresco/css/taskpane.css" />
 		${child.properties.description}<br/>
 </#if>
                 Modified: ${child.properties.modified?datetime}, Size: ${child.size / 1024} Kb<br/>
-                       <a href="#"><a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Move to..."></a><a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Copy to..."></a>
+                <a href="#" onClick="javascript:runAction('checkin','${child.id}', '');"><img src="/alfresco/images/taskpane/checkin.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Check In" title="Check In"></a>
+<a href="#" onClick="javascript:runAction('makepdf','${child.id}', '');"><img src="/alfresco/images/taskpane/makepdf.gif" border="0" style="padding:3px 6px 2px 0px;" alt="Make PDF..." title="Make PDF"></a>
                 </td>
             </tr>
             <!-- lb: end repeat -->
@@ -270,12 +332,17 @@ href="/alfresco/css/taskpane.css" />
 <div id="documentActions">
 <span style="font-weight:bold;">Document Actions</span><br/>
 <ul>
-    <li><a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco">Save to Alfresco</a></li>
-    <li><a href="#"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding-right:6px;" alt="[action]">Action</a></li>
+<#assign currentPath = thisSpace.displayPath  + '/' + thisSpace.name />
+<#assign webdavPath = currentPath?substring(13)?url('ISO-8859-1')?replace('%2F', '/') />
+    <li><a href="#" onClick="window.external.saveToAlfresco('${webdavPath}')"><img src="/alfresco/images/taskpane/save_to_alfresco.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco">Save to Alfresco</a></li>
 </ul>
+<br>
+Currently in:<br>
+${currentPath}<br>
 </div>
 
-<div id="bottomMargin">&nbsp;</div>
+<div id="bottomMargin" style="height:24px;"><span id="statusArea">&nbsp;</span>
+</div>
 
 
 </body>
