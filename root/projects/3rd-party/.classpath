@@ -41,7 +41,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/freemarker.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jaxen-1.1-beta-8.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xalan-2.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/htmlparser-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-beanutils-1.6.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/commons/commons-collections-3.0.jar"/>
@@ -89,5 +88,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/pdfbox-0.7.3.jar" sourcepath="src/pdfbox-0.7.3-src.zip"/>
 	<classpathentry kind="lib" path="lib/cglib-nodep-2.2_beta1.jar"/>
 	<classpathentry kind="lib" path="lib/fontbox-0.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xalan-2.7.0/xalan.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
