@@ -11,6 +11,8 @@ namespace Alfresco2007
         private UserControl1 myUserControl1;
         private Microsoft.Office.Tools.CustomTaskPane myCustomTaskPane = null;
         private String strAlfServer = "http://localhost:8080/alfresco/webdav";
+//       private String strAlfServer = "\\\\paulhh02_a\\Alfresco";
+//        private String strAlfServer = "http://paulhh02_a/Alfresco";
         private Boolean bNoDocuments = false;
         
         private void ThisAddIn_Startup(object sender, System.EventArgs e)
@@ -21,8 +23,8 @@ namespace Alfresco2007
 
         void Application_DocumentBeforeClose(Microsoft.Office.Interop.Word.Document Doc, ref bool Cancel)
         {
-            // If just about to close the last doc, keep the pane open at home
-            if (Application.Documents.Count == 1)
+            // If just about to close the last doc/window, keep the pane open at home
+            if (Application.Windows.Count == 1)
             {
                 myUserControl1.showHome(Application);
                 bNoDocuments = true;
