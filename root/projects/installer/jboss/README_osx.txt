@@ -1,10 +1,10 @@
-================================
-Alfresco 1.4 Release Candidate 1
-================================
+============================
+Alfresco 2.0 Preview Release
+============================
 
-Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
+Welcome to the Alfresco 2.0 Preview Release.  This software is for evaluation
 purposes only and cannot be used against an existing Alfresco repository.  There
-will not be an upgrade path from this Candidate Release to the final 1.4 release.
+will not be an upgrade path from this Candidate Release to the final 2.0 release.
 
 
 ===================
@@ -104,6 +104,7 @@ Running the Alfresco Server
 
 Open a new command window and navigate to the '/opt/alfresco' directory
 - Run 'alfresco.sh start' to start JBoss
+- If you plan to use WCM preview features, run './alfvirtual.sh start'
 - You can now try Alfresco by visiting:
 
 http://localhost:8080/portal and navigating to 'Alfresco' from the Page Menu and
@@ -125,11 +126,12 @@ http://www.alfresco.com/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '/opt/alfresco' folder and run 'alfresco.sh stop'.
+Navigate to the '/opt/alfresco' directory and run './alfresco.sh stop', also run 
+'./alfvirtual.sh stop' if you started the Virtualization server.
 
 
 ===========================
-Upgrading from V1.x to V1.4
+Upgrading from V1.x to V2.0
 ===========================
 
 Not yet available.
