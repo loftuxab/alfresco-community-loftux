@@ -291,6 +291,9 @@
       <copy todir="${dir.assemble.war}/extensions/messages">
          <fileset dir="${dir.project.installer}/messages" />
       </copy>
+      <!-- place latest Xalan jars to ensure they are used -->
+      <copy todir="${dir.assemble.war}/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
+      <copy todir="${dir.assemble.war}/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
    </target>
 
    <!-- ***************** -->

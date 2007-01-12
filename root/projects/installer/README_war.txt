@@ -1,10 +1,9 @@
-================================
-Alfresco 1.4 Release Candidate 1
-================================
+====================
+Alfresco 2.0 Preview
+====================
 
-Welcome to the Alfresco 1.4 Release Candidate 1.  This software is for evaluation
-purposes only and cannot be used against an existing Alfresco repository.  There
-will not be an upgrade path from this Candidate Release to the final 1.4 release.
+Welcome to the Alfresco 2.0 Preview Release.  This software is for evaluation
+purposes only and should not be used against an existing Alfresco repository.
 
 
 ===================
@@ -79,6 +78,27 @@ Add MySQL Database Connector
 
 - Download the MySQL Java Database Connector http://dev.mysql.com/downloads/connector/j/
 - Copy the JAR file into <container>/common/lib or <container>/server/default/lib
+
+
+Add Additional Required Libraries
+---------------------------------
+
+Some additional libraries are required to be added to the container's endorsed JAR
+files.  Currently, this is only required for WCM functionality, but may become necessary
+more generally for Alfresco in future releases.
+
+- Copy the JAR files from <alfresco>/endorsed into <container common>/endorsed
+  (e.g. tomcat/common/endorsed)
+
+
+Add Custom Configurations
+-------------------------
+
+Most of the Alfresco configuration can be customized by overriding the default
+settings.  This can be done by adding <alfresco>/extension to the appropriate
+location (e.g. tomcat/shared/classes/alfresco/extension or
+jboss/server/default/conf/alfresco/extension).  This provides a set of default
+and example configurations.
 
 
 Create Database
