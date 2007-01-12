@@ -62,8 +62,8 @@
       <copy todir="${dir.distribution.virtualtomcat}">
          <fileset dir="${dir.distribution.tomcat}" />
       </copy>
-      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.virtual}/build/dist/alfresco-catalina-virtual.jar" />
-      <copy todir="${dir.distribution.virtualtomcat}/server/lib" file="${dir.project.jndi}/build/dist/alfresco-jndi-client.jar" />
+      <copy todir="${dir.distribution.virtualtomcat}/server/lib" file="${dir.project.virtual}/build/dist/alfresco-catalina-virtual.jar" />
+      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.jndi}/build/dist/alfresco-jndi-client.jar" />
       <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-shared.properties"/>
       <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.password"/>
       <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.access"/>
