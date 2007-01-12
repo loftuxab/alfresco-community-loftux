@@ -136,7 +136,10 @@
       </delete>
       <copy todir="${dir.distribution.jboss}/server/default/lib" file="${dir.common.lib}/${file.name.mysql.connector}"/>
 
-      
+      <!-- place latest Xalan jars to ensure they are used -->
+      <copy todir="${dir.distribution.jboss}/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
+      <copy todir="${dir.distribution.jboss}/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
+
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.assemble.jboss}/jboss/server/default/deploy">
          <fileset dir="${dir.deploy.jboss}" includes="${file.name.war.alfresco}" />
@@ -223,6 +226,10 @@
          <fileset dir="${dir.distribution.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
       </delete>
       <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
+
+      <!-- place latest Xalan jars to ensure they are used -->
+      <copy todir="${dir.distribution.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
+      <copy todir="${dir.distribution.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
 
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.assemble.tomcat}/tomcat/webapps">
