@@ -222,17 +222,18 @@ function getWindowHeight() {
 <#if document.isDocument >
    <#if hasAspect(document, "cm:versionable") == 1 >
                  <!-- lb: start repeat row -->
-      <#list document.versionHistory as record>
-         <#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('%2F', '/') />
+      <#list document.versionHistory?sort_by("versionLabel")?reverse as record>
                    <tr>
                        <td valign="top">
-                       <a href="#" onClick="window.external.openDocument('${webdavPath}')"><img src="/alfresco/images/taskpane/document.gif" border="0" alt="Open ${record.versionLabel}"/></a>
+                       <a href="/alfresco${document.url}"><img src="/alfresco/images/taskpane/document.gif" border="0" alt="Open ${record.versionLabel}"/></a>
                        </td>
                        <td style="line-height:16px;" width="100%">
                        <a href="#" title="Open ${record.versionLabel}"><span style="font-weight:bold;">${record.versionLabel}</span></a><br/>
                        Author: ${record.creator}<br/>
                        Date: ${record.createdDate?datetime}<br/>
-                       Notes: [notes]<br/>
+<#if record.description?exists>
+                       Notes: ${record.description}<br/>
+</#if>
                        </td>
                    </tr>
       </#list>
@@ -248,7 +249,7 @@ The current document is not versioned.<br>
 <#else>
                    <tr>
                        <td valign="top">
-The current document is not being managed by Alfresco.
+The current document is not managed by Alfresco.
                        </td>
                    </tr>
 </#if>

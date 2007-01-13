@@ -235,7 +235,7 @@ function getWindowHeight() {
 <div id="mycheckedoutdocsList">
           <table>
                  <tbody>
-<#assign query="@cm\\:lockOwner:${person.properties.userName}">
+<#assign query="@cm\\:workingCopyOwner:${person.properties.userName}">
    <#list companyhome.childrenByLuceneSearch[query] as child>
       <#if child.isDocument>
                    <!-- lb: start repeat -->
@@ -260,7 +260,7 @@ function getWindowHeight() {
                  </tbody>
           </table>
 </div>
-<div id="mytodoListHeader"><span style="font-weight:bold;">My to-do list</span>
+<div id="mytodoListHeader"><span style="font-weight:bold;">My Shortcuts</span>
 </div>
 
 <div id="mytodoList">
@@ -269,76 +269,42 @@ function getWindowHeight() {
             <!-- lb: start repeat -->
             <tr>
                 <td>
-                <a href="#"><img src="/alfresco/images/taskpane/task.gif" border="0" alt="Manage [task description]" /></a>
+                <a href="#"><img src="/alfresco${document.icon32}" border="0" alt="Open ${document.name}" /></a>
                 </td>
-                <td style="line-height:16px;" width="100%">
-                <a href="#" title="Manage [task name]">[task description]</a><br/>
-                Type:[type], ID:[id]<br/>
-                Created:[Date], Due Date:[Size]<br/>
+                <td width="100%">
+                <a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_browse}" title="Open ${document.name}">${document.name}</a><br/>
+<#if document.properties.description?exists>
+		${document.properties.description}
+</#if>
                 </td>
             </tr>
-            <!-- lb: end repeat -->
-             <!-- lb: start repeat -->
+<#if document.isDocument >
+<#assign webdavPath = (document.displayPath?substring(13) + '/' + document.name)?url('ISO-8859-1')?replace('%2F', '/') />
             <tr>
                 <td>
-                <a href="#"><img src="/alfresco/images/taskpane/task.gif" border="0" alt="Manage [task description]" /></a>
+                <a href="#" onClick="window.external.openDocument('${webdavPath}')"><img src="/alfresco${document.icon32}" border="0" alt="Open ${document.name}" /></a>
                 </td>
                 <td style="line-height:16px;" width="100%">
-                <a href="#" title="Manage [task name]">[task description]</a><br/>
-                Type:[type], ID:[id]<br/>
-                Created:[Date], Due Date:[Size]<br/>
+                <a href="#" onClick="window.external.openDocument('${webdavPath}')" title="Open ${document.name}">${document.name}</a><br/>
+<#if document.properties.description?exists>
+		${document.properties.description}<br/>
+</#if>
+                Modified: ${document.properties.modified?datetime}<br/>
                 </td>
             </tr>
-            <!-- lb: end repeat -->
-             <!-- lb: start repeat -->
-            <tr>
-                <td>
-                <a href="#"><img src="/alfresco/images/taskpane/task.gif" border="0" alt="Manage [task description]" /></a>
-                </td>
-                <td style="line-height:16px;" width="100%">
-                <a href="#" title="Manage [task name]">[task description]</a><br/>
-                Type:[type], ID:[id]<br/>
-                Created:[Date], Due Date:[Size]<br/>
-                </td>
-            </tr>
-            <!-- lb: end repeat -->
-             <!-- lb: start repeat -->
-            <tr>
-                <td>
-                <a href="#"><img src="/alfresco/images/taskpane/task.gif" border="0" alt="Manage [task description]" /></a>
-                </td>
-                <td style="line-height:16px;" width="100%">
-                <a href="#" title="Manage [task name]">[task description]</a><br/>
-                Type:[type], ID:[id]<br/>
-                Created:[Date], Due Date:[Size]<br/>
-                </td>
-            </tr>
-            <!-- lb: end repeat -->
-             <!-- lb: start repeat -->
-            <tr>
-                <td>
-                <a href="#"><img src="/alfresco/images/taskpane/task.gif" border="0" alt="Manage [task description]" /></a>
-                </td>
-                <td style="line-height:16px;" width="100%">
-                <a href="#" title="Manage [task name]">[task description]</a><br/>
-                Type:[type], ID:[id]<br/>
-                Created:[Date], Due Date:[Size]<br/>
-                </td>
-            </tr>
+</#if>
             <!-- lb: end repeat -->
           </table>
 </div>
 
 <div id="documentActions">
-<span style="font-weight:bold;">Document Actions</span><br/>
+<span style="font-weight:bold;">Other Actions</span><br/>
 <ul>
-<#assign currentPath = thisSpace.displayPath  + '/' + thisSpace.name />
-<#assign webdavPath = currentPath?substring(13)?url('ISO-8859-1')?replace('%2F', '/') />
-    <li><a href="#" onClick="window.external.saveToAlfresco('${webdavPath}')"><img src="/alfresco/images/taskpane/save_to_alfresco.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco">Save to Alfresco</a></li>
+    <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><b>Save to Alfresco</b></a> Allows you to place the current document under Alfresco management.</li>
+    <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><b>Browse Alfresco</b></a> Navigate around the Alfresco repository for documents.</li>
+    <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_search}"><b>Find Documents</b></a> Search Alfresco for documents by name and content.</li>
+    <li><a href="/alfresco/navigate/browse" target="_blank"><b>Launch Alfresco</b></a> Start the Alfresco Web Client.</li>
 </ul>
-<br>
-Currently in:<br>
-${currentPath}<br>
 </div>
 
 <div id="bottomMargin" style="height:24px;"><span id="statusArea">&nbsp;</span>
