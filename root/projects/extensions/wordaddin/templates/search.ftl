@@ -7,20 +7,78 @@
    </#if>
 </#list>
 
-<#if args.maxresults?exists>
-    <#assign maxresults=args.maxresults?number>
+<#if args.search?exists>
+   <#assign searchString = args.search>
+   <#if searchString != "">
+      <#assign queryString = "TEXT:\"${searchString}\" @cm\\:title:${searchString}">
+   </#if>
 <#else>
-    <#assign maxresults=10>
+   <#assign searchString = "">
+   <#assign queryString = "">
 </#if>
-<#assign rescount=1>
 
-<#if args.search1?exists><!-- If we have a search string display the search result -->
-    <#assign searchString = "TEXT:" + args.search1 + "*">
-    <#assign search1=args.search1>
-<#else>
-    <#assign searchString="">
-    <#assign search1="">
+<#if searchString != "">
+   <#if args.maxresults?exists>
+      <#assign maxresults=args.maxresults?number>
+   <#else>
+      <#assign maxresults=10>
+   </#if>
+
+   <#assign rescount=1>
+
+
+<!-- Start output -->
+          <table>
+                 <tbody>
+   <#assign results = companyhome.childrenByLuceneSearch[queryString] >
+   <#if results?size = 0>
+                 <tr><td>No results found.</td></tr>
+   <#else>
+      <#list results as child>
+            <!-- lb: start repeat -->
+         <#if child.isDocument>
+            <#if child.name?ends_with(".pdf")>
+               <#assign openURL = "/alfresco${child.url}">
+               <#assign hrefExtra = " target=\"_blank\"">
+            <#else>
+               <#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('%2F', '/')?replace('\'', '\\\'') />
+               <#assign openURL = "#">
+               <#assign hrefExtra = " onClick=\"window.external.openDocument('${webdavPath}')\"">
+            </#if>
+         <#else>
+            <#assign openURL = "/alfresco/template/workspace/SpacesStore/${child.id}/workspace/SpacesStore/${office_browse}?search=${searchString}&maxresults=${maxresults}">
+            <#assign hrefExtra = "">
+         </#if>
+                 <tr>
+                     <td>
+                    <a href="${openURL}" ${hrefExtra}><img src="/alfresco${child.icon32}" border="0" alt="Open ${child.name}" /></a>
+                     </td>
+                     <td width="100%">
+                     <a href="${openURL}" ${hrefExtra} title="Open ${child.name}">${child.name}</a><br/>
+         <#if child.properties.description?exists>
+                ${child.properties.description}<br/>
+         </#if>
+         <#if child.isDocument>
+                Modified: ${child.properties.modified?datetime}, Size: ${child.size / 1024} Kb<br/>
+         </#if>
+                       </td>
+                     </tr>
+            <!-- lb: end repeat -->
+         <#if rescount = maxresults>
+            <#break>
+         </#if>
+         <#assign rescount=rescount + 1>
+      </#list>
+	</#if>
+          </tbody>
+          </table>
+<!-- End output -->
+
 </#if>
+<!-- End of returning search results -->
+
+<!-- Display Search UI -->
+<#if !args.search?exists>
 
 <!DOCTYPE html
 PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
@@ -34,7 +92,69 @@ href="/alfresco/css/taskpane.css" />
 
 <script type="text/javascript">
 
-		function getWindowHeight() {
+var xmlHttp
+
+function GetXmlHttpObject()
+{
+   var objXMLHttp=null;
+   if (window.XMLHttpRequest)
+   {
+      objXMLHttp=new XMLHttpRequest()
+   }
+   else if (window.ActiveXObject)
+   {
+       objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
+   }
+
+   return objXMLHttp;
+}
+
+function showStatus(url)
+{
+//   alert(url);
+   xmlHttp=GetXmlHttpObject();
+   if (xmlHttp==null)
+   {
+       alert("Browser does not support HTTP Request");
+       return;
+   }
+   xmlHttp.onreadystatechange=stateChanged;
+   xmlHttp.open("GET",url+"&sid="+Math.random(),true);
+   xmlHttp.send(null);
+}
+
+function stateChanged()
+{
+   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
+   {
+      if (xmlHttp.responseText.indexOf("System Error") > 0)
+      {
+          var myWindow = window.open("", "_blank", "scrollbars,height=500,width=400");
+          myWindow.document.write(xmlHttp.responseText);
+      }
+      else
+      {
+          document.getElementById("searchResultsList").innerHTML=xmlHttp.responseText;
+          stripe('searchResultsList', '#fff', '#f6f8fa');
+      }
+      document.getElementById("statusArea").innerHTML="";
+   }
+}
+
+function runSearch()
+{
+   document.getElementById("statusArea").innerHTML="Searching...";
+   searchString = document.getElementById("searchText").value;
+   maxcount = document.getElementById("maxresults").value;
+   doSearch(searchString, maxcount);
+}
+
+function doSearch(searchString, maxcount)
+{
+   showStatus("/alfresco/template/workspace/SpacesStore/${office_search}/workspace/SpacesStore/${office_search}?search=" + searchString + "&maxresults=" + maxcount);
+}
+
+function getWindowHeight() {
 			var windowHeight = 0;
 			if (typeof(window.innerHeight) == 'number') {
 				windowHeight = window.innerHeight;
@@ -51,7 +171,8 @@ href="/alfresco/css/taskpane.css" />
 			}
 			return windowHeight;
 		}
-		function setContent() {
+
+function setContent() {
 			if (document.getElementById) {
 				var windowHeight = getWindowHeight();
 				if (windowHeight > 0) {
@@ -98,7 +219,7 @@ href="/alfresco/css/taskpane.css" />
      return result;
   }
 
- function stripe(id) {
+function stripe(id) {
 
     // the flag we'll use to keep track of
     // whether the current row is odd or even
@@ -159,82 +280,55 @@ href="/alfresco/css/taskpane.css" />
 </script>
 
 </head>
-<body>
+   <#if args.searchagain?exists>
+      <#assign onLoad = "onLoad = \"doSearch('${args.searchagain}', '${args.maxresults}');\"">
+   <#else>
+      <#assign onLoad = "">
+   </#if>
+<body ${onLoad}>
 
 
 
 <div id="tabBar">
     <ul>
-      <li><a href="/alfresco/template/workspace/SpacesStore/${office_home}/workspace/SpacesStore/${office_home}"><img src="/alfresco/images/taskpane/my_alfresco.gif" border="0" alt="My Alfresco" /></a></li>
-      <li><a href="/alfresco/template/workspace/SpacesStore/${office_browse}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_home}"><img src="/alfresco/images/taskpane/my_alfresco.gif" border="0" alt="My Alfresco" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" alt="Browse Spaces and Documents" /></a></li>
       <li id="current" style="padding-right:6px;"><a href="#"><img src="/alfresco/images/taskpane/search.gif" border="0" alt="Search Alfresco" /></a></li>
-      <li><a href="/alfresco/template/workspace/SpacesStore/${office_details}/workspace/SpacesStore/${office_details}"><img src="/alfresco/images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
-      <li><a href="#"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
-      <li><a href="#"><img src="/alfresco/images/taskpane/workflow.gif" border="0" alt="View Workflow Info" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_details}"><img src="/alfresco/images/taskpane/document_details.gif" border="0" alt="View Details" /></a></li>
+      <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_history}"><img src="/alfresco/images/taskpane/version_history.gif" border="0" alt="View Version History" /></a></li>
     </ul>
 </div>
 
 <div id="search">
-<form id="myinputform" name="simpleSearch" method="get" action="/alfresco/template/workspace/SpacesStore/${template.id}/workspace/SpacesStore/${template.id}" accept-charset="UTF-8" enctype="application/x-www-form-urlencoded">
-Search for <input id="search1" type="text" maxlength='1024' style='width:140px;font-size:10px' value="${search1}"/><input id="simpleSearchButton" name="simpleSearchButton" type="submit" value="Search" onclick="" class="button"/><br/>
-<br/>
-Show me results for<br/>
-<label><input type="radio" name="SearchFilter" checked="checked" value="all" />&#160;All Items</label><br/>
-<label><input type="radio" name="SearchFilter" value="files_text" />&#160;File names and contents</label><br/>
-<label><input type="radio" name="SearchFilter" value="files" />&#160;File names only</label><br/>
-<label><input type="radio" name="SearchFilter" value="folders" />&#160;Space names only</label><br/>
-<label><SELECT id="maxresults" NAME="maxresults" onchange="javascript:document.myinputform.submit();">
-        <OPTION id="10" name="10">10</OPTION>
-        <OPTION id="15" name="15">15</OPTION>
-        <OPTION id="20" name="20">20</OPTION>
-        <OPTION id="50" name="50">50</OPTION>
-        <OPTION id="100" name="100">100</OPTION>
-     </SELECT>&#160;results maximum</label><br/>
-</form>
+<table width="100%" border="0">
+   <tr valign="top">
+      <td align="left" valign="middle">
+         <span style='font-size:12px'>Search for </span><input type="text" id="searchText" name="searchText" value="" maxlength='1024' style='width:140px;font-size:10px'/><input type="button" name="simpleSearchButton" id="simpleSearchButton" class="button" onClick="javascript:runSearch();" value="Search"/><br/>
+<label><SELECT id="maxresults" NAME="maxresults" onchange="javascript:runSearch();">
+        <option id="5" name="5" value=5>5</option>
+        <option id="10" name="10" value=10>10</option>
+        <option id="15" name="15" value=15>15</option>
+        <option id="20" name="20" value=20>20</option>
+        <option id="50" name="50" value=50>50</option>
+        </select><span style='font-size:12px'>&#160;Items</span></label><br/>
+      </td>
+   </tr>
+</table>
 </div>
 
 <div id="searchResultsListHeader"><span style="font-weight:bold">Items Found</span></div>
 
 <div id="searchResultsList">
-<#if args.search1?exists><!-- If we have a search string display the search result -->
-<#assign search1 = args.search1>
-<#assign searchString = "TEXT:" + search1 + "*">
-<!-- <p>Search String: ${searchString}</p> -->
-<!-- <p>${search1}</p> -->
-
-          <table>
-                 <tbody>
-<#list companyhome.childrenByLuceneSearch[searchString] as child>
-            <!-- lb: start repeat -->
-                 <tr>
-                     <td>
-                    <a href="#"><img src="/alfresco${child.icon32}" border="0" alt="Open ${child.name}" /></a>
-                     </td>
-                     <td width="100%">
-                     <a href="#" title="Open ${child.name}">${child.name}</a><br/>
-<#if child.properties.description?exists>
-		${child.properties.description}<br/>
-</#if>
-<#if child.isDocument>
-                Modified: ${child.properties.modified?datetime}, Size: ${child.size / 1024} Kb<br/>
-</#if>
-                       </td>
-                     </tr>
-            </tr>
-            <!-- lb: end repeat -->
-<#if rescount = maxresults>
-    <#break>
-</#if>
-<#assign rescount=rescount + 1>
-</#list>
-          </tbody>
-          </table>
-<#else> <!-- No Search term arguement -->
-<p>No Search text given.</p>
-</#if>
+   <table>
+      <tbody>
+      </tbody>
+   </table>
 </div>
 
-<div id="bottomMargin">&nbsp;</div>
+<div id="bottomMargin" style="height:24px;"><span id="statusArea">&nbsp;</span>
+</div>
 
 </body>
 </html>
+</#if>
+<!-- End of Search UI -->

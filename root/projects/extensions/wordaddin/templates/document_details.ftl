@@ -176,6 +176,7 @@ function GetXmlHttpObject()
 <ul>
     <li><a href="#" onClick="javascript:runAction('checkout','${document.id}', '');"><img src="/alfresco/images/taskpane/checkout.gif" border="0" style="padding-right:6px;" alt="Check Out">Check Out</a></li>
     <li><a href="#" onClick="javascript:runAction('makepdf','${document.id}', '');"><img src="/alfresco/images/taskpane/makepdf.gif" border="0" style="padding-right:6px;" alt="Transform to PDF">Transform to PDF</a></li>
+    <li><a href="/alfresco/navigate/showDocDetails/workspace/SpacesStore/${document.id}" target="_blank"><img src="/alfresco/images/taskpane/document_details.gif" border="0" style="padding-right:6px;" alt="Open Full Details">Open Full Details</a></li>
 </ul>
 </div>
 

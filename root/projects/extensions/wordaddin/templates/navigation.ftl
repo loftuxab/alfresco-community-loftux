@@ -293,7 +293,7 @@ function getWindowHeight() {
 <#list thisSpace.children as child>
    <#if child.isDocument>
             <!-- lb: start repeat -->
-<#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('\\', '/') />
+<#assign webdavPath = (child.displayPath?substring(13) + '/' + child.name)?url('ISO-8859-1')?replace('%2F', '/') />
             <tr>
                 <td>
                 <a href="#" onClick="window.external.openDocument('${webdavPath}')"><img src="/alfresco${child.icon32}" border="0" alt="Open ${child.name}" /></a>
@@ -328,8 +328,11 @@ function getWindowHeight() {
 <span style="font-weight:bold;">Document Actions</span><br/>
 <ul>
 <#assign currentPath = thisSpace.displayPath  + '/' + thisSpace.name />
-<#assign webdavPath = currentPath?substring(13)?url('ISO-8859-1')?replace('%2F', '/') />
+<#assign webdavPath = currentPath?substring(13)?url('ISO-8859-1')?replace('%2F', '/')?replace('\'', '\\\'') />
     <li><a href="#" onClick="window.external.saveToAlfresco('${webdavPath}')"><img src="/alfresco/images/taskpane/save_to_alfresco.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco">Save to Alfresco</a></li>
+    <#if args.search?exists>
+    <li><a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_search}?searchagain=${args.search}&maxresults=${args.maxresults}"><img src="/alfresco/images/taskpane/placeholder.gif" border="0" style="padding-right:6px;" alt="Back to results">Back to search results</a></li>
+    </#if>
 </ul>
 </div>
 
