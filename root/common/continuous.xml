@@ -56,24 +56,24 @@
 
    <target name="prepare-virtual" depends="init">
       <!-- prepare virtualization server -->
-      <delete>
-         <fileset dir="${dir.distribution.virtualtomcat}"/>
+      <delete quiet="true">
+         <fileset dir="${dir.assemble.virtualtomcat}"/>
       </delete>
-      <copy todir="${dir.distribution.virtualtomcat}">
+      <copy todir="${dir.assemble.virtualtomcat}">
          <fileset dir="${dir.distribution.tomcat}" />
       </copy>
-      <copy todir="${dir.distribution.virtualtomcat}/server/lib" file="${dir.project.virtual}/build/dist/alfresco-catalina-virtual.jar" />
-      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.jndi}/build/dist/alfresco-jndi-client.jar" />
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-shared.properties"/>
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.password"/>
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.access"/>
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.jndi}/config/alfresco-virtserver-context.xml" />
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.jndi}/config/alfresco-virtserver.properties" />
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.virtual}/config/server.xml" overwrite="yes"/>
-      <copy todir="${dir.distribution.virtualtomcat}/conf" file="${dir.project.virtual}/config/web.xml"    overwrite="yes"/>
-      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.core}/build/dist/core.jar" />
-      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.repository}/build/dist/repository.jar" />
-      <copy todir="${dir.distribution.virtualtomcat}/common/lib" file="${dir.project.3rdparty}/lib/spring.jar" />
+      <copy todir="${dir.assemble.virtualtomcat}/server/lib" file="${dir.project.virtual}/build/dist/alfresco-catalina-virtual.jar" />
+      <copy todir="${dir.assemble.virtualtomcat}/common/lib" file="${dir.project.jndi}/build/dist/alfresco-jndi-client.jar" />
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-shared.properties"/>
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.password"/>
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.repository}/config/alfresco/alfresco-jmxrmi.access"/>
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.jndi}/config/alfresco-virtserver-context.xml" />
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.jndi}/config/alfresco-virtserver.properties" />
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.virtual}/config/server.xml" overwrite="yes"/>
+      <copy todir="${dir.assemble.virtualtomcat}/conf" file="${dir.project.virtual}/config/web.xml"    overwrite="yes"/>
+      <copy todir="${dir.assemble.virtualtomcat}/common/lib" file="${dir.project.core}/build/dist/core.jar" />
+      <copy todir="${dir.assemble.virtualtomcat}/common/lib" file="${dir.project.repository}/build/dist/repository.jar" />
+      <copy todir="${dir.assemble.virtualtomcat}/common/lib" file="${dir.project.3rdparty}/lib/spring.jar" />
    </target>
 
    <!-- ******************* -->
@@ -91,6 +91,9 @@
 
    <target name="distribute-jboss-windows" depends="init">
       <zip destfile="${dir.dist}/${file.name.dist.jboss}.zip">
+         <!-- Add standard jboss distribution -->
+         <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
+         <!-- now overlay Alfresco webapp extras -->
          <zipfileset dir="${dir.assemble.jboss}" />
          <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
          <zipfileset dir="${dir.project.installer}" includes="jboss/alfresco.bat" fullpath="alfresco.bat" />
@@ -100,14 +103,18 @@
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
          <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <zipfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.sh" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
+         <zipfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </zip>
    </target>
 
    <target name="distribute-jboss-linux" depends="init">
       <tar destfile="${dir.dist}/${file.name.dist.jboss}.tar" longfile="gnu">
+         <!-- Add standard jboss distribution -->
+         <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
+         <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
+         <!-- now overlay Alfresco webapp extras -->
          <tarfileset dir="${dir.assemble.jboss}" />
          <tarfileset dir="${dir.project.installer}" includes="${files.installer.linux}" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/alfresco.sh" fullpath="alfresco.sh" mode="755" />
@@ -119,8 +126,7 @@
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
          <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
-         <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.jboss}.tar" />
       <delete file="${dir.dist}/${file.name.dist.jboss}.tar" />
@@ -180,6 +186,9 @@
 
    <target name="distribute-tomcat-windows" depends="init">
       <zip destfile="${dir.dist}/${file.name.dist.tomcat}.zip">
+         <!-- Add standard tomcat distribution -->
+         <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
+         <!-- now overlay Alfresco webapp extras -->
          <zipfileset dir="${dir.assemble.tomcat}" />
          <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/alfresco.bat" fullpath="alfresco.bat" />
@@ -189,15 +198,18 @@
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
          <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <zipfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh" />
-         <zipfileset dir="${dir.distribution.virtualtomcat}" prefix="virtual-tomcat" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
+         <zipfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </zip>
    </target>
 
    <target name="distribute-tomcat-linux" depends="init">
       <tar destfile="${dir.dist}/${file.name.dist.tomcat}.tar" longfile="gnu">
+         <!-- Add standard tomcat distribution -->
+         <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
+         <!-- now overlay Alfresco webapp extras -->
          <tarfileset dir="${dir.assemble.tomcat}" />
          <tarfileset dir="${dir.project.installer}" includes="${files.installer.linux}" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/alfresco.sh" fullpath="alfresco.sh" mode="755" />
@@ -209,9 +221,7 @@
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
          <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <tarfileset dir="${dir.distribution.tomcat}" prefix="tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
-         <tarfileset dir="${dir.distribution.virtualtomcat}" prefix="virtual-tomcat" />
-         <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.tomcat}.tar.gz" src="${dir.dist}/${file.name.dist.tomcat}.tar" />
       <delete file="${dir.dist}/${file.name.dist.tomcat}.tar" />
@@ -228,8 +238,8 @@
       <copy todir="${dir.distribution.tomcat}/common/lib" file="${dir.common.lib}/${file.name.mysql.connector}" />
 
       <!-- place latest Xalan jars to ensure they are used -->
-      <copy todir="${dir.distribution.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
-      <copy todir="${dir.distribution.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
+      <copy todir="${dir.assemble.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
+      <copy todir="${dir.assemble.tomcat}/common/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
 
       <!-- copy project files common to both platforms -->
       <copy todir="${dir.assemble.tomcat}/tomcat/webapps">
@@ -281,7 +291,7 @@
    <target name="assemble-war-common" depends="init">
       <mkdir dir="${dir.assemble.war}"/>
       <copy todir="${dir.assemble.war}">
-         <fileset dir="${dir.project.installer}" includes="*.sql,licenses/**,AlfrescoTest.pdf, README_war.txt" />
+         <fileset dir="${dir.project.installer}" includes="*.sql,licenses/**, README_war.txt" />
          <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
       </copy>
       <copy todir="${dir.assemble.war}/extensions/extension">
