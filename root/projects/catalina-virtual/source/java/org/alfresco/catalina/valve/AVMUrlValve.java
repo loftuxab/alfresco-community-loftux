@@ -21,11 +21,10 @@
 *
 *  NOTE:
 *     RFCs regarding hostnames & fully qualified domain names (FQDN):
-*     608, 810, 608, 952, 1035, and 1123.   Plowing through this mess
-*     was fairly confusing, but in the end, I believe the following
-*     perl regex probably defines a valid host name:
+*     608, 810, 608, 952, 1035, and 1123.   The following PCRE-style
+*     regex defines a valid label within a FQDN:
 *
-*            /^[a-z0-9][a-z0-9-]{0,61}[a-z0-9]$/i
+*          ^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$
 *
 *     Less formally:
 *
@@ -50,6 +49,18 @@
 *     and the total length is less than 255 chars:
 *
 *     moo.cow.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
+*
+*     Ultimately, I18N-encoded domain names will be supported via the IDNA 
+*     (Internationalizing Domain Names In Applications) standard.   
+*     IDNA encodes host labels that would normally contain I18N chars using 
+*     a "xn--" prefix.  Apps present IDNA URLs in decoded form, but only
+*     the "traditional" DNS characters ever go over the wire.  For details,
+*     see RFC-3490 (http://www.ietf.org/rfc/rfc3490.txt)
+*     and RFC-3492 (http://www.ietf.org/rfc/rfc3492.txt).
+*
+*     The encoding scheme used for virtualization has been designed to
+*     be IDNA-friendly; when GUI support becomes available, no changes
+*     will be needed as far as the virtualization logic is concnered.
 *
 *----------------------------------------------------------------------------*/
 
@@ -145,6 +156,73 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     {
     }
 
+    /**
+    *  Transforms a version (e.g.: -1), a storeName (e.g.:  "mysite--alice"),
+    *  and a webappName (e.g.: "ROOT") into a virtualized context name
+    *  (e.g.:  "/$-1$mysite--alice$ROOT")
+    */
+    public static String GetContextNameFromStoreName( String version, 
+                                                      String storeName, 
+                                                      String webappName
+                                                    )
+    {
+        return  "/"         +    // context paths start with "/"
+                "$"         +    // delimiter
+                version     +    // TODO: ".version--vXXXXX."
+                "$"         +    // delimiter
+                storeName   +    // (...).www--sandbox.
+                "$"         +    // delimiter
+                webappName;
+    }
+
+    /**
+    *  Transforms a version (e.g.: -1), a storeName (e.g.:  "mysite--alice"),
+    *  and a webappName (e.g.: "ROOT") into a virtualized context name
+    *  (e.g.:  "/$-1$mysite--alice$ROOT")
+    */
+    public static String GetContextNameFromStoreName( int    version, 
+                                                      String storeName, 
+                                                      String webappName
+                                                    )
+    {
+        return  "/"         +    // context paths start with "/"
+                "$"         +    // delimiter
+                version     +    // TODO: ".version--vXXXXX."
+                "$"         +    // delimiter
+                storeName   +    // (...).www--sandbox.
+                "$"         +    // delimiter
+                webappName;
+    }
+
+
+
+    /**
+    *  Transforms a version (e.g.: -1), and a storePath 
+    *  (e.g.:  "mysite--alice:/www/avm_webapps/ROOT")
+    *  into a virtualized context name (e.g.:  "/$-1$mysite--alice$ROOT").
+    *  On failure, null is returned.
+    */
+    public static String GetContextNameFromStorePath( int    version, 
+                                                      String storePath
+                                                    )
+    {
+        int store_tail  = storePath.indexOf(':');
+        int webapp_head = storePath.lastIndexOf('/') + 1;
+
+        if ( (store_tail < 0 )   || 
+             (webapp_head <= 0 ) || 
+             (webapp_head >= storePath.length())
+           ) 
+        { 
+            return null; 
+        }
+
+        String store_name   = storePath.substring(0, store_tail);
+        String webapp_name  = storePath.substring(webapp_head, storePath.length() );
+        return  "/$" + version + "$" + store_name + "$" + webapp_name; 
+    }
+
+
 
     /**
     * This method is called by Tomcat's pipeline mechanism on every new request.
@@ -212,6 +290,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             //
             // After unmangling:
             //   /servlets-examples/servlet/RequestInfoExample
+            //
+            // Note that it's critical that the mangled URI
+            // contains all the repository & version information
+            // needed within its first "/"-delimited segment.
+            // This allows J2EE Mapper logic to work as-is.
+
 
             decoded_uri = unMangleAVMuri( decoded_uri );
             request_uri = unMangleAVMuri( request_uri );
@@ -385,12 +469,14 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         // The request seen at runtime needs to be rewritten to match this
         // scheme so that the proper Context is fetched by "path"
 
-        String  uri_prefix = "/"        +    // context paths start with "/"
-                            "$"         +    // delimiter
-                             version    +    // v-(...)   in subdomain name
-                            "$"         +    // delimiter
-                            repo_name   +    // www-(...) in subdomain name
-                            "$";             // delimiter
+
+        // Give a fake webapp name for now: ""
+        // This lets us append it later when we know the real value.
+        //
+        String uri_prefix = GetContextNameFromStoreName( version, 
+                                                         repo_name,
+                                                         ""
+                                                       );
 
 
         // In the URI:  /moo/cow/egg.html, the first_segment is
@@ -469,15 +555,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             adapter.service(req, resp );
 
             //
-            // If you try to set headers afterwards,
-            // thw isCommitted() flag might be set,
-            // and the output already sent to the 
-            // any browser.   Therefore, it's better
-            // do fiddle with most output headers
-            // in a Filter (other than Location).
-            // Filters are more portable anyhow, because
-            // they're part of the J2EE spec 
-            // (sadly, the Valve construct isn't)
+            // If you try to set headers afterwards, the isCommitted()
+            // flag might be set, and the output already sent to the 
+            // any browser.   Therefore, it's better do fiddle with 
+            // most output headers in a Filter (other than Location).
+            // Filters are more portable anyhow, because they're part 
+            // of the J2EE spec (sadly, the Valve construct isn't).
 
 
             // The Mapper will redirect a path to a DirContext
@@ -491,12 +574,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             //
             // Consider following request:
             //
-            //     http://www-repo-1.avm.alfresco.localhost:8080/my_webapp
+            //  http://alice.mysite.www-sandbox.ip.localdomain.lan:8180/my_webapp
             //
             // This can Generates a 302 (SC_FOUND) response with
             // a Location header along the lines of:
             //
-            //Location: http://avm.alfresco.localhost:8080/$-1$repo-1$my_webapp/
+            //Location: http://avm.alfresco.localhost:8080/$-1$alice$my_webapp/
             //
             // This isn't what we really want, because proper virtualization
             // relies upon preserving the reverse proxy name on the client's
