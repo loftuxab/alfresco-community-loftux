@@ -29,7 +29,7 @@
 
 <!-- Start output -->
           <table>
-                 <tbody>
+                 <tbody style="font-family: tahoma, sans-serif; font-size: 11px;">
    <#assign results = companyhome.childrenByLuceneSearch[queryString] >
    <#if results?size = 0>
                  <tr><td>No results found.</td></tr>
@@ -153,6 +153,28 @@ function doSearch(searchString, maxcount)
 {
    showStatus("/alfresco/template/workspace/SpacesStore/${office_search}/workspace/SpacesStore/${office_search}?search=" + searchString + "&maxresults=" + maxcount);
 }
+
+function handleTextEnter(e) {
+   var keycode;
+
+   // get the keycode
+   if (window.event) 
+   {
+      keycode = window.event.keyCode;
+   }
+   else if (e)
+   {
+      keycode = e.which;
+   }   
+   // if ENTER was pressed execute the query
+   if (keycode == 13)
+   {  
+      runSearch();
+      return false;
+   }
+   return true;
+}
+
 
 function getWindowHeight() {
 			var windowHeight = 0;
@@ -300,17 +322,17 @@ function stripe(id) {
 </div>
 
 <div id="search">
-<table width="100%" border="0">
+<table width="100%" border="0" style="font-family: tahoma, sans-serif; font-size: 11px;">
    <tr valign="top">
       <td align="left" valign="middle">
-         <span style='font-size:12px'>Search for </span><input type="text" id="searchText" name="searchText" value="" maxlength='1024' style='width:140px;font-size:10px'/><input type="button" name="simpleSearchButton" id="simpleSearchButton" class="button" onClick="javascript:runSearch();" value="Search"/><br/>
+         Search for <input type="text" id="searchText" name="searchText" value="" maxlength='1024' style='width:140px;font-size:10px' onkeyup="return handleTextEnter(event);" /><input type="button" name="simpleSearchButton" id="simpleSearchButton" class="button" onClick="javascript:runSearch();" value="Search"/><br/>
 <label><SELECT id="maxresults" NAME="maxresults" onchange="javascript:runSearch();">
         <option id="5" name="5" value=5>5</option>
         <option id="10" name="10" value=10>10</option>
         <option id="15" name="15" value=15>15</option>
         <option id="20" name="20" value=20>20</option>
         <option id="50" name="50" value=50>50</option>
-        </select><span style='font-size:12px'>&#160;Items</span></label><br/>
+        </select>&#160;Items</label><br/>
       </td>
    </tr>
 </table>

@@ -299,12 +299,14 @@ function getWindowHeight() {
 
 <div id="documentActions">
 <span style="font-weight:bold;">Other Actions</span><br/>
+<div id="yellowbox" style="background:#ffffcc;border: 1px solid #cccccc; margin-top:6px; padding-bottom:6px;">
 <ul>
-    <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><b>Save to Alfresco</b></a> Allows you to place the current document under Alfresco management.</li>
-    <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><b>Browse Alfresco</b></a> Navigate around the Alfresco repository for documents.</li>
-    <li><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_search}"><b>Find Documents</b></a> Search Alfresco for documents by name and content.</li>
-    <li><a href="/alfresco/navigate/browse" target="_blank"><b>Launch Alfresco</b></a> Start the Alfresco Web Client.</li>
+    <li style="padding-bottom:4px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/save_to_alfresco.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco"><b>Save to Alfresco</b></a><br> Allows you to place the current document under Alfresco management.</li>
+    <li style="padding-bottom:4px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" style="padding-right:6px;" alt="Browse"><b>Browse Alfresco</b></a><br> Navigate around the Alfresco repository for documents.</li>
+    <li style="padding-bottom:4px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_search}"><img src="/alfresco/images/taskpane/search.gif" border="0" style="padding-right:6px;" alt="Search"><b>Find Documents</b></a><br> Search Alfresco for documents by name and content.</li>
+    <li style="padding-bottom:4px;"><a href="/alfresco/navigate/browse" target="_blank"><img src="/alfresco/images/logo/AlfrescoLogo16.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco"><b>Launch Alfresco</b></a><br> Start the Alfresco Web Client.</li>
 </ul>
+</div>
 </div>
 
 <div id="bottomMargin" style="height:24px;"><span id="statusArea">&nbsp;</span>

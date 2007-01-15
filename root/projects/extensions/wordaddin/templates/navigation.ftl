@@ -243,7 +243,7 @@ function getWindowHeight() {
                 </tr>
                 <tr>
                 <td>
-<#if space.properties.description?exists>
+<#if thisSpace.properties.description?exists>
 		${thisSpace.properties.description}
 </#if>
                 </td>

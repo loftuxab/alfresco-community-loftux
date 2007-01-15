@@ -184,9 +184,8 @@ function GetXmlHttpObject()
                        No actions available.
 </#if>
 
-<spanid="statusArea">&nbsp;</span>
-
-<div id="bottomMargin">&nbsp;</div>
+<div id="bottomMargin"><span id="statusArea">&nbsp;</span>
+</div>
 
 
 </body>
