@@ -115,6 +115,7 @@ import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.util.JNDIPath;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
@@ -128,7 +129,7 @@ import org.springframework.context.support.FileSystemXmlApplicationContext;
 public class AVMFileDirContext extends  
              org.apache.naming.resources.FileDirContext  
 {
-    // AVMFileDirAppBase_  is used by AVMHost as a prefix
+    // AVMFileDirMountPoint_  is used by AVMHost as a prefix
     // for the host appBase.  This makes it easy for JNDI
     // to recognize all paths (from all AVMHost-based 
     // virtual hosts) that belong to it.
@@ -137,10 +138,10 @@ public class AVMFileDirContext extends
     // if the following dir isn't "absolute", then the application base
     // gets prepended (e.g.: on windows "c:/alfresco-.../virtual-tomcat").
     //
-    // A little extra fancy footwork is neede here because of the
+    // A little extra fancy footwork is needed here because of the
     // order in which various services come up.  For this resson, 
-    // AVMFileDirAppBase_ is actually set via a call to 
-    // setAVMFileDirAppBase() within VirtServerRegistrationThread.
+    // AVMFileDirMountPoint_ is actually set via a call to 
+    // setAVMFileDirMountPoint() within VirtServerRegistrationThread.
     //
     //
     // Examples:
@@ -149,19 +150,25 @@ public class AVMFileDirContext extends
     //            Windows :  "v" or "v:" or "v:/"
     //                       (where 'v' is any drive letter)
     //
-    static protected String   AVMFileDirAppBase_; 
+    static protected String   AVMFileDirMountPoint_; 
 
 
-    public static final String getAVMFileDirAppBase() { return AVMFileDirAppBase_; }
+    public static final String getAVMFileDirMountPoint() { return AVMFileDirMountPoint_; }
 
     /** 
     *  @exclude
     *  Sets the base dir for JNDI paths.   
     *  Typically, this function is only called at startup time
-    *  by the VirtServerRegistrationThread.
+    *  by the VirtServerRegistrationThread.  After the first
+    *  call to this function, this function becomes a no-op.
+    *
+    * @return true iff sucessful
+    *
     */
-    public static final void  setAVMFileDirAppBase( String mount_point)
-    { AVMFileDirAppBase_ = mount_point; }
+    public static final void setAVMFileDirMountPoint( String mount_point)
+    { 
+        if ( AVMFileDirMountPoint_ == null ) { AVMFileDirMountPoint_ = mount_point; }
+    }
 
     // setDocBase() examples:
     //
@@ -322,11 +329,11 @@ public class AVMFileDirContext extends
     {
         Service_refcount_ -- ;
 
-        log.info("AVMFileDirContext.ReleaseAVMRemote() refcount now: " +  Service_refcount_ );
+        log.debug("AVMFileDirContext.ReleaseAVMRemote() refcount now: " +  Service_refcount_ );
 
         if ( Service_refcount_ == 0 )
         {
-            log.info("AVMFileDirContext.ReleaseAVMRemote() closing " +
+            log.debug("AVMFileDirContext.ReleaseAVMRemote() closing " +
                       "FileSystemXmlApplicationContext (refcount dropped to 0)");
 
 
@@ -383,7 +390,7 @@ public class AVMFileDirContext extends
     {
         super();
 
-        log.info("AVMFileDirContext:  AVMFileDirContext()");
+        log.debug("AVMFileDirContext:  AVMFileDirContext()");
 
 
         // This AVMFileDirContext corresponds to a top-level web application
@@ -457,7 +464,7 @@ public class AVMFileDirContext extends
         //
         // Instead it will look something in a deeper directory.
 
-        log.info("AVMFileDirContext:  AVMFileDirContext(env)");
+        log.debug("AVMFileDirContext:  AVMFileDirContext(env)");
     }
 
 
@@ -507,10 +514,28 @@ public class AVMFileDirContext extends
     {
         // Called once for every virtual webapp
         //
-        // new Exception("AVMFileDirContext setDocBase Stack trace: " + 
-        //               docBase).printStackTrace();
+        // The docBase will look like this:
         //
-        //  Here's the convoluted way this function is called at startup:
+        // <mount>/<store-name>/VERSION/v<version>/DATA/www/avm_webapps/ROOT
+        // /foo/cifs/mysite--xx/VERSION/v123456789/DATA/www/avm_webapps/ROOT
+        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~       ~~~ ~~~~~~~~~~~ ~~~~
+        //    ^         ^                   ^           ^        ^       ^
+        //    |         |                   |           |        |       |
+        // <mount>  <store-name>         <version>  <www_base> <app_base> <doc_base>
+        //    ^
+        //    |
+        // AVMFileDirMountPoint_
+        //
+        //
+        // Note that care is taken here to make the docBase line up
+        // with the CIFS <mount> point.  This enables servlet/JSP
+        // functions like getRealPath() to work properly (assuming
+        // the CIFS mount itself is up).
+        //
+        //
+        //  The convoluted way this function is called at startup can be see via:
+        //     new Exception("AVMFileDirContext setDocBase Stack trace: " + 
+        //                    docBase).printStackTrace();
         //
         //        at org.alfresco.jndi.AVMFileDirContext.setDocBase(AVMFileDirContext.java:496)
         //        at org.apache.catalina.core.StandardContext.resourcesStart(StandardContext.java:3812)
@@ -560,23 +585,8 @@ public class AVMFileDirContext extends
         //      /opt/apache-tomcat-5.5.15/server/webapps/manager
         //      /opt/apache-tomcat-5.5.15/server/webapps/host-manager
 
-        // Current docBase::
-        //  /alfresco.avm/avm.alfresco.localhost/$-1$mysite:/www/avm_webapps/ROOT
-        //
-        // Desired docBase:
-        // <mount>/<repo-name>/VERSION/v<version>/DATA/www/avm_webapps/ROOT
-        // /foo/cifs/mysite--x/VERSION/v123456789/DATA/www/avm_webapps/ROOT
-        // ~~~~~~~~~ ~~~~~~~~~          ~~~~~~~~       ~~~ ~~~~~~~~~~~ ~~~~
-        //    ^         ^                   ^           ^        ^       ^
-        //    |         |                   |           |        |       |
-        // <mount>  <repo-name>         <version>  <www_base> <app_base> <doc_base>
-        //    ^
-        //    |
-        // AVMFileDirAppBase_
-        //
 
-
-        log.info("AVMFileDirContext:  setDocBase(): " + docBase);
+        log.debug("AVMFileDirContext:  setDocBase(): " + docBase);
 
         // Validate the format of the proposed document root
         if (docBase == null)
@@ -585,10 +595,10 @@ public class AVMFileDirContext extends
         }
 
         if ( infer_webresources_from_docBase_  && 
-             docBase.startsWith( AVMFileDirAppBase_ )
+             docBase.startsWith( AVMFileDirMountPoint_ )
            )
         {
-            log.info("AVMFileDirContext:  USING AVM for: " + docBase );
+            log.debug("AVMFileDirContext:  USING AVM for: " + docBase );
 
             use_AVMRemote_ = true;
         }
@@ -600,11 +610,11 @@ public class AVMFileDirContext extends
         }
 
         // Because java does not let me say:  super.super
-        // I cannot easily reuse code from BaseDirContext
-        // therefore, I have to set this by hand here via
+        // it's hard to reuse code from BaseDirContext.
+        // Therefore, I have to set this by hand here via
         // cut/paste.  Actually, this is a JVM constraint,
-        // so there's no way to do it on any JVM-based
-        // language (due to the way 'invokespecial' is
+        // so there's no way to do it within *any* JVM-based
+        // language; this is due to the way 'invokespecial' is
         // treated by the JVM spec).   Quite annoying.
         //
         // Think about this for a moment:
@@ -631,80 +641,63 @@ public class AVMFileDirContext extends
         //    Change the document root property
         this.docBase = docBase;
 
-        log.info("AVMFileDirContext:  setDocBase() using AVMRemote for: " + docBase);
 
-        // Given a call to setDocBase() with a value:
+        // Implementation note
+        // -------------------
         //
-        // On Unix:
+        // The reason for preferrring VERSION paths over HEAD-style
+        // JNDI paths is that al you have to do to shift to another
+        // version is change the v-... value.
+        //
+        // For example:
         //   /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
         //
-        // On Windows:
+        // can become:
+        //   /media/alfresco/cifs/v/mysite--guest/VERSION/v-99/DATA/www/avm_webapps/ROOT
+        //
+        // The only transformation requires was "v-1" -->  "v-99". 
+        //
+        // Compare that to what you'd need to do in order to re-write a HEAD path
+        // (which is equivalent to a "v-1" VERSION path to version 99:
+        //
+        //   /media/alfresco/cifs/v/mysite--guest/HEAD/DATA/www/avm_webapps/ROOT
+        //   --->
+        //   /media/alfresco/cifs/v/mysite--guest/VERSION/v-99/DATA/www/avm_webapps/ROOT
+        //
+        // Thus, while HEAD-style paths are nice for interactive use,
+        // VERSION-style paths are better for programmatic access.
+        // because they're fully general.
+        //
+        // 
+        // On Unix, setDocBase() will get called with docBase values like:
+        //   /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
+        //
+        // On Windows, docBase values will look more like:
         //   v:\mysite--guest\VERSION\v-1\DATA\www\avm_webapps\ROOT
         //
-        // We want:
+        // In either case, we want:
         //     avmDocBase      == "mysite--guest:/www/avm_webapps/ROOT"
         //     and avmVersion_ == -1
-
-        int repo_head = AVMFileDirAppBase_.length();
-        if  (AVMFileDirAppBase_.charAt( repo_head -1 ) != File.separatorChar)
-        {
-            repo_head += 1;
-        }
-
-        int     repo_tail = docBase.indexOf( File.separatorChar, repo_head);
-        String  repo_name = docBase.substring(repo_head,repo_tail);
-        int     vers_head = repo_tail + "/VERSION/v".length();
-
-        if ( vers_head < 0) 
-        {
-            throw new IllegalArgumentException(
-                        sm.getString("fileResources.base", docBase));
-        }
-
-        int vers_tail = docBase.indexOf( File.separatorChar , vers_head );
-
-        if ( vers_tail < 0) 
-        {
-            throw new IllegalArgumentException(
-                        sm.getString("fileResources.base", docBase));
-        }
-
+        // 
+        // JNDIPath encapsulates the logic to do this, but assumes
+        // VERSION path to DATA  (i.e.: it's not written for HEAD-paths.
+        // This is ok, because that's all we ever do here.
 
         try 
         {
-            String vers_string =   docBase.substring( vers_head, vers_tail);
-            avmRootVersion_ = Integer.parseInt( vers_string);
+            JNDIPath jndi_path = new JNDIPath(  AVMFileDirMountPoint_, docBase);
+
+            avmDocBase_     = jndi_path.getAvmPath();
+            avmRootVersion_ = jndi_path.getAvmVersion();
+
+            log.debug("AVMFileDirContext.setDocBase avmDocBase_    : " + avmDocBase_);
+            log.debug("AVMFileDirContext.setDocBase avmRootVersion_: " + avmRootVersion_);
         }
-        catch (Exception e ) 
-        { 
-            // If malformed, assume -1  (HEAD)
-            // TODO:  issue a warning here?
-            //
-            avmRootVersion_ = -1; 
-        }
-
-        String repo_relpath = docBase.substring( vers_tail + "/DATA".length(),
-                                                 docBase.length()
-                                                );
-
-        avmDocBase_  = repo_name + ":" + repo_relpath;
-
-
-        // Within the AVM, the file seperator char is '/'.
-        // Therefore, on Windows, make sure that the avmDocBase_
-        // is normalized to use '/'
-        //
-        if ( File.separatorChar != '/' )
+        catch (Exception path_exception)
         {
-            avmDocBase_ = avmDocBase_.replace(  File.separatorChar , '/');
+            throw new IllegalArgumentException( 
+                sm.getString("fileResources.base", docBase), path_exception);
         }
-
-
-        log.info("AVMFileDirContext.setDocBase avmDocBase_    : " + avmDocBase_);
-        log.info("AVMFileDirContext.setDocBase avmRootVersion_: " + avmRootVersion_);
-
-
-        // TODO:  verify that docBase exists, is a dir, and can be read
     }
 
 
@@ -731,7 +724,7 @@ public class AVMFileDirContext extends
 
     public void allocate() 
     {
-        log.info("AVMFileDirContext:  allocate()");
+        log.debug("AVMFileDirContext:  allocate()");
         if ( use_AVMRemote_ ) 
         {
             // TODO: ensure we got an AVMRemote connection
@@ -747,7 +740,7 @@ public class AVMFileDirContext extends
      */
     public void release() 
     {
-        log.info("AVMFileDirContext:  release()");
+        log.debug("AVMFileDirContext:  release()");
 
         if ( use_AVMRemote_ ) 
         {
@@ -781,8 +774,8 @@ public class AVMFileDirContext extends
 
         if (! use_AVMRemote_ ) 
         { 
-            log.info("AVMFileDirContext:  lookup(): " + this.base + " + " + name);
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("AVMFileDirContext:  lookup(): " + this.base + " + " + name);
+            log.debug("    AVMFileDirContext: using file system");
             return super.lookup( name ); 
         }
 
@@ -790,7 +783,7 @@ public class AVMFileDirContext extends
         if (  name.charAt(0) != '/') { repo_path = avmDocBase_ + "/" + name; }
         else                         { repo_path = avmDocBase_ + name; }
 
-        log.info("AVMFileDirContext:  AVM lookup(): " + repo_path );
+        log.debug("AVMFileDirContext:  AVM lookup(): " + repo_path );
 
         AVMNodeDescriptor avm_node = null;
 
@@ -799,7 +792,7 @@ public class AVMFileDirContext extends
             avm_node = Service_.lookup(avmRootVersion_, repo_path); 
             if (avm_node == null)
             {
-                log.info("AVMFileDirContext:  lookup() not found: " +  repo_path);
+                log.debug("AVMFileDirContext:  lookup() not found: " +  repo_path);
                 throw new NamingException(sm.getString("resources.notFound", repo_path));
             }
         }
@@ -807,7 +800,7 @@ public class AVMFileDirContext extends
         {
             // TODO: emit message in exception e
 
-            log.info("AVMFileDirContext:  lookup() not found: " +  repo_path);
+            log.debug("AVMFileDirContext:  lookup() not found: " +  repo_path);
             throw new NamingException(sm.getString("resources.notFound", repo_path));
         }
 
@@ -815,7 +808,7 @@ public class AVMFileDirContext extends
 
         if ( avm_node.isDirectory() ) 
         {
-            log.info("AVMFileDirContext:  lookup creating AVMFileDirContext(env) for dir: " +  avm_node.getPath() );
+            log.debug("AVMFileDirContext:  lookup creating AVMFileDirContext(env) for dir: " +  avm_node.getPath() );
 
             AVMFileDirContext tempContext = new AVMFileDirContext(env);
             tempContext.setUseAVMRemote( use_AVMRemote_ );
@@ -827,7 +820,7 @@ public class AVMFileDirContext extends
         } 
         else 
         {
-            log.info("AVMFileDirContext:  lookup creating AVMFileResource for file: " +   avm_node.getPath() );
+            log.debug("AVMFileDirContext:  lookup creating AVMFileResource for file: " +   avm_node.getPath() );
 
             // The goal here is to create the AVMFileResource 
             // using an object that will be sufficient to stream
@@ -858,11 +851,11 @@ public class AVMFileDirContext extends
     public void unbind(String name)
         throws NamingException 
     {
-        log.info("AVMFileDirContext:  unbind(): " + name);
+        log.debug("AVMFileDirContext:  unbind(): " + name);
 
         if ( ! use_AVMRemote_ ) 
         { 
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.unbind( name ); 
             return;
         }
@@ -928,11 +921,11 @@ public class AVMFileDirContext extends
         throws NamingException 
     {
 
-        log.info("AVMFileDirContext:  rename(): " + oldName + " " + newName);
+        log.debug("AVMFileDirContext:  rename(): " + oldName + " " + newName);
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.rename(oldName, newName); 
             return;
         }
@@ -974,7 +967,7 @@ public class AVMFileDirContext extends
     {
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system for list(): " + name);
+            log.debug("    AVMFileDirContext: using file system for list(): " + name);
 
             // The following line is what makes me need to suppress "unchecked":
             return  super.list( name );
@@ -984,7 +977,7 @@ public class AVMFileDirContext extends
         if (  name.charAt(0) != '/') { repo_path = avmDocBase_ + "/" + name; }
         else                         { repo_path = avmDocBase_ + name; }
 
-        log.info("    AVMFileDirContext list() using AVMRemote for: " + repo_path);
+        log.debug("    AVMFileDirContext list() using AVMRemote for: " + repo_path);
 
         AVMNodeDescriptor avm_node = null;
 
@@ -1050,7 +1043,7 @@ public class AVMFileDirContext extends
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("AVMFileDirContext:  listBindings() file system: " + this.base + " + " + name);
+            log.debug("AVMFileDirContext:  listBindings() file system: " + this.base + " + " + name);
 
             // The following line is what makes me need to suppress "unchecked":
             return super.listBindings(name);
@@ -1062,7 +1055,7 @@ public class AVMFileDirContext extends
 
         AVMNodeDescriptor avm_node = null;
 
-        log.info("AVMFileDirContext:  listBindings() AVM: " + repo_path);
+        log.debug("AVMFileDirContext:  listBindings() AVM: " + repo_path);
 
         try 
         { 
@@ -1112,11 +1105,11 @@ public class AVMFileDirContext extends
      */
     public void destroySubcontext(String name) throws NamingException 
     {
-        log.info("AVMFileDirContext:  destroySubcontext(): " + name );
+        log.debug("AVMFileDirContext:  destroySubcontext(): " + name );
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.destroySubcontext(name);
             return;
         }
@@ -1138,11 +1131,11 @@ public class AVMFileDirContext extends
     public Object lookupLink(String name) throws NamingException 
     {
         // Note : Links are not supported
-        log.info("AVMFileDirContext:  lokupLink(): " + name );
+        log.debug("AVMFileDirContext:  lokupLink(): " + name );
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             return super.lookupLink( name );
         }
 
@@ -1169,11 +1162,11 @@ public class AVMFileDirContext extends
      */
     public String getNameInNamespace() throws NamingException 
     {
-        log.info("AVMFileDirContext:  getNameInNamespace()");
+        log.debug("AVMFileDirContext:  getNameInNamespace()");
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             return super.getNameInNamespace();
         }
 
@@ -1210,7 +1203,7 @@ public class AVMFileDirContext extends
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext.getAttributes(): using file system for: " + name);
+            log.debug("    AVMFileDirContext.getAttributes(): using file system for: " + name);
             return super.getAttributes( name, attrIds );
         }
 
@@ -1230,7 +1223,7 @@ public class AVMFileDirContext extends
             name      = name.substring(1);
         }
 
-        log.info("AVMFileDirContext: getAttributes(): " + repo_path );
+        log.debug("AVMFileDirContext: getAttributes(): " + repo_path );
 
         AVMNodeDescriptor avm_node = null;
 
@@ -1239,7 +1232,7 @@ public class AVMFileDirContext extends
             avm_node = Service_.lookup(avmRootVersion_, repo_path); 
             if (avm_node == null)
             {
-                log.info("AVMFileDirContext:  lookup() not found: " +  repo_path);
+                log.debug("AVMFileDirContext:  lookup() not found: " +  repo_path);
                 throw new NamingException(sm.getString("resources.notFound", repo_path));
             }
         }
@@ -1247,7 +1240,7 @@ public class AVMFileDirContext extends
         {
             // TODO: emit message in exception e
 
-            log.info("AVMFileDirContext:  lookup() not found: " +  repo_path);
+            log.debug("AVMFileDirContext:  lookup() not found: " +  repo_path);
             throw new NamingException(sm.getString("resources.notFound", repo_path));
         }
 
@@ -1274,7 +1267,7 @@ public class AVMFileDirContext extends
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.modifyAttributes( name, mod_op, attrs );
             return;
         }
@@ -1310,7 +1303,7 @@ public class AVMFileDirContext extends
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.modifyAttributes( name, mods );
             return;
         }
@@ -1343,11 +1336,11 @@ public class AVMFileDirContext extends
     public void bind(String name, Object obj, Attributes attrs)
         throws NamingException {
 
-        log.info("AVMFileDirContext:  bind(): " + name );
+        log.debug("AVMFileDirContext:  bind(): " + name );
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.bind( name, obj, attrs );
             return;
         }
@@ -1390,12 +1383,12 @@ public class AVMFileDirContext extends
     public void rebind(String name, Object obj, Attributes attrs)
         throws NamingException {
 
-        log.info("AVMFileDirContext:  rebind(): " + name );
+        log.debug("AVMFileDirContext:  rebind(): " + name );
 
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             super.rebind( name, obj, attrs );
             return;
         }
@@ -1482,12 +1475,12 @@ public class AVMFileDirContext extends
         throws NamingException {
 
 
-        log.info("AVMFileDirContext:  createSubcontext(): " + name );
+        log.debug("AVMFileDirContext:  createSubcontext(): " + name );
 
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             return super.createSubcontext( name, attrs );
         }
 
@@ -1533,7 +1526,7 @@ public class AVMFileDirContext extends
     
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             return super.getSchema( name );
         }
 
@@ -1565,7 +1558,7 @@ public class AVMFileDirContext extends
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
             return super.getSchemaClassDefinition( name );
         }
 
@@ -1604,7 +1597,7 @@ public class AVMFileDirContext extends
     {
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
 
             // The following line is what makes me need to suppress "unchecked":
             return super.search( name, matchingAttributes, attributesToReturn );
@@ -1643,7 +1636,7 @@ public class AVMFileDirContext extends
 
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
 
             // The following line is what makes me need to suppress "unchecked":
             return super.search( name, matchingAttributes );
@@ -1687,7 +1680,7 @@ public class AVMFileDirContext extends
     {
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
 
             // The following line is what makes me need to suppress "unchecked":
             return super.search( name, filter, cons );
@@ -1738,7 +1731,7 @@ public class AVMFileDirContext extends
     {
         if ( ! use_AVMRemote_ ) 
         {
-            log.info("    AVMFileDirContext: using file system");
+            log.debug("    AVMFileDirContext: using file system");
 
             // The following line is what makes me need to suppress "unchecked":
             return super.search( name, filterExpr, filterArgs, cons);
@@ -1943,7 +1936,7 @@ public class AVMFileDirContext extends
                 // Only fetch directly contained (foreground) objects
                 String fg_path =  avm_node.getPath();
 
-                log.info("AVMFileDirContext getDirectoryListingDirect: " + fg_path);
+                log.debug("AVMFileDirContext getDirectoryListingDirect: " + fg_path);
 
                 avm_entries = Service_.getDirectoryListingDirect( 
                                   avmRootVersion_, fg_path);
@@ -2089,7 +2082,7 @@ public class AVMFileDirContext extends
         public NamingEnumeration<java.lang.String> 
         getIDs()
         {
-            log.info("AVMFileResourceAttributes.getIDs()");
+            log.debug("AVMFileResourceAttributes.getIDs()");
             return super.getIDs();
         }
 
@@ -2102,7 +2095,7 @@ public class AVMFileDirContext extends
         public NamingEnumeration<? extends javax.naming.directory.Attribute> 
         getAll()
         {
-            log.info("AVMFileResourceAttributes.getAll()");
+            log.debug("AVMFileResourceAttributes.getAll()");
             return super.getAll();    // erasure annoyance
         }
 
@@ -2112,7 +2105,7 @@ public class AVMFileDirContext extends
          */
         public boolean isCollection() 
         {
-            log.info("AVMFileResourceAttributes.isCollection()");
+            log.debug("AVMFileResourceAttributes.isCollection()");
             return ( avm_node_.isDirectory() );
         }
 
@@ -2124,7 +2117,7 @@ public class AVMFileDirContext extends
          */
         public long getContentLength() 
         {
-            log.info("AVMFileResourceAttributes.getContentLength()");
+            log.debug("AVMFileResourceAttributes.getContentLength()");
             return avm_node_.getLength();
         }
 
@@ -2136,7 +2129,7 @@ public class AVMFileDirContext extends
          */
         public long getCreation() 
         {
-            log.info("AVMFileResourceAttributes.getCreation()");
+            log.debug("AVMFileResourceAttributes.getCreation()");
             this.creation = avm_node_.getCreateDate();
             return this.creation;
         }
@@ -2149,7 +2142,7 @@ public class AVMFileDirContext extends
          */
         public Date getCreationDate() 
         {
-            log.info("AVMFileResourceAttributes.getCreationDate()");
+            log.debug("AVMFileResourceAttributes.getCreationDate()");
             if ( this.creationDate == null )
             {
                 this.creationDate = new Date(  avm_node_.getCreateDate() );
@@ -2165,7 +2158,7 @@ public class AVMFileDirContext extends
          */
         public long getLastModified() 
         {
-            log.info("AVMFileResourceAttributes.getLastModified()");
+            log.debug("AVMFileResourceAttributes.getLastModified()");
             return avm_node_.getModDate();
         }
 
@@ -2176,7 +2169,7 @@ public class AVMFileDirContext extends
          */
         public Date getLastModifiedDate() 
         {
-            log.info("AVMFileResourceAttributes.getLastModifiedDate()");
+            log.debug("AVMFileResourceAttributes.getLastModifiedDate()");
 
             if ( this.lastModifiedDate == null )
             {
@@ -2242,7 +2235,7 @@ public class AVMFileDirContext extends
          */
         public String getCanonicalPath() 
         {
-            log.info("AVMFileResourceAttributes.getCannonicalPath(): " + avm_node_.getPath());
+            log.debug("AVMFileResourceAttributes.getCannonicalPath(): " + avm_node_.getPath());
 
             // TODO:  should this include name mangling for version numbers, 
             //        or would that mess things up elsewhere?   

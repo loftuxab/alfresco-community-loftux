@@ -141,7 +141,7 @@ public class VirtServerRegistrationThread extends Thread
             }
         }
 
-        AVMFileDirContext.setAVMFileDirAppBase( mount_path );
+        AVMFileDirContext.setAVMFileDirMountPoint( mount_path );
 
 
 

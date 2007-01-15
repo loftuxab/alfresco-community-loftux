@@ -47,9 +47,11 @@
 
 package org.alfresco.catalina.loader;
 
-import org.apache.catalina.loader.Constants;
 import org.alfresco.jndi.AVMFileDirContext;
+import org.alfresco.service.cmr.avm.LayeringDescriptor;
+import org.alfresco.service.cmr.remote.AVMRemote;
 
+import org.apache.catalina.loader.Constants;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -142,6 +144,18 @@ public class AVMWebappLoader
     */
     String parent_context_path_;                // possibly null
 
+    /**
+    * @exclude
+    *   The version within the AVM that all AVM-style paths corespond to
+    */
+    int version_ = -1; 
+
+    /**
+    * @exclude
+    *   The AVM path to the webapp that all AVM-style paths correspond to
+    */
+    String avm_webapp_path_;    // eg:  repo:/.../my_webapp
+
 
     /**
      * Construct a new AVMWebappLoader with no defined parent class loader
@@ -149,7 +163,7 @@ public class AVMWebappLoader
      */
     public AVMWebappLoader() {
 
-      this( null, null, null, null);
+      this( null, null, null, null, -1, null);
       new Exception("Stack trace for AVMWebappLoader").printStackTrace();
 
     }
@@ -165,13 +179,17 @@ public class AVMWebappLoader
                 ClassLoader parent, 
                 Map<String, ClassLoader> context_classloader_registry,
                 String      context_path,
-                String      parent_context_path)
+                String      parent_context_path,
+                int         version,
+                String      avm_webapp_path)
     {
         super();
         this.parentClassLoader        = parent;
         context_classloader_registry_ = context_classloader_registry;
         context_path_                 = context_path;
         parent_context_path_          = parent_context_path;  // possibly null
+        version_                      = version;          // typically -1
+        avm_webapp_path_              = avm_webapp_path;  // repo:/.../my_webapp
     }
 
 
@@ -977,7 +995,12 @@ public class AVMWebappLoader
 
     /**
      * Configure the repositories for our class loader, based on the
-     * associated Context.
+     * associated Context.  
+     * <p>
+     * When AVM directories classes & lib are in the background,
+     * files are not copied to the work dir because they're inherited
+     * from their webapp parent (e.g.: staging).
+     * 
      */
     private void setRepositories() {
 
@@ -1041,6 +1064,15 @@ public class AVMWebappLoader
 
                 classRepository = new File(workDir, classesPath);
                 classRepository.mkdirs();
+
+                // Automatically remove any junk left around from the
+                // last time the server was started.  While this makes
+                // restarts more heavy-weight, it does ensure that 
+                // you never get errors from old classes lingering
+                // around that should not.
+
+                cleanDir(classRepository,false);
+
                 copyDir(classes, classRepository);
             }
 
@@ -1094,118 +1126,202 @@ public class AVMWebappLoader
 
             File destDir = null;
 
-            if (absoluteLibPath != null &&    
-                // ... and does not start with "/alfresco.avm/"
-                ! absoluteLibPath.startsWith( AVMFileDirContext.getAVMFileDirAppBase() )
-               ) 
+
+            // AVMFileDirContext.getAVMFileDirMountPoint() might return
+            // something like:   /media/alfresco/cifs/v
+            //
+            // absoluteLibPath might look something like:
+            // v:/mysite/VERSION/v-1/DATA/www/avm_webapps/ROOT/WEB-INF/lib
+            //
+            // version_ (the version of teh avm_webapp_path_) is usually -1
+            //
+            // avm_webapp_path_ might look something like:
+            // repo:/.../my_webapp
+            //
+            //    There's no need to copy the jars if the lib dir is in 
+            //    the background.  Otherwise, we've got to copy everything.
+            //    This is because if absoluteLibPath is in the background,
+            //    the current webapp is adding nothing new besides what's
+            //    in the "staging" area... which will get picked up via
+            //    the classloader hierarchy.   If it's in the foreground,
+            //    then at least *one* new class is added, hence we've got
+            //    to suck in everything.  The reasons for this last requirement
+            //    are fairly subtle.  You might think that we'd only need
+            //    to pull in whatever is actually new in the curent layer,
+            //    but that were done, classcast errors would be generated if the
+            //    upper layer references a class that is fetched via delegation
+            //    to a classloader in a lower layer, and then some function in one
+            //    of *these* classes returns a reference to something defined
+            //    in by a classloader back up in the upper layer.   The lower
+            //    layer would resolve the passed-back class itself, but then
+            //    the code in the upper layer would have its *own* definition
+            //    of the class.  Nasty!   The reverse scenario is just as bad
+            //    (or worse):  if the 1st class referenced by the upper layer
+            //    were something fetched via delegation, and that class needed
+            //    to resolve something defined above & below, it would get
+            //    the class from below (i.e.: it's own layer).  Therefore, 
+            //    even though the upper layer defined its own version of
+            //    a class, you'd end up sucking in the old one... silently.
+
+            boolean is_avm_libdir_in_foreground = true;
+
+            if ( avm_webapp_path_ != null )
+            {
+                // Figure out if webapp's library is in the foreground or background
+                String avm_webapp_libpath = avm_webapp_path_  + libPath;
+
+                LayeringDescriptor lib_layer_info = 
+                   AVMFileDirContext.getAVMRemote().getLayeringInfo(
+                        version_,  
+                        avm_webapp_libpath );
+
+                if ( lib_layer_info.isBackground() )
+                {
+                    is_avm_libdir_in_foreground = false;
+                }
+            }
+
+
+            if ( avm_webapp_path_ != null )
+            {
+                // If is_avm_libdir_in_foreground == false
+                //  then there is no need to copy any jars
+                //  as their defs will be inherited via the
+                //  webapp classloader hierarchy.
+                //
+                if ( is_avm_libdir_in_foreground ) { copyJars = true; }
+
+                destDir = new File(workDir, libPath);
+                destDir.mkdirs();
+
+                // Automatically remove any junk left around from the
+                // last time the server was started.  While this makes
+                // restarts more heavy-weight, it does ensure that 
+                // you never get errors from old classes lingering
+                // around that should not.  The cleanDir is always 
+                // done within the work dir whether or not the 
+                // corresponding AVM contents are in the background
+                // currently, because they may *not* have been 
+                // in the background on the prior restart.  The goal
+                // here is to keep the work dir as clean as possible
+                // because of the potential for accumulating a large
+                // number of copies of files that never get scavanged.
+                //
+                // If libdir is in the background, we can even get rid 
+                // of the top-level 'lib' dir within the webapp...
+                // otherwise just clean the contents of the lib dir.
+                
+                cleanDir(destDir, ! is_avm_libdir_in_foreground );
+            }
+            else if (absoluteLibPath != null)
             {
                 destDir = new File(absoluteLibPath);
             } 
-            else 
+            else
             {
                 copyJars = true;
                 destDir = new File(workDir, libPath);
                 destDir.mkdirs();
+                cleanDir(destDir,false);
             }
 
+
             // Looking up directory /WEB-INF/lib in the context
-            try 
+            if ( is_avm_libdir_in_foreground )
             {
-                // Was:
-                //       NamingEnumeration enumeration = 
-                //            resources.listBindings(libPath);
-                //
-                // TODO:
-                //      The goal here is to list only those files
-                //      that aren't in the background.   There are
-                //      two ways to to about this:
-                //
-                //          (1)  Call a custom API that's not a part of JNDI
-                //          (2)  Use a name-mangling scheme on the path
-                //               that indicates "foreground only".
-                //
-                //      I chose (1) mostly because I wanted more time
-                //      to think about what else could be done with
-                //      a name mangling scheme.   In general, (2) seems
-                //      preferable, because then there would be no need
-                //      to strip away the ProxyDirContext wrapper and
-                //      do the type casting below.  It would also provide
-                //      a URI-driven way of seeing in-layer data 
-                //      (along with other things, maybe).
-                //
-                AVMFileDirContext avm_resources = 
-                        (AVMFileDirContext)
-                        (((ProxyDirContext) resources).getDirContext());
-
-                // Custom JNDI call ('false' indicates "don't show background")
-                // It would be nicer to just do name-mangling on libPath,
-                // and use a normal JNDI call.  This would put the layer
-                // wackiness into AVMFileDirContext, where it really belongs.
-                //
-                // See TODO comment above.
-                //
-                NamingEnumeration enumeration = 
-                        avm_resources.listBindings(libPath,false);
-
-
-                while (enumeration.hasMoreElements()) 
+                try 
                 {
-                    Binding binding = (Binding) enumeration.nextElement();
-                    String filename = libPath + "/" + binding.getName();
+                    // TODO:
+                    //
+                    // This code could be cleaned up now that
+                    // there's no attempt to do fine-grained
+                    // forground/background checks on individual
+                    // jar files.
+                    //
+                    //      The goal here is to list only those files
+                    //      that aren't in the background.   There are
+                    //      two ways to to about this:
+                    //
+                    //          (1)  Call a custom API that's not a part of JNDI
+                    //          (2)  Use a name-mangling scheme on the path
+                    //               that indicates "foreground only".
+                    //
+                    //      I chose (1) mostly because I wanted more time
+                    //      to think about what else could be done with
+                    //      a name mangling scheme.   In general, (2) seems
+                    //      preferable, because then there would be no need
+                    //      to strip away the ProxyDirContext wrapper and
+                    //      do the type casting below.  It would also provide
+                    //      a URI-driven way of seeing in-layer data 
+                    //      (along with other things, maybe).
+                    //
+                    AVMFileDirContext avm_resources = 
+                            (AVMFileDirContext)
+                            (((ProxyDirContext) resources).getDirContext());
+
+                    // Custom JNDI call ('false' indicates "don't show background")
+                    // It would be nicer to just do name-mangling on libPath,
+                    // and use a normal JNDI call.  This would put the layer
+                    // wackiness into AVMFileDirContext, where it really belongs.
+                    //
+                    // See TODO comment above.
+                    //
+                    NamingEnumeration enumeration = 
+                            avm_resources.listBindings(libPath,false);
 
 
-                    if (!filename.endsWith(".jar"))
-                        continue;
-
-
-                    // Copy JAR in the work directory, always (the JAR file
-                    // would get locked otherwise, which would make it
-                    // impossible to update it or remove it at runtime)
-                    File destFile = new File(destDir, binding.getName());
-
-                    if( log.isDebugEnabled())
-                    log.debug(sm.getString("webappLoader.jarDeploy", filename,
-                                     destFile.getAbsolutePath()));
-
-                    Resource jarResource = (Resource) binding.getObject();
-
-
-                    if (copyJars) {
-                        if (!copy(jarResource.streamContent(),
-                                  new FileOutputStream(destFile)))
-                            continue;
-                    }
-
-                    try 
+                    while (enumeration.hasMoreElements()) 
                     {
-                        // Example destFile :
-                        //
-                        //    /alfresco.avm/avm.alfresco.localhost/$-1$repo-1:/
-                        //       repo-1/alice/www/avm_webapps/jcox.alfresco/
-                        //       WEB-INF/lib/foo.jar
-                        //
+                        Binding binding = (Binding) enumeration.nextElement();
+                        String filename = libPath + "/" + binding.getName();
 
-                        JarFile jarFile = new JarFile(destFile);
 
-                        classLoader.addJar(filename, jarFile, destFile);
+                        if (!filename.endsWith(".jar"))
+                            continue;
 
-                    } catch (Exception ex) {
-                        // Catch the exception if there is an empty jar file
-                        // Should ignore and continute loading other jar files 
-                        // in the dir
+
+                        // Copy JAR in the work directory, always (the JAR file
+                        // would get locked otherwise, which would make it
+                        // impossible to update it or remove it at runtime)
+                        File destFile = new File(destDir, binding.getName());
+
+                        if( log.isDebugEnabled())
+                        log.debug(sm.getString("webappLoader.jarDeploy", filename,
+                                         destFile.getAbsolutePath()));
+
+                        Resource jarResource = (Resource) binding.getObject();
+
+
+                        if (copyJars) {
+                            if (!copy(jarResource.streamContent(),
+                                      new FileOutputStream(destFile)))
+                                continue;
+                        }
+
+                        try 
+                        {
+                            JarFile jarFile = new JarFile(destFile);
+
+                            classLoader.addJar(filename, jarFile, destFile);
+
+                        } catch (Exception ex) {
+                            // Catch the exception if there is an empty jar file
+                            // Should ignore and continute loading other jar files 
+                            // in the dir
+                        }
+
+                        loaderRepositories.add( filename );
                     }
-
-                    loaderRepositories.add( filename );
+                } 
+                catch (NamingException e) 
+                {
+                    // Silent catch: it's valid that no /WEB-INF/lib directory
+                    // exists
+                } 
+                catch (IOException e) 
+                {
+                    e.printStackTrace();
                 }
-            } 
-            catch (NamingException e) 
-            {
-                // Silent catch: it's valid that no /WEB-INF/lib directory
-                // exists
-            } 
-            catch (IOException e) 
-            {
-                e.printStackTrace();
             }
         }
     }
@@ -1346,6 +1462,40 @@ public class AVMWebappLoader
         return true;
 
     }
+
+
+    /**
+     * Remove all files and subdirs of dir.
+     * If deleteDir is true, dir itself is deleted.
+     *
+     * @param dir File object representing the directory to be cleaned
+     */
+    private static boolean cleanDir(File dir, boolean deleteDir)
+    {
+        boolean overall_status = true;
+        boolean status;
+
+        String files[] = dir.list();
+        if (files == null) { files = new String[0]; }
+
+        for (int i = 0; i < files.length; i++) 
+        {
+            File file = new File(dir, files[i]);
+
+            if (file.isDirectory()) { status = cleanDir(file, true); } 
+            else                    { status = file.delete(); }
+
+            overall_status = overall_status && status;
+        }
+
+        if  ( deleteDir )
+        {
+            overall_status = dir.delete() && overall_status;
+        }
+        return overall_status;
+    }
+
+
 
 
     /**

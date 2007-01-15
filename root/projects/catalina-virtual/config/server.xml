@@ -141,8 +141,12 @@
       <Valve className="org.apache.catalina.valves.RequestDumperValve"/>
       -->
 
+
       <!-- avm debugging -->
+      <!--
       <Valve className = "org.alfresco.catalina.valve.AVMRequestDumperValve"/>
+      -->
+
 
       <!-- avm reverse proxy mapping -->
       <Valve className = "org.alfresco.catalina.valve.AVMUrlValve"/>
@@ -195,7 +199,7 @@
            Note: XML Schema validation will not work with Xerces 2.2.
        -->
       <Host name="localhost" appBase="webapps"
-       unpackWARs="true" autoDeploy="true"
+       unpackWARs="true" autoDeploy="false"
        xmlValidation="false" xmlNamespaceAware="false">
 
         <!-- Defines a cluster for this node,
@@ -385,7 +389,7 @@
             className         ="org.alfresco.catalina.host.AVMHost"
             appBase           ="avm_webapps"
             unpackWARs        ="true"
-            autoDeploy        ="true"
+            autoDeploy        ="false"
             xmlValidation     ="false"
             xmlNamespaceAware ="false">
       </Host>

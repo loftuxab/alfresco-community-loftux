@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.alfresco.catalina.context.AVMStandardContext;
@@ -48,6 +49,7 @@ import org.apache.catalina.startup.ExpandWar;
 import org.apache.catalina.startup.HostConfig;
 
 import org.alfresco.config.JNDIConstants;
+import org.alfresco.catalina.valve.AVMUrlValve;
 
 
 /**
@@ -56,10 +58,10 @@ import org.alfresco.config.JNDIConstants;
 *
 *  <pre>
 *
-*         The Super Repository:    A forest of DAG structures
-*         ---------------------------------------------------
+*               The Repository:  A forest of DAG structures
+*               -------------------------------------------
 *
-*              repo1:      repo2:          repo3:       repo4:
+*             mysite:   mysite--bob:  yoursite:   yoursite--alice:
 *                /           /               /            /
 *                |           |               |            |
 *               www   <~~~  www             www   <~~~   www
@@ -73,9 +75,11 @@ import org.alfresco.config.JNDIConstants;
 *  </pre>
 *
 *  At startup time, the AVMHostConfig will create a "virtualized"
-*  version of <tt>avm_webapps</tt> by name-mangling the
-*  webapps within each repository containing an <tt>avm_webapps</tt>
-*  directory in the appropriate location.  
+*  version of <tt>avm_webapps</tt> by name-mangling the webapps within 
+*  each store containing a .dns.{...} property key.    The associated
+*  value is the path within this store where webapps are installed
+*  (e.g.: "mysite:/www/avm_webapps") 
+*
 */
 public class AVMHostConfig extends HostConfig
 {
@@ -115,9 +119,8 @@ public class AVMHostConfig extends HostConfig
     *
     * The Java class name of the Context implementation we should use.
     */
-    protected String contextClass = "org.alfresco.catalina.context.AVMStandardContext";
-
-
+    protected String contextClass = 
+        "org.alfresco.catalina.context.AVMStandardContext";
 
 
     /**
@@ -137,7 +140,7 @@ public class AVMHostConfig extends HostConfig
     *         className         ="org.alfresco.catalina.host.AVMHost"
     *         appBase           ="avm_webapps"
     *         unpackWARs        ="true" 
-    *         autoDeploy        ="true"
+    *         autoDeploy        ="false"
     *         xmlValidation     ="false" 
     *         xmlNamespaceAware ="false"&gt;
     *   &lt;/Host&gt;
@@ -201,6 +204,12 @@ public class AVMHostConfig extends HostConfig
      */
     protected void deployApps() 
     {
+        // This function is only called by HostConfig.
+        // Now that the check() function is a no-op, 
+        // there's no preiodic re-deployment of anything at all. 
+        // Live updates only occur when done via the custom MBean server.
+        // To see this, check out: new Exception("").printStackTrace();
+
         // Example appBase:
         //    /opt/apache-tomcat-5.5.15/avm_webapps
         File appBase = appBase();   
@@ -225,36 +234,61 @@ public class AVMHostConfig extends HostConfig
         HashMap<String, AVMWebappDescriptor> webapp_descriptors =  
                    new HashMap<String, AVMWebappDescriptor>();
 
-        List<AVMStoreDescriptor> repositories = AVMRemote_.getStores();
         LinkedList<String>     avm_webapp_paths = new LinkedList<String>();
 
         try 
         {
-            Map<String, Map<QName, PropertyValue>> repo_dns_entries = 
+            // Fetch map of store_name values of the form:
+            //
+            //       store_name   => { dns_name           =>
+            //                         dns_store_path 
+            //                       },
+            //       store_name   => { dns_name           =>
+            //                         dns_store_path 
+            //                       },
+            //        ...
+            //
+            // Example of data:
+            //
+            //      "mysite--bob" => { ".dns.bob.mysite"  => 
+            //                         "mysite--bob:/www/avm_webapps"
+            //                       },
+            //       ...
+
+            Map<String, Map<QName, PropertyValue>> store_dns_entries = 
                 AVMRemote_.queryStoresPropertyKey(
                     QName.createQName(null,".dns.%"));
 
-            for ( Map.Entry<String, Map<QName, PropertyValue>> repo_dns_entry  :
-                  repo_dns_entries.entrySet() 
+            for ( Map.Entry<String, Map<QName, PropertyValue>> store_dns_entry  :
+                  store_dns_entries.entrySet() 
                 )
             {
-                String  repo_name  = repo_dns_entry.getKey();
+                String  store_name  = store_dns_entry.getKey();
+
+                // Note:  Because the '%' wildcard is used in the query,
+                //        and the queryStoresPropertyKey() function is rather
+                //        generic, the value associated with store_dns_entry
+                //        is a Map, not a simple tuple object.   Therefore, the
+                //        somewhat ugly getValue().entrySet().iterator().next()
+                //        expression is needed (a bare getValue()won't do).
+                //        Because of how the dns names are structured, you'll
+                //        always get a map of 1 element, or nothing.
 
                 Map.Entry<QName, PropertyValue> dns_map = 
-                    repo_dns_entry.getValue().entrySet().iterator().next();
+                    store_dns_entry.getValue().entrySet().iterator().next();
 
-                // String dns_name      = dns_map.getKey().getLocalName();
-                String    dns_repo_path = dns_map.getValue().getStringValue();
+                // String dns_name       = dns_map.getKey().getLocalName();
+                String    dns_store_path = dns_map.getValue().getStringValue();
 
                 //  Example values:
-                //    repo_name     =  "repo-2"
-                //    dns_name      =  ".dns.bob"
-                //    dns_repo_path =  "repo-2:/www/avm_webapps"
+                //    store_name     =  "mysite--bob"
+                //    dns_name       =  ".dns.bob.mysite"
+                //    dns_store_path =  "mysite--bob:/www/avm_webapps"
 
-                if (  (dns_repo_path == null) || 
-                     ! dns_repo_path.endsWith( AVMHostRelativeAppBase_ ) )
+                if (  (dns_store_path == null) || 
+                     ! dns_store_path.endsWith( AVMHostRelativeAppBase_ ) )
                 {
-                    log.debug("DNS mount point " + dns_repo_path + 
+                    log.debug("DNS mount point " + dns_store_path + 
                                " does not end with: "      + 
                                AVMHostRelativeAppBase_     + 
                                " ...skipping on this host.");
@@ -264,9 +298,9 @@ public class AVMHostConfig extends HostConfig
                 Map<String, AVMNodeDescriptor> webapp_entries = null;
                 try 
                 {
-                    // e.g.:   -1, "repo-3:/www/avm_webapps"
+                    // e.g.:   -1, "mysite:/www/avm_webapps"
                     webapp_entries = 
-                       AVMRemote_.getDirectoryListing(-1, dns_repo_path );
+                       AVMRemote_.getDirectoryListing(-1, dns_store_path );
                 }
                 catch (Exception e)     // TODO: just AVMNotFoundException ?
                 {
@@ -281,15 +315,44 @@ public class AVMHostConfig extends HostConfig
 
                     log.debug("AVMHostConfig webapp: " + webapp_name); 
 
+                    if ( webapp_name.equalsIgnoreCase("META-INF")  ||
+                         webapp_name.equalsIgnoreCase("WEB-INF")
+                       )  
+                    {
+                        // Note that:
+                        //
+                        // [1]   Webapps named META-INF or WEB-INF
+                        //       aren't loaded by Tomcat.  See 
+                        //       references to "META-INF" and "WEB-INF"
+                        //       within HostConfig.java for details.
+                        //  
+                        // [2]   The servlet 2.4 spec says that it's
+                        //       illegal to serve any content from:
+                        //
+                        //             <webapp-name>/{META|WEB}-INF
+                        //
+                        // Are the Tomcat implementors just trying to 
+                        // make life easier for folks who blindly look
+                        // for {META|WEB}-INF *anywhere* in a path?
+                        // If so, this is probably ok because these 
+                        // are rather strange webapp names... but...
+                        // is this webapp name restriction actually 
+                        // mandated by the 2.4 servlet spec?
+                        // Review & find out. 
+
+                        log.warn("AVMHostConfig disallows webapps named: " + webapp_name); 
+                        continue; 
+                    }
+
                     AVMWebappDescriptor webapp_desc =  
                         new AVMWebappDescriptor( 
                         -1,             // version
-                        repo_name,      // repo-3
+                        store_name,     // store-3
                         AVMRemote_.getIndirectionPath(-1, webapp_entry.getValue().getPath()),
                                         // this gets the indirection path even if, physically,
                                         // the path is not a layered directory, as long as the
                                         // path is in a layered context.
-                        dns_repo_path,  // repo-3:/www/avm_webapps
+                        dns_store_path, // mysite:/www/avm_webapps
                         webapp_name     // my_webapp
                     );
 
@@ -300,7 +363,7 @@ public class AVMHostConfig extends HostConfig
         }
         catch (Exception e)
         {
-            // TODO:  think about what to do here
+            // TODO:  figure out if there's anything more that can be done here
             log.error("deployAllAVMwebappsInRepository failed: " + 
                                 e.getMessage() );
         }
@@ -312,53 +375,375 @@ public class AVMHostConfig extends HostConfig
         return;
     }
 
-    public boolean  updateVirtualWebapp( int version, 
-                                         String repoPath, 
+    /**
+    *  Updates a virtual webapp; if the isRecursive flag is set,
+    *  all dependent webapps are also updated (i.e.: webapps that use 
+    *  the one being updated as their "background" via transparency).
+    *  <p>
+    *  For example, storePath might look something like this:
+    *  <tt>mysite--bob:/www/avm_webapps/ROOT</tt>.  The value
+    *  of 'version' is typically -1 (which corresponds to HEAD).
+    */
+    public boolean  updateVirtualWebapp( int     version, 
+                                         String  storePath, 
                                          boolean isRecursive
                                        )
     {
-        // RESUME HERE
-        log.info("AVMHostConfig update from JMX: " + 
-                                           version + 
-                                           " "     +
-                                           repoPath);
-        return true;
+        log.info("AVMHostConfig update version: " + 
+                 version + " path: " + storePath);
+
+        String store_name;                           // e.g.: mysite--bob
+        int store_index = storePath.indexOf(':');
+        if ( store_index > 0 ) 
+        {
+            store_name = storePath.substring(0,store_index);
+        }
+        else
+        {
+           log.error("updateVirtualWebapp failed; bad store path: " + storePath );
+           return false;
+        }
+
+        // e.g.:  /www/avm_webapps/ROOT
+        String store_relpath = 
+               storePath.substring(store_index+1, storePath.length());
+
+
+        // TODO: When the GUI supports inviting a user to a single webapp,
+        // there will be no need to update *all* webapps in a web project.
+        // However, there's no way in the GUI right now to limit the
+        // scope of the inviation, so updating one webapp in a project
+        // means *all* webapps must be updated in the store containing
+        // the webapp mentioned by storePath.
+
+        int app_base_tail =  storePath.lastIndexOf('/');
+        if (app_base_tail < 0) 
+        { 
+            log.error("updateVirtualWebapp failed; bad store path: " + storePath );
+            return false;
+        }
+
+        // If    storePath looks like:   mysite--bob:/www/avm_webapps/ROOT
+        // then  app_base  looks like:   mysite--bob:/www/avm_webapps
+         
+        String avm_appBase = storePath.substring(0,app_base_tail);
+        Map<String, AVMNodeDescriptor> webapp_entries = null;
+
+        try 
+        {
+            webapp_entries = 
+                AVMRemote_.getDirectoryListing( version, avm_appBase );
+        }
+        catch (Exception e)
+        {
+            log.error("updateVirtualWebapp failed; could not list: " +  avm_appBase );
+            log.error( e.getMessage() );
+            return false;
+        }
+
+        for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  : 
+              webapp_entries.entrySet()
+            )
+        {
+            String webapp_name = webapp_entry.getKey();   // my_webapp
+
+            log.debug("updateVirtualWebapp found: " + webapp_name); 
+
+            String webapp_storePath =  avm_appBase + "/" + webapp_name;
+
+            String context_name = AVMUrlValve.GetContextNameFromStorePath(
+                                       version, webapp_storePath );
+
+            if ( context_name == null )
+            {
+                log.warn("updateVirtualWebapp failed; bad store path: " + 
+                          webapp_storePath );
+
+                return false;
+            }
+
+            this.deployed.remove( context_name );
+
+            AVMStandardContext context = (AVMStandardContext) host.findChild( context_name );
+            if ( context != null ) 
+            {
+                host.removeChild( context );
+                log.info("temporarily removed webapp: " + context_name);
+            }
+            
+            // If this webapp is the child of some other webapp, 
+            // calculate the name of the associated parent context.
+
+            String indirection_path = AVMRemote_.getIndirectionPath(
+                                          version, 
+                                          webapp_entry.getValue().getPath()
+                                      );
+
+            // Only call a webapp our "parent" if we're shadowing it, **and**
+            // it's in a different virtual store; otherwise, our parent is null.
+            String parent_context_name = null;
+
+            if (indirection_path != null)
+            {
+                int parent_store_index = indirection_path.indexOf(':');
+                if ( parent_store_index > 0 )
+                {
+                    String parent_store_name = 
+                        indirection_path.substring(0,parent_store_index);
+
+                    if ( ! parent_store_name.equals( store_name ) )
+                    {
+                        parent_context_name = 
+                            AVMUrlValve.GetContextNameFromStoreName(
+                                version,
+                                parent_store_name,
+                                webapp_name
+                            );
+                    }
+                }
+            }
+
+            deployAVMWebapp(
+               version,               // -1
+               avm_appBase,           // store-3:/www/avm_webapps
+               webapp_name,           // my_webapp
+               context_name,          // e.g.:   /$-1$store-3$my_webapp
+               parent_context_name);  // parent_context_path possibly null
+        }
+
+        boolean is_sucessful = true;
+
+        if (isRecursive)
+        {
+           ArrayList< LinkedList<String> >  store_hierarchy = 
+                getDependentWebappStores( store_name );
+
+            // Walk the hierarchy from lowest to highest
+            // This ensures that by the time any classloader
+            // is reloaded, it's parent/background classloader
+            // has *already* been reloaded.  Therefore, a user
+            // can't accidentally poison the fresh classloader
+            // by requesting somthing from a stale background.
+
+            for ( LinkedList<String> store_list : store_hierarchy )
+            {
+                if ( store_list == null )  { break; }
+
+                for (String dep_store : store_list )
+                {
+                    is_sucessful = 
+                        updateVirtualWebapp( 
+                                version, 
+                                dep_store + ":" + store_relpath,
+                                false
+                        ) 
+                        && is_sucessful;
+                }
+            }
+        }
+        return is_sucessful;
     }
 
-    public boolean  removeVirtualWebapp( int    version, 
-                                         String repoPath,
+    /**
+    * Fetches an array of lists of stores that are dependent upon 'store_name'.
+    * The initial element in this array are all the stores that are 1 hop away 
+    * (e.g.: "mysite--bob" is 1 hop away from "mysite"), the subsequent element 
+    * containts all stores that are 2 hops away (e.g.: "mysite--preview" is
+    * two hops away from "mysite"... and so on.
+    */
+    protected ArrayList< LinkedList<String> >  
+    getDependentWebappStores( String store_name)
+    {
+        ArrayList< LinkedList<String>> store_hierarchy = 
+            new ArrayList< LinkedList<String> >(8);       // overkill, but cheap
+
+
+        // It's nice to see IBM publish an article like this:
+        // http://www-128.ibm.com/developerworks/java/library/j-jtp01255.html
+        // Java generics leave a lot to be desired.
+        //
+        //  DUKE: I know a life of crime has led me to this sorry fate,
+        //        and yet, I blame society.  Society made me what I am.
+        //
+        //        -- "Repo Man" (1984, by Alex Cox... no relation, I think)
+
+
+        // Figure out which stores list this one as a background store
+        //
+        //   child_store_name   => { .background-layer.<this_store_name>   =>
+        //                            <distance>
+        //                         },
+        //        ...
+        //
+        // Example of data:
+        //
+        //      "mysite--bob" =>          { ".background-layer.mysite"  => 
+        //                                  1
+        //                                },
+        //      "mysite--bob--preview" => { ".background-layer.mysite"  => 
+        //                                  2
+        //                                },
+
+        Map<String, Map<QName, PropertyValue>> store_child_entries = 
+            AVMRemote_.queryStoresPropertyKey(
+                QName.createQName(null,".background-layer." + store_name)
+            );
+                    
+
+        for ( Map.Entry<String, Map<QName, PropertyValue>> store_child_entry  :
+              store_child_entries.entrySet() 
+            )
+        {
+            String  child_store_name  = store_child_entry.getKey();
+
+            Map.Entry<QName, PropertyValue> child_map = 
+                store_child_entry.getValue().entrySet().iterator().next();
+
+            int distance = (int) child_map.getValue().getLongValue();
+
+            LinkedList<String> store_list;
+
+            if (  distance > store_hierarchy.size() )
+            {
+                for (int i= store_hierarchy.size(); i<distance; i++)
+                {
+                    store_hierarchy.add( new LinkedList<String>() );
+                }
+            }
+            // Index in store_hierarchy is 0-based (distance 1 == index 0)
+            store_list = store_hierarchy.get( distance -1 );
+            store_list.add( child_store_name );
+        }
+
+        return store_hierarchy;
+    }
+
+    public boolean  removeVirtualWebapp( int     version, 
+                                         String  storePath,
                                          boolean isRecursive
                                        )
     {
-        // RESUME HERE
-        log.info("AVMHostConfig remove from JMX: " + 
-                                           version + 
-                                           " "     +
-                                           repoPath +
-                                           " isRecursive: " + isRecursive);
-        return true;
+        log.info("AVMHostConfig removeVirtualWebapp version: " + 
+                 version + " path: " + storePath);
+
+        boolean is_sucessful = true;
+        String  store_name;                           // e.g.: mysite--bob
+
+        int store_index = storePath.indexOf(':');
+        if ( store_index > 0 ) 
+        {
+            store_name = storePath.substring(0,store_index);
+        }
+        else
+        {
+           log.error("removeVirtualWebapp failed; bad store path: " + storePath );
+           return false;
+        }
+
+        // e.g.:  /www/avm_webapps/ROOT
+        String store_relpath = 
+               storePath.substring(store_index+1, storePath.length());
+
+        int app_base_tail =  storePath.lastIndexOf('/');
+        if (app_base_tail < 0) 
+        { 
+            log.error("removeVirtualWebapp failed; bad store path: " + storePath );
+            return false;
+        }
+
+        if (isRecursive)
+        {
+           ArrayList< LinkedList<String> >  store_hierarchy = 
+                getDependentWebappStores( store_name );
+
+            // Walk the hierarchy from highest to lowest.
+            // This prevents someone from accessing a store
+            // that has had its background removed.
+
+            for (int i= store_hierarchy.size() -1; i>=0; i--)
+            {
+                LinkedList<String> store_list = 
+                   store_hierarchy.get(i);
+
+                if ( store_list == null )  { continue; }
+
+                for (String dep_store : store_list )
+                {
+                    is_sucessful = 
+                        removeVirtualWebapp( 
+                                version, 
+                                dep_store + ":" + store_relpath,
+                                false
+                        ) 
+                        && is_sucessful;
+                }
+            }
+        }
+
+        // If    storePath looks like:   mysite--bob:/www/avm_webapps/ROOT
+        // then  app_base  looks like:   mysite--bob:/www/avm_webapps
+         
+        String avm_appBase = storePath.substring(0,app_base_tail);
+        Map<String, AVMNodeDescriptor> webapp_entries = null;
+
+        log.debug("removeVirtualWebapp listing: " + avm_appBase);
+
+        try 
+        {
+            webapp_entries = 
+                AVMRemote_.getDirectoryListing( version, avm_appBase );
+        }
+        catch (Exception e)
+        {
+            log.error("removeVirtualWebapp failed; could not list: " +  avm_appBase );
+            log.error( e.getMessage() );
+            return false;
+        }
+
+
+        log.debug("removeVirtualWebapp iterating over: " + avm_appBase);
+
+        for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  : 
+              webapp_entries.entrySet()
+            )
+        {
+            String webapp_name = webapp_entry.getKey();   // my_webapp
+
+            log.debug("removeVirtualWebapp found: " + webapp_name); 
+
+            String webapp_storePath =  avm_appBase + "/" + webapp_name;
+
+            String context_name = AVMUrlValve.GetContextNameFromStorePath(
+                                       version, webapp_storePath );
+
+            if ( context_name == null )
+            {
+                log.warn("removeVirtualWebapp failed; bad store path: " + 
+                          webapp_storePath );
+
+                return false;
+            }
+
+            this.deployed.remove( context_name );
+
+            log.debug("removeVirtualWebapp removed: " + context_name);
+
+
+            AVMStandardContext context = 
+                (AVMStandardContext) host.findChild( context_name );
+
+            if ( context != null ) 
+            {
+                host.removeChild( context );
+                log.info("removed webapp: " + context_name);
+            }
+        }
+        log.debug("removeVirtualWebapp done iterating over: " + avm_appBase);
+
+        return is_sucessful;
     }
 
 
-
-    //   There are 2 code paths that end up calling this function:
-    //
-    //   TODO: make certain that there are no race conditions in any 
-    //         data structures, and that there are no datastructures
-    //         that grow without bound or accumulate crud.
-    //    
-    //   (1)  Initial deployment:
-    //           AVMHostConfig.deployAVMWebappsInDependencyOrder(AVMHostConfig.java:448)
-    //           AVMHostConfig.deployAllAVMwebappsInRepository(AVMHostConfig.java:402)
-    //           AVMHostConfig.deployApps(AVMHostConfig.java:324)
-    //           HostConfig.start(HostConfig.java:1118)
-    //
-    //   (2)  The periodic check in another thread (if it's turned on):
-    //           AVMHostConfig.deployAVMWebappsInDependencyOrder(AVMHostConfig.java:448)
-    //           AVMHostConfig.deployAllAVMwebappsInRepository(AVMHostConfig.java:402)
-    //           AVMHostConfig.deployApps(AVMHostConfig.java:324)
-    //           HostConfig.check(HostConfig.java:1181)
-    //
     protected void 
     deployAVMWebappsInDependencyOrder( HashMap<String, 
                                        AVMWebappDescriptor> webapp_descriptors)
@@ -368,45 +753,45 @@ public class AVMHostConfig extends HostConfig
         //
         for ( AVMWebappDescriptor desc : webapp_descriptors.values() )
         {
-            int    version   = desc.version_;
-            String repo_path = desc.avm_appBase_ + "/" + desc.webapp_leafname_;
+            int    version    = desc.version_;
+            String store_path = desc.avm_appBase_ + "/" + desc.webapp_leafname_;
 
             LayeringDescriptor layer_info = 
-                AVMRemote_.getLayeringInfo(version, repo_path );
+                AVMRemote_.getLayeringInfo(version, store_path );
 
-            String native_repo = layer_info.getNativeAVMStore().getName();
+            String native_store = layer_info.getNativeAVMStore().getName();
          
-            if ( ! native_repo.equals( desc.repo_name_ ) )
+            if ( ! native_store.equals( desc.store_name_ ) )
             {
                 // System.out.println("AMMHostConfig background webapp: " + 
-                //                    desc.webapp_leafname_ + 
-                //                    " in repo: " + desc.repo_name_ + 
-                //                    " has parent repo: " + native_repo );
+                //                    desc.webapp_leafname_               + 
+                //                    " in store: " + desc.store_name_    + 
+                //                    " has parent store: " + native_store );
 
 
-                desc.setParentRepo( webapp_descriptors, native_repo );
+                desc.setParentRepo( webapp_descriptors, native_store );
             }
             else if ( desc.indirection_name_ != null )
             {
                 // While this webapp dir is not itself a background
                 // object, it's shadowing something in another layer.
-                // If that other layer is in another repo, it's an
+                // If that other layer is in another store, it's an
                 // inter-webapp dependency.
                 
                 int index = desc.indirection_name_.indexOf(':');
                 if ( index > 0 ) 
                 {
-                    String parent_repo = desc.indirection_name_.substring(0,index);
-                    if ( ! parent_repo.equals( desc.repo_name_ ) )
+                    String parent_store = desc.indirection_name_.substring(0,index);
+                    if ( ! parent_store.equals( desc.store_name_ ) )
                     {
                         // new Exception("debug stack trace").printStackTrace();
                         //
                         // System.out.println("AMMHostConfig overlay webapp: " + 
-                        //                   desc.webapp_leafname_ + 
-                        //                   " in repo: " + desc.repo_name_ + 
-                        //                   " has parent repo: " + parent_repo);
+                        //                   desc.webapp_leafname_             + 
+                        //                   " in store: " + desc.store_name_  + 
+                        //                   " has parent store: " + parent_store);
 
-                        desc.setParentRepo( webapp_descriptors, parent_repo);
+                        desc.setParentRepo( webapp_descriptors, parent_store);
                     }
                 }
             }
@@ -439,8 +824,7 @@ public class AVMHostConfig extends HostConfig
     protected void 
     deployAVMWebappDescriptorTree( AVMWebappDescriptor desc)
     {
-        deployAVMwebapp( desc.version_,
-                         desc.repo_name_,
+        deployAVMWebapp( desc.version_,
                          desc.avm_appBase_,
                          desc.webapp_leafname_,
                          desc.getContextPath(),
@@ -455,10 +839,12 @@ public class AVMHostConfig extends HostConfig
 
 
     /**
-    * Deploy directories.
+    * Deploy an AVM-based webapp.
+    *
+    * This is a webapp-validating wrapper for the lower-level 
+    * deployment function deployAVMdirectory.
     */
-    protected void deployAVMwebapp( int     version,
-                                    String  repo_name,
+    protected void deployAVMWebapp( int     version,
                                     String  avm_appBase,
                                     String  webapp_leafname,
                                     String  context_path,
@@ -467,75 +853,162 @@ public class AVMHostConfig extends HostConfig
     {
         // Examle params:
         //     version:         -1
-        //     repo_name:       repo-3
-        //     avm_appBase:     repo-3:/www/avm_webapps
+        //     avm_appBase:     mysite--bob:/www/avm_webapps
         //     webapp_leafname  my_webapp
-        //     context_path     /$-1$repo-3$my_webapp
+        //     context_path     /$-1$mysite--bob$my_webapp
 
 
-        Map<String, AVMNodeDescriptor> webapp_entries = null;
+        // Don't deploy if serviced elsewhere.
+        if (isServiced(context_path)) { return; }
 
-        try 
+
+        // TODO:  Think about clustering, failover, and 
+        //        distributed management in more detail.
+
+
+
+        if ( webapp_leafname.equalsIgnoreCase("META-INF")  ||
+             webapp_leafname.equalsIgnoreCase("WEB-INF")
+           )  
         {
-            webapp_entries = AVMRemote_.getDirectoryListing( 
-                                -1, 
-                                avm_appBase + "/" + webapp_leafname );
-        }
-        catch (Exception e)
-        {
+            // Note that:
+            //
+            // [1]   Webapps named META-INF or WEB-INF
+            //       aren't loaded by Tomcat.  See 
+            //       references to "META-INF" and "WEB-INF"
+            //       within HostConfig.java for details.
+            //  
+            // [2]   The servlet 2.4 spec says that it's
+            //       illegal to serve any content from:
+            //
+            //             <webapp-name>/{META|WEB}-INF
+            //
+            // Are the Tomcat implementors just trying to 
+            // make life easier for folks who blindly look
+            // for {META|WEB}-INF *anywhere* in a path?
+            // If so, this is probably ok because these 
+            // are rather strange webapp names... but...
+            // is this webapp name restriction actually 
+            // mandated by the 2.4 servlet spec?
+            // Review & find out. 
+
+            log.warn("AVMHostConfig disallows webapps named: " + webapp_leafname); 
             return;
         }
 
-        
-        for ( Map.Entry<String, AVMNodeDescriptor> entry  : 
-              webapp_entries.entrySet() 
-            )
-        {
-            String entry_name = entry.getKey();   // leaf dirname in webapp
 
-            if (entry_name.equalsIgnoreCase("META-INF")) { continue; }
-            if (entry_name.equalsIgnoreCase("WEB-INF"))  { continue; }
+        // TODO:   Determine the best policy for how strict we
+        //         should be when it comes to validating a webapp's
+        //         structure.   For example, we could insist on 
+        //         the webapp having a META-INF and WEB-INF subdir
+        //         right here, or defer it.  Explore the tradeoffs.
+        //
+        // For now, AVMHostConfig will be non-strict
+        // Because of when this function is called,
+        // webapp_entries is always empty.  Ugh.
 
-            AVMNodeDescriptor entry_value = entry.getValue();
+        // Here's an example of something we might do to be "strict":
+        // Note however that it costs an extra remote function call
+        // per webapp (times the number of virtual webapps, in the
+        // event of a reload)... so it's not cheap either.
+        //
+        // Ensure that the webapp has as META-INF  and a WEB-INF subdir
+        // Get a directory listing of webapp
+        //
+        //   boolean saw_meta_inf = false;
+        //   boolean saw_web_inf  = false;
+        //   
+        //   Map<String, AVMNodeDescriptor> webapp_entries = null;
+        //   try 
+        //   {
+        //       webapp_entries = AVMRemote_.getDirectoryListing( 
+        //                           version,
+        //                           avm_appBase + "/" + webapp_leafname );
+        //   }
+        //   catch (Exception e) { return; }
+        //
+        //
+        //
+        //   for ( Map.Entry<String, AVMNodeDescriptor> entry  : 
+        //         webapp_entries.entrySet() 
+        //       )
+        //   {
+        //       String            entry_name  = entry.getKey();   //  my_webapp
+        //       AVMNodeDescriptor entry_value = entry.getValue();
+        //
+        //       System.out.println("Entry name: -->" + entry_name + "<----");
+        //       System.out.println("Is dir: " +  entry_value.isDirectory()  );
+        //
+        //       if  ( entry_name.equalsIgnoreCase("META-INF") && 
+        //             entry_value.isDirectory() 
+        //           ) 
+        //       { 
+        //           saw_meta_inf = true; 
+        //       }
+        //       else if  ( entry_name.equalsIgnoreCase("WEB-INF") && 
+        //                  entry_value.isDirectory() 
+        //                ) 
+        //       { 
+        //           saw_web_inf = true; 
+        //       }
+        //
+        //       if ( saw_meta_inf && saw_web_inf ) { break ; }
+        //   }
+        //
+        //   System.out.println("Status for: " + avm_appBase + "/" + webapp_leafname );
+        //   System.out.println("    Saw META-INF: " + saw_meta_inf );
+        //   System.out.println("    Saw WEB-INF: "  + saw_web_inf );
+        //
+        //   if ( saw_meta_inf && saw_web_inf )
+        //   {
+        //       deployAVMdirectory(version,
+        //                          avm_appBase,
+        //                          webapp_leafname,
+        //                          context_path,
+        //                          parent_context_path);
+        //   }
+        //   else
+        //   {
+        //       log.warn("Not deploying webapp: " + webapp_leafname + 
+        //                "  ( No META-INF and/or WEB-INF in: " + 
+        //                avm_appBase + "/" + webapp_leafname + " )");
+        //   }
 
-            if  ( entry_value.isDirectory() )
-            {
-                if (isServiced(context_path)) { continue; }
-
-                deployAVMdirectory(version,
-                                   avm_appBase,
-                                   webapp_leafname,
-                                   context_path,
-                                   parent_context_path);
-            }
-        }
+        deployAVMdirectory(version,
+                           avm_appBase,
+                           webapp_leafname,
+                           context_path,
+                           parent_context_path);
     }
 
     /**
      * Deploys AVM directory.  Requires that any directory 
      * that this dir depends on has already been deployed.
+     *
+     * If a webapp has already been deployed, treat the
+     * current deployment as a failure.
      */
     @SuppressWarnings("unchecked")
-    protected void deployAVMdirectory(
+    protected boolean deployAVMdirectory(
        int    version,              // -1
-       String avmAppBase,           // repo-3:/www/avm_webapps
+       String avmAppBase,           // mysite--bob:/www/avm_webapps
        String webapp_leafname,      // my_webapp
-       String contextPath,          // e.g.:   /$-1$repo-3$my_webapp
+       String contextPath,          // e.g.:   /$-1$mysite--bob$my_webapp
        String parent_context_path)  // possibly null
     {
-        // repo-3:/www/avm_webapps/my_webapp
+        // mysite--bob:/www/avm_webapps/my_webapp
         String webapp_fullpath = avmAppBase + "/" + webapp_leafname;
 
         // Example params:
         //   version:         -1 
-        //   webapp_fullpath: repo-3:/www/avm_webapps/my_webapps
+        //   webapp_fullpath: mysite--bob:/www/avm_webapps/my_webapps
         //   webapp_leafname: my_webapps
-        //   contextPath      /$-1$repo-3$my_webapp
+        //   contextPath      /$-1$mysite--bob$my_webapp
         
         // Don't deploy something that's already deployed
         if (deploymentExists(contextPath)) 
         { 
-            return; 
+            return false; 
         }
 
         AVMDeployedApplication deployedApp = 
@@ -557,10 +1030,10 @@ public class AVMHostConfig extends HostConfig
             //                           |
             //                     ContainerBase  
             //                    /             \
-            //   AVMStandardContext         StandardHost   
-            //        (a webapp)                |
-            //                               AVMHost  
-            //                         (a webapp container)
+            //      StandardContext         StandardHost   
+            //             |                     |
+            //     AVMStandardContext         AVMHost  
+            //       (a webapp)           (a webapp container)
             //
             //
             // The AVMStandardContext object "context" corresponds to a
@@ -582,7 +1055,7 @@ public class AVMHostConfig extends HostConfig
             AVMStandardContext context = new AVMStandardContext();
 
 
-            if (context instanceof Lifecycle)           // yes, it's a Lifecycle
+            if (context instanceof Lifecycle)   // yes, it's a Lifecycle
             {
                 //  By default, getConfigClass() returns:
                 //         "org.apache.catalina.startup.ContextConfig"
@@ -637,11 +1110,20 @@ public class AVMHostConfig extends HostConfig
 
 
             AVMWebappLoader webappLoader = 
-                new AVMWebappLoader( parent_cl, 
-                                     context_classloader_registry_,
-                                     contextPath,
-                                     parent_context_path
-                                   );
+                new AVMWebappLoader( 
+                      parent_cl, 
+                      context_classloader_registry_,
+                      contextPath,
+                      parent_context_path,
+
+                      // AVM path version
+                      // Usually, it's -1 which corresponds to HEAD
+                      version,
+
+                      // AVM path to the webapp
+                      // Example:   mysite--bob:/www/avm_webapps/my_webapp
+                      avmAppBase + "/" + webapp_leafname  
+                );
 
             webappLoader.setDelegate( false );  // false == check local 1st
 
@@ -653,24 +1135,24 @@ public class AVMHostConfig extends HostConfig
             //
             context.setLoader(webappLoader);
 
-            context.setPath(contextPath);  // e.g.: /$-1$repo-3$my_webapp
+            context.setPath(contextPath);  // e.g.: /$-1$store-3$my_webapp
 
 
-            // Move from:  /media/alfresco/cifs/v/$-1$mysite--guest:/www/avm_webapps/ROOT
-            // To:         /media/alfresco/cifs/v/mysite--guest/VERSION/v-1/DATA/www/avm_webapps/ROOT
+            // CIFS-style JNDI path: 
+            //    /media/alfresco/cifs/v/mysite--bob/VERSION/v-1/DATA/www/avm_webapps/ROOT
             //
             // Example of webapp_fullpath:
-            //      "repo-3:/www/avm_webapps/my_webapp"
+            //      "mysite--bob:/www/avm_webapps/my_webapp"
             //
             // context.setDocBase( "$" + version + "$" + webapp_fullpath );
 
-            int repo_delim = webapp_fullpath.indexOf(':');
+            int store_delim = webapp_fullpath.indexOf(':');
 
             context.setDocBase(  
-                webapp_fullpath.substring(0,repo_delim)  + 
-                "/VERSION/v" + version                   + 
-                "/DATA"                                  + 
-                webapp_fullpath.substring(repo_delim +1 ,webapp_fullpath.length() ) );
+                webapp_fullpath.substring(0,store_delim)  + 
+                "/VERSION/v" + version                    + 
+                "/DATA"                                   + 
+                webapp_fullpath.substring(store_delim +1 ,webapp_fullpath.length() ) );
 
 
             // Make Constants.ApplicationContextXml == "META-INF/context.xml";
@@ -678,8 +1160,8 @@ public class AVMHostConfig extends HostConfig
             // file system.
             //
             // Example configFile: 
-            //   "repo-3:/www/avm_webapps/my_webapp" + 
-            //          "/META-INF/context.xml"
+            //   "mysite--bob:/www/avm_webapps/my_webapp" + 
+            //               "/META-INF/context.xml"
             //
             String configFile = webapp_fullpath + "/" + "META-INF/context.xml";
 
@@ -739,25 +1221,22 @@ public class AVMHostConfig extends HostConfig
                 }
 
                 // put() forces SuppressWarnings, due to map def in base class.
-                deployedApp.redeployResources.put(
-                    configFile,
-                    last_modified
-                );
+                deployedApp.redeployResources.put( configFile, last_modified);
             }
 
-            addWatchedResources(deployedApp, 
-                                webapp_fullpath,     
-                                context);
+            // TODO:  get rid of this?
+            addWatchedResources(deployedApp, webapp_fullpath, context);
         } 
         catch (Throwable t) 
         {
             log.error(sm.getString("hostConfig.deployDir.error", webapp_leafname), t);
+            return false;
         }
 
-
         //  Prevent app from being deployed on top of itself
-
         this.deployed.put(contextPath, deployedApp);
+
+        return true;
     }
 
 
@@ -768,7 +1247,7 @@ public class AVMHostConfig extends HostConfig
     {
         // Example params:
         //    app:     contextPath,  {avm_path,timestamp},{avm_path,timestamp},...
-        //    webapp_fullpath: repo-3:/www/avm_webapps/my_webapps
+        //    webapp_fullpath: mysite--bob:/www/avm_webapps/my_webapps
 
         String[] watchedResources = context.findWatchedResources();
 
@@ -801,7 +1280,8 @@ public class AVMHostConfig extends HostConfig
                     if ( ! (resource.charAt(0) == '/') )   // Windows
                     {
                         resource = webapp_fullpath + "/" + resource;
-                        log.debug("AVMHostConfig:  relative watched resource put into webapp_fullpath: " + resource);
+                        log.debug("AVMHostConfig:  relative watched resource " + 
+                                  "put into webapp_fullpath: " + resource);
                     }
                     else { continue; }
                 }
@@ -816,7 +1296,8 @@ public class AVMHostConfig extends HostConfig
                         //
                         resource = webapp_fullpath + "/" + resource;
 
-                        log.debug("AVMHostConfig:  relative watched resource put into webapp_fullpath: " + resource);
+                        log.debug("AVMHostConfig:  relative watched resource " + 
+                                  "put into webapp_fullpath: " + resource);
                     }
                     else { continue; }
                 }
@@ -840,7 +1321,8 @@ public class AVMHostConfig extends HostConfig
                 last_modified = new Long( 0L );
             }
 
-            log.debug("AVMHostConfig adding watched resource: " + resource  + "  modtime:" + last_modified);
+            log.debug("AVMHostConfig adding watched resource: " + 
+                      resource  + "  modtime:" + last_modified);
 
             // put() forces SuppressWarnings, due to map def in base class.
             app.reloadResources.put( resource, last_modified);
@@ -848,21 +1330,35 @@ public class AVMHostConfig extends HostConfig
     }
 
 
+    /**
+    *  The autoDepoy="true" option is a performance killer because it triggers
+    *  a lot of needless calls to checkResources() and deployApps(); therefore, 
+    *  this null check() implementation removes all possibility of this occuring.
+    */
+    protected void check() { }
+
+
+
     @SuppressWarnings("unchecked")
     protected synchronized void checkResources(DeployedApplication app)
     {
-        // TODO: NEON RESUME HERE remove after demo
-        //       Just doing early return to to stop possiblity of accidental undeploy
-        if ( 1 == 1 )
-        {
-            return;
-        }
+        // AVMHostConfig should never have periodic checks via autoDeploy="true"
+        // If someone has misconfigured things, nip it in the bud here.
+        //
+        // Note: 
+        //     This can't happen anymore due to the no-op check() function (see above).
+        //     Anyway, I'm leaving it in place for now.   
+        //
+        // TODO: remove this entire checkResources function someday.
+        //
+        if ( 1 == 1 ) { return; }
+
 
         // resource_desc
         //
         // The resources fetched within app look like this:
-        //      repo-3:/www/avm_webapps/my_webapp
-        //      repo-3:/www/avm_webapps/my_webapp/META-INF/context.xml
+        //      store-3:/www/avm_webapps/my_webapp
+        //      store-3:/www/avm_webapps/my_webapp/META-INF/context.xml
         //      ...
 
         new Exception("debug stack trace for checkResources").printStackTrace();
@@ -966,7 +1462,7 @@ public class AVMHostConfig extends HostConfig
                     {
                         //  For example:  
                         //    resources[j] == 
-                        //        "repo-3:/www/avm_webapps/my_webapp"
+                        //        "store-3:/www/avm_webapps/my_webapp"
 
                         try 
                         {
@@ -1199,16 +1695,16 @@ public class AVMHostConfig extends HostConfig
     *  once it has been created.
     */
     class AVMWebappDescriptor
-    {                                // Example of params:
-        int     version_;            // -1
-        String  repo_name_;          // "repo-3"
-        String  indirection_name_;   // not null iff not an overlay nor a layer
-        String  avm_appBase_;        // "repo-3:/www/avm_webapps"
-        String  webapp_leafname_;    // "my_webapp"
+    {                                  // Example of params:
+        int     version_;              // -1
+        String  store_name_;           // "mysite--bob"
+        String  indirection_name_;     // not null iff neither overlay nor layer
+        String  avm_appBase_;          // "mysite--bob:/www/avm_webapps"
+        String  webapp_leafname_;      // "my_webapp"
 
-        String  context_path_;           // "/$-1$repo-3$my_webapp"
-        String  parent_repo_name_;       // "repo-1"
-        String  parent_context_path_;    // "/$-1$repo-1$my_webapp"
+        String  context_path_;         // "/$-1$mysite--bob$my_webapp"
+        String  parent_store_name_;    // "mysite"
+        String  parent_context_path_;  // "/$-1$mysite$my_webapp"
 
         // List of of webapp decriptors that are layered on top 
         List<AVMWebappDescriptor> dependents_ = 
@@ -1220,13 +1716,13 @@ public class AVMHostConfig extends HostConfig
         }
 
         AVMWebappDescriptor(int     version,
-                            String  repo_name,
+                            String  store_name,
                             String  indirection_name,
                             String  avm_appBase,
                             String  webapp_leafname)
         {
             version_          = version;
-            repo_name_        = repo_name;
+            store_name_       = store_name;
             indirection_name_ = indirection_name;
             avm_appBase_      = avm_appBase;
             webapp_leafname_  = webapp_leafname;
@@ -1236,22 +1732,20 @@ public class AVMHostConfig extends HostConfig
         {
             if ( context_path_ == null )
             {
-                context_path_ = "/"              + 
-                               "$"               +
-                               version_          +
-                               "$"               +
-                               repo_name_        +
-                               "$"               +
-                               webapp_leafname_;
+                context_path_ = AVMUrlValve.GetContextNameFromStoreName(
+                                   version_,
+                                   store_name_,
+                                   webapp_leafname_
+                                );
             }
             return context_path_;
         }
 
         void setParentRepo(
                 HashMap<String, AVMWebappDescriptor> webapp_descriptors,
-                String                               parent_repo_name)
+                String                               parent_store_name)
         {
-            parent_repo_name_ = parent_repo_name; 
+            parent_store_name_ = parent_store_name; 
 
             AVMWebappDescriptor parent_desc =
                 webapp_descriptors.get( getParentContextPath() );
@@ -1261,17 +1755,15 @@ public class AVMHostConfig extends HostConfig
 
         String getParentContextPath()
         {
-            if ( parent_repo_name_ == null ) { return null; }
+            if ( parent_store_name_ == null ) { return null; }
 
             if ( parent_context_path_ == null )
             {
-                parent_context_path_ = "/"                  + 
-                                       "$"                  +
-                                       version_             +
-                                       "$"                  +
-                                       parent_repo_name_    +
-                                       "$"                  +
-                                       webapp_leafname_;
+                parent_context_path_ = AVMUrlValve.GetContextNameFromStoreName(
+                                           version_,
+                                           parent_store_name_,
+                                           webapp_leafname_
+                                       );
             }
             return parent_context_path_;
         }

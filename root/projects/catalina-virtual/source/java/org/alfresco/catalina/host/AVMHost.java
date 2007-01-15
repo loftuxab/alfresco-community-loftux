@@ -124,7 +124,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     private static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( AVMHost.class );
 
-    static String AVMFileDirAppBase_;
+    static String AVMFileDirMountPoint_;
 
     // Repeatedly re-registers this Host with the Alfresco server
     // (e.g.: every 10 seconds or so).
@@ -263,9 +263,9 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         // Help make JNDI paths line up with CIFS paths
         // Thus instead of something like:
         //
-        //      return AVMFileDirAppBase_  + this.name;
+        //      return AVMFileDirMountPoint_  + this.name;
         //
-        // Just pass back whatever AVMFileDirAppBase_ 
+        // Just pass back whatever AVMFileDirMountPoint_ 
         // was as the host's appBase.
         //
         // TODO:  Perhaps the CIFS mount path could be augmented
@@ -299,7 +299,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         //         <AvmFileDirAppBase>/<value-determined-by-AVMHostConfig>
         //
 
-        return AVMFileDirAppBase_;
+        return AVMFileDirMountPoint_;
     }
 
     /**
@@ -321,7 +321,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         // Create the registration thread early, but don't start it yet.
         // The creation of this object configures various attributes
         // in the VirtServerInfoMBean, and sets up AVMFileDirContext
-        // so it can yield a meaningul AVMFileDirAppBase.
+        // so it can yield a meaningful AVMFileDirMountPoint.
         //
         registrationThread_ = new VirtServerRegistrationThread();
 
@@ -330,7 +330,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         // to prepare for that prior to the AVMHostConfig start()
         // occurs.
         //
-        AVMFileDirAppBase_  = AVMFileDirContext.getAVMFileDirAppBase();
+        AVMFileDirMountPoint_  = AVMFileDirContext.getAVMFileDirMountPoint();
 
 
         try 
@@ -490,7 +490,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         // new Exception("Stack trace").printStackTrace();
 
         if( started ) { return; }
-
 
         if( ! initialized ) { init(); }
 
