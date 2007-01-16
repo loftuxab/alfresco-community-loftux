@@ -101,7 +101,7 @@
          <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
          <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
@@ -124,7 +124,7 @@
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
          <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </tar>
@@ -196,7 +196,7 @@
          <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
          <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
@@ -219,7 +219,7 @@
          <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.zip" prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
          <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </tar>
@@ -278,11 +278,13 @@
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
+         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
       </zip>
 
       <tar destfile="${dir.dist}/${file.name.dist.war}.tar" longfile="gnu">
          <tarfileset dir="${dir.assemble.war}" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.war}.tar.gz" src="${dir.dist}/${file.name.dist.war}.tar" />
       <delete file="${dir.dist}/${file.name.dist.war}.tar" />
