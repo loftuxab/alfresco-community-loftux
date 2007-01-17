@@ -286,7 +286,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             request_uri_MB.recycle();
 
             // Example of AVM-mangled subreq URI:
-            //   /$-1$repo-1$servlets-examples/servlet/RequestInfoExample
+            //   /$-1$store-1$servlets-examples/servlet/RequestInfoExample
             //
             // After unmangling:
             //   /servlets-examples/servlet/RequestInfoExample
@@ -302,7 +302,6 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
 
             decoded_uri_MB.setString( decoded_uri );
             request_uri_MB.setString( request_uri );
-
 
             // Create the same illusion for getContextPath()
             // that was just done for       getRequestURI()
@@ -367,11 +366,11 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         // This will be used later to fetch the InputStream of
         // of a resource via JNDI calls.
 
-        Matcher   rproxy_match       = hostmatch.getMatch();
-        AVMHost   avm_host           = hostmatch.getHost();
-        AVMResourceBinding binding   = avm_host.getResourceBinding();
-        String    repo_name = binding.getRepositoryName(rproxy_match );
-        String    version   = binding.getVersion(       rproxy_match );
+        Matcher            rproxy_match = hostmatch.getMatch();
+        AVMHost            avm_host     = hostmatch.getHost();
+        AVMResourceBinding binding    = avm_host.getResourceBinding();
+        String             store_name = binding.getRepositoryName(rproxy_match);
+        String             version    = binding.getVersion(       rproxy_match);
 
         host = avm_host;
 
@@ -406,7 +405,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         // AVMHostConfig, the repository was scanned repositories
         // with metadata of the form:  
         //
-        //         .dns.<hostname> = <repo-path> 
+        //         .dns.<hostname> = <store-path> 
         //
         // Suppose the avm has the following layout:
         //
@@ -427,11 +426,11 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         //  achieves virtualization by name-mangling the webapps
         //  during AVMHostConfig's auto deployment.  For example,
         //
-        //  Let:   <repoName> =  repo-3
+        //  Let:   <storeName> =  store-3
         //         <version>  =  -1
         //
-        //  Then   my_webapp is added to the AVMHost as:  /$-1$repo-3$my_webapp
-        //  and    ROOT      is added to the AVMHost as:  /$-1$repo-3$ROOT
+        //  Then   my_webapp is added to the AVMHost as:  /$-1$store-3$my_webapp
+        //  and    ROOT      is added to the AVMHost as:  /$-1$store-3$ROOT
         //
         //  Put another way, the default  HostConfig class would
         //  register webapps with names like this:
@@ -445,16 +444,17 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         //              "/servlets-examples"
         //              "/tomcat-docs"
         //
-        //  By contrast, the AVMHostConfig would register these same webapps:
+        //  By contrast, the AVMHostConfig would register the following
+        //  webapps for http://alice.mysite.www--sandbox.*/ :
         //
-        //              "/$-1$repo-3$ROOT"        ("ROOT" webapp context path)
-        //              "/$-1$repo-3$balancer"
-        //              "/$-1$repo-3$host-manager"
-        //              "/$-1$repo-3$jsp-examples"
-        //              "/$-1$repo-3$manager"
-        //              "/$-1$repo-3$my_webapp"
-        //              "/$-1$repo-3$servlets-examples"
-        //              "/$-1$repo-3$tomcat-docs"
+        //              "/$-1$mysite--alice$ROOT"        ("ROOT" webapp context path)
+        //              "/$-1$mysite--alice$balancer"
+        //              "/$-1$mysite--alice$host-manager"
+        //              "/$-1$mysite--alice$jsp-examples"
+        //              "/$-1$mysite--alice$manager"
+        //              "/$-1$mysite--alice$my_webapp"
+        //              "/$-1$mysite--alice$servlets-examples"
+        //              "/$-1$mysite--alice$tomcat-docs"
         //
         // The character '$' was chosen as the name mangling delimiter
         // for the following reasons:
@@ -462,7 +462,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         //      o  Legal in URLs without the need to %HH-encode
         //      o  Legal in file name on Unix/Windows
         //      o  It's an oddball character; people won't be too upset
-        //         if their <repoName> can't include '$'.  Actually, it
+        //         if their <storeName> can't include '$'.  Actually, it
         //         could appear, if I were willing to encode '$'
         //         (but that just seems like overkill at the moment).
         //
@@ -474,7 +474,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         // This lets us append it later when we know the real value.
         //
         String uri_prefix = GetContextNameFromStoreName( version, 
-                                                         repo_name,
+                                                         store_name,
                                                          ""
                                                        );
 
@@ -493,7 +493,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
 
         // There are two cases that name mangling needs to handle:
         //
-        //    (1)  The AVMHost has a /<repoVersion>$<repoName>$<first_segment>
+        //    (1)  The AVMHost has a /<storeVersion>$<storeName>$<first_segment>
         //    (2)  The context is mapped to the empty path ""  (i.e.: ROOT).
         //
         // Fortuantely, the entire path --> servlet context
@@ -509,7 +509,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         if ( host.findChild(  uri_prefix + first_segment ) != null )
         {
             // The host has a context path of the form:
-            //       /<repoVersion>$<repoName>$<first_segment>
+            //       /<storeVersion>$<storeName>$<first_segment>
             //
             decoded_uri = uri_prefix + decoded_uri.substring(1);
             request_uri = uri_prefix + request_uri.substring(1);
@@ -518,26 +518,49 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         {
             // This is a request for something within the context mapped to ""
             // (i.e.: ROOT).  Therefore, create name-mangled ROOT webapp path:
-            //       /<repoVersion>$<repoName>$ROOT<uri>
+            //       /<storeVersion>$<storeName>$ROOT<uri>
 
             decoded_uri = uri_prefix + "ROOT" + decoded_uri;
             request_uri = uri_prefix + "ROOT" + request_uri;
         }
 
-        decoded_uri_MB.setString( decoded_uri );
-        request_uri_MB.setString( request_uri );
+
+        // At this point, the simple-but-wrong thing to do is:
+        //
+        //    decoded_uri_MB.setString( decoded_uri );
+        //    request_uri_MB.setString( request_uri );
+        //
+        // Here's why:
+        //    If the value of decoded_uri contains space, 
+        //    it gets automatically %HH-encoded within the 
+        //    subrequest.  In a normal request, the MessageBytes 
+        //    buffer is of type T_BYTES, because it's data that 
+        //    has just been pulled off a TCP connection.  
+        //    If you say  decoded_uri_MB.setString( decoded_uri )
+        //    then decoded_uri_MB is left in state T_STR, which 
+        //    causes postParseRequest to skip %HH decoding,
+        //    because it assumes decoding has already been done.
+        //
+        // Therefore, it's critical here to use setBytes(), not
+        // setString().  Sub-request Powaqqatsi at its very finest.
+
+        byte [] uri_bytes =  decoded_uri.getBytes();
+        decoded_uri_MB.setBytes( uri_bytes, 0, uri_bytes.length);
+
+        uri_bytes =  request_uri.getBytes();
+        request_uri_MB.setBytes( uri_bytes, 0, uri_bytes.length);
 
         // Remember what adapter we're using, so we can do a subrequest
 
         org.apache.coyote.Adapter  adapter =
             request.getConnector().getProtocolHandler().getAdapter();
 
-
         // Clear the state of the high-level Catalina request
         // The req is attached to this object, so we don't want
         // residual crud from the 1st pass leaking through.
 
         request.recycle();
+
 
         try
         {
@@ -549,8 +572,24 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             // If you try to do set a header here:
             //   if (...) { resp.setHeader("Cache-Control","max=4");}
             // the service might set a different value for the header;
-            // this would override your settting here.
+            // this would override your setting here.
             //
+            // java.lang.Exception: Inside invoke...
+            // at org.alfresco.catalina.valve.AVMUrlValve.invoke(AVMUrlValve.java:573)
+            // at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
+            // at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
+            // at org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:667)
+            // at org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
+            // at org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
+            // at org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
+            // at java.lang.Thread.run(Thread.java:595
+            //
+            // The %HH decoding of the decoded_URI takes place in 
+            // CoyoteAdapter around line 212
+            // 
+            // The req (CoyoteAdapter has an internal UDecoder 
+            // fetchable via  req.getURLDecoder().convert(decodedURI, false)  (where false==not query)
+            // 
 
             adapter.service(req, resp );
 
@@ -633,7 +672,7 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     *  <p>
     *   Example of AVM-mangled subreq URI:
     *   <pre>
-    *     /$-1$repo-1$servlets-examples/servlet/RequestInfoExample
+    *     /$-1$store-1$servlets-examples/servlet/RequestInfoExample
     *   </pre>
     *
     *   After unmangling:
@@ -653,16 +692,16 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         if ( offset < 0 ) { return uri; }
         //     |
         //     V
-        // /$-1$repo-1$servlets-examples/servlet/RequestInfoExample
+        // /$-1$store-1$servlets-examples/servlet/RequestInfoExample
 
 
 
         offset = uri.indexOf('$', offset +1 );
         if ( offset < 0 ) { return uri; }
         //     |
-        //     `------.
-        //            V
-        // /$-1$repo-1$servlets-examples/servlet/RequestInfoExample
+        //     `-------.
+        //             V
+        // /$-1$store-1$servlets-examples/servlet/RequestInfoExample
 
         offset++;
 
@@ -670,9 +709,9 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         {
             offset += "ROOT/".length();
             //  |
-            //  `---------------.
-            //                  V
-            // /$-1$repo-1$ROOT/moo/cow/...
+            //  `----------------.
+            //                   V
+            // /$-1$store-1$ROOT/moo/cow/...
         }
 
         return "/" + uri.substring( offset, uri.length() );
