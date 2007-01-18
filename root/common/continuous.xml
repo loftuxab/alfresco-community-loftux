@@ -126,12 +126,13 @@
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
          <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}/bin" prefix="virtual-tomcat/bin" includes="*.sh" mode="755" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.jboss}.tar" />
       <delete file="${dir.dist}/${file.name.dist.jboss}.tar" />
    </target>
-   
+
    <target name="assemble-jboss-common" depends="init">
       <mkdir dir="${dir.dist}" />
       <mkdir dir="${dir.assemble.jboss}" />
@@ -221,7 +222,8 @@
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
          <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}/bin" prefix="virtual-tomcat/bin" includes="*.sh" mode="755" />
       </tar>
       <gzip zipfile="${dir.dist}/${file.name.dist.tomcat}.tar.gz" src="${dir.dist}/${file.name.dist.tomcat}.tar" />
       <delete file="${dir.dist}/${file.name.dist.tomcat}.tar" />
