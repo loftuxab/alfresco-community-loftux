@@ -116,12 +116,12 @@
          <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
          <!-- now overlay Alfresco webapp extras -->
          <tarfileset dir="${dir.assemble.jboss}" />
-         <tarfileset dir="${dir.project.installer}" includes="${files.installer.linux}" />
+         <tarfileset dir="${dir.project.installer}" includes="licenses/**" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_osx.txt" fullpath="README_osx.txt" />
-         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh,alfvirtual.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
@@ -211,12 +211,12 @@
          <tarfileset dir="${dir.distribution.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
          <!-- now overlay Alfresco webapp extras -->
          <tarfileset dir="${dir.assemble.tomcat}" />
-         <tarfileset dir="${dir.project.installer}" includes="${files.installer.linux}" />
+         <tarfileset dir="${dir.project.installer}" includes="licenses/**" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_osx.txt" fullpath="README_osx.txt" />
-         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh,alfvirtual.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
          <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
