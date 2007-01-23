@@ -73,6 +73,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -328,14 +329,24 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             server_MB.recycle();
             server_MB.setString( reverse_proxy );
 
-            //-------------------------------------------------------
-            // Finally, do the real work of servicing the subrequest!
-            //-------------------------------------------------------
-            getNext().invoke(request, response);
 
+            //---------------------------------------------
+            // Do the real work of servicing the subrequest
+            //---------------------------------------------
+            try 
+            {
+                getNext().invoke(request, response);
+            }
+            catch (Exception e)  
+            { 
+                /* nothing to do here */ 
+            }
+            finally  
+            {
+                // no matter what, turn off subrequest flag
+                AVMUrlValve_invoked_.set(null);
+            }
 
-            // turn off subrequest flag
-            AVMUrlValve_invoked_.set(null);
             return;
         }
 
@@ -371,6 +382,54 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         AVMResourceBinding binding    = avm_host.getResourceBinding();
         String             store_name = binding.getRepositoryName(rproxy_match);
         String             version    = binding.getVersion(       rproxy_match);
+
+
+        // Handle requests for bad virtual hosts gracefully
+
+        if ( (store_name == null) || store_name.equals("") )
+        {
+            // When the reqeust has failed due to no mapping
+            // between virtual host and AVM store, there
+            // won't be any subrequest.  Therefore, unset
+            // the subrequest flag.
+
+            AVMUrlValve_invoked_.set(null);   
+
+            // TODO:  The error page should be configurable/localizable. 
+            //        Longer term, figure out where configuration data
+            //        like this should go.  For now, I'm just hard-coding 
+            //        the response in English.
+
+            String html_error_msg = 
+                   "<html>\n"                                                  +
+                   "  <head><title>Virtual website not found</title></head>\n" +
+                   "  <body>\n"                                                +
+                   "     <p>\n"                                                +
+                   "     <h2>Virtual website not found</h2>\n"                 + 
+                   "     <br>\n"                                               +
+                   "     &nbsp;&nbsp;&nbsp;&nbsp;Bad host name:&nbsp;&nbsp;"   + 
+                   "     &nbsp;&nbsp;<tt>" + server_name + "</tt>\n"           +
+                   "  </body>\n" +
+                   "</html>";
+
+            try 
+            {
+                response.setStatus(404);
+                response.setContentType("text/html");
+                response.setCharacterEncoding("utf-8");
+                Writer writer = response.getReporter();
+
+                // A null writer indicates a hard commit
+                // has already taken place... which should
+                // never happen here.
+                if (writer != null)
+                {
+                    writer.write( html_error_msg);
+                }
+            }
+            catch (Exception e) { /* nothing to do */ }
+            finally { return; }
+        }
 
         host = avm_host;
 

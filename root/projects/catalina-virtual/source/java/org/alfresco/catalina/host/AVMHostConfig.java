@@ -23,12 +23,14 @@ package org.alfresco.catalina.host;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.LinkedList;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.ServletContext;
+import org.apache.catalina.Globals;
 import org.alfresco.catalina.context.AVMStandardContext;
 import org.alfresco.catalina.loader.AVMWebappLoader;
 import org.alfresco.jndi.AVMFileDirContext;
@@ -151,7 +153,11 @@ public class AVMHostConfig extends HostConfig
     {
         super();
 
-        log.debug("AVMHostConfig initial AVMHostRelativeAppBase: " + AVMHostRelativeAppBase);
+        if (log.isDebugEnabled())
+        {
+            log.debug("AVMHostConfig initial AVMHostRelativeAppBase: " + 
+                      AVMHostRelativeAppBase);
+        }
 
         if (AVMHostRelativeAppBase == null )
         {
@@ -168,8 +174,12 @@ public class AVMHostConfig extends HostConfig
         }
 
         AVMHostRelativeAppBase_ = AVMHostRelativeAppBase;
-
-        log.debug("AVMHostConfig initial AVMHostRelativeAppBase_: " + AVMHostRelativeAppBase_);
+   
+        if (log.isDebugEnabled())
+        {
+            log.debug("AVMHostConfig initial AVMHostRelativeAppBase_: " + 
+                      AVMHostRelativeAppBase_);
+        }
     }
 
 
@@ -288,10 +298,14 @@ public class AVMHostConfig extends HostConfig
                 if (  (dns_store_path == null) || 
                      ! dns_store_path.endsWith( AVMHostRelativeAppBase_ ) )
                 {
-                    log.debug("DNS mount point " + dns_store_path + 
-                               " does not end with: "      + 
-                               AVMHostRelativeAppBase_     + 
-                               " ...skipping on this host.");
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("DNS mount point " + dns_store_path +
+                                   " does not end with: "             + 
+                                   AVMHostRelativeAppBase_            + 
+                                   " ...skipping on this host.");
+                    }
+
                     continue;
                 }
 
@@ -313,7 +327,11 @@ public class AVMHostConfig extends HostConfig
                 {
                     String webapp_name = webapp_entry.getKey();    //  my_webapp
 
-                    log.debug("AVMHostConfig webapp: " + webapp_name); 
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("AVMHostConfig webapp: " + webapp_name); 
+                    }
+
 
                     if ( webapp_name.equalsIgnoreCase("META-INF")  ||
                          webapp_name.equalsIgnoreCase("WEB-INF")
@@ -340,7 +358,13 @@ public class AVMHostConfig extends HostConfig
                         // mandated by the 2.4 servlet spec?
                         // Review & find out. 
 
-                        log.warn("AVMHostConfig disallows webapps named: " + webapp_name); 
+
+                        if (log.isWarnEnabled())
+                        {
+                            log.warn("AVMHostConfig disallows webapps named: " + 
+                                     webapp_name); 
+                        }
+
                         continue; 
                     }
 
@@ -389,8 +413,11 @@ public class AVMHostConfig extends HostConfig
                                          boolean isRecursive
                                        )
     {
-        log.info("AVMHostConfig update version: " + 
-                 version + " path: " + storePath);
+        if (log.isInfoEnabled())
+        {
+            log.info("AVMHostConfig update version: " + 
+                     version + " path: " + storePath);
+        }
 
         String store_name;                           // e.g.: mysite--bob
         int store_index = storePath.indexOf(':');
@@ -447,7 +474,10 @@ public class AVMHostConfig extends HostConfig
         {
             String webapp_name = webapp_entry.getKey();   // my_webapp
 
-            log.debug("updateVirtualWebapp found: " + webapp_name); 
+            if (log.isDebugEnabled())
+            {
+                log.debug("updateVirtualWebapp found: " + webapp_name);
+            }
 
             String webapp_storePath =  avm_appBase + "/" + webapp_name;
 
@@ -456,8 +486,11 @@ public class AVMHostConfig extends HostConfig
 
             if ( context_name == null )
             {
-                log.warn("updateVirtualWebapp failed; bad store path: " + 
-                          webapp_storePath );
+                if (log.isWarnEnabled())
+                {
+                    log.warn("updateVirtualWebapp failed; bad store path: " + 
+                              webapp_storePath );
+                }
 
                 return false;
             }
@@ -468,7 +501,11 @@ public class AVMHostConfig extends HostConfig
             if ( context != null ) 
             {
                 host.removeChild( context );
-                log.info("temporarily removed webapp: " + context_name);
+
+                if (log.isInfoEnabled())
+                {
+                    log.info("temporarily removed webapp: " + context_name);
+                }
             }
             
             // If this webapp is the child of some other webapp, 
@@ -623,8 +660,11 @@ public class AVMHostConfig extends HostConfig
                                          boolean isRecursive
                                        )
     {
-        log.info("AVMHostConfig removeVirtualWebapp version: " + 
-                 version + " path: " + storePath);
+        if (log.isInfoEnabled())
+        {
+            log.info("AVMHostConfig removeVirtualWebapp version: " + 
+                     version + " path: " + storePath);
+        }
 
         boolean is_sucessful = true;
         String  store_name;                           // e.g.: mysite--bob
@@ -686,7 +726,10 @@ public class AVMHostConfig extends HostConfig
         String avm_appBase = storePath.substring(0,app_base_tail);
         Map<String, AVMNodeDescriptor> webapp_entries = null;
 
-        log.debug("removeVirtualWebapp listing: " + avm_appBase);
+        if (log.isDebugEnabled())
+        {
+            log.debug("removeVirtualWebapp listing: " + avm_appBase);
+        }
 
         try 
         {
@@ -700,16 +743,16 @@ public class AVMHostConfig extends HostConfig
             return false;
         }
 
-
-        log.debug("removeVirtualWebapp iterating over: " + avm_appBase);
-
         for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  : 
               webapp_entries.entrySet()
             )
         {
             String webapp_name = webapp_entry.getKey();   // my_webapp
 
-            log.debug("removeVirtualWebapp found: " + webapp_name); 
+            if (log.isDebugEnabled())
+            {
+                log.debug("removeVirtualWebapp found: " + webapp_name); 
+            }
 
             String webapp_storePath =  avm_appBase + "/" + webapp_name;
 
@@ -718,30 +761,96 @@ public class AVMHostConfig extends HostConfig
 
             if ( context_name == null )
             {
-                log.warn("removeVirtualWebapp failed; bad store path: " + 
-                          webapp_storePath );
+                if (log.isWarnEnabled())
+                {
+                    log.warn("removeVirtualWebapp failed; bad store path: " + 
+                              webapp_storePath );
+                }
 
                 return false;
             }
 
             this.deployed.remove( context_name );
 
-            log.debug("removeVirtualWebapp removed: " + context_name);
-
+            if (log.isDebugEnabled())
+            {
+                log.debug("removeVirtualWebapp removed: " + context_name);
+            }
 
             AVMStandardContext context = 
                 (AVMStandardContext) host.findChild( context_name );
 
             if ( context != null ) 
             {
+                ServletContext servletContext =
+                    context.getServletContext();
+
+                File workDir =
+                    (File) servletContext.getAttribute(Globals.WORK_DIR_ATTR);
+
                 host.removeChild( context );
-                log.info("removed webapp: " + context_name);
+
+                boolean clean_ok = cleanDir(workDir, true);
+
+                if ( ! clean_ok )
+                {
+                    if (log.isWarnEnabled())
+                    {
+                        log.warn("Could not remove entire work directory: " +  
+                                  workDir.getAbsolutePath());
+                    }
+                }
+                else
+                {
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("Remove work directory: " +  
+                                  workDir.getAbsolutePath());
+                    }
+                }
+
+                if (log.isInfoEnabled())
+                {
+                    log.info("removed webapp: " + context_name);
+                }
             }
         }
-        log.debug("removeVirtualWebapp done iterating over: " + avm_appBase);
 
         return is_sucessful;
     }
+
+    /**
+     * Remove all files and subdirs of dir.
+     * If deleteDir is true, dir itself is deleted.
+     *
+     * @param dir File object representing the directory to be cleaned
+     */
+    private static boolean cleanDir(File dir, boolean deleteDir)
+    {
+        boolean overall_status = true;
+        boolean status;
+
+        String files[] = dir.list();
+        if (files == null) { files = new String[0]; }
+
+        for (int i = 0; i < files.length; i++) 
+        {
+            File file = new File(dir, files[i]);
+
+            if (file.isDirectory()) { status = cleanDir(file, true); } 
+            else                    { status = file.delete(); }
+
+            overall_status = overall_status && status;
+        }
+
+        if  ( deleteDir )
+        {
+            overall_status = dir.delete() && overall_status;
+        }
+        return overall_status;
+    }
+
+
 
 
     protected void 
@@ -892,7 +1001,11 @@ public class AVMHostConfig extends HostConfig
             // mandated by the 2.4 servlet spec?
             // Review & find out. 
 
-            log.warn("AVMHostConfig disallows webapps named: " + webapp_leafname); 
+            if (log.isWarnEnabled())
+            {
+                log.warn("AVMHostConfig disallows webapps named: " + webapp_leafname); 
+            }
+
             return;
         }
 
@@ -1262,14 +1375,22 @@ public class AVMHostConfig extends HostConfig
 
         for (int i = 0; i < watchedResources.length; i++) 
         {
-            log.debug("AVMHostConfig DEBUG:  watched resource: " + watchedResources[i]);
+            if (log.isDebugEnabled())
+            {
+                log.debug("watched resource: " + watchedResources[i]);
+            }
 
             Long last_modified = null;
 
             String resource = watchedResources[i];
             if ( !resource.startsWith( webapp_fullpath ) )
             {
-                log.debug("AVMHostConfig watched resource: " + resource + " does not start with: " + webapp_fullpath);
+                if (log.isDebugEnabled())
+                {
+                    log.debug("AVMHostConfig watched resource: "   + 
+                               resource + " does not start with: " + 
+                               webapp_fullpath);
+                }
 
                 // PORTING NOTE:
                 //      The ugly hack below deals with Unix vs windows paths.
@@ -1280,8 +1401,12 @@ public class AVMHostConfig extends HostConfig
                     if ( ! (resource.charAt(0) == '/') )   // Windows
                     {
                         resource = webapp_fullpath + "/" + resource;
-                        log.debug("AVMHostConfig:  relative watched resource " + 
-                                  "put into webapp_fullpath: " + resource);
+
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("relative watched resource " +
+                                      "put into webapp_fullpath: " + resource);
+                        }
                     }
                     else { continue; }
                 }
@@ -1296,8 +1421,11 @@ public class AVMHostConfig extends HostConfig
                         //
                         resource = webapp_fullpath + "/" + resource;
 
-                        log.debug("AVMHostConfig:  relative watched resource " + 
-                                  "put into webapp_fullpath: " + resource);
+                        if (log.isDebugEnabled())
+                        {
+                            log.debug("relative watched resource " +
+                                      "put into webapp_fullpath: " + resource);
+                        }
                     }
                     else { continue; }
                 }
@@ -1321,8 +1449,11 @@ public class AVMHostConfig extends HostConfig
                 last_modified = new Long( 0L );
             }
 
-            log.debug("AVMHostConfig adding watched resource: " + 
-                      resource  + "  modtime:" + last_modified);
+            if (log.isDebugEnabled())
+            {
+                log.debug("adding watched resource: " + 
+                          resource  + "  modtime:" + last_modified);
+            }
 
             // put() forces SuppressWarnings, due to map def in base class.
             app.reloadResources.put( resource, last_modified);
@@ -1371,14 +1502,23 @@ public class AVMHostConfig extends HostConfig
             // 
             // AVMHostConfig checking AVMDeployedApplication: /$-1$alfreco-staging$my_webapp
             //
-            log.debug("AVMHostConfig checking AVMDeployedApplication: " + 
-                       ((AVMDeployedApplication)app).getName() );
+
+            if (log.isDebugEnabled())
+            {
+                log.debug("checking AVMDeployedApplication: " + 
+                           ((AVMDeployedApplication)app).getName() );
+            }
 
             avm_appBase = ((AVMDeployedApplication)app).getAvmAppBase();
         }
 
         //         AVMHostConfig checkResources using appBase: alfreco-staging:/www/avm_webapps
-        log.debug("AVMHostConfig checkResources using appBase: "  + avm_appBase);
+
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("checkResources using appBase: "  + avm_appBase);
+        }
 
     	// Any modification of the specified (static) resources will cause a 
     	// redeployment of the application. If any of the specified resources is
@@ -1390,7 +1530,10 @@ public class AVMHostConfig extends HostConfig
 
         for (int i = 0; i < resources.length; i++) 
         {
-            log.debug("AVMHost config checking: " + resources[i]);
+            if (log.isDebugEnabled())
+            {
+                log.debug("AVMHost config checking: " + resources[i]);
+            }
 
             String resource = resources[i];
 
@@ -1419,16 +1562,22 @@ public class AVMHostConfig extends HostConfig
                 long lastModified = 
                     ((Long) app.redeployResources.get( resource )).longValue();
 
-                log.debug("AVMHost config check non-null resource_desc. " +
-                          "Mod date: " +  resource_desc.getModDate() + 
-                          "  Last mod: " + lastModified);
+                if (log.isDebugEnabled())
+                {
+                    log.debug("AVMHost config check non-null resource_desc. " +
+                              "Mod date: " +  resource_desc.getModDate()      + 
+                              "  Last mod: " + lastModified);
+                }
 
                 if ( (!resource_desc.isDirectory()) && 
                      resource_desc.getModDate() > lastModified
                    )
                 {
-                   log.debug("AVMHost config check mod date > last mod, so undeploy app");
-
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("config check mod date > last mod, " +
+                                  "so undeploy app");
+                    }
 
                     // Undeploy application
                     if (log.isInfoEnabled())
@@ -1475,7 +1624,13 @@ public class AVMHostConfig extends HostConfig
 
                                 // NEON TODO:  figure out what to do here
                                 // ExpandWar.delete(current);
-                                log.debug("AVMHostConfig should un-deploy resource (but does not): " + current );
+
+                                if (log.isDebugEnabled())
+                                {
+                                    log.debug("AVMHostConfig should un-deploy " +
+                                              "resource (but does not): "       + 
+                                              current );
+                                }
                             }
                         } 
                         catch (Exception e) 
@@ -1493,9 +1648,12 @@ public class AVMHostConfig extends HostConfig
                 long lastModified = 
                     ((Long) app.redeployResources.get( resource )).longValue();
 
-
-                log.debug("AVMHost config check null resource_desc, so file/dir no longer exists.   Last mod: "+ lastModified);
-
+                if (log.isDebugEnabled())
+                {
+                    log.debug("AVMHost config check null resource_desc, " +
+                              "so file/dir no longer exists.   "          +
+                              "Last mod: "+ lastModified);
+                }
 
                 if (lastModified == 0L) { continue; }
 
@@ -1543,7 +1701,13 @@ public class AVMHostConfig extends HostConfig
 
                             // NEON TODO:  figure out what to do here
                             // ExpandWar.delete(current);
-                            log.debug("AVMHostConfig should un-deploy resource (but does not): " + current );
+
+                            if (log.isDebugEnabled())
+                            {
+                                log.debug("AVMHostConfig should un-deploy " +
+                                          "resource (but does not): "       + 
+                                          current );
+                            }
                         }
                     } 
                     catch (Exception e) 
@@ -1576,7 +1740,13 @@ public class AVMHostConfig extends HostConfig
 
                             // NEON TODO:  figure out what to do here
                             // ExpandWar.delete(current);
-                            log.debug("AVMHostConfig should un-deploy resource (but does not): " + current );
+
+                            if (log.isDebugEnabled())
+                            {
+                                log.debug("AVMHostConfig should un-deploy " +
+                                          "resource (but does not): "       + 
+                                          current );
+                            }
                         }
                     } 
                     catch (Exception e) 
@@ -1636,22 +1806,33 @@ public class AVMHostConfig extends HostConfig
                 }
                 catch (Exception e)  
                 { 
-                    log.debug("Exception looking up: "  + resource + "  " + e.getMessage() + 
-                              " ...and lastModified was: " + lastModified);
+                    if (log.isDebugEnabled())
+                    {
+                        log.debug("Exception looking up: "  + resource + 
+                                  "  " + e.getMessage() + 
+                                  " ...and lastModified was: " + 
+                                  lastModified);
+                    }
                 }
             }
 
-            log.debug("check on: " + resource                           +
-                      "\n            exists:          " + file_exists   +
-                      "\n            lastMod:         " + lastModified  +
-                      "\n            current_lastMod: " + current_lastModified );
+            if (log.isDebugEnabled())
+            {
+                log.debug("check on: " + resource                           +
+                          "\n            exists:          " + file_exists   +
+                          "\n            lastMod:         " + lastModified  +
+                          "\n            current_lastMod: " + 
+                          current_lastModified );
+            }
 
             if ( ( !file_exists && lastModified != 0L) || 
                  ( current_lastModified != lastModified)
                ) 
             {
-
-                log.debug("       Reloading app: " + app.name );
+                if (log.isDebugEnabled())
+                {
+                    log.debug("       Reloading app: " + app.name );
+                }
 
                 // Reload application
                 if(log.isInfoEnabled())
