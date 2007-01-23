@@ -4,7 +4,9 @@
    <#elseif child.name = "search.ftl"><#assign office_search = child.id>
    <#elseif child.name = "document_details.ftl"><#assign office_details = child.id>
    <#elseif child.name = "version_history.ftl"><#assign office_history = child.id>
-   <#elseif child.name = "doc_actions.js"><#assign doc_actions = child.id>   </#if>
+   <#elseif child.name = "doc_actions.js"><#assign doc_actions = child.id>
+   <#elseif child.name = "my_alfresco.js"><#assign myalf_script = child>
+   </#if>
 </#list>
 <#if document.isDocument>
    <#if document = template>
@@ -28,193 +30,7 @@ PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 <link rel="stylesheet" type="text/css"
 href="/alfresco/css/taskpane.css" />
 
-<script type="text/javascript">
-
-var xmlHttp
-
-function GetXmlHttpObject()
-{ 
-   var objXMLHttp=null;
-   if (window.XMLHttpRequest)
-   {
-      objXMLHttp=new XMLHttpRequest()
-   }
-   else if (window.ActiveXObject)
-   {
-       objXMLHttp=new ActiveXObject("Microsoft.XMLHTTP")
-   }
-
-   return objXMLHttp;
-} 
-
-function showStatus(url)
-{
-   xmlHttp=GetXmlHttpObject();
-   if (xmlHttp==null)
-   {
-       alert("Browser does not support HTTP Request");
-       return;
-   }        
-   xmlHttp.onreadystatechange=stateChanged;
-   xmlHttp.open("GET",url+"&sid="+Math.random(),true);
-   xmlHttp.send(null);
-} 
-
-function stateChanged() 
-{ 
-   if (xmlHttp.readyState==4 || xmlHttp.readyState=="complete")
-   { 
-      if (xmlHttp.responseText.indexOf("System Error") > 0)
-      {
-          var myWindow = window.open("", "_blank", "scrollbars,height=500,width=400");
-          myWindow.document.write(xmlHttp.responseText);
-          document.getElementById("statusArea").innerHTML=""; 
-      }
-      else
-      {
-          document.getElementById("statusArea").innerHTML=xmlHttp.responseText; 
-          window.location.reload();
-      }
-   } 
-} 
-
-function runAction(Action, Doc, Msg)
-{
-   if (Msg != "" && !confirm(Msg))
-   {
-       return;
-   }
-   document.getElementById("statusArea").innerHTML="Running action...";
-   showStatus("/alfresco/command/script/execute/workspace/SpacesStore/${doc_actions}/workspace/SpacesStore/" + Doc + "?action=" + Action);
-}
-
-
-function getWindowHeight() {
-			var windowHeight = 0;
-			if (typeof(window.innerHeight) == 'number') {
-				windowHeight = window.innerHeight;
-			}
-			else {
-				if (document.documentElement && document.documentElement.clientHeight) {
-					windowHeight = document.documentElement.clientHeight;
-				}
-				else {
-					if (document.body && document.body.clientHeight) {
-						windowHeight = document.body.clientHeight;
-					}
-				}
-			}
-			return windowHeight;
-		}
-		function setContent() {
-			if (document.getElementById) {
-				var windowHeight = getWindowHeight();
-				if (windowHeight > 0) {
-					var mycheckedoutdocsListElement = document.getElementById('mycheckedoutdocsList');
-					var mytodoListElement = document.getElementById('mytodoList');
-					var tabBarElement = document.getElementById('tabBar');
-                                        var mycheckedoutdocsListHeaderElement = document.getElementById('mycheckedoutdocsListHeader');
-                                        var mytodoListHeaderElement = document.getElementById('mytodoListHeader');
-                                        var bottomMarginElement = document.getElementById('bottomMargin');
-                                        var documentActionsElement = document.getElementById('documentActions');
-
-					var mycheckedoutdocsListHeight = mycheckedoutdocsListElement.offsetHeight;
-					var mytodoListHeight = mytodoListElement.offsetHeight;
-					var tabBarHeight = tabBarElement.offsetHeight;
-					var mycheckedoutdocsListHeaderHeight = mycheckedoutdocsListHeaderElement.offsetHeight;
-					var mytodoListHeaderHeight = mytodoListHeaderElement.offsetHeight;
-					var bottomMarginHeight = bottomMarginElement.offsetHeight;
-                                        var documentActionsHeight = documentActionsElement.offsetHeight;
-
-					if (windowHeight > 0) {
-						mycheckedoutdocsListElement.style.height = (windowHeight- (tabBarHeight + mytodoListHeaderHeight + mycheckedoutdocsListHeaderHeight + documentActionsHeight + bottomMarginHeight)) /2 + 'px';
-						mytodoListElement.style.height = (windowHeight- (tabBarHeight + mytodoListHeaderHeight + mycheckedoutdocsListHeaderHeight + documentActionsHeight + bottomMarginHeight)) /2 + 'px';
-					}
-
-				}
-			}
-		}
-		window.onload = function() {
-			setContent();
-			stripe('mytodoList', '#fff', '#f6f8fa');
-                        stripe('mycheckedoutdocsList', '#fff', '#f6f8fa');
-		}
-		window.onresize = function() {
-			setContent();
-		}
-		</script>
-
-             <script type="text/javascript">
-
-
-
-  // this function is need to work around
-  // a bug in IE related to element attributes
-  function hasClass(obj) {
-     var result = false;
-     if (obj.getAttributeNode("class") != null) {
-         result = obj.getAttributeNode("class").value;
-     }
-     return result;
-  }
-
- function stripe(id) {
-
-    // the flag we'll use to keep track of
-    // whether the current row is odd or even
-    var even = false;
-
-    // if arguments are provided to specify the colours
-    // of the even & odd rows, then use the them;
-    // otherwise use the following defaults:
-    var evenColor = arguments[1] ? arguments[1] : "#fff";
-    var oddColor = arguments[2] ? arguments[2] : "#eee";
-
-    // obtain a reference to the desired table
-    // if no such table exists, abort
-    var table = document.getElementById(id);
-    if (! table) { return; }
-
-    // by definition, tables can have more than one tbody
-    // element, so we'll have to get the list of child
-    // &lt;tbody&gt;s
-    var tbodies = table.getElementsByTagName("tbody");
-
-    // and iterate through them...
-    for (var h = 0; h < tbodies.length; h++) {
-
-     // find all the &lt;tr&gt; elements...
-      var trs = tbodies[h].getElementsByTagName("tr");
-
-      // ... and iterate through them
-      for (var i = 0; i < trs.length; i++) {
-
-	    // avoid rows that have a class attribute
-        // or backgroundColor style
-	    if (!hasClass(trs[i]) && ! trs[i].style.backgroundColor) {
-
-         // get all the cells in this row...
-          var tds = trs[i].getElementsByTagName("td");
-
-          // and iterate through them...
-          for (var j = 0; j < tds.length; j++) {
-
-            var mytd = tds[j];
-
-            // avoid cells that have a class attribute
-            // or backgroundColor style
-	        if (! hasClass(mytd) && ! mytd.style.backgroundColor) {
-
-		      mytd.style.backgroundColor = even ? evenColor : oddColor;
-
-            }
-          }
-        }
-        // flip from odd to even, or vice-versa
-        even =  ! even;
-      }
-    }
-  }
+<script type="text/javascript" src="/alfresco${myalf_script.url}" >
 </script>
 
 </head>
@@ -260,40 +76,27 @@ function getWindowHeight() {
                  </tbody>
           </table>
 </div>
-<div id="mytodoListHeader"><span style="font-weight:bold;">My Shortcuts</span>
+<div id="mytodoListHeader"><span style="font-weight:bold;">My Communities</span>
 </div>
 
 <div id="mytodoList">
           <table>
           <tbody>
+<#list companyhome.childrenByXPath["*[@cm:name='Communities']/*"] as child>
             <!-- lb: start repeat -->
             <tr>
                 <td>
-                <a href="#"><img src="/alfresco${document.icon32}" border="0" alt="Open ${document.name}" /></a>
+                <a href="#"><img src="/alfresco${child.icon32}" border="0" alt="Open ${child.name}" /></a>
                 </td>
                 <td width="100%">
-                <a href="/alfresco/template/workspace/SpacesStore/${document.id}/workspace/SpacesStore/${office_browse}" title="Open ${document.name}">${document.name}</a><br/>
-<#if document.properties.description?exists>
-		${document.properties.description}
+                <a href="/alfresco/template/workspace/SpacesStore/${child.id}/workspace/SpacesStore/${office_browse}" title="Open ${child.name}">${child.name}</a><br/>
+<#if child.properties.description?exists>
+		${child.properties.description}
 </#if>
                 </td>
             </tr>
-<#if document.isDocument >
-<#assign webdavPath = (document.displayPath?substring(13) + '/' + document.name)?url('ISO-8859-1')?replace('%2F', '/') />
-            <tr>
-                <td>
-                <a href="#" onClick="window.external.openDocument('${webdavPath}')"><img src="/alfresco${document.icon32}" border="0" alt="Open ${document.name}" /></a>
-                </td>
-                <td style="line-height:16px;" width="100%">
-                <a href="#" onClick="window.external.openDocument('${webdavPath}')" title="Open ${document.name}">${document.name}</a><br/>
-<#if document.properties.description?exists>
-		${document.properties.description}<br/>
-</#if>
-                Modified: ${document.properties.modified?datetime}<br/>
-                </td>
-            </tr>
-</#if>
             <!-- lb: end repeat -->
+</#list>
           </table>
 </div>
 
@@ -304,7 +107,7 @@ function getWindowHeight() {
     <li style="padding-bottom:4px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/save_to_alfresco.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco"><b>Save to Alfresco</b></a><br> Allows you to place the current document under Alfresco management.</li>
     <li style="padding-bottom:4px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_browse}"><img src="/alfresco/images/taskpane/navigator.gif" border="0" style="padding-right:6px;" alt="Browse"><b>Browse Alfresco</b></a><br> Navigate around the Alfresco repository for documents.</li>
     <li style="padding-bottom:4px;"><a href="/alfresco/template/workspace/SpacesStore/${thisContext.id}/workspace/SpacesStore/${office_search}"><img src="/alfresco/images/taskpane/search.gif" border="0" style="padding-right:6px;" alt="Search"><b>Find Documents</b></a><br> Search Alfresco for documents by name and content.</li>
-    <li style="padding-bottom:4px;"><a href="/alfresco/navigate/browse" target="_blank"><img src="/alfresco/images/logo/AlfrescoLogo16.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco"><b>Launch Alfresco</b></a><br> Start the Alfresco Web Client.</li>
+    <li style="padding-bottom:4px;"><a href="/alfresco/navigate/browse?ticket=${session.ticket}" target="_blank"><img src="/alfresco/images/logo/AlfrescoLogo16.gif" border="0" style="padding-right:6px;" alt="Save to Alfresco"><b>Launch Alfresco</b></a><br> Start the Alfresco Web Client.</li>
 </ul>
 </div>
 </div>
