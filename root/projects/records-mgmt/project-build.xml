@@ -1,33 +1,35 @@
 <project name="rm" default="package-war">
 	
-	<property name="file.extension.aep" value=".aep"/>
-	
-	<property file="extension.properties" />
+	<property name="file.extension.amp" value=".amp"/>
 	
 	<path id="path.common" path="${basedir}/../../common"/>
    	<property name="dir.common" refid="path.common"/>
    	<import file="${dir.common}/common.xml"/>
 	
-   	<!-- we want to build a WAR file in this project -->
-   	<!-- <target name="package" depends="package-war" /> -->
+	<target name="package" depends="package-war"/>
 	
-   	<!-- <target name="package-war" depends="package-jar">
-   	  <echo>Integrating records management features into: ${dir.project.webclient}/build/dist/${file.name.war.alfresco}</echo>
-   	  <zip destfile="${dir.project.webclient}/build/dist/${file.name.war.alfresco}" update="true">
-   	     <zipfileset file="${package.file.jar}" prefix="WEB-INF/lib"/>
-   	     <zipfileset dir="${config.dir}" prefix="WEB-INF/classes"/>
-   	  </zip>
-   	</target> -->
+	<path id="class.path">
+	  	<pathelement path="../core/build/classes" />
+	  	<fileset dir="../3rd-party/lib" includes="*.jar"/>
+	  	<pathelement path="../repository/build/classes" />	  
+   	</path>
+	
+   	<target name="package-war" depends="package-extension" if="${module.id}.enabled">
+		<echo>Installing records management into WAR</echo>
+   		<java dir="." fork="true" classname="org.alfresco.repo.module.tool.ModuleManagementTool">
+            <classpath refid="class.path"/>
+            <arg line="install ${dist.dir}/${module.id}${file.extension.amp} ${dir.project.webclient}/build/dist/${file.name.war.alfresco} -force -verbose -nobackup"/>
+        </java>
+   	</target>
 	
 	<target name="package-extension" depends="package-jar" description="Packages the extension">
-		<zip destfile="${dist.dir}/${extension.id}${file.extension.aep}" update="true">
-   	    	<!-- TODO additional jar dependancies -->
-			<zipfileset file="extension.properties"/>
+		<echo>Packaging records management AMP file</echo>
+		<zip destfile="${dist.dir}/${module.id}${file.extension.amp}" update="true">
+			<zipfileset file="${property.dir}/module.properties"/>
 			<zipfileset file="${package.file.jar}" prefix="lib"/>
-   	     	<zipfileset dir="${config.dir}" prefix="config"/>
-			<!-- TODO ACP's ?? -->
-			<!-- TODO Models ?? -->
-			<!-- JSP's and associated UI stuff -->
+   	     	<zipfileset dir="${config.dir}" prefix="config">
+   	     		<exclude name="**/module.properties"/>
+			</zipfileset>
    		</zip>
 	</target>
    

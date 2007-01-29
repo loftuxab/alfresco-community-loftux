@@ -19,7 +19,7 @@
                        ${dir.name.projects}/${dir.name.jndiclient}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.catalinavirtual}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.rm}/${file.name.project.build}      	
+                       ${dir.name.projects}/${dir.name.rm}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.benchmark-framework}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.benchmark-tests}/${file.name.project.build}"/>

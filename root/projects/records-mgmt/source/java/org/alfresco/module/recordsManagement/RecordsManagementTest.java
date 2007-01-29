@@ -23,14 +23,18 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.importer.ImporterComponent;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
 import org.alfresco.repo.jscript.ValueConverter;
+import org.alfresco.repo.module.ModuleServiceImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
+import org.alfresco.service.cmr.module.ModuleDetails;
+import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.CopyService;
@@ -127,21 +131,36 @@ public class RecordsManagementTest extends BaseSpringTest
             return false;
         }
         return true;
-    }
+    }   
     
     public void testUpdateTemplatesAndScripts()
-    {        
+    {            
         // Check whether the records management has been configured in
         if (isRMConfigured() == false)
         {
             return;
-        }
+        }        
         
         importFile("alfresco/module/recordsManagement/bootstrap/rm_javascripts.xml", "/app:company_home/app:dictionary/app:scripts");
         importFile("alfresco/module/recordsManagement/bootstrap/rm_templates.xml", "/app:company_home/app:dictionary/app:content_templates");
         
         setComplete();
         endTransaction();
+    }
+    
+    public void testModuleService()
+        throws Exception
+    {
+        ModuleService moduleService = new ModuleServiceImpl(); //(ModuleService)this.applicationContext.getBean("moduleService");
+        List<ModuleDetails> details = moduleService.getAllModules();
+        assertNotNull(details);
+        assertEquals(1, details.size());
+        ModuleDetails detail = details.get(0);
+        assertEquals("recordsManagement", detail.getId());
+        
+        ModuleDetails detail2 = moduleService.getModule("recordsManagement");
+        assertNotNull(detail2);
+        assertEquals("recordsManagement", detail2.getId());
     }
     
     private void importFile(String file, String destination)

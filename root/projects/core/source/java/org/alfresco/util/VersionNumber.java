@@ -16,6 +16,8 @@
  */
 package org.alfresco.util;
 
+import java.io.Serializable;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
@@ -26,14 +28,21 @@ import org.alfresco.error.AlfrescoRuntimeException;
  * 
  * @author Roy Wetherall
  */
-public class VersionNumber implements Comparable
+public class VersionNumber implements Comparable<VersionNumber>, Serializable
 {
+    private static final long serialVersionUID = -1570247769786810251L;
+
+    /** A convenient '0' version */
+    public static final VersionNumber VERSION_ZERO = new VersionNumber("0");
+    /** A convenient '999' version */
+    public static final VersionNumber VERSION_BIG = new VersionNumber("999");
+    
     /** Version delimeter */
     private static final String DELIMITER = "\\.";
     
     /** Version parts */
     private int[] parts;
-                
+
     /**
      * Constructror, expects a valid version string.
      * 
@@ -86,7 +95,7 @@ public class VersionNumber implements Comparable
      * @param that  the other version
      * @return  -1 if the passed version is less that this, 0 if they are equal, 1 if the passed version is greater
      */
-    public int compareTo(Object obj)
+    public int compareTo(VersionNumber obj)
     {
         int result = 0;
 
@@ -143,7 +152,18 @@ public class VersionNumber implements Comparable
     @Override
     public int hashCode()
     {
-        return this.parts.hashCode(); 
+        if (parts == null || parts.length == 0)
+        {
+            return 0;
+        }
+        else if (parts.length >= 2)
+        {
+            return parts[0] * 17 + parts[1];
+        }
+        else
+        {
+            return parts[0];
+        }
     }
     
     /**
@@ -156,20 +176,28 @@ public class VersionNumber implements Comparable
         {
             return true;
         }
-        if (obj instanceof VersionNumber)
-        {
-            if (this.compareTo((VersionNumber)obj) == 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
+        if (false == obj instanceof VersionNumber)
         {
             return false;
         }
+        VersionNumber that = (VersionNumber) obj;
+        return this.compareTo(that) == 0;
+    }
+    
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (int part : parts)
+        {
+            if (!first)
+            {
+                sb.append(".");
+            }
+            first = false;
+            sb.append(part);
+        }
+        return sb.toString();
     }
 }
