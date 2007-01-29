@@ -182,6 +182,23 @@ public abstract class BaseConfigService implements ConfigService
     {
         return this.globalConfig;
     }
+    
+    /**
+     * @see org.alfresco.config.ConfigService#appendConfig(org.alfresco.config.ConfigSource)
+     */
+    public void appendConfig(ConfigSource configSource)
+    {
+        for (InputStream inputStream : configSource)
+        {
+            if (logger.isDebugEnabled())
+               logger.debug("Commencing parse of input stream for appended config");
+            
+            parse(inputStream);
+            
+            if (logger.isDebugEnabled())
+               logger.debug("Completed parse of input stream for appended config");
+        }
+    }
 
     /**
      * Parses all the files passed to this config service
