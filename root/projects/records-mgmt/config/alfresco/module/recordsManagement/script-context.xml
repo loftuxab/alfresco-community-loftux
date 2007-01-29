@@ -1,0 +1,97 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+    <!-- Java script API -->
+    
+    <bean id="rmScript" parent="baseScriptImplementation" class="org.alfresco.module.recordsManagement.RecordsManagementScript">
+        <property name="scriptName">
+            <value>rm</value>
+        </property>               
+        <property name="serviceRegistry">
+            <ref bean="ServiceRegistry"/>
+        </property>
+    </bean>
+    
+    <bean id="rmActionListener" class="org.alfresco.module.recordsManagement.ui.RecordsManagementActionListener">               
+        <property name="serviceRegistry">
+            <ref bean="ServiceRegistry"/>
+        </property>
+    </bean>
+    
+    <!-- Scheduled scripts -->
+    
+    <bean id="scheduledCutoffJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass">
+            <value>org.alfresco.repo.jscript.ExecuteScriptJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="scriptLocation">
+                    <bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/module/recordsManagement/script/scheduled/scheduled_cutoff.js</value>
+		            	</constructor-arg>
+		            </bean>
+                </entry>
+                <entry key="scriptService">
+                    <ref bean="ScriptService"/>
+                </entry>
+                <entry key="authenticationComponent">
+                	<ref bean="authenticationComponent"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="scheduledCutoffTrigger" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <ref bean="scheduledCutoffJobDetail" />
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <!-- Execute @ 2:30 am every day -->
+            <value>0 30 2 * * ?</value>
+        </property>
+    </bean>   
+    
+    <bean id="scheduledRemoveHoldJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass">
+            <value>org.alfresco.repo.jscript.ExecuteScriptJob</value>
+        </property>
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="scriptService">
+                    <ref bean="ScriptService"/>
+                </entry>
+                <entry key="scriptLocation">
+                    <bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/module/recordsManagement/script/scheduled/scheduled_removeHold.js</value>
+		            	</constructor-arg>
+		            </bean>
+                </entry>
+                <entry key="authenticationComponent">
+                	<ref bean="authenticationComponent"/>
+                </entry>
+            </map>
+        </property>
+    </bean>
+        
+    <bean id="scheduledRemoveHoldTrigger" class="org.alfresco.util.CronTriggerBean">
+        <property name="jobDetail">
+            <ref bean="scheduledRemoveHoldJobDetail" />
+        </property>
+        <property name="scheduler">
+            <ref bean="schedulerFactory" />
+        </property>
+        <property name="cronExpression">
+            <!-- Execute @ 2:30 am every day -->
+            <value>0 30 2 * * ?</value>
+        </property>
+    </bean>
+    
+</beans>

@@ -47,4 +47,6 @@ public interface ConfigService
     * @return The global config section or null if there isn't one
     */
    public Config getGlobalConfig();
+   
+   public void appendConfig(ConfigSource configSource);
 }
