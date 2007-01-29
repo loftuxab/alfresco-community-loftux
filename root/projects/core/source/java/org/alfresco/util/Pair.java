@@ -88,6 +88,6 @@ public final class Pair<F, S> implements Serializable
     @Override
     public String toString()
     {
-        return '(' + fFirst.toString() + ", " + fSecond.toString() + ')';
+        return "(" + fFirst + ", " + fSecond + ")";
     }
 }
