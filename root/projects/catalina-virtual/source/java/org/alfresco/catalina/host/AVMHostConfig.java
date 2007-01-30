@@ -419,21 +419,24 @@ public class AVMHostConfig extends HostConfig
                      version + " path: " + storePath);
         }
 
-        String store_name;                           // e.g.: mysite--bob
-        int store_index = storePath.indexOf(':');
-        if ( store_index > 0 ) 
+        String store_name;     // e.g.: mysite--bob
+        int index_store_tail = storePath.indexOf(':');
+
+        if ( index_store_tail > 0 ) 
         {
-            store_name = storePath.substring(0,store_index);
+            store_name = storePath.substring(0,index_store_tail);
         }
         else
         {
-           log.error("updateVirtualWebapp failed; bad store path: " + storePath );
+           log.error("updateVirtualWebapp failed; bad store path: " + 
+                     storePath );
+
            return false;
         }
 
         // e.g.:  /www/avm_webapps/ROOT
         String store_relpath = 
-               storePath.substring(store_index+1, storePath.length());
+               storePath.substring(index_store_tail+1, storePath.length());
 
 
         // TODO: When the GUI supports inviting a user to a single webapp,
@@ -443,17 +446,47 @@ public class AVMHostConfig extends HostConfig
         // means *all* webapps must be updated in the store containing
         // the webapp mentioned by storePath.
 
-        int app_base_tail =  storePath.lastIndexOf('/');
-        if (app_base_tail < 0) 
+
+        // The app base is always just below the www dir, and the www dir 
+        // is a child of the root  "/" dir.  Use this invariant rather than
+        // relying upon the client handing this function a webapp name or 
+        // the app base dir;  it might give something longer such as the 
+        // absolute path to a changed file in a submit.
+        // For example:   mysite:/www/avm_webapps/ROOT/WEB-INF/web.xml
+
+
+        // Note: index_store_tail+1 points at final slash in:  "mysite:/"
+        // Skip this and point at final slash in:              "mysite:/www/"
+        // by using searching for / at index_store_tail+2 
+        //
+        int index_www_tail = storePath.indexOf('/', index_store_tail + 2);
+
+        if ( index_www_tail < 0 )
         { 
             log.error("updateVirtualWebapp failed; bad store path: " + storePath );
             return false;
         }
 
-        // If    storePath looks like:   mysite--bob:/www/avm_webapps/ROOT
-        // then  app_base  looks like:   mysite--bob:/www/avm_webapps
+        // Point at final slash in:  "mysite:/www/avm_webapps/"
+        int index_app_base_tail =  storePath.indexOf('/', index_www_tail + 1 );
+
+        // Allow a raw app_base to be provided as the storePath
+        if (index_app_base_tail < 0) { index_app_base_tail = storePath.length(); }
+
+        if ( index_app_base_tail == index_www_tail )
+        {
+            log.error("updateVirtualWebapp failed; bad store path: " + 
+                      storePath );
+
+            return false;
+        }
+
+        // If storePath is:  mysite--bob:/www/avm_webapps
+        //              or:  mysite--bob:/www/avm_webapps/ROOT/
+        //              or:  mysite--bob:/www/avm_webapps/ROOT/WEB-INF/...
+        // the app_base is:  mysite--bob:/www/avm_webapps
          
-        String avm_appBase = storePath.substring(0,app_base_tail);
+        String avm_appBase = storePath.substring(0,index_app_base_tail);
         Map<String, AVMNodeDescriptor> webapp_entries = null;
 
         try 
@@ -522,11 +555,11 @@ public class AVMHostConfig extends HostConfig
 
             if (indirection_path != null)
             {
-                int parent_store_index = indirection_path.indexOf(':');
-                if ( parent_store_index > 0 )
+                int parent_index_store_tail = indirection_path.indexOf(':');
+                if ( parent_index_store_tail > 0 )
                 {
                     String parent_store_name = 
-                        indirection_path.substring(0,parent_store_index);
+                        indirection_path.substring(0,parent_index_store_tail);
 
                     if ( ! parent_store_name.equals( store_name ) )
                     {
@@ -669,10 +702,10 @@ public class AVMHostConfig extends HostConfig
         boolean is_sucessful = true;
         String  store_name;                           // e.g.: mysite--bob
 
-        int store_index = storePath.indexOf(':');
-        if ( store_index > 0 ) 
+        int index_store_tail = storePath.indexOf(':');
+        if ( index_store_tail > 0 ) 
         {
-            store_name = storePath.substring(0,store_index);
+            store_name = storePath.substring(0,index_store_tail);
         }
         else
         {
@@ -682,14 +715,34 @@ public class AVMHostConfig extends HostConfig
 
         // e.g.:  /www/avm_webapps/ROOT
         String store_relpath = 
-               storePath.substring(store_index+1, storePath.length());
+               storePath.substring(index_store_tail+1, storePath.length());
 
-        int app_base_tail =  storePath.lastIndexOf('/');
-        if (app_base_tail < 0) 
+        // Note: index_store_tail+1 points at final slash in:  "mysite:/"
+        // Skip this and point at final slash in:              "mysite:/www/"
+        // by using searching for / at index_store_tail+2 
+        //
+        int index_www_tail = storePath.indexOf('/', index_store_tail + 2);
+
+        if ( index_www_tail < 0 )
         { 
             log.error("removeVirtualWebapp failed; bad store path: " + storePath );
             return false;
         }
+
+        // Point at final slash in:  "mysite:/www/avm_webapps/"
+        int index_app_base_tail =  storePath.indexOf('/', index_www_tail + 1 );
+
+        // Allow a raw app_base to be provided as the storePath
+        if (index_app_base_tail < 0) { index_app_base_tail = storePath.length(); }
+
+        if ( index_app_base_tail == index_www_tail )
+        {
+            log.error("removeVirtualWebapp failed; bad store path: " + 
+                      storePath );
+
+            return false;
+        }
+
 
         if (isRecursive)
         {
@@ -723,7 +776,7 @@ public class AVMHostConfig extends HostConfig
         // If    storePath looks like:   mysite--bob:/www/avm_webapps/ROOT
         // then  app_base  looks like:   mysite--bob:/www/avm_webapps
          
-        String avm_appBase = storePath.substring(0,app_base_tail);
+        String avm_appBase = storePath.substring(0,index_app_base_tail);
         Map<String, AVMNodeDescriptor> webapp_entries = null;
 
         if (log.isDebugEnabled())
