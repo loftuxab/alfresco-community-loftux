@@ -474,6 +474,8 @@
       <copy file="${dir.project.core}/build/dist/core.jar" todir="${dir.assemble.sdk}/lib/server" />
       <copy file="${dir.project.repository}/build/dist/repository.jar" todir="${dir.assemble.sdk}/lib/server" />
       <copy file="${dir.project.remoteapi}/build/dist/remote-api.jar" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.jndiclient}/build/dist/alfresco-jndi-client.jar" todir="${dir.assemble.sdk}/lib/server" />
+      <copy file="${dir.project.mbeans}/build/dist/alfresco-mbeans.jar" todir="${dir.assemble.sdk}/lib/server" />
       <copy file="${dir.project.webclient}/build/dist/web-client.jar" todir="${dir.assemble.sdk}/lib/server" />
 
       <!-- Package configuration as a .jar -->
@@ -507,6 +509,10 @@
       <copy todir="${dir.assemble.sdk}/lib/server/alfresco/desktop">
          <fileset dir="${dir.config.repository}/alfresco/desktop" />
       </copy>
+      <mkdir dir="${dir.assemble.sdk}/lib/server/alfresco/alfresco" />
+      <copy todir="${dir.assemble.sdk}/lib/server/alfresco/alfresco">
+         <fileset dir="${dir.config.repository}/alfresco" includes="alfresco-jmxrmi.*" />
+      </copy>
       <mkdir dir="${dir.assemble.sdk}/lib/remote/dependencies" />
       <copy todir="${dir.assemble.sdk}/lib/remote/dependencies" flatten="true">
          <fileset dir="${dir.project.3rdparty}/lib" includes="${dir.assemble.sdk.remote.jars}" />
@@ -525,7 +531,7 @@
       <zip destfile="${dir.assemble.sdk}/src/repository-src.zip">
          <zipfileset dir="${dir.project.repository}/source" />
       </zip>
-      <zip destfile="${dir.assemble.sdk}/src/web-client-service-src.zip">
+      <zip destfile="${dir.assemble.sdk}/src/web-service-client-src.zip">
          <zipfileset dir="${dir.project.webserviceclient}/source/java" />
          <zipfileset dir="${dir.project.webserviceclient}/source/generated" />
       </zip>
