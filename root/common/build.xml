@@ -10,8 +10,8 @@
    <!-- Define an ordered list of projects to build -->
    <target name="init" depends="common-init.init">
       <property name="file.deploy" value="${dir.project.webclient}/build/dist/${file.name.war.alfresco}" />
-      
-  <!--    <filelist id="files.project.build" dir="${dir.product.root}"
+
+   <filelist id="files.project.build" dir="${dir.product.root}"
                 files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.mbeans}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
@@ -22,16 +22,7 @@
                        ${dir.name.projects}/${dir.name.rm}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}
                        ${dir.name.projects}/${dir.name.benchmark-framework}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.benchmark-tests}/${file.name.project.build}"/>      -->
-
-      <filelist id="files.project.build" dir="${dir.product.root}"
-                files="${dir.name.projects}/${dir.name.core}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.mbeans}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.repository}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.remoteapi}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.jndiclient}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.webclient}/${file.name.project.build}
-                       ${dir.name.projects}/${dir.name.webserviceclient}/${file.name.project.build}"/>
+                       ${dir.name.projects}/${dir.name.benchmark-tests}/${file.name.project.build}"/>
    </target>
 
    <!-- ********************** -->
