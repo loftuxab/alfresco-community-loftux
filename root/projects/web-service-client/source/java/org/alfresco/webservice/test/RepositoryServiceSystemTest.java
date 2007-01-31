@@ -592,6 +592,19 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         QueryResult result = this.repositoryService.queryChildren(folderReference);
         assertEquals(1, result.getResultSet().getTotalRowCount());
         
+        // Test delete
+        CMLDelete delete = new CMLDelete();
+        delete.setWhere(new Predicate(new Reference[]{newCopy}, null, null));
+        CML cmlDelete = new CML();
+        cmlDelete.setDelete(new CMLDelete[]{delete});
+        
+        UpdateResult[] results3 = WebServiceFactory.getRepositoryService().update(cmlDelete);
+        assertNotNull(results3);
+        assertEquals(1, results3.length);
+        UpdateResult updateResult3 = results3[0];
+        assertNull(updateResult3.getDestination());
+        assertEquals(newCopy.getUuid(), updateResult3.getSource().getUuid());
+        
     }
     
     public void testGet() 
