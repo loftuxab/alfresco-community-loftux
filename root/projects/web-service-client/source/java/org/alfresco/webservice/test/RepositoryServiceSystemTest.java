@@ -229,6 +229,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         // show the results
         boolean rootFound = false;
         ResultSetRow[] rows = parentsResults.getRows();
+        logger.debug("There are " + rows.length + " rows:");
         for (int x = 0; x < rows.length; x++)
         {
             ResultSetRow row = rows[x];
@@ -238,6 +239,13 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
             String nodeId = rowNode.getId();
             logger.debug("parent node = " + nodeId + ", type = "
                     + rowNode.getType());
+            NamedValue[] columns = row.getColumns();
+            for (int y = 0; y < columns.length; y++)
+            {
+                logger.debug("row " + x + ": "
+                        + row.getColumns(y).getName() + " = "
+                        + row.getColumns(y).getValue());
+            }
 
             if (nodeId.equals(rootId) == true)
             {
@@ -250,6 +258,47 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
                 rootFound);
     }
 
+    /**
+     * Tests the queryChildren service method
+     * 
+     * @throws Exception
+     */
+    public void testQueryChildren() throws Exception
+    {
+        // query for all the child nodes of the root
+        Reference node = BaseWebServiceSystemTest.rootReference;
+        QueryResult rootChildren = WebServiceFactory.getRepositoryService().queryChildren(node);
+
+        assertNotNull("rootChildren should not be null", rootChildren);
+        ResultSet rootChildrenResults = rootChildren.getResultSet();
+        assertNotNull("rootChildrenResults should not be null",
+                rootChildrenResults);
+        assertTrue("There should be at least one child of the root node",
+                rootChildrenResults.getRows().length > 0);
+
+        // show the results
+        ResultSetRow[] rows = rootChildrenResults.getRows();
+        logger.debug("There are " + rows.length + " rows:");
+        for (int x = 0; x < rows.length; x++)
+        {
+            ResultSetRow row = rows[x];
+            assertNotNull("getColumns() should not return null", row
+                    .getColumns());
+            ResultSetRowNode rowNode = row.getNode();
+            String nodeId = rowNode.getId();
+            logger.debug("child node = " + nodeId + ", type = "
+                    + rowNode.getType());
+
+            NamedValue[] columns = row.getColumns();
+            for (int y = 0; y < columns.length; y++)
+            {
+                logger.debug("row " + x + ": "
+                        + row.getColumns(y).getName() + " = "
+                        + row.getColumns(y).getValue());
+            }            
+        }
+    }
+            
     /*
      * Tests the queryAssociated service method
      * 
@@ -265,6 +314,17 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         assertNotNull(result.getResultSet());
         assertNotNull(result.getResultSet().getRows());
         assertEquals(1, result.getResultSet().getRows().length);
+
+        logger.debug("There is 1 result row:");
+
+        ResultSetRow row = result.getResultSet().getRows()[0];
+        NamedValue[] columns = row.getColumns();
+        for (int y = 0; y < columns.length; y++)
+        {
+          logger.debug("row 0" + ": "
+              + row.getColumns(y).getName() + " = "
+              + row.getColumns(y).getValue());
+        }     
     }
 
     /**
@@ -555,9 +615,32 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         for (NamedValue prop : rootNode.getProperties())
         {
             logger.debug("Root node property " + prop.getName() + " = " + prop.getValue());
-        }
-        
+        }        
     }
+
+    /**
+     * Test that the uuid and path are both returned in a Reference object
+     * @throws Exception
+     */
+    public void testGetPath() throws Exception
+    {      
+      Predicate predicate = new Predicate(new Reference[]{BaseWebServiceSystemTest.folderReference}, null, null);   
+      Node[] nodes = WebServiceFactory.getRepositoryService().get(predicate);
+      assertNotNull(nodes);
+      assertEquals(1, nodes.length);
+      Node node = nodes[0];
+      String path = node.getReference().getPath();
+      String uuid = node.getReference().getUuid();
+      
+      logger.debug("Folder reference path = " + BaseWebServiceSystemTest.folderReference.getPath());
+      logger.debug("Retrieved node path = " + path);
+      logger.debug("Retrieved node uuid = " + uuid);
+      
+      assertNotNull(path);
+      assertNotNull(uuid);
+      assertEquals(BaseWebServiceSystemTest.folderReference.getPath(), path);
+      
+    }    
     
     public void testPropertySetGet() throws Exception
     {

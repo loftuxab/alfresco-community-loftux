@@ -295,6 +295,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         // TODO check creator
         
         // Get the version history
+        this.authoringService.createVersion(predicate, getVersionComments(), false);
         VersionHistory versionHistory = this.authoringService.getVersionHistory(reference);
         assertNotNull(versionHistory);
         assertEquals(2, versionHistory.getVersions().length);
