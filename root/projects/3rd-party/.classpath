@@ -36,7 +36,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/bcprov-jdk15-129.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/wss4j.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.2.1.jar"/>
 	<classpathentry exported="true" sourcepath="src/jcr_src.zip" kind="lib" path="lib/jcr-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/freemarker.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jid3lib-0.5.jar"/>
@@ -90,5 +89,6 @@
 	<classpathentry kind="lib" path="lib/fontbox-0.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/truezip.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.7.0/xalan.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.4.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
