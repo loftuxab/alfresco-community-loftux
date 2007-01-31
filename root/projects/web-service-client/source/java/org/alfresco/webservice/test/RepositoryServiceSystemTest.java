@@ -761,4 +761,38 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
             WebServiceFactory.getRepositoryService().update(cml);
         }
     }
+    
+    public void testFolderCreate()
+        throws Exception
+    {
+        Reference newFolder = createFolder(BaseWebServiceSystemTest.rootReference, "123TestFolder");
+        assertNotNull(newFolder);
+        Reference newFolder2 = createFolder(BaseWebServiceSystemTest.rootReference, "2007");
+        assertNotNull(newFolder2);
+    }
+    
+    public void testPathLookup()
+        throws Exception
+    {
+        
+    }
+    
+    private Reference createFolder(Reference parent, String folderName)
+        throws Exception
+    {
+        ParentReference parentReference = new ParentReference();
+        parentReference.setAssociationType(Constants.ASSOC_CHILDREN);
+        parentReference.setChildName(Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, folderName));
+        parentReference.setStore(parent.getStore());
+        parentReference.setUuid(parent.getUuid());
+        
+        NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, folderName)};
+        CMLCreate create = new CMLCreate("1", parentReference, null, null, null, Constants.TYPE_FOLDER, properties);
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{create});
+        
+        UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);
+        
+        return results[0].getDestination();
+    }
 }
