@@ -23,9 +23,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 public class I18NUtil
 {
     /**
-     * Thread local containing the Local for the current thread
+     * Thread-local containing the general Locale for the current thread
      */
-    private static ThreadLocal<Locale> currentLocale = new ThreadLocal<Locale>();
+    private static ThreadLocal<Locale> threadLocale = new ThreadLocal<Locale>();
+    
+    /**
+     * Thread-local containing the content Locale for for the current thread.  This
+     * can be used for content and property filtering.
+     */
+    private static ThreadLocal<Locale> threadContentLocale = new ThreadLocal<Locale>();
     
     /**
      * List of registered bundles
@@ -56,22 +62,49 @@ public class I18NUtil
      */
     public static void setLocale(Locale locale)
     {
-        currentLocale.set(locale);
+        threadLocale.set(locale);
     }
-     
+
     /**
-     * Get the local for the current thread, will revert to the default locale if none 
+     * Get the general local for the current thread, will revert to the default locale if none 
      * specified for this thread.
      * 
-     * @return  the Locale
+     * @return  the general locale
      */
     public static Locale getLocale()
     {
-        Locale locale = currentLocale.get(); 
+        Locale locale = threadLocale.get(); 
         if (locale == null)
         {
             // Get the default locale
             locale = Locale.getDefault();
+        }
+        return locale;
+    }
+    
+    /**
+     * Set the <b>content locale</b> for the current thread.
+     * 
+     * @param locale    the content locale
+     */
+    public static void setContentLocale(Locale locale)
+    {
+        threadContentLocale.set(locale);
+    }
+
+    /**
+     * Get the content local for the current thread.<br/>
+     * This will revert to {@link #getLocale()} if no value has been defined.
+     * 
+     * @return  Returns the content locale
+     */
+    public static Locale getContentLocale()
+    {
+        Locale locale = threadContentLocale.get(); 
+        if (locale == null)
+        {
+            // Revert to the normal locale
+            locale = getLocale();
         }
         return locale;
     }
