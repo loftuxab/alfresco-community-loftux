@@ -50,6 +50,7 @@ import org.alfresco.webservice.types.ResultSetRowNode;
 import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
+import org.alfresco.webservice.util.ISO9075;
 import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
@@ -577,7 +578,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
         // Try and copy the reference into the folder
         CMLCopy copy = new CMLCopy();
-        copy.setTo(new ParentReference(folderReference.getStore(), folderReference.getUuid(), null, Constants.ASSOC_CONTAINS, "{test}name.txt"));
+        copy.setTo(new ParentReference(folderReference.getStore(), folderReference.getUuid(), null, Constants.ASSOC_CONTAINS, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}name.txt"));
         copy.setWhere(new Predicate(new Reference[]{reference}, null, null));
         CML cmlCopy = new CML();
         cmlCopy.setCopy(new CMLCopy[]{copy});
@@ -774,7 +775,9 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     public void testPathLookup()
         throws Exception
     {
-        
+        Reference newFolder = createFolder(BaseWebServiceSystemTest.rootReference, "A Test Folder");
+        queryForFolder(newFolder.getPath(), newFolder);
+        queryForFolder("/cm:" + ISO9075.encode("A Test Folder"), newFolder);
     }
     
     private Reference createFolder(Reference parent, String folderName)
@@ -794,5 +797,27 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);
         
         return results[0].getDestination();
+    }
+    
+    private void queryForFolder(String pathName, Reference expected) 
+        throws Exception
+    {
+        Reference folderRef = new Reference(BaseWebServiceSystemTest.store, null, pathName);
+        Node[] nodes = repositoryService.get(new Predicate(new Reference[]{folderRef}, null, null));
+        if( nodes == null || nodes.length < 1 ) 
+        {
+            fail("No such folder found.");
+        } 
+        else if( nodes.length > 1) 
+        {
+            fail("Found more than one reference--should only be one.");
+        } 
+        else 
+        {
+            Reference ref = nodes[0].getReference();
+            assertNotNull(ref);
+            assertEquals(expected.getUuid(), ref.getUuid());
+            assertEquals(expected.getPath(), ref.getPath());
+        } 
     }
 }

@@ -100,7 +100,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
     {
         Reference reference = createContentAtRoot("version_test.txt", INITIAL_VERSION_CONTENT);
         Predicate predicate = convertToPredicate(reference);        
-        ParentReference parentReference = getFolderParentReference("{test}workingCopy");
+        ParentReference parentReference = getFolderParentReference("{" + Constants.NAMESPACE_CONTENT_MODEL + "}workingCopy");
         
         // Checkout the content to the folder
         CheckoutResult result = this.authoringService.checkout(predicate, parentReference);

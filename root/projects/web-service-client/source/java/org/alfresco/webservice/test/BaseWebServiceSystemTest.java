@@ -34,6 +34,7 @@ import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
+import org.apache.axis.wsdl.toJava.NamespaceSelector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -105,12 +106,12 @@ public abstract class BaseWebServiceSystemTest extends TestCase
             }
 
             // Create test content
-            ParentReference contentParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testContent");
+            ParentReference contentParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}testContent");
             NamedValue[] contentProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, CONTENT_NAME, null)};
             CMLCreate createContent = new CMLCreate("testContent", contentParentRef, null, null, null, Constants.TYPE_CONTENT, contentProperties);
             
             // Create test folder
-            ParentReference folderParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{test}testFolder");            
+            ParentReference folderParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}testFolder");            
             NamedValue[] folderProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, FOLDER_NAME, null)};
             CMLCreate createFolder = new CMLCreate("testFolder", folderParentRef, null, null, null, Constants.TYPE_FOLDER, folderProperties);
             
@@ -150,7 +151,7 @@ public abstract class BaseWebServiceSystemTest extends TestCase
         parentRef.setStore(BaseWebServiceSystemTest.store);
         parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
         parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
-        parentRef.setChildName("{test}test" + System.currentTimeMillis());
+        parentRef.setChildName("{" + Constants.NAMESPACE_CONTENT_MODEL + "}test" + System.currentTimeMillis());
         
         NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, name, null)};
         CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
