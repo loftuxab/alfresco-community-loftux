@@ -223,6 +223,23 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         return  "/$" + version + "$" + store_name + "$" + webapp_name; 
     }
 
+    void sendErrorPageResponse(Response response, String html_error_msg)
+    {
+        try 
+        {
+            response.setStatus(404);
+            response.setContentType("text/html");
+            response.setCharacterEncoding("utf-8");
+            Writer writer = response.getReporter();
+
+            // A null writer indicates a hard commit has already 
+            // taken place...  which should never happen here.
+
+            if (writer != null) { writer.write( html_error_msg); }
+        }
+        catch (Exception e) { /* nothing to do */ }
+    }
+
 
 
     /**
@@ -311,7 +328,35 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             MessageBytes context_path_MB = request.getContextPathMB();
             String       context_path    = request.getContextPath();
             context_path_MB.recycle();
-            context_path = unMangleAVMuri( context_path );
+
+            try
+            {
+               context_path = unMangleAVMuri( context_path );
+            }
+            catch (Exception bad_context)
+            {
+                // Handle corrupted or null context paths gracefully.
+                // The context path can be null if the store is present,
+                // but the webapp itself is not.
+
+                AVMUrlValve_invoked_.set(null);   
+
+                // TODO:  Sometimes, a 503 error is sent instead of this page.
+
+                sendErrorPageResponse( response,
+                    "<html>\n"                                                  +
+                    "  <head><title>Virtual website not found</title></head>\n" +
+                    "  <body>\n"                                                +
+                    "     <p>\n"                                                +
+                    "     <h2>Virtual website not found</h2>\n"                 + 
+                    "     <br>\n"                                               +
+                    "     &nbsp;&nbsp;&nbsp;&nbsp;No such webapp"               + 
+                    "  </body>\n" +
+                    "</html>" 
+                );
+                return;
+            }
+
             context_path_MB.setString( context_path );
 
             // Create the same illusion for getRequestURL()
@@ -388,47 +433,26 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
 
         if ( (store_name == null) || store_name.equals("") )
         {
-            // When the reqeust has failed due to no mapping
+            // When the request has failed due to no mapping
             // between virtual host and AVM store, there
             // won't be any subrequest.  Therefore, unset
             // the subrequest flag.
 
             AVMUrlValve_invoked_.set(null);   
+            sendErrorPageResponse( response,
+                "<html>\n"                                                  +
+                "  <head><title>Virtual website not found</title></head>\n" +
+                "  <body>\n"                                                +
+                "     <p>\n"                                                +
+                "     <h2>Virtual website not found</h2>\n"                 + 
+                "     <br>\n"                                               +
+                "     &nbsp;&nbsp;&nbsp;&nbsp;Bad host name:&nbsp;&nbsp;"   + 
+                "     &nbsp;&nbsp;<tt>" + server_name + "</tt>\n"           +
+                "  </body>\n" +
+                "</html>" 
+            );
 
-            // TODO:  The error page should be configurable/localizable. 
-            //        Longer term, figure out where configuration data
-            //        like this should go.  For now, I'm just hard-coding 
-            //        the response in English.
-
-            String html_error_msg = 
-                   "<html>\n"                                                  +
-                   "  <head><title>Virtual website not found</title></head>\n" +
-                   "  <body>\n"                                                +
-                   "     <p>\n"                                                +
-                   "     <h2>Virtual website not found</h2>\n"                 + 
-                   "     <br>\n"                                               +
-                   "     &nbsp;&nbsp;&nbsp;&nbsp;Bad host name:&nbsp;&nbsp;"   + 
-                   "     &nbsp;&nbsp;<tt>" + server_name + "</tt>\n"           +
-                   "  </body>\n" +
-                   "</html>";
-
-            try 
-            {
-                response.setStatus(404);
-                response.setContentType("text/html");
-                response.setCharacterEncoding("utf-8");
-                Writer writer = response.getReporter();
-
-                // A null writer indicates a hard commit
-                // has already taken place... which should
-                // never happen here.
-                if (writer != null)
-                {
-                    writer.write( html_error_msg);
-                }
-            }
-            catch (Exception e) { /* nothing to do */ }
-            finally { return; }
+            return;
         }
 
         host = avm_host;
@@ -632,16 +656,6 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             //   if (...) { resp.setHeader("Cache-Control","max=4");}
             // the service might set a different value for the header;
             // this would override your setting here.
-            //
-            // java.lang.Exception: Inside invoke...
-            // at org.alfresco.catalina.valve.AVMUrlValve.invoke(AVMUrlValve.java:573)
-            // at org.apache.catalina.connector.CoyoteAdapter.service(CoyoteAdapter.java:148)
-            // at org.apache.coyote.http11.Http11Processor.process(Http11Processor.java:869)
-            // at org.apache.coyote.http11.Http11BaseProtocol$Http11ConnectionHandler.processConnection(Http11BaseProtocol.java:667)
-            // at org.apache.tomcat.util.net.PoolTcpEndpoint.processSocket(PoolTcpEndpoint.java:527)
-            // at org.apache.tomcat.util.net.LeaderFollowerWorkerThread.runIt(LeaderFollowerWorkerThread.java:80)
-            // at org.apache.tomcat.util.threads.ThreadPool$ControlRunnable.run(ThreadPool.java:684)
-            // at java.lang.Thread.run(Thread.java:595
             //
             // The %HH decoding of the decoded_URI takes place in 
             // CoyoteAdapter around line 212
