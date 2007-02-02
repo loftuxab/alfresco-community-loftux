@@ -116,8 +116,8 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
         oper.setName("queryAssociated");
         param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "node"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/model/content/1.0", "Reference"), org.alfresco.webservice.types.Reference.class, false, false);
         oper.addParameter(param);
-        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "association"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "Association"), org.alfresco.webservice.repository.Association[].class, false, false);
-        param.setOmittable(true);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "association"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "Association"), org.alfresco.webservice.repository.Association.class, false, false);
+        param.setNillable(true);
         oper.addParameter(param);
         oper.setReturnType(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult"));
         oper.setReturnClass(org.alfresco.webservice.repository.QueryResult.class);
@@ -555,13 +555,6 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
-            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "AssociationDirectionEnum");
-            cachedSerQNames.add(qName);
-            cls = org.alfresco.webservice.repository.AssociationDirectionEnum.class;
-            cachedSerClasses.add(cls);
-            cachedSerFactories.add(enumsf);
-            cachedDeserFactories.add(enumdf);
-
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/repository/1.0", "QueryResult");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.repository.QueryResult.class;
@@ -881,7 +874,7 @@ public class RepositoryServiceSoapBindingStub extends org.apache.axis.client.Stu
      * Executes a query to retrieve associated resources of the specified
      * resource.
      */
-    public org.alfresco.webservice.repository.QueryResult queryAssociated(org.alfresco.webservice.types.Reference node, org.alfresco.webservice.repository.Association[] association) throws java.rmi.RemoteException, org.alfresco.webservice.repository.RepositoryFault {
+    public org.alfresco.webservice.repository.QueryResult queryAssociated(org.alfresco.webservice.types.Reference node, org.alfresco.webservice.repository.Association association) throws java.rmi.RemoteException, org.alfresco.webservice.repository.RepositoryFault {
         if (super.cachedEndpoint == null) {
             throw new org.apache.axis.NoEndPointException();
         }

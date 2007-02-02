@@ -39,7 +39,7 @@ public interface RepositoryServiceSoapPort extends java.rmi.Remote {
      * Executes a query to retrieve associated resources of the specified
      * resource.
      */
-    public org.alfresco.webservice.repository.QueryResult queryAssociated(org.alfresco.webservice.types.Reference node, org.alfresco.webservice.repository.Association[] association) throws java.rmi.RemoteException, org.alfresco.webservice.repository.RepositoryFault;
+    public org.alfresco.webservice.repository.QueryResult queryAssociated(org.alfresco.webservice.types.Reference node, org.alfresco.webservice.repository.Association association) throws java.rmi.RemoteException, org.alfresco.webservice.repository.RepositoryFault;
 
     /**
      * Fetches the next batch of query results.

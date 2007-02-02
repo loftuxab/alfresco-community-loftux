@@ -22,7 +22,6 @@ import java.util.Collection;
 
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.Association;
-import org.alfresco.webservice.repository.AssociationDirectionEnum;
 import org.alfresco.webservice.repository.QueryResult;
 import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.repository.UpdateResult;
@@ -309,8 +308,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     {
         Association association = new Association(Constants.createQNameString(
                 Constants.NAMESPACE_CONTENT_MODEL, "translations"),
-                AssociationDirectionEnum.target);
-        QueryResult result = WebServiceFactory.getRepositoryService().queryAssociated(BaseWebServiceSystemTest.contentReference, new Association[]{association});
+                "target");
+        QueryResult result = WebServiceFactory.getRepositoryService().queryAssociated(BaseWebServiceSystemTest.contentReference, association);
         assertNotNull(result);
         assertNotNull(result.getResultSet());
         assertNotNull(result.getResultSet().getRows());
