@@ -9,9 +9,9 @@
 	<target name="package" depends="package-war"/>
 	
 	<path id="class.path">
-	  	<pathelement path="../core/build/classes" />
-	  	<fileset dir="../3rd-party/lib" includes="*.jar"/>
-	  	<pathelement path="../repository/build/classes" />	  
+	  	<pathelement path="../../projects/core/build/classes" />
+	  	<fileset dir="../../projects/3rd-party/lib" includes="*.jar"/>
+	  	<pathelement path="../../projects/repository/build/classes" />	  
    	</path>
 	
    	<target name="package-war" depends="package-extension" if="${module.id}.enabled">
