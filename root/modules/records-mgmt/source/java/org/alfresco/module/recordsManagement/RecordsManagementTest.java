@@ -151,6 +151,12 @@ public class RecordsManagementTest extends BaseSpringTest
     public void testModuleService()
         throws Exception
     {
+        // Check whether the records management has been configured in
+        if (isRMConfigured() == false)
+        {
+            return;
+        } 
+        
         ModuleService moduleService = new ModuleServiceImpl(); //(ModuleService)this.applicationContext.getBean("moduleService");
         List<ModuleDetails> details = moduleService.getAllModules();
         assertNotNull(details);
