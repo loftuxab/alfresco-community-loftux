@@ -1438,13 +1438,6 @@ public class AVMHostConfig extends HostConfig
             String resource = watchedResources[i];
             if ( !resource.startsWith( webapp_fullpath ) )
             {
-                if (log.isDebugEnabled())
-                {
-                    log.debug("AVMHostConfig watched resource: "   + 
-                               resource + " does not start with: " + 
-                               webapp_fullpath);
-                }
-
                 // PORTING NOTE:
                 //      The ugly hack below deals with Unix vs windows paths.
                 //      There are better ways to do this.  
