@@ -31,12 +31,24 @@ public class VirtServerUtils
     // patterns for WEB-INF files that require virtualisation server reload
 
     private final static Pattern WEB_INF_PATH_PATTERN = 
-        Pattern.compile(  ".*:/" + JNDIConstants.DIR_DEFAULT_WWW        + 
-                          "/" + JNDIConstants.DIR_DEFAULT_APPBASE + "/" + 
-                          ".*/WEB-INF/((classes/.*)|(lib/.*)|(web.xml))",
-                          Pattern.CASE_INSENSITIVE
-                        );
-
+        Pattern.compile( 
+            "[^:]+"                                 +   // valid store name
+            ":"                                     +   // store delim
+            "/" + JNDIConstants.DIR_DEFAULT_WWW     +   // overlay dir ("/www")
+            "/" + JNDIConstants.DIR_DEFAULT_APPBASE +   // the host app base
+            "/" + "[^/]+"                           +   // the webapp name
+            "/WEB-INF"                              +   // jars,classes,web.xml
+            "("                                     +   // 
+               "/"                                  +   // Trigger on submit of
+                "("                                 +   // classes, jars in the
+                     "(classes(/.*)?)"              +   // lib dir and/or the
+                     "|"                            +   // entire contents of
+                     "(lib(/.*)?)"                  +   // these dirs.  Also,
+                     "|"                            +   // trigger on web.xml
+                     "(web\\.xml)"                  +   // within WEB-INF, and
+                ")"                                 +   // the entire WEB-INF
+            ")?"                                        // directory itself.
+           , Pattern.CASE_INSENSITIVE);                 // Whew!
 
    /**
     * @param path    Path to match against
