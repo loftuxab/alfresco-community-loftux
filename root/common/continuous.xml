@@ -37,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, set-build-number, distribute-jboss, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
+           depends="init, set-build-number, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
