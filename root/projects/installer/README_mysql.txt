@@ -23,6 +23,14 @@ Alfresco requires MySQL 4.1 or higher.
   are reported, then it is installed and running.  Enter 'quit' to exit.
 
 
+MySQL Database Connector
+------------------------
+
+You may need to add or update the MySQL Java Connector library (required for WAR bundle):
+- Download the MySQL Java Database Connector http://dev.mysql.com/downloads/connector/j/
+- Copy the JAR file into <container>/common/lib or <container>/server/default/lib
+
+
 Create Database
 ---------------
 

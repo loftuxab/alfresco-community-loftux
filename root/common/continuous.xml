@@ -37,7 +37,7 @@
 
    <!-- TODO: Do we still need to distribute php and web service client -->
    <target name="distribute"
-           depends="init, set-build-number, distribute-tomcat, distribute-war, distribute-sdk, distribute-web-service-client, distribute-benchmark"
+           depends="init, set-build-number, distribute-tomcat, distribute-war, distribute-wcm, distribute-sdk, distribute-web-service-client, distribute-benchmark"
            description="Creates the distribution files for all platforms for all appservers"/>
 
    <target name="generate-checksums" depends="init"
@@ -54,6 +54,37 @@
       <replace file="${dir.config.repository}/alfresco/version.properties" token="@build-number@" value="${label}" />
    </target>
 
+   <!-- ***************** -->
+   <!-- ** WCM targets ** -->
+   <!-- ***************** -->
+   
+   <target name="distribute-wcm" depends="init" description="Creates the distibution files for WCM">
+      <antcall target="prepare-virtual" />
+      <antcall target="distribute-wcm-windows" />
+      <antcall target="distribute-wcm-linux" />
+   </target>
+
+   <target name="distribute-wcm-windows" depends="init">
+      <zip destfile="${dir.dist}/${file.name.dist.wcm}.zip">
+         <zipfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
+         <zipfileset dir="${dir.project.installer}" includes="README_wcm.txt,wcm-bootstrap-context.xml" />
+         <zipfileset dir="${dir.project.installer}" includes="virtual_start.bat,virtual_stop.bat,virtual_alf.bat" />
+         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
+      </zip>
+   </target>
+
+   <target name="distribute-wcm-linux" depends="init">
+      <tar destfile="${dir.dist}/${file.name.dist.wcm}.tar.gz" longfile="gnu" compression="gzip">
+         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
+         <tarfileset dir="${dir.assemble.virtualtomcat}/bin" prefix="virtual-tomcat/bin" includes="*.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}" includes="README_wcm.txt,wcm-bootstrap-context.xml" />
+         <tarfileset dir="${dir.project.installer}" includes="virtual_alf.sh" mode="755" />
+         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
+      </tar>
+   </target>
+ 
    <target name="prepare-virtual" depends="init">
       <!-- prepare virtualization server -->
       <delete quiet="true">
@@ -84,6 +115,7 @@
    <!-- ******************* -->
    <!-- ** JBoss targets ** -->
    <!-- ******************* -->
+   <!-- May be out of date  -->
 
    <target name="distribute-jboss" depends="init" description="Creates the distibution files for JBoss">
       <ant antfile="${file.name.build}" target="clean-war" />
@@ -115,7 +147,7 @@
    </target>
 
    <target name="distribute-jboss-linux" depends="init">
-      <tar destfile="${dir.dist}/${file.name.dist.jboss}.tar" longfile="gnu">
+      <tar destfile="${dir.dist}/${file.name.dist.jboss}.tar.gz" longfile="gnu" compression="gzip">
          <!-- Add standard jboss distribution -->
          <tarfileset dir="${dir.distribution.jboss}" prefix="jboss" excludes="**/bin/*.bat" />
          <tarfileset dir="${dir.distribution.jboss}/bin" prefix="jboss/bin" includes="*.sh" mode="755" />
@@ -126,22 +158,16 @@
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.installer}" includes="jboss/README_osx.txt" fullpath="README_osx.txt" />
-         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh,alfvirtual.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
-         <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
-         <tarfileset dir="${dir.assemble.virtualtomcat}/bin" prefix="virtual-tomcat/bin" includes="*.sh" mode="755" />
       </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.jboss}.tar.gz" src="${dir.dist}/${file.name.dist.jboss}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.jboss}.tar" />
    </target>
 
    <target name="assemble-jboss-common" depends="init">
       <mkdir dir="${dir.dist}" />
       <mkdir dir="${dir.assemble.jboss}" />
-      
+
       <!-- make sure the MySQL connector is present and up to date -->
       <delete>
          <fileset dir="${dir.distribution.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.mysql.connector}"/>
@@ -179,7 +205,7 @@
    <!-- ******************** -->
    <!-- ** Tomcat targets ** -->
    <!-- ******************** -->
-   
+
    <target name="distribute-tomcat" depends="init" description="Creates the distibution files for Tomcat">
       <ant antfile="${file.name.build}" target="clean-war"/>
       <ant antfile="${file.name.build}" target="incremental-tomcat"/>
@@ -192,22 +218,19 @@
    <target name="distribute-tomcat-windows" depends="init">
       <zip destfile="${dir.dist}/${file.name.dist.tomcat}.zip">
          <zipfileset dir="${dir.assemble.tomcat}" prefix="tomcat" excludes="bin/*.sh" />
-         <zipfileset dir="${dir.project.installer}" includes="${files.installer.windows}" />
+         <zipfileset dir="${dir.project.installer}" includes="licenses/**,alf_start.bat,alf_stop.bat" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/alfresco.bat" fullpath="alfresco.bat" />
          <zipfileset dir="${dir.project.installer}" includes="tomcat/README_win.txt" fullpath="README.txt" />
          <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
-         <zipfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
          <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
-         <zipfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" />
       </zip>
    </target>
 
    <target name="distribute-tomcat-linux" depends="init">
-      <tar destfile="${dir.dist}/${file.name.dist.tomcat}.tar" longfile="gnu">
+      <tar destfile="${dir.dist}/${file.name.dist.tomcat}.tar.gz" longfile="gnu" compression="gzip">
          <tarfileset dir="${dir.assemble.tomcat}" prefix="tomcat" excludes="${dir.assemble.tomcat}/bin/*.sh,${dir.assemble.tomcat}/bin/*.bat" />
          <tarfileset dir="${dir.assemble.tomcat}/bin" prefix="tomcat" includes="${dir.assemble.tomcat}/bin/*.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="licenses/**" />
@@ -215,18 +238,12 @@
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_linux.txt" fullpath="README.txt" />
          <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_osx.txt" fullpath="README_osx.txt" />
-         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh,alfvirtual.sh" mode="755" />
+         <tarfileset dir="${dir.project.installer}" includes="zstart_oo.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
          <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
-         <tarfileset dir="${dir.project.webclient}/source/test-resources/xforms/demos/press-release" prefix="extras/wcm/forms" />
-         <tarfileset dir="${dir.assemble.virtualtomcat}" prefix="virtual-tomcat" excludes="**/bin/*.sh,**/bin/*.bat" />
-         <tarfileset dir="${dir.assemble.virtualtomcat}/bin" prefix="virtual-tomcat/bin" includes="*.sh" mode="755" />
       </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.tomcat}.tar.gz" src="${dir.dist}/${file.name.dist.tomcat}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.tomcat}.tar" />
    </target>
-   
+
    <target name="assemble-tomcat-common" depends="init">
       <mkdir dir="${dir.dist}" />
       <unzip src="${dir.project.3rdparty}/distro/${file.name.tomcat.dist}.zip" dest="${dir.assemble}" />
@@ -278,43 +295,38 @@
    <!-- ** WAR targets ** -->
    <!-- ***************** -->
 
-   <target name="distribute-war" depends="assemble-war-common"
+   <target name="distribute-war"
            description="Creates the WAR file distribution for all platforms">
+
       <mkdir dir="${dir.dist}" />
+
       <zip destfile="${dir.dist}/${file.name.dist.war}.zip">
-         <zipfileset dir="${dir.assemble.war}" />
-         <zipfileset dir="${dir.project.installer}/bin-win" prefix="bin"/>
          <zipfileset dir="${dir.project.netbios}/dll" prefix="bin"/>
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
-         <zipfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
+         <zipfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
+         <zipfileset dir="${dir.project.installer}" includes="licenses/**,README_war.txt" />
+         <zipfileset dir="${dir.project.installer}" includes="README_mysql.txt" />
+         <zipfileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}" />
+         <zipfileset dir="${dir.config.repository}/alfresco/extension" prefix="extensions/extension" />
+         <zipfileset dir="${dir.config.webclient}/alfresco/extension" prefix="extensions/extension" />
+         <zipfileset dir="${dir.project.installer}/messages" prefix="extensions/messages" />
+         <zipfileset dir="${dir.common.lib}" includes="${file.name.xalan},${file.name.xalan.serializer}" prefix="endorsed" />
       </zip>
 
-      <tar destfile="${dir.dist}/${file.name.dist.war}.tar" longfile="gnu">
-         <tarfileset dir="${dir.assemble.war}" />
+      <tar destfile="${dir.dist}/${file.name.dist.war}.tar.gz" longfile="gnu" compression="gzip">
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
-         <tarfileset dir="${dir.project.webclient}/build/dist" includes="alfresco-sample-website.war" prefix="extras/wcm" />
+         <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
+         <tarfileset dir="${dir.project.installer}/alf_data" prefix="alf_data" />
+         <tarfileset dir="${dir.project.installer}" includes="licenses/**,README_war.txt" />
+         <tarfileset dir="${dir.project.installer}" includes="README_mysql_linux.txt" fullpath="README_mysql.txt" />
+         <tarfileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}" />
+         <tarfileset dir="${dir.config.repository}/alfresco/extension" prefix="extensions/extension" />
+         <tarfileset dir="${dir.config.webclient}/alfresco/extension" prefix="extensions/extension" />
+         <tarfileset dir="${dir.project.installer}/messages" prefix="extensions/messages" />
+         <tarfileset dir="${dir.common.lib}" includes="${file.name.xalan},${file.name.xalan.serializer}" prefix="endorsed" />
       </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.war}.tar.gz" src="${dir.dist}/${file.name.dist.war}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.war}.tar" />
    </target>
 
-   <target name="assemble-war-common" depends="init">
-      <mkdir dir="${dir.assemble.war}"/>
-      <copy todir="${dir.assemble.war}">
-         <fileset dir="${dir.project.installer}" includes="*.sql,licenses/**, README_war.txt" />
-         <fileset dir="${dir.deploy.tomcat}" includes="${file.name.war.alfresco}"/>
-      </copy>
-      <copy todir="${dir.assemble.war}/extensions/extension">
-         <fileset dir="${dir.config.repository}/alfresco/extension" />
-         <fileset dir="${dir.config.webclient}/alfresco/extension" />
-      </copy>
-      <copy todir="${dir.assemble.war}/extensions/messages">
-         <fileset dir="${dir.project.installer}/messages" />
-      </copy>
-      <!-- place latest Xalan jars to ensure they are used -->
-      <copy todir="${dir.assemble.war}/endorsed" file="${dir.common.lib}/${file.name.xalan}" />
-      <copy todir="${dir.assemble.war}/endorsed" file="${dir.common.lib}/${file.name.xalan.serializer}" />
-   </target>
 
    <!-- ***************** -->
    <!-- ** Web Service Client targets ** -->
@@ -382,7 +394,7 @@
       <copy file="${dir.project.benchmark-tests}/build-classpath.xml.dist" tofile="${dir.assemble.benchmark}/build-classpath.xml" />
 
    </target>
-   
+
    <target name="distribute-benchmark" depends="assemble-benchmark"
            description="Creates the Alfresco benchmark distribution file for all platforms">
       <mkdir dir="${dir.dist}" />
@@ -391,11 +403,9 @@
          <zipfileset dir="${dir.assemble.benchmark}" />
       </zip>
 
-      <tar destfile="${dir.dist}/${file.name.dist.benchmark}.tar" longfile="gnu">
+      <tar destfile="${dir.dist}/${file.name.dist.benchmark}.tar.gz" longfile="gnu" compression="gzip">
          <tarfileset dir="${dir.assemble.benchmark}" />
       </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.benchmark}.tar.gz" src="${dir.dist}/${file.name.dist.benchmark}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.benchmark}.tar" />
    </target>
 
    <!-- ******************** -->
@@ -582,12 +592,10 @@
          <zipfileset dir="${dir.project.installer}/extras" prefix="extras" />
       </zip>
 
-      <tar destfile="${dir.dist}/${file.name.dist.sdk}.tar" longfile="gnu">
+      <tar destfile="${dir.dist}/${file.name.dist.sdk}.tar.gz" longfile="gnu" compression="gzip">
          <tarfileset dir="${dir.assemble.sdk}" />
          <tarfileset dir="${dir.project.installer}/extras" prefix="extras" />
       </tar>
-      <gzip zipfile="${dir.dist}/${file.name.dist.sdk}.tar.gz" src="${dir.dist}/${file.name.dist.sdk}.tar" />
-      <delete file="${dir.dist}/${file.name.dist.sdk}.tar" />
    </target>
 
 </project>

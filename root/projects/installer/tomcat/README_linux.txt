@@ -1,10 +1,8 @@
-============================
-Alfresco 2.0 Preview Release
-============================
+====================
+Alfresco 2.0 Release
+====================
 
-Welcome to the Alfresco 2.0 Preview Release.  This software is for evaluation
-purposes only and cannot be used against an existing Alfresco repository.  There
-will not be an upgrade path from this Candidate Release to the final 2.0 release.
+Welcome to the Alfresco 2.0 Release.  
 
 
 ===================
@@ -105,7 +103,6 @@ Running the Alfresco Server
 
 Navigate to the '/opt/alfresco' directory
 - Run 'alfresco.sh start'
-- If you plan to use WCM preview features, run './alfvirtual.sh start'
 - You can now try Alfresco by visiting:
 
 http://localhost:8080/alfresco
@@ -122,8 +119,7 @@ http://www.alfresco.com/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the '/opt/alfresco' directory and run './alfresco.sh stop', also run 
-'./alfvirtual.sh stop' if you started the Virtualization server.
+Navigate to the '/opt/alfresco' directory and run './alfresco.sh stop'.
 
 
 ===========================

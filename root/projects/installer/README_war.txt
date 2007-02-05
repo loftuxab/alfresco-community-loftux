@@ -1,10 +1,8 @@
 ====================
-Alfresco 2.0 Preview
+Alfresco 2.0 Release
 ====================
 
-Welcome to the Alfresco 2.0 Preview Release.  This software is for evaluation
-purposes only and should not be used against an existing Alfresco repository.
-
+Welcome to the Alfresco 2.0  Release.
 
 ===================
 Installing Alfresco
@@ -19,10 +17,10 @@ Alfresco WAR Installation
 
 Requirements:
 - Java Development Kit available from http://java.sun.com
-- MySQL Database available from http://www.mysql.com (other databases are supported)
 - Alfresco available from http://www.alfresco.com
 
 Optional:
+- MySQL Database available from http://www.mysql.com (other databases are supported)
 - OpenOffice for document transformation available from http://www.openoffice.org
 
 
@@ -41,27 +39,6 @@ Install JDK 5.0
 - Install once downloaded
 
 
-Install MySQL
--------------
-
-- If you wish to use other databases, please visit the forums and wiki at
-  www.alfresco.com for guidelines
-- If you already have MySQL 4.1 or above installed, skip to "Install Alfresco WAR Bundle"
-
-- Browse to http://dev.mysql.com/downloads/mysql
-- Download the appropriate package for your platform
-- Install once downloaded
-- Use Typical setup type
-- You may skip the MySQL.com sign-up
-- Configure using options appropriate to required use
-  - for demo, choose default selected options
-  - for non-English or non-West European languages, choose UTF8 Character set
-- Test MySQL is installed and running by opening a command prompt and entering:
-  'mysql -u root -p'
-- When prompted, give the password you set during installation.  If no errors
-  are reported, then it is installed and running.  Enter 'quit' to exit.
-
-
 Install Alfresco WAR Bundle
 ---------------------------
 
@@ -71,13 +48,6 @@ Install Alfresco WAR Bundle
 - Copy the alfresco.war file to the appropriate location for your application server
 - If you have deployed previous versions of Alfresco, you may wish to remove any
   temporary files you application server has created.  
-
-
-Add MySQL Database Connector
-----------------------------
-
-- Download the MySQL Java Database Connector http://dev.mysql.com/downloads/connector/j/
-- Copy the JAR file into <container>/common/lib or <container>/server/default/lib
 
 
 Add Additional Required Libraries
@@ -91,22 +61,21 @@ more generally for Alfresco in future releases.
   (e.g. tomcat/common/endorsed)
 
 
-Add Custom Configurations
--------------------------
+Extensions Configuration
+------------------------
 
-Most of the Alfresco configuration can be customized by overriding the default
-settings.  This can be done by adding <alfresco>/extension to the appropriate
-location (e.g. tomcat/shared/classes/alfresco/extension or
-jboss/server/default/conf/alfresco/extension).  This provides a set of default
-and example configurations.
+Alfresco can be customized in a number of ways.  Some samples and default configurations
+are provided in the extensions directory.  These should be copied into the container's
+shared classes location.  These configurations also set the database to be HSQL and will 
+use the alf_data directory provided.  You will need to change the path to the HSQL data
+directory in the custom-db-connection.properties file.  Alternatively, for a MySQL based
+installation, follow instructions in the README_mysql.txt file.
 
 
-Create Database
----------------
+Configure the Database Connection and Data Locations
+----------------------------------------------------
 
-Alfresco requires a MySQL database named 'alfresco' with a user account and password
-of 'alfresco'.  This can be set up manually by loading the 'db_setup.sql' file into
-MySQL, for example, 'mysql -u root -p <db_setup.sql'.
+Details can be found at http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
 
 
 You have now installed all the components needed to run the Alfresco server.
@@ -126,12 +95,6 @@ done at any point after Alfresco has been installed.
 - OpenOffice needs to be started in a specific way to work with Alfresco:
 
   soffice "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless
-
-
-Configure the Database Connection and Data Locations
-----------------------------------------------------
-
-Details can be found at http://wiki.alfresco.com/wiki/Repository_Configuration#New_Installations
 
 
 ===========================
@@ -155,12 +118,12 @@ http://www.alfresco.com/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Shut down your application server.  You may also wish to stop the OpenOffice process, but 
+Shut down your application server.  You may also wish to stop the OpenOffice process, but
 the command for this depends on your platform.
 
 
 ===========================
-Upgrading from V1.x to V1.4
+Upgrading from V1.x to V2.0
 ===========================
 
 Not yet available.
