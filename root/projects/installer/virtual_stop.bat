@@ -3,4 +3,4 @@ rem ---------------------------------------------------------------------------
 rem Stop script for the Alfresco Server
 rem ---------------------------------------------------------------------------
 
-call "%~dp0alfvirtual.bat" stop
+call "%~dp0virtual_alf.bat" stop

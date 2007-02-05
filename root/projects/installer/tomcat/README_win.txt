@@ -1,10 +1,8 @@
-============================
-Alfresco 2.0 Preview Release
-============================
+====================
+Alfresco 2.0 Release
+====================
 
-Welcome to the Alfresco 2.0 Preview Release.  This software is for evaluation 
-purposes only and cannot be used against an existing Alfresco repository.  There
-will not be an upgrade path from this Preview Release to the final 2.0 release.
+Welcome to the Alfresco 2.0 Release. 
 
 
 ===================
@@ -91,7 +89,6 @@ Navigate to the 'C:\alfresco' folder and run 'alf_start.bat'
 - a minimized window will be started for OpenOffice
 - a console window will open for Tomcat
 - when the console has the message 'INFO: Server startup in nnnnn ms', Tomcat is running
-- if you plan to use WCM preview features, run 'virtual_start.bat'
 - you can now try Alfresco by visiting:
 
 http://localhost:8080/alfresco
@@ -108,8 +105,7 @@ http://www.alfresco.com/downloads or from the company space from within the Web 
 Closing the Alfresco Server
 ===========================
 
-Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat', also run 'virtual_stop.bat'
-if you started the Virtualization server.
+Navigate to the 'C:\alfresco' folder and run 'alf_stop.bat'.
 
 
 ===========================
