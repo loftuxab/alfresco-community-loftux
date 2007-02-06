@@ -400,7 +400,7 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         // check the aspects
         ClassDefinition[] aspects = nodeDef.getAspects();
         assertNotNull("aspects should not be null", aspects);
-        assertEquals("There should be 2 aspects", 2, aspects.length);
+        assertEquals("There should be 3 aspects", 3, aspects.length);
 
         // check the first aspect
         ClassDefinition aspect1 = aspects[1];

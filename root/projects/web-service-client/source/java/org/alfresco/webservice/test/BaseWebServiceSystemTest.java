@@ -23,7 +23,9 @@ import org.alfresco.webservice.content.ContentServiceSoapBindingStub;
 import org.alfresco.webservice.repository.RepositoryServiceSoapBindingStub;
 import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
+import org.alfresco.webservice.types.CMLAddAspect;
 import org.alfresco.webservice.types.CMLCreate;
+import org.alfresco.webservice.types.CMLCreateAssociation;
 import org.alfresco.webservice.types.ContentFormat;
 import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.Node;
@@ -34,7 +36,6 @@ import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
-import org.apache.axis.wsdl.toJava.NamespaceSelector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -58,6 +59,7 @@ public abstract class BaseWebServiceSystemTest extends TestCase
     
     public static final String FOLDER_NAME = "test folder";
     protected static final String CONTENT_NAME = "test content";
+    protected static final String CONTENT_NAME_2 = "test content 2";
     
     protected static final String TEST_CONTENT = "This is some test content.  This is some test content.";
     
@@ -110,13 +112,24 @@ public abstract class BaseWebServiceSystemTest extends TestCase
             NamedValue[] contentProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, CONTENT_NAME, null)};
             CMLCreate createContent = new CMLCreate("testContent", contentParentRef, null, null, null, Constants.TYPE_CONTENT, contentProperties);
             
+            ParentReference contentParentRef2 = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}testContent2");
+            NamedValue[] contentProperties2 = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, CONTENT_NAME_2, null)};
+            CMLCreate createContent2 = new CMLCreate("testContent2", contentParentRef2, null, null, null, Constants.TYPE_CONTENT, contentProperties2);
+            
             // Create test folder
             ParentReference folderParentRef = new ParentReference(BaseWebServiceSystemTest.store, BaseWebServiceSystemTest.rootReference.getUuid(), null, Constants.ASSOC_CHILDREN, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}testFolder");            
             NamedValue[] folderProperties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, FOLDER_NAME, null)};
             CMLCreate createFolder = new CMLCreate("testFolder", folderParentRef, null, null, null, Constants.TYPE_FOLDER, folderProperties);
             
+            // Create an associatin between the content
+            CMLAddAspect cmlAddAspect = new CMLAddAspect("{http://www.alfresco.org/model/content/1.0}translatable", null, null, "testContent");
+            CMLCreateAssociation createAssoc = new CMLCreateAssociation(null, "testContent", null, "testContent2", Constants.createQNameString(
+                    Constants.NAMESPACE_CONTENT_MODEL, "translations"));
+            
             CML cml = new CML();
-            cml.setCreate(new CMLCreate[]{createContent, createFolder});
+            cml.setCreate(new CMLCreate[]{createContent, createContent2, createFolder});
+            cml.setAddAspect(new CMLAddAspect[]{cmlAddAspect});
+            cml.setCreateAssociation(new CMLCreateAssociation[]{createAssoc});
             
             UpdateResult[] updateResult = this.repositoryService.update(cml);
             BaseWebServiceSystemTest.contentReference = updateResult[0].getDestination();
