@@ -122,15 +122,8 @@ public class RecordsManagementTest extends BaseSpringTest
     
     public boolean isRMConfigured()
     {
-        try
-        {
-            this.applicationContext.getBean("rmScript");
-        }
-        catch (Exception exception)
-        {
-            return false;
-        }
-        return true;
+        ModuleService moduleService = (ModuleService)this.applicationContext.getBean("moduleService");
+        return (moduleService.getModule("recordsManagement") != null);
     }   
     
     public void testUpdateTemplatesAndScripts()
@@ -146,27 +139,6 @@ public class RecordsManagementTest extends BaseSpringTest
         
         setComplete();
         endTransaction();
-    }
-    
-    public void testModuleService()
-        throws Exception
-    {
-        // Check whether the records management has been configured in
-        if (isRMConfigured() == false)
-        {
-            return;
-        } 
-        
-        ModuleService moduleService = new ModuleServiceImpl(); //(ModuleService)this.applicationContext.getBean("moduleService");
-        List<ModuleDetails> details = moduleService.getAllModules();
-        assertNotNull(details);
-        assertEquals(1, details.size());
-        ModuleDetails detail = details.get(0);
-        assertEquals("recordsManagement", detail.getId());
-        
-        ModuleDetails detail2 = moduleService.getModule("recordsManagement");
-        assertNotNull(detail2);
-        assertEquals("recordsManagement", detail2.getId());
     }
     
     private void importFile(String file, String destination)
