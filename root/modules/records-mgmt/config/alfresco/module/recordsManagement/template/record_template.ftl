@@ -25,24 +25,40 @@ body {font:small/1.2em arial,helvetica,clean,sans-serif;font:x-small;margin-top:
 
 	<#if hasAspect(document, "${rma}vitalrecord") = 1>
 		<tr>
-	        <td>Vital record due for next review at ${document.properties["rma:nextReviewDate"]?string("dd MMM yyyy HH:mm")}</td>		
+	        <td>
+		        <#if document.properties["rma:nextReviewDate"]?exists>
+		        	Vital record due for next review at ${document.properties["rma:nextReviewDate"]?string("dd MMM yyyy HH:mm")}
+		        <#else>
+		        	Vital record with no review date set.
+		        </#if>
+	        </td>		
 		</tr>
 	</#if>
 	
 	<#if hasAspect(document, "${rma}scheduledCutoff") = 1 && hasAspect(document, "${rma}cutoff") = 0>
 		<tr>		
-			<td>Scheduled for cutoff at ${document.properties["rma:cutoffDateTime"]?string("dd MMM yyyy HH:mm")}</td>		
+			<td>
+				<#if document.properties["rma:cutoffDateTime"]?exists>				
+					Scheduled for cutoff at ${document.properties["rma:cutoffDateTime"]?string("dd MMM yyyy HH:mm")}
+				<#else>
+					Scheduled for cutoff with no cut off date set.
+				</#if>
+			</td>		
 		</tr>	
 	</#if>		
 
 	<#if hasAspect(document, "${rma}held") = 1>
-		<tr>
+		<tr><td>
 			<#if document.properties["rma:frozen"]>
-			    <td>This record is frozen</td>		
-			<#else>		
-				<td>Held until ${document.properties["rma:holdUntil"]?string("dd MMM yyyy HH:mm")}</td>		
+			    This record is frozen
+			<#else>	
+				<#if document.properties["rma:holdUntil"]?exists>
+					Held until ${document.properties["rma:holdUntil"]?string("dd MMM yyyy HH:mm")}
+				<#else>
+					Held with no held date specified
+				</#if>
 			</#if>
-		</tr>	
+		</td></tr>	
 	</#if>	
 
 	<#if hasAspect(document, "${rma}obsolete") = 1>
