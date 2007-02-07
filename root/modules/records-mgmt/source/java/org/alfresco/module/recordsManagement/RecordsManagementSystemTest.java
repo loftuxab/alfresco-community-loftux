@@ -23,17 +23,14 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.importer.ImporterComponent;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
 import org.alfresco.repo.jscript.ValueConverter;
-import org.alfresco.repo.module.ModuleServiceImpl;
 import org.alfresco.service.cmr.action.Action;
 import org.alfresco.service.cmr.action.ActionService;
-import org.alfresco.service.cmr.module.ModuleDetails;
 import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -60,7 +57,7 @@ import org.alfresco.util.GUID;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementTest extends BaseSpringTest 
+public class RecordsManagementSystemTest extends BaseSpringTest 
 {
     private static final String STRING_PROP_VALUE = "A test value";
     
@@ -104,7 +101,7 @@ public class RecordsManagementTest extends BaseSpringTest
         this.scriptService = (ScriptService)this.applicationContext.getBean("scriptService");
 		
 		// Get a reference to the company home node
-		ResultSet results1 = this.searchService.query(RecordsManagementTest.SPACES_STORE, SearchService.LANGUAGE_XPATH, "app:company_home");
+		ResultSet results1 = this.searchService.query(RecordsManagementSystemTest.SPACES_STORE, SearchService.LANGUAGE_XPATH, "app:company_home");
 		NodeRef companyHome = results1.getNodeRefs().get(0);
 		
 		Map<QName, Serializable> props = new HashMap<QName, Serializable>(10);
@@ -332,22 +329,22 @@ public class RecordsManagementTest extends BaseSpringTest
                                 		props).getChildRef();
 		
 		// Check that the vital record aspect has been applied
-		assertTrue(RecordsManagementTest.this.nodeService.hasAspect(folder1, RecordsManagementModel.ASPECT_VITAL_RECORD));
-		assertTrue(RecordsManagementTest.this.nodeService.hasAspect(doc1, RecordsManagementModel.ASPECT_VITAL_RECORD));
+		assertTrue(RecordsManagementSystemTest.this.nodeService.hasAspect(folder1, RecordsManagementModel.ASPECT_VITAL_RECORD));
+		assertTrue(RecordsManagementSystemTest.this.nodeService.hasAspect(doc1, RecordsManagementModel.ASPECT_VITAL_RECORD));
 		
 		// TODO check the other properties
 		
 		Calendar now = Calendar.getInstance();
 		
 		// Check the folders review date
-		Date date = (Date)RecordsManagementTest.this.nodeService.getProperty(folder1, RecordsManagementModel.PROP_NEXT_REVIEW_DATE);
+		Date date = (Date)RecordsManagementSystemTest.this.nodeService.getProperty(folder1, RecordsManagementModel.PROP_NEXT_REVIEW_DATE);
 		assertNotNull(date);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		assertEquals(now.get(Calendar.YEAR)+2, calendar.get(Calendar.YEAR));
 		
 		// Check the documents review date
-		Date date1 = (Date)RecordsManagementTest.this.nodeService.getProperty(doc1, RecordsManagementModel.PROP_NEXT_REVIEW_DATE);
+		Date date1 = (Date)RecordsManagementSystemTest.this.nodeService.getProperty(doc1, RecordsManagementModel.PROP_NEXT_REVIEW_DATE);
 		assertNotNull(date1);
 		Calendar calendar1 = Calendar.getInstance();
 		calendar1.setTime(date1);
@@ -383,22 +380,22 @@ public class RecordsManagementTest extends BaseSpringTest
 		props).getChildRef();
 
 		// Check that the vital record aspect has been applied
-		assertTrue(RecordsManagementTest.this.nodeService.hasAspect(folder1, RecordsManagementModel.ASPECT_CUTOFF_SCHEDULE));
-		assertTrue(RecordsManagementTest.this.nodeService.hasAspect(doc1, RecordsManagementModel.ASPECT_CUTOFF_SCHEDULE));
+		assertTrue(RecordsManagementSystemTest.this.nodeService.hasAspect(folder1, RecordsManagementModel.ASPECT_CUTOFF_SCHEDULE));
+		assertTrue(RecordsManagementSystemTest.this.nodeService.hasAspect(doc1, RecordsManagementModel.ASPECT_CUTOFF_SCHEDULE));
 		
 		// TODO check the other properties
 		
 		Calendar now = Calendar.getInstance();
 		
 		// Check the folders review date
-		Date date = (Date)RecordsManagementTest.this.nodeService.getProperty(folder1, RecordsManagementModel.PROP_CUTOFF_DATE_TIME);
+		Date date = (Date)RecordsManagementSystemTest.this.nodeService.getProperty(folder1, RecordsManagementModel.PROP_CUTOFF_DATE_TIME);
 		assertNotNull(date);
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(date);
 		assertEquals(now.get(Calendar.YEAR)+2, calendar.get(Calendar.YEAR));
 		
 		// Check the documents review date
-		Date date1 = (Date)RecordsManagementTest.this.nodeService.getProperty(doc1, RecordsManagementModel.PROP_CUTOFF_DATE_TIME);
+		Date date1 = (Date)RecordsManagementSystemTest.this.nodeService.getProperty(doc1, RecordsManagementModel.PROP_CUTOFF_DATE_TIME);
 		assertNotNull(date1);
 		Calendar calendar1 = Calendar.getInstance();
 		calendar1.setTime(date1);
