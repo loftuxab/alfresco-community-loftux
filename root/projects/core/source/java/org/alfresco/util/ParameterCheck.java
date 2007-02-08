@@ -23,7 +23,7 @@ import java.util.Collection;
  * 
  * @author gavinc
  */
-public class ParameterCheck
+public final class ParameterCheck
 {
     /**
      * Checks that the parameter with the given name has content i.e. it is not
@@ -32,14 +32,14 @@ public class ParameterCheck
      * @param strParamName Name of parameter to check
      * @param object Value of the parameter to check
      */
-    public static void mandatory(String strParamName, Object object)
+    public static void mandatory(final String strParamName, final Object object)
     {
         if (strParamName == null || strParamName.length() == 0)
         {
             throw new IllegalArgumentException("Parameter name is mandatory");
         }
 
-        // check that the given string value has content
+        // check that the object is not null
         if (object == null)
         {
             throw new IllegalArgumentException(strParamName + " is a mandatory parameter");
@@ -53,7 +53,7 @@ public class ParameterCheck
      * @param strParamName Name of parameter to check
      * @param strParamValue Value of the parameter to check
      */
-    public static void mandatoryString(String strParamName, String strParamValue)
+    public static void mandatoryString(final String strParamName, final String strParamValue)
     {
         if (strParamName == null || strParamName.length() == 0)
         {
@@ -73,7 +73,7 @@ public class ParameterCheck
      * @param strParamName Name of parameter to check
      * @param coll collection to check
      */
-    public static void mandatoryCollection(String strParamName, Collection coll)
+    public static void mandatoryCollection(final String strParamName, final Collection coll)
     {
         if (strParamName == null || strParamName.length() == 0)
         {
