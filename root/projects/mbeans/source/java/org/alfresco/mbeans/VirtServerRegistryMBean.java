@@ -79,7 +79,7 @@ public interface VirtServerRegistryMBean
     *                     version as well.
     */
     public boolean 
-    webappUpdated(int version, String pathToWebapp, boolean isRecursive);
+    updateAllWebapps(int version, String pathToWebapp, boolean isRecursive);
 
     /**
     *  Notifies remote listener that a AVM-based webapp has been removed.
@@ -108,5 +108,5 @@ public interface VirtServerRegistryMBean
     *                     version as well.
     */
     public boolean 
-    webappRemoved(int version, String pathToWebapp, boolean isRecursive );
+    removeAllWebapps(int version, String pathToWebapp, boolean isRecursive );
 }

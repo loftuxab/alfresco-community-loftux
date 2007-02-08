@@ -195,9 +195,9 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                   
     */
     public boolean 
-    webappUpdated(int version,  String pathToWebapp, boolean isRecursive )
+    updateAllWebapps(int version,  String pathToWebapp, boolean isRecursive )
     {
-        return jmxRmiWebappNotification( "virtualWebappUpdated",
+        return jmxRmiWebappNotification( "updateAllVirtualWebapps",
                                           version,
                                           pathToWebapp,
                                           isRecursive
@@ -231,9 +231,9 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                     version as well.
     */
     public boolean 
-    webappRemoved(int version, String pathToWebapp, boolean isRecursive )
+    removeAllWebapps(int version, String pathToWebapp, boolean isRecursive )
     {
-        return jmxRmiWebappNotification( "virtualWebappRemoved",
+        return jmxRmiWebappNotification( "removeAllVirtualWebapps",
                                           version,
                                           pathToWebapp,
                                           isRecursive
