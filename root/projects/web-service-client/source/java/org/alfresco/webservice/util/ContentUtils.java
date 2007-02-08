@@ -70,7 +70,7 @@ public class ContentUtils
     public static String getContentAsString(Content content)
     {
         // Get the url and the ticket
-        String ticket = AuthenticationUtils.getCurrentTicket();
+        String ticket = AuthenticationUtils.getTicket();
         String strUrl = content.getUrl() + "?ticket=" + ticket;
         
         StringBuilder readContent = new StringBuilder();
@@ -105,7 +105,7 @@ public class ContentUtils
     public static InputStream getContentAsInputStream(Content content)
     {
         // Get the url and the ticket
-        String ticket = AuthenticationUtils.getCurrentTicket();
+        String ticket = AuthenticationUtils.getTicket();
         String strUrl = content.getUrl() + "?ticket=" + ticket;
  
         try
@@ -153,7 +153,7 @@ public class ContentUtils
         {
             String url = "/alfresco/upload/" + 
                          URLEncoder.encode(file.getName(), "UTF-8") + 
-                         "?ticket=" + AuthenticationUtils.getCurrentTicket();
+                         "?ticket=" + AuthenticationUtils.getTicket();
             
             String request = "PUT " + url + " HTTP/1.1\n" +
                           "Content-Length: " + file.length() + "\n" +

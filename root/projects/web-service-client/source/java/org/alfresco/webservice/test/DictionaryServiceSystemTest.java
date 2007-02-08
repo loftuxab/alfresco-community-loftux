@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class DictionaryServiceSystemTest extends BaseWebServiceSystemTest
 {
+    @SuppressWarnings("unused")
     private static Log logger = LogFactory.getLog(DictionaryServiceSystemTest.class);
 
     @Override
