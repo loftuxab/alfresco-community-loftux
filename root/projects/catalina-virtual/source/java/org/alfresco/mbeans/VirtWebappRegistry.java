@@ -36,27 +36,27 @@ public class VirtWebappRegistry implements VirtWebappRegistryMBean
     public VirtWebappRegistry() { }
 
     public Boolean 
-    virtualWebappUpdated(Integer version, String pathToWebapp, Boolean isRecursive)
+    updateAllVirtualWebapps(Integer version, String pathToWebapp, Boolean isRecursive)
     {
         if ( deployer_ != null )
         {
-            return deployer_.updateVirtualWebapp( version.intValue(), 
-                                                  pathToWebapp,
-                                                  isRecursive.booleanValue()
-                                                );
+            return deployer_.updateAllVirtualWebapps( version.intValue(), 
+                                                      pathToWebapp,
+                                                      isRecursive.booleanValue()
+                                                    );
         }
         return false;
     }
 
     public Boolean 
-    virtualWebappRemoved(Integer version, String pathToWebapp, Boolean isRecursive)
+    removeAllVirtualWebapps(Integer version, String pathToWebapp, Boolean isRecursive)
     {
         if ( deployer_ != null )
         {
-            return deployer_.removeVirtualWebapp( version.intValue(), 
-                                                  pathToWebapp,
-                                                  isRecursive.booleanValue()
-                                                );
+            return deployer_.removeAllVirtualWebapps( version.intValue(), 
+                                                      pathToWebapp,
+                                                      isRecursive.booleanValue()
+                                                    );
         }
         return false;
     }

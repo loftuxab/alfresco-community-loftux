@@ -400,18 +400,20 @@ public class AVMHostConfig extends HostConfig
     }
 
     /**
-    *  Updates a virtual webapp; if the isRecursive flag is set,
-    *  all dependent webapps are also updated (i.e.: webapps that use 
-    *  the one being updated as their "background" via transparency).
+    *  Updates all virtual webapps within an AVM store; if the isRecursive 
+    *  flat is set, all dependent webapps are also updated (i.e.: webapps 
+    *  that use the one being updated as their "background" via transparency).
     *  <p>
     *  For example, storePath might look something like this:
     *  <tt>mysite--bob:/www/avm_webapps/ROOT</tt>.  The value
     *  of 'version' is typically -1 (which corresponds to HEAD).
+    *  If the store has other webapps besides ROOT, they are
+    *  updated as well.
     */
-    public boolean  updateVirtualWebapp( int     version, 
-                                         String  storePath, 
-                                         boolean isRecursive
-                                       )
+    public boolean  updateAllVirtualWebapps( int     version, 
+                                              String  storePath, 
+                                              boolean isRecursive
+                                            )
     {
         if (log.isInfoEnabled())
         {
@@ -428,7 +430,7 @@ public class AVMHostConfig extends HostConfig
         }
         else
         {
-           log.error("updateVirtualWebapp failed; bad store path: " + 
+           log.error("webapp update failed; bad store path: " + 
                      storePath );
 
            return false;
@@ -463,7 +465,7 @@ public class AVMHostConfig extends HostConfig
 
         if ( index_www_tail < 0 )
         { 
-            log.error("updateVirtualWebapp failed; bad store path: " + storePath );
+            log.error("webapp update failed; bad store path: " + storePath );
             return false;
         }
 
@@ -475,8 +477,7 @@ public class AVMHostConfig extends HostConfig
 
         if ( index_app_base_tail == index_www_tail )
         {
-            log.error("updateVirtualWebapp failed; bad store path: " + 
-                      storePath );
+            log.error("webapp update failed; bad store path: " + storePath );
 
             return false;
         }
@@ -496,7 +497,7 @@ public class AVMHostConfig extends HostConfig
         }
         catch (Exception e)
         {
-            log.error("updateVirtualWebapp failed; could not list: " +  avm_appBase );
+            log.error("webapp update failed; could not list: " +  avm_appBase );
             log.error( e.getMessage() );
             return false;
         }
@@ -509,7 +510,7 @@ public class AVMHostConfig extends HostConfig
 
             if (log.isDebugEnabled())
             {
-                log.debug("updateVirtualWebapp found: " + webapp_name);
+                log.debug("webapp found: " + webapp_name);
             }
 
             String webapp_storePath =  avm_appBase + "/" + webapp_name;
@@ -521,7 +522,7 @@ public class AVMHostConfig extends HostConfig
             {
                 if (log.isWarnEnabled())
                 {
-                    log.warn("updateVirtualWebapp failed; bad store path: " + 
+                    log.warn("webapp update failed; bad store path: " + 
                               webapp_storePath );
                 }
 
@@ -602,7 +603,7 @@ public class AVMHostConfig extends HostConfig
                 for (String dep_store : store_list )
                 {
                     is_sucessful = 
-                        updateVirtualWebapp( 
+                        updateAllVirtualWebapps( 
                                 version, 
                                 dep_store + ":" + store_relpath,
                                 false
@@ -613,6 +614,32 @@ public class AVMHostConfig extends HostConfig
         }
         return is_sucessful;
     }
+
+
+
+    /**
+    *  Updates a virtual webapp within an AVM store; if the isRecursive flag is set,
+    *  all dependent webapps are also updated (i.e.: webapps that use 
+    *  the one being updated as their "background" via transparency).
+    *  <p>
+    *  For example, storePath might look something like this:
+    *  <tt>mysite--bob:/www/avm_webapps/ROOT</tt>.  The value
+    *  of 'version' is typically -1 (which corresponds to HEAD).
+    *
+    *  <p>
+    *  <strong>NOTE:</strong> Currently, updateVirtualWebapp is just
+    *  a wrapper around updateAllVirtualWebapps because the granularity
+    *  of the GUI does not support single-webapp updates.  Therefore,
+    *  this function is heavier than it should be (for now) when a store
+    *  contains multiple webapps.   This is harmless, it's just slower.
+    */
+//     public boolean  updateVirtualWebapp( int     version, 
+//                                          String  storePath, 
+//                                          boolean isRecursive
+//                                        )
+//     {
+//         return updateAllVirtualWebapps( version, storePath, isRecursive);
+//     }
 
     /**
     * Fetches an array of lists of stores that are dependent upon 'store_name'.
@@ -688,14 +715,19 @@ public class AVMHostConfig extends HostConfig
         return store_hierarchy;
     }
 
-    public boolean  removeVirtualWebapp( int     version, 
-                                         String  storePath,
-                                         boolean isRecursive
-                                       )
+    /**
+    *  Removes all virtual webapps from the store, and removes the 
+    *  corresponding work directory.  This function is the logical 
+    *  compliment of updateAllVirtualWebapps.
+    */
+    public boolean  removeAllVirtualWebapps( int     version, 
+                                             String  storePath,
+                                             boolean isRecursive
+                                            )
     {
         if (log.isInfoEnabled())
         {
-            log.info("AVMHostConfig removeVirtualWebapp version: " + 
+            log.info("remove webapp version: " + 
                      version + " path: " + storePath);
         }
 
@@ -709,7 +741,7 @@ public class AVMHostConfig extends HostConfig
         }
         else
         {
-           log.error("removeVirtualWebapp failed; bad store path: " + storePath );
+           log.error("remove webapp failed; bad store path: " + storePath );
            return false;
         }
 
@@ -725,7 +757,7 @@ public class AVMHostConfig extends HostConfig
 
         if ( index_www_tail < 0 )
         { 
-            log.error("removeVirtualWebapp failed; bad store path: " + storePath );
+            log.error("remove webapp failed; bad store path: " + storePath );
             return false;
         }
 
@@ -737,8 +769,7 @@ public class AVMHostConfig extends HostConfig
 
         if ( index_app_base_tail == index_www_tail )
         {
-            log.error("removeVirtualWebapp failed; bad store path: " + 
-                      storePath );
+            log.error("remove webapp failed; bad store path: " + storePath );
 
             return false;
         }
@@ -763,7 +794,7 @@ public class AVMHostConfig extends HostConfig
                 for (String dep_store : store_list )
                 {
                     is_sucessful = 
-                        removeVirtualWebapp( 
+                        removeAllVirtualWebapps( 
                                 version, 
                                 dep_store + ":" + store_relpath,
                                 false
@@ -781,7 +812,7 @@ public class AVMHostConfig extends HostConfig
 
         if (log.isDebugEnabled())
         {
-            log.debug("removeVirtualWebapp listing: " + avm_appBase);
+            log.debug("remove webapp listing: " + avm_appBase);
         }
 
         try 
@@ -791,7 +822,7 @@ public class AVMHostConfig extends HostConfig
         }
         catch (Exception e)
         {
-            log.error("removeVirtualWebapp failed; could not list: " +  avm_appBase );
+            log.error("remove webapp failed; could not list: " +  avm_appBase );
             log.error( e.getMessage() );
             return false;
         }
@@ -804,7 +835,7 @@ public class AVMHostConfig extends HostConfig
 
             if (log.isDebugEnabled())
             {
-                log.debug("removeVirtualWebapp found: " + webapp_name); 
+                log.debug("remove webapp found: " + webapp_name); 
             }
 
             String webapp_storePath =  avm_appBase + "/" + webapp_name;
@@ -816,7 +847,7 @@ public class AVMHostConfig extends HostConfig
             {
                 if (log.isWarnEnabled())
                 {
-                    log.warn("removeVirtualWebapp failed; bad store path: " + 
+                    log.warn("remove webapp failed; bad store path: " + 
                               webapp_storePath );
                 }
 
@@ -827,7 +858,7 @@ public class AVMHostConfig extends HostConfig
 
             if (log.isDebugEnabled())
             {
-                log.debug("removeVirtualWebapp removed: " + context_name);
+                log.debug("remove webapp removed: " + context_name);
             }
 
             AVMStandardContext context = 
@@ -871,6 +902,27 @@ public class AVMHostConfig extends HostConfig
 
         return is_sucessful;
     }
+
+
+
+    // TODO: Eventually, this function will remove a single virtual webapp,
+    // but currently it's just a wrapper aruond removeAllVirtualWebapps.
+    // There's no GUI support for this operation right now, because
+    // it's impossible to restrict a single user in a web project to
+    // a single webapp.  Making it remove everything (analgous to how 
+    // the updateVirtualWebapp updates all webapps) is wrong because
+    // it removes too much.  Thus, this function remains as commented-out 
+    // stub for now.
+    //
+    //    public boolean  removeVirtualWebapp( int     version, 
+    //                                         String  storePath,
+    //                                         boolean isRecursive
+    //                                       )
+    //    {
+    //        write me!
+    //    }
+
+
 
     /**
      * Remove all files and subdirs of dir.
