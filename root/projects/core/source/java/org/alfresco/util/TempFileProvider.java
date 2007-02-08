@@ -81,7 +81,8 @@ public class TempFileProvider
         if (tempDir.exists())
         {
             // nothing to do
-        } else
+        }
+        else
         {
             // not there yet
             if (!tempDir.mkdirs())
