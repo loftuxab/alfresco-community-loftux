@@ -173,6 +173,7 @@ public final class WebServiceFactory
 		    RepositoryServiceLocator locator = new RepositoryServiceLocator(AuthenticationUtils.getEngineConfiguration());
 		    locator.setRepositoryServiceEndpointAddress(endpointAddress + REPOSITORY_SERVICE_ADDRESS);                
 		    repositoryService = (RepositoryServiceSoapBindingStub)locator.getRepositoryService();
+            repositoryService.setMaintainSession(true);
 		 }
 		 catch (ServiceException jre) 
 		 {
@@ -213,6 +214,7 @@ public final class WebServiceFactory
             AuthoringServiceLocator locator = new AuthoringServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setAuthoringServiceEndpointAddress(endpointAddress + AUTHORING_SERVICE_ADDRESS);                
             authoringService = (AuthoringServiceSoapBindingStub)locator.getAuthoringService();
+            authoringService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {
@@ -253,6 +255,7 @@ public final class WebServiceFactory
             ClassificationServiceLocator locator = new ClassificationServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setClassificationServiceEndpointAddress(endpointAddress + CLASSIFICATION_SERVICE_ADDRESS);                
             classificationService = (ClassificationServiceSoapBindingStub)locator.getClassificationService();
+            classificationService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {
@@ -293,6 +296,7 @@ public final class WebServiceFactory
             ActionServiceLocator locator = new ActionServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setActionServiceEndpointAddress(endpointAddress + ACTION_SERVICE_ADDRESS);                
             actionService = (ActionServiceSoapBindingStub)locator.getActionService();
+            actionService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {
@@ -332,6 +336,7 @@ public final class WebServiceFactory
             ContentServiceLocator locator = new ContentServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setContentServiceEndpointAddress(endpointAddress + CONTENT_SERVICE_ADDRESS);                
             contentService = (ContentServiceSoapBindingStub)locator.getContentService();
+            contentService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {
@@ -371,6 +376,7 @@ public final class WebServiceFactory
             AccessControlServiceLocator locator = new AccessControlServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setAccessControlServiceEndpointAddress(enpointAddress + ACCESS_CONTROL_ADDRESS);                
             accessControlService = (AccessControlServiceSoapBindingStub)locator.getAccessControlService();
+            accessControlService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {
@@ -411,6 +417,7 @@ public final class WebServiceFactory
             AdministrationServiceLocator locator = new AdministrationServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setAdministrationServiceEndpointAddress(endpointAddress + ADMINISTRATION_ADDRESS);                
             administrationService = (AdministrationServiceSoapBindingStub)locator.getAdministrationService();
+            administrationService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {
@@ -451,6 +458,7 @@ public final class WebServiceFactory
             DictionaryServiceLocator locator = new DictionaryServiceLocator(AuthenticationUtils.getEngineConfiguration());
             locator.setDictionaryServiceEndpointAddress(endpointAddress + DICTIONARY_SERVICE_ADDRESS);                
             dictionaryService = (DictionaryServiceSoapBindingStub)locator.getDictionaryService();
+            dictionaryService.setMaintainSession(true);
         }
         catch (ServiceException jre) 
         {

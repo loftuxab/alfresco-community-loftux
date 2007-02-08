@@ -40,19 +40,20 @@ public class AuthenticationUtils implements CallbackHandler
          "<deployment xmlns='http://xml.apache.org/axis/wsdd/' xmlns:java='http://xml.apache.org/axis/wsdd/providers/java'>" +
          "   <transport name='http' pivot='java:org.apache.axis.transport.http.HTTPSender'/>" +
          "   <globalConfiguration >" +
-         "      <requestFlow >" +
+         "     <requestFlow >" +
          "       <handler type='java:org.apache.ws.axis.security.WSDoAllSender' >" +
          "               <parameter name='action' value='UsernameToken Timestamp'/>" +
          "               <parameter name='user' value='ticket'/>" +
          "               <parameter name='passwordCallbackClass' value='org.alfresco.webservice.util.AuthenticationUtils'/>" +
          "               <parameter name='passwordType' value='PasswordText'/>" +
          "           </handler>" +
-         "       </requestFlow >" +
+         "       <handler name='cookieHandler' type='java:org.alfresco.webservice.util.CookieHandler' />" +
+         "     </requestFlow >" +
          "   </globalConfiguration>" +
          "</deployment>";
     
-    /** Thread local containing the current ticket */
-    private static ThreadLocal<String> currentTicket = new ThreadLocal<String>();
+    /** Thread local containing the current authentication details */
+    private static ThreadLocal<AuthenticationDetails> authenticationDetails = new ThreadLocal<AuthenticationDetails>();
     
     /**
      * Start a session
@@ -67,10 +68,10 @@ public class AuthenticationUtils implements CallbackHandler
         try
         {
             // Start the session
-            AuthenticationResult result = WebServiceFactory.getAuthenticationService().startSession(username, password);
+            AuthenticationResult result = WebServiceFactory.getAuthenticationService().startSession(username, password);           
             
             // Store the ticket for use later
-            currentTicket.set(result.getTicket());
+            authenticationDetails.set(new AuthenticationDetails(result.getUsername(), result.getTicket(), result.getSessionid()));
         }
         catch (RemoteException exception)
         {
@@ -92,13 +93,13 @@ public class AuthenticationUtils implements CallbackHandler
      */
     public static void endSession()
     {
-        String ticket = currentTicket.get();
-        if (ticket != null)
+        AuthenticationDetails authenticationDetails = AuthenticationUtils.authenticationDetails.get();
+        if (authenticationDetails != null)
         {
             try
             {
-                WebServiceFactory.getAuthenticationService().endSession(ticket);
-                currentTicket.remove();
+                WebServiceFactory.getAuthenticationService().endSession(authenticationDetails.getTicket());
+                AuthenticationUtils.authenticationDetails.remove();
             }
             catch (RemoteException exception)
             {
@@ -108,9 +109,20 @@ public class AuthenticationUtils implements CallbackHandler
         }
     }
     
-    public static String getCurrentTicket()
+    public static String getTicket()
     {
-        return currentTicket.get();
+        String result = null;
+        AuthenticationDetails authDetails = AuthenticationUtils.authenticationDetails.get();
+        if (authDetails != null)
+        {
+            result = authDetails.getTicket();
+        }
+        return result;
+    }
+    
+    public static AuthenticationDetails getAuthenticationDetails()
+    {
+        return AuthenticationUtils.authenticationDetails.get();
     }
     
     /**
@@ -125,7 +137,12 @@ public class AuthenticationUtils implements CallbackHandler
           if (callbacks[i] instanceof WSPasswordCallback) 
           {
              WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-             pc.setPassword(currentTicket.get());
+             String ticket = AuthenticationUtils.getTicket();
+             if (ticket == null)
+             {
+                 throw new WebServiceException("Ticket could not be found when calling callback handler.");
+             }
+             pc.setPassword(ticket);
           }
           else 
           {
