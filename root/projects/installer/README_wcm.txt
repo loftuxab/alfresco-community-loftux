@@ -33,4 +33,4 @@ You should now find 2 additional spaces in your Alfresco repository:
 If you wish to use the Website Preview feature, you will need to start
 the Alfresco Virtualization server:
 - on Windows run virtual_start.bat
-- on Linux run sh alfvirtual.sh
+- on Linux run sh virtual_alf.sh start
