@@ -157,7 +157,7 @@
 
         <!-- remote Alfresco server JMX RMI port -->
         <property name="alfrescoJmxRmiPort">
-            <value>${avm.jmxrmi.port}</value>
+            <value>${avm.remote.port}</value>
         </property>
 
         <!-- retry interval when network connections fail (in milliseconds)  -->
