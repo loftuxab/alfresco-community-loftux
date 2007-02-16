@@ -231,8 +231,8 @@
 
    <target name="distribute-tomcat-linux" depends="init">
       <tar destfile="${dir.dist}/${file.name.dist.tomcat}.tar.gz" longfile="gnu" compression="gzip">
-         <tarfileset dir="${dir.assemble.tomcat}" prefix="tomcat" excludes="${dir.assemble.tomcat}/bin/*.sh,${dir.assemble.tomcat}/bin/*.bat" />
-         <tarfileset dir="${dir.assemble.tomcat}/bin" prefix="tomcat" includes="${dir.assemble.tomcat}/bin/*.sh" mode="755" />
+         <tarfileset dir="${dir.assemble.tomcat}" prefix="tomcat" excludes="bin/*.sh,bin/*.bat,bin/*.exe" />
+         <tarfileset dir="${dir.assemble.tomcat}/bin" prefix="tomcat/bin" includes="*.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="licenses/**" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/alfresco.sh" fullpath="alfresco.sh" mode="755" />
          <tarfileset dir="${dir.project.installer}" includes="tomcat/README_linux.txt" fullpath="README.txt" />
