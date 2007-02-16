@@ -32,13 +32,12 @@ You may need to add or update the MySQL Java Connector library (required for WAR
 Create Database
 ---------------
 
-Navigate to the 'alfresco/extras/databases/mysql' folder and run 'db_setup.bat'.  
+Navigate to the 'alfresco/extras/databases/mysql' folder and run:
+'mysql -u root -p <db_setup.sql'  
 
 This creates a MySQL database named 'alfresco' with a user account and password
 of 'alfresco'.  If db_setup fails, this may be because the MySQL service is not
-running or that the mysql command cannot be found.  Either correct this or setup 
-the Alfresco database and user manually by loading the 'db_setup.sql' file into
-MySQL, for example, 'mysql -u root -p <db_setup.sql'.
+running or that the mysql command cannot be found. 
 
 
 Configure Alfresco
