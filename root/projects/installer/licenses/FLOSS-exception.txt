@@ -1,5 +1,5 @@
-Alfresco Software, Inc. FLOSS License Exception
-***********************************************
+Alfresco Software Limited FLOSS License Exception
+*************************************************
 
 The Alfresco Software, Inc. Exception for Free/Libre and Open Source 
 Software-only Applications Using Alfresco software (the `FLOSS
