@@ -1,7 +1,7 @@
 This license file applies to the Alfresco software library (the "Alfresco
 Software"), except as described below.  
 
-This product Copyright 2005-2007 Alfresco Software, Inc.  For detailed notice,
+This product Copyright 2005-2007 Alfresco Software Limited.  For detailed notice,
 see the "NOTICE" file with this distribution.
 
 
@@ -30,7 +30,7 @@ Some portions of the Alfresco Software are provided by third parties and thus
 are not available under the Alfresco Public License, but are available under 
 other licensing terms.  In this distribution, they are: Junit module, available 
 at www.junit.org, and wsdl4j, available at 
-http://sourceforge.net/projects/wsdl4j, are licensed under the terms of the 
+http://sourceforge.net/projects/wsdl4j, are licensed under the terms of the
 Common Public License.  You can find the terms of the CPL here: 
 http://www.opensource.org/licenses/cpl1.0.php 
 
