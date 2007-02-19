@@ -39,7 +39,6 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/odmg-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/opensaml-1.0.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/portlet-api-lib.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/saaj.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/saxpath.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/servlet.jar"/>
@@ -96,5 +95,6 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/xercesImpl-2.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R4.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
