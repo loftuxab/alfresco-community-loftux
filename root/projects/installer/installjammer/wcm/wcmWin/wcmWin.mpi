@@ -3,7 +3,7 @@ AllowLanguageSelection
 Yes
 
 AppName
-{Alfresco WCM}
+{Alfresco WCM Enterprise}
 
 ApplicationID
 5873894B-85ED-4B0B-BFD6-9F9AD53FC801
@@ -108,7 +108,7 @@ UpgradeApplicationID
 {}
 
 Version
-2.0
+2.0.0
 
 ViewReadme
 Yes
@@ -703,11 +703,10 @@ SetupType ::F6005EED-F116-409B-82E7-662D4A7065E8 -setup Install -active Yes -pla
 SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
 
 InstallComponent 185DEE53-68ED-4921-9CA3-E480BE16988A -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
-InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane -conditions {3FB18EB1-8713-42CF-AF1C-26756FA05D10 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B E4263D69-552B-472B-9E4B-0B6107059767 7F618341-5FFD-44A6-B4DE-A232441BC4E0} -title {Select Destination} -component SelectDestination -command reorder -active Yes -parent StandardInstall
+InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane -conditions {3FB18EB1-8713-42CF-AF1C-26756FA05D10 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B E4263D69-552B-472B-9E4B-0B6107059767} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
 Condition 3FB18EB1-8713-42CF-AF1C-26756FA05D10 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {Script Condition} -component ScriptCondition
 Condition 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Permission Condition} -component FilePermissionCondition
 Condition E4263D69-552B-472B-9E4B-0B6107059767 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Exists Condition} -component FileExistsCondition
-Condition 7F618341-5FFD-44A6-B4DE-A232441BC4E0 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Exists Condition} -component FileExistsCondition
 InstallComponent 349F9BC3-104C-4982-A1AF-5353A02DE035 -setup Install -type pane -title {Start Copying Files} -component StartCopyingFiles -active Yes -parent StandardInstall
 InstallComponent D3C20805-32F3-4D27-A208-14416A55DC0A -setup Install -type pane -title {Copying Files} -component CopyFiles -active Yes -parent StandardInstall
 InstallComponent 5B747634-BDE6-4E1C-9D67-3E45A888DB9B -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent D3C20805-32F3-4D27-A208-14416A55DC0A
@@ -1110,7 +1109,7 @@ ViewReadme
 {1 condition}
 
 679A07B2-4D09-4796-8F0F-BC470030E967,Files
-<%InstallDir%>/virtual_alf.sh,<%InstallDir%>/virtual_start.sh,<%InstallDir%>/virtual_stop.sh
+{virtual_alf.sh;virtual_start.sh;virtual_stop.sh}
 
 679A07B2-4D09-4796-8F0F-BC470030E967,StringMap
 {"@@ALFRESCO_DIR@@" "<%InstallDir%>"}
@@ -1186,15 +1185,6 @@ Finish
 
 7EEE05F1-15DE-49A8-9F99-7A58EB6279F8,Alias
 {Finish Actions}
-
-7F618341-5FFD-44A6-B4DE-A232441BC4E0,CheckCondition
-{Before Next Pane is Displayed}
-
-7F618341-5FFD-44A6-B4DE-A232441BC4E0,FailureMessage
-{Unable to find Tomcat in Alfresco directory}
-
-7F618341-5FFD-44A6-B4DE-A232441BC4E0,Filename
-<%InstallDir%>/tomcat
 
 82626A44-8DF9-4D53-8460-5DC03E855581,CheckCondition
 {Before Action is Executed}
@@ -1491,7 +1481,7 @@ D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption,subst
 1
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,Conditions
-{4 conditions}
+{3 conditions}
 
 D700B54B-CEAC-48E9-8AC8-94D982B73406,DestinationLabel,subst
 0
@@ -1524,7 +1514,7 @@ E4263D69-552B-472B-9E4B-0B6107059767,FailureMessage
 {No Alfresco installation found at this location}
 
 E4263D69-552B-472B-9E4B-0B6107059767,Filename
-<%InstallDir%>/alfresco.bat
+<%InstallDir%>/tomcat/webapps/alfresco.war
 
 EA91E082-AE52-4F66-8547-16F25AB2BB05,Alias
 {Setup Actions}
@@ -1965,6 +1955,17 @@ D48D5141-FE42-4E9F-94A0-B318959410E7,Message
 
 D48D5141-FE42-4E9F-94A0-B318959410E7,Title
 <%UninstallApplicationText%>
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption
+{Please locate the existing Alfresco server on which you wish to enable WCM.
+
+Use the Browse... button to navigate to find an existing Alfresco installation.}
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Subtitle
+{Where is your existing Alfresco for WCM to be enabled?}
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Title
+{Choose Existing Alfresco  Location}
 
 F6005EED-F116-409B-82E7-662D4A7065E8,Description
 <%TypicalInstallDescription%>
