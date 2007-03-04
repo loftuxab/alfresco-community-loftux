@@ -7,6 +7,6 @@ if [ "$2" = "" ]; then
 else
    # set the LIB_DIR value to point to the Alfresco lib directory
    SET LIB_DIR='../../tomcat/webapps/alfresco/WEB-INF/lib'
-   SET TEMP_CLASS_PATH=%LIB_DIR%/repository.jar;%LIB_DIR%/core.jar;%LIB_DIR%/dom4j-1.6.1.jar;%LIB_DIR%/xpp3-1.1.3_8.jar;%LIB_DIR%/jug.jar
+   SET TEMP_CLASS_PATH=%LIB_DIR%/alfresco-repository.jar;%LIB_DIR%/alfresco-core.jar;%LIB_DIR%/dom4j-1.6.1.jar;%LIB_DIR%/xpp3-1.1.3_8.jar;%LIB_DIR%/jug.jar
    java -cp %TEMP_CLASS_PATH% org.alfresco.repo.admin.patch.util.ImportFileUpdater $1 $2
 fi

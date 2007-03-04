@@ -8,6 +8,10 @@
 	<property name="package.file.jar" value="${build.dir}/custom-jsp.jar"/>
    <property name="package.file.zip" value="${build.dir}/custom-jsp.zip"/>
 	
+   <target name="compile">
+      <!-- placeholder -->
+   </target>
+   
 	<target name="package-jar">
       <delete file="${package.file.jar}" />  
 		<jar destfile="${package.file.jar}">

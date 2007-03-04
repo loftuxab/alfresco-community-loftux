@@ -33,7 +33,7 @@
 *
 *
 * CLASSPATH=$CLASSPATH:~/wcm-dev2/root/projects/3rd-party/lib/naming-resources.jar:
-*     ../repository/build/dist/repository.jar
+*     ../repository/build/dist/alfresco-repository.jar
 *     javac -Xlint:unchecked 
 *     source/java/org/alfresco/jndi/AVMFileDirContext.java
 *     source/java/org/alfresco/jndi/NamingContextBindingsEnumeration.java
