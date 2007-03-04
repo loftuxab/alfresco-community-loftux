@@ -2,11 +2,11 @@
 
 <project name="SDK Demo AMP Build File" default="package-amp" basedir=".">
 	
-	<property name="project.dir" value="."/>
-	<property name="build.dir" value="${project.dir}/build"/>
-	<property name="config.dir" value="${project.dir}/config"/>
-	<property name="jar.file" value="${build.dir}/lib/alfresco-sdk-custom-service.jar"/>
-	<property name="amp.file" value="${build.dir}/dist/alfresco-sdk-custom-service.amp"/>
+    <property name="project.dir" value="."/>
+    <property name="build.dir" value="${project.dir}/build"/>
+    <property name="config.dir" value="${project.dir}/config"/>
+    <property name="jar.file" value="${build.dir}/lib/alfresco-sdk-custom-service.jar"/>
+    <property name="amp.file" value="${build.dir}/dist/alfresco-sdk-custom-service.amp"/>
 	
     <target name="mkdirs">
         <mkdir dir="${build.dir}/dist" />
@@ -15,10 +15,11 @@
     
     <path id="class.path">
         <dirset dir="${build.dir}" />
-        <fileset dir="../../lib" includes="**/*.jar"/>
+        <fileset dir="../../lib/server" includes="**/*.jar"/>
     </path>
 
-    <target name="compile" >
+    <target name="compile">
+        <mkdir dir="${build.dir}/classes" />
         <javac classpathref="class.path" srcdir="${project.dir}/source/java" destdir="${build.dir}/classes" />
     </target>
     
