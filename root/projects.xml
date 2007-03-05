@@ -554,6 +554,7 @@
              destdir="${dir.project.webclient.samplewebsite}/alfresco/classes" fork="true"
              memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
              debug="${javac.debug}"  target="${javac.target}" source="${javac.source}"
+             encoding="${javac.encoding}"
              classpathref="classpath.compile" />
 
       <jar basedir="${dir.project.webclient.classes}"
@@ -812,7 +813,7 @@
       <mkdir dir="${dir.project.benchmarkframework.classes}" />
       <javac destdir="${dir.project.benchmarkframework.classes}" fork="true"
              memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-             debug="${javac.debug}"  target="${javac.target}" source="${javac.source}">
+             debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
          <src path="${dir.project.benchmarkframework.src.java}" />
          <classpath>
             <fileset dir="${dir.project.benchmarkframework.lib}/japex">

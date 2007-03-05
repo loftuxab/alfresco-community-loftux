@@ -21,7 +21,7 @@
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.classes}" />
          <javac destdir="@{projectdir}/${dir.name.build}/${dir.name.classes}" fork="true"
                 memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-                debug="${javac.debug}"  target="${javac.target}" source="${javac.source}">
+                debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <classpath refid="classpath.compile" />
          </javac>
@@ -44,7 +44,7 @@
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.classes}" />
          <javac destdir="@{projectdir}/${dir.name.build}/${dir.name.classes}" fork="true"
                 memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-                debug="${javac.debug}"  target="${javac.target}" source="${javac.source}">
+                debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <src path="@{projectdir}/${dir.name.source}/${dir.name.generated}" />
             <classpath refid="classpath.compile" />
