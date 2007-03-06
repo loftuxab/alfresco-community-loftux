@@ -35,14 +35,14 @@
    <target name="distribute" description="Creates the distribution files for all platforms"
            depends="set-build-number, incremental, distribute-tomcat, distribute-war, distribute-wcm, distribute-sdk, distribute-webserviceclient, distribute-benchmark" />
 
-   <target name="set-build-number-bamboo" depends="init" if="build.number">
+   <target name="set-build-number" depends="init" if="build.number">
       <exec executable="svn">
          <arg line="revert ${dir.project.repository.config}/alfresco/version.properties"/>
       </exec>
       <replace file="${dir.project.repository.config}/alfresco/version.properties" token="@build-number@" value="${build.number}" />
    </target>
 
-   <target name="set-build-number" depends="init" if="build.release">
+   <target name="set-build-number-cc" depends="init" if="build.release">
       <replace file="${dir.project.repository.config}/alfresco/version.properties" token="@build-number@" value="${label}" />
    </target>
 
