@@ -135,6 +135,12 @@
       </exec>
    </target>
 
+   <target name="start-tomcat-virtual" description="Starts the virtual Tomcat server on Windows" depends="init">
+      <exec dir="${home.virtualtomcat}/bin" executable="cmd.exe" spawn="true">
+         <arg line="/k startup.bat" />
+      </exec>
+   </target>
+
    <target name="start-tomcat-debug" description="Starts the Tomcat server on Windows" depends="init">
       <fail unless="env.JPDA_ADDRESS" 
             message="To run Tomcat in debug mode you need to setup the JPDA_ADDRESS enviornment variable"/>
