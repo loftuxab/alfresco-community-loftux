@@ -596,9 +596,51 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         Reference newCopy = results2[0].getDestination();
         assertNotNull(newCopy);
         
+        // Check that the name has been set correctly
+        Node[] nodes = this.repositoryService.get(new Predicate(new Reference[]{newCopy}, null, null));
+        Node node = nodes[0];
+        boolean checked = false;
+        for (NamedValue namedValue : node.getProperties())
+        {
+            if (namedValue.getName().equals(Constants.PROP_NAME) == true)
+            {
+                assertEquals("name.txt", namedValue.getValue());
+                checked = true;
+            }
+        }
+        assertTrue(checked);
+        
+        // Try and copy the reference into the same folde and check for rename
+        CMLCopy copy2 = new CMLCopy();
+        copy2.setTo(new ParentReference(folderReference.getStore(), folderReference.getUuid(), null, Constants.ASSOC_CONTAINS, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}name.txt"));
+        copy2.setWhere(new Predicate(new Reference[]{reference}, null, null));
+        CML cmlCopy2 = new CML();
+        cmlCopy2.setCopy(new CMLCopy[]{copy2});
+        
+        UpdateResult[] results22 = WebServiceFactory.getRepositoryService().update(cmlCopy2);
+        assertNotNull(results22);
+        assertEquals(1, results22.length);        
+        Reference newCopy2 = results22[0].getDestination();
+        assertNotNull(newCopy2);
+        
+        // Check that the name has been set correctly
+        Node[] nodes2 = this.repositoryService.get(new Predicate(new Reference[]{newCopy2}, null, null));
+        Node node2 = nodes2[0];
+        boolean checked2 = false;
+        for (NamedValue namedValue : node2.getProperties())
+        {
+            if (namedValue.getName().equals(Constants.PROP_NAME) == true)
+            {
+                assertFalse("name.txt".equals(namedValue.getValue()));
+                assertTrue(namedValue.getValue().contains("name.txt"));
+                checked2 = true;
+            }
+        }
+        assertTrue(checked2);
+        
         // Check that the folder does indeed have the copied reference
         QueryResult result = this.repositoryService.queryChildren(folderReference);
-        assertEquals(1, result.getResultSet().getTotalRowCount());
+        assertEquals(2, result.getResultSet().getTotalRowCount());
         
         // Test delete
         CMLDelete delete = new CMLDelete();
