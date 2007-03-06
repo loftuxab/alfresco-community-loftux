@@ -106,7 +106,7 @@
          <copy todir="@{location}/common/lib"  file="${dir.project.jndi.dist}/${file.name.jar.jndi}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.repository.dist}/${file.name.jar.repository}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.core.dist}/${file.name.jar.core}"/>
-         <copy todir="@{location}/common/lib"  file="${dir.project.3rdparty.lib}/spring.jar"/>
+         <copy todir="@{location}/common/lib"  file="${dir.project.3rdparty.lib}/spring-2.0.2.jar"/>
          <copy todir="@{location}/conf"        file="${dir.project.repository.config}/alfresco/alfresco-shared.properties"/>
          <copy todir="@{location}/conf"        file="${dir.project.repository.config}/alfresco/alfresco-jmxrmi.password"/>
          <copy todir="@{location}/conf"        file="${dir.project.repository.config}/alfresco/alfresco-jmxrmi.access"/>
