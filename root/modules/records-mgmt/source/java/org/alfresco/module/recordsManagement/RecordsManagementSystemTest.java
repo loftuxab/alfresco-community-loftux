@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.action.ActionService;
 import org.alfresco.service.cmr.module.ModuleService;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
@@ -186,6 +187,41 @@ public class RecordsManagementSystemTest extends BaseSpringTest
 		assertTrue(this.nodeService.hasAspect(folder1, RecordsManagementModel.ASPECT_RECORD));        
 	}
 	
+    public void testEMailRecord()
+    {
+        // Check whether the records management has been configured in
+        if (isRMConfigured() == false)
+        {
+            return;
+        }
+        
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
+        props.put(ContentModel.PROP_NAME, "test" + GUID.generate() + ".msg");
+        NodeRef doc1 = this.nodeService.createNode(
+                this.filePlan, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, GUID.generate()),
+                ContentModel.TYPE_CONTENT,
+                props).getChildRef();       
+        assertTrue(this.nodeService.hasAspect(doc1, RecordsManagementModel.ASPECT_RECORD));
+        assertFalse(this.nodeService.hasAspect(doc1, ContentModel.ASPECT_MAILED));
+        
+        // Now add the content
+        InputStream is = getClass().getClassLoader().getResourceAsStream("test.msg");
+        assertNotNull(is);
+        ContentWriter writer = this.contentService.getWriter(doc1, ContentModel.PROP_CONTENT, true);
+        writer.setMimetype("message/rfc822");
+        writer.setEncoding("UTF-8");
+        writer.putContent(is);
+        
+        // Do a quick check to ensure that the email details have been extracted
+        assertTrue(this.nodeService.hasAspect(doc1, ContentModel.ASPECT_MAILED));
+        String subjectLine = (String)this.nodeService.getProperty(doc1, ContentModel.PROP_SUBJECT);
+        assertNotNull(subjectLine);
+        assertEquals(subjectLine, this.nodeService.getProperty(doc1, RecordsManagementModel.PROP_SUBJECT));
+        
+    }
+    
 	public void testFolderIdGeneration()
 	{
         // Check whether the records management has been configured in

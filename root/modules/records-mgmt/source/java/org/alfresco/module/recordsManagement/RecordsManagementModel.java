@@ -76,6 +76,7 @@ public interface RecordsManagementModel
 	public static QName ASPECT_RECORD = QName.createQName(RM_URI, "record");
     public static QName ASSOC_FILE_PLAN = QName.createQName(RM_URI, "filePlan");
     public static QName PROP_RECORD_CATEGORY_IDENTIFIER = QName.createQName(RM_URI, "recordCategoryIdentifier");
+    public static QName PROP_SUBJECT = QName.createQName(RM_URI, "subject");
     
     // Vital record aspect
 	public static QName ASPECT_VITAL_RECORD = QName.createQName(RM_URI, "vitalrecord");
