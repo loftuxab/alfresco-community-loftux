@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+    <!-- PHP Engine -->
+    <bean id="phpEngine" class="org.alfresco.module.phpIntegration.PHPEngine"/>
+
+	<!-- PHP Script Service -->
+	<bean id="phpScriptService" class="org.alfresco.module.phpIntegration.PHPScriptService">
+    	<property name="phpEngine">
+    		<ref bean="phpEngine"/>
+    	</property>     	   
+    </bean>
+    
+    <!-- PHP Template Processor -->    
+    <bean id="phpTemplateProcessor" class="org.alfresco.module.phpIntegration.PHPTemplateProcessor">
+    	<property name="phpEngine">
+    		<ref bean="phpEngine"/>
+    	</property>     	   
+    </bean>
+    
+    <!-- Base module abstract bean.  Extend this to add custom modules. -->
+    <bean id="phpScriptImplementation" abstract="true" init-method="register">
+    	<property name="scriptService">
+    		<ref bean="phpScriptService"/>
+    	</property> 
+    	<property name="serviceRegistry">
+    		<ref bean="ServiceRegistry"/>
+    	</property> 
+    </bean>
+    
+    <!-- Alfresco module -->
+    <bean id="phpAlfrescoScript" parent="phpScriptImplementation" class="org.alfresco.module.phpIntegration.module.AlfrescoModule" >   	
+    	<property name="scriptName">
+    		<value>alfresco</value>
+    	</property>
+    </bean>
+    
+</beans>

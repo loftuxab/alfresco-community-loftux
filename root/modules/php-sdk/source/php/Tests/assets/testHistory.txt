@@ -1,0 +1,17 @@
+a:10:{i:0;s:20:"alfresco/VersionTest";i:1;s:103:"alfresco/ContentTest
+alfresco/NodeTest
+alfresco/SessionTest
+alfresco/StoreTest
+alfresco/VersionTest";i:2;s:81:"alfresco/ContentTest
+alfresco/NodeTest
+alfresco/SessionTest
+alfresco/StoreTest";i:3;s:17:"alfresco/NodeTest";i:4;s:18:"alfresco/StoreTest";i:5;s:81:"alfresco/StoreTest
+alfresco/ContentTest
+alfresco/NodeTest
+alfresco/SessionTest";i:6;s:20:"alfresco/ContentData";i:7;s:81:"alfresco/ContentTest
+alfresco/StoreTest
+alfresco/SessionTest
+alfresco/NodeTest";i:8;s:62:"alfresco/ContentTest
+alfresco/StoreTest
+alfresco/SessionTest";i:9;s:40:"alfresco/ContentTest
+alfresco/StoreTest";}

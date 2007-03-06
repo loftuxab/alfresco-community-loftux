@@ -1,0 +1,19 @@
+<project name="php-client" default="distribute-php" >
+
+   <property file="build.properties" />
+
+   <target name="distribute-php" description="Creates the PHP distribution files for all platforms">
+      <mkdir dir="${dir.dist}" />
+
+      <zip destfile="${dir.dist}/${file.name.dist.php}.zip">
+         <zipfileset dir="${base.dir}" excludes="dist/**,Tests/**,build.*"/>
+      </zip>
+
+      <tar destfile="${dir.dist}/${file.name.dist.php}.tar" longfile="gnu">
+         <tarfileset dir="${base.dir}" excludes="dist/**,Tests/**,build.*"/>
+      </tar>
+      <gzip zipfile="${dir.dist}/${file.name.dist.php}.tar.gz" src="${dir.dist}/${file.name.dist.php}.tar" />
+      <delete file="${dir.dist}/${file.name.dist.php}.tar" />
+   </target>
+   
+</project>
