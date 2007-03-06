@@ -1,0 +1,81 @@
+package org.alfresco.module.phpIntegration;
+
+import java.io.InputStream;
+import java.io.Writer;
+import java.util.Map;
+
+import org.alfresco.module.phpIntegration.lib.Node;
+import org.alfresco.module.phpIntegration.lib.Session;
+import org.alfresco.module.phpIntegration.lib.Store;
+import org.alfresco.module.phpIntegration.module.BaseQuercusModule;
+import org.alfresco.service.cmr.repository.ScriptException;
+
+import com.caucho.quercus.Quercus;
+import com.caucho.quercus.env.Env;
+import com.caucho.quercus.env.Value;
+import com.caucho.quercus.page.QuercusPage;
+import com.caucho.util.CharBuffer;
+import com.caucho.vfs.ReadStream;
+import com.caucho.vfs.StringWriter;
+import com.caucho.vfs.VfsStream;
+import com.caucho.vfs.WriteStream;
+
+public class PHPEngine
+{
+    private Quercus quercus = new Quercus();
+    
+    public void init()
+    {
+        // Add the libarary classes 
+        // TODO move this config to spring
+        registerClass("Session", Session.class);
+        registerClass("Node", Node.class);
+        registerClass("Store", Store.class);
+    }
+    
+    public void registerModule(BaseQuercusModule module)
+    {
+        this.quercus.addModule(module);    
+        module.initialiseModule(this.quercus.findModule(module.getClass().getName()));
+    }
+    
+    public void registerClass(String name, Class clazz)
+    {
+        this.quercus.addJavaClass(name, clazz);
+    }
+    
+    public Object executeScript(InputStream is, Writer out, Map<String, Object> model)
+    {
+        try
+        {
+            StringWriter writer = new StringWriter(new CharBuffer(1024));
+            writer.openWrite();
+            
+            // Parse the page
+            VfsStream stream = new VfsStream(is, null);        
+            QuercusPage page = this.quercus.parse(new ReadStream(stream));
+            
+            // Execute the page
+            WriteStream ws = new WriteStream(writer);
+            Env env = new Env(this.quercus, page, ws, null, null);        
+            Value value = page.executeTop(env);
+           
+            // Write to output
+            String result = writer.getString();
+            System.out.println("RESULT ..");
+            System.out.println(result);
+            
+            if (out != null)
+            {
+                out.write(result);
+            }
+            
+            // Return the result
+            return value.toJavaObject();
+        }
+        catch (Exception exception)
+        {
+            throw new ScriptException("Error executing script.", exception);
+        }
+    }
+}
