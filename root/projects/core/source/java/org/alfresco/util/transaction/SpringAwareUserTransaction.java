@@ -353,7 +353,9 @@ public class SpringAwareUserTransaction
         }
         
         // begin a transaction
-        internalTxnInfo = createTransactionIfNecessary(null, null);  // super class will just pass nulls back to us
+        internalTxnInfo = createTransactionIfNecessary(
+                (Method) null,
+                (Class) null);  // super class will just pass nulls back to us
         internalStatus = Status.STATUS_ACTIVE;
         threadId = Thread.currentThread().getId();
         
@@ -402,7 +404,7 @@ public class SpringAwareUserTransaction
             try
             {
                 // the status seems correct - we can try a commit
-                doCommitTransactionAfterReturning(txnInfo);
+                commitTransactionAfterReturning(txnInfo);
             }
             catch (Throwable e)
             {
@@ -417,7 +419,7 @@ public class SpringAwareUserTransaction
             finally
             {
                 // make sure that we clean up the stack
-                doFinally(txnInfo);
+                cleanupTransactionInfo(txnInfo);
                 finalized = true;
                 // clean up debug
                 if (traceLogger.isDebugEnabled())
@@ -466,12 +468,12 @@ public class SpringAwareUserTransaction
             try
             {
                 // force a rollback by generating an exception that will trigger a rollback
-                doCloseTransactionAfterThrowing(txnInfo, new Exception());
+                completeTransactionAfterThrowing(txnInfo, new Exception());
             }
             finally
             {
                 // make sure that we clean up the stack
-                doFinally(txnInfo);
+                cleanupTransactionInfo(txnInfo);
                 finalized = true;
                 // clean up debug
                 if (traceLogger.isDebugEnabled())
