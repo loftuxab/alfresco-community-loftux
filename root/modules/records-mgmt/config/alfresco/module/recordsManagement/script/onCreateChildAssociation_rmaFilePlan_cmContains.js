@@ -97,69 +97,19 @@ function initialiseRecordProperties(record, filePlan)
     record.properties["rma:dateFiled"]          = record.properties["cm:modified"];
     record.properties["rma:publicationDate"]    = record.properties["cm:modified"];   
     
-    if (record.hasAspect("cm:emailed")) 
+    if (record.properties["cm:author"] == null || record.properties["cm:author"] == "") 
     {
-       record.properties["rma:dateReceived"] = record.properties["cm:sentdate"];
-       if (record.properties["rma:dateReceived"] == null)
-       {
-          record.properties["rma:dateReceived"] = record.properties["cm:modified"];
-       }
-      
-       originator = record.properties["cm:originator"];
-       if (originator == null || originator == "")
-       {
-          record.properties["rma:originator"] = record.properties["cm:author"] = person.name;
-       }
-       else
-       {
-          record.properties["rma:originator"] = record.properties["cm:author"] = originator;
-       }
-      
-       if (record.properties["cm:subjectline"] != null && record.properties["cm:subjectline"] != "")
-       {
-          record.properties["rma:subject"] = record.properties["cm:description"] = record.properties["cm:subjectline"];
-       } 
-      
-       var addressees = "";
-       var strarray = record.properties["cm:addressees"];
-       if (strarray != null) 
-       {
-          for (var i = 0; i<strarray.length; i++) 
-          {
-             if (i != 0) addressees += "; ";
-             addressees += strarray[i];
-          }
-       }
-       else 
-       {
-          addressees = record.properties["cm:addressee"];
-       }
-      
-       if (addressees == "")
-       {
-          record.properties["rma:addressee"] = record.properties["cm:creator"];
-       }
-       else
-       {
-          record.properties["rma:addressee"] = addressees;
-       }
+        record.properties["rma:originator"] = record.properties["cm:creator"];
+        record.properties["rma:addressee"] = record.properties["cm:creator"];
     }
     else 
     {
-        if (record.properties["cm:author"] == null || record.properties["cm:author"] == "") 
-        {
-            record.properties["rma:originator"] = record.properties["cm:creator"];
-            record.properties["rma:addressee"] = record.properties["cm:creator"];
-        }
-        else 
-        {
-            record.properties["rma:originator"] = record.properties["cm:author"];
-            record.properties["rma:addressee"] = record.properties["cm:author"];
-        }
-
-        record.properties["rma:dateReceived"] = record.properties["cm:modified"].getTime();
+        record.properties["rma:originator"] = record.properties["cm:author"];
+        record.properties["rma:addressee"] = record.properties["cm:author"];
     }
-    
+
+    record.properties["rma:dateReceived"] = record.properties["cm:modified"].getTime();
+
     record.save();
 }
 
@@ -183,17 +133,7 @@ var filePlan = behaviour.args[0].parent;
 var record = behaviour.args[0].child;
 
 if (record.hasAspect("sys:temporary") == false)
-{
-    // Extract any meta-data
-    var action = actions.create("extract-metadata");
-    action.execute(record);
-    
-    // Add the emailed aspect if applicable
-    if (record.mimtype == "message/rfc822" && record.hasAspect("cm:emailed") == false)
-    {
-        record.addAspect("cm:emailed");
-    }
-    
+{   
     // Add the record aspect if it has not already been added
     if (record.hasAspect("rma:record") == false)
     {
