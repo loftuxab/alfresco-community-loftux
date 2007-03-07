@@ -104,7 +104,7 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
      * 
      * @throws Exception
      */
-    public void testCheckoutWithDestination() throws Exception
+    public void xtestCheckoutWithDestination() throws Exception
     {
         Reference reference = createContentAtRoot("version_test.txt", INITIAL_VERSION_CONTENT);
         Predicate predicate = convertToPredicate(reference);        
