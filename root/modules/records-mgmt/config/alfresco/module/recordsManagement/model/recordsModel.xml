@@ -206,7 +206,7 @@
 			<property name="rma:transferLocation">
 				<title>Transfer Location</title>
 				<type>d:text</type>
-				<mandatory>false</mandatory>
+				<mandatory>true</mandatory>
 			</property>			
         </properties>
      </aspect> 

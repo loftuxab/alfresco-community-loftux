@@ -316,14 +316,12 @@ public class RecordsManagementScript extends BaseScriptImplementation implements
     {
         // Get the transfer location
         String transferLocation = (String)this.services.getNodeService().getProperty(filePlan, RecordsManagementModel.PROP_TRANSFER_LOCATION);
-        if (transferLocation == null)
-        {
-            throw new AlfrescoRuntimeException("Unable to execute the transfer disposition since the transfer locatin has not been specified in the disposition instructions.");
+        if (transferLocation != null)
+        {        
+            Action transferAction = this.services.getActionService().createAction(TRANSFER_DISPOSITION_ACTION);
+            transferAction.setParameterValue(PARAM_LOCATION, transferLocation);
+            this.services.getActionService().executeAction(transferAction, record, false, true);
         }
-        
-        Action transferAction = this.services.getActionService().createAction(TRANSFER_DISPOSITION_ACTION);
-        transferAction.setParameterValue(PARAM_LOCATION, transferLocation);
-        this.services.getActionService().executeAction(transferAction, record, false, true);
     }
     
     private void executeDestroy(NodeRef filePlan, NodeRef record)
