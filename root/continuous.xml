@@ -80,6 +80,7 @@
       <delete verbose="true">
          <fileset dir="${basedir}" includes="**/alfresco.log" />
       </delete>
+      <delete dir="${dir.test.alfdata}" quiet="yes" includeEmptyDirs="true" />
       <delete dir="${dir.project.repository}/alf_data" quiet="yes" includeEmptyDirs="true"  />
       <delete dir="${dir.project.remoteapi}/alf_data" quiet="yes" includeEmptyDirs="true" />
    </target>
