@@ -42,7 +42,7 @@ call "%CATALINA_HOME%\bin\startup.bat"
 rem ---------------------------------
 rem Start Virtualization if available
 rem ---------------------------------
-if exist "virtual_start.bat" call virtual_start.bat 
+rem if exist "virtual_start.bat" call virtual_start.bat 
 
 rem ---------------------------------------
 rem Start OpenOffice for transformations
@@ -61,7 +61,7 @@ if not ""%1"" == ""stop"" goto nostop
 echo Shutting down Tomcat...
 call "%CATALINA_HOME%\bin\shutdown.bat" 
 
-if exist "virtual_start.bat" call virtual_stop.bat 
+rem if exist "virtual_start.bat" call virtual_stop.bat 
 
 if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
