@@ -24,14 +24,21 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-
+ 
+require_once("AlfrescoConfig.php"); 
 require_once("Alfresco/Service/Session.php");
 require_once("Alfresco/Service/SpacesStore.php");
 require_once("Alfresco/Service/Node.php");
 require_once("Alfresco/Service/Version.php");
 
+/**
+ * Hook function called before content is saved.  At this point we can extract information about the article
+ * and store it on the session to be used later.
+ */
 function alfArticleSave(&$article, &$user, &$text, &$summary, $minor, $watch, $sectionanchor, &$flags)
 {
+	// Execute a query to get the previous versions URL, we can use this later when we save the content
+	// and want to update the version history.
 	$url = null;
 	$fieldName = "old_text";
 	$revision = Revision::newFromId($article->mLatest);
@@ -45,33 +52,60 @@ function alfArticleSave(&$article, &$user, &$text, &$summary, $minor, $watch, $s
 		$url = $row->$fieldName;
 	}
 	
-	$_SESSION["title"] = $article->getTitle()->getText();	
+	// Sort out the namespace of this article so we can figure out what the title is
+	$title = $article->getTitle()->getText();
+	$ns = $article->getTitle()->getNamespace();
+	if ($ns != NS_MAIN)
+	{
+		// lookup the display name of the namespace
+		$title = Namespace::getCanonicalName($ns)." - ".$title;
+	}
+	
+	// Store the details of the article in the session
+	$_SESSION["title"] = $title;	
 	$_SESSION["description"] = $summary;
 	$_SESSION["lastVersionUrl"] = $url;
 	
+	// Returning true ensures that the document is saved
 	return true;
 }
 
+/**
+ * External Alfresco content store.
+ * 
+ * This store retrieves and stores content from MediWiki into a space in a given Alfresco repository.
+ */
 class ExternalStoreAlfresco 
 {
+	/**
+	 * Fetch the content from the Alfresco repository.
+	 * 
+	 * @param	$url	the URL to the alfresco content
+	 */
 	function fetchFromURL($url) 
 	{
-		$session = Session::create("admin", "admin");
+		$session = $this->getSession();
 		$version = $this->urlToVersion($session, $url);		
 		return $version->cm_content->content;
 	}
 
+	/**
+	 * Stores the provided content in the Alfresco repository
+	 * 
+	 * @param	$store	the external store
+	 * @param	$data	the content
+	 */
 	function &store($store, $data) 
 	{
-		$session = Session::create("admin", "admin");
-		$store = new SpacesStore($session);
-		
-		$results = $session->query($store, 'PATH:"app:company_home/cm:wiki"');
-	    $space = $results[0];
+		$session = $this->getSession();
+	    $space = $this->getWikiSpace($session);
 		
 		$url = $_SESSION["lastVersionUrl"];
 		$node = null;
-		if ($url != null)
+		
+		$isNormalText = (strpos($url, 'alfresco://') === false);
+		
+		if ($url != null && $isNormalText == false)
 		{
 			$node = $this->urlToNode($session, $url);	
 		}
@@ -108,6 +142,37 @@ class ExternalStoreAlfresco
 		return $result;		
 	}
 	
+	/**
+	 * Get the session to the Alfresco respoitory
+	 */
+	function getSession()
+	{
+		global $alfURL, $alfUser, $alfPassword;		
+		return Session::create($alfUser, $alfPassword, $alfURL);
+	}
+	
+	/**
+	 * Get the store
+	 */
+	function getStore($session)
+	{
+		global $alfWikiStore;
+		return Store::__fromString($session, $alfWikiStore);
+	}
+	
+	/**
+	 * Get the wiki space
+	 */
+	function getWikiSpace($session)
+	{
+		global $alfWikiSpace;
+		$results = $session->query($this->getStore(), 'PATH:"'.$alfWikiSpace.'"');
+	    return $results[0];
+	}
+	
+	/**
+	 * Convert the url to the the node it relates to
+	 */
 	function urlToNode($session, $url)
 	{
 		$values = explode("/", substr($url, 11));		
@@ -115,6 +180,9 @@ class ExternalStoreAlfresco
 		return Node::create($session, $store, $values[2]);	
 	}
 	
+	/**
+	 * Convert the url to the version it relates to
+	 */
 	function urlToVersion($session, $url)
 	{
 		$values = explode("/", substr($url, 11));		
