@@ -76,7 +76,7 @@ public abstract class AbstractTriggerBean implements InitializingBean, JobDetail
     /**
      * Get the scheduler with which the job and trigger are scheduled.
      * 
-     * @return
+     * @return The scheduler
      */
     public Scheduler getScheduler()
     {
@@ -120,7 +120,7 @@ public abstract class AbstractTriggerBean implements InitializingBean, JobDetail
     /**
      * Abstract method for implementations to build their trigger.
      * 
-     * @return
+     * @return The trigger
      * @throws Exception
      */
     public abstract Trigger getTrigger() throws Exception;
@@ -136,7 +136,7 @@ public abstract class AbstractTriggerBean implements InitializingBean, JobDetail
     /**
      * Get the bean/trigger name.
      * 
-     * @return
+     * @return The name of the bean
      */
     public String getBeanName()
     {

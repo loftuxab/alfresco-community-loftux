@@ -100,7 +100,7 @@ public class VersionNumber implements Comparable<VersionNumber>, Serializable
     /**
      * Compares the passed version to this.  Determines whether they are equal, greater or less than this version.
      * 
-     * @param that  the other version
+     * @param obj  the other version number
      * @return  -1 if the passed version is less that this, 0 if they are equal, 1 if the passed version is greater
      */
     public int compareTo(VersionNumber obj)

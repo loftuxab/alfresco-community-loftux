@@ -73,7 +73,7 @@ public class UrlConfigSource extends BaseConfigSource
      * 
      * @param sourceLocation The location from which to get config
      * 
-     * @see ClassPathConfigSource#ClassPathConfigSource(List<String>)
+     * @see ClassPathConfigSource#ClassPathConfigSource(java.util.List)
      */
     public UrlConfigSource(String sourceLocation)
     {
@@ -83,7 +83,7 @@ public class UrlConfigSource extends BaseConfigSource
     /**
      * Constructs a config location that figures out where to look for the config
      * 
-     * @param source List of locations from which to get the config
+     * @param sourceLocations List of locations from which to get the config
      */
     public UrlConfigSource(List<String> sourceLocations)
     {

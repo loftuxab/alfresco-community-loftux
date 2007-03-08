@@ -54,7 +54,7 @@ public class CronTriggerBean extends AbstractTriggerBean
     /**
      * Get the cron expression that determines when this job is run.
      * 
-     * @return
+     * @return The cron expression
      */
     public String getCronExpression()
     {
@@ -74,7 +74,7 @@ public class CronTriggerBean extends AbstractTriggerBean
     /**
      * Build the cron trigger
      * 
-     * @return
+     * @return The trigger
      * @throws Exception
      */
     public Trigger getTrigger() throws Exception
