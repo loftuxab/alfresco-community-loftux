@@ -47,9 +47,6 @@ public class GenericConfigElement extends ConfigElementAdapter
         super(name);
     }
     
-    /**
-     * @see org.alfresco.web.config.ConfigElement#combine(org.alfresco.web.config.ConfigElement)
-     */
     public ConfigElement combine(ConfigElement configElement)
     {
         GenericConfigElement combined = new GenericConfigElement(this.name);

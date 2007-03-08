@@ -57,49 +57,31 @@ public abstract class ConfigElementAdapter implements ConfigElement
         this.children = new ArrayList<ConfigElement>();
     }
 
-    /**
-     * @see org.alfresco.web.config.ConfigElement#getAttribute(java.lang.String)
-     */
     public String getAttribute(String name)
     {
         return attributes.get(name);
     }
 
-    /**
-     * @see org.alfresco.web.config.ConfigElement#getAttributes()
-     */
     public Map<String, String> getAttributes()
     {
         return Collections.unmodifiableMap(this.attributes);
     }
     
-    /**
-     * @see org.alfresco.config.ConfigElement#getAttributeCount()
-     */
     public int getAttributeCount()
     {
        return this.attributes.size();
     }
 
-    /**
-     * @see org.alfresco.web.config.ConfigElement#getChildren()
-     */
     public List<ConfigElement> getChildren()
     {
         return Collections.unmodifiableList(this.children);
     }
     
-    /**
-     * @see org.alfresco.config.ConfigElement#getChildCount()
-     */
     public int getChildCount()
     {
        return this.children.size();
     }
 
-    /**
-     * @see org.alfresco.config.ConfigElement#getChild(java.lang.String)
-     */
     public ConfigElement getChild(String name)
     {
        ConfigElement child = null;
@@ -119,17 +101,11 @@ public abstract class ConfigElementAdapter implements ConfigElement
        return child;
     }
     
-    /**
-     * @see org.alfresco.web.config.ConfigElement#getName()
-     */
     public String getName()
     {
         return this.name;
     }
 
-    /**
-     * @see org.alfresco.web.config.ConfigElement#getValue()
-     */
     public String getValue()
     {
         return this.value;
@@ -138,33 +114,23 @@ public abstract class ConfigElementAdapter implements ConfigElement
     /**
      * Sets the value of this config element
      * 
-     * @param value
-     *            The value to set.
+     * @param value The value to set.
      */
     public void setValue(String value)
     {
         this.value = value;
     }
 
-    /**
-     * @see org.alfresco.web.config.ConfigElement#hasAttribute(java.lang.String)
-     */
     public boolean hasAttribute(String name)
     {
         return attributes.containsKey(name);
     }
 
-    /**
-     * @see org.alfresco.web.config.ConfigElement#hasChildren()
-     */
     public boolean hasChildren()
     {
         return !children.isEmpty();
     }
 
-    /**
-     * @see java.lang.Object#toString()
-     */
     public String toString()
     {
         StringBuilder buffer = new StringBuilder(super.toString());
@@ -172,8 +138,5 @@ public abstract class ConfigElementAdapter implements ConfigElement
         return buffer.toString();
     }
     
-    /**
-     * @see org.alfresco.web.config.ConfigElement#combine(org.alfresco.web.config.ConfigElement)
-     */
     public abstract ConfigElement combine(ConfigElement configElement);
 }

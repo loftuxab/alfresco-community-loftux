@@ -84,8 +84,8 @@ public class GenericElementReader implements ConfigElementReader
    /**
     * Creates a ConfigElementImpl object from the given element.
     * 
-    * @param element
-    * @return
+    * @param element The element to parse
+    * @return The GenericConfigElement representation of the given element
     */
    @SuppressWarnings("unchecked")
    private GenericConfigElement createConfigElement(Element element)

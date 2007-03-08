@@ -47,7 +47,7 @@ public class HTTPConfigSource extends BaseConfigSource
      * 
      * @param url the url of the file from which to get config
      * 
-     * @see HTTPConfigSource#HTTPConfigSource(List<String>)
+     * @see HTTPConfigSource#HTTPConfigSource(java.util.List)
      */
     public HTTPConfigSource(String url)
     {
@@ -57,7 +57,7 @@ public class HTTPConfigSource extends BaseConfigSource
    /**
     * Constructs an HTTPConfigSource using the list of URLs
     * 
-    * @param source List of URLs to get config from
+    * @param sourceStrings List of URLs to get config from
     */
    public HTTPConfigSource(List<String> sourceStrings)
    {

@@ -48,7 +48,7 @@ public class FileConfigSource extends BaseConfigSource
      * 
      * @param filename the name of the file from which to get config
      * 
-     * @see FileConfigSource#FileConfigSource(List<String>)
+     * @see FileConfigSource#FileConfigSource(java.util.List)
      */
     public FileConfigSource(String filename)
     {
@@ -56,8 +56,7 @@ public class FileConfigSource extends BaseConfigSource
     }
     
     /**
-     * @param sources
-     *            List of file paths to get config from
+     * @param sourceStrings List of file paths to get config from
      */
     public FileConfigSource(List<String> sourceStrings)
     {
@@ -65,9 +64,8 @@ public class FileConfigSource extends BaseConfigSource
     }
 
     /**
-     * @param sourceString
-     *            a valid filename as accepted by the
-     *            {@link java.io.File#File(java.lang.String) file constructor}
+     * @param sourceString a valid filename as accepted by the
+     *        {@link java.io.File#File(java.lang.String) file constructor}
      * @return Returns a stream onto the file
      */
     protected InputStream getInputStream(String sourceString)

@@ -45,7 +45,7 @@ public class ClassPathConfigSource extends BaseConfigSource
      * 
      * @param classpath the classpath from which to get config
      * 
-     * @see ClassPathConfigSource#ClassPathConfigSource(List<String>)
+     * @see ClassPathConfigSource#ClassPathConfigSource(java.util.List)
      */
     public ClassPathConfigSource(String classpath)
     {
@@ -55,7 +55,7 @@ public class ClassPathConfigSource extends BaseConfigSource
     /**
      * Constructs an ClassPathConfigSource using the list of classpath elements
      * 
-     * @param source List of classpath resources to get config from
+     * @param sourceStrings List of classpath resources to get config from
      */
     public ClassPathConfigSource(List<String> sourceStrings)
     {

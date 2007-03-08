@@ -56,7 +56,7 @@ public class WebAppConfigSource extends BaseConfigSource implements ServletConte
      * 
      * @param filename the name of the file from which to get config
      * 
-     * @see WebAppConfigSource#WebAppConfigSource(List<String>)
+     * @see WebAppConfigSource#WebAppConfigSource(java.util.List)
      */
     public WebAppConfigSource(String filename)
     {
@@ -64,8 +64,7 @@ public class WebAppConfigSource extends BaseConfigSource implements ServletConte
     }
     
     /**
-     * @param sources
-     *            List of paths to files in a web application
+     * @param sourceStrings List of paths to files in a web application
      */
     public WebAppConfigSource(List<String> sourceStrings)
     {

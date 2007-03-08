@@ -161,7 +161,7 @@ public class RuntimeExec
      * A comma or space separated list of values that, if returned by the executed command,
      * indicate an error value.  This defaults to <b>"1, 2"</b>.
      * 
-     * @param erroCodesStr the error codes for the execution
+     * @param errCodesStr the error codes for the execution
      */
     public void setErrorCodes(String errCodesStr)
     {

@@ -65,9 +65,6 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         super(configSource);
     }
 
-    /**
-     * @see org.alfresco.web.config.BaseConfigService#init()
-     */
     public void init()
     {
         if (logger.isDebugEnabled())
@@ -84,9 +81,6 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             logger.debug("Completed initialisation");
     }
     
-    /**
-     * @see org.alfresco.config.BaseConfigService#destroy()
-     */
     public void destroy()
     {
        this.elementReaders.clear();
@@ -96,9 +90,6 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
        super.destroy();
     }
 
-    /**
-     * @see org.alfresco.web.config.BaseConfigService#parse(java.io.InputStream)
-     */
     protected void parse(InputStream stream)
     {
         try
@@ -224,8 +215,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     /**
      * Parses a config element of a config file
      * 
-     * @param configElement
-     *            The config element
+     * @param configElement The config element
      */
     private void parseConfigElement(Element configElement)
     {
@@ -281,10 +271,8 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     /**
      * Adds the config element reader with the given name and class name
      * 
-     * @param elementName
-     *            Name of the element the reader is for
-     * @param className
-     *            Class name of element reader implementation
+     * @param elementName Name of the element the reader is for
+     * @param className Class name of element reader implementation
      */
     private void addConfigElementReader(String elementName, String className)
     {
@@ -311,8 +299,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     /**
      * Retrieves the element reader for the given element name
      * 
-     * @param elementName
-     *            Name of the element to get the reader for
+     * @param elementName Name of the element to get the reader for
      * @return ConfigElementReader object or null if it doesn't exist
      */
     private ConfigElementReader getConfigElementReader(String elementName)
