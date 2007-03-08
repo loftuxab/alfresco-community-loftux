@@ -1,0 +1,35 @@
+
+-------------------------------------------------------------
+Installation Notes - Alfresco Extension To Media Wiki
+-------------------------------------------------------------
+
+1. Install Alfresco Repository
+
+Needs to be version 2.1 or higher.
+
+2. Install MediaWiki
+
+3. Install the Alfresco PHP library
+
+See installation instructions.
+
+3. Copy ExternalStoreAlfresco.php into the MediaWiki extensions directory
+
+4. Add the following code to the LocalSettings.php found in the root of the MediaWiki
+
+Edit the end point URL found in the follow config to ensure the correct repository is referenced.  The code below is currently pointing to a repository on localhost.
+
+# -------------------------------------------------------------------------------
+# Alfresco Extension Configuration
+# -------------------------------------------------------------------------------
+
+# include the alfresco extensions classes
+require_once("extensions/ExternalStoreAlfresco.php");
+
+# Configure in some external stores
+$wgDefaultExternalStore = array("alfresco://localhost:8080/alfresco/api");
+$wgExternalStores = array("alfresco");
+
+# Add hooks
+$wgHooks['ArticleSave'][] = 'alfArticleSave';
+	

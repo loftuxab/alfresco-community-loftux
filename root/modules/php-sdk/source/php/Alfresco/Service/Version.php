@@ -23,8 +23,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
- 
- require_once('log4php/LoggerManager.php');
+
  
  /**
   * Version class.
