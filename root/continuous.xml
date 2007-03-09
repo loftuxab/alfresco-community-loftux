@@ -60,6 +60,7 @@
    <!-- ** Database targets (for internal script use only)** -->
    <!-- **************************************************** -->
  
+  <target name="reset-database" depends="-drop-database, -create-database" />
    <target name="-reset-database" depends="-drop-database, -create-database" />
 
    <target name="-create-database" depends="init">
