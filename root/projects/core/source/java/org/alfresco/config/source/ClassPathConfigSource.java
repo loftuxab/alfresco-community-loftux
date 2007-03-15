@@ -25,9 +25,11 @@
 package org.alfresco.config.source;
 
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
+import org.alfresco.util.Debug;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -72,9 +74,18 @@ public class ClassPathConfigSource extends BaseConfigSource
     {
         InputStream is = this.getClass().getClassLoader().getResourceAsStream(sourceString);
 
-        if (is == null && logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
-            logger.debug("Failed to obtain input stream to classpath: " + sourceString);
+            if (is == null)
+            {
+                logger.debug("Failed to obtain input stream to classpath: " + sourceString);
+            }
+            else
+            {
+                URL url = this.getClass().getClassLoader().getResource(sourceString);
+                String location = url.toExternalForm();
+                logger.debug("Loaded '" + sourceString + "' from: " + location);
+            }
         }
 
         return is;
