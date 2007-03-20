@@ -56,12 +56,29 @@ class VersionTest extends BaseTest
 		$this->assertEquals("origional description", $version->cm_description);	
 		echo "content: ".$version->cm_content->content."<br>";
 		echo "content: ".$node->cm_content->content."<br>";
-		
-		$s = new Store($this->getSession(), "lightWeightVersionStore", "versionStore");
-		$v = new Version($this->getSession(), $s, "1e0d08cf-cb34-11db-9eb5-3569d0dd9f0d");
-		echo "content: ".$v->cm_content->content."<br>";
 	}
 
+	public function testVersionHistory()
+	{
+		// First create a new content node
+		$node = $this->createContentNode("origional content");
+		$node->addAspect("cm_titled");
+		$node->cm_title = "origional title";
+		$node->cm_description = "origional description";
+		$this->getSession()->save();
+		
+		// Version the content a couple of times ...	
+		$version1 = $node->createVersion();
+		$version2 = $node->createVersion();
+		$version3 = $node->createVersion();
+		
+		// Sanity check
+		$this->assertTrue($node->hasAspect("cm_versionable"));
+		$this->assertEquals("1.2", $node->cm_versionLabel);
+		
+		// Get the version history
+		$versionHistory = $node->versionHistory;
+	}
 	
 }
 ?>

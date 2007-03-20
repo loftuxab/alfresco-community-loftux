@@ -34,6 +34,14 @@
  	/** Array of versions **/
  	private $_versions;
  	
+ 	public static function create($node)
+	{
+		// Use the web service API to get the version history for this node
+		$client = WebServiceFactory::getAuthoringService($node->session->repositoryURL, $node->session->ticket);
+		$result = $client->getVersionHistory(array("node" => $node->__toArray()));
+		var_dump($result);
+	}
+ 	
  	/**
  	 * Constructor
  	 * 
@@ -41,7 +49,7 @@
  	 */
  	public function __construct($node) 
 	{ 
-		populateVersionHistory();	
+		populateVersionHistory($node);	
 	}
 	
 	public function getVersions()
@@ -49,12 +57,6 @@
 		return $this->_versions;
 	}
 	
-	private function populateVersionHistory()
-	{
-		// Use the web service API to get the version history for this node
-		$client = WebServiceFactory::getAuthoringService($node->session->repositoryURL, $node->session->ticket);
-		$result = $client->getVersionHistory(array("node" => $node->__toArray()));
-		echo $result;
-	}
+	
  }
 ?>
