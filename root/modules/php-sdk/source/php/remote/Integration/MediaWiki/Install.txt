@@ -13,9 +13,16 @@ Needs to be version 2.1 or higher.
 
 See installation instructions.
 
-3. Copy ExternalStoreAlfresco.php into the MediaWiki extensions directory
+3. Copy ExternalStoreAlfresco.php and AlfrescoConfig into the MediaWiki extensions directory
 
-4. Add the following code to the LocalSettings.php found in the root of the MediaWiki
+4. Modify the values in AlfrescoConfig.php appropriatly
+
+ - Set $alfURL to the webservice endpoint URL of your Alfresco repository
+ - Set $alfWikiStore to reference of the store that you want your content to be placed in
+ - Set $alfWikiSpace to the path to the the space where you want your content to be placed
+ - $alfUser and $alfPassword specifiy the connection details you want to use when connecting to the repository
+
+5. Add the following code to the LocalSettings.php found in the root of the MediaWiki
 
 Edit the end point URL found in the follow config to ensure the correct repository is referenced.  The code below is currently pointing to a repository on localhost.
 

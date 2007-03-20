@@ -138,7 +138,7 @@ class ExternalStoreAlfresco
 		// Create the version
 		$version = $node->createVersion($description);
 		
-		$result = "alfresco://".$store->scheme."/".$store->address."/".$node->id."/".$version->store->scheme."/".$version->store->address."/".$version->id;		
+		$result = "alfresco://".$node->store->scheme."/".$node->store->address."/".$node->id."/".$version->store->scheme."/".$version->store->address."/".$version->id;		
 		return $result;		
 	}
 	
@@ -176,7 +176,7 @@ class ExternalStoreAlfresco
 	function urlToNode($session, $url)
 	{
 		$values = explode("/", substr($url, 11));		
-		$store  = new Store($session, $values[1], $values[0]);
+		$store  = getStore($session); //new Store($session, $values[1], $values[0]);
 		return Node::create($session, $store, $values[2]);	
 	}
 	

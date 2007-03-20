@@ -45,7 +45,7 @@ class Node extends BaseObject
 	private $_primaryParent;
 	private $_isNewNode;
 	private $_associations;
-	
+	private $_versionHistory;	
 	private $origionalProperties;
 	private $addedAspects;
 	private $removedAspects;
@@ -359,6 +359,20 @@ class Node extends BaseObject
 	{
 		$this->populateProperties();
 		$this->_properties = $properties;	
+	}
+	
+	/**
+	 * Accessor for the versionHistory property.
+	 * 
+	 * @return	VersionHistory	the versionHistory for the node, null is none
+	 */
+	public function getVersionHistory()
+	{
+		if ($this->_versionHistory == null)
+		{
+			$this->_versionHistory = VersionHistory::create($this);
+		}
+		return $this->_versionHistory;
 	}
 	
 	public function getChildren()

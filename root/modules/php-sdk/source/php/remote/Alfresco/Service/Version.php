@@ -26,7 +26,7 @@
 
  
  /**
-  * Version class.
+  * Version class
   * 
   * @author Roy Wetherall
   */
@@ -41,6 +41,15 @@
  	private $_type;
  	private $_aspects;
  	
+ 	/**
+ 	 * Constructor
+ 	 * 
+ 	 * @param	$session		the session that the version is tied to
+ 	 * @param	@store			the store that the forzen node is stored in
+ 	 * @prarm	@id				the id of the frozen node
+ 	 * @param   @description	the description of the version
+ 	 * @param	@major			indicates whether this is a major or minor revision	
+ 	 */
  	public function __construct($session, $store, $id, $description=null, $major=false)
  	{
 		$this->_session = $session;
@@ -52,7 +61,14 @@
 		$this->_aspects = null;
 		$this->_type = null;	
  	}	
-	
+ 	
+	/**
+	 *	__get override.
+	 *
+	 * If called with a valid property short name, the frozen value of that property is returned. 
+	 * 
+	 * @return 	String	the appropriate property value, null if none found
+	 */
 	public function __get($name)
 	{
 		$fullName = NamespaceMap::getFullName($name);
@@ -74,11 +90,21 @@
 		}
 	}
  	
+ 	/**
+ 	 * Gets session
+ 	 * 
+ 	 * @return Session	the session
+ 	 */
  	public function getSession()
  	{
  		return $this->_session;
  	}
  	
+ 	/**
+ 	 * Get the frozen nodes store
+ 	 * 
+ 	 * @return Store	the store
+ 	 */
  	public function getStore()
  	{
  		return $this->_store;
