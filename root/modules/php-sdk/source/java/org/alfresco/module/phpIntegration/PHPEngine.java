@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.alfresco.module.phpIntegration.lib.Node;
 import org.alfresco.module.phpIntegration.lib.Session;
+import org.alfresco.module.phpIntegration.lib.SpacesStore;
 import org.alfresco.module.phpIntegration.lib.Store;
 import org.alfresco.module.phpIntegration.module.BaseQuercusModule;
 import org.alfresco.service.cmr.repository.ScriptException;
@@ -57,6 +58,7 @@ public class PHPEngine
         registerClass("Session", Session.class);
         registerClass("Node", Node.class);
         registerClass("Store", Store.class);
+        registerClass("SpacesStore", SpacesStore.class);
     }
     
     public void registerModule(BaseQuercusModule module)
@@ -74,6 +76,7 @@ public class PHPEngine
     {
         try
         {
+            // Create the string writer
             StringWriter writer = new StringWriter(new CharBuffer(1024));
             writer.openWrite();
             
@@ -85,16 +88,16 @@ public class PHPEngine
             WriteStream ws = new WriteStream(writer);
             Env env = new Env(this.quercus, page, ws, null, null);        
             Value value = page.executeTop(env);
+            
+            // Make sure we flush becuase otherwise the result does not get written
+            ws.flush();
            
             // Write to output
-            String result = writer.getString();
-            System.out.println("RESULT ..");
-            System.out.println(result);
-            
+            String result = ((StringWriter)ws.getSource()).getString();            
             if (out != null)
             {
                 out.write(result);
-            }
+            }            
             
             // Return the result
             return value.toJavaObject();

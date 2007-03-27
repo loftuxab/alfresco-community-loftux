@@ -26,9 +26,18 @@ package org.alfresco.module.phpIntegration.lib;
 
 import java.util.List;
 
+import javax.servlet.ServletContext;
+
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.caucho.quercus.env.Env;
 
 /**
  * @author Roy Wetherall
@@ -36,6 +45,13 @@ import org.alfresco.service.cmr.repository.StoreRef;
 public class Session
 {
     private ServiceRegistry serviceRegistry;
+    
+    public Session(Env env)
+    {
+        ServletContext servletContext = env.getRequest().getSession().getServletContext();
+        ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+        this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("ServiceRegistry");
+    }
     
     public Session(ServiceRegistry serviceRegistry)
     {
@@ -63,6 +79,41 @@ public class Session
             result[index] = new Store(this, storeRef);
             index ++;
         }
+        
+        return result;
+    }
+    
+    /**
+     * Execute a query
+     * 
+     * @param store
+     * @param statement
+     * @param language
+     * @return
+     */
+    public Node[] query(Store store, String statement, String language)
+    {
+        Node[] result = null;
+        
+        // Get the search service
+        SearchService searchService = this.getServiceRegistry().getSearchService();
+        
+        // Set the default search language
+        if (language == null)
+        {
+            language = SearchService.LANGUAGE_LUCENE;
+        }
+        
+        // Do the search
+        ResultSet resultSet = searchService.query(store.getStoreRef(), language, statement);
+        List<NodeRef> nodeRefs = resultSet.getNodeRefs();
+        result = new Node[nodeRefs.size()];
+        int iIndex = 0;
+        for (NodeRef nodeRef : nodeRefs)
+        {
+            result[iIndex] = new Node(this, nodeRef);
+            iIndex++;
+        }        
         
         return result;
     }

@@ -29,15 +29,58 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.model.ContentModel;
+import org.alfresco.service.cmr.repository.ContentReader;
+import org.alfresco.service.cmr.repository.ContentService;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.TemplateProcessor;
 
 public class PHPTemplateProcessor extends BasePHPProcessor implements TemplateProcessor
 {
+    private NodeService nodeService;
+    private ContentService contentService;
+    
+    public void setNodeService(NodeService nodeService)
+    {
+        this.nodeService = nodeService;
+    }
+    
+    public void setContentService(ContentService contentService)
+    {
+        this.contentService = contentService;
+    }
+    
     public void process(String template, Object model, Writer out)
     {
-        // TODO for now just assume the passed template is on the class path
-        
-        InputStream is = getClass().getClassLoader().getResourceAsStream(template);
+        InputStream is = null;
+        if (template.indexOf(StoreRef.URI_FILLER) != -1)
+        {
+            NodeRef ref = new NodeRef(template);
+            if (this.nodeService.exists(ref) == true)
+            {
+                ContentReader contentReader = this.contentService.getReader(ref, ContentModel.PROP_CONTENT);
+                if (contentReader != null)
+                {
+                    is = contentReader.getContentInputStream();
+                }
+                else
+                {
+                    throw new AlfrescoRuntimeException("The script (" + template + ") has not content.");
+                }
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("Invalid node reference passed to PHP template processor. (" + template + ")");
+            }
+        }
+        else
+        {
+            is = getClass().getClassLoader().getResourceAsStream(template);
+        }
+
         try
         {
             this.phpEngine.executeScript(is, out, null);

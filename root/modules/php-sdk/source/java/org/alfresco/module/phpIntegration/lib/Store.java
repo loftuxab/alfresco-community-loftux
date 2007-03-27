@@ -33,8 +33,8 @@ import org.alfresco.service.cmr.repository.StoreRef;
  */
 public class Store
 {
-    private Session session;
-    private StoreRef storeRef;
+    protected Session session;
+    protected StoreRef storeRef;
 
     public Store(Session session, StoreRef storeRef)
     {
@@ -68,6 +68,11 @@ public class Store
         return this.storeRef.getProtocol();
     }
     
+    /**
+     * Gets the root node
+     * 
+     * @return  the root node of the store
+     */
     public Node getRootNode()
     {
         // Get the node service
@@ -76,5 +81,18 @@ public class Store
         // Get the root node
         NodeRef rootNode = nodeService.getRootNode(this.storeRef);        
         return new Node(this.session, rootNode);        
+    }
+    
+    public static Store __fromString(Session session, String value)
+    {
+        return new Store(session, new StoreRef(value));
+    }
+    
+    /**
+     * @return  the store ref string
+     */
+    public String __toString()
+    {
+        return this.storeRef.toString();
     }
 }

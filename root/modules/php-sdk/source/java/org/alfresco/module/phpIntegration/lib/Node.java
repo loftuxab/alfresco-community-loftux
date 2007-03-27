@@ -24,13 +24,16 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.NodeService;
 
 /**
  * @author Roy Wetherall
  */
 public class Node
 {
+    private NodeService nodeService;
     private Session session;
     private NodeRef nodeRef;
     
@@ -38,12 +41,19 @@ public class Node
     {
         this.session = session;
         this.nodeRef = nodeRef;
+        this.nodeService = session.getServiceRegistry().getNodeService();
     }
     
     public Node(Session session, Store store, String id)
     {
         this.session = session;
         this.nodeRef = new NodeRef(store.getStoreRef(), id);
+    }
+    
+    // TODO this should look in the session cache and reuse the node (do we need to do that when running in the VM?)
+    public static Node createNode(Session session, Store store, String id)
+    {
+        return new Node(session, store, id);
     }
     
     public NodeRef getNodeRef()
@@ -56,8 +66,34 @@ public class Node
         return new Store(this.session, this.nodeRef.getStoreRef());
     }
     
+    /**
+     * Gets the id of the node
+     * 
+     * @return  the id of the node
+     */
     public String getId()
     {
         return this.nodeRef.getId();
+    }
+    
+    /** 
+     * Gets the type of the node
+     * 
+     * @return  the node type
+     */
+    public String getType()
+    {
+        return this.nodeService.getType(this.nodeRef).toString();
+    }
+    
+    // TODO need to figure out how we sort this out in the general case
+    public String getCm_name()
+    {
+        return (String)this.nodeService.getProperty(this.nodeRef, ContentModel.PROP_NAME);
+    }
+    
+    public String __toString()
+    {
+        return this.nodeRef.toString();
     }
 }

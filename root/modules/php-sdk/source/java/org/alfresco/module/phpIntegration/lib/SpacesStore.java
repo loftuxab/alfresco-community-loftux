@@ -22,38 +22,29 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.phpIntegration;
+package org.alfresco.module.phpIntegration.lib;
 
-import java.io.StringWriter;
-
-import org.alfresco.util.BaseSpringTest;
+import org.alfresco.service.cmr.repository.NodeRef;
+import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.search.ResultSet;
+import org.alfresco.service.cmr.search.SearchService;
 
 /**
  * @author Roy Wetherall
  */
-public class PHPTest extends BaseSpringTest
+public class SpacesStore extends Store
 {
-    
-    public void testScript1()
-        throws Exception
+    public SpacesStore(Session session)
     {
-        PHPScriptService scriptService = (PHPScriptService)this.applicationContext.getBean("phpScriptService");
-        Object result = scriptService.executeScript("alfresco/module/phpIntegration/test/script1.php", null);
-        System.out.println("->" + result.toString());
+        super(session, StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
     }
     
-    public void testTemplate1()
+    public Node getCompanyHome()
     {
-        PHPTemplateProcessor processor = (PHPTemplateProcessor)this.applicationContext.getBean("phpTemplateProcessor");
-        
-        StringWriter out = new StringWriter();
-        
-        processor.process("alfresco/module/phpIntegration/test/template1.php", null, out);
-        
-        System.out.println("The output of the template:");
-        System.out.println(out.toString());
+        SearchService searchService = this.session.getServiceRegistry().getSearchService();
+        ResultSet resultSet = searchService.query(this.storeRef, SearchService.LANGUAGE_LUCENE, "PATH:\"app:company_home\"");
+        NodeRef companyHome = resultSet.getNodeRef(0);
+        return new Node(session, companyHome);
     }
-    
-
 
 }
