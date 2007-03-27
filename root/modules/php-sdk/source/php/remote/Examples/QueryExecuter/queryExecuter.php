@@ -29,17 +29,8 @@ require_once('../../Alfresco/Service/SpacesStore.php');
 	
 session_start();
 
-// Get the session object
-$session = null;
-if (isset($_SESSION['sessionDetails']) == false)
-{
-	$session = Session::create("admin", "admin");
-	$_SESSION['sessionDetails'] = $session->sessionDetails;
-}	
-else
-{
-	$session = Session::createFromSessionDetails($_SESSION['sessionDetails']);	
-}
+// Start the Alfresco session
+$session = Session::create("admin", "admin");
 
 // Get the current query details
 $currentStore = new SpacesStore($session);

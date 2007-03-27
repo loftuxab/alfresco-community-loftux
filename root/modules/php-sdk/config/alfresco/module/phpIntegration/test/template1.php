@@ -21,3 +21,7 @@
 </body>
 
 </html>
+
+<?php	
+	return "this is my result so the file is being read correctly";
+?>
