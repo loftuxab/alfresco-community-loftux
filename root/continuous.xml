@@ -33,7 +33,7 @@
            depends="clean-continuous, clean, -reset-database, distribute" />
 
    <target name="distribute" description="Creates the distribution files for all platforms"
-           depends="set-build-number, incremental, distribute-tomcat, distribute-war, distribute-wcm, distribute-sdk, distribute-webserviceclient, distribute-benchmark" />
+           depends="set-build-number, incremental, distribute-tomcat, distribute-war, distribute-wcm, distribute-sdk, distribute-webserviceclient, distribute-benchmark, distribute-mmt" />
 
    <target name="set-build-number" depends="init" if="build.number">
       <exec executable="svn">
@@ -265,6 +265,66 @@
          <tarfileset dir="${dir.project.webserviceclient.dist}" />
          <tarfileset dir="${dir.project.webserviceclient.config}/alfresco" prefix="alfresco"/>
       </tar>
+   </target>
+
+   <!-- ************************************ -->
+   <!-- ** Module Management Tool targets ** -->
+   <!-- ************************************ -->
+   
+   <target name="assemble-mmt" depends="init">
+
+      <!-- Create the required directory structure -->
+      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble.mmt}" />
+
+      <!-- extract the one-jar file -->
+      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.95.jar" dest="${dir.continuous.assemble.mmt}" overwrite="true" />
+      <!-- remove unwanted files -->
+      <delete >
+         <fileset dir="${dir.continuous.assemble.mmt}">
+            <include name="**/*.java" />
+            <include name="**/boot-manifest.mf" />
+         </fileset>
+      </delete>
+
+      <!-- copy required jars into lib folder -->
+      <copy todir="${dir.continuous.assemble.mmt}/lib" flatten="false">
+         <fileset dir="${dir.project.3rdparty.lib}" includes="**/jug.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}" includes="**/truezip.jar" />
+      </copy>
+
+      <!-- get the files for the main mmt jar -->
+      <copy todir="${dir.continuous.assemble.mmt}/tmp-mmt-jar" flatten="false">
+         <fileset dir="${dir.project.core.classes}" includes="org/alfresco/i18n/I18NUtil.class" />
+         <fileset dir="${dir.project.core.classes}" includes="org/alfresco/error/AlfrescoRuntimeException.class" />
+         <fileset dir="${dir.project.core.classes}" includes="org/alfresco/util/VersionNumber.class" />
+         <fileset dir="${dir.project.repository.classes}" includes="org/alfresco/repo/module/tool/default-file-mapping.properties" />
+         <fileset dir="${dir.project.repository.classes}" includes="org/alfresco/repo/module/**/*.class" />
+         <fileset dir="${dir.project.repository.classes}" includes="org/alfresco/service/cmr/module/**/*.class" />
+      </copy>
+      <!-- copy in a manifest file -->
+      <copy tofile="${dir.continuous.assemble.mmt}/tmp-mmt-jar/META-INF/MANIFEST.MF" >
+         <fileset dir="${dir.project.repository}/source/meta-inf" includes="mmt-manifest.mf" />
+      </copy>
+      <!-- jar the main mmt classes -->
+      <mkdir dir="${dir.continuous.assemble.mmt}/main" />
+      <jar destfile="${dir.continuous.assemble.mmt}/main/mmt.jar" manifest="${dir.continuous.assemble.mmt}/tmp-mmt-jar/META-INF/MANIFEST.MF" update="false" >
+         <fileset dir="${dir.continuous.assemble.mmt}/tmp-mmt-jar">
+            <include name="**/*" />
+         </fileset>
+      </jar>
+      <!-- Remove temp files -->
+      <delete dir="${dir.continuous.assemble.mmt}/tmp-mmt-jar" />
+
+   </target>
+   
+   <target name="distribute-mmt" depends="assemble-mmt"
+           description="Creates the Alfresco Module Management Tool distribution file for all platforms">
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.mmt}.jar">
+         <zipfileset dir="${dir.continuous.assemble.mmt}" />
+      </zip>
    </target>
 
    <!-- *********************** -->
