@@ -1,6 +1,6 @@
-/*-----------------------------------------------------------------------------
-*  Copyright 2006 Alfresco Inc.
-*  
+/*
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * As a special exception to the terms and conditions of version 2.0 of
- * the GPL, you may redistribute this Program in connection with Free/Libre
- * and Open Source Software ("FLOSS") applications as described in Alfresco's
- * FLOSS exception.  You should have recieved a copy of the text describing
- * the FLOSS exception, and it is also available here:
- * http://www.alfresco.com/legal/licensing"*  
-*  
-*  Author  Jon Cox  <jcox@alfresco.com>
-*  File    AVMHost.java
-*----------------------------------------------------------------------------*/
 
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing"
+ */
 package org.alfresco.catalina.host;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -322,7 +320,53 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         if( initialized ) return;
         initialized=true;
 
+        // Initialize RPC to talk to AVM 
         AVMFileDirContext.InitAVMRemote();
+
+        // Clean out the work dir before *anything* else is done.
+        //
+        // The only way the work dir could get polluted with classes from
+        // defunct webapps is if the virt server was shut down during a
+        // moment when the Alfresco webapp was sending it messages to
+        // unregister that webapp.  However, because the work dir is cleaned
+        // every time the virt server does a fresh init(), missing a message
+        // like this is rendered moot because the work dir is cleaned  first.
+        //
+        // Annoyingly, there isn't a clean way to get the workdir for the
+        // servlet container itself, just the individual servlets it contains.
+        // Therefore, the following logic is cribbed from the way that 
+        // StandardContext.postWorkDirectory() does things.
+
+        String workDir = getWorkDir();
+        if ( workDir == null )
+        {
+            workDir = "work" + File.separator + 
+              ((StandardEngine)parent).getName() + File.separator + getName();
+        }
+
+        File absWorkDir = new File(workDir);
+
+        if ( ! absWorkDir.isAbsolute() )
+        {
+            String catalina_base;
+            catalina_base = System.getProperty("catalina.base");
+            if ( catalina_base == null)
+            {   
+                catalina_base = System.getProperty("catalina.home");
+            }
+            absWorkDir =  new File( catalina_base, workDir );
+        }
+
+        // Clean the entire work dir for this virtual host
+        if(log.isInfoEnabled())
+            log.info("Deleting: " + absWorkDir.getAbsolutePath() );
+
+        // Note: This must happen *after* InitAVMRemote(); 
+        //       if it's done beforehand, AVMRemote ops will fail, 
+        //       due to static initializer issues. 
+        //
+        AVMHostConfig.CleanDir( absWorkDir, true);
+
 
         // Create the registration thread early, but don't start it yet.
         // The creation of this object configures various attributes
@@ -494,7 +538,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
     public synchronized void start() throws LifecycleException 
     {
         // new Exception("Stack trace").printStackTrace();
-
         if( started ) { return; }
 
         if( ! initialized ) { init(); }

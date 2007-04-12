@@ -18,6 +18,8 @@
         </property>
     </bean>
 
+	<!-- Client Ticket Holder. -->
+	<bean id="clientTicketHolder" class="org.alfresco.repo.remote.ClientTicketHolderGlobal"/>
 
     <!-- The remote authentication service. -->
     <bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
@@ -36,6 +38,9 @@
     <bean id="reauthenticatingAdvice" class="org.alfresco.repo.remote.ReauthenticatingAdvice">
         <property name="authenticationService">
             <ref bean="authenticationService"/>
+        </property>
+        <property name="clientTicketHolder">
+            <ref bean="clientTicketHolder"/>
         </property>
         <property name="user">
             <value>${alfresco.server.user}</value>
@@ -77,6 +82,9 @@
     <bean id="avmRemote" class="org.alfresco.repo.remote.AVMRemoteImpl">
         <property name="avmRemoteTransport">
             <ref bean="avmRemoteTransport"/>
+        </property>
+        <property name="clientTicketHolder">
+            <ref bean="clientTicketHolder"/>
         </property>
     </bean>
 
