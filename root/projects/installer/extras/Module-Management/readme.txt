@@ -2,6 +2,7 @@ Module Manager
 ----------------------
 
 The module manager will allow you to install an Alfresco AMP file into a WAR file.
+The tool is distributed as an executable jar.  Run it with "java -jar alfresco-mmt-xxx.jar".
 
 Module managment tool available commands:
     
