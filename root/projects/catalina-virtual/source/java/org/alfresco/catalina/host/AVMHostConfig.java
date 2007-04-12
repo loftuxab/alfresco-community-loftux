@@ -1,6 +1,6 @@
-/*-----------------------------------------------------------------------------
-*  Copyright 2006 Alfresco Inc.
-*  
+/*
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
+ *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
@@ -14,17 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * As a special exception to the terms and conditions of version 2.0 of
- * the GPL, you may redistribute this Program in connection with Free/Libre
- * and Open Source Software ("FLOSS") applications as described in Alfresco's
- * FLOSS exception.  You should have recieved a copy of the text describing
- * the FLOSS exception, and it is also available here:
- * http://www.alfresco.com/legal/licensing"*  
-*  
-*  Author  Jon Cox  <jcox@alfresco.com>
-*  File    AVMHostConfig.java
-*----------------------------------------------------------------------------*/
 
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing"
+ */
 package org.alfresco.catalina.host;
 
 import java.io.File;
@@ -880,7 +877,7 @@ public class AVMHostConfig extends HostConfig
 
                 host.removeChild( context );
 
-                boolean clean_ok = cleanDir(workDir, true);
+                boolean clean_ok = CleanDir(workDir, true);
 
                 if ( ! clean_ok )
                 {
@@ -936,7 +933,7 @@ public class AVMHostConfig extends HostConfig
      *
      * @param dir File object representing the directory to be cleaned
      */
-    private static boolean cleanDir(File dir, boolean deleteDir)
+    static boolean CleanDir(File dir, boolean deleteDir)
     {
         boolean overall_status = true;
         boolean status;
@@ -948,7 +945,7 @@ public class AVMHostConfig extends HostConfig
         {
             File file = new File(dir, files[i]);
 
-            if (file.isDirectory()) { status = cleanDir(file, true); } 
+            if (file.isDirectory()) { status = CleanDir(file, true); } 
             else                    { status = file.delete(); }
 
             overall_status = overall_status && status;

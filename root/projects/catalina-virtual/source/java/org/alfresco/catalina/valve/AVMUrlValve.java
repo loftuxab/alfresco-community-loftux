@@ -1,7 +1,7 @@
-/*-----------------------------------------------------------------------------
-*  Copyright 2006 Alfresco Inc.
-*
-*   * This program is free software; you can redistribute it and/or
+/*
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
  * as published by the Free Software Foundation; either version 2
  * of the License, or (at your option) any later version.
@@ -14,62 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * As a special exception to the terms and conditions of version 2.0 of
- * the GPL, you may redistribute this Program in connection with Free/Libre
- * and Open Source Software ("FLOSS") applications as described in Alfresco's
- * FLOSS exception.  You should have recieved a copy of the text describing
- * the FLOSS exception, and it is also available here:
- * http://www.alfresco.com/legal/licensing"*
-*
-*  Author  Jon Cox  <jcox@alfresco.com>
-*  File    AVMUrlValve.java
-*
-*
-*  NOTE:
-*     RFCs regarding hostnames & fully qualified domain names (FQDN):
-*     608, 810, 608, 952, 1035, and 1123.   The following PCRE-style
-*     regex defines a valid label within a FQDN:
-*
-*          ^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$
-*
-*     Less formally:
-*
-*          o  Case insensitive
-*          o  First/last character:  alphanumeric
-*          o  Interior characters:   alphanumeric plus hyphen
-*          o  Minimum length:        2  characters
-*          o  Maximum length:        63 characters
-*
-*
-*     The FQDN (fully qualified domain name) is the following constraints:
-*
-*          o  Maximum 255 characters          (e.g.: www.foo.example.com)
-*          o  Must contain at least one alpha (i.e.: [a-z])
-*
-*     Thus, the following FQDN would be illegal because it contains
-*     a hostname label that is too long (64 > 63):
-*
-*        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
-*
-*     But the following FQDN would be ok because no host label is > 63 chars,
-*     and the total length is less than 255 chars:
-*
-*     moo.cow.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
-*
-*     Ultimately, I18N-encoded domain names will be supported via the IDNA 
-*     (Internationalizing Domain Names In Applications) standard.   
-*     IDNA encodes host labels that would normally contain I18N chars using 
-*     a "xn--" prefix.  Apps present IDNA URLs in decoded form, but only
-*     the "traditional" DNS characters ever go over the wire.  For details,
-*     see RFC-3490 (http://www.ietf.org/rfc/rfc3490.txt)
-*     and RFC-3492 (http://www.ietf.org/rfc/rfc3492.txt).
-*
-*     The encoding scheme used for virtualization has been designed to
-*     be IDNA-friendly; when GUI support becomes available, no changes
-*     will be needed as far as the virtualization logic is concnered.
-*
-*----------------------------------------------------------------------------*/
 
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing"
+ */
 package org.alfresco.catalina.valve;
 
 import java.io.BufferedReader;
@@ -109,6 +61,53 @@ import org.apache.tomcat.util.buf.MessageBytes;
 
 /**
 * Rewrites requests to make them easy for Alfresco to virtualize.
+* <pre>
+*     RFCs regarding hostnames & fully qualified domain names (FQDN):
+*     608, 810, 952, 1035, and 1123.   The following PCRE-style
+*     regex defines a valid label within a FQDN:
+*
+*          ^[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]$
+*
+*     Less formally:
+*
+*          o  Case insensitive
+*          o  First/last character:  alphanumeric
+*          o  Interior characters:   alphanumeric plus hyphen
+*          o  Minimum length:        2  characters
+*          o  Maximum length:        63 characters
+*
+*     The minimum 2-char length does not seem to be enforced by
+*     nameservers/resovlers in the real world.  For example, djbdns
+*     uses nameserver names like:   a.ns.example.com,  b.ns.example.com, etc.
+*
+*     The FQDN (fully qualified domain name) is the following constraints:
+*
+*          o  Maximum 255 characters          (e.g.: www.foo.example.com)
+*          o  Must contain at least one alpha (i.e.: [a-z])
+*
+*     Thus, the following FQDN would be illegal because it contains
+*     a hostname label that is too long (64 > 63):
+*
+*        aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
+*
+*     But the following FQDN would be ok because no host label is > 63 chars,
+*     and the total length is less than 255 chars:
+*
+*     moo.cow.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa.com
+*
+*     Ultimately, I18N-encoded domain names will be supported via the IDNA 
+*     (Internationalizing Domain Names In Applications) standard.   
+*     IDNA encodes host labels that would normally contain I18N chars using 
+*     a "xn--" prefix.  Apps present IDNA URLs in decoded form, but only
+*     the "traditional" DNS characters ever go over the wire.  For details,
+*     see RFC-3490 (http://www.ietf.org/rfc/rfc3490.txt)
+*     and RFC-3492 (http://www.ietf.org/rfc/rfc3492.txt).
+*
+*     The encoding scheme used for virtualization has been designed to
+*     be IDNA-friendly; when GUI support becomes available, no changes
+*     will be needed as far as the virtualization logic is concnered.
+*
+* </pre>
 */
 public class AVMUrlValve extends ValveBase implements Lifecycle
 {
@@ -163,24 +162,6 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     {
     }
 
-    /**
-    *  Transforms a version (e.g.: -1), a storeName (e.g.:  "mysite--alice"),
-    *  and a webappName (e.g.: "ROOT") into a virtualized context name
-    *  (e.g.:  "/$-1$mysite--alice$ROOT")
-    */
-    public static String GetContextNameFromStoreName( String version, 
-                                                      String storeName, 
-                                                      String webappName
-                                                    )
-    {
-        return  "/"         +    // context paths start with "/"
-                "$"         +    // delimiter
-                version     +    // TODO: ".version--vXXXXX."
-                "$"         +    // delimiter
-                storeName   +    // (...).www--sandbox.
-                "$"         +    // delimiter
-                webappName;
-    }
 
     /**
     *  Transforms a version (e.g.: -1), a storeName (e.g.:  "mysite--alice"),
@@ -200,7 +181,6 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
                 "$"         +    // delimiter
                 webappName;
     }
-
 
 
     /**
@@ -430,9 +410,41 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
 
         Matcher            rproxy_match = hostmatch.getMatch();
         AVMHost            avm_host     = hostmatch.getHost();
-        AVMResourceBinding binding    = avm_host.getResourceBinding();
-        String             store_name = binding.getRepositoryName(rproxy_match);
-        String             version    = binding.getVersion(       rproxy_match);
+        AVMResourceBinding binding      = avm_host.getResourceBinding();
+        String   store_name  = binding.getRepositoryName(rproxy_match);
+        String   version_str = binding.getVersion(       rproxy_match);
+
+        int version = 0;
+
+        try    { version = Integer.parseInt( version_str ); }
+        catch  (Exception num_ex)
+        {
+            // The regex for this AVMHost will prevent most badly 
+            // formateed strings from ever getting this far.  Checking 
+            // for a badly formatted string is an extra safety measure.
+            // 
+            // The request will fail because the version is bad.
+            // Therefore, there won't be any subrequest, so unset
+            // the subrequest flag.
+
+            if ( version_str == null ) { version_str = ""; }
+
+            AVMUrlValve_invoked_.set(null);   
+            sendErrorPageResponse( response,
+                "<html>\n"                                                    +
+                "  <head><title>Virtual website not found</title></head>\n"   +
+                "  <body>\n"                                                  +
+                "     <p>\n"                                                  +
+                "     <h2>Virtual website not found</h2>\n"                   + 
+                "     <br>\n"                                                 +
+                "     &nbsp;&nbsp;&nbsp;&nbsp;Bad version:&nbsp;&nbsp;"       + 
+                "     &nbsp;&nbsp;<tt>" + version_str + "</tt>\n"             +
+                "  </body>\n" +
+                "</html>" 
+            );
+
+            return;
+        }
 
 
         // Handle requests for bad virtual hosts gracefully
@@ -757,6 +769,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     *   After unmangling:
     *   <pre>
     *     /servlets-examples/servlet/RequestInfoExample
+    *   </pre>
+    *
+    *  If this were for a non-HEAD version (e.g.: '4'), the mangled
+    *  subrequest URI might look like this:
+    *   <pre>
+    *     /$4$store-1$servlets-examples/servlet/RequestInfoExample
     *   </pre>
     */
     String unMangleAVMuri( String uri )
