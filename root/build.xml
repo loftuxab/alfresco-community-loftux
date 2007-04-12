@@ -46,8 +46,10 @@
       <patternset id="files.tests">
          <include name="**/*Test.java" />
          <!-- include the updated indexer tests -->
+<!--
          <include name="**/LuceneCategoryTest2.java" />
          <include name="**/LuceneTest2.java" />
+-->
          <exclude name="**/Base*Test.java" />
          <exclude name="**/Abstract*Test.java" />
          <exclude name="**/*SystemTest.java" />
