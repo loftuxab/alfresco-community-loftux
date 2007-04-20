@@ -64,7 +64,7 @@ public class VersionNumber implements Comparable<VersionNumber>, Serializable
         String[] versions = version.split(DELIMITER);
         if (versions.length < 1)
         {
-            throw new AlfrescoRuntimeException("The extension version string '" + version + "' is invalid.");
+            throw new AlfrescoRuntimeException("The version string '" + version + "' is invalid.");
         }
         
         try
@@ -81,7 +81,7 @@ public class VersionNumber implements Comparable<VersionNumber>, Serializable
         }
         catch (NumberFormatException e)
         {
-            throw new AlfrescoRuntimeException("The extension version string '" + version + "' is invalid.");   
+            throw new AlfrescoRuntimeException("The version string '" + version + "' is invalid.");   
         }
     }
     
