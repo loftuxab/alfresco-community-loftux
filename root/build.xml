@@ -20,6 +20,9 @@
          <fileset dir="${dir.projects}">
             <include name="**/${dir.name.build}/${dir.name.dist}/*.jar" />
          </fileset>
+         <fileset dir="${dir.modules}">
+            <include name="**/${dir.name.lib}/*.jar" />
+         </fileset>
       </path>
 
       <path id="classpath.unit.test">
@@ -78,16 +81,16 @@
            depends="package-webclient-war-jboss, deploy-jboss" />
 
    <target name="generate-docs" description="Compiles all documentation for all projects"
-           depends="generate-javadocs-core, generate-javadocs-mbeans, generate-javadocs-repository, generate-javadocs-remoteapi, generate-javadocs-jndi, generate-javadocs-catalinavirtual, generate-javadocs-webclient, generate-taglibdocs-webclient, generate-javadocs-rm, generate-javadocs-webserviceclient, generate-javadocs-benchmarkframework, generate-javadocs-benchmarktests" />
+           depends="generate-javadocs-core, generate-javadocs-mbeans, generate-javadocs-repository, generate-javadocs-remoteapi, generate-javadocs-jndi, generate-javadocs-catalinavirtual, generate-javadocs-webclient, generate-taglibdocs-webclient, generate-javadocs-rm, generate-javadocs-php, generate-javadocs-webserviceclient, generate-javadocs-benchmarkframework, generate-javadocs-benchmarktests" />
 
-   <target name="-tomcat" depends="incremental-core, incremental-mbeans, incremental-repository, incremental-remoteapi, incremental-jndi, incremental-catalinavirtual, incremental-webclient, incremental-rm, incremental-webserviceclient" />
+   <target name="-tomcat" depends="incremental-core, incremental-mbeans, incremental-repository, incremental-remoteapi, incremental-jndi, incremental-catalinavirtual, incremental-webclient, incremental-rm, incremental-php, incremental-webserviceclient" />
 
    <!-- ********************** -->
    <!-- ** Cleaning targets ** -->
    <!-- ********************** -->
 
    <target name="clean" description="Cleans everything" 
-           depends="clean-core, clean-mbeans, clean-repository, clean-remoteapi, clean-jndi, clean-catalinavirtual, clean-webclient, clean-rm, clean-webserviceclient, clean-benchmarkframework, clean-benchmarktests" />
+           depends="clean-core, clean-mbeans, clean-repository, clean-remoteapi, clean-jndi, clean-catalinavirtual, clean-webclient, clean-rm, clean-php, clean-webserviceclient, clean-benchmarkframework, clean-benchmarktests" />
 
    <target name="clean-tomcat-deploy" description="Cleans the Alfresco application from Tomcat" depends="init">
       <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
@@ -186,7 +189,7 @@
    <!-- ********************** -->
 
    <target name="test" description="Runs unit tests for all the projects" 
-           depends="clean, incremental, test-core, test-mbeans, test-repository, test-remoteapi, test-jndi, test-catalinavirtual, test-webclient, test-rm, test-webserviceclient" />
+           depends="clean, incremental, test-core, test-mbeans, test-repository, test-remoteapi, test-jndi, test-catalinavirtual, test-webclient, test-rm, test-php, test-webserviceclient" />
 
    <target name="run-junit-test" description="Runs a single JUnit test. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir]"
            depends="init">

@@ -1,8 +1,5 @@
 <?php
-    $result = "";
-    $session = createSession();
-    
-    $stores = $session->stores;
+    $stores = $_REPOSITORY->createSession()->stores;
 ?>
 <html>
 
@@ -15,13 +12,14 @@
 <?php	
 	foreach ($stores as $store)
     {
-    	echo $store->scheme."://".$store->address."<br>";
+    	echo $store->scheme."://".$store->address."<br>\n";
+    	
+    	$rootNode = $store->rootNode;
+    	echo("summert: ".$rootNode->cm_title."\n");
+    	echo($rootNode->getClass()->toString()."\n");
+    	var_dump($rootNode);
     }
 ?>    
 </body>
 
 </html>
-
-<?php	
-	return "this is my result so the file is being read correctly";
-?>

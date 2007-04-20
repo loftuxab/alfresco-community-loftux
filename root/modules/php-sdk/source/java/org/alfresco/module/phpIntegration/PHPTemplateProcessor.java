@@ -28,29 +28,30 @@ package org.alfresco.module.phpIntegration;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.jscript.ClasspathScriptLocation;
+import org.alfresco.repo.processor.BaseProcessor;
 import org.alfresco.service.cmr.repository.ContentReader;
-import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.ScriptException;
+import org.alfresco.service.cmr.repository.ScriptLocation;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.TemplateProcessor;
+import org.alfresco.service.namespace.QName;
 
-public class PHPTemplateProcessor extends BasePHPProcessor implements TemplateProcessor
+import com.caucho.quercus.env.StringInputStream;
+
+public class PHPTemplateProcessor extends BaseProcessor implements TemplateProcessor
 {
-    private NodeService nodeService;
-    private ContentService contentService;
-    
-    public void setNodeService(NodeService nodeService)
+    protected PHPEngine phpEngine;
+
+    public void setPhpEngine(PHPEngine phpEngine)
     {
-        this.nodeService = nodeService;
-    }
-    
-    public void setContentService(ContentService contentService)
-    {
-        this.contentService = contentService;
+        this.phpEngine = phpEngine;
     }
     
     public void process(String template, Object model, Writer out)
@@ -59,9 +60,9 @@ public class PHPTemplateProcessor extends BasePHPProcessor implements TemplatePr
         if (template.indexOf(StoreRef.URI_FILLER) != -1)
         {
             NodeRef ref = new NodeRef(template);
-            if (this.nodeService.exists(ref) == true)
+            if (this.services.getNodeService().exists(ref) == true)
             {
-                ContentReader contentReader = this.contentService.getReader(ref, ContentModel.PROP_CONTENT);
+                ContentReader contentReader = this.services.getContentService().getReader(ref, ContentModel.PROP_CONTENT);
                 if (contentReader != null)
                 {
                     is = contentReader.getContentInputStream();
@@ -83,7 +84,7 @@ public class PHPTemplateProcessor extends BasePHPProcessor implements TemplatePr
 
         try
         {
-            this.phpEngine.executeScript(is, out, null);
+            this.phpEngine.executeScript(is, out, getModel(model));
         }
         finally
         {
@@ -94,5 +95,46 @@ public class PHPTemplateProcessor extends BasePHPProcessor implements TemplatePr
     public void processString(String template, Object model, Writer out)
     {
         // TODO implement this ...
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> getModel(Object model)
+    {
+        Map<String, Object> result = null;
+        if (model != null && model instanceof Map)
+        {
+            result = (Map<String, Object>)model;
+        }
+        else
+        {
+            result = new HashMap<String, Object>(2);
+        }
+        return result;
+    }
+    
+    public Object executeScript(String scriptClasspath, Map<String, Object> model) throws ScriptException
+    {
+        return executeScript(new ClasspathScriptLocation(scriptClasspath), model);
+    }
+
+    public Object executeScript(NodeRef scriptRef, QName contentProp, Map<String, Object> model) throws ScriptException
+    {
+        return null;
+    }
+
+    public Object executeScript(ScriptLocation scriptLocation, Map<String, Object> model) throws ScriptException
+    {
+        return executeScriptImpl(scriptLocation.getInputStream(), model);
+    }
+
+    public Object executeScriptString(String script, Map<String, Object> model) throws ScriptException
+    {
+        return executeScriptImpl(new StringInputStream(script), model);
+    }
+    
+    private Object executeScriptImpl(InputStream is, Map<String, Object> model)
+    {
+        // Execute the script and return the result
+        return this.phpEngine.executeScript(is, null, model);
     }
 }

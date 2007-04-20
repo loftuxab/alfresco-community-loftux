@@ -26,6 +26,7 @@ package org.alfresco.module.phpIntegration;
 
 import java.io.StringWriter;
 
+import org.alfresco.service.cmr.repository.TemplateService;
 import org.alfresco.util.BaseSpringTest;
 
 /**
@@ -37,18 +38,18 @@ public class PHPTest extends BaseSpringTest
     public void testScript1()
         throws Exception
     {
-        PHPScriptService scriptService = (PHPScriptService)this.applicationContext.getBean("phpScriptService");
-        Object result = scriptService.executeScript("alfresco/module/phpIntegration/test/script1.php", null);
-        System.out.println("->" + result.toString());
+       // PHPScriptService scriptService = (PHPScriptService)this.applicationContext.getBean("phpScriptService");
+       // Object result = scriptService.executeScript("alfresco/module/phpIntegration/test/script1.php", null);
+       // System.out.println("->" + result.toString());
     }
     
     public void testTemplate1()
     {
-        PHPTemplateProcessor processor = (PHPTemplateProcessor)this.applicationContext.getBean("phpTemplateProcessor");
+        TemplateService templateService = (TemplateService)this.applicationContext.getBean("templateService");
         
         StringWriter out = new StringWriter();
         
-        processor.process("alfresco/module/phpIntegration/test/template1.php", null, out);
+        templateService.processTemplate("php", "alfresco/module/phpIntegration/test/template1.php", null, out);
         
         System.out.println("The output of the template:");
         System.out.println(out.toString());

@@ -4,37 +4,40 @@
 <beans>
 
     <!-- PHP Engine -->
-    <bean id="phpEngine" class="org.alfresco.module.phpIntegration.PHPEngine"/>
-
-	<!-- PHP Script Service -->
-	<bean id="phpScriptService" class="org.alfresco.module.phpIntegration.PHPScriptService">
-    	<property name="phpEngine">
-    		<ref bean="phpEngine"/>
-    	</property>     	   
+    <bean id="phpEngine" class="org.alfresco.module.phpIntegration.PHPEngine" init-method="init">    	  
+    	<property name="serviceRegistry">
+    		<ref bean="ServiceRegistry"/>
+    	</property> 
     </bean>
     
     <!-- PHP Template Processor -->    
-    <bean id="phpTemplateProcessor" class="org.alfresco.module.phpIntegration.PHPTemplateProcessor">
+    <bean id="phpTemplateProcessor" parent="baseTemplateProcessor" class="org.alfresco.module.phpIntegration.PHPTemplateProcessor">
     	<property name="phpEngine">
     		<ref bean="phpEngine"/>
-    	</property>     	   
+    	</property>     
+    	<property name="name">
+			<value>php</value>
+		</property>
+		<property name="extension">
+			<value>php</value>
+		</property>	   
     </bean>
     
     <!-- Base module abstract bean.  Extend this to add custom modules. -->
-    <bean id="phpScriptImplementation" abstract="true" init-method="register">
+    <!-- <bean id="phpScriptImplementation" abstract="true" init-method="register">
     	<property name="scriptService">
     		<ref bean="phpScriptService"/>
     	</property> 
     	<property name="serviceRegistry">
     		<ref bean="ServiceRegistry"/>
     	</property> 
-    </bean>
+    </bean> -->
     
     <!-- Alfresco module -->
-    <bean id="phpAlfrescoScript" parent="phpScriptImplementation" class="org.alfresco.module.phpIntegration.module.AlfrescoModule" >   	
+   <!--  <bean id="phpAlfrescoScript" parent="phpScriptImplementation" class="org.alfresco.module.phpIntegration.module.AlfrescoModule" >   	
     	<property name="scriptName">
     		<value>alfresco</value>
     	</property>
-    </bean>
+    </bean> -->
     
 </beans>

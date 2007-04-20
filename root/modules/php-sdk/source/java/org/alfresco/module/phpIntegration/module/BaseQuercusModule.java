@@ -25,7 +25,7 @@
 package org.alfresco.module.phpIntegration.module;
 
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.repository.ScriptImplementation;
+import org.alfresco.service.cmr.repository.ProcessorExtension;
 import org.alfresco.service.cmr.repository.ScriptService;
 
 import com.caucho.quercus.module.AbstractQuercusModule;
@@ -34,7 +34,7 @@ import com.caucho.quercus.module.QuercusModule;
 /**
  * @author Roy Wetherall
  */
-public class BaseQuercusModule extends AbstractQuercusModule implements ScriptImplementation
+public class BaseQuercusModule extends AbstractQuercusModule implements ProcessorExtension
 {
     protected String scriptName;
     
@@ -52,7 +52,7 @@ public class BaseQuercusModule extends AbstractQuercusModule implements ScriptIm
         this.scriptName = scriptName;
     }
     
-    public String getScriptName()
+    public String getExtensionName()
     {
         return this.scriptName;
     }
@@ -64,7 +64,7 @@ public class BaseQuercusModule extends AbstractQuercusModule implements ScriptIm
     
     public void register()
     {
-        this.scriptService.registerScript(this);
+       // this.scriptService.registerScript(this);
     }
     
     public void initialiseModule(QuercusModule module)

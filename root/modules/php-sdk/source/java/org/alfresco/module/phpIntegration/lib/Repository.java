@@ -24,35 +24,49 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.repository.StoreRef;
-import org.alfresco.service.cmr.search.ResultSet;
-import org.alfresco.service.cmr.search.SearchService;
+import javax.servlet.ServletContext;
+
+import org.alfresco.module.phpIntegration.PHPEngine;
+import org.alfresco.service.ServiceRegistry;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.caucho.quercus.env.Env;
 
 /**
  * @author Roy Wetherall
  */
-public class SpacesStore extends Store implements ScriptObject
+public class Repository implements ScriptObject
 {
-    private static final String SCRIPT_OBJECT_NAME = "SpacesStore";
+    private static final String SCRIPT_OBJECT_NAME = "Repository";
     
-    public SpacesStore(Session session)
+    private ServiceRegistry serviceRegistry;
+    
+    public Repository(Env env)
     {
-        super(session, StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        if (env.getRequest() != null)
+        {
+            ServletContext servletContext = env.getRequest().getSession().getServletContext();
+            ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
+            this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("ServiceRegistry");
+        }
+        else
+        {
+            this.serviceRegistry = (ServiceRegistry)env.getQuercus().getSpecial(PHPEngine.KEY_SERVICE_REGISTRY);
+        }
     }
     
-    @Override
     public String getScriptObjectName()
     {
         return SCRIPT_OBJECT_NAME;
     }
     
-    public Node getCompanyHome()
+    public Session createSession()
     {
-        SearchService searchService = this.session.getServiceRegistry().getSearchService();
-        ResultSet resultSet = searchService.query(this.storeRef, SearchService.LANGUAGE_LUCENE, "PATH:\"app:company_home\"");
-        NodeRef companyHome = resultSet.getNodeRef(0);
-        return new Node(session, companyHome);
+        return new Session(this.serviceRegistry);
     }
-
+    
+    // public String authenticate();
+    
+    // publis Session createSession(String ticket);
 }

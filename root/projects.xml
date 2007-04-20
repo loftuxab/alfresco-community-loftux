@@ -608,10 +608,10 @@
    <!-- ** Records Management Project ** -->
    <!-- ******************************** -->
 
-   <target name="incremental-rm" description="Performs an incremental build of the records management project" 
+   <target name="incremental-rm" description="Performs an incremental build of the records management project"
            depends="package-rm" if="enable.module.rm" />
 
-   <target name="build-rm" description="Performs a clean build of the records management project" 
+   <target name="build-rm" description="Performs a clean build of the records management project"
            depends="clean-rm, incremental-rm" if="enable.module.rm" />
 
    <target name="clean-rm" description="Cleans the records management project" depends="init" if="enable.module.rm">
@@ -622,10 +622,10 @@
       <compile-java projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="package-rm" description="Packages the records management project" 
+   <target name="package-rm" description="Packages the records management project"
            depends="package-rm-war" if="enable.module.rm" />
 
-   <target name="package-rm-jar" description="Packages the JAR file for the records management project" 
+   <target name="package-rm-jar" description="Packages the JAR file for the records management project"
            depends="compile-rm" if="enable.module.rm">
       <mkdir dir="${dir.module.rm.dist}" />
       <jar jarfile="${dir.module.rm.dist}/${file.name.jar.rm}" basedir="${dir.module.rm.classes}" />
@@ -648,7 +648,7 @@
       </zip>
    </target>
 
-   <target name="test-rm" description="Runs the tests for the records management project" 
+   <target name="test-rm" description="Runs the tests for the records management project"
            depends="compile-rm" if="enable.module.rm">
       <run-tests projectdir="${dir.module.rm}" />
    </target>
@@ -657,6 +657,65 @@
            depends="init" if="enable.module.rm">
       <generate-javadocs documenttitle="Alfresco Records Management Extension" windowtitle="Records Management" 
                          projectdir="${dir.module.rm}"/>
+   </target>
+   
+   <!-- ******************************** -->
+   <!-- ** PHP SDK Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-php" description="Performs an incremental build of the PHP SDK project"
+           depends="package-php" if="enable.module.php" />
+
+   <target name="build-php" description="Performs a clean build of the PHP SDK project"
+           depends="clean-php, incremental-php" if="enable.module.php" />
+
+   <target name="clean-php" description="Cleans the PHP SDK project" depends="init" if="enable.module.php">
+      <clean projectdir="${dir.module.php}" />
+   </target>
+
+   <target name="compile-php" description="Compiles the PHP SDK project" depends="init" if="enable.module.php">
+      <compile-java projectdir="${dir.module.php}" />
+   </target>
+
+   <target name="package-php" description="Packages the PHP SDK project"
+           depends="package-php-war" if="enable.module.php" />
+
+   <target name="package-php-jar" description="Packages the JAR file for the PHP SDK project"
+           depends="compile-php" if="enable.module.php">
+      <mkdir dir="${dir.module.php.dist}" />
+      <jar jarfile="${dir.module.php.dist}/${file.name.jar.php}" basedir="${dir.module.php.classes}" />
+   </target>
+
+   <target name="package-php-war" description="Packages the WAR file installing the PHP integration module"
+           depends="package-php-module" if="enable.module.php">
+      <echo>Installing PHP Integration into WAR...</echo>
+      <install-amp ampfile="${dir.module.php.dist}/${file.name.amp.php}" warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-php-module" description="Packages the PHP Integration module into an AMP"
+           depends="package-php-jar" if="enable.module.php">
+      <zip destfile="${dir.module.php.dist}/${file.name.amp.php}" update="true">
+         <zipfileset file="${dir.module.php.property}/module.properties"/>
+         <zipfileset file="${dir.module.php.dist}/${file.name.jar.php}" prefix="lib"/>
+         <zipfileset dir="${dir.module.php}/${dir.name.lib}" prefix="lib">
+            <exclude name="**/source/**"/>
+         </zipfileset>
+	 <zipfileset dir="${dir.module.php.web.php}" prefix="web/php"/>
+         <zipfileset dir="${dir.module.php.config}" prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-php" description="Runs the tests for the PHP SDK project"
+           depends="compile-php" if="enable.module.php">
+      <run-tests projectdir="${dir.module.php}" />
+   </target>
+
+   <target name="generate-javadocs-php" description="Generates the JavaDocs for the records management project"
+           depends="init" if="enable.module.php">
+      <generate-javadocs documenttitle="Alfresco Records Management Extension" windowtitle="Records Management" 
+                         projectdir="${dir.module.php}"/>
    </target>
 
    <!-- ******************************** -->
