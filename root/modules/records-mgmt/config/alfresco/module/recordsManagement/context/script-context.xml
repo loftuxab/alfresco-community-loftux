@@ -5,8 +5,8 @@
     
     <!-- Java script API -->
     
-    <bean id="rmScript" parent="baseScriptImplementation" class="org.alfresco.module.recordsManagement.RecordsManagementScript">
-        <property name="scriptName">
+    <bean id="rmScript" parent="baseJavaScriptExtension" class="org.alfresco.module.recordsManagement.RecordsManagementScript">
+        <property name="extensionName">
             <value>rm</value>
         </property>               
         <property name="serviceRegistry">

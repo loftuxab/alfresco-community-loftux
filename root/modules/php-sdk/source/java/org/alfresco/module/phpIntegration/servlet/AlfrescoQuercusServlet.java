@@ -32,6 +32,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.module.phpIntegration.lib.Node;
+import org.alfresco.module.phpIntegration.lib.Repository;
 import org.alfresco.module.phpIntegration.lib.Session;
 import org.alfresco.module.phpIntegration.lib.SpacesStore;
 import org.alfresco.module.phpIntegration.lib.Store;
@@ -58,6 +59,7 @@ public class AlfrescoQuercusServlet extends QuercusServlet
         super();
         
         // Add the Alfresco modules and classes
+        registerClass("Repository", Repository.class);
         registerClass("Session", Session.class);
         registerClass("Node", Node.class);
         registerClass("Store", Store.class);

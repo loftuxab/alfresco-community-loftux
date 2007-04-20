@@ -30,10 +30,10 @@ import java.util.Date;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.jscript.BaseScriptImplementation;
 import org.alfresco.repo.jscript.Node;
 import org.alfresco.repo.jscript.Scopeable;
 import org.alfresco.repo.jscript.ValueConverter;
+import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.action.Action;
@@ -47,7 +47,7 @@ import org.mozilla.javascript.Scriptable;
  * 
  * @author Roy Wetherall
  */
-public class RecordsManagementScript extends BaseScriptImplementation implements Scopeable, RecordsManagementModel 
+public class RecordsManagementScript extends BaseProcessorExtension implements Scopeable, RecordsManagementModel 
 {
     /** The disposition action names and parameters */
     public static final String TRANSFER_DISPOSITION_ACTION = "transferDispositionAction";

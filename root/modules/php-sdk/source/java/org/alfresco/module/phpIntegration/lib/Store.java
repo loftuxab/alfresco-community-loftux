@@ -31,8 +31,10 @@ import org.alfresco.service.cmr.repository.StoreRef;
 /**
  * @author Roy Wetherall
  */
-public class Store
+public class Store implements ScriptObject
 {
+    private static final String SCRIPT_OBJECT_NAME = "Store";
+    
     protected Session session;
     protected StoreRef storeRef;
 
@@ -51,6 +53,11 @@ public class Store
     {
         this.session = session;
         this.storeRef = new StoreRef(scheme, address);
+    }
+    
+    public String getScriptObjectName()
+    {
+        return SCRIPT_OBJECT_NAME;
     }
     
     public StoreRef getStoreRef()

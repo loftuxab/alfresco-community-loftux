@@ -26,36 +26,30 @@ package org.alfresco.module.phpIntegration.lib;
 
 import java.util.List;
 
-import javax.servlet.ServletContext;
-
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import com.caucho.quercus.env.Env;
 
 /**
  * @author Roy Wetherall
  */
-public class Session
+public class Session implements ScriptObject
 {
-    private ServiceRegistry serviceRegistry;
+    private static final String SCRIPT_OBJECT_NAME = "Session";
     
-    public Session(Env env)
-    {
-        ServletContext servletContext = env.getRequest().getSession().getServletContext();
-        ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
-        this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("ServiceRegistry");
-    }
+    private ServiceRegistry serviceRegistry;
     
     public Session(ServiceRegistry serviceRegistry)
     {
         this.serviceRegistry = serviceRegistry;
+    }
+    
+    public String getScriptObjectName()
+    {
+        return SCRIPT_OBJECT_NAME;
     }
     
     public ServiceRegistry getServiceRegistry()

@@ -26,21 +26,28 @@
 
 package org.alfresco.module.phpIntegration;
 
+
 import java.io.InputStream;
 import java.io.Writer;
 import java.util.Map;
 
 import org.alfresco.module.phpIntegration.lib.Node;
+import org.alfresco.module.phpIntegration.lib.Repository;
+import org.alfresco.module.phpIntegration.lib.ScriptObject;
 import org.alfresco.module.phpIntegration.lib.Session;
 import org.alfresco.module.phpIntegration.lib.SpacesStore;
 import org.alfresco.module.phpIntegration.lib.Store;
 import org.alfresco.module.phpIntegration.module.BaseQuercusModule;
+import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ScriptException;
 
 import com.caucho.quercus.Quercus;
 import com.caucho.quercus.env.Env;
+import com.caucho.quercus.env.JavaValue;
+import com.caucho.quercus.env.StringValue;
 import com.caucho.quercus.env.Value;
 import com.caucho.quercus.page.QuercusPage;
+import com.caucho.quercus.program.JavaClassDef;
 import com.caucho.util.CharBuffer;
 import com.caucho.vfs.ReadStream;
 import com.caucho.vfs.StringWriter;
@@ -49,16 +56,29 @@ import com.caucho.vfs.WriteStream;
 
 public class PHPEngine
 {
-    private Quercus quercus = new Quercus();
+    public static final String KEY_SERVICE_REGISTRY = "ServiceRegistry";
+    
+    private Quercus quercus = new Quercus();    
+    
+    private ServiceRegistry serviceRegistry;    
+    
+    public void setServiceRegistry(ServiceRegistry serviceRegistry)
+    {
+        this.serviceRegistry = serviceRegistry;
+    }
     
     public void init()
     {
         // Add the libarary classes 
         // TODO move this config to spring
+        registerClass("Repository", Repository.class);
         registerClass("Session", Session.class);
         registerClass("Node", Node.class);
         registerClass("Store", Store.class);
         registerClass("SpacesStore", SpacesStore.class);
+        
+        // Add the service registry as a special value
+        this.quercus.setSpecial(KEY_SERVICE_REGISTRY, this.serviceRegistry);
     }
     
     public void registerModule(BaseQuercusModule module)
@@ -86,7 +106,22 @@ public class PHPEngine
             
             // Execute the page
             WriteStream ws = new WriteStream(writer);
-            Env env = new Env(this.quercus, page, ws, null, null);        
+            Env env = new Env(this.quercus, page, ws, null, null);    
+            
+            // Map the contents of the passed model into global variables
+            if (model != null)
+            {
+                for (Map.Entry<String, Object> entry : model.entrySet())
+                {
+                    setGlobalValue(env, entry.getKey(), entry.getValue());
+                }                
+            }
+            
+            // Add the session as a global variable
+            Repository repository = new Repository(env);
+            setGlobalValue(env, "_REPOSITORY", repository);
+            
+            // Execute the page
             Value value = page.executeTop(env);
             
             // Make sure we flush becuase otherwise the result does not get written
@@ -105,6 +140,26 @@ public class PHPEngine
         catch (Exception exception)
         {
             throw new ScriptException("Error executing script.", exception);
+        }
+    }
+    
+    private void setGlobalValue(Env env, String name, Object value)
+    {
+        if (value instanceof String)
+        {
+            env.setGlobalValue(name, StringValue.create(value));
+        }
+        // TODO handle other native types ...
+        else if (value instanceof ScriptObject)
+        {
+            JavaClassDef def = this.quercus.getModuleContext().getJavaClassDefinition(((ScriptObject)value).getScriptObjectName());
+            System.out.println("Adding global: " + name);
+            env.setGlobalValue(name, new JavaValue(env, value, def));
+        }
+        else
+        {
+            JavaClassDef def = this.quercus.getModuleContext().getJavaClassDefinition(value.getClass().toString());
+            env.setGlobalValue(name, new JavaValue(env, value, def));
         }
     }
 }

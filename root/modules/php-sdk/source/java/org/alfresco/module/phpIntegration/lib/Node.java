@@ -24,18 +24,35 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
-import org.alfresco.model.ContentModel;
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.namespace.QName;
+
+import com.caucho.quercus.env.Value;
 
 /**
  * @author Roy Wetherall
  */
-public class Node
+public class Node implements ScriptObject
 {
+    private static final String SCRIPT_OBJECT_NAME = "Node";
+    
     private NodeService nodeService;
     private Session session;
     private NodeRef nodeRef;
+    
+    private boolean arePropertiesDirty = false;
+    private Map<String, String> properties;
+    
+    public String getScriptObjectName()
+    {
+        return SCRIPT_OBJECT_NAME;
+    }
     
     public Node(Session session, NodeRef nodeRef)
     {
@@ -61,6 +78,11 @@ public class Node
         return nodeRef;
     }
     
+    /**
+     * Get the nodes store
+     * 
+     * @return  the Store
+     */
     public Store getStore()
     {
         return new Store(this.session, this.nodeRef.getStoreRef());
@@ -86,14 +108,65 @@ public class Node
         return this.nodeService.getType(this.nodeRef).toString();
     }
     
-    // TODO need to figure out how we sort this out in the general case
-    public String getCm_name()
+    /**
+     * Get the map of property names and values
+     * 
+     * @return  a map of property names and values
+     */
+    public Map<String, String> getProperties()
     {
-        return (String)this.nodeService.getProperty(this.nodeRef, ContentModel.PROP_NAME);
+        return getPropertiesImpl();
+    }
+    
+    /**
+     * Sets the property values for the node
+     * 
+     * @param properties    a map of property names and values
+     */
+    public void setProperties(Map<String, String> properties)
+    {
+        this.properties = properties;
+        this.arePropertiesDirty = true;
+    }        
+    
+    /**
+     * Dynamic implementation of the properties
+     * 
+     * @param name
+     * @return
+     */
+    public Value __getField(Value name)
+    {
+        System.out.println("__getField: " + name.toString());
+
+        return name;
+        
+    }
+
+    public void __setField(String name, String value)
+    {
+        System.out.println("__set: " + name.toString());
     }
     
     public String __toString()
     {
         return this.nodeRef.toString();
     }
+    
+    private Map<String, String> getPropertiesImpl()
+    {
+        if (this.properties == null)
+        {
+            Map<QName, Serializable> properties = this.nodeService.getProperties(this.nodeRef);
+            this.properties = new HashMap<String, String>(properties.size());
+            for (Map.Entry<QName, Serializable> entry : properties.entrySet())
+            {
+                String value = DefaultTypeConverter.INSTANCE.convert(String.class, entry.getValue());
+                this.properties.put(entry.getKey().toString(), value);
+            }
+            this.arePropertiesDirty = false;
+        }
+        return this.properties;
+    }
+    
 }

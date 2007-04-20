@@ -1,6 +1,7 @@
 <?php
     $result = "";
-    $session = createSession();
+    $repository = new Repository();
+    $session = $repository->createSession();
     
     $stores = $session->stores;
     foreach ($stores as $store)

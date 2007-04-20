@@ -20,32 +20,17 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.repo.jscript;
-
-import org.alfresco.repo.processor.BaseProcessorExtension;
-import org.apache.log4j.Logger;
+package org.alfresco.module.phpIntegration.lib;
 
 /**
- * @author Kevin Roast
+ * TODO .. how does this relate to the script implementation interface
+ * 
+ * @author Roy Wetherall
+ *
  */
-public final class ScriptLogger extends BaseProcessorExtension
+public interface ScriptObject
 {
-    private static final Logger logger = Logger.getLogger(ScriptLogger.class);
-    
-    public boolean isLoggingEnabled()
-    {
-        return logger.isDebugEnabled();
-    }
-    
-    public boolean jsGet_isLoggingEnabled()
-    {
-        return isLoggingEnabled();
-    }
-    
-    public void log(String str)
-    {
-        logger.debug(str);
-    }
+    String getScriptObjectName();
 }
