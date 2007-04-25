@@ -57,6 +57,11 @@ public class Session implements ScriptObject
         return serviceRegistry;
     }
     
+    public String getTicket()
+    {
+        return this.serviceRegistry.getAuthenticationService().getCurrentTicket();
+    }
+    
     public Store[] getStores()
     {
         // Get the node service
@@ -75,6 +80,42 @@ public class Session implements ScriptObject
         }
         
         return result;
+    }
+    
+    
+    // TODO figure out how to use the attributes to set the default values ...
+    public Store getStore(String address, String scheme)
+    {
+        Store store = null;
+        
+        // Set the default value
+        if (scheme == null)
+        {
+            scheme = StoreRef.PROTOCOL_WORKSPACE;
+        }
+        
+        // Check for the existance of the store
+        StoreRef storeRef = new StoreRef(scheme, address);
+        if (this.serviceRegistry.getNodeService().exists(storeRef) == true)
+        {
+            store = new Store(this, storeRef);
+        }
+        
+        return store;
+    }
+    
+    public Node getNode(Store store, String id)
+    {
+        Node node = null;
+        
+        // Check for the existance of the node
+        NodeRef nodeRef = new NodeRef(store.getStoreRef(), id);
+        if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
+        {
+            node = new Node(this, nodeRef);
+        }
+        
+        return node;
     }
     
     /**

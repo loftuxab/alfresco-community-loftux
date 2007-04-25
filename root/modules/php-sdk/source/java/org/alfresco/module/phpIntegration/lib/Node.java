@@ -67,12 +67,6 @@ public class Node implements ScriptObject
         this.nodeRef = new NodeRef(store.getStoreRef(), id);
     }
     
-    // TODO this should look in the session cache and reuse the node (do we need to do that when running in the VM?)
-    public static Node createNode(Session session, Store store, String id)
-    {
-        return new Node(session, store, id);
-    }
-    
     public NodeRef getNodeRef()
     {
         return nodeRef;
