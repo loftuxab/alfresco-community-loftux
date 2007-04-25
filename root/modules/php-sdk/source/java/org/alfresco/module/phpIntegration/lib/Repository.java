@@ -26,7 +26,7 @@ package org.alfresco.module.phpIntegration.lib;
 
 import javax.servlet.ServletContext;
 
-import org.alfresco.module.phpIntegration.PHPEngine;
+import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.service.ServiceRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -52,7 +52,7 @@ public class Repository implements ScriptObject
         }
         else
         {
-            this.serviceRegistry = (ServiceRegistry)env.getQuercus().getSpecial(PHPEngine.KEY_SERVICE_REGISTRY);
+            this.serviceRegistry = (ServiceRegistry)env.getQuercus().getSpecial(PHPProcessor.KEY_SERVICE_REGISTRY);
         }
     }
     
