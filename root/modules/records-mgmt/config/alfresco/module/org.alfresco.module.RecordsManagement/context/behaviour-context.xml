@@ -3,7 +3,7 @@
 
 <beans>
 
-	<bean id="onCreateNode_rmaFilePlan" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+	<bean id="org.alfresco.module.RecordsManagement.onCreateNode_rmaFilePlan" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onCreateNode</value>           
         </property>  	   
@@ -15,7 +15,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onCreateNode_rmaFilePlan.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onCreateNode_rmaFilePlan.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -23,7 +23,7 @@
         </property> 
     </bean>
 
-    <bean id="onCreateChildAssociation_rmaFilePlan_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onCreateChildAssociation_rmaFilePlan_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
         <property name="policyNames">
            <list>
         	  <value>{http://www.alfresco.org}onCreateChildAssociation</value>
@@ -41,7 +41,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onCreateChildAssociation_rmaFilePlan_cmContains.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onCreateChildAssociation_rmaFilePlan_cmContains.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -49,7 +49,7 @@
         </property> 
     </bean>
     
-    <bean id="onContentUpdate_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onContentUpdate_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onContentUpdate</value>           
         </property>  	   
@@ -61,7 +61,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onContentUpdate_rmaRecord.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onContentUpdate_rmaRecord.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -69,7 +69,7 @@
         </property> 
     </bean>
     
-    <bean id="onAddAspect_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -81,7 +81,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaRecord.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaRecord.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -89,7 +89,7 @@
         </property> 
     </bean>
     
-    <bean id="onAddAspect_rmaVitalRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaVitalRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -101,7 +101,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaVitalRecord.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaVitalRecord.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -109,7 +109,7 @@
         </property> 
     </bean>
     
-    <bean id="onAddAspect_rmaCutoffSchedule" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaCutoffSchedule" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -121,7 +121,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaCutoffSchedule.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaCutoffSchedule.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -129,7 +129,7 @@
         </property> 
     </bean>
     
-    <bean id="onAddAspect_rmaObsolete" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaObsolete" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -141,7 +141,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaObsolete.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaObsolete.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -149,7 +149,7 @@
         </property> 
     </bean>    
     
-    <bean id="onAddAspect_rmaSuperseded" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaSuperseded" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -161,7 +161,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaSuperseded.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaSuperseded.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -169,7 +169,7 @@
         </property> 
     </bean>     
     
-    <bean id="onAddAspect_rmaCutoff" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaCutoff" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -181,7 +181,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaCutoff.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaCutoff.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -189,7 +189,7 @@
         </property> 
     </bean>         
     
-    <bean id="onAddAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -201,7 +201,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onAddAspect_rmaHeld.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onAddAspect_rmaHeld.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>
@@ -209,7 +209,7 @@
         </property> 
     </bean>
     
-    <bean id="onRemoveAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org.alfresco.module.RecordsManagement.onRemoveAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onRemoveAspect</value>           
         </property>  	   
@@ -221,7 +221,7 @@
 		        <property name="location">
 		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
 		            	<constructor-arg>
-		            		<value>alfresco/module/recordsManagement/script/onRemoveAspect_rmaHeld.js</value>
+		            		<value>alfresco/module/org.alfresco.module.RecordsManagement/script/onRemoveAspect_rmaHeld.js</value>
 		            	</constructor-arg>
 		            </bean>
 				</property>

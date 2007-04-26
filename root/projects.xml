@@ -608,36 +608,37 @@
    <!-- ** Records Management Project ** -->
    <!-- ******************************** -->
 
-   <target name="incremental-rm" description="Performs an incremental build of the records management project"
+   <target name="incremental-rm" description="Performs an incremental build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="package-rm" if="enable.module.rm" />
 
-   <target name="build-rm" description="Performs a clean build of the records management project"
+   <target name="build-rm" description="Performs a clean build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="clean-rm, incremental-rm" if="enable.module.rm" />
 
    <target name="clean-rm" description="Cleans the records management project" depends="init" if="enable.module.rm">
       <clean projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="compile-rm" description="Compiles the records management project" depends="init" if="enable.module.rm">
+   <target name="compile-rm" description="Compiles the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="init" if="enable.module.rm">
       <compile-java projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="package-rm" description="Packages the records management project"
+   <target name="package-rm" description="Packages the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="package-rm-war" if="enable.module.rm" />
 
-   <target name="package-rm-jar" description="Packages the JAR file for the records management project"
+   <target name="package-rm-jar" description="Packages the JAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="compile-rm" if="enable.module.rm">
       <mkdir dir="${dir.module.rm.dist}" />
       <jar jarfile="${dir.module.rm.dist}/${file.name.jar.rm}" basedir="${dir.module.rm.classes}" />
    </target>
 
-   <target name="package-rm-war" description="Packages the WAR file for the records management project"
+   <target name="package-rm-war" description="Packages the WAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="package-rm-extension" if="enable.module.rm">
       <echo>Installing records management into WAR...</echo>
       <install-amp ampfile="${dir.module.rm.dist}/${file.name.amp.rm}" warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="package-rm-extension" description="Packages the records management extension"
+   <target name="package-rm-extension" description="Packages the records management extension.  Enable with '-Denable.module.rm=TRUE'."
            depends="package-rm-jar" if="enable.module.rm">
       <zip destfile="${dir.module.rm.dist}/${file.name.amp.rm}" update="true">
          <zipfileset file="${dir.module.rm.property}/module.properties"/>
@@ -648,12 +649,12 @@
       </zip>
    </target>
 
-   <target name="test-rm" description="Runs the tests for the records management project"
+   <target name="test-rm" description="Runs the tests for the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="compile-rm" if="enable.module.rm">
       <run-tests projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="generate-javadocs-rm" description="Generates the JavaDocs for the records management project"
+   <target name="generate-javadocs-rm" description="Generates the JavaDocs for the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="init" if="enable.module.rm">
       <generate-javadocs documenttitle="Alfresco Records Management Extension" windowtitle="Records Management" 
                          projectdir="${dir.module.rm}"/>

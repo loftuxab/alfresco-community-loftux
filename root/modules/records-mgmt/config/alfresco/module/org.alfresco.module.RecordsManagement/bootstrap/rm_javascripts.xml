@@ -39,7 +39,7 @@
             <sys:store-protocol>workspace</sys:store-protocol>
             <sys:store-identifier>SpacesStore</sys:store-identifier>
             <sys:node-uuid>uiAction_addRemoveAspect</sys:node-uuid>
-            <cm:content>contentUrl=classpath:alfresco/module/recordsManagement/script/ui/uiAction_addRemoveAspect.js|mimetype=application/x-javascript|size=1138|encoding=UTF-8</cm:content>
+            <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.RecordsManagement/script/ui/uiAction_addRemoveAspect.js|mimetype=application/x-javascript|size=1138|encoding=UTF-8</cm:content>
             <cm:title>uiAction_addRemoveAspect.js</cm:title>
             <cm:name>uiAction_addRemoveAspect.js</cm:name>
           </view:properties>

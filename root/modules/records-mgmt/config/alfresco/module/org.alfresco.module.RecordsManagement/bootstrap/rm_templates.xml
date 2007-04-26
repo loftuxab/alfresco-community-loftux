@@ -11,7 +11,7 @@
       <sys:node-uuid>fileplan_template</sys:node-uuid>
       <app:editInline>true</app:editInline>
       <cm:description>Displays the current state of records in a file plan space.</cm:description>
-      <cm:content>contentUrl=classpath:alfresco/module/recordsManagement/template/fileplan_template.ftl|mimetype=text/plain|size=6134|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.RecordsManagement/template/fileplan_template.ftl|mimetype=text/plain|size=6134|encoding=UTF-8</cm:content>
       <cm:title>fileplan_template.ftl</cm:title>
       <cm:name>fileplan_template.ftl</cm:name>
     </view:properties>
@@ -28,7 +28,7 @@
       <sys:node-uuid>record_template</sys:node-uuid>
       <app:editInline>true</app:editInline>
       <cm:description>Displays the current state of record.</cm:description>
-      <cm:content>contentUrl=classpath:alfresco/module/recordsManagement/template/record_template.ftl|mimetype=text/plain|size=6134|encoding=UTF-8</cm:content>
+      <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.RecordsManagement/template/record_template.ftl|mimetype=text/plain|size=6134|encoding=UTF-8</cm:content>
       <cm:title>record_template.ftl</cm:title>
       <cm:name>record_template.ftl</cm:name>
     </view:properties>
