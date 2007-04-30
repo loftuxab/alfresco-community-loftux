@@ -53,8 +53,6 @@
 	<classpathentry exported="true" sourcepath="src/rhino-js-1.62R4-src.zip" kind="lib" path="lib/rhino-js-1.6R4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/jbpm/bsh-1.3.0.jar"/>
 	<classpathentry exported="true" sourcepath="src/springmodules-jbpm31-src.zip" kind="lib" path="lib/jbpm/springmodules-jbpm31.jar"/>
-	<classpathentry exported="true" sourcepath="src/jbpm-src-3.1.2.jar" kind="lib" path="lib/jbpm/jbpm-3.1.2.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/jbpm/jbpm-identity-3.1.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xpp3-1.1.3_8.jar"/>
 	<classpathentry kind="lib" path="lib/openoffice/openoffice-juh-2.0.3.jar"/>
 	<classpathentry kind="lib" path="lib/openoffice/openoffice-jurt-2.0.3.jar"/>
@@ -89,5 +87,7 @@
 	<classpathentry exported="true" sourcepath="src/spring-2.0.2-src.zip" kind="lib" path="lib/spring-2.0.2.jar"/>
 	<classpathentry exported="true" sourcepath="src/spring-mock-2.0.2-src.zip" kind="lib" path="lib/devenv/spring-mock-2.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/devenv/mysql-connector-java-5.0.3-bin.jar"/>
+	<classpathentry kind="lib" path="lib/jbpm/jbpm-identity-3.2.jar"/>
+	<classpathentry exported="true" sourcepath="src/jbpm-jpdl-src-3.2.zip" kind="lib" path="lib/jbpm/jbpm-jpdl-3.2-patched.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
