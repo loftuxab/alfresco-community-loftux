@@ -9,30 +9,46 @@
    <!-- ** Core Project ** -->
    <!-- ****************** -->
    
-   <target name="incremental-core" description="Performs an incremental build of the core project" depends="package-core" />
+   <target name="incremental-core" 
+           description="Performs an incremental build of the core project" 
+           depends="package-core" />
       
-   <target name="build-core" description="Performs a clean build of the core project" depends="clean-core, incremental-core" />
+   <target name="build-core" 
+           description="Performs a clean build of the core project" 
+           depends="clean-core, 
+                    incremental-core" />
    
-   <target name="clean-core" description="Cleans the core project" depends="init">
+   <target name="clean-core" 
+           description="Cleans the core project" 
+           depends="init">
       <clean projectdir="${dir.project.core}" />
    </target>
    
-   <target name="compile-core" description="Compiles the core project" depends="init">
+   <target name="compile-core" 
+           description="Compiles the core project" 
+           depends="init">
       <compile-java projectdir="${dir.project.core}" />
    </target>
    
-   <target name="package-core" description="Packages the core project" depends="compile-core">
+   <target name="package-core" 
+           description="Packages the core project" 
+           depends="compile-core">
       <mkdir dir="${dir.project.core.dist}" />
-      <jar jarfile="${dir.project.core.dist}/${file.name.jar.core}" basedir="${dir.project.core.classes}" />
+      <jar jarfile="${dir.project.core.dist}/${file.name.jar.core}" 
+           basedir="${dir.project.core.classes}" />
    </target>
    
-   <target name="test-core" description="Runs the tests for the core project" depends="compile-core">
+   <target name="test-core" 
+           description="Runs the tests for the core project" 
+           depends="compile-core">
       <run-tests projectdir="${dir.project.core}" />
    </target>
    
-   <target name="generate-javadocs-core" description="Generates the JavaDocs for the core project"
+   <target name="generate-javadocs-core" 
+           description="Generates the JavaDocs for the core project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Core API Specification" windowtitle="Alfresco Core API" 
+      <generate-javadocs documenttitle="Alfresco Core API Specification" 
+                         windowtitle="Alfresco Core API" 
                          projectdir="${dir.project.core}"/>
    </target>
    
@@ -40,28 +56,43 @@
    <!-- ** MBeans Project ** -->
    <!-- ******************** -->
    
-   <target name="incremental-mbeans" description="Performs an incremental build of the mbeans project" depends="package-mbeans" />
+   <target name="incremental-mbeans" 
+           description="Performs an incremental build of the mbeans project" 
+           depends="package-mbeans" />
       
-   <target name="build-mbeans" description="Performs a clean build of the mbeans project" depends="clean-mbeans, incremental-mbeans" />
+   <target name="build-mbeans" 
+           description="Performs a clean build of the mbeans project" 
+           depends="clean-mbeans, 
+           incremental-mbeans" />
    
-   <target name="clean-mbeans" description="Cleans the mbeans project" depends="init">
+   <target name="clean-mbeans" 
+           description="Cleans the mbeans project" 
+           depends="init">
       <clean projectdir="${dir.project.mbeans}" />
    </target>
    
-   <target name="compile-mbeans" description="Compiles the mbeans project" depends="init">
+   <target name="compile-mbeans" 
+           description="Compiles the mbeans project" 
+           depends="init">
       <compile-java projectdir="${dir.project.mbeans}" />
    </target>
    
-   <target name="package-mbeans" description="Packages the mbeans project" depends="compile-mbeans">
+   <target name="package-mbeans" 
+           description="Packages the mbeans project" 
+           depends="compile-mbeans">
       <mkdir dir="${dir.project.mbeans.dist}" />
-      <jar jarfile="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" basedir="${dir.project.mbeans.classes}" />
+      <jar jarfile="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" 
+           basedir="${dir.project.mbeans.classes}" />
    </target>
    
-   <target name="test-mbeans" description="Runs the tests for the mbeans project" depends="compile-mbeans">
+   <target name="test-mbeans" 
+           description="Runs the tests for the mbeans project" 
+           depends="compile-mbeans">
       <run-tests projectdir="${dir.project.mbeans}" />
    </target>
    
-   <target name="generate-javadocs-mbeans" description="Generates the JavaDocs for the mbeans project"
+   <target name="generate-javadocs-mbeans" 
+           description="Generates the JavaDocs for the mbeans project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Virtualization MBean" windowtitle="Alfresco Virtualization MBean" 
                          projectdir="${dir.project.mbeans}" />
@@ -71,52 +102,79 @@
    <!-- ** Repository Project ** -->
    <!-- ************************ -->
       
-   <target name="incremental-repository" description="Performs an incremental build of the repository project" depends="package-repository" />
+   <target name="incremental-repository" 
+           description="Performs an incremental build of the repository project" 
+           depends="package-repository" />
       
-   <target name="build-repository" description="Performs a clean build of the repository project" depends="clean-repository, incremental-repository" />
+   <target name="build-repository" 
+           description="Performs a clean build of the repository project" 
+           depends="clean-repository, 
+                    incremental-repository" />
    
-   <target name="clean-repository" description="Cleans the repository project" depends="init">
+   <target name="clean-repository" 
+           description="Cleans the repository project" 
+           depends="init">
       <clean projectdir="${dir.project.repository}" />
    </target>
    
-   <target name="compile-repository" description="Compiles the repository project" 
-           depends="compile-repository-java, compile-repository-jibx" />
+   <target name="compile-repository" 
+           description="Compiles the repository project" 
+           depends="compile-repository-java, 
+                    compile-repository-jibx" />
    
-   <target name="compile-repository-java" description="Compiles the Java source for repository project" depends="init">
+   <target name="compile-repository-java" 
+           description="Compiles the Java source for repository project" 
+           depends="init">
       <compile-java projectdir="${dir.project.repository}" />
    </target>
    
-   <target name="compile-repository-jibx" description="Compiles the JIBX bindings for the repository project" depends="init">
+   <target name="compile-repository-jibx" 
+           description="Compiles the JIBX bindings for the repository project" 
+           depends="init">
       <!-- load the JIBX task definition -->
-      <taskdef name="bind" classname="org.jibx.binding.ant.CompileTask"
+      <taskdef name="bind" 
+               classname="org.jibx.binding.ant.CompileTask"
                classpath="${dir.project.3rdparty.lib}/jibx/jibx-bind.jar;${dir.project.3rdparty.lib}/jibx/jibx-run.jar;${dir.project.3rdparty.lib}/bcel.jar;${dir.project.3rdparty.lib}/xpp3-1.1.3_8.jar" />
 
-      <bind verbose="false" load="true" binding="${file.jibx.binding.m2}">
+      <bind verbose="false" 
+            load="true" 
+            binding="${file.jibx.binding.m2}">
          <classpathset dir="${dir.project.repository.classes}"/>
       </bind>
-      <bind verbose="false" load="true" binding="${file.jibx.binding.systeminfo}">
+      <bind verbose="false" 
+            load="true" 
+            binding="${file.jibx.binding.systeminfo}">
          <classpathset dir="${dir.project.repository.classes}"/>
      </bind>
    </target>
    
-   <target name="package-repository" description="Packages the repository project" depends="compile-repository">
+   <target name="package-repository" 
+           description="Packages the repository project" 
+           depends="compile-repository">
       <mkdir dir="${dir.project.repository.dist}" />
-      <jar jarfile="${dir.project.repository.dist}/${file.name.jar.repository}" basedir="${dir.project.repository.classes}" />
+      <jar jarfile="${dir.project.repository.dist}/${file.name.jar.repository}" 
+            basedir="${dir.project.repository.classes}" />
    </target>
    
-   <target name="test-repository" description="Runs the tests for the repository project" depends="compile-repository">
+   <target name="test-repository" 
+           description="Runs the tests for the repository project" 
+           depends="compile-repository">
       <run-tests projectdir="${dir.project.repository}" />
    </target>
    
-   <target name="generate-javadocs-repository" description="Generates the JavaDocs for the repository project"
+   <target name="generate-javadocs-repository" 
+           description="Generates the JavaDocs for the repository project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Repository Specification" windowtitle="Alfresco Repository" 
                          projectdir="${dir.project.repository}" />
    </target>
    
-   <target name="build-single-jar" depends="package-repository" description="Builds a self-contained executable jar" >
+   <target name="build-single-jar" 
+           description="Builds a self-contained executable jar" 
+           depends="package-repository">
       <!-- extract the one-jar file -->
-      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.95.jar" dest="${dir.onejar}" overwrite="true" />
+      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.95.jar" 
+             dest="${dir.onejar}" overwrite="true" />
       <!-- remove unwanted files -->
       <delete >
          <fileset dir="${dir.onejar}">
@@ -134,7 +192,8 @@
       <!-- delete target one-jar -->
       <delete file="${dir.project.repository.dist}/${file.name.jar.onejar}" />
       <!-- build the one-jar -->
-      <jar destfile="${dir.project.repository.dist}/${file.name.jar.onejar}" manifest="${dir.onejar}/META-INF/MANIFEST.MF" update="false" >
+      <jar destfile="${dir.project.repository.dist}/${file.name.jar.onejar}" 
+           manifest="${dir.onejar}/META-INF/MANIFEST.MF" update="false" >
          <fileset dir="${dir.onejar}">
             <include name="**/*" />
          </fileset>
@@ -145,7 +204,9 @@
    <!-- ** JCR TCK Project ** -->
    <!-- ********************* -->
 
-   <target name="build-tck" depends="package-repository" description="Builds the JCR TCK WAR file">
+   <target name="build-tck" 
+           depends="package-repository" 
+           description="Builds the JCR TCK WAR file">
       <war warfile="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
            webxml="${dir.project.repository.src.webinf}\JCRTCK\web.xml">
          <fileset dir="${dir.project.repository.src.web}" excludes="WEB-INF/**" />
@@ -165,12 +226,15 @@
       </war>
    </target>
 
-   <target name="deploy-tck" depends="build-tck">
-      <copy file="${dir.project.repository.dist}/${file.name.war.jcr.tck}" todir="${dir.deploy.jcr.tck}/bin/tck-webapp/webapps" />
+   <target name="deploy-tck" 
+           depends="build-tck">
+      <copy file="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
+            todir="${dir.deploy.jcr.tck}/bin/tck-webapp/webapps" />
    </target>
 
    <target name="start-tck" depends="init">
-      <exec dir="${dir.deploy.jcr.tck}/bin/tck-webapp" executable="cmd.exe" spawn="true">
+      <exec dir="${dir.deploy.jcr.tck}/bin/tck-webapp" 
+            executable="cmd.exe" spawn="true">
          <arg line="/k start server.bat -debug socket" />
       </exec>
    </target>
@@ -179,59 +243,88 @@
    <!-- ** Remote API Project ** -->
    <!-- ************************ -->
 
-   <target name="incremental-remoteapi" description="Performs an incremental build of the remote API project" depends="package-remoteapi" />
+   <target name="incremental-remoteapi" 
+           description="Performs an incremental build of the remote API project" 
+           depends="package-remoteapi" />
       
-   <target name="build-remoteapi" description="Performs a clean build of the remote API project" depends="clean-remoteapi, incremental-remoteapi" />
+   <target name="build-remoteapi" 
+           description="Performs a clean build of the remote API project" 
+           depends="clean-remoteapi, 
+                    incremental-remoteapi" />
    
-   <target name="clean-remoteapi" description="Cleans the remote API project" depends="init">
+   <target name="clean-remoteapi" 
+           description="Cleans the remote API project" 
+           depends="init">
       <clean projectdir="${dir.project.remoteapi}" />
    </target>
 
-   <target name="clean-remoteapi-services" depends="init">
+   <target name="clean-remoteapi-services" 
+           depends="init">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice" />
       </delete>
    </target>
 
-   <target name="compile-remoteapi" description="Compiles the remote API project" depends="init">
+   <target name="compile-remoteapi" 
+           description="Compiles the remote API project" depends="init">
       <compile-java-inc-generated projectdir="${dir.project.remoteapi}" />
    </target>
    
-   <target name="package-remoteapi" description="Packages the remote API project" depends="compile-remoteapi">
+   <target name="package-remoteapi" 
+           description="Packages the remote API project" 
+           depends="compile-remoteapi">
       <mkdir dir="${dir.project.remoteapi.dist}" />
-      <jar jarfile="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" basedir="${dir.project.remoteapi.classes}">
+      <jar jarfile="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" 
+           basedir="${dir.project.remoteapi.classes}">
          <metainf dir="${dir.project.remoteapi.src.metainf}" />
       </jar>
    </target>
    
-   <target name="test-remoteapi" description="Runs the tests for the remote API project" depends="compile-remoteapi">
+   <target name="test-remoteapi" 
+           description="Runs the tests for the remote API project" 
+           depends="compile-remoteapi">
       <run-tests projectdir="${dir.project.remoteapi}" />
    </target>
    
-   <target name="generate-javadocs-remoteapi" description="Generates the JavaDocs for the remote API project"
+   <target name="generate-javadocs-remoteapi" 
+           description="Generates the JavaDocs for the remote API project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Remote Services API Specification" windowtitle="Alfresco Remote Services API" 
+      <generate-javadocs documenttitle="Alfresco Remote Services API Specification" 
+                         windowtitle="Alfresco Remote Services API" 
                          projectdir="${dir.project.remoteapi}" />
    </target>
    
    <target name="gen-all-service-servers"
-           depends="gen-auth-service-server, gen-repo-service-server, gen-content-service-server, gen-authoring-service-server, gen-classification-service-server, gen-action-service-server, gen-access-control-service-server, gen-administration-service-server, gen-dictionary-service-server" />
+           depends="gen-auth-service-server, 
+                    gen-repo-service-server, 
+                    gen-content-service-server, 
+                    gen-authoring-service-server, 
+                    gen-classification-service-server, 
+                    gen-action-service-server, 
+                    gen-access-control-service-server, 
+                    gen-administration-service-server, 
+                    gen-dictionary-service-server" />
 
    <target name="init-service-gen" depends="init">
       <!-- load the WSDL 2 Java task definition -->
-      <taskdef name="wsdl2java" classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
+      <taskdef name="wsdl2java" 
+               classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
          <classpath refid="classpath.compile" />
       </taskdef>
    </target>
 
-   <target name="gen-auth-service-server" depends="init-service-gen">
+   <target name="gen-auth-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authentication" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
                  serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" package="org.alfresco.repo.webservice.authentication" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" 
+                  package="org.alfresco.repo.webservice.authentication" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authentication" 
@@ -239,16 +332,24 @@
       </delete>
    </target>
 
-   <target name="gen-repo-service-server" depends="init-service-gen">
+   <target name="gen-repo-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/repository" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" package="org.alfresco.repo.webservice.repository" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" package="org.alfresco.repo.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
+                  package="org.alfresco.repo.webservice.repository" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/repository" 
@@ -256,14 +357,20 @@
       </delete>
    </target>
 
-   <target name="gen-content-service-server" depends="init-service-gen">
+   <target name="gen-content-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/content" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" package="org.alfresco.repo.webservice.content" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" 
+                  package="org.alfresco.repo.webservice.content" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/content" 
@@ -271,14 +378,20 @@
       </delete>
    </target>
 
-   <target name="gen-dictionary-service-server" depends="init-service-gen">
+   <target name="gen-dictionary-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/dictionary" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" package="org.alfresco.repo.webservice.dictionary" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" 
+                  package="org.alfresco.repo.webservice.dictionary" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/dictionary" 
@@ -286,14 +399,20 @@
       </delete>
    </target>
 
-   <target name="gen-classification-service-server" depends="init-service-gen">
+   <target name="gen-classification-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/classification" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" package="org.alfresco.repo.webservice.classification" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" 
+                  package="org.alfresco.repo.webservice.classification" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/classification" 
@@ -301,14 +420,20 @@
       </delete>
    </target>
 
-   <target name="gen-authoring-service-server" depends="init-service-gen">
+   <target name="gen-authoring-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authoring" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" package="org.alfresco.repo.webservice.authoring" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" 
+                  package="org.alfresco.repo.webservice.authoring" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/authoring" 
@@ -320,10 +445,15 @@
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" package="org.alfresco.repo.webservice.action" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" 
+                  package="org.alfresco.repo.webservice.action" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" 
@@ -331,14 +461,20 @@
       </delete>
    </target>
 
-   <target name="gen-access-control-service-server" depends="init-service-gen">
+   <target name="gen-access-control-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/accesscontrol" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" package="org.alfresco.repo.webservice.accesscontrol" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" 
+                  package="org.alfresco.repo.webservice.accesscontrol" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/accesscontrol" 
@@ -350,10 +486,15 @@
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" package="org.alfresco.repo.webservice.administration" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.repo.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" 
+                 output="${dir.project.remoteapi.src.generated}" 
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" 
+                  package="org.alfresco.repo.webservice.administration" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.repo.webservice.types" />
       </wsdl2java>
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" 
@@ -366,30 +507,46 @@
    <!-- ** JNDI Project ** -->
    <!-- ****************** -->
 
-   <target name="incremental-jndi" description="Performs an incremental build of the JNDI project" depends="package-jndi" />
+   <target name="incremental-jndi" 
+           description="Performs an incremental build of the JNDI project" 
+           depends="package-jndi" />
       
-   <target name="build-jndi" description="Performs a clean build of the JNDI project" depends="clean-jndi, incremental-jndi" />
+   <target name="build-jndi" 
+           description="Performs a clean build of the JNDI project" 
+           depends="clean-jndi, 
+                    incremental-jndi" />
    
-   <target name="clean-jndi" description="Cleans the JNDI project" depends="init">
+   <target name="clean-jndi" 
+           description="Cleans the JNDI project" 
+           depends="init">
       <clean projectdir="${dir.project.jndi}" />
    </target>
    
-   <target name="compile-jndi" description="Compiles the JNDI project" depends="init">
+   <target name="compile-jndi" 
+           description="Compiles the JNDI project" 
+           depends="init">
       <compile-java projectdir="${dir.project.jndi}" />
    </target>
    
-   <target name="package-jndi" description="Packages the JNDI project" depends="compile-jndi">
+   <target name="package-jndi" 
+           description="Packages the JNDI project" 
+           depends="compile-jndi">
       <mkdir dir="${dir.project.jndi.dist}" />
-      <jar jarfile="${dir.project.jndi.dist}/${file.name.jar.jndi}" basedir="${dir.project.jndi.classes}" />
+      <jar jarfile="${dir.project.jndi.dist}/${file.name.jar.jndi}" 
+           basedir="${dir.project.jndi.classes}" />
    </target>
    
-   <target name="test-jndi" description="Runs the tests for the JNDI project" depends="compile-jndi">
+   <target name="test-jndi" 
+           description="Runs the tests for the JNDI project" 
+           depends="compile-jndi">
       <run-tests projectdir="${dir.project.jndi}" />
    </target>
    
-   <target name="generate-javadocs-jndi" description="Generates the JavaDocs for the JNDI project"
+   <target name="generate-javadocs-jndi" 
+           description="Generates the JavaDocs for the JNDI project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface)" windowtitle="Alfresco JNDI" 
+      <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface)" 
+                         windowtitle="Alfresco JNDI" 
                          projectdir="${dir.project.jndi}"/>
    </target>
 
@@ -397,32 +554,45 @@
    <!-- ** Virtual Tomcat Project ** -->
    <!-- **************************** -->
 
-   <target name="incremental-catalinavirtual" description="Performs an incremental build of the virtual tomcat project" 
+   <target name="incremental-catalinavirtual" 
+           description="Performs an incremental build of the virtual tomcat project" 
            depends="package-catalinavirtual" />
 
-   <target name="build-catalinavirtual" description="Performs a clean build of the virtual tomcat project" 
-           depends="clean-catalinavirtual, incremental-catalinavirtual" />
+   <target name="build-catalinavirtual" 
+           description="Performs a clean build of the virtual tomcat project" 
+           depends="clean-catalinavirtual, 
+                    incremental-catalinavirtual" />
 
-   <target name="clean-catalinavirtual" description="Cleans the virtual tomcat project" depends="init">
+   <target name="clean-catalinavirtual" 
+           description="Cleans the virtual tomcat project" 
+           depends="init">
       <clean projectdir="${dir.project.catalinavirtual}" />
    </target>
 
-   <target name="compile-catalinavirtual" description="Compiles the virtual tomcat project" depends="init">
+   <target name="compile-catalinavirtual" 
+           description="Compiles the virtual tomcat project" 
+           depends="init">
       <compile-java projectdir="${dir.project.catalinavirtual}" />
    </target>
 
-   <target name="package-catalinavirtual" description="Packages the virtual tomcat project" depends="compile-catalinavirtual">
+   <target name="package-catalinavirtual" 
+           description="Packages the virtual tomcat project" 
+           depends="compile-catalinavirtual">
       <mkdir dir="${dir.project.catalinavirtual.dist}" />
-      <jar jarfile="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}" basedir="${dir.project.catalinavirtual.classes}" />
+      <jar jarfile="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}" 
+           basedir="${dir.project.catalinavirtual.classes}" />
    </target>
 
-   <target name="test-catalinavirtual" description="Runs the tests for the virtual tomcat project" depends="compile-catalinavirtual">
+   <target name="test-catalinavirtual" 
+           description="Runs the tests for the virtual tomcat project" depends="compile-catalinavirtual">
       <run-tests projectdir="${dir.project.catalinavirtual}" />
    </target>
 
-   <target name="generate-javadocs-catalinavirtual" description="Generates the JavaDocs for the virtual tomcat project"
+   <target name="generate-javadocs-catalinavirtual" 
+           description="Generates the JavaDocs for the virtual tomcat project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Catalina Valve" windowtitle="Alfresco Catalina Valve" 
+      <generate-javadocs documenttitle="Alfresco Catalina Valve" 
+                         windowtitle="Alfresco Catalina Valve" 
                          projectdir="${dir.project.catalinavirtual}"/>
    </target>
 
@@ -430,41 +600,65 @@
    <!-- ** Web Client Project ** -->
    <!-- ************************ -->
 
-   <target name="incremental-webclient" description="Performs an incremental build of the webclient project" depends="package-webclient" />
+   <target name="incremental-webclient" 
+           description="Performs an incremental build of the webclient project" 
+           depends="package-webclient" />
       
-   <target name="build-webclient" description="Performs a clean build of the webclient project" depends="clean-webclient, incremental-webclient" />
+   <target name="build-webclient" 
+           description="Performs a clean build of the webclient project" 
+           depends="clean-webclient, 
+           incremental-webclient" />
    
-   <target name="clean-webclient" description="Cleans the webclient project" depends="init">
+   <target name="clean-webclient" 
+           description="Cleans the webclient project" 
+           depends="init">
       <clean projectdir="${dir.project.webclient}" />
-      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.project.webclient.samplewebsite}" />
+      <delete includeEmptyDirs="true" 
+              quiet="yes" 
+              dir="${dir.project.webclient.samplewebsite}" />
    </target>
    
-   <target name="compile-webclient" description="Compiles the webclient project" depends="init">
+   <target name="compile-webclient" 
+           description="Compiles the webclient project" 
+           depends="init">
       <compile-java projectdir="${dir.project.webclient}" />
    </target>
    
-   <target name="package-webclient" description="Packages the webclient project" depends="package-webclient-war, package-sample-website" />
+   <target name="package-webclient" 
+           description="Packages the webclient project" 
+           depends="package-webclient-war, 
+                    package-sample-website" />
 
-   <target name="package-webclient-jar" description="Packages the JAR file for the webclient project" depends="compile-webclient">
+   <target name="package-webclient-jar" 
+           description="Packages the JAR file for the webclient project" 
+           depends="compile-webclient">
       <mkdir dir="${dir.project.webclient.dist}" />
-      <jar jarfile="${dir.project.webclient.dist}/${file.name.jar.webclient}" basedir="${dir.project.webclient.classes}" />
+      <jar jarfile="${dir.project.webclient.dist}/${file.name.jar.webclient}" 
+           basedir="${dir.project.webclient.classes}" />
    </target>
 
-   <target name="package-webclient-war" description="Packages the WAR file for the webclient project" depends="assemble-webclient-war">
+   <target name="package-webclient-war" 
+           description="Packages the WAR file for the webclient project" 
+           depends="assemble-webclient-war">
       <mkdir dir="${dir.project.webclient.dist}" />
-      <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" webxml="${dir.project.webclient.src.webinf}/web.xml">
+      <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
+           webxml="${dir.project.webclient.src.webinf}/web.xml">
          <fileset dir="${dir.project.webclient.assemble}" />
       </war>
    </target>
 
-   <target name="assemble-webclient-war" depends="package-webclient-jar">
+   <target name="assemble-webclient-war" 
+           depends="package-webclient-jar">
       <mkdir dir="${dir.project.webclient.assemble}" />
 
       <copy todir="${dir.project.webclient.assemble}">
-         <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
+         <fileset dir="${dir.project.webclient.src.web}" 
+                  excludes="WEB-INF/**" />
       </copy>
 
-      <java classname="CommentStripper" dir="${dir.project.webclient.assemble}" fork="yes">
+      <java classname="CommentStripper" 
+            dir="${dir.project.webclient.assemble}" 
+            fork="yes">
          <arg line="-l -t -r .jsp" />
          <classpath refid="classpath.compile" />
       </java>
@@ -474,8 +668,10 @@
       </copy>
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF">
-         <fileset dir="${dir.project.webclient.src.webinf}" excludes="web.xml,jboss*.xml,portlet*.xml,alfresco-object.xml" />
-         <fileset dir="${dir.project.installer}" includes="licenses/**" />
+         <fileset dir="${dir.project.webclient.src.webinf}" 
+                  excludes="web.xml,jboss*.xml,portlet*.xml,alfresco-object.xml" />
+         <fileset dir="${dir.project.installer}" 
+                  includes="licenses/**" />
          <fileset dir="${dir.project.remoteapi.src.webinf}"/>
       </copy>
 
@@ -491,12 +687,14 @@
          dev-context.xml does not become part of the normal source
          code tree (it's excluded from check-in automatically).
          -->
-         <fileset dir="${dir.project.repository.config}" includes="**/extension/dev-context.xml"/>
+         <fileset dir="${dir.project.repository.config}" 
+                  includes="**/extension/dev-context.xml"/>
       </copy>
 
       <!-- Fixes to lucene FSDirectory -->
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/org/apache/lucene/store">
-         <fileset dir="${dir.project.repository.classes}/org/apache/lucene/store" includes="*.class" />
+         <fileset dir="${dir.project.repository.classes}/org/apache/lucene/store" 
+                  includes="*.class" />
       </copy>
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/lib">
@@ -524,36 +722,52 @@
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages">
          <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/messages"/>
-         <mapper type="glob" from="*.properties" to="*_en_US.properties"/>
+         <mapper type="glob" 
+                 from="*.properties" 
+                 to="*_en_US.properties"/>
       </copy>
    </target>
 
-   <target name="package-webclient-war-jboss" depends="-tomcat">
-      <copy todir="${dir.project.webclient.assemble}/WEB-INF" verbose="true">
-         <fileset dir="${dir.project.webclient.src.webinf}" includes="jboss*.xml,portlet*.xml,alfresco-object.xml" />
+   <target name="package-webclient-war-jboss" 
+           depends="-tomcat">
+      <copy todir="${dir.project.webclient.assemble}/WEB-INF" 
+            verbose="true">
+         <fileset dir="${dir.project.webclient.src.webinf}" 
+                  includes="jboss*.xml,portlet*.xml,alfresco-object.xml" />
       </copy>
       <delete verbose="true">
-         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes" includes="log4j.properties" />
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/classes" 
+                  includes="log4j.properties" />
       </delete>
       <delete verbose="true">
-         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/lib" includes="log4j-1.2.8.jar,portlet-api-lib.jar,myfaces-api.jar,myfaces-impl.jar" />
+         <fileset dir="${dir.project.webclient.assemble}/WEB-INF/lib" 
+                  includes="log4j-1.2.8.jar,portlet-api-lib.jar,myfaces-api.jar,myfaces-impl.jar" />
       </delete>
 
       <delete file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
-      <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" webxml="${dir.project.webclient.src.webinf}/web.xml">
+      <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
+           webxml="${dir.project.webclient.src.webinf}/web.xml">
          <fileset dir="${dir.project.webclient.assemble}" />
       </war>
    </target>
 
-   <target name="package-sample-website" description="Packages the sample website" 
-           depends="compile-webclient" if="enable.webclient.samplewebsite">
-      <delete includeEmptyDirs="true" quiet="yes" dir="${dir.project.webclient.samplewebsite}" />
+   <target name="package-sample-website" 
+           description="Packages the sample website" 
+           depends="compile-webclient" 
+           if="enable.webclient.samplewebsite">
+      <delete includeEmptyDirs="true" 
+              quiet="yes" 
+              dir="${dir.project.webclient.samplewebsite}" />
       <mkdir dir="${dir.project.webclient.samplewebsite}/alfresco/classes"/>
 
       <javac srcdir="${dir.project.webclient.test.resources}/websites/alfresco/ROOT/WEB-INF/classes"
-             destdir="${dir.project.webclient.samplewebsite}/alfresco/classes" fork="true"
-             memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-             debug="${javac.debug}"  target="${javac.target}" source="${javac.source}"
+             destdir="${dir.project.webclient.samplewebsite}/alfresco/classes" 
+             fork="true"
+             memoryMaximumSize="${mem.size.max}" 
+             deprecation="${javac.deprecation}" 
+             debug="${javac.debug}"  
+             target="${javac.target}" 
+             source="${javac.source}"
              encoding="${javac.encoding}"
              classpathref="classpath.compile" />
 
@@ -581,20 +795,26 @@
       </war>
    </target>
 
-   <target name="test-webclient" description="Runs the tests for the webclient project" depends="compile-webclient">
+   <target name="test-webclient" 
+           description="Runs the tests for the webclient project" 
+           depends="compile-webclient">
       <run-tests projectdir="${dir.project.webclient}" />
    </target>
 
-   <target name="generate-javadocs-webclient" description="Generates the JavaDocs for the webclient project"
+   <target name="generate-javadocs-webclient" 
+           description="Generates the JavaDocs for the webclient project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Client API Specification" windowtitle="Alfresco Web Client API" 
+      <generate-javadocs documenttitle="Alfresco Web Client API Specification" 
+                         windowtitle="Alfresco Web Client API" 
                          projectdir="${dir.project.webclient}"/>
    </target>
 
-   <target name="generate-taglibdocs-webclient" description="Creates the tag library docs for the webclient project"
+   <target name="generate-taglibdocs-webclient" 
+           description="Creates the tag library docs for the webclient project"
            depends="init">
       <mkdir dir="${dir.project.webclient.docs.taglib}" />
-      <java fork="true" jar="${dir.project.3rdparty.lib}/${dir.name.devenv}/tlddoc.jar" failonerror="true">
+      <java fork="true" jar="${dir.project.3rdparty.lib}/${dir.name.devenv}/tlddoc.jar" 
+            failonerror="true">
          <arg line="-d ${dir.project.webclient.docs.taglib}" />
          <arg line="-doctitle 'Alfresco Tag Library Documentation'" />
          <arg line="-windowtitle 'Alfresco Tag Library'" />
@@ -608,39 +828,60 @@
    <!-- ** Records Management Project ** -->
    <!-- ******************************** -->
 
-   <target name="incremental-rm" description="Performs an incremental build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm" if="enable.module.rm" />
+   <target name="incremental-rm" 
+           description="Performs an incremental build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="package-rm" 
+           if="enable.module.rm" />
 
-   <target name="build-rm" description="Performs a clean build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="clean-rm, incremental-rm" if="enable.module.rm" />
+   <target name="build-rm" 
+           description="Performs a clean build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="clean-rm, 
+                    incremental-rm" 
+                    if="enable.module.rm" />
 
-   <target name="clean-rm" description="Cleans the records management project" depends="init" if="enable.module.rm">
+   <target name="clean-rm" 
+           description="Cleans the records management project" 
+           depends="init" 
+           if="enable.module.rm">
       <clean projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="compile-rm" description="Compiles the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="init" if="enable.module.rm">
+   <target name="compile-rm" 
+           description="Compiles the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="init" 
+           if="enable.module.rm">
       <compile-java projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="package-rm" description="Packages the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm-war" if="enable.module.rm" />
+   <target name="package-rm" 
+           description="Packages the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="package-rm-war" 
+           if="enable.module.rm" />
 
-   <target name="package-rm-jar" description="Packages the JAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="compile-rm" if="enable.module.rm">
+   <target name="package-rm-jar" 
+           description="Packages the JAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="compile-rm" 
+           if="enable.module.rm">
       <mkdir dir="${dir.module.rm.dist}" />
-      <jar jarfile="${dir.module.rm.dist}/${file.name.jar.rm}" basedir="${dir.module.rm.classes}" />
+      <jar jarfile="${dir.module.rm.dist}/${file.name.jar.rm}" 
+           basedir="${dir.module.rm.classes}" />
    </target>
 
-   <target name="package-rm-war" description="Packages the WAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm-extension" if="enable.module.rm">
+   <target name="package-rm-war" 
+           description="Packages the WAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="package-rm-extension" 
+           if="enable.module.rm">
       <echo>Installing records management into WAR...</echo>
-      <install-amp ampfile="${dir.module.rm.dist}/${file.name.amp.rm}" warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+      <install-amp ampfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="package-rm-extension" description="Packages the records management extension.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm-jar" if="enable.module.rm">
-      <zip destfile="${dir.module.rm.dist}/${file.name.amp.rm}" update="true">
+   <target name="package-rm-extension" 
+           description="Packages the records management extension.  Enable with '-Denable.module.rm=TRUE'."
+           depends="package-rm-jar" 
+           if="enable.module.rm">
+      <zip destfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
+           update="true">
          <zipfileset file="${dir.module.rm.property}/module.properties"/>
          <zipfileset file="${dir.module.rm.dist}/${file.name.jar.rm}" prefix="lib"/>
          <zipfileset dir="${dir.module.rm.config}" prefix="config">
@@ -649,13 +890,17 @@
       </zip>
    </target>
 
-   <target name="test-rm" description="Runs the tests for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="compile-rm" if="enable.module.rm">
+   <target name="test-rm" 
+           description="Runs the tests for the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="compile-rm" 
+           if="enable.module.rm">
       <run-tests projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="generate-javadocs-rm" description="Generates the JavaDocs for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="init" if="enable.module.rm">
+   <target name="generate-javadocs-rm" 
+           description="Generates the JavaDocs for the records management project.  Enable with '-Denable.module.rm=TRUE'."
+           depends="init" 
+           if="enable.module.rm">
       <generate-javadocs documenttitle="Alfresco Records Management Extension" windowtitle="Records Management" 
                          projectdir="${dir.module.rm}"/>
    </target>
@@ -664,13 +909,21 @@
    <!-- ** PHP SDK Project ** -->
    <!-- ******************************** -->
 
-   <target name="incremental-php" description="Performs an incremental build of the PHP SDK project"
-           depends="package-php" if="enable.module.php" />
+   <target name="incremental-php" 
+           description="Performs an incremental build of the PHP SDK project"
+           depends="package-php" 
+           if="enable.module.php" />
 
-   <target name="build-php" description="Performs a clean build of the PHP SDK project"
-           depends="clean-php, incremental-php" if="enable.module.php" />
+   <target name="build-php" 
+           description="Performs a clean build of the PHP SDK project"
+           depends="clean-php, 
+                    incremental-php" 
+           if="enable.module.php" />
 
-   <target name="clean-php" description="Cleans the PHP SDK project" depends="init" if="enable.module.php">
+   <target name="clean-php" 
+           description="Cleans the PHP SDK project" 
+           depends="init" 
+           if="enable.module.php">
       <clean projectdir="${dir.module.php}" />
    </target>
 
@@ -678,44 +931,64 @@
       <compile-java projectdir="${dir.module.php}" />
    </target>
 
-   <target name="package-php" description="Packages the PHP SDK project"
-           depends="package-php-war" if="enable.module.php" />
+   <target name="package-php" 
+           description="Packages the PHP SDK project"
+           depends="package-php-war" 
+           if="enable.module.php" />
 
-   <target name="package-php-jar" description="Packages the JAR file for the PHP SDK project"
-           depends="compile-php" if="enable.module.php">
+   <target name="package-php-jar" 
+           description="Packages the JAR file for the PHP SDK project"
+           depends="compile-php" 
+           if="enable.module.php">
       <mkdir dir="${dir.module.php.dist}" />
-      <jar jarfile="${dir.module.php.dist}/${file.name.jar.php}" basedir="${dir.module.php.classes}" />
+      <jar jarfile="${dir.module.php.dist}/${file.name.jar.php}" 
+           basedir="${dir.module.php.classes}" />
    </target>
 
-   <target name="package-php-war" description="Packages the WAR file installing the PHP integration module"
-           depends="package-php-module" if="enable.module.php">
+   <target name="package-php-war" 
+           description="Packages the WAR file installing the PHP integration module"
+           depends="package-php-module" 
+           if="enable.module.php">
       <echo>Installing PHP Integration into WAR...</echo>
-      <install-amp ampfile="${dir.module.php.dist}/${file.name.amp.php}" warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+      <install-amp ampfile="${dir.module.php.dist}/${file.name.amp.php}" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="package-php-module" description="Packages the PHP Integration module into an AMP"
-           depends="package-php-jar" if="enable.module.php">
-      <zip destfile="${dir.module.php.dist}/${file.name.amp.php}" update="true">
+   <target name="package-php-module" 
+           description="Packages the PHP Integration module into an AMP"
+           depends="package-php-jar" 
+           if="enable.module.php">
+      <zip destfile="${dir.module.php.dist}/${file.name.amp.php}" 
+           update="true">
          <zipfileset file="${dir.module.php.property}/module.properties"/>
-         <zipfileset file="${dir.module.php.dist}/${file.name.jar.php}" prefix="lib"/>
-         <zipfileset dir="${dir.module.php}/${dir.name.lib}" prefix="lib">
+         <zipfileset file="${dir.module.php.dist}/${file.name.jar.php}" 
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.php}/${dir.name.lib}" 
+                     prefix="lib">
             <exclude name="**/source/**"/>
          </zipfileset>
-	 <zipfileset dir="${dir.module.php.web.php}" prefix="web/php"/>
-         <zipfileset dir="${dir.module.php.config}" prefix="config">
+	 <zipfileset dir="${dir.module.php.web.php}" 
+                     prefix="web/php"/>
+         <zipfileset dir="${dir.module.php.config}" 
+                     prefix="config">
             <exclude name="**/module.properties"/>
          </zipfileset>
       </zip>
    </target>
 
-   <target name="test-php" description="Runs the tests for the PHP SDK project"
-           depends="compile-php" if="enable.module.php">
+   <target name="test-php" 
+           description="Runs the tests for the PHP SDK project"
+           depends="compile-php" 
+           if="enable.module.php">
       <run-tests projectdir="${dir.module.php}" />
    </target>
 
-   <target name="generate-javadocs-php" description="Generates the JavaDocs for the records management project"
-           depends="init" if="enable.module.php">
-      <generate-javadocs documenttitle="Alfresco Records Management Extension" windowtitle="Records Management" 
+   <target name="generate-javadocs-php" 
+           description="Generates the JavaDocs for the records management project"
+           depends="init" 
+           if="enable.module.php">
+      <generate-javadocs documenttitle="Alfresco Records Management Extension" 
+                         windowtitle="Records Management" 
                          projectdir="${dir.module.php}"/>
    </target>
 
@@ -723,65 +996,99 @@
    <!-- ** Web Service Client Project ** -->
    <!-- ******************************** -->
    
-   <target name="incremental-webserviceclient" description="Performs an incremental build of the web service client project" 
+   <target name="incremental-webserviceclient" 
+           description="Performs an incremental build of the web service client project" 
            depends="package-webserviceclient" />
       
-   <target name="build-webserviceclient" description="Performs a clean build of the web service client project" 
-           depends="clean-webserviceclient, incremental-webserviceclient" />
+   <target name="build-webserviceclient" 
+           description="Performs a clean build of the web service client project" 
+           depends="clean-webserviceclient, 
+                    incremental-webserviceclient" />
    
-   <target name="clean-webserviceclient" description="Cleans the web service client project" depends="init">
+   <target name="clean-webserviceclient" 
+           description="Cleans the web service client project" 
+           depends="init">
       <clean projectdir="${dir.project.webserviceclient}" />
    </target>
 
-   <target name="clean-webserviceclient-services" depends="init">
+   <target name="clean-webserviceclient-services" 
+           depends="init">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice" />
       </delete>
    </target>
 
-   <target name="compile-webserviceclient" description="Compiles the web service client project" depends="init">
+   <target name="compile-webserviceclient" 
+           description="Compiles the web service client project" depends="init">
       <compile-java-inc-generated projectdir="${dir.project.webserviceclient}" />
    </target>
    
-   <target name="package-webserviceclient" description="Packages the web service client project"  depends="compile-webserviceclient">
+   <target name="package-webserviceclient" 
+           description="Packages the web service client project"  
+           depends="compile-webserviceclient">
       <mkdir dir="${dir.project.webserviceclient.dist}" />
-      <copy todir="${dir.project.webserviceclient.classes}" file="${dir.project.webserviceclient.src.java}/log4j.properties" />
+      <copy todir="${dir.project.webserviceclient.classes}" 
+            file="${dir.project.webserviceclient.src.java}/log4j.properties" />
       <jar jarfile="${dir.project.webserviceclient.dist}/${file.name.jar.webserviceclient}" 
            basedir="${dir.project.webserviceclient.classes}" />
    </target>
    
-   <target name="test-webserviceclient" description="Runs the tests for the web service client project" depends="compile-webserviceclient">
+   <target name="test-webserviceclient" 
+           description="Runs the tests for the web service client project" 
+           depends="compile-webserviceclient">
       <run-tests projectdir="${dir.project.webserviceclient}" />
    </target>
    
-   <target name="generate-javadocs-webserviceclient" description="Generates the JavaDocs for the web service client project"
+   <target name="generate-javadocs-webserviceclient" 
+           description="Generates the JavaDocs for the web service client project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Service Client Specification" windowtitle="Alfresco Web Service Client" 
+      <generate-javadocs documenttitle="Alfresco Web Service Client Specification" 
+                         windowtitle="Alfresco Web Service Client" 
                          projectdir="${dir.project.webserviceclient}"/>
    </target>
 
    <target name="gen-all-service-clients" 
-           depends="gen-auth-service-client, gen-repo-service-client, gen-content-service-client, gen-authoring-service-client, gen-classification-service-client, gen-action-service-client, gen-access-control-service-client, gen-administration-service-client, gen-dictionary-service-client" />
+           depends="gen-auth-service-client, 
+                    gen-repo-service-client, 
+                    gen-content-service-client, 
+                    gen-authoring-service-client, 
+                    gen-classification-service-client, 
+                    gen-action-service-client, 
+                    gen-access-control-service-client, 
+                    gen-administration-service-client, 
+                    gen-dictionary-service-client" />
 
-   <target name="gen-auth-service-client" depends="init-service-gen">
+   <target name="gen-auth-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/authentication" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" package="org.alfresco.webservice.authentication" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" 
+                  package="org.alfresco.webservice.authentication" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-repo-service-client" depends="init-service-gen">
+   <target name="gen-repo-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/repository" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" package="org.alfresco.webservice.repository" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" package="org.alfresco.webservice.types" />
-         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
+                  package="org.alfresco.webservice.repository" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/cml/1.0" 
+                  package="org.alfresco.webservice.types" />
+         <mapping namespace="http://www.alfresco.org/ws/headers/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
@@ -789,69 +1096,110 @@
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/dictionary" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" package="org.alfresco.webservice.dictionary" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/dictionary-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/dictionary/1.0" 
+                  package="org.alfresco.webservice.dictionary" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-content-service-client" depends="init-service-gen">
+   <target name="gen-content-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/content" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" package="org.alfresco.webservice.content" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/content-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/content/1.0" 
+                  package="org.alfresco.webservice.content" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-classification-service-client" depends="init-service-gen">
+   <target name="gen-classification-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/classification" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" package="org.alfresco.webservice.classification" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/classification-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/classification/1.0" 
+                  package="org.alfresco.webservice.classification" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-authoring-service-client" depends="init-service-gen">
+   <target name="gen-authoring-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/authoring" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" package="org.alfresco.webservice.authoring" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authoring-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/authoring/1.0" 
+                  package="org.alfresco.webservice.authoring" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-action-service-client" depends="init-service-gen">
+   <target name="gen-action-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/action" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" package="org.alfresco.webservice.action" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/action-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/action/1.0" 
+                  package="org.alfresco.webservice.action" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-access-control-service-client" depends="init-service-gen">
+   <target name="gen-access-control-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/accesscontrol" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" package="org.alfresco.webservice.accesscontrol" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/access-control-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/accesscontrol/1.0" 
+                  package="org.alfresco.webservice.accesscontrol" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
-   <target name="gen-administration-service-client" depends="init-service-gen">
+   <target name="gen-administration-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/administration" />
       </delete>
-      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" package="org.alfresco.webservice.administration" />
-         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" package="org.alfresco.webservice.types" />
+      <wsdl2java url="${dir.project.remoteapi.src.wsdl}/administration-service.wsdl" 
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
+         <mapping namespace="http://www.alfresco.org/ws/service/administration/1.0" 
+                  package="org.alfresco.webservice.administration" />
+         <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
+                  package="org.alfresco.webservice.types" />
       </wsdl2java>
    </target>
 
@@ -859,21 +1207,33 @@
    <!-- ** Benchmark Framework Project ** -->
    <!-- ********************************* -->
 
-   <target name="incremental-benchmarkframework" description="Performs an incremental build of the benchmark framework project" 
+   <target name="incremental-benchmarkframework" 
+           description="Performs an incremental build of the benchmark framework project" 
            depends="package-benchmarkframework"/>
 
-   <target name="build-benchmarkframework" description="Performs a clean build of the benchmark framework project" 
-           depends="clean-benchmarkframework, incremental-benchmarkframework" />
+   <target name="build-benchmarkframework" 
+           description="Performs a clean build of the benchmark framework project" 
+           depends="clean-benchmarkframework, 
+                    incremental-benchmarkframework" />
 
-   <target name="clean-benchmarkframework" description="Cleans the benchmark framework project" depends="init">
+   <target name="clean-benchmarkframework" 
+           description="Cleans the benchmark framework project" 
+           depends="init">
       <clean projectdir="${dir.project.benchmarkframework}" />
    </target>
 
-   <target name="compile-benchmarkframework" description="Compiles the benchmark framework project" depends="init">
+   <target name="compile-benchmarkframework" 
+           description="Compiles the benchmark framework project" 
+           depends="init">
       <mkdir dir="${dir.project.benchmarkframework.classes}" />
-      <javac destdir="${dir.project.benchmarkframework.classes}" fork="true"
-             memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-             debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
+      <javac destdir="${dir.project.benchmarkframework.classes}" 
+             fork="true"
+             memoryMaximumSize="${mem.size.max}" 
+             deprecation="${javac.deprecation}" 
+             debug="${javac.debug}"  
+             target="${javac.target}" 
+             source="${javac.source}" 
+             encoding="${javac.encoding}">
          <src path="${dir.project.benchmarkframework.src.java}" />
          <classpath>
             <fileset dir="${dir.project.benchmarkframework.lib}/japex">
@@ -886,16 +1246,19 @@
       </javac>
    </target>
 
-   <target name="package-benchmarkframework" description="Packages the benchmark framework project" 
+   <target name="package-benchmarkframework" 
+           description="Packages the benchmark framework project" 
            depends="compile-benchmarkframework">
       <mkdir dir="${dir.project.benchmarkframework.dist}" />
       <jar jarfile="${dir.project.benchmarkframework.dist}/${file.name.jar.benchmarkframework}" 
            basedir="${dir.project.benchmarkframework.classes}" />
    </target>
 
-   <target name="generate-javadocs-benchmarkframework" description="Generates the JavaDocs for the benchmark framework project"
+   <target name="generate-javadocs-benchmarkframework" 
+           description="Generates the JavaDocs for the benchmark framework project"
            depends="init">
-      <generate-javadocs documenttitle="Benchmark Framework" windowtitle="Benchmark Framework" 
+      <generate-javadocs documenttitle="Benchmark Framework" 
+                         windowtitle="Benchmark Framework" 
                          projectdir="${dir.project.benchmarkframework}"/>
    </target>
 
@@ -903,21 +1266,32 @@
    <!-- ** Benchmark Tests Project ** -->
    <!-- ***************************** -->
 
-   <target name="incremental-benchmarktests" description="Performs an incremental build of the benchmark tests project" 
+   <target name="incremental-benchmarktests" 
+           description="Performs an incremental build of the benchmark tests project" 
            depends="package-benchmarktests" />
 
-   <target name="build-benchmarktests" description="Performs a clean build of the benchmark tests project" 
-           depends="clean-benchmarktests, incremental-benchmarktests" />
+   <target name="build-benchmarktests" 
+           description="Performs a clean build of the benchmark tests project" 
+           depends="clean-benchmarktests, 
+                    incremental-benchmarktests" />
 
-   <target name="clean-benchmarktests" description="Cleans the benchmark tests project" depends="init">
+   <target name="clean-benchmarktests" 
+           description="Cleans the benchmark tests project" 
+           depends="init">
       <clean projectdir="${dir.project.benchmarktests}" />
    </target>
 
-   <target name="compile-benchmarktests" description="Compiles the benchmark tests project" depends="init">
+   <target name="compile-benchmarktests" 
+           description="Compiles the benchmark tests project" 
+           depends="init">
       <mkdir dir="${dir.project.benchmarktests.classes}" />
-      <javac destdir="${dir.project.benchmarktests.classes}" fork="true"
-             memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-             debug="${javac.debug}"  target="${javac.target}" source="${javac.source}">
+      <javac destdir="${dir.project.benchmarktests.classes}" 
+             fork="true"
+             memoryMaximumSize="${mem.size.max}" 
+             deprecation="${javac.deprecation}" 
+             debug="${javac.debug}"  
+             target="${javac.target}" 
+             source="${javac.source}">
          <src path="${dir.project.benchmarktests.src.java}" />
          <classpath refid="classpath.compile" />
          <classpath>
@@ -931,16 +1305,19 @@
       </javac>
    </target>
 
-   <target name="package-benchmarktests" description="Packages the benchmark tests project" 
+   <target name="package-benchmarktests" 
+           description="Packages the benchmark tests project" 
            depends="compile-benchmarktests">
       <mkdir dir="${dir.project.benchmarktests.dist}" />
       <jar jarfile="${dir.project.benchmarktests.dist}/${file.name.jar.benchmarktests}" 
            basedir="${dir.project.benchmarktests.classes}" />
    </target>
 
-   <target name="generate-javadocs-benchmarktests" description="Generates the JavaDocs for the benchmark tests project"
+   <target name="generate-javadocs-benchmarktests" 
+           description="Generates the JavaDocs for the benchmark tests project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Benchmark Tests" windowtitle="Alfresco Benchmark Tests" 
+      <generate-javadocs documenttitle="Alfresco Benchmark Tests" 
+                         windowtitle="Alfresco Benchmark Tests" 
                          projectdir="${dir.project.benchmarktests}"/>
    </target>
 
@@ -948,22 +1325,35 @@
    <!-- ** Devenv Tools Project ** -->
    <!-- ************************** -->
 
-   <target name="incremental-devenv" description="Performs an incremental build of the devenv tools project" depends="package-devenv" />
+   <target name="incremental-devenv" 
+           description="Performs an incremental build of the devenv tools project" 
+           depends="package-devenv" />
 
-   <target name="build-devenv" description="Performs a clean build of the devenv tools project" depends="clean-devenv, incremental-devenv" />
+   <target name="build-devenv" 
+           description="Performs a clean build of the devenv tools project" 
+           depends="clean-devenv, 
+                    incremental-devenv" />
 
-   <target name="clean-devenv" description="Cleans the devenv tools project" depends="init">
+   <target name="clean-devenv" 
+           description="Cleans the devenv tools project" 
+           depends="init">
       <clean projectdir="${dir.project.devenv}" />
    </target>
 
-   <target name="compile-devenv" description="Compiles the devenv tools project" depends="init">
+   <target name="compile-devenv" 
+           description="Compiles the devenv tools project" 
+           depends="init">
       <compile-java projectdir="${dir.project.devenv}" />
    </target>
 
-   <target name="package-devenv" description="Packages the devenv tools project" depends="compile-devenv">
+   <target name="package-devenv" 
+           description="Packages the devenv tools project" 
+           depends="compile-devenv">
       <mkdir dir="${dir.project.devenv.dist}" />
-      <jar jarfile="${dir.project.devenv.dist}/${file.name.jar.devenv}" basedir="${dir.project.devenv.classes}" />
-      <copy todir="${dir.project.3rdparty.lib}/devenv" file="${dir.project.devenv.dist}/${file.name.jar.devenv}" />
+      <jar jarfile="${dir.project.devenv.dist}/${file.name.jar.devenv}" 
+           basedir="${dir.project.devenv.classes}" />
+      <copy todir="${dir.project.3rdparty.lib}/devenv" 
+            file="${dir.project.devenv.dist}/${file.name.jar.devenv}" />
    </target>
 
 </project>
