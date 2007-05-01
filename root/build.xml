@@ -1,8 +1,9 @@
 <project name="alfresco" default="build-tomcat" >
 
-   <!-- ********************************** -->
-   <!-- ** Initialisation/Configuration ** -->
-   <!-- ********************************** -->
+
+   <!-- ****************************************************** -->
+   <!-- ************ Initialisation/Configuration ************ -->
+   <!-- ****************************************************** -->
 
    <import file="macros.xml" />
    <import file="projects.xml" />
@@ -59,159 +60,287 @@
       </patternset>
    </target>
 
-   <!-- ************************* -->
-   <!-- ** Entry point targets ** -->
-   <!-- ************************* -->
 
-   <target name="build" description="Performs a clean build of all projects" depends="clean, incremental" />
 
-   <target name="incremental" description="Performs an incremental build of all projects"
-           depends="-tomcat, incremental-benchmarkframework, incremental-benchmarktests" />
+   <!-- ****************************************************** -->
+   <!-- ***************** Entry point targets **************** -->
+   <!-- ****************************************************** -->
 
-   <target name="build-tomcat" description="Performs a clean build for Tomcat and deploys the WAR file"
-           depends="clean, incremental-tomcat" />
+   <target name="build" 
+           description="Performs a clean build of all projects" 
+           depends="clean, 
+                    incremental" />
 
-   <target name="incremental-tomcat" description="Performs an incremental build for Tomcat and deploys the WAR file"
-           depends="-tomcat, deploy-tomcat" />
+   <target name="incremental" 
+           description="Performs an incremental build of all projects"
+           depends="-tomcat, 
+                   incremental-benchmarkframework, 
+                   incremental-benchmarktests" />
 
-   <target name="build-jboss" description="Performs a clean build for JBoss and deploys the WAR file"
-           depends="clean, incremental-jboss" />
+   <target name="build-tomcat" 
+           description="Performs a clean build for Tomcat and deploys the WAR file"
+           depends="clean, 
+                    incremental-tomcat" />
 
-   <target name="incremental-jboss" description="Performs an incremental build for JBoss and deploys the WAR file"
-           depends="package-webclient-war-jboss, deploy-jboss" />
+   <target name="incremental-tomcat" 
+           description="Performs an incremental build for Tomcat and deploys the WAR file"
+           depends="-tomcat, 
+                    deploy-tomcat" />
 
-   <target name="generate-docs" description="Compiles all documentation for all projects"
-           depends="generate-javadocs-core, generate-javadocs-mbeans, generate-javadocs-repository, generate-javadocs-remoteapi, generate-javadocs-jndi, generate-javadocs-catalinavirtual, generate-javadocs-webclient, generate-taglibdocs-webclient, generate-javadocs-rm, generate-javadocs-php, generate-javadocs-webserviceclient, generate-javadocs-benchmarkframework, generate-javadocs-benchmarktests" />
+   <target name="build-jboss" 
+           description="Performs a clean build for JBoss and deploys the WAR file"
+           depends="clean, 
+                    incremental-jboss" />
 
-   <target name="-tomcat" depends="incremental-core, incremental-mbeans, incremental-repository, incremental-remoteapi, incremental-jndi, incremental-catalinavirtual, incremental-webclient, incremental-rm, incremental-php, incremental-webserviceclient" />
+   <target name="incremental-jboss" 
+           description="Performs an incremental build for JBoss and deploys the WAR file"
+           depends="package-webclient-war-jboss, 
+                    deploy-jboss" />
 
-   <!-- ********************** -->
-   <!-- ** Cleaning targets ** -->
-   <!-- ********************** -->
+   <target name="generate-docs" 
+           description="Compiles all documentation for all projects"
+           depends="generate-javadocs-core, 
+                    generate-javadocs-mbeans, 
+                    generate-javadocs-repository, 
+                    generate-javadocs-remoteapi, 
+                    generate-javadocs-jndi, 
+                    generate-javadocs-catalinavirtual, 
+                    generate-javadocs-webclient, 
+                    generate-taglibdocs-webclient, 
+                    generate-javadocs-rm, 
+                    generate-javadocs-php, 
+                    generate-javadocs-webserviceclient, 
+                    generate-javadocs-benchmarkframework, 
+                    generate-javadocs-benchmarktests" />
 
-   <target name="clean" description="Cleans everything" 
-           depends="clean-core, clean-mbeans, clean-repository, clean-remoteapi, clean-jndi, clean-catalinavirtual, clean-webclient, clean-rm, clean-php, clean-webserviceclient, clean-benchmarkframework, clean-benchmarktests" />
+   <target name="-tomcat" 
+           depends="incremental-core, 
+                    incremental-mbeans, 
+                    incremental-repository, 
+                    incremental-remoteapi, 
+                    incremental-jndi, 
+                    incremental-catalinavirtual, 
+                    incremental-webclient, 
+                    incremental-rm, 
+                    incremental-php, 
+                    incremental-webserviceclient" />
 
-   <target name="clean-tomcat-deploy" description="Cleans the Alfresco application from Tomcat" depends="init">
+
+
+   <!-- ****************************************************** -->
+   <!-- ****************** Cleaning targets ****************** -->
+   <!-- ****************************************************** -->
+
+   <target name="clean" 
+           description="Cleans everything" 
+           depends="clean-core, 
+                    clean-mbeans, 
+                    clean-repository, 
+                    clean-remoteapi, 
+                    clean-jndi, 
+                    clean-catalinavirtual, 
+                    clean-webclient, 
+                    clean-rm, 
+                    clean-php, 
+                    clean-webserviceclient, 
+                    clean-benchmarkframework, 
+                    clean-benchmarktests" />
+
+   <target name="clean-tomcat-deploy" 
+           description="Cleans the Alfresco application from Tomcat" depends="init">
       <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
       <delete dir="${dir.deploy.tomcat}/alfresco" includeEmptyDirs="true" quiet="yes" />
    </target>
    
-   <target name="clean-jboss-deploy" description="Cleans the Alfresco application from JBoss" depends="init">
+   <target name="clean-jboss-deploy" 
+           description="Cleans the Alfresco application from JBoss" depends="init">
       <delete file="${dir.deploy.jboss}/${file.name.war.webclient}" />
    </target>
 
-   <target name="clean-war" description="Cleans just the WAR file" depends="init">
+   <target name="clean-war" 
+           description="Cleans just the WAR file" depends="init">
       <delete file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
       <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.webclient.assemble}" />
    </target>
 
-   <!-- ************************ -->
-   <!-- ** Deployment targets ** -->
-   <!-- ************************ -->
 
-   <target name="deploy-tomcat" description="Deploys to Tomcat" depends="clean-tomcat-deploy, deploy-virtual-tomcat">
-      <copy todir="${dir.deploy.tomcat}" file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+
+   <!-- ****************************************************** -->
+   <!-- **************** Deployment targets ****************** -->
+   <!-- ****************************************************** -->
+
+   <target name="deploy-tomcat" 
+           description="Deploys to Tomcat" 
+           depends="clean-tomcat-deploy, deploy-virtual-tomcat">
+
+      <copy todir="${dir.deploy.tomcat}" 
+            file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+
       <!-- ensure mysql drivers and xalan files are present -->
       <delete>
-         <fileset dir="${home.tomcat}/common/lib" includes="mysql-connector*" excludes="${file.name.jar.mysql.connector}" />
+         <fileset dir="${home.tomcat}/common/lib" 
+                  includes="mysql-connector*" 
+                  excludes="${file.name.jar.mysql.connector}" />
       </delete>
-      <copy todir="${home.tomcat}/common/lib"      file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
-      <copy todir="${home.tomcat}/common/endorsed" file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
-      <copy todir="${home.tomcat}/common/endorsed" file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
+
+      <copy todir="${home.tomcat}/common/lib"      
+            file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
+
+      <copy todir="${home.tomcat}/common/endorsed" 
+            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
+
+      <copy todir="${home.tomcat}/common/endorsed" 
+            file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
 
       <!-- copy the hotspot_compiler file to bin directory -->
-      <copy todir="${home.tomcat}/bin" file="${file.hotspotcompiler}" />
+      <copy todir="${home.tomcat}/bin" 
+            file="${file.hotspotcompiler}" />
 
       <!-- enable WCM functionality -->
-      <copy todir="${home.tomcat}/shared/classes/alfresco/extension" file="${dir.project.installer}/wcm-bootstrap-context.xml" />
+      <copy todir="${home.tomcat}/shared/classes/alfresco/extension" 
+            file="${dir.project.installer}/wcm-bootstrap-context.xml" />
    </target>
 
-   <target name="deploy-virtual-tomcat" description="Deploys to Virtual Tomcat (the virtualization server)" depends="init">
+   <target name="deploy-virtual-tomcat" 
+           description="Deploys to Virtual Tomcat (the virtualization server)" 
+           depends="init">
       <deploy-virtual-tomcat location="${home.virtualtomcat}" />
    </target>
 
-   <target name="deploy-tomcat-exploded" depends="init">
+   <target name="deploy-tomcat-exploded" 
+           depends="init">
       <copy todir="${dir.deploy.tomcat}/alfresco" verbose="true">
          <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
       </copy>
    </target>
 
-   <target name="start-tomcat" description="Starts the Tomcat server on Windows" depends="init">
+   <target name="start-tomcat" 
+           description="Starts the Tomcat server on Windows" 
+           depends="init">
       <exec dir="${home.tomcat}/bin" executable="cmd.exe" spawn="true">
          <arg line="/k startup.bat" />
       </exec>
    </target>
 
-   <target name="start-tomcat-virtual" description="Starts the virtual Tomcat server on Windows" depends="init">
+   <target name="start-tomcat-virtual" 
+           description="Starts the virtual Tomcat server on Windows" 
+           depends="init">
       <exec dir="${home.virtualtomcat}/bin" executable="cmd.exe" spawn="true">
          <arg line="/k startup.bat" />
       </exec>
    </target>
 
-   <target name="start-tomcat-debug" description="Starts the Tomcat server on Windows" depends="init">
+   <target name="start-tomcat-debug" 
+           description="Starts the Tomcat server on Windows" 
+           depends="init">
       <fail unless="env.JPDA_ADDRESS" 
             message="To run Tomcat in debug mode you need to setup the JPDA_ADDRESS enviornment variable"/>
       <fail unless="env.JPDA_TRANSPORT"
             message="To run Tomcat in debug mode you need to setup the JPDA_TRANSPORT enviornment variable"/>
       
-      <exec dir="${home.tomcat}/bin" executable="cmd.exe" spawn="true">
+      <exec dir="${home.tomcat}/bin" 
+            executable="cmd.exe" 
+            spawn="true">
          <arg line="/k catalina.bat jpda start" />
       </exec>
    </target>
    
-   <target name="deploy-jboss" description="Deploys to JBoss" depends="clean-jboss-deploy">
+   <target name="deploy-jboss" 
+           description="Deploys to JBoss" 
+           depends="clean-jboss-deploy">
       <!-- ensure mysql drivers and xalan files are present -->
-      <copy todir="${dir.deploy.jboss}" file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+      <copy todir="${dir.deploy.jboss}" 
+            file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
       <delete>
-         <fileset dir="${home.jboss}/server/default/lib" includes="mysql-connector*" excludes="${file.name.jar.mysql.connector}" />
+         <fileset dir="${home.jboss}/server/default/lib" 
+                  includes="mysql-connector*" 
+                  excludes="${file.name.jar.mysql.connector}" />
       </delete>
-      <copy todir="${home.jboss}/server/default/lib" file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
+
+      <copy todir="${home.jboss}/server/default/lib" 
+            file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
 
       <!-- copy the hotspot_compiler file to bin directory -->
-      <copy todir="${home.jboss}/bin" file="${file.hotspotcompiler}" />
+      <copy todir="${home.jboss}/bin" 
+            file="${file.hotspotcompiler}" />
    </target>
    
-   <target name="start-jboss" description="Starts the JBoss server on Windows" depends="init">
-      <exec dir="${home.jboss}/bin" executable="cmd.exe" spawn="true">
+   <target name="start-jboss" 
+           description="Starts the JBoss server on Windows" 
+           depends="init">
+      <exec dir="${home.jboss}/bin" 
+            executable="cmd.exe" 
+            spawn="true">
          <arg line="/k start run.bat" />
       </exec>
    </target>
 
-   <target name="deploy-amp" description="Deploys an AMP file to the web client WAR file. Usage deploy-amp -Dampfile=[ampfile]" 
+   <target name="deploy-amp" 
+           description="Deploys an AMP file to the web client WAR file. Usage deploy-amp -Dampfile=[ampfile]" 
            depends="init">
-      <fail unless="ampfile" message="You must supply the path to an AMP file using -Dampfile=[ampfile]"/>
-      <install-amp ampfile="${ampfile}" warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+      <fail unless="ampfile" 
+            message="You must supply the path to an AMP file using -Dampfile=[ampfile]"/>
+      <install-amp ampfile="${ampfile}" 
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <!-- ********************** -->
-   <!-- ** Testing targets ** -->
-   <!-- ********************** -->
 
-   <target name="test" description="Runs unit tests for all the projects" 
-           depends="clean, incremental, test-core, test-mbeans, test-repository, test-remoteapi, test-jndi, test-catalinavirtual, test-webclient, test-rm, test-php, test-webserviceclient" />
 
-   <target name="run-junit-test" description="Runs a single JUnit test. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir]"
+   <!-- ****************************************************** -->
+   <!-- ****************** Testing targets ******************* -->
+   <!-- ****************************************************** -->
+
+   <target name="test" 
+           description="Runs unit tests for all the projects" 
+           depends="clean, 
+                    incremental, 
+                    test-core, 
+                    test-mbeans, 
+                    test-repository, 
+                    test-remoteapi, 
+                    test-jndi, 
+                    test-catalinavirtual, 
+                    test-webclient, 
+                    test-rm, 
+                    test-php, 
+                    test-webserviceclient" />
+
+   <target name="run-junit-test" 
+           description="Runs a single JUnit test. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir]"
            depends="init">
-      <fail unless="testcase" message="You must supply a testcase to run using -Dtestcase=[test]"/>
-      <fail unless="projectdir" message="You must supply a projectdir to run using -Dprojectdir=[dir]"/>
+      <fail unless="testcase" 
+            message="You must supply a testcase to run using -Dtestcase=[test]"/>
+      <fail unless="projectdir" 
+            message="You must supply a projectdir to run using -Dprojectdir=[dir]"/>
 
       <mkdir dir="${projectdir}/${dir.name.build}/${dir.name.test.results}" />
-      <junit printsummary="yes" fork="yes" maxmemory="${mem.size.max}" haltonfailure="no" dir="${projectdir}">
+
+      <junit printsummary="yes" 
+             fork="yes" 
+             maxmemory="${mem.size.max}" 
+             haltonfailure="no" 
+             dir="${projectdir}">
          <jvmarg value="-server"/>
          <classpath refid="classpath.unit.test" />
          <formatter type="xml" />
-         <test name="${testcase}" todir="${projectdir}/${dir.name.build}/${dir.name.test.results}" />
+         <test name="${testcase}" 
+               todir="${projectdir}/${dir.name.build}/${dir.name.test.results}" />
       </junit>
    </target>
 
    <!-- Run a junit test without the irritatingly dumb junit task output in memory buffering -->
-   <target name="run-test" depends="init" description="Runs a single JUnit test bypassing the junit task. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir]">
-      <fail unless="testcase" message="You must supply a testcase to run using -Dtestcase=[test]"/>
-      <fail unless="projectdir" message="You must supply a projectdir to run using -Dprojectdir=[dir]"/>
+   <target name="run-test" 
+           description="Runs a single JUnit test bypassing the junit task. Usage run-test -Dtestcase=[test] -Dprojectdir=[dir]"
+           depends="init">
+      <fail unless="testcase" 
+            message="You must supply a testcase to run using -Dtestcase=[test]"/>
+      <fail unless="projectdir" 
+            message="You must supply a projectdir to run using -Dprojectdir=[dir]"/>
 
       <mkdir dir="${projectdir}/${dir.name.build}/${dir.name.test.results}" />
-      <java fork="yes" classname="junit.textui.TestRunner" dir="${projectdir}"
+      <java fork="yes" 
+            classname="junit.textui.TestRunner" 
+            dir="${projectdir}"
             output="${projectdir}/${dir.name.build}/${dir.name.test.results}/${testcase}.out">
          <jvmarg value="-Xmx${mem.size.max}"/>
          <jvmarg value="-server"/>
@@ -220,17 +349,25 @@
       </java>
    </target>
 
-   <!-- ******************* -->
-   <!-- ** Debug targets ** -->
-   <!-- ******************* -->
 
-   <target name="dump-properties" depends="dump-version, dump-env-properties, dump-dir-properties, dump-file-properties" />
 
-   <target name="dump-version" depends="init">
+   <!-- ****************************************************** -->
+   <!-- ******************** Debug targets ******************* -->
+   <!-- ****************************************************** -->
+
+   <target name="dump-properties" 
+           depends="dump-version, 
+                    dump-env-properties, 
+                    dump-dir-properties, 
+                    dump-file-properties" />
+
+   <target name="dump-version" 
+           depends="init">
       <echo level="info">version.number = ${version.number}</echo>
    </target>
 
-   <target name="dump-env-properties" depends="init">
+   <target name="dump-env-properties" 
+           depends="init">
       <echo level="info">basedir = ${basedir}</echo>
       <echo level="info">dir.projects = ${dir.projects}</echo>
       <echo level="info">user.home = ${user.home}</echo>
@@ -240,20 +377,25 @@
       <echo level="info">home.findbugs = ${home.findbugs}</echo>
    </target>
 
-   <target name="dump-dir-properties" depends="init">
+   <target name="dump-dir-properties" 
+           depends="init">
        <echoproperties prefix="dir" />
    </target>
 
-   <target name="dump-file-properties" depends="init">
+   <target name="dump-file-properties" 
+           depends="init">
       <echoproperties prefix="file" />
    </target>
 
-   <target name="dump-arbitary-properties" depends="init">
-      <fail unless="prefix" message="You must supply a prefix i.e. -Dprefix=file.name" />
+   <target name="dump-arbitary-properties" 
+           depends="init">
+      <fail unless="prefix" 
+            message="You must supply a prefix i.e. -Dprefix=file.name" />
       <echoproperties prefix="${prefix}" />
    </target>
 
-   <target name="dump-all-properties" depends="init">
+   <target name="dump-all-properties" 
+           depends="init">
       <echoproperties />
    </target>
 
