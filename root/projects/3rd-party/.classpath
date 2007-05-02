@@ -89,5 +89,6 @@
 	<classpathentry kind="lib" path="lib/devenv/mysql-connector-java-5.0.3-bin.jar"/>
 	<classpathentry kind="lib" path="lib/jbpm/jbpm-identity-3.2.jar"/>
 	<classpathentry exported="true" sourcepath="src/jbpm-jpdl-src-3.2.zip" kind="lib" path="lib/jbpm/jbpm-jpdl-3.2-patched.jar"/>
+	<classpathentry exported="true" sourcepath="src/guessencoding-1.0-src.zip" kind="lib" path="lib/guessencoding-1.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
