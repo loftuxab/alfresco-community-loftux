@@ -23,17 +23,35 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.types;
-
-import java.io.Serializable;
+package org.alfresco.deployment;
 
 /**
- * File Types.
+ * This is the interface that is implemented for the client.
  * @author britt
  */
-public enum FileType implements Serializable
+public interface DeploymentReceiverTransport extends DeploymentReceiverService
 {
-    FILE,
-    DIR,
-    DELETED
+    /**
+     * Get an OutputStream token.
+     * @param ticket
+     * @param path
+     * @return
+     */
+    public String getSendToken(String ticket, String path, String guid);
+    
+    /**
+     * Tell the deployment receiver that a send is finished.
+     * @param ticket
+     * @param outputToken
+     */
+    public void finishSend(String ticket, String outputToken, String guid);
+    
+    /**
+     * Write a block of bytes to a file that is being sent.
+     * @param ticket
+     * @param outputToken
+     * @param data
+     * @param offset
+     */
+    public void write(String ticket, String outputToken, byte[] data, int offset, int count);
 }
