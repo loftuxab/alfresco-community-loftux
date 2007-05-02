@@ -62,13 +62,19 @@ public interface DeploymentReceiverService
     
     /**
      * Send a file to a path.
-     * The send is completed when the file is closed.
      * @param token
      * @param path
-     * @param guid The GUID of the file being sent.
      * @return
      */
     public OutputStream send(String token, String path, String guid);
+    
+    /**
+     * Tell the deployment receiver that a particular send is done.
+     * This closes the output stream.
+     * @param token
+     * @param out
+     */
+    public void finishSend(String token, OutputStream out, String guid);
     
     /**
      * Create a directory.
@@ -92,4 +98,11 @@ public interface DeploymentReceiverService
      * @return The listing in name sorted order.
      */
     public List<FileDescriptor> getListing(String token, String path);
+    
+    /**
+     * Shut down the Deployment Receiver.
+     * @param user
+     * @param password
+     */
+    public void shutDown(String user, String password);
 }

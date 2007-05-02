@@ -23,17 +23,25 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.types;
+package org.alfresco.deployment.impl;
 
-import java.io.Serializable;
+import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
- * File Types.
  * @author britt
+ *
  */
-public enum FileType implements Serializable
+public class DeploymentException extends AlfrescoRuntimeException
 {
-    FILE,
-    DIR,
-    DELETED
+    private static final long serialVersionUID = -1044761933985203012L;
+
+    public DeploymentException(String message)
+    {
+        super(message);
+    }
+    
+    public DeploymentException(String message, Throwable cause)
+    {
+        super(message, cause);
+    }
 }

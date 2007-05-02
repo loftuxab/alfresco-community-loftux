@@ -23,17 +23,69 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.types;
+package org.alfresco.deployment.impl.server;
 
 import java.io.Serializable;
 
+import org.alfresco.deployment.types.FileType;
+
 /**
- * File Types.
+ * This is a record of a deployed file. It holds the pre-commit location
+ * of a file, the final location of the file, and the GUID of the file.
  * @author britt
  */
-public enum FileType implements Serializable
+public class DeployedFile implements Serializable
 {
-    FILE,
-    DIR,
-    DELETED
+    private static final long serialVersionUID = -8500167211804636309L;
+
+    private FileType fType;
+    
+    private String fPreLocation;
+    
+    private String fFinalPath;
+    
+    private String fGUID;
+    
+    public DeployedFile(FileType type,
+                        String preLocation,
+                        String finalPath,
+                        String guid)
+    {
+        fType = type;
+        fPreLocation = preLocation;
+        fFinalPath = finalPath;
+        fGUID = guid;
+    }
+
+    /**
+     * @return the FinalPath
+     */
+    public String getFinalPath()
+    {
+        return fFinalPath;
+    }
+
+    /**
+     * @return the GUID
+     */
+    public String getGuid()
+    {
+        return fGUID;
+    }
+    
+    /**
+     * @return the PreLocation
+     */
+    public String getPreLocation()
+    {
+        return fPreLocation;
+    }
+    
+    /**
+     * @return the Type
+     */
+    public FileType getType()
+    {
+        return fType;
+    }
 }
