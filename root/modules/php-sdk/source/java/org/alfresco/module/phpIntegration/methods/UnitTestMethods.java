@@ -26,18 +26,12 @@ package org.alfresco.module.phpIntegration.methods;
 
 import org.alfresco.module.phpIntegration.PHPMethodExtension;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
-import org.alfresco.module.phpIntegration.lib.Node;
 
 /**
  * @author Roy Wetherall
  */
 public class UnitTestMethods extends PHPMethodExtension
-{
-    public String dump_node(Node node)
-    {
-        return "NODE";
-    }
-    
+{    
     public void assertEquals(Object expected, Object value)
     {
         if (expected.equals(value) == false)
@@ -53,6 +47,18 @@ public class UnitTestMethods extends PHPMethodExtension
             if (message == null)
             {
                 message = "Unexpected null value encountered.";
+            }
+            throw new PHPProcessorException(message);
+        }
+    }
+    
+    public void assertNull(Object value, String message)
+    {
+        if (value != null)
+        {
+            if (message == null)
+            {
+                message = "Unexpected non-null value encountered.";
             }
             throw new PHPProcessorException(message);
         }

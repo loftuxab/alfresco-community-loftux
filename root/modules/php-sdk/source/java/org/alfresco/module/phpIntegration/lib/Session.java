@@ -42,9 +42,12 @@ public class Session implements ScriptObject
     
     private ServiceRegistry serviceRegistry;
     
+    private NamespaceMap namespaceMap;
+    
     public Session(ServiceRegistry serviceRegistry)
     {
         this.serviceRegistry = serviceRegistry;
+        this.namespaceMap = new NamespaceMap(this);
     }
     
     public String getScriptObjectName()
@@ -60,6 +63,11 @@ public class Session implements ScriptObject
     public String getTicket()
     {
         return this.serviceRegistry.getAuthenticationService().getCurrentTicket();
+    }
+    
+    public NamespaceMap getNamespaceMap()
+    {
+        return this.namespaceMap;
     }
     
     public Store[] getStores()
@@ -110,6 +118,20 @@ public class Session implements ScriptObject
         
         // Check for the existance of the node
         NodeRef nodeRef = new NodeRef(store.getStoreRef(), id);
+        if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
+        {
+            node = new Node(this, nodeRef);
+        }
+        
+        return node;
+    }
+    
+    public Node getNode(String nodeString)
+    {
+        Node node = null;
+        
+        // Check for the existance of the node
+        NodeRef nodeRef = new NodeRef(nodeString);
         if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
         {
             node = new Node(this, nodeRef);

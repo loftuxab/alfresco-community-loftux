@@ -3,6 +3,8 @@
 
 <beans>
 
+	<import resource="classpath:alfresco/module/phpIntegration/bootstrap-context.xml" />
+
     <!-- PHP Processor -->    
     <bean id="phpProcessor" parent="baseTemplateProcessor" class="org.alfresco.module.phpIntegration.PHPProcessor">
     	<property name="name">
@@ -66,12 +68,48 @@
     	</property>    	
     </bean>
     
+    <bean id="phpAssociation" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>Association</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.Association</value>
+    	</property>    	
+    </bean>
+    
+    <bean id="phpChildAssociation" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>ChildAssociation</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.ChildAssociation</value>
+    	</property>    	
+    </bean>
+    
     <bean id="phpSpacesStore" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
     	<property name="extensionName">
     		<value>SpacesStore</value>
     	</property> 
     	<property name="extensionClass">
     		<value>org.alfresco.module.phpIntegration.lib.SpacesStore</value>
+    	</property>    	
+    </bean>
+    
+    <bean id="phpNamespaceMap" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>NamespaceMap</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.NamespaceMap</value>
+    	</property>    	
+    </bean>
+    
+    <bean id="phpContentData" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>ContentData</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.ContentData</value>
     	</property>    	
     </bean>
     
