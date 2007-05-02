@@ -94,7 +94,8 @@
    <target name="generate-javadocs-mbeans" 
            description="Generates the JavaDocs for the mbeans project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Virtualization MBean" windowtitle="Alfresco Virtualization MBean" 
+      <generate-javadocs documenttitle="Alfresco Virtualization MBean" 
+                         windowtitle="Alfresco Virtualization MBean" 
                          projectdir="${dir.project.mbeans}" />
    </target>
    
@@ -165,16 +166,20 @@
    <target name="generate-javadocs-repository" 
            description="Generates the JavaDocs for the repository project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Repository Specification" windowtitle="Alfresco Repository" 
+      <generate-javadocs documenttitle="Alfresco Repository Specification" 
+                         windowtitle="Alfresco Repository" 
                          projectdir="${dir.project.repository}" />
    </target>
    
    <target name="build-single-jar" 
            description="Builds a self-contained executable jar" 
            depends="package-repository">
+
       <!-- extract the one-jar file -->
       <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.95.jar" 
-             dest="${dir.onejar}" overwrite="true" />
+             dest="${dir.onejar}" 
+             overwrite="true" />
+
       <!-- remove unwanted files -->
       <delete >
          <fileset dir="${dir.onejar}">
@@ -183,22 +188,79 @@
          </fileset>
       </delete>
       <!-- copy required jars into lib folder -->
-      <copy todir="${dir.onejar}/lib" flatten="false">
-         <fileset dir="${dir.project.3rdparty.lib}" includes="**/*.jar" excludes="${dir.name.devenv}/**" />
-         <fileset dir="${dir.project.core.dist}" includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.repository.dist}" includes="${file.name.jar.repository}" />
-         <fileset dir="${dir.project.core.src.java}" includes="**/*log4j.properties" />
+      <copy todir="${dir.onejar}/lib" 
+            flatten="false">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="**/*.jar" 
+                  excludes="${dir.name.devenv}/**" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.repository.dist}" 
+                  includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.core.src.java}" 
+                  includes="**/*log4j.properties" />
       </copy>
       <!-- delete target one-jar -->
       <delete file="${dir.project.repository.dist}/${file.name.jar.onejar}" />
       <!-- build the one-jar -->
       <jar destfile="${dir.project.repository.dist}/${file.name.jar.onejar}" 
-           manifest="${dir.onejar}/META-INF/MANIFEST.MF" update="false" >
+           manifest="${dir.onejar}/META-INF/MANIFEST.MF" 
+           update="false" >
          <fileset dir="${dir.onejar}">
             <include name="**/*" />
          </fileset>
       </jar>
    </target>
+
+
+   <!-- ***************************** -->
+   <!-- ** Link Validation Project ** -->
+   <!-- ***************************** -->
+   
+   <target name="incremental-linkvalidation" 
+           description="Performs an incremental build of the linkvalidation project" 
+           depends="package-linkvalidation" />
+      
+   <target name="build-linkvalidation" 
+           description="Performs a clean build of the linkvalidation project" 
+           depends="clean-linkvalidation, 
+                    incremental-linkvalidation" />
+   
+   <target name="clean-linkvalidation" 
+           description="Cleans the linkvalidation project" 
+           depends="init">
+      <clean projectdir="${dir.project.linkvalidation}" />
+   </target>
+   
+   <target name="compile-linkvalidation" 
+           description="Compiles the linkvalidation project" 
+           depends="init">
+      <compile-java projectdir="${dir.project.linkvalidation}" />
+   </target>
+   
+   <target name="package-linkvalidation" 
+           description="Packages the linkvalidation project" 
+           depends="compile-linkvalidation">
+      <mkdir dir="${dir.project.linkvalidation.dist}" />
+      <jar jarfile="${dir.project.linkvalidation.dist}/${file.name.jar.linkvalidation}" 
+           basedir="${dir.project.linkvalidation.classes}" />
+   </target>
+   
+   <target name="test-linkvalidation" 
+           description="Runs the tests for the linkvalidation project" 
+           depends="compile-linkvalidation">
+      <run-tests projectdir="${dir.project.linkvalidation}" />
+   </target>
+   
+   <target name="generate-javadocs-linkvalidation" 
+           description="Generates the JavaDocs for the linkvalidation project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Core API Specification" 
+                         windowtitle="Alfresco Core API" 
+                         projectdir="${dir.project.linkvalidation}"/>
+   </target>
+
+
    
    <!-- ********************* -->
    <!-- ** JCR TCK Project ** -->
@@ -209,20 +271,34 @@
            description="Builds the JCR TCK WAR file">
       <war warfile="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
            webxml="${dir.project.repository.src.webinf}\JCRTCK\web.xml">
-         <fileset dir="${dir.project.repository.src.web}" excludes="WEB-INF/**" />
-         <webinf dir="${dir.project.installer}" includes="licenses/**" />
-         <webinf dir="${dir.project.repository.src.webinf}" excludes="web.xml"/>
-         <lib dir="${dir.project.3rdparty.lib}" includes="*.jar" excludes="${dir.name.devenv}/**,jcr-1.0.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/jibx" includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/openoffice" includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/jmagick" includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/commons" includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/jgroups" includes="*.jar" />
-         <lib dir="${dir.project.3rdparty.lib}/swarmcache" includes="*.jar" />
-         <lib dir="${dir.project.repository.dist}" includes="${file.name.jar.repository}" />
-         <lib dir="${dir.project.core.dist}" includes="${dir.name.jar.core}" />
+         <fileset dir="${dir.project.repository.src.web}" 
+                  excludes="WEB-INF/**" />
+         <webinf dir="${dir.project.installer}" 
+                 includes="licenses/**" />
+         <webinf dir="${dir.project.repository.src.webinf}" 
+                 excludes="web.xml"/>
+         <lib dir="${dir.project.3rdparty.lib}" 
+              includes="*.jar" 
+              excludes="${dir.name.devenv}/**,jcr-1.0.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/jibx" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/openoffice" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/jmagick" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/commons" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/jgroups" 
+              includes="*.jar" />
+         <lib dir="${dir.project.3rdparty.lib}/swarmcache" 
+              includes="*.jar" />
+         <lib dir="${dir.project.repository.dist}" 
+              includes="${file.name.jar.repository}" />
+         <lib dir="${dir.project.core.dist}" 
+              includes="${dir.name.jar.core}" />
          <classes dir="${dir.project.repository.config}"/>
-         <classes file="${dir.project.core.src.java}/log4j.properties" prefix="WEB-INF/classes" />
+         <classes file="${dir.project.core.src.java}/log4j.properties" 
+                  prefix="WEB-INF/classes" />
       </war>
    </target>
 
@@ -232,9 +308,11 @@
             todir="${dir.deploy.jcr.tck}/bin/tck-webapp/webapps" />
    </target>
 
-   <target name="start-tck" depends="init">
+   <target name="start-tck" 
+           depends="init">
       <exec dir="${dir.deploy.jcr.tck}/bin/tck-webapp" 
-            executable="cmd.exe" spawn="true">
+            executable="cmd.exe" 
+            spawn="true">
          <arg line="/k start server.bat -debug socket" />
       </exec>
    </target>
@@ -266,7 +344,8 @@
    </target>
 
    <target name="compile-remoteapi" 
-           description="Compiles the remote API project" depends="init">
+           description="Compiles the remote API project" 
+           depends="init">
       <compile-java-inc-generated projectdir="${dir.project.remoteapi}" />
    </target>
    
@@ -305,7 +384,8 @@
                     gen-administration-service-server, 
                     gen-dictionary-service-server" />
 
-   <target name="init-service-gen" depends="init">
+   <target name="init-service-gen" 
+           depends="init">
       <!-- load the WSDL 2 Java task definition -->
       <taskdef name="wsdl2java" 
                classname="org.apache.axis.tools.ant.wsdl.Wsdl2javaAntTask">
@@ -320,7 +400,9 @@
       </delete>
       <wsdl2java url="${dir.project.remoteapi.src.wsdl}/authentication-service.wsdl" 
                  output="${dir.project.remoteapi.src.generated}" 
-                 serverSide="true" skeletondeploy="false" all="true">
+                 serverSide="true" 
+                 skeletondeploy="false" 
+                 all="true">
          <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" 
                   package="org.alfresco.repo.webservice.authentication" />
          <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
@@ -441,7 +523,8 @@
       </delete>
    </target>
 
-   <target name="gen-action-service-server" depends="init-service-gen">
+   <target name="gen-action-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/action" />
       </delete>
@@ -482,7 +565,8 @@
       </delete>
    </target>
 
-   <target name="gen-administration-service-server" depends="init-service-gen">
+   <target name="gen-administration-service-server" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.remoteapi.src.generated}/org/alfresco/repo/webservice/administration" />
       </delete>
@@ -584,7 +668,8 @@
    </target>
 
    <target name="test-catalinavirtual" 
-           description="Runs the tests for the virtual tomcat project" depends="compile-catalinavirtual">
+           description="Runs the tests for the virtual tomcat project" 
+           depends="compile-catalinavirtual">
       <run-tests projectdir="${dir.project.catalinavirtual}" />
    </target>
 
@@ -677,9 +762,12 @@
 
       <!-- add config files to WEB-INF/classes -->
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes">
-         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
-         <fileset dir="${dir.project.repository.config}" excludes="**/extension/**" />
-         <fileset dir="${dir.project.webclient.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.core.src.java}" 
+                  includes="log4j.properties" />
+         <fileset dir="${dir.project.repository.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webclient.config}" 
+                  excludes="**/extension/**" />
          <!-- 
          Add dev-context.xml (if present) to WEB-INF/classes.
          This allows developers doing private builds to override
@@ -698,19 +786,33 @@
       </copy>
 
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/lib">
-         <fileset dir="${dir.project.3rdparty.lib}" includes="*.jar" excludes="${dir.name.devenv}/**" />
-         <fileset dir="${dir.project.webclient.dist}" includes="${file.name.jar.webclient}" />
-         <fileset dir="${dir.project.3rdparty.lib}/jibx" includes="*.jar" />
-         <fileset dir="${dir.project.3rdparty.lib}/openoffice" includes="*.jar" />
-         <fileset dir="${dir.project.3rdparty.lib}/jmagick" includes="*.jar" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" includes="*.jar" />
-         <fileset dir="${dir.project.3rdparty.lib}/jgroups" includes="*.jar" />
-         <fileset dir="${dir.project.3rdparty.lib}/jbpm" includes="*.jar" />
-         <fileset dir="${dir.project.3rdparty.lib}/fop" includes="*.jar"/>
-         <fileset dir="${dir.project.core.dist}" includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.repository.dist}" includes="${file.name.jar.repository}" />
-         <fileset dir="${dir.project.mbeans.dist}" includes="${file.name.jar.mbeans}" />
-         <fileset dir="${dir.project.remoteapi.dist}" includes="${file.name.jar.remoteapi}" />
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="*.jar" 
+                  excludes="${dir.name.devenv}/**" />
+         <fileset dir="${dir.project.webclient.dist}" 
+                  includes="${file.name.jar.webclient}" />
+         <fileset dir="${dir.project.3rdparty.lib}/jibx" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/openoffice" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jmagick" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jgroups" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jbpm" 
+                  includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/fop" 
+                  includes="*.jar"/>
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.repository.dist}" 
+                  includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.mbeans.dist}" 
+                  includes="${file.name.jar.mbeans}" />
+         <fileset dir="${dir.project.remoteapi.dist}" 
+                  includes="${file.name.jar.remoteapi}" />
       </copy>
 
       <!-- clean up previously generated properties files -->
@@ -812,8 +914,11 @@
    <target name="generate-taglibdocs-webclient" 
            description="Creates the tag library docs for the webclient project"
            depends="init">
+
       <mkdir dir="${dir.project.webclient.docs.taglib}" />
-      <java fork="true" jar="${dir.project.3rdparty.lib}/${dir.name.devenv}/tlddoc.jar" 
+
+      <java jar="${dir.project.3rdparty.lib}/${dir.name.devenv}/tlddoc.jar" 
+            fork="true" 
             failonerror="true">
          <arg line="-d ${dir.project.webclient.docs.taglib}" />
          <arg line="-doctitle 'Alfresco Tag Library Documentation'" />
@@ -883,8 +988,10 @@
       <zip destfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
            update="true">
          <zipfileset file="${dir.module.rm.property}/module.properties"/>
-         <zipfileset file="${dir.module.rm.dist}/${file.name.jar.rm}" prefix="lib"/>
-         <zipfileset dir="${dir.module.rm.config}" prefix="config">
+         <zipfileset file="${dir.module.rm.dist}/${file.name.jar.rm}" 
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.rm.config}" 
+                     prefix="config">
             <exclude name="**/module.properties"/>
          </zipfileset>
       </zip>
@@ -901,7 +1008,8 @@
            description="Generates the JavaDocs for the records management project.  Enable with '-Denable.module.rm=TRUE'."
            depends="init" 
            if="enable.module.rm">
-      <generate-javadocs documenttitle="Alfresco Records Management Extension" windowtitle="Records Management" 
+      <generate-javadocs documenttitle="Alfresco Records Management Extension" 
+                         windowtitle="Records Management" 
                          projectdir="${dir.module.rm}"/>
    </target>
    
@@ -927,7 +1035,10 @@
       <clean projectdir="${dir.module.php}" />
    </target>
 
-   <target name="compile-php" description="Compiles the PHP SDK project" depends="init" if="enable.module.php">
+   <target name="compile-php" 
+           description="Compiles the PHP SDK project" 
+           depends="init" 
+           if="enable.module.php">
       <compile-java projectdir="${dir.module.php}" />
    </target>
 
@@ -1019,7 +1130,8 @@
    </target>
 
    <target name="compile-webserviceclient" 
-           description="Compiles the web service client project" depends="init">
+           description="Compiles the web service client project" 
+           depends="init">
       <compile-java-inc-generated projectdir="${dir.project.webserviceclient}" />
    </target>
    
@@ -1080,7 +1192,9 @@
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/repository" />
       </delete>
       <wsdl2java url="${dir.project.remoteapi.src.wsdl}/repository-service.wsdl" 
-                 output="${dir.project.webserviceclient.src.generated}" testcase="no" all="true">
+                 output="${dir.project.webserviceclient.src.generated}" 
+                 testcase="no" 
+                 all="true">
          <mapping namespace="http://www.alfresco.org/ws/service/repository/1.0" 
                   package="org.alfresco.webservice.repository" />
          <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
@@ -1092,7 +1206,8 @@
       </wsdl2java>
    </target>
 
-   <target name="gen-dictionary-service-client" depends="init-service-gen">
+   <target name="gen-dictionary-service-client" 
+           depends="init-service-gen">
       <delete>
          <fileset dir="${dir.project.webserviceclient.src.generated}/org/alfresco/webservice/dictionary" />
       </delete>

@@ -1,4 +1,5 @@
-<project name="alfresco" default="build-tomcat" >
+<project name="alfresco" 
+         default="build-tomcat" >
 
 
    <!-- ****************************************************** -->
@@ -104,6 +105,7 @@
                     generate-javadocs-repository, 
                     generate-javadocs-remoteapi, 
                     generate-javadocs-jndi, 
+                    generate-javadocs-linkvalidation, 
                     generate-javadocs-catalinavirtual, 
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
@@ -118,6 +120,7 @@
                     incremental-mbeans, 
                     incremental-repository, 
                     incremental-remoteapi, 
+                    incremental-linkvalidation,
                     incremental-jndi, 
                     incremental-catalinavirtual, 
                     incremental-webclient, 
@@ -138,6 +141,7 @@
                     clean-repository, 
                     clean-remoteapi, 
                     clean-jndi, 
+                    clean-linkvalidation, 
                     clean-catalinavirtual, 
                     clean-webclient, 
                     clean-rm, 
@@ -147,20 +151,27 @@
                     clean-benchmarktests" />
 
    <target name="clean-tomcat-deploy" 
-           description="Cleans the Alfresco application from Tomcat" depends="init">
+           description="Cleans the Alfresco application from Tomcat" 
+           depends="init">
       <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
-      <delete dir="${dir.deploy.tomcat}/alfresco" includeEmptyDirs="true" quiet="yes" />
+      <delete dir="${dir.deploy.tomcat}/alfresco" 
+              includeEmptyDirs="true" 
+              quiet="yes" />
    </target>
    
    <target name="clean-jboss-deploy" 
-           description="Cleans the Alfresco application from JBoss" depends="init">
+           description="Cleans the Alfresco application from JBoss" 
+           depends="init">
       <delete file="${dir.deploy.jboss}/${file.name.war.webclient}" />
    </target>
 
    <target name="clean-war" 
-           description="Cleans just the WAR file" depends="init">
+           description="Cleans just the WAR file" 
+           depends="init">
       <delete file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
-      <delete quiet="yes" includeEmptyDirs="true" dir="${dir.project.webclient.assemble}" />
+      <delete quiet="yes" 
+              includeEmptyDirs="true" 
+              dir="${dir.project.webclient.assemble}" />
    </target>
 
 
@@ -171,7 +182,8 @@
 
    <target name="deploy-tomcat" 
            description="Deploys to Tomcat" 
-           depends="clean-tomcat-deploy, deploy-virtual-tomcat">
+           depends="clean-tomcat-deploy, 
+                    deploy-virtual-tomcat">
 
       <copy todir="${dir.deploy.tomcat}" 
             file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
@@ -209,15 +221,19 @@
 
    <target name="deploy-tomcat-exploded" 
            depends="init">
-      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="true">
-         <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
+      <copy todir="${dir.deploy.tomcat}/alfresco" 
+            verbose="true">
+         <fileset dir="${dir.project.webclient.src.web}" 
+                  excludes="WEB-INF/**" />
       </copy>
    </target>
 
    <target name="start-tomcat" 
            description="Starts the Tomcat server on Windows" 
            depends="init">
-      <exec dir="${home.tomcat}/bin" executable="cmd.exe" spawn="true">
+      <exec dir="${home.tomcat}/bin" 
+            executable="cmd.exe" 
+            spawn="true">
          <arg line="/k startup.bat" />
       </exec>
    </target>
@@ -225,7 +241,9 @@
    <target name="start-tomcat-virtual" 
            description="Starts the virtual Tomcat server on Windows" 
            depends="init">
-      <exec dir="${home.virtualtomcat}/bin" executable="cmd.exe" spawn="true">
+      <exec dir="${home.virtualtomcat}/bin" 
+            executable="cmd.exe" 
+            spawn="true">
          <arg line="/k startup.bat" />
       </exec>
    </target>
@@ -299,6 +317,7 @@
                     test-repository, 
                     test-remoteapi, 
                     test-jndi, 
+                    test-linkvalidation, 
                     test-catalinavirtual, 
                     test-webclient, 
                     test-rm, 
