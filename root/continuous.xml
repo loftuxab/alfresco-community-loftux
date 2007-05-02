@@ -474,6 +474,8 @@
                   includes="org/alfresco/util/VersionNumber.class" />
          <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/util/ISO8601DateFormat.class" />
+         <fileset dir="${dir.project.core.classes}" 
+                  includes="org/alfresco/util/Pair.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/repo/module/tool/default-file-mapping.properties" />
          <fileset dir="${dir.project.repository.classes}" 
