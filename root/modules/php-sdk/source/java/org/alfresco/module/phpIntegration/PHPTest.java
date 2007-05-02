@@ -41,6 +41,7 @@ import org.alfresco.service.cmr.repository.ScriptLocation;
 import org.alfresco.service.cmr.repository.ScriptService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.repository.TemplateService;
+import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.BaseSpringTest;
 
@@ -61,9 +62,10 @@ public class PHPTest extends BaseSpringTest
     private PHPProcessor phpProcessor;
     
     private StoreRef storeRef;
+    private NodeRef rootNode;
     private NodeRef templateNodeRef;
     private NodeRef scriptNodeRef;
-    
+
     /**
      * @see org.springframework.test.AbstractTransactionalSpringContextTests#onSetUpInTransaction()
      */
@@ -81,12 +83,12 @@ public class PHPTest extends BaseSpringTest
         
         // Create nodes used in the tests
         this.storeRef = this.nodeService.createStore(StoreRef.PROTOCOL_WORKSPACE, "phpTest_" + System.currentTimeMillis());
-        NodeRef rootNode = this.nodeService.getRootNode(this.storeRef);
+        this.rootNode = this.nodeService.getRootNode(this.storeRef);
         
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(ContentModel.PROP_NAME, "testTemplate.php");
         this.templateNodeRef = this.nodeService.createNode(
-                rootNode, 
+                this.rootNode, 
                 ContentModel.ASSOC_CHILDREN, 
                 ContentModel.ASSOC_CHILDREN, 
                 ContentModel.TYPE_CONTENT, 
@@ -100,7 +102,7 @@ public class PHPTest extends BaseSpringTest
         Map<QName, Serializable> props2 = new HashMap<QName, Serializable>(1);
         props2.put(ContentModel.PROP_NAME, "testScript.php");
         this.scriptNodeRef = this.nodeService.createNode(
-                rootNode, 
+                this.rootNode, 
                 ContentModel.ASSOC_CHILDREN, 
                 ContentModel.ASSOC_CHILDREN, 
                 ContentModel.TYPE_CONTENT, 
@@ -109,7 +111,7 @@ public class PHPTest extends BaseSpringTest
         contentWriter2.setEncoding("UTF-8");
         contentWriter2.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
         InputStream is2 = this.getClass().getClassLoader().getResourceAsStream(CLASSPATH_ROOT + "testScript.php");
-        contentWriter2.putContent(is2);
+        contentWriter2.putContent(is2);        
     }
     
     /** ========= Test template processor implementation ========= */
@@ -206,7 +208,81 @@ public class PHPTest extends BaseSpringTest
         StringWriter out = new StringWriter();        
         this.phpProcessor.process(CLASSPATH_ROOT + "testModelAndGlobals.php", model, out);
         
+        System.out.println("testGlobalVariables output:");
         System.out.println(out.toString());
+    }
+    
+    public void testNamespaceMap()
+    {
+        Map<String, Object> model = new HashMap<String, Object>(6);   
+        StringWriter out = new StringWriter();        
+        this.phpProcessor.process(CLASSPATH_ROOT + "testNamespaceMap.php", model, out);
+        
+        System.out.println("testNamespaceMap output:");
+        System.out.println(out.toString());
+    }
+    
+    public void testNode()
+    {
+        // Create a folder
+        Map<QName, Serializable> props3 = new HashMap<QName, Serializable>(1);
+        props3.put(ContentModel.PROP_NAME, "testFolder");
+        NodeRef testFolder = this.nodeService.createNode(
+                this.rootNode, 
+                ContentModel.ASSOC_CHILDREN, 
+                ContentModel.ASSOC_CHILDREN, 
+                ContentModel.TYPE_FOLDER, 
+                props3).getChildRef();
+        
+        // Create the node
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+        props.put(ContentModel.PROP_NAME, "testNode.txt");
+        props.put(ContentModel.PROP_AUTHOR, "Roy Wetherall");
+        NodeRef nodeRef = this.nodeService.createNode(
+                testFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "testNode.txt"), 
+                ContentModel.TYPE_CONTENT, 
+                props).getChildRef(); 
+        
+        // Add some test content
+        ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.setEncoding("UTF-8");
+        contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        contentWriter.putContent("test content");
+        
+        // Add a couple of aspects
+        this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_VERSIONABLE, null);
+        this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_CLASSIFIABLE, null);     
+        
+        // Create a second test node
+        Map<QName, Serializable> props2 = new HashMap<QName, Serializable>(2);
+        props2.put(ContentModel.PROP_NAME, "testNode2.txt");
+        props2.put(ContentModel.PROP_AUTHOR, "Roy Wetherall");
+        NodeRef nodeRef2 = this.nodeService.createNode(
+                testFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "testNode2.txt"), 
+                ContentModel.TYPE_CONTENT, 
+                props2).getChildRef(); 
+        
+        // Add association from one node to the other
+        this.nodeService.addAspect(nodeRef, ContentModel.ASPECT_REFERENCEABLE, null);
+        this.nodeService.createAssociation(nodeRef, nodeRef2, ContentModel.ASSOC_REFERENCES);
+        
+        // Create the model
+        Map<String, Object> model = new HashMap<String, Object>(1);
+        model.put("testFolder", testFolder);
+        model.put("testNode", nodeRef);
+        
+        // Process the test script
+        StringWriter out = new StringWriter();        
+        this.phpProcessor.process(CLASSPATH_ROOT + "testNode.php", model, out);
+        
+        // Print out any output from the template
+        System.out.println("testNode output:");
+        System.out.println(out.toString());
+        
     }
 
 }

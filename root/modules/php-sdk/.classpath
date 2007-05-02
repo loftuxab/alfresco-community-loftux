@@ -8,5 +8,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry exported="true" sourcepath="lib/source/quercus.zip" kind="lib" path="lib/quercus.jar"/>
 	<classpathentry exported="true" sourcepath="lib/source/quercus.zip" kind="lib" path="lib/resin-util.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

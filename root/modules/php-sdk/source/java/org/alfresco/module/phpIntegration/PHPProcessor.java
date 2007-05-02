@@ -51,10 +51,12 @@ import org.alfresco.service.cmr.repository.TemplateProcessor;
 import org.alfresco.service.namespace.QName;
 
 import com.caucho.quercus.Quercus;
+import com.caucho.quercus.env.ArrayValue;
+import com.caucho.quercus.env.ArrayValueImpl;
 import com.caucho.quercus.env.DoubleValue;
 import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.JavaValue;
-import com.caucho.quercus.env.NumberValue;
+import com.caucho.quercus.env.NullValue;
 import com.caucho.quercus.env.StringInputStream;
 import com.caucho.quercus.env.StringValue;
 import com.caucho.quercus.env.Value;
@@ -74,8 +76,9 @@ import com.caucho.vfs.WriteStream;
 public class PHPProcessor extends BaseProcessor implements TemplateProcessor, ScriptProcessor
 {
     /** Keys to well known global values */
-    public static final String GLOBAL_REPOSITORY = "_REPOSITORY";
-    public static final String GLOBAL_SESSION = "_SESSION";
+    public static final String GLOBAL_REPOSITORY = "_ALF_REPOSITORY";
+    public static final String GLOBAL_SESSION = "_ALF_SESSION";
+    public static final String GLOBAL_MODEL = "_ALF_MODEL";
     
     /** Key used to store a reference to the service registry in the Quercus engine */
     public static final String KEY_SERVICE_REGISTRY = "ServiceRegistry";
@@ -165,17 +168,14 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
             
             // Add the repository and session as a global variables
             Repository repository = new Repository(env);
-            setGlobalValue(env, GLOBAL_REPOSITORY, repository);
+            env.setGlobalValue(GLOBAL_REPOSITORY, convertToValue(env, null, repository));
             Session session = repository.createSession();
-            setGlobalValue(env, GLOBAL_SESSION, session);
+            env.setGlobalValue(GLOBAL_SESSION, convertToValue(env, null, session));
             
             // Map the contents of the passed model into global variables
             if (model != null)
             {
-                for (Map.Entry<String, Object> entry : model.entrySet())
-                {
-                    setGlobalValue(env, entry.getKey(), entry.getValue(), session);
-                }                
+               env.setGlobalValue(GLOBAL_MODEL, convertToValue(env, session, model));
             }
             
             // Execute the page
@@ -200,21 +200,18 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
         }
     }
     
-    private void setGlobalValue(Env env, String name, Object value)
+    public static Value convertToValue(Env env, Session session, Object value)
     {
-        setGlobalValue(env, name, value, null);
-    }
-    
-    private void setGlobalValue(Env env, String name, Object value, Session session)
-    {
+        Value result = null;
+        
         if (value instanceof String)
         {
-            env.setGlobalValue(name, StringValue.create(value));
+            result = StringValue.create(value);
         }
         else if (value instanceof Integer)
         {  
             // TODO could do with a IntegerValue value ...
-            env.setGlobalValue(name, DoubleValue.create(((Integer)value).doubleValue()));
+            result = DoubleValue.create(((Integer)value).doubleValue());
         }
         // TODO anyother primative value types that need converting ... 
         else if (value instanceof StoreRef)
@@ -225,7 +222,7 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
                 Store store = session.getStore(storeRef.getIdentifier(), storeRef.getProtocol());
                 if (store != null)
                 {
-                   setGlobalValue(env, name, store, session);                    
+                   result = convertToValue(env, session, store);                    
                 }
             }
             
@@ -242,27 +239,65 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
                     Node node = session.getNode(store, nodeRef.getId());
                     if (node != null)
                     {
-                        setGlobalValue(env, name, node, session);
+                        result = convertToValue(env, session, node);
                     }
                 }
             }
             
             // TODO do we need to raise the fact that the session, store or node way have been null ?? 
         }
+        else if (value instanceof Map)
+        {
+            Map map = (Map)value;
+            ArrayValue arrayValue = new ArrayValueImpl(map.size());
+            for (Object objKey : map.keySet())
+            {
+                if (objKey instanceof String)
+                {
+                    String key = (String)objKey;
+                    Object objValue = map.get(key);
+                    arrayValue.put(StringValue.create(key), convertToValue(env, session, objValue));
+                }
+            }
+            result = arrayValue;
+        }
         else if (value instanceof ScriptObject)
         {
-            JavaClassDef def = this.quercus.getModuleContext().getJavaClassDefinition(((ScriptObject)value).getScriptObjectName());
-            def.introspect();
-            env.setGlobalValue(name, new JavaValue(env, value, def));
+            try
+            {
+                JavaClassDef def = env.getQuercus().getModuleContext().getJavaClassDefinition(((ScriptObject)value).getScriptObjectName());
+                def.introspect();
+                result = new JavaValue(env, value, def);
+            }
+            catch (Exception exception)
+            {
+                // For some reason the class definition could not be retrieved so set to null
+                result = NullValue.NULL;
+            }
         }
         else
         {
-            JavaClassDef def = this.quercus.getModuleContext().getJavaClassDefinition(value.getClass().toString());
-            def.introspect();
-            env.setGlobalValue(name, new JavaValue(env, value, def));
+            try
+            {
+                JavaClassDef def = env.getQuercus().getModuleContext().getJavaClassDefinition(value.getClass().toString());
+                def.introspect();
+                result = new JavaValue(env, value, def);
+            }
+            catch (Exception exception)
+            {
+                // Failed to get the java class for the definition so set to null
+                result = NullValue.NULL;
+            }
         }
+        
+        return result;
     }
     
+    /**
+     * 
+     * @param model
+     * @return
+     */
     @SuppressWarnings("unchecked")
     private Map<String, Object> getModel(Object model)
     {
