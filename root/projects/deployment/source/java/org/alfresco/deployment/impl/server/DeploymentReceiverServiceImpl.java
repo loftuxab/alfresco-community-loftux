@@ -37,18 +37,26 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.deployment.DeploymentReceiverService;
+import org.alfresco.deployment.FileDescriptor;
+import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.config.Configuration;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.deployment.types.FileDescriptor;
-import org.alfresco.deployment.types.FileType;
+import org.alfresco.deployment.util.Deleter;
 import org.alfresco.util.GUID;
+import org.springframework.beans.BeansException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * Server implementation.
  * @author britt
  */
-public class DeploymentReceiverServiceImpl implements DeploymentReceiverService, Runnable
+public class DeploymentReceiverServiceImpl implements DeploymentReceiverService, Runnable, 
+    ApplicationContextAware
 {
+    private ConfigurableApplicationContext fContext;
+    
     private Configuration fConfiguration;
     
     private Thread fThread;
@@ -59,14 +67,11 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     
     private Map<String, Boolean> fTargetBusy;
     
-    private Map<OutputStream, DeployedFile> fOutputStreamFiles;
-    
     public DeploymentReceiverServiceImpl()
     {
         fDone = false;
         fDeployments = new HashMap<String, Deployment>();
         fTargetBusy = new HashMap<String, Boolean>();
-        fOutputStreamFiles = new HashMap<OutputStream, DeployedFile>();
     }
 
     public void setConfiguration(Configuration config)
@@ -76,7 +81,6 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     
     public void init()
     {
-        // TODO Incomplete.
         for (String target : fConfiguration.getTargetNames())
         {
             fTargetBusy.put(target, false);
@@ -92,14 +96,49 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         {
             this.notifyAll();
         }
+        try
+        {
+            fThread.join();
+        }
+        catch (InterruptedException e)
+        {
+            // Do nothing.
+        }
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#abort(java.lang.String)
      */
-    public void abort(String token)
+    public synchronized void abort(String token)
     {
-        // TODO Auto-generated method stub
+        Deployment deployment = fDeployments.get(token);
+        if (deployment == null)
+        {
+            throw new DeploymentException("Deployment timed out or invalid token.");  
+        }
+        if (deployment.getState() != DeploymentState.WORKING)
+        {
+            throw new DeploymentException("Deployment cannot be aborted: already aborting, or committing.");
+        }
+        try
+        {
+            deployment.abort();
+            for (DeployedFile file : deployment)
+            {
+                if (file.getType() == FileType.FILE)
+                {
+                    File ffile = new File(file.getPreLocation());
+                    ffile.delete();
+                }
+            }
+            Target target = deployment.getTarget();
+            fTargetBusy.put(target.getName(), false);
+            fDeployments.remove(token);
+        }
+        catch (IOException e)
+        {
+            throw new DeploymentException("Traumatic failure. Could not abort cleanly.");
+        }
     }
 
     /* (non-Javadoc)
@@ -141,7 +180,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#commit(java.lang.String)
      */
-    public void commit(String ticket)
+    public synchronized void commit(String ticket)
     {
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
@@ -150,36 +189,36 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         try
         {
-            // TODO Work out updating of metadata files.
             deployment.finishWork();
-            deployment.getTarget().cloneMetaData();
             // First phase.  Perform all mkdirs and file sends by renaming any
             // existing file/directory to *.alf, and by simply renaming any deleted
-            // files/directoris to *.alf.
+            // files/directories to *.alf.
             for (DeployedFile file : deployment)
             {
+                deployment.update(file);
+                String path = file.getPath();
                 switch (file.getType())
                 {
                     case DIR :
                     {
-                        File f = new File(file.getFinalPath());
+                        File f = deployment.getFileForPath(path);
                         if (f.exists())
                         {
                             File dest = new File(f.getAbsolutePath() + ".alf");
                             f.renameTo(dest);
-                            f = new File(file.getFinalPath());
+                            f = deployment.getFileForPath(path);;
                         }
                         f.mkdir();
                         break;
                     }
                     case FILE :
                     {
-                        File f = new File(file.getFinalPath());
+                        File f = deployment.getFileForPath(path);
                         if (f.exists())
                         {
                             File dest = new File(f.getAbsolutePath() + ".alf");
                             f.renameTo(dest);
-                            f = new File(file.getFinalPath());
+                            f = deployment.getFileForPath(path);
                         }
                         FileOutputStream out = new FileOutputStream(f);
                         InputStream in = new FileInputStream(file.getPreLocation());
@@ -197,7 +236,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                     }
                     case DELETED :
                     {
-                        File f = new File(file.getFinalPath());
+                        File f = deployment.getFileForPath(path);
                         if (f.exists())
                         {
                             File dest = new File(f.getAbsolutePath() + ".alf");
@@ -217,34 +256,30 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             {
                 File intermediate = new File(file.getPreLocation());
                 intermediate.delete();
-                File old = new File(file.getFinalPath() + ".alf");
-                purge(old);
+                File old = new File(deployment.getFileForPath(file.getPath()).getAbsolutePath() + ".alf");
+                Deleter.Delete(old);
             }
+            File preLocation = new File(fConfiguration.getDataDirectory() + File.separatorChar + ticket);
+            preLocation.delete();
             deployment.finishCommit();
             fDeployments.remove(ticket);
         }
         catch (Exception e)
         {
-            // TODO Clean out all accumulated junk.
-            fDeployments.remove(ticket);
-            throw new DeploymentException("Problem finishing transaction work; deployment aborted.");
+            cleanupFailedCommit(ticket);
+            throw new DeploymentException("Problem finishing transaction work; deployment aborted.", e);
         }
-        // TODO Now do the commit work.
     }
 
-    /**
-     * Purge the old version of a file if it exists.
-     * @param file
-     */
-    private void purge(File file)
+    private void cleanupFailedCommit(String ticket)
     {
-        // TODO Implement.   
+        // TODO implement.
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#delete(java.lang.String, java.lang.String)
      */
-    public void delete(String token, String path)
+    public synchronized void delete(String token, String path)
     {
         Deployment deployment = fDeployments.get(token);
         if (deployment == null)
@@ -261,7 +296,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (IOException e)
         {
-            // TODO cleanup deployment.
+            abort(token);
             throw new DeploymentException("Could not update log.", e);
         }
     }
@@ -269,7 +304,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#finishSend(java.lang.String, java.io.OutputStream)
      */
-    public void finishSend(String token, OutputStream out, String guid)
+    public synchronized void finishSend(String token, OutputStream out, String guid)
     {
         Deployment deployment = fDeployments.get(token);
         if (deployment == null)
@@ -278,15 +313,8 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         try
         {
-            out.flush();
-            ((FileOutputStream)out).getChannel().force(true);
-            out.close();
-            DeployedFile file = fOutputStreamFiles.get(out);
-            if (file == null)
-            {
-                // TODO Do cleanup.
-                throw new DeploymentException("Closing Unknown OutputStream.");
-            }
+            DeployedFile file = deployment.getOutputFile(out);
+            deployment.closeOutputFile(out);
             deployment.add(file);
         }
         catch (IOException e)
@@ -299,20 +327,20 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#getListing(java.lang.String, java.lang.String)
      */
-    public List<FileDescriptor> getListing(String ticket, String path)
+    public synchronized List<FileDescriptor> getListing(String ticket, String path)
     {
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
             throw new DeploymentException("Deployment timed out or invalid ticket.");
         }
-        return new ArrayList<FileDescriptor>(deployment.getTarget().getListing(path));
+        return new ArrayList<FileDescriptor>(deployment.getListing(path));
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#mkdir(java.lang.String, java.lang.String, java.lang.String)
      */
-    public void mkdir(String token, String path, String guid)
+    public synchronized void mkdir(String token, String path, String guid)
     {
         Deployment deployment = fDeployments.get(token);
         if (deployment == null)
@@ -321,7 +349,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         DeployedFile file = new DeployedFile(FileType.DIR,
                                              null,
-                                             deployment.getTarget().getFileForPath(path).getAbsolutePath(),
+                                             path,
                                              guid);
         try
         {
@@ -329,6 +357,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         catch (IOException e)
         {
+            abort(token);
             throw new DeploymentException("Could not log mkdir of " + path);
         }
     }
@@ -336,7 +365,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#send(java.lang.String, java.lang.String, java.lang.String)
      */
-    public OutputStream send(String ticket, String path, String guid)
+    public synchronized OutputStream send(String ticket, String path, String guid)
     {
         Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
@@ -349,13 +378,14 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             OutputStream out = new FileOutputStream(preLocation);
             DeployedFile file = new DeployedFile(FileType.FILE,
                                                  preLocation,
-                                                 deployment.getTarget().getFileForPath(path).getAbsolutePath(),
+                                                 path,
                                                  guid);
-            fOutputStreamFiles.put(out, file);
+            deployment.addOutputFile(out, file);
             return out;
         }
         catch (IOException e)
         {
+            abort(ticket);
             throw new DeploymentException("Could Not Open " + path + " for write.", e);
         }
     }
@@ -363,10 +393,10 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#shutDown(java.lang.String, java.lang.String)
      */
-    public void shutDown(String user, String password)
+    public synchronized void shutDown(String user, String password)
     {
-        // TODO Auto-generated method stub
-
+        fContext.close();
+        System.exit(0);
     }
 
     /* (non-Javadoc)
@@ -376,7 +406,19 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     {
         while (!fDone)
         {
-            
+            try
+            {
+                Thread.sleep(2000);
+            }
+            catch (InterruptedException e)
+            {
+                // Do Nothing.
+            }
         }
+    }
+
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException
+    {
+        fContext = (ConfigurableApplicationContext)applicationContext;
     }
 }

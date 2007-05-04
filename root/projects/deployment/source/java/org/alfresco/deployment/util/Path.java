@@ -25,6 +25,8 @@
 
 package org.alfresco.deployment.util;
 
+import java.io.File;
+
 /**
  * A Class that represents a deployment path.
  * @author britt
@@ -108,5 +110,25 @@ public class Path
         }
         result[fComponents.length] = name;
         return new Path(result);
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        if (fComponents.length == 0)
+        {
+            return "";
+        }
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < fComponents.length - 1; i++)
+        {
+            builder.append(fComponents[i]);
+            builder.append(File.separatorChar);
+        }
+        builder.append(fComponents[fComponents.length - 1]);
+        return builder.toString();
     }
 }

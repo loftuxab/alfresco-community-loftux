@@ -23,69 +23,51 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.impl.server;
+package org.alfresco.deployment.test;
 
-import java.io.Serializable;
+import org.alfresco.deployment.DeploymentReceiverService;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-import org.alfresco.deployment.FileType;
+import junit.framework.TestCase;
 
 /**
- * This is a record of a deployed file. It holds the pre-commit location
- * of a file, the final location of the file, and the GUID of the file.
+ * Some test for the deployment receiver.
  * @author britt
  */
-public class DeployedFile implements Serializable
+public class DeploymentTest extends TestCase
 {
-    private static final long serialVersionUID = -8500167211804636309L;
-
-    private FileType fType;
+    private static ApplicationContext fContext = null;
     
-    private String fPreLocation;
+    private static DeploymentReceiverService fService;
     
-    private String fPath;
-    
-    private String fGUID;
-    
-    public DeployedFile(FileType type,
-                        String preLocation,
-                        String path,
-                        String guid)
+    @Override
+    protected void setUp() throws Exception
     {
-        fType = type;
-        fPreLocation = preLocation;
-        fPath = path;
-        fGUID = guid;
+        if (fContext == null)
+        {
+            fContext = new FileSystemXmlApplicationContext("config/application-context.xml");
+            fService = (DeploymentReceiverService)fContext.getBean("deploymentReceiverService");
+        }
     }
 
-    /**
-     * @return the FinalPath
-     */
-    public String getPath()
+    @Override
+    protected void tearDown() throws Exception
     {
-        return fPath;
-    }
-
-    /**
-     * @return the GUID
-     */
-    public String getGuid()
-    {
-        return fGUID;
     }
     
-    /**
-     * @return the PreLocation
-     */
-    public String getPreLocation()
+    public void testSimple()
     {
-        return fPreLocation;
-    }
-    
-    /**
-     * @return the Type
-     */
-    public FileType getType()
-    {
-        return fType;
+        try
+        {
+            String ticket = fService.begin("sampleTarget", "Giles", "Watcher");
+            System.out.println(fService.getListing(ticket, "/"));
+            fService.commit(ticket);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            fail();
+        }
     }
 }

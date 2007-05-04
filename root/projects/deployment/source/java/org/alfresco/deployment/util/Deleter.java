@@ -23,69 +23,40 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.impl.server;
+package org.alfresco.deployment.util;
 
-import java.io.Serializable;
-
-import org.alfresco.deployment.FileType;
+import java.io.File;
 
 /**
- * This is a record of a deployed file. It holds the pre-commit location
- * of a file, the final location of the file, and the GUID of the file.
+ * Utility to delete a file or directory recursively.
  * @author britt
  */
-public class DeployedFile implements Serializable
+public class Deleter
 {
-    private static final long serialVersionUID = -8500167211804636309L;
-
-    private FileType fType;
-    
-    private String fPreLocation;
-    
-    private String fPath;
-    
-    private String fGUID;
-    
-    public DeployedFile(FileType type,
-                        String preLocation,
-                        String path,
-                        String guid)
-    {
-        fType = type;
-        fPreLocation = preLocation;
-        fPath = path;
-        fGUID = guid;
-    }
-
     /**
-     * @return the FinalPath
+     * Delete by path.
+     * @param path
      */
-    public String getPath()
+    public static void Delete(String path)
     {
-        return fPath;
-    }
-
-    /**
-     * @return the GUID
-     */
-    public String getGuid()
-    {
-        return fGUID;
+        File toDelete = new File(path);
+        Delete(toDelete);
     }
     
     /**
-     * @return the PreLocation
+     * Delete by File.
+     * @param toDelete
      */
-    public String getPreLocation()
+    public static void Delete(File toDelete)
     {
-        return fPreLocation;
-    }
-    
-    /**
-     * @return the Type
-     */
-    public FileType getType()
-    {
-        return fType;
+        if (toDelete.isDirectory())
+        {
+            File[] listing = toDelete.listFiles();
+            for (File file : listing)
+            {
+                Delete(file);
+            }
+        }
+        toDelete.delete();
     }
 }

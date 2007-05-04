@@ -33,9 +33,11 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.SortedSet;
 
+import org.alfresco.deployment.FileDescriptor;
+import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.deployment.types.FileDescriptor;
 import org.alfresco.deployment.util.Path;
+import org.alfresco.util.GUID;
 
 /**
  * This represents a target for a deployment.
@@ -88,6 +90,55 @@ public class Target
         fMetaDataDirectory = metadata;
         fUser = user;
         fPassword = password;
+        // On initial server bringup, there will be no metadata directory.
+        // If so then we churn through the current contents and generate 
+        // initial metadata.
+        File meta = new File(fMetaDataDirectory);
+        if (meta.exists())
+        {
+            return;
+        }
+        initialize();
+    }
+    
+    /**
+     * Helper to initialize metadata for a new deployment Target.
+     */
+    private void initialize()
+    {
+        File metadata = new File(fMetaDataDirectory);
+        metadata.mkdir();
+        recursiveInitialize(fMetaDataDirectory, fRootDirectory);
+    }
+
+    /**
+     * Recursively set up fresh metadata.
+     * @param metaDir
+     * @param dataDir
+     */
+    private void recursiveInitialize(String metaDir, String dataDir)
+    {
+        DirectoryMetaData md = new DirectoryMetaData();
+        File dFile = new File(dataDir);
+        File[] listing = dFile.listFiles();
+        for (File child : listing)
+        {
+            FileDescriptor desc = new FileDescriptor(child.getName(),
+                                                     child.isDirectory() ? FileType.DIR : FileType.FILE,
+                                                     GUID.generate());
+            md.add(desc);
+        }
+        putDirectory(metaDir + File.separatorChar + MD_NAME, md);
+        for (File child : listing)
+        {
+            if (child.isDirectory())
+            {
+                String newMetaDir = metaDir + File.separatorChar + child.getName();
+                File nmDir = new File(newMetaDir);
+                nmDir.mkdir();
+                recursiveInitialize(newMetaDir, dataDir + File.separatorChar + child.getName());
+            }
+        }
     }
     
     /**
@@ -177,21 +228,7 @@ public class Target
         builder.append(File.separatorChar);
         builder.append(MD_NAME);
         String mdPath = builder.toString();
-        try
-        {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(mdPath));
-            DirectoryMetaData md = (DirectoryMetaData)in.readObject();
-            in.close();
-            return md.getListing();
-        }
-        catch (IOException e)
-        {
-            throw new DeploymentException("Could not read metadata for " + path, e);
-        }
-        catch (ClassNotFoundException nfe)
-        {
-            throw new DeploymentException("Misconfiguration: cannot instantiate DirectoryMetaData.", nfe);
-        }
+        return getDirectory(mdPath).getListing();
     }
     
     /**
@@ -202,30 +239,16 @@ public class Target
         recursiveCloneMetaData(fMetaDataDirectory);
     }
     
+    /**
+     * Recursive implementation of metadata cloning.
+     * @param dir
+     */
     private void recursiveCloneMetaData(String dir)
     {
-        try
-        {
-            String mdName = dir + File.separatorChar + MD_NAME;
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(mdName));
-            DirectoryMetaData md = (DirectoryMetaData)in.readObject();
-            in.close();
-            String cloneName = mdName + CLONE;
-            FileOutputStream fout = new FileOutputStream(cloneName);
-            ObjectOutputStream out = new ObjectOutputStream(fout);
-            out.writeObject(md);
-            out.flush();
-            fout.getChannel().force(true);
-            out.close();
-        }
-        catch (IOException e)
-        {
-            throw new DeploymentException("Could not copy metadata for " + dir, e);
-        }
-        catch (ClassNotFoundException nfe)
-        {
-            throw new DeploymentException("Configuration error: could not instantiate DirectoryMetaData.");
-        }
+        String mdName = dir + File.separatorChar + MD_NAME;
+        DirectoryMetaData md = getDirectory(mdName);
+        String cloneName = mdName + CLONE;
+        putDirectory(cloneName, md);
         File dFile = new File(dir);
         File[] listing = dFile.listFiles();
         for (File file : listing)
@@ -233,6 +256,135 @@ public class Target
             if (file.isDirectory())
             {
                 recursiveCloneMetaData(dir + File.separatorChar + file.getName());
+            }
+        }
+    }
+    
+    /**
+     * Update cloned metadata file with the information given.
+     * @param file
+     */
+    public void update(DeployedFile file)
+    {
+        Path path = new Path(file.getPath());
+        Path parent = path.getParent();
+        String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME + CLONE; 
+        DirectoryMetaData md = getDirectory(mdName);
+        switch (file.getType())
+        {
+            case FILE :
+            {
+                md.add(new FileDescriptor(path.getBaseName(),
+                                          FileType.FILE,
+                                          file.getGuid()));
+                break;
+            }
+            case DIR :
+            {
+                md.add(new FileDescriptor(path.getBaseName(),
+                                          FileType.DIR,
+                                          file.getGuid()));
+                String newDirPath = fMetaDataDirectory + File.separatorChar + path.toString();
+                File newDir = new File(newDirPath);
+                if (!newDir.mkdir())
+                {
+                    throw new DeploymentException("Could not create metadata directory " + newDirPath);
+                }
+                DirectoryMetaData newMD = new DirectoryMetaData();
+                putDirectory(newDirPath + File.separatorChar + MD_NAME + CLONE, newMD);
+                break;
+            }
+            case DELETED :
+            {
+                FileDescriptor toRemove = new FileDescriptor(path.getBaseName(),
+                                                             null,
+                                                             null);
+                md.remove(toRemove);
+                break;
+            }
+            default :
+            {
+                throw new DeploymentException("Configuration Error: unknown FileType " + file.getType());
+            }
+        }
+        putDirectory(mdName, md);
+    }
+    
+    /**
+     * Utility routine to get a metadata object.
+     * @param path
+     * @return
+     */
+    private DirectoryMetaData getDirectory(String path)
+    {
+        try
+        {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(path));
+            DirectoryMetaData md = (DirectoryMetaData)in.readObject();
+            in.close();
+            return md;
+        }
+        catch (IOException ioe)
+        {
+            throw new DeploymentException("Could not read metadata file " + path, ioe);
+        }
+        catch (ClassNotFoundException nfe)
+        {
+            throw new DeploymentException("Configuration error: could not instantiate DirectoryMetaData.");
+        }
+    }
+    
+    /**
+     * Utility for writing a metadata object to disk.
+     * @param path
+     * @param md
+     */
+    private void putDirectory(String path, DirectoryMetaData md)
+    {
+        try
+        {
+            FileOutputStream fout = new FileOutputStream(path);
+            ObjectOutputStream out = new ObjectOutputStream(fout);
+            out.writeObject(md);
+            out.flush();
+            fout.getChannel().force(true);
+            out.close();
+        }
+        catch (IOException ioe)
+        {
+            throw new DeploymentException("Could not write metadata file " + path, ioe);
+        }
+    }
+    
+    /**
+     * Commit changed metadata.
+     */
+    public void commitMetaData()
+    {
+        recursiveCommitMetaData(fMetaDataDirectory);
+    }
+    
+    /**
+     * Implementation of metadata commit.
+     * @param dir
+     */
+    private void recursiveCommitMetaData(String dir)
+    {
+        String mdName = dir + File.separatorChar + MD_NAME;
+        File old = new File(mdName);
+        old.delete();
+        File clone = new File(mdName + CLONE);
+        if (!clone.renameTo(old))
+        {
+            throw new DeploymentException("Could not replace metadata " + mdName);
+        }
+        File dFile = new File(dir);
+        File[] listing = dFile.listFiles();
+        for (File file : listing)
+        {
+            if (file.isDirectory())
+            {
+                recursiveCommitMetaData(dir + File.separatorChar + file.getName());
             }
         }
     }

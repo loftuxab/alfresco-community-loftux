@@ -25,67 +25,12 @@
 
 package org.alfresco.deployment.impl.server;
 
-import java.io.Serializable;
-
-import org.alfresco.deployment.FileType;
-
 /**
- * This is a record of a deployed file. It holds the pre-commit location
- * of a file, the final location of the file, and the GUID of the file.
  * @author britt
  */
-public class DeployedFile implements Serializable
+public enum DeploymentState
 {
-    private static final long serialVersionUID = -8500167211804636309L;
-
-    private FileType fType;
-    
-    private String fPreLocation;
-    
-    private String fPath;
-    
-    private String fGUID;
-    
-    public DeployedFile(FileType type,
-                        String preLocation,
-                        String path,
-                        String guid)
-    {
-        fType = type;
-        fPreLocation = preLocation;
-        fPath = path;
-        fGUID = guid;
-    }
-
-    /**
-     * @return the FinalPath
-     */
-    public String getPath()
-    {
-        return fPath;
-    }
-
-    /**
-     * @return the GUID
-     */
-    public String getGuid()
-    {
-        return fGUID;
-    }
-    
-    /**
-     * @return the PreLocation
-     */
-    public String getPreLocation()
-    {
-        return fPreLocation;
-    }
-    
-    /**
-     * @return the Type
-     */
-    public FileType getType()
-    {
-        return fType;
-    }
+    WORKING,
+    COMMITTING,
+    ABORTING
 }

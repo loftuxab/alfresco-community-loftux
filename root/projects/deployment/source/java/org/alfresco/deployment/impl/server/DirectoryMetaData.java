@@ -29,7 +29,7 @@ import java.io.Serializable;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.alfresco.deployment.types.FileDescriptor;
+import org.alfresco.deployment.FileDescriptor;
 
 /**
  * This represents the metadata of a single directory.

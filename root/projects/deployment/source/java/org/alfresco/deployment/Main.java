@@ -23,69 +23,28 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.impl.server;
+package org.alfresco.deployment;
 
-import java.io.Serializable;
-
-import org.alfresco.deployment.FileType;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 /**
- * This is a record of a deployed file. It holds the pre-commit location
- * of a file, the final location of the file, and the GUID of the file.
+ * Main class for Deployment Receiver.
  * @author britt
  */
-public class DeployedFile implements Serializable
+public class Main
 {
-    private static final long serialVersionUID = -8500167211804636309L;
-
-    private FileType fType;
-    
-    private String fPreLocation;
-    
-    private String fPath;
-    
-    private String fGUID;
-    
-    public DeployedFile(FileType type,
-                        String preLocation,
-                        String path,
-                        String guid)
-    {
-        fType = type;
-        fPreLocation = preLocation;
-        fPath = path;
-        fGUID = guid;
-    }
-
     /**
-     * @return the FinalPath
+     * @param args
      */
-    public String getPath()
+    public static void main(String[] args)
     {
-        return fPath;
-    }
-
-    /**
-     * @return the GUID
-     */
-    public String getGuid()
-    {
-        return fGUID;
-    }
-    
-    /**
-     * @return the PreLocation
-     */
-    public String getPreLocation()
-    {
-        return fPreLocation;
-    }
-    
-    /**
-     * @return the Type
-     */
-    public FileType getType()
-    {
-        return fType;
+        if (args.length != 1)
+        {
+            System.err.println("Usage: org.alfresco.deployment.Main application-context.xml");
+            System.exit(1);
+        }
+        @SuppressWarnings("unused")
+        FileSystemXmlApplicationContext context =
+            new FileSystemXmlApplicationContext(args[0]);
     }
 }
