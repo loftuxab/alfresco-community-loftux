@@ -127,5 +127,123 @@
          </java>
       </sequential>
    </macrodef>
+
+
+   <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+       Wrapper that brings the Alfresco webapp and the virtualization
+       server up (if they weren't already up) to execute the Ant target 
+       specified by the 'target' parameter.   After the command has 
+       completed, both servers are stopped if this wrappper was 
+       responsible for starting them (otherwise, they're left up).
+
+       Example:
+           <target name="moo">
+               <alfresco-virtual-antcall target="_moo"/>
+           </target>
+
+           <target name="_moo">
+               <echo>Alfresco webapp + virtual tomcat are both up</echo>
+           </target>
+
+       This makes it easy to run tests that need both servers when you're
+       you're doing iterative development work & don't want to wait for 
+       heavy processes to start/stop every time... yet it accommodates the 
+       need to automatically start/stop servers when in a "clean" test 
+       environment (all it assumes is that both servers are installed).
+
+   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+   <macrodef name="alfresco-virtual-antcall">
+      <attribute name="target"/>
+      <sequential>         
+         <default-if-not-set  propname ="tomcat.home"
+                              propvalue="${env.TOMCAT_HOME}"/>
+
+         <default-if-not-set  propname ="virtual.tomcat.home"
+                              propvalue="${env.VIRTUAL_TOMCAT_HOME}"/>
+
+         <check-server-status propname="virtual.tomcat.previously.started"
+                              server  ="localhost"
+                              port    ="8180"/>
+
+         <check-server-status propname="tomcat.previously.started"
+                              server  ="localhost"
+                              port    ="8080"/>
+
+         <parallel>
+            <antcall target="start-tomcat-if-necessary"/>
+            <antcall target="start-virtual-tomcat-if-necessary"/>
+            <sequential>
+               <echo>Waiting for Alfresco Tomcat...</echo>
+               <antcall target="wait-for-alfresco"/>
+               <echo>Alfresco's Tomcat is up</echo>
+
+               <echo>Waiting for Virtual Tomcat...</echo>
+               <antcall target="wait-for-virtual-tomcat"/>
+               <echo>Virtual Tomcat is up</echo>
+
+               <antcall target="@{target}"/>
+
+               <antcall target="virtual-tomcat-stop-if-necessary"/>
+               <antcall target="tomcat-stop-if-necessary"/>
+            </sequential>
+         </parallel>
+      </sequential>
+   </macrodef>
+
+   <macrodef name="default-if-not-set">
+      <attribute name="propname"/>
+      <attribute name="propvalue"/>
+      <sequential>
+         <condition property= "@{propname}"  value="@{propvalue}">
+            <not> <isset property="@{propname}"/>  </not>
+         </condition>
+      </sequential>
+   </macrodef>
+
+   <macrodef name="check-server-status">
+      <attribute name="propname"/>
+      <attribute name="server"/>
+      <attribute name="port"/>
+      <sequential>
+         <condition property="@{propname}">
+            <socket server="@{server}" port="@{port}"/>
+         </condition>
+      </sequential>
+   </macrodef>
+
+   <macrodef name="tomcat-start">
+      <attribute name="heapmax" default="-Xmx512M"/>
+      <sequential>
+         <echo>Starting Alfresco Tomcat:  ${tomcat.home}</echo>
+         <java jar="${tomcat.home}/bin/bootstrap.jar" 
+               fork="true">
+            <jvmarg value="-Dcatalina.home=${tomcat.home}"/>
+            <jvmarg value="-Dcatalina.base=${tomcat.home}"/>
+            <jvmarg value="-server"/>
+            <jvmarg value="@{heapmax}"/>
+            <jvmarg value="-Djava.io.tmpdir=${tomcat.home}/temp"/>
+            <jvmarg value="-Djava.security.policy=${tomcat.home}/conf/catalina.policy"/>
+         </java>
+      </sequential>
+   </macrodef>
+
+   <macrodef name="virtual-tomcat-start">
+       <attribute name="heapmax" default="-Xmx512M"/>
+       <sequential>
+           <antcall  target="wait-for-alfresco"/>
+           <echo>Starting Virtual Tomcat:  ${virtual.tomcat.home}</echo>
+           <java jar="${virtual.tomcat.home}/bin/bootstrap.jar" 
+                 fork="true">
+               <jvmarg value="-Dcatalina.home=${virtual.tomcat.home}"/>
+               <jvmarg value="-Dcatalina.base=${virtual.tomcat.home}"/>
+               <jvmarg value="-server"/>
+               <jvmarg value="@{heapmax}"/>
+               <jvmarg value="-Djava.io.tmpdir=${virtual.tomcat.home}/temp"/>
+               <jvmarg value="-Djava.security.policy=${virtual.tomcat.home}/conf/catalina.policy"/>
+           </java>
+       </sequential>
+   </macrodef>
+
 </project>
 

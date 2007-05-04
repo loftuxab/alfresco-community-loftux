@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
+   "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans>
+
+    <!-- load common properties -->
+    <bean id="virtserver-properties"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+
+        <!--
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+        -->
+
+        <property name="locations">
+            <list>
+                <value>file:${catalina.base}/conf/alfresco-shared.properties</value>
+                <value>file:${catalina.base}/conf/alfresco-virtserver.properties</value>
+            </list>
+        </property>
+    </bean>
+
+   <!-- Client Ticket Holder. -->
+   <bean id="clientTicketHolder" class="org.alfresco.repo.remote.ClientTicketHolderGlobal"/>
+
+    <!-- The remote authentication service. -->
+    <bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl">
+            <value>rmi://${avm.remote.host}:${avm.remote.port}/authentication</value>
+        </property>
+        <property name="serviceInterface">
+            <value>org.alfresco.service.cmr.security.AuthenticationService</value>
+        </property>
+        <property name="refreshStubOnConnectFailure">
+            <value>true</value>
+        </property>
+    </bean>
+
+   <!-- Advice for automatic reauthentication. -->
+    <bean id="reauthenticatingAdvice" class="org.alfresco.repo.remote.ReauthenticatingAdvice">
+        <property name="authenticationService">
+            <ref bean="authenticationService"/>
+        </property>
+        <property name="clientTicketHolder">
+            <ref bean="clientTicketHolder"/>
+        </property>
+        <property name="user">
+            <value>${alfresco.server.user}</value>
+        </property>
+        <property name="password">
+            <value>${alfresco.server.password}</value>
+        </property>
+        <property name="retryInterval">
+            <value>${alfresco.virtserver.connection.retry.interval}</value>
+        </property>
+    </bean>
+
+    <bean id="avmReauthenticatingAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice">
+            <ref bean="reauthenticatingAdvice"/>
+        </property>
+        <property name="pointcut">
+            <bean class="org.springframework.aop.TruePointcut"/>
+        </property>
+    </bean>
+
+    <bean id="avmRemoteTransport" class="org.springframework.aop.framework.ProxyFactoryBean">
+       <property name="proxyInterfaces">
+           <list>
+               <value>org.alfresco.service.cmr.remote.AVMRemoteTransport</value>
+           </list>
+       </property>
+        <property name="target">
+            <ref bean="avmRemoteTransportRaw"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>avmReauthenticatingAdvisor</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Remote Alfresco RMI Proxy bean -->
+    <bean id="avmRemote" class="org.alfresco.repo.remote.AVMRemoteImpl">
+        <property name="avmRemoteTransport">
+            <ref bean="avmRemoteTransport"/>
+        </property>
+        <property name="clientTicketHolder">
+            <ref bean="clientTicketHolder"/>
+        </property>
+    </bean>
+
+    <!-- The underlying transport. -->
+    <bean id="avmRemoteTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl">
+            <value>rmi://${avm.remote.host}:${avm.remote.port}/avm</value>
+        </property>
+
+        <property name="serviceInterface">
+            <value>org.alfresco.service.cmr.remote.AVMRemoteTransport</value>
+        </property>
+
+        <property name="refreshStubOnConnectFailure">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <!-- The AttributeService -->
+   <bean id="attributeService" class="org.alfresco.repo.remote.AttributeServiceRemote">
+       <property name="clientTicketHolder">
+           <ref bean="clientTicketHolder"/>
+       </property>
+       <property name="attributeServiceTransport">
+           <ref bean="attributeServiceTransport"/>
+       </property>
+   </bean>
+
+   <!-- Wrapped AttributeService Transport -->
+    <bean id="attributeServiceTransport" class="org.springframework.aop.framework.ProxyFactoryBean">
+       <property name="proxyInterfaces">
+           <list>
+               <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
+           </list>
+       </property>
+        <property name="target">
+            <ref bean="attributeServiceTransportRaw"/>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>avmReauthenticatingAdvisor</value>
+            </list>
+        </property>
+    </bean>
+
+   <!-- The underlying transport for AttributeService -->
+   <bean id="attributeServiceTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+       <property name="serviceUrl">
+           <value>rmi://${avm.remote.host}:${avm.remote.port}/attributes</value>
+       </property>
+       <property name="serviceInterface">
+           <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
+       </property>
+       <property name="refreshStubOnConnectFailure">
+           <value>true</value>
+       </property>
+   </bean>
+
+    <!-- The JNDI info bean for jndi-client specific property access -->
+    <bean id="jndiInfoBean" class="org.alfresco.jndi.JndiInfoBean">
+       <property name="alfrescoServerUser">
+           <value>${alfresco.server.user}</value>
+       </property>
+       <property name="alfrescoServerPassword">
+          <value>${alfresco.server.password}</value>
+        </property>
+    </bean>
+
+
+    <!-- Info for peer/peer MBean registration with remote Alfresco server -->
+    <bean id="virtServerInfo"
+          class="org.alfresco.mbeans.VirtServerInfo"
+          lazy-init="true">
+
+        <!-- local virtualization server domain                   -->
+        <!-- Note: the actual virtualization server hostname used -->
+        <!--       in URLs created by the Alfreseco webapp will   -->
+        <!--       be:    ${alfresco.virtserver.domain}           -->
+        <!--                                                      -->
+        <property name="virtServerDomain">
+            <value>${alfresco.virtserver.domain}</value>
+        </property>
+
+        <!-- local virtualization server HTTP port  -->
+        <property name="virtServerHttpPort">
+            <value>${alfresco.virtserver.http.port}</value>
+        </property>
+
+        <!-- local virtualization server JMX RMI port  -->
+        <property name="virtServerJmxRmiPort">
+            <value>${alfresco.virtserver.jmxrmi.port}</value>
+        </property>
+
+
+        <!-- local CIFS automount props -->
+        <property name="virtServerCifsAvmVersionTreeWin">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.win}</value>
+        </property>
+        <property name="virtServerCifsAvmVersionTreeWinAutomount">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.win.automount}</value>
+        </property>
+        <property name="virtServerCifsAvmVersionTreeUnix">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.unix}</value>
+        </property>
+        <property name="virtServerCifsAvmVersionTreeUnixAutomount">
+            <value>${alfresco.virtserver.cifs.avm.versiontree.unix.automount}</value>
+        </property>
+
+
+
+
+
+        <!-- remote Alfresco server hostname -->
+        <property name="alfrescoJmxRmiHost">
+            <value>${avm.remote.host}</value>
+        </property>
+
+        <!-- remote Alfresco server JMX RMI port -->
+        <property name="alfrescoJmxRmiPort">
+            <value>${avm.remote.port}</value>
+        </property>
+
+        <!-- retry interval when network connections fail (in milliseconds)  -->
+        <property name="virtServerConnectionRetryInterval">
+            <value>${alfresco.virtserver.connection.retry.interval}</value>
+        </property>
+
+
+    </bean>
+
+
+</beans>
