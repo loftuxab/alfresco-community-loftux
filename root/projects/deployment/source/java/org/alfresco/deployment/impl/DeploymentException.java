@@ -29,7 +29,6 @@ import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
  * @author britt
- *
  */
 public class DeploymentException extends AlfrescoRuntimeException
 {

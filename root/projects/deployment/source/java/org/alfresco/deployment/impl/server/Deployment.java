@@ -25,14 +25,20 @@
 
 package org.alfresco.deployment.impl.server;
 
+import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.SortedSet;
 
+import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.impl.DeploymentException;
 
 /**
@@ -76,6 +82,16 @@ public class Deployment implements Iterable<DeployedFile>
      */
     private ObjectInputStream fIn;
     
+    /**
+     * The state of this deployment with regards to the transaction.
+     */
+    private DeploymentState fState;
+    
+    /**
+     * Keeps track of any open output files.
+     */
+    private Map<OutputStream, DeployedFile> fOutputFiles;
+    
     public Deployment(Target target, 
                       String logFile)
         throws IOException
@@ -86,6 +102,40 @@ public class Deployment implements Iterable<DeployedFile>
         fFileOut = new FileOutputStream(fLogFile);
         fOut = new ObjectOutputStream(fFileOut);
         fCanBeStale = true;
+        fState = DeploymentState.WORKING;
+        fOutputFiles = new HashMap<OutputStream, DeployedFile>();
+    }
+    
+    /**
+     * Tell the deployment about a file in transit.
+     * @param out
+     * @param file
+     */
+    public void addOutputFile(OutputStream out, DeployedFile file)
+    {
+        fOutputFiles.put(out, file);
+    }
+    
+    /**
+     * Get the deployed file record for the output stream.
+     * @param out
+     * @return
+     */
+    public DeployedFile getOutputFile(OutputStream out)
+    {
+        return fOutputFiles.get(out);
+    }
+    
+    public void closeOutputFile(OutputStream out)
+        throws IOException
+    {
+        out.flush();
+        ((FileOutputStream)out).getChannel().force(true);
+        out.close();
+        if (fOutputFiles.remove(out) == null)
+        {
+            throw new DeploymentException("Closed unknown file.");
+        }
     }
     
     /**
@@ -112,6 +162,8 @@ public class Deployment implements Iterable<DeployedFile>
         fOut.close();
         fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fCanBeStale = false;
+        fTarget.cloneMetaData();
+        fState = DeploymentState.COMMITTING;
     }
     
     public void resetLog()
@@ -122,12 +174,36 @@ public class Deployment implements Iterable<DeployedFile>
     }
     
     /**
+     * Mark the Deployment as aborting.
+     */
+    public void abort()
+        throws IOException
+    {
+        finishWork();
+        fState = DeploymentState.ABORTING;
+        for (OutputStream out : fOutputFiles.keySet())
+        {
+            out.close();
+        }
+    }
+    
+    /**
+     * Get the Target of this deployment.
+     * @return
+     */
+    public Target getTarget()
+    {
+        return fTarget;
+    }
+    
+    /**
      * Signal that the commit phase is finished and clean up.
      */
     public void finishCommit()
     {
         try
         {
+            fTarget.commitMetaData();
             fIn.close();
             File log = new File(fLogFile);
             log.delete();
@@ -137,12 +213,41 @@ public class Deployment implements Iterable<DeployedFile>
             // Do Nothing.
         }
     }
-    
-    public Target getTarget()
+
+    /**
+     * Get the target relative File.
+     * @param path
+     * @return
+     */
+    public File getFileForPath(String path)
     {
-        return fTarget;
+        return fTarget.getFileForPath(path);
     }
     
+    /**
+     * Report a deployed file during the commit phase.
+     * @param file
+     */
+    public void update(DeployedFile file)
+    {
+        fTarget.update(file);
+    }
+    
+    /**
+     * Get a listing for a directory. This is the predeployment listing.
+     * @param path
+     * @return
+     */
+    public SortedSet<FileDescriptor> getListing(String path)
+    {
+        return fTarget.getListing(path);
+    }
+    
+    /**
+     * Is the deployment stale.
+     * @param timeout
+     * @return
+     */
     public boolean isStale(long timeout)
     {
         if (!fCanBeStale)
@@ -162,6 +267,15 @@ public class Deployment implements Iterable<DeployedFile>
     public Iterator<DeployedFile> iterator()
     {
         return new DeployedFileIterator();
+    }
+    
+    /**
+     * Get the state of the deployment.
+     * @return
+     */
+    public DeploymentState getState()
+    {
+        return fState;
     }
     
     /**
@@ -188,8 +302,11 @@ public class Deployment implements Iterable<DeployedFile>
             }
             try
             {
-                fNext = (DeployedFile)fIn.readObject();
-                if (fNext == null)
+                try
+                {
+                    fNext = (DeployedFile)fIn.readObject();
+                }
+                catch (EOFException eofe)
                 {
                     return false;
                 }

@@ -28,7 +28,6 @@ package org.alfresco.deployment;
 import java.io.OutputStream;
 import java.util.List;
 
-import org.alfresco.deployment.types.FileDescriptor;
 
 /**
  * Interface for Filesystem Deployment Receiver.

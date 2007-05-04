@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    <bean id="properties" 
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+        <property name="locations">
+            <list>
+                <value>classpath:deployment.properties</value>
+            </list>
+        </property>
+    </bean>    
+    
+    <bean id="configuration" class="org.alfresco.deployment.config.Configuration"
+          init-method="init">
+        <property name="dataDirectory">
+            <value>${dep.datadir}</value>
+        </property>
+        <property name="logDirectory">
+            <value>${dep.logdir}</value>
+        </property>
+        <property name="metaDataDirectory">
+            <value>${dep.metadatadir}</value>
+        </property>
+        <property name="targetData">
+            <map>
+            	<entry key="sampleTarget">
+            	    <map>
+            	    	<entry key="root"><value>/Users/britt/target</value></entry>
+            	    	<entry key="user"><value>Giles</value></entry>
+            	    	<entry key="password"><value>Watcher</value></entry>
+            	    </map>
+            	</entry>
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="deploymentReceiverService" class="org.alfresco.deployment.impl.server.DeploymentReceiverServiceImpl" 
+          init-method="init">
+        <property name="configuration">
+            <ref bean="configuration"/>
+        </property>
+    </bean>
+</beans>

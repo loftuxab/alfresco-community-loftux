@@ -26,6 +26,7 @@
 package org.alfresco.deployment.config;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,6 +52,7 @@ public class Configuration
     
     public Configuration()
     {
+        fTargets = new HashMap<String, Target>();
     }
     
     public void setTargetData(Map<String, Map<String, String>> targetData)
