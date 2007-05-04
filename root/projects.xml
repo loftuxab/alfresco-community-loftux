@@ -246,12 +246,92 @@
            basedir="${dir.project.linkvalidation.classes}" />
    </target>
    
-   <target name="test-linkvalidation" 
+
+   <target name="test-linkvalidation">
+      <alfresco-virtual-antcall target="_test-linkvalidation"/>
+   </target>
+
+   <target name="_test-linkvalidation" 
            description="Runs the tests for the linkvalidation project" 
            depends="compile-linkvalidation">
       <run-tests projectdir="${dir.project.linkvalidation}" />
    </target>
-   
+
+   <target name="start-tomcat-if-necessary"
+           depends="tomcat-check-status" 
+           unless="tomcat.started">
+      <tomcat-start/>
+   </target>
+
+   <target name="start-virtual-tomcat-if-necessary"
+           depends="virtual-tomcat-check-status" 
+           unless="virtual.tomcat.started">
+       <virtual-tomcat-start/>
+   </target>
+
+   <target name="tomcat-check-status">
+      <condition property="tomcat.started">
+         <socket server="localhost" port="8080"/>
+      </condition>
+   </target>
+
+   <target name="virtual-tomcat-check-status">
+      <condition property="virtual.tomcat.started">
+         <socket server="localhost" port="8180"/>
+      </condition>
+   </target>
+
+   <target name="wait-for-alfresco">
+      <waitfor maxwaitunit    = "second"
+               checkeveryunit = "second"
+               maxwait        = "20"
+               checkevery     = "2">
+         <http url="http://localhost:8080/alfresco"/>
+      </waitfor>
+   </target>
+
+   <target name="wait-for-virtual-tomcat">
+      <waitfor maxwaitunit    = "second"
+               checkeveryunit = "second"
+               maxwait        = "20"
+               checkevery     = "2">
+          <!-- Any non-existent virtual host will do for testing liveness -->
+         <http url="http://dummy-project.www--sandbox.127-0-0-1.ip.alfrescodemo.net:8180/"/>
+      </waitfor>
+    </target>
+
+   <target name="tomcat-stop-if-necessary" 
+           depends="tomcat-check-status" 
+           if="tomcat.started">
+      <antcall target="java-tomcat-stop"/>
+   </target>
+
+   <target name="virtual-tomcat-stop-if-necessary" 
+           depends="virtual-tomcat-check-status" 
+           if="virtual.tomcat.started">
+      <antcall target="java-virtual-tomcat-stop"/>
+   </target>
+
+   <target name="java-tomcat-stop"
+           unless="tomcat.previously.started">
+      <java jar="${tomcat.home}/bin/bootstrap.jar" 
+            fork="true">
+         <jvmarg value="-Dcatalina.home=${tomcat.home}"/>
+         <arg line="stop"/>
+      </java>
+      <sleep seconds="2"/>
+   </target>
+
+   <target name="java-virtual-tomcat-stop"
+           unless="virtual.tomcat.previously.started">
+      <java jar="${virtual.tomcat.home}/bin/bootstrap.jar" 
+            fork="true">
+         <jvmarg value="-Dcatalina.home=${virtual.tomcat.home}"/>
+         <arg line="stop"/>
+      </java>
+      <sleep seconds="2"/>
+   </target>
+
    <target name="generate-javadocs-linkvalidation" 
            description="Generates the JavaDocs for the linkvalidation project"
            depends="init">
