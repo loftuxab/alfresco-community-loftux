@@ -26,6 +26,16 @@
 package org.alfresco.deployment.impl.server;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.SortedSet;
+
+import org.alfresco.deployment.impl.DeploymentException;
+import org.alfresco.deployment.types.FileDescriptor;
+import org.alfresco.deployment.util.Path;
 
 /**
  * This represents a target for a deployment.
@@ -33,6 +43,9 @@ import java.io.File;
  */
 public class Target
 {
+    private static final String MD_NAME = ".md.";
+    private static final String CLONE = "clone";
+
     /**
      * The name of the target.
      */
@@ -146,5 +159,81 @@ public class Target
             path = File.separator + path;
         }
         return path;
+    }
+
+    public SortedSet<FileDescriptor> getListing(String path)
+    {
+        Path cPath = new Path(path);
+        StringBuilder builder = new StringBuilder();
+        builder.append(fMetaDataDirectory);
+        if (cPath.size() != 0)
+        {
+            for (int i = 0; i < cPath.size(); i++)
+            {
+                builder.append(File.separatorChar);
+                builder.append(cPath.get(i));
+            }
+        }
+        builder.append(File.separatorChar);
+        builder.append(MD_NAME);
+        String mdPath = builder.toString();
+        try
+        {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(mdPath));
+            DirectoryMetaData md = (DirectoryMetaData)in.readObject();
+            in.close();
+            return md.getListing();
+        }
+        catch (IOException e)
+        {
+            throw new DeploymentException("Could not read metadata for " + path, e);
+        }
+        catch (ClassNotFoundException nfe)
+        {
+            throw new DeploymentException("Misconfiguration: cannot instantiate DirectoryMetaData.", nfe);
+        }
+    }
+    
+    /**
+     * Clone all the metadata files for the commit phase of a deployment.
+     */
+    public void cloneMetaData()
+    {
+        recursiveCloneMetaData(fMetaDataDirectory);
+    }
+    
+    private void recursiveCloneMetaData(String dir)
+    {
+        try
+        {
+            String mdName = dir + File.separatorChar + MD_NAME;
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(mdName));
+            DirectoryMetaData md = (DirectoryMetaData)in.readObject();
+            in.close();
+            String cloneName = mdName + CLONE;
+            FileOutputStream fout = new FileOutputStream(cloneName);
+            ObjectOutputStream out = new ObjectOutputStream(fout);
+            out.writeObject(md);
+            out.flush();
+            fout.getChannel().force(true);
+            out.close();
+        }
+        catch (IOException e)
+        {
+            throw new DeploymentException("Could not copy metadata for " + dir, e);
+        }
+        catch (ClassNotFoundException nfe)
+        {
+            throw new DeploymentException("Configuration error: could not instantiate DirectoryMetaData.");
+        }
+        File dFile = new File(dir);
+        File[] listing = dFile.listFiles();
+        for (File file : listing)
+        {
+            if (file.isDirectory())
+            {
+                recursiveCloneMetaData(dir + File.separatorChar + file.getName());
+            }
+        }
     }
 }

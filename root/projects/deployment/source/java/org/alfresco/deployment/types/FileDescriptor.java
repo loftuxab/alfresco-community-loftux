@@ -93,7 +93,7 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
             return false;
         }
         FileDescriptor other = (FileDescriptor)obj;
-        return fName.equals(other.fName) && fType.equals(other.fType) && fGUID.equals(other.fGUID);
+        return fName.equals(other.fName);
     }
 
     /* (non-Javadoc)
@@ -102,7 +102,7 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
     @Override
     public int hashCode()
     {
-        return fName.hashCode() + fType.hashCode() + fGUID.hashCode();
+        return fName.hashCode();
     }
 
     /* (non-Javadoc)

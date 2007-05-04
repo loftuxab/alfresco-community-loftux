@@ -26,9 +26,12 @@
 package org.alfresco.deployment.impl.server;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -147,7 +150,78 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         }
         try
         {
+            // TODO Work out updating of metadata files.
+            deployment.finishWork();
+            deployment.getTarget().cloneMetaData();
+            // First phase.  Perform all mkdirs and file sends by renaming any
+            // existing file/directory to *.alf, and by simply renaming any deleted
+            // files/directoris to *.alf.
+            for (DeployedFile file : deployment)
+            {
+                switch (file.getType())
+                {
+                    case DIR :
+                    {
+                        File f = new File(file.getFinalPath());
+                        if (f.exists())
+                        {
+                            File dest = new File(f.getAbsolutePath() + ".alf");
+                            f.renameTo(dest);
+                            f = new File(file.getFinalPath());
+                        }
+                        f.mkdir();
+                        break;
+                    }
+                    case FILE :
+                    {
+                        File f = new File(file.getFinalPath());
+                        if (f.exists())
+                        {
+                            File dest = new File(f.getAbsolutePath() + ".alf");
+                            f.renameTo(dest);
+                            f = new File(file.getFinalPath());
+                        }
+                        FileOutputStream out = new FileOutputStream(f);
+                        InputStream in = new FileInputStream(file.getPreLocation());
+                        byte[] buff = new byte[8192];
+                        int read = 0;
+                        while ((read = in.read(buff)) != 0)
+                        {
+                            out.write(buff, 0, read);
+                        }
+                        in.close();
+                        out.flush();
+                        out.getChannel().force(true);
+                        out.close();
+                        break;
+                    }
+                    case DELETED :
+                    {
+                        File f = new File(file.getFinalPath());
+                        if (f.exists())
+                        {
+                            File dest = new File(f.getAbsolutePath() + ".alf");
+                            f.renameTo(dest);
+                        }
+                        break;
+                    }
+                    default :
+                    {
+                        throw new DeploymentException("Internal error: unknown file type: " + file.getType());
+                    }
+                }
+            }
+            // Phase 2 : Go through the log again and remove all .alf entries
+            deployment.resetLog();
+            for (DeployedFile file : deployment)
+            {
+                File intermediate = new File(file.getPreLocation());
+                intermediate.delete();
+                File old = new File(file.getFinalPath() + ".alf");
+                purge(old);
+            }
             deployment.finishCommit();
+            fDeployments.remove(ticket);
         }
         catch (Exception e)
         {
@@ -158,6 +232,15 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         // TODO Now do the commit work.
     }
 
+    /**
+     * Purge the old version of a file if it exists.
+     * @param file
+     */
+    private void purge(File file)
+    {
+        // TODO Implement.   
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#delete(java.lang.String, java.lang.String)
      */
@@ -201,6 +284,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             DeployedFile file = fOutputStreamFiles.get(out);
             if (file == null)
             {
+                // TODO Do cleanup.
                 throw new DeploymentException("Closing Unknown OutputStream.");
             }
             deployment.add(file);
@@ -215,10 +299,14 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#getListing(java.lang.String, java.lang.String)
      */
-    public List<FileDescriptor> getListing(String token, String path)
+    public List<FileDescriptor> getListing(String ticket, String path)
     {
-        // TODO Auto-generated method stub
-        return null;
+        Deployment deployment = fDeployments.get(ticket);
+        if (deployment == null)
+        {
+            throw new DeploymentException("Deployment timed out or invalid ticket.");
+        }
+        return new ArrayList<FileDescriptor>(deployment.getTarget().getListing(path));
     }
 
     /* (non-Javadoc)

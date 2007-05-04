@@ -114,6 +114,13 @@ public class Deployment implements Iterable<DeployedFile>
         fCanBeStale = false;
     }
     
+    public void resetLog()
+        throws IOException
+    {
+        fIn.close();
+        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+    }
+    
     /**
      * Signal that the commit phase is finished and clean up.
      */
