@@ -40,13 +40,8 @@ public final class ParameterCheck
      * @param strParamName Name of parameter to check
      * @param object Value of the parameter to check
      */
-    public static void mandatory(final String strParamName, final Object object)
+    public static final void mandatory(final String strParamName, final Object object)
     {
-        if (strParamName == null || strParamName.length() == 0)
-        {
-            throw new IllegalArgumentException("Parameter name is mandatory");
-        }
-
         // check that the object is not null
         if (object == null)
         {
@@ -61,13 +56,8 @@ public final class ParameterCheck
      * @param strParamName Name of parameter to check
      * @param strParamValue Value of the parameter to check
      */
-    public static void mandatoryString(final String strParamName, final String strParamValue)
+    public static final void mandatoryString(final String strParamName, final String strParamValue)
     {
-        if (strParamName == null || strParamName.length() == 0)
-        {
-            throw new IllegalArgumentException("Parameter name is mandatory");
-        }
-
         // check that the given string value has content
         if (strParamValue == null || strParamValue.length() == 0)
         {
@@ -81,13 +71,8 @@ public final class ParameterCheck
      * @param strParamName Name of parameter to check
      * @param coll collection to check
      */
-    public static void mandatoryCollection(final String strParamName, final Collection coll)
+    public static final void mandatoryCollection(final String strParamName, final Collection coll)
     {
-        if (strParamName == null || strParamName.length() == 0)
-        {
-            throw new IllegalArgumentException("Parameter name is mandatory");
-        }
-
         if (coll == null || coll.size() == 0)
         {
             throw new IllegalArgumentException(strParamName + " collection must contain at least one item");
