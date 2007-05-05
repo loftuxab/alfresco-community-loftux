@@ -44,11 +44,10 @@ public interface DeploymentReceiverTransport extends DeploymentReceiverService
      * @param ticket
      * @param outputToken
      */
-    public void finishSend(String ticket, String outputToken, String guid);
+    public void finishSend(String ticket, String outputToken);
     
     /**
      * Write a block of bytes to a file that is being sent.
-     * @param ticket
      * @param outputToken
      * @param data
      * @param offset

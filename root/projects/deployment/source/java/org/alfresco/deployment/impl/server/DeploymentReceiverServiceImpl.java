@@ -109,9 +109,9 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#abort(java.lang.String)
      */
-    public synchronized void abort(String token)
+    public synchronized void abort(String ticket)
     {
-        Deployment deployment = fDeployments.get(token);
+        Deployment deployment = fDeployments.get(ticket);
         if (deployment == null)
         {
             throw new DeploymentException("Deployment timed out or invalid token.");  
@@ -123,17 +123,9 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         try
         {
             deployment.abort();
-            for (DeployedFile file : deployment)
-            {
-                if (file.getType() == FileType.FILE)
-                {
-                    File ffile = new File(file.getPreLocation());
-                    ffile.delete();
-                }
-            }
             Target target = deployment.getTarget();
             fTargetBusy.put(target.getName(), false);
-            fDeployments.remove(token);
+            fDeployments.remove(ticket);
         }
         catch (IOException e)
         {
@@ -170,6 +162,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             }
             catch (IOException e)
             {
+                // TODO How to we recover from this?
                 throw new DeploymentException("Could not create logfile; Deployment cannot continue", e);
             }
             fTargetBusy.put(targetName, true);
@@ -224,7 +217,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                         InputStream in = new FileInputStream(file.getPreLocation());
                         byte[] buff = new byte[8192];
                         int read = 0;
-                        while ((read = in.read(buff)) != 0)
+                        while ((read = in.read(buff)) != -1)
                         {
                             out.write(buff, 0, read);
                         }
@@ -254,8 +247,11 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             deployment.resetLog();
             for (DeployedFile file : deployment)
             {
-                File intermediate = new File(file.getPreLocation());
-                intermediate.delete();
+                if (file.getType() == FileType.FILE)
+                {
+                    File intermediate = new File(file.getPreLocation());
+                    intermediate.delete();
+                }
                 File old = new File(deployment.getFileForPath(file.getPath()).getAbsolutePath() + ".alf");
                 Deleter.Delete(old);
             }
@@ -263,19 +259,16 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             preLocation.delete();
             deployment.finishCommit();
             fDeployments.remove(ticket);
+            fTargetBusy.put(deployment.getTarget().getName(), false);
         }
         catch (Exception e)
         {
-            cleanupFailedCommit(ticket);
-            throw new DeploymentException("Problem finishing transaction work; deployment aborted.", e);
+            fDeployments.remove(ticket);
+            fTargetBusy.put(deployment.getTarget().getName(), false);
+            throw new DeploymentException("Problem finishing transaction work; try recovery.", e);
         }
     }
 
-    private void cleanupFailedCommit(String ticket)
-    {
-        // TODO implement.
-    }
-    
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#delete(java.lang.String, java.lang.String)
      */
@@ -297,14 +290,14 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         catch (IOException e)
         {
             abort(token);
-            throw new DeploymentException("Could not update log.", e);
+            throw new DeploymentException("Could not update log. Aborted.", e);
         }
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#finishSend(java.lang.String, java.io.OutputStream)
      */
-    public synchronized void finishSend(String token, OutputStream out, String guid)
+    public synchronized void finishSend(String token, OutputStream out)
     {
         Deployment deployment = fDeployments.get(token);
         if (deployment == null)
@@ -334,7 +327,15 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         {
             throw new DeploymentException("Deployment timed out or invalid ticket.");
         }
-        return new ArrayList<FileDescriptor>(deployment.getListing(path));
+        try
+        {
+            return new ArrayList<FileDescriptor>(deployment.getListing(path));
+        }
+        catch (Exception e)
+        {
+            abort(ticket);
+            throw new DeploymentException("Could not get listing for " + path + ". Aborted.", e);
+        }
     }
 
     /* (non-Javadoc)
@@ -358,7 +359,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         catch (IOException e)
         {
             abort(token);
-            throw new DeploymentException("Could not log mkdir of " + path);
+            throw new DeploymentException("Could not log mkdir of " + path + ". Aborted.");
         }
     }
 
@@ -386,7 +387,7 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
         catch (IOException e)
         {
             abort(ticket);
-            throw new DeploymentException("Could Not Open " + path + " for write.", e);
+            throw new DeploymentException("Could Not Open " + path + " for write. Aborted.", e);
         }
     }
 
