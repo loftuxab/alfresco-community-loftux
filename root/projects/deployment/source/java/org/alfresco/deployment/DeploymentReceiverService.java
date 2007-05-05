@@ -48,55 +48,55 @@ public interface DeploymentReceiverService
     /**
      * Signals that the deployment is finished and should
      * commit.  
-     * @param token The transaction token.
+     * @param ticket The transaction ticket.
      */
-    public void commit(String token);
+    public void commit(String ticket);
     
     /**
      * Signals that the deployment should be aborted and
      * rolled back.
-     * @param token
+     * @param ticket
      */
-    public void abort(String token);
+    public void abort(String ticket);
     
     /**
      * Send a file to a path.
-     * @param token
+     * @param ticket
      * @param path
      * @return
      */
-    public OutputStream send(String token, String path, String guid);
+    public OutputStream send(String ticket, String path, String guid);
     
     /**
      * Tell the deployment receiver that a particular send is done.
      * This closes the output stream.
-     * @param token
+     * @param ticket
      * @param out
      */
-    public void finishSend(String token, OutputStream out, String guid);
+    public void finishSend(String ticket, OutputStream out);
     
     /**
      * Create a directory.
-     * @param token
+     * @param ticket
      * @param path
      * @param guid The GUID of the directory to be created.
      */
-    public void mkdir(String token, String path, String guid);
+    public void mkdir(String ticket, String path, String guid);
     
     /**
      * Delete a file or directory.
-     * @param token
+     * @param ticket
      * @param path
      */
-    public void delete(String token, String path);
+    public void delete(String ticket, String path);
     
     /**
      * Get a listing of a directory.
-     * @param token
+     * @param ticket
      * @param path
      * @return The listing in name sorted order.
      */
-    public List<FileDescriptor> getListing(String token, String path);
+    public List<FileDescriptor> getListing(String ticket, String path);
     
     /**
      * Shut down the Deployment Receiver.

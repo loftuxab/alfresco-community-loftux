@@ -33,20 +33,25 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.SortedSet;
 
 import org.alfresco.deployment.FileDescriptor;
+import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
+import org.alfresco.deployment.util.Deleter;
 
 /**
  * This is a record of an ongoing deployment.
  * @author britt
  */
-public class Deployment implements Iterable<DeployedFile>
+public class Deployment implements Iterable<DeployedFile>, Serializable
 {
+    private static final long serialVersionUID = 4752110479673700145L;
+
     /**
      * Timestamp of last time this deployment was talked to.
      */
@@ -68,19 +73,29 @@ public class Deployment implements Iterable<DeployedFile>
     private String fLogFile;
     
     /**
+     * The location of the log directory.
+     */ 
+    private String fLogDir;
+    
+    /**
+     * The path to the persistent storage of this Deployment.
+     */
+    private String fDepFile;
+    
+    /**
      * The underlying file output stream.  Used for forcing to disk.
      */
-    private FileOutputStream fFileOut;
+    private transient FileOutputStream fFileOut;
     
     /**
      * The object output stream to which deployed files are written.
      */
-    private ObjectOutputStream fOut;
+    private transient ObjectOutputStream fOut;
     
     /**
      * The object input stream for reading in the log.
      */
-    private ObjectInputStream fIn;
+    private transient ObjectInputStream fIn;
     
     /**
      * The state of this deployment with regards to the transaction.
@@ -90,20 +105,25 @@ public class Deployment implements Iterable<DeployedFile>
     /**
      * Keeps track of any open output files.
      */
-    private Map<OutputStream, DeployedFile> fOutputFiles;
+    private transient Map<OutputStream, DeployedFile> fOutputFiles;
     
     public Deployment(Target target, 
-                      String logFile)
+                      String logDir)
         throws IOException
     {
         fTarget = target;
-        fLogFile = logFile;
+        fLogDir = logDir;
+        fLogFile = logDir + File.separatorChar + "log";
+        fDepFile = logDir + File.separatorChar + "deployment";
         fLastActivity = System.currentTimeMillis();
+        File lDir = new File(logDir);
+        lDir.mkdir();
         fFileOut = new FileOutputStream(fLogFile);
         fOut = new ObjectOutputStream(fFileOut);
         fCanBeStale = true;
         fState = DeploymentState.WORKING;
         fOutputFiles = new HashMap<OutputStream, DeployedFile>();
+        save();
     }
     
     /**
@@ -164,6 +184,7 @@ public class Deployment implements Iterable<DeployedFile>
         fCanBeStale = false;
         fTarget.cloneMetaData();
         fState = DeploymentState.COMMITTING;
+        save();
     }
     
     public void resetLog()
@@ -179,12 +200,27 @@ public class Deployment implements Iterable<DeployedFile>
     public void abort()
         throws IOException
     {
-        finishWork();
+        fOut.flush();
+        fFileOut.getChannel().force(true);
+        fOut.close();
+        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+        fCanBeStale = false;
         fState = DeploymentState.ABORTING;
         for (OutputStream out : fOutputFiles.keySet())
         {
             out.close();
         }
+        for (DeployedFile file : this)
+        {
+            if (file.getType() == FileType.FILE)
+            {
+                File toDelete = new File(file.getPreLocation());
+                toDelete.delete();
+            }
+        }
+        fIn.close();
+        File logDir = new File(fLogDir);
+        Deleter.Delete(logDir);
     }
     
     /**
@@ -205,8 +241,8 @@ public class Deployment implements Iterable<DeployedFile>
         {
             fTarget.commitMetaData();
             fIn.close();
-            File log = new File(fLogFile);
-            log.delete();
+            File logDir = new File(fLogDir);
+            Deleter.Delete(logDir);
         }
         catch (IOException e)
         {
@@ -277,6 +313,21 @@ public class Deployment implements Iterable<DeployedFile>
     {
         return fState;
     }
+
+    /**
+     * Save this record to its persistent location.
+     * @throws IOException
+     */
+    private void save()
+        throws IOException
+    {
+        // TODO rename, save, delete?
+        FileOutputStream fout = new FileOutputStream(fDepFile);
+        ObjectOutputStream out = new ObjectOutputStream(fout);
+        out.writeObject(this);
+        out.flush();
+        fout.getChannel().force(true);
+    }
     
     /**
      * Iterator for reading back the log.
@@ -327,7 +378,9 @@ public class Deployment implements Iterable<DeployedFile>
          */
         public DeployedFile next()
         {
-            return fNext;
+            DeployedFile next = fNext;
+            fNext = null;
+            return next;
         }
 
         /* (non-Javadoc)

@@ -31,6 +31,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.util.SortedSet;
 
 import org.alfresco.deployment.FileDescriptor;
@@ -43,8 +44,9 @@ import org.alfresco.util.GUID;
  * This represents a target for a deployment.
  * @author britt
  */
-public class Target
+public class Target implements Serializable
 {
+    private static final long serialVersionUID = 7759718377782991626L;
     private static final String MD_NAME = ".md.";
     private static final String CLONE = "clone";
 

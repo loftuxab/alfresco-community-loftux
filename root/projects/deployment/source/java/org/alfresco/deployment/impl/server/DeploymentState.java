@@ -25,10 +25,13 @@
 
 package org.alfresco.deployment.impl.server;
 
+import java.io.Serializable;
+
 /**
+ * The status of a Deployment.
  * @author britt
  */
-public enum DeploymentState
+public enum DeploymentState implements Serializable
 {
     WORKING,
     COMMITTING,
