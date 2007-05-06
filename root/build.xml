@@ -34,6 +34,7 @@
          <pathelement location="${user.home}"/>
          <pathelement location="${dir.project.repository.config}"/>
          <pathelement location="${dir.project.webclient.config}"/>
+         <pathelement location="${dir.project.deployment.config}"/>
          <dirset dir="${dir.projects}">
             <include name="**/${dir.name.source}/${dir.name.test.resources}" />
          </dirset>
@@ -101,7 +102,8 @@
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
            depends="generate-javadocs-core, 
-                    generate-javadocs-mbeans, 
+                    generate-javadocs-mbeans,
+                    generate-javadocs-deployment, 
                     generate-javadocs-repository, 
                     generate-javadocs-remoteapi, 
                     generate-javadocs-jndi, 
@@ -117,7 +119,8 @@
 
    <target name="-tomcat" 
            depends="incremental-core, 
-                    incremental-mbeans, 
+                    incremental-mbeans,
+                    incremental-deployment, 
                     incremental-repository, 
                     incremental-remoteapi, 
                     incremental-jndi, 
@@ -137,7 +140,8 @@
    <target name="clean" 
            description="Cleans everything" 
            depends="clean-core, 
-                    clean-mbeans, 
+                    clean-mbeans,
+                    clean-deployment, 
                     clean-repository, 
                     clean-remoteapi, 
                     clean-jndi, 
@@ -313,7 +317,8 @@
            depends="clean, 
                     incremental, 
                     test-core, 
-                    test-mbeans, 
+                    test-mbeans,
+                    test-deployment, 
                     test-repository, 
                     test-remoteapi, 
                     test-jndi, 

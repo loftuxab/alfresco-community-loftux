@@ -39,7 +39,7 @@ import junit.framework.TestCase;
  * Some test for the deployment receiver.
  * @author britt
  */
-public class DeploymentTest extends TestCase
+public class DeploymentTestP extends TestCase
 {
     private static ApplicationContext fContext = null;
     

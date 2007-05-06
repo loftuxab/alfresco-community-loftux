@@ -42,7 +42,7 @@ import java.util.SortedSet;
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.deployment.util.Deleter;
+import org.alfresco.util.Deleter;
 
 /**
  * This is a record of an ongoing deployment.

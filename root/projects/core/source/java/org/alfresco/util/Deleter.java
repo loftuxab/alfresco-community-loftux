@@ -23,7 +23,7 @@
  * http://www.alfresco.com/legal/licensing
  */
 
-package org.alfresco.deployment.util;
+package org.alfresco.util;
 
 import java.io.File;
 
