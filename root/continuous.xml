@@ -706,8 +706,17 @@
             file="${dir.project.jndi.dist}/${file.name.jar.jndi}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server"
+            file="${dir.project.deployment.dist}/${file.name.jar.deployment}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.webclient.dist}/${file.name.jar.webclient}" />
+
+      <!-- Deployment Libraries -->
+      <mkdir dir="${dir.continuous.assemble.sdk}/lib/deployment"/>
+      <copy todir="${dir.continous.assemble.sdk}/lib/deployment"
+            file="${dir.project.core.dist}/${file.name.jar.core}"/>
+      <copy todir="${dir.continous.assemble.sdk}/lib/deployment"
+            file="${dir.project.deployment.dist}/${file.name.jar.core}"/>
 
       <!-- Package configuration as a .jar -->
       <!-- TODO: configuration should ideally live in each of the above .jars -->

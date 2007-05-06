@@ -98,7 +98,54 @@
                          windowtitle="Alfresco Virtualization MBean" 
                          projectdir="${dir.project.mbeans}" />
    </target>
+
+   <!-- ******************** -->
+   <!-- ** Deployment Project ** -->
+   <!-- ******************** -->
    
+   <target name="incremental-deployment" 
+           description="Performs an incremental build of the deployment project" 
+           depends="package-deployment" />
+      
+   <target name="build-deployment" 
+           description="Performs a clean build of the deployment project" 
+           depends="clean-deployment, 
+           incremental-deployment" />
+   
+   <target name="clean-deployment" 
+           description="Cleans the deployment project" 
+           depends="init">
+      <clean projectdir="${dir.project.deployment}" />
+   </target>
+   
+   <target name="compile-deployment" 
+           description="Compiles the deployment project" 
+           depends="init">
+      <compile-java projectdir="${dir.project.deployment}" />
+   </target>
+   
+   <target name="package-deployment" 
+           description="Packages the deployment project" 
+           depends="compile-deployment">
+      <mkdir dir="${dir.project.deployment.dist}" />
+      <jar jarfile="${dir.project.deployment.dist}/${file.name.jar.deployment}" 
+           basedir="${dir.project.deployment.classes}" />
+   </target>
+   
+   <target name="test-deployment" 
+           description="Runs the tests for the deployment project" 
+           depends="compile-deployment">
+      <run-tests projectdir="${dir.project.deployment}" />
+   </target>
+   
+   <target name="generate-javadocs-deployment" 
+           description="Generates the JavaDocs for the deployment project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Deployment Receiver" 
+                         windowtitle="Alfresco Deployment Receiver" 
+                         projectdir="${dir.project.deployment}" />
+   </target>
+      
    <!-- ************************ -->
    <!-- ** Repository Project ** -->
    <!-- ************************ -->
@@ -891,6 +938,8 @@
                   includes="${file.name.jar.repository}" />
          <fileset dir="${dir.project.mbeans.dist}" 
                   includes="${file.name.jar.mbeans}" />
+         <fileset dir="${dir.project.deployment.dist}"
+                  includes="${file.name.jar.deployment}"/>
          <fileset dir="${dir.project.remoteapi.dist}" 
                   includes="${file.name.jar.remoteapi}" />
       </copy>

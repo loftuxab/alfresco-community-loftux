@@ -29,7 +29,7 @@
             <map>
             	<entry key="sampleTarget">
             	    <map>
-            	    	<entry key="root"><value>/Users/britt/target</value></entry>
+            	    	<entry key="root"><value>target</value></entry>
             	    	<entry key="user"><value>Giles</value></entry>
             	    	<entry key="password"><value>Watcher</value></entry>
             	    </map>

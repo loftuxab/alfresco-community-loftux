@@ -32,12 +32,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedSet;
 
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
 import org.alfresco.deployment.util.Path;
+import org.alfresco.util.Deleter;
 import org.alfresco.util.GUID;
 
 /**
@@ -49,6 +52,7 @@ public class Target implements Serializable
     private static final long serialVersionUID = 7759718377782991626L;
     private static final String MD_NAME = ".md.";
     private static final String CLONE = "clone";
+    private static final String OLD = "old";
 
     /**
      * The name of the target.
@@ -276,16 +280,22 @@ public class Target implements Serializable
         {
             case FILE :
             {
-                md.add(new FileDescriptor(path.getBaseName(),
-                                          FileType.FILE,
-                                          file.getGuid()));
+                FileDescriptor fd = 
+                    new FileDescriptor(path.getBaseName(),
+                                       FileType.FILE,
+                                       file.getGuid());
+                md.remove(fd);
+                md.add(fd);
                 break;
             }
             case DIR :
             {
-                md.add(new FileDescriptor(path.getBaseName(),
-                                          FileType.DIR,
-                                          file.getGuid()));
+                FileDescriptor fd = 
+                    new FileDescriptor(path.getBaseName(),
+                                       FileType.DIR,
+                                       file.getGuid());
+                md.remove(fd);
+                md.add(fd);
                 String newDirPath = fMetaDataDirectory + File.separatorChar + path.toString();
                 File newDir = new File(newDirPath);
                 if (!newDir.mkdir())
@@ -299,9 +309,10 @@ public class Target implements Serializable
             case DELETED :
             {
                 FileDescriptor toRemove = new FileDescriptor(path.getBaseName(),
-                                                             null,
+                                                             FileType.DELETED,
                                                              null);
                 md.remove(toRemove);
+                md.add(toRemove);
                 break;
             }
             default :
@@ -373,13 +384,39 @@ public class Target implements Serializable
     private void recursiveCommitMetaData(String dir)
     {
         String mdName = dir + File.separatorChar + MD_NAME;
-        File old = new File(mdName);
+        File original = new File(mdName);
+        File old = new File(mdName + OLD);
+        if (original.exists() && !original.renameTo(old))
+        {
+            throw new DeploymentException("Could not rename meta data file " + mdName); 
+        }
+        DirectoryMetaData md = getDirectory(mdName + CLONE);
+        List<FileDescriptor> toDelete = new ArrayList<FileDescriptor>();
+        SortedSet<FileDescriptor> mdListing = md.getListing();
+        for (FileDescriptor file : mdListing)
+        {
+            if (file.getType() == FileType.DELETED)
+            {
+                toDelete.add(file);
+            }
+            else if (file.getType() == FileType.DIR)
+            {
+                continue;
+            }
+            File mdDir = new File(dir + File.separatorChar + file.getName());
+            if (mdDir.exists())
+            {
+                Deleter.Delete(mdDir);
+            }
+        }
+        for (FileDescriptor file : toDelete)
+        {
+            md.remove(file);
+        }
+        putDirectory(mdName, md);
         old.delete();
         File clone = new File(mdName + CLONE);
-        if (!clone.renameTo(old))
-        {
-            throw new DeploymentException("Could not replace metadata " + mdName);
-        }
+        clone.delete();
         File dFile = new File(dir);
         File[] listing = dFile.listFiles();
         for (File file : listing)

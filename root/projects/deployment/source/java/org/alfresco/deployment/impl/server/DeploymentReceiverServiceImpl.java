@@ -41,7 +41,7 @@ import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.config.Configuration;
 import org.alfresco.deployment.impl.DeploymentException;
-import org.alfresco.deployment.util.Deleter;
+import org.alfresco.util.Deleter;
 import org.alfresco.util.GUID;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
