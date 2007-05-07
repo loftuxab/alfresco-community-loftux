@@ -422,4 +422,22 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
     {
         fContext = (ConfigurableApplicationContext)applicationContext;
     }
+
+    public synchronized void setGuid(String ticket, String path, String guid)
+    {
+        Deployment deployment = fDeployments.get(ticket);
+        if (deployment == null)
+        {
+            throw new DeploymentException("Deployment timed out or invalid ticket.");
+        }
+        try
+        {
+            deployment.setGuid(path, guid);
+        }
+        catch (Exception e)
+        {
+            abort(ticket);
+            throw new DeploymentException("Could not set guid on " + path, e);
+        }
+    }
 }

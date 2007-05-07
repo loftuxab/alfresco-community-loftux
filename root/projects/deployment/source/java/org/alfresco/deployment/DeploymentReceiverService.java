@@ -84,6 +84,14 @@ public interface DeploymentReceiverService
     public void mkdir(String ticket, String path, String guid);
     
     /**
+     * Set the Guid on a directory.
+     * @param ticket
+     * @param path
+     * @param guid
+     */
+    public void setGuid(String ticket, String path, String guid);
+    
+    /**
      * Delete a file or directory.
      * @param ticket
      * @param path

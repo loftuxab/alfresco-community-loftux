@@ -186,4 +186,9 @@ public class DeploymentReceiverTransportImpl implements
     {
         fService.shutDown(user, password);
     }
+
+    public void setGuid(String ticket, String path, String guid)
+    {
+        fService.setGuid(ticket, path, guid);
+    }
 }
