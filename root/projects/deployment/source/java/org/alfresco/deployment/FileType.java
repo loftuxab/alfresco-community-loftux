@@ -35,5 +35,6 @@ public enum FileType implements Serializable
 {
     FILE,
     DIR,
-    DELETED
+    DELETED,
+    SETGUID
 }

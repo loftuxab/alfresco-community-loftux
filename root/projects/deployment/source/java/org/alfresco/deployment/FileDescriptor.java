@@ -79,6 +79,11 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
         return fGUID;
     }
 
+    public void setGuid(String guid)
+    {
+        fGUID = guid;
+    }
+    
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */

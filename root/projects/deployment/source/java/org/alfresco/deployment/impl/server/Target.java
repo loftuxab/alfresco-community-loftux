@@ -315,6 +315,23 @@ public class Target implements Serializable
                 md.add(toRemove);
                 break;
             }
+            case SETGUID :
+            {
+                FileDescriptor toModify = new FileDescriptor(path.getBaseName(),
+                                                             null,
+                                                             null);
+                SortedSet<FileDescriptor> tail = md.getListing().tailSet(toModify);
+                if (tail.size() != 0)
+                {
+                    toModify = tail.first();
+                    if (toModify.getName().equals(path.getBaseName()))
+                    {
+                        toModify.setGuid(file.getGuid());
+                        break;
+                    }
+                }
+                throw new DeploymentException("Trying to set guid on non existent file " + path);
+            }
             default :
             {
                 throw new DeploymentException("Configuration Error: unknown FileType " + file.getType());

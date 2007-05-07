@@ -305,6 +305,16 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         return new DeployedFileIterator();
     }
     
+    public void setGuid(String path, String guid)
+        throws IOException
+    {
+        DeployedFile file = new DeployedFile(FileType.SETGUID,
+                                             null, 
+                                             path,
+                                             guid);
+        fOut.writeObject(file);
+    }
+    
     /**
      * Get the state of the deployment.
      * @return
