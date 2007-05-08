@@ -501,6 +501,8 @@ public class Convert
         }
     }
     
+    private static final String EOF_CHECK = "--EOF-CHECK--";
+    
     private static byte[] convertLineEndings(byte[] bytes, Charset charset, String lineEnding) throws Exception
     {
         String charsetName = charset.name();
@@ -510,13 +512,30 @@ public class Convert
         try
         {
             String str = new String(bytes, charsetName);
+            str = str + EOF_CHECK;
             reader = new BufferedReader(new StringReader(str));
             String line = reader.readLine();
             while (line != null)
             {
+                // Ignore the newline check
+                boolean addLine = true;
+                if (line.equals(EOF_CHECK))
+                {
+                    break;
+                }
+                else if (line.endsWith(EOF_CHECK))
+                {
+                    int index = line.indexOf(EOF_CHECK);
+                    line = line.substring(0, index);
+                    addLine = false;
+                }
                 // Write the line back out
                 sb.append(line);
-                if (lineEnding.equalsIgnoreCase("UNIX"))
+                if (!addLine)
+                {
+                    // No newline
+                }
+                else if (lineEnding.equalsIgnoreCase("UNIX"))
                 {
                     sb.append("\n");
                 }
