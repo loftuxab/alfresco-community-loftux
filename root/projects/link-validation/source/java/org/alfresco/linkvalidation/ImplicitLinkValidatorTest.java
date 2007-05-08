@@ -32,6 +32,7 @@ import java.util.List;
 import org.alfresco.jndi.JndiInfoBean;
 import org.alfresco.repo.attributes.*;
 import org.alfresco.repo.remote.ClientTicketHolder;
+import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.repo.domain.PropertyValue;
 import java.util.Map;
@@ -372,18 +373,8 @@ public class ImplicitLinkValidatorTest extends TestCase
     {
         try
         {
-            // NEON:  
-            //     Constants like:   AVMConstants.PROP_SANDBOX_STAGING_MAIN should be 
-            //     in util, not web-client
-            //
-            //     Below, I wanted to say:
-            //     QName.createQName(null,  AVMConstants.PROP_SANDBOX_STAGING_MAIN));
-            //     but I hard-coded ".sandbox.staging.main"  to get around build hassles.
-            //
-
             Map<String, Map<QName, PropertyValue>> store_staging_main_entries = 
-                AvmSvc_.queryStoresPropertyKey(
-                    QName.createQName(null, ".sandbox.staging.main" ));
+                AvmSvc_.queryStoresPropertyKey( SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
 
             for ( Map.Entry<String, Map<QName, PropertyValue>> store_staging_main_entry  :
                   store_staging_main_entries.entrySet() 

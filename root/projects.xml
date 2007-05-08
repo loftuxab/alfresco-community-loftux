@@ -294,7 +294,7 @@
    </target>
    
 
-   <target name="test-linkvalidation">
+   <target name="test-linkvalidation" depends="init">
       <alfresco-virtual-antcall target="_test-linkvalidation"/>
    </target>
 

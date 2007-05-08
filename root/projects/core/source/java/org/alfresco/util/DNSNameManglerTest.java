@@ -21,7 +21,7 @@
  * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing" */
 
-package org.alfresco.web.bean.wcm;
+package org.alfresco.util;
 
 import junit.framework.TestCase;
 
