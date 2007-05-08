@@ -5,7 +5,7 @@
     
     <!-- Action defintions -->
     
-    <bean id="org.alfresco.module.RecordsManagement.transferDispositionAction" parent="script">
+    <bean id="org_alfresco_module_RecordsManagement_transferDispositionAction" parent="script">
         <property name="scriptLocation">
         	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
             	<constructor-arg>
@@ -18,7 +18,7 @@
 	     </property>
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.destroyDispositionAction" class="org.alfresco.module.recordsManagement.action.DestroyDispositionAction" parent="action-executer">
+    <bean id="org_alfresco_module_RecordsManagement_destroyDispositionAction" class="org.alfresco.module.recordsManagement.action.DestroyDispositionAction" parent="action-executer">
         <property name="nodeService">
             <ref bean="NodeService" />
         </property>
@@ -30,7 +30,7 @@
 	     </property>
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.accessionDispositionAction" parent="script">
+    <bean id="org_alfresco_module_RecordsManagement_accessionDispositionAction" parent="script">
         <property name="scriptLocation">
         	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
             	<constructor-arg>

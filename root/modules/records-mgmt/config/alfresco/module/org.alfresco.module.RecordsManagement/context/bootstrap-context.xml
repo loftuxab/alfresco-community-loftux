@@ -5,7 +5,7 @@
 
 	<!-- Bootstrap -->
 
-    <bean id="org.alfresco.module.RecordsManagement.bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+    <bean id="org_alfresco_module_RecordsManagement_bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
         <property name="moduleId" value="org.alfresco.module.RecordsManagement" />
         <property name="name" value="org.alfresco.module.RecordsManagement.bootstrapSpaces" />
         <property name="description" value="Initial data requirements" />
@@ -39,7 +39,7 @@
         </property>
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.bootstrapGroups" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+    <bean id="org_alfresco_module_RecordsManagement_bootstrapGroups" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
         <property name="moduleId" value="org.alfresco.module.RecordsManagement" />
         <property name="name" value="org.alfresco.module.RecordsManagement.bootstrapGroups" />
         <property name="description" value="Initial data requirements" />
@@ -57,7 +57,7 @@
         </property>
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+    <bean id="org_alfresco_module_RecordsManagement_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
         <property name="models">
             <list>
                 <value>alfresco/module/org.alfresco.module.RecordsManagement/model/recordsModel.xml</value>

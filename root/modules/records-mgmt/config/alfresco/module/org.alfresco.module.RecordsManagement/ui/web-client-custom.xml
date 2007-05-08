@@ -153,7 +153,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.AddTransferInstructionsEvaluator</evaluator>
             <label>Add Transfer Instructions</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -170,7 +170,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.RemoveTransferInstructionsEvaluator</evaluator>
             <label>Remove Transfer Instructions</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -187,7 +187,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.AddDestroyInstructionsEvaluator</evaluator>
             <label>Add Destroy Instructions</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -204,7 +204,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.RemoveDestroyInstructionsEvaluator</evaluator>
             <label>Remove Destroy Instructions</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -228,7 +228,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.CutoffEvaluator</evaluator>
             <label>Cutoff Record</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -245,7 +245,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.HoldEvaluator</evaluator>
             <label>Hold</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -262,7 +262,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.RemoveHoldEvaluator</evaluator>
             <label>Remove Hold</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -279,7 +279,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.ObsoleteEvaluator</evaluator>
             <label>Obsolete</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>
@@ -296,7 +296,7 @@
             <evaluator>org.alfresco.module.recordsManagement.ui.SupersededEvaluator</evaluator>
             <label>Superseded</label>
             <image>/images/icons/edit_icon.gif</image>
-		    <action-listener>#{rmActionListener.executeScript}</action-listener>
+		    <action-listener>#{org_alfresco_module_RecordsManagement_ActionListener.executeScript}</action-listener>
 		    <params>
 		        <param name="id">#{actionContext.id}</param>
          		<param name="script">workspace://SpacesStore/uiAction_addRemoveAspect</param>

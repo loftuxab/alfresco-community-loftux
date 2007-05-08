@@ -3,7 +3,7 @@
 
 <beans>
 
-	<bean id="org.alfresco.module.RecordsManagement.onCreateNode_rmaFilePlan" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+	<bean id="org_alfresco_module_RecordsManagement_onCreateNode_rmaFilePlan" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onCreateNode</value>           
         </property>  	   
@@ -23,7 +23,7 @@
         </property> 
     </bean>
 
-    <bean id="org.alfresco.module.RecordsManagement.onCreateChildAssociation_rmaFilePlan_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onCreateChildAssociation_rmaFilePlan_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
         <property name="policyNames">
            <list>
         	  <value>{http://www.alfresco.org}onCreateChildAssociation</value>
@@ -49,7 +49,7 @@
         </property> 
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.onContentUpdate_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onContentUpdate_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onContentUpdate</value>           
         </property>  	   
@@ -69,7 +69,7 @@
         </property> 
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -89,7 +89,7 @@
         </property> 
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaVitalRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaVitalRecord" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -109,7 +109,7 @@
         </property> 
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaCutoffSchedule" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaCutoffSchedule" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -129,7 +129,7 @@
         </property> 
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaObsolete" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaObsolete" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -149,7 +149,7 @@
         </property> 
     </bean>    
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaSuperseded" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaSuperseded" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -169,7 +169,7 @@
         </property> 
     </bean>     
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaCutoff" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaCutoff" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -189,7 +189,7 @@
         </property> 
     </bean>         
     
-    <bean id="org.alfresco.module.RecordsManagement.onAddAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onAddAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onAddAspect</value>           
         </property>  	   
@@ -209,7 +209,7 @@
         </property> 
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.onRemoveAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+    <bean id="org_alfresco_module_RecordsManagement_onRemoveAspect_rmaHeld" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
         <property name="policyName">
            <value>{http://www.alfresco.org}onRemoveAspect</value>           
         </property>  	   
