@@ -5,7 +5,7 @@
     
     <!-- Java script API -->
     
-    <bean id="org.alfresco.module.RecordsManagement.Script" parent="baseJavaScriptExtension" class="org.alfresco.module.recordsManagement.RecordsManagementScript">
+    <bean id="org_alfresco_module_RecordsManagement_Script" parent="baseJavaScriptExtension" class="org.alfresco.module.recordsManagement.RecordsManagementScript">
         <property name="extensionName">
             <value>rm</value>
         </property>               
@@ -14,7 +14,7 @@
         </property>
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.ActionListener" class="org.alfresco.module.recordsManagement.ui.RecordsManagementActionListener">               
+    <bean id="org_alfresco_module_RecordsManagement_ActionListener" class="org.alfresco.module.recordsManagement.ui.RecordsManagementActionListener">               
         <property name="serviceRegistry">
             <ref bean="ServiceRegistry"/>
         </property>
@@ -22,7 +22,7 @@
     
     <!-- Scheduled scripts -->
     
-    <bean id="org.alfresco.module.RecordsManagement.scheduledCutoffJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean id="org_alfresco_module_RecordsManagement_scheduledCutoffJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass">
             <value>org.alfresco.repo.jscript.ExecuteScriptJob</value>
         </property>
@@ -45,9 +45,9 @@
         </property>
     </bean>
     
-    <bean id="org.alfresco.module.RecordsManagement.scheduledCutoffTrigger" class="org.alfresco.util.CronTriggerBean">
+    <bean id="org_alfresco_module_RecordsManagement_scheduledCutoffTrigger" class="org.alfresco.util.CronTriggerBean">
         <property name="jobDetail">
-            <ref bean="org.alfresco.module.RecordsManagement.scheduledCutoffJobDetail" />
+            <ref bean="org_alfresco_module_RecordsManagement_scheduledCutoffJobDetail" />
         </property>
         <property name="scheduler">
             <ref bean="schedulerFactory" />
@@ -58,7 +58,7 @@
         </property>
     </bean>   
     
-    <bean id="org.alfresco.module.RecordsManagement.scheduledRemoveHoldJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+    <bean id="org_alfresco_module_RecordsManagement_scheduledRemoveHoldJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
         <property name="jobClass">
             <value>org.alfresco.repo.jscript.ExecuteScriptJob</value>
         </property>
@@ -81,9 +81,9 @@
         </property>
     </bean>
         
-    <bean id="org.alfresco.module.RecordsManagement.scheduledRemoveHoldTrigger" class="org.alfresco.util.CronTriggerBean">
+    <bean id="org_alfresco_module_RecordsManagement_scheduledRemoveHoldTrigger" class="org.alfresco.util.CronTriggerBean">
         <property name="jobDetail">
-            <ref bean="org.alfresco.module.RecordsManagement.scheduledRemoveHoldJobDetail" />
+            <ref bean="org_alfresco_module_RecordsManagement_scheduledRemoveHoldJobDetail" />
         </property>
         <property name="scheduler">
             <ref bean="schedulerFactory" />
