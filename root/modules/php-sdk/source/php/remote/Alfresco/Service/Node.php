@@ -57,7 +57,7 @@ class Node extends BaseObject
 	/**
 	 * Constructor
 	 */
-	private function __construct($session, $store, $id) 
+	public function __construct($session, $store, $id) 
 	{
 		$this->_session = $session;
 		$this->_store = $store;
@@ -68,17 +68,6 @@ class Node extends BaseObject
 		$this->addedAssociations = array();
 	}
 
-    public static function create($session, $store, $id)
-    {
-    	$node = $session->getNode($store, $id);
-    	if ($node == null)
-    	{
-    		$node = new Node($session, $store, $id);
-    		$session->addNode($node);
-    	}		
-    	return $node;
-    }
-
     /**
      * Util method to create a node from a web service node structure.
      */
@@ -88,15 +77,10 @@ class Node extends BaseObject
 		$address = $webServiceNode->reference->store->address;
 		$id = $webServiceNode->reference->uuid;
 
-		$store = new Store($session, $address, $scheme);
+		$store = $session->getStore($address, $scheme);
 		$node = $session->getNode($store, $id);
-    	if ($node == null)
-    	{
-    		$node = new Node($session, $store, $id);
-    		$node->populateFromWebServiceNode($webServiceNode);
-    		$session->addNode($node);
-    	}		
-
+    	$node->populateFromWebServiceNode($webServiceNode);
+    	
 		return $node;
 	}
 	
@@ -113,16 +97,27 @@ class Node extends BaseObject
 		}		
 	}
 	
+	public function setContent($property, $mimetype=null, $encoding=null, $content=null)
+	{
+		list($property) = $this->_session->namespaceMap->getFullNames(array($property));
+		$contentData = new ContentData($this, $property, $mimetype, $encoding);
+		if ($content != null)
+		{
+			$contentData->content = $content;
+		}
+		$this->_properties[$property] = $contentData;
+	}
+	
 	public function hasAspect($aspect)
 	{
-		list($aspect) = $this->expandToFullNames(array($aspect));
+		list($aspect) = $this->_session->namespaceMap->getFullNames(array($aspect));
 		$this->populateProperties();
 		return in_array($aspect, $this->_aspects);
 	}
 	
 	public function addAspect($aspect, $properties = null)
 	{
-		list($aspect) = $this->expandToFullNames(array($aspect));		
+		list($aspect) = $this->_session->namespaceMap->getFullNames(array($aspect));		
 		$this->populateProperties();
 		
 		if (in_array($aspect, $this->_aspects) == false)
@@ -132,7 +127,7 @@ class Node extends BaseObject
 			{
 				foreach ($properties as $name=>$value)
 				{
-					$name = $this->expandToFullName($name);
+					$name = $this->_session->namespaceMap->getFullName($name);
 					$this->_properties[$name] = $value;
 				}
 			}
@@ -144,7 +139,7 @@ class Node extends BaseObject
 	
 	public function removeAspect($aspect)
 	{
-		list($aspect) = $this->expandToFullNames(array($aspect));
+		list($aspect) = $this->_session->namespaceMap->getFullNames(array($aspect));
 		$this->populateProperties();	
 		
 		if (in_array($aspect, $this->_aspects) == true)
@@ -157,7 +152,7 @@ class Node extends BaseObject
 	
 	public function createChild($type, $associationType, $associationName)
 	{		
-		list($type, $associationType, $associationName) = $this->expandToFullNames(array($type, $associationType, $associationName));
+		list($type, $associationType, $associationName) = $this->_session->namespaceMap->getFullNames(array($type, $associationType, $associationName));
 		
 		$id = $this->_session->nextSessionId();
 		$newNode = new Node($this->_session, $this->_store, $id);	
@@ -187,7 +182,7 @@ class Node extends BaseObject
 	
 	public function addChild($node, $associationType, $associationName)
 	{
-		list($associationType, $associationName) = $this->expandToFullNames(array($associationType, $associationName));
+		list($associationType, $associationName) = $this->_session->namespaceMap->getFullNames(array($associationType, $associationName));
 		
 		$childAssociation = new ChildAssociation($this, $node, $associationType, $associationName, false);
 		$this->addedChildren[$node->__toString()] = $childAssociation;
@@ -201,7 +196,7 @@ class Node extends BaseObject
 	
 	public function addAssociation($to, $associationType)
 	{
-		list($associationType) = $this->expandToFullNames(array($associationType));
+		list($associationType) = $this->_session->namespaceMap->getFullNames(array($associationType));
 		
 		$association = new Association($this, $to, $associationType);
 		$this->addedAssociations[$to->__toString()] = $association;		
@@ -222,7 +217,7 @@ class Node extends BaseObject
 		
 		// TODO implement major flag ...
 		
-		$client = WebServiceFactory::getAuthoringService($this->session->repositoryURL, $this->session->ticket);
+		$client = WebServiceFactory::getAuthoringService($this->_session->repository->connectionUrl, $this->_session->ticket);
 		$result = $client->createVersion(
 			array("items" => array("nodes" => $this->__toArray()),
 			      "comments" => array("name" => "description", "value" => $description),
@@ -239,7 +234,7 @@ class Node extends BaseObject
 		$versionStoreAddress = $result->createVersionReturn->versions->id->store->address;		
 		
 		// Create the version object to return	      
-		return new Version($this->session, new Store($this->session, $versionStoreAddress, $versionStoreScheme), $versionId);	      				      
+		return new Version($this->_session, new Store($this->_session, $versionStoreAddress, $versionStoreScheme), $versionId);	      				      
 	}
 	
 	private function isDirty()
@@ -259,8 +254,8 @@ class Node extends BaseObject
 	
 	public function __get($name)
 	{
-		$fullName = NamespaceMap::getFullName($name);
-		if ($fullName != null)
+		$fullName = $this->_session->namespaceMap->getFullName($name);
+		if ($fullName != $name)
 		{
 			$this->populateProperties();	
 			if (array_key_exists($fullName, $this->_properties) == true)
@@ -280,8 +275,8 @@ class Node extends BaseObject
 	
 	public function __set($name, $value)
 	{
-		$fullName = NamespaceMap::getFullName($name);
-		if ($fullName != null)
+		$fullName = $this->_session->namespaceMap->getFullName($name);
+		if ($fullName != $name)
 		{
 			$this->populateProperties();
 			$this->_properties[$fullName] = $value;
@@ -370,7 +365,7 @@ class Node extends BaseObject
 	{
 		if ($this->_versionHistory == null)
 		{
-			$this->_versionHistory = VersionHistory::create($this);
+			$this->_versionHistory = new VersionHistory($this);
 		}
 		return $this->_versionHistory;
 	}
@@ -460,16 +455,15 @@ class Node extends BaseObject
 				$value = $propertyDetails->value;
 				if ($this->isContentData($value) == true)
 				{
-					$value = new ContentData();
-					$value->setPropertyDetails($this, $name);
+					$value = new ContentData($this, $name);
 				}
 			}
 			else
 			{
-				$value = $propertyDetails->values;
+				$value = $propertyDetails->values;				
 			}
-			
 			$this->_properties[$name] = $value;
+						
 		}	
 		
 		$this->origionalProperties = $this->_properties;	
@@ -496,7 +490,7 @@ class Node extends BaseObject
 			$isPrimary = $value["isPrimary"];
 			$nthSibling = $value["nthSibling"];
 			
-			$child = Node::create($this->_session, new Store($this->_session, $store_address, $store_scheme), $id);
+			$child = $this->_session->getNode(new Store($this->_session, $store_address, $store_scheme), $id);
 			$children[$child->__toString()] = new ChildAssociation($this, $child, $assoc_type, $assoc_name, $isPrimary, $nthSibling);
 		}
 		
@@ -520,7 +514,7 @@ class Node extends BaseObject
 			$store_address = $value["{http://www.alfresco.org/model/system/1.0}store-identifier"];
 			$assoc_type = $value["associationType"];
 			
-			$to = Node::create($this->_session, new Store($this->_session, $store_address, $store_scheme), $id);
+			$to = $this->_session->getNode(new Store($this->_session, $store_address, $store_scheme), $id);
 			$associations[$to->__toString()] = new Association($this, $to, $assoc_type);
 		}
 		
@@ -545,7 +539,7 @@ class Node extends BaseObject
 			$isPrimary = $value["isPrimary"];
 			$nthSibling = $value["nthSibling"];
 			
-			$parent = Node::create($this->_session, new Store($this->_session, $store_address, $store_scheme), $id);
+			$parent = $this->_session->getNode(new Store($this->_session, $store_address, $store_scheme), $id);
 			if ($isPrimary == "true" or $isPrimary == true)
 			{
 				$this->_primaryParent = $parent;

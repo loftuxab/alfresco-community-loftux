@@ -41,12 +41,6 @@ class Store extends BaseObject
 		$this->_scheme = $scheme;
 	}
 
-    public static function __fromString($session, $value)
-    {
-    	list($scheme, $address) = split("://", $value);
-    	return new Store($session, $address, $scheme);	
-    }
-
 	public function __toString()
 	{
 		return $this->scheme . "://" . $this->address;

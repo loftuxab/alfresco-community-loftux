@@ -39,10 +39,17 @@ class ContentData extends BaseObject
 	private $_newContent;
 	private $_newFileContent;
 	
-	public function __construct($mimetype=null, $encoding=null)
+	public function __construct($node, $property, $mimetype=null, $encoding=null, $size=-1)
 	{
+		$this->_node = $node;
+		$this->_property = $property;
 		$this->_mimetype = $mimetype;
 		$this->_encoding = $encoding;
+		if ($size != -1)
+		{
+			$this->size = $size;
+		}		
+		$this->_isPopulated = false;
 	}	
 	
 	public function setPropertyDetails($node, $property)
@@ -54,7 +61,6 @@ class ContentData extends BaseObject
 	public function __toString()
 	{
 		$this->populateContentData();
-		return "contentUrl=".$this->_url."|mimetype=".$this->_mimetype."|size=".$this->_size."|encoding=".$this->_encoding;
 	}
 	
 	public function getNode()
@@ -186,7 +192,7 @@ class ContentData extends BaseObject
 			// Check mimetype has been set
 			if ($this->_mimetype == null)
 			{
-				throw Exception("A mime type for the content property ".$this->_property." on node ".$this->_node->__toString()." must be set");
+				throw new Exception("A mime type for the content property ".$this->_property." on node ".$this->_node->__toString()." must be set");
 			}
 			
 			// If a file has been specified then read content from there
@@ -230,8 +236,9 @@ class ContentData extends BaseObject
 	
 	private function populateContentData()
 	{
-		if ($this->_isPopulated == false && $this->_node != null && $this->_property != null)
-		{
+		//echo "isPopulated:".$this->_isPopulated."; node:".$this->_node."; property:".$this->_property."<br>";
+		if ($this->_isPopulated == false && $this->_node != null && $this->_property != null && $this->_node->isNewNode == false)
+		{			
 			$result = $this->_node->session->contentService->read( array(
 																"items" => array(
 																	"nodes" => array(

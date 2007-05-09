@@ -25,7 +25,6 @@
  */
  
 require_once 'Store.php';
-require_once 'SessionDetails.php';
 require_once 'Node.php';
 require_once 'WebService/WebServiceFactory.php';
 
@@ -35,8 +34,10 @@ class Session extends BaseObject
 	public $repositoryService;
 	public $contentService;
 
-	private $_sessionDetails;
+	private $_repository;
+	private $_ticket;
 	private $_stores;
+	private $_namespaceMap;
 	
 	private $nodeCache;
 	private $idCount = 0;
@@ -47,38 +48,24 @@ class Session extends BaseObject
      * @param userName the user name
      * @param ticket the currenlty authenticated users ticket
      */
-	private function __construct($userName, $ticket, $repositoryURL, $authenticationService=null)
+	public function __construct($repository, $ticket)  
 	{
-		$this->_sessionDetails = new SessionDetails($ticket, $userName, $repositoryURL);
-		$this->authenticationService = $authenticationService;
 		$this->nodeCache = array();
-
-		// Get the other service's
-		if ($authenticationService == null)
-		{
-			$this->authenticationService = WebServiceFactory::getAuthenticationService($this->_sessionDetails->repositoryURL);
-		}
-		$this->repositoryService = WebServiceFactory::getRepositoryService($this->_sessionDetails->repositoryURL, $this->_sessionDetails->ticket);
-		$this->contentService = WebServiceFactory::getContentService($this->_sessionDetails->repositoryURL, $this->_sessionDetails->ticket);
-	}
-
-	public static function create($userName, $password, $repositoryURL = "http://localhost:8080/alfresco/api")
-	{
-		// TODO need to handle exception here ...
-
-		$authenticationService = WebServiceFactory :: getAuthenticationService($repositoryURL);
-		$result = $authenticationService->startSession(array (
-			"username" => $userName,
-			"password" => $password
-		));
-		return new Session($result->startSessionReturn->username, $result->startSessionReturn->ticket, $repositoryURL, $authenticationService);
+		
+		$this->_repository = $repository;
+		$this->_ticket = $ticket;
+		
+		$this->repositoryService = WebServiceFactory::getRepositoryService($this->_repository->connectionUrl, $this->_ticket);
+		$this->contentService = WebServiceFactory::getContentService($this->_repository->connectionUrl, $this->_ticket);
 	}
 	
-	public static function createFromSessionDetails($sessionDetails)
-	{
-		return new Session($sessionDetails->userName, $sessionDetails->ticket, $sessionDetails->repositoryURL);	
-	}	
-	
+	/**
+	 * Creates a new store in the current respository
+	 * 
+	 * @param $address the address of the new store
+	 * @param $scheme the scheme of the new store, default value of 'workspace'
+	 * @return Store the new store
+	 */
 	public function createStore($address, $scheme="workspace")
 	{
 		// Create the store
@@ -96,14 +83,70 @@ class Session extends BaseObject
 		// Return the newly created store
 		return $store;
 	}
-
-	public function close()
+	
+	/**
+	 * Get the store
+	 * 
+	 * @param $address the address of the store
+	 * @param $scheme the scheme of the store.  The default it 'workspace'
+	 * @return Store the store
+	 */
+	public function getStore($address, $scheme="workspace")
 	{
-		$this->authenticationService->endSession(array (
-			"ticket" => $this->_sessionDetails->ticket
-		));
+		return new Store($this, $address, $scheme);	
+	}
+	
+	/**
+	 * Get the store from it string representation (eg: workspace://SpacesStore)
+	 * 
+	 * @param $value the stores string representation
+	 * @return Store the store
+	 */
+	public function getStoreFromString($value)
+	{
+		list($scheme, $address) = split("://", $value);
+    	return new Store($this, $address, $scheme);		
+	}	
+	
+	public function getNode($store, $id)
+    {
+    	$node = $this->getNodeImpl($store, $id);
+    	if ($node == null)
+    	{
+    		$node = new Node($this, $store, $id);
+    		$this->addNode($node);
+    	}		
+    	return $node;
+    }
+    
+    public function getNodeFromString($value)
+    {
+    	// TODO
+    	throw Exception("getNode($value) no yet implemented");
+    }
+    
+    /**
+	 * Adds a new node to the session.
+	 */
+	public function addNode($node)
+	{
+		$this->nodeCache[$node->__toString()] = $node;
+	}
+	
+	private function getNodeImpl($store, $id)
+	{		
+		$result = null;
+		$nodeRef = $store->scheme . "://" . $store->address . "/" . $id;
+		if (array_key_exists($nodeRef, $this->nodeCache) == true)
+		{
+			$result = $this->nodeCache[$nodeRef];
+		}
+		return $result;
 	}
 
+	/**
+	 * Commits all unsaved changes to the repository
+	 */
 	public function save($debug=false)
 	{
 		// Build the update statements from the node cache
@@ -186,27 +229,24 @@ class Session extends BaseObject
 		$resultSet = $result->queryReturn->resultSet;		
 		return $this->resultSetToNodes($this, $store, $resultSet);
 	}
-	
-	/** Read only property accessors */
-    
-    public function getSessionDetails()
-    {
-    	return $this->_sessionDetails;
-    }
-    
-	public function getUserName()
-	{
-		return $this->_sessionDetails->userName;
-	}
 
 	public function getTicket()
 	{
-		return $this->_sessionDetails->ticket;
+		return $this->_ticket;
 	}
 
-	public function getRepositoryURL()
+	public function getRepository()
 	{
-		return $this->_sessionDetails->repositoryURL;
+		return $this->_repository;
+	}
+	
+	public function getNamespaceMap()
+	{
+		if ($this->_namespaceMap == null)
+		{
+			$this->_namespaceMap = new NamespaceMap();
+		}
+		return $this->_namespaceMap;
 	}
 
 	public function getStores()
@@ -225,26 +265,7 @@ class Session extends BaseObject
 		return $this->_stores;
 	}
 	
-	/** Want these methods to be package scope some hoe! **/
-	
-	/**
-	 * Adds a new node to the session.
-	 */
-	public function addNode($node)
-	{
-		$this->nodeCache[$node->__toString()] = $node;
-	}
-	
-	public function getNode($store, $id)
-	{		
-		$result = null;
-		$nodeRef = $store->scheme . "://" . $store->address . "/" . $id;
-		if (array_key_exists($nodeRef, $this->nodeCache) == true)
-		{
-			$result = $this->nodeCache[$nodeRef];
-		}
-		return $result;
-	}
+	/** Want these methods to be package scope some how! **/
 	
 	public function nextSessionId()
 	{

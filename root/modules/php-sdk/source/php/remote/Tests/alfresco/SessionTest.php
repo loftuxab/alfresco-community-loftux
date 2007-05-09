@@ -25,43 +25,17 @@
  */
  
 require_once('BaseTest.php');
-require_once('../Alfresco/Service/Session.php');
+require_once('Alfresco/Service/Session.php');
 
 class SessionTest extends BaseTest
 {	
-	public function testInvalidCredentials()
-	{
-		try
-		{
-			$invalidSession = Session::create(BaseTest::USERNAME, "badPassword", BaseTest::URL);
-			$this->fail("An exception should have been raised since we tried to login with invalid credentials.");
-		}
-		catch (Exception $exception)
-		{
-			// Do nothing since we where expecting the exception
-		}
-	}
-	
 	public function testSessionDetails()
 	{
 		$session = $this->getSession();
 		
-		$this->assertEquals(BaseTest::USERNAME, $session->userName);
-		$this->assertEquals(BaseTest::URL, $session->repositoryURL);
-		$this->assertNotNull($session->ticket);
-		
-		$sessionDetails = $session->sessionDetails;
-		$this->assertNotNull($sessionDetails);
-		$this->assertEquals(BaseTest::USERNAME, $sessionDetails->userName);
-		$this->assertEquals(BaseTest::URL, $sessionDetails->repositoryURL);
-		$this->assertEquals($session->ticket, $sessionDetails->ticket);
-		
-		$newSession = Session::createFromSessionDetails($sessionDetails);
-		$this->assertNotNull($newSession);
-		$this->assertEquals(BaseTest::USERNAME, $newSession->userName);
-		$this->assertEquals(BaseTest::URL, $newSession->repositoryURL);
-		$this->assertEquals($session->ticket, $newSession->ticket);
-		$this->assertNotNull($newSession->sessionDetails);		
+		$this->assertNotNull($session->repository, "repository was unexpectedly null");
+		$this->assertNotNull($session->ticket, "ticket was unexpectedly null");
+		$this->assertNotNull($session->namespaceMap, "namespaceMap was unexpectedly null");
 	}
 	
 	public function testStores()
