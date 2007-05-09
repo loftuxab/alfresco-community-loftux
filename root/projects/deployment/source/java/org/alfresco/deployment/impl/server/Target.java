@@ -202,6 +202,13 @@ public class Target implements Serializable
         return new File(fRootDirectory + normalizePath(path));
     }
     
+    private static final String fgSeparatorReplacement;
+    
+    static
+    {
+    	fgSeparatorReplacement = File.separator.equals("/") ? "/" : "\\\\"; 
+    }
+    
     /**
      * Utility to normalize a path to platform specific form.
      * @param path
@@ -209,7 +216,7 @@ public class Target implements Serializable
      */
     private String normalizePath(String path)
     {
-        path = path.replaceAll("/+", File.separator);
+        path = path.replaceAll("/+", fgSeparatorReplacement);
         path = path.replace("/$", "");
         if (!path.startsWith(File.separator))
         {
