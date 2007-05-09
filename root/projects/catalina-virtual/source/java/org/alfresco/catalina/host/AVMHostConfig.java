@@ -374,10 +374,33 @@ public class AVMHostConfig extends HostConfig
                         continue; 
                     }
 
+                    // TODO:  Request some changes/additions to AVMRemote
+                    //
+                    //        Suppose A overlays B overlays C
+                    //
+                    //        Let 'x' denote content
+                    //            ' ' denote no conent
+                    //            '?' denote don't care
+                    //
+                    //                                                      Cases
+                    //                                                     1   2   3
+                    //                                                   +---+---+---+
+                    //  A  mysite--alice--preview:/www/avm_webapps/foo   |   |   | x |
+                    //  B           mysite--alice:/www/avm_webapps/foo   |   | x | ? |
+                    //  C                  mysite:/www/avm_webapps/foo   | x | ? | ? |
+                    //                                                   -------------
+                    //
+                    //                                                      Answers
+                    //                                                     1   2   3
+                    //                                                   +-----------+
+                    //     Function P :  What  am I really fetching?     | C | B | A |
+                    //     Function Q :  What  am I directly overlaying? | B | B | B |
+                    //                                                   +-----------+
+                     
                     AVMWebappDescriptor webapp_desc =  
                         new AVMWebappDescriptor( 
                         -1,             // version
-                        store_name,     // store-3
+                        store_name,     // mysite
                         AVMRemote_.getIndirectionPath(-1, webapp_entry.getValue().getPath()),
                                         // this gets the indirection path even if, physically,
                                         // the path is not a layered directory, as long as the
@@ -976,42 +999,26 @@ public class AVMHostConfig extends HostConfig
             int    version    = desc.version_;
             String store_path = desc.avm_appBase_ + "/" + desc.webapp_leafname_;
 
-            LayeringDescriptor layer_info = 
-                AVMRemote_.getLayeringInfo(version, store_path );
-
-            String native_store = layer_info.getNativeAVMStore().getName();
-         
-            if ( ! native_store.equals( desc.store_name_ ) )
+            if ( desc.indirection_name_ != null )
             {
-                // System.out.println("AMMHostConfig background webapp: " + 
-                //                    desc.webapp_leafname_               + 
-                //                    " in store: " + desc.store_name_    + 
-                //                    " has parent store: " + native_store );
+                // This webapp dir is shadowing something in another layer.
+                // By convention, webapp overlays always span 2 different
+                // AVM stores because each AVM store is associated with 
+                // a distinct DNS name (for webapp virtualization purposes).
+                // 
+                // Therfore, once the invariant condition (different stores)
+                // is verified, an inter-webapp dependency is set by 
+                // making this webapp a "child" of the "parent" it is
+                // overlaying in the other repository.
 
-
-                desc.setParentRepo( webapp_descriptors, native_store );
-            }
-            else if ( desc.indirection_name_ != null )
-            {
-                // While this webapp dir is not itself a background
-                // object, it's shadowing something in another layer.
-                // If that other layer is in another store, it's an
-                // inter-webapp dependency.
-                
                 int index = desc.indirection_name_.indexOf(':');
                 if ( index > 0 ) 
                 {
                     String parent_store = desc.indirection_name_.substring(0,index);
                     if ( ! parent_store.equals( desc.store_name_ ) )
-                    {
-                        // new Exception("debug stack trace").printStackTrace();
-                        //
-                        // System.out.println("AMMHostConfig overlay webapp: " + 
-                        //                   desc.webapp_leafname_             + 
-                        //                   " in store: " + desc.store_name_  + 
-                        //                   " has parent store: " + parent_store);
-
-                        desc.setParentRepo( webapp_descriptors, parent_store);
+                    {   
+                        // See comment in previous invocation of  setWebappDependency.
+                        desc.setWebappDependency( webapp_descriptors, parent_store);
                     }
                 }
             }
@@ -1082,9 +1089,28 @@ public class AVMHostConfig extends HostConfig
         if (isServiced(context_path)) { return; }
 
 
-        // TODO:  Think about clustering, failover, and 
-        //        distributed management in more detail.
-
+        // TODO:  Clustering, failover, and distributed management
+        //
+        // General idea:
+        //        Make all virt servers register a list of regexes 
+        //        corresponding to what they will & won't be willing 
+        //        to virtualize.   The GUI then hands out links to a 
+        //        servlet that does redirects to the proper virt server 
+        //        for the user's context.  This can include webapp 
+        //        specified rules for load balancing and/or work 
+        //        partitioning by regex type. It can also base decision 
+        //        on who the user is and/or what preference the user 
+        //        has specified (if any).  By default, all virt servers 
+        //        that register with the alfreco webapp can go in a global 
+        //        pool (this way, at least you get some load balancing 
+        //        by default).  If the servlet periodically does a 
+        //        heartbeat check on registered virt servers, then you
+        //        can do graceful corse-grained failover (at the ip level)
+        //        when the user clicks on the asset's "eyeball" icon in 
+        //        the GUI (as well as type-specific work routing).  From 
+        //        there, normal failover/clustering  could be done.   
+        //        This 2-stage failover avoids having a huge number 
+        //        of users proxy content through a single server.
 
 
         if ( webapp_leafname.equalsIgnoreCase("META-INF")  ||
@@ -2026,16 +2052,37 @@ public class AVMHostConfig extends HostConfig
             return context_path_;
         }
 
-        void setParentRepo(
+        void setWebappDependency(
                 HashMap<String, AVMWebappDescriptor> webapp_descriptors,
                 String                               parent_store_name)
         {
-            parent_store_name_ = parent_store_name; 
-
+            parent_store_name_         = parent_store_name; 
+            String parent_context_path = getParentContextPath();
             AVMWebappDescriptor parent_desc =
-                webapp_descriptors.get( getParentContextPath() );
+                webapp_descriptors.get( parent_context_path );
 
-            parent_desc.addDependentWebappDescriptor( this );
+            if ( parent_desc != null ) 
+            { 
+                parent_desc.addDependentWebappDescriptor( this );
+
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Virtual context: " + 
+                               getContextPath()   + 
+                              " has parent: "     + 
+                               parent_context_path);
+                }
+            }
+            else
+            {
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Virtual context: " + 
+                               getContextPath()   + 
+                              " has no parent: "  + 
+                               parent_context_path );
+                }
+            }
         }
 
         String getParentContextPath()
