@@ -713,10 +713,10 @@
 
       <!-- Deployment Libraries -->
       <mkdir dir="${dir.continuous.assemble.sdk}/lib/deployment"/>
-      <copy todir="${dir.continous.assemble.sdk}/lib/deployment"
+      <copy todir="${dir.continuous.assemble.sdk}/lib/deployment"
             file="${dir.project.core.dist}/${file.name.jar.core}"/>
-      <copy todir="${dir.continous.assemble.sdk}/lib/deployment"
-            file="${dir.project.deployment.dist}/${file.name.jar.core}"/>
+      <copy todir="${dir.continuous.assemble.sdk}/lib/deployment"
+            file="${dir.project.deployment.dist}/${file.name.jar.deployment}"/>
 
       <!-- Package configuration as a .jar -->
       <!-- TODO: configuration should ideally live in each of the above .jars -->
