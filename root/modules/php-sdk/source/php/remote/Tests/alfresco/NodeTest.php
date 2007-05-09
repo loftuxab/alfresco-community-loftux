@@ -56,7 +56,7 @@ class NodeTest extends BaseTest
 	{
 		// Create to root directory by hand
 		$rootId = $this->getStore()->rootNode->id;
-		$node = Node::create($this->getSession(), $this->getStore(), $rootId);
+		$node = $this->getSession()->getNode($this->getStore(), $rootId);
 		
 		// Check the details of the node
 		$this->assertNotNull($node);
@@ -110,18 +110,18 @@ class NodeTest extends BaseTest
 	{
 		$properties = self::$newNode->properties;
 		$this->assertNotNull($properties);
-		$this->assertEquals(NodeTest::TITLE, $properties[NamespaceMap::getFullName("cm_title")]);
-		$this->assertEquals(NodeTest::DESCRIPTION, $properties[NamespaceMap::getFullName("cm_description")]);
+		$this->assertEquals(NodeTest::TITLE, $properties[$this->getSession()->namespaceMap->getFullName("cm_title")]);
+		$this->assertEquals(NodeTest::DESCRIPTION, $properties[$this->getSession()->namespaceMap->getFullName("cm_description")]);
 	
-		$properties[NamespaceMap::getFullName("cm_title")] = "updatedTitle";
-		$properties[NamespaceMap::getFullName("cm_description")] = "updatedDescription";
+		$properties[$this->getSession()->namespaceMap->getFullName("cm_title")] = "updatedTitle";
+		$properties[$this->getSession()->namespaceMap->getFullName("cm_description")] = "updatedDescription";
 		self::$newNode->properties = $properties;
 		$this->getSession()->save();
 				
 		$properties = self::$newNode->properties;	
 		$this->assertNotNull($properties);
-		$this->assertEquals("updatedTitle", $properties[NamespaceMap::getFullName("cm_title")]);
-		$this->assertEquals("updatedDescription", $properties[NamespaceMap::getFullName("cm_description")]);	
+		$this->assertEquals("updatedTitle", $properties[$this->getSession()->namespaceMap->getFullName("cm_title")]);
+		$this->assertEquals("updatedDescription", $properties[$this->getSession()->namespaceMap->getFullName("cm_description")]);	
 		
 		$this->assertEquals("updatedTitle", self::$newNode->cm_title);
 		$this->assertEquals("updatedDescription", self::$newNode->cm_description);
@@ -138,16 +138,16 @@ class NodeTest extends BaseTest
 	{
 		$aspects = self::$newNode->aspects;
 		$this->assertNotNull($aspects);
-		$this->assertTrue(in_array(NamespaceMap::getFullName("cm_titled"), $aspects));	
-		$this->assertFalse(in_array(NamespaceMap::getFullName("cm_versionable"), $aspects));
+		$this->assertTrue(in_array($this->getSession()->namespaceMap->getFullName("cm_titled"), $aspects));	
+		$this->assertFalse(in_array($this->getSession()->namespaceMap->getFullName("cm_versionable"), $aspects));
 
 		self::$newNode->addAspect("cm_versionable", array("cm_autoVersion" => "false", "cm_initialVersion" => "false"));
 		$this->getSession()->save();
 		
 		$aspects = self::$newNode->aspects;
 		$this->assertNotNull($aspects);
-		$this->assertTrue(in_array(NamespaceMap::getFullName("cm_titled"), $aspects));
-		$this->assertTrue(in_array(NamespaceMap::getFullName("cm_versionable"), $aspects));
+		$this->assertTrue(in_array($this->getSession()->namespaceMap->getFullName("cm_titled"), $aspects));
+		$this->assertTrue(in_array($this->getSession()->namespaceMap->getFullName("cm_versionable"), $aspects));
 		$this->assertEquals("false", self::$newNode->cm_autoVersion);
 		$this->assertEquals("false", self::$newNode->cm_initialVersion);
 		
@@ -156,8 +156,8 @@ class NodeTest extends BaseTest
 		
 		$aspects = self::$newNode->aspects;
 		$this->assertNotNull($aspects);
-		$this->assertTrue(in_array(NamespaceMap::getFullName("cm_titled"), $aspects));	
-		$this->assertFalse(in_array(NamespaceMap::getFullName("cm_versionable"), $aspects));
+		$this->assertTrue(in_array($this->getSession()->namespaceMap->getFullName("cm_titled"), $aspects));	
+		$this->assertFalse(in_array($this->getSession()->namespaceMap->getFullName("cm_versionable"), $aspects));
 	}
 	
 	public function testAddRemoveChildren()
@@ -200,12 +200,12 @@ class NodeTest extends BaseTest
 	{
 		$id = self::$newNode->id;
 		$this->getSession()->clear();
-		$node = Node::create($this->getSession(), $this->getStore(), $id);
+		$node = $this->getSession()->getNode($this->getStore(), $id);
 		
 		$aspects = $node->aspects;
 		$this->assertNotNull($aspects);
-		$this->assertTrue(in_array(NamespaceMap::getFullName("cm_titled"), $aspects));	
-		$this->assertFalse(in_array(NamespaceMap::getFullName("cm_versionable"), $aspects));
+		$this->assertTrue(in_array($this->getSession()->namespaceMap->getFullName("cm_titled"), $aspects));	
+		$this->assertFalse(in_array($this->getSession()->namespaceMap->getFullName("cm_versionable"), $aspects));
 		
 		$associations = $node->associations;
 		$this->assertNotNull($associations);

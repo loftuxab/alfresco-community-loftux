@@ -24,6 +24,7 @@
  * http://www.alfresco.com/legal/licensing"
  */
 
+   require_once "Alfresco/Service/Repository.php";
    require_once "Alfresco/Service/Session.php";
    require_once "Alfresco/Service/SpacesStore.php";
    require_once "Alfresco/Service/Node.php";
@@ -33,7 +34,18 @@
    session_start();
    
    // Create the session
-   $session = Session::create("admin", "admin");
+   $repository = new Repository();
+   $ticket = null;
+   if (isset($_SESSION["ticket"]) == false)
+   {
+      $ticket = $repository->authenticate("admin", "admin");
+      $_SESSION["ticket"] = $ticket;	
+   }   
+   else
+   {
+     $ticket = $_SESSION["ticket"]; 	
+   }
+   $session = $repository->createSession($ticket);
    
    $store = new SpacesStore($session);
    $currentNode = null;
@@ -46,7 +58,7 @@
    }
    else
    {
-      $currentNode = Node::create($session, $store, $_REQUEST['uuid']);
+      $currentNode = $session->getNode($store, $_REQUEST['uuid']);
       $path = $_REQUEST['path'].'|'.$_REQUEST['uuid'].'|'.$_REQUEST['name'];
    }
 
@@ -57,7 +69,11 @@
       $result = null;
       if ($node->type == "{http://www.alfresco.org/model/content/1.0}content")
       {
-         $result = $node->cm_content->getUrl();
+      	 $contentData = $node->cm_content;
+      	 if ($contentData != null)
+      	 {
+         	$result = $contentData->getUrl();
+      	 }
       }
       else
       {
@@ -160,7 +176,7 @@
        foreach($id_map as $id=>$name)
        {
           $path .= '|'.$id.'|'.$name;
-          print("&nbsp;&gt;&nbsp;<a href='".getURL(Node::create($session, $store, $id))."'><b>".$name."</b></a>");
+          print("&nbsp;&gt;&nbsp;<a href='".getURL($session->getNode($store, $id))."'><b>".$name."</b></a>");
        }
 
        print(

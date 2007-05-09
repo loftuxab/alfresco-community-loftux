@@ -25,8 +25,8 @@
  */
  
 require_once('BaseTest.php');
-require_once('../Alfresco/Service/Store.php');
-require_once('../Alfresco/Service/SpacesStore.php');
+require_once('Alfresco/Service/Store.php');
+require_once('Alfresco/Service/SpacesStore.php');
 
 class StoreTest extends BaseTest
 {	
@@ -43,8 +43,8 @@ class StoreTest extends BaseTest
 	{
 		$store = new Store($this->getSession(), "SpacesStore");
 		$root = $store->rootNode;
-		$this->assertNotNull($root);
-		$this->assertNotNull($root->id);
+		$this->assertNotNull($root, "root node unexpectedly null");
+		$this->assertNotNull($root->id, "root node id unexpectedly null");
 		$this->assertEquals($store->__toString(), $root->store->__toString());	
 	}
 	
@@ -58,7 +58,7 @@ class StoreTest extends BaseTest
 	public function testFromString()
 	{
 		$storeRef = "workspace://SpacesStore";
-		$store = Store::__fromString($this->getSession(), $storeRef);
+		$store = $this->getSession()->getStoreFromString($storeRef);
 		
 		$this->assertNotNull($store);
 		$this->assertEquals("workspace", $store->scheme);

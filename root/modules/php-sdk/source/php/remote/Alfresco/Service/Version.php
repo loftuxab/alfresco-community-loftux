@@ -71,8 +71,8 @@
 	 */
 	public function __get($name)
 	{
-		$fullName = NamespaceMap::getFullName($name);
-		if ($fullName != null)
+		$fullName = $this->_session->namespaceMap->getFullName($name);
+		if ($fullName != $name)
 		{
 			$this->populateProperties();	
 			if (array_key_exists($fullName, $this->_properties) == true)
@@ -185,8 +185,7 @@
 				$value = $propertyDetails->value;
 				if ($this->isContentData($value) == true)
 				{
-					$value = new ContentData();
-					$value->setPropertyDetails($this, $name);
+					$value = new ContentData($this, $name);
 				}
 			}
 			else

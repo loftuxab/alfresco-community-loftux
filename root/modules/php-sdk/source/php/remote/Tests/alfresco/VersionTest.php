@@ -25,7 +25,7 @@
  */
  
 require_once ('BaseTest.php');
-require_once ('../Alfresco/Service/Version.php');
+require_once ('Alfresco/Service/Version.php');
 
 class VersionTest extends BaseTest 
 {

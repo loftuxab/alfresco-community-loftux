@@ -60,13 +60,13 @@ class BaseObject
 				foreach($resultSet->rows as $row)
 				{
 					$id = $row->node->id;
-					$return[] = Node::create($session, $store, $id);				
+					$return[] = $session->getNode($store, $id);				
 				}
 			}
 			else
 			{
 				$id = $resultSet->rows->node->id;
-				$return[] = Node::create($session, $store, $id);
+				$return[] = $session->getNode($store, $id);
 			}
         }
 		
@@ -123,27 +123,6 @@ class BaseObject
 			}
 		}
 	} 
-	
-	protected function expandToFullNames($params)
-	{
-		$result = array();
-		
-		foreach ($params as $param)
-		{
-			$result[] = $this->expandToFullName($param);			
-		}		
-		return $result;
-	}
-	
-	protected function expandToFullName($name)
-	{
-		$fullName = NamespaceMap::getFullName($name);
-		if ($fullName == null)
-		{
-			$fullName = $name;
-		}	
-		return $fullName;
-	}
 	
 	protected function isContentData($value)
 	{		

@@ -25,7 +25,8 @@
  */
  
 require_once ('BaseTest.php');
-require_once ('../Alfresco/Service/ContentData.php');
+require_once ("Alfresco/Service/SpacesStore.php");
+require_once ('Alfresco/Service/ContentData.php');
 
 class ContentTest extends BaseTest 
 {
@@ -69,10 +70,18 @@ class ContentTest extends BaseTest
 
 	public function testSetContent() 
 	{
-		$contentData = new ContentData("text/plain", "UTF-8");
-		$contentData->content = ContentTest :: CONTENT;
-		$this->getContentNode()->cm_content = $contentData;
-		$this->getSession()->save();
+		$this->getContentNode()->setContent("cm_content", "text/plain", "UTF-8", ContentTest :: CONTENT);		
+		$this->assertNotNull($this->getContentNode()->cm_content);
+		
+		try
+		{
+			$this->getSession()->save();
+		}
+		catch (Exception $e)
+		{
+			echo $e->getTraceAsString();
+			throw $e;
+		}
 	}
 
 	public function testReadContentDetails() 
@@ -123,6 +132,39 @@ class ContentTest extends BaseTest
 	{
 		$contentData = $this->getContentNode()->cm_content;
 		$contentData->readContentToFile("alfresco/resources/temp.jpg");	
+	}
+	
+	public function testContentCreationAndPopulation()
+	{
+		$session = $this->getSession();
+		$store = new SpacesStore($session);
+		$fileName = "2myDoc_" . time() . ".txt";
+		
+		$node = $store->getCompanyHome()->createChild(
+									"cm_content", 
+									"cm_contains", 
+									"cm_" .$fileName);
+	    $node->cm_name = $fileName;
+	    $node->setContent("cm_content", "text/plain", "UTF-8", "testTESTtest");
+	    
+	    $session->save();	    
+	    $nodeId = $node->id;
+	    
+	    // Create a new session and get the same node back
+	    $ticket = $this->getRepository()->authenticate("admin", "admin");
+	    $session2 = $this->getRepository()->createSession($ticket);
+	    
+	    $store2 = new SpacesStore($session2);
+	    $node2 = $session2->getNode($store2, $nodeId);
+	    
+	    //echo "node: ".$node2->__toString()."<BR>";
+	    
+	    $contentData = $node2->cm_content;
+		$this->assertNotNull($contentData);
+	    $this->assertEquals("text/plain", $contentData->mimetype);
+	    $this->assertEquals("UTF-8", $contentData->encoding);
+	    $this->assertEquals(12, $contentData->size);
+	    $this->assertEquals("testTESTtest", $contentData->content);		
 	}
 }
 ?>

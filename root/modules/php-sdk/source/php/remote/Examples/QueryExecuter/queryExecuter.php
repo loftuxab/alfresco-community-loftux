@@ -24,19 +24,22 @@
  * http://www.alfresco.com/legal/licensing"
  */
  
-require_once('../../Alfresco/Service/Session.php');
-require_once('../../Alfresco/Service/SpacesStore.php');
+require_once('Alfresco/Service/Repository.php');
+require_once('Alfresco/Service/Session.php');
+require_once('Alfresco/Service/SpacesStore.php');
 	
 session_start();
 
 // Start the Alfresco session
-$session = Session::create("admin", "admin");
+$repository = new Repository();
+$ticket = $repository->authenticate("admin", "admin");
+$session = $repository->createSession($ticket);
 
 // Get the current query details
 $currentStore = new SpacesStore($session);
 if (isset($_REQUEST['store']) == true)
 {
-	$currentStore = Store::__fromString($session, $_REQUEST['store']);	
+	$currentStore = $session->getStoreFromString($_REQUEST['store']);	
 }
 $statement = null;
 if (isset($_REQUEST['statement']) == true)
