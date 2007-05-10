@@ -394,6 +394,14 @@ public class Target implements Serializable
     }
     
     /**
+     * Roll back metadata changes.
+     */
+    public void rollbackMetaData()
+    {
+        recursiveRollbackMetaData(fMetaDataDirectory);
+    }
+    
+    /**
      * Commit changed metadata.
      */
     public void commitMetaData()
@@ -401,6 +409,39 @@ public class Target implements Serializable
         recursiveCommitMetaData(fMetaDataDirectory);
     }
     
+    private void recursiveRollbackMetaData(String dir)
+    {
+        String mdName = dir + File.separatorChar + MD_NAME;
+        String clone = mdName + CLONE;
+        File dClone = new File(clone);
+        dClone.delete();
+        DirectoryMetaData md = getDirectory(mdName);
+        SortedSet<FileDescriptor> mdListing = md.getListing();
+        File dDir = new File(dir);
+        File[] listing = dDir.listFiles();
+        for (File entry : listing)
+        {
+            if (entry.isDirectory())
+            {
+                FileDescriptor dummy = new FileDescriptor(entry.getName(),
+                                                          null,
+                                                          null);
+                if (!mdListing.contains(dummy))
+                {
+                    Deleter.Delete(entry);
+                }
+            }
+        }
+        listing = dDir.listFiles();
+        for (File entry : listing)
+        {
+            if (entry.isDirectory())
+            {
+                recursiveRollbackMetaData(dir + File.separatorChar + entry.getName());
+            }
+        }
+    }
+
     /**
      * Implementation of metadata commit.
      * @param dir

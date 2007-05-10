@@ -183,6 +183,15 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fCanBeStale = false;
         fTarget.cloneMetaData();
+        fState = DeploymentState.PREPARING;
+        save();
+    }
+    
+    public void finishPrepare()
+        throws IOException
+    {
+        fIn.close();
+        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fState = DeploymentState.COMMITTING;
         save();
     }
@@ -250,6 +259,23 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         }
     }
 
+    /**
+     * Rollback this deployment.
+     */
+    public void rollback()
+    {
+        try
+        {
+            fTarget.rollbackMetaData();
+            fIn.close();
+            Deleter.Delete(fLogDir);
+        }
+        catch (IOException e)
+        {
+            // Do nothing.            
+        }
+    }
+    
     /**
      * Get the target relative File.
      * @param path
