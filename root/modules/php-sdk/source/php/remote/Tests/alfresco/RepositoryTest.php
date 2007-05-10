@@ -33,10 +33,14 @@ class RepositoryTest extends BaseTest
 	public function testRepositoryCreate()
 	{
 		$repository = new Repository();
-		$this->assertEquals("http://localhost:8080/alfresco/api", $repository->connectionUrl);		
+		$this->assertEquals("http://localhost:8080/alfresco/api", $repository->connectionUrl);	
+		$this->assertEquals("localhost", $repository->host);
+		$this->assertEquals(8080, $repository->port);	
 		
 		$repository = new Repository("http://myserver:1001/alfresco/api");
 		$this->assertEquals("http://myserver:1001/alfresco/api", $repository->connectionUrl);
+		$this->assertEquals("myserver", $repository->host);
+		$this->assertEquals(1001, $repository->port);	
 	}
 
 	public function testAuthentication()
