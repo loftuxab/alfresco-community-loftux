@@ -30,15 +30,30 @@ require_once 'Alfresco/Service/BaseObject.php';
 class Repository extends BaseObject
 {
 	private $_connectionUrl;	
+	private $_host;
+	private $_port;
 
 	public function __construct($connectionUrl="http://localhost:8080/alfresco/api")
 	{
 		$this->_connectionUrl = $connectionUrl;			
+		$parts = parse_url($connectionUrl);
+		$this->_host = $parts["host"];
+		$this->_port = $parts["port"];
 	}
 	
 	public function getConnectionUrl()
 	{
 		return $this->_connectionUrl;
+	}
+	
+	public function getHost()
+	{
+		return $this->_host;	
+	}
+	
+	public function getPort()
+	{
+		return $this->_port;
 	}
 	
 	public function authenticate($userName, $password)

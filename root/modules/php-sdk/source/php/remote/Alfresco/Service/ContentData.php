@@ -24,6 +24,8 @@
  * http://www.alfresco.com/legal/licensing"
  */
 
+require_once("Alfresco/Service/Functions.php");
+
 class ContentData extends BaseObject
 {	
 	private $_isPopulated = false;
@@ -196,30 +198,35 @@ class ContentData extends BaseObject
 			}
 			
 			// If a file has been specified then read content from there
-			$content = null;
+			//$content = null;
 			if ($this->_newFileContent != null)
 			{
-				// Read the content from the file specified
-				$handle = fopen($this->_newFileContent, "rb");
-				$content = stream_get_contents($handle);
-				fclose($handle);	
+				// Upload the content to the repository
+				$contentData = upload_file($this->node->session, $this->_newFileContent, $this->_mimetype, $this->_encoding);
+				
+				// Set the content property value
+				$this->addStatement(
+					$statements, 
+					"update", 
+					array("property" => array(
+								"name" => $this->property,
+								"isMultiValue" => false,
+								"value" => $contentData)) + $where);	
 			}
 			else
 			{
-				$content = $this->_newContent;
-			} 
-			
-			// Add the writeContent statement
-			$this->addStatement(
+				// Add the writeContent statement
+				$this->addStatement(
 						$statements, 
 						"writeContent", 
 						array(
 							"property" => $this->_property,
-							"content" => $content,
+							"content" => $this->_newContent,
 							"format" => array(
 								"mimetype" => $this->_mimetype,
 								"encoding" => $this->_encoding)) + 
 							$where); 
+			} 
 		}
 	}
 	
