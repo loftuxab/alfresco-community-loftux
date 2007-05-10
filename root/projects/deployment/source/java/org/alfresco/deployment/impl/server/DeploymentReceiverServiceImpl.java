@@ -55,6 +55,10 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class DeploymentReceiverServiceImpl implements DeploymentReceiverService, Runnable, 
     ApplicationContextAware
 {
+    private static final boolean INJECT_PREPARE_FAILURE = false;
+    
+    private static final boolean INJECT_COMMIT_FAILURE = false;
+    
     private ConfigurableApplicationContext fContext;
     
     private Configuration fConfiguration;
@@ -237,20 +241,33 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
                         }
                         break;
                     }
+                    case SETGUID :
+                    {
+                        // Do nothing.
+                        break;
+                    }
                     default :
                     {
                         throw new DeploymentException("Internal error: unknown file type: " + file.getType());
                     }
                 }
             }
+            if (INJECT_PREPARE_FAILURE)
+            {
+                throw new DeploymentException("Injected Prepare Failure");
+            }
             // Phase 2 : Go through the log again and remove all .alf entries
-            deployment.resetLog();
+            deployment.finishPrepare();
             for (DeployedFile file : deployment)
             {
                 if (file.getType() == FileType.FILE)
                 {
                     File intermediate = new File(file.getPreLocation());
                     intermediate.delete();
+                    if (INJECT_COMMIT_FAILURE)
+                    {
+                        throw new DeploymentException("Injected Commit Failure.");
+                    }
                 }
                 File old = new File(deployment.getFileForPath(file.getPath()).getAbsolutePath() + ".alf");
                 Deleter.Delete(old);
@@ -258,17 +275,89 @@ public class DeploymentReceiverServiceImpl implements DeploymentReceiverService,
             File preLocation = new File(fConfiguration.getDataDirectory() + File.separatorChar + ticket);
             preLocation.delete();
             deployment.finishCommit();
-            fDeployments.remove(ticket);
-            fTargetBusy.put(deployment.getTarget().getName(), false);
         }
         catch (Exception e)
         {
+            if (!recover(ticket, deployment))
+            {
+                throw new DeploymentException("Failure during prepare phase; rolled back.", e);
+            }
+        }
+        finally
+        {
             fDeployments.remove(ticket);
             fTargetBusy.put(deployment.getTarget().getName(), false);
-            throw new DeploymentException("Problem finishing transaction work; try recovery.", e);
         }
     }
 
+    /**
+     * Attempt to recover from an error condition sometime during 
+     * prepare or commit.
+     * @param ticket The deployment ticket.
+     * @param deployment The deployment object.
+     * @return Whether the deployment was committed or rolled back.
+     */
+    private synchronized boolean recover(String ticket, Deployment deployment)
+    {
+        try
+        {
+            switch (deployment.getState())
+            {
+                // In these two cases, we recover by rolling back.
+                case WORKING :
+                case PREPARING :
+                {
+                    deployment.resetLog();
+                    for (DeployedFile file : deployment)
+                    {
+                        String path = deployment.getFileForPath(file.getPath()).getAbsolutePath();
+                        File renamed = new File(path + ".alf");
+                        File original = new File(path);
+                        if (original.exists() && file.getType() != FileType.SETGUID)
+                        {
+                            Deleter.Delete(original);
+                        }
+                        if (renamed.exists())
+                        {
+                            renamed.renameTo(original);
+                        }
+                    }
+                    deployment.rollback();
+                    return false;
+                }
+                // In this case the only thing we can do is go forward because
+                // we have all the new data in place and some of the original data may
+                // already be gone.
+                case COMMITTING :
+                {
+                    deployment.resetLog();
+                    for (DeployedFile file : deployment)
+                    {
+                        if (file.getType() == FileType.FILE)
+                        {
+                            File intermediate = new File(file.getPreLocation());
+                            intermediate.delete();
+                        }
+                        File old = new File(deployment.getFileForPath(file.getPath()).getAbsolutePath() + ".alf");
+                        Deleter.Delete(old);
+                    }
+                    File preLocation = new File(fConfiguration.getDataDirectory() + File.separatorChar + ticket);
+                    preLocation.delete();
+                    deployment.finishCommit();
+                    return true;
+                }
+                default :
+                {
+                    throw new DeploymentException("recover called while state = " + deployment.getState());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            throw new DeploymentException("Recovery failed for " + ticket, e);
+        }
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.deployment.DeploymentReceiverService#delete(java.lang.String, java.lang.String)
      */

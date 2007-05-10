@@ -34,6 +34,7 @@ import java.io.Serializable;
 public enum DeploymentState implements Serializable
 {
     WORKING,
+    PREPARING,
     COMMITTING,
     ABORTING
 }
