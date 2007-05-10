@@ -448,6 +448,13 @@ public class Convert
                     writeMemoryIntoFile(convertedBytes, file);
                 }
             }
+            else
+            {
+                if (!quiet)
+                {
+                    System.out.print(" <No change>");
+                }
+            }
         }
         catch (Throwable e)
         {
