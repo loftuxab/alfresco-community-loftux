@@ -33,6 +33,8 @@ class Repository extends BaseObject
 	private $_host;
 	private $_port;
 
+	private static $sessionIds = array();
+
 	public function __construct($connectionUrl="http://localhost:8080/alfresco/api")
 	{
 		$this->_connectionUrl = $connectionUrl;			
@@ -66,7 +68,17 @@ class Repository extends BaseObject
 			"password" => $password
 		));
 		
-		return $result->startSessionReturn->ticket;
+		// Get the ticket and sessionId
+		$ticket = $result->startSessionReturn->ticket;
+		$sessionId = $result->startSessionReturn->sessionid;
+		
+		// Store the session id for later use
+		if ($sessionId != null)
+		{
+			self::$sessionIds[$ticket] = $sessionId;	
+		}
+		
+		return $ticket;
 	}
 	
 	public function createSession($ticket=null)
@@ -86,6 +98,14 @@ class Repository extends BaseObject
 		}
 		
 		return $session;
+	}
+	
+	/**
+	 * For a given ticket, returns the realated session id, null if one can not be found.
+	 */
+	public static function getSessionId($ticket)
+	{
+		return self::$sessionIds[$ticket];	
 	}
 
 }
