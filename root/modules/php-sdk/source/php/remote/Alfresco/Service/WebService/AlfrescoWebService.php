@@ -51,8 +51,15 @@ class AlfrescoWebService extends SoapClient
    {
       if (isset($this->ticket))
       {
-         // Automatically add a security header
-         $input_headers = new SoapHeader($this->securityExtNS, "Security", null, 1);
+         // Automatically add a security header         
+         $input_headers[] = new SoapHeader($this->securityExtNS, "Security", null, 1);
+         
+         // Set the JSESSION cookie value
+         $sessionId = Repository::getSessionId($this->ticket);
+         if ($sessionId != null)
+         {
+         	$this->__setCookie("JSESSIONID", $sessionId);
+         }
       }
       
       return parent::__soapCall($function_name, $arguments, $options, $input_headers, $output_headers);   
