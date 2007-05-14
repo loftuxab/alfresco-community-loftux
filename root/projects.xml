@@ -1231,6 +1231,13 @@
                          windowtitle="Records Management" 
                          projectdir="${dir.module.php}"/>
    </target>
+   
+   <target name="refresh-mediawiki" description="Refreshes the media wiki integration files" depends="init">
+           <copy todir="${dir.mediawiki}/extensions">
+                 <fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
+           </copy>
+   </target>
+
 
    <!-- ******************************** -->
    <!-- ** Web Service Client Project ** -->

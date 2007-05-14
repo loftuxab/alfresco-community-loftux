@@ -1,6 +1,6 @@
 Alfresco PHP Library.Installation Instructions
 
-Note:  These instrcutions assume you are installing the Alfresco PHP library from the HEAD SVN archive.
+Note:  These instructions assume you are installing the Alfresco PHP library from the HEAD SVN archive.
 
 Prerequisites
 
