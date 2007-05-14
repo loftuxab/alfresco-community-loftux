@@ -24,6 +24,8 @@
  * http://www.alfresco.com/legal/licensing"
  */
  
+ $alfDebug = true;
+ 
  /** The web service end point that will be used when accessing the Alfresco repository **/
  $alfURL = "http://localhost:8080/alfresco/api";
  
@@ -31,7 +33,7 @@
  $alfWikiStore = "workspace://SpacesStore";
  
  /** Path to the space the contains the wiki content **/
- $alfWikiSpace = "app:company_home/cm:wiki";
+ $alfWikiSpace = "app:company_home/cm:Wiki";
  
  /** User credentails used to connect to Alfresco with **/
  $alfUser = "admin";

@@ -31,6 +31,18 @@ require_once("Alfresco/Service/SpacesStore.php");
 require_once("Alfresco/Service/Node.php");
 require_once("Alfresco/Service/Version.php");
 
+function debug($message)
+{
+	global $alfDebug;
+	
+	if ($alfDebug == true)
+	{
+		$handle = fopen("c:\\work\\mediawiki-debug.txt", "a");
+		fwrite($handle, date("G:i:s d/m/Y")." - ".$message."\n");
+		fclose($handle);
+	}
+}
+
 /**
  * Hook function called before content is saved.  At this point we can extract information about the article
  * and store it on the session to be used later.
@@ -114,19 +126,13 @@ class ExternalStoreAlfresco
 			$node = $space->createChild("cm_content", "cm_contains", "cm_".$_SESSION["title"]);
 			$node->cm_name = $_SESSION["title"];
 		
-			//$node->addAspect("cm_titled");
-			//$node->cm_title = $_SESSION["title"];
-			//$node->cm_description = $_SESSION["lastVersionUrl"];
-		
 			$node->addAspect("cm_versionable");
 			$node->cm_initialVersion = false;
 			$node->cm_autoVersion = false;
 		}
 		
-		$contentData = new ContentData("text/plain", "UTF-8");
-		$contentData->content = $data;
-		$node->cm_content = $contentData;
-		
+		// Set the content and save
+		$node->setContent("cm_content", "text/plain", "UTF-8", $data);		
 		$session->save();
 		
 		$description = $_SESSION["description"];
@@ -148,7 +154,10 @@ class ExternalStoreAlfresco
 	function getSession()
 	{
 		global $alfURL, $alfUser, $alfPassword;		
-		return Session::create($alfUser, $alfPassword, $alfURL);
+		
+		$repository = new Repository($alfURL);
+		$ticket = $repository->authenticate($alfUser, $alfPassword);
+		return $repository->createSession($ticket);
 	}
 	
 	/**
@@ -156,8 +165,11 @@ class ExternalStoreAlfresco
 	 */
 	function getStore($session)
 	{
-		global $alfWikiStore;
-		return Store::__fromString($session, $alfWikiStore);
+		global $alfWikiStore;		
+		debug("Getting store ". $alfWikiStore);
+		$store = $session->getStoreFromString($alfWikiStore);
+		debug("Store found - ".$store->scheme." ".$store->address);
+		return $store;
 	}
 	
 	/**
@@ -166,7 +178,7 @@ class ExternalStoreAlfresco
 	function getWikiSpace($session)
 	{
 		global $alfWikiSpace;
-		$results = $session->query($this->getStore(), 'PATH:"'.$alfWikiSpace.'"');
+		$results = $session->query($this->getStore($session), 'PATH:"'.$alfWikiSpace.'"');
 	    return $results[0];
 	}
 	
@@ -176,8 +188,8 @@ class ExternalStoreAlfresco
 	function urlToNode($session, $url)
 	{
 		$values = explode("/", substr($url, 11));		
-		$store  = getStore($session); //new Store($session, $values[1], $values[0]);
-		return Node::create($session, $store, $values[2]);	
+		$store  = $this->getStore($session); 
+		return $session->getNode($store, $values[2]);	
 	}
 	
 	/**
@@ -186,7 +198,7 @@ class ExternalStoreAlfresco
 	function urlToVersion($session, $url)
 	{
 		$values = explode("/", substr($url, 11));		
-		$store  = new Store($session, $values[4], $values[3]);
+		$store  = $session->getStore($values[4], $values[3]);
 		return new Version($session, $store, $values[5]);	
 	}
 }
