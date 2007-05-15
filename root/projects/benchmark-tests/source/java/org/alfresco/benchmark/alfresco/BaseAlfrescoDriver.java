@@ -28,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.benchmark.framework.BaseBenchmarkDriver;
 import org.alfresco.benchmark.framework.BenchmarkUtils;
 import org.alfresco.benchmark.framework.DataLoaderComponent;
@@ -198,8 +200,16 @@ public abstract class BaseAlfrescoDriver extends BaseBenchmarkDriver
             randomParentFolderPath = BenchmarkUtils.getRandomFolderPath(repositoryProfile, loadDepth - 1, true);
             randomTargetFilePath = BenchmarkUtils.getRandomFilePath(repositoryProfile, loadDepth, true);
         }
-        this.randomParentFolderNodeRef = resolvePath(randomParentFolderPath);
-        this.randomTargetFileNodeRef = resolvePath(randomTargetFilePath);
+        Authentication authentication = this.authenticationComponent.setSystemUserAsCurrentUser();            
+        try
+        {           
+            this.randomParentFolderNodeRef = resolvePath(randomParentFolderPath);
+            this.randomTargetFileNodeRef = resolvePath(randomTargetFilePath);
+        }
+        finally
+        {
+            this.authenticationComponent.setCurrentAuthentication(authentication);
+        }
         
         if (this.useUsers == true)
         {
