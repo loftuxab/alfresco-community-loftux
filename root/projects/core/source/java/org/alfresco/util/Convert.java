@@ -89,12 +89,13 @@ import com.glaforge.i18n.io.SmartEncodingInputStream;
  */
 public class Convert
 {
-    private static final String OPTION_HELP="--help";
+    private static final String OPTION_HELP = "--help";
     private static final String OPTION_SVN_STATUS = "--svn-status";
-    private static final String OPTION_MATCH="--match=";
-    private static final String OPTION_IGNORE="--ignore=";
-    private static final String OPTION_ENCODING="--encoding=";
+    private static final String OPTION_MATCH = "--match=";
+    private static final String OPTION_IGNORE = "--ignore=";
+    private static final String OPTION_ENCODING= "--encoding=";
     private static final String OPTION_LINE_ENDING = "--line-ending=";
+    private static final String OPTION_REPLACE_TABS= "--replace-tabs=";
     private static final String OPTION_NO_RECURSE = "--no-recurse";
     private static final String OPTION_NO_BACKUP = "--no-backup";
     private static final String OPTION_DRY_RUN = "--dry-run";
@@ -110,6 +111,7 @@ public class Convert
         OPTIONS.add(OPTION_IGNORE);
         OPTIONS.add(OPTION_ENCODING);
         OPTIONS.add(OPTION_LINE_ENDING);
+        OPTIONS.add(OPTION_REPLACE_TABS);
         OPTIONS.add(OPTION_NO_RECURSE);
         OPTIONS.add(OPTION_NO_BACKUP);
         OPTIONS.add(OPTION_DRY_RUN);
@@ -124,6 +126,7 @@ public class Convert
     private Pattern ignorePattern = null;
     private Charset charset = null;
     private String lineEnding = null;
+    private Integer replaceTabs = null;
     private boolean noRecurse = false;
     private boolean noBackup = false;
     private boolean quiet = false;
@@ -186,6 +189,24 @@ public class Convert
         noRecurse = optionValues.containsKey(OPTION_NO_RECURSE);
         noBackup = optionValues.containsKey(OPTION_NO_BACKUP);
         quiet = optionValues.containsKey(OPTION_QUIET);
+        
+        // Check that the tab replacement count is correct
+        String replaceTabsStr = optionValues.get(OPTION_REPLACE_TABS);
+        if (replaceTabsStr != null)
+        {
+            try
+            {
+                replaceTabs = Integer.parseInt(replaceTabsStr);
+            }
+            catch (NumberFormatException e)
+            {
+                System.err.println("Convert: ");
+                System.err.println("   Unable to determine how many spaces to replace tabs with: " + replaceTabsStr);
+                System.err.flush();
+                printUsage();
+                System.exit(1);
+            }
+        }
 
         // Check the match regex expressions
         if (match == null)
@@ -399,7 +420,12 @@ public class Convert
             byte[] convertedBytes = fileBytes;
             byte[] sourceBytes = fileBytes;
             byte[] convertedMd5 = fileMd5;
-                
+
+            // Convert the tabs
+            if (replaceTabs != null)
+            {
+                sourceBytes = convertTabs(sourceBytes, fileCharset, replaceTabs);
+            }
             // Convert the charset
             if (charset != null)
             {
@@ -439,7 +465,7 @@ public class Convert
                 }
                 if (!quiet)
                 {
-                    System.out.print(" <Modified " + lineEnding + ">");
+                    System.out.print(" <Modified>");
                 }
                 // Only write to the file if this is not a dry run
                 if (!dryRun)
@@ -508,8 +534,39 @@ public class Convert
         }
     }
     
+    private static byte[] convertTabs(byte[] bytes, Charset charset, int replaceTabs) throws Exception
+    {
+        // The tab character
+        char tab = '\t';
+        char space = ' ';
+
+        // The output
+        StringBuilder sb = new StringBuilder(bytes.length);
+        
+        String charsetName = charset.name();
+        // Using the charset, convert to a string
+        String str = new String(bytes, charsetName);
+        char[] chars = str.toCharArray();
+        for (char c : chars)
+        {
+            if (c == tab)
+            {
+                // Replace the tab
+                for (int i = 0; i < replaceTabs; i++)
+                {
+                    sb.append(space);
+                }
+            }
+            else
+            {
+                sb.append(c);
+            }
+        }
+        // Done
+        return sb.toString().getBytes(charsetName);
+    }
+
     private static final String EOF_CHECK = "--EOF-CHECK--";
-    
     private static byte[] convertLineEndings(byte[] bytes, Charset charset, String lineEnding) throws Exception
     {
         String charsetName = charset.name();
@@ -719,6 +776,8 @@ public class Convert
           .append("         --line-ending=? \n")
           .append("            This can either be WINDOWS or UNIX. \n")
           .append("            If not set, the line ending style is left unchanged. \n")
+          .append("         --replace-tabs=? \n")
+          .append("            Specify the number of spaces to insert in place of a tab. \n")
           .append("         --no-recurse \n")
           .append("            Do not recurse into subdirectories. \n")
           .append("         --no-backup \n")
