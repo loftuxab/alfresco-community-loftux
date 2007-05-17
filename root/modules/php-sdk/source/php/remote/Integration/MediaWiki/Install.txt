@@ -36,7 +36,4 @@ require_once("extensions/ExternalStoreAlfresco.php");
 # Configure in some external stores
 $wgDefaultExternalStore = array("alfresco://localhost:8080/alfresco/api");
 $wgExternalStores = array("alfresco");
-
-# Add hooks
-$wgHooks['ArticleSave'][] = 'alfArticleSave';
 	

@@ -30,18 +30,11 @@ require_once("Alfresco/Service/Session.php");
 require_once("Alfresco/Service/SpacesStore.php");
 require_once("Alfresco/Service/Node.php");
 require_once("Alfresco/Service/Version.php");
+require_once("Alfresco/Service/Logger/Logger.php");
 
-function debug($message)
-{
-	global $alfDebug;
-	
-	if ($alfDebug == true)
-	{
-		$handle = fopen("c:\\work\\mediawiki-debug.txt", "a");
-		fwrite($handle, date("G:i:s d/m/Y")." - ".$message."\n");
-		fclose($handle);
-	}
-}
+// Register the various event hooks
+$wgHooks['ArticleSave'][] = 'alfArticleSave';
+$wgHooks['TitleMoveComplete'][] = 'alfTitleMoveComplete';
 
 /**
  * Hook function called before content is saved.  At this point we can extract information about the article
@@ -64,22 +57,30 @@ function alfArticleSave(&$article, &$user, &$text, &$summary, $minor, $watch, $s
 		$url = $row->$fieldName;
 	}
 	
-	// Sort out the namespace of this article so we can figure out what the title is
-	$title = $article->getTitle()->getText();
-	$ns = $article->getTitle()->getNamespace();
-	if ($ns != NS_MAIN)
-	{
-		// lookup the display name of the namespace
-		$title = Namespace::getCanonicalName($ns)." - ".$title;
-	}
-	
 	// Store the details of the article in the session
-	$_SESSION["title"] = $title;	
+	$_SESSION["title"] = ExternalStoreAlfresco::getTitle($article->getTitle());	
 	$_SESSION["description"] = $summary;
 	$_SESSION["lastVersionUrl"] = $url;
 	
 	// Returning true ensures that the document is saved
 	return true;
+}
+
+function alfTitleMoveComplete(&$title, &$newtitle, &$user, $pageid, $redirid)
+{
+	$logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
+	
+	if ($logger->isDebugEnabled() == true)
+	{
+		$logger->debug("Handling title move event");
+		$logger->debug(	  "title=".ExternalStoreAlfresco::getTitle($title).
+					    "; newTitle=".ExternalStoreAlfresco::getTitle($newtitle).
+						"; user=".$user->getName().
+						"; pageid=".$pageid.		// is page_id on page table
+						"; redirid=".$redirid);
+	}
+	
+	// Do summert :D
 }
 
 /**
@@ -89,15 +90,39 @@ function alfArticleSave(&$article, &$user, &$text, &$summary, $minor, $watch, $s
  */
 class ExternalStoreAlfresco 
 {
+	private $logger;
+	private $session;
+	private $store;
+	private $wikiSpace;
+	
+	public function __construct()
+	{
+		global $alfURL, $alfUser, $alfPassword, $alfWikiStore, $alfWikiSpace;
+		
+		$this->logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
+		
+		// Create the session
+		$repository = new Repository($alfURL);
+		$ticket = $repository->authenticate($alfUser, $alfPassword);
+		$this->session = $repository->createSession($ticket);
+		
+		// Get the store
+		$this->store = $this->session->getStoreFromString($alfWikiStore);
+		
+		// Get the wiki space
+		$results = $this->session->query($this->store, 'PATH:"'.$alfWikiSpace.'"');
+	    $this->wikiSpace = $results[0];
+	}
+	
 	/**
 	 * Fetch the content from the Alfresco repository.
 	 * 
 	 * @param	$url	the URL to the alfresco content
 	 */
-	function fetchFromURL($url) 
+	public function fetchFromURL($url) 
 	{
-		$session = $this->getSession();
-		$version = $this->urlToVersion($session, $url);		
+		//$session = $this->getSession();
+		$version = $this->urlToVersion($url);		
 		return $version->cm_content->content;
 	}
 
@@ -107,11 +132,8 @@ class ExternalStoreAlfresco
 	 * @param	$store	the external store
 	 * @param	$data	the content
 	 */
-	function &store($store, $data) 
+	public function &store($store, $data) 
 	{
-		$session = $this->getSession();
-	    $space = $this->getWikiSpace($session);
-		
 		$url = $_SESSION["lastVersionUrl"];
 		$node = null;
 		
@@ -119,11 +141,11 @@ class ExternalStoreAlfresco
 		
 		if ($url != null && $isNormalText == false)
 		{
-			$node = $this->urlToNode($session, $url);	
+			$node = $this->urlToNode($url);	
 		}
 		else
 		{
-			$node = $space->createChild("cm_content", "cm_contains", "cm_".$_SESSION["title"]);
+			$node = $this->wikiSpace->createChild("cm_content", "cm_contains", "cm_".$_SESSION["title"]);
 			$node->cm_name = $_SESSION["title"];
 		
 			$node->addAspect("cm_versionable");
@@ -133,7 +155,7 @@ class ExternalStoreAlfresco
 		
 		// Set the content and save
 		$node->setContent("cm_content", "text/plain", "UTF-8", $data);		
-		$session->save();
+		$this->session->save();
 		
 		$description = $_SESSION["description"];
 		if ($description == null)
@@ -149,58 +171,36 @@ class ExternalStoreAlfresco
 	}
 	
 	/**
-	 * Get the session to the Alfresco respoitory
-	 */
-	function getSession()
-	{
-		global $alfURL, $alfUser, $alfPassword;		
-		
-		$repository = new Repository($alfURL);
-		$ticket = $repository->authenticate($alfUser, $alfPassword);
-		return $repository->createSession($ticket);
-	}
-	
-	/**
-	 * Get the store
-	 */
-	function getStore($session)
-	{
-		global $alfWikiStore;		
-		debug("Getting store ". $alfWikiStore);
-		$store = $session->getStoreFromString($alfWikiStore);
-		debug("Store found - ".$store->scheme." ".$store->address);
-		return $store;
-	}
-	
-	/**
-	 * Get the wiki space
-	 */
-	function getWikiSpace($session)
-	{
-		global $alfWikiSpace;
-		$results = $session->query($this->getStore($session), 'PATH:"'.$alfWikiSpace.'"');
-	    return $results[0];
-	}
-	
-	/**
 	 * Convert the url to the the node it relates to
 	 */
-	function urlToNode($session, $url)
+	private function urlToNode($url)
 	{
 		$values = explode("/", substr($url, 11));		
-		$store  = $this->getStore($session); 
-		return $session->getNode($store, $values[2]);	
+		return $this->session->getNode($this->store, $values[2]);	
 	}
 	
 	/**
 	 * Convert the url to the version it relates to
 	 */
-	function urlToVersion($session, $url)
+	private function urlToVersion($url)
 	{
 		$values = explode("/", substr($url, 11));		
-		$store  = $session->getStore($values[4], $values[3]);
-		return new Version($session, $store, $values[5]);	
+		$store  = $this->session->getStore($values[4], $values[3]);
+		return new Version($this->session, $store, $values[5]);	
 	}
+	
+    public static function getTitle($titleObject)
+    {
+    	// Sort out the namespace of this article so we can figure out what the title is
+		$title = $titleObject->getText();
+		$ns = $titleObject->getNamespace();
+		if ($ns != NS_MAIN)
+		{
+			// lookup the display name of the namespace
+			$title = Namespace::getCanonicalName($ns)." - ".$title;
+		}	
+		return $title;
+    }
 }
 
 ?>
