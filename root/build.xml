@@ -60,7 +60,7 @@
          <exclude name="**/Abstract*Test.java" />
          <exclude name="**/*SystemTest.java" />
          <!-- Content Tests -->
-         <exclude name="**/org/alfresco/repo/content/*Test.java" />
+         <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
          <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
       </patternset>
    </target>
