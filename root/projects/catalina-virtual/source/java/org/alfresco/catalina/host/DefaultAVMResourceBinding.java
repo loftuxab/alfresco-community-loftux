@@ -44,13 +44,17 @@ public class      DefaultAVMResourceBinding
     static protected AVMRemote AVMRemote_;
 
     /**
-    *  Fetch the name of the virtual repository indicated by
-    *  data obtained when the reverseProxyBinding 
-    *  regex was matched within the AVMUrlValve.
+    *  Fetch the name of the virtual repository indicated 
+    *  by data obtained when the reverseProxyBinding regex 
+    *  was matched within the AVMUrlValve.  The default
+    *  regex binding specified by AVMHost is:
+    *  <pre>
+    *   "^(.+)\\.www--sandbox\\.(?:version--v(-?[\\d]+)\\.)?.*$"
+    *  </pre>
     */
     public String getRepositoryName(Matcher match)
     {
-        String host_info = match.group(1);    // www-(...)
+        String host_info = match.group(1);         // "^(.+)\\.www--sandbox\\."
         if (host_info == null) { host_info = ""; }
 
         String repo = getRepoNameFromHostInfo( host_info );

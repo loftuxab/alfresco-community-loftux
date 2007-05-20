@@ -134,9 +134,14 @@ public class HrefValidatorTest extends TestCase
     */
     public void testOnestore()
     {
-        HrefValidator validator = new HrefValidator( AvmSvc_, AttribSvc_);
-
         // http://mysite.www--sandbox.192-168-1-5.ip.alfrescodemo.net:8180/
+
+        HrefValidator validator = 
+                new HrefValidator( AvmSvc_, 
+                                   AttribSvc_,
+                                   "127-0-0-1.ip.alfrescodemo.net",
+                                   8180);
+
 
         Map<String, Map<QName, PropertyValue>> store_staging_main_entries = 
             AvmSvc_.queryStoresPropertyKey( SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
