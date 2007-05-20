@@ -24,6 +24,10 @@
                 debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <classpath refid="classpath.compile" />
+
+            <!-- To run javac with Xlint:unchecked, uncomment the line below  -->
+            <!-- <compilerarg value="-Xlint:unchecked"/> -->
+
          </javac>
          
          <copy todir="@{projectdir}/${dir.name.build}/${dir.name.classes}">

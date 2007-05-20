@@ -115,6 +115,7 @@ import javax.naming.directory.SearchControls;
 
 import org.apache.naming.NamingContextEnumeration;
 import org.apache.naming.NamingEntry;
+import org.alfresco.filter.CacheControlFilter;
 
 import org.alfresco.repo.avm.AVMNodeType;
 import org.alfresco.repo.remote.ClientTicketHolder;
@@ -160,6 +161,21 @@ public class AVMFileDirContext extends
 
 
     public static final String getAVMFileDirMountPoint() { return AVMFileDirMountPoint_; }
+
+
+    // For now, never cache.
+    // This is motivated by the desire to see *every* access of 
+    // a resource to AVMRemote for link checking dependencies.
+    //  
+    // TODO:   Turning off caching is a fairly crude approach.
+    //         What might be nicer is having a custom ProxyDirContext,
+    //         and injecting into the system via AVMStandardContext.resourcesStart()
+    //         That way, there would be a way to introduce a callback
+    //         prior to even cached lookups  (such a callback would
+    //         have spared me some real hassle here).  Investigate.
+    //
+    // public int getCacheTTL() { return 0; }      // oh well
+
 
     /** 
     *  @exclude
@@ -785,6 +801,18 @@ public class AVMFileDirContext extends
             return super.lookup( name ); 
         }
 
+        // Remove the following prefix from "name", if it exists:
+        //         /avm.alfresco.localhost/<virtwebapp>
+        //
+        // There's no need to worry about which <virtwebapp> it is,
+        // just make sure it starts with the '$' character.
+        //
+        if ( name.startsWith("/avm.alfresco.localhost/$") )
+        {
+            int name_index = name.indexOf('/', "/avm.alfresco.localhost/$".length() );
+            if (name_index >=0) { name = name.substring( name_index); }
+        }
+
         String repo_path;
         if (  name.charAt(0) != '/') { repo_path = avmDocBase_ + "/" + name; }
         else                         { repo_path = avmDocBase_ + name; }
@@ -795,6 +823,19 @@ public class AVMFileDirContext extends
 
         try 
         { 
+            // Lookup dependencies are set here and in lastModified() 
+            // The reason you need them here is that someone might
+            // try to lookup a file that does not exist.  If this occurs,
+            // there won't be a valide avm_node to query for its 
+            // canonical name.
+            //
+            // The reason dependencies are also set in lastModified()
+            // as to do with caching.  If Tomcat has cached the item,
+            // the call to lookup() never occurs... but the lastModified()
+            // call always does.  Tricky, ey?
+
+            CacheControlFilter.AddLookupDependency( repo_path );
+
             avm_node = Service_.lookup(avmRootVersion_, repo_path); 
             if (avm_node == null)
             {
@@ -2165,6 +2206,19 @@ public class AVMFileDirContext extends
         public long getLastModified() 
         {
             log.debug("AVMFileResourceAttributes.getLastModified()");
+
+            // Tracking lookup dependencies in getLastModified()
+            // rather than in lookup() to avoid problems with 
+            // missing dependencies due to caching effects.
+            //
+            // This means you sometimes get "dependencies" on WEB-INF/...
+            // but these are easy to filter out.  While getLastModified
+            // is invoked multiple times per URI request on the same
+            // dependent assets, duplicate entries on the same file
+            // are suppressed, so redundant calls are harmless.
+
+            CacheControlFilter.AddLookupDependency(getCanonicalPath());
+
             return avm_node_.getModDate();
         }
 
@@ -2190,7 +2244,10 @@ public class AVMFileDirContext extends
          *
          * @return Name value
          */
-        public String getName() { return name_; }
+        public String getName() 
+        { 
+            return name_; 
+        }
 
         /**
          * Get resource type.

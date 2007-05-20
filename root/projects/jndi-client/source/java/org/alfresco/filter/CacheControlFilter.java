@@ -29,6 +29,7 @@
 package org.alfresco.filter;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +54,47 @@ public class CacheControlFilter implements Filter
     protected static String  [] CacheControlHeader_;
     protected static Pattern [] HostPattern_;
 
+    public static final String LOOKUP_DEPENDENCY_HEADER = 
+                               "X-Alfresco-Lookup";
+
+
+    // To track the dependencies of URLs on files, the files accessed are 
+    // sometimes tracked by making AVMFileDirContext.lastModified call back
+    // and report file access is taking place.  There's no easy means of 
+    // communication between file access and filters so a thread local 
+    // (LookupDependency_) is used, and gets set/unset by AVMUrlValve, 
+    // depending on whether or not a special header is present.
+
+    private static ThreadLocal< HashMap<String,String> >  LookupDependency_ = 
+                                new ThreadLocal< HashMap<String,String> >();
+
+    public static void StartLookupDependency()
+    {
+        if ( LookupDependency_.get() == null )
+        { 
+            LookupDependency_.set( new HashMap<String,String>() ); 
+        }
+    }
+
+    public static void StopLookupDependency()
+    {
+        LookupDependency_.set( null );
+    }
+
+    public static void AddLookupDependency(String file)
+    {
+        HashMap<String,String> lookup_dependency = (HashMap<String,String>) 
+                                                   LookupDependency_.get();
+
+        // Not sending back lookup dependencies
+        if ( lookup_dependency == null ) 
+        { 
+            return; 
+        }
+        lookup_dependency.put( file , null );
+    }
+ 
+
     public void init(FilterConfig config) throws ServletException 
     {
     	this.config = config;
@@ -65,6 +107,8 @@ public class CacheControlFilter implements Filter
 
         if ( HostPattern_ == null ) { Init(); } 
     }
+
+
 
     protected static void Init()
     {
@@ -126,14 +170,18 @@ public class CacheControlFilter implements Filter
         }
     }
 
-
-    public void doFilter( ServletRequest request, 
+    public void doFilter( ServletRequest  request, 
                           ServletResponse response,
-                          FilterChain chain
+                          FilterChain     chain
                         ) throws IOException, ServletException 
     {
-        // HttpServletRequest req  = (HttpServletRequest)  request;
-        HttpServletResponse   res  = (HttpServletResponse) response;
+        PrintWriter         out     = response.getWriter();
+
+        HttpServletRequest  req     = (HttpServletRequest)  request;
+        HttpServletResponse res     = (HttpServletResponse) response;
+        CharResponseWrapper wrapper = new CharResponseWrapper( res );
+
+        chain.doFilter(request, wrapper); 
 
         String serverName  = request.getServerName();
 
@@ -144,12 +192,44 @@ public class CacheControlFilter implements Filter
            
             if ( HostPattern_[i].matcher( serverName  ).find() )
             {
-                res.setHeader("Cache-Control", CacheControlHeader_[i] );
+                wrapper.setHeader("Cache-Control", CacheControlHeader_[i] );
                 break;
             }
         }
 
-        chain.doFilter(request, response); 
+        HashMap<String,String> lookup_dependency = (HashMap<String,String>)
+                                                    LookupDependency_.get();
+        if ( lookup_dependency != null )
+        {
+            StringBuilder hdr = new StringBuilder();
+            String delim = "";
+
+            for (String file : lookup_dependency.keySet() )
+            {
+                try 
+                { 
+                    file = java.net.URLEncoder.encode( file , "UTF-8");
+                    hdr.append( delim + file );
+
+                    delim = ", ";
+                }
+                catch (Exception e) 
+                {
+                    /* UTF-8 is always OK */
+                }
+            }
+
+            String header =  hdr.toString();
+
+            if ( (header != null) && header.length() != 0)
+            {
+                wrapper.setHeader(LOOKUP_DEPENDENCY_HEADER, header );
+            }
+        }
+
+        out.write(wrapper.toString());
+        out.close();
     }
+
     public void destroy() { }
 }

@@ -61,6 +61,8 @@ import org.apache.catalina.util.LifecycleSupport;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.CharChunk;
 import org.apache.tomcat.util.buf.MessageBytes;
+import org.alfresco.filter.CacheControlFilter;
+
 
 /**
 * Rewrites requests to make them easy for Alfresco to virtualize.
@@ -257,7 +259,8 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     */
 
     @SuppressWarnings("unchecked")
-    public void invoke( Request  request, Response response
+    public void invoke( Request  request, 
+                        Response response
                       ) throws IOException, ServletException
     {
         // Request/Response implement HttpServlet{Request|Response}
@@ -386,6 +389,16 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
 
         AVMUrlValve_invoked_.set(Boolean.TRUE);   // flag: invoke() got called
 
+        boolean in_lookup_dependency = false;
+
+        if  ( null != 
+              request.getHeader( CacheControlFilter.LOOKUP_DEPENDENCY_HEADER)
+            )
+        {  
+            CacheControlFilter.StartLookupDependency();
+            in_lookup_dependency = true;
+        }
+
         org.apache.coyote.Request req = request.getCoyoteRequest();
 
         MessageBytes  server_MB       = req.serverName();
@@ -399,6 +412,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         {                                         // AVMUrlValve_invoked_
             getNext().invoke(request, response);  // is true. Therefore,
             AVMUrlValve_invoked_.set(null);       // this filter can be nested.
+
+            if ( in_lookup_dependency )
+            {
+                 CacheControlFilter.StopLookupDependency();
+            }
+
             return;
         }
 
@@ -433,6 +452,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             if ( version_str == null ) { version_str = ""; }
 
             AVMUrlValve_invoked_.set(null);   
+            if ( in_lookup_dependency )
+            {
+                 CacheControlFilter.StopLookupDependency();
+            }
+
+
             sendErrorPageResponse( response,
                 "<html>\n"                                                    +
                 "  <head><title>Virtual website not found</title></head>\n"   +
@@ -460,6 +485,11 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             // the subrequest flag.
 
             AVMUrlValve_invoked_.set(null);   
+            if ( in_lookup_dependency )
+            {
+                 CacheControlFilter.StopLookupDependency();
+            }
+
             sendErrorPageResponse( response,
                 "<html>\n"                                                  +
                 "  <head><title>Virtual website not found</title></head>\n" +
@@ -758,6 +788,10 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
         }
         catch (Exception e) { }
         AVMUrlValve_invoked_.set(null);
+        if ( in_lookup_dependency )
+        {
+             CacheControlFilter.StopLookupDependency();
+        }
     }
 
 
