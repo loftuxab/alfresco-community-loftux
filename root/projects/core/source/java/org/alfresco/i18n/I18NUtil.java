@@ -110,6 +110,20 @@ public class I18NUtil
     }
     
     /**
+* Get the content local for the current thread.<br/>
+     * This will revert <tt>null</tt> if no value has been defined.
+     * 
+     * @return  Returns the content locale
+     */
+    public static Locale getContentLocaleOrNull()
+    {
+        Locale locale = threadContentLocale.get(); 
+        
+        return locale;
+    }
+    
+    
+    /**
      * Searches for the nearest locale from the available options.  To match any locale, pass in
      * <tt>null</tt>.
      * 
@@ -147,7 +161,7 @@ public class I18NUtil
             while (iterator.hasNext())
             {
                 Locale option = iterator.next();
-                if (!templateLanguage.equals(option.getLanguage()))
+                if (option != null && !templateLanguage.equals(option.getLanguage()))
                 {
                     iterator.remove();                  // It doesn't match, so remove
                 }
@@ -175,10 +189,11 @@ public class I18NUtil
             while (iterator.hasNext())
             {
                 Locale option = iterator.next();
-                if (!templateCountry.equals(option.getCountry()))
+                if (option != null && !templateCountry.equals(option.getCountry()))
                 {
                     // It doesn't match language - remove
-                    iterator.remove();
+                    // Don't remove the iterator. If it matchs a langage but not the country, returns any matched language                     
+                    // iterator.remove();
                 }
                 else
                 {
@@ -186,11 +201,12 @@ public class I18NUtil
                 }
             }
         }
-        if (remaining.isEmpty())
+        /*if (remaining.isEmpty())
         {
             return null;
         }
-        else if (remaining.size() == 1 && lastMatchingOption != null)
+        else */
+        if (remaining.size() == 1 && lastMatchingOption != null)
         {
             return lastMatchingOption;
         }
@@ -216,6 +232,10 @@ public class I18NUtil
      */
     public static Locale parseLocale(String localeStr)
     {
+        if(localeStr == null)
+        {
+            return null; 
+        }
         Locale locale = Locale.getDefault();
         
         StringTokenizer t = new StringTokenizer(localeStr, "_");
