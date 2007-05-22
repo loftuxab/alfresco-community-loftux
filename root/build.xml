@@ -62,6 +62,9 @@
          <!-- Content Tests -->
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
          <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
+         <!-- Multilingual Tests -->
+         <exclude name="**/org/alfresco/repo/model/ml/**/*Test.java" />
+         <include name="**/org/alfresco/repo/model/ml/MultilingualTestSuite.java" />
       </patternset>
    </target>
 
