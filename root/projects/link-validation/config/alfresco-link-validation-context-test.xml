@@ -117,6 +117,132 @@
        </property>
    </bean>
 
+
+
+    <!-- LinkValidationService -->
+
+    <bean id="MockRetryTransactionAdvice"
+          class="org.alfresco.linkvalidation.MockRetryTransactionAdvice"/>
+
+    <!-- Read transaction advisor for link validation service. -->
+    <bean id="linkValidationServiceReadTxnAdvisor" 
+          class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+
+        <property name="advice">
+
+            <!-- To simplify testing, retryingTxtAdvice will be skipped here; -->
+            <!-- however, it will be present in the webapp's Spring config -->
+            <!-- <ref bean="retryingReadTxnAdvice"/> -->
+            <ref bean="MockRetryTransactionAdvice"/>
+
+        </property>
+
+        <property name="mappedNames">
+            <list>
+                <!-- Takes a value to a collection of webapps -->
+                <!-- (e.g.:   mysite:/www/avm_webapps)        -->
+                <!-- or a specific webapp within a store      -->
+                <!-- (e.g.:   mysite:/www/avm_webapps/ROOT)   -->
+                <value>getBrokenHrefs</value>
+            </list>
+        </property>
+    </bean>
+    
+    <!-- Write transaction advisor for link validation service. -->
+    <bean id="linkValidationServiceWriteTxnAdvisor" 
+          class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor">
+
+        <!-- To simplify testing, retryingWriteTxtAdvice will be skipped here; -->
+        <!-- however, it will be present in the webapp's Spring config -->
+        <property name="advice">
+
+            <!-- To simplify testing, retryingTxtAdvice will be skipped here; -->
+            <!-- however, it will be present in the webapp's Spring config -->
+            <!-- <ref bean="retryingWriteTxnAdvice"/>  -->
+            <ref bean="MockRetryTransactionAdvice"/>
+        </property>
+
+        <property name="mappedNames">
+            <list>
+                <!-- Takes a value to a collection of webapps -->
+                <!-- (e.g.:   mysite:/www/avm_webapps)        -->
+                <!-- or a specific webapp within a store      -->
+                <!-- (e.g.:   mysite:/www/avm_webapps/ROOT)   -->
+
+                <value>updateHrefInfo</value>
+
+            </list>
+        </property>
+    </bean>
+
+    <!-- Create a fake virt server registry object that the test code  -->
+    <!-- can query for information and use to tell the virt server     -->
+    <!-- that it's time to bring an archived version on/off line       -->
+    <bean id="VirtServerRegistry" 
+          class="org.alfresco.mbeans.VirtServerRegistry"
+          init-method="initialize" >
+
+        <!-- Authentication info to contact remote virtualization server  -->
+        <!-- NOTE:                                                        -->
+        <!--    On the machine hosting the virtualization server,         -->
+        <!--    $VIRTUAL_TOMCAT_HOME/conf/alfresco-jmxrmi.password and    -->
+        <!--    $VIRTUAL_TOMCAT_HOME/conf/alfresco-jmxrmi.access          -->
+        <!--    should have the same data as the corresponding files      -->
+        <!--    contained here within the Alfresco webapp server.         -->
+        <!--    By default, they do; however, if you change the password  -->
+        <!--    file on one server, be sure to change it on the other.    -->
+        <!--                                                              -->
+        <!-- WARNING:                                                     -->
+        <!--    For security, be certain that *only* the uid under which  -->
+        <!--    the servers run have read access to the password files    -->
+        <!--    (e.g.:  under Unix, chmod them to "400").                 -->
+        <!--                                                              -->
+        <!--                                                              -->
+        <!-- For testing, just hard-coding ${alfresco.jmx.dir}            -->
+        <!-- to ../repository/config/alfresco                             -->
+
+        <property name="passwordFile" 
+                  value="../repository/config/alfresco/alfresco-jmxrmi.password"/>
+
+        <property name="accessFile"   
+                  value="../repository/config/alfresco/alfresco-jmxrmi.access"/>
+    </bean>
+
+    <bean id="linkValidationService" 
+          class="org.alfresco.linkvalidation.LinkValidationServiceImpl">
+        <property name="attributeService">
+            <ref bean="attributeService"/>
+        </property>
+        <property name="avmRemote">
+            <ref bean="avmRemote"/>
+        </property>
+        <property name="virtServerRegistry">
+            <ref bean="VirtServerRegistry"/>
+        </property>
+    </bean>
+
+    <bean id="LinkValidationService" 
+          class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.linkvalidation.LinkValidationService</value>
+            </list>
+        </property>
+        <property name="targetName">
+            <value>linkValidationService</value>
+        </property>
+        <property name="interceptorNames">
+            <list>
+                <value>linkValidationServiceWriteTxnAdvisor</value>
+                <value>linkValidationServiceReadTxnAdvisor</value>
+            </list>
+        </property>
+    </bean>
+
+
+
+
+
    <!-- Wrapped AttributeService Transport -->
     <bean id="attributeServiceTransport" class="org.springframework.aop.framework.ProxyFactoryBean">
        <property name="proxyInterfaces">
@@ -163,11 +289,21 @@
           class="org.alfresco.mbeans.VirtServerInfo"
           lazy-init="true">
 
-        <!-- local virtualization server domain                   -->
-        <!-- Note: the actual virtualization server hostname used -->
-        <!--       in URLs created by the Alfreseco webapp will   -->
-        <!--       be:    ${alfresco.virtserver.domain}           -->
-        <!--                                                      -->
+        <!-- local virtualization server domain                      -->
+        <!-- Note: the actual virtualization server hostname used    -->
+        <!--       in URLs created by the Alfreseco webapp will      -->
+        <!--       be:    ${alfresco.virtserver.domain}              -->
+        <!--                                                         -->
+        <!-- Note:  When multiple virt servers are supported,        -->
+        <!--        this property will need to be more elaborate.    -->
+        <!--        One way this could be handled is to pass         -->
+        <!--        a reference to an object that creates a url      -->
+        <!--        from an avm file name, and let *that* be the     -->
+        <!--        central point of the file/url mapping.           -->
+        <!--        Another technique would be to alwasy create urls -->
+        <!--        to a servlet that does the appropriate redirect  -->
+        <!--        dynamically (this is the most general approach). -->
+
         <property name="virtServerDomain">
             <value>${alfresco.virtserver.domain}</value>
         </property>

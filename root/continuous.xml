@@ -704,6 +704,8 @@
             file="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.jndi.dist}/${file.name.jar.jndi}" />
+      <copy todir="${dir.continuous.assemble.sdk}/lib/server"
+            file="${dir.project.linkvalidation.dist}/${file.name.jar.linkvalidation}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server" 
             file="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" />
       <copy todir="${dir.continuous.assemble.sdk}/lib/server"
