@@ -41,6 +41,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import org.alfresco.config.JNDIConstants;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -206,6 +207,24 @@ public class CacheControlFilter implements Filter
 
             for (String file : lookup_dependency.keySet() )
             {
+                // Make sure this isn't a file in META-INF or WEB-INF
+                //
+                // When the webapp first starts up, there's an initial 
+                // access of web.xml and pr.tld, for example:
+                // 
+                //    mysite:/www/avm_webapps/ROOT/WEB-INF/web.xml
+                //    mysite:/www/avm_webapps/ROOT/WEB-INF/pr.tld
+                //
+                // In general, you can't predict exactly what is or will be
+                // dependent upon the contents of the WEB-INF & META-INF
+                // directories, so it's best to handle that issue seperately.
+                // Hence, such files will be omitted from the dep list.
+                //
+                if (  JNDIConstants.DEFAULT_INF_PATTERN.matcher( file ).find() ) 
+                { 
+                    continue; 
+                } 
+
                 try 
                 { 
                     file = java.net.URLEncoder.encode( file , "UTF-8");

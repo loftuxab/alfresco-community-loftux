@@ -30,6 +30,7 @@ package org.alfresco.linkvalidation;
 import java.util.List;
 
 import org.alfresco.jndi.JndiInfoBean;
+import org.alfresco.mbeans.VirtServerInfo;
 import org.alfresco.repo.attributes.*;
 import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.sandbox.SandboxConstants;
@@ -40,6 +41,7 @@ import java.lang.reflect.Method;
 import org.alfresco.service.namespace.QName;
 
 import org.alfresco.config.JNDIConstants;
+import org.alfresco.mbeans.VirtServerRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
 import org.alfresco.service.cmr.attributes.AttributeService;
@@ -64,6 +66,8 @@ public class HrefValidatorTest extends TestCase
     private static AVMRemote        AvmSvc_;
     private static AttributeService AttribSvc_;
     private static int TestMethodsLeft_;
+    private static LinkValidationService LinkValidation_;
+    private static VirtServerRegistry VirtServerRegistry_;
 
     // @BeforeClass
     static
@@ -87,8 +91,42 @@ public class HrefValidatorTest extends TestCase
             Context_ = new FileSystemXmlApplicationContext(
                            "config/alfresco-link-validation-context-test.xml");
 
-            AttribSvc_ = (AttributeService)Context_.getBean("attributeService");
-            AvmSvc_    = (AVMRemote)Context_.getBean("avmRemote");
+
+            // Rather than hard-code which repositories to index,
+            // the tests here will just access the AVM directly
+            // and then tell the LinkValidationService to validate
+            // hrefs within the first webapp it discovers.
+
+            AvmSvc_ = (AVMRemote)Context_.getBean("avmRemote");
+
+
+            // In a live system, it's the virt server that fetches its info:
+
+            VirtServerRegistry_      = (VirtServerRegistry) Context_.getBean("VirtServerRegistry");
+            VirtServerInfo virt_info = (VirtServerInfo) Context_.getBean("virtServerInfo");
+            int    virt_port         = virt_info.getVirtServerHttpPort();
+            String virt_domain       = virt_info.getVirtServerDomain();
+            String virt_jmx_url      = "service:jmx:rmi://ignored/jndi/rmi://" +
+                                       virt_domain                             +
+                                       ":"                                     +
+                                       virt_info.getVirtServerJmxRmiPort()     +
+                                       "/alfresco/jmxrmi";
+
+            // Fake registration of a virt server with the VirtServerRegistry
+            //
+            VirtServerRegistry_.registerVirtServerInfo(virt_jmx_url, 
+                                                       virt_domain, 
+                                                       virt_port);
+
+            // Now a fake virt server is registered with the VirtServerRegistry,
+            // fetch the link validation service.   This service has a ref to
+            // the VirtServerRegistry within it;  the Spring config for the
+            // LinkValidationService in the live webapp will also provide
+            // a ref to the virt registry, so within the LinkValidationService,
+            // the code will look the same (i.e.: it does not need to know that
+            // the virt server registration was faked from within this test).
+
+            LinkValidation_ =  (LinkValidationService) Context_.getBean("LinkValidationService");
 
             // Get the authentication service.
             AuthenticationService authService =
@@ -134,26 +172,19 @@ public class HrefValidatorTest extends TestCase
     */
     public void testOnestore()
     {
-        // http://mysite.www--sandbox.192-168-1-5.ip.alfrescodemo.net:8180/
+         Map<String, Map<QName, PropertyValue>> store_staging_main_entries = 
+             AvmSvc_.queryStoresPropertyKey( SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
+        
+         for ( Map.Entry<String, Map<QName, PropertyValue>> store_staging_main_entry  :
+               store_staging_main_entries.entrySet() 
+             )
+         {
+             String  store_name  = store_staging_main_entry.getKey();
+             LinkValidation_.updateHrefInfo( store_name, false );
+             break;
+         }
 
-        HrefValidator validator = 
-                new HrefValidator( AvmSvc_, 
-                                   AttribSvc_,
-                                   "127-0-0-1.ip.alfrescodemo.net",
-                                   8180);
-
-
-        Map<String, Map<QName, PropertyValue>> store_staging_main_entries = 
-            AvmSvc_.queryStoresPropertyKey( SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
-
-        for ( Map.Entry<String, Map<QName, PropertyValue>> store_staging_main_entry  :
-              store_staging_main_entries.entrySet() 
-            )
-        {
-            String  store_name  = store_staging_main_entry.getKey();
-            validator.revalidateAllWebappsInStore( store_name );
-            break;
-        }
+        // LinkValidation_.getBrokenHrefs("get broken links");
     }
 
     

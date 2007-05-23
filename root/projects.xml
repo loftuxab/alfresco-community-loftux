@@ -936,6 +936,8 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.linkvalidation.dist}" 
+                  includes="${file.name.jar.linkvalidation}" />
          <fileset dir="${dir.project.mbeans.dist}" 
                   includes="${file.name.jar.mbeans}" />
          <fileset dir="${dir.project.deployment.dist}"

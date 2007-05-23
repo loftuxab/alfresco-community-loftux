@@ -28,6 +28,8 @@
 
 package org.alfresco.config;
 
+import java.util.regex.Pattern;
+
 /**
  * Constants to create proper JNDI names for the directories
  * that contain www content.
@@ -50,6 +52,33 @@ public final class JNDIConstants
      */
     public final static String  DIR_DEFAULT_APPBASE  = "avm_webapps";
     
+    /** 
+    * Patern to detect if an AVM webapp asset is in META-INF or WEB-INF dir.
+    *
+    * To use this pattern, you'd do something like this:
+    * <pre>
+    *
+    *      if ( DEFAULT_INF_PATTERN.matcher( yourfile ).find() ) 
+    *      { 
+    *           //  yourfile is inside an AVM webapp's META-INF or WEB-INF dir
+    *      } 
+    * </pre>
+    *  
+    */
+    public static final Pattern DEFAULT_INF_PATTERN = 
+                  Pattern.compile(
+                            "[^:]+:"                          + "/"  +
+                            JNDIConstants.DIR_DEFAULT_WWW     + "/"  +
+                            JNDIConstants.DIR_DEFAULT_APPBASE + "/"  +
+                            "[^/]+"                           + "/"  +
+                            "(?:WEB-INF|META-INF)"            + "(?:$|/)",
+                            Pattern.CASE_INSENSITIVE);
+
+
+
+
+
+
     /**
      * Default virtualization server IP address 
      */

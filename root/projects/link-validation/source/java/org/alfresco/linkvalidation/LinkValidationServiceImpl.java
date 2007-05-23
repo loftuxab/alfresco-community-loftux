@@ -22,16 +22,20 @@
 *  
 *  
 *  Author  Jon Cox  <jcox@alfresco.com>
-*  File    HrefValidator.java
+*  File    LinkValidationServiceImpl.java
 *----------------------------------------------------------------------------*/
 
 package org.alfresco.linkvalidation;
 
-
-import java.net.URLConnection;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Map;
 import org.alfresco.config.JNDIConstants;
+import org.alfresco.filter.CacheControlFilter;
+import org.alfresco.mbeans.VirtServerRegistry;
 import org.alfresco.repo.attributes.Attribute;
 import org.alfresco.repo.attributes.IntAttribute;
 import org.alfresco.repo.attributes.IntAttributeValue;
@@ -41,6 +45,7 @@ import org.alfresco.repo.attributes.StringAttribute;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
+import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttrNotQuery;
@@ -53,14 +58,13 @@ import org.alfresco.service.cmr.attributes.AttrQueryLT;
 import org.alfresco.service.cmr.attributes.AttrQueryLTE;
 import org.alfresco.service.cmr.attributes.AttrQueryNE;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
+import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.namespace.QName;
-import java.util.Map;
+import org.alfresco.util.MD5;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.htmlparser.beans.LinkBean;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 
 /**
 
@@ -218,9 +222,11 @@ Here's a sketch of the algorithm
 
 </pre>
 */
-public class HrefValidator
+
+
+public class LinkValidationServiceImpl implements LinkValidationService
 {
-    private static Log log = LogFactory.getLog(HrefValidator.class);
+    private static Log log = LogFactory.getLog(LinkValidationServiceImpl.class);
 
     static String HREF                 = ".href";    // top level href key
 
@@ -240,113 +246,108 @@ public class HrefValidator
     static String FDEP_TO_HREF         = "fdep_to_href";
 
 
-    AVMRemote        avm_;
-    AttributeService attr_;
-    LinkBean         lb_;
-    String           virt_domain_;
-    int              virt_port_;
-  
+    AVMRemote          avm_;
+    AttributeService   attr_;
+    VirtServerRegistry virtreg_;
 
-    public HrefValidator( AVMRemote        avmRemote, 
-                          AttributeService attributeService,
-                          String           virt_domain,
-                          int              virt_port
-                        )
+    public LinkValidationServiceImpl() { }
+
+
+    // TODO: make this return non-null soon
+    public void getBrokenHrefs(String path) throws AVMNotFoundException 
     {
-        avm_         = avmRemote;
-        attr_        = attributeService;
-        virt_domain_ = virt_domain;
-        virt_port_   = virt_port;
-        lb_          = new LinkBean();
-
-        //   Map<String,String>  req_props = conn.getRequestProperties();
     }
 
-    String lookupStoreDNS( String store )
-    {
-        Map<QName, PropertyValue> props = 
-                avm_.queryStorePropertyKey(store, 
-                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
+    public void setAttributeService(AttributeService svc) { attr_ = svc; }
+    public AttributeService getAttributeService()         { return attr_;}
 
-        return ( props.size() != 1 
-                 ? null
-                 : props.keySet().iterator().next().getLocalName().
-                         substring(SandboxConstants.PROP_DNS.length())
-               );
+    public void setAvmRemote(AVMRemote svc) { avm_ = svc; }
+    public AVMRemote getAvmRemote()         { return avm_;}
+
+    public void setVirtServerRegistry(VirtServerRegistry reg)
+    { 
+        virtreg_ = reg;
     }
+    public VirtServerRegistry getVirtServerRegistry()
+    { 
+        return virtreg_;
+    }
+
+
 
     /**
-    *  Creates keys corresponding to the store being valiated,
-    *  and returns the final key path.   If the leaf key already
-    *  exists and 'clobber_leaf' is false, then the pre-existing
-    *  leaf key will be reused;  otherwise,  this function creates
-    *  a new leaf (potentially clobbering the pre-existing one).
-    */
-    String createAttributeStemForStore( String  store, 
-                                        String  dns_name,
-                                        boolean clobber_leaf )
-    {
-        // Given a store name X has a dns name   a.b.c
-        // The attribute key pattern used is:   .href/c/b/a
-        // 
-        // This guarantees if a segment contains a ".", it's not a part 
-        // of the store's fqdn.  Thus, "." can be used to delimit the end 
-        // of the store, and the begnining of the version-specific info.
-        // 
-
-        // Construct path & create coresponding attrib entries
-        StringBuilder str  = new StringBuilder( dns_name.length() );
-        str.append( HREF );
-
-        // Create top level .href key if necessary
-        if ( attr_.getAttribute( HREF ) == null )       // TODO:  use 'exists' test.
-        {
-            MapAttribute map = new MapAttributeValue();
-            attr_.setAttribute("", HREF, map );
-        }
-
-        String [] seg = dns_name.split("\\.");
-        String pth;
-        for (int i= seg.length -1 ; i>=0; i--) 
-        { 
-            pth = str.toString();
-            if ( ((i==0) && clobber_leaf == true ) ||
-                 attr_.getAttribute( pth + "/" + seg[i] ) == null       // TODO: use 'exists' test
-               )
-            {
-                MapAttribute map = new MapAttributeValue();
-                attr_.setAttribute( pth , seg[i], map );
-            }
-            str.append("/" + seg[i] ); 
-        }
-        return str.toString();
-    }
-
-
-    // Example    mysite:/www/avm_webapps/ROOT
-
-    /**
-    * Revalidate the status of all hrefs in all webapps in the latest
-    * version of 'store'.
+    *   Updates all href info under the specified path.
+    *   The 'path' parameter should be the path to either:
     *
-    * @return true iff all webapps were sucessfully revalidated
+    *   <ul>
+    *      <li> A store name (e.g.:  mysite)
+    *      <li> The path to the dir containing all webapps in a store
+    *           (e.g.:  mysite:/www/avm_webapps/ROOT)
+    *      <li> The path to a particular webapp, or within a webapp
+    *           (e.g.:  mysite:/www/avm_webapps/ROOT/moo)
+    *   </ul>
+    *
+    *   If you give a path to a particular webapp (or within one), 
+    *   only that webapp's href info is updated.  If you give a 
+    *   store name, or the dir containing all webapps ina store 
+    *   (e.g.: mysite:/www/avm_webapps), then the href info for 
+    *   all webapps in the store are updated.
     */
-    //-------------------------------------------------------------------------
-    public boolean revalidateAllWebappsInStore( String store )
+    public void updateHrefInfo( String path, boolean incremental )
+                throws AVMNotFoundException
     {
-        String app_base = store + ":/" + 
-                          JNDIConstants.DIR_DEFAULT_WWW + "/" +
-                          JNDIConstants.DIR_DEFAULT_APPBASE;
+        String app_dir = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
+                         "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
+
+        String  store       = null;
+        String  app_base    = null;
+        String  webapp_name = null;
+
+        int store_index = path.indexOf(':');
+        if ( store_index < 0) 
+        {
+            // We were passed a store path
+            store = path;
+            app_base = store + ":" + app_dir;
+        }
+        else if ( ! path.startsWith( app_dir, store_index+1 )  )
+        {
+            throw new IllegalArgumentException("Invalid webapp path: " + path);
+        }
+        else
+        {
+            store = path.substring(0,store_index);
+            int webapp_start = 
+                path.indexOf('/', store_index + 1 + app_dir.length()); 
+
+            if (webapp_start >= 0)
+            {
+                int webapp_end = path.indexOf('/', webapp_start + 1);
+                webapp_name = path.substring( webapp_start +1, 
+                                              (webapp_end < 1)
+                                              ?  path.length()
+                                              :  webapp_end
+                                            );
+                if  ((webapp_name != null) && 
+                     (webapp_name.length() == 0)
+                    ) 
+                { 
+                    webapp_name = null; 
+                }
+            }
+        }
 
         String  dns_name = lookupStoreDNS( store );
-        if ( dns_name == null ) { return false; }
+        if ( dns_name == null ) 
+        { 
+            throw new AVMNotFoundException(
+                       "No DNS entry for AVM store: " + store);
+        }
 
-        String store_attr_base    =       // Example value:  ".href/mysite"
-               createAttributeStemForStore( store, dns_name, true );
+        String store_attr_base    =   // Example value:  ".href/mysite"
+               createAttributeStemForStore( store, dns_name, incremental );
 
-        if ( store_attr_base == null ) { return false; }
         int version = avm_.getLatestSnapshotID( store );
-
         //--------------------------------------------------------------------
         // NEON:       faking latest snapshot version and just using HEAD
         version = -1;  // NEON:  TODO remove this line & replace with a JMX
@@ -357,39 +358,22 @@ public class HrefValidator
         //--------------------------------------------------------------------
 
 
-        Map<String, AVMNodeDescriptor> webapp_entries = null;
-        try
-        {
-            // e.g.:   42, "mysite:/www/avm_webapps"
-            webapp_entries = avm_.getDirectoryListing(version, app_base );
-        }
-        catch (Exception e)     // TODO: just AVMNotFoundException ?
-        {
-            return false;
-        }
 
+        // In the future, it should be possible for different webapp 
+        // urls should resolve to different servers.
+        // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>
+
+        String virt_domain    = virtreg_.getVirtServerFQDN();
+        int    virt_port      = virtreg_.getVirtServerHttpPort();
         String store_url_base = "http://" + 
                                 dns_name  + 
                                 ".www--sandbox.version--v" + version  + "." + 
-                                virt_domain_ + ":" + virt_port_;
+                                virt_domain + ":" + virt_port;
 
-        boolean result = true;
-        for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
-                      webapp_entries.entrySet()
-                    )
+        MD5 md5 = new MD5();
+
+        if  ( webapp_name != null )
         {
-            String            webapp_name = webapp_entry.getKey();  // my_webapp
-            AVMNodeDescriptor avm_node    = webapp_entry.getValue();
-
-            if ( webapp_name.equalsIgnoreCase("META-INF")  ||
-                 webapp_name.equalsIgnoreCase("WEB-INF")
-               )
-            {
-                continue;
-            }
-
-            // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>
-
             String webapp_url_base = null;
             try 
             {
@@ -399,22 +383,67 @@ public class HrefValidator
             }
             catch (Exception e) { /* UTF-8 is supported */ }
 
+            revalidateWebapp( store, 
+                              version,
+                              true,           // is_latest_version
+                              store_attr_base,
+                              dns_name,
+                              webapp_name,
+                              app_base + "/" + webapp_name,
+                              webapp_url_base,
+                              md5
+                            );
+        }
+        else
+        {
+            Map<String, AVMNodeDescriptor> webapp_entries = null;
 
-            if  ( avm_node.isDirectory() )
+            // e.g.:   42, "mysite:/www/avm_webapps"
+            webapp_entries = avm_.getDirectoryListing(version, app_base );
+
+
+            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
+                          webapp_entries.entrySet()
+                        )
             {
-                 result = revalidateWebapp( store, 
-                                            version,
-                                            true,           // is_latest_version
-                                            store_attr_base,
-                                            dns_name,
-                                            webapp_name,
-                                            app_base + "/" + webapp_name,
-                                            webapp_url_base
-                                          )
-                          && result;
+                webapp_name = webapp_entry.getKey();  // my_webapp
+                AVMNodeDescriptor avm_node    = webapp_entry.getValue();
+
+                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
+                     webapp_name.equalsIgnoreCase("WEB-INF")
+                   )
+                {
+                    continue;
+                }
+
+                // In the future, it should be possible for different webapp 
+                // urls should resolve to different servers.
+                // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>
+
+                String webapp_url_base = null;
+                try 
+                {
+                    webapp_url_base = 
+                           store_url_base + (webapp_name.equals("ROOT") ? "" : 
+                           URLEncoder.encode( webapp_name, "UTF-8"));
+                }
+                catch (Exception e) { /* UTF-8 is supported */ }
+
+                if  ( avm_node.isDirectory() )
+                {
+                     revalidateWebapp( store, 
+                                       version,
+                                       true,           // is_latest_version
+                                       store_attr_base,
+                                       dns_name,
+                                       webapp_name,
+                                       app_base + "/" + webapp_name,
+                                       webapp_url_base,
+                                       md5
+                                     );
+                }
             }
         }
-        return result;
     }
 
     public boolean revalidateWebapp( String  store, 
@@ -424,7 +453,8 @@ public class HrefValidator
                                      String  dns_name,
                                      String  webapp_name,
                                      String  webapp_avm_base,
-                                     String  webapp_url_base
+                                     String  webapp_url_base,
+                                     MD5     md5
                                    )
 
     {
@@ -445,7 +475,7 @@ public class HrefValidator
         // Example:               ".href/mysite/|ROOT"
         String webapp_attr_base =  store_attr_base  +  "/|"  +  webapp_name;
 
-        if ( attr_.getAttribute( webapp_attr_base ) == null )       // TODO:  use 'exists' test.
+        if ( ! attr_.exists( webapp_attr_base ) ) 
         {
             attr_.setAttribute(store_attr_base, "|" + webapp_name, 
                                new MapAttributeValue());
@@ -534,6 +564,7 @@ public class HrefValidator
                       webapp_avm_base,
                       webapp_url_base, 
                       href_attr, 
+                      md5,
                       0 
                     );
         
@@ -544,6 +575,7 @@ public class HrefValidator
                           String dir,
                           String url_base,
                           String href_attr, 
+                          MD5    md5,
                           int    depth 
                         )
     {
@@ -597,6 +629,7 @@ public class HrefValidator
                 //                        dir      + "/"  + entry_name,
                 //                        url_base +  "/" + url_encoded_entry_name,
                 //                        href_attr,
+                //                        md5,
                 //                        depth + 1 ) 
                 //         && result;
                 //
@@ -607,7 +640,8 @@ public class HrefValidator
                             version, 
                             dir       +  "/"  +  entry_name,
                             url_base  +  "/"  +  url_encoded_entry_name,
-                            href_attr 
+                            href_attr,
+                            md5
                          ) 
                          && result;
             }
@@ -615,13 +649,16 @@ public class HrefValidator
         return result;
     }
 
-    boolean validate_file(int    version, 
-                          String avm_path, 
-                          String url_str, 
-                          String href_attr)
+    boolean validate_file( int    version, 
+                           String avm_path, 
+                           String url_str, 
+                           String href_attr,
+                           MD5    md5
+                         )
     {
-        System.out.println("The URL for: " + avm_path + "\n" +
-                           "         is: " + url_str );
+        // Example values:
+        //    avm_path:  mysite:/www/avm_webapps/ROOT/index.jsp
+        //    url_str:   http://mysite.www--sandbox.version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/index.jsp
 
         URL           url  = null;
         URLConnection conn = null; 
@@ -641,29 +678,44 @@ public class HrefValidator
             return false;
         }
 
-        conn.addRequestProperty("X-Alfresco-Lookup", "true" );
+        conn.addRequestProperty(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, 
+                                "true" 
+                               );
+
         conn.setUseCaches( false );
 
-        lb_.setConnection( conn );
+        LinkBean lb = new LinkBean();
+        lb.setConnection( conn );
 
-        URL[] urls = lb_.getLinks ();
+        URL[] urls = lb.getLinks ();
 
         // http://mysite.www--sandbox.version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/...
         for (int i = 0; i < urls.length; i++)
+        {
             System.out.println ("URL: " + urls[i]);
+        }
 
-        // getHeaderFieldKey makes the name of the 0-th header return null, 
-        // "even though the 0-th header has a value".  Thus the loop below 
-        // is 1-based, not 0-based. 
+        // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER 
+        // in the response, to be paranoid deal with the possiblity that 
+        // the information about what AVM files have been accessed is stored 
+        // in more than one of these headers (though it *should* be all in 1).
+        //
+        // Unfortunately, getHeaderFieldKey makes the name of the 0-th header 
+        // return null, "even though the 0-th header has a value".  Thus the 
+        // loop below is 1-based, not 0-based. 
         //
         // "It's a madhouse! A madhouse!" 
         //            -- Charton Heston playing the character "George Taylor"
         //               Planet of the Apes, 1968
+        //
 
         String header_key = null;
         for (int i=1; (header_key = conn.getHeaderFieldKey(i)) != null; i++)
         {
-            if (! header_key.equals("X-Alfresco-Lookup")) { continue; }
+            if (!header_key.equals(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER))
+            { 
+                continue; 
+            }
 
             String header_value = null;
             try 
@@ -681,12 +733,81 @@ public class HrefValidator
                 continue;
             }
 
-            System.out.println("Lookup dependency: " + header_value);
+            // Each lookup dependency header consists of a comma-separated
+            // list file names.
+            String [] lookup_dependencies = header_value.split(", *");
+
+            for (String dep : lookup_dependencies )
+            {
+               System.out.println("Lookup dependency: " + dep);
+            }
+        }
+        return true;
+    }
+
+    String lookupStoreDNS( String store )
+    {
+        Map<QName, PropertyValue> props = 
+                avm_.queryStorePropertyKey(store, 
+                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
+
+        return ( props.size() != 1 
+                 ? null
+                 : props.keySet().iterator().next().getLocalName().
+                         substring(SandboxConstants.PROP_DNS.length())
+               );
+    }
+
+    /**
+    *  Creates keys corresponding to the store being valiated,
+    *  and returns the final key path.   If the leaf key already
+    *  exists and 'incremental' is true, then the pre-existing
+    *  leaf key will be reused;  otherwise,  this function creates
+    *  a new leaf (potentially clobbering the pre-existing one).
+    */
+    String createAttributeStemForStore( String  store, 
+                                        String  dns_name,
+                                        boolean incremental )
+    {
+        // Given a store name X has a dns name   a.b.c
+        // The attribute key pattern used is:   .href/c/b/a
+        // 
+        // This guarantees if a segment contains a ".", it's not a part 
+        // of the store's fqdn.  Thus, "." can be used to delimit the end 
+        // of the store, and the begnining of the version-specific info.
+        // 
+
+        // Construct path & create coresponding attrib entries
+        StringBuilder str  = new StringBuilder( dns_name.length() );
+        str.append( HREF );
+
+        // Create top level .href key if necessary
+        if ( ! attr_.exists( HREF ) )
+        {
+            MapAttribute map = new MapAttributeValue();
+            attr_.setAttribute("", HREF, map );
         }
 
-        System.out.println ("That's all folks!\n\n");
-
-        return true;
+        String [] seg = dns_name.split("\\.");
+        String pth;
+        for (int i= seg.length -1 ; i>=0; i--) 
+        { 
+            pth = str.toString();
+            if ( ((i==0) && incremental == false ) ||
+                 ! attr_.exists( pth + "/" + seg[i] )
+               )
+            {
+                MapAttribute map = new MapAttributeValue();
+                attr_.setAttribute( pth , seg[i], map );
+            }
+            str.append("/" + seg[i] ); 
+        }
+        String result = str.toString();
+        if ( result == null )
+        {
+            throw new IllegalArgumentException("Invalid DNS name: " + dns_name);
+        }
+        return result;
     }
 }
 
