@@ -33,6 +33,8 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
@@ -371,6 +373,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 virt_domain + ":" + virt_port;
 
         MD5 md5 = new MD5();
+        HashMap<String,String>  url_cache = new HashMap<String,String>();
 
         if  ( webapp_name != null )
         {
@@ -391,7 +394,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               webapp_name,
                               app_base + "/" + webapp_name,
                               webapp_url_base,
-                              md5
+                              md5,
+                              url_cache
                             );
         }
         else
@@ -439,23 +443,25 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                        webapp_name,
                                        app_base + "/" + webapp_name,
                                        webapp_url_base,
-                                       md5
+                                       md5,
+                                       url_cache
                                      );
                 }
             }
         }
     }
 
-    public boolean revalidateWebapp( String  store, 
-                                     int     version,
-                                     boolean is_latest_version,
-                                     String  store_attr_base,
-                                     String  dns_name,
-                                     String  webapp_name,
-                                     String  webapp_avm_base,
-                                     String  webapp_url_base,
-                                     MD5     md5
-                                   )
+    void revalidateWebapp( String  store, 
+                           int     version,
+                           boolean is_latest_version,
+                           String  store_attr_base,
+                           String  dns_name,
+                           String  webapp_name,
+                           String  webapp_avm_base,
+                           String  webapp_url_base,
+                           MD5     md5,
+                           Map<String,String> url_cache 
+                          )
 
     {
         // The following convention is used:  
@@ -563,21 +569,23 @@ public class LinkValidationServiceImpl implements LinkValidationService
         validate_dir( version,
                       webapp_avm_base,
                       webapp_url_base, 
+                      webapp_url_base,  // domain to recurse within
                       href_attr, 
                       md5,
+                      url_cache,
                       0 
                     );
-        
-        return true;
     }
 
-    boolean validate_dir( int    version, 
-                          String dir,
-                          String url_base,
-                          String href_attr, 
-                          MD5    md5,
-                          int    depth 
-                        )
+    void validate_dir( int    version, 
+                       String dir,
+                       String url_base,
+                       String href_validation_domain,
+                       String href_attr, 
+                       MD5    md5,
+                       Map<String,String> url_cache,
+                       int    depth 
+                     )
     {
         Map<String, AVMNodeDescriptor> entries = null;
 
@@ -595,10 +603,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                 log.error("Could not list version: " + version + 
                          " of directory: " + dir + "  " + e.getMessage());
             }
-            return false;
+            return;
         }
 
-        boolean result = true;
         for ( Map.Entry<String, AVMNodeDescriptor> entry  : entries.entrySet() )
         {
             String            entry_name = entry.getKey();
@@ -625,75 +632,131 @@ public class LinkValidationServiceImpl implements LinkValidationService
             {
                 // NEON uncomment the next function call:
                 //
-                // result = validate_dir( version, 
-                //                        dir      + "/"  + entry_name,
-                //                        url_base +  "/" + url_encoded_entry_name,
-                //                        href_attr,
-                //                        md5,
-                //                        depth + 1 ) 
-                //         && result;
-                //
+                // validate_dir( version, 
+                //               dir      + "/"  + entry_name,
+                //               url_base +  "/" + url_encoded_entry_name,
+                //               href_validation_domain,
+                //               href_attr,
+                //               md5,
+                //               url_cache,
+                //               depth + 1 ) 
             }
             else
             {
-                result = validate_file( 
-                            version, 
-                            dir       +  "/"  +  entry_name,
-                            url_base  +  "/"  +  url_encoded_entry_name,
-                            href_attr,
-                            md5
-                         ) 
-                         && result;
+                validate_url( 
+                   version, 
+                   url_base  +  "/"  +  url_encoded_entry_name,
+                   href_validation_domain,
+                   href_attr,
+                   md5,
+                   url_cache
+                );
             }
         }
-        return result;
     }
 
-    boolean validate_file( int    version, 
-                           String avm_path, 
-                           String url_str, 
-                           String href_attr,
-                           MD5    md5
-                         )
+    void validate_url( int    version, 
+                       String url_str, 
+                       String href_validation_domain,
+                       String href_attr,
+                       MD5    md5,
+                       Map<String,String> url_cache
+                     )
     {
-        // Example values:
-        //    avm_path:  mysite:/www/avm_webapps/ROOT/index.jsp
-        //    url_str:   http://mysite.www--sandbox.version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/index.jsp
+        // The url_str will look someting like this:
+        // http://mysite.www--sandbox.version--v999.
+        //        127-0-0-1.ip.alfrescodemo.net:8180/index.jsp
 
-        URL           url  = null;
-        URLConnection conn = null; 
+        String url_md5 = md5.digest(url_str.getBytes());
+
+        if ( url_cache.containsKey( url_md5 ) )            // already visited?
+        {                                                  // then just do an 
+            return ;                                       // early return.
+        }
+
+        // No matter what happens mark the url as "visited"
+        // from this point forward, even if the connection
+        // is refused.  
+        //
+        // TODO: See if it's faster to cache the raw url -> md5
+        //       or just cache the md5(url) -> null and take
+        //       the hit of some needless md5 recomputation
+        //       (memory/cpu tradeoff).   For now, just saving
+        //       md5(url) -> null.
+
+        url_cache.put(url_md5,null);
+
+        URL               url  = null;
+        HttpURLConnection conn = null; 
 
         try 
         { 
             url  = new URL( url_str );
-            conn = url.openConnection(); 
+
+            // Oddly, url.openConnection() does not actually
+            // open a connection; it merely creates a connection
+            // object that is later opened via connect() within
+            // the LinkBean.  Go figure.
+            //
+            conn = (HttpURLConnection) url.openConnection(); 
         }
         catch (Exception e )
         {
             if ( log.isErrorEnabled() )
             {
-                log.error("Could not validate avm resource: " + avm_path + 
-                          " (version " + version + ")  via: " + url_str );
+                log.error("Cannot connect to :" + url_str );
             }
-            return false;
+
+            // Rather than update the URL status just let it retain 
+            // whatever status it had before, and assume this is
+            // an ephemeral network failure;  "ephemeral" here means 
+            // "on all instances of this url for this validation."
+
+            return;
         }
 
-        conn.addRequestProperty(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, 
-                                "true" 
-                               );
+        // Make AVMUrlValve send back lookup depdendency info for this URL
+        //
+        conn.addRequestProperty(
+            CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, "true" );
 
-        conn.setUseCaches( false );
+
+        // "Infinite" timeouts that aren't really infinite
+        // are a bad idea in this context.  If it takes more 
+        // than 15 seconds to connect or more than 60 seconds 
+        // to read a response, give up.  
+        //
+        conn.setConnectTimeout(15000);          // TODO: make tunable
+        conn.setReadTimeout(60000);             // TODO: make tunable
+        conn.setUseCaches( false );             // handle caching manually
 
         LinkBean lb = new LinkBean();
+
+        if ( log.isInfoEnabled() )
+        {
+            log.info("About to fetch: " + url_str );
+        }
+
         lb.setConnection( conn );
 
+        //  RESUME HERE.
+        //        
+        //        try 
+        //        {
+        //            attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS, 
+        //                                url_md5, new  new IntAttributeValue( conn.getResponseCode() ) 
+        //                              );
+        //        }
+        //        catch (IOException )
+        //        {
+        //            // If the link was unreachable, don't alter status.
+        //        }
+
+
+
+        // only if we're in the virt validation domain...
         URL[] urls = lb.getLinks ();
 
-        // http://mysite.www--sandbox.version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/...
-        for (int i = 0; i < urls.length; i++)
-        {
-            System.out.println ("URL: " + urls[i]);
-        }
 
         // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER 
         // in the response, to be paranoid deal with the possiblity that 
@@ -708,6 +771,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
         //            -- Charton Heston playing the character "George Taylor"
         //               Planet of the Apes, 1968
         //
+
+        ArrayList<String> dependencies = new ArrayList<String>();
 
         String header_key = null;
         for (int i=1; (header_key = conn.getHeaderFieldKey(i)) != null; i++)
@@ -739,10 +804,21 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
             for (String dep : lookup_dependencies )
             {
-               System.out.println("Lookup dependency: " + dep);
+                dependencies.add( dep );
             }
         }
-        return true;
+
+
+        for (URL  parsed_url  : urls )
+        {
+            validate_url(version, 
+                         parsed_url.toString(),
+                         href_validation_domain,
+                         href_attr,
+                         md5,
+                         url_cache
+                        );
+        }
     }
 
     String lookupStoreDNS( String store )
