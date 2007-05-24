@@ -140,7 +140,7 @@ public class ContentUtils
      */
     public static String putContent(File file)
     {
-        return putContent(file, WebServiceFactory.getHost(), WebServiceFactory.getPort());
+        return putContent(file, WebServiceFactory.getHost(), WebServiceFactory.getPort(), null, null);
     }
     
     /**
@@ -152,8 +152,24 @@ public class ContentUtils
      * @param port  the port name of the destination repository
      * @return      the content data that can be used to set the content property in a CML statement  
      */
-    @SuppressWarnings("deprecation")
     public static String putContent(File file, String host, int port)
+    {
+        return putContent(file, host, port, null, null);
+    }
+    
+    /**
+     * Streams content into the repository.  Once done a content details string is returned and this can be used to update 
+     * a content property in a CML statement.
+     * 
+     * @param file  the file to stream into the repository
+     * @param host  the host name of the destination repository
+     * @param port  the port name of the destination repository
+     * @param mimetype the mimetype of the file, ignored if null
+     * @param encoding the encoding of the file, ignored if null
+     * @return      the content data that can be used to set the content property in a CML statement  
+     */
+    @SuppressWarnings("deprecation")
+    public static String putContent(File file, String host, int port, String mimetype, String encoding)
     {      
         String result = null;
         
@@ -162,6 +178,14 @@ public class ContentUtils
             String url = "/alfresco/upload/" + 
                          URLEncoder.encode(file.getName(), "UTF-8") + 
                          "?ticket=" + AuthenticationUtils.getTicket();
+            if (mimetype != null)
+            {
+                url = url + "&mimetype=" + mimetype;
+            }
+            if (encoding != null)
+            {
+                url += "&encoding=" + encoding;
+            }
             
             String request = "PUT " + url + " HTTP/1.1\n" +
                           "Content-Length: " + file.length() + "\n" +
