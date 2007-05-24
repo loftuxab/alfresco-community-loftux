@@ -59,6 +59,9 @@
          <exclude name="**/Base*Test.java" />
          <exclude name="**/Abstract*Test.java" />
          <exclude name="**/*SystemTest.java" />
+         <!-- Action Tests -->
+         <exclude name="**/org/alfresco/repo/action/**/*Test.java" />
+         <include name="**/org/alfresco/repo/action/ActionTestSuite.java" />
          <!-- Content Tests -->
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
          <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
