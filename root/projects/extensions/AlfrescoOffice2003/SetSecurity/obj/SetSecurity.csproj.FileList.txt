@@ -1,0 +1,5 @@
+bin\Debug\SetSecurity.dll
+bin\Debug\SetSecurity.pdb
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\SetSecurity.dll
+obj\Debug\SetSecurity.pdb

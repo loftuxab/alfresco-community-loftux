@@ -1,0 +1,12 @@
+.\bin\Debug\AlfrescoWord2003.dll
+.\bin\Debug\AlfrescoWord2003.pdb
+.\bin\Debug\AlfrescoWord2003.dll.manifest
+obj\Debug\ResolveAssemblyReference.cache
+obj\Debug\AlfrescoWord2003.csproj.ResolveComReference.cache
+obj\Debug\AlfrescoWord2003.Properties.Resources.resources
+obj\Debug\AlfrescoWord2003.csproj.GenerateResource.Cache
+obj\Debug\AlfrescoWord2003.dll
+obj\Debug\AlfrescoWord2003.pdb
+obj\Debug\AlfrescoWord2003.AlfrescoPane.resources
+.\bin\Debug\AlfrescoWord2003.dll.config
+obj\Debug\AlfrescoWord2003.Login.resources
