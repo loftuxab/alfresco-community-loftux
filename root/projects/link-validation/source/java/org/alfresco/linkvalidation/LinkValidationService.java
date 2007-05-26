@@ -30,7 +30,10 @@ import org.alfresco.service.cmr.avm.AVMNotFoundException;
 
 public interface LinkValidationService
 {
-    public void updateHrefInfo(String path, boolean incremental) 
+    public void updateHrefInfo(String  path, 
+                               boolean incremental,
+                               int     connectTimeout,
+                               int     readTimeout) 
                 throws AVMNotFoundException;
 
     public void getBrokenHrefs(String path) 

@@ -27,23 +27,29 @@
 
 package org.alfresco.linkvalidation;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
 import org.alfresco.repo.attributes.Attribute;
+import org.alfresco.repo.attributes.BooleanAttribute;
+import org.alfresco.repo.attributes.BooleanAttributeValue;
 import org.alfresco.repo.attributes.IntAttribute;
 import org.alfresco.repo.attributes.IntAttributeValue;
+import org.alfresco.repo.attributes.ListAttribute;
+import org.alfresco.repo.attributes.ListAttributeValue;
 import org.alfresco.repo.attributes.MapAttribute;
 import org.alfresco.repo.attributes.MapAttributeValue;
 import org.alfresco.repo.attributes.StringAttribute;
+import org.alfresco.repo.attributes.StringAttributeValue;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
@@ -235,17 +241,17 @@ public class LinkValidationServiceImpl implements LinkValidationService
     static String LATEST_VERSION       = "latest";   // numerical version
     static String LATEST_VERSION_ALIAS = "-2";       // alias for numerical
 
-    static String SOURCE_TO_HREF       = "source_to_href";
-    static String HREF_TO_SOURCE       = "href_to_source";
+    static String SOURCE_TO_HREF       = "source_to_href";  // key->list
+    static String HREF_TO_SOURCE       = "href_to_source";  // key->map
 
-    static String HREF_TO_STATUS       = "href_to_status";
-    static String STATUS_TO_HREF       = "status_to_href";
+    static String HREF_TO_STATUS       = "href_to_status";  // key->int
+    static String STATUS_TO_HREF       = "status_to_href";  // key->map
 
-    static String MD5_TO_FILE          = "md5_to_file";
-    static String MD5_TO_HREF          = "md5_to_href";
+    static String MD5_TO_FILE          = "md5_to_file";     // key->string
+    static String MD5_TO_HREF          = "md5_to_href";     // key->string
 
-    static String HREF_TO_FDEP         = "href_to_fdep";
-    static String FDEP_TO_HREF         = "fdep_to_href";
+    static String HREF_TO_FDEP         = "href_to_fdep";    // key->list
+    static String FILE_TO_HDEP         = "file_to_hdep";    // key->map
 
 
     AVMRemote          avm_;
@@ -295,7 +301,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
     *   (e.g.: mysite:/www/avm_webapps), then the href info for 
     *   all webapps in the store are updated.
     */
-    public void updateHrefInfo( String path, boolean incremental )
+    public void updateHrefInfo( String  path, 
+                                boolean incremental,
+                                int     connect_timeout,
+                                int     read_timeout)
+                                //  int threads
+
                 throws AVMNotFoundException
     {
         String app_dir = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
@@ -373,8 +384,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 virt_domain + ":" + virt_port;
 
         MD5 md5 = new MD5();
-        HashMap<String,String>  url_cache = new HashMap<String,String>();
-
         if  ( webapp_name != null )
         {
             String webapp_url_base = null;
@@ -395,7 +404,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               app_base + "/" + webapp_name,
                               webapp_url_base,
                               md5,
-                              url_cache
+                              connect_timeout,
+                              read_timeout
                             );
         }
         else
@@ -444,11 +454,13 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                        app_base + "/" + webapp_name,
                                        webapp_url_base,
                                        md5,
-                                       url_cache
+                                       connect_timeout,
+                                       read_timeout
                                      );
                 }
             }
         }
+
     }
 
     void revalidateWebapp( String  store, 
@@ -460,10 +472,17 @@ public class LinkValidationServiceImpl implements LinkValidationService
                            String  webapp_avm_base,
                            String  webapp_url_base,
                            MD5     md5,
-                           Map<String,String> url_cache 
-                          )
+                           int     connect_timeout,
+                           int     read_timeout
+                         )
 
     {
+        HashMap<String,String>  gen_url_cache    = new HashMap<String,String>();
+        HashMap<String,String>  parsed_url_cache = new HashMap<String,String>();
+        HashMap<Integer,String> status_cache     = new HashMap<Integer,String>();
+        HashMap<String,String>  file_hdep_cache  = new HashMap<String,String>();
+
+
         // The following convention is used:  
         //           version <==> (version - max - 2) %(max+2)
         //
@@ -527,7 +546,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
             href_attr = webapp_attr_base +  "/" + LATEST_VERSION_ALIAS;
         }
 
-        // Attribute Not Found: [.href, mysite, -2]
 
         attr_.setAttribute( href_attr, SOURCE_TO_HREF, new MapAttributeValue());
         attr_.setAttribute( href_attr, HREF_TO_SOURCE, new MapAttributeValue());
@@ -536,7 +554,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         attr_.setAttribute( href_attr, MD5_TO_FILE,    new MapAttributeValue());
         attr_.setAttribute( href_attr, MD5_TO_HREF,    new MapAttributeValue());
         attr_.setAttribute( href_attr, HREF_TO_FDEP,   new MapAttributeValue());
-        attr_.setAttribute( href_attr, FDEP_TO_HREF,   new MapAttributeValue());
+        attr_.setAttribute( href_attr, FILE_TO_HDEP,   new MapAttributeValue());
 
         // Info for latest snapshot (42) of mywebapp within mysite is now:
         //
@@ -548,7 +566,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         //      .href/mysite/|mywebapp/-2/md5_to_file/
         //      .href/mysite/|mywebapp/-2/md5_to_href/
         //      .href/mysite/|mywebapp/-2/href_to_fdep/
-        //      .href/mysite/|mywebapp/-2/fdep_to_href/
+        //      .href/mysite/|mywebapp/-2/file_to_hdep/
         //
         // Info for latest snapshot (42) of mywebapp within mysite/alice is now:
         //
@@ -560,7 +578,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         //      .href/mysite/alice/|mywebapp/-2/md5_to_file/
         //      .href/mysite/alice/|mywebapp/-2/md5_to_href/
         //      .href/mysite/alice/|mywebapp/-2/href_to_fdep/
-        //      .href/mysite/alice/|mywebapp/-2/fdep_to_href/
+        //      .href/mysite/alice/|mywebapp/-2/file_to_hdep/
         //
         // This makes it easy to delete an entire project or webapp.
 
@@ -569,21 +587,57 @@ public class LinkValidationServiceImpl implements LinkValidationService
         validate_dir( version,
                       webapp_avm_base,
                       webapp_url_base, 
-                      webapp_url_base,  // domain to recurse within
                       href_attr, 
                       md5,
-                      url_cache,
+                      gen_url_cache,
+                      parsed_url_cache,
+                      status_cache,
+                      file_hdep_cache,
+                      connect_timeout,
+                      read_timeout,
                       0 
                     );
+
+
+        // Now all the generated URLs have had their status checked,
+        // but the parsed URLs from these files might not be yet.
+        // Pull on every URL that isn't currently in the gen_cache.
+
+        for ( Map.Entry<String,String> entry  :  parsed_url_cache.entrySet() )
+        {
+            String  parsed_url_md5 = entry.getKey();
+
+            if ( gen_url_cache.containsKey( parsed_url_md5 ) )  // skip if this
+            {                                                   // url validated
+                continue;                                       // within the dir
+            }                                                   // walking phase
+            
+            String  parsed_url = entry.getValue();
+
+            validate_url( parsed_url,
+                          parsed_url_md5, 
+                          href_attr,
+                          md5,
+                          parsed_url.startsWith( webapp_url_base ),
+                          status_cache,
+                          file_hdep_cache,
+                          connect_timeout,
+                          read_timeout
+                        );
+        }
     }
 
     void validate_dir( int    version, 
                        String dir,
                        String url_base,
-                       String href_validation_domain,
                        String href_attr, 
                        MD5    md5,
-                       Map<String,String> url_cache,
+                       Map<String,String>  gen_url_cache,
+                       Map<String,String>  parsed_url_cache,
+                       Map<Integer,String> status_cache,
+                       Map<String,String>  file_hdep_cache,
+                       int    connect_timeout,
+                       int    read_timeout,
                        int    depth 
                      )
     {
@@ -635,63 +689,179 @@ public class LinkValidationServiceImpl implements LinkValidationService
                 // validate_dir( version, 
                 //               dir      + "/"  + entry_name,
                 //               url_base +  "/" + url_encoded_entry_name,
-                //               href_validation_domain,
                 //               href_attr,
                 //               md5,
-                //               url_cache,
+                //               gen_url_cache,
+                //               parsed_url_cache,
+                //               status_cache,
+                //               file_hdep_cache,
+                //               connect_timeout,
+                //               read_timeout,
                 //               depth + 1 ) 
             }
             else
             {
-                validate_url( 
-                   version, 
-                   url_base  +  "/"  +  url_encoded_entry_name,
-                   href_validation_domain,
+                String implicit_url = url_base  +  "/" + url_encoded_entry_name;
+
+                validate_file( 
+                   dir       +  "/" + entry_name,
+                   implicit_url,
+                   md5.digest(implicit_url.getBytes()),
                    href_attr,
                    md5,
-                   url_cache
+                   gen_url_cache,
+                   parsed_url_cache,
+                   status_cache,
+                   file_hdep_cache,
+                   connect_timeout,
+                   read_timeout
                 );
             }
         }
     }
 
-    void validate_url( int    version, 
-                       String url_str, 
-                       String href_validation_domain,
-                       String href_attr,
-                       MD5    md5,
-                       Map<String,String> url_cache
-                     )
+    void validate_file( String              avm_path,
+                        String              gen_url_str, 
+                        String              gen_url_md5,
+                        String              href_attr,
+                        MD5                 md5,
+                        Map<String,String>  gen_url_cache,
+                        Map<String,String>  parsed_url_cache,
+                        Map<Integer,String> status_cache,
+                        Map<String,String>  file_hdep_cache,
+                        int                 connect_timeout,
+                        int                 read_timeout
+                      )
     {
-        // The url_str will look someting like this:
-        // http://mysite.www--sandbox.version--v999.
-        //        127-0-0-1.ip.alfrescodemo.net:8180/index.jsp
+        String file_md5= md5.digest(avm_path.getBytes());
 
-        String url_md5 = md5.digest(url_str.getBytes());
+        gen_url_cache.put(gen_url_md5,null);
 
-        if ( url_cache.containsKey( url_md5 ) )            // already visited?
-        {                                                  // then just do an 
-            return ;                                       // early return.
+        // A map from the href to the source files that contain it created
+        // made as soon a new generated or parsed url is discovered.
+        // Because of how directories are traversed when generating urls,
+        // in this function we can be certain that the href being processed
+        // has never been generated before, but it may have been *parsed*
+        // from an earlier file.
+        //
+        // Therefore, a call to see if the HREF_TO_SOURCE key for this URL
+        // exists can be avoided if parsed_url_cache already contains it.
+        // Otherwise, we've got to do the actual 'exists' test.
+
+        if ( ! parsed_url_cache.containsKey( gen_url_md5 )   &&
+             ! attr_.exists( href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5)
+           )
+        {
+            attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,
+                                gen_url_md5,
+                                new MapAttributeValue()
+                              );
         }
 
-        // No matter what happens mark the url as "visited"
-        // from this point forward, even if the connection
-        // is refused.  
-        //
-        // TODO: See if it's faster to cache the raw url -> md5
-        //       or just cache the md5(url) -> null and take
-        //       the hit of some needless md5 recomputation
-        //       (memory/cpu tradeoff).   For now, just saving
-        //       md5(url) -> null.
 
-        url_cache.put(url_md5,null);
+        // Claim the url to self "appears" in this source file
 
+        attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5,
+                            file_md5,
+                            new BooleanAttributeValue( true )
+                          );
+
+
+        attr_.setAttribute( href_attr + "/" + MD5_TO_FILE, 
+                            file_md5, 
+                            new StringAttributeValue( avm_path )
+                          );
+
+
+        URL[] urls = validate_url( gen_url_str, 
+                                   gen_url_md5, 
+                                   href_attr, 
+                                   md5,
+                                   true,            // get lookup dependencies
+                                   status_cache,
+                                   file_hdep_cache,
+                                   connect_timeout,
+                                   read_timeout);
+
+        if ( urls == null ) 
+        {
+            return;
+        }
+
+        // Collect list of hrefs contained by this source file
+        // If the generated URL is not already contained in the 
+        // parsed URL list, add it.
+
+        ListAttribute href_list_attrib_value = new ListAttributeValue();
+        boolean       saw_gen_url            = false;
+
+        for (URL  resp_url  : urls )
+        {
+            String response_url     = resp_url.toString();
+            String response_url_md5 = md5.digest(response_url.getBytes());
+
+            if ( ! saw_gen_url && response_url_md5.equals( gen_url_md5) )
+            {
+                saw_gen_url = true;
+            }
+            
+            href_list_attrib_value.add( 
+                new StringAttributeValue(response_url_md5 ));
+
+
+            if ( ! parsed_url_cache.containsKey( response_url_md5 ) )
+            {
+                parsed_url_cache.put(response_url_md5, response_url);
+
+                if ( ! gen_url_cache.containsKey( response_url_md5 ) &&
+                     ! attr_.exists( href_attr      + "/" + 
+                                     HREF_TO_SOURCE + "/" + 
+                                     response_url_md5 )
+                   )
+                {
+                    attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,
+                                        response_url_md5,
+                                        new MapAttributeValue()
+                                      );
+                }
+            }
+
+            attr_.setAttribute( 
+                href_attr + "/" + HREF_TO_SOURCE  + "/" + response_url_md5 ,
+                file_md5,
+                new BooleanAttributeValue( true ));
+        }
+
+        if ( ! saw_gen_url )
+        {
+            href_list_attrib_value.add( new StringAttributeValue( gen_url_md5 ));
+        }
+
+        attr_.setAttribute( href_attr + "/" + SOURCE_TO_HREF,
+                            file_md5, 
+                            href_list_attrib_value
+                          );
+    }
+
+
+    URL[]  validate_url( String  url_str,
+                         String  url_md5,
+                         String  href_attr,
+                         MD5     md5,
+                         boolean get_lookup_dependencies,
+                         Map<Integer,String> status_cache,
+                         Map<String,String>  file_hdep_cache,
+                         int  connect_timeout,
+                         int  read_timeout
+                       )
+    {
         URL               url  = null;
         HttpURLConnection conn = null; 
+        int      response_code = 500;  // uninit
 
         try 
         { 
-            url  = new URL( url_str );
+            url = new URL( url_str );
 
             // Oddly, url.openConnection() does not actually
             // open a connection; it merely creates a connection
@@ -712,25 +882,26 @@ public class LinkValidationServiceImpl implements LinkValidationService
             // an ephemeral network failure;  "ephemeral" here means 
             // "on all instances of this url for this validation."
 
-            return;
+            return null;
         }
 
-        // Make AVMUrlValve send back lookup depdendency info for this URL
-        //
-        conn.addRequestProperty(
-            CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, "true" );
-
+        if ( get_lookup_dependencies )
+        {
+            conn.addRequestProperty(
+                CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, "true" );
+        }
 
         // "Infinite" timeouts that aren't really infinite
         // are a bad idea in this context.  If it takes more 
         // than 15 seconds to connect or more than 60 seconds 
         // to read a response, give up.  
         //
-        conn.setConnectTimeout(15000);          // TODO: make tunable
-        conn.setReadTimeout(60000);             // TODO: make tunable
-        conn.setUseCaches( false );             // handle caching manually
-
         LinkBean lb = new LinkBean();
+
+        conn.setConnectTimeout( connect_timeout );  // e.g.:  10000 milliseconds
+        conn.setReadTimeout(    read_timeout    );  // e.g.:  30000 milliseconds
+        conn.setUseCaches( false );                 // handle caching manually
+
 
         if ( log.isInfoEnabled() )
         {
@@ -739,23 +910,59 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         lb.setConnection( conn );
 
-        //  RESUME HERE.
-        //        
-        //        try 
-        //        {
-        //            attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS, 
-        //                                url_md5, new  new IntAttributeValue( conn.getResponseCode() ) 
-        //                              );
-        //        }
-        //        catch (IOException )
-        //        {
-        //            // If the link was unreachable, don't alter status.
-        //        }
+        try { response_code = conn.getResponseCode(); }
+        catch (IOException ioe)
+        {
+            log.error("Could not fetch response code: " + ioe.getMessage());
+            response_code = 500;
+        }
+
+        attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
+                            url_md5, 
+                            new StringAttributeValue( url_str )
+                          );
+
+        attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS, 
+                            url_md5, 
+                            new IntAttributeValue( response_code )
+                          );
+
+        // Only initialize the response map if absoultely necessary
+        // Use the status_cache to eliminate calls to test existence
+
+        if ( ! status_cache.containsKey( response_code ) )  // maybe necessary
+        {
+            if ( ! attr_.exists( href_attr      + "/" +     // do actual remote
+                                 STATUS_TO_HREF + "/" +     // call to see if
+                                 response_code )            // this status key
+               )                                            // must be created
+            {                                                
+                attr_.setAttribute( href_attr + "/" + STATUS_TO_HREF, 
+                                    "" + response_code,
+                                    new MapAttributeValue()
+                                  );
+
+            }
+            status_cache.put( response_code, null );        // never check again
+        }
+
+        attr_.setAttribute( 
+                href_attr + "/" + STATUS_TO_HREF + "/" + response_code,
+                url_md5,
+                new BooleanAttributeValue( true ));
 
 
+        if ( ! get_lookup_dependencies  ||  
+             ( response_code < 200 || response_code >= 300)
+           )
+        { 
+            // The remainder of this function deals with tracking lookup 
+            // dependencies.  Because  we only care about the links that
+            // URL's page contains if we're tracking dependencies, do
+            // an early return here.
 
-        // only if we're in the virt validation domain...
-        URL[] urls = lb.getLinks ();
+            return null; 
+        } 
 
 
         // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER 
@@ -808,18 +1015,49 @@ public class LinkValidationServiceImpl implements LinkValidationService
             }
         }
 
+        // Now "dependencies" contains a list of all 
+        // files upon which url_str URL depends.
 
-        for (URL  parsed_url  : urls )
+        ListAttribute fdep_list_attrib_value = new ListAttributeValue();
+
+        for (String file_dependency : dependencies )
         {
-            validate_url(version, 
-                         parsed_url.toString(),
-                         href_validation_domain,
-                         href_attr,
-                         md5,
-                         url_cache
-                        );
+            String fdep_md5 = md5.digest(file_dependency.getBytes());
+
+            if ( ! file_hdep_cache.containsKey( fdep_md5 ) )
+            {
+                attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP,
+                                    fdep_md5,
+                                    new MapAttributeValue()
+                                  );
+
+                file_hdep_cache.put( fdep_md5, null );
+            }
+
+            attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP + "/" + fdep_md5,
+                                url_md5,
+                                new BooleanAttributeValue( true )
+                              );
+
+            fdep_list_attrib_value.add( new StringAttributeValue( fdep_md5 ) );
         }
+
+
+        attr_.setAttribute( href_attr + "/" + HREF_TO_FDEP,
+                            url_md5, 
+                            fdep_list_attrib_value
+                          );
+
+
+        URL[] urls = lb.getLinks();
+        return urls;
     }
+
+
+
+
+
+
 
     String lookupStoreDNS( String store )
     {
@@ -835,7 +1073,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
     }
 
     /**
-    *  Creates keys corresponding to the store being valiated,
+    *  Creates keys corresponding to the store being validated,
     *  and returns the final key path.   If the leaf key already
     *  exists and 'incremental' is true, then the pre-existing
     *  leaf key will be reused;  otherwise,  this function creates
