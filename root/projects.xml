@@ -1017,7 +1017,7 @@
            webxml="${dir.project.webclient.test.resources}/websites/alfresco/ROOT/WEB-INF/web.xml">
          <lib dir="${dir.project.3rdparty.lib}">
             <include name="standard.jar"/>
-            <include name="jstl.jar"/>
+            <include name="jstl-1.1.0.jar"/>
          </lib>
          <lib dir="${dir.project.webclient.samplewebsite}/alfresco" />
          <fileset dir="${dir.project.webclient.test.resources}/websites/alfresco/ROOT">
