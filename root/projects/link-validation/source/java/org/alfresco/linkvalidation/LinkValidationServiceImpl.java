@@ -262,7 +262,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
 
     // TODO: make this return non-null soon
-    public void getBrokenHrefs(String path) throws AVMNotFoundException 
+    public void   getBrokenHrefs(String store_name_or_webapp_path) 
+           throws AVMNotFoundException 
     {
     }
 
@@ -686,18 +687,18 @@ public class LinkValidationServiceImpl implements LinkValidationService
             {
                 // NEON uncomment the next function call:
                 //
-                // validate_dir( version, 
-                //               dir      + "/"  + entry_name,
-                //               url_base +  "/" + url_encoded_entry_name,
-                //               href_attr,
-                //               md5,
-                //               gen_url_cache,
-                //               parsed_url_cache,
-                //               status_cache,
-                //               file_hdep_cache,
-                //               connect_timeout,
-                //               read_timeout,
-                //               depth + 1 ) 
+                validate_dir( version, 
+                              dir      + "/"  + entry_name,
+                              url_base +  "/" + url_encoded_entry_name,
+                              href_attr,
+                              md5,
+                              gen_url_cache,
+                              parsed_url_cache,
+                              status_cache,
+                              file_hdep_cache,
+                              connect_timeout,
+                              read_timeout,
+                              depth + 1 ) ;
             }
             else
             {

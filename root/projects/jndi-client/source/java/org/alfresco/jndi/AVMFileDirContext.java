@@ -118,13 +118,9 @@ import org.apache.naming.NamingEntry;
 import org.alfresco.filter.CacheControlFilter;
 
 import org.alfresco.repo.avm.AVMNodeType;
-import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.remote.AVMRemote;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.util.JNDIPath;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 // Had to use:   new Exception("Stack trace").printStackTrace();
 // and read a lot of tomcat source to figure out what was actually 
@@ -161,20 +157,6 @@ public class AVMFileDirContext extends
 
 
     public static final String getAVMFileDirMountPoint() { return AVMFileDirMountPoint_; }
-
-
-    // For now, never cache.
-    // This is motivated by the desire to see *every* access of 
-    // a resource to AVMRemote for link checking dependencies.
-    //  
-    // TODO:   Turning off caching is a fairly crude approach.
-    //         What might be nicer is having a custom ProxyDirContext,
-    //         and injecting into the system via AVMStandardContext.resourcesStart()
-    //         That way, there would be a way to introduce a callback
-    //         prior to even cached lookups  (such a callback would
-    //         have spared me some real hassle here).  Investigate.
-    //
-    // public int getCacheTTL() { return 0; }      // oh well
 
 
     /** 
@@ -214,131 +196,17 @@ public class AVMFileDirContext extends
     // A single AVMRemote object is used for 
     // all queries to the AVM repository.
 
-    static FileSystemXmlApplicationContext Context_ = null;
     static AVMRemote Service_;
     static int Service_refcount_ = 0; 
 
 
-    /**
-    *  Associates an AVMRemote with a storage location, 
-    *  increments the reference count on the AVMRemote, and
-    *  returns a completely initialized AVMRemote.
-    *  This function is called by AVMHost during the init()
-    *  of its lifcycle.
-    *  <p>
-    *  If this function is called more than once, the value
-    *  of 'storage_directory' is ignored, and the previously-created
-    *  AVMRemote singleton is returned instead.
-    *  <p>
-    *  If you just want to get a handle to the initialized 
-    *  AVMRemote and *not* increment the refcount, then call
-    *  call getAVMRemote() instead.   
-    */
+
     static public synchronized 
-    AVMRemote InitAVMRemote()
+    void InitAVMRemote(AVMRemote service)
     { 
-        if ( Service_ == null )
-        {
-            String catalina_base;
-            catalina_base = System.getProperty("catalina.base");
-            if ( catalina_base == null)
-            {
-                catalina_base = System.getProperty("catalina.home");
-            }
-            if ( catalina_base != null)
-            {
-                if ( ! catalina_base.endsWith("/") )
-                {
-                    catalina_base = catalina_base + "/";
-                }
-            }
-            else { catalina_base = ""; }
+        Service_ = service;
 
-            // Using the Spring framework load the application context:
-            //   conf/alfresco-virtserver-context.xml"
-            // which assocates
-            //   "avmService" 
-            // with
-            //    org.alfresco.repo.avm.AVMRemote
-            // and via its resource file:
-            //   conf/alfresco-catalina-virtual-avm.properties
-            // associates the property
-            //   ${avm.storage}      (i.e.: the blob backing store location)
-            // with the default Catalina directory:
-            //   alfresco/store
-
-            boolean done_trying = false;
-            while ( ! done_trying )
-            {
-                try 
-                {
-                    Context_ = 
-                        new FileSystemXmlApplicationContext(
-                                "file:"              +
-                                catalina_base        + 
-                                "conf/alfresco-virtserver-context.xml");
-
-
-                    Service_ = (AVMRemote)Context_.getBean("avmRemote");
-                    
-                    // Get the authentication service.
-                    AuthenticationService authService =
-                        (AuthenticationService)Context_.getBean("authenticationService");
-                    
-                    // Get the info bean for the user name and password.
-                    JndiInfoBean info = 
-                        (JndiInfoBean)Context_.getBean("jndiInfoBean");
-                    
-                    // Authenticate once,
-                    authService.authenticate(
-                        info.getAlfrescoServerUser(), 
-                        info.getAlfrescoServerPassword().toCharArray()
-                    );
-                    
-                    // and set the ticket.
-                    ((ClientTicketHolder)(Context_.getBean("clientTicketHolder"))).setTicket(authService.getCurrentTicket());
-
-                    done_trying = true;
-                }
-                catch (org.springframework.beans.factory.BeanCreationException e)
-                {
-                    // When using RMI, the nested exception 
-                    // is: java.rmi.ConnectException
-                    // However, you might configure Spring to use
-                    // some other transport besides RMI; therefore
-                    // only require a java.io.IOException.
-
-                    Throwable cause =  e.getCause();
-                    
-                    if ( (cause == null) ||
-                         ! (cause instanceof java.io.IOException)
-                       )
-                    {
-                        throw e;
-                    }
-                    log.warn("Retrying JNDI connection....");
-                    try { Thread.currentThread().sleep( 5000 ); }
-                    catch (Exception te) { /* ignored */ }
-                }
-            }
-        }
-        Service_refcount_ ++;
-
-        return Service_;
     }
-
-    /**
-    *  Fetches the Spring ApplicationContext associated
-    *  with this virtualization server.   
-    *  <p>
-    *  This function assumesInitAVMRemote has been called previously.
-    */
-    static public ApplicationContext 
-    GetSpringApplicationContext()
-    {
-        return Context_;
-    }
-
 
     /**
     *  Decrements the reference count on the AVMRemote.
@@ -358,8 +226,6 @@ public class AVMFileDirContext extends
             log.debug("AVMFileDirContext.ReleaseAVMRemote() closing " +
                       "FileSystemXmlApplicationContext (refcount dropped to 0)");
 
-
-            Context_.close();
             // lost in time, like tears in rain... 
             Service_ = null;
         }
@@ -413,6 +279,12 @@ public class AVMFileDirContext extends
         super();
 
         log.debug("AVMFileDirContext:  AVMFileDirContext()");
+
+        // filedir pre Spring Class/Method Name Here: parent classLoader == org.apache.catalina.loader.StandardClassLoader@c5c3ac
+        // filedir pre Spring Class/Method Name Here: parent classLoader == sun.misc.Launcher$AppClassLoader@1858610
+        // filedir pre Spring Class/Method Name Here: parent classLoader == sun.misc.Launcher$ExtClassLoader@12498b5
+        // filedir pre Spring Class/Method Name Here: parent classLoader == null
+
 
 
         // This AVMFileDirContext corresponds to a top-level web application

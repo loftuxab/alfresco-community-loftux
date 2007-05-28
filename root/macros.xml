@@ -103,14 +103,15 @@
       </sequential>
    </macrodef>
 
-   <macrodef name="deploy-virtual-tomcat" description="Deploys the files required for the virtualisation server to the given location">
+   <macrodef name="deploy-virtual-tomcat" 
+             description="Deploys the files required for the virtualisation server to the given location">
       <attribute name="location" />
       <sequential>
+         <copy todir="@{location}/server/lib"  file="${dir.project.3rdparty.lib}/spring-2.0.2.jar"/>
          <copy todir="@{location}/server/lib"  file="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.jndi.dist}/${file.name.jar.jndi}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.repository.dist}/${file.name.jar.repository}"/>
          <copy todir="@{location}/common/lib"  file="${dir.project.core.dist}/${file.name.jar.core}"/>
-         <copy todir="@{location}/common/lib"  file="${dir.project.3rdparty.lib}/spring-2.0.2.jar"/>
          <copy todir="@{location}/conf"        file="${dir.project.repository.config}/alfresco/alfresco-shared.properties"/>
          <copy todir="@{location}/conf"        file="${dir.project.repository.config}/alfresco/alfresco-jmxrmi.password"/>
          <copy todir="@{location}/conf"        file="${dir.project.repository.config}/alfresco/alfresco-jmxrmi.access"/>
