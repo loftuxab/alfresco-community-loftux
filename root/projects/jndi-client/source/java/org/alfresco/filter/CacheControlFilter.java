@@ -42,7 +42,6 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import org.alfresco.config.JNDIConstants;
-import org.springframework.context.ApplicationContext;
 
 /**
 *   Sets "Cache-Control" http header values in response 
@@ -51,6 +50,8 @@ import org.springframework.context.ApplicationContext;
 */
 public class CacheControlFilter implements Filter 
 {
+    static protected CacheControlFilterInfoBean FilterInfo_;
+
     protected FilterConfig      config   = null;
     protected static String  [] CacheControlHeader_;
     protected static Pattern [] HostPattern_;
@@ -110,6 +111,11 @@ public class CacheControlFilter implements Filter
     }
 
 
+    public static void InitInfo(CacheControlFilterInfoBean  info)
+    {
+        FilterInfo_ = info;
+    }
+
 
     protected static void Init()
     {
@@ -132,16 +138,11 @@ public class CacheControlFilter implements Filter
         //
         // 
         // However, this filter applies the same rules to all virtual webapps
-        // and draws its rule set from a Spring application context. 
-
-        ApplicationContext springContext =
-            org.alfresco.jndi.AVMFileDirContext.GetSpringApplicationContext();
-
-        CacheControlFilterInfoBean cacheControlInfo = 
-         (CacheControlFilterInfoBean) springContext.getBean("cacheControlInfo");
+        // and draws its rule set from a Spring application context 
+        // (AVMHost reads the Spring config, then sets FilterInfo).
 
         Set<Map.Entry<String,String>> cacheControlRulesEntrySet =  
-            cacheControlInfo.getCacheControlRulesEntrySet();
+            FilterInfo_.getCacheControlRulesEntrySet();
 
         int len = cacheControlRulesEntrySet.size();
         CacheControlHeader_ = new String[ len ];

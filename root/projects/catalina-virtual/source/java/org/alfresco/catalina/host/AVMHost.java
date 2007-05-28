@@ -50,6 +50,12 @@ import org.apache.catalina.Valve;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.modeler.Registry;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.repo.remote.ClientTicketHolder;
+import org.alfresco.jndi.JndiInfoBean;
+import org.alfresco.filter.CacheControlFilter;
+import org.alfresco.filter.CacheControlFilterInfoBean;
 
 /**
 *  This class implements a Catalina virtual Host;  it can be 
@@ -128,6 +134,10 @@ import org.springframework.context.ApplicationContext;
 */ 
 public class AVMHost extends org.apache.catalina.core.StandardHost
 {
+    static AVMRemote Service_;
+    static FileSystemXmlApplicationContext Context_ = null;
+
+
     private static org.apache.commons.logging.Log log=
         org.apache.commons.logging.LogFactory.getLog( AVMHost.class );
 
@@ -318,13 +328,108 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         return super.getAppBase();
     }
 
+    public static ApplicationContext 
+    GetSpringApplicationContext() { return Context_ ;}
+
     public void init() 
     {
         if( initialized ) return;
         initialized=true;
 
-        // Initialize RPC to talk to AVM 
-        AVMFileDirContext.InitAVMRemote();
+            String catalina_base;
+            catalina_base = System.getProperty("catalina.base");
+            if ( catalina_base == null)
+            {
+                catalina_base = System.getProperty("catalina.home");
+            }
+            if ( catalina_base != null)
+            {
+                if ( ! catalina_base.endsWith("/") )
+                {
+                    catalina_base = catalina_base + "/";
+                }
+            }
+            else { catalina_base = ""; }
+
+            //  pre Spring Class/Method Name Here: parent classLoader == org.apache.catalina.loader.StandardClassLoader@2c84d9
+            //  pre Spring Class/Method Name Here: parent classLoader == org.apache.catalina.loader.StandardClassLoader@c5c3ac
+            //  pre Spring Class/Method Name Here: parent classLoader == sun.misc.Launcher$AppClassLoader@1858610
+            //  pre Spring Class/Method Name Here: parent classLoader == sun.misc.Launcher$ExtClassLoader@12498b5
+            //  pre Spring Class/Method Name Here: parent classLoader == null
+            //  
+            //  ClassLoader classLoader = getClass().getClassLoader();        // get current classloader
+            //  // Implies that we're at the top of the hierarchy when null.
+            //  while (classLoader != null)
+            //  {  
+            //     System.out.println("pre Spring Class/Method Name Here: parent classLoader == " + classLoader.toString());
+            //     // Note that getParent() may require opening up the
+            //     // security settings in the JVM.
+            //     classLoader = classLoader.getParent();                     // get parent of this classloader
+            //  }
+            //  System.out.println("pre Spring Class/Method Name Here: parent classLoader == null");
+
+            boolean done_trying = false;
+            while ( ! done_trying )
+            {
+                try 
+                {
+                    Context_ = 
+                        new FileSystemXmlApplicationContext(
+                                "file:"              +
+                                catalina_base        + 
+                                "conf/alfresco-virtserver-context.xml");
+
+                    Service_ = (AVMRemote)Context_.getBean("avmRemote");
+
+                    // Get the authentication service.
+                    AuthenticationService authService =
+                        (AuthenticationService)Context_.getBean("authenticationService");
+                    
+                    // Get the info bean for the user name and password.
+                    JndiInfoBean info = 
+                        (JndiInfoBean)Context_.getBean("jndiInfoBean");
+                    
+                    // Authenticate once,
+                    authService.authenticate(
+                        info.getAlfrescoServerUser(), 
+                        info.getAlfrescoServerPassword().toCharArray()
+                    );
+                    
+                    // and set the ticket.
+                    ((ClientTicketHolder)(Context_.getBean("clientTicketHolder"))).setTicket(authService.getCurrentTicket());
+
+                    done_trying = true;
+                }
+                catch (org.springframework.beans.factory.BeanCreationException e)
+                {
+                    // When using RMI, the nested exception 
+                    // is: java.rmi.ConnectException
+                    // However, you might configure Spring to use
+                    // some other transport besides RMI; therefore
+                    // only require a java.io.IOException.
+
+                    Throwable cause =  e.getCause();
+                    
+                    if ( (cause == null) ||
+                         ! (cause instanceof java.io.IOException)
+                       )
+                    {
+                        throw e;
+                    }
+                    log.warn("Retrying connection...");
+                    try { Thread.currentThread().sleep( 5000 ); }
+                    catch (Exception te) { /* ignored */ }
+                }
+            }
+
+
+            // Initialize RPC to talk to AVM 
+            AVMFileDirContext.InitAVMRemote(Service_);
+
+            CacheControlFilter.InitInfo( (CacheControlFilterInfoBean) 
+                                          Context_.getBean("cacheControlInfo")
+                                       );
+
 
         // Clean out the work dir before *anything* else is done.
         //
@@ -351,12 +456,6 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
 
         if ( ! absWorkDir.isAbsolute() )
         {
-            String catalina_base;
-            catalina_base = System.getProperty("catalina.base");
-            if ( catalina_base == null)
-            {   
-                catalina_base = System.getProperty("catalina.home");
-            }
             absWorkDir =  new File( catalina_base, workDir );
         }
 
@@ -426,14 +525,11 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             // the server.xml file.
              
             AVMHostConfig deployer = new AVMHostConfig( super.getAppBase() );
-            ApplicationContext springContext =  
-                AVMFileDirContext.GetSpringApplicationContext();
-
 
             if ( reverse_proxy_binding_ == null )
             {
                 // VirtServerInfoMBean serverInfo =
-                //     (VirtServerInfoMBean) springContext.getBean("virtServerInfo");
+                //     (VirtServerInfoMBean) Context_.getBean("virtServerInfo");
                 //
                 // String virt_domain = serverInfo.getVirtServerDomain();
 
@@ -463,7 +559,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             // recusive load,reload, or unload of the appropriate webapps.
 
             VirtWebappRegistryMBean  virtWebappRegistry = 
-                (VirtWebappRegistryMBean)  springContext.getBean("virtWebappRegistry");
+                (VirtWebappRegistryMBean)  Context_.getBean("virtWebappRegistry");
 
             virtWebappRegistry.setDeployer( deployer );
 
@@ -640,6 +736,8 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             registrationThread_.setDone();
             registrationThread_ = null;
         }
+
+        Context_.close();
 
         AVMFileDirContext.ReleaseAVMRemote();
 

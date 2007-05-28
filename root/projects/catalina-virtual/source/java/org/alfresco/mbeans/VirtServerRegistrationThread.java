@@ -42,7 +42,7 @@ import org.alfresco.mbeans.VirtServerInfoMBean;
 import org.springframework.context.ApplicationContext;
 import java.util.Map;
 import java.util.HashMap;
-
+import org.alfresco.catalina.host.AVMHost;
 
 /**
 *  Registers virtualization server with an AVM server.
@@ -76,7 +76,7 @@ public class VirtServerRegistrationThread extends Thread
 
     public VirtServerRegistrationThread()
     {
-        springContext_   = AVMFileDirContext.GetSpringApplicationContext();
+        springContext_   = AVMHost.GetSpringApplicationContext();
 
         VirtServerInfoMBean serverInfo = 
             (VirtServerInfoMBean)  

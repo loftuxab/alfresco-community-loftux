@@ -171,6 +171,18 @@
               includeEmptyDirs="true" 
               quiet="yes" />
    </target>
+
+   <target name="clean-virtual-tomcat-deploy"
+           description="Cleans the Virtual Tomcat deployment" 
+           depends="init">
+       <delete failonerror="no">
+           <!-- Remove old spring jar files lingering in common/lib, if any -->
+           <fileset dir="${home.virtualtomcat}/common/lib" includes="spring*.jar"/>
+
+           <!-- Get rid of old config files -->
+           <fileset dir="${home.virtualtomcat}/conf" includes="alfresco-*"/>
+       </delete>
+   </target>
    
    <target name="clean-jboss-deploy" 
            description="Cleans the Alfresco application from JBoss" 
@@ -228,7 +240,7 @@
 
    <target name="deploy-virtual-tomcat" 
            description="Deploys to Virtual Tomcat (the virtualization server)" 
-           depends="init">
+           depends="init,clean-virtual-tomcat-deploy">
       <deploy-virtual-tomcat location="${home.virtualtomcat}" />
    </target>
 

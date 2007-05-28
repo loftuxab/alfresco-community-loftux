@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE beans PUBLIC "-//SPRING/DTD BEAN//EN"
-	"http://www.springframework.org/dtd/spring-beans.dtd">
+    "http://www.springframework.org/dtd/spring-beans.dtd">
 
 <beans>
 
@@ -18,24 +18,25 @@
         </property>
     </bean>
 
-	<!-- Client Ticket Holder. -->
-	<bean id="clientTicketHolder" class="org.alfresco.repo.remote.ClientTicketHolderGlobal"/>
+    <!-- Advice for automatic reauthentication.
 
-    <!-- The remote authentication service. -->
-    <bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-        <property name="serviceUrl">
-            <value>rmi://${avm.remote.host}:${avm.remote.port}/authentication</value>
+         NOTE: Cannot use org.alfresco.repo.remote.ReauthenticatingAdvice
+               because that would force spring.jar to live inside common/lib,
+               but we only want it to live in server/lib, so as not to
+               generate classloader problems when virtualizing webapps
+               that use Spring.
+    -->
+    <bean id="avmReauthenticatingAdvisor"
+          class="org.springframework.aop.support.DefaultPointcutAdvisor">
+        <property name="advice">
+            <ref bean="reauthenticatingAdvice"/>
         </property>
-        <property name="serviceInterface">
-            <value>org.alfresco.service.cmr.security.AuthenticationService</value>
-        </property>
-        <property name="refreshStubOnConnectFailure">
-            <value>true</value>
+        <property name="pointcut">
+            <bean class="org.springframework.aop.TruePointcut"/>
         </property>
     </bean>
-
-	<!-- Advice for automatic reauthentication. -->
-    <bean id="reauthenticatingAdvice" class="org.alfresco.repo.remote.ReauthenticatingAdvice">
+    <bean id="reauthenticatingAdvice"
+          class="org.alfresco.catalina.host.ReauthenticatingAdvice">
         <property name="authenticationService">
             <ref bean="authenticationService"/>
         </property>
@@ -53,21 +54,43 @@
         </property>
     </bean>
 
-    <bean id="avmReauthenticatingAdvisor" class="org.springframework.aop.support.DefaultPointcutAdvisor">
-        <property name="advice">
-            <ref bean="reauthenticatingAdvice"/>
+    <!-- Client Ticket Holder. -->
+    <bean id="clientTicketHolder" 
+          class="org.alfresco.repo.remote.ClientTicketHolderGlobal"/>
+
+    <!-- The remote authentication service. -->
+    <bean id="authenticationService" 
+          class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl">
+            <value>rmi://${avm.remote.host}:${avm.remote.port}/authentication</value>
         </property>
-        <property name="pointcut">
-            <bean class="org.springframework.aop.TruePointcut"/>
+        <property name="serviceInterface">
+            <value>org.alfresco.service.cmr.security.AuthenticationService</value>
+        </property>
+        <property name="refreshStubOnConnectFailure">
+            <value>true</value>
         </property>
     </bean>
 
-    <bean id="avmRemoteTransport" class="org.springframework.aop.framework.ProxyFactoryBean">
-    	<property name="proxyInterfaces">
-    	    <list>
-    	        <value>org.alfresco.service.cmr.remote.AVMRemoteTransport</value>
-    	    </list>
-    	</property>
+
+    <!-- Remote Alfresco RMI Proxy bean -->
+    <bean id="avmRemote" 
+          class="org.alfresco.repo.remote.AVMRemoteImpl">
+        <property name="avmRemoteTransport">
+            <ref bean="avmRemoteTransport"/>
+        </property>
+        <property name="clientTicketHolder">
+            <ref bean="clientTicketHolder"/>
+        </property>
+    </bean>
+    <!-- Re-authenticating transport for AVMRemote -->
+    <bean id="avmRemoteTransport"
+          class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.service.cmr.remote.AVMRemoteTransport</value>
+            </list>
+        </property>
         <property name="target">
             <ref bean="avmRemoteTransportRaw"/>
         </property>
@@ -77,19 +100,9 @@
             </list>
         </property>
     </bean>
-    
-    <!-- Remote Alfresco RMI Proxy bean -->
-    <bean id="avmRemote" class="org.alfresco.repo.remote.AVMRemoteImpl">
-        <property name="avmRemoteTransport">
-            <ref bean="avmRemoteTransport"/>
-        </property>
-        <property name="clientTicketHolder">
-            <ref bean="clientTicketHolder"/>
-        </property>
-    </bean>
-
-    <!-- The underlying transport. -->
-    <bean id="avmRemoteTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+    <!-- Raw transport for AVMRemote -->
+    <bean id="avmRemoteTransportRaw"
+          class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
             <value>rmi://${avm.remote.host}:${avm.remote.port}/avm</value>
         </property>
@@ -103,23 +116,26 @@
         </property>
     </bean>
 
-    <!-- The AttributeService -->
-	<bean id="attributeService" class="org.alfresco.repo.remote.AttributeServiceRemote">
-	    <property name="clientTicketHolder">
-	        <ref bean="clientTicketHolder"/>
-	    </property>
-	    <property name="attributeServiceTransport">
-	        <ref bean="attributeServiceTransport"/>
-	    </property>
-	</bean>
 
-	<!-- Wrapped AttributeService Transport -->
-    <bean id="attributeServiceTransport" class="org.springframework.aop.framework.ProxyFactoryBean">
-    	<property name="proxyInterfaces">
-    	    <list>
-    	        <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
-    	    </list>
-    	</property>
+
+    <!-- The AttributeService -->
+    <bean id="attributeService" 
+          class="org.alfresco.repo.remote.AttributeServiceRemote">
+        <property name="clientTicketHolder">
+            <ref bean="clientTicketHolder"/>
+        </property>
+        <property name="attributeServiceTransport">
+            <ref bean="attributeServiceTransport"/>
+        </property>
+    </bean>
+    <!-- Re-authenticating transport for AttributeService -->
+    <bean id="attributeServiceTransport" 
+          class="org.springframework.aop.framework.ProxyFactoryBean">
+        <property name="proxyInterfaces">
+            <list>
+                <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
+            </list>
+        </property>
         <property name="target">
             <ref bean="attributeServiceTransportRaw"/>
         </property>
@@ -129,27 +145,30 @@
             </list>
         </property>
     </bean>
+    <!-- Raw transport for AttributeServic -->
+    <bean id="attributeServiceTransportRaw" 
+          class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
+        <property name="serviceUrl">
+            <value>rmi://${avm.remote.host}:${avm.remote.port}/attributes</value>
+        </property>
+        <property name="serviceInterface">
+            <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
+        </property>
+        <property name="refreshStubOnConnectFailure">
+            <value>true</value>
+        </property>
+    </bean>
 
-	<!-- The underlying transport for AttributeService -->
-	<bean id="attributeServiceTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
-	    <property name="serviceUrl">
-	        <value>rmi://${avm.remote.host}:${avm.remote.port}/attributes</value>
-	    </property>
-	    <property name="serviceInterface">
-	        <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
-	    </property>
-	    <property name="refreshStubOnConnectFailure">
-	        <value>true</value>
-	    </property>
-	</bean>
+
 
     <!-- The JNDI info bean for jndi-client specific property access -->
-    <bean id="jndiInfoBean" class="org.alfresco.jndi.JndiInfoBean">
-    	<property name="alfrescoServerUser">
-    	    <value>${alfresco.server.user}</value>
-    	</property>
-    	<property name="alfrescoServerPassword">
-    		<value>${alfresco.server.password}</value>
+    <bean id="jndiInfoBean" 
+          class="org.alfresco.jndi.JndiInfoBean">
+        <property name="alfrescoServerUser">
+            <value>${alfresco.server.user}</value>
+        </property>
+        <property name="alfrescoServerPassword">
+            <value>${alfresco.server.password}</value>
         </property>
     </bean>
 
@@ -228,10 +247,12 @@
     <!--   needs to reload the webapp, and any webapps         -->
     <!--   that depend on it (e.g.: webapps corresponding      -->
     <!--   to sandboxes that aren't "staging").                -->
-    <bean id="virtServerMBeanServer" class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
+    <bean id="virtServerMBeanServer" 
+          class="org.springframework.jmx.support.MBeanServerFactoryBean"/>
 
 
-    <bean id="virtServerRegistry"   class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
+    <bean id="virtServerRegistry"   
+          class="org.springframework.remoting.rmi.RmiRegistryFactoryBean">
         <property name="port" value="${alfresco.virtserver.jmxrmi.port}"/>
     </bean>
 
@@ -243,7 +264,7 @@
 
         <property name="server"      ref="virtServerMBeanServer"/>
         <property name="objectName"  value="connector:name=rmi"/>
-        <property name="serviceUrl"  
+        <property name="serviceUrl"
                   value="service:jmx:rmi://localhost/jndi/rmi://localhost:${alfresco.virtserver.jmxrmi.port}/alfresco/jmxrmi" />
 
         <property name="environment">
@@ -256,7 +277,8 @@
     </bean>
 
 
-    <bean id="virtServerExporter" class="org.springframework.jmx.export.MBeanExporter">
+    <bean id="virtServerExporter" 
+          class="org.springframework.jmx.export.MBeanExporter">
        <property name="server" ref="virtServerMBeanServer"/>
        <property name="beans">
          <map>
@@ -268,7 +290,8 @@
 
 
     <!-- MBeans registered with virtServerMBeanServer -->
-    <bean id="virtWebappRegistry" class="org.alfresco.mbeans.VirtWebappRegistry"/>
+    <bean id="virtWebappRegistry" 
+          class="org.alfresco.mbeans.VirtWebappRegistry"/>
 
     <!--
          The virtualization server forces different HTTP "Cache-Control" headers
@@ -300,16 +323,16 @@
 
          Note:
 
-            o  Each key='...' within "cacheControlRules" property 
-               is a java/PCRE regex that matches virtual hosts;   
-               there's no implicit '^' regex prefix  or '$' regex 
+            o  Each key='...' within "cacheControlRules" property
+               is a java/PCRE regex that matches virtual hosts;
+               there's no implicit '^' regex prefix  or '$' regex
                suffix, so if you want to anchor something to the
                starting or ending position of a FQDN, do so explicitly.
 
             o  For more details on the regular expression grammar, see:
                http://java.sun.com/j2se/1.5.0/docs/api/java/util/regex/Pattern.html
                However, note that in this context, when you want to escape
-               a character that's a part of the regex grammar, use a single 
+               a character that's a part of the regex grammar, use a single
                '\', not '\\' (unlike what the web page mentined above says).
                Thus, to compose a regex that inclues the literal dot-character,
                you'd do something like this "moo\.cow", not "moo\\.cow"
