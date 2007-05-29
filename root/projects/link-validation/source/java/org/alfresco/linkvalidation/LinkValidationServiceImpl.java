@@ -35,7 +35,9 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
@@ -70,6 +72,7 @@ import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.MD5;
+import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.htmlparser.beans.LinkBean;
@@ -261,11 +264,122 @@ public class LinkValidationServiceImpl implements LinkValidationService
     public LinkValidationServiceImpl() { }
 
 
-    // TODO: make this return non-null soon
-    public void   getBrokenHrefs(String store_name_or_webapp_path) 
+    public void   getBrokenHrefs(String path) 
            throws AVMNotFoundException 
     {
+        ValidationPathParser p = new ValidationPathParser(avm_, path);
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
+
+        // Example value:  ".href/mysite"
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
+                                                              false, 
+                                                              true
+                                                            );
+
+        int version = avm_.getLatestSnapshotID( store );
+        //--------------------------------------------------------------------
+        // NEON:       faking latest snapshot version and just using HEAD
+        version = -1;  // NEON:  TODO remove this line & replace with a JMX
+                       //        call to load the version if it isn't already.
+                       //
+                       //        Question:  how long should the version stay
+                       //                   loaded if a load was required?
+        //--------------------------------------------------------------------
+
+        if  ( webapp_name != null )
+        {
+            // NEON - do something with result
+            getBrokenHrefsFromWebapp( webapp_name,
+                                      store_attr_base );
+        }
+        else
+        {
+            Map<String, AVMNodeDescriptor> webapp_entries = null;
+
+            // e.g.:   42, "mysite:/www/avm_webapps"
+            webapp_entries = avm_.getDirectoryListing(version, app_base );
+
+            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
+                          webapp_entries.entrySet()
+                        )
+            {
+                webapp_name = webapp_entry.getKey();  // my_webapp
+                AVMNodeDescriptor avm_node    = webapp_entry.getValue();
+
+                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
+                     webapp_name.equalsIgnoreCase("WEB-INF")
+                   )
+                {
+                    continue;
+                }
+
+                if  ( avm_node.isDirectory() )
+                {
+                    // NEON - do something with result
+                    getBrokenHrefsFromWebapp( webapp_name,
+                                              store_attr_base );
+                }
+            }
+        }
     }
+
+    public void  getBrokenHrefsFromWebapp( String webapp_name,
+                                           String store_attr_base
+                                         )
+                                          
+    {
+        // Example value: .href/mysite/|ROOT/-2
+        String href_attr =  store_attr_base    + 
+                            "/|" + webapp_name +
+                            "/"  + LATEST_VERSION_ALIAS;
+
+         
+        List<Pair<String, Attribute>> broken_links = 
+            attr_.query( href_attr + "/" + STATUS_TO_HREF, 
+                         new AttrQueryGTE("400"));
+
+        if  ( broken_links == null ) {return;}
+
+        for ( Pair<String, Attribute> broken : broken_links  )
+        {
+            String      response_code = broken.getFirst();
+            Set<String> href_md5_set  = broken.getSecond().keySet();
+            for ( String href_md5 : href_md5_set )
+            {
+                String href_str = 
+                   attr_.getAttribute( href_attr   + "/" + 
+                                       MD5_TO_HREF + "/" + 
+                                       href_md5
+                                     ).getStringValue();
+
+                System.out.println("Status:  " + response_code + "  " + href_str);
+
+                Set<String> file_md5_set = 
+                        attr_.getAttribute( 
+                                            href_attr      + "/" + 
+                                            HREF_TO_SOURCE + "/" + 
+                                            href_md5
+                                          ).keySet();
+                
+                for ( String file_md5 : file_md5_set )
+                {
+                    String file_str = 
+                       attr_.getAttribute( href_attr   + "/" + 
+                                           MD5_TO_FILE + "/" + 
+                                           file_md5
+                                         ).getStringValue();
+
+                    System.out.println("         " + file_str);
+                }
+            }
+        }
+    }
+
+
+
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
     public AttributeService getAttributeService()         { return attr_;}
@@ -310,56 +424,18 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
                 throws AVMNotFoundException
     {
-        String app_dir = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
-                         "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
+        ValidationPathParser p = new ValidationPathParser(avm_, path);
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
 
-        String  store       = null;
-        String  app_base    = null;
-        String  webapp_name = null;
 
-        int store_index = path.indexOf(':');
-        if ( store_index < 0) 
-        {
-            // We were passed a store path
-            store = path;
-            app_base = store + ":" + app_dir;
-        }
-        else if ( ! path.startsWith( app_dir, store_index+1 )  )
-        {
-            throw new IllegalArgumentException("Invalid webapp path: " + path);
-        }
-        else
-        {
-            store = path.substring(0,store_index);
-            int webapp_start = 
-                path.indexOf('/', store_index + 1 + app_dir.length()); 
-
-            if (webapp_start >= 0)
-            {
-                int webapp_end = path.indexOf('/', webapp_start + 1);
-                webapp_name = path.substring( webapp_start +1, 
-                                              (webapp_end < 1)
-                                              ?  path.length()
-                                              :  webapp_end
-                                            );
-                if  ((webapp_name != null) && 
-                     (webapp_name.length() == 0)
-                    ) 
-                { 
-                    webapp_name = null; 
-                }
-            }
-        }
-
-        String  dns_name = lookupStoreDNS( store );
-        if ( dns_name == null ) 
-        { 
-            throw new AVMNotFoundException(
-                       "No DNS entry for AVM store: " + store);
-        }
-
-        String store_attr_base    =   // Example value:  ".href/mysite"
-               createAttributeStemForStore( store, dns_name, incremental );
+        // Example value:  ".href/mysite"
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
+                                                              true, 
+                                                              incremental 
+                                                             );
 
         int version = avm_.getLatestSnapshotID( store );
         //--------------------------------------------------------------------
@@ -400,7 +476,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               version,
                               true,           // is_latest_version
                               store_attr_base,
-                              dns_name,
                               webapp_name,
                               app_base + "/" + webapp_name,
                               webapp_url_base,
@@ -450,7 +525,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                        version,
                                        true,           // is_latest_version
                                        store_attr_base,
-                                       dns_name,
                                        webapp_name,
                                        app_base + "/" + webapp_name,
                                        webapp_url_base,
@@ -461,14 +535,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
                 }
             }
         }
-
     }
 
     void revalidateWebapp( String  store, 
                            int     version,
                            boolean is_latest_version,
                            String  store_attr_base,
-                           String  dns_name,
                            String  webapp_name,
                            String  webapp_avm_base,
                            String  webapp_url_base,
@@ -1056,33 +1128,22 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
 
 
-
-
-
-
-    String lookupStoreDNS( String store )
-    {
-        Map<QName, PropertyValue> props = 
-                avm_.queryStorePropertyKey(store, 
-                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
-
-        return ( props.size() != 1 
-                 ? null
-                 : props.keySet().iterator().next().getLocalName().
-                         substring(SandboxConstants.PROP_DNS.length())
-               );
-    }
-
     /**
-    *  Creates keys corresponding to the store being validated,
-    *  and returns the final key path.   If the leaf key already
-    *  exists and 'incremental' is true, then the pre-existing
-    *  leaf key will be reused;  otherwise,  this function creates
-    *  a new leaf (potentially clobbering the pre-existing one).
+    *  If 'create' is false, fetches the key bath associated 
+    *  with the dns name.
+    *  <p>
+    *
+    *  If 'create' is true, creates keys corresponding to 
+    *  the store dns_name being validated, and returns the 
+    *  final key path.   If the leaf key already exists 
+    *  and 'incremental' is true, then the pre-existing 
+    *  leaf key will be reused;  otherwise,  this function 
+    *  creates a new leaf (potentially clobbering the 
+    *  pre-existing one).
     */
-    String createAttributeStemForStore( String  store, 
-                                        String  dns_name,
-                                        boolean incremental )
+    String getAttributeStemForDnsName( String  dns_name,
+                                       boolean create,
+                                       boolean incremental )
     {
         // Given a store name X has a dns name   a.b.c
         // The attribute key pattern used is:   .href/c/b/a
@@ -1097,7 +1158,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         str.append( HREF );
 
         // Create top level .href key if necessary
-        if ( ! attr_.exists( HREF ) )
+        if ( create && ! attr_.exists( HREF ) )
         {
             MapAttribute map = new MapAttributeValue();
             attr_.setAttribute("", HREF, map );
@@ -1107,14 +1168,18 @@ public class LinkValidationServiceImpl implements LinkValidationService
         String pth;
         for (int i= seg.length -1 ; i>=0; i--) 
         { 
-            pth = str.toString();
-            if ( ((i==0) && incremental == false ) ||
-                 ! attr_.exists( pth + "/" + seg[i] )
-               )
+            if (create)
             {
-                MapAttribute map = new MapAttributeValue();
-                attr_.setAttribute( pth , seg[i], map );
+                pth = str.toString();
+                if ( ((i==0) && incremental == false ) ||
+                     ! attr_.exists( pth + "/" + seg[i] )
+                   )
+                {
+                    MapAttribute map = new MapAttributeValue();
+                    attr_.setAttribute( pth , seg[i], map );
+                }
             }
+
             str.append("/" + seg[i] ); 
         }
         String result = str.toString();
@@ -1126,3 +1191,77 @@ public class LinkValidationServiceImpl implements LinkValidationService
     }
 }
 
+class ValidationPathParser
+{
+    static String App_Dir_ = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
+                             "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
+
+    String  store_       = null;
+    String  app_base_    = null;
+    String  webapp_name_ = null;
+    String  dns_name_    = null;
+
+    String getStore()      { return store_; }
+    String getAppBase()    { return app_base_;}
+    String getWebappName() { return webapp_name_;}
+    String getDnsName()    { return dns_name_;}
+
+    ValidationPathParser(AVMRemote avm, String path) 
+        throws IllegalArgumentException,
+               AVMNotFoundException
+    {
+        int store_index = path.indexOf(':');
+        if ( store_index < 0) 
+        {
+            // We were passed a store path
+            store_ = path;
+            app_base_ = store_ + ":" + App_Dir_;
+        }
+        else if ( ! path.startsWith( App_Dir_, store_index+1 )  )
+        {
+            throw new IllegalArgumentException("Invalid webapp path: " + path);
+        }
+        else
+        {
+            store_ = path.substring(0,store_index);
+            int webapp_start = 
+                path.indexOf('/', store_index + 1 + App_Dir_.length()); 
+
+            if (webapp_start >= 0)
+            {
+                int webapp_end = path.indexOf('/', webapp_start + 1);
+                webapp_name_ = path.substring( webapp_start +1, 
+                                              (webapp_end < 1)
+                                              ?  path.length()
+                                              :  webapp_end
+                                            );
+                if  ((webapp_name_ != null) && 
+                     (webapp_name_.length() == 0)
+                    ) 
+                { 
+                    webapp_name_ = null; 
+                }
+            }
+        }
+
+        dns_name_ = lookupStoreDNS( avm, store_ );
+        if ( dns_name_ == null ) 
+        { 
+            throw new AVMNotFoundException(
+                       "No DNS entry for AVM store: " + store_);
+        }
+    }
+
+    String lookupStoreDNS(AVMRemote avm,  String store )
+    {
+        Map<QName, PropertyValue> props = 
+                avm.queryStorePropertyKey(store, 
+                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
+
+        return ( props.size() != 1 
+                 ? null
+                 : props.keySet().iterator().next().getLocalName().
+                         substring(SandboxConstants.PROP_DNS.length())
+               );
+    }
+}
