@@ -180,15 +180,20 @@ public class HrefValidatorTest extends TestCase
              )
          {
              String  store_name  = store_staging_main_entry.getKey();
-             LinkValidation_.updateHrefInfo( 
-                 store_name,                    // store to update hrefs
-                 false,                         // false = not incremental
-                 10000,                         // connect timeout (ms)
-                 30000);                        // read timeout (ms)
+
+             // NEON -  remove asap
+             if (false)
+             {
+                 LinkValidation_.updateHrefInfo( 
+                     store_name,                    // store to update hrefs
+                     false,                         // false = not incremental
+                     10000,                         // connect timeout (ms)
+                     30000);                        // read timeout (ms)
+             }
+
+             LinkValidation_.getBrokenHrefs( store_name );
 
              break;
          }
-
-        // LinkValidation_.getBrokenHrefs("get broken links");
     }
 }
