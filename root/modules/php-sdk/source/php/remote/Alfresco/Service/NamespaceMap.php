@@ -59,6 +59,7 @@ class NamespaceMap
 			{
 				$url = $this->namespaceMap[$prefix];
 				$name = substr($shortName, $index+1);
+				$name = str_replace("_", "-", $name);
 				if ($name != null && strlen($name) != 0)
 				{
 					$result = "{".$url."}".$name;
@@ -93,7 +94,8 @@ class NamespaceMap
 			{
 				$name = substr($fullName, $index+1);
 				if ($name != null && strlen($name) != 0)
-				{
+				{					
+					$name = str_replace("-", "_", $name);			
 					$result = $prefix.NamespaceMap::DELIMITER.$name;
 				}
 			}

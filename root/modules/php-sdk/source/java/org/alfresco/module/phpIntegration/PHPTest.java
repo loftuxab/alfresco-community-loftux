@@ -275,13 +275,25 @@ public class PHPTest extends BaseSpringTest
         model.put("testFolder", testFolder);
         model.put("testNode", nodeRef);
         
+        System.out.println("Executing testNode.php ... ");
+        
         // Process the test script
         StringWriter out = new StringWriter();        
         this.phpProcessor.process(CLASSPATH_ROOT + "testNode.php", model, out);
-        
-        // Print out any output from the template
         System.out.println("testNode output:");
         System.out.println(out.toString());
+        
+        System.out.println("Executing testNodeSave.php ... ");
+        
+        StringWriter out2 = new StringWriter();        
+        this.phpProcessor.process(CLASSPATH_ROOT + "testNodeSave.php", model, out2);
+        System.out.println("testNodeSave output:");
+        System.out.println(out2.toString());
+        
+        // Check the details of the node after the save 
+        System.out.println("Checking properties of node " + nodeRef.getId());
+        assertEquals("changed.txt", this.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
+        assertEquals("Mr Trouble", this.nodeService.getProperty(nodeRef, ContentModel.PROP_AUTHOR));
         
     }
 

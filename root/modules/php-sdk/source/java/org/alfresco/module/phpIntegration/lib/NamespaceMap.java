@@ -73,10 +73,10 @@ public class NamespaceMap implements ScriptObject
         this.urlToPrefixMap = new HashMap<String, String>(prefixes.size());
         for (String prefix : prefixes)
         {
-            String escapedPrefix = escapePrefix(prefix);
+            //String escapedPrefix = escapePrefix(prefix);
             String url = this.namespaceService.getNamespaceURI(prefix);
-            this.prefixToUrlMap.put(escapedPrefix, url);
-            this.urlToPrefixMap.put(url, escapedPrefix);           
+            this.prefixToUrlMap.put(prefix, url);
+            this.urlToPrefixMap.put(url, prefix);           
         }
     }
     
@@ -86,10 +86,10 @@ public class NamespaceMap implements ScriptObject
      * @param prefix    the prefix string
      * @return String   the escaped prefix string
      */
-    private String escapePrefix(String prefix)
-    {
-        return prefix.replace('_', '-');
-    }
+    //private String escapePrefix(String prefix)
+    //{
+    //    return prefix.replace('_', '-');
+   // }
     
     /**
      * @see org.alfresco.module.phpIntegration.lib.ScriptObject#getScriptObjectName()
@@ -141,6 +141,7 @@ public class NamespaceMap implements ScriptObject
             String name = getNameFromShort(shortName);
             if (url != null && name != null && name.length() != 0)
             {
+                name = name.replace('_', '-');
                 result = "{" + url + "}" + name;
             }
         }
@@ -168,6 +169,7 @@ public class NamespaceMap implements ScriptObject
                 String name = fullQName.getLocalName();
                 if (prefix != null && name != null && name.length() != 0)
                 {
+                    name = name.replace('-', '_');
                     result = prefix + NAME_DELIMITER + name;
                 }
             }

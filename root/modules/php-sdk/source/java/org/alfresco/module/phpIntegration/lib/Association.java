@@ -24,6 +24,8 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import org.alfresco.util.EqualsHelper;
+
 /**
  * Association object.
  * 
@@ -93,5 +95,36 @@ public class Association implements ScriptObject
     public String getType()
     {
         return type;
+    }
+    
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof Association))
+        {
+            return false;
+        }
+        Association other = (Association) o;
+
+        return (EqualsHelper.nullSafeEquals(this.type, other.type)
+                && EqualsHelper.nullSafeEquals(this.from, other.from)
+                && EqualsHelper.nullSafeEquals(this.to, other.to));
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        int hashCode = ((this.type == null) ? 0 : this.type.hashCode());
+        hashCode = 37 * hashCode + ((this.from == null) ? 0 : this.from.hashCode());
+        hashCode = 37 * hashCode + ((this.to == null) ? 0 : this.to.hashCode());
+        return hashCode;
     }
 }

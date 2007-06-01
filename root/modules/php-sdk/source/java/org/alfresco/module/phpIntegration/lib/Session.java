@@ -24,7 +24,9 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -32,22 +34,28 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.apache.log4j.Logger;
 
 /**
  * @author Roy Wetherall
  */
 public class Session implements ScriptObject
 {
+    private static Logger logger = Logger.getLogger(Session.class);
+    
     private static final String SCRIPT_OBJECT_NAME = "Session";
     
     private ServiceRegistry serviceRegistry;
     
     private NamespaceMap namespaceMap;
     
+    private Map<String, Node> nodeMap;
+    
     public Session(ServiceRegistry serviceRegistry)
     {
         this.serviceRegistry = serviceRegistry;
         this.namespaceMap = new NamespaceMap(this);
+        this.nodeMap = new HashMap<String, Node>(10);
     }
     
     public String getScriptObjectName()
@@ -112,32 +120,67 @@ public class Session implements ScriptObject
         return store;
     }
     
+    public Store getStoreFromString(String value)
+    {
+        Store store = null;
+        StoreRef storeRef = new StoreRef(value);
+        
+        // Check for the existance of the store
+        if (this.serviceRegistry.getNodeService().exists(storeRef) == true)
+        {
+            store = new Store(this, storeRef);
+        }
+        
+        return store;
+    }
+    
     public Node getNode(Store store, String id)
     {
-        Node node = null;
-        
-        // Check for the existance of the node
         NodeRef nodeRef = new NodeRef(store.getStoreRef(), id);
-        if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
-        {
-            node = new Node(this, nodeRef);
+        Node node = this.nodeMap.get(nodeRef.toString());
+        
+        if (node == null)
+        {        
+            // Check for the existance of the node        
+            if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
+            {
+                node = new Node(this, nodeRef);
+            }
         }
         
         return node;
     }
     
-    public Node getNode(String nodeString)
+    public Node getNodeFromString(String nodeString)
     {
-        Node node = null;
+        Node node = this.nodeMap.get(nodeString); 
         
-        // Check for the existance of the node
-        NodeRef nodeRef = new NodeRef(nodeString);
-        if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
-        {
-            node = new Node(this, nodeRef);
+        if (node == null)
+        {        
+            // Check for the existance of the node
+            NodeRef nodeRef = new NodeRef(nodeString);
+            if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
+            {
+                node = new Node(this, nodeRef);
+            }
         }
         
         return node;
+    }
+    
+    /*package*/ void addNode(Node node)
+    {
+        // Log a warning if the node is already in the session
+        if (this.nodeMap.containsKey(node.toString()) == true)
+        {
+            if (logger.isInfoEnabled() == true)
+            {
+                logger.info("A duplicate node is beingadded to the session. (" + node.toString() + ")");
+            }
+        }
+        
+        // Add the node
+        this.nodeMap.put(node.toString(), node);
     }
     
     /**
@@ -173,5 +216,33 @@ public class Session implements ScriptObject
         }        
         
         return result;
+    }
+    
+    public void save()
+    {
+        if (logger.isDebugEnabled() == true)
+        {
+            logger.debug("Saving session");
+        }
+        
+        // Prepare for the save
+        for (Node node : this.nodeMap.values())
+        {
+            // Prepare each node for saving
+            node.prepareSave();
+        }
+        
+        // Check each node and see whether the node needs to be saved
+        for (Node node : this.nodeMap.values())
+        {
+            // Do the save processing on each node
+            node.onSave();
+        }
+    }
+    
+    public void clean()
+    {
+        // Clear the node map to clean the session
+        this.nodeMap.clear();
     }
 }

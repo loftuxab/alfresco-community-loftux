@@ -14,7 +14,7 @@
 	$fullName4 = $namespaceMap->getFullName("bob");
 	assertEquals("bob", $fullName4);
 	$fullName5 = $namespaceMap->getFullName("sys_some_prop");
-	assertEquals("{http://www.alfresco.org/model/system/1.0}some_prop", $fullName5);
+	assertEquals("{http://www.alfresco.org/model/system/1.0}some-prop", $fullName5);
 	$fullName6 = $namespaceMap->getFullName("sys_");
 	assertEquals("sys_", $fullName6);
 	

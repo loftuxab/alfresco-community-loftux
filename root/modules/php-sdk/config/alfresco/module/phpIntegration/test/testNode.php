@@ -25,6 +25,11 @@
 	assertNull($node->junk);
 	assertNull($node->cm_title);	
 	
+	// Check the system properties
+	assertNotNull($node->sys_node_dbid);
+	assertNotNull($node->sys_node_uuid);
+	assertNotNull($node->sys_store_identifier);
+	
 	// Check aspects and hasAspect
 	$aspects = $node->aspects;
 	assertNotNull($aspects);
@@ -93,5 +98,86 @@
 	echo "   - url: ".$contentData->url."\n";
 	echo "   - guest Url: ".$contentData->guestUrl."\n";
 	
+	// Check set property
+	$props = $node->properties;
+	$props["{http://www.alfresco.org/model/content/1.0}name"] = "test1.txt";
+	$props["{http://www.alfresco.org/model/content/1.0}author"] = "Mr Blobby";
+	$node->properties = $props;
+	assertEquals("test1.txt", $node->cm_name);
+	assertEquals("Mr Blobby", $node->cm_author);
+		
+	// Check setPropertyValues
+	$propertyValues = array("{http://www.alfresco.org/model/content/1.0}name" => "test2.txt",
+							"{http://www.alfresco.org/model/content/1.0}author" => "Mr Cod");
+	$node->setPropertyValues($propertyValues);
+	assertEquals("test2.txt", $node->cm_name);
+	assertEquals("Mr Cod", $node->cm_author);	
 	
+	// Check setting properties using dynamic attributes
+	$node->cm_name = "test3.txt";
+	$node->cm_author = "Ms Sunshine";
+	assertEquals("test3.txt", $node->cm_name);
+	assertEquals("Ms Sunshine", $node->cm_author);
+	
+	// Check add and remove aspect
+	$node->addAspect("cm_titled", array("cm_title" => "my title",
+										"cm_description" => "my description"));
+	assertTrue($node->hasAspect("cm_titled"));										
+	assertTrue(in_array("{http://www.alfresco.org/model/content/1.0}titled", $node->aspects));										
+	assertEquals("my title", $node->cm_title); 
+	assertEquals("my description", $node->cm_description);
+	$node->removeAspect("cm_versionable");
+	assertFalse($node->hasAspect("cm_versionable"));										
+	assertFalse(in_array("{http://www.alfresco.org/model/content/1.0}versionable", $node->aspects));	
+	
+	// Check create node
+	$newNode = $folder->createChild("cm_folder", "cm_contains", "{http://www.alfresco.org/model/content/1.0}My Test Folder");
+	$newNode->cm_name = "My Test Folder";
+	
+	assertNotNull($newNode);
+	assertEquals(3, count($folder->children));
+	assertEquals(1, count($newNode->parents));
+	$newChildAssoc = $folder->children[2];
+	assertEquals($folder->__toString(), $newChildAssoc->parent->__toString());
+	assertEquals($newNode->__toString(), $newChildAssoc->child->__toString());
+	assertEquals("{http://www.alfresco.org/model/content/1.0}contains", $newChildAssoc->type);
+	assertEquals("{http://www.alfresco.org/model/content/1.0}My Test Folder", $newChildAssoc->name);
+	assertTrue($newChildAssoc->isPrimary);
+	assertEquals("{http://www.alfresco.org/model/content/1.0}folder", $newNode->type);
+	assertEquals("My Test Folder", $newNode->cm_name);
+	assertTrue(strpos($newNode->id, 'new_') !== false);
+	
+	// Add child
+	$folder->addChild($node, "cm_contains", "cm_summertOrNuffin");
+	
+	assertEquals(4, count($folder->children));
+	assertEquals(2, count($node->parents));
+	$addedChildAssoc = $node->parents[1];
+	assertEquals($folder->__toString(), $addedChildAssoc->parent->__toString());
+	assertEquals($node->__toString(), $addedChildAssoc->child->__toString());
+	assertEquals("{http://www.alfresco.org/model/content/1.0}contains", $addedChildAssoc->type);
+	assertEquals("{http://www.alfresco.org/model/content/1.0}summertOrNuffin", $addedChildAssoc->name);
+	assertFalse($addedChildAssoc->isPrimary);
+	
+	// Remove child
+	$folder->removeChild($addedChildAssoc);
+	
+	assertEquals(3, count($folder->children));
+	assertEquals(1, count($node->parents));
+	
+	// Add association
+	$folder->addAssociation($node, "cm_summertOrNuffin");
+	
+	assertEquals(1, count($folder->associations));
+	$associationOne = $folder->associations[0];
+	assertEquals($folder, $associationOne->from);
+	assertEquals($node, $associationOne->to);
+	assertEquals("{http://www.alfresco.org/model/content/1.0}summertOrNuffin", $associationOne->type);
+		
+	// Remove association
+	$association = $node->associations[0];
+	$node->removeAssociation($association);
+	
+	assertEquals(0, count($node->associations));
+		
 ?>
