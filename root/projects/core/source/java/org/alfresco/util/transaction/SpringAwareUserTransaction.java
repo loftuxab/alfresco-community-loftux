@@ -50,12 +50,25 @@ import org.springframework.transaction.interceptor.TransactionAttributeSource;
  * in transactions that are normally only begun and committed by the <b>SpringFramework</b>
  * transaction aware components.
  * <p>
+ * Client code can use this class directly, but should be very careful to handle the exception
+ * conditions with the appropriate <code>finally</code> blocks and <code>rollback</code> code.
+ * It is recommended that clients use this class indirectly via an instance of the
+ * {@link org.alfresco.repo.transaction.RetryingTransactionHelper}.
+ * <p>
  * This class is thread-safe in that it will detect multithreaded access and throw
  * exceptions.  Therefore </b>do not use on multiple threads</b>.  Instances should be
  * used only for the duration of the required user transaction and then discarded.
  * Any attempt to reuse an instance will result in failure.
  * <p>
  * Nested user transaction are allowed.
+ * <p>
+ * <b>Logging:</b><br/>
+ * To dump exceptions during commits, turn debugging on for this class.<br/>
+ * To check that all trasactions are cleaned either committed or rolled back by client code,
+ * add <i>.trace</i> to the usual classname-based debug category.  This will hamper
+ * performance but is useful when it appears that something is eating connections or
+ * holding onto resources - usually a sign that client code hasn't handled all possible
+ * exception conditions.
  * 
  * @see org.springframework.transaction.PlatformTransactionManager
  * @see org.springframework.transaction.support.DefaultTransactionDefinition
@@ -408,7 +421,10 @@ public class SpringAwareUserTransaction
             }
             catch (Throwable e)
             {
-                logger.error("Transaction didn't commit", e);
+                if (logger.isDebugEnabled())
+                {
+                    logger.debug("Transaction didn't commit", e);
+                }
                 // commit failed
                 internalStatus = Status.STATUS_ROLLEDBACK;
                 RollbackException re = new RollbackException("Transaction didn't commit: " + e.getMessage());
