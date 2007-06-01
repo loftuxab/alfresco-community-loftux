@@ -66,7 +66,7 @@ class NamespaceMapTest extends PHPUnit2_Framework_TestCase
 		$fullName4 = $namespaceMap->getFullName("bob");
 		$this->assertEquals("bob", $fullName4);
 		$fullName5 = $namespaceMap->getFullName("sys_some_prop");
-		$this->assertEquals("{http://www.alfresco.org/model/system/1.0}some_prop", $fullName5);
+		$this->assertEquals("{http://www.alfresco.org/model/system/1.0}some-prop", $fullName5);
 		$fullName6 = $namespaceMap->getFullName("sys_");
 		$this->assertEquals("sys_", $fullName6);		
 	}

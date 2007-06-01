@@ -132,6 +132,13 @@ class NodeTest extends BaseTest
 		
 		$this->assertEquals(NodeTest::TITLE, self::$newNode->cm_title);
 		$this->assertEquals(NodeTest::DESCRIPTION, self::$newNode->cm_description);
+		
+		// Check system properties
+		//echo "Node dbid: ".self::$newNode->sys_node_dbid."<br>";
+		$this->assertNotNull(self::$newNode->sys_node_dbid);
+		$this->assertNotNull(self::$newNode->sys_node_uuid);
+		$this->assertNotNull(self::$newNode->sys_store_identifier);
+		
 	}
 	
 	public function testAddRemoveAspect()

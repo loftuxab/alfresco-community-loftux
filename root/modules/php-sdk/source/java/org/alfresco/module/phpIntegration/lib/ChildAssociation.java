@@ -24,6 +24,8 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import org.alfresco.util.EqualsHelper;
+
 
 /**
  * Child association object.
@@ -139,5 +141,38 @@ public class ChildAssociation implements ScriptObject
     public int getNthSibling()
     {
         return this.nthSibling;
+    }
+    
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof ChildAssociation))
+        {
+            return false;
+        }
+        ChildAssociation other = (ChildAssociation) o;
+
+        return (EqualsHelper.nullSafeEquals(this.type, other.type)
+                && EqualsHelper.nullSafeEquals(this.parent, other.parent)
+                && EqualsHelper.nullSafeEquals(this.name, other.name)
+                && EqualsHelper.nullSafeEquals(this.child, other.child));
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode()
+    {
+        int hashCode = ((this.type == null) ? 0 : this.type.hashCode());
+        hashCode = 37 * hashCode + ((this.parent == null) ? 0 : this.parent.hashCode());
+        hashCode = 37 * hashCode + ((this.name == null) ? 0 : this.name.hashCode());
+        hashCode = 37 * hashCode + this.child.hashCode();
+        return hashCode;
     }
 }

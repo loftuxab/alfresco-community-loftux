@@ -106,6 +106,8 @@ class Node extends BaseObject
 			$contentData->content = $content;
 		}
 		$this->_properties[$property] = $contentData;
+		
+		return $contentData;
 	}
 	
 	public function hasAspect($aspect)
