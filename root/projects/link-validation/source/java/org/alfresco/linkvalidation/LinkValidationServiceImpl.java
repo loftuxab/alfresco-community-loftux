@@ -34,6 +34,8 @@ import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -263,21 +265,130 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
     public LinkValidationServiceImpl() { }
 
-
-    public void   getBrokenHrefs(String path) 
-           throws AVMNotFoundException 
+    public HrefManifest getBrokenHrefManifest( String path) 
+                                               throws AVMNotFoundException
     {
-        ValidationPathParser p = new ValidationPathParser(avm_, path);
+        return getHrefManifest( path, 400, 599);
+    }
+
+    public HrefManifest getHrefManifest( String path,
+                                         int    statusGTE,
+                                         int    statusLTE) throws 
+                                         AVMNotFoundException 
+    {
+        MD5 md5         = new MD5();
+        String path_md5 =  md5.digest( path.getBytes() );
+
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, path);
+
         String store           = p.getStore();
         String webapp_name     = p.getWebappName();
         String app_base        = p.getAppBase();
         String dns_name        = p.getDnsName();
 
+        if (webapp_name == null ) 
+        { 
+            throw new RuntimeException("Not a path to a file: " + path);
+        }
+
+        String status_gte = "" + statusGTE;
+        String status_lte = "" + statusLTE;
+
         // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
-                                                              false, 
-                                                              true
-                                                            );
+        String store_attr_base =  
+               getAttributeStemForDnsName( dns_name, false, true);
+
+        int version = avm_.getLatestSnapshotID( store );
+        //--------------------------------------------------------------------
+        // NEON:       faking latest snapshot version and just using HEAD
+        version = -1;  // NEON:  TODO remove this line & replace with a JMX
+                       //        call to load the version if it isn't already.
+                       //
+                       //        Question:  how long should the version stay
+                       //                   loaded if a load was required?
+        //--------------------------------------------------------------------
+
+
+        // Example value: .href/mysite/|ROOT/-2
+        String href_attr =  store_attr_base    + 
+                            "/|" + webapp_name +
+                            "/"  + LATEST_VERSION_ALIAS;
+
+
+        Attribute href_attr_list = attr_.getAttribute( href_attr      + "/" +
+                                                       SOURCE_TO_HREF + "/" +
+                                                       path_md5
+                                                     );
+
+        // TODO:  It would be nice if you could just get the list itself
+        //        not just an iterator to the list.
+
+        ArrayList<String> href_arraylist = new ArrayList<String>();
+        for ( Attribute href_attribute : href_attr_list )
+        {
+            String href_md5 = href_attribute.getStringValue();
+
+            // Filter by examining the response code,
+            // but only if we're being selective.
+
+            if ( (statusGTE > 100) || (statusLTE < 599) )
+            {
+                int response_code =   
+                            attr_.getAttribute( href_attr      + "/" + 
+                                                HREF_TO_STATUS + "/" + 
+                                                href_md5
+                                              ).getIntValue();
+                
+                if ( (response_code < statusGTE) || (response_code > statusLTE) )
+                {
+                    continue;
+                }
+            }
+
+            String href_str = 
+                   attr_.getAttribute( href_attr   + "/" + 
+                                       MD5_TO_HREF + "/" + 
+                                       href_md5
+                                     ).getStringValue();
+
+            href_arraylist.add( href_str );
+        }
+
+        return new HrefManifest( path, href_arraylist);
+    }
+
+    public List<HrefManifest> getBrokenHrefManifests( 
+                                 String storeNameOrWebappPath
+                              )  throws AVMNotFoundException 
+    {
+        return getHrefManifests( storeNameOrWebappPath, 400, 599);
+    }
+
+    public List<HrefManifest> getHrefManifests( 
+                                      String storeNameOrWebappPath,
+                                      int    statusGTE,
+                                      int    statusLTE) throws 
+                                      AVMNotFoundException 
+    {
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, storeNameOrWebappPath);
+
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
+
+        String status_gte = "" + statusGTE;
+        String status_lte = "" + statusLTE;
+
+        HashMap<String, ArrayList<String> > href_manifest_map = 
+            new HashMap<String, ArrayList<String> >();
+
+        // Example value:  ".href/mysite"
+        String store_attr_base =  
+               getAttributeStemForDnsName( dns_name, false, true);
+
 
         int version = avm_.getLatestSnapshotID( store );
         //--------------------------------------------------------------------
@@ -291,9 +402,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         if  ( webapp_name != null )
         {
-            // NEON - do something with result
-            getBrokenHrefsFromWebapp( webapp_name,
-                                      store_attr_base );
+            getHrefManifestsFromWebapp( href_manifest_map,
+                                        webapp_name,
+                                        store_attr_base,
+                                        status_gte,
+                                        status_lte);
         }
         else
         {
@@ -318,18 +431,44 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
                 if  ( avm_node.isDirectory() )
                 {
-                    // NEON - do something with result
-                    getBrokenHrefsFromWebapp( webapp_name,
-                                              store_attr_base );
+                    getHrefManifestsFromWebapp( href_manifest_map,
+                                                webapp_name,
+                                                store_attr_base,
+                                                status_gte,
+                                                status_lte );
                 }
             }
         }
+
+        // The user will always want to see the list of files sorted
+        ArrayList<String> file_names = 
+            new ArrayList<String>( href_manifest_map.keySet() );
+
+        Collections.sort (file_names );
+
+        // Create sorted list from sorted keys of map
+        // TODO: Would using a TreeMap be faster than this?
+
+        ArrayList<HrefManifest> href_manifest_list = 
+            new ArrayList<HrefManifest>(file_names.size());
+        
+        for (String file_name : file_names )
+        {
+            List<String> hlist = href_manifest_map.get( file_name );
+            Collections.sort( hlist );
+            href_manifest_list.add( new HrefManifest(file_name, hlist ) );
+        }
+
+        return href_manifest_list; 
     }
 
-    public void  getBrokenHrefsFromWebapp( String webapp_name,
-                                           String store_attr_base
-                                         )
-                                          
+
+    void getHrefManifestsFromWebapp( 
+            HashMap<String, ArrayList<String> > href_manifest_map, 
+            String webapp_name,
+            String store_attr_base,
+            String status_gte,
+            String status_lte)
     {
         // Example value: .href/mysite/|ROOT/-2
         String href_attr =  store_attr_base    + 
@@ -337,16 +476,19 @@ public class LinkValidationServiceImpl implements LinkValidationService
                             "/"  + LATEST_VERSION_ALIAS;
 
          
-        List<Pair<String, Attribute>> broken_links = 
+        List<Pair<String, Attribute>> links = 
             attr_.query( href_attr + "/" + STATUS_TO_HREF, 
-                         new AttrQueryGTE("400"));
+                         new AttrAndQuery(new AttrQueryGTE(status_gte),
+                                          new AttrQueryLTE(status_lte)));
 
-        if  ( broken_links == null ) {return;}
+        if  ( links == null ) {return;}
 
-        for ( Pair<String, Attribute> broken : broken_links  )
+        HashMap<String,String> md5_to_file_cache = new HashMap<String,String>();
+
+        for ( Pair<String, Attribute> link : links  )
         {
-            String      response_code = broken.getFirst();
-            Set<String> href_md5_set  = broken.getSecond().keySet();
+            Set<String> href_md5_set  = link.getSecond().keySet();
+
             for ( String href_md5 : href_md5_set )
             {
                 String href_str = 
@@ -355,7 +497,172 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                        href_md5
                                      ).getStringValue();
 
-                System.out.println("Status:  " + response_code + "  " + href_str);
+                Set<String> file_md5_set = 
+                        attr_.getAttribute( 
+                                            href_attr      + "/" + 
+                                            HREF_TO_SOURCE + "/" + 
+                                            href_md5
+                                          ).keySet();
+                
+
+                for ( String file_md5 : file_md5_set )
+                {
+                    ArrayList<String> href_list;
+                    String file_name = md5_to_file_cache.get( file_md5 );
+
+                    if ( file_name != null )
+                    {
+                        href_list = href_manifest_map.get( file_name );
+                    }
+                    else
+                    {
+                        file_name = attr_.getAttribute( href_attr   + "/" +
+                                                        MD5_TO_FILE + "/" +
+                                                        file_md5
+                                                      ).getStringValue();
+
+                        md5_to_file_cache.put( file_md5, file_name );
+
+                        href_list = new ArrayList<String>();
+                        href_manifest_map.put( file_name, href_list );
+                    }
+
+                    href_list.add( href_str );
+                }
+            }
+        }
+    }
+     
+
+
+    public List<HrefConcordanceEntry> getBrokenHrefConcordance(
+                                         String storeNameOrWebappPath 
+                                      ) throws AVMNotFoundException 
+    {
+        return getHrefConcordance(storeNameOrWebappPath, 400, 599);
+    }
+    
+    public List<HrefConcordanceEntry> getHrefConcordance(
+                                         String storeNameOrWebappPath, 
+                                         int    statusGTE,
+                                         int    statusLTE
+                                      ) throws AVMNotFoundException 
+    {
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, storeNameOrWebappPath);
+
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
+
+        String status_gte = "" + statusGTE;
+        String status_lte = "" + statusLTE;
+
+        List<HrefConcordanceEntry>  concordance_entries = 
+            new ArrayList<HrefConcordanceEntry>();
+
+
+        // Example value:  ".href/mysite"
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
+                                                              false, 
+                                                              true
+                                                            );
+
+        int version = avm_.getLatestSnapshotID( store );
+        //--------------------------------------------------------------------
+        // NEON:       faking latest snapshot version and just using HEAD
+        version = -1;  // NEON:  TODO remove this line & replace with a JMX
+                       //        call to load the version if it isn't already.
+                       //
+                       //        Question:  how long should the version stay
+                       //                   loaded if a load was required?
+        //--------------------------------------------------------------------
+
+        if  ( webapp_name != null )
+        {
+            getHrefsByStatusCodeFromWebapp( concordance_entries,
+                                            webapp_name,
+                                            store_attr_base,
+                                            status_gte,
+                                            status_lte);
+        }
+        else
+        {
+            Map<String, AVMNodeDescriptor> webapp_entries = null;
+
+            // e.g.:   42, "mysite:/www/avm_webapps"
+            webapp_entries = avm_.getDirectoryListing(version, app_base );
+
+            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
+                          webapp_entries.entrySet()
+                        )
+            {
+                webapp_name = webapp_entry.getKey();  // my_webapp
+                AVMNodeDescriptor avm_node    = webapp_entry.getValue();
+
+                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
+                     webapp_name.equalsIgnoreCase("WEB-INF")
+                   )
+                {
+                    continue;
+                }
+
+                if  ( avm_node.isDirectory() )
+                {
+                    getHrefsByStatusCodeFromWebapp( concordance_entries,
+                                                    webapp_name,
+                                                    store_attr_base,
+                                                    status_gte,
+                                                    status_lte );
+                }
+            }
+        }
+
+        for ( HrefConcordanceEntry conc_entry : concordance_entries )
+        {
+            Arrays.sort ( conc_entry.getLocations() );
+        }
+
+        Collections.sort( concordance_entries );
+
+        return concordance_entries;
+    }
+
+    void  getHrefsByStatusCodeFromWebapp( 
+                List<HrefConcordanceEntry> concordance_entries,
+                String webapp_name,
+                String store_attr_base,
+                String status_gte,
+                String status_lte)
+    {
+        // Example value: .href/mysite/|ROOT/-2
+        String href_attr =  store_attr_base    + 
+                            "/|" + webapp_name +
+                            "/"  + LATEST_VERSION_ALIAS;
+
+         
+        List<Pair<String, Attribute>> links = 
+            attr_.query( href_attr + "/" + STATUS_TO_HREF, 
+                         new AttrAndQuery(new AttrQueryGTE(status_gte),
+                                          new AttrQueryLTE(status_lte)));
+
+        if  ( links == null ) {return;}
+
+        for ( Pair<String, Attribute> link : links  )
+        {
+            String  response_code_str = link.getFirst();
+            int     response_code     = Integer.parseInt( response_code_str );
+
+            Set<String> href_md5_set  = link.getSecond().keySet();
+
+            for ( String href_md5 : href_md5_set )
+            {
+                String href_str = 
+                   attr_.getAttribute( href_attr   + "/" + 
+                                       MD5_TO_HREF + "/" + 
+                                       href_md5
+                                     ).getStringValue();
 
                 Set<String> file_md5_set = 
                         attr_.getAttribute( 
@@ -364,21 +671,26 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                             href_md5
                                           ).keySet();
                 
+
+                String [] locations = new String[  file_md5_set.size() ];
+                int i=0; 
                 for ( String file_md5 : file_md5_set )
                 {
-                    String file_str = 
+                    locations[i] = 
                        attr_.getAttribute( href_attr   + "/" + 
                                            MD5_TO_FILE + "/" + 
                                            file_md5
                                          ).getStringValue();
-
-                    System.out.println("         " + file_str);
+                    i++;
                 }
+
+                HrefConcordanceEntry concordance_entry = 
+                  new HrefConcordanceEntry( href_str, locations, response_code);
+
+                concordance_entries.add( concordance_entry );
             }
         }
     }
-
-
 
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
@@ -416,26 +728,53 @@ public class LinkValidationServiceImpl implements LinkValidationService
     *   (e.g.: mysite:/www/avm_webapps), then the href info for 
     *   all webapps in the store are updated.
     */
-    public void updateHrefInfo( String  path, 
+    public void updateHrefInfo( String  storeNameOrWebappPath, 
                                 boolean incremental,
                                 int     connect_timeout,
-                                int     read_timeout)
-                                //  int threads
-
-                throws AVMNotFoundException
+                                int     read_timeout,
+                                int     nthreads,                // NEON - currently ignored
+                                UpdateHrefInfoStatus update_status
+                              ) throws AVMNotFoundException
     {
-        ValidationPathParser p = new ValidationPathParser(avm_, path);
+        update_status.init();
+
+        try 
+        {
+            updateHrefInfo_( storeNameOrWebappPath, 
+                             incremental,
+                             connect_timeout,
+                             read_timeout,
+                             nthreads,
+                             update_status
+                           );
+        }
+        finally 
+        { 
+            update_status.setDone( true ); 
+        }
+    }
+
+    void updateHrefInfo_( String  storeNameOrWebappPath, 
+                          boolean incremental,
+                          int     connect_timeout,
+                          int     read_timeout,
+                          int     nthreads,                // NEON - currently ignored
+                          UpdateHrefInfoStatus update_status
+                        ) throws AVMNotFoundException
+    {
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, storeNameOrWebappPath);
+
         String store           = p.getStore();
         String webapp_name     = p.getWebappName();
         String app_base        = p.getAppBase();
         String dns_name        = p.getDnsName();
 
-
         // Example value:  ".href/mysite"
         String store_attr_base =  getAttributeStemForDnsName( dns_name, 
                                                               true, 
                                                               incremental 
-                                                             );
+                                                            );
 
         int version = avm_.getLatestSnapshotID( store );
         //--------------------------------------------------------------------
@@ -481,8 +820,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               webapp_url_base,
                               md5,
                               connect_timeout,
-                              read_timeout
+                              read_timeout,
+                              update_status
                             );
+
+            // stats for monitoring
+            update_status.incrementWebappUpdateCount(); 
         }
         else
         {
@@ -521,17 +864,21 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
                 if  ( avm_node.isDirectory() )
                 {
-                     revalidateWebapp( store, 
-                                       version,
-                                       true,           // is_latest_version
-                                       store_attr_base,
-                                       webapp_name,
-                                       app_base + "/" + webapp_name,
-                                       webapp_url_base,
-                                       md5,
-                                       connect_timeout,
-                                       read_timeout
-                                     );
+                    revalidateWebapp( store, 
+                                      version,
+                                      true,           // is_latest_version
+                                      store_attr_base,
+                                      webapp_name,
+                                      app_base + "/" + webapp_name,
+                                      webapp_url_base,
+                                      md5,
+                                      connect_timeout,
+                                      read_timeout,
+                                      update_status
+                                    );
+
+                    // stats for monitoring
+                    update_status.incrementWebappUpdateCount();  
                 }
             }
         }
@@ -546,7 +893,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                            String  webapp_url_base,
                            MD5     md5,
                            int     connect_timeout,
-                           int     read_timeout
+                           int     read_timeout,
+                           UpdateHrefInfoStatus update_status
                          )
 
     {
@@ -668,8 +1016,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
                       file_hdep_cache,
                       connect_timeout,
                       read_timeout,
+                      update_status,
                       0 
                     );
+ 
+        // stats for monitoring
+        update_status.incrementDirUpdateCount();  
 
 
         // Now all the generated URLs have had their status checked,
@@ -697,7 +1049,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
                           connect_timeout,
                           read_timeout
                         );
+
+             // stats for monitoring
+             update_status.incrementUrlUpdateCount();
         }
+
+        update_status.incrementWebappUpdateCount();  // for monitoring progress
     }
 
     void validate_dir( int    version, 
@@ -711,6 +1068,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                        Map<String,String>  file_hdep_cache,
                        int    connect_timeout,
                        int    read_timeout,
+                       UpdateHrefInfoStatus update_status,
                        int    depth 
                      )
     {
@@ -757,8 +1115,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
             if  ( avm_node.isDirectory() )
             {
-                // NEON uncomment the next function call:
-                //
                 validate_dir( version, 
                               dir      + "/"  + entry_name,
                               url_base +  "/" + url_encoded_entry_name,
@@ -770,7 +1126,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               file_hdep_cache,
                               connect_timeout,
                               read_timeout,
+                              update_status,
                               depth + 1 ) ;
+
+                // stats for monitoring
+                update_status.incrementDirUpdateCount();  
             }
             else
             {
@@ -787,23 +1147,28 @@ public class LinkValidationServiceImpl implements LinkValidationService
                    status_cache,
                    file_hdep_cache,
                    connect_timeout,
-                   read_timeout
+                   read_timeout,
+                   update_status
                 );
+
+                // stats for monitoring
+                update_status.incrementFileUpdateCount();  
             }
         }
     }
 
-    void validate_file( String              avm_path,
-                        String              gen_url_str, 
-                        String              gen_url_md5,
-                        String              href_attr,
-                        MD5                 md5,
-                        Map<String,String>  gen_url_cache,
-                        Map<String,String>  parsed_url_cache,
-                        Map<Integer,String> status_cache,
-                        Map<String,String>  file_hdep_cache,
-                        int                 connect_timeout,
-                        int                 read_timeout
+    void validate_file( String               avm_path,
+                        String               gen_url_str, 
+                        String               gen_url_md5,
+                        String               href_attr,
+                        MD5                  md5,
+                        Map<String,String>   gen_url_cache,
+                        Map<String,String>   parsed_url_cache,
+                        Map<Integer,String>  status_cache,
+                        Map<String,String>   file_hdep_cache,
+                        int                  connect_timeout,
+                        int                  read_timeout,
+                        UpdateHrefInfoStatus update_status
                       )
     {
         String file_md5= md5.digest(avm_path.getBytes());
@@ -855,6 +1220,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                    file_hdep_cache,
                                    connect_timeout,
                                    read_timeout);
+
+        // stats for monitoring
+        update_status.incrementUrlUpdateCount();
 
         if ( urls == null ) 
         {
@@ -928,9 +1296,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                          int  read_timeout
                        )
     {
-        URL               url  = null;
         HttpURLConnection conn = null; 
-        int      response_code = 500;  // uninit
+        URL               url  = null;
+        int               response_code;
 
         try 
         { 
@@ -976,9 +1344,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
         conn.setUseCaches( false );                 // handle caching manually
 
 
-        if ( log.isInfoEnabled() )
+        if ( log.isDebugEnabled() )
         {
-            log.info("About to fetch: " + url_str );
+            log.debug("About to fetch: " + url_str );
         }
 
         lb.setConnection( conn );
@@ -986,8 +1354,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
         try { response_code = conn.getResponseCode(); }
         catch (IOException ioe)
         {
-            log.error("Could not fetch response code: " + ioe.getMessage());
-            response_code = 500;
+            if ( log.isDebugEnabled() )
+            {
+                log.debug("Could not fetch response code: " + ioe.getMessage());
+            }
+            response_code = 400;                // probably a bad request
         }
 
         attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
