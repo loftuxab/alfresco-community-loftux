@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" 
+				layout="absolute" 
+				applicationComplete="appComplete();">
+				
+	<mx:Script>
+        <![CDATA[          
+            import mx.controls.Alert;
+            import mx.rpc.events.ResultEvent;
+          
+            private function appComplete():void 
+            {
+                currentState = "login";
+            }
+            
+            private function onLogin():void
+            {
+            	authenticationService.startSession(userTextInput.text, passwordTextInput.text);            	
+            }
+            
+            private function onAuthenticationComplete(event:ResultEvent):void
+            {
+            	Alert.show(event.result.ticket);
+            	currentState = '';		
+            }
+        ]]>
+    </mx:Script>
+    
+    <mx:WebService 
+    	id="authenticationService" 
+    	wsdl="http://localhost:8080/alfresco/api/AuthenticationService?wsdl" 
+    	result="onAuthenticationComplete(event);" 
+    	fault="Alert.show(event.fault.faultString, 'Error');"/>
+    
+	<mx:states>
+		<mx:State name="login">
+			<mx:SetProperty target="{mainVBox}" name="enabled" value="false"/>
+			<mx:AddChild position="lastChild">
+				<mx:Panel x="256.5" y="250" title="Alfresco Login">					
+					<mx:Form>
+							<mx:FormItem label="User:">
+								<mx:TextInput id="userTextInput"/>
+							</mx:FormItem>						
+							<mx:FormItem label="Password:">
+								<mx:TextInput id="passwordTextInput" displayAsPassword="true"/>
+							</mx:FormItem>
+							<mx:FormItem>
+								<mx:Button label="Login" click="onLogin();"/>								
+							</mx:FormItem>	
+					</mx:Form>				
+				</mx:Panel>
+			</mx:AddChild>
+		</mx:State>
+	</mx:states>
+	<mx:VBox id="mainVBox" height="747" horizontalAlign="center" verticalAlign="middle" width="770" borderStyle="none" x="0" y="0">
+		<mx:HBox width="100%" height="10%" id="topHBox">
+			<mx:Panel width="75%" height="100%" layout="absolute" id="searchPanel">
+			</mx:Panel>
+			<mx:Panel width="25%" height="100%" layout="absolute" id="greetingPanel">
+			</mx:Panel>
+		</mx:HBox>
+		<mx:Panel width="100%" height="5%" layout="absolute" id="navigationPanel">
+		</mx:Panel>
+		<mx:Panel width="100%" height="100%" layout="absolute" id="naviagtionBarPanel">
+		</mx:Panel>
+	</mx:VBox>
+</mx:Application>
