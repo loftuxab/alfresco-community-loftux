@@ -32,11 +32,15 @@ import org.alfresco.module.phpIntegration.PHPProcessorException;
  */
 public class UnitTestMethods extends PHPMethodExtension
 {    
-    public void assertEquals(Object expected, Object value)
+    public void assertEquals(Object expected, Object value, String message)
     {
         if (expected.equals(value) == false)
         {
-            throw new PHPProcessorException("Expected value '" + expected + "' was '" + value + "'");
+            if (message == null)
+            {
+                message = "Expected value '" + expected + "' was '" + value + "'";
+            }
+            throw new PHPProcessorException(message);
         }
     }
     

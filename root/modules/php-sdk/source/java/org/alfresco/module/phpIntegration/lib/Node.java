@@ -38,6 +38,7 @@ import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentData;
+import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
@@ -57,22 +58,36 @@ import com.caucho.quercus.env.Value;
  */
 public class Node implements ScriptObject
 {
+    /** Logger **/
     private static Logger logger = Logger.getLogger(Node.class);
     
+    /** Script object name */
     private static final String SCRIPT_OBJECT_NAME = "Node";
     
+    /** New node id delimiter */
     private static final String NEW_NODE_DELIM = "new_";
     
+    /** Node service */
     private NodeService nodeService;
+    
+    /** Session object */
     private Session session;
+    
+    /** Node id */
     private String id;
+    
+    /** Node type */
     private String type;
+    
+    /** Node store */
     private Store store;
     
+    /** List of nodes aspects (removed and added)*/
     private List<String> aspects;
-    private List<String> removeAspects;
+    private List<String> addedAspects;
     private List<String> removedAspects;
     
+    /** Indicates if the properties have been modified */
     private boolean arePropertiesDirty = false;
     private Map<String, Object> properties;
     
@@ -294,7 +309,7 @@ public class Node implements ScriptObject
             }
             else
             {
-                this.removeAspects.add(aspect);
+                this.addedAspects.add(aspect);
             }
             
             this.aspects.add(aspect);                     
@@ -323,9 +338,9 @@ public class Node implements ScriptObject
         // Remove the aspect
         if (this.aspects.contains(aspect) == true)
         {
-            if (this.removeAspects.contains(aspect) == true)
+            if (this.addedAspects.contains(aspect) == true)
             {
-                this.removeAspects.remove(aspect);
+                this.addedAspects.remove(aspect);
             }
             else
             {
@@ -588,6 +603,94 @@ public class Node implements ScriptObject
     }
     
     /**
+     * Copyies the node and optionally all its children, to another destination
+     * 
+     * @param destination       the destination node
+     * @param associationType   the association type
+     * @param associationName   the association name
+     * @param copyChildren      indicates whether the children of the node should be copied or not
+     * @return Node             the newly created copy of the origional node 
+     */
+    public Node copy(Node destination, String associationType, String associationName, boolean copyChildren)
+    {
+        // Get the full names of the assoc type and name
+        associationType = this.session.getNamespaceMap().getFullName(associationType);
+        associationName = this.session.getNamespaceMap().getFullName(associationName);
+        
+        // Check that the destination node is not an unsaved node
+        if (destination.isDirty() == true)
+        {
+            throw new PHPProcessorException("Can not copy node (" + toString() + ") since there are outstanding modifications that require saving on the destination node (" + destination.toString() + ")");
+        }
+        
+        // Check whether there are any outstanding changes
+        if (isDirty() == true)
+        {
+            throw new PHPProcessorException("Can not copy node (" + toString() + ") since there are outstanding modifications that require saving");
+        }
+        
+        // Copy the node
+        CopyService copyService = this.session.getServiceRegistry().getCopyService();
+        NodeRef nodeRef = copyService.copyAndRename(
+                getNodeRef(), 
+                destination.getNodeRef(),
+                QName.createQName(associationType),
+                QName.createQName(associationName),
+                copyChildren);
+        
+        // To ensure information is up to date, clean the destination node
+        destination.cleanNode();
+        
+        // Return the newly created node
+        return this.session.getNodeFromString(nodeRef.toString());
+    }
+    
+    /**
+     * Moves the node from its current primary parent into another.
+     * 
+     * @param destination       the destination node
+     * @param associationType   the assocation type
+     * @param assocationName    the association name
+     */
+    public void move(Node destination, String associationType, String associationName)    
+    {
+        // Get the full names of the assoc type and name
+        associationType = this.session.getNamespaceMap().getFullName(associationType);
+        associationName = this.session.getNamespaceMap().getFullName(associationName);
+        
+        // Check the current primary parent for modifications
+        Node currentParent = getPrimaryParent();
+        if (currentParent.isDirty() == true)
+        {
+            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving on the current parent node (" + currentParent.toString() + ")");
+        }
+        
+        // Check that the destination node is not an unsaved node
+        if (destination.isDirty() == true)
+        {
+            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving on the destination node (" + destination.toString() + ")");
+        }
+        
+        // Check whether there are any outstanding changes
+        if (isDirty() == true)
+        {
+            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving");
+        }
+        
+        // Do the move
+        this.nodeService.moveNode(
+                getNodeRef(),
+                destination.getNodeRef(),
+                QName.createQName(associationType),
+                QName.createQName(associationName));    
+        
+        // Clean all 3 nodes involved in the mode to ensure no data is out of date
+        currentParent.cleanNode();
+        destination.cleanNode();
+        cleanNode();
+    }
+    
+    /**
      * Dynamic implementation of get properties
      * 
      * @param name      the name of the property
@@ -734,9 +837,9 @@ public class Node implements ScriptObject
         }
         
         // Update the aspects
-        if (this.removeAspects != null && this.removeAspects.size() != 0)
+        if (this.addedAspects != null && this.addedAspects.size() != 0)
         {
-            for (String aspect : this.removeAspects)
+            for (String aspect : this.addedAspects)
             {
                 this.nodeService.addAspect(nodeRef, QName.createQName(aspect), null);                
             }
@@ -795,13 +898,56 @@ public class Node implements ScriptObject
         }
         
         // Refresh the state of the node
+        cleanNode();      
+    }
+    
+    /**
+     * Cleans the nodes cached data and restores it to its initial state
+     */
+    private void cleanNode()
+    {
+        if (logger.isDebugEnabled() == true)
+        {
+            logger.debug("Cleaning node " + getId());            
+        }
+        
         this.properties = null;
         this.arePropertiesDirty = false;
         this.aspects = null;
+        this.addedAspects = null;
+        this.removedAspects = null;
         this.children = null;
+        this.addedChildren = null;
+        this.removedChildren = null;
         this.parents = null;
+        this.primaryParent = null;
         this.associations = null;
-        this.primaryParent = null;        
+        this.addedAssociations = null;
+        this.removedAssociations = null;
+    }
+    
+    private boolean isDirty()
+    {
+        if (logger.isDebugEnabled() == true)
+        {
+            logger.debug("Calling isDrity() for " + getId() + " (isNewNode = " + isNewNode() + "; arePropertiesDirty = " + this.arePropertiesDirty + ")");
+        }
+        
+        if (isNewNode() == false &&
+            this.arePropertiesDirty == false &&
+            (this.addedAspects == null || this.addedAspects.size() == 0 ) &&
+            (this.removedAspects == null || this.removedAspects.size() == 0 ) &&
+            (this.addedChildren == null || this.addedChildren.size() == 0 ) &&
+            (this.removedChildren == null || this.removedChildren.size() == 0 ) &&
+            (this.addedAssociations == null || this.addedAssociations.size() == 0 ) &&
+            (this.removedAssociations == null || this.removedAssociations.size() == 0))
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
     
     /**
@@ -873,7 +1019,7 @@ public class Node implements ScriptObject
             }
             
             // Create the list's used to monitor added and deleted aspects
-            this.removeAspects = new ArrayList<String>();
+            this.addedAspects = new ArrayList<String>();
             this.removedAspects = new ArrayList<String>();
         }
     }

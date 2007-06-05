@@ -42,7 +42,7 @@ public class PHPUpdateExamplesTest extends BaseSpringTest
 {
     public void testUpdateTemplatesAndScripts()
     {                       
-        //importFile("alfresco/module/recordsManagement/bootstrap/rm_javascripts.xml", "/app:company_home/app:dictionary/app:scripts");
+        importFile("alfresco/module/phpIntegration/script/script-import.xml", "/app:company_home/app:dictionary/app:scripts");
         importFile("alfresco/module/phpIntegration/template/template-import.xml", "/app:company_home/app:dictionary/app:content_templates");
         
         setComplete();
