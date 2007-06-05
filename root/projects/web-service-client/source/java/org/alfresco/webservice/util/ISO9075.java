@@ -24,7 +24,7 @@
  */
 package org.alfresco.webservice.util;
 
-import com.sun.org.apache.xerces.internal.util.XMLChar;
+import org.apache.xerces.util.XMLChar;
 
 /**
  * Support for the ISO 9075 encoding of XML element names.
