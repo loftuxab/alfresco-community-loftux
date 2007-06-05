@@ -178,5 +178,8 @@ public interface LinkValidationService
                                          int    statusGTE,
                                          int    statusLTE) throws 
                                          AVMNotFoundException;
+
+
+    public List<String> getHrefsDependentUponFile(String path);
 }
 

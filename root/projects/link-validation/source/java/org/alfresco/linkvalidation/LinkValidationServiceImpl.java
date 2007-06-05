@@ -532,7 +532,59 @@ public class LinkValidationServiceImpl implements LinkValidationService
             }
         }
     }
-     
+
+
+
+    public List<String> getHrefsDependentUponFile(String path)
+                        throws AVMNotFoundException
+    {
+        MD5    md5      = new MD5();
+        String file_md5 =  md5.digest(path.getBytes());
+
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, path);
+
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
+
+        // Example value:  ".href/mysite"
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
+                                                              false, 
+                                                              true
+                                                            );
+
+        // Example value: .href/mysite/|ROOT/-2
+        String href_attr =  store_attr_base    + 
+                            "/|" + webapp_name +
+                            "/"  + LATEST_VERSION_ALIAS;
+
+        Set<String> dependent_hrefs_md5 = 
+                         attr_.getAttribute( href_attr    + "/" + 
+                                             FILE_TO_HDEP + "/" + 
+                                             file_md5
+                                           ).keySet();
+
+        List<String> dependent_hrefs = 
+                        new ArrayList<String>( dependent_hrefs_md5.size() );
+
+        for (String href_md5 : dependent_hrefs_md5 )
+        {
+            String href_str = 
+                   attr_.getAttribute( href_attr   + "/" + 
+                                       MD5_TO_HREF + "/" + 
+                                       href_md5
+                                     ).getStringValue();
+
+            dependent_hrefs.add( href_str );
+        }
+
+        Collections.sort( dependent_hrefs );
+
+        return  dependent_hrefs;
+    }
+      
 
 
     public List<HrefConcordanceEntry> getBrokenHrefConcordance(
@@ -559,9 +611,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
         String status_gte = "" + statusGTE;
         String status_lte = "" + statusLTE;
 
-        List<HrefConcordanceEntry>  concordance_entries = 
-            new ArrayList<HrefConcordanceEntry>();
-
 
         // Example value:  ".href/mysite"
         String store_attr_base =  getAttributeStemForDnsName( dns_name, 
@@ -578,6 +627,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                        //        Question:  how long should the version stay
                        //                   loaded if a load was required?
         //--------------------------------------------------------------------
+
+        List<HrefConcordanceEntry>  concordance_entries = 
+            new ArrayList<HrefConcordanceEntry>();
+
 
         if  ( webapp_name != null )
         {
