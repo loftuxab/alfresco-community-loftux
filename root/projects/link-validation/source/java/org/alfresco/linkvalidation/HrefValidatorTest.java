@@ -183,7 +183,7 @@ public class HrefValidatorTest extends TestCase
 
              // NEON -  remove asap
              UpdateHrefInfoStatus update_status = new UpdateHrefInfoStatus();
-             if (true)
+             if (false)
              {
                  LinkValidation_.updateHrefInfo( 
                      store_name,                    // store to update hrefs
@@ -280,6 +280,15 @@ public class HrefValidatorTest extends TestCase
              List<String> single_file_hrefs  = file_href_manifest.getHrefs();
 
              for (String href : single_file_hrefs )
+             {
+                 System.out.println("      "  + href );
+             }
+
+
+             index_html = "mysite:/www/avm_webapps/ROOT/assets/footer.html";
+             System.out.println("\nHrefs dependent on file: " + index_html);
+             List<String> dependent_hrefs =  LinkValidation_.getHrefsDependentUponFile( index_html );
+             for (String href : dependent_hrefs)
              {
                  System.out.println("      "  + href );
              }
