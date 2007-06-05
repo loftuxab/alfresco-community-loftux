@@ -295,6 +295,15 @@ public class PHPTest extends BaseSpringTest
         assertEquals("changed.txt", this.nodeService.getProperty(nodeRef, ContentModel.PROP_NAME));
         assertEquals("Mr Trouble", this.nodeService.getProperty(nodeRef, ContentModel.PROP_AUTHOR));
         
+        System.out.println("Executing testCopyMove.php ... ");
+        
+        // Set the titled property value
+        this.nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, "My Title");
+        
+        StringWriter out3 = new StringWriter();        
+        this.phpProcessor.process(CLASSPATH_ROOT + "testCopyMove.php", model, out2);
+        System.out.println("testCopyMove output:");
+        System.out.println(out3.toString());
     }
 
 }

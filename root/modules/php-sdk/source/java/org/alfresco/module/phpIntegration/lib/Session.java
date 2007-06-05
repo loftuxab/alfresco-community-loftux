@@ -168,6 +168,11 @@ public class Session implements ScriptObject
         return node;
     }
     
+    /**
+     * Adds a node to the session cache
+     * 
+     * @param node  the node to add to the session cache
+     */
     /*package*/ void addNode(Node node)
     {
         // Log a warning if the node is already in the session
@@ -175,12 +180,23 @@ public class Session implements ScriptObject
         {
             if (logger.isInfoEnabled() == true)
             {
-                logger.info("A duplicate node is beingadded to the session. (" + node.toString() + ")");
+                logger.info("A duplicate node is being added to the session. (" + node.toString() + ")");
             }
         }
         
         // Add the node
         this.nodeMap.put(node.toString(), node);
+    }
+    
+    /**
+     * Remove the node from the session cache.  This be called with care as it could mean modificaiton made to the node are lost.
+     * 
+     * @param node  the node to remove from the session cache
+     */
+    /*package*/ void removeNode(Node node)
+    {
+        // Remove the node
+        this.nodeMap.remove(node.toString());
     }
     
     /**
