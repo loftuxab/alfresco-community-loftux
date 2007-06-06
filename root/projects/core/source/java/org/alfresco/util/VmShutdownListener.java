@@ -42,7 +42,7 @@ import org.apache.commons.logging.LogFactory;
 public class VmShutdownListener
 {
     private Log logger;
-    private boolean vmShuttingDown;
+    private volatile boolean vmShuttingDown;
     
     /**
      * Constructs this instance to listen to the VM shutdown call.
