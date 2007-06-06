@@ -42,6 +42,7 @@ import org.alfresco.service.cmr.repository.CopyService;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
+import org.alfresco.service.cmr.security.AccessStatus;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.EqualsHelper;
@@ -697,6 +698,33 @@ public class Node implements ScriptObject
         currentParent.cleanNode();
         destination.cleanNode();
         cleanNode();
+    }
+    
+    /**
+     * Determines whether the current user has specified permissions on the node
+     * 
+     * @param permission    the permission string
+     * @return boolean      true if the user has the permission, false otherwise
+     */
+    public boolean hasPermission(String permission)
+    {    
+        boolean allowed = false;
+        
+        if (permission != null && permission.length() != 0)
+        {
+            if (this.isNewNode() == true)
+            {
+                // Since this is a new node then this user must have created it
+                allowed = true;
+            }
+            else
+            {
+                AccessStatus status = this.session.getServiceRegistry().getPermissionService().hasPermission(getNodeRef(), permission);
+                allowed = (AccessStatus.ALLOWED == status);
+            }
+        }
+    
+        return allowed;
     }
     
     /**

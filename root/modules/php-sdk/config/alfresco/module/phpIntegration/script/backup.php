@@ -11,23 +11,25 @@
 	
 	if (count($nodes) == 0)
 	{
-		// TODO check for 'CreateChildren' permission on $document folder
-	
-		// Create the backup folder if it could not be found
-		$backupFolder = $space->createChild("cm_folder", "cm_contains", "cm_Backup");
-		$backupFolder->cm_name = "Backup";
-		$session->save();
+		if ($document->hasPermission('CreateChildren') == true)
+		{	
+			// Create the backup folder if it could not be found
+			$backupFolder = $space->createChild("cm_folder", "cm_contains", "cm_Backup");
+			$backupFolder->cm_name = "Backup";
+			$session->save();
+		}
 	}
 	else
 	{
 		$backupFolder = $nodes[0];
 	}
 	
-	// TODO check for 'CreateChildren' permission on $backupFolder
-	
-	// Create the backup and place it in the backup folder
-	$copy = $document->copy($backupFolder, "cm_contains", "cm_".$document->cm_name);
-	$copy->cm_name = "Backup of ".$copy->cm_name;
-	$session->save();
+	if ($backupFolder != null && $backupFolder->hasPermission('CreateChildren') == true)
+	{
+		// Create the backup and place it in the backup folder
+		$copy = $document->copy($backupFolder, "cm_contains", "cm_".$document->cm_name);
+		$copy->cm_name = "Backup of ".$copy->cm_name;
+		$session->save();
+	}
 
 ?>
