@@ -58,8 +58,6 @@ import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
 import org.alfresco.service.cmr.attributes.AttributeService;
-import org.alfresco.service.cmr.attributes.AttributeService;
-import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttrNotQuery;
 import org.alfresco.service.cmr.attributes.AttrOrQuery;
 import org.alfresco.service.cmr.attributes.AttrQueryEquals;
@@ -71,9 +69,11 @@ import org.alfresco.service.cmr.attributes.AttrQueryLTE;
 import org.alfresco.service.cmr.attributes.AttrQueryNE;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
+import org.alfresco.service.cmr.avmsync.AVMSyncService;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.MD5;
+import org.alfresco.util.NameMatcher;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -261,6 +261,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
     AVMRemote          avm_;
     AttributeService   attr_;
+    AVMSyncService     sync_;
+
     VirtServerRegistry virtreg_;
 
     public LinkValidationServiceImpl() { }
@@ -587,14 +589,14 @@ public class LinkValidationServiceImpl implements LinkValidationService
       
 
 
-    public List<HrefConcordanceEntry> getBrokenHrefConcordance(
+    public List<HrefConcordanceEntry> getBrokenHrefConcordanceEntries(
                                          String storeNameOrWebappPath 
                                       ) throws AVMNotFoundException 
     {
-        return getHrefConcordance(storeNameOrWebappPath, 400, 599);
+        return getHrefConcordanceEntries(storeNameOrWebappPath, 400, 599);
     }
     
-    public List<HrefConcordanceEntry> getHrefConcordance(
+    public List<HrefConcordanceEntry> getHrefConcordanceEntries(
                                          String storeNameOrWebappPath, 
                                          int    statusGTE,
                                          int    statusLTE
@@ -749,8 +751,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
     public AttributeService getAttributeService()         { return attr_;}
 
-    public void setAvmRemote(AVMRemote svc) { avm_ = svc; }
-    public AVMRemote getAvmRemote()         { return avm_;}
+    public void setAVMSyncService( AVMSyncService sync )  { sync_ = sync;}
+    public AVMSyncService getAVMSyncService()             { return sync_;}
+
+    public void setAvmRemote(AVMRemote svc)               { avm_ = svc; }
+    public AVMRemote getAvmRemote()                       { return avm_;}
 
     public void setVirtServerRegistry(VirtServerRegistry reg)
     { 
@@ -761,6 +766,26 @@ public class LinkValidationServiceImpl implements LinkValidationService
         return virtreg_;
     }
 
+    
+    public BrokenHrefConcordanceDifference getBrokenHrefConcordanceDifference(
+                                               int srcVersion, String srcPath,
+                                               int dstVersion, String dstPath,
+                                               NameMatcher     excluder) 
+                                           throws AVMNotFoundException
+    {
+        BrokenHrefConcordanceDifference diff    = new BrokenHrefConcordanceDifference();
+
+        List<HrefConcordanceEntry> repaired = 
+                diff.getRepairedHrefConcordanceEntries();
+
+        List<HrefConcordanceEntry> newly_broken = 
+                diff.getNewlyBrokenHrefConcordanceEntries();
+
+        // TODO: implement me!
+
+
+        return diff;
+    }
 
 
     /**

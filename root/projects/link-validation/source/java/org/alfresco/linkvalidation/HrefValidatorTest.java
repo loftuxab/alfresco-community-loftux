@@ -63,11 +63,10 @@ import junit.framework.TestCase;
 public class HrefValidatorTest extends TestCase
 {
     private static FileSystemXmlApplicationContext Context_ = null;
-    private static AVMRemote        AvmSvc_;
-    private static AttributeService AttribSvc_;
-    private static int TestMethodsLeft_;
-    private static LinkValidationService LinkValidation_;
-    private static VirtServerRegistry VirtServerRegistry_;
+    private static AVMRemote              AvmSvc_;
+    private static int                    TestMethodsLeft_;
+    private static LinkValidationService  LinkValidation_;
+    private static VirtServerRegistry     VirtServerRegistry_;
 
     // @BeforeClass
     static
@@ -211,20 +210,20 @@ public class HrefValidatorTest extends TestCase
              List<HrefConcordanceEntry> href_conc;
 
              // OK  (200)
-             // href_conc = LinkValidation_.getHrefConcordance( store_name, 200, 200);
+             // href_conc = LinkValidation_.getHrefConcordanceEntries( store_name, 200, 200);
              //
              // Success (2xx)
-             // href_conc =  LinkValidation_.getHrefConcordance( store_name, 200, 299 );
+             // href_conc =  LinkValidation_.getHrefConcordanceEntries( store_name, 200, 299 );
              //
              // Error (400-500)
-             // href_conc = LinkValidation_.getHrefConcordance( store_name, 400, 599 );
+             // href_conc = LinkValidation_.getHrefConcordanceEntries( store_name, 400, 599 );
              //
              // Same as Error case above.
 
              long start, end;
 
              start = System.currentTimeMillis();
-             href_conc = LinkValidation_.getBrokenHrefConcordance( store_name );
+             href_conc = LinkValidation_.getBrokenHrefConcordanceEntries( store_name );
              end = System.currentTimeMillis();
 
              System.out.println(
