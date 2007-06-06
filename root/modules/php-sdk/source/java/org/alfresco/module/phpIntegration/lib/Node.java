@@ -49,6 +49,7 @@ import org.alfresco.util.GUID;
 import org.apache.log4j.Logger;
 
 import com.caucho.quercus.env.Env;
+import com.caucho.quercus.env.NullValue;
 import com.caucho.quercus.env.Value;
 
 /**
@@ -251,6 +252,14 @@ public class Node implements ScriptObject
             String fullName = this.session.getNamespaceMap().getFullName(entry.getKey());
             this.properties.put(fullName, entry.getValue());
         }
+        this.arePropertiesDirty = true;
+    }
+    
+    /**
+     * Callback used to indicate that a content property has been modified directly.
+     */
+    /*package*/ void contentUpdated()
+    {
         this.arePropertiesDirty = true;
     }
     
@@ -711,6 +720,10 @@ public class Node implements ScriptObject
             {
                 result = PHPProcessor.convertToValue(env, this.session, value);
             }
+            else
+            {
+                result = NullValue.NULL;
+            }
         }
 
         return result;        
@@ -798,13 +811,18 @@ public class Node implements ScriptObject
                 logger.debug("Saving property updates made to node " + this.getId());
             }
             
+            // List of pending content properties to process
+            List<org.alfresco.module.phpIntegration.lib.ContentData> pendingContentProperties = new ArrayList<org.alfresco.module.phpIntegration.lib.ContentData>(1);
+            
             // Update the properties
             Map<QName, Serializable> currentProperties = this.nodeService.getProperties(nodeRef);
             for (Map.Entry<String, Object> entry : this.properties.entrySet())
             {
                 if (entry.getValue() instanceof org.alfresco.module.phpIntegration.lib.ContentData)
                 {
-                    // TODO Do something with the content property
+                    // Save the content property
+                    org.alfresco.module.phpIntegration.lib.ContentData contentData = (org.alfresco.module.phpIntegration.lib.ContentData)entry.getValue();
+                    pendingContentProperties.add(contentData);
                 }
                 else
                 {
@@ -834,6 +852,12 @@ public class Node implements ScriptObject
             
             // Set the values of the updated properties
             this.nodeService.setProperties(nodeRef, currentProperties);
+            
+            // Sort out any pending content properties
+            for (org.alfresco.module.phpIntegration.lib.ContentData contentData : pendingContentProperties)
+            {
+                contentData.onSave();
+            }
         }
         
         // Update the aspects

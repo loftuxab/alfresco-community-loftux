@@ -33,6 +33,7 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
+import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -301,9 +302,27 @@ public class PHPTest extends BaseSpringTest
         this.nodeService.setProperty(nodeRef, ContentModel.PROP_TITLE, "My Title");
         
         StringWriter out3 = new StringWriter();        
-        this.phpProcessor.process(CLASSPATH_ROOT + "testCopyMove.php", model, out2);
+        this.phpProcessor.process(CLASSPATH_ROOT + "testCopyMove.php", model, out3);
         System.out.println("testCopyMove output:");
         System.out.println(out3.toString());
+        
+        System.out.println("Executing testContentProperties.php ... ");
+        
+        StringWriter out4 = new StringWriter();        
+        this.phpProcessor.process(CLASSPATH_ROOT + "testContentProperties.php", model, out4);
+        System.out.println("testContentProperties output:");
+        System.out.println(out4.toString());
+        
+//        System.out.println("Tempory ... ");        
+//        Map<String, Object> model2 = new HashMap<String, Object>(1);
+//        model2.put("document", nodeRef);        
+//        StringWriter out5 = new StringWriter();        
+//        this.phpProcessor.process("alfresco/module/phpIntegration/script/append_copyright.php", model2, out5);
+//        System.out.println("result ...");
+//        System.out.println(out5.toString());
+//        ContentReader contentReader = this.contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
+//        System.out.println("appended content ... " + contentReader.getContentString());
+        
     }
 
 }
