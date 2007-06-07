@@ -30,6 +30,20 @@
       </property>
    </bean>
 
+   <!-- A bean to make sure that the startup doesn't fall over -->
+   <bean id="commandFailureGuaranteed" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandMap">
+          <map>
+              <entry key=".*">
+                  <value>wibble</value>
+              </entry>
+          </map>
+      </property>
+      <property name="errorCodes">
+          <value>666</value>
+      </property>
+   </bean>
+
    <bean id="testBootstrapCommands" class="org.alfresco.util.exec.RuntimeExecBootstrapBean" >
       <property name="startupCommands">
           <list>

@@ -204,6 +204,8 @@ public class RuntimeExec
      */
     public ExecutionResult execute(Map<String, String> properties)
     {
+        int defaultFailureExitValue = errCodes.size() > 0 ? ((Integer)errCodes.toArray()[0]) : 1;
+        
         // check that the command has been set
         if (command == null)
         {
@@ -222,7 +224,16 @@ public class RuntimeExec
         }
         catch (IOException e)
         {
-            throw new AlfrescoRuntimeException("Failed to execute command: " + commandToExecute, e);
+            // The process could not be executed here, so just drop out with an appropriate error state
+            String execOut = "";
+            String execErr = e.getMessage();
+            int exitValue = defaultFailureExitValue;
+            ExecutionResult result = new ExecutionResult(commandToExecute, errCodes, exitValue, execOut, execErr);
+            if (logger.isDebugEnabled())
+            {
+                logger.debug(result);
+            }
+            return result;
         }
 
         // create the stream gobblers
@@ -243,7 +254,7 @@ public class RuntimeExec
         {
             // process was interrupted - generate an error message
             stdErrGobbler.addToBuffer(e.toString());
-            exitValue = 1;
+            exitValue = defaultFailureExitValue;
         }
 
         // ensure that the stream gobblers get to finish
