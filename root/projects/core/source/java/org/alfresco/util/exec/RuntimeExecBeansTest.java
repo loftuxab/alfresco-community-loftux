@@ -28,6 +28,7 @@ import java.io.File;
 
 import junit.framework.TestCase;
 
+import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -64,5 +65,19 @@ public class RuntimeExecBeansTest extends TestCase
         
         // the folder should be gone
         assertFalse("Folder was not deleted by shutdown", dir.exists());
+    }
+    
+    public void testFailureModeOfMissingCommand()
+    {
+        File dir = new File(DIR);
+        dir.mkdir();
+        assertTrue("Directory not created", dir.exists());
+        ApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        
+        RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandFailureGuaranteed");
+        assertNotNull(failureExec);
+        // Execute it
+        ExecutionResult result = failureExec.execute();
+        assertEquals("Expected first error code in list", 666, result.getExitValue());
     }
 }
