@@ -206,6 +206,28 @@ avmpath as above.
 
 ------
 
+getnodeproperties - List all properties of a node.
+
+getnodeproperties, avmpath, #versionnumber#
+
+avmpath as above.
+
+#versionnumber# as above.
+
+------
+
+deletenodeproperty - Delete a property of a node.
+
+deletenodeproperty, avmpath, #versionnumber#, qname
+
+avmpath as above.
+
+#versionnumber# as above.
+
+qname - a property name in the form {namespaceURI}localName
+
+------
+
 history - Get a list of the previous versions
 of a node.
 
