@@ -69,6 +69,7 @@ import org.alfresco.service.cmr.attributes.AttrQueryLTE;
 import org.alfresco.service.cmr.attributes.AttrQueryNE;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
+import org.alfresco.service.cmr.avmsync.AVMDifference;
 import org.alfresco.service.cmr.avmsync.AVMSyncService;
 import org.alfresco.service.cmr.remote.AVMRemote;
 import org.alfresco.service.namespace.QName;
@@ -116,7 +117,7 @@ Here's a sketch of the algorithm
             .href/mysite/|mywebapp/-2/md5_to_href/
 
   [7]   Given an href what files does it depend on?
-            md5_href_to_md5_fdep[ md5( url ) ]  --> map { md5( file ) } 
+             hamd5_href_to_md5_fdep[ md5( url ) ]  --> map { md5( file ) } 
             .href/mysite/|mywebapp/-2/md5_href_to_md5_fdep/
 
   [8]   Given a file, what hrefs depend on it
@@ -246,7 +247,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
     static String LATEST_VERSION       = "latest";   // numerical version
     static String LATEST_VERSION_ALIAS = "-2";       // alias for numerical
 
-    static String SOURCE_TO_HREF       = "source_to_href";  // key->list
+    static String SOURCE_TO_HREF       = "source_to_href";  // key->map
     static String HREF_TO_SOURCE       = "href_to_source";  // key->map
 
     static String HREF_TO_STATUS       = "href_to_status";  // key->int
@@ -255,13 +256,14 @@ public class LinkValidationServiceImpl implements LinkValidationService
     static String MD5_TO_FILE          = "md5_to_file";     // key->string
     static String MD5_TO_HREF          = "md5_to_href";     // key->string
 
-    static String HREF_TO_FDEP         = "href_to_fdep";    // key->list
+    static String HREF_TO_FDEP         = "href_to_fdep";    // key->map
     static String FILE_TO_HDEP         = "file_to_hdep";    // key->map
 
 
     AVMRemote          avm_;
     AttributeService   attr_;
     AVMSyncService     sync_;
+    NameMatcher        excluder_;
 
     VirtServerRegistry virtreg_;
 
@@ -318,19 +320,15 @@ public class LinkValidationServiceImpl implements LinkValidationService
                             "/"  + LATEST_VERSION_ALIAS;
 
 
-        Attribute href_attr_list = attr_.getAttribute( href_attr      + "/" +
+        Attribute href_attr_map = attr_.getAttribute( href_attr      + "/" +
                                                        SOURCE_TO_HREF + "/" +
                                                        path_md5
-                                                     );
+                                                    );
 
-        // TODO:  It would be nice if you could just get the list itself
-        //        not just an iterator to the list.
 
         ArrayList<String> href_arraylist = new ArrayList<String>();
-        for ( Attribute href_attribute : href_attr_list )
+        for ( String href_md5 : href_attr_map.keySet() )
         {
-            String href_md5 = href_attribute.getStringValue();
-
             // Filter by examining the response code,
             // but only if we're being selective.
 
@@ -757,6 +755,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
     public void setAvmRemote(AVMRemote svc)               { avm_ = svc; }
     public AVMRemote getAvmRemote()                       { return avm_;}
 
+    public void setExcludeMatcher(NameMatcher excluder) { excluder_ = excluder;}
+    public NameMatcher getExcludeMatcher()              { return excluder_;}
+
+
     public void setVirtServerRegistry(VirtServerRegistry reg)
     { 
         virtreg_ = reg;
@@ -768,23 +770,146 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
     
     public BrokenHrefConcordanceDifference getBrokenHrefConcordanceDifference(
-                                               int srcVersion, String srcPath,
-                                               int dstVersion, String dstPath,
-                                               NameMatcher     excluder) 
+                                               int                    srcVersion,
+                                               String                 srcPath,
+                                               int                    dstVersion,
+                                               String                 dstPath,
+                                               HrefValidationProgress progress)
                                            throws AVMNotFoundException
     {
-        BrokenHrefConcordanceDifference diff    = new BrokenHrefConcordanceDifference();
+        BrokenHrefConcordanceDifference conc_diff = 
+                new BrokenHrefConcordanceDifference();
 
         List<HrefConcordanceEntry> repaired = 
-                diff.getRepairedHrefConcordanceEntries();
+                conc_diff.getRepairedHrefConcordanceEntries();
 
         List<HrefConcordanceEntry> newly_broken = 
-                diff.getNewlyBrokenHrefConcordanceEntries();
+                conc_diff.getNewlyBrokenHrefConcordanceEntries();
 
-        // TODO: implement me!
+        // Newer means  src (chageset|author) is newer than dst(staging)
+        // Note: deletions in src show up as "newer".
+
+        List<AVMDifference> diffs =
+            sync_.compare(srcVersion, srcPath, dstVersion, dstPath, excluder_);
+
+        // Cases to handle:
+        //      If deleted file/dir does not exist in staging,
+        //      ignore it because it's not part of the staging map,
+        //      and we've got nothing to re-index in author area.
+        //
+        //      Example of typical deleted file:  foo.txt~  ('~' from vim edit).
+        //      User may also have created/destroyed dir in author area
+        //
+        //      TODO: avoid indexing ~ files cf: excluder.
+        //
+        //      Deleted dir must be able to account for all deleted kids in staging
+        //      Created dir must be able to account for all deleted kids in author
+        //
+        //   added   xxx/yyy/zzz/jcox.html
+        //   added   stuff/added_via_cifs.html
+        //   added   stuff/added_via_cifs_2.html
+        //   added   stuff_file.html
+        //   deleted about/contact
+        //              Contained:  index.html*  us.png*
+        //
+        //   deleted about/people/jonc_small.jpg
+        //   deleted about/people/index.html
+        //
+        //   copied ROOT/customers/case_studies/swansea_housing_association/index.html 
+        //   to     ROOT/customers/case_studies/swansea_housing_association/index_jcox.html    
+        //
+        //         path: mysite--alice:/www/avm_webapps/ROOT/about/contact
+        //         code: 0
+        //         DELETED
+        //         file
+        // 
+        //         path: mysite--alice:/www/avm_webapps/ROOT/about/people/jonc_small.jpg
+        //         code: 0
+        //         DELETED
+        //         file
+        // 
+        //         path: mysite--alice:/www/avm_webapps/ROOT/customers/case_studies/swansea_housing_association/index_jcox.html
+        //         code: 0
+        //         file
+        // 
+        //         path: mysite--alice:/www/avm_webapps/ROOT/stuff
+        //         code: 0
+        //         dir
+        // 
+        //         path: mysite--alice:/www/avm_webapps/ROOT/stuff_file.html
+        //         code: 0
+        //         file
+        // 
+        //         path: mysite--alice:/www/avm_webapps/ROOT/xxx
+        //         code: 0
+        //         dir
+
+        for (AVMDifference diff : diffs )
+        {
+            String src_path  = diff.getSourcePath();
+            int    diff_code = diff.getDifferenceCode();
+
+            // Look up source node, even if it's been deleted
+            
+            AVMNodeDescriptor src_desc = avm_.lookup(srcVersion,src_path,true);
+            if (src_desc == null ) { continue; }
+
+            if (src_desc.isDeleted() )
+            {
+                String dst_path  = diff.getDestinationPath();
+
+                if ( src_desc.isDeletedDirectory() )
+                {
+                    // recurse within dst for deleted kids
+                }
+                else
+                {
+                    // get links from dst
+                }
+            }
+            else if (src_desc.isDirectory())
+            {
+                // recurse within src for new links
+            }
+            else
+            {
+                // get links from src
+                // 
+            }
+        }
+
+        return conc_diff;
+
+        //     void validate_dir( int    version, 
+        //                        String dir,
+        //                        String url_base,
+        //                        String href_attr, 
+        //                        MD5    md5,
+        //                        Map<String,String>  gen_url_cache,
+        //                        Map<String,String>  parsed_url_cache,
+        //                        Map<Integer,String> status_cache,
+        //                        Map<String,String>  file_hdep_cache,
+        //                        int    connect_timeout,
+        //                        int    read_timeout,
+        //                        HrefValidationProgress progress,
+        //                        int    depth 
+        //                      )
+        //
+        //    void validate_file( String               avm_path,
+        //                        String               gen_url_str, 
+        //                        String               gen_url_md5,
+        //                        String               href_attr,
+        //                        MD5                  md5,
+        //                        Map<String,String>   gen_url_cache,
+        //                        Map<String,String>   parsed_url_cache,
+        //                        Map<Integer,String>  status_cache,
+        //                        Map<String,String>   file_hdep_cache,
+        //                        int                  connect_timeout,
+        //                        int                  read_timeout,
+        //                        HrefValidationProgress progress
+        //                      )
 
 
-        return diff;
     }
 
 
@@ -811,10 +936,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 int     connect_timeout,
                                 int     read_timeout,
                                 int     nthreads,                // NEON - currently ignored
-                                UpdateHrefInfoStatus update_status
+                                HrefValidationProgress progress
                               ) throws AVMNotFoundException
     {
-        update_status.init();
+        progress.init();
 
         try 
         {
@@ -823,12 +948,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
                              connect_timeout,
                              read_timeout,
                              nthreads,
-                             update_status
+                             progress
                            );
         }
         finally 
         { 
-            update_status.setDone( true ); 
+            progress.setDone( true ); 
         }
     }
 
@@ -837,7 +962,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                           int     connect_timeout,
                           int     read_timeout,
                           int     nthreads,                // NEON - currently ignored
-                          UpdateHrefInfoStatus update_status
+                          HrefValidationProgress progress
                         ) throws AVMNotFoundException
     {
         ValidationPathParser p = 
@@ -899,11 +1024,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               md5,
                               connect_timeout,
                               read_timeout,
-                              update_status
+                              progress
                             );
 
             // stats for monitoring
-            update_status.incrementWebappUpdateCount(); 
+            progress.incrementWebappUpdateCount(); 
         }
         else
         {
@@ -952,11 +1077,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                       md5,
                                       connect_timeout,
                                       read_timeout,
-                                      update_status
+                                      progress
                                     );
 
                     // stats for monitoring
-                    update_status.incrementWebappUpdateCount();  
+                    progress.incrementWebappUpdateCount();  
                 }
             }
         }
@@ -972,7 +1097,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                            MD5     md5,
                            int     connect_timeout,
                            int     read_timeout,
-                           UpdateHrefInfoStatus update_status
+                           HrefValidationProgress progress
                          )
 
     {
@@ -1094,12 +1219,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
                       file_hdep_cache,
                       connect_timeout,
                       read_timeout,
-                      update_status,
+                      progress,
                       0 
                     );
  
         // stats for monitoring
-        update_status.incrementDirUpdateCount();  
+        progress.incrementDirUpdateCount();  
 
 
         // Now all the generated URLs have had their status checked,
@@ -1129,10 +1254,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                         );
 
              // stats for monitoring
-             update_status.incrementUrlUpdateCount();
+             progress.incrementUrlUpdateCount();
         }
 
-        update_status.incrementWebappUpdateCount();  // for monitoring progress
+        progress.incrementWebappUpdateCount();  // for monitoring progress
     }
 
     void validate_dir( int    version, 
@@ -1146,7 +1271,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                        Map<String,String>  file_hdep_cache,
                        int    connect_timeout,
                        int    read_timeout,
-                       UpdateHrefInfoStatus update_status,
+                       HrefValidationProgress progress,
                        int    depth 
                      )
     {
@@ -1173,12 +1298,19 @@ public class LinkValidationServiceImpl implements LinkValidationService
         {
             String            entry_name = entry.getKey();
             AVMNodeDescriptor avm_node   = entry.getValue();
+            String            avm_path   = dir +  "/" + entry_name;
 
             if ( (depth == 0) &&
                  (entry_name.equalsIgnoreCase("META-INF")  || 
                   entry_name.equalsIgnoreCase("WEB-INF")
                  )
                )
+            {
+                continue;
+            }
+
+            // Don't index bogus files
+            if ( excluder_ != null && excluder_.matches( avm_path )) 
             {
                 continue;
             }
@@ -1191,11 +1323,13 @@ public class LinkValidationServiceImpl implements LinkValidationService
             catch (Exception e) { /* UTF-8 is supported */ }
 
 
+            String implicit_url = url_base  +  "/" + url_encoded_entry_name;
+
             if  ( avm_node.isDirectory() )
             {
                 validate_dir( version, 
-                              dir      + "/"  + entry_name,
-                              url_base +  "/" + url_encoded_entry_name,
+                              avm_path,
+                              implicit_url,
                               href_attr,
                               md5,
                               gen_url_cache,
@@ -1204,18 +1338,16 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               file_hdep_cache,
                               connect_timeout,
                               read_timeout,
-                              update_status,
+                              progress,
                               depth + 1 ) ;
 
                 // stats for monitoring
-                update_status.incrementDirUpdateCount();  
+                progress.incrementDirUpdateCount();  
             }
             else
             {
-                String implicit_url = url_base  +  "/" + url_encoded_entry_name;
-
                 validate_file( 
-                   dir       +  "/" + entry_name,
+                   avm_path,
                    implicit_url,
                    md5.digest(implicit_url.getBytes()),
                    href_attr,
@@ -1226,27 +1358,27 @@ public class LinkValidationServiceImpl implements LinkValidationService
                    file_hdep_cache,
                    connect_timeout,
                    read_timeout,
-                   update_status
+                   progress
                 );
 
                 // stats for monitoring
-                update_status.incrementFileUpdateCount();  
+                progress.incrementFileUpdateCount();  
             }
         }
     }
 
-    void validate_file( String               avm_path,
-                        String               gen_url_str, 
-                        String               gen_url_md5,
-                        String               href_attr,
-                        MD5                  md5,
-                        Map<String,String>   gen_url_cache,
-                        Map<String,String>   parsed_url_cache,
-                        Map<Integer,String>  status_cache,
-                        Map<String,String>   file_hdep_cache,
-                        int                  connect_timeout,
-                        int                  read_timeout,
-                        UpdateHrefInfoStatus update_status
+    void validate_file( String                 avm_path,
+                        String                 gen_url_str, 
+                        String                 gen_url_md5,
+                        String                 href_attr,
+                        MD5                    md5,
+                        Map<String,String>     gen_url_cache,
+                        Map<String,String>     parsed_url_cache,
+                        Map<Integer,String>    status_cache,
+                        Map<String,String>     file_hdep_cache,
+                        int                    connect_timeout,
+                        int                    read_timeout,
+                        HrefValidationProgress progress
                       )
     {
         String file_md5= md5.digest(avm_path.getBytes());
@@ -1300,7 +1432,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                    read_timeout);
 
         // stats for monitoring
-        update_status.incrementUrlUpdateCount();
+        progress.incrementUrlUpdateCount();
 
         if ( urls == null ) 
         {
@@ -1311,7 +1443,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         // If the generated URL is not already contained in the 
         // parsed URL list, add it.
 
-        ListAttribute href_list_attrib_value = new ListAttributeValue();
+        MapAttribute  href_map_attrib_value  = new MapAttributeValue();
         boolean       saw_gen_url            = false;
 
         for (URL  resp_url  : urls )
@@ -1324,8 +1456,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                 saw_gen_url = true;
             }
             
-            href_list_attrib_value.add( 
-                new StringAttributeValue(response_url_md5 ));
+            href_map_attrib_value.put( response_url_md5,
+                                       new BooleanAttributeValue(true ));
 
 
             if ( ! parsed_url_cache.containsKey( response_url_md5 ) )
@@ -1353,16 +1485,20 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         if ( ! saw_gen_url )
         {
-            href_list_attrib_value.add( new StringAttributeValue( gen_url_md5 ));
+            href_map_attrib_value.put( gen_url_md5, new BooleanAttributeValue( true ));
         }
 
         attr_.setAttribute( href_attr + "/" + SOURCE_TO_HREF,
                             file_md5, 
-                            href_list_attrib_value
+                            href_map_attrib_value
                           );
     }
 
 
+    //-----------------------------------------------------------------------
+    /**
+    *   Validate an indidual URL
+    */
     URL[]  validate_url( String  url_str,
                          String  url_md5,
                          String  href_attr,
@@ -1540,7 +1676,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         // Now "dependencies" contains a list of all 
         // files upon which url_str URL depends.
 
-        ListAttribute fdep_list_attrib_value = new ListAttributeValue();
+        MapAttribute fdep_map_attrib_value = new MapAttributeValue();
 
         for (String file_dependency : dependencies )
         {
@@ -1561,13 +1697,14 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 new BooleanAttributeValue( true )
                               );
 
-            fdep_list_attrib_value.add( new StringAttributeValue( fdep_md5 ) );
+            fdep_map_attrib_value.put( fdep_md5, 
+                                       new BooleanAttributeValue( true ));
         }
 
 
         attr_.setAttribute( href_attr + "/" + HREF_TO_FDEP,
                             url_md5, 
-                            fdep_list_attrib_value
+                            fdep_map_attrib_value
                           );
 
 
