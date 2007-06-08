@@ -3,13 +3,13 @@
   <Profiles />
   <Settings>
     <Setting Name="DefaultTemplate" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/office/</Value>
+      <Value Profile="(Default)">wcservice/office/</Value>
     </Setting>
     <Setting Name="OldTemplate" Type="System.String" Scope="User">
       <Value Profile="(Default)">template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/office/</Value>
     </Setting>
     <Setting Name="NewTemplate" Type="System.String" Scope="User">
-      <Value Profile="(Default)">service/office/</Value>
+      <Value Profile="(Default)">wcservice/office/</Value>
     </Setting>
   </Settings>
 </SettingsFile>

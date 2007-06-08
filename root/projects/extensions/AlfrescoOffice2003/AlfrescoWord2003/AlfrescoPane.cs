@@ -111,8 +111,8 @@ namespace AlfrescoWord2003
          else
          {
             // Yes - navigate to the home template
-            string theURI = string.Format(@"{0}{1}my_alfresco.ftl&contextPath=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
-//            string theURI = string.Format(@"{0}{1}myAlfresco?p=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
+//            string theURI = string.Format(@"{0}{1}my_alfresco.ftl&contextPath=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
+            string theURI = string.Format(@"{0}{1}myAlfresco?p=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
             string strAuthTicket = m_ServerDetails.AuthenticationTicket;
             if (strAuthTicket != "")
             {
@@ -134,8 +134,8 @@ namespace AlfrescoWord2003
          }
          else
          {
-            string theURI = string.Format(@"{0}{1}document_details.ftl&contextPath=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
-//            string theURI = string.Format(@"{0}{1}documentDetails?p=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
+//            string theURI = string.Format(@"{0}{1}document_details.ftl&contextPath=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
+            string theURI = string.Format(@"{0}{1}documentDetails?p=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
             string strAuthTicket = m_ServerDetails.AuthenticationTicket;
             if (strAuthTicket != "")
             {
