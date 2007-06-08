@@ -25,8 +25,7 @@ namespace AlfrescoWord2003.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/" +
-            "office/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("wcservice/office/")]
         public string DefaultTemplate {
             get {
                 return ((string)(this["DefaultTemplate"]));
@@ -48,7 +47,7 @@ namespace AlfrescoWord2003.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("service/office/")]
+        [global::System.Configuration.DefaultSettingValueAttribute("wcservice/office/")]
         public string NewTemplate {
             get {
                 return ((string)(this["NewTemplate"]));
