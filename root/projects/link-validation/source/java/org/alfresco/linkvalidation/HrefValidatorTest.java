@@ -29,17 +29,18 @@ package org.alfresco.linkvalidation;
 
 import java.util.List;
 
+
+import java.lang.reflect.Method;
+import java.util.Map;
 import org.alfresco.jndi.JndiInfoBean;
 import org.alfresco.mbeans.VirtServerInfo;
 import org.alfresco.repo.attributes.*;
+import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.remote.AVMRemote;
-import org.alfresco.repo.domain.PropertyValue;
-import java.util.Map;
-import java.lang.reflect.Method;
 import org.alfresco.service.namespace.QName;
-
+import org.alfresco.util.NameMatcher;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.mbeans.VirtServerRegistry;
 import org.alfresco.service.cmr.security.AuthenticationService;
@@ -181,7 +182,7 @@ public class HrefValidatorTest extends TestCase
              String  store_name  = store_staging_main_entry.getKey();
 
              // NEON -  remove asap
-             UpdateHrefInfoStatus update_status = new UpdateHrefInfoStatus();
+             HrefValidationProgress progress = new HrefValidationProgress();
              if (false)
              {
                  LinkValidation_.updateHrefInfo( 
@@ -190,22 +191,21 @@ public class HrefValidatorTest extends TestCase
                      10000,                         // connect timeout (ms)
                      30000,                         // read timeout (ms)
                      5,                             // thread count
-                     update_status                  // status monitor
+                     progress                  // status monitor
                  );
              }
 
              System.out.println("Webapps updated: " + 
-                                update_status.getWebappUpdateCount() );
+                                progress.getWebappUpdateCount() );
 
              System.out.println("Dirs updated: " + 
-                                update_status.getDirUpdateCount() );
+                                progress.getDirUpdateCount() );
 
              System.out.println("Files updated: " + 
-                                update_status.getFileUpdateCount() );
+                                progress.getFileUpdateCount() );
 
              System.out.println("Distinct URLs updated: " + 
-                                update_status.getUrlUpdateCount() );
-
+                                progress.getUrlUpdateCount() );
 
              List<HrefConcordanceEntry> href_conc;
 
@@ -291,6 +291,15 @@ public class HrefValidatorTest extends TestCase
              {
                  System.out.println("      "  + href );
              }
+
+
+             progress = new HrefValidationProgress();
+
+             BrokenHrefConcordanceDifference conc_diff = 
+                LinkValidation_.getBrokenHrefConcordanceDifference(  -1, "mysite--alice:/www/avm_webapps/ROOT",
+                                                                     -1, "mysite:/www/avm_webapps/ROOT",
+                                                                     progress
+                                                                  );
 
 
              // Just test the first store... that's enough.

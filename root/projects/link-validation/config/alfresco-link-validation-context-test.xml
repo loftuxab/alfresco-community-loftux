@@ -205,6 +205,19 @@
                   value="../repository/config/alfresco/alfresco-jmxrmi.access"/>
     </bean>
 
+    <bean id="linkValidationServiceExcludeExtensionMatcher" 
+          class="org.alfresco.repo.avm.util.FileExtensionNameMatcher">
+        <property name="extensions">
+            <list>
+                <value>.o</value>
+                <value>.bak</value>
+                <value>.tmp</value>
+                <value>.swp</value>
+                <value>~</value>
+            </list>
+        </property>
+    </bean>
+
     <bean id="linkValidationService" 
           class="org.alfresco.linkvalidation.LinkValidationServiceImpl">
         <property name="attributeService">
@@ -218,6 +231,9 @@
         </property>
         <property name="AVMSyncService">
             <ref bean="avmSyncService"/>
+        </property>
+        <property name="excludeMatcher">
+            <ref bean="linkValidationServiceExcludeExtensionMatcher"/>
         </property>
     </bean>
 
