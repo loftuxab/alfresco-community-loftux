@@ -58,6 +58,7 @@ namespace AlfrescoWord2003
       {
          m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
          this.showDocumentDetails(m_ServerDetails.DocumentPath);
+         this.Show();
       }
 
       public void OnDocumentChanged()
