@@ -20,6 +20,15 @@
     	<property name="policyComponent">
     		<ref bean="policyComponent"/>
     	</property>
+        <property name="policyFilter">
+            <ref bean="policyBehaviourFilter"/>
+        </property>
+    	<property name="transactionService">
+    		<ref bean="transactionService"/>
+    	</property>
+    	<property name="threadExecuter">
+    		<ref bean="threadPoolExecutor"/>
+    	</property>
     </bean>  
       
 </beans>

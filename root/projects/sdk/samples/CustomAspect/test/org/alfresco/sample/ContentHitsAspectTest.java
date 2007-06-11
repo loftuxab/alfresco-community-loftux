@@ -81,8 +81,7 @@ public class ContentHitsAspectTest extends TestCase
     /**
      * Test the contentHits aspect behaviour
      */
-    public void testContentHitsApsectBehaviour()
-        throws Exception
+    public void testContentHitsApsectBehaviour() throws Throwable
     {
         NodeRef nodeRef = null;
         
@@ -126,7 +125,7 @@ public class ContentHitsAspectTest extends TestCase
 
             userTransaction1.commit();
         }
-        catch(Exception e)
+        catch(Throwable e)
         {
             try { userTransaction1.rollback(); } catch (IllegalStateException ee) {}
             throw e;
@@ -154,18 +153,34 @@ public class ContentHitsAspectTest extends TestCase
      * @param expectedUpdateCount       the expected update count value
      * @param expectedReadCount         the expected read count value
      */
-    private void checkHitCountValues(NodeService nodeService, NodeRef nodeRef, int expectedUpdateCount, int expectedReadCount)
+    private synchronized void checkHitCountValues(
+            NodeService nodeService,
+            NodeRef nodeRef,
+            int expectedUpdateCount,
+            int expectedReadCount)
     {
-        // Get the update count value
-        int currentUpdateCount = ((Integer)nodeService.getProperty(nodeRef, ContentHitsAspect.PROP_UPDATE_COUNT)).intValue();
-        
-        // Assert that it matches the expected value
-        assertEquals(expectedUpdateCount, currentUpdateCount);
-        
-        // Get the read count value
-        int currentReadCount = ((Integer)nodeService.getProperty(nodeRef, ContentHitsAspect.PROP_READ_COUNT)).intValue();
-        
-        // Assert that it matches the expected value        
-        assertEquals(expectedReadCount, currentReadCount);
+        int currentReadCount = 0;
+        int currentUpdateCount = 0;
+        // Loop for 5 seconds, testing for the value
+        for (int i = 0; i < 5; i++)
+        {
+            try { this.wait(1000L); } catch (InterruptedException e) {}
+            
+            // Get the read count value
+            currentReadCount = ((Integer)nodeService.getProperty(nodeRef, ContentHitsAspect.PROP_READ_COUNT)).intValue();
+            // Get the update count value
+            currentUpdateCount = ((Integer)nodeService.getProperty(nodeRef, ContentHitsAspect.PROP_UPDATE_COUNT)).intValue();
+            
+            if (expectedUpdateCount == currentUpdateCount && expectedReadCount == currentReadCount)
+            {
+                // Got it
+                return;
+            }
+        }
+        fail("Content Hits incorrect: \n" +
+                "   Expected read count:  " + expectedReadCount + "\n" +
+                "   Actual read count:    " + currentReadCount + "\n" +
+                "   Expected write count: " + expectedUpdateCount + "\n" +
+                "   Actual write count:   " + currentUpdateCount);
     }
 }
