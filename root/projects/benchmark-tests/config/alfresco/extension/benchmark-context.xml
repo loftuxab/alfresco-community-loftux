@@ -14,7 +14,7 @@
 	   	  <ref bean="contentService" />
 	   </property>
 	   <property name="transactionService">
-	   	  <ref bean="transactionComponent" />
+	   	  <ref bean="transactionService" />
 	   </property>
 	   <property name="authenticationService">
 	   	  <ref bean="authenticationService" />
