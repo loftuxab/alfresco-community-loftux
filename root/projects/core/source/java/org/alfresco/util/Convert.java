@@ -99,6 +99,7 @@ public class Convert
     private static final String OPTION_NO_RECURSE = "--no-recurse";
     private static final String OPTION_NO_BACKUP = "--no-backup";
     private static final String OPTION_DRY_RUN = "--dry-run";
+    private static final String OPTION_VERBOSE = "--verbose";
     private static final String OPTION_QUIET = "--quiet";
     
     private static final Set<String> OPTIONS = new HashSet<String>(13);
@@ -115,6 +116,7 @@ public class Convert
         OPTIONS.add(OPTION_NO_RECURSE);
         OPTIONS.add(OPTION_NO_BACKUP);
         OPTIONS.add(OPTION_DRY_RUN);
+        OPTIONS.add(OPTION_VERBOSE);
         OPTIONS.add(OPTION_QUIET);
     }
 
@@ -129,6 +131,7 @@ public class Convert
     private Integer replaceTabs = null;
     private boolean noRecurse = false;
     private boolean noBackup = false;
+    private boolean verbose = false;
     private boolean quiet = false;
     
     public static void main(String[] args)
@@ -188,6 +191,7 @@ public class Convert
         lineEnding = optionValues.get(OPTION_LINE_ENDING);
         noRecurse = optionValues.containsKey(OPTION_NO_RECURSE);
         noBackup = optionValues.containsKey(OPTION_NO_BACKUP);
+        verbose = optionValues.containsKey(OPTION_VERBOSE);
         quiet = optionValues.containsKey(OPTION_QUIET);
         
         // Check that the tab replacement count is correct
@@ -263,6 +267,16 @@ public class Convert
         {
             System.err.println("Convert: ");
             System.err.println("   Line endings can be either WINDOWS or UNIX: " + lineEnding);
+            System.err.flush();
+            printUsage();
+            System.exit(1);
+        }
+        
+        // Check quiet/verbose match
+        if (verbose && quiet)
+        {
+            System.err.println("Convert: ");
+            System.err.println("   Cannot output in verbose and quiet mode.");
             System.err.flush();
             printUsage();
             System.exit(1);
@@ -397,10 +411,6 @@ public class Convert
             return;
         }
         
-        if (!quiet)
-        {
-            System.out.print("   " + file);
-        }
         if (file.length() > (1024 * 1024))              // 1MB.  TODO: Make an option
         {
             System.out.println(" (Too big)");
@@ -465,7 +475,7 @@ public class Convert
                 }
                 if (!quiet)
                 {
-                    System.out.print(" <Modified>");
+                    System.out.println("   " + file + " <Modified>");
                 }
                 // Only write to the file if this is not a dry run
                 if (!dryRun)
@@ -476,9 +486,9 @@ public class Convert
             }
             else
             {
-                if (!quiet)
+                if (verbose)
                 {
-                    System.out.print(" <No change>");
+                    System.out.println("   " + file + " <No change>");
                 }
             }
         }
@@ -501,9 +511,8 @@ public class Convert
         }
         finally
         {
-            if (!quiet)
+            if (!quiet || verbose)
             {
-                System.out.println("");
                 System.out.flush();
             }
         }
@@ -786,6 +795,8 @@ public class Convert
           .append("         --dry-run \n")
           .append("            Do not modify or backup any files. \n")
           .append("            No filesystem modifications are made. \n")
+          .append("         --verbose \n")
+          .append("            Dump all files checked to std.out. \n")
           .append("         --quiet \n")
           .append("            Don't dump anything to std.out. \n")
           .append("       directory: \n")
