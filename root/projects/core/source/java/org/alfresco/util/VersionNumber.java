@@ -144,7 +144,7 @@ public class VersionNumber implements Comparable<VersionNumber>, Serializable
      * @param index     the index
      * @return          the part value, 0 if the index is invalid
      */
-    private int getPart(int index)
+    public int getPart(int index)
     {
         int result = 0;
         if (index < this.parts.length)
