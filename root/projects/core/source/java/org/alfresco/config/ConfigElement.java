@@ -90,6 +90,14 @@ public interface ConfigElement
     public ConfigElement getChild(String name);
     
     /**
+     * Returns a list of children held by this ConfigElement with the given name.
+     * 
+     * @param name The name of the config element to retrieve
+     * @return The list of children.
+     */
+    public List<ConfigElement> getChildren(String name);
+
+    /**
      * Returns a list of children held by this ConfigElement
      * 
      * @return The list of children.
