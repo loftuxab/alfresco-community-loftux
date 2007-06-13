@@ -119,13 +119,21 @@ public class I18NUtilTest extends TestCase
         options.add(zh_CN_1);                       // zh_CN_1
         options.add(zh_CN_2);                       // zh_CN_2
         
+        Set<Locale> chineseMatches = new HashSet<Locale>(3);
+        chineseMatches.add(Locale.SIMPLIFIED_CHINESE);
+        chineseMatches.add(zh_CN_1);                      
+        chineseMatches.add(zh_CN_2);   
+        
+        Set<Locale> frenchMatches = new HashSet<Locale>(3);
+        frenchMatches.add(Locale.FRANCE);
+        
         // check
         assertEquals(Locale.CHINA, I18NUtil.getNearestLocale(Locale.CHINA, options));
         assertEquals(Locale.CHINESE, I18NUtil.getNearestLocale(Locale.CHINESE, options));
         assertEquals(zh_CN_1, I18NUtil.getNearestLocale(zh_CN_1, options));
         assertEquals(zh_CN_2, I18NUtil.getNearestLocale(zh_CN_2, options));
-        assertEquals(zh_CN_2, I18NUtil.getNearestLocale(zh_CN_3, options));         // must match the last variant
-        assertEquals(Locale.FRANCE, I18NUtil.getNearestLocale(fr_FR_1, options));
+        assertTrue(chineseMatches.contains(I18NUtil.getNearestLocale(zh_CN_3, options)));         // must match the last variant - but set can have any order an IBM JDK differs!
+        assertEquals(Locale.FRANCE, I18NUtil.getNearestLocale(fr_FR_1, options)); // same here
         
         // now test the match for just anything
         Locale na_na_na = new Locale("", "", "");
