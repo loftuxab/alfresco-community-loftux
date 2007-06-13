@@ -214,10 +214,19 @@ public class I18NUtil
         {
             // We have done an earlier equality check, so there isn't a matching variant
             // Also, we know that there are multiple options at this point, either of which will do.
-            for (Locale locale : remaining)
-            {
-                return locale;
-            }
+        	
+        	// This gets any country match (there will be worse matches so we take the last the country match)
+        	if(lastMatchingOption != null)
+        	{
+        		return lastMatchingOption;
+        	}
+        	else
+        	{
+                for (Locale locale : remaining)
+                {
+                    return locale;
+                }
+        	}
         }
         // The logic guarantees that this code can't be called
         throw new RuntimeException("Logic should not allow code to get here.");
