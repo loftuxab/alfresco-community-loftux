@@ -60,6 +60,7 @@
                     distribute-webserviceclient, 
                     distribute-benchmark, 
                     distribute-mmt,
+                    distribute-sample-extensions,
                     distribute-docs" />
 
    <target name="set-build-number" 
@@ -429,6 +430,41 @@
          <tarfileset dir="${dir.project.webserviceclient.dist}" />
          <tarfileset dir="${dir.project.webserviceclient.config}/alfresco" 
                      prefix="alfresco"/>
+      </tar>
+   </target>
+
+   <!-- ************************************ -->
+   <!-- ** Module Management Tool targets ** -->
+   <!-- ************************************ -->
+   
+   <target name="assemble-sample-extensions" 
+           depends="init">
+
+      <!-- Create the required directory structure -->
+      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble.extension-samples}" />
+
+      <!-- get the sample extension files -->
+      <copy todir="${dir.continuous.assemble.extension-samples}" 
+            flatten="false">
+         <fileset dir="${dir.project.repository.config}" 
+                  includes="alfresco/extension/**/*" />
+      </copy>
+
+   </target>
+   
+   <target name="distribute-sample-extensions" 
+           depends="assemble-sample-extensions"
+           description="Creates a jar file containing the alfresco sample extensions">
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.sample-extensions}.zip">
+         <zipfileset dir="${dir.continuous.assemble.extension-samples}" />
+      </zip>
+      <tar destfile="${dir.continuous.dist}/${file.name.dist.sample-extensions}.tar.gz" 
+           longfile="gnu" 
+           compression="gzip">
+         <tarfileset dir="${dir.continuous.assemble.extension-samples}" />
       </tar>
    </target>
 
