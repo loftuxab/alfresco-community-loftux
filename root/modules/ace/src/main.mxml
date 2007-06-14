@@ -151,7 +151,7 @@
             
             private function onSearch():void
             {	
-            	searchService.url="http://localhost:8090/alfresco/service/api/search/keyword.atom?q="+searchTxt.text;
+            	searchService.url="http://localhost:8080/alfresco/service/api/search/keyword.atom?q="+searchTxt.text;
             	searchService.send();
             }
             
@@ -241,7 +241,7 @@
 					method="GET" 
 	   	 			result="onLoginComplete(event);" 
 	   	 			fault="username.setFocus(); Alert.show(event.fault.faultString, 'Error Log');"
-	   				url="http://localhost:8090/alfresco/service/api/login">
+	   				url="http://localhost:8080/alfresco/service/api/login">
     	 <mx:request xmlns="">
         	 <u>{username.text}</u>
          	<pw>{password.text}</pw>
@@ -252,7 +252,7 @@
     				method="POST" 
 	   	 			result="onLogoutComplete(event);" 
 	   				fault="Alert.show(event.fault.faultString, 'Error Log');"
-	   				url="http://localhost:8090/alfresco/service/api/login/ticket/{ticketTxt.text}">
+	   				url="http://localhost:8080/alfresco/service/api/login/ticket/{ticketTxt.text}">
   		  <mx:request xmlns="" >
   		  		<alf_method>DELETE</alf_method>
   		   </mx:request>
@@ -263,7 +263,7 @@
 	   				 method="GET"
 	   				 result="onSearchComplete(event);" 
     	 			 fault="Alert.show(event.fault.faultString, 'Error Log');"
-    	 			 url="http://localhost:8090/alfresco/service/api/search/keyword.atom?q={searchTxt.text}">
+    	 			 url="http://localhost:8080/alfresco/service/api/search/keyword.atom?q={searchTxt.text}">
   	 </mx:HTTPService>  
   	 
   	 <!-- loginPanel has the controls for Login -->
