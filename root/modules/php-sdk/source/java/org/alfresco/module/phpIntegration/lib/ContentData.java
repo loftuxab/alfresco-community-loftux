@@ -239,6 +239,7 @@ public class ContentData implements ScriptObject
     {
         // Set the content string
         this.updatedContentString = content;
+        this.size = content.length();
         this.isDirty = true;
         this.node.contentUpdated();
     }

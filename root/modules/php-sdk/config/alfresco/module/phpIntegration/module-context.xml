@@ -112,6 +112,33 @@
     		<value>org.alfresco.module.phpIntegration.lib.ContentData</value>
     	</property>    	
     </bean>
+        
+    <bean id="phpDataDictionary" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>DataDictionary</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.DataDictionary</value>
+    	</property>    	
+    </bean>
+    
+    <bean id="phpFile" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>File</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.File</value>
+    	</property>    	
+    </bean>
+    
+    <bean id="phpFolder" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>Folder</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.Folder</value>
+    	</property>    	
+    </bean>
     
     
     <!-- Methods Extensions -->
