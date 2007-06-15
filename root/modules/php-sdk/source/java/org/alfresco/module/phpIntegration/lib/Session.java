@@ -28,56 +28,107 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.namespace.QName;
 import org.apache.log4j.Logger;
 
 /**
+ * The PHP Session object implementation.
+ * 
  * @author Roy Wetherall
  */
 public class Session implements ScriptObject
 {
+    /** Logger */
     private static Logger logger = Logger.getLogger(Session.class);
     
+    /** Script object name */
     private static final String SCRIPT_OBJECT_NAME = "Session";
     
+    /** Service registry */
     private ServiceRegistry serviceRegistry;
     
+    /** Namespace map */
     private NamespaceMap namespaceMap;
     
+    /** Data dictionary */
+    private DataDictionary dataDictionary;
+    
+    /** Internal cache of nodes in the scope of this session */
     private Map<String, Node> nodeMap;
     
+    /**
+     * Constructor
+     * 
+     * @param serviceRegistry   the service registry
+     */
     public Session(ServiceRegistry serviceRegistry)
     {
         this.serviceRegistry = serviceRegistry;
         this.namespaceMap = new NamespaceMap(this);
+        this.dataDictionary = new DataDictionary(this);
         this.nodeMap = new HashMap<String, Node>(10);
     }
     
+    /**
+     * @see org.alfresco.module.phpIntegration.lib.ScriptObject#getScriptObjectName()
+     */
     public String getScriptObjectName()
     {
         return SCRIPT_OBJECT_NAME;
     }
     
+    /**
+     * Get the service registry
+     * 
+     * @return ServiceRegistry  the service registry
+     */
     public ServiceRegistry getServiceRegistry()
     {
         return serviceRegistry;
     }
     
+    /**
+     * The currently authenticated ticket
+     * 
+     * @return  String  the ticket
+     */
     public String getTicket()
     {
         return this.serviceRegistry.getAuthenticationService().getCurrentTicket();
     }
     
+    /**
+     * Get the namespace map
+     * 
+     * @return  NamespaceMap    the namespace map
+     */
     public NamespaceMap getNamespaceMap()
     {
         return this.namespaceMap;
     }
     
+    /**
+     * Gets the data dictionary
+     * 
+     * @return  DataDictionary  the data dictionary
+     */
+    public DataDictionary getDataDictionary()
+    {
+        return this.dataDictionary;
+    }
+    
+    /**
+     * Gets a list of the stores in the repository
+     * 
+     * @return  Store[]     a list of stores
+     */
     public Store[] getStores()
     {
         // Get the node service
@@ -99,7 +150,13 @@ public class Session implements ScriptObject
     }
     
     
-    // TODO figure out how to use the attributes to set the default values ...
+    /**
+     * Get the store object
+     * 
+     * @param address   the addess of the store
+     * @param scheme    the scheme of the store
+     * @return Store    the Store object
+     */
     public Store getStore(String address, String scheme)
     {
         Store store = null;
@@ -120,6 +177,11 @@ public class Session implements ScriptObject
         return store;
     }
     
+    /**
+     * 
+     * @param value
+     * @return
+     */
     public Store getStoreFromString(String value)
     {
         Store store = null;
@@ -134,9 +196,36 @@ public class Session implements ScriptObject
         return store;
     }
     
+    /**
+     * 
+     * @param store
+     * @param id
+     * @return
+     */
     public Node getNode(Store store, String id)
     {
         NodeRef nodeRef = new NodeRef(store.getStoreRef(), id);
+        return getNodeImpl(nodeRef);
+    }
+    
+    /**
+     * 
+     * @param nodeString
+     * @return
+     */
+    public Node getNodeFromString(String nodeString)
+    {
+        NodeRef nodeRef = new NodeRef(nodeString);
+        return getNodeImpl(nodeRef);
+    }
+    
+    /**
+     * 
+     * @param nodeRef
+     * @return
+     */
+    private Node getNodeImpl(NodeRef nodeRef)
+    {
         Node node = this.nodeMap.get(nodeRef.toString());
         
         if (node == null)
@@ -144,24 +233,20 @@ public class Session implements ScriptObject
             // Check for the existance of the node        
             if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
             {
-                node = new Node(this, nodeRef);
-            }
-        }
-        
-        return node;
-    }
-    
-    public Node getNodeFromString(String nodeString)
-    {
-        Node node = this.nodeMap.get(nodeString); 
-        
-        if (node == null)
-        {        
-            // Check for the existance of the node
-            NodeRef nodeRef = new NodeRef(nodeString);
-            if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
-            {
-                node = new Node(this, nodeRef);
+                // Get the nodes type
+                QName type = this.serviceRegistry.getNodeService().getType(nodeRef);
+                if (this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_CONTENT) == true)
+                {
+                    node = new File(this, nodeRef);
+                }
+                else if (this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_FOLDER) == true)
+                {
+                    node = new Folder(this, nodeRef);
+                }
+                else
+                {
+                    node = new Node(this, nodeRef);
+                }
             }
         }
         
@@ -227,7 +312,7 @@ public class Session implements ScriptObject
         int iIndex = 0;
         for (NodeRef nodeRef : nodeRefs)
         {
-            result[iIndex] = new Node(this, nodeRef);
+            result[iIndex] = getNodeImpl(nodeRef);
             iIndex++;
         }        
         

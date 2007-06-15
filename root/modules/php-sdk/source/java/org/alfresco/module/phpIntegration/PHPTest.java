@@ -33,7 +33,6 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.jscript.ClasspathScriptLocation;
-import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -58,6 +57,7 @@ public class PHPTest extends BaseSpringTest
     
     private NodeService nodeService;
     private ContentService contentService;
+    @SuppressWarnings("unused")
     private TemplateService templateService;
     private ScriptService scriptService;
     private PHPProcessor phpProcessor;
@@ -197,13 +197,15 @@ public class PHPTest extends BaseSpringTest
     
     public void testGlobalVariables()
     {
+        assertNotNull(this.templateNodeRef);
+        
         Map<String, Object> model = new HashMap<String, Object>(6);
-        model.put("testNode", this.templateNodeRef);
         model.put("testStore", this.storeRef);
         model.put("testString", "testString");
         model.put("testNumber", 1);
         model.put("nodeId", this.templateNodeRef.getId());
         model.put("storeId", this.storeRef.getIdentifier());
+        model.put("testNode", this.templateNodeRef);
         // TODO test dates and other common types
         
         StringWriter out = new StringWriter();        
@@ -323,6 +325,45 @@ public class PHPTest extends BaseSpringTest
 //        ContentReader contentReader = this.contentService.getReader(nodeRef, ContentModel.PROP_CONTENT);
 //        System.out.println("appended content ... " + contentReader.getContentString());
         
+    }
+    
+    public void testFileFolder()
+    {
+        // Create a folder
+        Map<QName, Serializable> props3 = new HashMap<QName, Serializable>(1);
+        props3.put(ContentModel.PROP_NAME, "testFolder");
+        NodeRef testFolder = this.nodeService.createNode(
+                this.rootNode, 
+                ContentModel.ASSOC_CHILDREN, 
+                ContentModel.ASSOC_CHILDREN, 
+                ContentModel.TYPE_FOLDER, 
+                props3).getChildRef();
+        
+        // Create the node
+        Map<QName, Serializable> props = new HashMap<QName, Serializable>(2);
+        props.put(ContentModel.PROP_NAME, "testNode.txt");
+        props.put(ContentModel.PROP_AUTHOR, "Roy Wetherall");
+        NodeRef nodeRef = this.nodeService.createNode(
+                testFolder, 
+                ContentModel.ASSOC_CONTAINS, 
+                QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "testNode.txt"), 
+                ContentModel.TYPE_CONTENT, 
+                props).getChildRef(); 
+        
+        // Add some test content
+        ContentWriter contentWriter = this.contentService.getWriter(nodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.setEncoding("UTF-8");
+        contentWriter.setMimetype(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        contentWriter.putContent("test content");
+                
+        Map<String, Object> model = new HashMap<String, Object>(2);   
+        model.put("file", nodeRef);
+        model.put("folder", testFolder);
+        StringWriter out = new StringWriter();        
+        this.phpProcessor.process(CLASSPATH_ROOT + "testFileFolder.php", model, out);
+        
+        System.out.println("testFileFolder output:");
+        System.out.println(out.toString());
     }
 
 }

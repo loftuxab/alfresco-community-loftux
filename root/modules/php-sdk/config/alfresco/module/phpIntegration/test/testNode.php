@@ -179,5 +179,11 @@
 	$node->removeAssociation($association);
 	
 	assertEquals(0, count($node->associations));
+	
+	// Check isSubTypeOf
+	assertTrue($node->isSubTypeOf("cm_content"));
+	assertTrue($folder->isSubTypeOf("cm_folder"));
+	assertTrue($newNode->isSubTypeOf("cm_folder"));
+	assertFalse($folder->isSubTypeOf("cm_content"));
 		
 ?>

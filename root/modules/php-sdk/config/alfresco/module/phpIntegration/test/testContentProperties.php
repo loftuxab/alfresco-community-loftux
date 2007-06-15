@@ -10,7 +10,7 @@
 	$contentData = $node->cm_content;
 	assertNull($contentData, "No content data has been set so should be null");
 	
-	$contentData2 = $node->setContent("cm_content", "text/plain", "UTF-8");
+	$contentData2 = $node->updateContent("cm_content", "text/plain", "UTF-8");
 	assertNotNull($contentData2, "The newly created content data is unexpectedly null");
 	assertEquals("text/plain", $contentData2->mimetype);
 	assertEquals("UTF-8", $contentData2->encoding);

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
@@ -70,10 +71,10 @@ public class Node implements ScriptObject
     private static final String NEW_NODE_DELIM = "new_";
     
     /** Node service */
-    private NodeService nodeService;
+    protected NodeService nodeService;
     
     /** Session object */
-    private Session session;
+    protected Session session;
     
     /** Node id */
     private String id;
@@ -218,6 +219,39 @@ public class Node implements ScriptObject
         
         // Return the properties
         return new HashMap<String, Object>(this.properties);
+    }
+    
+    /**
+     * Get the value of a property
+     * 
+     * @param propertyName  the property name
+     * @return Object       the value of the property
+     */
+    public Object getProperty(String propertyName)
+    {
+        // Get the property value from the property map
+        propertyName = this.session.getNamespaceMap().getFullName(propertyName);
+        Map<String, Object> properties = getProperties();
+        return properties.get(propertyName);
+    }
+    
+    /**
+     * Set the value of a property
+     * 
+     * @param propertyName      the property name
+     * @param value             the value of the property
+     */
+    public void setProperty(String propertyName, Object value)
+    {
+        // Get the full name of the property
+        propertyName = this.session.getNamespaceMap().getFullName(propertyName);
+        
+        // Make sure the properties are populated
+        populateProperties();
+        
+        // Set the value of the property
+        this.properties.put(propertyName, value);
+        this.arePropertiesDirty = true;
     }
     
     /**
@@ -414,7 +448,7 @@ public class Node implements ScriptObject
     }
     
     /**
-     * Sets the content on a content property
+     * Updates the content on a content property
      * 
      * @param property  the content property name
      * @param mimetype  the content mimetype
@@ -422,7 +456,7 @@ public class Node implements ScriptObject
      * @param content   the content
      * @return ContentData the contetn data
      */
-    public org.alfresco.module.phpIntegration.lib.ContentData setContent(String property, String mimetype, String encoding, String content)
+    public org.alfresco.module.phpIntegration.lib.ContentData updateContent(String property, String mimetype, String encoding, String content)
     {
         // Make sure the properties are populated
         populateProperties();
@@ -463,8 +497,22 @@ public class Node implements ScriptObject
         
         // Create the new node
         String id = NEW_NODE_DELIM + GUID.generate();
-        Node newNode = new Node(this.session, this.getStore(), id, type);
         
+        // TODO Need to generalise this at some point
+        Node newNode = null;
+        if (this.session.getServiceRegistry().getDictionaryService().isSubClass(QName.createQName(type), ContentModel.TYPE_CONTENT) == true)
+        {
+            newNode = new File(this.session, this.getStore(), id, type);
+        }
+        else if (this.session.getServiceRegistry().getDictionaryService().isSubClass(QName.createQName(type), ContentModel.TYPE_FOLDER) == true)
+        {
+            newNode = new Folder(this.session, this.getStore(), id, type);
+        }
+        else
+        {
+            newNode = new Node(this.session, this.getStore(), id, type);
+        }
+                
         // Create the child association object
         ChildAssociation childAssociation = new ChildAssociation(this, newNode, associationType, associationName, true, 0);
         
@@ -728,6 +776,17 @@ public class Node implements ScriptObject
     }
     
     /**
+     * Indicates whether this node is a sub type of the another type.
+     * 
+     * @param subTypeOf     is this node a sub type of this type.
+     * @return boolean      true if it is, false otherwise
+     */
+    public boolean isSubTypeOf(String subTypeOf)
+    {
+        return this.session.getDataDictionary().isSubTypeOf(getType(), subTypeOf);
+    }
+    
+    /**
      * Dynamic implementation of get properties
      * 
      * @param name      the name of the property
@@ -956,7 +1015,7 @@ public class Node implements ScriptObject
     /**
      * Cleans the nodes cached data and restores it to its initial state
      */
-    private void cleanNode()
+    protected void cleanNode()
     {
         if (logger.isDebugEnabled() == true)
         {
@@ -1022,6 +1081,11 @@ public class Node implements ScriptObject
                 {
                     if (entry.getValue() instanceof ContentData)
                     {
+                        if (logger.isDebugEnabled() == true)
+                        {
+                            logger.debug("   - Found content property " + entry.getKey());                
+                        }
+                        
                         ContentData value = (ContentData)entry.getValue();
                         org.alfresco.module.phpIntegration.lib.ContentData contentData = new org.alfresco.module.phpIntegration.lib.ContentData(
                                                                                             this,
