@@ -5,6 +5,7 @@ rem ---------------------------------------------------------------------------
 
 rem set Alfresco home (includes trailing \  e.g. c:\alfresco\)
 set ALF_HOME=%~dp0
+set ALF_HOME_URI=%ALF_HOME:\=/%
 
 set CATALINA_HOME=%ALF_HOME%tomcat
 
@@ -47,7 +48,7 @@ rem if exist "virtual_start.bat" call virtual_start.bat
 rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" -nologo -headless -nofirststartwizard
+if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///%ALF_HOME_URI%oouser" -nologo -headless -nofirststartwizard
 
 goto nostop
 :nostart
