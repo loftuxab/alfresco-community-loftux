@@ -183,7 +183,7 @@ public class HrefValidatorTest extends TestCase
 
              // NEON -  remove asap
              HrefValidationProgress progress = new HrefValidationProgress();
-             if (false)
+             if (true)
              {
                  LinkValidation_.updateHrefInfo( 
                      store_name,                    // store to update hrefs
@@ -249,9 +249,9 @@ public class HrefValidatorTest extends TestCase
 
              start = System.currentTimeMillis();
 
-             List<HrefManifest> file_href_manifests = 
-                   LinkValidation_.getBrokenHrefManifests(  store_name );
-                // LinkValidation_.getHrefManifests(        store_name,  400, 599 );
+             List<HrefManifestEntry> file_href_manifests = 
+                   LinkValidation_.getBrokenHrefManifestEntries(  store_name );
+                // LinkValidation_.getHrefManifestEntries(        store_name,  400, 599 );
 
              end = System.currentTimeMillis();
 
@@ -259,7 +259,7 @@ public class HrefValidatorTest extends TestCase
                  "\n\n------------------- Broken Hrefs manifests  "  +
                  "(time in ms: " +  (end - start ) + " )" );
 
-             for ( HrefManifest manifest : file_href_manifests )
+             for ( HrefManifestEntry manifest : file_href_manifests )
              {
                  System.out.println("File: "  + manifest.getFileName() );
                  List<String> hrefs = manifest.getHrefs();
@@ -274,35 +274,59 @@ public class HrefValidatorTest extends TestCase
              String index_html = "mysite:/www/avm_webapps/ROOT/products/ecm/comparison/index.html";
 
 
-             System.out.println("---single file: " + index_html);
-             HrefManifest file_href_manifest = LinkValidation_.getBrokenHrefManifest( index_html );
-             List<String> single_file_hrefs  = file_href_manifest.getHrefs();
-
-             for (String href : single_file_hrefs )
-             {
-                 System.out.println("      "  + href );
-             }
-
-
-             index_html = "mysite:/www/avm_webapps/ROOT/assets/footer.html";
-             System.out.println("\nHrefs dependent on file: " + index_html);
-             List<String> dependent_hrefs =  LinkValidation_.getHrefsDependentUponFile( index_html );
-             for (String href : dependent_hrefs)
-             {
-                 System.out.println("      "  + href );
-             }
-
+              // -1, "mysite:/www/avm_webapps/ROOT",
+              // progress
 
              progress = new HrefValidationProgress();
 
-             BrokenHrefConcordanceDifference conc_diff = 
-                LinkValidation_.getBrokenHrefConcordanceDifference(  -1, "mysite--alice:/www/avm_webapps/ROOT",
-                                                                     -1, "mysite:/www/avm_webapps/ROOT",
-                                                                     progress
-                                                                  );
+             HrefDifference href_diff = 
+                LinkValidation_.getHrefDifference( 
+                    "mysite--alice:/www/avm_webapps/ROOT",
+                    "mysite:/www/avm_webapps/ROOT",
+                    10000,
+                    30000,  
+                    5,
+                    progress);
+
+
+
+             // Show what is broken due to deleted files
+             System.out.println("\n\nFiles containing URLs broken due to deletion:");
+
+             HrefManifest broken_by_deletion    = 
+                          href_diff.getBrokenByDeletionHrefManifest();
+
+             for ( HrefManifestEntry manifest_entry : 
+                   broken_by_deletion.getManifestEntries() 
+                  )
+             {
+                 System.out.println("\nFile:  " +  manifest_entry.getFileName() );
+                 for ( String broken_href :  manifest_entry.getHrefs() )
+                 {
+                     System.out.println("       " +  broken_href);
+                 }
+             }
+
+
+             // Show what is broken within new mods:
+             System.out.println("\n\nFiles containing URLs broken in new/modified files:");
+             HrefManifest broken_in_newmod = 
+                          href_diff.getBrokenInNewModHrefManifest();
+
+             for ( HrefManifestEntry manifest_entry : 
+                   broken_in_newmod.getManifestEntries() 
+                  )
+             {
+                 System.out.println("\nFile:  " +  manifest_entry.getFileName() );
+                 for ( String broken_href :  manifest_entry.getHrefs() )
+                 {
+                     System.out.println("       " +  broken_href);
+                 }
+             }
 
 
              // Just test the first store... that's enough.
+
              break;
          }
     }
