@@ -20,6 +20,7 @@ namespace AlfrescoWord2003
       private ServerDetails m_ServerDetails;
       private string m_TemplateRoot = "";
       private bool m_ShowPaneOnActivate = false;
+      private bool m_ManuallyHidden = false;
 
 
       public Word.Application WordApplication
@@ -58,14 +59,17 @@ namespace AlfrescoWord2003
       {
          m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
          this.showDocumentDetails(m_ServerDetails.DocumentPath);
-         this.Show();
+         if (!m_ManuallyHidden)
+         {
+            this.Show();
+         }
       }
 
       public void OnDocumentChanged()
       {
          try
          {
-            if ((m_WordApplication.ActiveDocument != null) && (m_ServerDetails.AuthenticationTicket != ""))
+            if ((m_WordApplication.ActiveDocument != null) && (m_ServerDetails.getAuthenticationTicket(false) != ""))
             {
                m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
                this.showDocumentDetails(m_ServerDetails.DocumentPath);
@@ -73,7 +77,7 @@ namespace AlfrescoWord2003
             else
             {
                m_ServerDetails.DocumentPath = "";
-               this.showHome();
+               this.showHome(false);
             }
          }
          catch
@@ -98,30 +102,59 @@ namespace AlfrescoWord2003
       public void OnDocumentBeforeClose()
       {
          m_ServerDetails.DocumentPath = "";
-         this.showHome();
+         this.showHome(true);
       }
 
-      public void showHome()
+      public void OnToggleVisible()
+      {
+         m_ManuallyHidden = !m_ManuallyHidden;
+
+         if (m_ManuallyHidden)
+         {
+            this.Hide();
+         }
+         else
+         {
+            this.Show();
+         }
+      }
+
+      private void AlfrescoPane_FormClosing(object sender, FormClosingEventArgs e)
+      {
+         // Override the close box
+         if (e.CloseReason == CloseReason.UserClosing)
+         {
+            e.Cancel = true;
+            m_ManuallyHidden = true;
+            this.Hide();
+         }
+      }
+
+      public void showHome(bool isClosing)
       {
          // Do we have a valid web server address?
          if (m_ServerDetails.WebClientURL == "")
          {
             // No - show the configuration UI
-            PanelMode = PanelModes.PanelModeConfiguration;
+            PanelMode = PanelModes.Configuration;
          }
          else
          {
             // Yes - navigate to the home template
 //            string theURI = string.Format(@"{0}{1}my_alfresco.ftl&contextPath=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
             string theURI = string.Format(@"{0}{1}myAlfresco?p=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
-            string strAuthTicket = m_ServerDetails.AuthenticationTicket;
+            // We don't prompt the user if the document is closing
+            string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
             if (strAuthTicket != "")
             {
                theURI += "&ticket=" + strAuthTicket;
             }
-            webBrowser.ObjectForScripting = this;
-            webBrowser.Navigate(new Uri(theURI));
-            PanelMode = PanelModes.PanelModeWebBrowser;
+            if (!isClosing || (strAuthTicket != ""))
+            {
+               webBrowser.ObjectForScripting = this;
+               webBrowser.Navigate(new Uri(theURI));
+               PanelMode = PanelModes.WebBrowser;
+            }
          }
       }
 
@@ -131,20 +164,20 @@ namespace AlfrescoWord2003
          if (m_ServerDetails.WebClientURL == "")
          {
             // No - show the configuration UI
-            PanelMode = PanelModes.PanelModeConfiguration;
+            PanelMode = PanelModes.Configuration;
          }
          else
          {
 //            string theURI = string.Format(@"{0}{1}document_details.ftl&contextPath=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
             string theURI = string.Format(@"{0}{1}documentDetails?p=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
-            string strAuthTicket = m_ServerDetails.AuthenticationTicket;
+            string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
             if (strAuthTicket != "")
             {
                theURI += "&ticket=" + strAuthTicket;
             }
             webBrowser.ObjectForScripting = this;
             webBrowser.Navigate(new Uri(theURI));
-            PanelMode = PanelModes.PanelModeWebBrowser;
+            PanelMode = PanelModes.WebBrowser;
          }
       }
 
@@ -181,13 +214,20 @@ namespace AlfrescoWord2003
       {
          object missingValue = Type.Missing;
          // TODO: WebDAV or CIFS path to save on?
-         object file = m_ServerDetails.WebDAVURL + documentPath + "/" + m_WordApplication.ActiveDocument.Name;
+         string filePath = m_ServerDetails.WebDAVURL;
+         if (documentPath.Length > 0)
+         {
+            filePath += documentPath + "/";
+         }
+         filePath += m_WordApplication.ActiveDocument.Name;
+         // Remove empty path elements
+         object file = filePath;
          try
          {
             m_WordApplication.ActiveDocument.SaveAs(
-            ref file, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
-            ref missingValue, ref missingValue, ref missingValue, ref missingValue,
-            ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue);
+               ref file, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
+               ref missingValue, ref missingValue, ref missingValue, ref missingValue,
+               ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue);
             showDocumentDetails(documentPath + "/" + m_WordApplication.ActiveDocument.Name);
          }
          catch (Exception e)
@@ -198,16 +238,16 @@ namespace AlfrescoWord2003
 
       private enum PanelModes
       {
-         PanelModeWebBrowser,
-         PanelModeConfiguration
+         WebBrowser,
+         Configuration
       }
 
       private PanelModes PanelMode
       {
          set
          {
-            pnlWebBrowser.Visible = (value == PanelModes.PanelModeWebBrowser);
-            pnlConfiguration.Visible = (value == PanelModes.PanelModeConfiguration);
+            pnlWebBrowser.Visible = (value == PanelModes.WebBrowser);
+            pnlConfiguration.Visible = (value == PanelModes.Configuration);
          }
       }
 
@@ -319,12 +359,13 @@ namespace AlfrescoWord2003
 
       private void lnkBackToBrowser_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
       {
-         PanelMode = PanelModes.PanelModeWebBrowser;
+         PanelMode = PanelModes.WebBrowser;
       }
       private void lnkShowConfiguration_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
       {
-         PanelMode = PanelModes.PanelModeConfiguration;
+         PanelMode = PanelModes.Configuration;
       }
       #endregion
+
    }
 }

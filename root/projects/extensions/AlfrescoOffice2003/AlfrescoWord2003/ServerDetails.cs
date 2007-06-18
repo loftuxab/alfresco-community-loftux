@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
@@ -27,6 +29,16 @@ namespace AlfrescoWord2003
       private string m_AuthenticationTicket = "";
       private string m_DocumentPhysicalPath = "";
       private string m_DocumentAlfrescoPath = "";
+
+      private byte[] m_IV = new byte[8];
+      private byte[] m_Key = new byte[8];
+
+      public ServerDetails()
+      {
+         AssemblyCompanyAttribute assemblyCompany = (AssemblyCompanyAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyCompanyAttribute));
+         m_IV = Encoding.ASCII.GetBytes(assemblyCompany.Company.Substring(0, 8));
+         for (int i=8; i>0; m_Key[i-1] = (byte)(m_IV[8-(i--)] ^ 0x20));
+      }
 
       public string ServerName
       {
@@ -63,14 +75,68 @@ namespace AlfrescoWord2003
       {
          get
          {
-            // TODO: Password will be encrypted as read from the registry
-            return Password;
+            return Convert.ToBase64String(Encrypt(Password));
          }
          set
          {
-            Password = value;
+            Password = Decrypt(Convert.FromBase64String(value));
          }
       }
+
+      private byte[] Encrypt(string PlainText)
+      {
+         // Create a new DES key
+         DESCryptoServiceProvider key = new DESCryptoServiceProvider();
+         key.IV = m_IV;
+         key.Key = m_Key;
+
+         // Create a CryptoStream using a memory stream and the CSP DES key
+         MemoryStream ms = new MemoryStream();
+         CryptoStream encStream = new CryptoStream(ms, key.CreateEncryptor(), CryptoStreamMode.Write);
+         StreamWriter sw = new StreamWriter(encStream);
+         sw.WriteLine(PlainText);
+         sw.Close();
+         encStream.Close();
+
+         // Get an array of bytes that represents the memory stream
+         byte[] buffer = ms.ToArray();
+
+         ms.Close();
+
+         // Return the encrypted byte array.
+         return buffer;
+      }
+
+      private string Decrypt(byte[] CypherText)
+      {
+         string val = "";
+         try
+         {
+            // Create a new DES key
+            DESCryptoServiceProvider key = new DESCryptoServiceProvider();
+            key.IV = m_IV;
+            key.Key = m_Key;
+
+            // Create a memory stream to the passed buffer
+            MemoryStream ms = new MemoryStream(CypherText);
+
+            // Create a CryptoStream using the memory stream and the CSP DES key
+            CryptoStream encStream = new CryptoStream(ms, key.CreateDecryptor(), CryptoStreamMode.Read);
+
+            StreamReader sr = new StreamReader(encStream);
+            val = sr.ReadLine();
+
+            sr.Close();
+            encStream.Close();
+            ms.Close();
+         }
+         catch
+         {
+            val = "";
+         }
+         return val;
+      }
+     
 
       public bool LoadFromRegistry()
       {
@@ -87,15 +153,27 @@ namespace AlfrescoWord2003
          try
          {
             string serverName = rootKey.GetValue("").ToString();
-            using (RegistryKey serverKey = rootKey.OpenSubKey(serverName))
+            using (RegistryKey serverKey = rootKey.OpenSubKey(serverName, true))
             {
                this.WebClientURL = serverKey.GetValue(REG_WEBCLIENTURL).ToString();
                this.WebDAVURL = serverKey.GetValue(REG_WEBDAVURL).ToString();
                this.CIFSServer = serverKey.GetValue(REG_CIFSSERVER).ToString();
                this.Username = serverKey.GetValue(REG_USERNAME).ToString();
-               this.EncryptedPassword = serverKey.GetValue(REG_PASSWORD).ToString();
+               string regPassword = serverKey.GetValue(REG_PASSWORD).ToString();
+               try
+               {
+                  this.EncryptedPassword = regPassword;
+               }
+               catch
+               {
+                  // Possible this is an unencrypted password from an early version
+                  if (regPassword.Length > 0)
+                  {
+                     this.Password = regPassword;
+                     serverKey.SetValue(REG_PASSWORD, this.EncryptedPassword);
+                  }
+               }
             }
-
          }
          catch
          {
@@ -157,90 +235,87 @@ namespace AlfrescoWord2003
          }
       }
 
-      public string AuthenticationTicket
+      public string getAuthenticationTicket(bool promptUser)
       {
-         get
+         string strAuthTicket = "";
+         if (m_AuthenticationTicket == "")
          {
-            string strAuthTicket = "";
-            if (m_AuthenticationTicket == "")
+            // Do we recognise the path as belonging to an Alfresco server?
+            if ((m_DocumentPhysicalPath.StartsWith("http")) || (m_DocumentPhysicalPath == ""))
             {
-               // Do we recognise the path as belonging to an Alfresco server?
-               if ((m_DocumentPhysicalPath.StartsWith("http")) || (m_DocumentPhysicalPath == ""))
+               // Try WebDAV
+               if ((this.MatchWebDAVURL(m_DocumentPhysicalPath)) || (m_DocumentPhysicalPath == ""))
                {
-                  // Try WebDAV
-                  if ((this.MatchWebDAVURL(m_DocumentPhysicalPath)) || (m_DocumentPhysicalPath == ""))
+                  IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
+                  strAuthTicket = myAuthTicket.GetAuthenticationTicket();
+                  if (strAuthTicket != "401")
                   {
-                     IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
-                     strAuthTicket = myAuthTicket.GetAuthenticationTicket();
+                     m_AuthenticationTicket = strAuthTicket;
+                  }
+                  else
+                  {
+                     // Authentication failed - do we have a saved username/password?
+                     if ((this.Username.Length > 0) && (this.Password.Length > 0))
+                     {
+                        strAuthTicket = myAuthTicket.GetAuthenticationTicket(this.Username, this.Password);
+                     }
                      if (strAuthTicket != "401")
                      {
                         m_AuthenticationTicket = strAuthTicket;
                      }
                      else
                      {
-                        // Authentication failed - do we have a saved username/password?
-                        if ((this.Username.Length > 0) && (this.Password.Length > 0))
+                        // Last option - pop up the login form
+                        using (Login myLogin = new Login())
                         {
-                           strAuthTicket = myAuthTicket.GetAuthenticationTicket(this.Username, this.Password);
-                        }
-                        if (strAuthTicket != "401")
-                        {
-                           m_AuthenticationTicket = strAuthTicket;
-                        }
-                        else
-                        {
-                           // Last option - pop up the login form
-                           using (Login myLogin = new Login())
+                           bool bRetry = true;
+
+                           // Pre-populate with values already configured
+                           myLogin.Username = this.Username;
+                           myLogin.Password = this.Password;
+
+                           // Retry loop for typos
+                           while (bRetry)
                            {
-                              bool bRetry = true;
-
-                              // Pre-populate with values already configured
-                              myLogin.Username = this.Username;
-                              myLogin.Password = this.Password;
-
-                              // Retry loop for typos
-                              while (bRetry)
+                              if (myLogin.ShowDialog() == DialogResult.OK)
                               {
-                                 if (myLogin.ShowDialog() == DialogResult.OK)
+                                 // Try to authenticate with entered credentials
+                                 strAuthTicket = myAuthTicket.GetAuthenticationTicket(myLogin.Username, myLogin.Password);
+                                 if ((strAuthTicket == "401") || (strAuthTicket == ""))
                                  {
-                                    // Try to authenticate with entered credentials
-                                    strAuthTicket = myAuthTicket.GetAuthenticationTicket(myLogin.Username, myLogin.Password);
-                                    if ((strAuthTicket == "401") || (strAuthTicket == ""))
-                                    {
-                                       // Retry?
-                                       bRetry = (MessageBox.Show("Couldn't authenticate with Alfresco server.", "Alfresco Authentication", MessageBoxButtons.RetryCancel) == DialogResult.Retry);
-                                    }
-                                    else
-                                    {
-                                       // Successful login
-                                       m_AuthenticationTicket = strAuthTicket;
-                                       bRetry = false;
-                                    }
+                                    // Retry?
+                                    bRetry = (MessageBox.Show("Couldn't authenticate with Alfresco server.", "Alfresco Authentication", MessageBoxButtons.RetryCancel) == DialogResult.Retry);
                                  }
                                  else
                                  {
-                                    // Cancel or close chosen on login dialog
+                                    // Successful login
+                                    m_AuthenticationTicket = strAuthTicket;
                                     bRetry = false;
                                  }
+                              }
+                              else
+                              {
+                                 // Cancel or close chosen on login dialog
+                                 bRetry = false;
                               }
                            }
                         }
                      }
                   }
                }
-               else
+            }
+            else
+            {
+               // Try CIFS
+               if (this.MatchCIFSServer(m_DocumentPhysicalPath))
                {
-                  // Try CIFS
-                  if (this.MatchCIFSServer(m_DocumentPhysicalPath))
-                  {
-                     IServerHelper myAuthTicket = new CIFSHelper(this.CIFSServer);
-                     m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
-                  }
+                  IServerHelper myAuthTicket = new CIFSHelper(this.CIFSServer);
+                  m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
                }
             }
-
-            return m_AuthenticationTicket;
          }
+
+         return m_AuthenticationTicket;
       }
 
       public bool MatchWebDAVURL(string urlToMatch)

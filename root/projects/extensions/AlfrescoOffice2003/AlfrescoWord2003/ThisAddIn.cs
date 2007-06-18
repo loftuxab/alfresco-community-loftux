@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Tools.Applications.Runtime;
 using Word = Microsoft.Office.Interop.Word;
@@ -10,7 +11,8 @@ namespace AlfrescoWord2003
    {
       private AlfrescoPane m_AlfrescoPane;
       private string m_DefaultTemplate = null;
-//      private ServerDetails m_ServerDetails = null;
+      private Office.CommandBar m_CommandBar;
+      private Office.CommandBarButton m_AlfrescoButton;
 
       private void ThisAddIn_Startup(object sender, System.EventArgs e)
       {
@@ -22,8 +24,81 @@ namespace AlfrescoWord2003
          Application.DocumentOpen += new Word.ApplicationEvents4_DocumentOpenEventHandler(Application_DocumentOpen);
          Application.DocumentBeforeClose += new Word.ApplicationEvents4_DocumentBeforeCloseEventHandler(Application_DocumentBeforeClose);
          Application.DocumentChange += new Microsoft.Office.Interop.Word.ApplicationEvents4_DocumentChangeEventHandler(Application_DocumentChange);
-         
+
+         // Add the Alfresco button to the Office toolbar
+         AddToolbar();
+
+         // Open the AddIn main window
          OpenAlfrescoPane();
+      }
+
+      /// <summary>
+      /// Adds commandBars to Word Application
+      /// </summary>
+      private void AddToolbar()
+      {
+         // Try to get a handle to the Alfresco CommandBar
+         try
+         {
+            m_CommandBar = Application.CommandBars["Alfresco"];
+         }
+         catch
+         {
+            // Toolbar named Alfresco does not exist so we should create it.
+            m_CommandBar = Application.CommandBars.Add("Alfresco", Office.MsoBarPosition.msoBarTop, false, true);
+         }
+
+         // Try to get a handle to the Alfresco CommandButton
+         try
+         {
+            m_AlfrescoButton = (Office.CommandBarButton)Application.CommandBars.FindControl(Office.MsoControlType.msoControlButton, missing, "AlfrescoButton", missing);
+         }
+         catch
+         {
+            m_AlfrescoButton = null;
+         }
+
+         if (m_AlfrescoButton == null)
+         {
+            // Add our button to the command bar and an event handler.
+            m_AlfrescoButton = (Office.CommandBarButton)m_CommandBar.Controls.Add(Office.MsoControlType.msoControlButton, missing, missing, missing, false);
+            if (m_AlfrescoButton != null)
+            {
+               m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonCaption;
+               m_AlfrescoButton.Caption = "Alfresco";
+               m_AlfrescoButton.DescriptionText = "Show/hide the Alfresco Add-In window";
+               Bitmap bmpButton = new Bitmap(GetType(), "toolbar.ico");
+               m_AlfrescoButton.Picture = new ToolbarPicture(bmpButton);
+               Bitmap bmpMask = new Bitmap(GetType(), "toolbar_mask.ico");
+               m_AlfrescoButton.Mask = new ToolbarPicture(bmpMask);
+               m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonIconAndCaption;
+               m_AlfrescoButton.Tag = "AlfrescoButton";
+            }
+         }
+
+         // Finally add the event handler and make sure the button is visible
+         if (m_AlfrescoButton != null)
+         {
+            m_AlfrescoButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(m_AlfrescoButton_Click);
+            m_CommandBar.Visible = true;
+         }
+      }
+
+      /// <summary>
+      /// Alfresco toolbar button event handler
+      /// </summary>
+      /// <param name="Ctrl"></param>
+      /// <param name="CancelDefault"></param>
+      void m_AlfrescoButton_Click(Office.CommandBarButton Ctrl, ref bool CancelDefault)
+      {
+         if (m_AlfrescoPane != null)
+         {
+            m_AlfrescoPane.OnToggleVisible();
+         }
+         else
+         {
+            OpenAlfrescoPane(true);
+         }
       }
 
       /// <summary>
@@ -104,7 +179,7 @@ namespace AlfrescoWord2003
          if (Show)
          {
             m_AlfrescoPane.Show();
-            m_AlfrescoPane.showHome();
+            m_AlfrescoPane.showHome(false);
          }
       }
 

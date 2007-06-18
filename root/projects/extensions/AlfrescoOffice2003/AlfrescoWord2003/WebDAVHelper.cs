@@ -42,7 +42,7 @@ namespace AlfrescoWord2003
          xmlResponse.InnerXml = SendWebDAVRequest(m_AlfrescoServer, "", Username, Password);
 
          // Did we get an HTTP 401 error?
-         if (xmlResponse.InnerXml.Contains("401"))
+         if (xmlResponse.InnerXml.Contains("(401) Unauth"))
          {
             strTicket = "401";
          }
@@ -55,7 +55,7 @@ namespace AlfrescoWord2003
                XmlNode xmlTicket = xmlResponse.SelectSingleNode("/D:multistatus/D:response/D:propstat/D:prop/D:authticket", xmlNS);
                strTicket = xmlTicket.InnerText;
             }
-            catch (Exception e)
+            catch
             {
                strTicket = "";
             }

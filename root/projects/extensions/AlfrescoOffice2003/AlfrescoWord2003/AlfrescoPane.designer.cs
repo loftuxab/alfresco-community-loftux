@@ -115,22 +115,24 @@ namespace AlfrescoWord2003
            // 
            // btnDetailsOK
            // 
+           this.btnDetailsOK.BackColor = System.Drawing.SystemColors.ButtonFace;
            this.btnDetailsOK.Location = new System.Drawing.Point(98, 440);
            this.btnDetailsOK.Name = "btnDetailsOK";
            this.btnDetailsOK.Size = new System.Drawing.Size(100, 23);
            this.btnDetailsOK.TabIndex = 8;
            this.btnDetailsOK.Text = "Save Settings";
-           this.btnDetailsOK.UseVisualStyleBackColor = true;
+           this.btnDetailsOK.UseVisualStyleBackColor = false;
            this.btnDetailsOK.Click += new System.EventHandler(this.btnDetailsOK_Click);
            // 
            // btnDetailsCancel
            // 
+           this.btnDetailsCancel.BackColor = System.Drawing.SystemColors.ButtonFace;
            this.btnDetailsCancel.Location = new System.Drawing.Point(204, 440);
            this.btnDetailsCancel.Name = "btnDetailsCancel";
            this.btnDetailsCancel.Size = new System.Drawing.Size(75, 23);
            this.btnDetailsCancel.TabIndex = 7;
            this.btnDetailsCancel.Text = "Reset";
-           this.btnDetailsCancel.UseVisualStyleBackColor = true;
+           this.btnDetailsCancel.UseVisualStyleBackColor = false;
            this.btnDetailsCancel.Click += new System.EventHandler(this.btnDetailsCancel_Click);
            // 
            // groupBox1
@@ -339,8 +341,9 @@ namespace AlfrescoWord2003
            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
            this.ClientSize = new System.Drawing.Size(292, 686);
-           this.Controls.Add(this.pnlConfiguration);
            this.Controls.Add(this.pnlWebBrowser);
+           this.Controls.Add(this.pnlConfiguration);
+           this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
            this.MaximizeBox = false;
            this.MinimizeBox = false;
@@ -348,6 +351,7 @@ namespace AlfrescoWord2003
            this.ShowInTaskbar = false;
            this.Text = "Alfresco";
            this.TopMost = true;
+           this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AlfrescoPane_FormClosing);
            this.pnlConfiguration.ResumeLayout(false);
            this.grpConfiguration.ResumeLayout(false);
            this.groupBox1.ResumeLayout(false);
