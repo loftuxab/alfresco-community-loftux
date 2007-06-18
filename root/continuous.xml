@@ -1,4 +1,4 @@
-<project name="continuous" 
+<project name="continuous"
          default="continuous" >
 
    <!-- ********************************** -->
@@ -229,7 +229,7 @@
                      prefix="tomcat" 
                      excludes="bin/*.sh" />
          <zipfileset dir="${dir.project.installer}" 
-                     includes="licenses/**,alf_start.bat,alf_stop.bat" />
+                     includes="licenses/**,alf_start.bat,alf_restart.bat,alf_stop.bat" />
          <zipfileset dir="${dir.project.installer}" 
                      includes="tomcat/alfresco.bat" 
                      fullpath="alfresco.bat" />
@@ -262,7 +262,7 @@
                      prefix="tomcat/bin" 
                      includes="*.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer}" 
+         <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**" />
          <tarfileset dir="${dir.project.installer}" 
                      includes="tomcat/alfresco.sh" 
@@ -313,7 +313,12 @@
 
       <!-- make sure the context is set for no serialization -->
       <copy todir="${dir.continuous.assemble.tomcat}/conf" 
-            file="${dir.project.installer.tomcat}/context.xml" 
+            file="${dir.project.3rdparty.distro}/context.xml"
+            overwrite="true"/>
+
+      <!-- make sure the server is set for UTF-8 -->
+      <copy todir="${dir.continuous.assemble.tomcat}/conf" 
+            file="${dir.project.3rdparty.distro}/server.xml"
             overwrite="true"/>
 
       <!-- place latest Xalan jars to ensure they are used -->
