@@ -72,23 +72,25 @@ namespace AlfrescoWord2003
          // 
          // btnCancel
          // 
+         this.btnCancel.BackColor = System.Drawing.SystemColors.ButtonFace;
          this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
          this.btnCancel.Location = new System.Drawing.Point(176, 176);
          this.btnCancel.Name = "btnCancel";
          this.btnCancel.Size = new System.Drawing.Size(75, 23);
          this.btnCancel.TabIndex = 4;
          this.btnCancel.Text = "Cancel";
-         this.btnCancel.UseVisualStyleBackColor = true;
+         this.btnCancel.UseVisualStyleBackColor = false;
          // 
          // btnOK
          // 
+         this.btnOK.BackColor = System.Drawing.SystemColors.ButtonFace;
          this.btnOK.DialogResult = System.Windows.Forms.DialogResult.OK;
          this.btnOK.Location = new System.Drawing.Point(95, 176);
          this.btnOK.Name = "btnOK";
          this.btnOK.Size = new System.Drawing.Size(75, 23);
          this.btnOK.TabIndex = 5;
          this.btnOK.Text = "OK";
-         this.btnOK.UseVisualStyleBackColor = true;
+         this.btnOK.UseVisualStyleBackColor = false;
          // 
          // Login
          // 

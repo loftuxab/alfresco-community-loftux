@@ -177,6 +177,16 @@
                     "Name" = "8:.NET Framework 2.0"
                     "ProductCode" = "8:Microsoft.Net.Framework.2.0"
                     }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.Office.PIA.2003"
+                    {
+                    "Name" = "8:Microsoft Office 2003 Primary Interop Assemblies"
+                    "ProductCode" = "8:Microsoft.Office.PIA.2003"
+                    }
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:Microsoft.VSTORuntime.2.0.SE"
+                    {
+                    "Name" = "8:Microsoft Visual Studio 2005 Tools for Office Second Edition runtime"
+                    "ProductCode" = "8:Microsoft.VSTORuntime.2.0.SE"
+                    }
                 }
             }
         }
@@ -468,7 +478,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A07721C221A44762920C45C9DF4A8B5E"
             {
-            "SourcePath" = "8:W:\\Office Integration\\AlfrescoOffice2003\\alfrescoInstall.jpg"
+            "SourcePath" = "8:..\\alfrescoInstall.jpg"
             "TargetName" = "8:alfrescoInstall.jpg"
             "Tag" = "8:"
             "Folder" = "8:_4EF5D9A5E8604C89A74FEBF3AF7613A6"
@@ -573,7 +583,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Alfresco Add-In for Microsoft Word 2003"
         "ProductCode" = "8:{70059AED-0498-4A79-94D3-F6C31E6D7DB9}"
-        "PackageCode" = "8:{3136EFC5-520C-424F-8C52-200FAA064A2B}"
+        "PackageCode" = "8:{54A11535-8454-4F5B-89D6-955072EBC9AC}"
         "UpgradeCode" = "8:{FB093BEB-D4B1-47C8-91C2-ACC7A6A27FCE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
