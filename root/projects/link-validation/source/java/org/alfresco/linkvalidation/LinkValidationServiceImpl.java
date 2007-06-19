@@ -328,7 +328,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
         int srcVersion = -1;
         int dstVersion = -1;
 
-        return  getHrefDifference( srcVersion,     
+        progress.init();
+        
+        try
+        {
+           return  getHrefDifference( srcVersion,     
                                    srcWebappPath,
                                    dstVersion,
                                    dstWebappPath,
@@ -337,6 +341,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                    nthreads,
                                    progress
                                  );
+        }
+        finally
+        {
+           progress.setDone( true );
+        }
     }
 
 
@@ -1131,6 +1140,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
             response_code = 400;                // probably a bad request
         }
 
+        if ( log.isDebugEnabled() )
+        {
+            log.debug("Response code for '" + url_str + "': " + response_code);
+        }
+        
         // deal with resonse code 
 
         if ( ! get_lookup_dependencies  ||  
