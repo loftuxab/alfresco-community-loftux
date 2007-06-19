@@ -183,7 +183,10 @@ public class HrefValidatorTest extends TestCase
 
              // NEON -  remove asap
              HrefValidationProgress progress = new HrefValidationProgress();
-             if (true)
+             
+             if (     false
+                   // true
+                )
              {
                  LinkValidation_.updateHrefInfo( 
                      store_name,                    // store to update hrefs
@@ -294,7 +297,7 @@ public class HrefValidatorTest extends TestCase
              System.out.println("\n\nFiles containing URLs broken due to deletion:");
 
              HrefManifest broken_by_deletion    = 
-                          href_diff.getBrokenByDeletionHrefManifest();
+                          LinkValidation_.getHrefManifestBrokenByDelete(href_diff);
 
              for ( HrefManifestEntry manifest_entry : 
                    broken_by_deletion.getManifestEntries() 
@@ -311,7 +314,7 @@ public class HrefValidatorTest extends TestCase
              // Show what is broken within new mods:
              System.out.println("\n\nFiles containing URLs broken in new/modified files:");
              HrefManifest broken_in_newmod = 
-                          href_diff.getBrokenInNewModHrefManifest();
+                          LinkValidation_.getHrefManifestBrokenByNewOrMod(href_diff);
 
              for ( HrefManifestEntry manifest_entry : 
                    broken_in_newmod.getManifestEntries() 
@@ -324,9 +327,10 @@ public class HrefValidatorTest extends TestCase
                  }
              }
 
+             List<String> fixed_urls =  
+                 LinkValidation_.getHrefListFixedByDeleteOrMod( href_diff);
 
              // Just test the first store... that's enough.
-
              break;
          }
     }
