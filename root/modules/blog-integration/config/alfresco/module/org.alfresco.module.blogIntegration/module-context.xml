@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+    <bean id="org_alfresco_module_blogIntegration_dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+        <property name="models">
+            <list>
+                <value>alfresco/module/org.alfresco.module.blogIntegration/model/blogIntegrationModel.xml</value>
+            </list>
+        </property>
+    </bean>
+    
+    <bean id="blogIntegrationService" class="org.alfresco.module.blogIntegration.BlogIntegrationServiceImpl">
+    	<property name="nodeService" ref="NodeService"/>
+    	<property name="contentService" ref="ContentService"/>
+    </bean>
+    
+    <bean id="baseBlogIntegrationImplmentation" abstract="true" init-method="register">
+    	<property name="blogIntegrationService" ref="blogIntegrationService"/>
+    </bean>
+    
+    <bean id="wordPressBlogIntegration" parent="baseBlogIntegrationImplmentation" class="org.alfresco.module.blogIntegration.DefaultBlogIntegrationImplementation">
+    	<property name="name" value="wordpress"/>
+    </bean>
+    
+    <bean id="typePadBlogIntegration" parent="baseBlogIntegrationImplmentation" class="org.alfresco.module.blogIntegration.DefaultBlogIntegrationImplementation">
+    	<property name="name" value="typepad"/>
+    </bean>
+
+</beans>
