@@ -316,11 +316,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
     * </pre>
     */
     public HrefDifference getHrefDifference( 
-                              String                 srcWebappPath, 
-                              String                 dstWebappPath, 
-                              int                    connectTimeout,
-                              int                    readTimeout,
-                              int                    nthreads,    // NEON - ignored for now
+                              String  srcWebappPath, 
+                              String  dstWebappPath, 
+                              int     connectTimeout,
+                              int     readTimeout,
+                              int     nthreads,    // NEON - ignored for now
                               HrefValidationProgress progress
                           ) throws AVMNotFoundException
     {
@@ -340,7 +340,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
     }
 
 
-    /*-------------------------------------------------------------------------*/
+    /*-----------------------------------------------------------------------*/
     /**
     * Determines how hrefs have changed between two stores,
     * along with status info, and returns the result;
@@ -349,16 +349,21 @@ public class LinkValidationServiceImpl implements LinkValidationService
     *
     * Thus, you can use this function to see how the status of hyperlinks 
     * would change if you were to incorporate the diff without actually 
-    * incorporating it. 
+    * incorporating it.  After calling this function, the user can see 
+    * what's broken by invoking:
+    * <ul>
+    *   <li>  getHrefManifestBrokenByDeletion()
+    *   <li>  getHrefManifestBrokenInNewOrMod()
+    * </ul>
     */
-    /*-------------------------------------------------------------------------*/
-    public HrefDifference getHrefDifference( int                    srcVersion,
-                                             String                 srcWebappPath,
-                                             int                    dstVersion,
-                                             String                 dstWebappPath,
-                                             int                    connectTimeout,
-                                             int                    readTimeout,
-                                             int                    nthreads,
+    /*-----------------------------------------------------------------------*/
+    public HrefDifference getHrefDifference( int         srcVersion,
+                                             String      srcWebappPath,
+                                             int         dstVersion,
+                                             String      dstWebappPath,
+                                             int         connectTimeout,
+                                             int         readTimeout,
+                                             int         nthreads,
                                              HrefValidationProgress progress)
                                            throws AVMNotFoundException
     {
@@ -379,10 +384,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                                    dstWebappPath, 
                                                    excluder_);
             
-        String store_attr_base  = getAttributeStemForDnsName(dst_dns_name,
-                                                             false,
-                                                             true);
-
         ValidationPathParser sp = new ValidationPathParser(avm_, srcWebappPath);
         String src_dns_name     = sp.getDnsName();
         String src_req_path     = sp.getRequestPath();
@@ -396,9 +397,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
         String dst_fqdn         = dst_dns_name + ".www--sandbox.version--v" + 
                                   dstVersion   + "." + virt_domain;
 
-        String href_attr        = store_attr_base    + 
-                                  "/|" + webapp_name +
-                                  "/"  + LATEST_VERSION_ALIAS;
 
         String src_webapp_url_base = null;
         String dst_webapp_url_base = null;
@@ -414,7 +412,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                          null,         // query
                          null);        // frag
 
-            // http://alice.mysite.www--sandbox.version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
+            // http://alice.mysite.www--sandbox.
+            //       version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
+
             src_webapp_url_base = u.toASCIIString();
 
             u = new URI( "http",       // scheme
@@ -425,7 +425,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                          null,         // query
                          null);        // frag
 
-            // http://mysite.www--sandbox.version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
+            // http://mysite.www--sandbox.
+            //        version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
+
             dst_webapp_url_base = u.toASCIIString();
         }
         catch (Exception e) { /* can't happen */ }
@@ -438,16 +440,28 @@ public class LinkValidationServiceImpl implements LinkValidationService
         //       in href_manifest and href_status.
         //    
         //    o  If a file or dir is deleted, then update the
-        //       file_gone_cache and the broken_hdep cache from dst.
+        //       deleted_file_md5 and the broken_hdep cache from dst.
+
+        String store_attr_base  = getAttributeStemForDnsName(dst_dns_name,
+                                                             false,
+                                                             true);
+        String href_attr        = store_attr_base    + 
+                                  "/|" + webapp_name +
+                                  "/"  + LATEST_VERSION_ALIAS;
+
+        HrefDifference href_diff = new HrefDifference(href_attr, 
+                                                      sp.getStore(),
+                                                      dp.getStore(),
+                                                      src_webapp_url_base,
+                                                      dst_webapp_url_base);
+
+        HrefStatusMap      href_status      = href_diff.getHrefStatusMap();
+        HrefManifest       href_manifest    = href_diff.getHrefManifest();
+        Map<String,String> deleted_file_md5 = href_diff.getDeletedFileMd5();
 
 
-        HrefDifference href_diff     = new HrefDifference();
-        HrefStatusMap  href_status   = href_diff.getHrefStatusMap();
-        HrefManifest   href_manifest = href_diff.getHrefManifest();
 
-        HashMap<String,String>  file_gone_cache    = new HashMap<String,String>();
-        HashMap<String,String>  broken_hdep_cache  = new HashMap<String,String>();
-
+        HashMap<String,String> broken_hdep_cache = new HashMap<String,String>();
         MD5 md5 = new MD5();
 
         for (AVMDifference diff : diffs )
@@ -470,7 +484,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                     update_dir_gone_broken_hdep_cache(
                         dstVersion, 
                         dst_path,
-                        file_gone_cache,
+                        deleted_file_md5,
                         broken_hdep_cache,
                         href_attr,
                         md5,
@@ -483,7 +497,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                 {
                     update_file_gone_broken_hdep_cache( 
                         dst_path,
-                        file_gone_cache,
+                        deleted_file_md5,
                         broken_hdep_cache,
                         href_attr,
                         md5,
@@ -574,40 +588,6 @@ public class LinkValidationServiceImpl implements LinkValidationService
             }
         }
 
-
-
-        // Derived a pruned version of the href_manifest to get only 
-        // those new/modified files with at least one broken link
-
-        HrefManifest   broken_in_newmod = 
-                          href_diff.getBrokenInNewModHrefManifest();
-
-        Map<String, Pair<Integer,List<String>>> href_status_map = 
-            href_status.getStatusMap();
-
-        for ( HrefManifestEntry manifest_entry : manifest_entry_list )
-        {
-            ArrayList<String> broken_href_list = new ArrayList<String>();
-            List<String>      href_list        = manifest_entry.getHrefs();
-
-            for (String parsed_url : href_list)
-            {
-                int status_code = href_status_map.get(parsed_url).getFirst();
-                if (status_code >= 400 )
-                {
-                    broken_href_list.add( parsed_url );
-                }
-            }
-
-            if  ( broken_href_list.size() > 0 )
-            {
-                broken_in_newmod.add( 
-                   new HrefManifestEntry( manifest_entry.getFileName(),
-                                          broken_href_list));
-            }
-        }
-
-
         // TODO:  When validating url for cache is multi-threaded
         //        put a thread barrier here so that we've got 
         //        status info for all parsed links after this point
@@ -615,12 +595,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         // Remove from the collection of "broken" hyperlinks 
         // anything that is no longer referenced by any file
-        
+        //
         // Compute what's broken by the deletion
-        HashMap<String, List<String>> broken_manifest_map = 
-                new HashMap<String, List<String>>();
+        
+        Map<String, List<String>> broken_manifest_map = 
+                href_diff.getBrokenManifestMap();
 
-        Map<String,String> obsolete_href = href_diff.getObsoleteHrefMd5();
 
         for ( String broken_href_md5 : broken_hdep_cache.keySet() )
         {
@@ -634,7 +614,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
             
             for ( String file_md5 : file_md5_set )
             {
-                if  (  ! file_gone_cache.containsKey(  file_md5 ) )
+                if  (  ! deleted_file_md5.containsKey(  file_md5 ) )
                 {
                     String conc_file = 
                        attr_.getAttribute( href_attr   + "/" + 
@@ -667,37 +647,248 @@ public class LinkValidationServiceImpl implements LinkValidationService
                     manifest_list.add( broken_href );
                 }
             }
-            else
-            {
-                // This hash make it easy to clean up obsolete HREFs later
-                obsolete_href.put( broken_href_md5, broken_href );
-            }
         }
 
-        // Create broken_by_deletion manifest
-        // Sort the files being inserted, as well as the associated broken links
-        //
+        // Now to see what's broken in the update, the client can call:
+        // 
+        //    getHrefManifestBrokenByDeletion()
+        //    getHrefManifestBrokenInNewOrMod()
+
+        return href_diff;
+    }
+
+    public HrefManifest getHrefManifestBrokenByDelete(HrefDifference href_diff)
+    {
+        if ( href_diff.broken_by_deletion_ != null ) 
+        { 
+            return href_diff.broken_by_deletion_;
+        }
+
+        href_diff.broken_by_deletion_ = new HrefManifest();
+
+
+        Map<String, List<String>> broken_manifest_map = 
+                href_diff.getBrokenManifestMap();
+
         ArrayList<String> broken_file_list = 
-                new ArrayList<String>( broken_manifest_map.keySet() );
+            new ArrayList<String>( broken_manifest_map.keySet() );
 
         Collections.sort( broken_file_list);
 
         // push result into href_diff 
 
-        HrefManifest   broken_by_deletion    = 
-                           href_diff.getBrokenByDeletionHrefManifest();
-
         for (String broken_file : broken_file_list)
         {
-            List<String> broken_href_list= broken_manifest_map.get(broken_file);
+            List<String> broken_href_list =
+                broken_manifest_map.get(broken_file);
+
             Collections.sort( broken_href_list );
 
-            broken_by_deletion.add(
+            href_diff.broken_by_deletion_.add(
                 new HrefManifestEntry( broken_file,  broken_href_list ));
         }
-
-        return href_diff;
+        return href_diff.broken_by_deletion_;
     }
+
+    public HrefManifest getHrefManifestBrokenByNewOrMod( HrefDifference href_diff)
+    {
+        if ( href_diff.broken_in_newmod_ != null)   // If already calculated
+        {                                           // then just return the
+            return href_diff.broken_in_newmod_;     // old result
+        }
+
+        // Derived a pruned version of the href_manifest to get only those
+        // new/modified files with at least one broken link.  Note that
+        // href_diff.broken_in_newmod_ is a subset of href_diff.href_manifest_
+        // in both files mentioned and hrefs per file.
+
+        href_diff.broken_in_newmod_ = new HrefManifest();   
+
+        List<HrefManifestEntry> manifest_entry_list =  
+                href_diff.href_manifest_.getManifestEntries();
+
+        for ( HrefManifestEntry manifest_entry : manifest_entry_list )
+        {
+            ArrayList<String> broken_href_list = new ArrayList<String>();
+            List<String>      href_list        = manifest_entry.getHrefs();
+
+            for (String parsed_url : href_list)
+            {
+                int status_code = 
+                        href_diff.href_status_map_.get(parsed_url).getFirst();
+
+                if (status_code >= 400 )
+                {
+                    broken_href_list.add( parsed_url );
+                }
+            }
+
+            if  ( broken_href_list.size() > 0 )
+            {
+                href_diff.broken_in_newmod_.add( 
+                   new HrefManifestEntry( manifest_entry.getFileName(),
+                                          broken_href_list));
+            }
+        }
+        return href_diff.broken_in_newmod_;
+    }
+
+    /**
+    *  Returns a list of all urls that were previously broken, but have been 
+    *  completely expunged by the update via file deletions & modifications.
+    */
+    public List<String> getHrefListFixedByDeleteOrMod( HrefDifference href_diff)
+    {
+        // hrefs_to_update - list of all hrefs effected by the update
+        // newmod_conc     - conc of src urls, translated
+        // dst_conc        - old conc of url in attribute service
+        //
+        //
+        // [1] From href_manifest, compute newmod_dst_file_md5 
+        //     for every new or mod file.  This will be the counterpart
+        //     of the newmod file when it gets checked in.
+        //
+        // [2] Compute newmod_conc from href_manifest. While doing so, do
+        //     lookups by translating src->dst url & augment  dst_conc.
+        //     Even if an href isn't there, add a key to the dst_conc hash
+        //
+        // [3] Walk  href_diff.getDeletedFileMd5() to augment dst_conc
+        //     but omit from it any file that has been deleted or is 
+        //     a member of newmod_dst_file_md5
+        //
+        // [4] Update attribute service with dst_conc
+
+        MD5 md5 = new MD5();
+
+        String dst_store                  = href_diff.getDstStore();
+        String src_store                  = href_diff.getSrcStore();
+        int    src_store_length           = src_store.length();
+
+        String dst_webapp_url_base        = href_diff. getDstWebappUrlBase();
+        String src_webapp_url_base        = href_diff. getSrcWebappUrlBase();
+        int    src_webapp_url_base_length = src_webapp_url_base.length();
+
+        List<HrefManifestEntry> manifest_entry_list =  
+            href_diff.getHrefManifest().getManifestEntries();
+
+        HashMap<String, HashMap<String,String>>  newmod_conc =
+            new HashMap<String, HashMap<String,String>>();
+
+        Map<String,String> newmod_dst_file_md5_map =   // dst-ified files in newmod
+            new HashMap<String, String>();             
+
+
+        // Walk the list of files that are new,
+        // and create: newmod_conc 
+        // and       :   newmod_dst_file_md5_map
+
+        for ( HrefManifestEntry manifest_entry : manifest_entry_list )
+        {
+            String newmod_src_file = manifest_entry.getFileName();
+            String newmod_dst_file = dst_store + 
+                                     newmod_src_file.substring( src_store_length ); 
+
+            // Remember that newmod contained this file by computing its 
+            // dst-equivalent and storing it in a hash.  This allows it to 
+            // be omitted from the old HREF_TO_SOURCE list when constructing
+            // the new HREF_TO_SOURCE value.
+
+            String newmod_dst_file_md5 = md5.digest(newmod_dst_file.getBytes());
+            newmod_dst_file_md5_map.put( newmod_dst_file_md5, null );
+
+            List<String> href_list = manifest_entry.getHrefs();
+             
+            for (String src_url : href_list)
+            {
+                String dst_url;
+                if ( ! src_url.startsWith( src_webapp_url_base ) )
+                {
+                    dst_url = src_url;
+                }
+                else
+                {
+                    dst_url = dst_webapp_url_base +
+                              src_url.substring( src_webapp_url_base_length );
+                }
+
+                String dst_url_md5 = md5.digest( dst_url.getBytes() );
+                
+                HashMap<String,String> url_locations =  newmod_conc.get( dst_url_md5 );
+
+                if (  url_locations == null )
+                {
+                    url_locations = new HashMap<String,String>();
+                    newmod_conc.put( dst_url_md5, url_locations);
+                }
+                url_locations.put( newmod_dst_file_md5, null );
+            }
+        }
+
+ 
+        // Create a concordance of the deleted files.
+        // RESUME here
+        //
+        //        Map<String, Map<String,String>> deleted_href_locations =
+        //                new HashMap<String, HashMap<String,String>>();
+        //
+        //        String href_attr = href_diff.getHrefAttr();
+        //        Map<String,String> deleted_file_md5_set = href_diff.getDeletedFileMd5();
+        //
+        //
+        //        for (String deleted_file_md5 : deleted_file_md5_set )
+        //        {
+        //            // Get the set of hrefs that are now gone from deleted file
+        //
+        //            Set<String> deleted_href_md5_set =
+        //                    attr_.getAttribute( href_attr      + "/" + 
+        //                                        SOURCE_TO_HREF + "/" + 
+        //                                        deleted_file_md5
+        //                                      ).keySet();
+        //
+        //            for (String href_md5 : deleted_href_md5_set )
+        //            {
+        //                if ( deleted_dst_url_conc.containsKey( href_md5 ) )
+        //                {
+        //                    continue;   // we've already fetched old concordance
+        //                }
+        //
+        //                Set<String> deleted_href_location_md5_set =
+        //                        attr_.getAttribute( href_attr      + "/" + 
+        //                                            HREF_TO_SOURCE + "/" + 
+        //                                            href_md5
+        //                                          ).keySet();
+        //                
+        //                Map<String, String> old_file_map = 
+        //                   new HashMap<String,String>( 
+        //                        deleted_href_location_md5_set.size() );
+        //
+        //
+        //                for ( String file_md5 : deleted_href_location_md5_set )
+        //                {
+        //                    old_file_map.put( file_md5, null );
+        //                }
+        //
+        //                deleted_dst_url_conc.put( dst_href_md5, old_file_map)
+        //            }
+        //        }
+
+
+        for (String newmod_href_md5 : newmod_conc.keySet() )
+        {
+        }
+
+
+
+
+
+        return null;
+    }
+
+    public List<String> getHrefListFixedByNew( HrefDifference href_diff)
+    {
+        return null;
+    }
+
 
     /*-------------------------------------------------------------------------
     *  extract_links_from_dir --
@@ -828,8 +1019,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         List<String> urls = validate_href(  implicit_url,
                                              href_status,
-                                             true,              // get lookup dep
-                                             true,              // get urls
+                                             true,            // get lookup dep
+                                             true,            // get urls
                                              connectTimeout,
                                              readTimeout,
                                              progress);
@@ -951,13 +1142,13 @@ public class LinkValidationServiceImpl implements LinkValidationService
             // URL's page contains if we're tracking dependencies, do
             // an early return here.
 
-            href_status.put( url_str, new Pair<Integer,List<String>>(response_code,null)  );
+            href_status.put( 
+                url_str, new Pair<Integer,List<String>>(response_code,null) );
+
             progress.incrementUrlUpdateCount();
 
             return null; 
         } 
-
-
 
         // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER 
         // in the response, to be paranoid deal with the possiblity that 
@@ -1010,7 +1201,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
         }
 
         // files upon which url_str URL depends.
-        href_status.put( url_str, new Pair<Integer,List<String>>(response_code,dependencies));
+        href_status.put( 
+           url_str, new Pair<Integer,List<String>>(response_code,dependencies));
 
         progress.incrementUrlUpdateCount();
 
@@ -1026,13 +1218,14 @@ public class LinkValidationServiceImpl implements LinkValidationService
         }
         catch (Exception e) 
         { 
-            if ( log.isErrorEnabled() ) { log.error("Could not parse: " + url_str ); }
+            if ( log.isErrorEnabled() ) 
+            { 
+                log.error("Could not parse: " + url_str ); 
+            }
         }
 
         return extracted_hrefs;
     }
-
-
 
 
     //------------------------------------------------------------------------
@@ -1099,8 +1292,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
 
         Attribute href_attr_map = attr_.getAttribute( href_attr      + "/" +
-                                                       SOURCE_TO_HREF + "/" +
-                                                       path_md5
+                                                      SOURCE_TO_HREF + "/" +
+                                                      path_md5
                                                     );
 
 
@@ -1118,7 +1311,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                                 href_md5
                                               ).getIntValue();
                 
-                if ( (response_code < statusGTE) || (response_code > statusLTE) )
+                if ((response_code < statusGTE) || (response_code > statusLTE))
                 {
                     continue;
                 }
@@ -1563,7 +1756,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
     void update_dir_gone_broken_hdep_cache( 
                 int                    dst_version,
                 String                 dst_path, 
-                Map<String,String>     file_gone_cache,
+                Map<String,String>     deleted_file_md5,
                 Map<String,String>     broken_hdep_cache,
                 String                 href_attr,
                 MD5                    md5,
@@ -1601,7 +1794,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
             {
                 update_dir_gone_broken_hdep_cache( dst_version,
                                                    avm_path,
-                                                   file_gone_cache,
+                                                   deleted_file_md5,
                                                    broken_hdep_cache,
                                                    href_attr,
                                                    md5,
@@ -1613,7 +1806,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
             else if ( avm_node.isFile() )
             {
                 update_file_gone_broken_hdep_cache( avm_path,
-                                                    file_gone_cache,
+                                                    deleted_file_md5,
                                                     broken_hdep_cache,
                                                     href_attr,
                                                     md5,
@@ -1637,7 +1830,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
     /*------------------------------------------------------------------------*/
     void update_file_gone_broken_hdep_cache( 
                 String                 dst_path, 
-                Map<String,String>     file_gone_cache,
+                Map<String,String>     deleted_file_md5,
                 Map<String,String>     broken_hdep_cache,
                 String                 href_attr,
                 MD5                    md5,
@@ -1661,7 +1854,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         {
              broken_hdep_cache.put(href_md5, null); 
         }
-        file_gone_cache.put( file_gone_md5, null );
+        deleted_file_md5.put( file_gone_md5, null );
     }
                                           
 
@@ -1689,7 +1882,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 boolean incremental,
                                 int     connect_timeout,
                                 int     read_timeout,
-                                int     nthreads,                // NEON - currently ignored
+                                int     nthreads,    // NEON - currently ignored
                                 HrefValidationProgress progress
                               ) throws AVMNotFoundException
     {
@@ -1719,7 +1912,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                           boolean incremental,
                           int     connect_timeout,
                           int     read_timeout,
-                          int     nthreads,                // NEON - currently ignored
+                          int     nthreads,         // NEON - currently ignored
                           HrefValidationProgress progress
                         ) throws AVMNotFoundException
     {
@@ -1766,11 +1959,12 @@ public class LinkValidationServiceImpl implements LinkValidationService
             String webapp_url_base = null;
             try 
             {
-                webapp_url_base = store_url_base + 
-                                  ( webapp_name.equals("ROOT") 
-                                    ? "" 
-                                    : ("/" + URLEncoder.encode( webapp_name, "UTF-8"))
-                                  );
+                webapp_url_base = 
+                    store_url_base + 
+                    ( webapp_name.equals("ROOT") 
+                      ? "" 
+                      : ("/" + URLEncoder.encode( webapp_name, "UTF-8"))
+                    );
             }
             catch (Exception e) { /* UTF-8 is supported */ }
 
@@ -1814,7 +2008,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
                 // In the future, it should be possible for different webapp 
                 // urls should resolve to different servers.
-                // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>
+                // http://<dns>.www--sandbox.version-v<vers>.<virtdomain>:<port>
 
                 String webapp_url_base = null;
                 try 
@@ -1865,10 +2059,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                          )
 
     {
-        HashMap<String,String>  gen_url_cache    = new HashMap<String,String>();
-        HashMap<String,String>  parsed_url_cache = new HashMap<String,String>();
-        HashMap<Integer,String> status_cache     = new HashMap<Integer,String>();
-        HashMap<String,String>  file_hdep_cache  = new HashMap<String,String>();
+        HashMap<String,String>  gen_url_cache   = new HashMap<String,String>();
+        HashMap<String,String>  parsed_url_cache= new HashMap<String,String>();
+        HashMap<Integer,String> status_cache    = new HashMap<Integer,String>();
+        HashMap<String,String>  file_hdep_cache = new HashMap<String,String>();
 
 
         // The following convention is used:  
@@ -1895,7 +2089,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
         }
         
         String href_attr;
-        if ( ! is_latest_version )  // add key:  .href/mysite/|mywebapp/latest/42
+        if ( ! is_latest_version ) // add key: .href/mysite/|mywebapp/latest/42
         {
             // Because we're not validating the last snapshot,
             // don't clobber "last snapshot" info.  Instead
@@ -2169,7 +2363,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
         // Otherwise, we've got to do the actual 'exists' test.
 
         if ( ! parsed_url_cache.containsKey( gen_url_md5 )   &&
-             ! attr_.exists( href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5)
+             ! attr_.exists( href_attr      + "/" + 
+                             HREF_TO_SOURCE + "/" + gen_url_md5)
            )
         {
             attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,
@@ -2181,9 +2376,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         // Claim the url to self "appears" in this source file
 
-        attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5,
-                            file_md5,
-                            new BooleanAttributeValue( true )
+        attr_.setAttribute(href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5,
+                           file_md5,
+                           new BooleanAttributeValue( true )
                           );
 
 
@@ -2197,7 +2392,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                           gen_url_md5, 
                                           href_attr, 
                                           md5,
-                                          true,            // get lookup dependencies
+                                          true,     // get lookup dependencies
                                           status_cache,
                                           file_hdep_cache,
                                           connect_timeout,
@@ -2256,7 +2451,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
         if ( ! saw_gen_url )
         {
-            href_map_attrib_value.put( gen_url_md5, new BooleanAttributeValue( true ));
+            href_map_attrib_value.put( gen_url_md5, 
+                                       new BooleanAttributeValue( true ));
         }
 
         attr_.setAttribute( href_attr + "/" + SOURCE_TO_HREF,
@@ -2485,7 +2681,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
         }
         catch (Exception e) 
         { 
-            if ( log.isErrorEnabled() ) { log.error("Could not parse: " + url_str ); }
+            if ( log.isErrorEnabled() ) 
+            { 
+                log.error("Could not parse: " + url_str ); 
+            }
         }
         return extracted_hrefs;
     }
