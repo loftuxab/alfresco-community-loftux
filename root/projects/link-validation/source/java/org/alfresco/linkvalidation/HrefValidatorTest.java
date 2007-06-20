@@ -327,8 +327,7 @@ public class HrefValidatorTest extends TestCase
                  }
              }
 
-             List<String> fixed_urls =  
-                 LinkValidation_.getHrefListFixedByDeleteOrMod( href_diff);
+             LinkValidation_.mergeHrefDiff( href_diff);
 
              // Just test the first store... that's enough.
              break;
