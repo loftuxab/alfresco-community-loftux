@@ -30,8 +30,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.jscript.Node;
 import org.alfresco.repo.jscript.Scopeable;
+import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.repo.jscript.ValueConverter;
 import org.alfresco.repo.processor.BaseProcessorExtension;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
@@ -211,7 +211,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
      * @param node  the node
      * @return      true if it is a filePlan, false otherwise
      */
-    public boolean isFilePlan(Node node)
+    public boolean isFilePlan(ScriptNode node)
     {
         NodeRef nodeRef = (NodeRef)this.valueConverter.convertValueForRepo(node);
         QName nodeType = this.services.getNodeService().getType(nodeRef);
@@ -224,7 +224,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
      * @param recordNode    the record node
      * @param filePlanNode  the file plan node
      */
-    public void linkToFilePlan(Node recordNode, Node filePlanNode)
+    public void linkToFilePlan(ScriptNode recordNode, ScriptNode filePlanNode)
     {
         NodeRef record = (NodeRef)this.valueConverter.convertValueForRepo(recordNode);
         NodeRef filePlan = (NodeRef)this.valueConverter.convertValueForRepo(filePlanNode);        
@@ -237,15 +237,15 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
      * @param node  the node
      * @return      the file plan node, null if none found
      */
-    public Node getFilePlan(Node node)
+    public ScriptNode getFilePlan(ScriptNode node)
     {
-        Node result = null;
+        ScriptNode result = null;
         NodeRef nodeRef = (NodeRef)this.valueConverter.convertValueForRepo(node);
         NodeRef filePlanNodeRef = getFilePlanNodeRef(nodeRef);
         
         if (filePlanNodeRef != null)
         {
-            result = (Node)this.valueConverter.convertValueForScript(this.services, this.scope, null, filePlanNodeRef);            
+            result = (ScriptNode)this.valueConverter.convertValueForScript(this.services, this.scope, null, filePlanNodeRef);            
         }
         
         return result;
@@ -271,7 +271,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
         return filePlan;
     }
     
-    public void setCutoffPermissions(Node recordNode)
+    public void setCutoffPermissions(ScriptNode recordNode)
     {
         final NodeRef record = (NodeRef)this.valueConverter.convertValueForRepo(recordNode);
         AuthenticationUtil.runAs(new AuthenticationUtil.RunAsWork<Object>()
@@ -288,7 +288,7 @@ public class RecordsManagementScript extends BaseProcessorExtension implements S
         }, AuthenticationUtil.getSystemUserName());
     }
     
-    public void processImmediateDispositions(Node recordNode)
+    public void processImmediateDispositions(ScriptNode recordNode)
     {
         NodeRef record = (NodeRef)this.valueConverter.convertValueForRepo(recordNode);
         NodeRef filePlan = getFilePlanNodeRef(record);

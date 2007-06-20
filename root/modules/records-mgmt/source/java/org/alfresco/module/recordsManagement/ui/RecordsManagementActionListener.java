@@ -31,7 +31,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
 import org.alfresco.model.ContentModel;
-import org.alfresco.repo.jscript.Node;
+import org.alfresco.repo.jscript.ScriptNode;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.web.app.servlet.FacesHelper;
@@ -70,7 +70,7 @@ public class RecordsManagementActionListener
         NodeRef documentNodeRef = new NodeRef(Repository.getStoreRef(), id);
         
         Map<String, Object> model = new HashMap<String, Object>(1);
-        model.put("document", new Node(documentNodeRef, this.services));
+        model.put("document", new ScriptNode(documentNodeRef, this.services));
         
         // Add the parameters to the model passed to the script
         for (Map.Entry<String, String> entry : params.entrySet())
