@@ -27,18 +27,17 @@ package org.alfresco.module.blogIntegration;
 import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
+ * Blog integration runtime exception
+ * 
  * @author Roy Wetherall
- *
  */
 public class BlogIntegrationRuntimeException extends AlfrescoRuntimeException
 {
-
-    /**
-     * 
-     */
     private static final long serialVersionUID = -159901552962025003L;
 
     /**
+     * Constructor 
+     * 
      * @param msgId
      */
     public BlogIntegrationRuntimeException(String msgId)
@@ -47,6 +46,8 @@ public class BlogIntegrationRuntimeException extends AlfrescoRuntimeException
     }
 
     /**
+     * Constructor
+     * 
      * @param msgId
      * @param msgParams
      */
@@ -56,6 +57,8 @@ public class BlogIntegrationRuntimeException extends AlfrescoRuntimeException
     }
 
     /**
+     * Constructor
+     * 
      * @param msgId
      * @param cause
      */
@@ -65,6 +68,8 @@ public class BlogIntegrationRuntimeException extends AlfrescoRuntimeException
     }
 
     /**
+     * Constructor
+     * 
      * @param msgId
      * @param msgParams
      * @param cause

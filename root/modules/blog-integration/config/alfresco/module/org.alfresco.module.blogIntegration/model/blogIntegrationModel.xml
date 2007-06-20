@@ -75,8 +75,33 @@
             <property name="blg:postId">
 				<title>Blog post identifier</title>
 				<type>d:text</type>
+				<protected>true</protected>	
+				<mandatory>true</mandatory>			
+			</property>  	            
+            <property name="blg:published">
+				<title>Blog published</title>
+				<type>d:boolean</type>
+				<protected>true</protected>
 				<mandatory>true</mandatory>
-			</property>  
+			</property>  	            
+            <property name="blg:link">
+				<title>Blog post link</title>
+				<type>d:text</type>
+				<protected>true</protected>
+				<mandatory>true</mandatory>
+			</property> 	            
+            <property name="blg:posted">
+				<title>Date posted</title>
+				<type>d:date</type>
+				<protected>true</protected>
+				<mandatory>true</mandatory>
+			</property> 	            
+            <property name="blg:lastUpdate">
+				<title>Date last updated</title>
+				<type>d:date</type>
+				<protected>true</protected>
+				<mandatory>true</mandatory>
+			</property> 
 		</properties>
 		
          <associations>

@@ -29,20 +29,26 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.xmlrpc.XmlRpcException;
 import org.apache.xmlrpc.client.XmlRpcClient;
 import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
 
 /**
+ * Default blog integration implementation.  Uses various standard XML PRC blogging API to satisfy the 
+ * blog integration implementation interface.
+ * 
  * Based on origional contribution by Sudhakar Selvaraj.
  * 
  * @author Roy Wetherall
  */
 public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImplementation
 {
+    /** Blog actions */
     private static final String ACTION_NEW_POST = "metaWeblog.newPost";
     private static final String ACTION_EDIT_POST = "metaWeblog.editPost";
+    private static final String ACTION_GET_POST = "metaWeblog.getPost";
     private static final String ACTION_DELETE_POST = "blogger.deletePost";
     
     /**
@@ -68,9 +74,9 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
     }
 
     /**
-     * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#editPost(org.alfresco.module.blogIntegration.BlogDetails, java.lang.String, java.lang.String, java.lang.String, boolean)
+     * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#updatePost(org.alfresco.module.blogIntegration.BlogDetails, java.lang.String, java.lang.String, java.lang.String, boolean)
      */
-    public boolean editPost(BlogDetails blogDetails, String postId, String title, String body, boolean publish)
+    public boolean updatePost(BlogDetails blogDetails, String postId, String title, String body, boolean publish)
     {
         // Create the hash table containing details of the post's content
         Hashtable<String, Object> content = new Hashtable<String, Object>();
@@ -79,7 +85,6 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         
         // Create a list of parameters
         List<Object> params = new ArrayList<Object>(5);     
-        //params.add(blogDetails.getBlogId());
         params.add(postId);
         params.add(blogDetails.getUserName());
         params.add(blogDetails.getPassword()); 
@@ -90,15 +95,44 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         Boolean result = (Boolean)execute(blogDetails.getConnectionURL(), ACTION_EDIT_POST, params);        
         return result.booleanValue();
     }
+    
+    public Map<String, Object> getPost(BlogDetails blogDetails, String postId)
+    {
+        // Create a list of parameters
+        List<Object> params = new ArrayList<Object>(3);     
+        params.add(postId);
+        params.add(blogDetails.getUserName());
+        params.add(blogDetails.getPassword()); 
+
+        // Get the post details
+        return (Map<String, Object>)execute(blogDetails.getConnectionURL(), ACTION_GET_POST, params);        
+    }
 
     /**
      * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#deletePost(org.alfresco.module.blogIntegration.BlogDetails, java.lang.String)
      */
     public boolean deletePost(BlogDetails blogDetails, String postId)
     {
-        return false;
+        // Create a list of parameters
+        List<Object> params = new ArrayList<Object>(5);        
+        // Use the blog id for the app key
+        params.add(blogDetails.getBlogId()); 
+        params.add(postId); 
+        params.add(blogDetails.getUserName()); 
+        params.add(blogDetails.getPassword());
+        params.add(true); 
+        
+        // Delete post
+        Boolean result = (Boolean)execute(blogDetails.getConnectionURL(), ACTION_DELETE_POST, params);        
+        return result.booleanValue();
     }
     
+    /**
+     * Helper method to get the XML RPC client
+     * 
+     * @param url
+     * @return
+     */
     private XmlRpcClient getClient(String url)
     {    
         XmlRpcClient client = null;
@@ -120,6 +154,14 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         return client;
     }
     
+    /**
+     * Executes an XML RPC method
+     * 
+     * @param url
+     * @param method
+     * @param params
+     * @return
+     */
     private Object execute(String url, String method, List<Object> params)
     {
         Object result = null;
@@ -127,13 +169,12 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         {
             // Make the remote call to the blog
             XmlRpcClient client = getClient(url);
-            result = (String)client.execute(method, params);
+            result = client.execute(method, params);
         }
         catch (XmlRpcException exception)
         {
-            throw new BlogIntegrationRuntimeException("Failed to create new post on blog.", exception);
+            throw new BlogIntegrationRuntimeException("Failed to execute blog action '" + method + "' @ url '" + url + "'", exception);
         }
         return result;
     }
-
 }
