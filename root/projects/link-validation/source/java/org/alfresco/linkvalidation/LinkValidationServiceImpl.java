@@ -699,7 +699,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
         return href_diff.broken_by_deletion_;
     }
 
-    public HrefManifest getHrefManifestBrokenByNewOrMod( HrefDifference href_diff)
+    public HrefManifest getHrefManifestBrokenByNewOrMod(
+                            HrefDifference href_diff)
     {
         if ( href_diff.broken_in_newmod_ != null)   // If already calculated
         {                                           // then just return the
@@ -743,10 +744,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
     }
 
     /**
-    *  Returns a list of all urls that were previously broken, but have been 
-    *  completely expunged by the update via file deletions & modifications.
+    *  Merges href difference into destnation table (e.g.: for staging)
     */
-    public List<String> getHrefListFixedByDeleteOrMod( HrefDifference href_diff)
+    public void mergeHrefDiff( HrefDifference href_diff)
     {
         // hrefs_to_update - list of all hrefs effected by the update
         // newmod_conc     - conc of src urls, translated
@@ -783,19 +783,32 @@ public class LinkValidationServiceImpl implements LinkValidationService
         HashMap<String, HashMap<String,String>>  newmod_conc =
             new HashMap<String, HashMap<String,String>>();
 
-        Map<String,String> newmod_dst_file_md5_map =   // dst-ified files in newmod
+        Map<String,String> newmod_file =   // dst-ified files in newmod
             new HashMap<String, String>();             
 
 
-        // Walk the list of files that are new,
-        // and create: newmod_conc 
-        // and       :   newmod_dst_file_md5_map
+        // href_in_conc contains as keys any href that is present in
+        // either newmod_conc or deleted_conc.
+        //
+        // When there's a chance that the href is new, the value
+        // the value in this has is the actual url not null.
+        // This only occurs when the url is in newmod (not deleted),
+        // and allows some calls to set md5 -> url to be skipped
+        // by testing for the null.
+
+        Map<String,String> href_in_conc = new HashMap<String, String>();
+
+
+        // Walk the list of files that are new or modified (newmod_file)
+        // and a concordance (newmod_conc) of urls -> the newmod files 
+        // they appear in.
+
 
         for ( HrefManifestEntry manifest_entry : manifest_entry_list )
         {
             String newmod_src_file = manifest_entry.getFileName();
-            String newmod_dst_file = dst_store + 
-                                     newmod_src_file.substring( src_store_length ); 
+            String newmod_dst_file = 
+                      dst_store + newmod_src_file.substring( src_store_length );
 
             // Remember that newmod contained this file by computing its 
             // dst-equivalent and storing it in a hash.  This allows it to 
@@ -803,7 +816,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
             // the new HREF_TO_SOURCE value.
 
             String newmod_dst_file_md5 = md5.digest(newmod_dst_file.getBytes());
-            newmod_dst_file_md5_map.put( newmod_dst_file_md5, null );
+            newmod_file.put( newmod_dst_file_md5, newmod_dst_file );
 
             List<String> href_list = manifest_entry.getHrefs();
              
@@ -822,7 +835,15 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
                 String dst_url_md5 = md5.digest( dst_url.getBytes() );
                 
-                HashMap<String,String> url_locations =  newmod_conc.get( dst_url_md5 );
+                HashMap<String,String> url_locations =  
+                  newmod_conc.get( dst_url_md5 );
+
+                // href_in_conc has as keys any href in either
+                // newmod_conc or deleted_conc.  Note that because
+                // the url could be new, its value is set to dst_url 
+                // rather than null.
+
+                href_in_conc.put( dst_url_md5, dst_url );
 
                 if (  url_locations == null )
                 {
@@ -833,69 +854,280 @@ public class LinkValidationServiceImpl implements LinkValidationService
             }
         }
 
- 
-        // Create a concordance of the deleted files.
-        // RESUME here
+        // 
+        // Build concordance of deleted files
         //
-        //        Map<String, Map<String,String>> deleted_href_locations =
-        //                new HashMap<String, HashMap<String,String>>();
-        //
-        //        String href_attr = href_diff.getHrefAttr();
-        //        Map<String,String> deleted_file_md5_set = href_diff.getDeletedFileMd5();
-        //
-        //
-        //        for (String deleted_file_md5 : deleted_file_md5_set )
-        //        {
-        //            // Get the set of hrefs that are now gone from deleted file
-        //
-        //            Set<String> deleted_href_md5_set =
-        //                    attr_.getAttribute( href_attr      + "/" + 
-        //                                        SOURCE_TO_HREF + "/" + 
-        //                                        deleted_file_md5
-        //                                      ).keySet();
-        //
-        //            for (String href_md5 : deleted_href_md5_set )
-        //            {
-        //                if ( deleted_dst_url_conc.containsKey( href_md5 ) )
-        //                {
-        //                    continue;   // we've already fetched old concordance
-        //                }
-        //
-        //                Set<String> deleted_href_location_md5_set =
-        //                        attr_.getAttribute( href_attr      + "/" + 
-        //                                            HREF_TO_SOURCE + "/" + 
-        //                                            href_md5
-        //                                          ).keySet();
-        //                
-        //                Map<String, String> old_file_map = 
-        //                   new HashMap<String,String>( 
-        //                        deleted_href_location_md5_set.size() );
-        //
-        //
-        //                for ( String file_md5 : deleted_href_location_md5_set )
-        //                {
-        //                    old_file_map.put( file_md5, null );
-        //                }
-        //
-        //                deleted_dst_url_conc.put( dst_href_md5, old_file_map)
-        //            }
-        //        }
 
+        HashMap<String, HashMap<String,String>>  deleted_conc =
+                new HashMap<String, HashMap<String,String>>();
 
-        for (String newmod_href_md5 : newmod_conc.keySet() )
+        Map<String,String> deleted_file_md5_map = 
+            href_diff.getDeletedFileMd5();
+
+        String href_attr = href_diff.getHrefAttr();
+
+        for (String deleted_file_md5 : deleted_file_md5_map.keySet() )
         {
+            // Get the set of hrefs that are now gone from deleted file
+        
+            Set<String> deleted_href_md5_set =
+                    attr_.getAttribute( href_attr      + "/" + 
+                                        SOURCE_TO_HREF + "/" + 
+                                        deleted_file_md5
+                                      ).keySet();
+
+            for ( String deleted_href_md5 : deleted_href_md5_set )
+            {
+                // href_in_conc contains as keys any hrefs 
+                // present in newmod_conc or deleted_conc. 
+                //
+                // Because the href is deleted, there's no need to worry 
+                // about the  md5->href mapping, so just use null
+                // to allow some md5 -> href updates to be skipped.
+
+                href_in_conc.put( deleted_href_md5, null );
+
+                HashMap<String,String> url_locations =  
+                        deleted_conc.get( deleted_file_md5 );
+
+                if (url_locations == null )
+                {
+                    url_locations = new HashMap<String,String>();
+                    deleted_conc.put( deleted_href_md5, url_locations );
+                }
+                url_locations.put(deleted_file_md5, null );
+            }
+        }
+
+        // Now we have:
+        //    
+        //  deleted_conc  maps urls to a map of the files they were deleted from
+        //  newmod_conc   maps urls to a map of the files they were created in 
+        //  newmod_file   is a map with keys == files that are new or modified
+        //  href_in_conc  has as keys all hrefs in newmod_conc or deleted_conc.
+        //                When there's a chance that the href is new, the value
+        //                the value in this has is the actual url (not the MD5).
+        //
+        // The old HREF_TO_SOURCE needs to be updated with the delta as follows:
+        //
+        //    For each URL in href_in_conc, 
+        //       o  Get old HREF_TO_SOURCE (if null, create empty set).
+        //       o  Remove from this set any file in deleted_conc or newmod_file
+        //       o  Add back to this set any file in newmod_conc
+        //       o  Update HREF_TO_SOURCE
+        //       o  If href_in_conc value is non-null, update MD5_TO_HREF
+        //       o  If new HREF_TO_SOURCE is empty, remove the href:
+        //              - [2] HREF_TO_SOURCE
+        //              - [3] HREF_TO_STATUS
+        //              - [4] STATUS_TO_HREF
+        //              - [6] MD5_TO_HREF
+        //              - [7] HREF_TO_FDEP
+        //              - [8] FILE_TO_HREF
+        //
+        //    For each deleted file in:  deleted_file_md5_map
+        //              
+        //       o  Remove:
+        //              - [1] SOURCE_TO_HREF
+        //
+        //       o  If HREF_TO_FDEP for the file is empty, then remove:
+        //              - [5] MD5_TO_FILE
+        //
+        //    Also, ensure: 
+        //            any new files get an md5 -> file mapping
+        //            any new hrefs get an md5 -> href mapping
+        //
+
+        for (String href_md5  :  href_in_conc.keySet() )
+        {
+            // updated HREF_TO_SOURCE value for href_md5
+            MapAttribute new_href_to_source = new MapAttributeValue();
+
+            Set<String> old_href_to_source_set = 
+                    attr_.getAttribute( href_attr      + "/" + 
+                                        HREF_TO_SOURCE + "/" + 
+                                        href_md5
+                                      ).keySet();
+
+            HashMap<String,String> deleted_locations =  
+                deleted_conc.get( href_md5  );
+             
+
+            // Copy filtered list of locations into  new_href_to_source
+
+            if  ( old_href_to_source_set != null )
+            {
+                for ( String location : old_href_to_source_set )
+                {
+                    if ( ( deleted_locations != null  && 
+                           deleted_locations.containsKey( location )
+                         ) || newmod_file.containsKey( location ))
+                    {
+                        continue;               // filter this location out
+                    }
+                    new_href_to_source.put( 
+                        location, new BooleanAttributeValue( true ));
+                }
+            }
+
+            // Add to new_href_to_source any values in newmod_conc
+
+            HashMap<String,String> added_locations =  
+                newmod_conc.get( href_md5  );
+
+            if  ( added_locations != null )
+            {
+                for (String location : added_locations.keySet() )
+                {
+                    new_href_to_source.put( 
+                        location, new BooleanAttributeValue( true ));
+                }
+            }
+
+            // If new_href_to_source is empty, this is now a stale HREF
+            if  ( new_href_to_source.size() == 0)
+            {
+                // TODO: clean up href garbage
+
+                attr_.removeAttribute( href_attr + "/" + HREF_TO_SOURCE,
+                                       href_md5);
+
+                Attribute rsp = 
+                    attr_.getAttribute( href_attr      + "/" + 
+                                        HREF_TO_STATUS + "/" +
+                                        href_md5
+                                      );
+
+                boolean is_href_broken = true;
+                if (rsp != null)
+                {
+                    int response_code = rsp.getIntValue();
+
+                    if ( response_code < 400 ) { is_href_broken = false; }
+
+                    attr_.removeAttribute( href_attr + "/" +  HREF_TO_STATUS,
+                                           href_md5);
+
+                    attr_.removeAttribute( href_attr + "/" + STATUS_TO_HREF + 
+                                           "/" + response_code,
+                                           href_md5
+                                         );
+
+                    attr_.removeAttribute( href_attr   + "/" + MD5_TO_HREF,
+                                           href_md5);
+
+
+                    Attribute old_fdep_attribute = 
+                        attr_.getAttribute( href_attr    + "/" + 
+                                            HREF_TO_FDEP + "/" + 
+                                            href_md5);
+
+                    attr_.removeAttribute( href_attr  + "/" + HREF_TO_FDEP,
+                                           href_md5);
+
+
+                    if ( old_fdep_attribute != null )
+                    {
+                        Set<String> old_fdep_set = old_fdep_attribute.keySet();
+                        for (String old_fdep : old_fdep_set)
+                        {
+                            attr_.removeAttribute(href_attr    + "/" + 
+                                                  FILE_TO_HDEP + "/" + old_fdep,
+                                                  href_md5);
+                        }
+                    }
+                }
+                // obsolete_href_map.put( href_md5, is_href_broken );
+            }
+            else
+            {
+                // If possibly a new href, be sure md5 -> href mapping exists
+                String orig_href = href_in_conc.get( href_md5 );
+                if  ( orig_href != null )
+                {
+                    attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
+                                        href_md5,
+                                        new StringAttributeValue( orig_href )
+                                      );
+                }
+            }
+        }
+
+        // Ensure any new or modified file has an associated md5 -> file mapping
+        for ( String file_md5 : newmod_file.keySet() )
+        {
+            attr_.setAttribute( 
+                    href_attr + "/" + MD5_TO_FILE,
+                    file_md5,
+                    new StringAttributeValue( newmod_file.get( file_md5 )));
         }
 
 
+        // Clean up obsolete file info when a file has been deleted
+        for (String deleted_file_md5 : deleted_file_md5_map.keySet() )
+        {
+            attr_.removeAttribute(href_attr + "/" + SOURCE_TO_HREF,
+                                  deleted_file_md5);
 
+            Attribute old_hdep_attribute = 
+                attr_.getAttribute( href_attr    + "/" + 
+                                    FILE_TO_HDEP + "/" + 
+                                    deleted_file_md5);
 
+            // Let's see if any hrefs depend on the deleted file
+            if ( old_hdep_attribute != null )
+            {
+                if ( old_hdep_attribute.size() == 0 )
+                {
+                    attr_.removeAttribute( href_attr   + "/" + FILE_TO_HDEP,
+                                           deleted_file_md5);
 
-        return null;
+                    // No hrefs depend on this, so md5 -> file isn't needed
+                    attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
+                                           deleted_file_md5);
+                }
+            }
+            else
+            {
+                // No hrefs depend on this, so md5 -> file isn't needed
+                attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
+                                       deleted_file_md5);
+            }
+        }
+
+        recheckBrokenLinks( href_diff);
     }
 
-    public List<String> getHrefListFixedByNew( HrefDifference href_diff)
+    public void recheckBrokenLinks(HrefDifference href_diff)
     {
-        return null;
+        String href_attr = href_diff.getHrefAttr();
+
+        List<Pair<String, Attribute>> links = 
+            attr_.query( href_attr + "/" + STATUS_TO_HREF, 
+                         new AttrAndQuery(new AttrQueryGTE( "" + 400 ),
+                                          new AttrQueryLTE( "" + 599 )));
+
+        if  ( links == null ) {return;}
+
+        for ( Pair<String, Attribute> link : links  )
+        {
+            String  response_code_str = link.getFirst();
+            int     response_code     = Integer.parseInt( response_code_str );
+            Set<String> href_md5_set  = link.getSecond().keySet();
+
+            for ( String href_md5 : href_md5_set )
+            {
+                String href_str = 
+                   attr_.getAttribute( href_attr   + "/" + 
+                                       MD5_TO_HREF + "/" + 
+                                       href_md5
+                                     ).getStringValue();
+
+                // RESUME HERE - do something like validate_href
+            }
+
+        }
+
+        return; 
     }
 
 
