@@ -45,5 +45,9 @@ public interface BlogIntegrationModel
         
     static final QName ASPECT_BLOG_POST = QName.createQName(MODEL_URL, "blogPost");
     static final QName PROP_POST_ID = QName.createQName(MODEL_URL, "postId");
+    static final QName PROP_PUBLISHED = QName.createQName(MODEL_URL, "published");
+    static final QName PROP_LINK = QName.createQName(MODEL_URL, "link");
+    static final QName PROP_POSTED = QName.createQName(MODEL_URL, "posted");
+    static final QName PROP_LAST_UPDATE = QName.createQName(MODEL_URL, "lastUpdate");
     static final QName ASSOC_BLOG_DETAILS = QName.createQName(MODEL_URL, "blogDetails");
 }

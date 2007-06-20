@@ -24,16 +24,58 @@
  */
 package org.alfresco.module.blogIntegration;
 
+import java.util.Map;
+
 /**
+ * Blog integration implementation interface
+ * 
  * @author Roy Wetherall
  */
 public interface BlogIntegrationImplementation
 {
+    /**
+     * Gets the name of the blog integration
+     * 
+     * @return String   the name of the blog integration
+     */
     String getName();
     
+    /**
+     * Create a new post on the blog.
+     * 
+     * @param blogDetails   the blog details
+     * @param title         the title of the post
+     * @param body          the body of the post
+     * @param publish       indicates whether the post is published or not
+     * @return String       the newly created post id
+     */
     String newPost(BlogDetails blogDetails, String title, String body, boolean publish);
     
-    boolean editPost(BlogDetails blogDetails, String postId, String title, String body, boolean publish);
+    /**
+     * 
+     * 
+     * @param blogDetails
+     * @param postId
+     * @param title
+     * @param body
+     * @param publish
+     * @return
+     */
+    boolean updatePost(BlogDetails blogDetails, String postId, String title, String body, boolean publish);
     
+    /**
+     * 
+     * @param blogDetails
+     * @param postId
+     * @return
+     */
+    Map<String, Object> getPost(BlogDetails blogDetails, String postId);
+    
+    /**
+     * 
+     * @param blogDetails
+     * @param postId
+     * @return
+     */
     boolean deletePost(BlogDetails blogDetails, String postId);
 }

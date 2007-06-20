@@ -25,33 +25,51 @@
 package org.alfresco.module.blogIntegration;
 
 /**
+ * Base blog implementation class.  Extend this when writting a blog integration implementation.
+ * 
  * @author Roy Wetherall
- *
  */
 public abstract class BaseBlogIntegrationImplementation implements BlogIntegrationImplementation
 {
+    /** Blog integration service */
     private BlogIntegrationService blogIntegrationService;
     
+    /** Integration name */
     private String name;
     
+    /**
+     * Sets the blog integration service
+     * 
+     * @param blogIntegrationService    the blog integration service
+     */
     public void setBlogIntegrationService(BlogIntegrationService blogIntegrationService)
     {
         this.blogIntegrationService = blogIntegrationService;
     }
     
+    /**
+     * Registers the blog implementation with the blog integration service.
+     */
     public void register()
     {
         this.blogIntegrationService.register(this);
     }
     
+    /**
+     * Sets the name of the blog integration service
+     * 
+     * @param name  the name
+     */
     public void setName(String name)
     {
         this.name = name;
     }
     
+    /**
+     * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#getName()
+     */
     public String getName()
     {
         return this.name;
     }
-
 }

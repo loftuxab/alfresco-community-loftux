@@ -57,6 +57,13 @@ public class BlogIntegrationServiceSystemTest extends BaseSpringTest implements 
      * 114eb1
      */
     
+    /**
+     * Typepad details
+     * 
+     * http://www.typepad.com/t/api
+     * 
+     */
+    
     /** Blog Details **/
     private static final String BLOG = "wordpress";
     private static final String BLOG_URL = "http://paulhh.wordpress.com/xmlrpc.php";
@@ -68,8 +75,11 @@ public class BlogIntegrationServiceSystemTest extends BaseSpringTest implements 
     
     /** Blog entry */
     private static final String TITLE = "My Test Post @ " + new Date().toString();
+    //private static final String TITLE = "";
+    private static final String MODIFIED_TITLE = "My Test Post Modified @ " + new Date().toString();
     private static final String DESCRIPTION = "This is a description of my test post.";
     private static final String POST_CONTENT = "Hello and welcome to my test post.  This has been posted from the blog integration system test @ " + new Date().toString();
+    private static final String MODIFIED_POST_CONTENT = "Hello and welcome to my MODIFIED test post.  This has been posted and MODIFIED from the blog integration system test @ " + new Date().toString();
     private static final boolean PUBLISH = true;
     
     private NodeService nodeService;    
@@ -139,7 +149,18 @@ public class BlogIntegrationServiceSystemTest extends BaseSpringTest implements 
         contentWriter.putContent(POST_CONTENT);
     }
     
-    public void testNewPostToWordPress()
+    public void testGetBlogIntegrationImplementations()
+    {
+        List<BlogIntegrationImplementation> list = this.blogService.getBlogIntegrationImplementations();
+        assertNotNull(list);
+        assertEquals(2, list.size());
+        
+        BlogIntegrationImplementation blog = this.blogService.getBlogIntegrationImplementation(BLOG);
+        assertNotNull(blog);
+        assertEquals(BLOG, blog.getName());
+    }
+    
+    public void testNewPost()
     {
         // Create the blog details
         BlogDetails blogDetails = BlogDetails.createBlogDetails(this.nodeService, this.blogDetailsNodeRef);
@@ -165,5 +186,55 @@ public class BlogIntegrationServiceSystemTest extends BaseSpringTest implements 
         assertEquals(1, assocs.size());
         NodeRef testRef = assocs.get(0).getTargetRef();
         assertEquals(blogDetailsNodeRef, testRef);
+        
+        // TODO check the other stuff
+        
+        
+        // Check that im not allowed to create another new post with the same node
+        try
+        {
+            this.blogService.newPost(blogDetails, this.nodeRef, ContentModel.PROP_CONTENT, PUBLISH);
+        }
+        catch (BlogIntegrationRuntimeException e)
+        {
+            // Expected
+        }
+        
+        // Edit the title and content
+        this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_TITLE, MODIFIED_TITLE);        
+    }
+    
+    public void testUpdatePost()
+    {
+        // Create the blog details
+        BlogDetails blogDetails = BlogDetails.createBlogDetails(this.nodeService, this.blogDetailsNodeRef);
+               
+        // Post and publish the content contained on the node
+        this.blogService.newPost(blogDetails, this.nodeRef, ContentModel.PROP_CONTENT, PUBLISH);
+        
+        // Edit the title and content of the node
+        this.nodeService.setProperty(this.nodeRef, ContentModel.PROP_TITLE, MODIFIED_TITLE);
+        ContentWriter contentWriter = this.contentService.getWriter(this.nodeRef, ContentModel.PROP_CONTENT, true);
+        contentWriter.putContent(MODIFIED_POST_CONTENT);
+        
+        // Update the post
+        this.blogService.updatePost(this.nodeRef, ContentModel.PROP_CONTENT, PUBLISH);
+        
+        // Check the updated meta-data .... TODO
+    }
+    
+    public void testDeletePost()
+    {
+        // Create the blog details
+        BlogDetails blogDetails = BlogDetails.createBlogDetails(this.nodeService, this.blogDetailsNodeRef);
+               
+        // Post and publish the content contained on the node
+        this.blogService.newPost(blogDetails, this.nodeRef, ContentModel.PROP_CONTENT, PUBLISH);
+        
+        // Delete the post
+        this.blogService.deletePost(this.nodeRef);
+        
+        // Check the aspect has bee removed from the node
+        assertFalse(this.nodeService.hasAspect(this.nodeRef, ASPECT_BLOG_POST));
     }
 }
