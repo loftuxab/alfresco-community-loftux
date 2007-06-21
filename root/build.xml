@@ -50,12 +50,6 @@
       </path>
 
       <patternset id="files.tests">
-         <include name="**/*Test.java" />
-         <!-- include the updated indexer tests -->
-         <include name="**/LuceneCategoryTest2.java" />
-<!--
-         <include name="**/LuceneTest2.java" />
--->
          <exclude name="**/Base*Test.java" />
          <exclude name="**/Abstract*Test.java" />
          <exclude name="**/*SystemTest.java" />
@@ -65,9 +59,17 @@
          <!-- Content Tests -->
          <exclude name="**/org/alfresco/repo/content/**/*Test.java" />
          <include name="**/org/alfresco/repo/content/ContentTestSuite.java" />
+         <include name="**/org/alfresco/repo/content/metadata/xml/XmlMetadataExtracterTest.java" />
          <!-- Multilingual Tests -->
          <exclude name="**/org/alfresco/repo/model/ml/**/*Test.java" />
          <include name="**/org/alfresco/repo/model/ml/MultilingualTestSuite.java" />
+         <!-- All other tests -->
+         <include name="**/*Test.java" />
+         <!-- include the updated indexer tests -->
+         <include name="**/LuceneCategoryTest2.java" />
+<!--
+         <include name="**/LuceneTest2.java" />
+-->
       </patternset>
    </target>
 
