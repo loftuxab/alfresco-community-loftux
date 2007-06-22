@@ -47,10 +47,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.alfresco.encoding.CharactersetFinder;
+import org.alfresco.encoding.GuessEncodingCharsetFinder;
 import org.alfresco.util.exec.RuntimeExec;
 import org.alfresco.util.exec.RuntimeExec.ExecutionResult;
-
-import com.glaforge.i18n.io.SmartEncodingInputStream;
 
 /**
  * Utility to convert text files.
@@ -119,6 +119,11 @@ public class Convert
         OPTIONS.add(OPTION_VERBOSE);
         OPTIONS.add(OPTION_QUIET);
     }
+    
+    /**
+     * @see GuessEncodingCharsetFinder
+     */
+    private static final CharactersetFinder CHARACTER_ENCODING_FINDER = new GuessEncodingCharsetFinder();
 
     private File startDir = null;
     
@@ -520,26 +525,17 @@ public class Convert
     
     /**
      * Brute force guessing by doing charset conversions.<br/>
-     * TODO: Complete
      */
     private static Charset guessCharset(byte[] bytes, Charset charset) throws Exception
     {
-        SmartEncodingInputStream is = null;
-        try
+        Charset guessedCharset = CHARACTER_ENCODING_FINDER.detectCharset(bytes);
+        if (guessedCharset == null)
         {
-            is = new SmartEncodingInputStream(
-                    new ByteArrayInputStream(bytes),
-                    SmartEncodingInputStream.BUFFER_LENGTH_8KB,
-                    charset);
-            Charset encoding = is.getEncoding();
-            return encoding;
+            return charset;
         }
-        finally
+        else
         {
-            if (is != null)
-            {
-                try { is.close(); } catch (Throwable e) {}
-            }
+            return guessedCharset;
         }
     }
     
