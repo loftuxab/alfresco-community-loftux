@@ -282,14 +282,21 @@ public class HrefValidatorTest extends TestCase
 
              progress = new HrefValidationProgress();
 
-             HrefDifference href_diff = 
-                LinkValidation_.getHrefDifference( 
-                    "mysite--alice:/www/avm_webapps/ROOT",
-                    "mysite:/www/avm_webapps/ROOT",
-                    10000,
-                    30000,  
-                    5,
-                    progress);
+             HrefDifference href_diff = null;
+             try 
+             {
+                 href_diff = LinkValidation_.getHrefDifference( 
+                                "mysite--alice:/www/avm_webapps/ROOT",
+                                "mysite:/www/avm_webapps/ROOT",
+                                10000,
+                                30000,  
+                                5,
+                                progress);
+             }
+             catch (LinkValidationAbortedException e)
+             {
+                 // Won't happen here.
+             }
 
 
 
