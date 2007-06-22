@@ -32,6 +32,7 @@ import java.util.List;
 import junit.framework.TestCase;
 import org.alfresco.service.cmr.avm.AVMService;
 import org.alfresco.service.cmr.avm.AVMStoreDescriptor;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 public class JndiTest extends TestCase
@@ -50,6 +51,8 @@ public class JndiTest extends TestCase
             new FileSystemXmlApplicationContext("config/jndi-test-context.xml");
 
         AVMService    service     = (AVMService)context_.getBean("AVMService");
+        AuthenticationService authService = (AuthenticationService)context_.getBean("AuthenticationService");
+        authService.authenticate("admin", "admin".toCharArray());
         AVMBulkLoader loader      = new AVMBulkLoader(service); 
         File          import_base = new File("test-data");
 
