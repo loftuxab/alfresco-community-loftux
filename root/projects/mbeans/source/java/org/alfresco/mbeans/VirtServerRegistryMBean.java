@@ -29,7 +29,7 @@
 
 package org.alfresco.mbeans;
 
-public interface VirtServerRegistryMBean
+public interface VirtServerRegistryMBean 
 {
     public void initialize();
 

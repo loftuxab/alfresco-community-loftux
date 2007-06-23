@@ -27,8 +27,12 @@
 
 package org.alfresco.linkvalidation;
 
+import java.io.File;
+
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
@@ -37,10 +41,12 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
@@ -229,9 +235,13 @@ Here's a sketch of the algorithm
 */
 
 
-public class LinkValidationServiceImpl implements LinkValidationService
+public class LinkValidationServiceImpl implements LinkValidationService,
+                                                  Runnable
 {
     private static Log log = LogFactory.getLog(LinkValidationServiceImpl.class);
+
+    // Shutdown flag for service
+    private static AtomicBoolean Shutdown_ = new AtomicBoolean( false );
 
     static String HREF                 = ".href";    // top level href key
 
@@ -260,6 +270,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
     AVMSyncService     sync_;
     NameMatcher        excluder_;
 
+
     VirtServerRegistry virtreg_;
 
     public LinkValidationServiceImpl() { }
@@ -278,6 +289,123 @@ public class LinkValidationServiceImpl implements LinkValidationService
 
     public void setVirtServerRegistry(VirtServerRegistry reg) {virtreg_ = reg;}
     public VirtServerRegistry getVirtServerRegistry()         {return virtreg_;}
+
+    //-------------------------------------------------------------------------
+    /**
+    *  Called by LinkValidationServiceBootstrap at startup time to ensure 
+    *  that the link status in all stores is up to date.
+    */
+    //-------------------------------------------------------------------------
+    public void onBootstrap()
+    {
+        Thread validation_update_thread = new Thread(this);
+        Shutdown_.set( false );    
+        validation_update_thread.start();
+    }
+    //-------------------------------------------------------------------------
+    /**
+    *  Called by LinkValidationServiceBootstrap at shutdown time to ensure 
+    *  that any link status checking operation in progress is abandoned.
+    */
+    //-------------------------------------------------------------------------
+    public void onShutdown() { Shutdown_.set( true ); }
+
+
+    //-------------------------------------------------------------------------
+    /**
+    *   Main thread to update href validation info in staging.
+    */
+    //-------------------------------------------------------------------------
+    public void run()
+    {
+        // Initiate background process to check links
+        // For now, hard-code initial update
+        String   webappPath       = null;    // all stores/webapps
+        boolean  incremental      = true;    // use deltas & merge
+        boolean  validateExternal = true;    // check external hrefs
+        int      connectTimeout   = 10000;   // 10 sec
+        int      readTimeout      = 30000;   // 30 sec
+        long     poll_interval    = 2000;    // 2 sec
+        int      nthreads         = 5;       // ignored
+
+        HrefValidationProgress progress = null;;
+
+        while ( ! Shutdown_.get() ) 
+        {
+            progress = new HrefValidationProgress();
+            try 
+            {
+                updateHrefInfo( webappPath,
+                                incremental,
+                                validateExternal,
+                                readTimeout,
+                                connectTimeout,
+                                nthreads,
+                                progress);
+
+                Thread.sleep( poll_interval );
+            }
+            catch (Exception e) { /* nothing to do */ }
+        }
+
+        // Usually, tomcat will be dead by now, but just in case...
+
+        if ( progress != null) { progress.abort(); }
+    }
+
+
+
+    //-------------------------------------------------------------------------
+    /**
+    *   
+    * @param  webappPath
+    *           Path to webapp
+    *
+    * @param  incremental
+    *           Use deltas if true (faster); otherwise, force
+    *           the href info to be updated from scratch. 
+    *
+    * @param  validateExternal
+    *           Validate external links 
+    *
+    * @param connectTimeout  
+    *           Amount of time in milliseconds that this function will wait
+    *           before declaring that the connection has failed 
+    *           (e.g.: 10000 ms).
+    *
+    * @param readTimeout     
+    *           time in milliseconds that this function will wait before
+    *           declaring that a read on the connection has failed
+    *           (e.g.:  30000 ms).
+    * 
+    * @param nthreads
+    *             Number of threads to use when fetching URLs (e.g.: 5)
+    *
+    * @param  progress           
+    *             While updateHrefInfo() is a synchronous function, 
+    *             'progress' may be polled in a separate thread to 
+    *             observe its progress.
+    */
+    //-------------------------------------------------------------------------
+    public void updateHrefInfo( String                 webappPath,
+                                boolean                incremental,
+                                boolean                validateExternal,
+                                int                    connectTimeout,
+                                int                    readTimeout,
+                                int                    nthreads,
+                                HrefValidationProgress progress)          
+                throws          AVMNotFoundException,
+                                SocketException,
+                                SSLException,
+                                LinkValidationAbortedException
+    {
+        // RESUME HERE
+        //  Handle update to staging
+        //  If webappPath == null, do all stores
+        //  if webappPath == a store do all webapps in that store
+        //  Handle each weapp separately in a different try block
+        //  if given a null or store instead of a webapp
+    }
 
 
     //------------------------------------------------------------------------
@@ -323,6 +451,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                               int     nthreads,    // NEON - ignored for now
                               HrefValidationProgress progress)   
             throws            AVMNotFoundException,
+                              SocketException,
+                              SSLException,
                               LinkValidationAbortedException
     {
         // TODO:  Make this work with latest snapshot instead of HEAD
@@ -381,7 +511,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                   int    readTimeout,
                                   int    nthreads,
                                   HrefValidationProgress progress)
-                          throws  AVMNotFoundException, 
+                          throws  AVMNotFoundException,
+                                  SocketException,
+                                  SSLException,
                                   LinkValidationAbortedException
     {
         ValidationPathParser dp = new ValidationPathParser(avm_,dstWebappPath);
@@ -614,8 +746,7 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                    false,
                                    connectTimeout,
                                    readTimeout,
-                                   progress
-                                 );
+                                   progress);
                 }
             }
         }
@@ -689,6 +820,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
         return href_diff;
     }
 
+
+    /*-------------------------------------------------------------------------
+    *  getHrefManifestBrokenByDelete --
+    *        
+    *------------------------------------------------------------------------*/
     public HrefManifest getHrefManifestBrokenByDelete(HrefDifference href_diff)
     {
         if ( href_diff.broken_by_deletion_ != null ) 
@@ -722,6 +858,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
         return href_diff.broken_by_deletion_;
     }
 
+
+    /*-------------------------------------------------------------------------
+    *  getHrefManifestBrokenByNewOrMod --
+    *        
+    *------------------------------------------------------------------------*/
     public HrefManifest getHrefManifestBrokenByNewOrMod(
                             HrefDifference href_diff)
     {
@@ -1298,6 +1439,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
     *  Merges href difference into destnation table (e.g.: for staging)
     */
     public void mergeHrefDiff( HrefDifference href_diff)
+                throws         AVMNotFoundException,
+                               SocketException,
+                               SSLException,
+                               LinkValidationAbortedException
     {
         MD5    md5                        = new MD5();
         String dst_store                  = href_diff.getDstStore();
@@ -1518,6 +1663,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                     String         dst_store,
                                     String         href_attr,
                                     MD5            md5 )
+                throws              AVMNotFoundException,
+                                    SocketException,
+                                    SSLException,
+                                    LinkValidationAbortedException
     {
         List<Pair<String, Attribute>> links = 
             attr_.query( href_attr + "/" + STATUS_TO_HREF, 
@@ -1548,25 +1697,14 @@ public class LinkValidationServiceImpl implements LinkValidationService
                 boolean get_lookup_dependencies = 
                             href_str.startsWith( dst_webapp_url_base);
 
-                try 
-                {
-                    validate_href( 
-                        href_str,                 // href to revalidate
-                        href_status_map,          // new status map 
-                        get_lookup_dependencies,  // only when url is internal
-                        false,                    // don't fetch urls in result
-                        connect_timeout,          // same as original href_diff
-                        read_timeout,             // same as original href_diff
-                        null);                    // don't monitor progress
-                }
-                catch (Exception e)
-                {
-                    if ( log.isErrorEnabled() )
-                    {
-                        log.error("Could not revalidate: " + href_str + 
-                                   "  err: " + e.getMessage());
-                    }
-                }
+                validate_href( 
+                    href_str,                 // href to revalidate
+                    href_status_map,          // new status map 
+                    get_lookup_dependencies,  // only when url is internal
+                    false,                    // don't fetch urls in result
+                    connect_timeout,          // same as original href_diff
+                    read_timeout,             // same as original href_diff
+                    null);                    // don't monitor progress
             }
         }
 
@@ -1605,6 +1743,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                   HrefValidationProgress progress,
                                   int                    depth) 
           throws                  AVMNotFoundException,
+                                  SocketException, 
+                                  SSLException,
                                   LinkValidationAbortedException
     {
         Map<String, AVMNodeDescriptor> entries = null;
@@ -1696,6 +1836,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                    int                    readTimeout,
                                    HrefValidationProgress progress) 
           throws                   AVMNotFoundException,
+                                   SocketException, 
+                                   SSLException,
                                    LinkValidationAbortedException
     {
         String implicit_url = null;
@@ -1773,7 +1915,9 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                  int                    connect_timeout,
                                  int                    read_timeout,
                                  HrefValidationProgress progress) 
-                  throws         LinkValidationAbortedException
+                  throws         SocketException, 
+                                 SSLException,
+                                 LinkValidationAbortedException
     {
         HttpURLConnection conn = null; 
         URL               url  = null;
@@ -1800,6 +1944,11 @@ public class LinkValidationServiceImpl implements LinkValidationService
         }
         catch (Exception e )
         {
+            // You could have a bogus protocol or some other probem.
+            // For example:           <a href="sales@alfresco.com">woops</a>
+            // Gives you              url_str="sales@alfresco.com"
+            // and exception msg: no protocol: sales@alfresco.com
+
             if ( log.isErrorEnabled() )
             {
                 log.error("Cannot connect to :" + url_str );
@@ -1809,6 +1958,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
             // whatever status it had before, and assume this is
             // an ephemeral network failure;  "ephemeral" here means 
             // "on all instances of this url for this validation."
+            //
+            // TODO -- rethink this.
 
             return null;
         }
@@ -1838,14 +1989,49 @@ public class LinkValidationServiceImpl implements LinkValidationService
         href_extractor.setConnection( conn );
 
         try { response_code = conn.getResponseCode(); }
+        catch ( SocketException se )
+        {
+            // This could be either of two major problems:
+            //   java.net.SocketException
+            //      java.net.ConnectException        likely: Server down
+            //      java.net.NoRouteToHostException  likely: firewall/router
+
+            if  ( get_lookup_dependencies )   // If we're trying to get lookup
+            {                                 // dependencies, this is a fatal
+                throw se;                     // error fetching virtualized
+            }                                 // content, so rethrow.
+            else                              
+            {                                 // It's an external link, so
+                response_code = 400;          // just call it a link failure.
+            }
+        }
+        catch ( SSLException ssle )
+        {
+            // SSL issues
+            if  ( get_lookup_dependencies )   // If we're trying to get lookup
+            {                                 // dependencies, this is a fatal
+                throw ssle;                   // error fetching virtualized
+            }                                 // content, so rethrow.
+            else
+            {                                 // It's an external link, so
+                response_code = 400;          // just call it a link failure.
+            }
+        }
         catch (IOException ioe)
         {
+            // java.net.UnknownHostException 
+            // .. or other things, possibly due to a mist-typed url
+            // or other bad/interrupted request.
+            //
+            // Even if this is a local link, let's keep going.
+
             if ( log.isDebugEnabled() )
             {
                 log.debug("Could not fetch response code: " + ioe.getMessage());
             }
             response_code = 400;                // probably a bad request
         }
+
 
         if ( log.isDebugEnabled() )
         {
@@ -2618,7 +2804,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 int     read_timeout,
                                 int     nthreads,    // NEON - currently ignored
                                 HrefValidationProgress progress) 
-                 throws         AVMNotFoundException
+                throws          AVMNotFoundException, 
+                                SocketException, 
+                                SSLException,
+                                LinkValidationAbortedException
     {
         if ( progress != null )
         {
@@ -2654,7 +2843,10 @@ public class LinkValidationServiceImpl implements LinkValidationService
                           int     read_timeout,
                           int     nthreads,         // NEON - currently ignored
                           HrefValidationProgress progress) 
-         throws           AVMNotFoundException
+         throws           AVMNotFoundException, 
+                          SocketException, 
+                          SSLException,
+                          LinkValidationAbortedException
     {
         ValidationPathParser p = 
             new ValidationPathParser(avm_, storeNameOrWebappPath);
@@ -2801,9 +2993,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                            MD5     md5,
                            int     connect_timeout,
                            int     read_timeout,
-                           HrefValidationProgress progress
-                         )
-
+                           HrefValidationProgress progress) 
+         throws            SocketException, SSLException
     {
         HashMap<String,String>  gen_url_cache   = new HashMap<String,String>();
         HashMap<String,String>  parsed_url_cache= new HashMap<String,String>();
@@ -2989,8 +3180,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                        int    connect_timeout,
                        int    read_timeout,
                        HrefValidationProgress progress,
-                       int    depth 
-                     )
+                       int    depth ) 
+         throws        SocketException, SSLException
     {
         Map<String, AVMNodeDescriptor> entries = null;
 
@@ -3105,8 +3296,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                         Map<String,String>     file_hdep_cache,
                         int                    connect_timeout,
                         int                    read_timeout,
-                        HrefValidationProgress progress
-                      )
+                        HrefValidationProgress progress)
+         throws         SocketException, SSLException
     {
         String file_md5= md5.digest(avm_path.getBytes());
 
@@ -3237,8 +3428,8 @@ public class LinkValidationServiceImpl implements LinkValidationService
                                 Map<Integer,String> status_cache,
                                 Map<String,String>  file_hdep_cache,
                                 int  connect_timeout,
-                                int  read_timeout
-                              )
+                                int  read_timeout) 
+                  throws        SocketException, SSLException
     {
         HttpURLConnection conn = null; 
         URL               url  = null;
@@ -3257,15 +3448,22 @@ public class LinkValidationServiceImpl implements LinkValidationService
         }
         catch (Exception e )
         {
+            // You could have a bogus protocol or some other probem.
+            // For example:           <a href="sales@alfresco.com">woops</a>
+            // Gives you              url_str="sales@alfresco.com"
+            // and exception msg: no protocol: sales@alfresco.com
+
             if ( log.isErrorEnabled() )
             {
-                log.error("Cannot connect to :" + url_str );
+                log.error("openConnection() cannot connect to :" + url_str );
             }
 
             // Rather than update the URL status just let it retain 
             // whatever status it had before, and assume this is
             // an ephemeral network failure;  "ephemeral" here means 
             // "on all instances of this url for this validation."
+            //
+            // TODO -- rethink this.
 
             return null;
         }
@@ -3296,14 +3494,49 @@ public class LinkValidationServiceImpl implements LinkValidationService
         href_extractor.setConnection( conn );
 
         try { response_code = conn.getResponseCode(); }
+        catch ( SocketException se )
+        {
+            // This could be either of two major problems:
+            //   java.net.SocketException
+            //      java.net.ConnectException        likely: Server down
+            //      java.net.NoRouteToHostException  likely: firewall/router
+
+            if  ( get_lookup_dependencies )   // If we're trying to get lookup
+            {                                 // dependencies, this is a fatal
+                throw se;                     // error fetching virtualized
+            }                                 // content, so rethrow.
+            else                              
+            {                                 // It's an external link, so
+                response_code = 400;          // just call it a link failure.
+            }
+        }
+        catch ( SSLException ssle )
+        {
+            // SSL issues
+            if  ( get_lookup_dependencies )   // If we're trying to get lookup
+            {                                 // dependencies, this is a fatal
+                throw ssle;                   // error fetching virtualized
+            }                                 // content, so rethrow.
+            else
+            {                                 // It's an external link, so
+                response_code = 400;          // just call it a link failure.
+            }
+        }
         catch (IOException ioe)
         {
+            // java.net.UnknownHostException 
+            // .. or other things, possibly due to a mist-typed url
+            // or other bad/interrupted request.
+            //
+            // Even if this is a local link, let's keep going.
+
             if ( log.isDebugEnabled() )
             {
                 log.debug("Could not fetch response code: " + ioe.getMessage());
             }
             response_code = 400;                // probably a bad request
         }
+
 
         attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
                             url_md5, 

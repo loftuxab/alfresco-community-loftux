@@ -184,18 +184,30 @@ public class HrefValidatorTest extends TestCase
              // NEON -  remove asap
              HrefValidationProgress progress = new HrefValidationProgress();
              
-             if (     false
-                   // true
+             if (  //   false
+                        true
                 )
              {
-                 LinkValidation_.updateHrefInfo( 
-                     store_name,                    // store to update hrefs
-                     false,                         // false = not incremental
-                     10000,                         // connect timeout (ms)
-                     30000,                         // read timeout (ms)
-                     5,                             // thread count
-                     progress                  // status monitor
-                 );
+                 try 
+                 {
+                     LinkValidation_.updateHrefInfo( 
+                         store_name,                    // store to update hrefs
+                         false,                         // false = not incremental
+                         10000,                         // connect timeout (ms)
+                         30000,                         // read timeout (ms)
+                         5,                             // thread count
+                         progress                  // status monitor
+                     );
+                 }
+                 catch (Exception e)
+                 {
+                     System.out.println(
+                        "LinkValidation_.updateHrefInfo failed: " + e.getMessage());
+
+                     // Try another webapp
+                     continue;
+
+                 }
              }
 
              System.out.println("Webapps updated: " + 
@@ -296,6 +308,23 @@ public class HrefValidatorTest extends TestCase
              catch (LinkValidationAbortedException e)
              {
                  // Won't happen here.
+                 System.out.println(
+                         "LinkValidation_.getHrefDifference aborted: " + e.getMessage());
+ 
+                 continue;
+             }
+             catch (Exception e)
+             {
+                 // AVMNotFoundException,
+                 // SocketException,
+                 // SSLException,
+                 // LinkValidationAbortedException
+                 
+                 System.out.println(
+                         "LinkValidation_.getHrefDifference failed: " + e.getMessage());
+                 
+                 // Try another webapp
+                 continue;
              }
 
 
@@ -334,7 +363,7 @@ public class HrefValidatorTest extends TestCase
                  }
              }
 
-             LinkValidation_.mergeHrefDiff( href_diff);
+             // LinkValidation_.mergeHrefDiff( href_diff);
 
              // Just test the first store... that's enough.
              break;
