@@ -109,7 +109,7 @@ public abstract class AbstractCharactersetFinder implements CharactersetFinder
                     logger.debug("\n" +
                             "Identified character set from stream:\n" +
                             "   Charset:        " + charset + "\n" +
-                            "   Detected chars: " + new String(buffer, charset));
+                            "   Detected chars: " + new String(buffer, charset.name()));
                 }
             }
             return charset;
