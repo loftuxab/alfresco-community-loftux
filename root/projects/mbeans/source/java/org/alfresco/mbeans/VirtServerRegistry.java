@@ -46,6 +46,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 
+
+
 public class VirtServerRegistry implements VirtServerRegistryMBean
 {
     private static org.apache.commons.logging.Log log=
@@ -77,6 +79,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     {
         log.info("--------------Creating VirtServerRegistry MBean");
     }
+
 
     
     public void initialize()

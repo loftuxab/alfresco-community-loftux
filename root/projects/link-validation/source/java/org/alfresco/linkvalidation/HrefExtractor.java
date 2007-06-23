@@ -56,10 +56,20 @@ public class HrefExtractor
 
     public HrefExtractor() { parser_ = new Parser(); }
 
-    public void setConnection (URLConnection connection)
+    public void setConnection (URLConnection connection)  
     {
         try { parser_.setConnection( connection); }
-        catch (ParserException hpe) { /* Oh well */  }
+        catch (ParserException hpe) 
+        { 
+            // This is where the attempt is made to connect
+            // to the remote server.  Unfortunately, ParserException
+            // isn't particuarly informative, and hpe.getCause() 
+            // returns null.   The good news is that when you call
+            // other functions later on, more precice exceptions
+            // get thrown.  Therefore, just swallow the uninformative
+            // ParserException here.  Not ideal, but neither is
+            // re-writing org.htmlparser.Parser.
+        }
     }
 
     public List<String> extractHrefs() throws ParserException 
