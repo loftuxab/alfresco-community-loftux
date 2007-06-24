@@ -243,19 +243,20 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     // Shutdown flag for service
     private static AtomicBoolean Shutdown_ = new AtomicBoolean( false );
 
-    static String HREF                 = ".href";    // top level href key
+    static String HREF               = ".href";    // top level href key
 
-    static String LATEST_VERSION       = "latest";   // numerical version
-    static String LATEST_VERSION_ALIAS = "-2";       // alias for numerical
+    static String BASE_VERSION       = "latest";   // vers # of  baseline
+    static String BASE_VERSION_ALIAS = "-2";       // alias  for baseline
+    static String UPDATE_VERSION     = "update";   // vers # of  update
 
-    static String SOURCE_TO_HREF       = "source_to_href";  // key->map
-    static String HREF_TO_SOURCE       = "href_to_source";  // key->map
+    static String SOURCE_TO_HREF     = "source_to_href";  // key->map
+    static String HREF_TO_SOURCE     = "href_to_source";  // key->map
 
-    static String HREF_TO_STATUS       = "href_to_status";  // key->int
-    static String STATUS_TO_HREF       = "status_to_href";  // key->map
+    static String HREF_TO_STATUS     = "href_to_status";  // key->int
+    static String STATUS_TO_HREF     = "status_to_href";  // key->map
 
-    static String MD5_TO_FILE          = "md5_to_file";     // key->string
-    static String MD5_TO_HREF          = "md5_to_href";     // key->string
+    static String MD5_TO_FILE        = "md5_to_file";     // key->string
+    static String MD5_TO_HREF        = "md5_to_href";     // key->string
 
     
     // All files on which a hyperlink depends
@@ -387,7 +388,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *             observe its progress.
     */
     //-------------------------------------------------------------------------
-    public void updateHrefInfo( String                 webappPath,
+    public void updateHrefInfo( String                 path,
                                 boolean                incremental,
                                 boolean                validateExternal,
                                 int                    connectTimeout,
@@ -399,12 +400,310 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                 SSLException,
                                 LinkValidationAbortedException
     {
-        // RESUME HERE
-        //  Handle update to staging
-        //  If webappPath == null, do all stores
-        //  if webappPath == a store do all webapps in that store
-        //  Handle each weapp separately in a different try block
-        //  if given a null or store instead of a webapp
+        if ( path == null )           // For every staging store, update href
+        {                             // validity info on every webapp. 
+            // get staging stores
+            Map<String, Map<QName, PropertyValue>> store_staging_main_entries =
+                avm_.queryStoresPropertyKey( 
+                    SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
+         
+            for ( Map.Entry<String, Map<QName, PropertyValue>> 
+                  store_staging_main_entry  : 
+                  store_staging_main_entries.entrySet())
+            {   
+                String  store  = store_staging_main_entry.getKey();
+
+                updateStoreHrefInfo( store,
+                                     incremental,
+                                     validateExternal,
+                                     connectTimeout,
+                                     readTimeout,
+                                     nthreads,
+                                     progress);          
+            }
+        }
+        else
+        {                                                // This must be either
+            ValidationPathParser p =                     // a store path or a   
+                new ValidationPathParser(avm_, path );   // webapp path. If the 
+                                                         // wepapp_name is null 
+            String store           = p.getStore();       // then it's a store   
+            String webapp_name     = p.getWebappName();  // path;  otherwise it   
+                                                         // is a webapp path.   
+
+            if ( webapp_name == null )                   // A store path
+            {
+                updateStoreHrefInfo( store,                 
+                                     incremental,
+                                     validateExternal,
+                                     connectTimeout,
+                                     readTimeout,
+                                     nthreads,
+                                     progress);          
+            }
+            else                                         // A webapp path
+            {
+                int update_to_version = avm_.getLatestSnapshotID( store );
+
+                updateWebappHrefInfo( update_to_version,
+                                      path,
+                                      incremental,
+                                      validateExternal,
+                                      connectTimeout,
+                                      readTimeout,
+                                      nthreads,
+                                      progress);          
+            }
+        }
+
+        // TODO: clean up attribute info for webapps that no longer exist
+    }
+
+    /*-------------------------------------------------------------------------
+    *  updateStoreHrefInfo --
+    *        
+    *------------------------------------------------------------------------*/
+    void updateStoreHrefInfo( String                 store,
+                              boolean                incremental,
+                              boolean                validateExternal,
+                              int                    connectTimeout,
+                              int                    readTimeout,
+                              int                    nthreads,
+                              HrefValidationProgress progress)          
+         throws               AVMNotFoundException,
+                              SocketException,
+                              SSLException,
+                              LinkValidationAbortedException
+    {
+        // Determine what version of the store we're trying to update
+        // the baseline version of the href validity info to.
+
+        int update_to_version = avm_.getLatestSnapshotID( store );
+
+
+        // Get all webapps in this store
+        
+        ValidationPathParser p = new ValidationPathParser(avm_, store ); 
+        String app_base  = p.getAppBase();
+        Map<String, AVMNodeDescriptor> webapp_entries = null;
+        webapp_entries = avm_.getDirectoryListing( update_to_version, app_base);
+
+        for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
+                      webapp_entries.entrySet()
+                    )
+        {
+            String webapp_name = webapp_entry.getKey();  // my_webapp
+            AVMNodeDescriptor avm_node = webapp_entry.getValue();
+
+            if ( webapp_name.equalsIgnoreCase("META-INF")  ||
+                 webapp_name.equalsIgnoreCase("WEB-INF")
+               )
+            {
+                continue;
+            }
+
+            if  ( ! avm_node.isDirectory() )
+            {
+                continue;
+            }
+
+            String webappPath = app_base + "/" + webapp_name;
+
+            updateWebappHrefInfo( update_to_version,
+                                  webappPath,
+                                  incremental,
+                                  validateExternal,
+                                  connectTimeout,
+                                  readTimeout,
+                                  nthreads,
+                                  progress);
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+    *  setAttribute_if_not_found --
+    *     Creates base/key/value  if  value does not already exist at base/key.
+    *     Returns true if value needed to be set.
+    *------------------------------------------------------------------------*/
+    boolean setAttribute_if_not_found( String base, 
+                                       String key, 
+                                       Attribute  value)
+    {
+        if ( ! attr_.exists( base + "/" + key ) )
+        {
+            attr_.setAttribute( base, key, value );
+            return true;
+        }
+        return false;
+    }
+
+    /*-------------------------------------------------------------------------
+    *  updateWebappHrefInfo --
+    *        
+    *------------------------------------------------------------------------*/
+    void updateWebappHrefInfo( int                    update_to_version,
+                               String                 webappPath,
+                               boolean                incremental,
+                               boolean                validateExternal,
+                               int                    connectTimeout,
+                               int                    readTimeout,
+                               int                    nthreads,
+                               HrefValidationProgress progress)          
+         throws                AVMNotFoundException,
+                               SocketException,
+                               SSLException,
+                               LinkValidationAbortedException
+    {
+        // Ensure the proper attribute service key is set up for this webapp
+        //
+        // The following convention is used:  
+        //           version <==> (version - max - 2) %(max+2)
+        //
+        // The only case that ever matters for now is that:
+        // -2 is an alias for the last snapshot
+        //
+        // Thus href attribute info for the  "last snapshot" of 
+        // a store with the dns name:  preview.alice.mysite is
+        // stored within attribute service under the keys: 
+        //
+        //      .href/mysite/alice/preview/|mywebapp/-2
+        //
+        // This allows entire projects and/or webapps to removed in 1 step
+        
+
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, webappPath );
+
+
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
+
+
+        // Example:               ".href/mysite"
+        String store_attr_base  = getAttributeStemForDnsName( dns_name, true );
+
+        setAttribute_if_not_found( store_attr_base,
+                                   "|" + webapp_name,
+                                   new MapAttributeValue());
+
+
+        // Example:               ".href/mysite/|ROOT"
+        String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
+
+        setAttribute_if_not_found( webapp_attr_base,
+                                   BASE_VERSION_ALIAS,
+                                   new MapAttributeValue());
+
+        String  href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;
+
+        String [] index_list = { SOURCE_TO_HREF, HREF_TO_SOURCE, 
+                                 HREF_TO_STATUS, STATUS_TO_HREF,
+                                 MD5_TO_FILE,    MD5_TO_HREF,    
+                                 HREF_TO_FDEP,   FILE_TO_HDEP };         
+
+        for (String key : index_list )
+        {
+            setAttribute_if_not_found( href_attr, key ,new MapAttributeValue());
+        }
+
+
+        int base_version = 0;
+        Attribute base_vers_attr = 
+            attr_.getAttribute( webapp_attr_base + "/" + BASE_VERSION);
+
+        if ( base_vers_attr != null )
+        {
+            base_version = base_vers_attr.getIntValue();
+        }
+        else
+        {
+            attr_.setAttribute( webapp_attr_base, 
+                                BASE_VERSION,
+                                new IntAttributeValue( 0 ));
+        }
+
+        int old_update_version = 0;
+        Attribute old_update_vers_attr = 
+            attr_.getAttribute( webapp_attr_base + "/" + UPDATE_VERSION);
+
+        if ( old_update_vers_attr != null )
+        {
+            old_update_version = old_update_vers_attr.getIntValue();
+        }
+        else
+        {
+             attr_.setAttribute( webapp_attr_base, 
+                                 UPDATE_VERSION,
+                                 new IntAttributeValue( 0 ));
+        }
+
+
+        if  ( base_version == update_to_version )
+        {
+            // The latest version for which hrefs have been validated
+            // equals the last snapshot for this store.  Therefore
+            // there's nothing to do.
+
+            return;
+        }
+
+        if ( old_update_version > 0 )
+        {
+            // make JMX call to turn old virtualized webapp off
+            virtreg_. removeAllWebapps( old_update_version, webappPath, false);
+        }
+
+        // set update_to_version attribute
+
+        attr_.setAttribute( webapp_attr_base, 
+                            UPDATE_VERSION,
+                            new IntAttributeValue( update_to_version ));
+       
+
+        // Virtualize update_to_version
+        //
+        // NEON TODO:  Implement the ablity to update a single webapp
+        //             Calling updateAllWebapps becomes N^2 with 
+        //             the number of webapps in a store....
+        //
+
+        if ( ! virtreg_.updateAllWebapps( update_to_version, webappPath, false))
+        {
+            throw new LinkValidationAbortedException(
+                "Version: " + update_to_version + " of: " + webappPath + 
+                " cannot be virtualized");
+        }
+
+
+        HrefDifference hdiff = 
+                 getHrefDifference( update_to_version,  // src vers
+                                    webappPath,
+                                    base_version,       // dst vers
+                                    webappPath,
+                                    connectTimeout, 
+                                    readTimeout,
+                                    nthreads,
+                                    progress);
+
+
+
+        //------------------------------------------------------ 
+        //------------------------------------------------------ 
+        // TODO:  put the following into a single transaction:
+        
+
+        mergeHrefDiff( hdiff );
+
+        // set baseline == update_to_version
+
+        attr_.setAttribute( webapp_attr_base, 
+                            BASE_VERSION,
+                            new IntAttributeValue( update_to_version ));
+        //------------------------------------------------------ 
+        //------------------------------------------------------ 
+
     }
 
 
@@ -455,9 +754,25 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                               SSLException,
                               LinkValidationAbortedException
     {
-        // TODO:  Make this work with latest snapshot instead of HEAD
+        ValidationPathParser p = 
+            new ValidationPathParser(avm_, dstWebappPath);
+
+        String dns_name         = p.getDnsName();
+        String webapp_name      = p.getWebappName();
+        String store_attr_base  = getAttributeStemForDnsName( dns_name, false );
+        String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
+
+
+        Attribute base_vers_attr = 
+            attr_.getAttribute( webapp_attr_base + "/" + BASE_VERSION);
+
+
         int srcVersion = -1;
-        int dstVersion = -1;
+        int dstVersion;
+
+        if ( base_vers_attr != null ) { dstVersion = base_vers_attr.getIntValue(); }
+        else                          { dstVersion = -1; }
+        
 
         if ( progress != null ) 
         { 
@@ -591,12 +906,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         //    o  If a file or dir is deleted, then update the
         //       deleted_file_md5 and the broken_hdep cache from dst.
 
-        String store_attr_base  = getAttributeStemForDnsName(dst_dns_name,
-                                                             false,
-                                                             true);
-        String href_attr        = store_attr_base    + 
-                                  "/|" + webapp_name +
-                                  "/"  + LATEST_VERSION_ALIAS;
+        String store_attr_base = getAttributeStemForDnsName(dst_dns_name,false);
+
+        String href_attr       = store_attr_base    + 
+                                 "/|" + webapp_name +
+                                 "/"  + BASE_VERSION_ALIAS;
 
         HrefDifference href_diff = new HrefDifference(href_attr, 
                                                       sp.getStore(),
@@ -2140,6 +2454,58 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         return extracted_hrefs;
     }
 
+    //-----------------------------------------------------------------------
+    /**
+    *  If 'create' is false, fetches the key bath associated with the 
+    *  dns name, otherwise it both fetches the key and makes sure it
+    *  also exists within AttributeService.
+    */
+    //-----------------------------------------------------------------------
+    String getAttributeStemForDnsName( String  dns_name, boolean create )
+    {
+        // Given a store name X has a dns name   a.b.c
+        // The attribute key pattern used is:   .href/c/b/a
+        // 
+        // This guarantees if a segment contains a ".", it's not a part 
+        // of the store's fqdn.  Thus, "." can be used to delimit the end 
+        // of the store, and the begnining of the version-specific info.
+        // 
+
+        // Construct path & create coresponding attrib entries
+        StringBuilder str  = new StringBuilder( dns_name.length() );
+        str.append( HREF );
+
+        // Create top level .href key if necessary
+        if ( create && ! attr_.exists( HREF ) )
+        {
+            MapAttribute map = new MapAttributeValue();
+            attr_.setAttribute("", HREF, map );
+        }
+
+        String [] seg = dns_name.split("\\.");
+        String pth;
+        for (int i= seg.length -1 ; i>=0; i--) 
+        { 
+            if (create)
+            {
+                pth = str.toString();
+                if ( ! attr_.exists( pth + "/" + seg[i] ) )
+                {
+                    MapAttribute map = new MapAttributeValue();
+                    attr_.setAttribute( pth , seg[i], map );
+                }
+            }
+
+            str.append("/" + seg[i] ); 
+        }
+        String result = str.toString();
+        if ( result == null )
+        {
+            throw new IllegalArgumentException("Invalid DNS name: " + dns_name);
+        }
+        return result;
+    }
+
 
     //------------------------------------------------------------------------
     //------------------------------------------------------------------------
@@ -2185,7 +2551,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         // Example value:  ".href/mysite"
         String store_attr_base =  
-               getAttributeStemForDnsName( dns_name, false, true);
+               getAttributeStemForDnsName( dns_name, false);
 
         int version = avm_.getLatestSnapshotID( store );
         //--------------------------------------------------------------------
@@ -2201,7 +2567,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // Example value: .href/mysite/|ROOT/-2
         String href_attr =  store_attr_base    + 
                             "/|" + webapp_name +
-                            "/"  + LATEST_VERSION_ALIAS;
+                            "/"  + BASE_VERSION_ALIAS;
 
 
         Attribute href_attr_map = attr_.getAttribute( href_attr      + "/" +
@@ -2279,7 +2645,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         // Example value:  ".href/mysite"
         String store_attr_base =  
-               getAttributeStemForDnsName( dns_name, false, true);
+               getAttributeStemForDnsName( dns_name, false);
 
 
         int version = avm_.getLatestSnapshotID( store );
@@ -2369,7 +2735,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // Example value: .href/mysite/|ROOT/-2
         String href_attr =  store_attr_base    + 
                             "/|" + webapp_name +
-                            "/"  + LATEST_VERSION_ALIAS;
+                            "/"  + BASE_VERSION_ALIAS;
 
          
         List<Pair<String, Attribute>> links = 
@@ -2450,15 +2816,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String dns_name        = p.getDnsName();
 
         // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
-                                                              false, 
-                                                              true
-                                                            );
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, false );
 
         // Example value: .href/mysite/|ROOT/-2
         String href_attr =  store_attr_base    + 
                             "/|" + webapp_name +
-                            "/"  + LATEST_VERSION_ALIAS;
+                            "/"  + BASE_VERSION_ALIAS;
 
         Set<String> dependent_hrefs_md5 = 
                          attr_.getAttribute( href_attr    + "/" + 
@@ -2517,10 +2880,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
         // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
-                                                              false, 
-                                                              true
-                                                            );
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, false );
+                                                              
 
         int version = avm_.getLatestSnapshotID( store );
         //--------------------------------------------------------------------
@@ -2601,7 +2962,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // Example value: .href/mysite/|ROOT/-2
         String href_attr =  store_attr_base    + 
                             "/|" + webapp_name +
-                            "/"  + LATEST_VERSION_ALIAS;
+                            "/"  + BASE_VERSION_ALIAS;
 
          
         List<Pair<String, Attribute>> links = 
@@ -2857,10 +3218,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String dns_name        = p.getDnsName();
 
         // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, 
-                                                              true, 
-                                                              incremental 
-                                                            );
+        String store_attr_base =  getAttributeStemForDnsName( dns_name, true );
+                                                              
 
         int version = avm_.getLatestSnapshotID( store );
         //--------------------------------------------------------------------
@@ -3044,7 +3403,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             // Validating the latest snapshot.  Therefore, record the actual 
             // LATEST_SNAPSHOT version info, but store data under the
-            // LATEST_VERSION_ALIAS key ("-2") rather than the version number.
+            // BASE_VERSION_ALIAS key ("-2") rather than the version number.
             // This make it possible to do incremental updates more easily
             // because we're not constantly shuffling data around from 
             // exlicit version key to explicit version key.
@@ -3052,17 +3411,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             //Example:  .href/mysite/|mywebapp/latest -> version
 
             attr_.setAttribute( webapp_attr_base , 
-                                LATEST_VERSION, 
+                                BASE_VERSION, 
                                 new IntAttributeValue( version )
                               );
         
             //Example:  .href/mysite/|mywebapp/-2
 
-            attr_.setAttribute( webapp_attr_base ,  LATEST_VERSION_ALIAS, 
+            attr_.setAttribute( webapp_attr_base ,  BASE_VERSION_ALIAS, 
                                 new MapAttributeValue() );
 
             //  href data goes under the "-2" key:    .href/mysite/|myproject/-2
-            href_attr = webapp_attr_base +  "/" + LATEST_VERSION_ALIAS;
+            href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;
         }
 
 
@@ -3684,72 +4043,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
         return extracted_hrefs;
-    }
-
-
-
-    //-----------------------------------------------------------------------
-    /**
-    *  If 'create' is false, fetches the key bath associated 
-    *  with the dns name.
-    *  <p>
-    *
-    *  If 'create' is true, creates keys corresponding to 
-    *  the store dns_name being validated, and returns the 
-    *  final key path.   If the leaf key already exists 
-    *  and 'incremental' is true, then the pre-existing 
-    *  leaf key will be reused;  otherwise,  this function 
-    *  creates a new leaf (potentially clobbering the 
-    *  pre-existing one).
-    */
-    //-----------------------------------------------------------------------
-    String getAttributeStemForDnsName( String  dns_name,
-                                       boolean create,
-                                       boolean incremental )
-    {
-        // Given a store name X has a dns name   a.b.c
-        // The attribute key pattern used is:   .href/c/b/a
-        // 
-        // This guarantees if a segment contains a ".", it's not a part 
-        // of the store's fqdn.  Thus, "." can be used to delimit the end 
-        // of the store, and the begnining of the version-specific info.
-        // 
-
-        // Construct path & create coresponding attrib entries
-        StringBuilder str  = new StringBuilder( dns_name.length() );
-        str.append( HREF );
-
-        // Create top level .href key if necessary
-        if ( create && ! attr_.exists( HREF ) )
-        {
-            MapAttribute map = new MapAttributeValue();
-            attr_.setAttribute("", HREF, map );
-        }
-
-        String [] seg = dns_name.split("\\.");
-        String pth;
-        for (int i= seg.length -1 ; i>=0; i--) 
-        { 
-            if (create)
-            {
-                pth = str.toString();
-                if ( ((i==0) && incremental == false ) ||
-                     ! attr_.exists( pth + "/" + seg[i] )
-                   )
-                {
-                    MapAttribute map = new MapAttributeValue();
-                    attr_.setAttribute( pth , seg[i], map );
-                }
-            }
-
-            str.append("/" + seg[i] ); 
-        }
-        String result = str.toString();
-        if ( result == null )
-        {
-            throw new IllegalArgumentException("Invalid DNS name: " + dns_name);
-        }
-        return result;
     }
 }
 
