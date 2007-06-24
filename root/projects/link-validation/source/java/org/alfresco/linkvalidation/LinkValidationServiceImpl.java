@@ -3895,6 +3895,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
             response_code = 400;                // probably a bad request
         }
+        
+        if ( log.isDebugEnabled() )
+        {
+            log.debug("Response code for '" + url_str + "': " + response_code);
+        }
 
 
         attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
