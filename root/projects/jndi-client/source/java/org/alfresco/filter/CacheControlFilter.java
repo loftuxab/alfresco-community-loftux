@@ -177,7 +177,26 @@ public class CacheControlFilter implements Filter
                           FilterChain     chain
                         ) throws IOException, ServletException 
     {
-        PrintWriter         out     = response.getWriter();
+        PrintWriter out = null;
+        try 
+        {
+           out = response.getWriter();
+        }
+        catch (Exception e)
+        {
+            // If this filter has been configured to deal with 
+            // post-response cleanup as well as wrapping the
+            // request itself, then getWriter() will be called
+            // after the response has been sent, which will
+            // throw an illegal state transition exception.   
+            // Because the work of injecting the proper headers
+            // into the response has been done, that can just be
+            // ignored... so just chain to make this invocation
+            // a no-op.
+
+            chain.doFilter(request, response); 
+            return;
+        }
 
         HttpServletRequest  req     = (HttpServletRequest)  request;
         HttpServletResponse res     = (HttpServletResponse) response;
