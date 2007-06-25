@@ -96,6 +96,10 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         return result.booleanValue();
     }
     
+    /**
+     * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#getPost(org.alfresco.module.blogIntegration.BlogDetails, java.lang.String)
+     */
+    @SuppressWarnings("unchecked")
     public Map<String, Object> getPost(BlogDetails blogDetails, String postId)
     {
         // Create a list of parameters

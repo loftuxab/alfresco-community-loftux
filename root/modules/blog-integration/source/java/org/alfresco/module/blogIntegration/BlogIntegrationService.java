@@ -60,6 +60,17 @@ public interface BlogIntegrationService
     List<BlogIntegrationImplementation> getBlogIntegrationImplementations();
     
     /**
+     * Given a node reference, gets a list of 'in scope' BlogDetails. 
+     * 
+     * The node itself and then the primary parent hierarchy is searched and any blog details found returned in 
+     * a list, with the 'nearest' first.
+     * 
+     * @param nodeRef               the node reference
+     * @return List<BlogDetails>    list of the blog details found 'in scope' for the node, empty if none found
+     */
+    List<BlogDetails> getBlogDetails(NodeRef nodeRef);
+    
+    /**
      * Posts the content of a node to the blog specified
      * 
      * @param blogDetails

@@ -34,6 +34,7 @@ import java.util.Map;
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.service.cmr.repository.AssociationRef;
+import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.NodeRef;
@@ -50,15 +51,12 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
     private ContentService contentService;
     
     private Map<String, BlogIntegrationImplementation> implementations = new HashMap<String, BlogIntegrationImplementation>(5); 
-    private List<String> supportedMimetypes = new ArrayList<String>(5);
+    public static List<String> supportedMimetypes = new ArrayList<String>(5);
     
-    /**
-     * Constructor
-     */
-    public BlogIntegrationServiceImpl()
+    static
     {
-        this.supportedMimetypes.add(MimetypeMap.MIMETYPE_TEXT_PLAIN);
-        this.supportedMimetypes.add(MimetypeMap.MIMETYPE_HTML);
+        supportedMimetypes.add(MimetypeMap.MIMETYPE_TEXT_PLAIN);
+        supportedMimetypes.add(MimetypeMap.MIMETYPE_HTML);
     }
     
     /**
@@ -108,6 +106,52 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
     {
         return new ArrayList<BlogIntegrationImplementation>(this.implementations.values());
     }
+
+    /**
+     * @see org.alfresco.module.blogIntegration.BlogIntegrationService#getBlogDetails(org.alfresco.service.cmr.repository.NodeRef)
+     */
+    public List<BlogDetails> getBlogDetails(NodeRef nodeRef)
+    {
+        List<BlogDetails> result = new ArrayList<BlogDetails>(5);
+        
+        // First check the node itself
+        if (this.nodeService.hasAspect(nodeRef, ASPECT_BLOG_DETAILS) == true)
+        {
+            result.add(BlogDetails.createBlogDetails(this.nodeService, nodeRef));
+        }
+        
+        // Now walk up the parent hiearchy adding details as they are found
+        getBlogDetailsImpl(nodeRef, result);        
+        return result;
+    }
+    
+    /**
+     * Helper method that recurses up the primary parent hierarchy checking for 
+     * blog details
+     * 
+     * @param nodeRef       the node reference
+     * @param blogDetails   list of blog details
+     */
+    private void getBlogDetailsImpl(NodeRef nodeRef, List<BlogDetails> blogDetails)
+    {
+        // Check the parent assoc
+        ChildAssociationRef parentAssoc = this.nodeService.getPrimaryParent(nodeRef);
+        if (parentAssoc != null)
+        {
+            // Check for the blog details
+            NodeRef parent = parentAssoc.getParentRef();
+            if (parent != null)
+            {
+                if (this.nodeService.hasAspect(parent, ASPECT_BLOG_DETAILS) == true)
+                {
+                    blogDetails.add(BlogDetails.createBlogDetails(this.nodeService, parent));
+                }
+                
+                // Recurse
+                getBlogDetailsImpl(parent, blogDetails);
+            }
+        }        
+    }
     
     /**
      * @see org.alfresco.module.blogIntegration.BlogIntegrationService#newPost(org.alfresco.module.blogIntegration.BlogDetails, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName, boolean)
@@ -132,7 +176,7 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
         
         // Check the mimetype
         String body = null;
-        if (this.supportedMimetypes.contains(contentReader.getMimetype()) == true)
+        if (supportedMimetypes.contains(contentReader.getMimetype()) == true)
         {
             // Get the content
             body = contentReader.getContentString();
@@ -239,7 +283,7 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
         
         // Check the mimetype
         String body = null;
-        if (this.supportedMimetypes.contains(contentReader.getMimetype()) == true)
+        if (supportedMimetypes.contains(contentReader.getMimetype()) == true)
         {
             // Get the content
             body = contentReader.getContentString();

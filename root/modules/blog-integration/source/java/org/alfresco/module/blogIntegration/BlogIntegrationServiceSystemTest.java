@@ -42,12 +42,12 @@ import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
-import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.BaseAlfrescoSpringTest;
 
 /**
  * @author Roy Wetherall
  */
-public class BlogIntegrationServiceSystemTest extends BaseSpringTest implements BlogIntegrationModel
+public class BlogIntegrationServiceSystemTest extends BaseAlfrescoSpringTest implements BlogIntegrationModel
 {
     /**
      * Wordpress details
@@ -158,6 +158,19 @@ public class BlogIntegrationServiceSystemTest extends BaseSpringTest implements 
         BlogIntegrationImplementation blog = this.blogService.getBlogIntegrationImplementation(BLOG);
         assertNotNull(blog);
         assertEquals(BLOG, blog.getName());
+    }
+    
+    public void testGetBlogDetails()
+    {
+        List<BlogDetails> details = this.blogService.getBlogDetails(this.nodeRef);
+        assertNotNull(details);
+        assertEquals(1, details.size());
+        assertEquals(BLOG_URL, details.get(0).getConnectionURL());
+        
+        List<BlogDetails> details2 = this.blogService.getBlogDetails(this.blogDetailsNodeRef);
+        assertNotNull(details2);
+        assertEquals(1, details2.size());
+        assertEquals(BLOG_URL, details2.get(0).getConnectionURL());
     }
     
     public void testNewPost()
