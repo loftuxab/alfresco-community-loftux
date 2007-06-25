@@ -1,8 +1,8 @@
 ====================
-Alfresco 2.0 Release
+Alfresco 2.1 Release
 ====================
 
-Welcome to the Alfresco 2.0  Release.
+Welcome to the Alfresco 2.1  Release.
 
 ===================
 Installing Alfresco
@@ -28,14 +28,14 @@ Optional:
 Simple Installation
 ===================
 
-Install JDK 5.0
----------------
+Install JDK 5.0/6.0
+-------------------
 
-- If you already have J2SE Development Kit 5.0 installed, skip to "Install MySQL"
+- If you already have J2SE Development Kit 5.0 or 6.0 installed, skip to "Install Alfresco WAR Bundle"
 
-- Browse to http://java.sun.com/j2se/1.5.0/download.jsp
-- Select the "JDK 5.0 Update x" option
-- Download the "Windows Offline Installation" option (~55M)
+- Browse to http://java.sun.com/javase/downloads
+- Select the "JDK 6uN" option
+- Download the appropriate option (~55M)
 - Install once downloaded
 
 
@@ -68,7 +68,7 @@ Alfresco can be customized in a number of ways.  Some samples and default config
 are provided in the extensions directory.  These should be copied into the container's
 shared classes location.  These configurations also set the database to be HSQL and will 
 use the alf_data directory provided.  You will need to change the path to the HSQL data
-directory in the custom-db-connection.properties file.  Alternatively, for a MySQL based
+directory in the custom-repository.properties file.  Alternatively, for a MySQL based
 installation, follow instructions in the README_mysql.txt file.
 
 
@@ -123,7 +123,7 @@ the command for this depends on your platform.
 
 
 ===========================
-Upgrading from V1.x to V2.0
+Upgrading from V1.x to V2.1
 ===========================
 
 Not yet available.
@@ -169,8 +169,7 @@ Image Manipulation
 ==================
 
 To enable image manipulation on a Windows platform, the 'imconvert.exe' in
-'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'. 
-On a Linux platform, just create a symbolic link named imconvert to the convert executable.
+'C:\alfresco\bin' needs to be copied into a folder on the system path, such as 'C:\windows\system32'.
 
 
 ================
@@ -180,10 +179,9 @@ Trouble-Shooting
 If you have problems with your installation, please look for help on the Installation
 forum at http://forums.alfresco.com and ask for any additional help you may need.
 
-- The JAVA_HOME variable must be set correctly to your Java5 installation.
+- The JAVA_HOME variable must be set correctly to your Java installation.
 
 - If the following errors are reported on the console:
-  ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
   ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available:
   Failed to execute command: imconvert ...
 

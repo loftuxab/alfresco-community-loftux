@@ -1,8 +1,8 @@
 ====================
-Alfresco 2.0 Release
+Alfresco 2.1 Release
 ====================
 
-Welcome to the Alfresco 2.0  Release. 
+Welcome to the Alfresco 2.1  Release. 
 
 
 ===================
@@ -35,12 +35,12 @@ may need to prefix some of the commands with 'sudo' if you do not have administr
 access.
 
 
-Install JDK 5.0
----------------
+Install JDK 5.0/6.0
+-------------------
 
-- If you already have J2SE Development Kit 5.0 installed, skip to "Install Alfresco Tomcat Bundle"
+- If you already have J2SE Development Kit 5.0 or 6.0 installed, skip to "Install Alfresco Tomcat Bundle"
 
-- Browse to http://www.apple.com/support/downloads/java2se50release1.html
+- Browse to http://developer.apple.com/java/ and find the latest JDK
 - Install once downloaded
 - Ensure the JAVA_HOME variable is set correctly
 
@@ -182,7 +182,6 @@ forum at http://www.alfresco.com/forums and ask for any additional help you may 
 - The JAVA_HOME variable must be set correctly to your Java5 installation.
 
 - If the following errors are reported on the console:
-  ERROR [AbstractImageMagickContentTransformer] JMagickContentTransformer not available:
   ERROR [AbstractImageMagickContentTransformer] ImageMagickContentTransformer not available:
   Failed to execute command: convert ...
 
