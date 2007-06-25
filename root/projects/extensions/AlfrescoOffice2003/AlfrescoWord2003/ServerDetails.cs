@@ -21,8 +21,8 @@ namespace AlfrescoWord2003
       // Persisted settings
       private string m_ServerName = "";
       private string m_WebClientURL = "";
-      public string WebDAVURL = "";
-      public string CIFSServer = "";
+      private string m_WebDAVURL = "";
+      private string m_CIFSServer = "";
       public string Username = "";
       public string Password = "";
       // Temporary/runtime-only settings
@@ -59,6 +59,10 @@ namespace AlfrescoWord2003
             try
             {
                m_WebClientURL = value;
+               if (!m_WebClientURL.EndsWith("/"))
+               {
+                  m_WebClientURL += "/";
+               }
                m_AuthenticationTicket = "";
                Uri webClient = new Uri(value);
                m_ServerName = webClient.Host;
@@ -67,6 +71,38 @@ namespace AlfrescoWord2003
             {
                m_WebClientURL = "";
                m_ServerName = "";
+            }
+         }
+      }
+
+      public string WebDAVURL
+      {
+         get
+         {
+            return m_WebDAVURL;
+         }
+         set
+         {
+            m_WebDAVURL = value;
+            if (!m_WebDAVURL.EndsWith("/"))
+            {
+               m_WebDAVURL += "/";
+            }
+         }
+      }
+
+      public string CIFSServer
+      {
+         get
+         {
+            return m_CIFSServer;
+         }
+         set
+         {
+            m_CIFSServer = value;
+            if (!m_CIFSServer.EndsWith("\\"))
+            {
+               m_CIFSServer += "\\";
             }
          }
       }

@@ -583,7 +583,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Alfresco Add-In for Microsoft Word 2003"
         "ProductCode" = "8:{70059AED-0498-4A79-94D3-F6C31E6D7DB9}"
-        "PackageCode" = "8:{54A11535-8454-4F5B-89D6-955072EBC9AC}"
+        "PackageCode" = "8:{F33B83C5-94E8-49DF-84DE-16F9D1EBCA77}"
         "UpgradeCode" = "8:{FB093BEB-D4B1-47C8-91C2-ACC7A6A27FCE}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
