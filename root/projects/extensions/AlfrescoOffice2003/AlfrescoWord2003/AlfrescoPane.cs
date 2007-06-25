@@ -87,7 +87,7 @@ namespace AlfrescoWord2003
 
       public void OnWindowActivate()
       {
-         if (m_ShowPaneOnActivate)
+         if (m_ShowPaneOnActivate && !m_ManuallyHidden)
          {
             this.Show();
          }
@@ -116,6 +116,7 @@ namespace AlfrescoWord2003
          else
          {
             this.Show();
+            m_WordApplication.Activate();
          }
       }
 
@@ -202,33 +203,82 @@ namespace AlfrescoWord2003
 
       public void compareDocument(string documentPath)
       {
-         /* TODO: Is compareDocument() needed?
          object missingValue = Type.Missing;
+
          m_WordApplication.ActiveDocument.Compare(
-            m_AlfrescoWebServer + documentPath, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
+            m_ServerDetails.WebClientURL + documentPath, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
             ref missingValue, ref missingValue, ref missingValue);
-         */
+      }
+
+      public bool docHasExtension()
+      {
+         return (m_WordApplication.ActiveDocument.Name.EndsWith(".doc"));
       }
 
       public void saveToAlfresco(string documentPath)
       {
+         saveToAlfrescoAs(documentPath, m_WordApplication.ActiveDocument.Name);
+      }
+
+      public void saveToAlfrescoAs(string documentPath, string docName)
+      {
          object missingValue = Type.Missing;
-         // TODO: WebDAV or CIFS path to save on?
-         string filePath = m_ServerDetails.WebDAVURL;
-         if (documentPath.Length > 0)
+
+         // Remove leading "/"
+         if (documentPath.StartsWith("/"))
          {
-            filePath += documentPath + "/";
+            documentPath = documentPath.Substring(1);
          }
-         filePath += m_WordApplication.ActiveDocument.Name;
-         // Remove empty path elements
-         object file = filePath;
+
+         // CIFS or WebDAV path?
+         string docPath = m_WordApplication.ActiveDocument.FullName;
+         string savePath = "";
+
+         if (m_ServerDetails.MatchCIFSServer(docPath))
+         {
+            // Use CIFS
+            savePath = m_ServerDetails.CIFSServer + documentPath.Replace("/", "\\") + "\\".Replace("%20", " ");
+         }
+         else if (m_ServerDetails.MatchWebDAVURL(docPath))
+         {
+            // Use WebDAV
+            savePath = m_ServerDetails.WebDAVURL + documentPath + "/";
+         }
+         else
+         {
+            // No match - what config have we been given?
+            if (m_ServerDetails.CIFSServer != "")
+            {
+               // Default to CIFS if we've been given a server
+               savePath = m_ServerDetails.CIFSServer + documentPath.Replace("/", "\\").Replace("%20", " ") + "\\";
+            }
+            else
+            {
+               // Otherwise use WebDAV
+               savePath = m_ServerDetails.WebDAVURL + documentPath + "/";
+            }
+         }
+
+         // Add the Word filename
+         savePath += docName;
+
+         // Have the correct file extension already?
+         if (!savePath.EndsWith(".doc"))
+         {
+            savePath += ".doc";
+         }
+
+         // Box into object - Word requirement
+         object file = savePath;
          try
          {
             m_WordApplication.ActiveDocument.SaveAs(
                ref file, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
                ref missingValue, ref missingValue, ref missingValue, ref missingValue,
                ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue);
-            showDocumentDetails(documentPath + "/" + m_WordApplication.ActiveDocument.Name);
+
+            this.OnDocumentChanged();
+//            showDocumentDetails(documentPath + "/" + m_WordApplication.ActiveDocument.Name);
          }
          catch (Exception e)
          {
