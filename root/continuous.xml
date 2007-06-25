@@ -21,7 +21,7 @@
    <!-- ** Cleaning targets ** -->
    <!-- ********************** -->
 
-   <target name="clean-continuous" 
+   <target name="clean-continuous"
            description="Cleans just the continuous build area" 
            depends="init">
       <delete quiet="yes" 
@@ -378,7 +378,9 @@
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.webclient.config}/alfresco/extension" 
                      prefix="extensions/extension" />
-         <zipfileset dir="${dir.project.installer.messages}" 
+         <zipfileset dir="${dir.project.installer.extension}"
+                     prefix="extensions/extension" />
+         <zipfileset dir="${dir.project.installer.messages}"
                      prefix="extensions/messages" />
          <zipfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}" 
                      includes="${file.name.jar.xalan},${file.name.jar.serializer}" 
@@ -403,9 +405,11 @@
                      includes="${file.name.war.webclient}" />
          <tarfileset dir="${dir.project.repository.config}/alfresco/extension" 
                      prefix="extensions/extension" />
-         <tarfileset dir="${dir.project.webclient.config}/alfresco/extension" 
+         <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"
                      prefix="extensions/extension" />
-         <tarfileset dir="${dir.project.installer.messages}" 
+         <tarfileset dir="${dir.project.installer.extension}"
+                     prefix="extensions/extension" />
+         <tarfileset dir="${dir.project.installer.messages}"
                      prefix="extensions/messages" />
          <tarfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}" 
                      includes="${file.name.jar.xalan},
