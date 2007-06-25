@@ -31,40 +31,40 @@
         <title>Blog Details</title>
         <properties>	            
             <property name="blg:blogImplementation">
-				<title>Blog implementation</title>
+				<title>Blog Type</title>
 				<type>d:text</type>
-				<mandatory>true</mandatory>
+				<mandatory>false</mandatory>
 			</property>                       
             <property name="blg:id">
-				<title>Blog identifier</title>
+				<title>Blog Identifier</title>
 				<type>d:text</type>
-				<mandatory>true</mandatory>
+				<mandatory>false</mandatory>
 				<default>0</default>
 			</property>                       
             <property name="blg:name">
-				<title>Blog name</title>
+				<title>Blog Name</title>
 				<type>d:text</type>
 				<mandatory>false</mandatory>
 			</property>             
             <property name="blg:description">
-				<title>Blog description</title>
+				<title>Blog Description</title>
 				<type>d:text</type>
 				<mandatory>false</mandatory>
 			</property>
             <property name="blg:connectionURL">
-				<title>Blog connection URL</title>
+				<title>Blog Connection URL</title>
 				<type>d:text</type>
-				<mandatory>true</mandatory>
+				<mandatory>false</mandatory>
 			</property>            
             <property name="blg:userName">
-				<title>Blog user name</title>
+				<title>Blog User Name</title>
 				<type>d:text</type>
-				<mandatory>true</mandatory>
+				<mandatory>false</mandatory>
 			</property>            
             <property name="blg:password">
-				<title>Blog user'spassword</title>
+				<title>Blog User Password</title>
 				<type>d:text</type>
-				<mandatory>true</mandatory>
+				<mandatory>false</mandatory>
 			</property>			
         </properties>
      </aspect> 
