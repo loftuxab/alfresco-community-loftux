@@ -25,10 +25,10 @@
 *  File    CacheControlFilter.java
 *----------------------------------------------------------------------------*/
 
-
 package org.alfresco.filter;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -36,11 +36,11 @@ import java.util.regex.Pattern;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.JNDIConstants;
 
 /**
@@ -177,32 +177,18 @@ public class CacheControlFilter implements Filter
                           FilterChain     chain
                         ) throws IOException, ServletException 
     {
-        PrintWriter out = null;
-        try 
-        {
-           out = response.getWriter();
-        }
-        catch (Exception e)
-        {
-            // If this filter has been configured to deal with 
-            // post-response cleanup as well as wrapping the
-            // request itself, then getWriter() will be called
-            // after the response has been sent, which will
-            // throw an illegal state transition exception.   
-            // Because the work of injecting the proper headers
-            // into the response has been done, that can just be
-            // ignored... so just chain to make this invocation
-            // a no-op.
-
-            chain.doFilter(request, response); 
-            return;
-        }
+         ByteArrayServletOutputStream byte_stream =
+                new ByteArrayServletOutputStream();
 
         HttpServletRequest  req     = (HttpServletRequest)  request;
         HttpServletResponse res     = (HttpServletResponse) response;
-        CharResponseWrapper wrapper = new CharResponseWrapper( res );
+        ByteResponseWrapper wrapper = new ByteResponseWrapper(res,byte_stream);
 
         chain.doFilter(request, wrapper); 
+
+        wrapper.flushOutputStreamOrWriter();
+
+        byte[] bytes = byte_stream.toByteArray();
 
         String serverName  = request.getServerName();
 
@@ -266,8 +252,27 @@ public class CacheControlFilter implements Filter
             }
         }
 
-        out.write(wrapper.toString());
-        out.close();
+
+        // Write the output
+        //
+        //      Figuring out how to do a write in order to handle all 
+        //      cases properly required a lot of digging.  The example:
+        //      http://java.sun.com/products/servlet/Filters.html
+        //      is incorrect.  You really need to deal with both 
+        //      the OutputStream and PrintWriter case, not just the
+        //      PrintWriter (if you do that, images will be messed up),  
+        //      probably due to confusion over chunked transfer sizes.
+
+        try 
+        { 
+            OutputStream out = res.getOutputStream(); 
+            out.write(bytes); 
+        } 
+        catch (Throwable t) 
+        { 
+            PrintWriter out = res.getWriter(); 
+            out.write(new String(bytes)); 
+        }
     }
 
     public void destroy() { }
