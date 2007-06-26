@@ -41,6 +41,25 @@ public abstract class AbstractCharactersetFinder implements CharactersetFinder
     private static Log logger = LogFactory.getLog(AbstractCharactersetFinder.class);
     private static boolean isDebugEnabled = logger.isDebugEnabled();
     
+    private int bufferSize;
+    
+    public AbstractCharactersetFinder()
+    {
+        this.bufferSize  = 8192;
+    }
+
+    /**
+     * Set the maximum number of bytes to read ahead when attempting to determine the characterset.
+     * Most characterset detectors are efficient and can process 8K of buffered data very quickly.
+     * Some, may need to be constrained a bit.
+     * 
+     * @param bufferSize        the number of bytes - default 8K.
+     */
+    public void setBufferSize(int bufferSize)
+    {
+        this.bufferSize = bufferSize;
+    }
+
     /**
      * {@inheritDoc}
      * <p>
@@ -56,7 +75,7 @@ public abstract class AbstractCharactersetFinder implements CharactersetFinder
         }
         try
         {
-            int bufferSize = getBestBufferSize();
+            int bufferSize = getBufferSize();
             if (bufferSize < 0)
             {
                 throw new RuntimeException("The required buffer size may not be negative: " + bufferSize);
@@ -125,18 +144,31 @@ public abstract class AbstractCharactersetFinder implements CharactersetFinder
      * Some implementations may only require a few bytes to do detect the stream type,
      * whilst others may be more efficient with larger buffers.  In either case, the
      * number of bytes actually present in the buffer cannot be enforced.
+     * <p>
+     * Only override this method if there is a very compelling reason to adjust the buffer
+     * size, and then consider handling the {@link #setBufferSize(int)} method by issuing a
+     * warning.  This will prevent users from setting the buffer size when it has no effect.
      * 
      * @return              Returns the maximum desired size of the buffer passed
      *                      to the {@link CharactersetFinder#detectCharset(byte[])} method.
+     * 
+     * @see #setBufferSize(int)
      */
-    protected abstract int getBestBufferSize();
+    protected int getBufferSize()
+    {
+        return bufferSize;
+    }
     
     /**
      * Worker method for implementations to override.  All exceptions will be reported and
      * absorbed and <tt>null</tt> returned.
+     * <p>
+     * The interface contract is that the data buffer must not be altered in any way.
      * 
      * @param buffer            the buffer of data no bigger than the requested
-     *                          {@linkplain #getBestBufferSize() best buffer size}
+     *                          {@linkplain #getBestBufferSize() best buffer size}.  This can,
+     *                          very efficiently, be turned into an <tt>InputStream</tt> using a
+     *                          <tt>ByteArrayInputStream<tt>. 
      * @return                  Returns the charset or <tt>null</tt> if an accurate conclusion
      *                          is not possible
      * @throws Exception        Any exception, checked or not
