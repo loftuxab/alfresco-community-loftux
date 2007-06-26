@@ -39,20 +39,9 @@ import com.glaforge.i18n.io.CharsetToolkit;
  */
 public class GuessEncodingCharsetFinder extends AbstractCharactersetFinder
 {
-    /** 8192 bytes */
-    private static final int BUFFER_SIZE = 8192;
     /** Dummy charset to detect the default guess */
     private static final Charset DUMMY_CHARSET = new DummyCharset();
 
-    /**
-     * @return          Returns {@link #BUFFER_SIZE}
-     */
-    @Override
-    protected int getBestBufferSize()
-    {
-        return BUFFER_SIZE;
-    }
-    
     @Override
     protected Charset detectCharsetImpl(byte[] buffer) throws Exception
     {

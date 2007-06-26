@@ -28,6 +28,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Byte Order Marker encoding detection.
  * 
@@ -37,11 +40,19 @@ import java.nio.charset.Charset;
  */
 public class BomCharactersetFinder extends AbstractCharactersetFinder
 {
+    private static Log logger = LogFactory.getLog(BomCharactersetFinder.class);
+    
+    @Override
+    public void setBufferSize(int bufferSize)
+    {
+        logger.warn("Setting the buffersize has no effect for charset finder: " + BomCharactersetFinder.class.getName());
+    }
+
     /**
      * @return          Returns 64
      */
     @Override
-    protected int getBestBufferSize()
+    protected int getBufferSize()
     {
         return 64;
     }
