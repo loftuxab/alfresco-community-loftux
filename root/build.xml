@@ -94,12 +94,29 @@
            description="Performs a clean build for Tomcat and deploys the WAR file"
            depends="clean, 
                     incremental-tomcat" />
+                    
+   <target name="build-tomcat-exploded"
+           depends="clean, 
+                    clean-tomcat-deploy, 
+                    incremental-tomcat-exploded" />
 
    <target name="incremental-tomcat" 
            description="Performs an incremental build for Tomcat and deploys the WAR file"
            depends="-tomcat, 
                     deploy-tomcat" />
-
+   
+   <target name="incremental-tomcat-exploded" 
+           depends="incremental-core, 
+                    incremental-mbeans, 
+                    incremental-deployment,
+                    incremental-repository, 
+                    incremental-remoteapi, 
+                    incremental-jndi,
+                    incremental-catalinavirtual, 
+                    incremental-linkvalidation,
+                    package-webclient-jar,
+                    deploy-tomcat-exploded" />
+   
    <target name="build-jboss" 
            description="Performs a clean build for JBoss and deploys the WAR file"
            depends="clean, 
@@ -206,14 +223,8 @@
    <!-- ****************************************************** -->
    <!-- **************** Deployment targets ****************** -->
    <!-- ****************************************************** -->
-
-   <target name="deploy-tomcat" 
-           description="Deploys to Tomcat" 
-           depends="clean-tomcat-deploy, 
-                    deploy-virtual-tomcat">
-
-      <copy todir="${dir.deploy.tomcat}" 
-            file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   
+   <target name="-deploy-tomcat-common" depends="init">
 
       <!-- ensure mysql drivers and xalan files are present -->
       <delete>
@@ -239,19 +250,82 @@
       <copy todir="${home.tomcat}/shared/classes/alfresco/extension" 
             file="${dir.project.installer}/wcm-bootstrap-context.xml" />
    </target>
+   
+   <target name="deploy-tomcat" 
+           description="Deploys to Tomcat" 
+           depends="clean-tomcat-deploy, -deploy-tomcat-common, deploy-virtual-tomcat">
 
-   <target name="deploy-virtual-tomcat" 
-           description="Deploys to Virtual Tomcat (the virtualization server)" 
-           depends="init,clean-virtual-tomcat-deploy">
-      <deploy-virtual-tomcat location="${home.virtualtomcat}" />
+      <!-- copy the webclient WAR file to Tomcat's deploy folder -->
+      <copy todir="${dir.deploy.tomcat}" 
+            file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
    <target name="deploy-tomcat-exploded" 
-           depends="init">
-      <copy todir="${dir.deploy.tomcat}/alfresco" 
-            verbose="true">
+           depends="-deploy-tomcat-common">
+      
+      <!-- copy the class files from each project to the WEB-INF/classes folder -->
+      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/classes">
+      
+         <!-- copy class files -->
+         <fileset dir="${dir.project.core.classes}" />
+         <fileset dir="${dir.project.mbeans.classes}" />
+         <fileset dir="${dir.project.deployment.classes}" />
+         <fileset dir="${dir.project.repository.classes}" />
+         <fileset dir="${dir.project.remoteapi.classes}" />
+         <fileset dir="${dir.project.catalinavirtual.classes}" />
+         <fileset dir="${dir.project.linkvalidation.classes}" />
+         <fileset dir="${dir.project.webclient.classes}" />
+        
+         <!-- copy config files -->
+         <fileset dir="${dir.project.core.src.java}" 
+                  includes="log4j.properties" />
+         <fileset dir="${dir.project.repository.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webclient.config}" 
+                  excludes="**/extension/**" />
+         <!-- NOTE: include dev-context.xml to allow developer overrides -->
+         <fileset dir="${dir.project.repository.config}" 
+                  includes="**/extension/dev-context.xml"/>
+      </copy>
+      
+      <!-- copy webclient web source files i.e. JSPs, images etc. -->
+      <copy todir="${dir.deploy.tomcat}/alfresco">
          <fileset dir="${dir.project.webclient.src.web}" 
-                  excludes="WEB-INF/**" />
+                  excludes="WEB-INF/jboss*.xml, WEB-INF/portlet*.xml, 
+                            WEB-INF/alfresco-object.xml" />
+      </copy>
+      
+      <!-- copy required 3rd party libs -->
+      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" includes="*.jar" 
+                  excludes="${dir.name.devenv}/**" />
+         <fileset dir="${dir.project.3rdparty.lib}/jibx" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/openoffice" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jmagick" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jgroups" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/jbpm" includes="*.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}/fop" includes="*.jar"/>
+      </copy>
+      
+      <!-- copy webservices files -->
+      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF">
+         <fileset dir="${dir.project.remoteapi.src.webinf}"/>
+      </copy>
+      <copy todir="${dir.deploy.tomcat}/alfresco/wsdl">
+         <fileset dir="${dir.project.remoteapi.src.wsdl}" />
+      </copy>
+   </target>
+   
+   <target name="deploy-virtual-tomcat" 
+           description="Deploys to Virtual Tomcat (the virtualization server)" 
+           depends="init, clean-virtual-tomcat-deploy">
+      <deploy-virtual-tomcat location="${home.virtualtomcat}" />
+   </target>
+   
+   <target name="deploy-webclient-changes" depends="init">
+      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="true">
+         <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
       </copy>
    </target>
 
