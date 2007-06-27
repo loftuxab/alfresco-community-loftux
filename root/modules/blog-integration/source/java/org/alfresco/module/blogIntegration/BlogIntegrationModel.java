@@ -39,7 +39,7 @@ public interface BlogIntegrationModel
     static final QName PROP_ID = QName.createQName(MODEL_URL, "id");
     static final QName PROP_NAME = QName.createQName(MODEL_URL, "name");
     static final QName PROP_DESCRIPTION = QName.createQName(MODEL_URL, "description");
-    static final QName PROP_CONNNECTION_URL = QName.createQName(MODEL_URL, "connectionURL");
+    static final QName PROP_URL = QName.createQName(MODEL_URL, "url");
     static final QName PROP_USER_NAME = QName.createQName(MODEL_URL, "userName");
     static final QName PROP_PASSWORD = QName.createQName(MODEL_URL, "password");
         

@@ -1,4 +1,4 @@
-<project name="alfresco" 
+<project name="alfresco"
          default="build-tomcat" >
 
 
@@ -134,28 +134,30 @@
                     generate-javadocs-deployment, 
                     generate-javadocs-repository, 
                     generate-javadocs-remoteapi, 
-                    generate-javadocs-jndi, 
+                    generate-javadocs-jndi,
                     generate-javadocs-catalinavirtual, 
                     generate-javadocs-linkvalidation, 
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
                     generate-javadocs-rm, 
-                    generate-javadocs-php, 
-                    generate-javadocs-webserviceclient, 
-                    generate-javadocs-benchmarkframework, 
+		              generate-javadocs-blog,
+                    generate-javadocs-php,
+                    generate-javadocs-webserviceclient,
+                    generate-javadocs-benchmarkframework,
                     generate-javadocs-benchmarktests" />
 
-   <target name="-tomcat" 
-           depends="incremental-core, 
+   <target name="-tomcat"
+           depends="incremental-core,
                     incremental-mbeans,
-                    incremental-deployment, 
-                    incremental-repository, 
-                    incremental-remoteapi, 
+                    incremental-deployment,
+                    incremental-repository,
+                    incremental-remoteapi,
                     incremental-jndi, 
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
                     incremental-webclient, 
                     incremental-rm, 
+		    incremental-blog,
                     incremental-php, 
                     incremental-webserviceclient" />
 
@@ -176,7 +178,8 @@
                     clean-catalinavirtual, 
                     clean-linkvalidation, 
                     clean-webclient, 
-                    clean-rm, 
+                    clean-rm,
+		    clean-blog,
                     clean-php, 
                     clean-webserviceclient, 
                     clean-benchmarkframework, 
@@ -351,7 +354,7 @@
       </exec>
    </target>
 
-   <target name="start-tomcat-debug" 
+   <target name="start-tomcat-debug"
            description="Starts the Tomcat server on Windows" 
            depends="init">
       <fail unless="env.JPDA_ADDRESS" 
@@ -424,6 +427,7 @@
                     test-catalinavirtual, 
                     test-webclient, 
                     test-rm, 
+		    test-blog,
                     test-php, 
                     test-webserviceclient" />
 

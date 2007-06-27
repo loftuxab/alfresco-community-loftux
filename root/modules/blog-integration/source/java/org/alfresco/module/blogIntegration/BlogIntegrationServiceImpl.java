@@ -42,17 +42,25 @@ import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.namespace.QName;
 
 /**
+ * Blog integration service implementation
  * 
  * @author Roy Wetherall
  */
 public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogIntegrationModel
 {
+    /** Node service */
     private NodeService nodeService;
+    
+    /** Content service */
     private ContentService contentService;
     
-    private Map<String, BlogIntegrationImplementation> implementations = new HashMap<String, BlogIntegrationImplementation>(5); 
+    /** Registered blog integration implemenatations */
+    private Map<String, BlogIntegrationImplementation> implementations = new HashMap<String, BlogIntegrationImplementation>(5);
+    
+    /** Supported mimetypes */
     public static List<String> supportedMimetypes = new ArrayList<String>(5);
     
+    /** Static initialisation of supported mimetypes */
     static
     {
         supportedMimetypes.add(MimetypeMap.MIMETYPE_TEXT_PLAIN);

@@ -31,9 +31,11 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.xmlrpc.XmlRpcException;
-import org.apache.xmlrpc.client.XmlRpcClient;
-import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
+import marquee.xmlrpc.XmlRpcClient;
+import marquee.xmlrpc.XmlRpcException;
+import marquee.xmlrpc.XmlRpcParser;
+import marquee.xmlrpc.XmlRpcSerializer;
+import marquee.xmlrpc.serializers.HashtableSerializer;
 
 /**
  * Default blog integration implementation.  Uses various standard XML PRC blogging API to satisfy the 
@@ -43,13 +45,21 @@ import org.apache.xmlrpc.client.XmlRpcClientConfigImpl;
  * 
  * @author Roy Wetherall
  */
-public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImplementation
+public abstract class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImplementation
 {
     /** Blog actions */
-    private static final String ACTION_NEW_POST = "metaWeblog.newPost";
-    private static final String ACTION_EDIT_POST = "metaWeblog.editPost";
-    private static final String ACTION_GET_POST = "metaWeblog.getPost";
-    private static final String ACTION_DELETE_POST = "blogger.deletePost";
+    protected static final String ACTION_NEW_POST = "metaWeblog.newPost";
+    protected static final String ACTION_EDIT_POST = "metaWeblog.editPost";
+    protected static final String ACTION_GET_POST = "metaWeblog.getPost";
+    protected static final String ACTION_DELETE_POST = "blogger.deletePost";
+    
+    /**
+     * Gets the XML RPC end point URL for the given blog details.
+     * 
+     * @param blogDetails   blog details
+     * @return String       the end point URL
+     */
+    protected abstract String getEndpointURL(BlogDetails blogDetails);
     
     /**
      * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#newPost(org.alfresco.module.blogIntegration.BlogDetails, java.lang.String, java.lang.String, boolean)
@@ -70,7 +80,7 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         params.add(publish);
         
         // Create the new post
-        return (String)execute(blogDetails.getConnectionURL(), ACTION_NEW_POST, params);
+        return (String)execute(getEndpointURL(blogDetails), ACTION_NEW_POST, params);
     }
 
     /**
@@ -92,7 +102,7 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         params.add(publish);
         
         // Create the new post
-        Boolean result = (Boolean)execute(blogDetails.getConnectionURL(), ACTION_EDIT_POST, params);        
+        Boolean result = (Boolean)execute(getEndpointURL(blogDetails), ACTION_EDIT_POST, params);        
         return result.booleanValue();
     }
     
@@ -109,7 +119,7 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         params.add(blogDetails.getPassword()); 
 
         // Get the post details
-        return (Map<String, Object>)execute(blogDetails.getConnectionURL(), ACTION_GET_POST, params);        
+        return (Map<String, Object>)execute(getEndpointURL(blogDetails), ACTION_GET_POST, params);        
     }
 
     /**
@@ -127,7 +137,7 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         params.add(true); 
         
         // Delete post
-        Boolean result = (Boolean)execute(blogDetails.getConnectionURL(), ACTION_DELETE_POST, params);        
+        Boolean result = (Boolean)execute(getEndpointURL(blogDetails), ACTION_DELETE_POST, params);        
         return result.booleanValue();
     }
     
@@ -142,13 +152,9 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         XmlRpcClient client = null;
         try
         {
-            // Init the client with url
-            XmlRpcClientConfigImpl xmlrpcConfig = new XmlRpcClientConfigImpl();
-            xmlrpcConfig.setServerURL(new URL(url));
-            
-            // Create the client
-            client = new XmlRpcClient();
-            client.setConfig(xmlrpcConfig);
+            XmlRpcSerializer.registerCustomSerializer(new HashtableSerializer());
+            XmlRpcParser.setDriver("org.apache.xerces.parsers.SAXParser");
+            client = new XmlRpcClient(new URL(url));
         }
         catch (MalformedURLException exception)
         {
@@ -156,6 +162,7 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
         }
         
         return client;
+        
     }
     
     /**
@@ -166,19 +173,50 @@ public class DefaultBlogIntegrationImplementation extends BaseBlogIntegrationImp
      * @param params
      * @return
      */
-    private Object execute(String url, String method, List<Object> params)
+    protected Object execute(String url, String method, List<Object> params)
     {
         Object result = null;
+        
         try
         {
-            // Make the remote call to the blog
             XmlRpcClient client = getClient(url);
-            result = client.execute(method, params);
+            result = client.invoke(method, params);
         }
         catch (XmlRpcException exception)
         {
             throw new BlogIntegrationRuntimeException("Failed to execute blog action '" + method + "' @ url '" + url + "'", exception);
         }
+        
         return result;
+    }
+    
+    /**
+     * Checks a url for a protocol and adds http if none present
+     * 
+     * @param url       the url
+     * @return String   the checked url
+     */
+    protected String checkForProtocol(String url)
+    {
+        if (url.indexOf("://") == -1)
+        {
+            url = "http://" + url;
+        }
+        return url;
+    }
+    
+    /**
+     * Checks the url for a trailing slash and adds one if none present
+     * 
+     * @param url       the url
+     * @return String   the checked url
+     */
+    protected String checkForTrainlingSlash(String url)
+    {
+        if (url.endsWith("/") == false)
+        {
+            url = url + "/";
+        }
+        return url;
     }
 }

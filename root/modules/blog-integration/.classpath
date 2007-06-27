@@ -7,8 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Web-Client"/>
-	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-client-3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xmlrpc-common-3.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/ws-commons-util-1.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

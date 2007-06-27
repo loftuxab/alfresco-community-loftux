@@ -251,7 +251,7 @@
       <delete file="${dir.project.repository.dist}/${file.name.jar.onejar}" />
       <!-- build the one-jar -->
       <jar destfile="${dir.project.repository.dist}/${file.name.jar.onejar}" 
-           manifest="${dir.onejar}/META-INF/MANIFEST.MF" 
+           manifest="${dir.onejar}/META-INF/MANIFEST.MF"
            update="false" >
          <fileset dir="${dir.onejar}">
             <include name="**/*" />
@@ -1135,15 +1135,105 @@
       <run-tests projectdir="${dir.module.rm}" />
    </target>
 
-   <target name="generate-javadocs-rm" 
+   <target name="generate-javadocs-rm"
            description="Generates the JavaDocs for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="init" 
+           depends="init"
            if="enable.module.rm">
-      <generate-javadocs documenttitle="Alfresco Records Management Extension" 
-                         windowtitle="Records Management" 
+      <generate-javadocs documenttitle="Alfresco Records Management Extension"
+                         windowtitle="Records Management"
                          projectdir="${dir.module.rm}"/>
    </target>
-   
+
+   <!-- ******************************** -->
+   <!-- ** Blog Integration Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-blog"
+           description="Performs an incremental build of the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="package-blog"
+           if="enable.module.blog" />
+
+   <target name="build-blog"
+           description="Performs a clean build of the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="clean-blog,
+                    incremental-blog"
+                    if="enable.module.blog" />
+
+   <target name="clean-blog"
+           description="Cleans the blog integration project"
+           depends="init"
+           if="enable.module.blog">
+      <clean projectdir="${dir.module.blog}" />
+   </target>
+
+   <target name="compile-blog"
+           description="Compiles the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="init"
+           if="enable.module.blog">
+      <compile-java projectdir="${dir.module.blog}" />
+   </target>
+
+   <target name="package-blog"
+           description="Packages the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="package-blog-war"
+           if="enable.module.blog" />
+
+   <target name="package-blog-jar"
+           description="Packages the JAR file for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="compile-blog"
+           if="enable.module.blog">
+      <mkdir dir="${dir.module.blog.dist}" />
+      <jar jarfile="${dir.module.blog.dist}/${file.name.jar.blog}"
+           basedir="${dir.module.blog.classes}">
+         <fileset dir="${dir.module.blog}/source">
+            <include name="META-INF/*" />
+         </fileset>
+      </jar>
+   </target>
+
+   <target name="package-blog-war"
+           description="Packages the WAR file for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="package-blog-extension"
+           if="enable.module.blog">
+      <echo>Installing blog integration into WAR...</echo>
+      <install-amp ampfile="${dir.module.blog.dist}/${file.name.amp.blog}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-blog-extension"
+           description="Packages the blog integration extension.  Enable with '-Denable.module.blog=TRUE'."
+           depends="package-blog-jar"
+           if="enable.module.blog">
+      <zip destfile="${dir.module.blog.dist}/${file.name.amp.blog}"
+           update="true">
+         <zipfileset file="${dir.module.blog.property}/module.properties"/>
+         <zipfileset file="${dir.module.blog.dist}/${file.name.jar.blog}"
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.blog}/${dir.name.lib}"
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.blog.config}"
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-blog"
+           description="Runs the tests for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="compile-blog"
+           if="enable.module.blog">
+      <run-tests projectdir="${dir.module.blog}" />
+   </target>
+
+   <target name="generate-javadocs-blog"
+           description="Generates the JavaDocs for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
+           depends="init"
+           if="enable.module.blog">
+      <generate-javadocs documenttitle="Alfresco Blog Integration Extension"
+                         windowtitle="Blog Integration"
+                         projectdir="${dir.module.blog}"/>
+   </target>
+
    <!-- ******************************** -->
    <!-- ** PHP SDK Project ** -->
    <!-- ******************************** -->
