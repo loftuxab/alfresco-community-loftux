@@ -270,11 +270,13 @@
          <fileset dir="${dir.project.core.classes}" />
          <fileset dir="${dir.project.mbeans.classes}" />
          <fileset dir="${dir.project.deployment.classes}" />
-         <fileset dir="${dir.project.repository.classes}" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.remoteapi.classes}" />
          <fileset dir="${dir.project.catalinavirtual.classes}" />
          <fileset dir="${dir.project.linkvalidation.classes}" />
-         <fileset dir="${dir.project.webclient.classes}" />
+         <fileset dir="${dir.project.webclient.classes}" 
+                  excludes="**/extension/**" />
         
          <!-- copy config files -->
          <fileset dir="${dir.project.core.src.java}" 
