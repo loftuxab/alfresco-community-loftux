@@ -37,6 +37,9 @@ public abstract class BaseBlogIntegrationImplementation implements BlogIntegrati
     /** Integration name */
     private String name;
     
+    /** Display name */
+    private String displayName;
+    
     /**
      * Sets the blog integration service
      * 
@@ -71,5 +74,23 @@ public abstract class BaseBlogIntegrationImplementation implements BlogIntegrati
     public String getName()
     {
         return this.name;
+    }
+    
+    /**
+     * Sets the display name
+     * 
+     * @param displayName   the display name
+     */
+    public void setDisplayName(String displayName)
+    {
+        this.displayName = displayName;
+    }
+    
+    /**
+     * @see org.alfresco.module.blogIntegration.BlogIntegrationImplementation#getDisplayName()
+     */
+    public String getDisplayName()
+    {
+       return this.displayName;
     }
 }

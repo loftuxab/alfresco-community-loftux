@@ -51,8 +51,8 @@
 				<type>d:text</type>
 				<mandatory>false</mandatory>
 			</property>
-            <property name="blg:connectionURL">
-				<title>Blog Connection URL</title>
+            <property name="blg:url">
+				<title>Blog URL</title>
 				<type>d:text</type>
 				<mandatory>false</mandatory>
 			</property>            

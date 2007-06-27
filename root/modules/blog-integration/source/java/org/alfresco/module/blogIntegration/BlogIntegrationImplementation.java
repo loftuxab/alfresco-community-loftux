@@ -41,6 +41,13 @@ public interface BlogIntegrationImplementation
     String getName();
     
     /**
+     * Gets the display name of the blog integration
+     * 
+     * @return String the display name of the blog integration
+     */
+    String getDisplayName();
+    
+    /**
      * Create a new post on the blog.
      * 
      * @param blogDetails   the blog details
@@ -52,7 +59,7 @@ public interface BlogIntegrationImplementation
     String newPost(BlogDetails blogDetails, String title, String body, boolean publish);
     
     /**
-     * 
+     * Update an exisiting blog post
      * 
      * @param blogDetails
      * @param postId
@@ -64,6 +71,7 @@ public interface BlogIntegrationImplementation
     boolean updatePost(BlogDetails blogDetails, String postId, String title, String body, boolean publish);
     
     /**
+     * Get the details of an existing blog post
      * 
      * @param blogDetails
      * @param postId
@@ -72,6 +80,7 @@ public interface BlogIntegrationImplementation
     Map<String, Object> getPost(BlogDetails blogDetails, String postId);
     
     /**
+     * Delete an existing blog post
      * 
      * @param blogDetails
      * @param postId

@@ -47,8 +47,8 @@ public class BlogDetails implements BlogIntegrationModel
     /** The blog id */
     private String blogId;
     
-    /** The connection URL */
-    private String connectionURL;
+    /** The blog URL */
+    private String url;
     
     /** The user name */
     private String userName;
@@ -82,7 +82,7 @@ public class BlogDetails implements BlogIntegrationModel
         return new BlogDetails(
                 (String)props.get(PROP_BLOG_IMPLEMENTATION),
                 (String)props.get(PROP_ID),
-                (String)props.get(PROP_CONNNECTION_URL),
+                (String)props.get(PROP_URL),
                 (String)props.get(PROP_USER_NAME),
                 (String)props.get(PROP_PASSWORD),
                 (String)props.get(PROP_NAME),
@@ -95,15 +95,15 @@ public class BlogDetails implements BlogIntegrationModel
      * 
      * @param implementationName    the implementation name
      * @param blogId                the blog id
-     * @param connectionURL         the connection URL
+     * @param url                   the blog URL
      * @param userName              the user name
      * @param password              the password
      * @param name                  the name
      * @param description           the description
      */
-    public BlogDetails(String implementationName, String blogId, String connectionURL, String userName, String password, String name, String description)
+    public BlogDetails(String implementationName, String blogId, String url, String userName, String password, String name, String description)
     {
-        this(implementationName, blogId, connectionURL, userName, password, name, description, null);
+        this(implementationName, blogId, url, userName, password, name, description, null);
     }
     
     /**
@@ -111,18 +111,18 @@ public class BlogDetails implements BlogIntegrationModel
      * 
      * @param implementationName    the implementation name
      * @param blogId                the blog id
-     * @param connectionURL         the connection URL
+     * @param url                   the blog URL
      * @param userName              the user name
      * @param password              the password
      * @param name                  the name
      * @param description           the description
      * @param nodeRef               the node reference
      */
-    public BlogDetails(String implementationName, String blogId, String connectionURL, String userName, String password, String name, String description, NodeRef nodeRef)
+    public BlogDetails(String implementationName, String blogId, String url, String userName, String password, String name, String description, NodeRef nodeRef)
     {
         this.implementationName = implementationName;
         this.blogId = blogId;
-        this.connectionURL = connectionURL;
+        this.url = url;
         this.userName = userName;
         this.password = password;
         this.name = name;
@@ -161,13 +161,13 @@ public class BlogDetails implements BlogIntegrationModel
     }
     
     /**
-     * Get the connection URL
+     * Get the blog URL
      * 
-     * @return String   the connection URL
+     * @return String   the blog URL
      */
-    public String getConnectionURL()
+    public String getUrl()
     {
-        return this.connectionURL;
+        return this.url;
     }
     
     /**

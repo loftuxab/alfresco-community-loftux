@@ -56,12 +56,14 @@
     	<property name="blogIntegrationService" ref="blogIntegrationService"/>
     </bean>
     
-    <bean id="wordPressBlogIntegration" parent="baseBlogIntegrationImplmentation" class="org.alfresco.module.blogIntegration.DefaultBlogIntegrationImplementation">
+    <bean id="wordPressBlogIntegration" parent="baseBlogIntegrationImplmentation" class="org.alfresco.module.blogIntegration.wordpress.WordPressIntegration">
     	<property name="name" value="wordpress"/>
+    	<property name="displayName" value="WordPress"/>
     </bean>
     
-    <bean id="typePadBlogIntegration" parent="baseBlogIntegrationImplmentation" class="org.alfresco.module.blogIntegration.DefaultBlogIntegrationImplementation">
+    <bean id="typePadBlogIntegration" parent="baseBlogIntegrationImplmentation" class="org.alfresco.module.blogIntegration.typepad.TypepadIntegration">
     	<property name="name" value="typepad"/>
+    	<property name="displayName" value="Typepad"/>
     </bean>
 
 	<!-- UI Configuration Bootstrap -->

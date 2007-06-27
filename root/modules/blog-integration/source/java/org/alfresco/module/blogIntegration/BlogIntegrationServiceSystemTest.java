@@ -61,15 +61,20 @@ public class BlogIntegrationServiceSystemTest extends BaseAlfrescoSpringTest imp
      * Typepad details
      * 
      * http://www.typepad.com/t/api
+     * http://rwetherall.typepad.com/my_test_blog
+     * 1340792
+     * rwetherall
      * 
      */
     
     /** Blog Details **/
     private static final String BLOG = "wordpress";
-    private static final String BLOG_URL = "http://paulhh.wordpress.com/xmlrpc.php";
+    private static final String BLOG_URL = "http://paulhh.wordpress.com";
     private static final String BLOG_USER = "paulhh";
     private static final String BLOG_PWD = "114eb1";
     private static final String BLOG_ID = "0";
+    
+       
     private static final String BLOG_NAME = "Test blog details";
     private static final String BLOG_DESCRIPTION = "These are the details used to test the blog integration service";
     
@@ -121,7 +126,7 @@ public class BlogIntegrationServiceSystemTest extends BaseAlfrescoSpringTest imp
         props2.put(PROP_ID, BLOG_ID);
         props2.put(PROP_NAME, BLOG_NAME);
         props2.put(PROP_DESCRIPTION, BLOG_DESCRIPTION);
-        props2.put(PROP_CONNNECTION_URL, BLOG_URL);
+        props2.put(PROP_URL, BLOG_URL);
         props2.put(PROP_USER_NAME, BLOG_USER);
         props2.put(PROP_PASSWORD, BLOG_PWD);
         this.nodeService.addAspect(this.blogDetailsNodeRef, ASPECT_BLOG_DETAILS, props2);
@@ -165,12 +170,12 @@ public class BlogIntegrationServiceSystemTest extends BaseAlfrescoSpringTest imp
         List<BlogDetails> details = this.blogService.getBlogDetails(this.nodeRef);
         assertNotNull(details);
         assertEquals(1, details.size());
-        assertEquals(BLOG_URL, details.get(0).getConnectionURL());
+        assertEquals(BLOG_URL, details.get(0).getUrl());
         
         List<BlogDetails> details2 = this.blogService.getBlogDetails(this.blogDetailsNodeRef);
         assertNotNull(details2);
         assertEquals(1, details2.size());
-        assertEquals(BLOG_URL, details2.get(0).getConnectionURL());
+        assertEquals(BLOG_URL, details2.get(0).getUrl());
     }
     
     public void testNewPost()
@@ -184,7 +189,7 @@ public class BlogIntegrationServiceSystemTest extends BaseAlfrescoSpringTest imp
         assertEquals(BLOG_ID, blogDetails.getBlogId());
         assertEquals(BLOG_NAME, blogDetails.getName());
         assertEquals(BLOG_DESCRIPTION, blogDetails.getDescription());
-        assertEquals(BLOG_URL, blogDetails.getConnectionURL());
+        assertEquals(BLOG_URL, blogDetails.getUrl());
         assertEquals(BLOG_USER, blogDetails.getUserName());
         assertEquals(BLOG_PWD, blogDetails.getPassword());
         
