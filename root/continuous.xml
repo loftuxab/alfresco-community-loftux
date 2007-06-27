@@ -57,7 +57,8 @@
                     distribute-war, 
                     distribute-wcm, 
                     distribute-sdk, 
-                    distribute-webserviceclient, 
+                    distribute-webserviceclient,
+                    distribute-extensions-office2003, 
                     distribute-benchmark, 
                     distribute-mmt,
                     distribute-sample-extensions,
@@ -440,6 +441,30 @@
          <tarfileset dir="${dir.project.webserviceclient.config}/alfresco" 
                      prefix="alfresco"/>
       </tar>
+   </target>
+
+   <!-- *************************** -->
+   <!-- ** Office Add-in targets ** -->
+   <!-- *************************** -->
+   
+   <target name="distribute-extensions-office2003"
+           description="Creates the Office 2003 Extensions distribution files"
+           depends="distribute-extensions-office2003-word" />
+
+   <target name="distribute-extensions-office2003-word"
+           description="Creates the Word 2003 Extensions distribution files"
+           depends="init">
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-word}.zip">
+         <zipfileset dir="${dir.project.extension.office.word2003}"
+                     includes="readme.txt,
+                               setup.exe,
+                               AlfrescoWord2003Setup.msi" />
+         <zipfileset dir="${dir.project.extension.office.word2003}/Office2003PIA"
+                     prefix="Office2003PIA"
+                     includes="o2003pia.msi" />
+      </zip>
    </target>
 
    <!-- ************************************ -->
