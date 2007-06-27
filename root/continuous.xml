@@ -230,7 +230,7 @@
                      prefix="tomcat" 
                      excludes="bin/*.sh" />
          <zipfileset dir="${dir.project.installer}" 
-                     includes="licenses/**,alf_start.bat,alf_restart.bat,alf_stop.bat" />
+                     includes="licenses/**,alf_start.bat,restart_alf.bat,alf_stop.bat" />
          <zipfileset dir="${dir.project.installer}" 
                      includes="tomcat/alfresco.bat" 
                      fullpath="alfresco.bat" />
@@ -400,7 +400,7 @@
                      includes="licenses/**,
                                README_war.txt" />
          <tarfileset dir="${dir.project.installer}" 
-                     includes="README_mysql_linux.txt" 
+                     includes="README_mysql_linux.txt"
                      fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.webclient.dist}" 
                      includes="${file.name.war.webclient}" />
