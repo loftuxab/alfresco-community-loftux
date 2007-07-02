@@ -1,16 +1,16 @@
 /*-----------------------------------------------------------------------------
 *  Copyright 2007 Alfresco Inc.
-*  
+*
 *  This program is free software; you can redistribute it and/or modify
 *  it under the terms of the GNU General Public License as published by
 *  the Free Software Foundation; either version 2 of the License, or
 *  (at your option) any later version.
-*  
+*
 *  This program is distributed in the hope that it will be useful, but
 *  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 *  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 *  for more details.
-*  
+*
 *  You should have received a copy of the GNU General Public License along
 *  with this program; if not, write to the Free Software Foundation, Inc.,
 *  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  As a special
@@ -19,8 +19,8 @@
 *  Software ("FLOSS") applications as described in Alfresco's FLOSS exception.
 *  You should have received a copy of the text describing the FLOSS exception,
 *  and it is also available here:   http://www.alfresco.com/legal/licensing
-*  
-*  
+*
+*
 *  Author  Jon Cox  <jcox@alfresco.com>
 *  File    LinkValidationServiceImpl.java
 *----------------------------------------------------------------------------*/
@@ -28,8 +28,9 @@
 package org.alfresco.linkvalidation;
 
 import java.io.File;
-
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
@@ -45,6 +46,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.Set;
 import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
@@ -60,11 +63,13 @@ import org.alfresco.repo.attributes.MapAttributeValue;
 import org.alfresco.repo.attributes.StringAttribute;
 import org.alfresco.repo.attributes.StringAttributeValue;
 import org.alfresco.repo.domain.PropertyValue;
+import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
 import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttrQueryGTE;
 import org.alfresco.service.cmr.attributes.AttrQueryLTE;
+import org.alfresco.service.cmr.avm.AVMException;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.avmsync.AVMDifference;
@@ -77,9 +82,162 @@ import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
 
-Here's a sketch of the algorithm
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+*    Utility class to parse paths
+*/
+//-----------------------------------------------------------------------------
+class ValidationPathParser
+{
+    static String App_Dir_ = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
+                             "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
+
+    String    store_        = null;
+    String    app_base_     = null;
+    String    webapp_name_  = null;
+    String    dns_name_     = null;
+    String    path_         = null;
+    String    req_path_     = null;
+    int       store_end_    = -2;
+    int       webapp_start_ = -2;
+    int       webapp_end_   = -2;
+    AVMRemote avm_          = null;
+
+    ValidationPathParser(AVMRemote avm, String path)
+    throws               IllegalArgumentException
+    {
+        avm_ = avm;
+        path_ = path;
+    }
+
+    String getStore()
+    {
+        if ( store_ != null ) { return store_ ; }
+        store_end_ = path_.indexOf(':');
+
+        if ( store_end_ < 0)
+        {
+            store_ = path_;
+            return store_;
+        }
+
+        if ( ! path_.startsWith( App_Dir_, store_end_ + 1 )  )
+        {
+            throw new IllegalArgumentException("Invalid webapp path: " + path_);
+        }
+        else
+        {
+            store_ = path_.substring(0,store_end_);
+        }
+
+        return store_;
+    }
+
+    String getAppBase()
+    {
+        if (app_base_ != null) { return app_base_; }
+        if (store_ == null )   { getStore(); }
+        app_base_ = store_ + ":" + App_Dir_;
+        return app_base_;
+    }
+
+    String getWebappName()
+    {
+        if ( webapp_name_ != null) { return webapp_name_; }
+        if ( store_end_ < -1)    { getStore(); }
+        if ( store_end_ < 0 )    { return null; }
+
+        webapp_start_ =
+                path_.indexOf('/', store_end_ + 1 + App_Dir_.length());
+
+        if (webapp_start_ >= 0)
+        {
+            webapp_end_  = path_.indexOf('/', webapp_start_ + 1);
+            webapp_name_ = path_.substring( webapp_start_ +1,
+                                            (webapp_end_ < 1)
+                                            ?  path_.length()
+                                            :  webapp_end_ );
+
+            if  ((webapp_name_ != null) &&
+                 (webapp_name_.length() == 0)
+                )
+            {
+                webapp_name_ = null;
+            }
+        }
+        return webapp_name_;
+    }
+
+    /*-------------------------------------------------------------------------
+    *  getRequestPath --
+    *       Given an path of the form mysite:/www/avm_webapps/ROOT/m oo/bar.txt
+    *       returns the non-encoded request path  ( "/mo o/bar.txt")
+    *
+    *       Given an path of the form mysite:/www/avm_webapps/cow/m oo/bar.txt
+    *       returns the non-encoded request path  ( "/cow/mo o/bar.txt")
+    *
+    *------------------------------------------------------------------------*/
+    String getRequestPath()
+    {
+        if (req_path_ != null ) { return req_path_;}
+
+        String webapp_name = getWebappName();
+        if (webapp_name == null ) { return null; }
+
+        int req_start = -1;
+
+        if ( webapp_name.equals("ROOT") )
+        {
+            req_start = webapp_start_ + "ROOT".length() + 1;
+        }
+        else
+        {
+            req_start = webapp_start_;
+        }
+
+        req_path_ =  path_.substring( req_start, path_.length() );
+
+        if ( req_path_.equals("") ) { req_path_ = "/"; }
+
+        return req_path_;
+    }
+
+
+    String getDnsName() throws AVMNotFoundException
+    {
+        if ( dns_name_ != null ) { return dns_name_; }
+        if ( store_ == null )    { getStore() ; }
+
+        dns_name_ = lookupStoreDNS( avm_, store_ );
+        if ( dns_name_ == null )
+        {
+            throw new AVMNotFoundException(
+                       "No DNS entry for AVM store: " + store_);
+        }
+        dns_name_ = dns_name_.toLowerCase();
+        return dns_name_;
+    }
+
+    String lookupStoreDNS(AVMRemote avm,  String store )
+    {
+        Map<QName, PropertyValue> props =
+                avm.queryStorePropertyKey(store,
+                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
+
+        return ( props.size() != 1
+                 ? null
+                 : props.keySet().iterator().next().getLocalName().
+                         substring(SandboxConstants.PROP_DNS.length())
+               );
+    }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+   Implementation of link validation service.
 
 <pre>
 
@@ -92,7 +250,7 @@ Here's a sketch of the algorithm
             md5_source_to_md5_href[ md5( file ) ]  --> map { md5( url ) }
             .href/mysite/|mywebapp/-2/md5_source_to_md5_href/
 
-  [2]   Given an href, in what source files does it appear 
+  [2]   Given an href, in what source files does it appear
         explicitly or implicitly (via dead reconing):
             md5_href_to_md5_source[ md5( url ) ]  --> map { md5( file ) }
             .href/mysite/|mywebapp/-2/md5_href_to_source
@@ -108,133 +266,22 @@ Here's a sketch of the algorithm
   [5]   Given an md5, what's the filename?
             md5_to_file[          md5( file ) ]  --> String( file )
             .href/mysite/|mywebapp/-2/md5_to_file/
-        
+
   [6]   Given an md5, what's the href?
             md5_to_href[          md5( url ) ]  --> String( url )
             .href/mysite/|mywebapp/-2/md5_to_href/
 
   [7]   Given an href what files does it depend on?
-             hamd5_href_to_md5_fdep[ md5( url ) ]  --> map { md5( file ) } 
+             hamd5_href_to_md5_fdep[ md5( url ) ]  --> map { md5( file ) }
             .href/mysite/|mywebapp/-2/md5_href_to_md5_fdep/
 
   [8]   Given a file, what hrefs depend on it
-            md5_file_to_md5_hdep[ md5( file ) ]  --> map { md5( url ) }     
+            md5_file_to_md5_hdep[ md5( file ) ]  --> map { md5( url ) }
             .href/mysite/|mywebapp/-2/file_to_hdep/
-
-  On file creation Fj
-  --------------------
-  [c0]  Calculate href Ui for Fj, and enter md5(Ui) into ephemeral url cache
-  [c1]  Pull on Ui, get file set accessed F 
-        This is usually just Fj but could be Fj,...Fk).
-            If F = {} or does not include Fj either we failed to compute 
-            Ui from Fj or an error has occured when we pulled on Ui.  
-            skip all remaining work on Fj & track the error (possibly
-            report to gui or just log).  This is a "soft" failure because
-            the link's existence is implied by the file's existence 
-            (we didn't *actually* extract it from a returned html page).
-
-  [c2]  Update [1] with md5(Fj) -> md5(Ui)  (handles implicit link)
-  [c3]  Update [2] with md5(Ui) -> md5(Fj)  (handles implicit link)
-  [c4]  Update [3] with md5(Ui) -> status
-  [c5]  Update [4] with status  -> md5(Ui)
-  [c6]  Update [5] with md5(Fj) -> Fj,       md5(Fk) -> Fk,  ...
-  [c7]  Update [6] with md5(Ui) -> Ui
-  [c8]  Update [7] with md5(Ui) -> md5(Fj),  md5(Ui) -> md5(Fk), ...
-  [c9]  Update [8] with md5(Fj) -> md5(Ui),  md5(Fk) -> md5(Ui), ... 
-
-        For every url Ux in the page (but not the dead-reconed one Ui),
-        If Ux is already in the ephemeral url cache,
-  [c10]     Next Ux
-        Else
-  [c11]     Pull on Ux and regardless of what happens:
-  [c12]     Update [1] with md5(Fj) -> md5(Ux)
-  [c13]     Update [2] with md5(Ux) -> md5(Fj)
-  [c14]     Update [3] with md5(Ux) -> status
-  [c15]     Update [4] with status  -> md5(Ux)
-  [c16] 
-        If status==success, determine which files are accessed Fx,Fy, ...
-  [c17]     Update [5] with md5(Fx) -> Fx,  md5(Fy) -> Fy, ...
-  [c18]     Update [6] with md5(Ux) -> Ux
-  [c19]     Update [7] with md5(Ux) -> Fx,  md5(Ux) -> Fy, ...
-  [c20]     Update [8] with md5(Fx) -> md5(Ux), md5(Fy) -> md5(Ux), ...
-
-
-  On file modification
-  --------------------
-
-  [m0] Calculate href Ui for Fj, if already in ephermal cache, do next Fj
-  [m1] == [c1]
-  [m2] == [c2] but it's a no-op
-  [m3] == [c3] but it's a no-op
-  [m4] == [c4]
-  [m5] == [c5]
-  [m6] == [c6] but it's a no-op for md5(Fj)
-  [m7] == [c7] but it's a no-op
-  [m8] == [c8] but it's a no-op for md5(Ui) -> md5(Fj)
-  [m9] == [c9] but it's a no-op for md5(Fj) -> md5(Ui)
-
-  [m10]  Parse & get list of hrefs curently in page, plus link to self: Ucurr
-  [m11]  Using [1], get previous href list:    Uprev
-  [m12]  Subtracing lists, find urls now gone: Ugone
-         Note:  implicit link to self never 
-                appears in Ugone on modifiction
-                becuse [m10] includes implicit 
-                link to self.  
-        
-         For each unique URL Ux in Ugone (no cache check):
-  [m13]         Update [1], removing  md5(Fj) -> md5(Ux)
-  [m14]         Update [2], removing  md5(Ux) -> md5(Fj)
-  [m15]         If [2] shows that href no longer appears anywhere, then:
-  [m16]              Remove from [2]  md5(Ux)
-  [m17]              Remove from [6]  md5(Ux) -> Ux
-  [m18]              Using [7], 
-                     for each file md5(Fx) depending on the defunct md5(Ux):
-                          Remove from [8]  md5(Fx) -> md5(Ux)
-  [m19]              Remove from [7] md5(Ux)
-  [m20]              Using [3], fetch status of Ux. If there's a status 
-                     then:
-  [m21]                      Remove from [3]  md5(Ux) -> status
-  [m22]                      Remove from [4]  status  -> md5(Ux)
-
-         For each unique URL Ux in Ucurr
-         If Ux isn't already in the ephermal url cache, do:
-  [m24..m34] ==  [c10..20]
-
-
-
-  On proposed file deletion
-  -------------------------
-   [p0]  Use [8] to get raw list of URLs that depend on Fj.
-
-         For each URL Ux in [8]:
-   [p1]     Use [2] to get list of files with newly broken links
-            but omit from this list the Fj itself
-            (because it's going away).
-
-
-  On file deletion Fj
-  --------------------
-  [d0]  Use [1] to get list of hrefs that appear in Fj explicitly 
-        and implicitly.  Call this set Ugone.  
-
-        For each URL Ux in Ugone
-  [d1-d9] == [m14..m22] 
-
-  [d10-d11] == [p0-p1]
-
-  [d12]  For each broken link discovered in [d10-d11], update [3] and [4] 
-         with 404 status (assumed)... or perhaps some other 4xx status
-         to denote "presumed broken" if you don't really test it.
-
-  [d13]  Update [1] by removing md5( Fj )   (remove all urls in one shot)
-
-  [d14]  Using [8], if nothing depends on md5(Fj), 
-         then remove md5(Fj) from [5] and [8].
 
 </pre>
 */
-
-
+//-----------------------------------------------------------------------------
 public class LinkValidationServiceImpl implements LinkValidationService,
                                                   Runnable
 {
@@ -258,7 +305,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     static String MD5_TO_FILE        = "md5_to_file";     // key->string
     static String MD5_TO_HREF        = "md5_to_href";     // key->string
 
-    
+
     // All files on which a hyperlink depends
     static String HREF_TO_FDEP         = "href_to_fdep";    // key->map
 
@@ -266,10 +313,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     static String FILE_TO_HDEP         = "file_to_hdep";    // key->map
 
 
-    AVMRemote          avm_;
-    AttributeService   attr_;
-    AVMSyncService     sync_;
-    NameMatcher        excluder_;
+    AVMRemote                    avm_;
+    AttributeService             attr_;
+    AVMSyncService               sync_;
+    NameMatcher                  excluder_;
+    NameMatcher                  href_bearing_request_path_matcher_;
+    RetryingTransactionHelper    transaction_helper_;
+
+    static Pattern WEB_INF_META_INF_pattern_ = 
+             Pattern.compile(
+               "[^:]+:/www/avm_webapps/(:?META-INF|WEB-INF)(?:/.*|$)",
+               Pattern.CASE_INSENSITIVE);
 
 
     VirtServerRegistry virtreg_;
@@ -288,24 +342,42 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     public void setExcludeMatcher(NameMatcher matcher)  { excluder_ = matcher;}
     public NameMatcher getExcludeMatcher()              { return excluder_;}
 
+    public void setHrefBearingRequestPathMatcher(NameMatcher matcher)
+    {
+        href_bearing_request_path_matcher_ = matcher;
+    }
+
+    public NameMatcher getHrefBearingRequestPathMatcher()
+    {
+        return href_bearing_request_path_matcher_;
+    }
+
+
     public void setVirtServerRegistry(VirtServerRegistry reg) {virtreg_ = reg;}
     public VirtServerRegistry getVirtServerRegistry()         {return virtreg_;}
 
+
+    public void setRetryingTransactionHelper( RetryingTransactionHelper t)
+    {
+        transaction_helper_ = t;
+    }
+
+
     //-------------------------------------------------------------------------
     /**
-    *  Called by LinkValidationServiceBootstrap at startup time to ensure 
+    *  Called by LinkValidationServiceBootstrap at startup time to ensure
     *  that the link status in all stores is up to date.
     */
     //-------------------------------------------------------------------------
     public void onBootstrap()
     {
         Thread validation_update_thread = new Thread(this);
-        Shutdown_.set( false );    
+        Shutdown_.set( false );
         validation_update_thread.start();
     }
     //-------------------------------------------------------------------------
     /**
-    *  Called by LinkValidationServiceBootstrap at shutdown time to ensure 
+    *  Called by LinkValidationServiceBootstrap at shutdown time to ensure
     *  that any link status checking operation in progress is abandoned.
     */
     //-------------------------------------------------------------------------
@@ -321,70 +393,320 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     {
         // Initiate background process to check links
         // For now, hard-code initial update
-        String   webappPath       = null;    // all stores/webapps
-        boolean  incremental      = true;    // use deltas & merge
-        boolean  validateExternal = true;    // check external hrefs
-        int      connectTimeout   = 10000;   // 10 sec
-        int      readTimeout      = 30000;   // 30 sec
-        long     poll_interval    = 2000;    // 2 sec
-        int      nthreads         = 5;       // ignored
+        final String   webappPath       =  null;   // all stores/webapps
+        final boolean  incremental      =  true;   // use deltas & merge
+        final boolean  validateExternal =  true;   // check external hrefs
+        final int      connectTimeout   = 10000;   // 10 sec
+        final int      readTimeout      = 30000;   // 30 sec
+        final long     poll_interval    =  5000;   // 5 sec
+        final int      nthreads         =     5;   // ignored
 
-        HrefValidationProgress progress = null;;
+        HrefValidationProgress progress_sleepy = null;
 
-        while ( ! Shutdown_.get() ) 
+        while ( ! Shutdown_.get() )
         {
-            progress = new HrefValidationProgress();
-            try 
-            {
-                updateHrefInfo( webappPath,
-                                incremental,
-                                validateExternal,
-                                readTimeout,
-                                connectTimeout,
-                                nthreads,
-                                progress);
+            if ( log.isDebugEnabled() )
+                log.debug( "LinkValidationService polling webapps...");
 
-                Thread.sleep( poll_interval );
+
+            final HrefValidationProgress progress = new HrefValidationProgress();
+            progress_sleepy = progress;
+
+            try
+            {
+                RetryingTransactionHelper.RetryingTransactionCallback<Object> 
+                callback = new 
+                RetryingTransactionHelper.RetryingTransactionCallback<Object>()
+                {
+                    public String execute() throws Throwable
+                    {
+                        try 
+                        {
+                            updateHrefInfo( webappPath,
+                                            incremental,
+                                            validateExternal,
+                                            readTimeout,
+                                            connectTimeout,
+                                            nthreads,
+                                            progress);
+                        }
+                        catch (Exception  ex)
+                        {
+                            StringWriter string_writer = new StringWriter();
+                            PrintWriter print_writer   = new PrintWriter(string_writer);
+                            ex.printStackTrace(print_writer);
+
+                            log.error( "Threw exception within execute() method of " +
+                                       "txn helper... Exception class:  " + 
+                                       ex.getClass().getName() + 
+                                       ":  " + ex.getMessage() + 
+                                       "\n" + string_writer.toString() );
+
+                            throw ex;
+                        }
+
+                        return null;
+                    }
+                };
+        
+                transaction_helper_.doInTransaction(callback);
             }
-            catch (Exception e) { /* nothing to do */ }
+            catch (Exception e)
+            {
+                if ( log.isErrorEnabled() )
+                {
+                    // After all these years, there's still no easy 
+                    // method to print a stack trace into a string.
+                    // Where is the love?  Where?
+
+                    StringWriter string_writer = new StringWriter();
+                    PrintWriter print_writer   = new PrintWriter(string_writer);
+                    e.printStackTrace(print_writer);
+
+                    log.error( "Exception class:  " + e.getClass().getName() + 
+                               ":  " + e.getMessage() + 
+                               "\n" + string_writer.toString() );
+                }
+                
+                if ( log.isDebugEnabled() )
+                    log.debug("Could not validate links.  Retrying");
+            }
+            finally
+            {
+                if ( log.isDebugEnabled() )
+                    log.debug("About to sleep");
+            }
+
+            // Sleep regardless of whetherthe updateHrefInfo failed 
+            try { Thread.sleep( poll_interval ); }
+            catch (Exception e) 
+            { 
+                /* nothing to do */ 
+                if ( log.isDebugEnabled() )
+                    log.debug("Troubled sleep(): " + e.getMessage());
+            }
+            if ( log.isDebugEnabled() )
+                log.debug("Woke up from sleep");
         }
 
-        // Usually, tomcat will be dead by now, but just in case...
+        if ( log.isDebugEnabled() )
+            log.debug("Done with main loop of link validation thread");
 
-        if ( progress != null) { progress.abort(); }
+
+        // Usually, tomcat will be dead by now, but just in case...
+        if ( progress_sleepy != null) 
+        { 
+            if ( log.isDebugEnabled() )
+                log.debug("Aborting...");
+
+            progress_sleepy.abort(); 
+        }
+    }
+
+    //-------------------------------------------------------------------------
+    /**
+    *  Purge AttributeService of href info that no longer corresponds
+    *  to a webapp (e.g.: a project or webapp may have been deleted).
+    */
+    //-------------------------------------------------------------------------
+    void remove_stale_href_info(
+            Map<String, Map<QName, PropertyValue>>  store_staging_main_entries )
+    {
+        if ( log.isDebugEnabled() )
+            log.debug( "remove_stale_href_info");
+
+        Map<String,String> valid_webapp_keys = new HashMap<String,String>();
+
+        for ( Map.Entry<String, Map<QName, PropertyValue>>
+              store_staging_main_entry  :
+              store_staging_main_entries.entrySet())
+        {
+            String  store  = store_staging_main_entry.getKey();
+            ValidationPathParser p =
+                new ValidationPathParser(avm_, store );
+
+            String app_base  = p.getAppBase();
+            String dns_name  = p.getDnsName();
+
+            Map<String, AVMNodeDescriptor> webapp_entries = null;
+            try 
+            {
+                // It's safe to use -1 as the version here because
+                // if the user has removed the HEAD version, there's
+                // no reason to care about any associated href info
+                // in an archive.  
+
+                webapp_entries = avm_.getDirectoryListing( -1 , app_base);
+            }
+            catch (AVMException e)
+            {
+                if ( log.isErrorEnabled() )
+                {
+                    log.error("Could to get directory listing of: " + app_base + 
+                              "     " + e.getClass().getName()  +  e.getMessage());
+                }
+                continue;      // don't let errors like this thwart cleanup 
+            }
+
+            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
+                                                       webapp_entries.entrySet()
+                )
+            {
+                String webapp_name = webapp_entry.getKey();  // my_webapp
+                AVMNodeDescriptor avm_node = webapp_entry.getValue();
+
+                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
+                     webapp_name.equalsIgnoreCase("WEB-INF")
+                   )
+                {
+                    continue;
+                }
+
+                if  ( ! avm_node.isDirectory() )
+                {
+                    continue;
+                }
+
+                String store_attr_base  = getAttributeStemForDnsName( dns_name );
+
+                // Examples of possible webapp_attr_base values:
+                //
+                //            .href/mysite/|ROOT
+                //            .href/mysite/alice/preview/|mywebapp
+                //
+                // Note that the leafname always begins with '|'
+                // which is an illegal DNS name char... therefore
+                // there's no need to worry about escape/unescape.
+                
+                String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
+                valid_webapp_keys.put( webapp_attr_base, null );
+            }
+        }
+
+        // The valid_webapp_keys map now contains all and only the keys 
+        // that correspond to webapps that have not been deleted. 
+        //
+        // Build a list of all the webapps in attribute service
+
+        Map<String,String> webapp_keys = new HashMap<String,String>();
+        get_webapp_keys_in_attribute_service( HREF, 0, webapp_keys );
+
+        // Get rid of stuff that isn't needed anymore
+
+        if ( log.isDebugEnabled() )
+            log.debug("Removing href attributes that are no longer needed");
+
+        for (String key : webapp_keys.keySet() )
+        {
+            if ( ! valid_webapp_keys.containsKey( key ) )
+            {
+                if ( log.isDebugEnabled() )
+                    log.debug("Removing AttributeService key: " + key );
+
+                int    last_slash = key.lastIndexOf('/');
+                String stem       = key.substring(0,last_slash);
+                String stale      = key.substring(last_slash + 1);
+
+                try  
+                { 
+                    attr_.removeAttribute( stem, stale); 
+
+                    if ( log.isDebugEnabled() )
+                        log.debug("Removed stale AttributeService key: " + key );
+
+                }
+                catch (Exception e )
+                {
+                    if ( log.isErrorEnabled() )
+                        log.error(
+                        "Could not remove stale AttributeService key: " + key + 
+                        "   " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    /*-------------------------------------------------------------------------
+    *  get_webapp_keys_in_attribute_service --
+    *       Collect the webapp keys in attribute service,
+    *       some of which may be stale. 
+    *------------------------------------------------------------------------*/
+    void get_webapp_keys_in_attribute_service( 
+            String             base, 
+            int                depth,
+            Map<String,String> webapp_keys)
+    {
+        if ( log.isDebugEnabled() )
+            log.debug( "get_webapp_keys_in_attribute_service: " + base);
+
+
+        if ( depth > 128 )              // Sanity check.
+        {                               // No DNS name can be this deep
+            if ( log.isWarnEnabled() )
+                log.warn("Impossible link validation key: " + base);
+
+            return; 
+        }
+
+        List<String> children = null;
+
+        try  
+        { 
+            children = attr_.getKeys( base ); 
+        }
+        catch (Exception e) 
+        { 
+            return;     // no children means we're done
+        }
+
+
+        for (String child : children )
+        {
+            if  ( child.charAt(0) == '|' )
+            {
+                webapp_keys.put( base + "/" + child, null );
+            }
+            else
+            {
+                get_webapp_keys_in_attribute_service(
+                    base + "/" + child,
+                    depth + 1, 
+                    webapp_keys);
+            }
+        }
     }
 
 
 
     //-------------------------------------------------------------------------
     /**
-    *   
+    *
     * @param  webappPath
     *           Path to webapp
     *
     * @param  incremental
     *           Use deltas if true (faster); otherwise, force
-    *           the href info to be updated from scratch. 
+    *           the href info to be updated from scratch.
     *
     * @param  validateExternal
-    *           Validate external links 
+    *           Validate external links
     *
-    * @param connectTimeout  
+    * @param connectTimeout
     *           Amount of time in milliseconds that this function will wait
-    *           before declaring that the connection has failed 
+    *           before declaring that the connection has failed
     *           (e.g.: 10000 ms).
     *
-    * @param readTimeout     
+    * @param readTimeout
     *           time in milliseconds that this function will wait before
     *           declaring that a read on the connection has failed
     *           (e.g.:  30000 ms).
-    * 
+    *
     * @param nthreads
     *             Number of threads to use when fetching URLs (e.g.: 5)
     *
-    * @param  progress           
-    *             While updateHrefInfo() is a synchronous function, 
-    *             'progress' may be polled in a separate thread to 
+    * @param  progress
+    *             While updateHrefInfo() is a synchronous function,
+    *             'progress' may be polled in a separate thread to
     *             observe its progress.
     */
     //-------------------------------------------------------------------------
@@ -394,23 +716,26 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                 int                    connectTimeout,
                                 int                    readTimeout,
                                 int                    nthreads,
-                                HrefValidationProgress progress)          
+                                HrefValidationProgress progress)
                 throws          AVMNotFoundException,
                                 SocketException,
                                 SSLException,
                                 LinkValidationAbortedException
     {
+        if ( log.isDebugEnabled() )
+            log.debug( "updateHrefInfo path: " + path);
+
         if ( path == null )           // For every staging store, update href
-        {                             // validity info on every webapp. 
+        {                             // validity info on every webapp.
             // get staging stores
             Map<String, Map<QName, PropertyValue>> store_staging_main_entries =
-                avm_.queryStoresPropertyKey( 
+                avm_.queryStoresPropertyKey(
                     SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
-         
-            for ( Map.Entry<String, Map<QName, PropertyValue>> 
-                  store_staging_main_entry  : 
+
+            for ( Map.Entry<String, Map<QName, PropertyValue>>
+                  store_staging_main_entry  :
                   store_staging_main_entries.entrySet())
-            {   
+            {
                 String  store  = store_staging_main_entry.getKey();
 
                 updateStoreHrefInfo( store,
@@ -419,30 +744,43 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                      connectTimeout,
                                      readTimeout,
                                      nthreads,
-                                     progress);          
+                                     progress);
             }
+
+            // Because this is a global update, this is a good place
+            // to trigger a cleanup of any stale attribute info.
+            // For example, a store may have been validated in the past,
+            // but then deleted.  The old validation data can be purged.
+            
+            remove_stale_href_info(  store_staging_main_entries );
+
         }
         else
         {                                                // This must be either
-            ValidationPathParser p =                     // a store path or a   
-                new ValidationPathParser(avm_, path );   // webapp path. If the 
-                                                         // wepapp_name is null 
-            String store           = p.getStore();       // then it's a store   
-            String webapp_name     = p.getWebappName();  // path;  otherwise it   
-                                                         // is a webapp path.   
+            ValidationPathParser p =                     // a store path or a
+                new ValidationPathParser(avm_, path );   // webapp path. If the
+                                                         // wepapp_name is null
+            String store           = p.getStore();       // then it's a store
+            String webapp_name     = p.getWebappName();  // path;  otherwise it
+                                                         // is a webapp path.
 
             if ( webapp_name == null )                   // A store path
             {
-                updateStoreHrefInfo( store,                 
+                updateStoreHrefInfo( store,
                                      incremental,
                                      validateExternal,
                                      connectTimeout,
                                      readTimeout,
                                      nthreads,
-                                     progress);          
+                                     progress);
             }
             else                                         // A webapp path
             {
+                // Flush all modified files into an anonymous snapshot.
+                // A null tag & description  are used to avoid clobbering
+                // tag/description info in a non-anonymous snapshot.
+                // avm_.createSnapshot(store, null, null);
+
                 int update_to_version = avm_.getLatestSnapshotID( store );
 
                 updateWebappHrefInfo( update_to_version,
@@ -452,16 +790,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                       connectTimeout,
                                       readTimeout,
                                       nthreads,
-                                      progress);          
+                                      progress);
             }
         }
 
-        // TODO: clean up attribute info for webapps that no longer exist
+        // Clean up attribute info for webapps that no longer exist
     }
 
     /*-------------------------------------------------------------------------
     *  updateStoreHrefInfo --
-    *        
+    *
     *------------------------------------------------------------------------*/
     void updateStoreHrefInfo( String                 store,
                               boolean                incremental,
@@ -469,28 +807,59 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                               int                    connectTimeout,
                               int                    readTimeout,
                               int                    nthreads,
-                              HrefValidationProgress progress)          
+                              HrefValidationProgress progress)
          throws               AVMNotFoundException,
                               SocketException,
                               SSLException,
                               LinkValidationAbortedException
     {
+        if ( log.isDebugEnabled() )
+            log.debug("starting updateStoreHrefInfo: " + store );
+
         // Determine what version of the store we're trying to update
         // the baseline version of the href validity info to.
 
+
+        // Flush all modified files into an anonymous snapshot.
+        // A null tag & description  are used to avoid clobbering
+        // tag/description info in a non-anonymous snapshot.
+        // avm_.createSnapshot(store, null, null);
+        
+
         int update_to_version = avm_.getLatestSnapshotID( store );
+
+        if ( log.isDebugEnabled() )
+            log.debug("update_to_version: " + update_to_version );
 
 
         // Get all webapps in this store
-        
-        ValidationPathParser p = new ValidationPathParser(avm_, store ); 
+
+        ValidationPathParser p = new ValidationPathParser(avm_, store );
         String app_base  = p.getAppBase();
+
         Map<String, AVMNodeDescriptor> webapp_entries = null;
-        webapp_entries = avm_.getDirectoryListing( update_to_version, app_base);
+
+        try 
+        {
+            webapp_entries = avm_.getDirectoryListing( update_to_version, app_base);
+        }
+        catch (AVMException e)
+        {
+            if ( log.isErrorEnabled() )
+                log.error("Could to do directory listing of: " + app_base + 
+                          "     " + e.getClass().getName()  +  e.getMessage());
+
+            throw e;
+        }
+
+        if ( log.isDebugEnabled() )
+            log.debug(
+                "updateStoreHrefInfo fetched webapp_entries from: " + app_base);
+
 
         for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
-                      webapp_entries.entrySet()
-                    )
+                                                   webapp_entries.entrySet()
+            )
         {
             String webapp_name = webapp_entry.getKey();  // my_webapp
             AVMNodeDescriptor avm_node = webapp_entry.getValue();
@@ -509,6 +878,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             String webappPath = app_base + "/" + webapp_name;
 
+            if ( log.isDebugEnabled() )
+                log.debug( "About to update hrefs in: "  + webappPath);
+
             updateWebappHrefInfo( update_to_version,
                                   webappPath,
                                   incremental,
@@ -517,7 +889,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                   readTimeout,
                                   nthreads,
                                   progress);
+
+            if ( log.isDebugEnabled() )
+                log.debug( "Finished update of hrefs in: "  + webappPath);
         }
+
+        if ( log.isDebugEnabled() )
+            log.debug("done updateStoreHrefInfo: " + store );
     }
 
     /*-------------------------------------------------------------------------
@@ -525,8 +903,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *     Creates base/key/value  if  value does not already exist at base/key.
     *     Returns true if value needed to be set.
     *------------------------------------------------------------------------*/
-    boolean setAttribute_if_not_found( String base, 
-                                       String key, 
+    boolean setAttribute_if_not_found( String base,
+                                       String key,
                                        Attribute  value)
     {
         if ( ! attr_.exists( base + "/" + key ) )
@@ -539,7 +917,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     /*-------------------------------------------------------------------------
     *  updateWebappHrefInfo --
-    *        
+    *
     *------------------------------------------------------------------------*/
     void updateWebappHrefInfo( int                    update_to_version,
                                String                 webappPath,
@@ -548,30 +926,35 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                int                    connectTimeout,
                                int                    readTimeout,
                                int                    nthreads,
-                               HrefValidationProgress progress)          
+                               HrefValidationProgress progress)
          throws                AVMNotFoundException,
                                SocketException,
                                SSLException,
                                LinkValidationAbortedException
     {
+        if ( log.isDebugEnabled() )
+            log.debug("starting updateWebappHrefInfo:  " + 
+                      webappPath + " (to version: " + update_to_version + ")");
+
+
         // Ensure the proper attribute service key is set up for this webapp
         //
-        // The following convention is used:  
+        // The following convention is used:
         //           version <==> (version - max - 2) %(max+2)
         //
         // The only case that ever matters for now is that:
         // -2 is an alias for the last snapshot
         //
-        // Thus href attribute info for the  "last snapshot" of 
+        // Thus href attribute info for the  "last snapshot" of
         // a store with the dns name:  preview.alice.mysite is
-        // stored within attribute service under the keys: 
+        // stored within attribute service under the keys:
         //
         //      .href/mysite/alice/preview/|mywebapp/-2
         //
         // This allows entire projects and/or webapps to removed in 1 step
-        
 
-        ValidationPathParser p = 
+
+        ValidationPathParser p =
             new ValidationPathParser(avm_, webappPath );
 
 
@@ -582,7 +965,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
         // Example:               ".href/mysite"
-        String store_attr_base  = getAttributeStemForDnsName( dns_name, true );
+        String store_attr_base  = setAttributeStemForDnsName( dns_name );
 
         setAttribute_if_not_found( store_attr_base,
                                    "|" + webapp_name,
@@ -598,19 +981,19 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         String  href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;
 
-        String [] index_list = { SOURCE_TO_HREF, HREF_TO_SOURCE, 
+        String [] index_list = { SOURCE_TO_HREF, HREF_TO_SOURCE,
                                  HREF_TO_STATUS, STATUS_TO_HREF,
-                                 MD5_TO_FILE,    MD5_TO_HREF,    
-                                 HREF_TO_FDEP,   FILE_TO_HDEP };         
+                                 MD5_TO_FILE,    MD5_TO_HREF,
+                                 HREF_TO_FDEP,   FILE_TO_HDEP };
+
 
         for (String key : index_list )
         {
             setAttribute_if_not_found( href_attr, key ,new MapAttributeValue());
         }
 
-
         int base_version = 0;
-        Attribute base_vers_attr = 
+        Attribute base_vers_attr =
             attr_.getAttribute( webapp_attr_base + "/" + BASE_VERSION);
 
         if ( base_vers_attr != null )
@@ -619,13 +1002,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
         else
         {
-            attr_.setAttribute( webapp_attr_base, 
+            attr_.setAttribute( webapp_attr_base,
                                 BASE_VERSION,
                                 new IntAttributeValue( 0 ));
         }
 
         int old_update_version = 0;
-        Attribute old_update_vers_attr = 
+        Attribute old_update_vers_attr =
             attr_.getAttribute( webapp_attr_base + "/" + UPDATE_VERSION);
 
         if ( old_update_vers_attr != null )
@@ -634,11 +1017,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
         else
         {
-             attr_.setAttribute( webapp_attr_base, 
+             attr_.setAttribute( webapp_attr_base,
                                  UPDATE_VERSION,
                                  new IntAttributeValue( 0 ));
         }
-
 
         if  ( base_version == update_to_version )
         {
@@ -646,68 +1028,75 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // equals the last snapshot for this store.  Therefore
             // there's nothing to do.
 
+            if ( log.isDebugEnabled() )
+                log.debug("No need to revalidate (skipping): " +  webappPath );
+
+            progress.incrementWebappUpdateCount();  // for monitoring progress
+
+            if ( log.isDebugEnabled() )
+                log.debug("done updateWebappHrefInfo: " + webappPath);
+
             return;
         }
 
         if ( old_update_version > 0 )
         {
             // make JMX call to turn old virtualized webapp off
-            virtreg_. removeAllWebapps( old_update_version, webappPath, false);
+            virtreg_.removeAllWebapps( old_update_version, webappPath, false);
         }
 
         // set update_to_version attribute
 
-        attr_.setAttribute( webapp_attr_base, 
+        attr_.setAttribute( webapp_attr_base,
                             UPDATE_VERSION,
                             new IntAttributeValue( update_to_version ));
-       
+
 
         // Virtualize update_to_version
         //
         // NEON TODO:  Implement the ablity to update a single webapp
-        //             Calling updateAllWebapps becomes N^2 with 
+        //             Calling updateAllWebapps becomes N^2 with
         //             the number of webapps in a store....
         //
 
         if ( ! virtreg_.updateAllWebapps( update_to_version, webappPath, false))
         {
             throw new LinkValidationAbortedException(
-                "Version: " + update_to_version + " of: " + webappPath + 
+                "Version: " + update_to_version + " of: " + webappPath +
                 " cannot be virtualized");
         }
 
+        if ( log.isDebugEnabled() )
+            log.debug("updateWebappHrefInfo starting getHrefDifference:  " +
+                      base_version + "->" + update_to_version + "  " +
+                      webappPath);
 
-        HrefDifference hdiff = 
+        HrefDifference hdiff =
                  getHrefDifference( update_to_version,  // src vers
                                     webappPath,
                                     base_version,       // dst vers
                                     webappPath,
-                                    connectTimeout, 
+                                    connectTimeout,
                                     readTimeout,
                                     nthreads,
                                     progress);
 
 
-
-        //------------------------------------------------------ 
-        //------------------------------------------------------ 
-        // TODO:  put the following into a single transaction:
-        
-
         mergeHrefDiff( hdiff );
 
         // set baseline == update_to_version
 
-        attr_.setAttribute( webapp_attr_base, 
+        attr_.setAttribute( webapp_attr_base,
                             BASE_VERSION,
                             new IntAttributeValue( update_to_version ));
-        //------------------------------------------------------ 
-        //------------------------------------------------------ 
 
+        progress.incrementWebappUpdateCount();  // for monitoring progress
+
+        if ( log.isDebugEnabled() )
+            log.debug("done updateWebappHrefInfo: " + webappPath);
     }
 
 
-    //------------------------------------------------------------------------
     //------------------------------------------------------------------------
     /**
     *  Computes what changes would take place the link status of staging
@@ -726,7 +1115,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *                 - Scales with # of links in changeset
     *                 - Potentially slow
     *
-    *
     *          [3]  Fixed by deleted files/dirs in src:
     *               o  Any url that is broken and only occurs in the
     *                  members of the set being deleted
@@ -742,59 +1130,70 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *
     * </pre>
     */
-    public HrefDifference getHrefDifference( 
-                              String  srcWebappPath, 
-                              String  dstWebappPath, 
+    //------------------------------------------------------------------------
+    public HrefDifference getHrefDifference(
+                              String  srcWebappPath,
+                              String  dstWebappPath,
                               int     connectTimeout,
                               int     readTimeout,
                               int     nthreads,    // NEON - ignored for now
-                              HrefValidationProgress progress)   
+                              HrefValidationProgress progress)
             throws            AVMNotFoundException,
                               SocketException,
                               SSLException,
                               LinkValidationAbortedException
     {
-        ValidationPathParser p = 
+        if ( log.isErrorEnabled() )
+            log.error("getHrefDifference: " + srcWebappPath  + "  " + dstWebappPath );
+
+
+        ValidationPathParser p =
             new ValidationPathParser(avm_, dstWebappPath);
 
         String dns_name         = p.getDnsName();
         String webapp_name      = p.getWebappName();
-        String store_attr_base  = getAttributeStemForDnsName( dns_name, false );
+        String store_attr_base  = getAttributeStemForDnsName( dns_name );
         String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
 
 
-        Attribute base_vers_attr = 
+        Attribute base_vers_attr =
             attr_.getAttribute( webapp_attr_base + "/" + BASE_VERSION);
 
 
         int srcVersion = -1;
         int dstVersion;
 
-        if ( base_vers_attr != null ) { dstVersion = base_vers_attr.getIntValue(); }
-        else                          { dstVersion = -1; }
-        
-
-        if ( progress != null ) 
-        { 
-            progress.init(); 
+        if ( base_vers_attr != null )
+        {
+            dstVersion = base_vers_attr.getIntValue();
         }
-        
+        else                    // If we're differencing against a non-indexed
+        {                       // base, then consider every file "new"> in the
+            dstVersion = 0;     // src by by diffing against the empty version.
+        }
+
+
+        if ( progress != null )
+        {
+            progress.init();
+        }
+
         try
         {
-           return  getHrefDifference( srcVersion,     
+           return  getHrefDifference( srcVersion,
                                       srcWebappPath,
                                       dstVersion,
                                       dstWebappPath,
-                                      connectTimeout, 
+                                      connectTimeout,
                                       readTimeout,
                                       nthreads,
                                       progress);
         }
         finally
         {
-            if (progress != null)  
+            if (progress != null)
             {
-                progress.setDone( true ); 
+                progress.setDone( true );
             }
         }
     }
@@ -804,12 +1203,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     /**
     * Determines how hrefs have changed between two stores,
     * along with status info, and returns the result;
-    * this href difference info is not merged with the 
-    * overall href status info for the webapp. 
+    * this href difference info is not merged with the
+    * overall href status info for the webapp.
     *
-    * Thus, you can use this function to see how the status of hyperlinks 
-    * would change if you were to incorporate the diff without actually 
-    * incorporating it.  After calling this function, the user can see 
+    * Thus, you can use this function to see how the status of hyperlinks
+    * would change if you were to incorporate the diff without actually
+    * incorporating it.  After calling this function, the user can see
     * what's broken by invoking:
     * <ul>
     *   <li>  getHrefManifestBrokenByDeletion()
@@ -817,7 +1216,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     * </ul>
     */
     /*-----------------------------------------------------------------------*/
-    public HrefDifference getHrefDifference( 
+    public HrefDifference getHrefDifference(
                                   int    srcVersion,
                                   String srcWebappPath,
                                   int    dstVersion,
@@ -831,23 +1230,30 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                   SSLException,
                                   LinkValidationAbortedException
     {
+        if ( log.isDebugEnabled() )
+            log.debug(
+             "getHrefDifference: " + srcVersion + " " + srcWebappPath  + 
+                              "  " + dstVersion + " " +  dstWebappPath ); 
+
+
         ValidationPathParser dp = new ValidationPathParser(avm_,dstWebappPath);
         String dst_dns_name     = dp.getDnsName();
         String dst_req_path     = dp.getRequestPath();
         String webapp_name      = dp.getWebappName();
 
-        if (webapp_name == null ) 
-        { 
-            throw new RuntimeException( "Not a path to a webapp: " + 
+
+        if (webapp_name == null )
+        {
+            throw new RuntimeException( "Not a path to a webapp: " +
                                         dstWebappPath);
         }
 
-        List<AVMDifference> diffs = sync_.compare( srcVersion, 
-                                                   srcWebappPath, 
-                                                   dstVersion, 
-                                                   dstWebappPath, 
+        List<AVMDifference> diffs = sync_.compare( srcVersion,
+                                                   srcWebappPath,
+                                                   dstVersion,
+                                                   dstWebappPath,
                                                    excluder_);
-            
+
         ValidationPathParser sp = new ValidationPathParser(avm_, srcWebappPath);
         String src_dns_name     = sp.getDnsName();
         String src_req_path     = sp.getRequestPath();
@@ -855,16 +1261,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String virt_domain      = virtreg_.getVirtServerFQDN();
         int    virt_port        = virtreg_.getVirtServerHttpPort();
 
-        String src_fqdn         = src_dns_name + ".www--sandbox.version--v" + 
+        String src_fqdn         = src_dns_name + ".www--sandbox.version--v" +
                                   srcVersion   + "." + virt_domain;
 
-        String dst_fqdn         = dst_dns_name + ".www--sandbox.version--v" + 
+        String dst_fqdn         = dst_dns_name + ".www--sandbox.version--v" +
                                   dstVersion   + "." + virt_domain;
 
 
         String src_webapp_url_base = null;
         String dst_webapp_url_base = null;
-        try 
+        try
         {
             URI u;
 
@@ -876,10 +1282,18 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                          null,         // query
                          null);        // frag
 
-            // http://alice.mysite.www--sandbox.
-            //       version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
-
             src_webapp_url_base = u.toASCIIString();
+            if ( src_webapp_url_base.charAt( src_webapp_url_base.length()-1 )
+                 == '/'
+               )
+            {
+                src_webapp_url_base = src_webapp_url_base.substring(
+                                         0, src_webapp_url_base.length() -1 );
+            }
+
+            // Example src_webapp_url_base:
+            //   http://alice.mysite.www--sandbox.
+            //         version--v-1.127-0-0-1.ip.alfrescodemo.net:8180
 
             u = new URI( "http",       // scheme
                          null,         // userinfo
@@ -889,30 +1303,44 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                          null,         // query
                          null);        // frag
 
-            // http://mysite.www--sandbox.
-            //        version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
-
             dst_webapp_url_base = u.toASCIIString();
         }
-        catch (Exception e) { /* can't happen */ }
+        catch (Exception e) 
+        { 
+            /* can't happen */ 
+            if ( log.isErrorEnabled() )
+                log.error("Could not create src & dst URL base"); 
+        }
 
-        
+        if ( dst_webapp_url_base.charAt( dst_webapp_url_base.length()-1 )
+             == '/'
+           )
+        {
+            dst_webapp_url_base = dst_webapp_url_base.substring(
+                                     0, dst_webapp_url_base.length() -1 );
+        }
+
+        // Example dst_webapp_url_base:
+        //   http://mysite.www--sandbox.
+        //          version--v-1.127-0-0-1.ip.alfrescodemo.net:8180/
+
+
         // Examine the diffs between src and dst
         //
-        //    o  If a file or dir is non-deleted, then fetch all the 
+        //    o  If a file or dir is non-deleted, then fetch all the
         //       relevant link from src and store the data collected
-        //       in href_manifest and href_status_map.
-        //    
+        //       in href_manifest and src_href_status_map.
+        //
         //    o  If a file or dir is deleted, then update the
         //       deleted_file_md5 and the broken_hdep cache from dst.
 
-        String store_attr_base = getAttributeStemForDnsName(dst_dns_name,false);
+        String store_attr_base = getAttributeStemForDnsName(dst_dns_name);
 
-        String href_attr       = store_attr_base    + 
+        String href_attr       = store_attr_base    +
                                  "/|" + webapp_name +
                                  "/"  + BASE_VERSION_ALIAS;
 
-        HrefDifference href_diff = new HrefDifference(href_attr, 
+        HrefDifference href_diff = new HrefDifference(href_attr,
                                                       sp.getStore(),
                                                       dp.getStore(),
                                                       src_webapp_url_base,
@@ -921,11 +1349,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                                       readTimeout,
                                                       nthreads);
 
-        HrefStatusMap      href_status_map  = href_diff.getHrefStatusMap();
-        HrefManifest       href_manifest    = href_diff.getHrefManifest();
+        HrefStatusMap  src_href_status_map  = href_diff.getHrefStatusMap();
+        HrefManifest   href_manifest        = href_diff.getHrefManifest();
         Map<String,String> deleted_file_md5 = href_diff.getDeletedFileMd5();
-
-
 
         HashMap<String,String> broken_hdep_cache = new HashMap<String,String>();
         MD5 md5 = new MD5();
@@ -934,8 +1360,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             String src_path  = diff.getSourcePath();
 
+            // Never look at diffs in META-INF or WEB-INF
+
+            if ( (WEB_INF_META_INF_pattern_.matcher( src_path )).matches() ) 
+            {
+                continue;
+            }
+
             // Look up source node, even if it's been deleted
-            
+
             AVMNodeDescriptor src_desc = avm_.lookup(srcVersion,src_path,true);
             if (src_desc == null ) { continue; }
 
@@ -944,11 +1377,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 // Deal with deleted files
 
                 String dst_path  = diff.getDestinationPath();
-                
+
                 if ( src_desc.isDeletedDirectory() )            // deleted dir
-                {                                              
+                {
                     update_dir_gone_broken_hdep_cache(
-                        dstVersion, 
+                        dstVersion,
                         dst_path,
                         deleted_file_md5,
                         broken_hdep_cache,
@@ -957,14 +1390,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                         progress);
 
                     // stats for monitoring
-                    if ( progress != null ) 
-                    { 
-                        progress.incrementDirUpdateCount(); 
+                    if ( progress != null )
+                    {
+                        progress.incrementDirUpdateCount();
                     }
                 }
                 else                                            // deleted file
                 {
-                    update_file_gone_broken_hdep_cache( 
+                    update_file_gone_broken_hdep_cache(
                         dst_path,
                         deleted_file_md5,
                         broken_hdep_cache,
@@ -983,22 +1416,23 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 // New, modified, or conflicted  files/dirs
 
-                ValidationPathParser spath = 
+                ValidationPathParser spath =
                         new ValidationPathParser(avm_, src_path);
 
                 String req_path = spath.getRequestPath();
+                if ( req_path.equals("/") ) { req_path = ""; }
 
                 if (src_desc.isDirectory())
                 {
                     // recurse within src for new links
-                    extract_links_from_dir( 
+                    extract_links_from_dir(
                             srcVersion,
                             src_path,
                             src_fqdn,
                             virt_port,
                             req_path,
-                            href_manifest,       // sync list
-                            href_status_map,     // sync map
+                            href_manifest,        // sync list
+                            src_href_status_map,  // sync map
                             connectTimeout,
                             readTimeout,
                             progress,
@@ -1012,17 +1446,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 }
                 else
                 {
-                    // Get links from src_path and status of implicit 
+                    // Get links from src_path and status of implicit
                     // (dead-reckoned) link to it, but don't pull
                     // on the parsed links yet.
 
-                    extract_links_from_file( 
+                    extract_links_from_file(
                             src_path,
                             src_fqdn,
                             virt_port,
                             req_path,
-                            href_manifest,       // sync list
-                            href_status_map,     // sync map
+                            href_manifest,        // sync list
+                            src_href_status_map,  // sync map
                             connectTimeout,
                             readTimeout,
                             progress);
@@ -1041,22 +1475,22 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         //        put a thread barrier here, so that all the dead
         //        reckoned links have been validated before proceeding.
         //
-        
 
-        // Get status of links in href_manifest if not already known 
-        List<HrefManifestEntry> manifest_entry_list =  
+
+        // Get status of links in href_manifest if not already known
+        List<HrefManifestEntry> src_manifest_entry_list =
                 href_manifest.getManifestEntries();
 
-        for ( HrefManifestEntry manifest_entry : manifest_entry_list )
+        for ( HrefManifestEntry src_manifest_entry : src_manifest_entry_list )
         {
-            List<String> href_list = manifest_entry.getHrefs();
-            for (String parsed_url : href_list)
+            List<String> src_href_list = src_manifest_entry.getHrefs();
+            for (String src_parsed_url : src_href_list)
             {
-                if ( href_status_map.get( parsed_url ) == null )
+                if ( src_href_status_map.get( src_parsed_url ) == null )
                 {
-                    validate_href( parsed_url,
-                                   href_status_map,
-                                   parsed_url.startsWith( src_webapp_url_base ),
+                    validate_href( src_parsed_url,
+                                   src_href_status_map,
+                                   src_parsed_url.startsWith( src_webapp_url_base ),
                                    false,
                                    connectTimeout,
                                    readTimeout,
@@ -1066,68 +1500,69 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
         // TODO:  When validating url for cache is multi-threaded
-        //        put a thread barrier here so that we've got 
+        //        put a thread barrier here so that we've got
         //        status info for all parsed links after this point
 
 
-        // Remove from the collection of "broken" hyperlinks 
+        // Remove from the collection of "broken" hyperlinks
         // anything that is no longer referenced by any file
         //
         // Compute what's broken by the deletion
-        
-        Map<String, List<String>> broken_manifest_map = 
+
+        Map<String, List<String>> broken_manifest_map =
                 href_diff.getBrokenManifestMap();
 
 
         for ( String broken_href_md5 : broken_hdep_cache.keySet() )
         {
-            Set<String> file_md5_set = 
-                    attr_.getAttribute( href_attr      + "/" + 
-                                        HREF_TO_SOURCE + "/" + 
-                                        broken_href_md5
-                                      ).keySet();
+            List<String> file_md5_list =
+                    attr_.getKeys( href_attr      + "/" +
+                                   HREF_TO_SOURCE + "/" +
+                                   broken_href_md5
+                                 );
 
             ArrayList<String> conc_file_list = new ArrayList<String>();
-            
-            for ( String file_md5 : file_md5_set )
+
+            for ( String file_md5 : file_md5_list )
             {
                 if  (  ! deleted_file_md5.containsKey(  file_md5 ) )
                 {
-                    String conc_file = 
-                       attr_.getAttribute( href_attr   + "/" + 
-                                           MD5_TO_FILE + "/" + 
+                    String conc_file =
+                       attr_.getAttribute( href_attr   + "/" +
+                                           MD5_TO_FILE + "/" +
                                            file_md5
                                          ).getStringValue();
-                    
+
                     conc_file_list.add( conc_file );
                 }
             }
-            
-            String broken_href = attr_.getAttribute( href_attr   + "/" +
-                                                     MD5_TO_HREF + "/" +
-                                                     broken_href_md5
-                                                   ).getStringValue();
+
+            String rel_broken_href = attr_.getAttribute(
+                                              href_attr   + "/" +
+                                              MD5_TO_HREF + "/" +
+                                              broken_href_md5).getStringValue();
+
 
             // This broken href is relevant because it still exists in some file
             if ( conc_file_list.size() > 0 )
             {
                 for ( String broken_file : conc_file_list )
                 {
-                    List<String> manifest_list = 
-                        broken_manifest_map.get(broken_file);         
+                    List<String> manifest_list =
+                        broken_manifest_map.get(broken_file);
 
                     if ( manifest_list == null )
                     {
                         manifest_list = new ArrayList<String>();
                         broken_manifest_map.put( broken_file, manifest_list);
                     }
-                    manifest_list.add( broken_href );
+                    manifest_list.add( rel_broken_href );
                 }
             }
         }
 
         // Now to see what's broken in the update, the client can call:
-        // 
+        //
         //    getHrefManifestBrokenByDeletion()
         //    getHrefManifestBrokenInNewOrMod()
 
@@ -1137,37 +1572,68 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     /*-------------------------------------------------------------------------
     *  getHrefManifestBrokenByDelete --
-    *        
     *------------------------------------------------------------------------*/
     public HrefManifest getHrefManifestBrokenByDelete(HrefDifference href_diff)
     {
-        if ( href_diff.broken_by_deletion_ != null ) 
-        { 
+        if ( log.isDebugEnabled() )
+            log.debug("getHrefManifestBrokenByDelete");
+
+
+        if ( href_diff.broken_by_deletion_ != null )
+        {
             return href_diff.broken_by_deletion_;
         }
 
         href_diff.broken_by_deletion_ = new HrefManifest();
 
+        String src_webapp_url_base = href_diff.getSrcWebappUrlBase();
+        String src_store           = href_diff.getSrcStore();
+        String dst_store           = href_diff.getDstStore();
+        int dst_store_length       = dst_store.length();
 
-        Map<String, List<String>> broken_manifest_map = 
+        Map<String, List<String>> broken_manifest_map =
                 href_diff.getBrokenManifestMap();
 
-        ArrayList<String> broken_file_list = 
+        ArrayList<String> dst_broken_file_list =
             new ArrayList<String>( broken_manifest_map.keySet() );
 
-        Collections.sort( broken_file_list);
+        Collections.sort( dst_broken_file_list);
 
-        // push result into href_diff 
+        // push result into href_diff
 
-        for (String broken_file : broken_file_list)
+        for (String dst_broken_file : dst_broken_file_list)
         {
-            List<String> broken_href_list =
-                broken_manifest_map.get(broken_file);
+            List<String> rel_broken_href_list =
+                broken_manifest_map.get(dst_broken_file);
 
-            Collections.sort( broken_href_list );
+            List<String> src_broken_href_list =
+                new ArrayList<String>( 
+                        ( rel_broken_href_list != null)
+                        ? rel_broken_href_list.size() 
+                        : 0 );
+
+            for ( String rel_broken_href : rel_broken_href_list )
+            {
+                String src_broken_href;
+                if ( rel_broken_href.charAt(0) == '/')
+                {
+                    src_broken_href = src_webapp_url_base + rel_broken_href;
+                }
+                else
+                {
+                    src_broken_href = rel_broken_href;
+                }
+                src_broken_href_list.add( src_broken_href );
+            }
+
+            Collections.sort( src_broken_href_list );
+
+            String src_broken_file = 
+                  src_store + 
+                  dst_broken_file.substring( dst_store_length );
 
             href_diff.broken_by_deletion_.add(
-                new HrefManifestEntry( broken_file,  broken_href_list ));
+                new HrefManifestEntry( src_broken_file, src_broken_href_list ));
         }
         return href_diff.broken_by_deletion_;
     }
@@ -1175,11 +1641,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     /*-------------------------------------------------------------------------
     *  getHrefManifestBrokenByNewOrMod --
-    *        
+    *
     *------------------------------------------------------------------------*/
     public HrefManifest getHrefManifestBrokenByNewOrMod(
                             HrefDifference href_diff)
     {
+        if ( log.isDebugEnabled() )
+            log.debug("getHrefManifestBrokenByNewOrMod");
+
+
         if ( href_diff.broken_in_newmod_ != null)   // If already calculated
         {                                           // then just return the
             return href_diff.broken_in_newmod_;     // old result
@@ -1190,33 +1660,33 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // href_diff.broken_in_newmod_ is a subset of href_diff.href_manifest_
         // in both files mentioned and hrefs per file.
 
-        href_diff.broken_in_newmod_ = new HrefManifest();   
+        href_diff.broken_in_newmod_ = new HrefManifest();
 
-        List<HrefManifestEntry> manifest_entry_list =  
-                href_diff.href_manifest_.getManifestEntries();
+        List<HrefManifestEntry> src_manifest_entry_list =
+                href_diff.getHrefManifest().getManifestEntries();
 
-        HrefStatusMap href_status_map  = href_diff.getHrefStatusMap();
+        HrefStatusMap src_href_status_map  = href_diff.getHrefStatusMap();
 
-        for ( HrefManifestEntry manifest_entry : manifest_entry_list )
+        for ( HrefManifestEntry src_manifest_entry : src_manifest_entry_list )
         {
-            ArrayList<String> broken_href_list = new ArrayList<String>();
-            List<String>      href_list        = manifest_entry.getHrefs();
+            ArrayList<String> src_broken_href_list = new ArrayList<String>();
+            List<String>      src_href_list = src_manifest_entry.getHrefs();
 
-            for (String parsed_url : href_list)
+            for (String src_parsed_url : src_href_list)
             {
-                int status_code = href_status_map.get(parsed_url).getFirst();
+                int status_code = src_href_status_map.get(src_parsed_url).getFirst();
 
                 if (status_code >= 400 )
                 {
-                    broken_href_list.add( parsed_url );
+                    src_broken_href_list.add( src_parsed_url );
                 }
             }
 
-            if  ( broken_href_list.size() > 0 )
+            if  ( src_broken_href_list.size() > 0 )
             {
-                href_diff.broken_in_newmod_.add( 
-                   new HrefManifestEntry( manifest_entry.getFileName(),
-                                          broken_href_list));
+                href_diff.broken_in_newmod_.add(
+                   new HrefManifestEntry( src_manifest_entry.getFileName(),
+                                          src_broken_href_list));
             }
         }
         return href_diff.broken_in_newmod_;
@@ -1228,27 +1698,35 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     * and update the following parameters:
     * <pre>
     *
-    *   newmod_conc           Contains as keys any new or modified dst_url_md5.
+    *   rel_newmod_conc       Contains as keys any new or modified rel_url_md5.
     *                         Its values are a map keys of dst_file_md5
     *                         (that have null values).
-    *                         
-    *   deleted_conc          Contains as keys any deleted dst_url_md5.
-    *                         its values are a map of the dst_file_md5 
-    *                         (that have null values).
-    *                         
+    *
+    *   deleted_conc          Contains as keys any deleted rel_url_md5.
+    *                         its values are a map of the dst_file_md5
+    *                         (that have null values).  A url can appear
+    *                         in this concordance because some dst_file_md5 
+    *                         it was once in was either deleted or modified.
+    *
     *   newmod_file           Contains as keys any new or modified dst_file_md5.
     *                         Its values are the associated dst_file
-    *                         
-    *   href_in_conc          Contains as keys dst_url_md5 that is present
-    *                         in either newmod_conc or deleted_conc.  Its
-    *                         values are the associated dst_url.  When the
-    *                         href appears in newmod_conc but not deleted_conc,
-    *                         its value in is the actual url, not null.
-    *                         This serves as a flag that allows some calls 
-    *                         to set md5 -> url to be skipped.
     *
-    *   newmod_manifest_list  Like the manifest_list, only all values are
-    *                         the md5sum of their translation into the dst
+    *   rel_href_in_conc      Contains as keys rel_url_md5 that is present
+    *                         in either rel_newmod_conc or deleted_conc.  Its
+    *                         values are the associated rel_url.  When the
+    *                         href appears in rel_newmod_conc but not 
+    *                         deleted_conc, its value in is the actual url, 
+    *                         not null.  This serves as a flag that allows some
+    *                         calls to set md5 -> url to be skipped.
+    *
+    *   rel_href_broken_fdep  Contains as keys any rel_url_md5 that depended 
+    *                         upon a file that was deleted.  These hrefs
+    *                         are are likely to make a state transition from
+    *                         good to bad, and so must be rechecked.
+    *
+    *   rel_newmod_manifest_list  
+    *                         Like the src_manifest_list, only all values are
+    *                         the md5sum of their translation into the rel
     *                         namespace.
     *
     * </pre>
@@ -1256,11 +1734,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     void build_changeset_concordances(
             HrefDifference                       href_diff,
-            Map<String, HashMap<String,String>>  newmod_conc,
+            Map<String, HashMap<String,String>>  rel_newmod_conc,
             Map<String, HashMap<String,String>>  deleted_conc,
             Map<String,String>                   newmod_file,
-            Map<String,String>                   href_in_conc,
-            List<HrefManifestEntry>              newmod_manifest_list,
+            Map<String,String>                   rel_href_in_conc,
+            Map<String,String>                   rel_href_broken_fdep,
+            List<HrefManifestEntry>              rel_newmod_manifest_list,
             String                               dst_webapp_url_base,
             String                               src_webapp_url_base,
             int                                  src_webapp_url_base_length,
@@ -1268,69 +1747,123 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             String                               dst_store,
             MD5                                  md5)
     {
+        if ( log.isDebugEnabled() )
+            log.debug("build_changeset_concordances");
+
         String                  href_attr;
-        List<HrefManifestEntry> manifest_entry_list;
+        List<HrefManifestEntry> src_manifest_entry_list;
 
         href_attr = href_diff.getHrefAttr();
-        manifest_entry_list =  href_diff.getHrefManifest().getManifestEntries();
+        src_manifest_entry_list =  href_diff.getHrefManifest().getManifestEntries();
 
-        // 
+        //
         // Build concordance of new or modified files
         //
 
-        for ( HrefManifestEntry manifest_entry : manifest_entry_list )
+        for ( HrefManifestEntry src_manifest_entry : src_manifest_entry_list )
         {
-            String newmod_src_file = manifest_entry.getFileName();
-            String newmod_dst_file = 
-                      dst_store + newmod_src_file.substring( src_store_length );
+            String newmod_src_file = src_manifest_entry.getFileName();
+
+            String newmod_dst_file =
+                   dst_store + newmod_src_file.substring( src_store_length );
 
             String newmod_dst_file_md5 = md5.digest(newmod_dst_file.getBytes());
+
             newmod_file.put( newmod_dst_file_md5, newmod_dst_file );
 
-            List<String> href_list = manifest_entry.getHrefs();
-            ArrayList<String> src_dst_href_md5_list = new ArrayList<String>();
-             
-            for (String src_url : href_list)
+            List<String>      src_href_list     = src_manifest_entry.getHrefs();
+            ArrayList<String> rel_href_md5_list = new ArrayList<String>();
+
+            for (String src_url : src_href_list)
             {
-                String dst_url;
+                // The src & dst urls are different for any given asset
+                // so just keep track of the virtual host relative link
+                // and take context-appropriate action later.   This makes
+                // it easy to look up the link status in hashes without
+                // needing to know what version it was originally saved;
+                // there's no ".version--vXXX." to worry about in the hash
+                // lookup and hostname case becomes a non-issue.
+
+                String rel_url;
                 if ( ! src_url.startsWith( src_webapp_url_base ) )
                 {
-                    dst_url = src_url;
+                    rel_url = src_url;
                 }
                 else
                 {
-                    dst_url = dst_webapp_url_base +
-                              src_url.substring( src_webapp_url_base_length );
+                    rel_url = src_url.substring( src_webapp_url_base_length );
                 }
 
-                String dst_url_md5 = md5.digest( dst_url.getBytes() );
+                String rel_url_md5 = md5.digest( rel_url.getBytes() );
+                rel_href_md5_list.add( rel_url_md5 );
 
-                src_dst_href_md5_list.add( dst_url_md5 );
-                
-                HashMap<String,String> url_locations =  
-                  newmod_conc.get( dst_url_md5 );
+                HashMap<String,String> url_locations =
+                  rel_newmod_conc.get( rel_url_md5 );
 
-                // href_in_conc has as keys any href in either
-                // newmod_conc or deleted_conc.  Note that because
-                // the url could be new, its value is set to dst_url 
+                // rel_href_in_conc has as keys any href in either
+                // rel_newmod_conc or deleted_conc.  Note that because
+                // the url could be new, its value is set to dst_url
                 // rather than null.
 
-                href_in_conc.put( dst_url_md5, dst_url );
+                rel_href_in_conc.put( rel_url_md5, rel_url );
 
                 if (  url_locations == null )
                 {
                     url_locations = new HashMap<String,String>();
-                    newmod_conc.put( dst_url_md5, url_locations);
+                    rel_newmod_conc.put( rel_url_md5, url_locations);
                 }
                 url_locations.put( newmod_dst_file_md5, null );
             }
-            newmod_manifest_list.add(
-                new HrefManifestEntry( newmod_dst_file_md5, 
-                                       src_dst_href_md5_list));
+            rel_newmod_manifest_list.add(
+                new HrefManifestEntry( newmod_dst_file_md5,
+                                       rel_href_md5_list));
         }
 
 
-        // 
+        // Add to deleted_conc any url that was once in SOURCE_TO_HREF 
+        // but now is not.   This allows the system to become aware that 
+        // a URL has been removed from a modified (but not deleted) file.
+
+        for ( String newmod_file_md5  : newmod_file.keySet() )
+        {
+            List<String> old_source_href_list = null;
+
+            try 
+            {
+                old_source_href_list = attr_.getKeys( href_attr      + "/" +
+                                                      SOURCE_TO_HREF + "/" +
+                                                      newmod_file_md5);
+            }
+            catch (Exception e)
+            {
+                continue;
+            }
+
+            for ( String old_href_md5 : old_source_href_list )
+            {
+                HashMap<String,String> url_locations =  
+                                       rel_newmod_conc.get( old_href_md5 );
+
+
+                if ( (url_locations == null) ||
+                      ! url_locations.containsKey( newmod_file_md5 )
+                   )
+                {
+                    // The url was once present in this file but now it isn't
+                    rel_href_in_conc.put( old_href_md5, null );
+
+                    if (url_locations == null )
+                    {
+                         url_locations = new HashMap<String,String>();
+                         deleted_conc.put( old_href_md5, url_locations );
+                    }
+                    url_locations.put(newmod_file_md5, null );
+                }
+            }
+        }
+
+
+        //
         // Build concordance of deleted files
         //
 
@@ -1339,26 +1872,50 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         for (String deleted_file_md5 : deleted_file_md5_map.keySet() )
         {
-            // Get the set of hrefs that are now gone from deleted file
-        
-            Set<String> deleted_href_md5_set =
-                    attr_.getAttribute( href_attr      + "/" + 
-                                        SOURCE_TO_HREF + "/" + 
-                                        deleted_file_md5
-                                      ).keySet();
+            //
+            // Get the hrefs that depended upon this deleted file
+            //
 
-            for ( String deleted_href_md5 : deleted_href_md5_set )
+            try 
             {
-                // href_in_conc contains as keys any hrefs 
-                // present in newmod_conc or deleted_conc. 
+                List<String> dependent_hrefs_md5_list = 
+                    attr_.getKeys( href_attr    + "/" +
+                                   FILE_TO_HDEP + "/" +
+                                   deleted_file_md5);
+
+                for ( String href_md5 : dependent_hrefs_md5_list )
+                {
+                    rel_href_broken_fdep.put( href_md5, null );
+                }
+            }
+            catch (Exception e)
+            {
+                // It's ok not to have any href dependencies
+            }
+
+
+            //
+            // Get the set of hrefs that are now gone from deleted file
+            //
+
+            List<String> deleted_href_md5_list =
+                            attr_.getKeys( href_attr      + "/" +
+                                           SOURCE_TO_HREF + "/" +
+                                           deleted_file_md5);
+
+
+            for ( String deleted_href_md5 : deleted_href_md5_list )
+            {
+                // rel_href_in_conc contains as keys any hrefs
+                // present in rel_newmod_conc or deleted_conc.
                 //
-                // Because the href is deleted, there's no need to worry 
+                // Because the href is deleted, there's no need to worry
                 // about the  md5->href mapping, so just use null
                 // to allow some md5 -> href updates to be skipped.
 
-                href_in_conc.put( deleted_href_md5, null );
+                rel_href_in_conc.put( deleted_href_md5, null );
 
-                HashMap<String,String> url_locations =  
+                HashMap<String,String> url_locations =
                         deleted_conc.get( deleted_file_md5 );
 
                 if (url_locations == null )
@@ -1377,59 +1934,67 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *       and gets rid of stale hrefs.   Does not get rid
     *       of stale SOURCE_TO_HREF data (that's handled elsewhere).
     *------------------------------------------------------------------------*/
-    void merge_href_to_source_and_source_to_href( 
+    void merge_href_to_source_and_source_to_href(
                  HrefDifference                       href_diff,
-                 Map<String, HashMap<String,String>>  newmod_conc,
+                 Map<String, HashMap<String,String>>  rel_newmod_conc,
                  Map<String, HashMap<String,String>>  deleted_conc,
                  Map<String,String>                   newmod_file,
-                 Map<String,String>                   href_in_conc,
-                 List<HrefManifestEntry>              newmod_manifest_list)
+                 Map<String,String>                   rel_href_in_conc,
+                 List<HrefManifestEntry>              rel_newmod_manifest_list)
     {
+        if ( log.isDebugEnabled() )
+            log.debug("merge_href_to_source_and_source_to_href");
+
+
         String href_attr = href_diff.getHrefAttr();
 
         // Look at any href in the changeset   (ie: in a new/mod/del file)
 
-        for (String href_md5  :  href_in_conc.keySet() )
+        for (String rel_href_md5  :  rel_href_in_conc.keySet() )
         {
-            // updated HREF_TO_SOURCE value for href_md5
+            // updated HREF_TO_SOURCE value for rel_href_md5
             MapAttribute new_href_to_source = new MapAttributeValue();
 
-            Set<String> old_href_to_source_set = 
-                    attr_.getAttribute( href_attr      + "/" + 
-                                        HREF_TO_SOURCE + "/" + 
-                                        href_md5
-                                      ).keySet();
+            Attribute old_href_to_source_attrib =
+                    attr_.getAttribute( href_attr      + "/" +
+                                        HREF_TO_SOURCE + "/" +
+                                        rel_href_md5);
 
-            HashMap<String,String> deleted_locations =  
-                deleted_conc.get( href_md5  );
-             
+            Set<String> old_href_to_source_set =
+                           ( old_href_to_source_attrib != null)
+                           ? old_href_to_source_attrib.keySet()
+                           : null;
+
+            HashMap<String,String> deleted_locations =
+                deleted_conc.get( rel_href_md5  );
+
             // Copy filtered list of locations into  new_href_to_source
 
             if  ( old_href_to_source_set != null )
             {
                 for ( String location : old_href_to_source_set )
                 {
-                    if ( ( deleted_locations != null  && 
+                    if ( ( deleted_locations != null  &&
                            deleted_locations.containsKey( location )
                          ) || newmod_file.containsKey( location ))
                     {
                         continue;               // filter this location out
                     }
-                    new_href_to_source.put( 
+                    new_href_to_source.put(
                         location, new BooleanAttributeValue( true ));
                 }
             }
 
-            // Add to new_href_to_source any values in newmod_conc
+            // Add to new_href_to_source any values in rel_newmod_conc
 
-            HashMap<String,String> added_locations =  
-                newmod_conc.get( href_md5  );
+            HashMap<String,String> added_locations =
+                rel_newmod_conc.get( rel_href_md5  );
 
             if  ( added_locations != null )
             {
                 for (String location : added_locations.keySet() )
                 {
-                    new_href_to_source.put( 
+                    new_href_to_source.put(
                         location, new BooleanAttributeValue( true ));
                 }
             }
@@ -1437,13 +2002,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // If new_href_to_source is empty, this is now a stale HREF
             if  ( new_href_to_source.size() == 0)
             {
-                attr_.removeAttribute( href_attr + "/" + HREF_TO_SOURCE,
-                                       href_md5);
+                attr_.removeAttribute( href_attr  + "/" + HREF_TO_SOURCE,
+                                       rel_href_md5);
 
-                Attribute rsp = 
-                    attr_.getAttribute( href_attr      + "/" + 
+                Attribute rsp =
+                    attr_.getAttribute( href_attr      + "/" +
                                         HREF_TO_STATUS + "/" +
-                                        href_md5
+                                        rel_href_md5
                                       );
 
                 boolean is_href_broken = true;
@@ -1454,34 +2019,51 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     if ( response_code < 400 ) { is_href_broken = false; }
 
                     attr_.removeAttribute( href_attr + "/" +  HREF_TO_STATUS,
-                                           href_md5);
+                                           rel_href_md5);
 
-                    attr_.removeAttribute( href_attr + "/" + STATUS_TO_HREF + 
+                    attr_.removeAttribute( href_attr + "/" + STATUS_TO_HREF +
                                            "/" + response_code,
-                                           href_md5
+                                           rel_href_md5
                                          );
 
                     attr_.removeAttribute( href_attr   + "/" + MD5_TO_HREF,
-                                           href_md5);
+                                           rel_href_md5);
 
 
-                    Attribute old_fdep_attribute = 
-                        attr_.getAttribute( href_attr    + "/" + 
-                                            HREF_TO_FDEP + "/" + 
-                                            href_md5);
+                    Attribute old_fdep_attribute =
+                        attr_.getAttribute( href_attr    + "/" +
+                                            HREF_TO_FDEP + "/" +
+                                            rel_href_md5);
 
-                    attr_.removeAttribute( href_attr  + "/" + HREF_TO_FDEP,
-                                           href_md5);
-
+                    try 
+                    {
+                        attr_.removeAttribute( href_attr  + "/" + HREF_TO_FDEP,
+                                               rel_href_md5);
+                    }
+                    catch (Exception xx) 
+                    { 
+                        // If you try to remove an attribute that does not exist,
+                        // AttributeService throws an exception.  In this case,
+                        // we don't care if is attribute wasn't there, so it's
+                        // safe to ignore the exception.
+                        //
+                        // Two cases can cause this non-exceptional exception
+                        // to be thrown:
+                        //
+                        //      [1]  An internal href that was always bad
+                        //      [2]  An external href
+                        //
+                        // Neither are expected to have any file dependencies.
+                    }
 
                     if ( old_fdep_attribute != null )
                     {
                         Set<String> old_fdep_set = old_fdep_attribute.keySet();
                         for (String old_fdep : old_fdep_set)
                         {
-                            attr_.removeAttribute(href_attr    + "/" + 
+                            attr_.removeAttribute(href_attr    + "/" +
                                                   FILE_TO_HDEP + "/" + old_fdep,
-                                                  href_md5);
+                                                  rel_href_md5);
                         }
                     }
                 }
@@ -1489,31 +2071,30 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             else
             {
                 // If possibly a new href, be sure md5 -> href mapping exists
-                String orig_href = href_in_conc.get( href_md5 );
-                if  ( orig_href != null )
+                String rel_orig_href = rel_href_in_conc.get( rel_href_md5 );
+                if  ( rel_orig_href != null )
                 {
-                    attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
-                                        href_md5,
-                                        new StringAttributeValue( orig_href )
-                                      );
+                    attr_.setAttribute( href_attr + "/" + MD5_TO_HREF,
+                                        rel_href_md5,
+                                        new StringAttributeValue( rel_orig_href ));
                 }
 
                 attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,
-                                    href_md5,
+                                    rel_href_md5,
                                     new_href_to_source );
             }
         }
 
-        //  Update SOURCE_TO_HREF 
-        for ( HrefManifestEntry dst_md5_entry : newmod_manifest_list)
+        //  Update SOURCE_TO_HREF
+        for ( HrefManifestEntry rel_md5_entry : rel_newmod_manifest_list)
         {
-            String dst_file_md5             = dst_md5_entry.getFileName();
-            List<String> dst_href_md5_list  = dst_md5_entry.getHrefs();
+            String       dst_file_md5       = rel_md5_entry.getFileName();
+            List<String> rel_href_md5_list  = rel_md5_entry.getHrefs();
             MapAttribute new_source_to_href = new MapAttributeValue();
 
-            for ( String dst_href_md5 : dst_href_md5_list)
+            for ( String rel_href_md5 : rel_href_md5_list)
             {
-                new_source_to_href.put( dst_href_md5, 
+                new_source_to_href.put( rel_href_md5,
                                         new BooleanAttributeValue( true ));
             }
 
@@ -1523,27 +2104,33 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
     }
 
-    void update_href_status( 
+    /*-------------------------------------------------------------------------
+    *  update_href_status --
+    *------------------------------------------------------------------------*/
+    void update_href_status(
              String href_attr,
              HashMap<String,Pair<Integer,HashMap<String,String>>> status_map)
     {
+        if ( log.isDebugEnabled() )
+            log.debug("update_href_status");
+
         HashMap<Integer,String> status_cache = new HashMap<Integer,String>();
 
-        for ( String src_dst_url_md5 : status_map.keySet() )
+        for ( String rel_url_md5 : status_map.keySet() )
         {
-            Pair<Integer,HashMap<String,String>>  src_status = 
-                status_map.get( src_dst_url_md5 );
+            Pair<Integer,HashMap<String,String>>  src_status =
+                status_map.get( rel_url_md5 );
 
             int  src_response_code  =  src_status.getFirst(); // new status
             HashMap<String,String> src_dst_fdep_md5_map =     // new fdep
-                                       src_status.getSecond(); 
+                                       src_status.getSecond();
 
 
             // Get the old status of this href that's in a new/modified file:
 
-            Attribute rsp = attr_.getAttribute( href_attr      + "/" + 
+            Attribute rsp = attr_.getAttribute( href_attr      + "/" +
                                                 HREF_TO_STATUS + "/" +
-                                                src_dst_url_md5
+                                                rel_url_md5
                                               );
 
             boolean status_already_correct = false;
@@ -1558,15 +2145,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 if ( dst_response_code != src_response_code )
                 {
                     attr_.removeAttribute( href_attr + "/" +  HREF_TO_STATUS,
-                                           src_dst_url_md5);
+                                           rel_url_md5);
 
 
-                    attr_.removeAttribute( href_attr + "/" + STATUS_TO_HREF + 
+                    attr_.removeAttribute( href_attr + "/" + STATUS_TO_HREF +
                                            "/" + dst_response_code,
-                                           src_dst_url_md5
+                                           rel_url_md5
                                          );
                 }
-                else                                // The status of this 
+                else                                // The status of this
                 {                                   // href has not changed.
                     status_already_correct = true;  // Therefore, don't bother
                 }                                   // doing an update for it.
@@ -1574,58 +2161,59 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             if ( ! status_already_correct )
             {
-                attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS, 
-                                    src_dst_url_md5,
-                                    new IntAttributeValue( src_response_code )
-                                  );
+                attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS,
+                                    rel_url_md5,
+                                    new IntAttributeValue( src_response_code ));
 
 
-                if ( ! status_cache.containsKey( src_response_code ) ) 
+                if ( ! status_cache.containsKey( src_response_code ) )
                 {
-                    if ( ! attr_.exists( href_attr      + "/" +     // do actual remote
-                                         STATUS_TO_HREF + "/" +     // call to see if
-                                         src_response_code )        // this status key
-                       )                                            // must be created
-                    {                                                
-                        attr_.setAttribute( href_attr + "/" + STATUS_TO_HREF, 
-                                            "" + src_response_code,
-                                            new MapAttributeValue()
-                                          );
+                    if ( ! attr_.exists(
+                               href_attr      + "/" +  // do actual remote
+                               STATUS_TO_HREF + "/" +  // call to see if
+                               src_response_code )     // this status key
+                       )                                // must be created
+                    {
+                        attr_.setAttribute(
+                            href_attr + "/" + STATUS_TO_HREF,
+                            "" + src_response_code,
+                            new MapAttributeValue());
                     }
-                    status_cache.put( src_response_code, null );     // never check again
+                    // never check again
+                    status_cache.put( src_response_code, null );
                 }
 
-                attr_.setAttribute( 
-                        href_attr + "/" + STATUS_TO_HREF + "/" + src_response_code,
-                        src_dst_url_md5,
-                        new BooleanAttributeValue( true ));
+                attr_.setAttribute(
+                    href_attr + "/" + STATUS_TO_HREF + "/" + src_response_code,
+                    rel_url_md5,
+                    new BooleanAttributeValue( true ));
             }
 
 
 
             // If an fdep is in fdep_already_present, there's no need to add it
             //
-            HashMap<String,String> fdep_already_present = 
+            HashMap<String,String> fdep_already_present =
                 new HashMap<String,String>();
 
             Attribute old_fdep_attribute = null;   // If the href had a status,
             if (rsp != null)                       // it might have old fdep;
             {                                      // otherwise, it can't.
-                old_fdep_attribute = 
-                    attr_.getAttribute( href_attr    + "/" + 
-                                        HREF_TO_FDEP + "/" + 
-                                        src_dst_url_md5);
+                old_fdep_attribute =
+                    attr_.getAttribute( href_attr    + "/" +
+                                        HREF_TO_FDEP + "/" +
+                                        rel_url_md5);
 
-                // If the fdep 
+                // If the fdep
                 if ( old_fdep_attribute != null )
                 {
                     // Note that List<String> src_dst_fdep_md5_map
-                    // contains the (possibly null) incoming fdep list 
+                    // contains the (possibly null) incoming fdep list
                     // that's been translated into the dst namespace.
                     //
-                    // If these lists are identical 
+                    // If these lists are identical
 
-                    ArrayList<String> stale_fdep_md5_list = 
+                    ArrayList<String> stale_fdep_md5_list =
                         new ArrayList<String>();
 
                     Set<String> old_fdep_md5_set = old_fdep_attribute.keySet();
@@ -1642,15 +2230,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     // Remove the stale file dependencies
                     for ( String stale_fdep_md5 :  stale_fdep_md5_list)
                     {
-                        attr_.removeAttribute( href_attr    + "/" + 
-                                               HREF_TO_FDEP + "/" + 
-                                               src_dst_url_md5,
+                        attr_.removeAttribute( href_attr    + "/" +
+                                               HREF_TO_FDEP + "/" +
+                                               rel_url_md5,
                                                stale_fdep_md5);
 
-                        attr_.removeAttribute(href_attr    + "/" + 
-                                              FILE_TO_HDEP + "/" + 
+                        attr_.removeAttribute(href_attr    + "/" +
+                                              FILE_TO_HDEP + "/" +
                                               stale_fdep_md5,
-                                              src_dst_url_md5);
+                                              rel_url_md5);
                     }
                 }
             }
@@ -1663,15 +2251,35 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     continue;           // No need to add dependency
                 }
 
-                attr_.setAttribute(  href_attr + "/" + HREF_TO_FDEP,
-                                     src_dst_url_md5, 
-                                     new StringAttributeValue(src_dst_fdep_md5)
-                                  );
+                if ( ! attr_.exists( href_attr      + "/" +
+                                     HREF_TO_FDEP   + "/" +
+                                     rel_url_md5 )
+                   )
+                {
+                    attr_.setAttribute(  href_attr + "/" + HREF_TO_FDEP,
+                                         rel_url_md5,
+                                         new MapAttributeValue());
+                }
 
-                attr_.setAttribute(  href_attr + "/" + FILE_TO_HDEP,
-                                     src_dst_fdep_md5,
-                                     new StringAttributeValue( src_dst_url_md5 )
-                                  );
+                if ( ! attr_.exists( href_attr      + "/" +
+                                     FILE_TO_HDEP   + "/" +
+                                     src_dst_fdep_md5 )
+                   )
+                {
+                    attr_.setAttribute(  href_attr + "/" + FILE_TO_HDEP,
+                                         src_dst_fdep_md5,
+                                         new MapAttributeValue());
+                }
+
+                attr_.setAttribute(
+                        href_attr + "/" + HREF_TO_FDEP + "/" + rel_url_md5,
+                        src_dst_fdep_md5,
+                        new BooleanAttributeValue( true ));
+
+                attr_.setAttribute(
+                        href_attr + "/" + FILE_TO_HDEP + "/" + src_dst_fdep_md5,
+                        rel_url_md5,
+                        new BooleanAttributeValue( true ));
             }
         }
     }
@@ -1680,12 +2288,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     /**
     * Build a version of href_status map that translates all
-    * values from src into md5(dst) namespace, and uses 
-    * a map rather than a list of strings (this makes 
+    * values from src into md5(dst) namespace, and uses
+    * a map rather than a list of strings (this makes
     * comparisons of the old list & new map easy later on).
     */
     //-------------------------------------------------------------------------
-    HashMap<String,Pair<Integer,HashMap<String,String>>> make_dst_status_map(
+    HashMap<String,Pair<Integer,HashMap<String,String>>> make_rel_status_map(
         HrefStatusMap href_status_map,
         String        dst_webapp_url_base,
         String        src_webapp_url_base,
@@ -1694,70 +2302,78 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String        dst_store,
         MD5           md5)
     {
+        if ( log.isDebugEnabled() )
+            log.debug("make_rel_status_map");
+
         // Extract the raw map (avoids the need to use syncrhonized func)
-        Map<String,Pair<Integer,List<String>>> src_status_map = 
+        Map<String,Pair<Integer,List<String>>> src_status_map =
                                                href_status_map.getStatusMap();
 
-        HashMap<String,Pair<Integer,HashMap<String,String>>> 
-            src_dst_status_md5_map = 
+        HashMap<String,Pair<Integer,HashMap<String,String>>>
+            rel_status_md5_map =
                 new HashMap<String,Pair<Integer,HashMap<String,String>>>(
                     src_status_map.size());
 
         for ( String src_url  :  src_status_map.keySet() )
         {
-            String dst_url;
+            String rel_url;
             if ( ! src_url.startsWith( src_webapp_url_base ) )
             {
-                dst_url = src_url;
+                rel_url = src_url;
             }
             else
             {
-                dst_url = dst_webapp_url_base +
-                          src_url.substring( src_webapp_url_base_length );
+                rel_url = src_url.substring( src_webapp_url_base_length );
             }
 
-            String dst_url_md5 = md5.digest( dst_url.getBytes() );
+            String rel_url_md5 = md5.digest( rel_url.getBytes() );
 
-            Pair<Integer,List<String>>  src_status = 
+            Pair<Integer,List<String>>  src_status =
                                         src_status_map.get( src_url );
 
             List<String> src_fdep_list  = src_status.getSecond();   // maybe null
 
-            HashMap<String,String> src_dst_fdep_md5_map = 
+            HashMap<String,String> src_dst_fdep_md5_map =
                 new HashMap<String,String>();
 
             if (src_fdep_list != null )
             {
                 for ( String src_fdep : src_fdep_list )
                 {
-                    String dst_fdep = 
+                    String dst_fdep =
                        dst_store + src_fdep.substring( src_store_length );
                     String dest_fdep_md5 = md5.digest( dst_fdep.getBytes());
                     src_dst_fdep_md5_map.put( dest_fdep_md5, null );
                 }
             }
 
-            // Note:  src_dst_fdep_md5_map will never be null, 
+            // Note:  src_dst_fdep_md5_map will never be null,
             //        but it might be empty
 
-            src_dst_status_md5_map.put(dst_url_md5, 
-                                       new Pair<Integer,HashMap<String,String>>(
+            rel_status_md5_map.put(rel_url_md5,
+                                   new Pair<Integer,HashMap<String,String>>(
                                            src_status.getFirst(),
                                            src_dst_fdep_md5_map));
         }
 
-        return src_dst_status_md5_map;
+        return rel_status_md5_map;
     }
 
+    //-------------------------------------------------------------------------
     /**
     *  Merges href difference into destnation table (e.g.: for staging)
     */
+    //-------------------------------------------------------------------------
     public void mergeHrefDiff( HrefDifference href_diff)
                 throws         AVMNotFoundException,
                                SocketException,
                                SSLException,
                                LinkValidationAbortedException
     {
+        if ( log.isDebugEnabled() )
+            log.debug("mergeHrefDiff");
+
+
         MD5    md5                        = new MD5();
         String dst_store                  = href_diff.getDstStore();
         String src_store                  = href_diff.getSrcStore();
@@ -1770,23 +2386,25 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         // Build various concordances & lookup tables for this changeset:
         //
-        Map<String,String> newmod_file  = new HashMap<String, String>();             
-        Map<String,String> href_in_conc = new HashMap<String, String>();
-        HashMap<String, HashMap<String,String>>  newmod_conc;
+        Map<String,String> newmod_file          = new HashMap<String, String>();
+        Map<String,String> rel_href_in_conc     = new HashMap<String, String>();
+        Map<String,String> rel_href_broken_fdep = new HashMap<String, String>();
+        HashMap<String, HashMap<String,String>>  rel_newmod_conc;
         HashMap<String, HashMap<String,String>>  deleted_conc;
-        List<HrefManifestEntry>                  newmod_manifest_list;
+        List<HrefManifestEntry>                  rel_newmod_manifest_list;
 
-        newmod_conc          = new HashMap<String, HashMap<String,String>>();
-        deleted_conc         = new HashMap<String, HashMap<String,String>>();
-        newmod_manifest_list = new ArrayList<HrefManifestEntry>();
+        rel_newmod_conc          = new HashMap<String,HashMap<String,String>>();
+        deleted_conc             = new HashMap<String,HashMap<String,String>>();
+        rel_newmod_manifest_list = new ArrayList<HrefManifestEntry>();
 
         build_changeset_concordances(
-             href_diff, 
-             newmod_conc,             // updated by this call
-             deleted_conc,            // updated by this call
-             newmod_file,             // updated by this call
-             href_in_conc,            // updated by this call
-             newmod_manifest_list,
+             href_diff,
+             rel_newmod_conc,             // updated by this call
+             deleted_conc,                // updated by this call
+             newmod_file,                 // updated by this call
+             rel_href_in_conc,            // updated by this call
+             rel_href_broken_fdep,        // updated by this call
+             rel_newmod_manifest_list,
              dst_webapp_url_base,
              src_webapp_url_base,
              src_webapp_url_base_length,
@@ -1795,41 +2413,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
              md5);
 
 
-        // Now we have:
-        //
-        //   newmod_conc           Contains as keys any new or modified 
-        //                         dst_url_md5.  Its values are a map keys of 
-        //                         dst_file_md5 (that have null values).
-        //                         
-        //   deleted_conc          Contains as keys any deleted dst_url_md5.
-        //                         its values are a map of the dst_file_md5 
-        //                         (that have null values).
-        //                         
-        //   newmod_file           Contains as keys any new or modified 
-        //                         dst_file_md5.  Its values are the associated 
-        //                         dst_file
-        //                         
-        //   href_in_conc          Contains as keys dst_url_md5 that is present
-        //                         in either newmod_conc or deleted_conc.  Its
-        //                         values are the associated dst_url.  When the
-        //                         href appears in newmod_conc but not 
-        //                         deleted_conc, its value in is the actual url,
-        //                         not null.  This serves as a flag that allows 
-        //                         some calls to set md5 -> url to be skipped.
-        //
-        //   newmod_manifest_list  Like the manifest_list, only all values are
-        //                         the md5sum of their translation into the dst
-        //                         namespace.
-        //
-        //
         // The old HREF_TO_SOURCE needs to be updated with the delta as follows:
         //
-        //    For each URL in href_in_conc, 
+        //    For each URL in rel_href_in_conc,
         //       o  Get old HREF_TO_SOURCE (if null, create empty set).
         //       o  Remove from this set any file in deleted_conc or newmod_file
-        //       o  Add back to this set any file in newmod_conc
+        //       o  Add back to this set any file in rel_newmod_conc
         //       o  Update HREF_TO_SOURCE
-        //       o  If href_in_conc value is non-null, update MD5_TO_HREF
+        //       o  If rel_href_in_conc value is non-null, update MD5_TO_HREF
         //       o  If new HREF_TO_SOURCE is empty, remove the href:
         //              - [2] HREF_TO_SOURCE
         //              - [3] HREF_TO_STATUS
@@ -1846,38 +2437,38 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         //             [4]  Remove prior status from STATUS_TO_HREF if necessary
         //
         //        o  Get old dependency list from HREF_TO_FDEP
-        //           For every file not in href_status_map, 
+        //           For every file not in href_status_map,
         //                remove it from new HREF_TO_FDEP and FILE_TO_HDEP.
         //           For every file in href_status_map not in old HREF_TO_FDEP
         //                add it to new HREF_TO_FDEP and FILE_TO_HDEP.
         //
         //
         //    For each deleted file in:  deleted_file_md5_map
-        //              
+        //
         //       o  Remove:
         //              - [1] SOURCE_TO_HREF
         //
         //       o  If HREF_TO_FDEP for the file is empty, then remove:
         //              - [5] MD5_TO_FILE
         //
-        //    Also, ensure: 
+        //    Also, ensure:
         //            any new files get an md5 -> file mapping
         //            any new hrefs get an md5 -> href mapping
         //
 
-        merge_href_to_source_and_source_to_href( 
+        merge_href_to_source_and_source_to_href(
             href_diff,
-            newmod_conc,
+            rel_newmod_conc,
             deleted_conc,
             newmod_file,
-            href_in_conc,
-            newmod_manifest_list);  
+            rel_href_in_conc,
+            rel_newmod_manifest_list);
 
 
         // Ensure any new or modified file has an associated md5 -> file mapping
         for ( String file_md5 : newmod_file.keySet() )
         {
-            attr_.setAttribute( 
+            attr_.setAttribute(
                     href_attr + "/" + MD5_TO_FILE,
                     file_md5,
                     new StringAttributeValue( newmod_file.get( file_md5 )));
@@ -1893,7 +2484,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         HrefStatusMap  href_status_map  = href_diff.getHrefStatusMap();
 
         HashMap<String,Pair<Integer,HashMap<String,String>>>
-            src_dst_status_md5_map  =  make_dst_status_map( 
+            src_dst_status_md5_map  =  make_rel_status_map(
                                             href_status_map,
                                             dst_webapp_url_base,
                                             src_webapp_url_base,
@@ -1904,9 +2495,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
         // Reset the status of the urls, if necessary.
-        // 
-        // Because src_dst_status_md5_map is derived from src_status_map 
-        // by translating values into the dst namespace and taking 
+        //
+        // Because src_dst_status_md5_map is derived from src_status_map
+        // by translating values into the dst namespace and taking
         // their md5sum, all operations below can work directly
         // using md5(dst) values.
 
@@ -1926,9 +2517,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             attr_.removeAttribute(href_attr + "/" + SOURCE_TO_HREF,
                                   deleted_file_md5);
 
-            Attribute old_hdep_attribute = 
-                attr_.getAttribute( href_attr    + "/" + 
-                                    FILE_TO_HDEP + "/" + 
+            Attribute old_hdep_attribute =
+                attr_.getAttribute( href_attr    + "/" +
+                                    FILE_TO_HDEP + "/" +
                                     deleted_file_md5);
 
             // Let's see if any hrefs depend on the deleted file
@@ -1952,6 +2543,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
+
         recheckBrokenLinks(href_diff,
                            dst_webapp_url_base,
                            src_webapp_url_base,
@@ -1959,31 +2551,37 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                            src_store_length,
                            dst_store,
                            href_attr,
+                           rel_href_broken_fdep,
                            md5);
     }
 
 
     //-------------------------------------------------------------------------
     /**
-    *   Walk the set of links believed to be broken looking for hrefs that 
+    *   Walk the set of links believed to be broken looking for hrefs that
     *   are no longer broken (due to adding a file, fixing a server, etc.).
     */
     //-------------------------------------------------------------------------
-    public void recheckBrokenLinks( HrefDifference href_diff,
-                                    String         dst_webapp_url_base,
-                                    String         src_webapp_url_base,
-                                    int            src_webapp_url_base_length,
-                                    int            src_store_length,
-                                    String         dst_store,
-                                    String         href_attr,
-                                    MD5            md5 )
-                throws              AVMNotFoundException,
-                                    SocketException,
-                                    SSLException,
-                                    LinkValidationAbortedException
+    public void recheckBrokenLinks( 
+                    HrefDifference     href_diff,
+                    String             dst_webapp_url_base,
+                    String             src_webapp_url_base,
+                    int                src_webapp_url_base_length,
+                    int                src_store_length,
+                    String             dst_store,
+                    String             href_attr,
+                    Map<String,String> rel_href_broken_fdep,
+                    MD5                md5 )
+           throws   AVMNotFoundException,
+                    SocketException,
+                    SSLException,
+                    LinkValidationAbortedException
     {
-        List<Pair<String, Attribute>> links = 
-            attr_.query( href_attr + "/" + STATUS_TO_HREF, 
+        if ( log.isDebugEnabled() )
+            log.debug("recheckBrokenLinks");
+
+        List<Pair<String, Attribute>> links =
+            attr_.query( href_attr + "/" + STATUS_TO_HREF,
                          new AttrAndQuery(new AttrQueryGTE( "" + 400 ),
                                           new AttrQueryLTE( "" + 599 )));
 
@@ -1994,6 +2592,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         int    connect_timeout     = href_diff.getConnectTimeout();
         int    read_timeout        = href_diff.getReadTimeout();
 
+        int    dst_webapp_url_base_length = dst_webapp_url_base.length();
+
         for ( Pair<String, Attribute> link : links  )
         {
             String  response_code_str = link.getFirst();
@@ -2002,18 +2602,49 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             for ( String href_md5 : href_md5_set )
             {
-                String href_str = 
-                   attr_.getAttribute( href_attr   + "/" + 
-                                       MD5_TO_HREF + "/" + 
-                                       href_md5
-                                     ).getStringValue();
+                if ( rel_href_broken_fdep.containsKey( href_md5 ) )
+                {
+                    // This URL had broken status, and also seems to 
+                    // be further broken by a newly unsatisified file 
+                    // dependency (c.f.: the late Grigori Rasputin).
+                    // Rather than double-check, skip it for now and
+                    // let the rel_href_broken_fdep handle it (below).
+                    //
+                    continue;
+                }
 
-                boolean get_lookup_dependencies = 
-                            href_str.startsWith( dst_webapp_url_base);
+                Attribute rel_href_str_attr =
+                   attr_.getAttribute( href_attr   + "/" +
+                                       MD5_TO_HREF + "/" +
+                                       href_md5);
 
-                validate_href( 
+                if (  rel_href_str_attr == null )
+                {
+                    if ( log.isDebugEnabled() )
+                        log.debug("No MD5_TO_HREF (purged): " + href_md5);
+
+                    continue;
+                }
+
+                String rel_href_str = rel_href_str_attr.getStringValue();
+
+
+                boolean get_lookup_dependencies = (rel_href_str.charAt(0) == '/');
+
+                String href_str;
+                if  ( get_lookup_dependencies )
+                {
+                    // Convert it into the src namespace for validation.
+                    href_str = src_webapp_url_base + rel_href_str;
+                }
+                else
+                {
+                    href_str = rel_href_str;
+                }
+
+                validate_href(
                     href_str,                 // href to revalidate
-                    href_status_map,          // new status map 
+                    href_status_map,          // new status map
                     get_lookup_dependencies,  // only when url is internal
                     false,                    // don't fetch urls in result
                     connect_timeout,          // same as original href_diff
@@ -2023,10 +2654,45 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
 
-        // TODO: double check this... 
+        //
+        // Recheck hrefs that depended on a file that 
+        // has since been deleted
+        //
+
+        for (String href_md5 :  rel_href_broken_fdep.keySet())
+        {
+            Attribute rel_href_str_attr =
+                attr_.getAttribute( href_attr   + "/" +
+                                    MD5_TO_HREF + "/" +
+                                    href_md5);
+
+
+             if ( rel_href_str_attr == null )
+             {
+                if ( log.isDebugEnabled() )
+                    log.debug("No MD5_TO_HREF (purged): " + href_md5);
+
+                 continue;
+             }
+
+             String rel_href_str = rel_href_str_attr.getStringValue();
+
+             String href_str = src_webapp_url_base + rel_href_str;
+
+             validate_href(
+                 href_str,                 // href to revalidate
+                 href_status_map,          // new status map
+                 true,                     // always internal
+                 false,                    // don't fetch urls in result
+                 connect_timeout,          // same as original href_diff
+                 read_timeout,             // same as original href_diff
+                 null);                    // don't monitor progress
+        }
+
+
 
         HashMap<String,Pair<Integer,HashMap<String,String>>>
-            src_dst_status_md5_map  =  make_dst_status_map( 
+            src_dst_status_md5_map  =  make_rel_status_map(
                                             href_status_map,
                                             dst_webapp_url_base,
                                             src_webapp_url_base,
@@ -2034,11 +2700,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                             src_store_length,
                                             dst_store,
                                             md5);
-        
+
         update_href_status( href_attr, src_dst_status_md5_map);
 
-
-        return; 
+        return;
     }
 
 
@@ -2055,12 +2720,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                   int                    connectTimeout,
                                   int                    readTimeout,
                                   HrefValidationProgress progress,
-                                  int                    depth) 
+                                  int                    depth)
           throws                  AVMNotFoundException,
-                                  SocketException, 
+                                  SocketException,
                                   SSLException,
                                   LinkValidationAbortedException
     {
+        if ( log.isDebugEnabled() )
+            log.debug("extract_links_from_dir");
+
         Map<String, AVMNodeDescriptor> entries = null;
 
         // Ensure that the virt server is virtualizing this version
@@ -2074,7 +2742,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             if ( log.isErrorEnabled() )
             {
-                log.error("Could not list version: " + version + 
+                log.error("Could not list version: " + version +
                          " of directory: " + dir + "  " + e.getMessage());
             }
             return;
@@ -2087,7 +2755,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             String            avm_path   = dir +  "/" + entry_name;
 
             if ( (depth == 0) &&
-                 (entry_name.equalsIgnoreCase("META-INF")  || 
+                 (entry_name.equalsIgnoreCase("META-INF")  ||
                   entry_name.equalsIgnoreCase("WEB-INF")
                  )
                )
@@ -2112,7 +2780,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 // stats for monitoring
                 if ( progress != null )
                 {
-                    progress.incrementDirUpdateCount();  
+                    progress.incrementDirUpdateCount();
                 }
             }
             else
@@ -2130,13 +2798,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 // stats for monitoring
                 if ( progress != null )
                 {
-                    progress.incrementFileUpdateCount();  
+                    progress.incrementFileUpdateCount();
                 }
             }
         }
     }
 
-        
+
     /*-------------------------------------------------------------------------
     *  extract_links_from_file --
     *------------------------------------------------------------------------*/
@@ -2148,14 +2816,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                    HrefStatusMap          href_status_map,
                                    int                    connectTimeout,
                                    int                    readTimeout,
-                                   HrefValidationProgress progress) 
+                                   HrefValidationProgress progress)
           throws                   AVMNotFoundException,
-                                   SocketException, 
+                                   SocketException,
                                    SSLException,
                                    LinkValidationAbortedException
     {
         String implicit_url = null;
-        try 
+        try
         {
             // You might think that URLEncoder or URI would be
             // able to encode individual segements, but URLEncoder
@@ -2175,8 +2843,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             implicit_url = u.toASCIIString();
         }
         catch (Exception e)
-        { 
-            if ( log.isErrorEnabled() ) { log.error(e.getMessage()); }
+        {
+            if ( log.isErrorEnabled() ) 
+                log.error("Could not create URI for:  " + req_path + 
+                           "   " + e.getClass().getName() + 
+                           "   " + e.getMessage()); 
+
             return;
         }
 
@@ -2193,9 +2865,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         boolean saw_gen_url = false;
 
         ArrayList<String> href_arraylist;
-        if ( urls == null ) 
-        { 
-            href_arraylist = new ArrayList<String>( 1 ); 
+        if ( urls == null )
+        {
+            href_arraylist = new ArrayList<String>( 1 );
         }
         else
         {
@@ -2211,8 +2883,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
-        // add imlicit (dead reckoned) url if not contained in file
-        if ( ! saw_gen_url )  { href_arraylist.add( implicit_url ); }
+        // Add imlicit (dead reckoned) url if not contained in file
+
+        if ( ! saw_gen_url )
+        { 
+            href_arraylist.add( implicit_url ); 
+        }
 
 
         href_manifest.add( new HrefManifestEntry( src_path, href_arraylist ));
@@ -2228,16 +2904,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                  boolean                get_urls,
                                  int                    connect_timeout,
                                  int                    read_timeout,
-                                 HrefValidationProgress progress) 
-                  throws         SocketException, 
+                                 HrefValidationProgress progress)
+                  throws         SocketException,
                                  SSLException,
                                  LinkValidationAbortedException
     {
-        HttpURLConnection conn = null; 
+        HttpURLConnection conn = null;
         URL               url  = null;
         int               response_code;
 
-        // Allow operation to be aborted before the potentially 
+        // Allow operation to be aborted before the potentially
         // long-running act of pulling on a URL.
 
         if ( progress != null && progress.isAborted() )
@@ -2245,8 +2921,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             throw new LinkValidationAbortedException();
         }
 
-        try 
-        { 
+        try
+        {
             url = new URL( url_str );
 
             // Oddly, url.openConnection() does not actually
@@ -2254,7 +2930,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // object that is later opened via connect() within
             // the HrefExtractor.
             //
-            conn = (HttpURLConnection) url.openConnection(); 
+            conn = (HttpURLConnection) url.openConnection();
         }
         catch (Exception e )
         {
@@ -2263,14 +2939,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // Gives you              url_str="sales@alfresco.com"
             // and exception msg: no protocol: sales@alfresco.com
 
-            if ( log.isErrorEnabled() )
-            {
-                log.error("Cannot connect to :" + url_str );
-            }
+            if ( log.isDebugEnabled() )
+                log.debug("Cannot connect to :" + url_str );
 
-            // Rather than update the URL status just let it retain 
+
+            // Rather than update the URL status just let it retain
             // whatever status it had before, and assume this is
-            // an ephemeral network failure;  "ephemeral" here means 
+            // an ephemeral network failure;  "ephemeral" here means
             // "on all instances of this url for this validation."
             //
             // TODO -- rethink this.
@@ -2285,9 +2960,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
         // "Infinite" timeouts that aren't really infinite
-        // are a bad idea in this context.  If it takes more 
-        // than 15 seconds to connect or more than 60 seconds 
-        // to read a response, give up.  
+        // are a bad idea in this context.  If it takes more
+        // than 15 seconds to connect or more than 60 seconds
+        // to read a response, give up.
         //
         HrefExtractor href_extractor = new HrefExtractor();
 
@@ -2295,10 +2970,26 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         conn.setReadTimeout(    read_timeout    );  // e.g.:  30000 milliseconds
         conn.setUseCaches( false );                 // handle caching manually
 
-        if ( log.isDebugEnabled() )
+        // The only reason to fetch the file data is if it's going to be parsed
+        // for hyperlinks.   Therefore, use HEAD rather than GET when possible,
+        // to save bandwidth & time.
+
+        if ( ! get_urls ||
+             (  (href_bearing_request_path_matcher_ != null ) &&
+               ! href_bearing_request_path_matcher_.matches( url.getPath() )
+             )
+          )
         {
-            log.debug("About to fetch: " + url_str );
+            try { conn.setRequestMethod( "HEAD" ); }
+            catch (java.net.ProtocolException pex)
+            {                                         // There would need to be
+                return null;                          // something very wrong
+            }                                         // with the link here!
         }
+
+
+        if ( log.isDebugEnabled() )
+            log.debug("About to fetch URL: " + url_str );
 
         href_extractor.setConnection( conn );
 
@@ -2310,11 +3001,19 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             //      java.net.ConnectException        likely: Server down
             //      java.net.NoRouteToHostException  likely: firewall/router
 
-            if  ( get_lookup_dependencies )   // If we're trying to get lookup
-            {                                 // dependencies, this is a fatal
-                throw se;                     // error fetching virtualized
-            }                                 // content, so rethrow.
-            else                              
+            // If we're trying to get lookup
+            // dependencies, this is a fatal
+            // error fetching virtualized
+
+            if  ( get_lookup_dependencies )
+            {                                 
+                if ( log.isErrorEnabled() )
+                    log.error("Error validating internal link: " + 
+                              se.getClass().getName() + " " + se.getMessage() );
+
+                throw se;
+            }           
+            else
             {                                 // It's an external link, so
                 response_code = 400;          // just call it a link failure.
             }
@@ -2322,10 +3021,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         catch ( SSLException ssle )
         {
             // SSL issues
-            if  ( get_lookup_dependencies )   // If we're trying to get lookup
-            {                                 // dependencies, this is a fatal
-                throw ssle;                   // error fetching virtualized
-            }                                 // content, so rethrow.
+            if  ( get_lookup_dependencies )
+            {                                
+                if ( log.isErrorEnabled() )
+                    log.error("Error validating internal link via ssl: " + 
+                              ssle.getClass().getName() + 
+                              "   " + ssle.getMessage() );
+
+                throw ssle;                  
+            }                                
             else
             {                                 // It's an external link, so
                 response_code = 400;          // just call it a link failure.
@@ -2333,37 +3037,33 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
         catch (IOException ioe)
         {
-            // java.net.UnknownHostException 
+            // java.net.UnknownHostException
             // .. or other things, possibly due to a mist-typed url
             // or other bad/interrupted request.
             //
             // Even if this is a local link, let's keep going.
 
             if ( log.isDebugEnabled() )
-            {
                 log.debug("Could not fetch response code: " + ioe.getMessage());
-            }
+
             response_code = 400;                // probably a bad request
         }
 
-
         if ( log.isDebugEnabled() )
-        {
             log.debug("Response code for '" + url_str + "': " + response_code);
-        }
-        
-        // deal with resonse code 
 
-        if ( ! get_lookup_dependencies  ||  
+        // deal with resonse code
+
+        if ( ! get_lookup_dependencies  ||
              ( response_code < 200 || response_code >= 300)
            )
-        { 
-            // The remainder of this function deals with tracking lookup 
+        {
+            // The remainder of this function deals with tracking lookup
             // dependencies.  Because  we only care about the links that
             // URL's page contains if we're tracking dependencies, do
             // an early return here.
 
-            href_status_map.put( 
+            href_status_map.put(
                 url_str, new Pair<Integer,List<String>>(response_code,null) );
 
             if  ( progress != null )
@@ -2371,19 +3071,19 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 progress.incrementUrlUpdateCount();
             }
 
-            return null; 
-        } 
+            return null;
+        }
 
-        // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER 
-        // in the response, to be paranoid deal with the possiblity that 
-        // the information about what AVM files have been accessed is stored 
+        // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER
+        // in the response, to be paranoid deal with the possiblity that
+        // the information about what AVM files have been accessed is stored
         // in more than one of these headers (though it *should* be all in 1).
         //
-        // Unfortunately, getHeaderFieldKey makes the name of the 0-th header 
-        // return null, "even though the 0-th header has a value".  Thus the 
-        // loop below is 1-based, not 0-based. 
+        // Unfortunately, getHeaderFieldKey makes the name of the 0-th header
+        // return null, "even though the 0-th header has a value".  Thus the
+        // loop below is 1-based, not 0-based.
         //
-        // "It's a madhouse! A madhouse!" 
+        // "It's a madhouse! A madhouse!"
         //            -- Charton Heston playing the character "George Taylor"
         //               Planet of the Apes, 1968
         //
@@ -2394,21 +3094,21 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         for (int i=1; (header_key = conn.getHeaderFieldKey(i)) != null; i++)
         {
             if (!header_key.equals(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER))
-            { 
-                continue; 
+            {
+                continue;
             }
 
             String header_value = null;
-            try 
-            { 
-                header_value = 
-                    URLDecoder.decode( conn.getHeaderField(i), "UTF-8"); 
+            try
+            {
+                header_value =
+                    URLDecoder.decode( conn.getHeaderField(i), "UTF-8");
             }
             catch (Exception e)
             {
                 if ( log.isErrorEnabled() )
                 {
-                    log.error("Skipping undecodable response header: " + 
+                    log.error("Skipping undecodable response header: " +
                               conn.getHeaderField(i));
                 }
                 continue;
@@ -2425,7 +3125,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
         // files upon which url_str URL depends.
-        href_status_map.put( 
+        href_status_map.put(
            url_str, new Pair<Integer,List<String>>(response_code,dependencies));
 
         if ( progress != null )
@@ -2433,9 +3133,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             progress.incrementUrlUpdateCount();
         }
 
-        if ( ! get_urls ) 
-        { 
-            return null; 
+        if ( ! get_urls )
+        {
+            return null;
         }
 
         List<String> extracted_hrefs = null;
@@ -2443,60 +3143,45 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             extracted_hrefs = href_extractor.extractHrefs();
         }
-        catch (Exception e) 
-        { 
-            if ( log.isErrorEnabled() ) 
-            { 
-                log.error("Could not parse: " + url_str ); 
-            }
+        catch (Exception e)
+        {
+            if ( log.isErrorEnabled() )
+                log.error("Could not parse: " + url_str );
         }
 
         return extracted_hrefs;
     }
 
-    //-----------------------------------------------------------------------
+    //-------------------------------------------------------------------------
     /**
-    *  If 'create' is false, fetches the key bath associated with the 
-    *  dns name, otherwise it both fetches the key and makes sure it
-    *  also exists within AttributeService.
+    *   Fetches the attribute stem value associated with a given dns name.
+    *   Unlike setAttributeStemForDnsName(), if the AttributeService
+    *   attributes are not present, they will *not* be created.
+    *   <p>
+    *   This partitioning makes static analysis of what modifies
+    *   attribute services more obvious.
     */
-    //-----------------------------------------------------------------------
-    String getAttributeStemForDnsName( String  dns_name, boolean create )
+    //-------------------------------------------------------------------------
+    String getAttributeStemForDnsName( String dns_name )
     {
         // Given a store name X has a dns name   a.b.c
         // The attribute key pattern used is:   .href/c/b/a
-        // 
-        // This guarantees if a segment contains a ".", it's not a part 
-        // of the store's fqdn.  Thus, "." can be used to delimit the end 
+        //
+        // This guarantees if a segment contains a ".", it's not a part
+        // of the store's fqdn.  Thus, "." can be used to delimit the end
         // of the store, and the begnining of the version-specific info.
-        // 
+        //
 
-        // Construct path & create coresponding attrib entries
         StringBuilder str  = new StringBuilder( dns_name.length() );
         str.append( HREF );
 
         // Create top level .href key if necessary
-        if ( create && ! attr_.exists( HREF ) )
-        {
-            MapAttribute map = new MapAttributeValue();
-            attr_.setAttribute("", HREF, map );
-        }
 
         String [] seg = dns_name.split("\\.");
         String pth;
-        for (int i= seg.length -1 ; i>=0; i--) 
-        { 
-            if (create)
-            {
-                pth = str.toString();
-                if ( ! attr_.exists( pth + "/" + seg[i] ) )
-                {
-                    MapAttribute map = new MapAttributeValue();
-                    attr_.setAttribute( pth , seg[i], map );
-                }
-            }
-
-            str.append("/" + seg[i] ); 
+        for (int i= seg.length -1 ; i>=0; i--)
+        {
+            str.append("/" + seg[i] );
         }
         String result = str.toString();
         if ( result == null )
@@ -2507,516 +3192,48 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     }
 
 
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-
-
-    /*-------------------------------------------------------------------------
-    *  getHrefManifestEntry --
-    *        
-    *------------------------------------------------------------------------*/
-    public HrefManifestEntry getHrefManifestEntry( String path,
-                                         int    statusGTE,
-                                         int    statusLTE) 
-                             throws      AVMNotFoundException 
+    //-----------------------------------------------------------------------
+    /**
+    *   Fetches the attribute stem value associated with a given dns name.
+    *   Unlike getAttributeStemForDnsName(), if the AttributeService
+    *   attributes are not present, they *will* also be created.
+    *   <p>
+    *   This partitioning makes static analysis of what modifies
+    *   attribute services more obvious.
+    */
+    //-----------------------------------------------------------------------
+    String setAttributeStemForDnsName( String  dns_name)
     {
-        MD5 md5         = new MD5();
-        String path_md5 =  md5.digest( path.getBytes() );
+        StringBuilder str  = new StringBuilder( dns_name.length() );
+        str.append( HREF );
 
-        ValidationPathParser p = 
-            new ValidationPathParser(avm_, path);
-
-        String store           = p.getStore();
-        String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
-        String dns_name        = p.getDnsName();
-
-        if (webapp_name == null ) 
-        { 
-            throw new RuntimeException("Not a path to a file: " + path);
+        // Create top level .href key if necessary
+        if (  ! attr_.exists( HREF ) )
+        {
+            MapAttribute map = new MapAttributeValue();
+            attr_.setAttribute("", HREF, map );
         }
 
-        String status_gte = "" + statusGTE;
-        String status_lte = "" + statusLTE;
-
-        // Example value:  ".href/mysite"
-        String store_attr_base =  
-               getAttributeStemForDnsName( dns_name, false);
-
-        int version = avm_.getLatestSnapshotID( store );
-        //--------------------------------------------------------------------
-        // NEON:       faking latest snapshot version and just using HEAD
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX
-                       //        call to load the version if it isn't already.
-                       //
-                       //        Question:  how long should the version stay
-                       //                   loaded if a load was required?
-        //--------------------------------------------------------------------
-
-
-        // Example value: .href/mysite/|ROOT/-2
-        String href_attr =  store_attr_base    + 
-                            "/|" + webapp_name +
-                            "/"  + BASE_VERSION_ALIAS;
-
-
-        Attribute href_attr_map = attr_.getAttribute( href_attr      + "/" +
-                                                      SOURCE_TO_HREF + "/" +
-                                                      path_md5
-                                                    );
-
-
-        ArrayList<String> href_arraylist = new ArrayList<String>();
-        for ( String href_md5 : href_attr_map.keySet() )
+        String [] seg = dns_name.split("\\.");
+        String pth;
+        for (int i= seg.length -1 ; i>=0; i--)
         {
-            // Filter by examining the response code,
-            // but only if we're being selective.
-
-            if ( (statusGTE > 100) || (statusLTE < 599) )
+            pth = str.toString();
+            if ( ! attr_.exists( pth + "/" + seg[i] ) )
             {
-                int response_code =   
-                            attr_.getAttribute( href_attr      + "/" + 
-                                                HREF_TO_STATUS + "/" + 
-                                                href_md5
-                                              ).getIntValue();
-                
-                if ((response_code < statusGTE) || (response_code > statusLTE))
-                {
-                    continue;
-                }
+                MapAttribute map = new MapAttributeValue();
+                attr_.setAttribute( pth , seg[i], map );
             }
 
-            String href_str = 
-                   attr_.getAttribute( href_attr   + "/" + 
-                                       MD5_TO_HREF + "/" + 
-                                       href_md5
-                                     ).getStringValue();
-
-            href_arraylist.add( href_str );
+            str.append("/" + seg[i] );
         }
-
-        return new HrefManifestEntry( path, href_arraylist);
+        String result = str.toString();
+        if ( result == null )
+        {
+            throw new IllegalArgumentException("Invalid DNS name: " + dns_name);
+        }
+        return result;
     }
-
-    /*-------------------------------------------------------------------------
-    *  getBrokenHrefManifestEntries --
-    *        
-    *------------------------------------------------------------------------*/
-    public List<HrefManifestEntry> getBrokenHrefManifestEntries( 
-                                          String   storeNameOrWebappPath)  
-                                   throws AVMNotFoundException 
-    {
-        return getHrefManifestEntries( storeNameOrWebappPath, 400, 599);
-    }
-
-    /*-------------------------------------------------------------------------
-    *  getHrefManifestEntries --
-    *        
-    *------------------------------------------------------------------------*/
-    public List<HrefManifestEntry> getHrefManifestEntries( 
-                                      String storeNameOrWebappPath,
-                                      int    statusGTE,
-                                      int    statusLTE) 
-                                   throws AVMNotFoundException 
-    {
-        ValidationPathParser p = 
-            new ValidationPathParser(avm_, storeNameOrWebappPath);
-
-        String store           = p.getStore();
-        String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
-        String dns_name        = p.getDnsName();
-
-        String status_gte = "" + statusGTE;
-        String status_lte = "" + statusLTE;
-
-        HashMap<String, ArrayList<String> > href_manifest_map = 
-            new HashMap<String, ArrayList<String> >();
-
-        // Example value:  ".href/mysite"
-        String store_attr_base =  
-               getAttributeStemForDnsName( dns_name, false);
-
-
-        int version = avm_.getLatestSnapshotID( store );
-        //--------------------------------------------------------------------
-        // NEON:       faking latest snapshot version and just using HEAD
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX
-                       //        call to load the version if it isn't already.
-                       //
-                       //        Question:  how long should the version stay
-                       //                   loaded if a load was required?
-        //--------------------------------------------------------------------
-
-        if  ( webapp_name != null )
-        {
-            getHrefManifestEntriesFromWebapp( href_manifest_map,
-                                        webapp_name,
-                                        store_attr_base,
-                                        status_gte,
-                                        status_lte);
-        }
-        else
-        {
-            Map<String, AVMNodeDescriptor> webapp_entries = null;
-
-            // e.g.:   42, "mysite:/www/avm_webapps"
-            webapp_entries = avm_.getDirectoryListing(version, app_base );
-
-            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
-                          webapp_entries.entrySet()
-                        )
-            {
-                webapp_name = webapp_entry.getKey();  // my_webapp
-                AVMNodeDescriptor avm_node    = webapp_entry.getValue();
-
-                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
-                     webapp_name.equalsIgnoreCase("WEB-INF")
-                   )
-                {
-                    continue;
-                }
-
-                if  ( avm_node.isDirectory() )
-                {
-                    getHrefManifestEntriesFromWebapp( href_manifest_map,
-                                                webapp_name,
-                                                store_attr_base,
-                                                status_gte,
-                                                status_lte );
-                }
-            }
-        }
-
-        // The user will always want to see the list of files sorted
-        ArrayList<String> file_names = 
-            new ArrayList<String>( href_manifest_map.keySet() );
-
-        Collections.sort (file_names );
-
-        // Create sorted list from sorted keys of map
-        // TODO: Would using a TreeMap be faster than this?
-
-        ArrayList<HrefManifestEntry> href_manifest_list = 
-            new ArrayList<HrefManifestEntry>(file_names.size());
-        
-        for (String file_name : file_names )
-        {
-            List<String> hlist = href_manifest_map.get( file_name );
-            Collections.sort( hlist );
-            href_manifest_list.add( new HrefManifestEntry(file_name, hlist ) );
-        }
-
-        return href_manifest_list; 
-    }
-
-
-    /*-------------------------------------------------------------------------
-    *  getHrefManifestEntriesFromWebapp --
-    *        
-    *------------------------------------------------------------------------*/
-    void getHrefManifestEntriesFromWebapp( 
-            HashMap<String, ArrayList<String> > href_manifest_map, 
-            String webapp_name,
-            String store_attr_base,
-            String status_gte,
-            String status_lte)
-    {
-        // Example value: .href/mysite/|ROOT/-2
-        String href_attr =  store_attr_base    + 
-                            "/|" + webapp_name +
-                            "/"  + BASE_VERSION_ALIAS;
-
-         
-        List<Pair<String, Attribute>> links = 
-            attr_.query( href_attr + "/" + STATUS_TO_HREF, 
-                         new AttrAndQuery(new AttrQueryGTE(status_gte),
-                                          new AttrQueryLTE(status_lte)));
-
-        if  ( links == null ) {return;}
-
-        HashMap<String,String> md5_to_file_cache = new HashMap<String,String>();
-
-        for ( Pair<String, Attribute> link : links  )
-        {
-            Set<String> href_md5_set  = link.getSecond().keySet();
-
-            for ( String href_md5 : href_md5_set )
-            {
-                String href_str = 
-                   attr_.getAttribute( href_attr   + "/" + 
-                                       MD5_TO_HREF + "/" + 
-                                       href_md5
-                                     ).getStringValue();
-
-                Set<String> file_md5_set = 
-                        attr_.getAttribute( 
-                                            href_attr      + "/" + 
-                                            HREF_TO_SOURCE + "/" + 
-                                            href_md5
-                                          ).keySet();
-                
-
-                for ( String file_md5 : file_md5_set )
-                {
-                    ArrayList<String> href_list;
-                    String file_name = md5_to_file_cache.get( file_md5 );
-
-                    if ( file_name != null )
-                    {
-                        href_list = href_manifest_map.get( file_name );
-                    }
-                    else
-                    {
-                        file_name = attr_.getAttribute( href_attr   + "/" +
-                                                        MD5_TO_FILE + "/" +
-                                                        file_md5
-                                                      ).getStringValue();
-
-                        md5_to_file_cache.put( file_md5, file_name );
-
-                        href_list = new ArrayList<String>();
-                        href_manifest_map.put( file_name, href_list );
-                    }
-
-                    href_list.add( href_str );
-                }
-            }
-        }
-    }
-
-
-
-    /*-------------------------------------------------------------------------
-    *  getHrefsDependentUponFile --
-    *        
-    *------------------------------------------------------------------------*/
-    public List<String> getHrefsDependentUponFile(String path)
-                        throws                    AVMNotFoundException
-    {
-        MD5    md5      = new MD5();
-        String file_md5 =  md5.digest(path.getBytes());
-
-        ValidationPathParser p = 
-            new ValidationPathParser(avm_, path);
-
-        String store           = p.getStore();
-        String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
-        String dns_name        = p.getDnsName();
-
-        // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, false );
-
-        // Example value: .href/mysite/|ROOT/-2
-        String href_attr =  store_attr_base    + 
-                            "/|" + webapp_name +
-                            "/"  + BASE_VERSION_ALIAS;
-
-        Set<String> dependent_hrefs_md5 = 
-                         attr_.getAttribute( href_attr    + "/" + 
-                                             FILE_TO_HDEP + "/" + 
-                                             file_md5
-                                           ).keySet();
-
-        List<String> dependent_hrefs = 
-                        new ArrayList<String>( dependent_hrefs_md5.size() );
-
-        for (String href_md5 : dependent_hrefs_md5 )
-        {
-            String href_str = 
-                   attr_.getAttribute( href_attr   + "/" + 
-                                       MD5_TO_HREF + "/" + 
-                                       href_md5
-                                     ).getStringValue();
-
-            dependent_hrefs.add( href_str );
-        }
-
-        Collections.sort( dependent_hrefs );
-
-        return  dependent_hrefs;
-    }
-      
-
-
-    /*-------------------------------------------------------------------------
-    *  getBrokenHrefConcordanceEntries --
-    *
-    *------------------------------------------------------------------------*/
-    public List<HrefConcordanceEntry> getBrokenHrefConcordanceEntries(
-                                         String storeNameOrWebappPath ) 
-                                      throws AVMNotFoundException 
-    {
-        return getHrefConcordanceEntries(storeNameOrWebappPath, 400, 599);
-    }
-    
-    public List<HrefConcordanceEntry> getHrefConcordanceEntries(
-                                         String storeNameOrWebappPath, 
-                                         int    statusGTE,
-                                         int    statusLTE) 
-                                      throws AVMNotFoundException 
-    {
-        ValidationPathParser p = 
-            new ValidationPathParser(avm_, storeNameOrWebappPath);
-
-        String store           = p.getStore();
-        String webapp_name     = p.getWebappName();
-        String app_base        = p.getAppBase();
-        String dns_name        = p.getDnsName();
-
-        String status_gte = "" + statusGTE;
-        String status_lte = "" + statusLTE;
-
-
-        // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, false );
-                                                              
-
-        int version = avm_.getLatestSnapshotID( store );
-        //--------------------------------------------------------------------
-        // NEON:       faking latest snapshot version and just using HEAD
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX
-                       //        call to load the version if it isn't already.
-                       //
-                       //        Question:  how long should the version stay
-                       //                   loaded if a load was required?
-        //--------------------------------------------------------------------
-
-        List<HrefConcordanceEntry>  concordance_entries = 
-            new ArrayList<HrefConcordanceEntry>();
-
-
-        if  ( webapp_name != null )
-        {
-            getHrefsByStatusCodeFromWebapp( concordance_entries,
-                                            webapp_name,
-                                            store_attr_base,
-                                            status_gte,
-                                            status_lte);
-        }
-        else
-        {
-            Map<String, AVMNodeDescriptor> webapp_entries = null;
-
-            // e.g.:   42, "mysite:/www/avm_webapps"
-            webapp_entries = avm_.getDirectoryListing(version, app_base );
-
-            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
-                          webapp_entries.entrySet()
-                        )
-            {
-                webapp_name = webapp_entry.getKey();  // my_webapp
-                AVMNodeDescriptor avm_node    = webapp_entry.getValue();
-
-                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
-                     webapp_name.equalsIgnoreCase("WEB-INF")
-                   )
-                {
-                    continue;
-                }
-
-                if  ( avm_node.isDirectory() )
-                {
-                    getHrefsByStatusCodeFromWebapp( concordance_entries,
-                                                    webapp_name,
-                                                    store_attr_base,
-                                                    status_gte,
-                                                    status_lte );
-                }
-            }
-        }
-
-        for ( HrefConcordanceEntry conc_entry : concordance_entries )
-        {
-            Arrays.sort ( conc_entry.getLocations() );
-        }
-
-        Collections.sort( concordance_entries );
-
-        return concordance_entries;
-    }
-
-
-    /*-------------------------------------------------------------------------
-    *  getHrefsByStatusCodeFromWebapp --
-    *        
-    *------------------------------------------------------------------------*/
-    void  getHrefsByStatusCodeFromWebapp( 
-                List<HrefConcordanceEntry> concordance_entries,
-                String webapp_name,
-                String store_attr_base,
-                String status_gte,
-                String status_lte)
-    {
-        // Example value: .href/mysite/|ROOT/-2
-        String href_attr =  store_attr_base    + 
-                            "/|" + webapp_name +
-                            "/"  + BASE_VERSION_ALIAS;
-
-         
-        List<Pair<String, Attribute>> links = 
-            attr_.query( href_attr + "/" + STATUS_TO_HREF, 
-                         new AttrAndQuery(new AttrQueryGTE(status_gte),
-                                          new AttrQueryLTE(status_lte)));
-
-        if  ( links == null ) {return;}
-
-        for ( Pair<String, Attribute> link : links  )
-        {
-            String  response_code_str = link.getFirst();
-            int     response_code     = Integer.parseInt( response_code_str );
-
-            Set<String> href_md5_set  = link.getSecond().keySet();
-
-            for ( String href_md5 : href_md5_set )
-            {
-                String href_str = 
-                   attr_.getAttribute( href_attr   + "/" + 
-                                       MD5_TO_HREF + "/" + 
-                                       href_md5
-                                     ).getStringValue();
-
-                Set<String> file_md5_set = 
-                        attr_.getAttribute( 
-                                            href_attr      + "/" + 
-                                            HREF_TO_SOURCE + "/" + 
-                                            href_md5
-                                          ).keySet();
-                
-
-                String [] locations = new String[  file_md5_set.size() ];
-                int i=0; 
-                for ( String file_md5 : file_md5_set )
-                {
-                    locations[i] = 
-                       attr_.getAttribute( href_attr   + "/" + 
-                                           MD5_TO_FILE + "/" + 
-                                           file_md5
-                                         ).getStringValue();
-                    i++;
-                }
-
-                HrefConcordanceEntry concordance_entry = 
-                  new HrefConcordanceEntry( href_str, locations, response_code);
-
-                concordance_entries.add( concordance_entry );
-            }
-        }
-    }
-
-
-    
 
     /*------------------------------------------------------------------------*/
     /**
@@ -3027,16 +3244,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  that still exist within files that are not "gone".
     */
     /*------------------------------------------------------------------------*/
-    void update_dir_gone_broken_hdep_cache( 
+    void update_dir_gone_broken_hdep_cache(
                 int                    dst_version,
-                String                 dst_path, 
+                String                 dst_path,
                 Map<String,String>     deleted_file_md5,
                 Map<String,String>     broken_hdep_cache,
                 String                 href_attr,
                 MD5                    md5,
                 HrefValidationProgress progress)
     {
-        if ( excluder_ != null && excluder_.matches( dst_path )) 
+        if ( excluder_ != null && excluder_.matches( dst_path ))
         {
             return;
         }
@@ -3050,10 +3267,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         catch (Exception e)     // TODO: just AVMNotFoundException ?
         {
             if ( log.isErrorEnabled() )
-            {
-                log.error("Could not list version: " + dst_version + 
+                log.error("Could not list version: " + dst_version +
                          " of directory: " + dst_path + "  " + e.getMessage());
-            }
+
             return;
         }
 
@@ -3094,11 +3310,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 {
                     progress.incrementFileUpdateCount();
                 }
-
             }
         }
     }
-
 
     /*------------------------------------------------------------------------*/
     /**
@@ -3109,107 +3323,69 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  that still exist within files that are not "gone".
     */
     /*------------------------------------------------------------------------*/
-    void update_file_gone_broken_hdep_cache( 
-                String                 dst_path, 
+    void update_file_gone_broken_hdep_cache(
+                String                 dst_path,
                 Map<String,String>     deleted_file_md5,
                 Map<String,String>     broken_hdep_cache,
                 String                 href_attr,
                 MD5                    md5,
                 HrefValidationProgress progress)
     {
-        if ( excluder_ != null && excluder_.matches( dst_path )) 
+        if ( excluder_ != null && excluder_.matches( dst_path ))
         {
             return;
         }
 
         String file_gone_md5 =  md5.digest( dst_path.getBytes() );
 
-        Set<String> dependent_hrefs_md5 = 
-                         attr_.getAttribute( href_attr    + "/" + 
-                                             FILE_TO_HDEP + "/" + 
-                                             file_gone_md5
-                                           ).keySet();
+        Attribute  dependent_hrefs_md5_attrib = 
+                         attr_.getAttribute( href_attr    + "/" +
+                                             FILE_TO_HDEP + "/" +
+                                             file_gone_md5);
 
-
-        for ( String href_md5 :  dependent_hrefs_md5 )
+        if ( dependent_hrefs_md5_attrib != null )
         {
-             broken_hdep_cache.put(href_md5, null); 
+            Set<String> dependent_hrefs_md5 = 
+                dependent_hrefs_md5_attrib.keySet();
+
+            for ( String href_md5 :  dependent_hrefs_md5 )
+            {
+                 broken_hdep_cache.put(href_md5, null);
+            }
         }
         deleted_file_md5.put( file_gone_md5, null );
     }
-                                          
 
-    /*------------------------------------------------------------------------*/
-    /**
-    *   Updates all href info under the specified path.
-    *   The 'path' parameter should be the path to either:
+
+    /*-------------------------------------------------------------------------
+    *  getBrokenHrefManifestEntries --
     *
-    *   <ul>
-    *      <li> A store name (e.g.:  mysite)
-    *      <li> The path to the dir containing all webapps in a store
-    *           (e.g.:  mysite:/www/avm_webapps/ROOT)
-    *      <li> The path to a particular webapp, or within a webapp
-    *           (e.g.:  mysite:/www/avm_webapps/ROOT/moo)
-    *   </ul>
+    *   File: test:/www/avm_webapps/ROOT/index.html
+    *      /bad_internal.html
+    *      /fixable_internal.html
+    *      /purgeable_bad_internal.html
+    *      http://a-site-that-is-quite-dead.com
     *
-    *   If you give a path to a particular webapp (or within one), 
-    *   only that webapp's href info is updated.  If you give a 
-    *   store name, or the dir containing all webapps ina store 
-    *   (e.g.: mysite:/www/avm_webapps), then the href info for 
-    *   all webapps in the store are updated.
-    */
-    /*------------------------------------------------------------------------*/
-    public void updateHrefInfo( String  storeNameOrWebappPath, 
-                                boolean incremental,
-                                int     connect_timeout,
-                                int     read_timeout,
-                                int     nthreads,    // NEON - currently ignored
-                                HrefValidationProgress progress) 
-                throws          AVMNotFoundException, 
-                                SocketException, 
-                                SSLException,
-                                LinkValidationAbortedException
+    *
+    *------------------------------------------------------------------------*/
+    public List<HrefManifestEntry> getBrokenHrefManifestEntries(
+                                          String   storeNameOrWebappPath)
+                                   throws AVMNotFoundException
     {
-        if ( progress != null )
-        {
-            progress.init();
-        }
-
-        try 
-        {
-            updateHrefInfo_( storeNameOrWebappPath, 
-                             incremental,
-                             connect_timeout,
-                             read_timeout,
-                             nthreads,
-                             progress
-                           );
-        }
-        finally 
-        { 
-            if ( progress != null )
-            {
-                progress.setDone( true ); 
-            }
-        }
+        return getHrefManifestEntries( storeNameOrWebappPath, 400, 599);
     }
 
     /*-------------------------------------------------------------------------
-    *  updateHrefInfo_ --
-    *        
+    *  getHrefManifestEntries --
+    *
     *------------------------------------------------------------------------*/
-    void updateHrefInfo_( String  storeNameOrWebappPath, 
-                          boolean incremental,
-                          int     connect_timeout,
-                          int     read_timeout,
-                          int     nthreads,         // NEON - currently ignored
-                          HrefValidationProgress progress) 
-         throws           AVMNotFoundException, 
-                          SocketException, 
-                          SSLException,
-                          LinkValidationAbortedException
+    public List<HrefManifestEntry> getHrefManifestEntries(
+                                      String storeNameOrWebappPath,
+                                      int    statusGTE,
+                                      int    statusLTE)
+                                   throws AVMNotFoundException
     {
-        ValidationPathParser p = 
+        ValidationPathParser p =
             new ValidationPathParser(avm_, storeNameOrWebappPath);
 
         String store           = p.getStore();
@@ -3217,66 +3393,26 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String app_base        = p.getAppBase();
         String dns_name        = p.getDnsName();
 
+        String status_gte = "" + statusGTE;
+        String status_lte = "" + statusLTE;
+
+        HashMap<String, ArrayList<String> > href_manifest_map =
+            new HashMap<String, ArrayList<String> >();
+
         // Example value:  ".href/mysite"
-        String store_attr_base =  getAttributeStemForDnsName( dns_name, true );
-                                                              
+        String store_attr_base =
+               getAttributeStemForDnsName( dns_name );
 
         int version = avm_.getLatestSnapshotID( store );
-        //--------------------------------------------------------------------
-        // NEON:       faking latest snapshot version and just using HEAD
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX
-                       //        call to load the version if it isn't already.
-                       //
-                       //        Question:  how long should the version stay
-                       //                   loaded if a load was required?
-        //--------------------------------------------------------------------
 
-
-
-        // In the future, it should be possible for different webapp 
-        // urls should resolve to different servers.
-        // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>
-
-        String virt_domain    = virtreg_.getVirtServerFQDN();
-        int    virt_port      = virtreg_.getVirtServerHttpPort();
-        String store_url_base = "http://" + 
-                                dns_name  + 
-                                ".www--sandbox.version--v" + version  + "." + 
-                                virt_domain + ":" + virt_port;
-
-        MD5 md5 = new MD5();
         if  ( webapp_name != null )
         {
-            String webapp_url_base = null;
-            try 
-            {
-                webapp_url_base = 
-                    store_url_base + 
-                    ( webapp_name.equals("ROOT") 
-                      ? "" 
-                      : ("/" + URLEncoder.encode( webapp_name, "UTF-8"))
-                    );
-            }
-            catch (Exception e) { /* UTF-8 is supported */ }
-
-            revalidateWebapp( store, 
-                              version,
-                              true,           // is_latest_version
-                              store_attr_base,
-                              webapp_name,
-                              app_base + "/" + webapp_name,
-                              webapp_url_base,
-                              md5,
-                              connect_timeout,
-                              read_timeout,
-                              progress
-                            );
-
-            // stats for monitoring
-            if ( progress != null )
-            {
-                progress.incrementWebappUpdateCount(); 
-            }
+            getHrefManifestEntriesFromWebapp( href_manifest_map,
+                                              webapp_name,
+                                              store_attr_base,
+                                              status_gte,
+                                              status_lte,
+                                              dns_name);
         }
         else
         {
@@ -3285,10 +3421,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // e.g.:   42, "mysite:/www/avm_webapps"
             webapp_entries = avm_.getDirectoryListing(version, app_base );
 
-
-            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
-                          webapp_entries.entrySet()
-                        )
+            for ( Map.Entry<String, AVMNodeDescriptor> 
+                  webapp_entry  :  webapp_entries.entrySet()
+                )
             {
                 webapp_name = webapp_entry.getKey();  // my_webapp
                 AVMNodeDescriptor avm_node    = webapp_entry.getValue();
@@ -3300,901 +3435,1442 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     continue;
                 }
 
-                // In the future, it should be possible for different webapp 
-                // urls should resolve to different servers.
-                // http://<dns>.www--sandbox.version-v<vers>.<virtdomain>:<port>
-
-                String webapp_url_base = null;
-                try 
-                {
-                    webapp_url_base = 
-                           store_url_base + (webapp_name.equals("ROOT") ? "" : 
-                           URLEncoder.encode( webapp_name, "UTF-8"));
-                }
-                catch (Exception e) { /* UTF-8 is supported */ }
-
                 if  ( avm_node.isDirectory() )
                 {
-                    revalidateWebapp( store, 
-                                      version,
-                                      true,           // is_latest_version
-                                      store_attr_base,
-                                      webapp_name,
-                                      app_base + "/" + webapp_name,
-                                      webapp_url_base,
-                                      md5,
-                                      connect_timeout,
-                                      read_timeout,
-                                      progress
-                                    );
-
-                    // stats for monitoring
-                    if ( progress != null )
-                    {
-                        progress.incrementWebappUpdateCount();  
-                    }
+                    getHrefManifestEntriesFromWebapp( href_manifest_map,
+                                                      webapp_name,
+                                                      store_attr_base,
+                                                      status_gte,
+                                                      status_lte,
+                                                      dns_name );
                 }
             }
         }
-    }
 
-    /*-------------------------------------------------------------------------
-    *  revalidateWebapp --
-    *        
-    *------------------------------------------------------------------------*/
-    void revalidateWebapp( String  store, 
-                           int     version,
-                           boolean is_latest_version,
-                           String  store_attr_base,
-                           String  webapp_name,
-                           String  webapp_avm_base,
-                           String  webapp_url_base,
-                           MD5     md5,
-                           int     connect_timeout,
-                           int     read_timeout,
-                           HrefValidationProgress progress) 
-         throws            SocketException, SSLException
-    {
-        HashMap<String,String>  gen_url_cache   = new HashMap<String,String>();
-        HashMap<String,String>  parsed_url_cache= new HashMap<String,String>();
-        HashMap<Integer,String> status_cache    = new HashMap<Integer,String>();
-        HashMap<String,String>  file_hdep_cache = new HashMap<String,String>();
+        // The user will always want to see the list of files sorted
+        ArrayList<String> file_names =
+            new ArrayList<String>( href_manifest_map.keySet() );
 
+        Collections.sort (file_names );
 
-        // The following convention is used:  
-        //           version <==> (version - max - 2) %(max+2)
-        //
-        // The only case that ever matters for now is that:
-        // -2 is an alias for the last snapshot
-        //
-        // Thus href attribute info for the  "last snapshot" of 
-        // a store with the dns name:  preview.alice.mysite is
-        // stored within attribute service under the keys: 
-        //
-        //      .href/mysite/alice/preview/|mywebapp/-2
-        //
-        // This allows entire projects and/or webapps to removed in 1 step
+        // Create sorted list from sorted keys of map
 
-        // Example:               ".href/mysite/|ROOT"
-        String webapp_attr_base =  store_attr_base  +  "/|"  +  webapp_name;
+        ArrayList<HrefManifestEntry> href_manifest_list =
+            new ArrayList<HrefManifestEntry>(file_names.size());
 
-        if ( ! attr_.exists( webapp_attr_base ) ) 
+        for (String file_name : file_names )
         {
-            attr_.setAttribute(store_attr_base, "|" + webapp_name, 
-                               new MapAttributeValue());
-        }
-        
-        String href_attr;
-        if ( ! is_latest_version ) // add key: .href/mysite/|mywebapp/latest/42
-        {
-            // Because we're not validating the last snapshot,
-            // don't clobber "last snapshot" info.  Instead
-            // just make the href_attr info live under the
-            // version specified.  
-
-            //Example:  .href/mysite/|mywebapp/99
-            attr_.setAttribute( webapp_attr_base , version, 
-                                new MapAttributeValue() );
-
-            //  href data uses the raw version key
-            href_attr = webapp_attr_base +  "/" + version;
-        }
-        else
-        {
-            // Validating the latest snapshot.  Therefore, record the actual 
-            // LATEST_SNAPSHOT version info, but store data under the
-            // BASE_VERSION_ALIAS key ("-2") rather than the version number.
-            // This make it possible to do incremental updates more easily
-            // because we're not constantly shuffling data around from 
-            // exlicit version key to explicit version key.
-
-            //Example:  .href/mysite/|mywebapp/latest -> version
-
-            attr_.setAttribute( webapp_attr_base , 
-                                BASE_VERSION, 
-                                new IntAttributeValue( version )
-                              );
-        
-            //Example:  .href/mysite/|mywebapp/-2
-
-            attr_.setAttribute( webapp_attr_base ,  BASE_VERSION_ALIAS, 
-                                new MapAttributeValue() );
-
-            //  href data goes under the "-2" key:    .href/mysite/|myproject/-2
-            href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;
+            List<String> hlist = href_manifest_map.get( file_name );
+            Collections.sort( hlist );
+            href_manifest_list.add( new HrefManifestEntry(file_name, hlist ) );
         }
 
-
-        attr_.setAttribute( href_attr, SOURCE_TO_HREF, new MapAttributeValue());
-        attr_.setAttribute( href_attr, HREF_TO_SOURCE, new MapAttributeValue());
-        attr_.setAttribute( href_attr, HREF_TO_STATUS, new MapAttributeValue());
-        attr_.setAttribute( href_attr, STATUS_TO_HREF, new MapAttributeValue());
-        attr_.setAttribute( href_attr, MD5_TO_FILE,    new MapAttributeValue());
-        attr_.setAttribute( href_attr, MD5_TO_HREF,    new MapAttributeValue());
-        attr_.setAttribute( href_attr, HREF_TO_FDEP,   new MapAttributeValue());
-        attr_.setAttribute( href_attr, FILE_TO_HDEP,   new MapAttributeValue());
-
-        // Info for latest snapshot (42) of mywebapp within mysite is now:
-        //
-        //      .href/mysite/|mywebapp/latest -> 42
-        //      .href/mysite/|mywebapp/-2/source_to_href/   
-        //      .href/mysite/|mywebapp/-2/href_to_source/  
-        //      .href/mysite/|mywebapp/-2/href_to_status/
-        //      .href/mysite/|mywebapp/-2/status_to_href/
-        //      .href/mysite/|mywebapp/-2/md5_to_file/
-        //      .href/mysite/|mywebapp/-2/md5_to_href/
-        //      .href/mysite/|mywebapp/-2/href_to_fdep/
-        //      .href/mysite/|mywebapp/-2/file_to_hdep/
-        //
-        // Info for latest snapshot (42) of mywebapp within mysite/alice is now:
-        //
-        //      .href/mysite/alice/|mywebapp/latest -> 42
-        //      .href/mysite/alice/|mywebapp/-2/source_to_href/   
-        //      .href/mysite/alice/|mywebapp/-2/href_to_source/  
-        //      .href/mysite/alice/|mywebapp/-2/href_to_status/
-        //      .href/mysite/alice/|mywebapp/-2/status_to_href/
-        //      .href/mysite/alice/|mywebapp/-2/md5_to_file/
-        //      .href/mysite/alice/|mywebapp/-2/md5_to_href/
-        //      .href/mysite/alice/|mywebapp/-2/href_to_fdep/
-        //      .href/mysite/alice/|mywebapp/-2/file_to_hdep/
-        //
-        // This makes it easy to delete an entire project or webapp.
-
-
-        // Find dead reconning URLs for every asset in the system:
-        validate_dir( version,
-                      webapp_avm_base,
-                      webapp_url_base, 
-                      href_attr, 
-                      md5,
-                      gen_url_cache,
-                      parsed_url_cache,
-                      status_cache,
-                      file_hdep_cache,
-                      connect_timeout,
-                      read_timeout,
-                      progress,
-                      0 
-                    );
- 
-        // stats for monitoring
-        if ( progress != null )
-        {
-            progress.incrementDirUpdateCount();  
-        }
-
-
-        // Now all the generated URLs have had their status checked,
-        // but the parsed URLs from these files might not be yet.
-        // Pull on every URL that isn't currently in the gen_cache.
-
-        for ( Map.Entry<String,String> entry  :  parsed_url_cache.entrySet() )
-        {
-            String  parsed_url_md5 = entry.getKey();
-
-            if ( gen_url_cache.containsKey( parsed_url_md5 ) )  // skip if this
-            {                                                   // url validated
-                continue;                                       // within the dir
-            }                                                   // walking phase
-            
-            String  parsed_url = entry.getValue();
-
-            validate_url( parsed_url,
-                          parsed_url_md5, 
-                          href_attr,
-                          md5,
-                          parsed_url.startsWith( webapp_url_base ),
-                          status_cache,
-                          file_hdep_cache,
-                          connect_timeout,
-                          read_timeout
-                        );
-
-             // stats for monitoring
-             if ( progress != null )
-             {
-                 progress.incrementUrlUpdateCount();
-             }
-        }
-
-        if ( progress != null )
-        {
-            progress.incrementWebappUpdateCount();  // for monitoring progress
-        }
+        return href_manifest_list;
     }
 
 
     /*-------------------------------------------------------------------------
-    *  validate_dir --
+    *  getHrefManifestEntriesFromWebapp --
+    *
     *------------------------------------------------------------------------*/
-    void validate_dir( int    version, 
-                       String dir,
-                       String url_base,
-                       String href_attr, 
-                       MD5    md5,
-                       Map<String,String>  gen_url_cache,
-                       Map<String,String>  parsed_url_cache,
-                       Map<Integer,String> status_cache,
-                       Map<String,String>  file_hdep_cache,
-                       int    connect_timeout,
-                       int    read_timeout,
-                       HrefValidationProgress progress,
-                       int    depth ) 
-         throws        SocketException, SSLException
+    void getHrefManifestEntriesFromWebapp(
+            HashMap<String, ArrayList<String> > href_manifest_map,
+            String webapp_name,
+            String store_attr_base,
+            String status_gte,
+            String status_lte,
+            String dns_name)
     {
-        Map<String, AVMNodeDescriptor> entries = null;
+        // Example value: .href/mysite/|ROOT
+        String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
 
-        // Ensure that the virt server is virtualizing this version
+        // Example value: .href/mysite/|ROOT/-2
+        String href_attr =  webapp_attr_base + 
+                            "/"  + BASE_VERSION_ALIAS;
 
-        try
+        String virt_domain = virtreg_.getVirtServerFQDN();
+        int    virt_port   = virtreg_.getVirtServerHttpPort();
+
+        int base_version = 0;
+        Attribute base_vers_attr =
+            attr_.getAttribute( webapp_attr_base + "/" + BASE_VERSION);
+
+        if ( base_vers_attr != null )
         {
-            // e.g.:   42, "mysite:/www/avm_webapps/ROOT/moo"
-            entries = avm_.getDirectoryListing( version, dir );
-        }
-        catch (Exception e)     // TODO: just AVMNotFoundException ?
-        {
-            if ( log.isErrorEnabled() )
-            {
-                log.error("Could not list version: " + version + 
-                         " of directory: " + dir + "  " + e.getMessage());
-            }
-            return;
-        }
-
-        for ( Map.Entry<String, AVMNodeDescriptor> entry  : entries.entrySet() )
-        {
-            String            entry_name = entry.getKey();
-            AVMNodeDescriptor avm_node   = entry.getValue();
-            String            avm_path   = dir +  "/" + entry_name;
-
-            if ( (depth == 0) &&
-                 (entry_name.equalsIgnoreCase("META-INF")  || 
-                  entry_name.equalsIgnoreCase("WEB-INF")
-                 )
-               )
-            {
-                continue;
-            }
-
-            // Don't index bogus files
-            if ( excluder_ != null && excluder_.matches( avm_path )) 
-            {
-                continue;
-            }
-
-            String url_encoded_entry_name = null;
-            try 
-            {
-                url_encoded_entry_name = URLEncoder.encode(entry_name, "UTF-8");
-            }
-            catch (Exception e) { /* UTF-8 is supported */ }
-
-
-            String implicit_url = url_base  +  "/" + url_encoded_entry_name;
-
-            if  ( avm_node.isDirectory() )
-            {
-                validate_dir( version, 
-                              avm_path,
-                              implicit_url,
-                              href_attr,
-                              md5,
-                              gen_url_cache,
-                              parsed_url_cache,
-                              status_cache,
-                              file_hdep_cache,
-                              connect_timeout,
-                              read_timeout,
-                              progress,
-                              depth + 1 ) ;
-
-                // stats for monitoring
-                if ( progress != null )
-                {
-                    progress.incrementDirUpdateCount();  
-                }
-            }
-            else
-            {
-                validate_file( 
-                   avm_path,
-                   implicit_url,
-                   md5.digest(implicit_url.getBytes()),
-                   href_attr,
-                   md5,
-                   gen_url_cache,
-                   parsed_url_cache,
-                   status_cache,
-                   file_hdep_cache,
-                   connect_timeout,
-                   read_timeout,
-                   progress
-                );
-
-                // stats for monitoring
-                if ( progress != null )
-                {
-                    progress.incrementFileUpdateCount();  
-                }
-            }
-        }
-    }
-
-    /*-------------------------------------------------------------------------
-    *  validate_file --
-    *        
-    *------------------------------------------------------------------------*/
-    void validate_file( String                 avm_path,
-                        String                 gen_url_str, 
-                        String                 gen_url_md5,
-                        String                 href_attr,
-                        MD5                    md5,
-                        Map<String,String>     gen_url_cache,
-                        Map<String,String>     parsed_url_cache,
-                        Map<Integer,String>    status_cache,
-                        Map<String,String>     file_hdep_cache,
-                        int                    connect_timeout,
-                        int                    read_timeout,
-                        HrefValidationProgress progress)
-         throws         SocketException, SSLException
-    {
-        String file_md5= md5.digest(avm_path.getBytes());
-
-        gen_url_cache.put(gen_url_md5,null);
-
-        // A map from the href to the source files that contain it created
-        // made as soon a new generated or parsed url is discovered.
-        // Because of how directories are traversed when generating urls,
-        // in this function we can be certain that the href being processed
-        // has never been generated before, but it may have been *parsed*
-        // from an earlier file.
-        //
-        // Therefore, a call to see if the HREF_TO_SOURCE key for this URL
-        // exists can be avoided if parsed_url_cache already contains it.
-        // Otherwise, we've got to do the actual 'exists' test.
-
-        if ( ! parsed_url_cache.containsKey( gen_url_md5 )   &&
-             ! attr_.exists( href_attr      + "/" + 
-                             HREF_TO_SOURCE + "/" + gen_url_md5)
-           )
-        {
-            attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,
-                                gen_url_md5,
-                                new MapAttributeValue()
-                              );
+            base_version = base_vers_attr.getIntValue();
         }
 
-
-        // Claim the url to self "appears" in this source file
-
-        attr_.setAttribute(href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5,
-                           file_md5,
-                           new BooleanAttributeValue( true )
-                          );
-
-
-        attr_.setAttribute( href_attr + "/" + MD5_TO_FILE, 
-                            file_md5, 
-                            new StringAttributeValue( avm_path )
-                          );
+        String store_url_base = "http://"                   + 
+                                dns_name                    + 
+                                ".www--sandbox.version--v"  + 
+                                base_version  + "."         +
+                                virt_domain   + ":"         + 
+                                virt_port;
 
 
-        List<String> urls = validate_url( gen_url_str, 
-                                          gen_url_md5, 
-                                          href_attr, 
-                                          md5,
-                                          true,     // get lookup dependencies
-                                          status_cache,
-                                          file_hdep_cache,
-                                          connect_timeout,
-                                          read_timeout);
-
-        // stats for monitoring
-        if ( progress != null )
-        {
-            progress.incrementUrlUpdateCount();
-        }
-
-        if ( urls == null ) 
-        {
-            return;
-        }
-
-        // Collect list of hrefs contained by this source file
-        // If the generated URL is not already contained in the 
-        // parsed URL list, add it.
-
-        MapAttribute  href_map_attrib_value  = new MapAttributeValue();
-        boolean       saw_gen_url            = false;
-
-        for (String  response_url  : urls )
-        {
-            String response_url_md5 = md5.digest(response_url.getBytes());
-
-            if ( ! saw_gen_url && response_url_md5.equals( gen_url_md5) )
-            {
-                saw_gen_url = true;
-            }
-            
-            href_map_attrib_value.put( response_url_md5,
-                                       new BooleanAttributeValue(true ));
-
-
-            if ( ! parsed_url_cache.containsKey( response_url_md5 ) )
-            {
-                parsed_url_cache.put(response_url_md5, response_url);
-
-                if ( ! gen_url_cache.containsKey( response_url_md5 ) &&
-                     ! attr_.exists( href_attr      + "/" + 
-                                     HREF_TO_SOURCE + "/" + 
-                                     response_url_md5 )
-                   )
-                {
-                    attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,
-                                        response_url_md5,
-                                        new MapAttributeValue()
-                                      );
-                }
-            }
-
-            attr_.setAttribute( 
-                href_attr + "/" + HREF_TO_SOURCE  + "/" + response_url_md5 ,
-                file_md5,
-                new BooleanAttributeValue( true ));
-        }
-
-        if ( ! saw_gen_url )
-        {
-            href_map_attrib_value.put( gen_url_md5, 
-                                       new BooleanAttributeValue( true ));
-        }
-
-        attr_.setAttribute( href_attr + "/" + SOURCE_TO_HREF,
-                            file_md5, 
-                            href_map_attrib_value
-                          );
-    }
-
-
-    /*-------------------------------------------------------------------------
-    *  validate_url --
-    *------------------------------------------------------------------------*/
-    List<String>  validate_url( String  url_str,
-                                String  url_md5,
-                                String  href_attr,
-                                MD5     md5,
-                                boolean get_lookup_dependencies,
-                                Map<Integer,String> status_cache,
-                                Map<String,String>  file_hdep_cache,
-                                int  connect_timeout,
-                                int  read_timeout) 
-                  throws        SocketException, SSLException
-    {
-        HttpURLConnection conn = null; 
-        URL               url  = null;
-        int               response_code;
-
+        List<Pair<String, Attribute>> links = null;
         try 
-        { 
-            url = new URL( url_str );
-
-            // Oddly, url.openConnection() does not actually
-            // open a connection; it merely creates a connection
-            // object that is later opened via connect() within
-            // the HrefExtractor.
-            //
-            conn = (HttpURLConnection) url.openConnection(); 
+        {
+            links = attr_.query( href_attr + "/" + STATUS_TO_HREF,
+                         new AttrAndQuery(new AttrQueryGTE(status_gte),
+                                          new AttrQueryLTE(status_lte)));
         }
         catch (Exception e )
         {
-            // You could have a bogus protocol or some other probem.
-            // For example:           <a href="sales@alfresco.com">woops</a>
-            // Gives you              url_str="sales@alfresco.com"
-            // and exception msg: no protocol: sales@alfresco.com
-
             if ( log.isErrorEnabled() )
             {
-                log.error("openConnection() cannot connect to :" + url_str );
-            }
-
-            // Rather than update the URL status just let it retain 
-            // whatever status it had before, and assume this is
-            // an ephemeral network failure;  "ephemeral" here means 
-            // "on all instances of this url for this validation."
-            //
-            // TODO -- rethink this.
-
-            return null;
-        }
-
-        if ( get_lookup_dependencies )
-        {
-            conn.addRequestProperty(
-                CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, "true" );
-        }
-
-        // "Infinite" timeouts that aren't really infinite
-        // are a bad idea in this context.  If it takes more 
-        // than 15 seconds to connect or more than 60 seconds 
-        // to read a response, give up.  
-        //
-        HrefExtractor href_extractor = new HrefExtractor();
-
-        conn.setConnectTimeout( connect_timeout );  // e.g.:  10000 milliseconds
-        conn.setReadTimeout(    read_timeout    );  // e.g.:  30000 milliseconds
-        conn.setUseCaches( false );                 // handle caching manually
-
-
-        if ( log.isDebugEnabled() )
-        {
-            log.debug("About to fetch: " + url_str );
-        }
-
-        href_extractor.setConnection( conn );
-
-        try { response_code = conn.getResponseCode(); }
-        catch ( SocketException se )
-        {
-            // This could be either of two major problems:
-            //   java.net.SocketException
-            //      java.net.ConnectException        likely: Server down
-            //      java.net.NoRouteToHostException  likely: firewall/router
-
-            if  ( get_lookup_dependencies )   // If we're trying to get lookup
-            {                                 // dependencies, this is a fatal
-                throw se;                     // error fetching virtualized
-            }                                 // content, so rethrow.
-            else                              
-            {                                 // It's an external link, so
-                response_code = 400;          // just call it a link failure.
+                log.error("No link validation information " + 
+                          "is available yet for webapp: " + webapp_name);
             }
         }
-        catch ( SSLException ssle )
-        {
-            // SSL issues
-            if  ( get_lookup_dependencies )   // If we're trying to get lookup
-            {                                 // dependencies, this is a fatal
-                throw ssle;                   // error fetching virtualized
-            }                                 // content, so rethrow.
-            else
-            {                                 // It's an external link, so
-                response_code = 400;          // just call it a link failure.
-            }
-        }
-        catch (IOException ioe)
-        {
-            // java.net.UnknownHostException 
-            // .. or other things, possibly due to a mist-typed url
-            // or other bad/interrupted request.
-            //
-            // Even if this is a local link, let's keep going.
 
-            if ( log.isDebugEnabled() )
+        if  ( links == null ) {return;}
+
+        HashMap<String,String> md5_to_file_cache = new HashMap<String,String>();
+
+        for ( Pair<String, Attribute> link : links  )
+        {
+            Set<String> href_md5_set  = link.getSecond().keySet();
+
+            for ( String href_md5 : href_md5_set )
             {
-                log.debug("Could not fetch response code: " + ioe.getMessage());
-            }
-            response_code = 400;                // probably a bad request
-        }
-        
-        if ( log.isDebugEnabled() )
-        {
-            log.debug("Response code for '" + url_str + "': " + response_code);
-        }
+                String href_str =
+                   attr_.getAttribute( href_attr   + "/" +
+                                       MD5_TO_HREF + "/" +
+                                       href_md5
+                                     ).getStringValue();
+
+                Set<String> file_md5_set =
+                        attr_.getAttribute(
+                                            href_attr      + "/" +
+                                            HREF_TO_SOURCE + "/" +
+                                            href_md5
+                                          ).keySet();
 
 
-        attr_.setAttribute( href_attr + "/" + MD5_TO_HREF, 
-                            url_md5, 
-                            new StringAttributeValue( url_str )
-                          );
-
-        attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS, 
-                            url_md5, 
-                            new IntAttributeValue( response_code )
-                          );
-
-        // Only initialize the response map if absoultely necessary
-        // Use the status_cache to eliminate calls to test existence
-
-        if ( ! status_cache.containsKey( response_code ) )  // maybe necessary
-        {
-            if ( ! attr_.exists( href_attr      + "/" +     // do actual remote
-                                 STATUS_TO_HREF + "/" +     // call to see if
-                                 response_code )            // this status key
-               )                                            // must be created
-            {                                                
-                attr_.setAttribute( href_attr + "/" + STATUS_TO_HREF, 
-                                    "" + response_code,
-                                    new MapAttributeValue()
-                                  );
-
-            }
-            status_cache.put( response_code, null );        // never check again
-        }
-
-        attr_.setAttribute( 
-                href_attr + "/" + STATUS_TO_HREF + "/" + response_code,
-                url_md5,
-                new BooleanAttributeValue( true ));
-
-
-        if ( ! get_lookup_dependencies  ||  
-             ( response_code < 200 || response_code >= 300)
-           )
-        { 
-            // The remainder of this function deals with tracking lookup 
-            // dependencies.  Because  we only care about the links that
-            // URL's page contains if we're tracking dependencies, do
-            // an early return here.
-
-            return null; 
-        } 
-
-
-        // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER 
-        // in the response, to be paranoid deal with the possiblity that 
-        // the information about what AVM files have been accessed is stored 
-        // in more than one of these headers (though it *should* be all in 1).
-        //
-        // Unfortunately, getHeaderFieldKey makes the name of the 0-th header 
-        // return null, "even though the 0-th header has a value".  Thus the 
-        // loop below is 1-based, not 0-based. 
-        //
-        // "It's a madhouse! A madhouse!" 
-        //            -- Charton Heston playing the character "George Taylor"
-        //               Planet of the Apes, 1968
-        //
-
-        ArrayList<String> dependencies = new ArrayList<String>();
-
-        String header_key = null;
-        for (int i=1; (header_key = conn.getHeaderFieldKey(i)) != null; i++)
-        {
-            if (!header_key.equals(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER))
-            { 
-                continue; 
-            }
-
-            String header_value = null;
-            try 
-            { 
-                header_value = 
-                    URLDecoder.decode( conn.getHeaderField(i), "UTF-8"); 
-            }
-            catch (Exception e)
-            {
-                if ( log.isErrorEnabled() )
+                for ( String file_md5 : file_md5_set )
                 {
-                    log.error("Skipping undecodable response header: " + 
-                              conn.getHeaderField(i));
+                    ArrayList<String> href_list;
+                    String file_name = md5_to_file_cache.get( file_md5 );
+
+                    if ( file_name != null )
+                    {
+                        href_list = href_manifest_map.get( file_name );
+                    }
+                    else
+                    {
+                        file_name = attr_.getAttribute( href_attr   + "/" +
+                                                        MD5_TO_FILE + "/" +
+                                                        file_md5
+                                                      ).getStringValue();
+
+                        md5_to_file_cache.put( file_md5, file_name );
+
+                        href_list = new ArrayList<String>();
+                        href_manifest_map.put( file_name, href_list );
+                    }
+
+                    // If this is an internal link, make it point 
+                    // to the version of staging that was checked
+                    // for validity.
+
+                    if ( href_str.charAt(0) == '/' )
+                    {
+                        href_str = store_url_base + href_str;
+                    }
+
+                    href_list.add( href_str );
                 }
-                continue;
-            }
-
-            // Each lookup dependency header consists of a comma-separated
-            // list file names.
-            String [] lookup_dependencies = header_value.split(", *");
-
-            for (String dep : lookup_dependencies )
-            {
-                dependencies.add( dep );
             }
         }
-
-        // Now "dependencies" contains a list of all 
-        // files upon which url_str URL depends.
-
-        MapAttribute fdep_map_attrib_value = new MapAttributeValue();
-
-        for (String file_dependency : dependencies )
-        {
-            String fdep_md5 = md5.digest(file_dependency.getBytes());
-
-            if ( ! file_hdep_cache.containsKey( fdep_md5 ) )
-            {
-                attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP,
-                                    fdep_md5,
-                                    new MapAttributeValue()
-                                  );
-
-                file_hdep_cache.put( fdep_md5, null );
-            }
-
-            attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP + "/" + fdep_md5,
-                                url_md5,
-                                new BooleanAttributeValue( true )
-                              );
-
-            fdep_map_attrib_value.put( fdep_md5, 
-                                       new BooleanAttributeValue( true ));
-        }
-
-
-        attr_.setAttribute( href_attr + "/" + HREF_TO_FDEP,
-                            url_md5, 
-                            fdep_map_attrib_value
-                          );
-
-
-        List<String> extracted_hrefs = null;
-        try
-        {
-            extracted_hrefs = href_extractor.extractHrefs();
-        }
-        catch (Exception e) 
-        { 
-            if ( log.isErrorEnabled() ) 
-            { 
-                log.error("Could not parse: " + url_str ); 
-            }
-        }
-        return extracted_hrefs;
-    }
-}
-
-/*-----------------------------------------------------------------------------
-*  ValidationPathParser --
-*        
-*----------------------------------------------------------------------------*/
-class ValidationPathParser
-{
-    static String App_Dir_ = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
-                             "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
-
-    String    store_        = null;
-    String    app_base_     = null;
-    String    webapp_name_  = null;
-    String    dns_name_     = null;
-    String    path_         = null;
-    String    req_path_     = null;
-    int       store_end_    = -2;
-    int       webapp_start_ = -2;
-    int       webapp_end_   = -2;
-    AVMRemote avm_          = null;
-
-    ValidationPathParser(AVMRemote avm, String path) 
-    throws               IllegalArgumentException
-    {
-        avm_ = avm;
-        path_ = path;
-    }
-
-    String getStore()      
-    { 
-        if ( store_ != null ) { return store_ ; }
-        store_end_ = path_.indexOf(':');
-
-        if ( store_end_ < 0) 
-        { 
-            store_ = path_; 
-            return store_;
-        }
-
-        if ( ! path_.startsWith( App_Dir_, store_end_ + 1 )  )
-        {
-            throw new IllegalArgumentException("Invalid webapp path: " + path_);
-        }
-        else
-        {
-            store_ = path_.substring(0,store_end_);
-        }
-
-        return store_;
-    }
-
-    String getAppBase()    
-    { 
-        if (app_base_ != null) { return app_base_; }
-        if (store_ == null )   { getStore(); }
-        app_base_ = store_ + ":" + App_Dir_;
-        return app_base_;
-    }
-
-    String getWebappName() 
-    {
-        if ( webapp_name_ != null) { return webapp_name_; }
-        if ( store_end_ < -1)    { getStore(); }
-        if ( store_end_ < 0 )    { return null; }
-
-        webapp_start_ = 
-                path_.indexOf('/', store_end_ + 1 + App_Dir_.length()); 
-
-        if (webapp_start_ >= 0)
-        {
-            webapp_end_  = path_.indexOf('/', webapp_start_ + 1);
-            webapp_name_ = path_.substring( webapp_start_ +1, 
-                                            (webapp_end_ < 1)
-                                            ?  path_.length()
-                                            :  webapp_end_ );
-
-            if  ((webapp_name_ != null) && 
-                 (webapp_name_.length() == 0)
-                ) 
-            { 
-                webapp_name_ = null; 
-            }
-        }
-        return webapp_name_;
-    }
-
-    /*-------------------------------------------------------------------------
-    *  getRequestPath --
-    *       Given an path of the form mysite:/www/avm_webapps/ROOT/m oo/bar.txt
-    *       returns the non-encoded request path  ( "/mo o/bar.txt")
-    *
-    *       Given an path of the form mysite:/www/avm_webapps/cow/m oo/bar.txt
-    *       returns the non-encoded request path  ( "/cow/mo o/bar.txt")
-    *
-    *------------------------------------------------------------------------*/
-    String getRequestPath()
-    {
-        if (req_path_ != null ) { return req_path_;}
-
-        String webapp_name = getWebappName();
-        if (webapp_name == null ) { return null; }
-
-        int req_start = -1;
-
-        if ( webapp_name.equals("ROOT") )
-        {
-            req_start = webapp_start_ + "ROOT".length() + 1;
-        }
-        else
-        {
-            req_start = webapp_start_;
-        }
-
-        req_path_ =  path_.substring( req_start, path_.length() );
-
-        if ( req_path_.equals("") ) { req_path_ = "/"; }
-                
-        return req_path_;
     }
 
 
-    String getDnsName() throws AVMNotFoundException
-    { 
-        if ( dns_name_ != null ) { return dns_name_; }
-        if ( store_ == null )    { getStore() ; }
 
-        dns_name_ = lookupStoreDNS( avm_, store_ );
-        if ( dns_name_ == null ) 
-        { 
-            throw new AVMNotFoundException(
-                       "No DNS entry for AVM store: " + store_);
-        }
-        return dns_name_;
-    }
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
+    //------------------------------------------------------------------------
 
-    String lookupStoreDNS(AVMRemote avm,  String store )
-    {
-        Map<QName, PropertyValue> props = 
-                avm.queryStorePropertyKey(store, 
-                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
 
-        return ( props.size() != 1 
-                 ? null
-                 : props.keySet().iterator().next().getLocalName().
-                         substring(SandboxConstants.PROP_DNS.length())
-               );
-    }
-}
+
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  getHrefManifestEntry --                                                           // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    public HrefManifestEntry getHrefManifestEntry( String path,                          // NEARLY OBSOLETE!
+                                         int    statusGTE,                               // NEARLY OBSOLETE!
+                                         int    statusLTE)                               // NEARLY OBSOLETE!
+                             throws      AVMNotFoundException                            // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        MD5 md5         = new MD5();                                                     // NEARLY OBSOLETE!
+        String path_md5 =  md5.digest( path.getBytes() );                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
+            new ValidationPathParser(avm_, path);                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String store           = p.getStore();                                           // NEARLY OBSOLETE!
+        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
+        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
+        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if (webapp_name == null )                                                        // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            throw new RuntimeException("Not a path to a file: " + path);                 // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String status_gte = "" + statusGTE;                                              // NEARLY OBSOLETE!
+        String status_lte = "" + statusLTE;                                              // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
+        String store_attr_base =                                                         // NEARLY OBSOLETE!
+               getAttributeStemForDnsName( dns_name);                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        int version = avm_.getLatestSnapshotID( store );                                 // NEARLY OBSOLETE!
+        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
+        // NEON:       faking latest snapshot version and just using HEAD                // NEARLY OBSOLETE!
+        version = -1;  // NEON:  TODO remove this line & replace with a JMX              // NEARLY OBSOLETE!
+                       //        call to load the version if it isn't already.           // NEARLY OBSOLETE!
+                       //                                                                // NEARLY OBSOLETE!
+                       //        Question:  how long should the version stay             // NEARLY OBSOLETE!
+                       //                   loaded if a load was required?               // NEARLY OBSOLETE!
+        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example value: .href/mysite/|ROOT/-2                                          // NEARLY OBSOLETE!
+        String href_attr =  store_attr_base    +                                         // NEARLY OBSOLETE!
+                            "/|" + webapp_name +                                         // NEARLY OBSOLETE!
+                            "/"  + BASE_VERSION_ALIAS;                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        Attribute href_attr_map = attr_.getAttribute( href_attr      + "/" +             // NEARLY OBSOLETE!
+                                                      SOURCE_TO_HREF + "/" +             // NEARLY OBSOLETE!
+                                                      path_md5                           // NEARLY OBSOLETE!
+                                                    );                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        ArrayList<String> href_arraylist = new ArrayList<String>();                      // NEARLY OBSOLETE!
+        for ( String href_md5 : href_attr_map.keySet() )                                 // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // Filter by examining the response code,                                    // NEARLY OBSOLETE!
+            // but only if we're being selective.                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( (statusGTE > 100) || (statusLTE < 599) )                                // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                int response_code =                                                      // NEARLY OBSOLETE!
+                            attr_.getAttribute( href_attr      + "/" +                   // NEARLY OBSOLETE!
+                                                HREF_TO_STATUS + "/" +                   // NEARLY OBSOLETE!
+                                                href_md5                                 // NEARLY OBSOLETE!
+                                              ).getIntValue();                           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                if ((response_code < statusGTE) || (response_code > statusLTE))          // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    continue;                                                            // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            String href_str =                                                            // NEARLY OBSOLETE!
+                   attr_.getAttribute( href_attr   + "/" +                               // NEARLY OBSOLETE!
+                                       MD5_TO_HREF + "/" +                               // NEARLY OBSOLETE!
+                                       href_md5                                          // NEARLY OBSOLETE!
+                                     ).getStringValue();                                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            href_arraylist.add( href_str );                                              // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        return new HrefManifestEntry( path, href_arraylist);                             // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  getHrefsDependentUponFile --                                                      // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    public List<String> getHrefsDependentUponFile(String path)                           // NEARLY OBSOLETE!
+                        throws                    AVMNotFoundException                   // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        MD5    md5      = new MD5();                                                     // NEARLY OBSOLETE!
+        String file_md5 =  md5.digest(path.getBytes());                                  // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
+            new ValidationPathParser(avm_, path);                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String store           = p.getStore();                                           // NEARLY OBSOLETE!
+        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
+        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
+        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
+        String store_attr_base =  getAttributeStemForDnsName( dns_name );                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example value: .href/mysite/|ROOT/-2                                          // NEARLY OBSOLETE!
+        String href_attr =  store_attr_base    +                                         // NEARLY OBSOLETE!
+                            "/|" + webapp_name +                                         // NEARLY OBSOLETE!
+                            "/"  + BASE_VERSION_ALIAS;                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        Set<String> dependent_hrefs_md5 =                                                // NEARLY OBSOLETE!
+                         attr_.getAttribute( href_attr    + "/" +                        // NEARLY OBSOLETE!
+                                             FILE_TO_HDEP + "/" +                        // NEARLY OBSOLETE!
+                                             file_md5                                    // NEARLY OBSOLETE!
+                                           ).keySet();                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        List<String> dependent_hrefs =                                                   // NEARLY OBSOLETE!
+                        new ArrayList<String>( dependent_hrefs_md5.size() );             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for (String href_md5 : dependent_hrefs_md5 )                                     // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String href_str =                                                            // NEARLY OBSOLETE!
+                   attr_.getAttribute( href_attr   + "/" +                               // NEARLY OBSOLETE!
+                                       MD5_TO_HREF + "/" +                               // NEARLY OBSOLETE!
+                                       href_md5                                          // NEARLY OBSOLETE!
+                                     ).getStringValue();                                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            dependent_hrefs.add( href_str );                                             // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        Collections.sort( dependent_hrefs );                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        return  dependent_hrefs;                                                         // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  getBrokenHrefConcordanceEntries --                                                // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    public List<HrefConcordanceEntry> getBrokenHrefConcordanceEntries(                   // NEARLY OBSOLETE!
+                                         String storeNameOrWebappPath )                  // NEARLY OBSOLETE!
+                                      throws AVMNotFoundException                        // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        return getHrefConcordanceEntries(storeNameOrWebappPath, 400, 599);               // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    public List<HrefConcordanceEntry> getHrefConcordanceEntries(                         // NEARLY OBSOLETE!
+                                         String storeNameOrWebappPath,                   // NEARLY OBSOLETE!
+                                         int    statusGTE,                               // NEARLY OBSOLETE!
+                                         int    statusLTE)                               // NEARLY OBSOLETE!
+                                      throws AVMNotFoundException                        // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
+            new ValidationPathParser(avm_, storeNameOrWebappPath);                       // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String store           = p.getStore();                                           // NEARLY OBSOLETE!
+        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
+        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
+        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String status_gte = "" + statusGTE;                                              // NEARLY OBSOLETE!
+        String status_lte = "" + statusLTE;                                              // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
+        String store_attr_base =  getAttributeStemForDnsName( dns_name );                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        int version = avm_.getLatestSnapshotID( store );                                 // NEARLY OBSOLETE!
+        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
+        // NEON:       faking latest snapshot version and just using HEAD                // NEARLY OBSOLETE!
+        version = -1;  // NEON:  TODO remove this line & replace with a JMX              // NEARLY OBSOLETE!
+                       //        call to load the version if it isn't already.           // NEARLY OBSOLETE!
+                       //                                                                // NEARLY OBSOLETE!
+                       //        Question:  how long should the version stay             // NEARLY OBSOLETE!
+                       //                   loaded if a load was required?               // NEARLY OBSOLETE!
+        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        List<HrefConcordanceEntry>  concordance_entries =                                // NEARLY OBSOLETE!
+            new ArrayList<HrefConcordanceEntry>();                                       // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if  ( webapp_name != null )                                                      // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            getHrefsByStatusCodeFromWebapp( concordance_entries,                         // NEARLY OBSOLETE!
+                                            webapp_name,                                 // NEARLY OBSOLETE!
+                                            store_attr_base,                             // NEARLY OBSOLETE!
+                                            status_gte,                                  // NEARLY OBSOLETE!
+                                            status_lte);                                 // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        else                                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            Map<String, AVMNodeDescriptor> webapp_entries = null;                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // e.g.:   42, "mysite:/www/avm_webapps"                                     // NEARLY OBSOLETE!
+            webapp_entries = avm_.getDirectoryListing(version, app_base );               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :                   // NEARLY OBSOLETE!
+                          webapp_entries.entrySet()                                      // NEARLY OBSOLETE!
+                        )                                                                // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                webapp_name = webapp_entry.getKey();  // my_webapp                       // NEARLY OBSOLETE!
+                AVMNodeDescriptor avm_node    = webapp_entry.getValue();                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                if ( webapp_name.equalsIgnoreCase("META-INF")  ||                        // NEARLY OBSOLETE!
+                     webapp_name.equalsIgnoreCase("WEB-INF")                             // NEARLY OBSOLETE!
+                   )                                                                     // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    continue;                                                            // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                if  ( avm_node.isDirectory() )                                           // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    getHrefsByStatusCodeFromWebapp( concordance_entries,                 // NEARLY OBSOLETE!
+                                                    webapp_name,                         // NEARLY OBSOLETE!
+                                                    store_attr_base,                     // NEARLY OBSOLETE!
+                                                    status_gte,                          // NEARLY OBSOLETE!
+                                                    status_lte );                        // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for ( HrefConcordanceEntry conc_entry : concordance_entries )                    // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            Arrays.sort ( conc_entry.getLocations() );                                   // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        Collections.sort( concordance_entries );                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        return concordance_entries;                                                      // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  getHrefsByStatusCodeFromWebapp --                                                 // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    void  getHrefsByStatusCodeFromWebapp(                                                // NEARLY OBSOLETE!
+                List<HrefConcordanceEntry> concordance_entries,                          // NEARLY OBSOLETE!
+                String webapp_name,                                                      // NEARLY OBSOLETE!
+                String store_attr_base,                                                  // NEARLY OBSOLETE!
+                String status_gte,                                                       // NEARLY OBSOLETE!
+                String status_lte)                                                       // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        // Example value: .href/mysite/|ROOT/-2                                          // NEARLY OBSOLETE!
+        String href_attr =  store_attr_base    +                                         // NEARLY OBSOLETE!
+                            "/|" + webapp_name +                                         // NEARLY OBSOLETE!
+                            "/"  + BASE_VERSION_ALIAS;                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        List<Pair<String, Attribute>> links =                                            // NEARLY OBSOLETE!
+            attr_.query( href_attr + "/" + STATUS_TO_HREF,                               // NEARLY OBSOLETE!
+                         new AttrAndQuery(new AttrQueryGTE(status_gte),                  // NEARLY OBSOLETE!
+                                          new AttrQueryLTE(status_lte)));                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if  ( links == null ) {return;}                                                  // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for ( Pair<String, Attribute> link : links  )                                    // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String  response_code_str = link.getFirst();                                 // NEARLY OBSOLETE!
+            int     response_code     = Integer.parseInt( response_code_str );           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            Set<String> href_md5_set  = link.getSecond().keySet();                       // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            for ( String href_md5 : href_md5_set )                                       // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                String href_str =                                                        // NEARLY OBSOLETE!
+                   attr_.getAttribute( href_attr   + "/" +                               // NEARLY OBSOLETE!
+                                       MD5_TO_HREF + "/" +                               // NEARLY OBSOLETE!
+                                       href_md5                                          // NEARLY OBSOLETE!
+                                     ).getStringValue();                                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                Set<String> file_md5_set =                                               // NEARLY OBSOLETE!
+                        attr_.getAttribute(                                              // NEARLY OBSOLETE!
+                                            href_attr      + "/" +                       // NEARLY OBSOLETE!
+                                            HREF_TO_SOURCE + "/" +                       // NEARLY OBSOLETE!
+                                            href_md5                                     // NEARLY OBSOLETE!
+                                          ).keySet();                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                String [] locations = new String[  file_md5_set.size() ];                // NEARLY OBSOLETE!
+                int i=0;                                                                 // NEARLY OBSOLETE!
+                for ( String file_md5 : file_md5_set )                                   // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    locations[i] =                                                       // NEARLY OBSOLETE!
+                       attr_.getAttribute( href_attr   + "/" +                           // NEARLY OBSOLETE!
+                                           MD5_TO_FILE + "/" +                           // NEARLY OBSOLETE!
+                                           file_md5                                      // NEARLY OBSOLETE!
+                                         ).getStringValue();                             // NEARLY OBSOLETE!
+                    i++;                                                                 // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                HrefConcordanceEntry concordance_entry =                                 // NEARLY OBSOLETE!
+                  new HrefConcordanceEntry( href_str, locations, response_code);         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                concordance_entries.add( concordance_entry );                            // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*------------------------------------------------------------------------*/         // NEARLY OBSOLETE!
+    /**                                                                                  // NEARLY OBSOLETE!
+    *   Updates all href info under the specified path.                                  // NEARLY OBSOLETE!
+    *   The 'path' parameter should be the path to either:                               // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *   <ul>                                                                             // NEARLY OBSOLETE!
+    *      <li> A store name (e.g.:  mysite)                                             // NEARLY OBSOLETE!
+    *      <li> The path to the dir containing all webapps in a store                    // NEARLY OBSOLETE!
+    *           (e.g.:  mysite:/www/avm_webapps/ROOT)                                    // NEARLY OBSOLETE!
+    *      <li> The path to a particular webapp, or within a webapp                      // NEARLY OBSOLETE!
+    *           (e.g.:  mysite:/www/avm_webapps/ROOT/moo)                                // NEARLY OBSOLETE!
+    *   </ul>                                                                            // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *   If you give a path to a particular webapp (or within one),                       // NEARLY OBSOLETE!
+    *   only that webapp's href info is updated.  If you give a                          // NEARLY OBSOLETE!
+    *   store name, or the dir containing all webapps ina store                          // NEARLY OBSOLETE!
+    *   (e.g.: mysite:/www/avm_webapps), then the href info for                          // NEARLY OBSOLETE!
+    *   all webapps in the store are updated.                                            // NEARLY OBSOLETE!
+    */                                                                                   // NEARLY OBSOLETE!
+    /*------------------------------------------------------------------------*/         // NEARLY OBSOLETE!
+    public void updateHrefInfo( String  storeNameOrWebappPath,                           // NEARLY OBSOLETE!
+                                boolean incremental,                                     // NEARLY OBSOLETE!
+                                int     connect_timeout,                                 // NEARLY OBSOLETE!
+                                int     read_timeout,                                    // NEARLY OBSOLETE!
+                                int     nthreads,    // NEON - currently ignored         // NEARLY OBSOLETE!
+                                HrefValidationProgress progress)                         // NEARLY OBSOLETE!
+                throws          AVMNotFoundException,                                    // NEARLY OBSOLETE!
+                                SocketException,                                         // NEARLY OBSOLETE!
+                                SSLException,                                            // NEARLY OBSOLETE!
+                                LinkValidationAbortedException                           // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        if ( progress != null )                                                          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            progress.init();                                                             // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        try                                                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            updateHrefInfo_( storeNameOrWebappPath,                                      // NEARLY OBSOLETE!
+                             incremental,                                                // NEARLY OBSOLETE!
+                             connect_timeout,                                            // NEARLY OBSOLETE!
+                             read_timeout,                                               // NEARLY OBSOLETE!
+                             nthreads,                                                   // NEARLY OBSOLETE!
+                             progress                                                    // NEARLY OBSOLETE!
+                           );                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        finally                                                                          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            if ( progress != null )                                                      // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                progress.setDone( true );                                                // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  updateHrefInfo_ --                                                                // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    void updateHrefInfo_( String  storeNameOrWebappPath,                                 // NEARLY OBSOLETE!
+                          boolean incremental,                                           // NEARLY OBSOLETE!
+                          int     connect_timeout,                                       // NEARLY OBSOLETE!
+                          int     read_timeout,                                          // NEARLY OBSOLETE!
+                          int     nthreads,         // NEON - currently ignored          // NEARLY OBSOLETE!
+                          HrefValidationProgress progress)                               // NEARLY OBSOLETE!
+         throws           AVMNotFoundException,                                          // NEARLY OBSOLETE!
+                          SocketException,                                               // NEARLY OBSOLETE!
+                          SSLException,                                                  // NEARLY OBSOLETE!
+                          LinkValidationAbortedException                                 // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
+            new ValidationPathParser(avm_, storeNameOrWebappPath);                       // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String store           = p.getStore();                                           // NEARLY OBSOLETE!
+        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
+        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
+        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
+        String store_attr_base =  setAttributeStemForDnsName( dns_name);                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        int version = avm_.getLatestSnapshotID( store );                                 // NEARLY OBSOLETE!
+        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
+        // NEON:       faking latest snapshot version and just using HEAD                // NEARLY OBSOLETE!
+        version = -1;  // NEON:  TODO remove this line & replace with a JMX              // NEARLY OBSOLETE!
+                       //        call to load the version if it isn't already.           // NEARLY OBSOLETE!
+                       //                                                                // NEARLY OBSOLETE!
+                       //        Question:  how long should the version stay             // NEARLY OBSOLETE!
+                       //                   loaded if a load was required?               // NEARLY OBSOLETE!
+        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // In the future, it should be possible for different webapp                     // NEARLY OBSOLETE!
+        // urls should resolve to different servers.                                     // NEARLY OBSOLETE!
+        // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String virt_domain    = virtreg_.getVirtServerFQDN();                            // NEARLY OBSOLETE!
+        int    virt_port      = virtreg_.getVirtServerHttpPort();                        // NEARLY OBSOLETE!
+        String store_url_base = "http://" +                                              // NEARLY OBSOLETE!
+                                dns_name  +                                              // NEARLY OBSOLETE!
+                                ".www--sandbox.version--v" + version  + "." +            // NEARLY OBSOLETE!
+                                virt_domain + ":" + virt_port;                           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        MD5 md5 = new MD5();                                                             // NEARLY OBSOLETE!
+        if  ( webapp_name != null )                                                      // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String webapp_url_base = null;                                               // NEARLY OBSOLETE!
+            try                                                                          // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                webapp_url_base =                                                        // NEARLY OBSOLETE!
+                    store_url_base +                                                     // NEARLY OBSOLETE!
+                    ( webapp_name.equals("ROOT")                                         // NEARLY OBSOLETE!
+                      ? ""                                                               // NEARLY OBSOLETE!
+                      : ("/" + URLEncoder.encode( webapp_name, "UTF-8"))                 // NEARLY OBSOLETE!
+                    );                                                                   // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            catch (Exception e) { /* UTF-8 is supported */ }                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            revalidateWebapp( store,                                                     // NEARLY OBSOLETE!
+                              version,                                                   // NEARLY OBSOLETE!
+                              true,           // is_latest_version                       // NEARLY OBSOLETE!
+                              store_attr_base,                                           // NEARLY OBSOLETE!
+                              webapp_name,                                               // NEARLY OBSOLETE!
+                              app_base + "/" + webapp_name,                              // NEARLY OBSOLETE!
+                              webapp_url_base,                                           // NEARLY OBSOLETE!
+                              md5,                                                       // NEARLY OBSOLETE!
+                              connect_timeout,                                           // NEARLY OBSOLETE!
+                              read_timeout,                                              // NEARLY OBSOLETE!
+                              progress                                                   // NEARLY OBSOLETE!
+                            );                                                           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // stats for monitoring                                                      // NEARLY OBSOLETE!
+            if ( progress != null )                                                      // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                progress.incrementWebappUpdateCount();                                   // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        else                                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            Map<String, AVMNodeDescriptor> webapp_entries = null;                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // e.g.:   42, "mysite:/www/avm_webapps"                                     // NEARLY OBSOLETE!
+            webapp_entries = avm_.getDirectoryListing(version, app_base );               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :                   // NEARLY OBSOLETE!
+                          webapp_entries.entrySet()                                      // NEARLY OBSOLETE!
+                        )                                                                // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                webapp_name = webapp_entry.getKey();  // my_webapp                       // NEARLY OBSOLETE!
+                AVMNodeDescriptor avm_node    = webapp_entry.getValue();                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                if ( webapp_name.equalsIgnoreCase("META-INF")  ||                        // NEARLY OBSOLETE!
+                     webapp_name.equalsIgnoreCase("WEB-INF")                             // NEARLY OBSOLETE!
+                   )                                                                     // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    continue;                                                            // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                // In the future, it should be possible for different webapp             // NEARLY OBSOLETE!
+                // urls should resolve to different servers.                             // NEARLY OBSOLETE!
+                // http://<dns>.www--sandbox.version-v<vers>.<virtdomain>:<port>         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                String webapp_url_base = null;                                           // NEARLY OBSOLETE!
+                try                                                                      // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    webapp_url_base =                                                    // NEARLY OBSOLETE!
+                           store_url_base + (webapp_name.equals("ROOT") ? "" :           // NEARLY OBSOLETE!
+                           URLEncoder.encode( webapp_name, "UTF-8"));                    // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+                catch (Exception e) { /* UTF-8 is supported */ }                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                if  ( avm_node.isDirectory() )                                           // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    revalidateWebapp( store,                                             // NEARLY OBSOLETE!
+                                      version,                                           // NEARLY OBSOLETE!
+                                      true,           // is_latest_version               // NEARLY OBSOLETE!
+                                      store_attr_base,                                   // NEARLY OBSOLETE!
+                                      webapp_name,                                       // NEARLY OBSOLETE!
+                                      app_base + "/" + webapp_name,                      // NEARLY OBSOLETE!
+                                      webapp_url_base,                                   // NEARLY OBSOLETE!
+                                      md5,                                               // NEARLY OBSOLETE!
+                                      connect_timeout,                                   // NEARLY OBSOLETE!
+                                      read_timeout,                                      // NEARLY OBSOLETE!
+                                      progress                                           // NEARLY OBSOLETE!
+                                    );                                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                    // stats for monitoring                                              // NEARLY OBSOLETE!
+                    if ( progress != null )                                              // NEARLY OBSOLETE!
+                    {                                                                    // NEARLY OBSOLETE!
+                        progress.incrementWebappUpdateCount();                           // NEARLY OBSOLETE!
+                    }                                                                    // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  revalidateWebapp --                                                               // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    void revalidateWebapp( String  store,                                                // NEARLY OBSOLETE!
+                           int     version,                                              // NEARLY OBSOLETE!
+                           boolean is_latest_version,                                    // NEARLY OBSOLETE!
+                           String  store_attr_base,                                      // NEARLY OBSOLETE!
+                           String  webapp_name,                                          // NEARLY OBSOLETE!
+                           String  webapp_avm_base,                                      // NEARLY OBSOLETE!
+                           String  webapp_url_base,                                      // NEARLY OBSOLETE!
+                           MD5     md5,                                                  // NEARLY OBSOLETE!
+                           int     connect_timeout,                                      // NEARLY OBSOLETE!
+                           int     read_timeout,                                         // NEARLY OBSOLETE!
+                           HrefValidationProgress progress)                              // NEARLY OBSOLETE!
+         throws            SocketException, SSLException                                 // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        HashMap<String,String>  gen_url_cache   = new HashMap<String,String>();          // NEARLY OBSOLETE!
+        HashMap<String,String>  parsed_url_cache= new HashMap<String,String>();          // NEARLY OBSOLETE!
+        HashMap<Integer,String> status_cache    = new HashMap<Integer,String>();         // NEARLY OBSOLETE!
+        HashMap<String,String>  file_hdep_cache = new HashMap<String,String>();          // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // The following convention is used:                                             // NEARLY OBSOLETE!
+        //           version <==> (version - max - 2) %(max+2)                           // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // The only case that ever matters for now is that:                              // NEARLY OBSOLETE!
+        // -2 is an alias for the last snapshot                                          // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // Thus href attribute info for the  "last snapshot" of                          // NEARLY OBSOLETE!
+        // a store with the dns name:  preview.alice.mysite is                           // NEARLY OBSOLETE!
+        // stored within attribute service under the keys:                               // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        //      .href/mysite/alice/preview/|mywebapp/-2                                  // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // This allows entire projects and/or webapps to removed in 1 step               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Example:               ".href/mysite/|ROOT"                                   // NEARLY OBSOLETE!
+        String webapp_attr_base =  store_attr_base  +  "/|"  +  webapp_name;             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( ! attr_.exists( webapp_attr_base ) )                                        // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            attr_.setAttribute(store_attr_base, "|" + webapp_name,                       // NEARLY OBSOLETE!
+                               new MapAttributeValue());                                 // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String href_attr;                                                                // NEARLY OBSOLETE!
+        if ( ! is_latest_version ) // add key: .href/mysite/|mywebapp/latest/42          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // Because we're not validating the last snapshot,                           // NEARLY OBSOLETE!
+            // don't clobber "last snapshot" info.  Instead                              // NEARLY OBSOLETE!
+            // just make the href_attr info live under the                               // NEARLY OBSOLETE!
+            // version specified.                                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            //Example:  .href/mysite/|mywebapp/99                                        // NEARLY OBSOLETE!
+            attr_.setAttribute( webapp_attr_base , version,                              // NEARLY OBSOLETE!
+                                new MapAttributeValue() );                               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            //  href data uses the raw version key                                       // NEARLY OBSOLETE!
+            href_attr = webapp_attr_base +  "/" + version;                               // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        else                                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // Validating the latest snapshot.  Therefore, record the actual             // NEARLY OBSOLETE!
+            // LATEST_SNAPSHOT version info, but store data under the                    // NEARLY OBSOLETE!
+            // BASE_VERSION_ALIAS key ("-2") rather than the version number.             // NEARLY OBSOLETE!
+            // This make it possible to do incremental updates more easily               // NEARLY OBSOLETE!
+            // because we're not constantly shuffling data around from                   // NEARLY OBSOLETE!
+            // exlicit version key to explicit version key.                              // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            //Example:  .href/mysite/|mywebapp/latest -> version                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            attr_.setAttribute( webapp_attr_base ,                                       // NEARLY OBSOLETE!
+                                BASE_VERSION,                                            // NEARLY OBSOLETE!
+                                new IntAttributeValue( version )                         // NEARLY OBSOLETE!
+                              );                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            //Example:  .href/mysite/|mywebapp/-2                                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            attr_.setAttribute( webapp_attr_base ,  BASE_VERSION_ALIAS,                  // NEARLY OBSOLETE!
+                                new MapAttributeValue() );                               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            //  href data goes under the "-2" key:    .href/mysite/|myproject/-2         // NEARLY OBSOLETE!
+            href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;                    // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, SOURCE_TO_HREF, new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, HREF_TO_SOURCE, new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, HREF_TO_STATUS, new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, STATUS_TO_HREF, new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, MD5_TO_FILE,    new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, MD5_TO_HREF,    new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, HREF_TO_FDEP,   new MapAttributeValue());         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr, FILE_TO_HDEP,   new MapAttributeValue());         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Info for latest snapshot (42) of mywebapp within mysite is now:               // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/latest -> 42                                      // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/source_to_href/                                // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/href_to_source/                                // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/href_to_status/                                // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/status_to_href/                                // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/md5_to_file/                                   // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/md5_to_href/                                   // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/href_to_fdep/                                  // NEARLY OBSOLETE!
+        //      .href/mysite/|mywebapp/-2/file_to_hdep/                                  // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // Info for latest snapshot (42) of mywebapp within mysite/alice is now:         // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/latest -> 42                                // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/source_to_href/                          // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/href_to_source/                          // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/href_to_status/                          // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/status_to_href/                          // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/md5_to_file/                             // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/md5_to_href/                             // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/href_to_fdep/                            // NEARLY OBSOLETE!
+        //      .href/mysite/alice/|mywebapp/-2/file_to_hdep/                            // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // This makes it easy to delete an entire project or webapp.                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Find dead reconning URLs for every asset in the system:                       // NEARLY OBSOLETE!
+        validate_dir( version,                                                           // NEARLY OBSOLETE!
+                      webapp_avm_base,                                                   // NEARLY OBSOLETE!
+                      webapp_url_base,                                                   // NEARLY OBSOLETE!
+                      href_attr,                                                         // NEARLY OBSOLETE!
+                      md5,                                                               // NEARLY OBSOLETE!
+                      gen_url_cache,                                                     // NEARLY OBSOLETE!
+                      parsed_url_cache,                                                  // NEARLY OBSOLETE!
+                      status_cache,                                                      // NEARLY OBSOLETE!
+                      file_hdep_cache,                                                   // NEARLY OBSOLETE!
+                      connect_timeout,                                                   // NEARLY OBSOLETE!
+                      read_timeout,                                                      // NEARLY OBSOLETE!
+                      progress,                                                          // NEARLY OBSOLETE!
+                      0                                                                  // NEARLY OBSOLETE!
+                    );                                                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // stats for monitoring                                                          // NEARLY OBSOLETE!
+        if ( progress != null )                                                          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            progress.incrementDirUpdateCount();                                          // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Now all the generated URLs have had their status checked,                     // NEARLY OBSOLETE!
+        // but the parsed URLs from these files might not be yet.                        // NEARLY OBSOLETE!
+        // Pull on every URL that isn't currently in the gen_cache.                      // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for ( Map.Entry<String,String> entry  :  parsed_url_cache.entrySet() )           // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String  parsed_url_md5 = entry.getKey();                                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( gen_url_cache.containsKey( parsed_url_md5 ) )  // skip if this          // NEARLY OBSOLETE!
+            {                                                   // url validated         // NEARLY OBSOLETE!
+                continue;                                       // within the dir        // NEARLY OBSOLETE!
+            }                                                   // walking phase         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            String  parsed_url = entry.getValue();                                       // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            validate_url( parsed_url,                                                    // NEARLY OBSOLETE!
+                          parsed_url_md5,                                                // NEARLY OBSOLETE!
+                          href_attr,                                                     // NEARLY OBSOLETE!
+                          md5,                                                           // NEARLY OBSOLETE!
+                          parsed_url.startsWith( webapp_url_base ),                      // NEARLY OBSOLETE!
+                          status_cache,                                                  // NEARLY OBSOLETE!
+                          file_hdep_cache,                                               // NEARLY OBSOLETE!
+                          connect_timeout,                                               // NEARLY OBSOLETE!
+                          read_timeout                                                   // NEARLY OBSOLETE!
+                        );                                                               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+             // stats for monitoring                                                     // NEARLY OBSOLETE!
+             if ( progress != null )                                                     // NEARLY OBSOLETE!
+             {                                                                           // NEARLY OBSOLETE!
+                 progress.incrementUrlUpdateCount();                                     // NEARLY OBSOLETE!
+             }                                                                           // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( progress != null )                                                          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            progress.incrementWebappUpdateCount();  // for monitoring progress           // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  validate_dir --                                                                   // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    void validate_dir( int    version,                                                   // NEARLY OBSOLETE!
+                       String dir,                                                       // NEARLY OBSOLETE!
+                       String url_base,                                                  // NEARLY OBSOLETE!
+                       String href_attr,                                                 // NEARLY OBSOLETE!
+                       MD5    md5,                                                       // NEARLY OBSOLETE!
+                       Map<String,String>  gen_url_cache,                                // NEARLY OBSOLETE!
+                       Map<String,String>  parsed_url_cache,                             // NEARLY OBSOLETE!
+                       Map<Integer,String> status_cache,                                 // NEARLY OBSOLETE!
+                       Map<String,String>  file_hdep_cache,                              // NEARLY OBSOLETE!
+                       int    connect_timeout,                                           // NEARLY OBSOLETE!
+                       int    read_timeout,                                              // NEARLY OBSOLETE!
+                       HrefValidationProgress progress,                                  // NEARLY OBSOLETE!
+                       int    depth )                                                    // NEARLY OBSOLETE!
+         throws        SocketException, SSLException                                     // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        Map<String, AVMNodeDescriptor> entries = null;                                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Ensure that the virt server is virtualizing this version                      // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        try                                                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // e.g.:   42, "mysite:/www/avm_webapps/ROOT/moo"                            // NEARLY OBSOLETE!
+            entries = avm_.getDirectoryListing( version, dir );                          // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        catch (Exception e)     // TODO: just AVMNotFoundException ?                     // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            if ( log.isErrorEnabled() )                                                  // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                log.error("Could not list version: " + version +                         // NEARLY OBSOLETE!
+                         " of directory: " + dir + "  " + e.getMessage());               // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            return;                                                                      // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for ( Map.Entry<String, AVMNodeDescriptor> entry  : entries.entrySet() )         // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String            entry_name = entry.getKey();                               // NEARLY OBSOLETE!
+            AVMNodeDescriptor avm_node   = entry.getValue();                             // NEARLY OBSOLETE!
+            String            avm_path   = dir +  "/" + entry_name;                      // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( (depth == 0) &&                                                         // NEARLY OBSOLETE!
+                 (entry_name.equalsIgnoreCase("META-INF")  ||                            // NEARLY OBSOLETE!
+                  entry_name.equalsIgnoreCase("WEB-INF")                                 // NEARLY OBSOLETE!
+                 )                                                                       // NEARLY OBSOLETE!
+               )                                                                         // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                continue;                                                                // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // Don't index bogus files                                                   // NEARLY OBSOLETE!
+            if ( excluder_ != null && excluder_.matches( avm_path ))                     // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                continue;                                                                // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            String url_encoded_entry_name = null;                                        // NEARLY OBSOLETE!
+            try                                                                          // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                url_encoded_entry_name = URLEncoder.encode(entry_name, "UTF-8");         // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            catch (Exception e) { /* UTF-8 is supported */ }                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            String implicit_url = url_base  +  "/" + url_encoded_entry_name;             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if  ( avm_node.isDirectory() )                                               // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                validate_dir( version,                                                   // NEARLY OBSOLETE!
+                              avm_path,                                                  // NEARLY OBSOLETE!
+                              implicit_url,                                              // NEARLY OBSOLETE!
+                              href_attr,                                                 // NEARLY OBSOLETE!
+                              md5,                                                       // NEARLY OBSOLETE!
+                              gen_url_cache,                                             // NEARLY OBSOLETE!
+                              parsed_url_cache,                                          // NEARLY OBSOLETE!
+                              status_cache,                                              // NEARLY OBSOLETE!
+                              file_hdep_cache,                                           // NEARLY OBSOLETE!
+                              connect_timeout,                                           // NEARLY OBSOLETE!
+                              read_timeout,                                              // NEARLY OBSOLETE!
+                              progress,                                                  // NEARLY OBSOLETE!
+                              depth + 1 ) ;                                              // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                // stats for monitoring                                                  // NEARLY OBSOLETE!
+                if ( progress != null )                                                  // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    progress.incrementDirUpdateCount();                                  // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            else                                                                         // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                validate_file(                                                           // NEARLY OBSOLETE!
+                   avm_path,                                                             // NEARLY OBSOLETE!
+                   implicit_url,                                                         // NEARLY OBSOLETE!
+                   md5.digest(implicit_url.getBytes()),                                  // NEARLY OBSOLETE!
+                   href_attr,                                                            // NEARLY OBSOLETE!
+                   md5,                                                                  // NEARLY OBSOLETE!
+                   gen_url_cache,                                                        // NEARLY OBSOLETE!
+                   parsed_url_cache,                                                     // NEARLY OBSOLETE!
+                   status_cache,                                                         // NEARLY OBSOLETE!
+                   file_hdep_cache,                                                      // NEARLY OBSOLETE!
+                   connect_timeout,                                                      // NEARLY OBSOLETE!
+                   read_timeout,                                                         // NEARLY OBSOLETE!
+                   progress                                                              // NEARLY OBSOLETE!
+                );                                                                       // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                // stats for monitoring                                                  // NEARLY OBSOLETE!
+                if ( progress != null )                                                  // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    progress.incrementFileUpdateCount();                                 // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  validate_file --                                                                  // NEARLY OBSOLETE!
+    *                                                                                    // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    void validate_file( String                 avm_path,                                 // NEARLY OBSOLETE!
+                        String                 gen_url_str,                              // NEARLY OBSOLETE!
+                        String                 gen_url_md5,                              // NEARLY OBSOLETE!
+                        String                 href_attr,                                // NEARLY OBSOLETE!
+                        MD5                    md5,                                      // NEARLY OBSOLETE!
+                        Map<String,String>     gen_url_cache,                            // NEARLY OBSOLETE!
+                        Map<String,String>     parsed_url_cache,                         // NEARLY OBSOLETE!
+                        Map<Integer,String>    status_cache,                             // NEARLY OBSOLETE!
+                        Map<String,String>     file_hdep_cache,                          // NEARLY OBSOLETE!
+                        int                    connect_timeout,                          // NEARLY OBSOLETE!
+                        int                    read_timeout,                             // NEARLY OBSOLETE!
+                        HrefValidationProgress progress)                                 // NEARLY OBSOLETE!
+         throws         SocketException, SSLException                                    // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        String file_md5= md5.digest(avm_path.getBytes());                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        gen_url_cache.put(gen_url_md5,null);                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // A map from the href to the source files that contain it created               // NEARLY OBSOLETE!
+        // made as soon a new generated or parsed url is discovered.                     // NEARLY OBSOLETE!
+        // Because of how directories are traversed when generating urls,                // NEARLY OBSOLETE!
+        // in this function we can be certain that the href being processed              // NEARLY OBSOLETE!
+        // has never been generated before, but it may have been *parsed*                // NEARLY OBSOLETE!
+        // from an earlier file.                                                         // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // Therefore, a call to see if the HREF_TO_SOURCE key for this URL               // NEARLY OBSOLETE!
+        // exists can be avoided if parsed_url_cache already contains it.                // NEARLY OBSOLETE!
+        // Otherwise, we've got to do the actual 'exists' test.                          // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( ! parsed_url_cache.containsKey( gen_url_md5 )   &&                          // NEARLY OBSOLETE!
+             ! attr_.exists( href_attr      + "/" +                                      // NEARLY OBSOLETE!
+                             HREF_TO_SOURCE + "/" + gen_url_md5)                         // NEARLY OBSOLETE!
+           )                                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,                        // NEARLY OBSOLETE!
+                                gen_url_md5,                                             // NEARLY OBSOLETE!
+                                new MapAttributeValue()                                  // NEARLY OBSOLETE!
+                              );                                                         // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Claim the url to self "appears" in this source file                           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute(href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5,         // NEARLY OBSOLETE!
+                           file_md5,                                                     // NEARLY OBSOLETE!
+                           new BooleanAttributeValue( true )                             // NEARLY OBSOLETE!
+                          );                                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr + "/" + MD5_TO_FILE,                               // NEARLY OBSOLETE!
+                            file_md5,                                                    // NEARLY OBSOLETE!
+                            new StringAttributeValue( avm_path )                         // NEARLY OBSOLETE!
+                          );                                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        List<String> urls = validate_url( gen_url_str,                                   // NEARLY OBSOLETE!
+                                          gen_url_md5,                                   // NEARLY OBSOLETE!
+                                          href_attr,                                     // NEARLY OBSOLETE!
+                                          md5,                                           // NEARLY OBSOLETE!
+                                          true,     // get lookup dependencies           // NEARLY OBSOLETE!
+                                          status_cache,                                  // NEARLY OBSOLETE!
+                                          file_hdep_cache,                               // NEARLY OBSOLETE!
+                                          connect_timeout,                               // NEARLY OBSOLETE!
+                                          read_timeout);                                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // stats for monitoring                                                          // NEARLY OBSOLETE!
+        if ( progress != null )                                                          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            progress.incrementUrlUpdateCount();                                          // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( urls == null )                                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            return;                                                                      // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Collect list of hrefs contained by this source file                           // NEARLY OBSOLETE!
+        // If the generated URL is not already contained in the                          // NEARLY OBSOLETE!
+        // parsed URL list, add it.                                                      // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        MapAttribute  href_map_attrib_value  = new MapAttributeValue();                  // NEARLY OBSOLETE!
+        boolean       saw_gen_url            = false;                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for (String  response_url  : urls )                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String response_url_md5 = md5.digest(response_url.getBytes());               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( ! saw_gen_url && response_url_md5.equals( gen_url_md5) )                // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                saw_gen_url = true;                                                      // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            href_map_attrib_value.put( response_url_md5,                                 // NEARLY OBSOLETE!
+                                       new BooleanAttributeValue(true ));                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( ! parsed_url_cache.containsKey( response_url_md5 ) )                    // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                parsed_url_cache.put(response_url_md5, response_url);                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                if ( ! gen_url_cache.containsKey( response_url_md5 ) &&                  // NEARLY OBSOLETE!
+                     ! attr_.exists( href_attr      + "/" +                              // NEARLY OBSOLETE!
+                                     HREF_TO_SOURCE + "/" +                              // NEARLY OBSOLETE!
+                                     response_url_md5 )                                  // NEARLY OBSOLETE!
+                   )                                                                     // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,                // NEARLY OBSOLETE!
+                                        response_url_md5,                                // NEARLY OBSOLETE!
+                                        new MapAttributeValue()                          // NEARLY OBSOLETE!
+                                      );                                                 // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            attr_.setAttribute(                                                          // NEARLY OBSOLETE!
+                href_attr + "/" + HREF_TO_SOURCE  + "/" + response_url_md5 ,             // NEARLY OBSOLETE!
+                file_md5,                                                                // NEARLY OBSOLETE!
+                new BooleanAttributeValue( true ));                                      // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( ! saw_gen_url )                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            href_map_attrib_value.put( gen_url_md5,                                      // NEARLY OBSOLETE!
+                                       new BooleanAttributeValue( true ));               // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr + "/" + SOURCE_TO_HREF,                            // NEARLY OBSOLETE!
+                            file_md5,                                                    // NEARLY OBSOLETE!
+                            href_map_attrib_value                                        // NEARLY OBSOLETE!
+                          );                                                             // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
+    *  validate_url --                                                                   // NEARLY OBSOLETE!
+    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
+    List<String>  validate_url( String  url_str,                                         // NEARLY OBSOLETE!
+                                String  url_md5,                                         // NEARLY OBSOLETE!
+                                String  href_attr,                                       // NEARLY OBSOLETE!
+                                MD5     md5,                                             // NEARLY OBSOLETE!
+                                boolean get_lookup_dependencies,                         // NEARLY OBSOLETE!
+                                Map<Integer,String> status_cache,                        // NEARLY OBSOLETE!
+                                Map<String,String>  file_hdep_cache,                     // NEARLY OBSOLETE!
+                                int  connect_timeout,                                    // NEARLY OBSOLETE!
+                                int  read_timeout)                                       // NEARLY OBSOLETE!
+                  throws        SocketException, SSLException                            // NEARLY OBSOLETE!
+    {                                                                                    // NEARLY OBSOLETE!
+        HttpURLConnection conn = null;                                                   // NEARLY OBSOLETE!
+        URL               url  = null;                                                   // NEARLY OBSOLETE!
+        int               response_code;                                                 // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        try                                                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            url = new URL( url_str );                                                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // Oddly, url.openConnection() does not actually                             // NEARLY OBSOLETE!
+            // open a connection; it merely creates a connection                         // NEARLY OBSOLETE!
+            // object that is later opened via connect() within                          // NEARLY OBSOLETE!
+            // the HrefExtractor.                                                        // NEARLY OBSOLETE!
+            //                                                                           // NEARLY OBSOLETE!
+            conn = (HttpURLConnection) url.openConnection();                             // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        catch (Exception e )                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // You could have a bogus protocol or some other probem.                     // NEARLY OBSOLETE!
+            // For example:           <a href="sales@alfresco.com">woops</a>             // NEARLY OBSOLETE!
+            // Gives you              url_str="sales@alfresco.com"                       // NEARLY OBSOLETE!
+            // and exception msg: no protocol: sales@alfresco.com                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( log.isErrorEnabled() )                                                  // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                log.error("openConnection() cannot connect to :" + url_str );            // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // Rather than update the URL status just let it retain                      // NEARLY OBSOLETE!
+            // whatever status it had before, and assume this is                         // NEARLY OBSOLETE!
+            // an ephemeral network failure;  "ephemeral" here means                     // NEARLY OBSOLETE!
+            // "on all instances of this url for this validation."                       // NEARLY OBSOLETE!
+            //                                                                           // NEARLY OBSOLETE!
+            // TODO -- rethink this.                                                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            return null;                                                                 // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( get_lookup_dependencies )                                                   // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            conn.addRequestProperty(                                                     // NEARLY OBSOLETE!
+                CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, "true" );                   // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // "Infinite" timeouts that aren't really infinite                               // NEARLY OBSOLETE!
+        // are a bad idea in this context.  If it takes more                             // NEARLY OBSOLETE!
+        // than 15 seconds to connect or more than 60 seconds                            // NEARLY OBSOLETE!
+        // to read a response, give up.                                                  // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        HrefExtractor href_extractor = new HrefExtractor();                              // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        conn.setConnectTimeout( connect_timeout );  // e.g.:  10000 milliseconds         // NEARLY OBSOLETE!
+        conn.setReadTimeout(    read_timeout    );  // e.g.:  30000 milliseconds         // NEARLY OBSOLETE!
+        conn.setUseCaches( false );                 // handle caching manually           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( log.isDebugEnabled() )                                                      // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            log.debug("About to fetch: " + url_str );                                    // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        href_extractor.setConnection( conn );                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        try { response_code = conn.getResponseCode(); }                                  // NEARLY OBSOLETE!
+        catch ( SocketException se )                                                     // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // This could be either of two major problems:                               // NEARLY OBSOLETE!
+            //   java.net.SocketException                                                // NEARLY OBSOLETE!
+            //      java.net.ConnectException        likely: Server down                 // NEARLY OBSOLETE!
+            //      java.net.NoRouteToHostException  likely: firewall/router             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if  ( get_lookup_dependencies )   // If we're trying to get lookup           // NEARLY OBSOLETE!
+            {                                 // dependencies, this is a fatal           // NEARLY OBSOLETE!
+                throw se;                     // error fetching virtualized              // NEARLY OBSOLETE!
+            }                                 // content, so rethrow.                    // NEARLY OBSOLETE!
+            else                                                                         // NEARLY OBSOLETE!
+            {                                 // It's an external link, so               // NEARLY OBSOLETE!
+                response_code = 400;          // just call it a link failure.            // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        catch ( SSLException ssle )                                                      // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // SSL issues                                                                // NEARLY OBSOLETE!
+            if  ( get_lookup_dependencies )   // If we're trying to get lookup           // NEARLY OBSOLETE!
+            {                                 // dependencies, this is a fatal           // NEARLY OBSOLETE!
+                throw ssle;                   // error fetching virtualized              // NEARLY OBSOLETE!
+            }                                 // content, so rethrow.                    // NEARLY OBSOLETE!
+            else                                                                         // NEARLY OBSOLETE!
+            {                                 // It's an external link, so               // NEARLY OBSOLETE!
+                response_code = 400;          // just call it a link failure.            // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        catch (IOException ioe)                                                          // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // java.net.UnknownHostException                                             // NEARLY OBSOLETE!
+            // .. or other things, possibly due to a mist-typed url                      // NEARLY OBSOLETE!
+            // or other bad/interrupted request.                                         // NEARLY OBSOLETE!
+            //                                                                           // NEARLY OBSOLETE!
+            // Even if this is a local link, let's keep going.                           // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( log.isDebugEnabled() )                                                  // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                log.debug("Could not fetch response code: " + ioe.getMessage());         // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            response_code = 400;                // probably a bad request                // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( log.isDebugEnabled() )                                                      // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            log.debug("Response code for '" + url_str + "': " + response_code);          // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr + "/" + MD5_TO_HREF,                               // NEARLY OBSOLETE!
+                            url_md5,                                                     // NEARLY OBSOLETE!
+                            new StringAttributeValue( url_str )                          // NEARLY OBSOLETE!
+                          );                                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS,                            // NEARLY OBSOLETE!
+                            url_md5,                                                     // NEARLY OBSOLETE!
+                            new IntAttributeValue( response_code )                       // NEARLY OBSOLETE!
+                          );                                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Only initialize the response map if absoultely necessary                      // NEARLY OBSOLETE!
+        // Use the status_cache to eliminate calls to test existence                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( ! status_cache.containsKey( response_code ) )  // maybe necessary           // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            if ( ! attr_.exists( href_attr      + "/" +     // do actual remote          // NEARLY OBSOLETE!
+                                 STATUS_TO_HREF + "/" +     // call to see if            // NEARLY OBSOLETE!
+                                 response_code )            // this status key           // NEARLY OBSOLETE!
+               )                                            // must be created           // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                attr_.setAttribute( href_attr + "/" + STATUS_TO_HREF,                    // NEARLY OBSOLETE!
+                                    "" + response_code,                                  // NEARLY OBSOLETE!
+                                    new MapAttributeValue()                              // NEARLY OBSOLETE!
+                                  );                                                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            status_cache.put( response_code, null );        // never check again         // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute(                                                              // NEARLY OBSOLETE!
+                href_attr + "/" + STATUS_TO_HREF + "/" + response_code,                  // NEARLY OBSOLETE!
+                url_md5,                                                                 // NEARLY OBSOLETE!
+                new BooleanAttributeValue( true ));                                      // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        if ( ! get_lookup_dependencies  ||                                               // NEARLY OBSOLETE!
+             ( response_code < 200 || response_code >= 300)                              // NEARLY OBSOLETE!
+           )                                                                             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            // The remainder of this function deals with tracking lookup                 // NEARLY OBSOLETE!
+            // dependencies.  Because  we only care about the links that                 // NEARLY OBSOLETE!
+            // URL's page contains if we're tracking dependencies, do                    // NEARLY OBSOLETE!
+            // an early return here.                                                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            return null;                                                                 // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER                       // NEARLY OBSOLETE!
+        // in the response, to be paranoid deal with the possiblity that                 // NEARLY OBSOLETE!
+        // the information about what AVM files have been accessed is stored             // NEARLY OBSOLETE!
+        // in more than one of these headers (though it *should* be all in 1).           // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // Unfortunately, getHeaderFieldKey makes the name of the 0-th header            // NEARLY OBSOLETE!
+        // return null, "even though the 0-th header has a value".  Thus the             // NEARLY OBSOLETE!
+        // loop below is 1-based, not 0-based.                                           // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+        // "It's a madhouse! A madhouse!"                                                // NEARLY OBSOLETE!
+        //            -- Charton Heston playing the character "George Taylor"            // NEARLY OBSOLETE!
+        //               Planet of the Apes, 1968                                        // NEARLY OBSOLETE!
+        //                                                                               // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        ArrayList<String> dependencies = new ArrayList<String>();                        // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        String header_key = null;                                                        // NEARLY OBSOLETE!
+        for (int i=1; (header_key = conn.getHeaderFieldKey(i)) != null; i++)             // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            if (!header_key.equals(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER))         // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                continue;                                                                // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            String header_value = null;                                                  // NEARLY OBSOLETE!
+            try                                                                          // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                header_value =                                                           // NEARLY OBSOLETE!
+                    URLDecoder.decode( conn.getHeaderField(i), "UTF-8");                 // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+            catch (Exception e)                                                          // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                if ( log.isErrorEnabled() )                                              // NEARLY OBSOLETE!
+                {                                                                        // NEARLY OBSOLETE!
+                    log.error("Skipping undecodable response header: " +                 // NEARLY OBSOLETE!
+                              conn.getHeaderField(i));                                   // NEARLY OBSOLETE!
+                }                                                                        // NEARLY OBSOLETE!
+                continue;                                                                // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            // Each lookup dependency header consists of a comma-separated               // NEARLY OBSOLETE!
+            // list file names.                                                          // NEARLY OBSOLETE!
+            String [] lookup_dependencies = header_value.split(", *");                   // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            for (String dep : lookup_dependencies )                                      // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                dependencies.add( dep );                                                 // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        // Now "dependencies" contains a list of all                                     // NEARLY OBSOLETE!
+        // files upon which url_str URL depends.                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        MapAttribute fdep_map_attrib_value = new MapAttributeValue();                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        for (String file_dependency : dependencies )                                     // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            String fdep_md5 = md5.digest(file_dependency.getBytes());                    // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            if ( ! file_hdep_cache.containsKey( fdep_md5 ) )                             // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP,                      // NEARLY OBSOLETE!
+                                    fdep_md5,                                            // NEARLY OBSOLETE!
+                                    new MapAttributeValue()                              // NEARLY OBSOLETE!
+                                  );                                                     // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                file_hdep_cache.put( fdep_md5, null );                                   // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP + "/" + fdep_md5,         // NEARLY OBSOLETE!
+                                url_md5,                                                 // NEARLY OBSOLETE!
+                                new BooleanAttributeValue( true )                        // NEARLY OBSOLETE!
+                              );                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+            fdep_map_attrib_value.put( fdep_md5,                                         // NEARLY OBSOLETE!
+                                       new BooleanAttributeValue( true ));               // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        attr_.setAttribute( href_attr + "/" + HREF_TO_FDEP,                              // NEARLY OBSOLETE!
+                            url_md5,                                                     // NEARLY OBSOLETE!
+                            fdep_map_attrib_value                                        // NEARLY OBSOLETE!
+                          );                                                             // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+                                                                                         // NEARLY OBSOLETE!
+        List<String> extracted_hrefs = null;                                             // NEARLY OBSOLETE!
+        try                                                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            extracted_hrefs = href_extractor.extractHrefs();                             // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        catch (Exception e)                                                              // NEARLY OBSOLETE!
+        {                                                                                // NEARLY OBSOLETE!
+            if ( log.isErrorEnabled() )                                                  // NEARLY OBSOLETE!
+            {                                                                            // NEARLY OBSOLETE!
+                log.error("Could not parse: " + url_str );                               // NEARLY OBSOLETE!
+            }                                                                            // NEARLY OBSOLETE!
+        }                                                                                // NEARLY OBSOLETE!
+        return extracted_hrefs;                                                          // NEARLY OBSOLETE!
+    }                                                                                    // NEARLY OBSOLETE!
+}                                                                                        // NEARLY OBSOLETE!

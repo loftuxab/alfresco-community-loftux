@@ -65,6 +65,7 @@ public class HrefValidatorTest extends TestCase
 {
     private static FileSystemXmlApplicationContext Context_ = null;
     private static AVMRemote              AvmSvc_;
+    private static AttributeService       Attrib_;
     private static int                    TestMethodsLeft_;
     private static LinkValidationService  LinkValidation_;
     private static VirtServerRegistry     VirtServerRegistry_;
@@ -85,7 +86,8 @@ public class HrefValidatorTest extends TestCase
 
             if ( catalina_base == null || catalina_base.equals("") )
             {
-                System.setProperty("catalina.base", System.getenv("VIRTUAL_TOMCAT_HOME" ) );
+                System.setProperty("catalina.base", 
+                                   System.getenv("VIRTUAL_TOMCAT_HOME" ) );
             }
 
             Context_ = new FileSystemXmlApplicationContext(
@@ -102,8 +104,10 @@ public class HrefValidatorTest extends TestCase
 
             // In a live system, it's the virt server that fetches its info:
 
-            VirtServerRegistry_      = (VirtServerRegistry) Context_.getBean("VirtServerRegistry");
-            VirtServerInfo virt_info = (VirtServerInfo) Context_.getBean("virtServerInfo");
+            VirtServerRegistry_      = 
+                (VirtServerRegistry) Context_.getBean("VirtServerRegistry");
+            VirtServerInfo virt_info = 
+                (VirtServerInfo) Context_.getBean("virtServerInfo");
             int    virt_port         = virt_info.getVirtServerHttpPort();
             String virt_domain       = virt_info.getVirtServerDomain();
             String virt_jmx_url      = "service:jmx:rmi://ignored/jndi/rmi://" +
@@ -126,11 +130,12 @@ public class HrefValidatorTest extends TestCase
             // the code will look the same (i.e.: it does not need to know that
             // the virt server registration was faked from within this test).
 
-            LinkValidation_ =  (LinkValidationService) Context_.getBean("LinkValidationService");
+            LinkValidation_ =  (LinkValidationService) 
+                               Context_.getBean("LinkValidationService");
 
             // Get the authentication service.
             AuthenticationService authService =
-                (AuthenticationService)Context_.getBean("authenticationService");
+               (AuthenticationService)Context_.getBean("authenticationService");
 
             // Get the info bean for the user name and password.
 
@@ -147,6 +152,18 @@ public class HrefValidatorTest extends TestCase
             ((ClientTicketHolder)
              (Context_.getBean("clientTicketHolder"))
             ).setTicket(authService.getCurrentTicket());
+
+            Attrib_ =  (AttributeService) Context_.getBean("attributeService"); 
+
+            // Start with a blank slate.
+            try 
+            {
+                Attrib_.removeAttribute("", LinkValidationServiceImpl.HREF);
+            }
+            catch (Exception e)
+            { 
+                /* If HREF data wan't there, that's ok */
+            }
         }
     }
 
@@ -172,201 +189,236 @@ public class HrefValidatorTest extends TestCase
     */
     public void testOnestore()
     {
-         Map<String, Map<QName, PropertyValue>> store_staging_main_entries = 
-             AvmSvc_.queryStoresPropertyKey( SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
-        
-         for ( Map.Entry<String, Map<QName, PropertyValue>> store_staging_main_entry  :
-               store_staging_main_entries.entrySet() 
-             )
-         {
-             String  store_name  = store_staging_main_entry.getKey();
+        //         Map<String, Map<QName, PropertyValue>> store_staging_main_entries = 
+        //             AvmSvc_.queryStoresPropertyKey( 
+        //                SandboxConstants.PROP_SANDBOX_STAGING_MAIN );
+        //        
+        //         
+        //         for ( Map.Entry<String, Map<QName, PropertyValue>> 
+        //               store_staging_main_entry  :
+        //               store_staging_main_entries.entrySet() 
+        //             )
+        //         {
+        //             String  store_name  = store_staging_main_entry.getKey();
+        //             // ...
+        //         }
 
-             // NEON -  remove asap
-             HrefValidationProgress progress = new HrefValidationProgress();
-             
-             if (  //   false
-                        true
-                )
-             {
-                 try 
-                 {
-                     LinkValidation_.updateHrefInfo( 
-                         store_name,                    // store to update hrefs
-                         false,                         // false = not incremental
-                         10000,                         // connect timeout (ms)
-                         30000,                         // read timeout (ms)
-                         5,                             // thread count
-                         progress                  // status monitor
-                     );
-                 }
-                 catch (Exception e)
-                 {
-                     System.out.println(
-                        "LinkValidation_.updateHrefInfo failed: " + e.getMessage());
+        String store_name = "test";    // NEON: hard coding for now
 
-                     // Try another webapp
-                     continue;
+        for (int i = 0; i<2; i++)
+        {
 
-                 }
-             }
+            // NEON -  remove asap
+            HrefValidationProgress progress = new HrefValidationProgress();
+            
+            try 
+            {
+                LinkValidation_.updateHrefInfo( 
+                    store_name,                 // store to update hrefs
+                    true,                       // false = not incremental
+                    true,                       // validate external
+                    10000,                      // connect timeout (ms)
+                    30000,                      // read timeout (ms)
+                    5,                          // thread count
+                    progress                    // status monitor
+                );
+            }
+            catch (Exception e)
+            {
+                System.out.println(
+                   "LinkValidation_.updateHrefInfo failed:  " + 
+                     e.getClass().getName() + "  msg: " +  e.getMessage());
 
-             System.out.println("Webapps updated: " + 
-                                progress.getWebappUpdateCount() );
-
-             System.out.println("Dirs updated: " + 
-                                progress.getDirUpdateCount() );
-
-             System.out.println("Files updated: " + 
-                                progress.getFileUpdateCount() );
-
-             System.out.println("Distinct URLs updated: " + 
-                                progress.getUrlUpdateCount() );
-
-             List<HrefConcordanceEntry> href_conc;
-
-             // OK  (200)
-             // href_conc = LinkValidation_.getHrefConcordanceEntries( store_name, 200, 200);
-             //
-             // Success (2xx)
-             // href_conc =  LinkValidation_.getHrefConcordanceEntries( store_name, 200, 299 );
-             //
-             // Error (400-500)
-             // href_conc = LinkValidation_.getHrefConcordanceEntries( store_name, 400, 599 );
-             //
-             // Same as Error case above.
-
-             long start, end;
-
-             start = System.currentTimeMillis();
-             href_conc = LinkValidation_.getBrokenHrefConcordanceEntries( store_name );
-             end = System.currentTimeMillis();
-
-             System.out.println(
-                 "\n\n------------------- Broken Hrefs Concordance  "  +
-                 "(time in ms: " +  (end - start ) + " )" );
-                                
-
-             for (HrefConcordanceEntry conc_entry : href_conc )
-             {
-                 System.out.println( 
-                     "Status: " + conc_entry.getResponseStatus() + "  " +
-                                  conc_entry.getHref());
-
-                 String [] locations = conc_entry.getLocations();
-
-                 for ( String location : locations )
-                 {
-                     System.out.println("        " + location);
-                 }
-             }
+                e.printStackTrace();
 
 
+                // Try another webapp
+                continue;
 
-             start = System.currentTimeMillis();
-
-             List<HrefManifestEntry> file_href_manifests = 
-                   LinkValidation_.getBrokenHrefManifestEntries(  store_name );
-                // LinkValidation_.getHrefManifestEntries(        store_name,  400, 599 );
-
-             end = System.currentTimeMillis();
-
-             System.out.println(
-                 "\n\n------------------- Broken Hrefs manifests  "  +
-                 "(time in ms: " +  (end - start ) + " )" );
-
-             for ( HrefManifestEntry manifest : file_href_manifests )
-             {
-                 System.out.println("File: "  + manifest.getFileName() );
-                 List<String> hrefs = manifest.getHrefs();
-
-                 for (String href : hrefs )
-                 {
-                     System.out.println("      "  + href );
-                 }
-             }
-             System.out.println("Time:  " + (end - start) );
-
-             String index_html = "mysite:/www/avm_webapps/ROOT/products/ecm/comparison/index.html";
+            }
 
 
-              // -1, "mysite:/www/avm_webapps/ROOT",
-              // progress
+            System.out.println("Webapps updated: " + 
+                               progress.getWebappUpdateCount() );
 
-             progress = new HrefValidationProgress();
+            System.out.println("Dirs updated: " + 
+                               progress.getDirUpdateCount() );
 
-             HrefDifference href_diff = null;
-             try 
-             {
-                 href_diff = LinkValidation_.getHrefDifference( 
-                                "mysite--alice:/www/avm_webapps/ROOT",
-                                "mysite:/www/avm_webapps/ROOT",
-                                10000,
-                                30000,  
-                                5,
-                                progress);
-             }
-             catch (LinkValidationAbortedException e)
-             {
-                 // Won't happen here.
-                 System.out.println(
-                         "LinkValidation_.getHrefDifference aborted: " + e.getMessage());
- 
-                 continue;
-             }
-             catch (Exception e)
-             {
-                 // AVMNotFoundException,
-                 // SocketException,
-                 // SSLException,
-                 // LinkValidationAbortedException
-                 
-                 System.out.println(
-                         "LinkValidation_.getHrefDifference failed: " + e.getMessage());
-                 
-                 // Try another webapp
-                 continue;
-             }
+            System.out.println("Files updated: " + 
+                               progress.getFileUpdateCount() );
+
+            System.out.println("Distinct URLs updated: " + 
+                               progress.getUrlUpdateCount() );
+
+            List<HrefConcordanceEntry> href_conc;
+
+            // OK  (200)
+            // href_conc = LinkValidation_.getHrefConcordanceEntries( 
+            //                                 store_name, 200, 200);
+            //
+            // Success (2xx)
+            // href_conc =  LinkValidation_.getHrefConcordanceEntries( 
+            //                                 store_name, 200, 299 );
+            //
+            // Error (400-500)
+            // href_conc = LinkValidation_.getHrefConcordanceEntries( 
+            //                                 store_name, 400, 599 );
+            //
+            // Same as Error case above.
+
+            long start, end;
+
+            start = System.currentTimeMillis();
+            href_conc = LinkValidation_.getBrokenHrefConcordanceEntries( 
+                                               store_name );
+
+            end = System.currentTimeMillis();
+
+
+            //             System.out.println(
+            //                 "\n\n------------------- Broken Hrefs Concordance  "  +
+            //                 "(time in ms: " +  (end - start ) + " )" );
+            //                                
+            //
+            //             for (HrefConcordanceEntry conc_entry : href_conc )
+            //             {
+            //                 System.out.println( 
+            //                     "Status: " + conc_entry.getResponseStatus() + "  " +
+            //                                  conc_entry.getHref());
+            //
+            //                 String [] locations = conc_entry.getLocations();
+            //
+            //                 for ( String location : locations )
+            //                 {
+            //                     System.out.println("        " + location);
+            //                 }
+            //             }
 
 
 
-             // Show what is broken due to deleted files
-             System.out.println("\n\nFiles containing URLs broken due to deletion:");
+            start = System.currentTimeMillis();
 
-             HrefManifest broken_by_deletion    = 
-                          LinkValidation_.getHrefManifestBrokenByDelete(href_diff);
+            List<HrefManifestEntry> file_href_manifests = 
+                  LinkValidation_.getBrokenHrefManifestEntries(  store_name );
 
-             for ( HrefManifestEntry manifest_entry : 
-                   broken_by_deletion.getManifestEntries() 
-                  )
-             {
-                 System.out.println("\nFile:  " +  manifest_entry.getFileName() );
-                 for ( String broken_href :  manifest_entry.getHrefs() )
-                 {
-                     System.out.println("       " +  broken_href);
-                 }
-             }
+            end = System.currentTimeMillis();
+
+            System.out.println(
+                "\n\n------------------- Broken Hrefs manifests in STAGING "  +
+                "(time in ms: " +  (end - start ) + " )" );
+
+            for ( HrefManifestEntry manifest : file_href_manifests )
+            {
+                System.out.println("File: "  + manifest.getFileName() );
+                List<String> hrefs = manifest.getHrefs();
+
+                for (String href : hrefs )
+                {
+                    System.out.println("      "  + href );
+                }
+            }
+            System.out.println("Time:  " + (end - start) );
+
+            String index_html = 
+             "mysite:/www/avm_webapps/ROOT/products/ecm/comparison/index.html";
 
 
-             // Show what is broken within new mods:
-             System.out.println("\n\nFiles containing URLs broken in new/modified files:");
-             HrefManifest broken_in_newmod = 
-                          LinkValidation_.getHrefManifestBrokenByNewOrMod(href_diff);
+             // -1, "mysite:/www/avm_webapps/ROOT",
+             // progress
 
-             for ( HrefManifestEntry manifest_entry : 
-                   broken_in_newmod.getManifestEntries() 
-                  )
-             {
-                 System.out.println("\nFile:  " +  manifest_entry.getFileName() );
-                 for ( String broken_href :  manifest_entry.getHrefs() )
-                 {
-                     System.out.println("       " +  broken_href);
-                 }
-             }
+            progress = new HrefValidationProgress();
 
-             // LinkValidation_.mergeHrefDiff( href_diff);
+            HrefDifference href_diff = null;
+            try 
+            {
+                href_diff = LinkValidation_.getHrefDifference( 
+                               store_name  +  "--alice:/www/avm_webapps/ROOT",
+                               store_name  +  ":/www/avm_webapps/ROOT",
+                               10000,
+                               30000,  
+                               5,
+                               progress);
+            }
+            catch (LinkValidationAbortedException e)
+            {
+                // Won't happen here.
+                System.out.println(
+                        "LinkValidation_.getHrefDifference aborted: " + 
+                        e.getMessage());
+     
+                continue;
+            }
+            catch (Exception e)
+            {
+                // AVMNotFoundException,
+                // SocketException,
+                // SSLException,
+                // LinkValidationAbortedException
+                
+                System.out.println(
+                        "LinkValidation_.getHrefDifference failed:  " + 
+                         e.getClass().getName() + "  msg: " +  e.getMessage());
 
-             // Just test the first store... that's enough.
-             break;
-         }
+                e.printStackTrace();
+                
+                // Try another webapp
+                continue;
+            }
+
+
+
+            // Show what is broken due to deleted files
+            System.out.println("\n\n--------------------------------------\n");
+            System.out.println(
+               "\n\nMainfest broken by delete from WORKAREA:\n\n");
+
+            HrefManifest broken_by_deletion    = 
+               LinkValidation_.getHrefManifestBrokenByDelete(href_diff);
+
+            for ( HrefManifestEntry manifest_entry : 
+                  broken_by_deletion.getManifestEntries() 
+                 )
+            {
+                System.out.println("\nFile:  " + manifest_entry.getFileName());
+                for ( String broken_href :  manifest_entry.getHrefs() )
+                {
+                    System.out.println("       " +  broken_href);
+                }
+            }
+
+
+            // Show what is broken within new mods:
+            System.out.println("\n\n--------------------------------------\n");
+            System.out.println(
+               "\n\nMainfest broken by new/modified files in WORKAREA:\n\n");
+
+            HrefManifest broken_in_newmod = 
+               LinkValidation_.getHrefManifestBrokenByNewOrMod(href_diff);
+
+            for ( HrefManifestEntry manifest_entry : 
+                  broken_in_newmod.getManifestEntries() 
+                 )
+            {
+                System.out.println("\nFile:  " + manifest_entry.getFileName());
+                for ( String broken_href :  manifest_entry.getHrefs() )
+                {
+                    System.out.println("       " +  broken_href);
+                }
+            }
+
+
+            if ( i == 0 )
+            {
+                System.out.println("\n\n----------------------------------");
+                System.out.println("-----Sleeping for 30 sec...-------");
+                System.out.println("----------------------------------\n\n");
+
+                try { Thread.sleep( 30000 ); }
+                catch (Exception te ) 
+                { 
+                    System.out.println("trouble sleeping.. " + te.getMessage());
+                }
+            }
+        }
     }
 }
