@@ -66,13 +66,15 @@
 
    <target name="set-build-number" 
            depends="init" 
-           if="build.number">
+           if="alf.build.number">
       <exec executable="svn">
          <arg line="revert ${dir.project.repository.config}/alfresco/version.properties"/>
       </exec>
       <replace file="${dir.project.repository.config}/alfresco/version.properties" 
                token="@build-number@" 
-               value="${build.number}" />
+               value="${alf.build.number}" 
+               summary="yes" />
+      <echo>Set build number to ${alf.build.number} in ${dir.project.repository.config}/alfresco/version.properties</echo>
    </target>
 
    <target name="set-build-number-cc" 
