@@ -46,7 +46,9 @@ import org.htmlparser.util.ParserException;
 import org.htmlparser.util.SimpleNodeIterator;
 
 /**
-*  Given an HREF, extracts links from "A" and "IMG" nodes.
+*  Given an HREF, extracts links from "A" and "IMG" nodes,
+*  and forcing all hostnames and protocols to lower-case
+*  (this makes map-based caching more effective).
 */
 public class HrefExtractor 
 {
@@ -95,14 +97,42 @@ public class HrefExtractor
             Tag node = (Tag) iter.nextNode();
             if  ( "A".equals( node.getTagName() ) )
             {
-                hrefs.add( ((LinkTag)node).getLink() );
+                hrefs.add( lowercase_hostname( ((LinkTag)node).getLink()));
             }
             else
             {
-                hrefs.add( ((ImageTag)node).getImageURL() );
+                hrefs.add( lowercase_hostname( ((ImageTag)node).getImageURL()));
             }
         }
         return hrefs;
+    }
+
+    /*-------------------------------------------------------------------------
+    *   Ensure hostname & protocol are in lower-case.
+    *------------------------------------------------------------------------*/
+    String lowercase_hostname( String raw_url )
+    {
+        // Incoming URLs will look like this:  "http://mooCow.com"
+        //                                or:  "http://mooCow.com/"
+        //                                or:  "http://mooCow.com:999"
+        //                                or:  "http://mooCow.com:999/..."
+
+        if  (raw_url == null ) { return null; }
+
+        int slash_1 = raw_url.indexOf('/');
+        if ( slash_1 < 0) { return raw_url;}
+
+        int slash_2 = raw_url.indexOf('/', slash_1 + 1);
+        if ( slash_2 < 0) { return raw_url;}
+
+        int end_hostport =  raw_url.indexOf('/', slash_2 + 1);
+
+        int raw_url_length = raw_url.length();
+
+        if ( end_hostport < 0) { end_hostport = raw_url_length; }
+
+        return raw_url.substring(0, end_hostport).toLowerCase() +
+               raw_url.substring(end_hostport, raw_url_length);
     }
 
     public static void main(String[] argv) 
