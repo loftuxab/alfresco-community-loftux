@@ -38,6 +38,7 @@
            depends="clean-continuous, 
                     clean, 
                     -reset-database, 
+                    set-build-number,
                     init-test, 
                     test, 
                     distribute" />
