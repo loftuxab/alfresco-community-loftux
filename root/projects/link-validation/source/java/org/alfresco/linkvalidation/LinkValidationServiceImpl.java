@@ -415,45 +415,27 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             try
             {
                 RetryingTransactionHelper.RetryingTransactionCallback<Object> 
-                callback = new 
-                RetryingTransactionHelper.RetryingTransactionCallback<Object>()
-                {
-                    public String execute() throws Throwable
-                    {
-                        try 
-                        {
-                            updateHrefInfo( webappPath,
-                                            incremental,
-                                            validateExternal,
-                                            readTimeout,
-                                            connectTimeout,
-                                            nthreads,
-                                            progress);
-                        }
-                        catch (Exception  ex)
-                        {
-                            StringWriter string_writer = new StringWriter();
-                            PrintWriter print_writer   = new PrintWriter(string_writer);
-                            ex.printStackTrace(print_writer);
-
-                            log.error( "Threw exception within execute() method of " +
-                                       "txn helper... Exception class:  " + 
-                                       ex.getClass().getName() + 
-                                       ":  " + ex.getMessage() + 
-                                       "\n" + string_writer.toString() );
-
-                            throw ex;
-                        }
-
-                        return null;
-                    }
-                };
+                callback = new RetryingTransactionHelper.
+                               RetryingTransactionCallback<Object>()
+                               {
+                                   public String execute() throws Throwable
+                                   {
+                                           updateHrefInfo( webappPath,
+                                                           incremental,
+                                                           validateExternal,
+                                                           readTimeout,
+                                                           connectTimeout,
+                                                           nthreads,
+                                                           progress);
+                                       return null;
+                                   }
+                               };
         
                 transaction_helper_.doInTransaction(callback);
             }
             catch (Exception e)
             {
-                if ( log.isErrorEnabled() )
+                if ( log.isDebugEnabled() )
                 {
                     // After all these years, there's still no easy 
                     // method to print a stack trace into a string.
@@ -463,13 +445,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     PrintWriter print_writer   = new PrintWriter(string_writer);
                     e.printStackTrace(print_writer);
 
-                    log.error( "Exception class:  " + e.getClass().getName() + 
+                    log.debug( "Exception class:  " + e.getClass().getName() + 
                                ":  " + e.getMessage() + 
                                "\n" + string_writer.toString() );
                 }
                 
-                if ( log.isDebugEnabled() )
-                    log.debug("Could not validate links.  Retrying");
+                if ( log.isInfoEnabled() )
+                    log.info("Could not validate links.  Retrying");
             }
             finally
             {

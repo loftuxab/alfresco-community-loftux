@@ -256,7 +256,9 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
 
         if ( getVirtServerJmxUrl() == null )
         { 
-            log.error("No virtualization servers have registered as listeners");
+            if ( log.isWarnEnabled() )
+                log.warn("No virtualization servers have registered as listeners");
+
             return false ; 
         }
 
