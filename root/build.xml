@@ -11,7 +11,24 @@
 
    <target name="init">
       <property environment="env" />
-      <property file="${user.home}/user-override.properties" />
+
+      <!-- 
+            On UNIX, it's considered very poor form to dump a config file that
+            does not start with "." into the user's $HOME directory.  
+
+            On Windows, it's a bit more debatable, but in any event Alfresco 
+            config files should always start with "alfresco-...", so the current
+            prop file convention needs to be fixed no matter how you slice it.  
+            The conditional below is intended to make the transition more graceful 
+            until we re-work the build.  
+      -->
+      <condition property = "alfresco.user.override.properties.file"
+                 value    = "${user.home}/.alfresco-user-override.properties"
+                 else     = "${user.home}/user-override.properties">
+          <available file = "${user.home}/.alfresco-user-override.properties"/>
+      </condition>
+      <property file      = "${alfresco.user.override.properties.file}" />
+
       <property file="${basedir}/projects/repository/config/alfresco/version.properties" />
       <property file="${basedir}/build.properties" />
 
