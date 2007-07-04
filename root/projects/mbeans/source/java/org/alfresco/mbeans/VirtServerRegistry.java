@@ -77,7 +77,8 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     //
     public VirtServerRegistry() 
     {
-        log.info("--------------Creating VirtServerRegistry MBean");
+        if ( log.isInfoEnabled() )
+            log.info("--------------Creating VirtServerRegistry MBean");
     }
 
 
@@ -101,8 +102,10 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
         }
         catch (Exception e)
         {
-            log.error(
-              "Could not find password file for remote virtualization server",e);
+            if ( log.isErrorEnabled() )
+                log.error(
+                  "Could not find password file for " + 
+                  "remote virtualization server",e);
         }
     }
 
@@ -165,14 +168,16 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
         try { jmxServiceUrl_ = new JMXServiceURL( virtServerJmxUrl_ ); }
         catch (Exception e)
         {
-            log.error("Could not create JMXServiceURL from: " + virtServerJmxUrl_);
+            if ( log.isErrorEnabled() )
+                log.error("Could not create JMXServiceURL from: " + 
+                           virtServerJmxUrl_);
+
             jmxServiceUrl_ = null;
         }
         return jmxServiceUrl_;
     }
     
     public String getVirtServerJmxUrl()                  { return virtServerJmxUrl_; }
-
 
     /**
     *  Notifies remote listener that a AVM-based webapp has been updated;
@@ -187,7 +192,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                     <p>
     *
     * @param pathToWebapp The full AVM path to the webapp being updated.
-    *                     For example:  repoName:/www/avm_webapps/your_webapp
+    *                     For example:  storeName:/www/avm_webapps/your_webapp
     *                     <p>
     *
     * @param isRecursive  When true, update all webapps that depend on this one.
@@ -204,11 +209,51 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                   
     */
     public boolean 
-    updateAllWebapps(int version,  String pathToWebapp, boolean isRecursive )
+    updateWebapp(int version,  String pathToWebapp, boolean isRecursive )
+    {
+        return jmxRmiWebappNotification( "updateVirtualWebapp",
+                                          version,
+                                          pathToWebapp,
+                                          isRecursive
+                                       );
+    }
+
+    /**
+    *  Notifies remote listener that a AVM-based webapp has been updated;
+    *  an "update" is any change to (or creation of) contents within
+    *  WEB-INF/classes  WEB-INF/lib, WEB-INF/web.xml of a webapp.
+    *
+    * @param version      The version of the webapp being updated.
+    *                     Typically, this is set to -1, which corresponds
+    *                     to the very latest version ("HEAD").
+    *                     If versinon != -1, you might want to consider
+    *                     setting the 'isRecursive' parameter to false.
+    *                     <p>
+    *
+    * @param path         The full AVM path to the webapp(s) being updated.
+    *                     For example:  storeName:/www/avm_webapps/your_webapp
+    *                     or:           storeName:/www/avm_webapps
+    *                     <p>
+    *
+    * @param isRecursive  When true, update all webapps that depend on this one.
+    *                     For example, an author's webapps share jar/class files
+    *                     with the master version in staging; thus, the author's
+    *                     webapp "depends" on the webapp in staging.   Similarly,
+    *                     webapps in an author's preview area depend on the ones
+    *                     in the "main" layer of the author's sandbox.   
+    *                     You might wish to set this parameter to 'false' if 
+    *                     the goal is to bring a non-HEAD version of a staging 
+    *                     area online, without forcing the virtualization server 
+    *                     to load all the author sandboxes for this archived 
+    *                     version as well.
+    *                   
+    */
+    public boolean 
+    updateAllWebapps(int version,  String path, boolean isRecursive )
     {
         return jmxRmiWebappNotification( "updateAllVirtualWebapps",
                                           version,
-                                          pathToWebapp,
+                                          path,
                                           isRecursive
                                        );
     }
@@ -224,7 +269,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                     <p>
     *
     * @param pathToWebapp The full AVM path to the webapp being removed.
-    *                     For example:  repoName:/www/avm_webapps/your_webapp
+    *                     For example:  storeName:/www/avm_webapps/your_webapp
     *                     <p>
     *
     * @param isRecursive  When true, remove all webapps that depend on this one.
@@ -240,11 +285,49 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     *                     version as well.
     */
     public boolean 
-    removeAllWebapps(int version, String pathToWebapp, boolean isRecursive )
+    removeWebapp(int version, String pathToWebapp, boolean isRecursive )
+    {
+        return jmxRmiWebappNotification( "removeVirtualWebapp",
+                                          version,
+                                          pathToWebapp,
+                                          isRecursive
+                                       );
+    }
+
+
+    /**
+    *  Notifies remote listener that a AVM-based webapp has been removed.
+    *
+    * @param version      The version of the webapp being removed.
+    *                     Typically, this is set to -1, which corresponds
+    *                     to the very latest version ("HEAD").
+    *                     If versinon != -1, you might want to consider
+    *                     setting the 'isRecursive' parameter to false.
+    *                     <p>
+    *
+    * @param path         The full AVM path to the webapp(s) being removed.
+    *                     For example:  storeName:/www/avm_webapps/your_webapp
+    *                              or:  storeName:/www/avm_webapps
+    *                     <p>
+    *
+    * @param isRecursive  When true, remove all webapps that depend on this one.
+    *                     For example, an author's webapps share jar/class files
+    *                     with the master version in staging; thus, the author's
+    *                     webapp "depends" on the webapp in staging.   Similarly,
+    *                     webapps in an author's preview area depend on the ones
+    *                     in the "main" layer of the author's sandbox.   
+    *                     You might wish to set this parameter to 'false' if 
+    *                     the goal is to bring a non-HEAD version of a staging 
+    *                     area online, without forcing the virtualization server 
+    *                     to load all the author sandboxes for this archived 
+    *                     version as well.
+    */
+    public boolean 
+    removeAllWebapps(int version, String path, boolean isRecursive )
     {
         return jmxRmiWebappNotification( "removeAllVirtualWebapps",
                                           version,
-                                          pathToWebapp,
+                                          path,
                                           isRecursive
                                        );
     }
@@ -271,8 +354,9 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
             }
             catch (Exception e)
             {
-                log.error("Could not connect to virtualization server: " + 
-                          getVirtServerJmxUrl() );
+                if ( log.isErrorEnabled() )
+                    log.error("Could not connect to virtualization server: " + 
+                              getVirtServerJmxUrl() );
 
                 return false;
             }
@@ -306,8 +390,9 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
            
             if ( ! result.booleanValue() ) 
             { 
-                log.error("Action failed: " + action + "  Version: " + version  + 
-                          "  Webapp: " + pathToWebapp );
+                if ( log.isErrorEnabled() )
+                    log.error("Action failed: " + action + "  Version: " + 
+                              version  + "  Webapp: " + pathToWebapp );
 
                 return false; 
             }
@@ -315,9 +400,11 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
         }
         catch (Exception e)
         {
-            log.error(
-              "Could not connect to JMX Server within remote virtualization server " + 
-              "(this may be a transient error.)");
+            if ( log.isErrorEnabled() )
+                log.error(
+                  "Could not connect to JMX Server within remote " +
+                  "virtualization server " + 
+                  "(this may be a transient error.)");
 
             // NEON:
             //     Trace through all possible failure cases to figure out

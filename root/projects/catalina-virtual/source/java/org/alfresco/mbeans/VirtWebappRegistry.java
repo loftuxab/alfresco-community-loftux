@@ -42,27 +42,55 @@ public class VirtWebappRegistry implements VirtWebappRegistryMBean
     public VirtWebappRegistry() { }
 
     public Boolean 
-    updateAllVirtualWebapps(Integer version, String pathToWebapp, Boolean isRecursive)
+    updateVirtualWebapp(Integer version, String pathToWebapp, Boolean isRecursive)
     {
         if ( deployer_ != null )
         {
-            return deployer_.updateAllVirtualWebapps( version.intValue(), 
-                                                      pathToWebapp,
-                                                      isRecursive.booleanValue()
-                                                    );
+            return deployer_.updateVirtualWebapp( 
+                                version.intValue(), 
+                                pathToWebapp,
+                                isRecursive.booleanValue());
+        }
+        return false;
+    }
+
+
+    public Boolean 
+    updateAllVirtualWebapps(Integer version, String path, Boolean isRecursive)
+    {
+        if ( deployer_ != null )
+        {
+            return deployer_.updateAllVirtualWebapps( 
+                                version.intValue(), 
+                                path,
+                                isRecursive.booleanValue());
         }
         return false;
     }
 
     public Boolean 
-    removeAllVirtualWebapps(Integer version, String pathToWebapp, Boolean isRecursive)
+    removeVirtualWebapp(Integer version, String pathToWebapp, Boolean isRecursive)
     {
         if ( deployer_ != null )
         {
-            return deployer_.removeAllVirtualWebapps( version.intValue(), 
-                                                      pathToWebapp,
-                                                      isRecursive.booleanValue()
-                                                    );
+            return deployer_.removeVirtualWebapp( 
+                                version.intValue(), 
+                                pathToWebapp,
+                                isRecursive.booleanValue());
+        }
+        return false;
+    }
+
+
+    public Boolean 
+    removeAllVirtualWebapps(Integer version, String path, Boolean isRecursive)
+    {
+        if ( deployer_ != null )
+        {
+            return deployer_.removeAllVirtualWebapps( 
+                                version.intValue(), 
+                                path,
+                                isRecursive.booleanValue());
         }
         return false;
     }
