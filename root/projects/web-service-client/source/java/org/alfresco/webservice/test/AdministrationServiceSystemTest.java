@@ -26,6 +26,7 @@ package org.alfresco.webservice.test;
 
 import org.alfresco.webservice.administration.NewUserDetails;
 import org.alfresco.webservice.administration.UserDetails;
+import org.alfresco.webservice.administration.UserFilter;
 import org.alfresco.webservice.administration.UserQueryResults;
 import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.types.NamedValue;
@@ -229,14 +230,34 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
             // Ignore since this is what we would expect to happen
         }
     }
-    
-    /**
-     * Test querying for users
-     */
-//    public void testUserQuery()
-//    {
-//        
-//    }
+
+    public void testUserFilter()
+        throws Exception
+    {
+        UserFilter userFilter = new UserFilter("^user.*");
+
+        UserQueryResults results = WebServiceFactory.getAdministrationService().queryUsers(userFilter);
+        assertNotNull(results);
+        assertTrue(results.getUserDetails().length != 0);
+        
+        UserFilter userFilter2 = new UserFilter("^bob.*");
+
+        UserQueryResults results2 = WebServiceFactory.getAdministrationService().queryUsers(userFilter2);
+        assertNotNull(results2);
+        assertNull(results2.getUserDetails());
+        
+        UserFilter userFilter3 = new UserFilter("^ad.*");
+
+        UserQueryResults results3 = WebServiceFactory.getAdministrationService().queryUsers(userFilter3);
+        assertNotNull(results3);
+        assertTrue(results3.getUserDetails().length == 1);
+        
+        UserFilter userFilter4 = new UserFilter("admin");
+
+        UserQueryResults results4 = WebServiceFactory.getAdministrationService().queryUsers(userFilter4);
+        assertNotNull(results4);
+        assertTrue(results4.getUserDetails().length == 1);
+    }
     
     /**
      * Test being able to create a new user, log in as that user, change that users password
@@ -279,7 +300,8 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
        // {
        //     // Ignore since we where expecting the exception
        // }
-        WebServiceFactory.getAdministrationService().changePassword("user" + one, "password" + one, "newPassword");
+        // "password" + one
+        WebServiceFactory.getAdministrationService().changePassword("user" + one, null, "newPassword");
         
         // Now we should try and start a session with the new password
         AuthenticationUtils.endSession();
