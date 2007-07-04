@@ -25,6 +25,8 @@
 package org.alfresco.webservice.util;
 
 import org.alfresco.webservice.types.NamedValue;
+import org.alfresco.webservice.types.Reference;
+import org.alfresco.webservice.types.Store;
 
 /**
  * This class provides a number of common utility methods usful when using the web service API
@@ -33,7 +35,13 @@ import org.alfresco.webservice.types.NamedValue;
  */
 public class Utils
 {
-
+	/**
+	 * Creates a single valued named value.
+	 * 
+	 * @param name			the name 
+	 * @param value			the value
+	 * @return NamedValue	the created NamedValue object
+	 */
     public static NamedValue createNamedValue(String name, String value)
     {
         NamedValue namedValue = new NamedValue();
@@ -43,6 +51,13 @@ public class Utils
         return namedValue;
     }
     
+    /**
+     * Creates a multi-valued named value
+     * 
+     * @param name			the name
+     * @param values		the array of values
+     * @return NamedValue	the create NamedValue object
+     */
     public static NamedValue createNamedValue(String name, String[] values)
     {
         NamedValue namedValue = new NamedValue();
@@ -50,5 +65,27 @@ public class Utils
         namedValue.setIsMultiValue(true);
         namedValue.setValues(values);
         return namedValue;
+    }
+    
+    /**
+     * Gets the store reference string for a given Store object.
+     * 
+     * @param store		the store
+     * @return String	the store reference string
+     */
+    public static String getStoreRef(Store store)
+    {
+    	return store.getScheme() + "://" + store.getAddress();
+    }
+
+    /**
+     * Gets the node reference string for a given Reference object
+     * 
+     * @param reference		the reference
+     * @return String		the node reference string
+     */
+    public static String getNodeRef(Reference reference)
+    {
+    	return getStoreRef(reference.getStore()) + "/" + reference.getUuid();
     }
 }
