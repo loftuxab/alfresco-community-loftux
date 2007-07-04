@@ -24,6 +24,9 @@
  */
 package org.alfresco.webservice.test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.webservice.action.Action;
 import org.alfresco.webservice.action.ActionExecutionResult;
 import org.alfresco.webservice.action.ActionItemDefinition;
@@ -32,10 +35,16 @@ import org.alfresco.webservice.action.ActionServiceSoapBindingStub;
 import org.alfresco.webservice.action.ParameterDefinition;
 import org.alfresco.webservice.action.Rule;
 import org.alfresco.webservice.action.RuleType;
+import org.alfresco.webservice.repository.UpdateResult;
+import org.alfresco.webservice.types.CML;
+import org.alfresco.webservice.types.CMLCreate;
+import org.alfresco.webservice.types.ContentFormat;
 import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.Node;
+import org.alfresco.webservice.types.ParentReference;
 import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
+import org.alfresco.webservice.util.ActionUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
@@ -312,5 +321,73 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         // Check all rules have gone
         Rule[] rules3 = this.actionService.getRules(BaseWebServiceSystemTest.contentReference, null);
         assertNull(rules3);
+    }
+    
+    public void testActionUtilMethods()
+    	throws Exception
+    {
+    	Predicate predicate = new Predicate(new Reference[]{BaseWebServiceSystemTest.contentReference}, BaseWebServiceSystemTest.store, null);
+    	
+    	Map<String, String> parameters = new HashMap<String, String>(1);
+    	parameters.put("aspect-name", "{http://www.alfresco.org/model/content/1.0}summarizable");
+    	String result = ActionUtils.executeAction(BaseWebServiceSystemTest.contentReference, "add-features", parameters);
+    	
+    	assertNull(result);
+    	
+    	// Need to check that the aspect has been applied to the node
+    	Node node2 = this.repositoryService.get(predicate)[0];
+        boolean bFail = true;
+        for(String aspect : node2.getAspects())
+        {
+            if ("{http://www.alfresco.org/model/content/1.0}summarizable".equals(aspect) == true)
+            {
+                bFail = false;
+            }
+        }
+        if (bFail == true)
+        {
+            fail("The action was executed but the summarizable aspect has not been applied to the content reference");
+        }
+        
+        ParentReference parentReference = new ParentReference();
+        parentReference.setAssociationType(Constants.ASSOC_CHILDREN);
+        parentReference.setChildName("{" + Constants.NAMESPACE_CONTENT_MODEL + "}tempFolder");
+        parentReference.setStore(BaseWebServiceSystemTest.store);
+        parentReference.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+        
+        CMLCreate createFolder = new CMLCreate();
+        createFolder.setId("folder1");
+        createFolder.setType(Constants.TYPE_FOLDER);
+        createFolder.setParent(parentReference);
+        createFolder.setProperty(new NamedValue[] {
+                new NamedValue(
+                        Constants.PROP_NAME,
+                        false,
+                        "tempFolder",
+                        null)});
+        
+        // Create a content document beneth the folder
+        NamedValue[] contentProperties2 = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "test.js", null)};
+        CMLCreate createContent2 = new CMLCreate("testContent2", null, "folder1", Constants.ASSOC_CONTAINS, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}test.js", Constants.TYPE_CONTENT, contentProperties2);
+        
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{createFolder, createContent2});
+        
+        UpdateResult[] updateResult = this.repositoryService.update(cml);
+        Reference folder = updateResult[0].getDestination();
+        Reference script = updateResult[1].getDestination();
+        
+        // Write the test content to the reference
+        this.contentService.write(script, Constants.PROP_CONTENT, "\"VALUE\"".getBytes(), new ContentFormat(Constants.MIMETYPE_TEXT_PLAIN, "UTF-8"));
+        
+        // Execute 'count children' action
+        String result2 = ActionUtils.executeAction(folder, "count-children", null);        
+        assertNotNull(result2);
+        assertEquals("1", result2);
+        
+        // Execute scipt
+        String scriptResult = ActionUtils.executeScript(folder, script);
+        assertNotNull(scriptResult);
+        assertEquals("VALUE", scriptResult);
     }
 }
