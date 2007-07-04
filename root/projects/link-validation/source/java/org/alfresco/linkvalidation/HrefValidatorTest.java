@@ -217,9 +217,6 @@ public class HrefValidatorTest extends TestCase
                     store_name,                 // store to update hrefs
                     true,                       // false = not incremental
                     true,                       // validate external
-                    10000,                      // connect timeout (ms)
-                    30000,                      // read timeout (ms)
-                    5,                          // thread count
                     progress                    // status monitor
                 );
             }
@@ -250,74 +247,10 @@ public class HrefValidatorTest extends TestCase
             System.out.println("Distinct URLs updated: " + 
                                progress.getUrlUpdateCount() );
 
-            List<HrefConcordanceEntry> href_conc;
-
-            // OK  (200)
-            // href_conc = LinkValidation_.getHrefConcordanceEntries( 
-            //                                 store_name, 200, 200);
-            //
-            // Success (2xx)
-            // href_conc =  LinkValidation_.getHrefConcordanceEntries( 
-            //                                 store_name, 200, 299 );
-            //
-            // Error (400-500)
-            // href_conc = LinkValidation_.getHrefConcordanceEntries( 
-            //                                 store_name, 400, 599 );
-            //
-            // Same as Error case above.
 
             long start, end;
 
-            start = System.currentTimeMillis();
-            href_conc = LinkValidation_.getBrokenHrefConcordanceEntries( 
-                                               store_name );
 
-            end = System.currentTimeMillis();
-
-
-            //             System.out.println(
-            //                 "\n\n------------------- Broken Hrefs Concordance  "  +
-            //                 "(time in ms: " +  (end - start ) + " )" );
-            //                                
-            //
-            //             for (HrefConcordanceEntry conc_entry : href_conc )
-            //             {
-            //                 System.out.println( 
-            //                     "Status: " + conc_entry.getResponseStatus() + "  " +
-            //                                  conc_entry.getHref());
-            //
-            //                 String [] locations = conc_entry.getLocations();
-            //
-            //                 for ( String location : locations )
-            //                 {
-            //                     System.out.println("        " + location);
-            //                 }
-            //             }
-
-
-
-            start = System.currentTimeMillis();
-
-            List<HrefManifestEntry> file_href_manifests = 
-                  LinkValidation_.getBrokenHrefManifestEntries(  store_name );
-
-            end = System.currentTimeMillis();
-
-            System.out.println(
-                "\n\n------------------- Broken Hrefs manifests in STAGING "  +
-                "(time in ms: " +  (end - start ) + " )" );
-
-            for ( HrefManifestEntry manifest : file_href_manifests )
-            {
-                System.out.println("File: "  + manifest.getFileName() );
-                List<String> hrefs = manifest.getHrefs();
-
-                for (String href : hrefs )
-                {
-                    System.out.println("      "  + href );
-                }
-            }
-            System.out.println("Time:  " + (end - start) );
 
             String index_html = 
              "mysite:/www/avm_webapps/ROOT/products/ecm/comparison/index.html";
@@ -334,9 +267,6 @@ public class HrefValidatorTest extends TestCase
                 href_diff = LinkValidation_.getHrefDifference( 
                                store_name  +  "--alice:/www/avm_webapps/ROOT",
                                store_name  +  ":/www/avm_webapps/ROOT",
-                               10000,
-                               30000,  
-                               5,
                                progress);
             }
             catch (LinkValidationAbortedException e)

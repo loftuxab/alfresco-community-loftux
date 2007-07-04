@@ -320,7 +320,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     NameMatcher                  href_bearing_request_path_matcher_;
     RetryingTransactionHelper    transaction_helper_;
 
-    static Pattern WEB_INF_META_INF_pattern_ = 
+    int local_connect_timeout_  = 10000;
+    int remote_connect_timeout_ = 10000;
+    int local_read_timeout_     = 30000;
+    int remote_read_timeout_    = 30000;
+    int poll_interval_          = 5000;
+
+
+    static Pattern WEB_INF_META_INF_pattern_ =
              Pattern.compile(
                "[^:]+:/www/avm_webapps/(:?META-INF|WEB-INF)(?:/.*|$)",
                Pattern.CASE_INSENSITIVE);
@@ -362,6 +369,27 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         transaction_helper_ = t;
     }
 
+    public void setLocalConnectTimeout(int milliseconds)
+    {
+        local_connect_timeout_ = milliseconds;
+    }
+    public void setRemoteConnectTimeout(int milliseconds)
+    {
+        local_connect_timeout_ = milliseconds;
+    }
+    public void setLocalReadTimeout( int milliseconds )
+    {
+        local_read_timeout_ = milliseconds;
+    }
+    public void setRemoteReadTimeout( int milliseconds )
+    {
+        remote_read_timeout_ = milliseconds;
+    }
+    public void setPollInterval( int milliseconds )
+    {
+        poll_interval_ = milliseconds;
+    }
+
 
     //-------------------------------------------------------------------------
     /**
@@ -396,10 +424,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         final String   webappPath       =  null;   // all stores/webapps
         final boolean  incremental      =  true;   // use deltas & merge
         final boolean  validateExternal =  true;   // check external hrefs
-        final int      connectTimeout   = 10000;   // 10 sec
-        final int      readTimeout      = 30000;   // 30 sec
-        final long     poll_interval    =  5000;   // 5 sec
-        final int      nthreads         =     5;   // ignored
 
         HrefValidationProgress progress_sleepy = null;
 
@@ -414,7 +438,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             try
             {
-                RetryingTransactionHelper.RetryingTransactionCallback<Object> 
+                RetryingTransactionHelper.RetryingTransactionCallback<Object>
                 callback = new RetryingTransactionHelper.
                                RetryingTransactionCallback<Object>()
                                {
@@ -423,33 +447,33 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                            updateHrefInfo( webappPath,
                                                            incremental,
                                                            validateExternal,
-                                                           readTimeout,
-                                                           connectTimeout,
-                                                           nthreads,
                                                            progress);
                                        return null;
                                    }
                                };
-        
+
                 transaction_helper_.doInTransaction(callback);
             }
             catch (Exception e)
             {
-                if ( log.isDebugEnabled() )
-                {
-                    // After all these years, there's still no easy 
-                    // method to print a stack trace into a string.
-                    // Where is the love?  Where?
+                // Super-low level debug.
+                //
+                // if ( log.isDebugEnabled() )
+                // {
+                //     // After all these years, there's still no easy
+                //     // method to print a stack trace into a string.
+                //     // Where is the love?  Where?
+                //
+                //     StringWriter string_writer = new StringWriter();
+                //     PrintWriter print_writer   = new PrintWriter(string_writer);
+                //     e.printStackTrace(print_writer);
+                //
+                //     log.debug( "Exception class:  " + e.getClass().getName() +
+                //                ":  " + e.getMessage() +
+                //                "\n" + string_writer.toString() );
+                // }
 
-                    StringWriter string_writer = new StringWriter();
-                    PrintWriter print_writer   = new PrintWriter(string_writer);
-                    e.printStackTrace(print_writer);
 
-                    log.debug( "Exception class:  " + e.getClass().getName() + 
-                               ":  " + e.getMessage() + 
-                               "\n" + string_writer.toString() );
-                }
-                
                 if ( log.isInfoEnabled() )
                     log.info("Could not validate links.  Retrying");
             }
@@ -459,11 +483,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     log.debug("About to sleep");
             }
 
-            // Sleep regardless of whetherthe updateHrefInfo failed 
-            try { Thread.sleep( poll_interval ); }
-            catch (Exception e) 
-            { 
-                /* nothing to do */ 
+            // Sleep regardless of whetherthe updateHrefInfo failed
+            try { Thread.sleep( poll_interval_ ); }
+            catch (Exception e)
+            {
+                /* nothing to do */
                 if ( log.isDebugEnabled() )
                     log.debug("Troubled sleep(): " + e.getMessage());
             }
@@ -476,12 +500,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
         // Usually, tomcat will be dead by now, but just in case...
-        if ( progress_sleepy != null) 
-        { 
+        if ( progress_sleepy != null)
+        {
             if ( log.isDebugEnabled() )
                 log.debug("Aborting...");
 
-            progress_sleepy.abort(); 
+            progress_sleepy.abort();
         }
     }
 
@@ -511,12 +535,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             String dns_name  = p.getDnsName();
 
             Map<String, AVMNodeDescriptor> webapp_entries = null;
-            try 
+            try
             {
                 // It's safe to use -1 as the version here because
                 // if the user has removed the HEAD version, there's
                 // no reason to care about any associated href info
-                // in an archive.  
+                // in an archive.
 
                 webapp_entries = avm_.getDirectoryListing( -1 , app_base);
             }
@@ -524,10 +548,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 if ( log.isErrorEnabled() )
                 {
-                    log.error("Could to get directory listing of: " + app_base + 
+                    log.error("Could to get directory listing of: " + app_base +
                               "     " + e.getClass().getName()  +  e.getMessage());
                 }
-                continue;      // don't let errors like this thwart cleanup 
+                continue;      // don't let errors like this thwart cleanup
             }
 
             for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
@@ -559,14 +583,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 // Note that the leafname always begins with '|'
                 // which is an illegal DNS name char... therefore
                 // there's no need to worry about escape/unescape.
-                
+
                 String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
                 valid_webapp_keys.put( webapp_attr_base, null );
             }
         }
 
-        // The valid_webapp_keys map now contains all and only the keys 
-        // that correspond to webapps that have not been deleted. 
+        // The valid_webapp_keys map now contains all and only the keys
+        // that correspond to webapps that have not been deleted.
         //
         // Build a list of all the webapps in attribute service
 
@@ -589,9 +613,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 String stem       = key.substring(0,last_slash);
                 String stale      = key.substring(last_slash + 1);
 
-                try  
-                { 
-                    attr_.removeAttribute( stem, stale); 
+                try
+                {
+                    attr_.removeAttribute( stem, stale);
 
                     if ( log.isDebugEnabled() )
                         log.debug("Removed stale AttributeService key: " + key );
@@ -601,7 +625,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 {
                     if ( log.isErrorEnabled() )
                         log.error(
-                        "Could not remove stale AttributeService key: " + key + 
+                        "Could not remove stale AttributeService key: " + key +
                         "   " + e.getMessage());
                 }
             }
@@ -611,10 +635,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     /*-------------------------------------------------------------------------
     *  get_webapp_keys_in_attribute_service --
     *       Collect the webapp keys in attribute service,
-    *       some of which may be stale. 
+    *       some of which may be stale.
     *------------------------------------------------------------------------*/
-    void get_webapp_keys_in_attribute_service( 
-            String             base, 
+    void get_webapp_keys_in_attribute_service(
+            String             base,
             int                depth,
             Map<String,String> webapp_keys)
     {
@@ -627,17 +651,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             if ( log.isWarnEnabled() )
                 log.warn("Impossible link validation key: " + base);
 
-            return; 
+            return;
         }
 
         List<String> children = null;
 
-        try  
-        { 
-            children = attr_.getKeys( base ); 
+        try
+        {
+            children = attr_.getKeys( base );
         }
-        catch (Exception e) 
-        { 
+        catch (Exception e)
+        {
             return;     // no children means we're done
         }
 
@@ -652,7 +676,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 get_webapp_keys_in_attribute_service(
                     base + "/" + child,
-                    depth + 1, 
+                    depth + 1,
                     webapp_keys);
             }
         }
@@ -673,18 +697,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     * @param  validateExternal
     *           Validate external links
     *
-    * @param connectTimeout
-    *           Amount of time in milliseconds that this function will wait
-    *           before declaring that the connection has failed
-    *           (e.g.: 10000 ms).
-    *
-    * @param readTimeout
-    *           time in milliseconds that this function will wait before
-    *           declaring that a read on the connection has failed
-    *           (e.g.:  30000 ms).
-    *
-    * @param nthreads
-    *             Number of threads to use when fetching URLs (e.g.: 5)
     *
     * @param  progress
     *             While updateHrefInfo() is a synchronous function,
@@ -695,9 +707,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     public void updateHrefInfo( String                 path,
                                 boolean                incremental,
                                 boolean                validateExternal,
-                                int                    connectTimeout,
-                                int                    readTimeout,
-                                int                    nthreads,
                                 HrefValidationProgress progress)
                 throws          AVMNotFoundException,
                                 SocketException,
@@ -723,9 +732,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 updateStoreHrefInfo( store,
                                      incremental,
                                      validateExternal,
-                                     connectTimeout,
-                                     readTimeout,
-                                     nthreads,
                                      progress);
             }
 
@@ -733,7 +739,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // to trigger a cleanup of any stale attribute info.
             // For example, a store may have been validated in the past,
             // but then deleted.  The old validation data can be purged.
-            
+
             remove_stale_href_info(  store_staging_main_entries );
 
         }
@@ -751,9 +757,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 updateStoreHrefInfo( store,
                                      incremental,
                                      validateExternal,
-                                     connectTimeout,
-                                     readTimeout,
-                                     nthreads,
                                      progress);
             }
             else                                         // A webapp path
@@ -769,9 +772,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                       path,
                                       incremental,
                                       validateExternal,
-                                      connectTimeout,
-                                      readTimeout,
-                                      nthreads,
                                       progress);
             }
         }
@@ -786,9 +786,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     void updateStoreHrefInfo( String                 store,
                               boolean                incremental,
                               boolean                validateExternal,
-                              int                    connectTimeout,
-                              int                    readTimeout,
-                              int                    nthreads,
                               HrefValidationProgress progress)
          throws               AVMNotFoundException,
                               SocketException,
@@ -806,7 +803,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // A null tag & description  are used to avoid clobbering
         // tag/description info in a non-anonymous snapshot.
         // avm_.createSnapshot(store, null, null);
-        
+
 
         int update_to_version = avm_.getLatestSnapshotID( store );
 
@@ -821,14 +818,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         Map<String, AVMNodeDescriptor> webapp_entries = null;
 
-        try 
+        try
         {
             webapp_entries = avm_.getDirectoryListing( update_to_version, app_base);
         }
         catch (AVMException e)
         {
             if ( log.isErrorEnabled() )
-                log.error("Could to do directory listing of: " + app_base + 
+                log.error("Could to do directory listing of: " + app_base +
                           "     " + e.getClass().getName()  +  e.getMessage());
 
             throw e;
@@ -867,9 +864,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                   webappPath,
                                   incremental,
                                   validateExternal,
-                                  connectTimeout,
-                                  readTimeout,
-                                  nthreads,
                                   progress);
 
             if ( log.isDebugEnabled() )
@@ -905,9 +899,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                String                 webappPath,
                                boolean                incremental,
                                boolean                validateExternal,
-                               int                    connectTimeout,
-                               int                    readTimeout,
-                               int                    nthreads,
                                HrefValidationProgress progress)
          throws                AVMNotFoundException,
                                SocketException,
@@ -915,7 +906,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                LinkValidationAbortedException
     {
         if ( log.isDebugEnabled() )
-            log.debug("starting updateWebappHrefInfo:  " + 
+            log.debug("starting updateWebappHrefInfo:  " +
                       webappPath + " (to version: " + update_to_version + ")");
 
 
@@ -1058,13 +1049,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                     webappPath,
                                     base_version,       // dst vers
                                     webappPath,
-                                    connectTimeout,
-                                    readTimeout,
-                                    nthreads,
                                     progress);
 
 
-        mergeHrefDiff( hdiff );
+        mergeHrefDiff( hdiff, progress );
 
         // set baseline == update_to_version
 
@@ -1116,9 +1104,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     public HrefDifference getHrefDifference(
                               String  srcWebappPath,
                               String  dstWebappPath,
-                              int     connectTimeout,
-                              int     readTimeout,
-                              int     nthreads,    // NEON - ignored for now
                               HrefValidationProgress progress)
             throws            AVMNotFoundException,
                               SocketException,
@@ -1166,9 +1151,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                       srcWebappPath,
                                       dstVersion,
                                       dstWebappPath,
-                                      connectTimeout,
-                                      readTimeout,
-                                      nthreads,
                                       progress);
         }
         finally
@@ -1203,9 +1185,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                   String srcWebappPath,
                                   int    dstVersion,
                                   String dstWebappPath,
-                                  int    connectTimeout,
-                                  int    readTimeout,
-                                  int    nthreads,
                                   HrefValidationProgress progress)
                           throws  AVMNotFoundException,
                                   SocketException,
@@ -1214,8 +1193,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     {
         if ( log.isDebugEnabled() )
             log.debug(
-             "getHrefDifference: " + srcVersion + " " + srcWebappPath  + 
-                              "  " + dstVersion + " " +  dstWebappPath ); 
+             "getHrefDifference: " + srcVersion + " " + srcWebappPath  +
+                              "  " + dstVersion + " " +  dstWebappPath );
 
 
         ValidationPathParser dp = new ValidationPathParser(avm_,dstWebappPath);
@@ -1287,11 +1266,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             dst_webapp_url_base = u.toASCIIString();
         }
-        catch (Exception e) 
-        { 
-            /* can't happen */ 
+        catch (Exception e)
+        {
+            /* can't happen */
             if ( log.isErrorEnabled() )
-                log.error("Could not create src & dst URL base"); 
+                log.error("Could not create src & dst URL base");
         }
 
         if ( dst_webapp_url_base.charAt( dst_webapp_url_base.length()-1 )
@@ -1326,10 +1305,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                                       sp.getStore(),
                                                       dp.getStore(),
                                                       src_webapp_url_base,
-                                                      dst_webapp_url_base,
-                                                      connectTimeout,
-                                                      readTimeout,
-                                                      nthreads);
+                                                      dst_webapp_url_base);
 
         HrefStatusMap  src_href_status_map  = href_diff.getHrefStatusMap();
         HrefManifest   href_manifest        = href_diff.getHrefManifest();
@@ -1344,7 +1320,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             // Never look at diffs in META-INF or WEB-INF
 
-            if ( (WEB_INF_META_INF_pattern_.matcher( src_path )).matches() ) 
+            if ( (WEB_INF_META_INF_pattern_.matcher( src_path )).matches() )
             {
                 continue;
             }
@@ -1415,8 +1391,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                             req_path,
                             href_manifest,        // sync list
                             src_href_status_map,  // sync map
-                            connectTimeout,
-                            readTimeout,
                             progress,
                             0);
 
@@ -1439,8 +1413,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                             req_path,
                             href_manifest,        // sync list
                             src_href_status_map,  // sync map
-                            connectTimeout,
-                            readTimeout,
                             progress);
 
                     // stats for monitoring
@@ -1474,8 +1446,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                    src_href_status_map,
                                    src_parsed_url.startsWith( src_webapp_url_base ),
                                    false,
-                                   connectTimeout,
-                                   readTimeout,
                                    progress);
                 }
             }
@@ -1589,9 +1559,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 broken_manifest_map.get(dst_broken_file);
 
             List<String> src_broken_href_list =
-                new ArrayList<String>( 
+                new ArrayList<String>(
                         ( rel_broken_href_list != null)
-                        ? rel_broken_href_list.size() 
+                        ? rel_broken_href_list.size()
                         : 0 );
 
             for ( String rel_broken_href : rel_broken_href_list )
@@ -1610,8 +1580,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             Collections.sort( src_broken_href_list );
 
-            String src_broken_file = 
-                  src_store + 
+            String src_broken_file =
+                  src_store +
                   dst_broken_file.substring( dst_store_length );
 
             href_diff.broken_by_deletion_.add(
@@ -1687,7 +1657,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *   deleted_conc          Contains as keys any deleted rel_url_md5.
     *                         its values are a map of the dst_file_md5
     *                         (that have null values).  A url can appear
-    *                         in this concordance because some dst_file_md5 
+    *                         in this concordance because some dst_file_md5
     *                         it was once in was either deleted or modified.
     *
     *   newmod_file           Contains as keys any new or modified dst_file_md5.
@@ -1696,17 +1666,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *   rel_href_in_conc      Contains as keys rel_url_md5 that is present
     *                         in either rel_newmod_conc or deleted_conc.  Its
     *                         values are the associated rel_url.  When the
-    *                         href appears in rel_newmod_conc but not 
-    *                         deleted_conc, its value in is the actual url, 
+    *                         href appears in rel_newmod_conc but not
+    *                         deleted_conc, its value in is the actual url,
     *                         not null.  This serves as a flag that allows some
     *                         calls to set md5 -> url to be skipped.
     *
-    *   rel_href_broken_fdep  Contains as keys any rel_url_md5 that depended 
+    *   rel_href_broken_fdep  Contains as keys any rel_url_md5 that depended
     *                         upon a file that was deleted.  These hrefs
     *                         are are likely to make a state transition from
     *                         good to bad, and so must be rechecked.
     *
-    *   rel_newmod_manifest_list  
+    *   rel_newmod_manifest_list
     *                         Like the src_manifest_list, only all values are
     *                         the md5sum of their translation into the rel
     *                         namespace.
@@ -1802,15 +1772,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
 
-        // Add to deleted_conc any url that was once in SOURCE_TO_HREF 
-        // but now is not.   This allows the system to become aware that 
+        // Add to deleted_conc any url that was once in SOURCE_TO_HREF
+        // but now is not.   This allows the system to become aware that
         // a URL has been removed from a modified (but not deleted) file.
 
         for ( String newmod_file_md5  : newmod_file.keySet() )
         {
             List<String> old_source_href_list = null;
 
-            try 
+            try
             {
                 old_source_href_list = attr_.getKeys( href_attr      + "/" +
                                                       SOURCE_TO_HREF + "/" +
@@ -1823,7 +1793,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             for ( String old_href_md5 : old_source_href_list )
             {
-                HashMap<String,String> url_locations =  
+                HashMap<String,String> url_locations =
                                        rel_newmod_conc.get( old_href_md5 );
 
 
@@ -1858,9 +1828,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // Get the hrefs that depended upon this deleted file
             //
 
-            try 
+            try
             {
-                List<String> dependent_hrefs_md5_list = 
+                List<String> dependent_hrefs_md5_list =
                     attr_.getKeys( href_attr    + "/" +
                                    FILE_TO_HDEP + "/" +
                                    deleted_file_md5);
@@ -2017,13 +1987,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                             HREF_TO_FDEP + "/" +
                                             rel_href_md5);
 
-                    try 
+                    try
                     {
                         attr_.removeAttribute( href_attr  + "/" + HREF_TO_FDEP,
                                                rel_href_md5);
                     }
-                    catch (Exception xx) 
-                    { 
+                    catch (Exception xx)
+                    {
                         // If you try to remove an attribute that does not exist,
                         // AttributeService throws an exception.  In this case,
                         // we don't care if is attribute wasn't there, so it's
@@ -2346,7 +2316,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  Merges href difference into destnation table (e.g.: for staging)
     */
     //-------------------------------------------------------------------------
-    public void mergeHrefDiff( HrefDifference href_diff)
+    public void mergeHrefDiff( HrefDifference         href_diff,
+                               HrefValidationProgress progress)
                 throws         AVMNotFoundException,
                                SocketException,
                                SSLException,
@@ -2534,7 +2505,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                            dst_store,
                            href_attr,
                            rel_href_broken_fdep,
-                           md5);
+                           md5,
+                           progress);
     }
 
 
@@ -2544,16 +2516,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *   are no longer broken (due to adding a file, fixing a server, etc.).
     */
     //-------------------------------------------------------------------------
-    public void recheckBrokenLinks( 
-                    HrefDifference     href_diff,
-                    String             dst_webapp_url_base,
-                    String             src_webapp_url_base,
-                    int                src_webapp_url_base_length,
-                    int                src_store_length,
-                    String             dst_store,
-                    String             href_attr,
-                    Map<String,String> rel_href_broken_fdep,
-                    MD5                md5 )
+    public void recheckBrokenLinks(
+                    HrefDifference         href_diff,
+                    String                 dst_webapp_url_base,
+                    String                 src_webapp_url_base,
+                    int                    src_webapp_url_base_length,
+                    int                    src_store_length,
+                    String                 dst_store,
+                    String                 href_attr,
+                    Map<String,String>     rel_href_broken_fdep,
+                    MD5                    md5,
+                    HrefValidationProgress progress)
            throws   AVMNotFoundException,
                     SocketException,
                     SSLException,
@@ -2571,9 +2544,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         HrefStatusMap  href_status_map = new HrefStatusMap();
 
-        int    connect_timeout     = href_diff.getConnectTimeout();
-        int    read_timeout        = href_diff.getReadTimeout();
-
         int    dst_webapp_url_base_length = dst_webapp_url_base.length();
 
         for ( Pair<String, Attribute> link : links  )
@@ -2586,8 +2556,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 if ( rel_href_broken_fdep.containsKey( href_md5 ) )
                 {
-                    // This URL had broken status, and also seems to 
-                    // be further broken by a newly unsatisified file 
+                    // This URL had broken status, and also seems to
+                    // be further broken by a newly unsatisified file
                     // dependency (c.f.: the late Grigori Rasputin).
                     // Rather than double-check, skip it for now and
                     // let the rel_href_broken_fdep handle it (below).
@@ -2629,15 +2599,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     href_status_map,          // new status map
                     get_lookup_dependencies,  // only when url is internal
                     false,                    // don't fetch urls in result
-                    connect_timeout,          // same as original href_diff
-                    read_timeout,             // same as original href_diff
-                    null);                    // don't monitor progress
+                    progress);
             }
         }
 
 
         //
-        // Recheck hrefs that depended on a file that 
+        // Recheck hrefs that depended on a file that
         // has since been deleted
         //
 
@@ -2666,9 +2634,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                  href_status_map,          // new status map
                  true,                     // always internal
                  false,                    // don't fetch urls in result
-                 connect_timeout,          // same as original href_diff
-                 read_timeout,             // same as original href_diff
-                 null);                    // don't monitor progress
+                 progress);                // don't monitor progress
         }
 
 
@@ -2699,8 +2665,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                   String                 req_path,
                                   HrefManifest           href_manifest,
                                   HrefStatusMap          href_status_map,
-                                  int                    connectTimeout,
-                                  int                    readTimeout,
                                   HrefValidationProgress progress,
                                   int                    depth)
           throws                  AVMNotFoundException,
@@ -2754,8 +2718,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                         req_path + "/" + entry_name,
                                         href_manifest,
                                         href_status_map,
-                                        connectTimeout,
-                                        readTimeout,
                                         progress,
                                         depth + 1);
 
@@ -2773,8 +2735,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                          req_path + "/" + entry_name,
                                          href_manifest,
                                          href_status_map,
-                                         connectTimeout,
-                                         readTimeout,
                                          progress);
 
                 // stats for monitoring
@@ -2796,8 +2756,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                    String                 req_path,
                                    HrefManifest           href_manifest,
                                    HrefStatusMap          href_status_map,
-                                   int                    connectTimeout,
-                                   int                    readTimeout,
                                    HrefValidationProgress progress)
           throws                   AVMNotFoundException,
                                    SocketException,
@@ -2826,10 +2784,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
         catch (Exception e)
         {
-            if ( log.isErrorEnabled() ) 
-                log.error("Could not create URI for:  " + req_path + 
-                           "   " + e.getClass().getName() + 
-                           "   " + e.getMessage()); 
+            if ( log.isErrorEnabled() )
+                log.error("Could not create URI for:  " + req_path +
+                           "   " + e.getClass().getName() +
+                           "   " + e.getMessage());
 
             return;
         }
@@ -2839,8 +2797,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                            href_status_map,
                                            true,            // get lookup dep
                                            true,            // get urls
-                                           connectTimeout,
-                                           readTimeout,
                                            progress);
 
 
@@ -2868,8 +2824,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // Add imlicit (dead reckoned) url if not contained in file
 
         if ( ! saw_gen_url )
-        { 
-            href_arraylist.add( implicit_url ); 
+        {
+            href_arraylist.add( implicit_url );
         }
 
 
@@ -2884,8 +2840,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                  HrefStatusMap          href_status_map,
                                  boolean                get_lookup_dependencies,
                                  boolean                get_urls,
-                                 int                    connect_timeout,
-                                 int                    read_timeout,
                                  HrefValidationProgress progress)
                   throws         SocketException,
                                  SSLException,
@@ -2948,8 +2902,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         //
         HrefExtractor href_extractor = new HrefExtractor();
 
-        conn.setConnectTimeout( connect_timeout );  // e.g.:  10000 milliseconds
-        conn.setReadTimeout(    read_timeout    );  // e.g.:  30000 milliseconds
+        if (get_lookup_dependencies)    // local file
+        {
+            conn.setConnectTimeout( local_connect_timeout_ );
+            conn.setReadTimeout(    local_read_timeout_    );
+        }
+        else                            // remote file
+        {
+            conn.setConnectTimeout( remote_connect_timeout_ );
+            conn.setReadTimeout(    remote_read_timeout_    );
+        }
+
         conn.setUseCaches( false );                 // handle caching manually
 
         // The only reason to fetch the file data is if it's going to be parsed
@@ -2988,13 +2951,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // error fetching virtualized
 
             if  ( get_lookup_dependencies )
-            {                                 
+            {
                 if ( log.isErrorEnabled() )
-                    log.error("Error validating internal link: " + 
+                    log.error("Error validating internal link: " +
                               se.getClass().getName() + " " + se.getMessage() );
 
                 throw se;
-            }           
+            }
             else
             {                                 // It's an external link, so
                 response_code = 400;          // just call it a link failure.
@@ -3004,14 +2967,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             // SSL issues
             if  ( get_lookup_dependencies )
-            {                                
+            {
                 if ( log.isErrorEnabled() )
-                    log.error("Error validating internal link via ssl: " + 
-                              ssle.getClass().getName() + 
+                    log.error("Error validating internal link via ssl: " +
+                              ssle.getClass().getName() +
                               "   " + ssle.getMessage() );
 
-                throw ssle;                  
-            }                                
+                throw ssle;
+            }
             else
             {                                 // It's an external link, so
                 response_code = 400;          // just call it a link failure.
@@ -3320,14 +3283,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         String file_gone_md5 =  md5.digest( dst_path.getBytes() );
 
-        Attribute  dependent_hrefs_md5_attrib = 
+        Attribute  dependent_hrefs_md5_attrib =
                          attr_.getAttribute( href_attr    + "/" +
                                              FILE_TO_HDEP + "/" +
                                              file_gone_md5);
 
         if ( dependent_hrefs_md5_attrib != null )
         {
-            Set<String> dependent_hrefs_md5 = 
+            Set<String> dependent_hrefs_md5 =
                 dependent_hrefs_md5_attrib.keySet();
 
             for ( String href_md5 :  dependent_hrefs_md5 )
@@ -3403,7 +3366,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // e.g.:   42, "mysite:/www/avm_webapps"
             webapp_entries = avm_.getDirectoryListing(version, app_base );
 
-            for ( Map.Entry<String, AVMNodeDescriptor> 
+            for ( Map.Entry<String, AVMNodeDescriptor>
                   webapp_entry  :  webapp_entries.entrySet()
                 )
             {
@@ -3467,7 +3430,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
 
         // Example value: .href/mysite/|ROOT/-2
-        String href_attr =  webapp_attr_base + 
+        String href_attr =  webapp_attr_base +
                             "/"  + BASE_VERSION_ALIAS;
 
         String virt_domain = virtreg_.getVirtServerFQDN();
@@ -3482,16 +3445,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             base_version = base_vers_attr.getIntValue();
         }
 
-        String store_url_base = "http://"                   + 
-                                dns_name                    + 
-                                ".www--sandbox.version--v"  + 
+        String store_url_base = "http://"                   +
+                                dns_name                    +
+                                ".www--sandbox.version--v"  +
                                 base_version  + "."         +
-                                virt_domain   + ":"         + 
+                                virt_domain   + ":"         +
                                 virt_port;
 
 
         List<Pair<String, Attribute>> links = null;
-        try 
+        try
         {
             links = attr_.query( href_attr + "/" + STATUS_TO_HREF,
                          new AttrAndQuery(new AttrQueryGTE(status_gte),
@@ -3501,7 +3464,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             if ( log.isErrorEnabled() )
             {
-                log.error("No link validation information " + 
+                log.error("No link validation information " +
                           "is available yet for webapp: " + webapp_name);
             }
         }
@@ -3552,7 +3515,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                         href_manifest_map.put( file_name, href_list );
                     }
 
-                    // If this is an internal link, make it point 
+                    // If this is an internal link, make it point
                     // to the version of staging that was checked
                     // for validity.
 
@@ -3568,1291 +3531,54 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     }
 
 
+    /*-------------------------------------------------------------------------
+    *  getHrefsDependentUponFile --
+    *
+    *------------------------------------------------------------------------*/
+    public List<String> getHrefsDependentUponFile(String path)
+                        throws                    AVMNotFoundException
+    {
+        MD5    md5      = new MD5();
+        String file_md5 =  md5.digest(path.getBytes());
 
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
-    //------------------------------------------------------------------------
+        ValidationPathParser p =
+            new ValidationPathParser(avm_, path);
 
+        String store           = p.getStore();
+        String webapp_name     = p.getWebappName();
+        String app_base        = p.getAppBase();
+        String dns_name        = p.getDnsName();
 
+        // Example value:  ".href/mysite"
+        String store_attr_base =  getAttributeStemForDnsName( dns_name );
 
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  getHrefManifestEntry --                                                           // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    public HrefManifestEntry getHrefManifestEntry( String path,                          // NEARLY OBSOLETE!
-                                         int    statusGTE,                               // NEARLY OBSOLETE!
-                                         int    statusLTE)                               // NEARLY OBSOLETE!
-                             throws      AVMNotFoundException                            // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        MD5 md5         = new MD5();                                                     // NEARLY OBSOLETE!
-        String path_md5 =  md5.digest( path.getBytes() );                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
-            new ValidationPathParser(avm_, path);                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String store           = p.getStore();                                           // NEARLY OBSOLETE!
-        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
-        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
-        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if (webapp_name == null )                                                        // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            throw new RuntimeException("Not a path to a file: " + path);                 // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String status_gte = "" + statusGTE;                                              // NEARLY OBSOLETE!
-        String status_lte = "" + statusLTE;                                              // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
-        String store_attr_base =                                                         // NEARLY OBSOLETE!
-               getAttributeStemForDnsName( dns_name);                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        int version = avm_.getLatestSnapshotID( store );                                 // NEARLY OBSOLETE!
-        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
-        // NEON:       faking latest snapshot version and just using HEAD                // NEARLY OBSOLETE!
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX              // NEARLY OBSOLETE!
-                       //        call to load the version if it isn't already.           // NEARLY OBSOLETE!
-                       //                                                                // NEARLY OBSOLETE!
-                       //        Question:  how long should the version stay             // NEARLY OBSOLETE!
-                       //                   loaded if a load was required?               // NEARLY OBSOLETE!
-        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example value: .href/mysite/|ROOT/-2                                          // NEARLY OBSOLETE!
-        String href_attr =  store_attr_base    +                                         // NEARLY OBSOLETE!
-                            "/|" + webapp_name +                                         // NEARLY OBSOLETE!
-                            "/"  + BASE_VERSION_ALIAS;                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        Attribute href_attr_map = attr_.getAttribute( href_attr      + "/" +             // NEARLY OBSOLETE!
-                                                      SOURCE_TO_HREF + "/" +             // NEARLY OBSOLETE!
-                                                      path_md5                           // NEARLY OBSOLETE!
-                                                    );                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        ArrayList<String> href_arraylist = new ArrayList<String>();                      // NEARLY OBSOLETE!
-        for ( String href_md5 : href_attr_map.keySet() )                                 // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // Filter by examining the response code,                                    // NEARLY OBSOLETE!
-            // but only if we're being selective.                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( (statusGTE > 100) || (statusLTE < 599) )                                // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                int response_code =                                                      // NEARLY OBSOLETE!
-                            attr_.getAttribute( href_attr      + "/" +                   // NEARLY OBSOLETE!
-                                                HREF_TO_STATUS + "/" +                   // NEARLY OBSOLETE!
-                                                href_md5                                 // NEARLY OBSOLETE!
-                                              ).getIntValue();                           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                if ((response_code < statusGTE) || (response_code > statusLTE))          // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    continue;                                                            // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            String href_str =                                                            // NEARLY OBSOLETE!
-                   attr_.getAttribute( href_attr   + "/" +                               // NEARLY OBSOLETE!
-                                       MD5_TO_HREF + "/" +                               // NEARLY OBSOLETE!
-                                       href_md5                                          // NEARLY OBSOLETE!
-                                     ).getStringValue();                                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            href_arraylist.add( href_str );                                              // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        return new HrefManifestEntry( path, href_arraylist);                             // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  getHrefsDependentUponFile --                                                      // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    public List<String> getHrefsDependentUponFile(String path)                           // NEARLY OBSOLETE!
-                        throws                    AVMNotFoundException                   // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        MD5    md5      = new MD5();                                                     // NEARLY OBSOLETE!
-        String file_md5 =  md5.digest(path.getBytes());                                  // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
-            new ValidationPathParser(avm_, path);                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String store           = p.getStore();                                           // NEARLY OBSOLETE!
-        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
-        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
-        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
-        String store_attr_base =  getAttributeStemForDnsName( dns_name );                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example value: .href/mysite/|ROOT/-2                                          // NEARLY OBSOLETE!
-        String href_attr =  store_attr_base    +                                         // NEARLY OBSOLETE!
-                            "/|" + webapp_name +                                         // NEARLY OBSOLETE!
-                            "/"  + BASE_VERSION_ALIAS;                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        Set<String> dependent_hrefs_md5 =                                                // NEARLY OBSOLETE!
-                         attr_.getAttribute( href_attr    + "/" +                        // NEARLY OBSOLETE!
-                                             FILE_TO_HDEP + "/" +                        // NEARLY OBSOLETE!
-                                             file_md5                                    // NEARLY OBSOLETE!
-                                           ).keySet();                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        List<String> dependent_hrefs =                                                   // NEARLY OBSOLETE!
-                        new ArrayList<String>( dependent_hrefs_md5.size() );             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for (String href_md5 : dependent_hrefs_md5 )                                     // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String href_str =                                                            // NEARLY OBSOLETE!
-                   attr_.getAttribute( href_attr   + "/" +                               // NEARLY OBSOLETE!
-                                       MD5_TO_HREF + "/" +                               // NEARLY OBSOLETE!
-                                       href_md5                                          // NEARLY OBSOLETE!
-                                     ).getStringValue();                                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            dependent_hrefs.add( href_str );                                             // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        Collections.sort( dependent_hrefs );                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        return  dependent_hrefs;                                                         // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  getBrokenHrefConcordanceEntries --                                                // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    public List<HrefConcordanceEntry> getBrokenHrefConcordanceEntries(                   // NEARLY OBSOLETE!
-                                         String storeNameOrWebappPath )                  // NEARLY OBSOLETE!
-                                      throws AVMNotFoundException                        // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        return getHrefConcordanceEntries(storeNameOrWebappPath, 400, 599);               // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    public List<HrefConcordanceEntry> getHrefConcordanceEntries(                         // NEARLY OBSOLETE!
-                                         String storeNameOrWebappPath,                   // NEARLY OBSOLETE!
-                                         int    statusGTE,                               // NEARLY OBSOLETE!
-                                         int    statusLTE)                               // NEARLY OBSOLETE!
-                                      throws AVMNotFoundException                        // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
-            new ValidationPathParser(avm_, storeNameOrWebappPath);                       // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String store           = p.getStore();                                           // NEARLY OBSOLETE!
-        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
-        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
-        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String status_gte = "" + statusGTE;                                              // NEARLY OBSOLETE!
-        String status_lte = "" + statusLTE;                                              // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
-        String store_attr_base =  getAttributeStemForDnsName( dns_name );                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        int version = avm_.getLatestSnapshotID( store );                                 // NEARLY OBSOLETE!
-        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
-        // NEON:       faking latest snapshot version and just using HEAD                // NEARLY OBSOLETE!
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX              // NEARLY OBSOLETE!
-                       //        call to load the version if it isn't already.           // NEARLY OBSOLETE!
-                       //                                                                // NEARLY OBSOLETE!
-                       //        Question:  how long should the version stay             // NEARLY OBSOLETE!
-                       //                   loaded if a load was required?               // NEARLY OBSOLETE!
-        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        List<HrefConcordanceEntry>  concordance_entries =                                // NEARLY OBSOLETE!
-            new ArrayList<HrefConcordanceEntry>();                                       // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if  ( webapp_name != null )                                                      // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            getHrefsByStatusCodeFromWebapp( concordance_entries,                         // NEARLY OBSOLETE!
-                                            webapp_name,                                 // NEARLY OBSOLETE!
-                                            store_attr_base,                             // NEARLY OBSOLETE!
-                                            status_gte,                                  // NEARLY OBSOLETE!
-                                            status_lte);                                 // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        else                                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            Map<String, AVMNodeDescriptor> webapp_entries = null;                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // e.g.:   42, "mysite:/www/avm_webapps"                                     // NEARLY OBSOLETE!
-            webapp_entries = avm_.getDirectoryListing(version, app_base );               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :                   // NEARLY OBSOLETE!
-                          webapp_entries.entrySet()                                      // NEARLY OBSOLETE!
-                        )                                                                // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                webapp_name = webapp_entry.getKey();  // my_webapp                       // NEARLY OBSOLETE!
-                AVMNodeDescriptor avm_node    = webapp_entry.getValue();                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                if ( webapp_name.equalsIgnoreCase("META-INF")  ||                        // NEARLY OBSOLETE!
-                     webapp_name.equalsIgnoreCase("WEB-INF")                             // NEARLY OBSOLETE!
-                   )                                                                     // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    continue;                                                            // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                if  ( avm_node.isDirectory() )                                           // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    getHrefsByStatusCodeFromWebapp( concordance_entries,                 // NEARLY OBSOLETE!
-                                                    webapp_name,                         // NEARLY OBSOLETE!
-                                                    store_attr_base,                     // NEARLY OBSOLETE!
-                                                    status_gte,                          // NEARLY OBSOLETE!
-                                                    status_lte );                        // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for ( HrefConcordanceEntry conc_entry : concordance_entries )                    // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            Arrays.sort ( conc_entry.getLocations() );                                   // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        Collections.sort( concordance_entries );                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        return concordance_entries;                                                      // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  getHrefsByStatusCodeFromWebapp --                                                 // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    void  getHrefsByStatusCodeFromWebapp(                                                // NEARLY OBSOLETE!
-                List<HrefConcordanceEntry> concordance_entries,                          // NEARLY OBSOLETE!
-                String webapp_name,                                                      // NEARLY OBSOLETE!
-                String store_attr_base,                                                  // NEARLY OBSOLETE!
-                String status_gte,                                                       // NEARLY OBSOLETE!
-                String status_lte)                                                       // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        // Example value: .href/mysite/|ROOT/-2                                          // NEARLY OBSOLETE!
-        String href_attr =  store_attr_base    +                                         // NEARLY OBSOLETE!
-                            "/|" + webapp_name +                                         // NEARLY OBSOLETE!
-                            "/"  + BASE_VERSION_ALIAS;                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        List<Pair<String, Attribute>> links =                                            // NEARLY OBSOLETE!
-            attr_.query( href_attr + "/" + STATUS_TO_HREF,                               // NEARLY OBSOLETE!
-                         new AttrAndQuery(new AttrQueryGTE(status_gte),                  // NEARLY OBSOLETE!
-                                          new AttrQueryLTE(status_lte)));                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if  ( links == null ) {return;}                                                  // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for ( Pair<String, Attribute> link : links  )                                    // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String  response_code_str = link.getFirst();                                 // NEARLY OBSOLETE!
-            int     response_code     = Integer.parseInt( response_code_str );           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            Set<String> href_md5_set  = link.getSecond().keySet();                       // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            for ( String href_md5 : href_md5_set )                                       // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                String href_str =                                                        // NEARLY OBSOLETE!
-                   attr_.getAttribute( href_attr   + "/" +                               // NEARLY OBSOLETE!
-                                       MD5_TO_HREF + "/" +                               // NEARLY OBSOLETE!
-                                       href_md5                                          // NEARLY OBSOLETE!
-                                     ).getStringValue();                                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                Set<String> file_md5_set =                                               // NEARLY OBSOLETE!
-                        attr_.getAttribute(                                              // NEARLY OBSOLETE!
-                                            href_attr      + "/" +                       // NEARLY OBSOLETE!
-                                            HREF_TO_SOURCE + "/" +                       // NEARLY OBSOLETE!
-                                            href_md5                                     // NEARLY OBSOLETE!
-                                          ).keySet();                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                String [] locations = new String[  file_md5_set.size() ];                // NEARLY OBSOLETE!
-                int i=0;                                                                 // NEARLY OBSOLETE!
-                for ( String file_md5 : file_md5_set )                                   // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    locations[i] =                                                       // NEARLY OBSOLETE!
-                       attr_.getAttribute( href_attr   + "/" +                           // NEARLY OBSOLETE!
-                                           MD5_TO_FILE + "/" +                           // NEARLY OBSOLETE!
-                                           file_md5                                      // NEARLY OBSOLETE!
-                                         ).getStringValue();                             // NEARLY OBSOLETE!
-                    i++;                                                                 // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                HrefConcordanceEntry concordance_entry =                                 // NEARLY OBSOLETE!
-                  new HrefConcordanceEntry( href_str, locations, response_code);         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                concordance_entries.add( concordance_entry );                            // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*------------------------------------------------------------------------*/         // NEARLY OBSOLETE!
-    /**                                                                                  // NEARLY OBSOLETE!
-    *   Updates all href info under the specified path.                                  // NEARLY OBSOLETE!
-    *   The 'path' parameter should be the path to either:                               // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *   <ul>                                                                             // NEARLY OBSOLETE!
-    *      <li> A store name (e.g.:  mysite)                                             // NEARLY OBSOLETE!
-    *      <li> The path to the dir containing all webapps in a store                    // NEARLY OBSOLETE!
-    *           (e.g.:  mysite:/www/avm_webapps/ROOT)                                    // NEARLY OBSOLETE!
-    *      <li> The path to a particular webapp, or within a webapp                      // NEARLY OBSOLETE!
-    *           (e.g.:  mysite:/www/avm_webapps/ROOT/moo)                                // NEARLY OBSOLETE!
-    *   </ul>                                                                            // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *   If you give a path to a particular webapp (or within one),                       // NEARLY OBSOLETE!
-    *   only that webapp's href info is updated.  If you give a                          // NEARLY OBSOLETE!
-    *   store name, or the dir containing all webapps ina store                          // NEARLY OBSOLETE!
-    *   (e.g.: mysite:/www/avm_webapps), then the href info for                          // NEARLY OBSOLETE!
-    *   all webapps in the store are updated.                                            // NEARLY OBSOLETE!
-    */                                                                                   // NEARLY OBSOLETE!
-    /*------------------------------------------------------------------------*/         // NEARLY OBSOLETE!
-    public void updateHrefInfo( String  storeNameOrWebappPath,                           // NEARLY OBSOLETE!
-                                boolean incremental,                                     // NEARLY OBSOLETE!
-                                int     connect_timeout,                                 // NEARLY OBSOLETE!
-                                int     read_timeout,                                    // NEARLY OBSOLETE!
-                                int     nthreads,    // NEON - currently ignored         // NEARLY OBSOLETE!
-                                HrefValidationProgress progress)                         // NEARLY OBSOLETE!
-                throws          AVMNotFoundException,                                    // NEARLY OBSOLETE!
-                                SocketException,                                         // NEARLY OBSOLETE!
-                                SSLException,                                            // NEARLY OBSOLETE!
-                                LinkValidationAbortedException                           // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        if ( progress != null )                                                          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            progress.init();                                                             // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        try                                                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            updateHrefInfo_( storeNameOrWebappPath,                                      // NEARLY OBSOLETE!
-                             incremental,                                                // NEARLY OBSOLETE!
-                             connect_timeout,                                            // NEARLY OBSOLETE!
-                             read_timeout,                                               // NEARLY OBSOLETE!
-                             nthreads,                                                   // NEARLY OBSOLETE!
-                             progress                                                    // NEARLY OBSOLETE!
-                           );                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        finally                                                                          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            if ( progress != null )                                                      // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                progress.setDone( true );                                                // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  updateHrefInfo_ --                                                                // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    void updateHrefInfo_( String  storeNameOrWebappPath,                                 // NEARLY OBSOLETE!
-                          boolean incremental,                                           // NEARLY OBSOLETE!
-                          int     connect_timeout,                                       // NEARLY OBSOLETE!
-                          int     read_timeout,                                          // NEARLY OBSOLETE!
-                          int     nthreads,         // NEON - currently ignored          // NEARLY OBSOLETE!
-                          HrefValidationProgress progress)                               // NEARLY OBSOLETE!
-         throws           AVMNotFoundException,                                          // NEARLY OBSOLETE!
-                          SocketException,                                               // NEARLY OBSOLETE!
-                          SSLException,                                                  // NEARLY OBSOLETE!
-                          LinkValidationAbortedException                                 // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        ValidationPathParser p =                                                         // NEARLY OBSOLETE!
-            new ValidationPathParser(avm_, storeNameOrWebappPath);                       // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String store           = p.getStore();                                           // NEARLY OBSOLETE!
-        String webapp_name     = p.getWebappName();                                      // NEARLY OBSOLETE!
-        String app_base        = p.getAppBase();                                         // NEARLY OBSOLETE!
-        String dns_name        = p.getDnsName();                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example value:  ".href/mysite"                                                // NEARLY OBSOLETE!
-        String store_attr_base =  setAttributeStemForDnsName( dns_name);                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        int version = avm_.getLatestSnapshotID( store );                                 // NEARLY OBSOLETE!
-        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
-        // NEON:       faking latest snapshot version and just using HEAD                // NEARLY OBSOLETE!
-        version = -1;  // NEON:  TODO remove this line & replace with a JMX              // NEARLY OBSOLETE!
-                       //        call to load the version if it isn't already.           // NEARLY OBSOLETE!
-                       //                                                                // NEARLY OBSOLETE!
-                       //        Question:  how long should the version stay             // NEARLY OBSOLETE!
-                       //                   loaded if a load was required?               // NEARLY OBSOLETE!
-        //--------------------------------------------------------------------           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // In the future, it should be possible for different webapp                     // NEARLY OBSOLETE!
-        // urls should resolve to different servers.                                     // NEARLY OBSOLETE!
-        // http://<dns>.www--sandbox.version-v<vers>.<virt-domain>:<port>                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String virt_domain    = virtreg_.getVirtServerFQDN();                            // NEARLY OBSOLETE!
-        int    virt_port      = virtreg_.getVirtServerHttpPort();                        // NEARLY OBSOLETE!
-        String store_url_base = "http://" +                                              // NEARLY OBSOLETE!
-                                dns_name  +                                              // NEARLY OBSOLETE!
-                                ".www--sandbox.version--v" + version  + "." +            // NEARLY OBSOLETE!
-                                virt_domain + ":" + virt_port;                           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        MD5 md5 = new MD5();                                                             // NEARLY OBSOLETE!
-        if  ( webapp_name != null )                                                      // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String webapp_url_base = null;                                               // NEARLY OBSOLETE!
-            try                                                                          // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                webapp_url_base =                                                        // NEARLY OBSOLETE!
-                    store_url_base +                                                     // NEARLY OBSOLETE!
-                    ( webapp_name.equals("ROOT")                                         // NEARLY OBSOLETE!
-                      ? ""                                                               // NEARLY OBSOLETE!
-                      : ("/" + URLEncoder.encode( webapp_name, "UTF-8"))                 // NEARLY OBSOLETE!
-                    );                                                                   // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            catch (Exception e) { /* UTF-8 is supported */ }                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            revalidateWebapp( store,                                                     // NEARLY OBSOLETE!
-                              version,                                                   // NEARLY OBSOLETE!
-                              true,           // is_latest_version                       // NEARLY OBSOLETE!
-                              store_attr_base,                                           // NEARLY OBSOLETE!
-                              webapp_name,                                               // NEARLY OBSOLETE!
-                              app_base + "/" + webapp_name,                              // NEARLY OBSOLETE!
-                              webapp_url_base,                                           // NEARLY OBSOLETE!
-                              md5,                                                       // NEARLY OBSOLETE!
-                              connect_timeout,                                           // NEARLY OBSOLETE!
-                              read_timeout,                                              // NEARLY OBSOLETE!
-                              progress                                                   // NEARLY OBSOLETE!
-                            );                                                           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // stats for monitoring                                                      // NEARLY OBSOLETE!
-            if ( progress != null )                                                      // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                progress.incrementWebappUpdateCount();                                   // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        else                                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            Map<String, AVMNodeDescriptor> webapp_entries = null;                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // e.g.:   42, "mysite:/www/avm_webapps"                                     // NEARLY OBSOLETE!
-            webapp_entries = avm_.getDirectoryListing(version, app_base );               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :                   // NEARLY OBSOLETE!
-                          webapp_entries.entrySet()                                      // NEARLY OBSOLETE!
-                        )                                                                // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                webapp_name = webapp_entry.getKey();  // my_webapp                       // NEARLY OBSOLETE!
-                AVMNodeDescriptor avm_node    = webapp_entry.getValue();                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                if ( webapp_name.equalsIgnoreCase("META-INF")  ||                        // NEARLY OBSOLETE!
-                     webapp_name.equalsIgnoreCase("WEB-INF")                             // NEARLY OBSOLETE!
-                   )                                                                     // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    continue;                                                            // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                // In the future, it should be possible for different webapp             // NEARLY OBSOLETE!
-                // urls should resolve to different servers.                             // NEARLY OBSOLETE!
-                // http://<dns>.www--sandbox.version-v<vers>.<virtdomain>:<port>         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                String webapp_url_base = null;                                           // NEARLY OBSOLETE!
-                try                                                                      // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    webapp_url_base =                                                    // NEARLY OBSOLETE!
-                           store_url_base + (webapp_name.equals("ROOT") ? "" :           // NEARLY OBSOLETE!
-                           URLEncoder.encode( webapp_name, "UTF-8"));                    // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-                catch (Exception e) { /* UTF-8 is supported */ }                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                if  ( avm_node.isDirectory() )                                           // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    revalidateWebapp( store,                                             // NEARLY OBSOLETE!
-                                      version,                                           // NEARLY OBSOLETE!
-                                      true,           // is_latest_version               // NEARLY OBSOLETE!
-                                      store_attr_base,                                   // NEARLY OBSOLETE!
-                                      webapp_name,                                       // NEARLY OBSOLETE!
-                                      app_base + "/" + webapp_name,                      // NEARLY OBSOLETE!
-                                      webapp_url_base,                                   // NEARLY OBSOLETE!
-                                      md5,                                               // NEARLY OBSOLETE!
-                                      connect_timeout,                                   // NEARLY OBSOLETE!
-                                      read_timeout,                                      // NEARLY OBSOLETE!
-                                      progress                                           // NEARLY OBSOLETE!
-                                    );                                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                    // stats for monitoring                                              // NEARLY OBSOLETE!
-                    if ( progress != null )                                              // NEARLY OBSOLETE!
-                    {                                                                    // NEARLY OBSOLETE!
-                        progress.incrementWebappUpdateCount();                           // NEARLY OBSOLETE!
-                    }                                                                    // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  revalidateWebapp --                                                               // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    void revalidateWebapp( String  store,                                                // NEARLY OBSOLETE!
-                           int     version,                                              // NEARLY OBSOLETE!
-                           boolean is_latest_version,                                    // NEARLY OBSOLETE!
-                           String  store_attr_base,                                      // NEARLY OBSOLETE!
-                           String  webapp_name,                                          // NEARLY OBSOLETE!
-                           String  webapp_avm_base,                                      // NEARLY OBSOLETE!
-                           String  webapp_url_base,                                      // NEARLY OBSOLETE!
-                           MD5     md5,                                                  // NEARLY OBSOLETE!
-                           int     connect_timeout,                                      // NEARLY OBSOLETE!
-                           int     read_timeout,                                         // NEARLY OBSOLETE!
-                           HrefValidationProgress progress)                              // NEARLY OBSOLETE!
-         throws            SocketException, SSLException                                 // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        HashMap<String,String>  gen_url_cache   = new HashMap<String,String>();          // NEARLY OBSOLETE!
-        HashMap<String,String>  parsed_url_cache= new HashMap<String,String>();          // NEARLY OBSOLETE!
-        HashMap<Integer,String> status_cache    = new HashMap<Integer,String>();         // NEARLY OBSOLETE!
-        HashMap<String,String>  file_hdep_cache = new HashMap<String,String>();          // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // The following convention is used:                                             // NEARLY OBSOLETE!
-        //           version <==> (version - max - 2) %(max+2)                           // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // The only case that ever matters for now is that:                              // NEARLY OBSOLETE!
-        // -2 is an alias for the last snapshot                                          // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // Thus href attribute info for the  "last snapshot" of                          // NEARLY OBSOLETE!
-        // a store with the dns name:  preview.alice.mysite is                           // NEARLY OBSOLETE!
-        // stored within attribute service under the keys:                               // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        //      .href/mysite/alice/preview/|mywebapp/-2                                  // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // This allows entire projects and/or webapps to removed in 1 step               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Example:               ".href/mysite/|ROOT"                                   // NEARLY OBSOLETE!
-        String webapp_attr_base =  store_attr_base  +  "/|"  +  webapp_name;             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( ! attr_.exists( webapp_attr_base ) )                                        // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            attr_.setAttribute(store_attr_base, "|" + webapp_name,                       // NEARLY OBSOLETE!
-                               new MapAttributeValue());                                 // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String href_attr;                                                                // NEARLY OBSOLETE!
-        if ( ! is_latest_version ) // add key: .href/mysite/|mywebapp/latest/42          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // Because we're not validating the last snapshot,                           // NEARLY OBSOLETE!
-            // don't clobber "last snapshot" info.  Instead                              // NEARLY OBSOLETE!
-            // just make the href_attr info live under the                               // NEARLY OBSOLETE!
-            // version specified.                                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            //Example:  .href/mysite/|mywebapp/99                                        // NEARLY OBSOLETE!
-            attr_.setAttribute( webapp_attr_base , version,                              // NEARLY OBSOLETE!
-                                new MapAttributeValue() );                               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            //  href data uses the raw version key                                       // NEARLY OBSOLETE!
-            href_attr = webapp_attr_base +  "/" + version;                               // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        else                                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // Validating the latest snapshot.  Therefore, record the actual             // NEARLY OBSOLETE!
-            // LATEST_SNAPSHOT version info, but store data under the                    // NEARLY OBSOLETE!
-            // BASE_VERSION_ALIAS key ("-2") rather than the version number.             // NEARLY OBSOLETE!
-            // This make it possible to do incremental updates more easily               // NEARLY OBSOLETE!
-            // because we're not constantly shuffling data around from                   // NEARLY OBSOLETE!
-            // exlicit version key to explicit version key.                              // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            //Example:  .href/mysite/|mywebapp/latest -> version                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            attr_.setAttribute( webapp_attr_base ,                                       // NEARLY OBSOLETE!
-                                BASE_VERSION,                                            // NEARLY OBSOLETE!
-                                new IntAttributeValue( version )                         // NEARLY OBSOLETE!
-                              );                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            //Example:  .href/mysite/|mywebapp/-2                                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            attr_.setAttribute( webapp_attr_base ,  BASE_VERSION_ALIAS,                  // NEARLY OBSOLETE!
-                                new MapAttributeValue() );                               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            //  href data goes under the "-2" key:    .href/mysite/|myproject/-2         // NEARLY OBSOLETE!
-            href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;                    // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, SOURCE_TO_HREF, new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, HREF_TO_SOURCE, new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, HREF_TO_STATUS, new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, STATUS_TO_HREF, new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, MD5_TO_FILE,    new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, MD5_TO_HREF,    new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, HREF_TO_FDEP,   new MapAttributeValue());         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr, FILE_TO_HDEP,   new MapAttributeValue());         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Info for latest snapshot (42) of mywebapp within mysite is now:               // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/latest -> 42                                      // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/source_to_href/                                // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/href_to_source/                                // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/href_to_status/                                // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/status_to_href/                                // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/md5_to_file/                                   // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/md5_to_href/                                   // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/href_to_fdep/                                  // NEARLY OBSOLETE!
-        //      .href/mysite/|mywebapp/-2/file_to_hdep/                                  // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // Info for latest snapshot (42) of mywebapp within mysite/alice is now:         // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/latest -> 42                                // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/source_to_href/                          // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/href_to_source/                          // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/href_to_status/                          // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/status_to_href/                          // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/md5_to_file/                             // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/md5_to_href/                             // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/href_to_fdep/                            // NEARLY OBSOLETE!
-        //      .href/mysite/alice/|mywebapp/-2/file_to_hdep/                            // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // This makes it easy to delete an entire project or webapp.                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Find dead reconning URLs for every asset in the system:                       // NEARLY OBSOLETE!
-        validate_dir( version,                                                           // NEARLY OBSOLETE!
-                      webapp_avm_base,                                                   // NEARLY OBSOLETE!
-                      webapp_url_base,                                                   // NEARLY OBSOLETE!
-                      href_attr,                                                         // NEARLY OBSOLETE!
-                      md5,                                                               // NEARLY OBSOLETE!
-                      gen_url_cache,                                                     // NEARLY OBSOLETE!
-                      parsed_url_cache,                                                  // NEARLY OBSOLETE!
-                      status_cache,                                                      // NEARLY OBSOLETE!
-                      file_hdep_cache,                                                   // NEARLY OBSOLETE!
-                      connect_timeout,                                                   // NEARLY OBSOLETE!
-                      read_timeout,                                                      // NEARLY OBSOLETE!
-                      progress,                                                          // NEARLY OBSOLETE!
-                      0                                                                  // NEARLY OBSOLETE!
-                    );                                                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // stats for monitoring                                                          // NEARLY OBSOLETE!
-        if ( progress != null )                                                          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            progress.incrementDirUpdateCount();                                          // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Now all the generated URLs have had their status checked,                     // NEARLY OBSOLETE!
-        // but the parsed URLs from these files might not be yet.                        // NEARLY OBSOLETE!
-        // Pull on every URL that isn't currently in the gen_cache.                      // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for ( Map.Entry<String,String> entry  :  parsed_url_cache.entrySet() )           // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String  parsed_url_md5 = entry.getKey();                                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( gen_url_cache.containsKey( parsed_url_md5 ) )  // skip if this          // NEARLY OBSOLETE!
-            {                                                   // url validated         // NEARLY OBSOLETE!
-                continue;                                       // within the dir        // NEARLY OBSOLETE!
-            }                                                   // walking phase         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            String  parsed_url = entry.getValue();                                       // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            validate_url( parsed_url,                                                    // NEARLY OBSOLETE!
-                          parsed_url_md5,                                                // NEARLY OBSOLETE!
-                          href_attr,                                                     // NEARLY OBSOLETE!
-                          md5,                                                           // NEARLY OBSOLETE!
-                          parsed_url.startsWith( webapp_url_base ),                      // NEARLY OBSOLETE!
-                          status_cache,                                                  // NEARLY OBSOLETE!
-                          file_hdep_cache,                                               // NEARLY OBSOLETE!
-                          connect_timeout,                                               // NEARLY OBSOLETE!
-                          read_timeout                                                   // NEARLY OBSOLETE!
-                        );                                                               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-             // stats for monitoring                                                     // NEARLY OBSOLETE!
-             if ( progress != null )                                                     // NEARLY OBSOLETE!
-             {                                                                           // NEARLY OBSOLETE!
-                 progress.incrementUrlUpdateCount();                                     // NEARLY OBSOLETE!
-             }                                                                           // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( progress != null )                                                          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            progress.incrementWebappUpdateCount();  // for monitoring progress           // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  validate_dir --                                                                   // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    void validate_dir( int    version,                                                   // NEARLY OBSOLETE!
-                       String dir,                                                       // NEARLY OBSOLETE!
-                       String url_base,                                                  // NEARLY OBSOLETE!
-                       String href_attr,                                                 // NEARLY OBSOLETE!
-                       MD5    md5,                                                       // NEARLY OBSOLETE!
-                       Map<String,String>  gen_url_cache,                                // NEARLY OBSOLETE!
-                       Map<String,String>  parsed_url_cache,                             // NEARLY OBSOLETE!
-                       Map<Integer,String> status_cache,                                 // NEARLY OBSOLETE!
-                       Map<String,String>  file_hdep_cache,                              // NEARLY OBSOLETE!
-                       int    connect_timeout,                                           // NEARLY OBSOLETE!
-                       int    read_timeout,                                              // NEARLY OBSOLETE!
-                       HrefValidationProgress progress,                                  // NEARLY OBSOLETE!
-                       int    depth )                                                    // NEARLY OBSOLETE!
-         throws        SocketException, SSLException                                     // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        Map<String, AVMNodeDescriptor> entries = null;                                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Ensure that the virt server is virtualizing this version                      // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        try                                                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // e.g.:   42, "mysite:/www/avm_webapps/ROOT/moo"                            // NEARLY OBSOLETE!
-            entries = avm_.getDirectoryListing( version, dir );                          // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        catch (Exception e)     // TODO: just AVMNotFoundException ?                     // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            if ( log.isErrorEnabled() )                                                  // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                log.error("Could not list version: " + version +                         // NEARLY OBSOLETE!
-                         " of directory: " + dir + "  " + e.getMessage());               // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            return;                                                                      // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for ( Map.Entry<String, AVMNodeDescriptor> entry  : entries.entrySet() )         // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String            entry_name = entry.getKey();                               // NEARLY OBSOLETE!
-            AVMNodeDescriptor avm_node   = entry.getValue();                             // NEARLY OBSOLETE!
-            String            avm_path   = dir +  "/" + entry_name;                      // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( (depth == 0) &&                                                         // NEARLY OBSOLETE!
-                 (entry_name.equalsIgnoreCase("META-INF")  ||                            // NEARLY OBSOLETE!
-                  entry_name.equalsIgnoreCase("WEB-INF")                                 // NEARLY OBSOLETE!
-                 )                                                                       // NEARLY OBSOLETE!
-               )                                                                         // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                continue;                                                                // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // Don't index bogus files                                                   // NEARLY OBSOLETE!
-            if ( excluder_ != null && excluder_.matches( avm_path ))                     // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                continue;                                                                // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            String url_encoded_entry_name = null;                                        // NEARLY OBSOLETE!
-            try                                                                          // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                url_encoded_entry_name = URLEncoder.encode(entry_name, "UTF-8");         // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            catch (Exception e) { /* UTF-8 is supported */ }                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            String implicit_url = url_base  +  "/" + url_encoded_entry_name;             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if  ( avm_node.isDirectory() )                                               // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                validate_dir( version,                                                   // NEARLY OBSOLETE!
-                              avm_path,                                                  // NEARLY OBSOLETE!
-                              implicit_url,                                              // NEARLY OBSOLETE!
-                              href_attr,                                                 // NEARLY OBSOLETE!
-                              md5,                                                       // NEARLY OBSOLETE!
-                              gen_url_cache,                                             // NEARLY OBSOLETE!
-                              parsed_url_cache,                                          // NEARLY OBSOLETE!
-                              status_cache,                                              // NEARLY OBSOLETE!
-                              file_hdep_cache,                                           // NEARLY OBSOLETE!
-                              connect_timeout,                                           // NEARLY OBSOLETE!
-                              read_timeout,                                              // NEARLY OBSOLETE!
-                              progress,                                                  // NEARLY OBSOLETE!
-                              depth + 1 ) ;                                              // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                // stats for monitoring                                                  // NEARLY OBSOLETE!
-                if ( progress != null )                                                  // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    progress.incrementDirUpdateCount();                                  // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            else                                                                         // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                validate_file(                                                           // NEARLY OBSOLETE!
-                   avm_path,                                                             // NEARLY OBSOLETE!
-                   implicit_url,                                                         // NEARLY OBSOLETE!
-                   md5.digest(implicit_url.getBytes()),                                  // NEARLY OBSOLETE!
-                   href_attr,                                                            // NEARLY OBSOLETE!
-                   md5,                                                                  // NEARLY OBSOLETE!
-                   gen_url_cache,                                                        // NEARLY OBSOLETE!
-                   parsed_url_cache,                                                     // NEARLY OBSOLETE!
-                   status_cache,                                                         // NEARLY OBSOLETE!
-                   file_hdep_cache,                                                      // NEARLY OBSOLETE!
-                   connect_timeout,                                                      // NEARLY OBSOLETE!
-                   read_timeout,                                                         // NEARLY OBSOLETE!
-                   progress                                                              // NEARLY OBSOLETE!
-                );                                                                       // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                // stats for monitoring                                                  // NEARLY OBSOLETE!
-                if ( progress != null )                                                  // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    progress.incrementFileUpdateCount();                                 // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  validate_file --                                                                  // NEARLY OBSOLETE!
-    *                                                                                    // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    void validate_file( String                 avm_path,                                 // NEARLY OBSOLETE!
-                        String                 gen_url_str,                              // NEARLY OBSOLETE!
-                        String                 gen_url_md5,                              // NEARLY OBSOLETE!
-                        String                 href_attr,                                // NEARLY OBSOLETE!
-                        MD5                    md5,                                      // NEARLY OBSOLETE!
-                        Map<String,String>     gen_url_cache,                            // NEARLY OBSOLETE!
-                        Map<String,String>     parsed_url_cache,                         // NEARLY OBSOLETE!
-                        Map<Integer,String>    status_cache,                             // NEARLY OBSOLETE!
-                        Map<String,String>     file_hdep_cache,                          // NEARLY OBSOLETE!
-                        int                    connect_timeout,                          // NEARLY OBSOLETE!
-                        int                    read_timeout,                             // NEARLY OBSOLETE!
-                        HrefValidationProgress progress)                                 // NEARLY OBSOLETE!
-         throws         SocketException, SSLException                                    // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        String file_md5= md5.digest(avm_path.getBytes());                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        gen_url_cache.put(gen_url_md5,null);                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // A map from the href to the source files that contain it created               // NEARLY OBSOLETE!
-        // made as soon a new generated or parsed url is discovered.                     // NEARLY OBSOLETE!
-        // Because of how directories are traversed when generating urls,                // NEARLY OBSOLETE!
-        // in this function we can be certain that the href being processed              // NEARLY OBSOLETE!
-        // has never been generated before, but it may have been *parsed*                // NEARLY OBSOLETE!
-        // from an earlier file.                                                         // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // Therefore, a call to see if the HREF_TO_SOURCE key for this URL               // NEARLY OBSOLETE!
-        // exists can be avoided if parsed_url_cache already contains it.                // NEARLY OBSOLETE!
-        // Otherwise, we've got to do the actual 'exists' test.                          // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( ! parsed_url_cache.containsKey( gen_url_md5 )   &&                          // NEARLY OBSOLETE!
-             ! attr_.exists( href_attr      + "/" +                                      // NEARLY OBSOLETE!
-                             HREF_TO_SOURCE + "/" + gen_url_md5)                         // NEARLY OBSOLETE!
-           )                                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,                        // NEARLY OBSOLETE!
-                                gen_url_md5,                                             // NEARLY OBSOLETE!
-                                new MapAttributeValue()                                  // NEARLY OBSOLETE!
-                              );                                                         // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Claim the url to self "appears" in this source file                           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute(href_attr + "/" + HREF_TO_SOURCE + "/" + gen_url_md5,         // NEARLY OBSOLETE!
-                           file_md5,                                                     // NEARLY OBSOLETE!
-                           new BooleanAttributeValue( true )                             // NEARLY OBSOLETE!
-                          );                                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr + "/" + MD5_TO_FILE,                               // NEARLY OBSOLETE!
-                            file_md5,                                                    // NEARLY OBSOLETE!
-                            new StringAttributeValue( avm_path )                         // NEARLY OBSOLETE!
-                          );                                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        List<String> urls = validate_url( gen_url_str,                                   // NEARLY OBSOLETE!
-                                          gen_url_md5,                                   // NEARLY OBSOLETE!
-                                          href_attr,                                     // NEARLY OBSOLETE!
-                                          md5,                                           // NEARLY OBSOLETE!
-                                          true,     // get lookup dependencies           // NEARLY OBSOLETE!
-                                          status_cache,                                  // NEARLY OBSOLETE!
-                                          file_hdep_cache,                               // NEARLY OBSOLETE!
-                                          connect_timeout,                               // NEARLY OBSOLETE!
-                                          read_timeout);                                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // stats for monitoring                                                          // NEARLY OBSOLETE!
-        if ( progress != null )                                                          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            progress.incrementUrlUpdateCount();                                          // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( urls == null )                                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            return;                                                                      // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Collect list of hrefs contained by this source file                           // NEARLY OBSOLETE!
-        // If the generated URL is not already contained in the                          // NEARLY OBSOLETE!
-        // parsed URL list, add it.                                                      // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        MapAttribute  href_map_attrib_value  = new MapAttributeValue();                  // NEARLY OBSOLETE!
-        boolean       saw_gen_url            = false;                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for (String  response_url  : urls )                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String response_url_md5 = md5.digest(response_url.getBytes());               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( ! saw_gen_url && response_url_md5.equals( gen_url_md5) )                // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                saw_gen_url = true;                                                      // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            href_map_attrib_value.put( response_url_md5,                                 // NEARLY OBSOLETE!
-                                       new BooleanAttributeValue(true ));                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( ! parsed_url_cache.containsKey( response_url_md5 ) )                    // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                parsed_url_cache.put(response_url_md5, response_url);                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                if ( ! gen_url_cache.containsKey( response_url_md5 ) &&                  // NEARLY OBSOLETE!
-                     ! attr_.exists( href_attr      + "/" +                              // NEARLY OBSOLETE!
-                                     HREF_TO_SOURCE + "/" +                              // NEARLY OBSOLETE!
-                                     response_url_md5 )                                  // NEARLY OBSOLETE!
-                   )                                                                     // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    attr_.setAttribute( href_attr + "/" + HREF_TO_SOURCE,                // NEARLY OBSOLETE!
-                                        response_url_md5,                                // NEARLY OBSOLETE!
-                                        new MapAttributeValue()                          // NEARLY OBSOLETE!
-                                      );                                                 // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            attr_.setAttribute(                                                          // NEARLY OBSOLETE!
-                href_attr + "/" + HREF_TO_SOURCE  + "/" + response_url_md5 ,             // NEARLY OBSOLETE!
-                file_md5,                                                                // NEARLY OBSOLETE!
-                new BooleanAttributeValue( true ));                                      // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( ! saw_gen_url )                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            href_map_attrib_value.put( gen_url_md5,                                      // NEARLY OBSOLETE!
-                                       new BooleanAttributeValue( true ));               // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr + "/" + SOURCE_TO_HREF,                            // NEARLY OBSOLETE!
-                            file_md5,                                                    // NEARLY OBSOLETE!
-                            href_map_attrib_value                                        // NEARLY OBSOLETE!
-                          );                                                             // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-    /*-------------------------------------------------------------------------          // NEARLY OBSOLETE!
-    *  validate_url --                                                                   // NEARLY OBSOLETE!
-    *------------------------------------------------------------------------*/          // NEARLY OBSOLETE!
-    List<String>  validate_url( String  url_str,                                         // NEARLY OBSOLETE!
-                                String  url_md5,                                         // NEARLY OBSOLETE!
-                                String  href_attr,                                       // NEARLY OBSOLETE!
-                                MD5     md5,                                             // NEARLY OBSOLETE!
-                                boolean get_lookup_dependencies,                         // NEARLY OBSOLETE!
-                                Map<Integer,String> status_cache,                        // NEARLY OBSOLETE!
-                                Map<String,String>  file_hdep_cache,                     // NEARLY OBSOLETE!
-                                int  connect_timeout,                                    // NEARLY OBSOLETE!
-                                int  read_timeout)                                       // NEARLY OBSOLETE!
-                  throws        SocketException, SSLException                            // NEARLY OBSOLETE!
-    {                                                                                    // NEARLY OBSOLETE!
-        HttpURLConnection conn = null;                                                   // NEARLY OBSOLETE!
-        URL               url  = null;                                                   // NEARLY OBSOLETE!
-        int               response_code;                                                 // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        try                                                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            url = new URL( url_str );                                                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // Oddly, url.openConnection() does not actually                             // NEARLY OBSOLETE!
-            // open a connection; it merely creates a connection                         // NEARLY OBSOLETE!
-            // object that is later opened via connect() within                          // NEARLY OBSOLETE!
-            // the HrefExtractor.                                                        // NEARLY OBSOLETE!
-            //                                                                           // NEARLY OBSOLETE!
-            conn = (HttpURLConnection) url.openConnection();                             // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        catch (Exception e )                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // You could have a bogus protocol or some other probem.                     // NEARLY OBSOLETE!
-            // For example:           <a href="sales@alfresco.com">woops</a>             // NEARLY OBSOLETE!
-            // Gives you              url_str="sales@alfresco.com"                       // NEARLY OBSOLETE!
-            // and exception msg: no protocol: sales@alfresco.com                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( log.isErrorEnabled() )                                                  // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                log.error("openConnection() cannot connect to :" + url_str );            // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // Rather than update the URL status just let it retain                      // NEARLY OBSOLETE!
-            // whatever status it had before, and assume this is                         // NEARLY OBSOLETE!
-            // an ephemeral network failure;  "ephemeral" here means                     // NEARLY OBSOLETE!
-            // "on all instances of this url for this validation."                       // NEARLY OBSOLETE!
-            //                                                                           // NEARLY OBSOLETE!
-            // TODO -- rethink this.                                                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            return null;                                                                 // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( get_lookup_dependencies )                                                   // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            conn.addRequestProperty(                                                     // NEARLY OBSOLETE!
-                CacheControlFilter.LOOKUP_DEPENDENCY_HEADER, "true" );                   // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // "Infinite" timeouts that aren't really infinite                               // NEARLY OBSOLETE!
-        // are a bad idea in this context.  If it takes more                             // NEARLY OBSOLETE!
-        // than 15 seconds to connect or more than 60 seconds                            // NEARLY OBSOLETE!
-        // to read a response, give up.                                                  // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        HrefExtractor href_extractor = new HrefExtractor();                              // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        conn.setConnectTimeout( connect_timeout );  // e.g.:  10000 milliseconds         // NEARLY OBSOLETE!
-        conn.setReadTimeout(    read_timeout    );  // e.g.:  30000 milliseconds         // NEARLY OBSOLETE!
-        conn.setUseCaches( false );                 // handle caching manually           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( log.isDebugEnabled() )                                                      // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            log.debug("About to fetch: " + url_str );                                    // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        href_extractor.setConnection( conn );                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        try { response_code = conn.getResponseCode(); }                                  // NEARLY OBSOLETE!
-        catch ( SocketException se )                                                     // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // This could be either of two major problems:                               // NEARLY OBSOLETE!
-            //   java.net.SocketException                                                // NEARLY OBSOLETE!
-            //      java.net.ConnectException        likely: Server down                 // NEARLY OBSOLETE!
-            //      java.net.NoRouteToHostException  likely: firewall/router             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if  ( get_lookup_dependencies )   // If we're trying to get lookup           // NEARLY OBSOLETE!
-            {                                 // dependencies, this is a fatal           // NEARLY OBSOLETE!
-                throw se;                     // error fetching virtualized              // NEARLY OBSOLETE!
-            }                                 // content, so rethrow.                    // NEARLY OBSOLETE!
-            else                                                                         // NEARLY OBSOLETE!
-            {                                 // It's an external link, so               // NEARLY OBSOLETE!
-                response_code = 400;          // just call it a link failure.            // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        catch ( SSLException ssle )                                                      // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // SSL issues                                                                // NEARLY OBSOLETE!
-            if  ( get_lookup_dependencies )   // If we're trying to get lookup           // NEARLY OBSOLETE!
-            {                                 // dependencies, this is a fatal           // NEARLY OBSOLETE!
-                throw ssle;                   // error fetching virtualized              // NEARLY OBSOLETE!
-            }                                 // content, so rethrow.                    // NEARLY OBSOLETE!
-            else                                                                         // NEARLY OBSOLETE!
-            {                                 // It's an external link, so               // NEARLY OBSOLETE!
-                response_code = 400;          // just call it a link failure.            // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        catch (IOException ioe)                                                          // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // java.net.UnknownHostException                                             // NEARLY OBSOLETE!
-            // .. or other things, possibly due to a mist-typed url                      // NEARLY OBSOLETE!
-            // or other bad/interrupted request.                                         // NEARLY OBSOLETE!
-            //                                                                           // NEARLY OBSOLETE!
-            // Even if this is a local link, let's keep going.                           // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( log.isDebugEnabled() )                                                  // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                log.debug("Could not fetch response code: " + ioe.getMessage());         // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            response_code = 400;                // probably a bad request                // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( log.isDebugEnabled() )                                                      // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            log.debug("Response code for '" + url_str + "': " + response_code);          // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr + "/" + MD5_TO_HREF,                               // NEARLY OBSOLETE!
-                            url_md5,                                                     // NEARLY OBSOLETE!
-                            new StringAttributeValue( url_str )                          // NEARLY OBSOLETE!
-                          );                                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr + "/" + HREF_TO_STATUS,                            // NEARLY OBSOLETE!
-                            url_md5,                                                     // NEARLY OBSOLETE!
-                            new IntAttributeValue( response_code )                       // NEARLY OBSOLETE!
-                          );                                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Only initialize the response map if absoultely necessary                      // NEARLY OBSOLETE!
-        // Use the status_cache to eliminate calls to test existence                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( ! status_cache.containsKey( response_code ) )  // maybe necessary           // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            if ( ! attr_.exists( href_attr      + "/" +     // do actual remote          // NEARLY OBSOLETE!
-                                 STATUS_TO_HREF + "/" +     // call to see if            // NEARLY OBSOLETE!
-                                 response_code )            // this status key           // NEARLY OBSOLETE!
-               )                                            // must be created           // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                attr_.setAttribute( href_attr + "/" + STATUS_TO_HREF,                    // NEARLY OBSOLETE!
-                                    "" + response_code,                                  // NEARLY OBSOLETE!
-                                    new MapAttributeValue()                              // NEARLY OBSOLETE!
-                                  );                                                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            status_cache.put( response_code, null );        // never check again         // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute(                                                              // NEARLY OBSOLETE!
-                href_attr + "/" + STATUS_TO_HREF + "/" + response_code,                  // NEARLY OBSOLETE!
-                url_md5,                                                                 // NEARLY OBSOLETE!
-                new BooleanAttributeValue( true ));                                      // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        if ( ! get_lookup_dependencies  ||                                               // NEARLY OBSOLETE!
-             ( response_code < 200 || response_code >= 300)                              // NEARLY OBSOLETE!
-           )                                                                             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            // The remainder of this function deals with tracking lookup                 // NEARLY OBSOLETE!
-            // dependencies.  Because  we only care about the links that                 // NEARLY OBSOLETE!
-            // URL's page contains if we're tracking dependencies, do                    // NEARLY OBSOLETE!
-            // an early return here.                                                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            return null;                                                                 // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Rather than just fetch the 1st LOOKUP_DEPENDENCY_HEADER                       // NEARLY OBSOLETE!
-        // in the response, to be paranoid deal with the possiblity that                 // NEARLY OBSOLETE!
-        // the information about what AVM files have been accessed is stored             // NEARLY OBSOLETE!
-        // in more than one of these headers (though it *should* be all in 1).           // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // Unfortunately, getHeaderFieldKey makes the name of the 0-th header            // NEARLY OBSOLETE!
-        // return null, "even though the 0-th header has a value".  Thus the             // NEARLY OBSOLETE!
-        // loop below is 1-based, not 0-based.                                           // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-        // "It's a madhouse! A madhouse!"                                                // NEARLY OBSOLETE!
-        //            -- Charton Heston playing the character "George Taylor"            // NEARLY OBSOLETE!
-        //               Planet of the Apes, 1968                                        // NEARLY OBSOLETE!
-        //                                                                               // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        ArrayList<String> dependencies = new ArrayList<String>();                        // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        String header_key = null;                                                        // NEARLY OBSOLETE!
-        for (int i=1; (header_key = conn.getHeaderFieldKey(i)) != null; i++)             // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            if (!header_key.equals(CacheControlFilter.LOOKUP_DEPENDENCY_HEADER))         // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                continue;                                                                // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            String header_value = null;                                                  // NEARLY OBSOLETE!
-            try                                                                          // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                header_value =                                                           // NEARLY OBSOLETE!
-                    URLDecoder.decode( conn.getHeaderField(i), "UTF-8");                 // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-            catch (Exception e)                                                          // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                if ( log.isErrorEnabled() )                                              // NEARLY OBSOLETE!
-                {                                                                        // NEARLY OBSOLETE!
-                    log.error("Skipping undecodable response header: " +                 // NEARLY OBSOLETE!
-                              conn.getHeaderField(i));                                   // NEARLY OBSOLETE!
-                }                                                                        // NEARLY OBSOLETE!
-                continue;                                                                // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            // Each lookup dependency header consists of a comma-separated               // NEARLY OBSOLETE!
-            // list file names.                                                          // NEARLY OBSOLETE!
-            String [] lookup_dependencies = header_value.split(", *");                   // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            for (String dep : lookup_dependencies )                                      // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                dependencies.add( dep );                                                 // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        // Now "dependencies" contains a list of all                                     // NEARLY OBSOLETE!
-        // files upon which url_str URL depends.                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        MapAttribute fdep_map_attrib_value = new MapAttributeValue();                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        for (String file_dependency : dependencies )                                     // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            String fdep_md5 = md5.digest(file_dependency.getBytes());                    // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            if ( ! file_hdep_cache.containsKey( fdep_md5 ) )                             // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP,                      // NEARLY OBSOLETE!
-                                    fdep_md5,                                            // NEARLY OBSOLETE!
-                                    new MapAttributeValue()                              // NEARLY OBSOLETE!
-                                  );                                                     // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                file_hdep_cache.put( fdep_md5, null );                                   // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            attr_.setAttribute( href_attr + "/" + FILE_TO_HDEP + "/" + fdep_md5,         // NEARLY OBSOLETE!
-                                url_md5,                                                 // NEARLY OBSOLETE!
-                                new BooleanAttributeValue( true )                        // NEARLY OBSOLETE!
-                              );                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-            fdep_map_attrib_value.put( fdep_md5,                                         // NEARLY OBSOLETE!
-                                       new BooleanAttributeValue( true ));               // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        attr_.setAttribute( href_attr + "/" + HREF_TO_FDEP,                              // NEARLY OBSOLETE!
-                            url_md5,                                                     // NEARLY OBSOLETE!
-                            fdep_map_attrib_value                                        // NEARLY OBSOLETE!
-                          );                                                             // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-                                                                                         // NEARLY OBSOLETE!
-        List<String> extracted_hrefs = null;                                             // NEARLY OBSOLETE!
-        try                                                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            extracted_hrefs = href_extractor.extractHrefs();                             // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        catch (Exception e)                                                              // NEARLY OBSOLETE!
-        {                                                                                // NEARLY OBSOLETE!
-            if ( log.isErrorEnabled() )                                                  // NEARLY OBSOLETE!
-            {                                                                            // NEARLY OBSOLETE!
-                log.error("Could not parse: " + url_str );                               // NEARLY OBSOLETE!
-            }                                                                            // NEARLY OBSOLETE!
-        }                                                                                // NEARLY OBSOLETE!
-        return extracted_hrefs;                                                          // NEARLY OBSOLETE!
-    }                                                                                    // NEARLY OBSOLETE!
-}                                                                                        // NEARLY OBSOLETE!
+        // Example value: .href/mysite/|ROOT/-2
+        String href_attr =  store_attr_base    +
+                            "/|" + webapp_name +
+                            "/"  + BASE_VERSION_ALIAS;
+
+        Set<String> dependent_hrefs_md5 =
+                         attr_.getAttribute( href_attr    + "/" +
+                                             FILE_TO_HDEP + "/" +
+                                             file_md5
+                                           ).keySet();
+
+        List<String> dependent_hrefs =
+                        new ArrayList<String>( dependent_hrefs_md5.size() );
+
+        for (String href_md5 : dependent_hrefs_md5 )
+        {
+            String href_str =
+                   attr_.getAttribute( href_attr   + "/" +
+                                       MD5_TO_HREF + "/" +
+                                       href_md5
+                                     ).getStringValue();
+
+            dependent_hrefs.add( href_str );
+        }
+
+        Collections.sort( dependent_hrefs );
+
+        return  dependent_hrefs;
+    }
+}
