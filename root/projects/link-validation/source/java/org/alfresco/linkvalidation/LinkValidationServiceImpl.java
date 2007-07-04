@@ -1015,7 +1015,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         if ( old_update_version > 0 )
         {
             // make JMX call to turn old virtualized webapp off
-            virtreg_.removeAllWebapps( old_update_version, webappPath, false);
+            virtreg_.removeWebapp( old_update_version, webappPath, false);
         }
 
         // set update_to_version attribute
@@ -1025,14 +1025,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                             new IntAttributeValue( update_to_version ));
 
 
-        // Virtualize update_to_version
-        //
-        // NEON TODO:  Implement the ablity to update a single webapp
-        //             Calling updateAllWebapps becomes N^2 with
-        //             the number of webapps in a store....
-        //
+        // Virtualize update_to_version via JMX call
 
-        if ( ! virtreg_.updateAllWebapps( update_to_version, webappPath, false))
+        if ( ! virtreg_.updateWebapp( update_to_version, webappPath, false))
         {
             throw new LinkValidationAbortedException(
                 "Version: " + update_to_version + " of: " + webappPath +
@@ -1626,7 +1621,22 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             for (String src_parsed_url : src_href_list)
             {
-                int status_code = src_href_status_map.get(src_parsed_url).getFirst();
+
+                Pair<Integer,List<String>> tuple = 
+                    src_href_status_map.get(src_parsed_url);
+
+                int status_code;
+
+                // TODO: handle things like ftp links
+
+                if ( tuple != null )
+                {
+                    status_code =  tuple.getFirst();
+                }
+                else
+                {
+                    status_code = 400;
+                }
 
                 if (status_code >= 400 )
                 {
@@ -2871,13 +2881,19 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         catch (Exception e )
         {
             // You could have a bogus protocol or some other probem.
-            // For example:           <a href="sales@alfresco.com">woops</a>
-            // Gives you              url_str="sales@alfresco.com"
-            // and exception msg: no protocol: sales@alfresco.com
+            //
+            // <a href=>xxx</a>
+            // <a href='bogus-moo://xh:324/s'>xxx</a>
+            // Causes: java.net.MalformedURLException
+            //
+            // <a href='ftp://as.4sxh:324/ss/s'>xxx</a>
+            // Causes:  sun.net.www.protocol.ftp.FtpURLConnection
+            //
+            // ... and so on.
 
             if ( log.isDebugEnabled() )
-                log.debug("Cannot connect to :" + url_str );
-
+                log.debug("Cannot connect to:  " + url_str + "  " +
+                          e.getClass().getName() +  "  " + e.getMessage());
 
             // Rather than update the URL status just let it retain
             // whatever status it had before, and assume this is
