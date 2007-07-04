@@ -1,4 +1,4 @@
-# Sample Hibernate configuration to disnable Hibernate schema updates
+# Sample Hibernate configuration to disable Hibernate schema updates
 # Values are "validate" or "update" (default)
 #hibernate.hbm2ddl.auto=validate
 

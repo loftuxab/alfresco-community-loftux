@@ -43,7 +43,7 @@ call "%CATALINA_HOME%\bin\startup.bat"
 rem ---------------------------------
 rem Start Virtualization if available
 rem ---------------------------------
-rem if exist "virtual_start.bat" call virtual_start.bat 
+rem if exist "~dp0virtual_start.bat" call "~dp0virtual_start.bat" 
 
 rem ---------------------------------------
 rem Start OpenOffice for transformations
