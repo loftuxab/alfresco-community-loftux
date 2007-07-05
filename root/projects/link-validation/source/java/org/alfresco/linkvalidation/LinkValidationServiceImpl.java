@@ -81,7 +81,9 @@ import org.alfresco.util.NameMatcher;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.alfresco.repo.avm.CreateVersionTxnListener;
+import org.alfresco.repo.avm.PurgeVersionTxnListener;
+import org.alfresco.repo.avm.PurgeStoreTxnListener;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -319,6 +321,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     NameMatcher                  excluder_;
     NameMatcher                  href_bearing_request_path_matcher_;
     RetryingTransactionHelper    transaction_helper_;
+    CreateVersionTxnListener     create_version_txn_listener_;
+    PurgeVersionTxnListener      purge_version_txn_listener_;
+    PurgeStoreTxnListener        purge_store_txn_listener_;
+
+    LinkValidationStoreCallbackHandler  store_latest_version_info_;
 
     int local_connect_timeout_  = 10000;
     int remote_connect_timeout_ = 10000;
@@ -390,6 +397,20 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         poll_interval_ = milliseconds;
     }
 
+    public void setCreateVersionTxnListener( CreateVersionTxnListener listener)
+    {
+        create_version_txn_listener_ = listener;
+    }
+
+    public void setPurgeVersionTxnListener ( PurgeVersionTxnListener listener)
+    {
+        purge_version_txn_listener_ = listener;
+    }
+
+    public void setPurgeStoreTxnListener(PurgeStoreTxnListener listener)
+    {
+        purge_store_txn_listener_ = listener;
+    }
 
     //-------------------------------------------------------------------------
     /**
@@ -426,6 +447,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         final boolean  validateExternal =  true;   // check external hrefs
 
         HrefValidationProgress progress_sleepy = null;
+
+        // Register transaction callbacks to build a cache that helps to
+        // avoid unnecesary calls to the real AVM getLatestSnapshotID().
+        // Instead, the local version is called (which consults the cache).
+
+        store_latest_version_info_ = new LinkValidationStoreCallbackHandler();
+
+        create_version_txn_listener_.addCallback( store_latest_version_info_ );
+        purge_version_txn_listener_.addCallback(  store_latest_version_info_ );
+        purge_store_txn_listener_.addCallback(    store_latest_version_info_ );
+
 
         while ( ! Shutdown_.get() )
         {
@@ -508,6 +540,40 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             progress_sleepy.abort();
         }
     }
+
+    /*-------------------------------------------------------------------------
+    *  getLatestSnapshotID --
+    *       Cached version of the AVM call of the same name.
+    *------------------------------------------------------------------------*/
+    protected int getLatestSnapshotID( String  store )
+                  throws  AVMNotFoundException
+    {
+        Integer latest = 
+            store_latest_version_info_.getLatestSnapshotID( store );
+
+        if ((latest != null) &&  latest >= 0) 
+        { 
+            return latest;                      // cache hit
+        }
+
+        // Call the real function
+        latest = avm_.getLatestSnapshotID( store );
+
+        // Update the cache
+        //
+        // Note:  The somewhat peculiar calling syntax is necesary to avoid
+        //        a race condition. If the cache was updated between the time
+        //        the call to the "real" getLatestSnapshotID() (see above)
+        //        and the fetch of the data from the cache (see below),
+        //        the return vaule of putLatestSnapshotID() obtains the
+        //        final latest version.
+
+        latest = store_latest_version_info_.putLatestSnapshotID(store, latest);
+
+        return latest;
+    }
+
+
 
     //-------------------------------------------------------------------------
     /**
@@ -599,16 +665,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         // Get rid of stuff that isn't needed anymore
 
-        if ( log.isDebugEnabled() )
-            log.debug("Removing href attributes that are no longer needed");
-
         for (String key : webapp_keys.keySet() )
         {
             if ( ! valid_webapp_keys.containsKey( key ) )
             {
-                if ( log.isDebugEnabled() )
-                    log.debug("Removing AttributeService key: " + key );
-
                 int    last_slash = key.lastIndexOf('/');
                 String stem       = key.substring(0,last_slash);
                 String stale      = key.substring(last_slash + 1);
@@ -642,10 +702,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             int                depth,
             Map<String,String> webapp_keys)
     {
-        if ( log.isDebugEnabled() )
-            log.debug( "get_webapp_keys_in_attribute_service: " + base);
-
-
         if ( depth > 128 )              // Sanity check.
         {                               // No DNS name can be this deep
             if ( log.isWarnEnabled() )
@@ -766,7 +822,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 // tag/description info in a non-anonymous snapshot.
                 // avm_.createSnapshot(store, null, null);
 
-                int update_to_version = avm_.getLatestSnapshotID( store );
+                int update_to_version = getLatestSnapshotID( store );
 
                 updateWebappHrefInfo( update_to_version,
                                       path,
@@ -805,11 +861,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // avm_.createSnapshot(store, null, null);
 
 
-        int update_to_version = avm_.getLatestSnapshotID( store );
-
-        if ( log.isDebugEnabled() )
-            log.debug("update_to_version: " + update_to_version );
-
+        int update_to_version = getLatestSnapshotID( store );
 
         // Get all webapps in this store
 
@@ -830,11 +882,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             throw e;
         }
-
-        if ( log.isDebugEnabled() )
-            log.debug(
-                "updateStoreHrefInfo fetched webapp_entries from: " + app_base);
-
 
         for ( Map.Entry<String, AVMNodeDescriptor> webapp_entry  :
                                                    webapp_entries.entrySet()
@@ -3364,7 +3411,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String store_attr_base =
                getAttributeStemForDnsName( dns_name );
 
-        int version = avm_.getLatestSnapshotID( store );
+        int version = getLatestSnapshotID( store );
 
         if  ( webapp_name != null )
         {
