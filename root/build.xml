@@ -309,7 +309,17 @@
          <fileset dir="${dir.project.repository.config}" 
                   includes="**/extension/dev-context.xml"/>
       </copy>
-      
+
+
+      <!-- 
+           Temporary measure to help Eclipse users deal with 
+           link validation dependencies.  This should be cleaned
+           up when the build is transformed into a single project.
+      -->
+      <copy file="${dir.project.linkvalidation.config}/alfresco/alfresco-link-validation-bootstrap-context.xml"
+            todir="${dir.deploy.tomcat}/alfresco/WEB-INF/classes/alfresco/extension"/>
+
+
       <!-- copy webclient web source files i.e. JSPs, images etc. -->
       <copy todir="${dir.deploy.tomcat}/alfresco">
          <fileset dir="${dir.project.webclient.src.web}" 
