@@ -4,6 +4,18 @@
 
 <beans>
 
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!--                                                                    -->
+    <!--                        ****  TODO  ****                            -->
+    <!--                                                                    -->
+    <!--  The contents of this file really should be inside:                -->
+    <!--  root/projects/repository/config/alfresco/bootstrap-context.xml    -->
+    <!--                                                                    -->
+    <!-- However, this will only be practical after the build reorg         -->
+    <!-- (everything will go in 1 project).                                 -->
+    <!--                                                                    -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+
     <bean id="linkValidationServiceBootstrap" 
           class="org.alfresco.linkvalidation.LinkValidationServiceBootstrap">
     </bean>

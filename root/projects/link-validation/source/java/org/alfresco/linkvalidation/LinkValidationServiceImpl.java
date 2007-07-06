@@ -39,6 +39,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -46,6 +47,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
@@ -62,6 +64,9 @@ import org.alfresco.repo.attributes.MapAttribute;
 import org.alfresco.repo.attributes.MapAttributeValue;
 import org.alfresco.repo.attributes.StringAttribute;
 import org.alfresco.repo.attributes.StringAttributeValue;
+import org.alfresco.repo.avm.CreateVersionTxnListener;
+import org.alfresco.repo.avm.PurgeStoreTxnListener;
+import org.alfresco.repo.avm.PurgeVersionTxnListener;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
@@ -81,9 +86,6 @@ import org.alfresco.util.NameMatcher;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.alfresco.repo.avm.CreateVersionTxnListener;
-import org.alfresco.repo.avm.PurgeVersionTxnListener;
-import org.alfresco.repo.avm.PurgeStoreTxnListener;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -289,11 +291,23 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 {
     private static Log log = LogFactory.getLog(LinkValidationServiceImpl.class);
 
+    //------------------------------------------------------------------------
+    //                         ***************
+    //                         **  WARNING  **
+    //                         ***************
+    //
+    //        Update the Schema_version_ any time the AttributeService
+    //        schema used by LinkValidationServiceImpl creates changes.
+    //
+    //------------------------------------------------------------------------
+    static private final int Schema_version_  = 1;
+
+
     // Shutdown flag for service
     private static AtomicBoolean Shutdown_ = new AtomicBoolean( false );
 
     static String HREF               = ".href";    // top level href key
-
+    static String SCHEMA_VERSION     = "schema";   // vers # of  info schema
     static String BASE_VERSION       = "latest";   // vers # of  baseline
     static String BASE_VERSION_ALIAS = "-2";       // alias  for baseline
     static String UPDATE_VERSION     = "update";   // vers # of  update
@@ -332,6 +346,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     int local_read_timeout_     = 30000;
     int remote_read_timeout_    = 30000;
     int poll_interval_          = 5000;
+
+    String jsse_trust_store_file_;
+    String jsse_trust_store_password_;
+
+
+    boolean purge_all_validation_data_on_bootstrap_;
 
 
     static Pattern WEB_INF_META_INF_pattern_ =
@@ -412,6 +432,22 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         purge_store_txn_listener_ = listener;
     }
 
+    public void setJsseTrustStoreFile( String file )
+    {
+        jsse_trust_store_file_ = file.replace('/', File.separatorChar);
+    }
+
+    public void setJsseTrustStorePassword( String password)
+    {
+        jsse_trust_store_password_ = password;
+    }
+
+    public void  setPurgeAllValidationDataOnBootstrap( boolean tf)
+    {
+        purge_all_validation_data_on_bootstrap_ = tf;
+    }
+
+
     //-------------------------------------------------------------------------
     /**
     *  Called by LinkValidationServiceBootstrap at startup time to ensure
@@ -458,12 +494,72 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         purge_version_txn_listener_.addCallback(  store_latest_version_info_ );
         purge_store_txn_listener_.addCallback(    store_latest_version_info_ );
 
+        // JSSE HTTPS:
+        //   Unless a trust store is set, HTTPS connections will fail with:
+        //      java.security.InvalidAlgorithmParameterException: 
+        //           the trustAnchors parameter must be non-empty
+
+        String password =  
+                ( (jsse_trust_store_password_ != null) && 
+                  ! jsse_trust_store_password_.equals("")
+                )
+                ? jsse_trust_store_password_ 
+                : "changeit";                       // That's the JDK default!
+                                                    // Who really changes this?
+        String trust_store_file = 
+                ( (jsse_trust_store_file_ != null) && 
+                  !jsse_trust_store_file_.equals("")
+                ) ? jsse_trust_store_file_
+                  : (System.getProperty("java.home") + 
+                    "/lib/security/cacerts".replace('/', File.separatorChar));
+
+        System.setProperty("javax.net.ssl.trustStore",trust_store_file);
+        System.setProperty("javax.net.ssl.trustStorePassword",password);
+
+        // Before Java 1.4, you needed to do a dance like the one below;
+        // however, that's no longer necessary.
+        //
+        // See also:   http://java.sun.com/j2se/1.4.2/docs/guide/security/
+        //                    jsse/JSSERefGuide.html
+        //
+        // Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
+        // Properties properties = System.getProperties();
+        // String handlers = System.getProperty("java.protocol.handler.pkgs");
+        // if (handlers == null)  // expected case: no handlers
+        // {
+        //     properties.put("java.protocol.handler.pkgs", 
+        //                    "com.sun.net.ssl.internal.www.protocol");
+        // }
+        // else
+        // {
+        //     properties.put(
+        //        "java.protocol.handler.pkgs", 
+        //        "com.sun.net.ssl.internal.www.protocol|".concat(handlers));
+        // }
+        // System.setProperties(properties);
+
+
+        if ( purge_all_validation_data_on_bootstrap_ )
+        {
+            try 
+            { 
+                attr_.removeAttribute( "", HREF); 
+
+                if ( log.isInfoEnabled() )
+                    log.info( "Purged all link validation data.");
+            }
+            catch (Exception e) 
+            { 
+                if ( log.isInfoEnabled() )
+                    log.info( "No link validation data to purge.");
+            }
+        }
+
 
         while ( ! Shutdown_.get() )
         {
             if ( log.isDebugEnabled() )
                 log.debug( "LinkValidationService polling webapps...");
-
 
             final HrefValidationProgress progress = new HrefValidationProgress();
             progress_sleepy = progress;
@@ -993,24 +1089,46 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
         // Example:               ".href/mysite/|ROOT"
-        String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
+        String webapp_attr_base = store_attr_base  +  "/|" + webapp_name;
 
-        setAttribute_if_not_found( webapp_attr_base,
-                                   BASE_VERSION_ALIAS,
-                                   new MapAttributeValue());
-
-        String  href_attr = webapp_attr_base +  "/" + BASE_VERSION_ALIAS;
-
-        String [] index_list = { SOURCE_TO_HREF, HREF_TO_SOURCE,
-                                 HREF_TO_STATUS, STATUS_TO_HREF,
-                                 MD5_TO_FILE,    MD5_TO_HREF,
-                                 HREF_TO_FDEP,   FILE_TO_HDEP };
+        // Example:               ".href/mysite/|ROOT/-2"
+        String href_attr        = webapp_attr_base +  "/"  + BASE_VERSION_ALIAS;
 
 
-        for (String key : index_list )
+        Attribute schema_vers_attr =
+            attr_.getAttribute( webapp_attr_base + "/" + SCHEMA_VERSION);
+
+        if ((schema_vers_attr == null)
+            ||
+            (schema_vers_attr.getIntValue() != Schema_version_ )
+           )
         {
-            setAttribute_if_not_found( href_attr, key ,new MapAttributeValue());
+            // The webapp's href info is not using the same schema version
+            // so toss the old data before attempting to to an update.
+
+            attr_.setAttribute(                 // reset schema version
+                webapp_attr_base,
+                SCHEMA_VERSION,
+                new IntAttributeValue( Schema_version_ ));
+
+            attr_.setAttribute(                 // diff against empty store
+                webapp_attr_base,
+                BASE_VERSION,
+                new IntAttributeValue( 0 ));
+            
+            try                                 // discard other schema's info
+            { 
+                attr_.removeAttribute( webapp_attr_base, BASE_VERSION_ALIAS);
+            }
+            catch (Exception e)
+            {
+                // Not harmful if there was nothing to throw away.
+            }
+
+            if ( log.isDebugEnabled() )
+                log.debug("updateWebappHrefInfo purged data from prior schema");
         }
+
 
         int base_version = 0;
         Attribute base_vers_attr =
@@ -1026,6 +1144,26 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                 BASE_VERSION,
                                 new IntAttributeValue( 0 ));
         }
+
+
+
+
+        setAttribute_if_not_found( webapp_attr_base,
+                                   BASE_VERSION_ALIAS,
+                                   new MapAttributeValue());
+
+
+        String [] index_list = { SOURCE_TO_HREF, HREF_TO_SOURCE,
+                                 HREF_TO_STATUS, STATUS_TO_HREF,
+                                 MD5_TO_FILE,    MD5_TO_HREF,
+                                 HREF_TO_FDEP,   FILE_TO_HDEP };
+
+
+        for (String key : index_list )
+        {
+            setAttribute_if_not_found( href_attr, key ,new MapAttributeValue());
+        }
+
 
         int old_update_version = 0;
         Attribute old_update_vers_attr =
@@ -1673,8 +1811,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     src_href_status_map.get(src_parsed_url);
 
                 int status_code;
-
-                // TODO: handle things like ftp links
 
                 if ( tuple != null )
                 {
@@ -2741,7 +2877,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // e.g.:   42, "mysite:/www/avm_webapps/ROOT/moo"
             entries = avm_.getDirectoryListing( version, dir );
         }
-        catch (Exception e)     // TODO: just AVMNotFoundException ?
+        catch (Exception e)
         {
             if ( log.isErrorEnabled() )
             {
@@ -2925,6 +3061,58 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             //
             conn = (HttpURLConnection) url.openConnection();
         }
+        catch (ClassCastException e)
+        {
+            // The HttpURLConnection class will throw an exception
+            // on non-http links that correspond to valid protocols.
+            // For example, sun.net.www.protocol.ftp.FtpURLConnection
+            // will be thrown by a valid link of the form:
+            // <a href="ftp://ftp.example.com/xyz.txt">good ftp</a>
+            // 
+            // Here's a complete list of the protocol types that will
+            // generate this exception:
+            //
+            //    ftp 
+            //    gopher 
+            //    file
+            //
+            // Here's a list of known protocols
+            // (c.f: http://www.iana.org/assignments/uri-schemes.html )
+            // 
+            //    aaa aaas acap afs cap cid crid data dav dict dns dtn 
+            //    fax file ftp go gopher h323 http https iax2 icap im 
+            //    imap info ipp iris iris.beep iris.lwz iris.xpc iris.xpcs 
+            //    ldap mailserver mailto mid modem msrp msrps mtqp mupdate 
+            //    news nfs nntp opaquelocktoken pop pres prospero rtsp 
+            //    service shttp sip sips snmp soap.beep soap.beeps tag 
+            //    tel telnet tftp thismessage tip tn3270 tv urn vemmi wais 
+            //    xmlrpc.beep xmlrpc.beeps xmpp z39.50r z39.50s
+            //
+            // TODO: 
+            //   In the future, it would be nice if there were a good way
+            //   to at least validate FTP links. 
+            //
+            // See also:
+            //   http://www.javaworld.com/javaworld/jw-04-2003/jw-0404-ftp.html
+            //   http://java.sun.com/developer/onlineTraining/protocolhandlers/
+            //
+            // For now, let's just not claim they're broken.
+            // Hack:  set status to 299.
+
+            response_code = 299;
+
+            // Let's not call progress.incrementUrlUpdateCount();
+            // because the URL it wasn't really checked.
+
+            if ( log.isDebugEnabled() )
+                log.debug("Response code (simulated) for '" + 
+                           url_str + "': " + response_code);
+
+            href_status_map.put(
+                url_str, new Pair<Integer,List<String>>(response_code,null) );
+
+            return null;
+        }
         catch (Exception e )
         {
             // You could have a bogus protocol or some other probem.
@@ -2932,9 +3120,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // <a href=>xxx</a>
             // <a href='bogus-moo://xh:324/s'>xxx</a>
             // Causes: java.net.MalformedURLException
-            //
-            // <a href='ftp://as.4sxh:324/ss/s'>xxx</a>
-            // Causes:  sun.net.www.protocol.ftp.FtpURLConnection
             //
             // ... and so on.
 
@@ -2946,8 +3131,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // whatever status it had before, and assume this is
             // an ephemeral network failure;  "ephemeral" here means
             // "on all instances of this url for this validation."
-            //
-            // TODO -- rethink this.
 
             return null;
         }
@@ -3022,8 +3205,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 throw se;
             }
             else
-            {                                 // It's an external link, so
-                response_code = 400;          // just call it a link failure.
+            {                                 
+                // It's an external link, so
+                // just call it a link failure.
+
+                if ( log.isDebugEnabled() )
+                    log.debug("Error validating external link: " +
+                               se.getClass().getName() + " " + se.getMessage() );
+
+                response_code = 400; 
             }
         }
         catch ( SSLException ssle )
@@ -3039,8 +3229,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 throw ssle;
             }
             else
-            {                                 // It's an external link, so
-                response_code = 400;          // just call it a link failure.
+            { 
+                // It's an external link, so
+                // just call it a link failure.
+
+                if ( log.isDebugEnabled() )
+                    log.debug("Error validating external https link: " +
+                               ssle.getClass().getName()         + " " + 
+                               ssle.getMessage() );
+
+                response_code = 400; 
             }
         }
         catch (IOException ioe)
@@ -3272,7 +3470,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             entries = avm_.getDirectoryListing( dst_version, dst_path);
         }
-        catch (Exception e)     // TODO: just AVMNotFoundException ?
+        catch (Exception e)
         {
             if ( log.isErrorEnabled() )
                 log.error("Could not list version: " + dst_version +

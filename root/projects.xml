@@ -905,6 +905,14 @@
          <fileset dir="${dir.project.repository.config}" 
                   includes="**/extension/dev-context.xml"/>
       </copy>
+      <!-- 
+           Temporary measure to help Eclipse users deal with 
+           link validation dependencies.  This should be cleaned
+           up when the build is transformed into a single project.
+      -->
+      <copy file="${dir.project.linkvalidation.config}/alfresco/alfresco-link-validation-bootstrap-context.xml"
+            todir="${dir.project.webclient.assemble}/WEB-INF/classes/alfresco/extension"/>
+
 
       <!-- Fixes to lucene FSDirectory -->
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes/org/apache/lucene/store">
