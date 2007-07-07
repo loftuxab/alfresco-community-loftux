@@ -22,7 +22,7 @@
 *  
 *  
 *  Author  Jon Cox  <jcox@alfresco.com>
-*  File    HrefExtractor.java
+*  File    UriExtractor.java
 *----------------------------------------------------------------------------*/
 
 package org.alfresco.linkvalidation;
@@ -31,8 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import org.htmlparser.filters.OrFilter;
 import org.htmlparser.filters.TagNameFilter;
 import org.htmlparser.Node;
@@ -46,17 +46,21 @@ import org.htmlparser.util.ParserException;
 import org.htmlparser.util.SimpleNodeIterator;
 
 /**
-*  Given an HREF, extracts links from "A" and "IMG" nodes,
-*  and forcing all hostnames and protocols to lower-case
-*  (this makes map-based caching more effective).
+*  Given an HREF, extracts a unique and sorted list of URIs from 
+*  "A" and "IMG" nodes, and forcing all hostnames and protocols 
+*  to lower-case (this makes map-based caching more effective).  
+*  Unlike the "legacy" htmlparser.org standard of stripping the 
+*  URI scheme away from "mailto:*"  and "javascript:*" links 
+*  (an no others), this extractor preserves them (thereby making
+*  it possible to deal with URIs in a uniform way downstream).
 */
-public class HrefExtractor 
+public class UriExtractor 
 {
     Parser parser_;
     static OrFilter A_OR_IMG = new OrFilter( new TagNameFilter("A"), 
                                              new TagNameFilter("IMG"));
 
-    public HrefExtractor() { parser_ = new Parser(); }
+    public UriExtractor() { parser_ = new Parser(); }
 
     public void setConnection (URLConnection connection)  
     {
@@ -74,7 +78,7 @@ public class HrefExtractor
         }
     }
 
-    public List<String> extractHrefs() throws ParserException 
+    public Set<String> extractURIs() throws ParserException 
     {
         parser_.reset();
         NodeList node_list;
@@ -89,7 +93,7 @@ public class HrefExtractor
             node_list = parser_.extractAllNodesThatMatch( A_OR_IMG ); 
         }
 
-        ArrayList<String> hrefs = new ArrayList<String>( node_list.size() );
+        Set<String> hrefs = new TreeSet<String>();
 
         SimpleNodeIterator iter = node_list.elements();
         while (iter.hasMoreNodes() )
@@ -97,7 +101,34 @@ public class HrefExtractor
             Tag node = (Tag) iter.nextNode();
             if  ( "A".equals( node.getTagName() ) )
             {
-                hrefs.add( lowercase_hostname( ((LinkTag)node).getLink()));
+                // Oddly, there's a special case for mailto and javascript
+                // links that needs to be handled.   The LinkTag strips these
+                // schemes away when you call getLink().
+                //
+                // See: http://htmlparser.sourceforge.net
+                //            /javadoc/org/htmlparser/tags
+                //            /LinkTag.html#getLink()
+                // 
+                //       "This string has had the "mailto:" and "javascript:" 
+                //       protocol stripped off the front (if those predicates 
+                //       return true) but not for other protocols. Don't ask 
+                //       me why, it's a legacy thing.
+                //
+                // Fortunately, the source is online:
+                // http://htmlparser.cvs.sourceforge.net/htmlparser/htmlparser 
+                //       /src/org/htmlparser/tags/LinkTag.java
+                // 
+                // What isn't clear in the docs becomes obvious in the source:
+                // the function that's *really* wanted is extractLink()
+                // (and getLink() is nothing more than a decoy).  
+                //
+                // You can't even reliably call getLink() then isMailLink()
+                // because the logic there is somewhat busted and assumes
+                // "mailtoxxxxxxxxxxxx:foo@example.com" is a mail link.
+
+                LinkTag tag = (LinkTag) node;   // and so it goes...
+
+                hrefs.add( lowercase_hostname( tag.extractLink() ) );
             }
             else
             {
@@ -110,29 +141,35 @@ public class HrefExtractor
     /*-------------------------------------------------------------------------
     *   Ensure hostname & protocol are in lower-case.
     *------------------------------------------------------------------------*/
-    String lowercase_hostname( String raw_url )
+    String lowercase_hostname( String raw_uri )
     {
-        // Incoming URLs will look like this:  "http://mooCow.com"
+        // Incoming URIs will look like this:  "http://mooCow.com"
         //                                or:  "http://mooCow.com/"
         //                                or:  "http://mooCow.com:999"
         //                                or:  "http://mooCow.com:999/..."
+        //                                or:  "mailto:alice@example.com"
+        //                                or:   ... ? 
+        // 
+        // Therefore, just look for ".*://.../" 
+        //                      or  ".*://...."
+        // and lower case that frag.
 
-        if  (raw_url == null ) { return null; }
 
-        int slash_1 = raw_url.indexOf('/');
-        if ( slash_1 < 0) { return raw_url;}
+        if ( raw_uri == null ) { return raw_uri; }
 
-        int slash_2 = raw_url.indexOf('/', slash_1 + 1);
-        if ( slash_2 < 0) { return raw_url;}
+        int colon = raw_uri.indexOf(':');
+        if (colon < 0 ) { return raw_uri; }
 
-        int end_hostport =  raw_url.indexOf('/', slash_2 + 1);
+        int length = raw_uri.length();
+        if ( length <= colon + 2 ) { return raw_uri;}
+        if ( raw_uri.charAt( colon + 1 ) != '/') { return raw_uri;}
+        if ( raw_uri.charAt( colon + 2 ) != '/') { return raw_uri;}
 
-        int raw_url_length = raw_url.length();
+        int eohost =  raw_uri.indexOf('/', colon + 3);
+        if ( eohost < 0 ) { eohost = length; }
 
-        if ( end_hostport < 0) { end_hostport = raw_url_length; }
-
-        return raw_url.substring(0, end_hostport).toLowerCase() +
-               raw_url.substring(end_hostport, raw_url_length);
+        return raw_uri.substring(0, eohost).toLowerCase() +
+               raw_uri.substring(eohost,length);
     }
 
     public static void main(String[] argv) 
@@ -154,7 +191,7 @@ public class HrefExtractor
         }
         catch (Exception e) { e.printStackTrace(); }
 
-        HrefExtractor     linkExtractor = new HrefExtractor();
+        UriExtractor     linkExtractor = new UriExtractor();
 
         conn.setConnectTimeout( 10000 );
         conn.setReadTimeout(    30000 );
@@ -174,13 +211,13 @@ public class HrefExtractor
         System.out.println("Response code: " + response_code );
 
         linkExtractor.setConnection( conn );
-        List<String> hrefs = null;
-        try { hrefs = linkExtractor.extractHrefs(); }
+        Set<String> uris = null;
+        try { uris = linkExtractor.extractURIs(); }
         catch (Exception e) { e.printStackTrace(); }
 
-        for (String href: hrefs)
+        for (String uri : uris)
         {
-            System.out.println( href );
+            System.out.println( uri );
         }
     }
 }

@@ -67,6 +67,7 @@ import org.alfresco.repo.attributes.StringAttributeValue;
 import org.alfresco.repo.avm.CreateVersionTxnListener;
 import org.alfresco.repo.avm.PurgeStoreTxnListener;
 import org.alfresco.repo.avm.PurgeVersionTxnListener;
+import org.alfresco.repo.avm.util.UriSchemeNameMatcher;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
@@ -332,7 +333,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     AVMRemote                    avm_;
     AttributeService             attr_;
     AVMSyncService               sync_;
-    NameMatcher                  excluder_;
+    NameMatcher                  path_excluder_;
+    NameMatcher                  scheme_excluder_;
     NameMatcher                  href_bearing_request_path_matcher_;
     RetryingTransactionHelper    transaction_helper_;
     CreateVersionTxnListener     create_version_txn_listener_;
@@ -356,7 +358,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     static Pattern WEB_INF_META_INF_pattern_ =
              Pattern.compile(
-               "[^:]+:/www/avm_webapps/(:?META-INF|WEB-INF)(?:/.*|$)",
+               "[^:]+:/www/avm_webapps/[^/]+/(:?META-INF|WEB-INF)(?:/.*|$)",
                Pattern.CASE_INSENSITIVE);
 
 
@@ -373,8 +375,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     public void setAvmRemote(AVMRemote svc)               { avm_ = svc; }
     public AVMRemote getAvmRemote()                       { return avm_;}
 
-    public void setExcludeMatcher(NameMatcher matcher)  { excluder_ = matcher;}
-    public NameMatcher getExcludeMatcher()              { return excluder_;}
+    public void setExcludePathMatcher(NameMatcher matcher) 
+    {
+        path_excluder_ = matcher;
+    }
+
+    public NameMatcher getExcludePathMatcher()
+    {
+        return path_excluder_;
+    }
 
     public void setHrefBearingRequestPathMatcher(NameMatcher matcher)
     {
@@ -386,6 +395,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         return href_bearing_request_path_matcher_;
     }
 
+    public void setExcludeUriMatcher( NameMatcher matcher)
+    {
+        scheme_excluder_ = matcher;
+    }
 
     public void setVirtServerRegistry(VirtServerRegistry reg) {virtreg_ = reg;}
     public VirtServerRegistry getVirtServerRegistry()         {return virtreg_;}
@@ -1393,7 +1406,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                                    srcWebappPath,
                                                    dstVersion,
                                                    dstWebappPath,
-                                                   excluder_);
+                                                   path_excluder_);
 
         ValidationPathParser sp = new ValidationPathParser(avm_, srcWebappPath);
         String src_dns_name     = sp.getDnsName();
@@ -1622,7 +1635,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 if ( src_href_status_map.get( src_parsed_url ) == null )
                 {
-                    validate_href( src_parsed_url,
+                    validate_uri( src_parsed_url,
                                    src_href_status_map,
                                    src_parsed_url.startsWith( src_webapp_url_base ),
                                    false,
@@ -1806,20 +1819,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             for (String src_parsed_url : src_href_list)
             {
-
                 Pair<Integer,List<String>> tuple = 
                     src_href_status_map.get(src_parsed_url);
 
                 int status_code;
 
-                if ( tuple != null )
-                {
-                    status_code =  tuple.getFirst();
-                }
-                else
-                {
-                    status_code = 400;
-                }
+                if ( tuple != null ) { status_code =  tuple.getFirst(); }
+                else                 { status_code = 400; }
 
                 if (status_code >= 400 )
                 {
@@ -2787,7 +2793,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     href_str = rel_href_str;
                 }
 
-                validate_href(
+                validate_uri(
                     href_str,                 // href to revalidate
                     href_status_map,          // new status map
                     get_lookup_dependencies,  // only when url is internal
@@ -2822,7 +2828,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
              String href_str = src_webapp_url_base + rel_href_str;
 
-             validate_href(
+             validate_uri(
                  href_str,                 // href to revalidate
                  href_status_map,          // new status map
                  true,                     // always internal
@@ -2986,7 +2992,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
 
-        List<String> urls = validate_href( implicit_url,
+        Set<String> urls  = validate_uri( implicit_url,
                                            href_status_map,
                                            true,            // get lookup dep
                                            true,            // get urls
@@ -3026,17 +3032,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     }
 
     /*-------------------------------------------------------------------------
-    *  validate_href --
-    *        Validate one hyperlink
+    *  validate_uri --
+    *        Validate one hyperlink 
     *------------------------------------------------------------------------*/
-    List<String>  validate_href( String                 url_str,
-                                 HrefStatusMap          href_status_map,
-                                 boolean                get_lookup_dependencies,
-                                 boolean                get_urls,
-                                 HrefValidationProgress progress)
-                  throws         SocketException,
-                                 SSLException,
-                                 LinkValidationAbortedException
+    Set<String>   validate_uri( String                 uri_str,
+                                HrefStatusMap          href_status_map,
+                                boolean                get_lookup_dependencies,
+                                boolean                get_urls,
+                                HrefValidationProgress progress)
+                  throws        SocketException,
+                                SSLException,
+                                LinkValidationAbortedException
     {
         HttpURLConnection conn = null;
         URL               url  = null;
@@ -3050,44 +3056,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             throw new LinkValidationAbortedException();
         }
 
-        try
-        {
-            url = new URL( url_str );
+        // Certain URI schema types are hard to validate,
+        // so just claim they work if they've been excluded 
 
-            // Oddly, url.openConnection() does not actually
-            // open a connection; it merely creates a connection
-            // object that is later opened via connect() within
-            // the HrefExtractor.
-            //
-            conn = (HttpURLConnection) url.openConnection();
-        }
-        catch (ClassCastException e)
+        if  ( scheme_excluder_.matches( uri_str ) )
         {
-            // The HttpURLConnection class will throw an exception
-            // on non-http links that correspond to valid protocols.
-            // For example, sun.net.www.protocol.ftp.FtpURLConnection
-            // will be thrown by a valid link of the form:
-            // <a href="ftp://ftp.example.com/xyz.txt">good ftp</a>
-            // 
-            // Here's a complete list of the protocol types that will
-            // generate this exception:
-            //
-            //    ftp 
-            //    gopher 
-            //    file
-            //
-            // Here's a list of known protocols
-            // (c.f: http://www.iana.org/assignments/uri-schemes.html )
-            // 
-            //    aaa aaas acap afs cap cid crid data dav dict dns dtn 
-            //    fax file ftp go gopher h323 http https iax2 icap im 
-            //    imap info ipp iris iris.beep iris.lwz iris.xpc iris.xpcs 
-            //    ldap mailserver mailto mid modem msrp msrps mtqp mupdate 
-            //    news nfs nntp opaquelocktoken pop pres prospero rtsp 
-            //    service shttp sip sips snmp soap.beep soap.beeps tag 
-            //    tel telnet tftp thismessage tip tn3270 tv urn vemmi wais 
-            //    xmlrpc.beep xmlrpc.beeps xmpp z39.50r z39.50s
-            //
             // TODO: 
             //   In the future, it would be nice if there were a good way
             //   to at least validate FTP links. 
@@ -3101,17 +3074,47 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             response_code = 299;
 
-            // Let's not call progress.incrementUrlUpdateCount();
-            // because the URL it wasn't really checked.
+            progress.incrementUrlUpdateCount();
 
             if ( log.isDebugEnabled() )
                 log.debug("Response code (simulated) for '" + 
-                           url_str + "': " + response_code);
+                           uri_str + "': " + response_code);
 
             href_status_map.put(
-                url_str, new Pair<Integer,List<String>>(response_code,null) );
+                uri_str, new Pair<Integer,List<String>>(response_code,null) );
 
             return null;
+        }
+
+
+        try
+        {
+            // The URL class is much too strict, and
+            // the URI class is much too lax.
+            // Where's the 3rd Java Bear, huh?
+            // Nothing is "just right". :(  
+
+            url = new URL( uri_str );
+        }
+        catch (Exception e)
+        {
+            progress.incrementUrlUpdateCount();
+
+            if ( log.isDebugEnabled() )
+                log.debug("Bad URI:  " + uri_str + "  " +
+                          e.getClass().getName() +  "  " + e.getMessage());
+
+            return null;
+        }
+
+        try
+        {
+            // Oddly, url.openConnection() does not actually
+            // open a connection; it merely creates a connection
+            // object that is later opened via connect() within
+            // the UriExtractor.
+            //
+            conn = (HttpURLConnection) url.openConnection();
         }
         catch (Exception e )
         {
@@ -3124,7 +3127,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // ... and so on.
 
             if ( log.isDebugEnabled() )
-                log.debug("Cannot connect to:  " + url_str + "  " +
+                log.debug("Cannot connect to:  " + uri_str + "  " +
                           e.getClass().getName() +  "  " + e.getMessage());
 
             // Rather than update the URL status just let it retain
@@ -3146,7 +3149,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // than 15 seconds to connect or more than 60 seconds
         // to read a response, give up.
         //
-        HrefExtractor href_extractor = new HrefExtractor();
+        UriExtractor uri_extractor = new UriExtractor();
 
         if (get_lookup_dependencies)    // local file
         {
@@ -3180,9 +3183,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
         if ( log.isDebugEnabled() )
-            log.debug("About to fetch URL: " + url_str );
+            log.debug("About to fetch URL: " + uri_str );
 
-        href_extractor.setConnection( conn );
+        uri_extractor.setConnection( conn );
 
         try { response_code = conn.getResponseCode(); }
         catch ( SocketException se )
@@ -3256,7 +3259,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
         if ( log.isDebugEnabled() )
-            log.debug("Response code for '" + url_str + "': " + response_code);
+            log.debug("Response code for '" + uri_str + "': " + response_code);
 
         // deal with resonse code
 
@@ -3270,7 +3273,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // an early return here.
 
             href_status_map.put(
-                url_str, new Pair<Integer,List<String>>(response_code,null) );
+                uri_str, new Pair<Integer,List<String>>(response_code,null) );
 
             if  ( progress != null )
             {
@@ -3330,9 +3333,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
-        // files upon which url_str URL depends.
+        // files upon which uri_str URL depends.
         href_status_map.put(
-           url_str, new Pair<Integer,List<String>>(response_code,dependencies));
+           uri_str, new Pair<Integer,List<String>>(response_code,dependencies));
 
         if ( progress != null )
         {
@@ -3344,18 +3347,18 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             return null;
         }
 
-        List<String> extracted_hrefs = null;
+        Set<String> extracted_uris = null;
         try
         {
-            extracted_hrefs = href_extractor.extractHrefs();
+            extracted_uris = uri_extractor.extractURIs();
         }
         catch (Exception e)
         {
             if ( log.isErrorEnabled() )
-                log.error("Could not parse: " + url_str );
+                log.error("Could not parse: " + uri_str );
         }
 
-        return extracted_hrefs;
+        return extracted_uris;
     }
 
     //-------------------------------------------------------------------------
@@ -3459,7 +3462,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 MD5                    md5,
                 HrefValidationProgress progress)
     {
-        if ( excluder_ != null && excluder_.matches( dst_path ))
+        if ( path_excluder_ != null && path_excluder_.matches( dst_path ))
         {
             return;
         }
@@ -3537,7 +3540,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 MD5                    md5,
                 HrefValidationProgress progress)
     {
-        if ( excluder_ != null && excluder_.matches( dst_path ))
+        if ( path_excluder_ != null && path_excluder_.matches( dst_path ))
         {
             return;
         }
