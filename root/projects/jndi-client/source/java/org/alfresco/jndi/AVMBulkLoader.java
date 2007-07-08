@@ -48,6 +48,7 @@ import org.alfresco.service.cmr.avm.AVMExistsException;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.avm.AVMService;
+import org.alfresco.service.cmr.avm.locking.AVMLockingService;
 import org.alfresco.service.namespace.QName;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -302,6 +303,8 @@ public class AVMBulkLoader
 
     /** @exclude */
     protected AVMService service_;
+    
+    protected AVMLockingService lockingService_;
 
     /** 
     * @exclude 
@@ -311,7 +314,12 @@ public class AVMBulkLoader
     protected HashMap<String, Object> repo_to_snapshot_ = 
                                           new HashMap<String, Object>();
 
-    public AVMBulkLoader( AVMService service ) { service_ = service; }
+    public AVMBulkLoader( AVMService service,
+                          AVMLockingService lockingService) 
+    { 
+        service_ = service; 
+        lockingService_ = lockingService;
+    }
 
 
     /**
@@ -413,6 +421,8 @@ public class AVMBulkLoader
                 QName.createQName(null, dnsname_key ),
                 new PropertyValue(null, dnsname_val )
             );
+            String webProject = dnsname_key.substring(dnsname_key.lastIndexOf('.') + 1, dnsname_key.length());
+            lockingService_.addWebProject(webProject);
         }
         catch (AVMException e) 
         { 
@@ -713,7 +723,11 @@ public class AVMBulkLoader
 
         String repo_name = basepath.substring(0,colon_index);
 
-        try { service_.createStore( repo_name ); }
+        try 
+        { 
+            service_.createStore( repo_name );
+            
+        }
         catch (AVMExistsException e )  { /* ok */ }
 
         if (service_.lookup(-1, basepath) == null) // start off optimistic
