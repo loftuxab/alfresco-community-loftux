@@ -51,6 +51,7 @@ import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Set;
+import java.util.SortedMap;
 import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
@@ -87,157 +88,6 @@ import org.alfresco.util.NameMatcher;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-/**
-*    Utility class to parse paths
-*/
-//-----------------------------------------------------------------------------
-class ValidationPathParser
-{
-    static String App_Dir_ = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
-                             "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
-
-    String    store_        = null;
-    String    app_base_     = null;
-    String    webapp_name_  = null;
-    String    dns_name_     = null;
-    String    path_         = null;
-    String    req_path_     = null;
-    int       store_end_    = -2;
-    int       webapp_start_ = -2;
-    int       webapp_end_   = -2;
-    AVMRemote avm_          = null;
-
-    ValidationPathParser(AVMRemote avm, String path)
-    throws               IllegalArgumentException
-    {
-        avm_ = avm;
-        path_ = path;
-    }
-
-    String getStore()
-    {
-        if ( store_ != null ) { return store_ ; }
-        store_end_ = path_.indexOf(':');
-
-        if ( store_end_ < 0)
-        {
-            store_ = path_;
-            return store_;
-        }
-
-        if ( ! path_.startsWith( App_Dir_, store_end_ + 1 )  )
-        {
-            throw new IllegalArgumentException("Invalid webapp path: " + path_);
-        }
-        else
-        {
-            store_ = path_.substring(0,store_end_);
-        }
-
-        return store_;
-    }
-
-    String getAppBase()
-    {
-        if (app_base_ != null) { return app_base_; }
-        if (store_ == null )   { getStore(); }
-        app_base_ = store_ + ":" + App_Dir_;
-        return app_base_;
-    }
-
-    String getWebappName()
-    {
-        if ( webapp_name_ != null) { return webapp_name_; }
-        if ( store_end_ < -1)    { getStore(); }
-        if ( store_end_ < 0 )    { return null; }
-
-        webapp_start_ =
-                path_.indexOf('/', store_end_ + 1 + App_Dir_.length());
-
-        if (webapp_start_ >= 0)
-        {
-            webapp_end_  = path_.indexOf('/', webapp_start_ + 1);
-            webapp_name_ = path_.substring( webapp_start_ +1,
-                                            (webapp_end_ < 1)
-                                            ?  path_.length()
-                                            :  webapp_end_ );
-
-            if  ((webapp_name_ != null) &&
-                 (webapp_name_.length() == 0)
-                )
-            {
-                webapp_name_ = null;
-            }
-        }
-        return webapp_name_;
-    }
-
-    /*-------------------------------------------------------------------------
-    *  getRequestPath --
-    *       Given an path of the form mysite:/www/avm_webapps/ROOT/m oo/bar.txt
-    *       returns the non-encoded request path  ( "/mo o/bar.txt")
-    *
-    *       Given an path of the form mysite:/www/avm_webapps/cow/m oo/bar.txt
-    *       returns the non-encoded request path  ( "/cow/mo o/bar.txt")
-    *
-    *------------------------------------------------------------------------*/
-    String getRequestPath()
-    {
-        if (req_path_ != null ) { return req_path_;}
-
-        String webapp_name = getWebappName();
-        if (webapp_name == null ) { return null; }
-
-        int req_start = -1;
-
-        if ( webapp_name.equals("ROOT") )
-        {
-            req_start = webapp_start_ + "ROOT".length() + 1;
-        }
-        else
-        {
-            req_start = webapp_start_;
-        }
-
-        req_path_ =  path_.substring( req_start, path_.length() );
-
-        if ( req_path_.equals("") ) { req_path_ = "/"; }
-
-        return req_path_;
-    }
-
-
-    String getDnsName() throws AVMNotFoundException
-    {
-        if ( dns_name_ != null ) { return dns_name_; }
-        if ( store_ == null )    { getStore() ; }
-
-        dns_name_ = lookupStoreDNS( avm_, store_ );
-        if ( dns_name_ == null )
-        {
-            throw new AVMNotFoundException(
-                       "No DNS entry for AVM store: " + store_);
-        }
-        dns_name_ = dns_name_.toLowerCase();
-        return dns_name_;
-    }
-
-    String lookupStoreDNS(AVMRemote avm,  String store )
-    {
-        Map<QName, PropertyValue> props =
-                avm.queryStorePropertyKey(store,
-                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
-
-        return ( props.size() != 1
-                 ? null
-                 : props.keySet().iterator().next().getLocalName().
-                         substring(SandboxConstants.PROP_DNS.length())
-               );
-    }
-}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -299,10 +149,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //
     //        Update the Schema_version_ any time the AttributeService
     //        schema used by LinkValidationServiceImpl creates changes.
+    //        This includes:
+    //
+    //           o  Adding a new AttributeService key (e.g.: SOURCE_TO_HREF)
+    //           o  Reworking how links are parsed
+    //           o  New validation support for schemes/protocls (e.g.: ftp?)
     //
     //------------------------------------------------------------------------
-    static private final int Schema_version_  = 1;
-
+    static private final int Schema_version_  = 2;
 
     // Shutdown flag for service
     private static AtomicBoolean Shutdown_ = new AtomicBoolean( false );
@@ -352,9 +206,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     String jsse_trust_store_file_;
     String jsse_trust_store_password_;
 
-
     boolean purge_all_validation_data_on_bootstrap_;
-
 
     static Pattern WEB_INF_META_INF_pattern_ =
              Pattern.compile(
@@ -375,7 +227,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     public void setAvmRemote(AVMRemote svc)               { avm_ = svc; }
     public AVMRemote getAvmRemote()                       { return avm_;}
 
-    public void setExcludePathMatcher(NameMatcher matcher) 
+    public void setExcludePathMatcher(NameMatcher matcher)
     {
         path_excluder_ = matcher;
     }
@@ -509,21 +361,21 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         // JSSE HTTPS:
         //   Unless a trust store is set, HTTPS connections will fail with:
-        //      java.security.InvalidAlgorithmParameterException: 
+        //      java.security.InvalidAlgorithmParameterException:
         //           the trustAnchors parameter must be non-empty
 
-        String password =  
-                ( (jsse_trust_store_password_ != null) && 
+        String password =
+                ( (jsse_trust_store_password_ != null) &&
                   ! jsse_trust_store_password_.equals("")
                 )
-                ? jsse_trust_store_password_ 
+                ? jsse_trust_store_password_
                 : "changeit";                       // That's the JDK default!
                                                     // Who really changes this?
-        String trust_store_file = 
-                ( (jsse_trust_store_file_ != null) && 
+        String trust_store_file =
+                ( (jsse_trust_store_file_ != null) &&
                   !jsse_trust_store_file_.equals("")
                 ) ? jsse_trust_store_file_
-                  : (System.getProperty("java.home") + 
+                  : (System.getProperty("java.home") +
                     "/lib/security/cacerts".replace('/', File.separatorChar));
 
         System.setProperty("javax.net.ssl.trustStore",trust_store_file);
@@ -540,13 +392,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // String handlers = System.getProperty("java.protocol.handler.pkgs");
         // if (handlers == null)  // expected case: no handlers
         // {
-        //     properties.put("java.protocol.handler.pkgs", 
+        //     properties.put("java.protocol.handler.pkgs",
         //                    "com.sun.net.ssl.internal.www.protocol");
         // }
         // else
         // {
         //     properties.put(
-        //        "java.protocol.handler.pkgs", 
+        //        "java.protocol.handler.pkgs",
         //        "com.sun.net.ssl.internal.www.protocol|".concat(handlers));
         // }
         // System.setProperties(properties);
@@ -554,15 +406,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
         if ( purge_all_validation_data_on_bootstrap_ )
         {
-            try 
-            { 
-                attr_.removeAttribute( "", HREF); 
+            try
+            {
+                attr_.removeAttribute( "", HREF);
 
                 if ( log.isInfoEnabled() )
                     log.info( "Purged all link validation data.");
             }
-            catch (Exception e) 
-            { 
+            catch (Exception e)
+            {
                 if ( log.isInfoEnabled() )
                     log.info( "No link validation data to purge.");
             }
@@ -616,7 +468,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
                 if ( log.isInfoEnabled() )
-                    log.info("Could not validate links.  Retrying");
+                    log.info("Could not validate links.  Retrying.  ( "       +
+                             e.getClass().getName() +  ":  " + e.getMessage() +
+                             " )");
             }
             finally
             {
@@ -632,8 +486,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 if ( log.isDebugEnabled() )
                     log.debug("Troubled sleep(): " + e.getMessage());
             }
-            if ( log.isDebugEnabled() )
-                log.debug("Woke up from sleep");
         }
 
         if ( log.isDebugEnabled() )
@@ -657,11 +509,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     protected int getLatestSnapshotID( String  store )
                   throws  AVMNotFoundException
     {
-        Integer latest = 
+        Integer latest =
             store_latest_version_info_.getLatestSnapshotID( store );
 
-        if ((latest != null) &&  latest >= 0) 
-        { 
+        if ((latest != null) &&  latest >= 0)
+        {
             return latest;                      // cache hit
         }
 
@@ -693,9 +545,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     void remove_stale_href_info(
             Map<String, Map<QName, PropertyValue>>  store_staging_main_entries )
     {
-        if ( log.isDebugEnabled() )
-            log.debug( "remove_stale_href_info");
-
         Map<String,String> valid_webapp_keys = new HashMap<String,String>();
 
         for ( Map.Entry<String, Map<QName, PropertyValue>>
@@ -878,9 +727,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                 SSLException,
                                 LinkValidationAbortedException
     {
-        if ( log.isDebugEnabled() )
-            log.debug( "updateHrefInfo path: " + path);
-
         if ( path == null )           // For every staging store, update href
         {                             // validity info on every webapp.
             // get staging stores
@@ -926,11 +772,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
             else                                         // A webapp path
             {
-                // Flush all modified files into an anonymous snapshot.
-                // A null tag & description  are used to avoid clobbering
-                // tag/description info in a non-anonymous snapshot.
-                // avm_.createSnapshot(store, null, null);
-
                 int update_to_version = getLatestSnapshotID( store );
 
                 updateWebappHrefInfo( update_to_version,
@@ -957,18 +798,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                               SSLException,
                               LinkValidationAbortedException
     {
-        if ( log.isDebugEnabled() )
-            log.debug("starting updateStoreHrefInfo: " + store );
-
         // Determine what version of the store we're trying to update
         // the baseline version of the href validity info to.
-
-
-        // Flush all modified files into an anonymous snapshot.
-        // A null tag & description  are used to avoid clobbering
-        // tag/description info in a non-anonymous snapshot.
-        // avm_.createSnapshot(store, null, null);
-
 
         int update_to_version = getLatestSnapshotID( store );
 
@@ -1013,21 +844,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             String webappPath = app_base + "/" + webapp_name;
 
-            if ( log.isDebugEnabled() )
-                log.debug( "About to update hrefs in: "  + webappPath);
 
             updateWebappHrefInfo( update_to_version,
                                   webappPath,
                                   incremental,
                                   validateExternal,
                                   progress);
-
-            if ( log.isDebugEnabled() )
-                log.debug( "Finished update of hrefs in: "  + webappPath);
         }
-
-        if ( log.isDebugEnabled() )
-            log.debug("done updateStoreHrefInfo: " + store );
     }
 
     /*-------------------------------------------------------------------------
@@ -1128,9 +951,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 webapp_attr_base,
                 BASE_VERSION,
                 new IntAttributeValue( 0 ));
-            
+
             try                                 // discard other schema's info
-            { 
+            {
                 attr_.removeAttribute( webapp_attr_base, BASE_VERSION_ALIAS);
             }
             catch (Exception e)
@@ -1303,9 +1126,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                               SSLException,
                               LinkValidationAbortedException
     {
-        if ( log.isErrorEnabled() )
-            log.error("getHrefDifference: " + srcWebappPath  + "  " + dstWebappPath );
-
+        if ( log.isDebugEnabled() )
+            log.debug("getHrefDifference: " + srcWebappPath  + "  " + dstWebappPath );
 
         ValidationPathParser p =
             new ValidationPathParser(avm_, dstWebappPath);
@@ -1413,7 +1235,22 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String src_req_path     = sp.getRequestPath();
 
         String virt_domain      = virtreg_.getVirtServerFQDN();
-        int    virt_port        = virtreg_.getVirtServerHttpPort();
+        int    virt_port;
+        try { virt_port = virtreg_.getVirtServerHttpPort(); }
+        catch (NullPointerException e)
+        {
+            // Note that if the virt server has registered but is not
+            // online at the point when you want to validate links,
+            // you can also get:
+            //
+            //      java.net.ConnectException: Connection refused
+
+            if ( log.isErrorEnabled() )
+                log.error("No virtualization server online " +
+                          "(needed by getHrefDifference)");
+
+            throw new  java.net.ConnectException("Connection refused");
+        }
 
         String src_fqdn         = src_dns_name + ".www--sandbox.version--v" +
                                   srcVersion   + "." + virt_domain;
@@ -1495,7 +1332,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                  "/"  + BASE_VERSION_ALIAS;
 
         HrefDifference href_diff = new HrefDifference(href_attr,
+                                                      srcVersion,
                                                       sp.getStore(),
+                                                      dstVersion,
                                                       dp.getStore(),
                                                       src_webapp_url_base,
                                                       dst_webapp_url_base);
@@ -1636,10 +1475,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 if ( src_href_status_map.get( src_parsed_url ) == null )
                 {
                     validate_uri( src_parsed_url,
-                                   src_href_status_map,
-                                   src_parsed_url.startsWith( src_webapp_url_base ),
-                                   false,
-                                   progress);
+                                  src_href_status_map,
+                                  src_parsed_url.startsWith( src_webapp_url_base ),
+                                  false,
+                                  progress);
                 }
             }
         }
@@ -1819,7 +1658,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             for (String src_parsed_url : src_href_list)
             {
-                Pair<Integer,List<String>> tuple = 
+                Pair<Integer,List<String>> tuple =
                     src_href_status_map.get(src_parsed_url);
 
                 int status_code;
@@ -2695,17 +2534,29 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
+        if ( href_diff.getDstVersion() == 0 )
+        {
+            // We're done!
 
-        recheckBrokenLinks(href_diff,
-                           dst_webapp_url_base,
-                           src_webapp_url_base,
-                           src_webapp_url_base_length,
-                           src_store_length,
-                           dst_store,
-                           href_attr,
-                           rel_href_broken_fdep,
-                           md5,
-                           progress);
+            if ( log.isDebugEnabled() )
+                log.debug("recheckBrokenLinks skipped (update from version 0)");
+        }
+        else
+        {
+            // Some links may have been fixed.
+            // Recheck them.
+
+            recheckBrokenLinks(href_diff,
+                               dst_webapp_url_base,
+                               src_webapp_url_base,
+                               src_webapp_url_base_length,
+                               src_store_length,
+                               dst_store,
+                               href_attr,
+                               rel_href_broken_fdep,
+                               md5,
+                               progress);
+        }
     }
 
 
@@ -2991,13 +2842,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             return;
         }
 
-
-        Set<String> urls  = validate_uri( implicit_url,
-                                           href_status_map,
-                                           true,            // get lookup dep
-                                           true,            // get urls
-                                           progress);
-
+        Map<String,Boolean> urls  = validate_uri( implicit_url,
+                                                   href_status_map,
+                                                   true,           // lookup dep
+                                                   true,           // get urls
+                                                   progress);
 
         boolean saw_gen_url = false;
 
@@ -3010,7 +2859,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             href_arraylist = new ArrayList<String>( urls.size() + 1 );
 
-            for (String  resp_url  : urls )
+            for (String  resp_url  : urls.keySet() )
             {
                 if ( ! saw_gen_url  && implicit_url.equals(resp_url))
                 {
@@ -3033,16 +2882,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     /*-------------------------------------------------------------------------
     *  validate_uri --
-    *        Validate one hyperlink 
+    *        Validate one hyperlink
     *------------------------------------------------------------------------*/
-    Set<String>   validate_uri( String                 uri_str,
-                                HrefStatusMap          href_status_map,
-                                boolean                get_lookup_dependencies,
-                                boolean                get_urls,
-                                HrefValidationProgress progress)
-                  throws        SocketException,
-                                SSLException,
-                                LinkValidationAbortedException
+    Map<String,Boolean> validate_uri(
+                        String                 uri_str,
+                        HrefStatusMap          href_status_map,
+                        boolean                get_lookup_dependencies,
+                        boolean                get_urls,
+                        HrefValidationProgress progress)
+                 throws SocketException,
+                        SSLException,
+                        LinkValidationAbortedException
     {
         HttpURLConnection conn = null;
         URL               url  = null;
@@ -3057,13 +2907,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
         // Certain URI schema types are hard to validate,
-        // so just claim they work if they've been excluded 
+        // so just claim they work if they've been excluded
 
         if  ( scheme_excluder_.matches( uri_str ) )
         {
-            // TODO: 
+            // TODO:
             //   In the future, it would be nice if there were a good way
-            //   to at least validate FTP links. 
+            //   to at least validate FTP links.
             //
             // See also:
             //   http://www.javaworld.com/javaworld/jw-04-2003/jw-0404-ftp.html
@@ -3077,7 +2927,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             progress.incrementUrlUpdateCount();
 
             if ( log.isDebugEnabled() )
-                log.debug("Response code (simulated) for '" + 
+                log.debug("Response code (simulated) for '" +
                            uri_str + "': " + response_code);
 
             href_status_map.put(
@@ -3092,7 +2942,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // The URL class is much too strict, and
             // the URI class is much too lax.
             // Where's the 3rd Java Bear, huh?
-            // Nothing is "just right". :(  
+            // Nothing is "just right". :(
 
             url = new URL( uri_str );
         }
@@ -3182,9 +3032,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         }
 
 
-        if ( log.isDebugEnabled() )
-            log.debug("About to fetch URL: " + uri_str );
-
         uri_extractor.setConnection( conn );
 
         try { response_code = conn.getResponseCode(); }
@@ -3208,7 +3055,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 throw se;
             }
             else
-            {                                 
+            {
                 // It's an external link, so
                 // just call it a link failure.
 
@@ -3216,7 +3063,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     log.debug("Error validating external link: " +
                                se.getClass().getName() + " " + se.getMessage() );
 
-                response_code = 400; 
+                response_code = 400;
             }
         }
         catch ( SSLException ssle )
@@ -3232,16 +3079,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 throw ssle;
             }
             else
-            { 
+            {
                 // It's an external link, so
                 // just call it a link failure.
 
                 if ( log.isDebugEnabled() )
                     log.debug("Error validating external https link: " +
-                               ssle.getClass().getName()         + " " + 
+                               ssle.getClass().getName()         + " " +
                                ssle.getMessage() );
 
-                response_code = 400; 
+                response_code = 400;
             }
         }
         catch (IOException ioe)
@@ -3347,7 +3194,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             return null;
         }
 
-        Set<String> extracted_uris = null;
+        SortedMap<String,Boolean> extracted_uris = null;
         try
         {
             extracted_uris = uri_extractor.extractURIs();
@@ -3578,8 +3425,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *
     *------------------------------------------------------------------------*/
     public List<HrefManifestEntry> getBrokenHrefManifestEntries(
-                                          String   storeNameOrWebappPath)
-                                   throws AVMNotFoundException
+                                          String      storeNameOrWebappPath)
+                                   throws AVMNotFoundException,
+                                          SocketException
     {
         return getHrefManifestEntries( storeNameOrWebappPath, 400, 599);
     }
@@ -3589,10 +3437,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *
     *------------------------------------------------------------------------*/
     public List<HrefManifestEntry> getHrefManifestEntries(
-                                      String storeNameOrWebappPath,
-                                      int    statusGTE,
-                                      int    statusLTE)
-                                   throws AVMNotFoundException
+                                          String      storeNameOrWebappPath,
+                                          int         statusGTE,
+                                          int         statusLTE)
+                                   throws AVMNotFoundException,
+                                          SocketException
     {
         ValidationPathParser p =
             new ValidationPathParser(avm_, storeNameOrWebappPath);
@@ -3683,12 +3532,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *
     *------------------------------------------------------------------------*/
     void getHrefManifestEntriesFromWebapp(
-            HashMap<String, ArrayList<String> > href_manifest_map,
-            String webapp_name,
-            String store_attr_base,
-            String status_gte,
-            String status_lte,
-            String dns_name)
+                HashMap<String, ArrayList<String> > href_manifest_map,
+                String webapp_name,
+                String store_attr_base,
+                String status_gte,
+                String status_lte,
+                String dns_name)
+         throws SocketException
     {
         // Example value: .href/mysite/|ROOT
         String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
@@ -3698,7 +3548,24 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                             "/"  + BASE_VERSION_ALIAS;
 
         String virt_domain = virtreg_.getVirtServerFQDN();
-        int    virt_port   = virtreg_.getVirtServerHttpPort();
+        int    virt_port;
+
+        try { virt_port = virtreg_.getVirtServerHttpPort(); }
+        catch (NullPointerException e)
+        {
+            // Note that if the virt server has registered but is not
+            // online at the point when you want to validate links,
+            // you can also get:
+            //
+            //      java.net.ConnectException: Connection refused
+
+            if ( log.isErrorEnabled() )
+                log.error("No virtualization server online " +
+                          "(needed by getHrefManifestEntriesFromWebapp)");
+
+            throw new  java.net.ConnectException("Connection refused");
+        }
+
 
         int base_version = 0;
         Attribute base_vers_attr =
@@ -3844,5 +3711,156 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         Collections.sort( dependent_hrefs );
 
         return  dependent_hrefs;
+    }
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+/**
+*    Utility class to parse paths
+*/
+//-----------------------------------------------------------------------------
+class ValidationPathParser
+{
+    static String App_Dir_ = "/" + JNDIConstants.DIR_DEFAULT_WWW   +
+                             "/" + JNDIConstants.DIR_DEFAULT_APPBASE;
+
+    String    store_        = null;
+    String    app_base_     = null;
+    String    webapp_name_  = null;
+    String    dns_name_     = null;
+    String    path_         = null;
+    String    req_path_     = null;
+    int       store_end_    = -2;
+    int       webapp_start_ = -2;
+    int       webapp_end_   = -2;
+    AVMRemote avm_          = null;
+
+    ValidationPathParser(AVMRemote avm, String path)
+    throws               IllegalArgumentException
+    {
+        avm_ = avm;
+        path_ = path;
+    }
+
+    String getStore()
+    {
+        if ( store_ != null ) { return store_ ; }
+        store_end_ = path_.indexOf(':');
+
+        if ( store_end_ < 0)
+        {
+            store_ = path_;
+            return store_;
+        }
+
+        if ( ! path_.startsWith( App_Dir_, store_end_ + 1 )  )
+        {
+            throw new IllegalArgumentException("Invalid webapp path: " + path_);
+        }
+        else
+        {
+            store_ = path_.substring(0,store_end_);
+        }
+
+        return store_;
+    }
+
+    String getAppBase()
+    {
+        if (app_base_ != null) { return app_base_; }
+        if (store_ == null )   { getStore(); }
+        app_base_ = store_ + ":" + App_Dir_;
+        return app_base_;
+    }
+
+    String getWebappName()
+    {
+        if ( webapp_name_ != null) { return webapp_name_; }
+        if ( store_end_ < -1)    { getStore(); }
+        if ( store_end_ < 0 )    { return null; }
+
+        webapp_start_ =
+                path_.indexOf('/', store_end_ + 1 + App_Dir_.length());
+
+        if (webapp_start_ >= 0)
+        {
+            webapp_end_  = path_.indexOf('/', webapp_start_ + 1);
+            webapp_name_ = path_.substring( webapp_start_ +1,
+                                            (webapp_end_ < 1)
+                                            ?  path_.length()
+                                            :  webapp_end_ );
+
+            if  ((webapp_name_ != null) &&
+                 (webapp_name_.length() == 0)
+                )
+            {
+                webapp_name_ = null;
+            }
+        }
+        return webapp_name_;
+    }
+
+    /*-------------------------------------------------------------------------
+    *  getRequestPath --
+    *       Given an path of the form mysite:/www/avm_webapps/ROOT/m oo/bar.txt
+    *       returns the non-encoded request path  ( "/mo o/bar.txt")
+    *
+    *       Given an path of the form mysite:/www/avm_webapps/cow/m oo/bar.txt
+    *       returns the non-encoded request path  ( "/cow/mo o/bar.txt")
+    *
+    *------------------------------------------------------------------------*/
+    String getRequestPath()
+    {
+        if (req_path_ != null ) { return req_path_;}
+
+        String webapp_name = getWebappName();
+        if (webapp_name == null ) { return null; }
+
+        int req_start = -1;
+
+        if ( webapp_name.equals("ROOT") )
+        {
+            req_start = webapp_start_ + "ROOT".length() + 1;
+        }
+        else
+        {
+            req_start = webapp_start_;
+        }
+
+        req_path_ =  path_.substring( req_start, path_.length() );
+
+        if ( req_path_.equals("") ) { req_path_ = "/"; }
+
+        return req_path_;
+    }
+
+
+    String getDnsName() throws AVMNotFoundException
+    {
+        if ( dns_name_ != null ) { return dns_name_; }
+        if ( store_ == null )    { getStore() ; }
+
+        dns_name_ = lookupStoreDNS( avm_, store_ );
+        if ( dns_name_ == null )
+        {
+            throw new AVMNotFoundException(
+                       "No DNS entry for AVM store: " + store_);
+        }
+        dns_name_ = dns_name_.toLowerCase();
+        return dns_name_;
+    }
+
+    String lookupStoreDNS(AVMRemote avm,  String store )
+    {
+        Map<QName, PropertyValue> props =
+                avm.queryStorePropertyKey(store,
+                     QName.createQName(null, SandboxConstants.PROP_DNS + '%'));
+
+        return ( props.size() != 1
+                 ? null
+                 : props.keySet().iterator().next().getLocalName().
+                         substring(SandboxConstants.PROP_DNS.length())
+               );
     }
 }
