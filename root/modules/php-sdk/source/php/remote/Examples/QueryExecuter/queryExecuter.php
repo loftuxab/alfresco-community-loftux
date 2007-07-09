@@ -27,15 +27,16 @@
 require_once('Alfresco/Service/Repository.php');
 require_once('Alfresco/Service/Session.php');
 require_once('Alfresco/Service/SpacesStore.php');
+require_once('../config.php');
 	
 if (isset($_SESSION) == false)
 {
    session_start();
-}   
+}
 
 // Start the Alfresco session
-$repository = new Repository();
-$ticket = $repository->authenticate("admin", "admin");
+$repository = new Repository($repositoryUrl);
+$ticket = $repository->authenticate($userName, $password);
 $session = $repository->createSession($ticket);
 
 // Get the current query details
