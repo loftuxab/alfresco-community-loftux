@@ -56,6 +56,7 @@ import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
+import org.alfresco.repo.admin.patch.impl.WCMFoldersPatch;
 import org.alfresco.repo.attributes.Attribute;
 import org.alfresco.repo.attributes.BooleanAttribute;
 import org.alfresco.repo.attributes.BooleanAttributeValue;
@@ -68,6 +69,7 @@ import org.alfresco.repo.attributes.StringAttributeValue;
 import org.alfresco.repo.avm.CreateVersionTxnListener;
 import org.alfresco.repo.avm.PurgeStoreTxnListener;
 import org.alfresco.repo.avm.PurgeVersionTxnListener;
+import org.alfresco.repo.avm.util.RawServices;
 import org.alfresco.repo.avm.util.UriSchemeNameMatcher;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
@@ -88,6 +90,8 @@ import org.alfresco.util.NameMatcher;
 import org.alfresco.util.Pair;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
+import org.springframework.context.ApplicationContext;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -341,6 +345,28 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     public void run()
     {
+        // If WCM isn't installed (c.f:  wcm-bootstrap-context.xml), then 
+        // an attempt to fetch the "patch.wcmFolders" will fail, indicating
+        // that there's no need to run the link validation service.
+
+        try
+        {                                             
+            ApplicationContext springContext =
+               RawServices.Instance().getContext();
+
+            WCMFoldersPatch  has_wcm =
+                (WCMFoldersPatch)  springContext.getBean("patch.wcmFolders");
+        }
+        catch ( NoSuchBeanDefinitionException e)        // WCM is not installed
+        {                                               // so there's no need for
+            if ( log.isDebugEnabled() )                 // LinkValidationService
+                log.debug(
+                "LinkValidationService disabled (WCM not installed)");
+
+            return;                                     // terminate service
+        }
+
+
         // Initiate background process to check links
         // For now, hard-code initial update
         final String   webappPath       =  null;   // all stores/webapps
@@ -471,11 +497,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     log.info("Could not validate links.  Retrying.  ( "       +
                              e.getClass().getName() +  ":  " + e.getMessage() +
                              " )");
-            }
-            finally
-            {
-                if ( log.isDebugEnabled() )
-                    log.debug("About to sleep");
             }
 
             // Sleep regardless of whetherthe updateHrefInfo failed
