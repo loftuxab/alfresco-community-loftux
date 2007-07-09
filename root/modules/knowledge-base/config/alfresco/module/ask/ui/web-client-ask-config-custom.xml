@@ -1,0 +1,252 @@
+<alfresco-config>
+ 
+   <config evaluator="string-compare" condition="Dashboards">
+      <!-- Dashboard layouts and available dashlets for the My Alfresco pages -->
+      <dashboards>
+         <layouts>
+         </layouts>
+         <dashlets>
+            <dashlet id="records-report" label="Records Report"
+                  description="Records Report"
+                  jsp="/jsp/dashboards/dashlets/records/records-report-dashlet.jsp" allow-narrow="false" />
+            <!--
+				 		<dashlet id="knowledge-base" label="ASK Knowledge Base Manager"
+                  description="Manage Alfresco ASK Knowledge Base"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/knowledge-base-dashlet.jsp" allow-narrow="true" />
+            -->
+				 		<dashlet id="search-knowledge-base" label="ASK Knowledge Base Search"
+                  description="Search Alfresco ASK Knowledge Base"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/search-knowledge-base-dashlet.jsp" allow-narrow="false" />
+            <!--
+            <dashlet id="report-knowledge-base" label="ASK Knowledge Base Report"
+                  description="Alfresco ASK Knowledge Base Report"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/knowledge-base-report-dashlet.jsp" allow-narrow="true" />
+            <dashlet id="article-summary-report" label="ASK Knowledge Base Summary Report"
+                  description="Alfresco ASK Knowledge Base Summary Report"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/article-summary-report.jsp" allow-narrow="true" />
+            <dashlet id="article-usage-report" label="ASK Knowledge Base Usage Report"
+                  description="Alfresco ASK Knowledge Base Summary Report"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/article-usage-report.jsp" allow-narrow="true" />
+            -->
+            <dashlet id="article-manager" label="ASK Knowledge Base Manager"
+                  description="Alfresco ASK Knowledge Manager"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/knowledge-base-manager.jsp" allow-narrow="true" />
+                  
+         </dashlets>
+      </dashboards>
+   </config>
+
+   <!-- Example of overriding the from email address -->
+   
+   <config>
+      <client>
+         <!-- <from-email-address>someone@your-domain.com</from-email-address> -->
+         <search-max-results>100</search-max-results>
+         <!-- the type of edit link to use, NOTE: inline editable will always take precedence -->
+         <!-- can be: http|webdav|cifs -->
+   			 <edit-link-type>cifs</edit-link-type>
+      </client>
+   </config>
+   
+
+   <!-- Example of adding languages to the list in the login page -->
+	
+	 <!--
+   <config evaluator="string-compare" condition="Languages" replace="false">
+      <languages>
+         <language locale="fr_FR">French</language>
+         <language locale="de_DE">German</language>
+         <language locale="ja_JP">Japanese</language>
+      </languages>
+   </config>
+   -->
+   
+   <!-- Example of configuring advanced search -->
+   <!--
+   <config evaluator="string-compare" condition="Advanced Search">
+      <advanced-search>
+         <content-types>
+         </content-types>
+         <custom-properties>
+            <meta-data aspect="app:simpleworkflow" property="app:approveStep" />
+         </custom-properties>
+      </advanced-search>
+   </config>
+   -->
+
+   <!-- Example of changing the sort direction for a view in the client -->
+   <!--
+   <config evaluator="string-compare" condition="Views">
+      <views>
+         <view-defaults>
+            <topic>
+               <sort-direction>ascending</sort-direction>
+            </topic>
+         </view-defaults>
+      </views>
+   </config>
+   -->
+
+   <!-- Example of adding a custom icon to the Create Space dialog -->
+   <!--
+   <config evaluator="string-compare" condition="cm:folder icons">
+      <icons>
+         <icon name="space-icon-custom" path="/images/icons/space-icon-custom.gif" />
+      </icons>
+   </config>
+   -->
+
+   <!-- The config below shows how to incorporate the example model-->
+   <!-- into the web client, for this to work you will need to -->
+   <!-- rename example-model-context.xml.sample to example-model-context.xml -->
+
+<!--   
+   <config evaluator="string-compare" condition="Content Wizards">
+      <content-types>
+         <type name="my:sop" />
+         <type name="ibc:timesheet" />
+      </content-types>
+   </config>
+-->
+<!--
+
+   <config evaluator="node-type" condition="my:sop">
+      <property-sheet>
+         <show-property name="mimetype" display-label-id="content_type" 
+                        component-generator="MimeTypeSelectorGenerator" />
+         <show-property name="size" display-label-id="size" 
+                        converter="org.alfresco.faces.ByteSizeConverter" 
+                        show-in-edit-mode="false" />               
+         <show-property name="my:publishedDate" />
+         <show-association name="my:signOff" />
+         <show-property name="my:authorisedBy" />
+         <show-child-association name="my:processSteps" />
+      </property-sheet>
+   </config>
+-->
+   
+   <!-- For DA
+   <config evaluator="node-type" condition="my:document">
+      <property-sheet>
+         <show-property name="title" display-label="Title" show-in-view-mode="false" show-in-edit-mode="false"/>
+         
+         <show-property name="projectName" display-label="Project Name" show-in-edit-mode="true"/>
+         
+         <show-property name="size" display-label-id="size" 
+                        converter="org.alfresco.faces.ByteSizeConverter" 
+                        show-in-edit-mode="false" />               
+         <show-property name="my:disposaldate" display-label="Disposal Date" />
+         <show-property name="my:externalreference" display-label="External Reference" />
+      </property-sheet>
+   </config>
+   End for DA -->
+
+<!-- For Ask
+   <config evaluator="node-type" condition="cm:content">
+      <property-sheet>
+         <show-property name="mimetype" display-label-id="content_type" 
+                        component-generator="MimeTypeSelectorGenerator" />
+         <show-property name="size" display-label-id="size" 
+                        converter="org.alfresco.faces.ByteSizeConverter" 
+                        show-in-edit-mode="false" />         
+         <separator name="sep" display-label="Ask Article Properties" component-generator="HeaderSeparatorGenerator" />      
+         <show-property name="ask:article_type" />
+         <show-property name="cm:categories" />
+         <show-property name="ask:alfresco_version" />
+         <show-property name="ask:tags" />
+         <show-property name="ask:error_messages" />
+         <show-property name="ask:status" />
+      </property-sheet>
+   </config>
+End for Ask -->
+
+   <config evaluator="aspect-name" condition="ask:article">
+      <property-sheet>
+         <separator name="sep" display-label="Ask Article Properties" component-generator="HeaderSeparatorGenerator"  show-in-edit-mode="false"/>      
+         <show-property name="ask:askid"  show-in-edit-mode="true"/>
+         <show-property name="ask:article_type"  show-in-edit-mode="false"/>
+         <show-property name="cm:categories"  show-in-edit-mode="false"/>
+         <show-property name="ask:alfresco_version"  show-in-edit-mode="false"/>
+         <show-property name="ask:tags"  show-in-edit-mode="false"/>
+         <show-property name="ask:error_messages"  show-in-edit-mode="false"/>
+         <show-property name="ask:status"  show-in-edit-mode="false"/>
+      </property-sheet>
+   </config>
+
+
+<!--
+   <config evaluator="node-type" condition="ibc:timesheet">
+      <property-sheet>
+         <show-property name="mimetype" display-label-id="content_type" 
+                        component-generator="MimeTypeSelectorGenerator" />
+         <show-property name="size" display-label-id="size" 
+                        converter="org.alfresco.faces.ByteSizeConverter" 
+                        show-in-edit-mode="false" />               
+         <show-property name="ibc:claimPeriod" />
+         <show-property name="ibc:authorisedBy" />
+         <show-property name="ibc:claimedBy" />
+         <show-property name="ibc:doctype" />
+      </property-sheet>
+   </config>
+-->
+<!--
+
+   <config evaluator="aspect-name" condition="my:imageClassification">
+      <property-sheet>
+         <show-property name="my:width"/>
+         <show-property name="my:height"/>
+         <show-property name="my:resolution"/>
+      </property-sheet>
+   </config>
+-->
+
+<!--   
+   <config evaluator="aspect-name" condition="my:status">
+      <property-sheet>
+         <show-property name="my:status" display-label="Status"/>
+      </property-sheet>
+   </config>
+-->
+
+
+   <config evaluator="aspect-name" condition="ch:contentHits">
+      <property-sheet>
+         <show-property name="ch:updateCount" display-label="Update Count" show-in-edit-mode="false"/>
+         <show-property name="ch:readCount" display-label="Read Count" show-in-edit-mode="false"/>
+      </property-sheet>
+   </config>
+
+
+   <config evaluator="aspect-name" condition="wfl:status">
+      <property-sheet>
+         <show-property name="wfl:status" display-label="Status"/>
+      </property-sheet>
+   </config>
+
+
+
+   <config evaluator="string-compare" condition="Action Wizards">
+      <aspects>      
+         <aspect name="ask:article"/>
+         <aspect name="ch:contentHits"/>
+      </aspects>
+      <types>
+      </types>
+      <specialise-types>
+      </specialise-types>
+      <subtypes>
+      </subtypes>
+   </config>
+
+<!--
+   <config evaluator="string-compare" condition="Advanced Search">
+      <advanced-search>
+         <content-types>
+         </content-types>
+         <custom-properties>            
+         </custom-properties>
+      </advanced-search>
+   </config>
+-->
+
+</alfresco-config>
