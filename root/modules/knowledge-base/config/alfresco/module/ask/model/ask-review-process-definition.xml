@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<process-definition xmlns="urn:jbpm.org:jpdl-3.1" name="wf:articleapproval">
+
+    <swimlane name="initiator" />
+
+    <start-state name="start">
+        <task name="wf:submitReviewTask" swimlane="initiator" />
+            <event type="node-leave"> <!-- Call script once the package exists i.e. on node-leave -->
+            <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
+              <!-- Check we have a document attached to the package -->
+		          <!-- Apply the ASK Aspect (ask:status) if not set already. Note: The default ask:status property is draft -->
+		          <!-- Note: Logging to the console requires jscript logging to be enabled in log4j -->
+		          <script>
+		            if (bpm_package.children.length > 0) {
+							  	if (!bpm_package.children[0].hasAspect("ask:status")) {
+										bpm_package.children[0].addAspect("ask:status");
+										bpm_package.children[0].save();									
+										}																								
+								}
+								else
+								if (logger.isLoggingEnabled()) {
+		            	logger.log("Error: Package has no content. Length: " + bpm_package.children.length + " Package: " + bpm_package);
+		            }
+    		      </script>
+    		    </action>
+            </event>
+        <transition name="" to="review" />
+    </start-state>
+
+    <swimlane name="reviewer">
+        <assignment actor-id="#{bpm_assignee.properties['cm:userName']}" />
+    </swimlane>
+
+    <task-node name="review">
+        <!-- Update the status to In Review when we enter this task -->
+        <event type="node-enter">
+            <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
+		          <script>
+									bpm_package.children[0].properties["ask:status"] = "Pending Approval";																
+									bpm_package.children[0].save();
+    		      </script>
+    		    </action>
+        </event>
+        
+        <task name="wf:reviewTask" swimlane="reviewer">
+            <event type="task-create">
+                <script>
+                    if (bpm_workflowDueDate != void)
+                    {
+                        taskInstance.dueDate = bpm_workflowDueDate;
+                    }
+                    if (bpm_workflowPriority != void)
+                    {
+                        taskInstance.priority = bpm_workflowPriority;
+                    }                    
+                </script>
+            </event>
+        </task>
+        <transition name="reject" to="rejected" />
+        <transition name="approve" to="approved"/>
+    </task-node>
+
+    <task-node name="rejected">
+        <!-- Update the status to Draft when we enter this task -->
+        <event type="node-enter">
+            <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
+		          <script>
+									bpm_package.children[0].properties["ask:status"] = "Draft";																
+									bpm_package.children[0].save();
+    		      </script>
+    		    </action>
+        </event>
+
+        <task name="wf:rejectedTask" swimlane="initiator" />
+        <transition name="" to="end" />
+    </task-node>
+
+    <task-node name="approved">
+        <!-- Update the status to Approved when we enter this task -->
+        <event type="node-enter">
+            <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
+		          <script>
+									bpm_package.children[0].properties["ask:status"] = "Current";																
+									bpm_package.children[0].save();
+    		      </script>
+    		    </action>
+        </event>
+
+        <task name="wf:approvedTask" swimlane="initiator" />
+        <transition name="" to="end" />
+    </task-node>
+
+    <end-state name="end" />
+
+    <event type="process-end">
+        <!-- Update the status to Approved when we enter this task -->
+            <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
+		          <script>
+			        	if (cancelled) {
+			        			if (bpm_package.children[0].hasAspect("ask:status")) {
+			        				bpm_package.children[0].properties["ask:status"] = "Draft";																
+											bpm_package.children[0].save();
+											}
+									if (logger.isLoggingEnabled()) {
+			            	logger.log("Workflow cancelled, status reset to Draft");
+				            }
+		            }
+								if (logger.isLoggingEnabled()) {
+			            	logger.log("Workflow completed");
+				        }
+        			</script>
+        		</action>
+    </event>
+
+</process-definition>
