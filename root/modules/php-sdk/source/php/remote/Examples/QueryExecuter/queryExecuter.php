@@ -28,7 +28,10 @@ require_once('Alfresco/Service/Repository.php');
 require_once('Alfresco/Service/Session.php');
 require_once('Alfresco/Service/SpacesStore.php');
 	
-session_start();
+if (isset($_SESSION) == false)
+{
+   session_start();
+}   
 
 // Start the Alfresco session
 $repository = new Repository();

@@ -23,17 +23,21 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
- 
+
 require_once 'Alfresco/Service/WebService/WebServiceFactory.php';
 require_once 'Alfresco/Service/BaseObject.php';
+
+if (isset($_SESSION) == false)
+{
+   // Start the session
+   session_start();
+}   
  
 class Repository extends BaseObject
 {
 	private $_connectionUrl;	
 	private $_host;
 	private $_port;
-
-	private static $sessionIds = array();
 
 	public function __construct($connectionUrl="http://localhost:8080/alfresco/api")
 	{
@@ -75,7 +79,17 @@ class Repository extends BaseObject
 		// Store the session id for later use
 		if ($sessionId != null)
 		{
-			self::$sessionIds[$ticket] = $sessionId;	
+         $sessionIds = null;
+         if (isset($_SESSION["sessionIds"]) == false)
+			{
+            $sessionIds = array();
+         }
+         else
+         {
+            $sessionIds = $_SESSION["sessionIds"];
+         }
+         $sessionIds[$ticket] = $sessionId;
+         $_SESSION["sessionIds"] = $sessionIds;
 		}
 		
 		return $ticket;
@@ -105,7 +119,13 @@ class Repository extends BaseObject
 	 */
 	public static function getSessionId($ticket)
 	{
-		return self::$sessionIds[$ticket];	
+      $result = null;
+      if (isset($_SESSION["sessionIds"]) == true)
+      {
+         $result = $_SESSION["sessionIds"][$ticket];
+      }
+      return $result;
+
 	}
 
 }

@@ -30,8 +30,11 @@
    require_once "Alfresco/Service/Node.php";
    
 
-   // Start the session
-   session_start();
+   if (isset($_SESSION) == false)
+   {
+      // Start the session
+      session_start();
+   }
    
    // Create the session
    $repository = new Repository();
@@ -234,7 +237,7 @@
 
           <td width=8>&nbsp;</td>
           <td><nobr>
-              <img src="../Common/Images/logout.gif" border=0 alt="Logout (<?php echo $session->userName ?>)" title="Logout (<?php echo $session->userName ?>)" align=absmiddle><span style='padding-left:2px'><a href='/examples/common/login.php?logout=true&redirect=/examples/browse/index.php'>Logout (<?php echo $session->userName ?>)</a></span>
+              <img src="../Common/Images/logout.gif" border=0 alt="Logout" align=absmiddle><span style='padding-left:2px'><a href='#'>Logout</a></span>
            </nobr></td>
         </tr>
    </table>
