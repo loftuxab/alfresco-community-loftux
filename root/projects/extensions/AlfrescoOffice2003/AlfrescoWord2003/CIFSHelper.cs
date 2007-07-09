@@ -124,7 +124,7 @@ namespace AlfrescoWord2003
             return "";
          }
          // Does the documentPath belong to the server?
-         if (documentPath.IndexOf(m_RootPath) == 0)
+         if (documentPath.ToLower().IndexOf(m_RootPath.ToLower()) == 0)
          {
             alfrescoPath = documentPath.Remove(0, m_RootPath.Length).Replace("\\", "/");
          }

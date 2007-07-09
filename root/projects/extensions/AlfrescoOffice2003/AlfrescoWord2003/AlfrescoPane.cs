@@ -79,24 +79,47 @@ namespace AlfrescoWord2003
                m_ServerDetails.DocumentPath = "";
                this.showHome(false);
             }
+            if (!m_ManuallyHidden)
+            {
+               this.Show();
+            }
          }
          catch
          {
          }
       }
 
+      delegate void ShowCallback();
       public void OnWindowActivate()
       {
          if (m_ShowPaneOnActivate && !m_ManuallyHidden)
          {
-            this.Show();
+            if (this.InvokeRequired)
+            {
+               ShowCallback s = new ShowCallback(OnWindowActivate);
+               this.Invoke(s);
+            }
+            else
+            {
+               this.Show();
+               m_WordApplication.Activate();
+            }
          }
       }
 
+      delegate void HideCallback();
       public void OnWindowDeactivate()
       {
          m_ShowPaneOnActivate = true;
-         this.Hide();
+         if (this.InvokeRequired)
+         {
+            HideCallback h = new HideCallback(OnWindowDeactivate);
+            this.Invoke(h);
+         }
+         else
+         {
+            this.Hide();
+         }
       }
 
       public void OnDocumentBeforeClose()
@@ -170,14 +193,15 @@ namespace AlfrescoWord2003
          else
          {
 //            string theURI = string.Format(@"{0}{1}document_details.ftl&contextPath=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
-            string theURI = string.Format(@"{0}{1}documentDetails?p=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
+            string theURI = string.Format(@"{0}{1}documentDetails?p=/Company Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
             if (strAuthTicket != "")
             {
                theURI += "&ticket=" + strAuthTicket;
             }
             webBrowser.ObjectForScripting = this;
-            webBrowser.Navigate(new Uri(theURI));
+            UriBuilder uriBuilder = new UriBuilder(theURI);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
             PanelMode = PanelModes.WebBrowser;
          }
       }
