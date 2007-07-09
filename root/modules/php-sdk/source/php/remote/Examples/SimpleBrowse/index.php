@@ -28,7 +28,8 @@
    require_once "Alfresco/Service/Session.php";
    require_once "Alfresco/Service/SpacesStore.php";
    require_once "Alfresco/Service/Node.php";
-   
+   require_once "../config.php";
+
 
    if (isset($_SESSION) == false)
    {
@@ -37,11 +38,11 @@
    }
    
    // Create the session
-   $repository = new Repository();
+   $repository = new Repository($repositoryUrl);
    $ticket = null;
    if (isset($_SESSION["ticket"]) == false)
    {
-      $ticket = $repository->authenticate("admin", "admin");
+      $ticket = $repository->authenticate($userName, $password);
       $_SESSION["ticket"] = $ticket;	
    }   
    else
