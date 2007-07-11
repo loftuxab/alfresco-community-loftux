@@ -28,14 +28,18 @@ package org.alfresco.deployment.impl.server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 
+import org.alfresco.deployment.FSDeploymentRunnable;
 import org.alfresco.deployment.FileDescriptor;
 import org.alfresco.deployment.FileType;
 import org.alfresco.deployment.impl.DeploymentException;
@@ -80,6 +84,16 @@ public class Target implements Serializable
     private String fPassword;
     
     /**
+     * A special runnable that will be invoked after commit.
+     */
+    private FSDeploymentRunnable fRunnable;
+    
+    /**
+     * An external program to be run after a commit.
+     */
+    private String fProgram;
+    
+    /**
      * Make one up.
      * @param name
      * @param root
@@ -88,12 +102,16 @@ public class Target implements Serializable
     public Target(String name,
                   String root,
                   String metadata,
+                  FSDeploymentRunnable runnable,
+                  String program,
                   String user,
                   String password)
     {
         fTargetName = name;
         fRootDirectory = root;
         fMetaDataDirectory = metadata;
+        fRunnable = runnable;
+        fProgram = program;
         fUser = user;
         fPassword = password;
         // On initial server bringup, there will be no metadata directory.
@@ -489,6 +507,48 @@ public class Target implements Serializable
             if (file.isDirectory())
             {
                 recursiveCommitMetaData(dir + File.separatorChar + file.getName());
+            }
+        }
+    }
+
+    public void runPostCommit(Deployment deployment)
+    {
+        if (fRunnable != null)
+        {
+            fRunnable.init(deployment);
+            fRunnable.run();
+            return;
+        }
+        if (fProgram != null)
+        {
+            try
+            {
+                File tempFile = File.createTempFile("deployment", "txt");
+                Writer out = new FileWriter(tempFile);
+                for (DeployedFile file : deployment)
+                {
+                    out.write(file.getType().toString() + " " + file.getPath() + " " + file.getGuid() + "\n");
+                }
+                out.close();
+                Runtime runTime = Runtime.getRuntime();
+                String[] command = { fProgram, tempFile.getAbsolutePath() };
+                Map<String, String> envMap = System.getenv();
+                String[] env = new String[envMap.size()];
+                int off = 0;
+                for (Map.Entry<String, String> entry : envMap.entrySet())
+                {
+                    env[off++] = entry.getKey() + '=' + entry.getValue();
+                }
+                Process process = runTime.exec(command, env, new File(fRootDirectory));
+                process.waitFor();
+            }
+            catch (IOException ie)
+            {
+                // Do nothing for now.
+            }
+            catch (InterruptedException inte)
+            {
+                // Do nothing for now.
             }
         }
     }

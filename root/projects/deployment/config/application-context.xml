@@ -32,6 +32,10 @@
             	    	<entry key="root"><value>target</value></entry>
             	    	<entry key="user"><value>Giles</value></entry>
             	    	<entry key="password"><value>Watcher</value></entry>
+            	    	<entry key="runnable"><value>org.alfresco.deployment.SampleRunnable</value></entry>
+            	    	<!-- 
+            	    	<entry key="program"><value>/path/to/program</value></entry>
+            	    	 -->
             	    </map>
             	</entry>
             </map>
