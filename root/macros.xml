@@ -85,6 +85,27 @@
          </javadoc>
       </sequential>
    </macrodef>
+	
+	<macrodef name="generate-generated-javadocs">
+      <attribute name="projectdir" />
+      <attribute name="documenttitle" />
+      <attribute name="windowtitle" />
+      <sequential>
+         <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.docs}/${dir.name.java}" />
+         <javadoc maxmemory="${mem.size.max}" author="true" version="true" 
+                  sourcepath="@{projectdir}/${dir.name.source}/${dir.name.generated}" 
+                  destdir="@{projectdir}/${dir.name.build}/${dir.name.docs}/${dir.name.java}" 
+                  packagenames="${javadoc.packages.include}"
+                  excludepackagenames="${javadoc.packages.exclude}" 
+                  bottom="${javadoc.copyright}"
+                  doctitle="@{documenttitle}"
+                  windowtitle="@{windowtitle}" 
+                  classpathref="classpath.javadoc">
+            <!-- doclet that hides public classes/members via @exclude -->
+            <doclet name="ExcludeDoclet" path="${dir.project.3rdparty.lib}/${dir.name.devenv}/exclude-doclet.jar"/>
+         </javadoc>
+      </sequential>
+   </macrodef>
    
    <macrodef name="run-tests" description="Runs the tests for the given project">
       <attribute name="projectdir" />

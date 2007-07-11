@@ -62,6 +62,7 @@
                     distribute-extensions-office2003, 
                     distribute-benchmark, 
                     distribute-mmt,
+   					  distribute-amps,
                     distribute-sample-extensions,
                     distribute-docs" />
 
@@ -586,6 +587,21 @@
       </zip>
    </target>
 
+	<!-- ***************** -->
+	<!-- ** AMP targets ** -->
+	<!-- ***************** -->
+	
+	<target name="distribute-amps" 
+	        description="Creates the distribution AMP file for all extensions"
+	        depends="init, package-php-module, package-rm-extension, package-blog-extension">
+		
+		<copy todir="${dir.continuous.dist}">
+			<fileset dir="${dir.module.php.dist}" includes="${file.name.amp.php}" />
+			<fileset dir="${dir.module.rm.dist}" includes="${file.name.amp.rm}" />
+			<fileset dir="${dir.module.blog.dist}" includes="${file.name.amp.blog}" />
+	   </copy>
+	</target>
+	
    <!-- *********************** -->
    <!-- ** Benchmark targets ** -->
    <!-- *********************** -->

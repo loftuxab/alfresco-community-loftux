@@ -1410,6 +1410,9 @@
       <generate-javadocs documenttitle="Alfresco Web Service Client Specification" 
                          windowtitle="Alfresco Web Service Client" 
                          projectdir="${dir.project.webserviceclient}"/>
+   	<generate-generated-javadocs documenttitle="Alfresco Web Service Client Specification" 
+   	                             windowtitle="Alfresco Web Service Client" 
+   	                             projectdir="${dir.project.webserviceclient}"/>
    </target>
 
    <target name="gen-all-service-clients" 
