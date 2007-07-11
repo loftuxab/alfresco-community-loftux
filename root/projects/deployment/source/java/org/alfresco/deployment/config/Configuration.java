@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.deployment.FSDeploymentRunnable;
 import org.alfresco.deployment.impl.DeploymentException;
 import org.alfresco.deployment.impl.server.Target;
 
@@ -77,6 +78,22 @@ public class Configuration
     
     public void init()
     {
+        // Create the various necessary directories if they don't already exits.
+        File meta = new File(fMetaDataDirectory);
+        if (!meta.exists())
+        {
+            meta.mkdirs();
+        }
+        File log = new File(fLogDirectory);
+        if (!log.exists())
+        {
+            log.mkdirs();
+        }
+        File data = new File(fDataDirectory);
+        if (!data.exists())
+        {
+            data.mkdirs();
+        }
         for (Map.Entry<String, Map<String, String>> entry : fTargetData.entrySet())
         {
             Map<String, String> targetEntry = entry.getValue();
@@ -99,9 +116,25 @@ public class Configuration
                 throw new DeploymentException("No password specification for target " +
                                               targetName);
             }
+            FSDeploymentRunnable runner = null;
+            String runnable = targetEntry.get("runnable");
+            if (runnable != null)
+            {
+                try
+                {
+                    runner = (FSDeploymentRunnable)Class.forName(runnable).newInstance();
+                }
+                catch (Exception e)
+                {
+                    throw new DeploymentException("Could not instantiate " + runnable + " in target " + targetName);
+                }
+            }
+            String program = targetEntry.get("program");
             fTargets.put(targetName, new Target(targetName,
                                                 root,
                                                 fMetaDataDirectory + File.separator + targetName + ".md",
+                                                runner,
+                                                program,
                                                 user,
                                                 password));
         }

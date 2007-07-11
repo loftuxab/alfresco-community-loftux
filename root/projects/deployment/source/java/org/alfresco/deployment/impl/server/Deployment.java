@@ -250,6 +250,8 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         {
             fTarget.commitMetaData();
             fIn.close();
+            fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+            fTarget.runPostCommit(this);
             File logDir = new File(fLogDir);
             Deleter.Delete(logDir);
         }
