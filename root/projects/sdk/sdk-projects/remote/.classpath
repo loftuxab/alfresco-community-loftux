@@ -15,5 +15,6 @@
 	<classpathentry exported="true" kind="lib" path="alfresco-web-service-client.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xalan.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/xercesImpl-2.8.0.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
