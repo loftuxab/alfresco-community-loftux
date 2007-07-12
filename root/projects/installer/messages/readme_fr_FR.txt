@@ -2,7 +2,7 @@
 Alfresco Language Pack
 ======================
 
-Pour la version : 2.0-preview
+Pour la version : 2.1RC1
 
 Pour la langue : fr_FR
 

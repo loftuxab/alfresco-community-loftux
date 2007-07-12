@@ -4,19 +4,19 @@ readme.txt:
 Alfresco Language Pack 
 ====================== 
 
-For release: 1.3
+For release: 2.0
 
 For locale:  hr_HR (default) 
 
-Ver:         0.1
+Version:     0.1
 
-Date:        2006-09-18
+Date:        2007-04-02
 
 ============================== 
 Contents of this Language Pack 
 ============================== 
 
-*_hr_HR.properties (only two biggest files, partially translated)
+All files that are part of release 2.0 are translated including files that are required for WCM that can be additionally added. 
 
 
 ============ 
@@ -30,14 +30,9 @@ Contributors to this Language Pack
 ================================== 
 
 Original Author(s): 
-Davor Fanton, Mario Saric, Dinko Srkoc
-http://www.helix.hr, Zagreb Croatia
+Vlatka Paunovic, Sinisa Tomic
+http://www.open.hr, Zagreb Croatia
 
-Other contributors: -Welcome-
+Other contributors: 
 
-================= 
-Forum info at URL
-=================
-
-See the Alfresco Forum for status on Croatian Language Pack: 
-http://forums.alfresco.com/viewtopic.php?t=3267 
+Note: This translation is not based od existing translation that was done by Davor Fanton, Mario Saric, Dinko Srkoc (Helix.hr) for previous Alfresco version (sorry, we didn't know it existed until this one was 99.9% done)

@@ -54,14 +54,14 @@
            description="Creates the distribution files for all platforms"
            depends="set-build-number, 
                     incremental, 
-                    distribute-tomcat, 
+                    distribute-mmt,
+                    distribute-tomcat,
                     distribute-war, 
                     distribute-wcm, 
                     distribute-sdk, 
                     distribute-webserviceclient,
                     distribute-extensions-office2003, 
                     distribute-benchmark, 
-                    distribute-mmt,
    					  distribute-amps,
                     distribute-sample-extensions,
                     distribute-docs" />
@@ -234,7 +234,7 @@
                      prefix="tomcat" 
                      excludes="bin/*.sh" />
          <zipfileset dir="${dir.project.installer}" 
-                     includes="licenses/**,alf_start.bat,restart_alf.bat,alf_stop.bat" />
+                     includes="alf_start.bat,restart_alf.bat,alf_stop.bat,apply_amps.bat" />
          <zipfileset dir="${dir.project.installer}" 
                      includes="tomcat/alfresco.bat" 
                      fullpath="alfresco.bat" />
@@ -242,16 +242,19 @@
                      includes="tomcat/README_win.txt" 
                      fullpath="README.txt" />
          <zipfileset dir="${dir.project.installer}" 
-                     includes="README_mysql.txt" />
+                     includes="licenses/**,amps/**,README_mysql.txt" />
          <zipfileset dir="${dir.project.installer.extras}" 
                      prefix="extras" 
                      excludes="**/*.sh" />
          <zipfileset dir="${dir.project.installer.alfdata}" 
                      prefix="alf_data" />
-         <zipfileset dir="${dir.project.installer.binwin}" 
+         <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
-         <zipfileset dir="${dir.project.netbios}/dll" 
+         <zipfileset dir="${dir.project.netbios}/dll"
                      prefix="bin" />
+         <zipfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.dist.mmt}.jar"
+                     fullpath="bin/alfresco-mmt.jar" />
       </zip>
    </target>
 
@@ -268,10 +271,10 @@
                      includes="*.sh" 
                      mode="755" />
          <tarfileset dir="${dir.project.installer}"
-                     includes="licenses/**" />
+                     includes="licenses/**,amps/**" />
          <tarfileset dir="${dir.project.installer}" 
                      includes="tomcat/alfresco.sh" 
-                     fullpath="alfresco.sh" 
+                     fullpath="alfresco.sh,apply_amps.sh"
                      mode="755" />
          <tarfileset dir="${dir.project.installer}" 
                      includes="tomcat/README_linux.txt" 
@@ -290,6 +293,11 @@
                      excludes="**/*.bat" />
          <tarfileset dir="${dir.project.installer.alfdata}" 
                      prefix="alf_data" />
+         <tarfileset dir="${dir.project.installer.binlin}"
+                     prefix="bin" />
+         <tarfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.dist.mmt}.jar"
+                     fullpath="bin/alfresco-mmt.jar" />
       </tar>
    </target>
 

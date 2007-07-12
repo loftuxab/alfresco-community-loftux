@@ -1,0 +1,6 @@
+To help you manage AMP extensions to your Alfresco server, you can place AMP files
+in this directory and use the apply_amps script to perform the update.
+
+Usually, you only need to run the apply_amps script when you add a new AMP to the 
+directory, or when you upgrade your Alfresco server.  Whenever the script is run, 
+a backup of the core server file is made (the alfresco.war file).
