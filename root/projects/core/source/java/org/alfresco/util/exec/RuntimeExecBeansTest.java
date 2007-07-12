@@ -72,12 +72,40 @@ public class RuntimeExecBeansTest extends TestCase
         File dir = new File(DIR);
         dir.mkdir();
         assertTrue("Directory not created", dir.exists());
-        ApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
         
-        RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandFailureGuaranteed");
-        assertNotNull(failureExec);
-        // Execute it
-        ExecutionResult result = failureExec.execute();
-        assertEquals("Expected first error code in list", 666, result.getExitValue());
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        try
+        {
+            RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandFailureGuaranteed");
+            assertNotNull(failureExec);
+            // Execute it
+            ExecutionResult result = failureExec.execute();
+            assertEquals("Expected first error code in list", 666, result.getExitValue());
+        }
+        finally
+        {
+            ctx.close();
+        }
+    }
+    
+    public void testExecOfNeverEndingProcess()
+    {
+        File dir = new File(DIR);
+        dir.mkdir();
+        assertTrue("Directory not created", dir.exists());
+        
+        ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext(APP_CONTEXT_XML);
+        try
+        {
+            RuntimeExec failureExec = (RuntimeExec) ctx.getBean("commandNeverEnding");
+            assertNotNull(failureExec);
+            // Execute it
+            failureExec.execute();
+            // The command is never-ending, so this should be out immediately
+        }
+        finally
+        {
+            ctx.close();
+        }
     }
 }
