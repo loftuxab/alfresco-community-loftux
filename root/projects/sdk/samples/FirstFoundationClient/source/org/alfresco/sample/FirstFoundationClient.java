@@ -30,8 +30,7 @@ import java.util.Map;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.repo.transaction.TransactionUtil;
-import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.ChildAssociationRef;
 import org.alfresco.service.cmr.repository.ContentService;
@@ -73,15 +72,15 @@ public class FirstFoundationClient
         
         // use TransactionWork to wrap service calls in a user transaction
         TransactionService transactionService = serviceRegistry.getTransactionService();
-        TransactionWork<Object> exampleWork = new TransactionWork<Object>()
+        RetryingTransactionCallback<Object> exampleWork = new RetryingTransactionCallback<Object>()
         {
-            public Object doWork() throws Exception
+            public Object execute() throws Exception
             {
                 doExample(serviceRegistry);
                 return null;
             }
         };
-        TransactionUtil.executeInUserTransaction(transactionService, exampleWork);
+        transactionService.getRetryingTransactionHelper().doInTransaction(exampleWork);
         System.exit(0);
     }
 
