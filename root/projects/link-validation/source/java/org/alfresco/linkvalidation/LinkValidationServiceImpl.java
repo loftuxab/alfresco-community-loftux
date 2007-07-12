@@ -28,6 +28,7 @@
 package org.alfresco.linkvalidation;
 
 import java.io.File;
+import java.util.TreeMap;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -180,7 +181,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     static String MD5_TO_FILE        = "md5_to_file";     // key->string
     static String MD5_TO_HREF        = "md5_to_href";     // key->string
 
-
     // All files on which a hyperlink depends
     static String HREF_TO_FDEP         = "href_to_fdep";    // key->map
 
@@ -199,7 +199,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     PurgeVersionTxnListener      purge_version_txn_listener_;
     PurgeStoreTxnListener        purge_store_txn_listener_;
 
-    LinkValidationStoreCallbackHandler  store_latest_version_info_;
+    LinkValidationStoreCallbackHandler    store_latest_version_info_;
+    HashMap<String,Pair<Integer,Integer>> webapp_asset_count_info_;
 
     int local_connect_timeout_  = 10000;
     int remote_connect_timeout_ = 10000;
@@ -345,12 +346,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     public void run()
     {
-        // If WCM isn't installed (c.f:  wcm-bootstrap-context.xml), then 
+        // If WCM isn't installed (c.f:  wcm-bootstrap-context.xml), then
         // an attempt to fetch the "patch.wcmFolders" will fail, indicating
         // that there's no need to run the link validation service.
 
         try
-        {                                             
+        {
             ApplicationContext springContext =
                RawServices.Instance().getContext();
 
@@ -374,6 +375,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         final boolean  validateExternal =  true;   // check external hrefs
 
         HrefValidationProgress progress_sleepy = null;
+
+        // Cache the number of files and hrefs there are in each webapp
+        webapp_asset_count_info_ = new HashMap<String,Pair<Integer,Integer>>();
+
 
         // Register transaction callbacks to build a cache that helps to
         // avoid unnecesary calls to the real AVM getLatestSnapshotID().
@@ -477,26 +482,30 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             {
                 // Super-low level debug.
                 //
-                // if ( log.isDebugEnabled() )
-                // {
-                //     // After all these years, there's still no easy
-                //     // method to print a stack trace into a string.
-                //     // Where is the love?  Where?
-                //
-                //     StringWriter string_writer = new StringWriter();
-                //     PrintWriter print_writer   = new PrintWriter(string_writer);
-                //     e.printStackTrace(print_writer);
-                //
-                //     log.debug( "Exception class:  " + e.getClass().getName() +
-                //                ":  " + e.getMessage() +
-                //                "\n" + string_writer.toString() );
-                // }
-
-
-                if ( log.isInfoEnabled() )
-                    log.info("Could not validate links.  Retrying.  ( "       +
-                             e.getClass().getName() +  ":  " + e.getMessage() +
-                             " )");
+                if ( true )
+                {
+                    if ( log.isDebugEnabled() )
+                    {
+                        // After all these years, there's still no easy
+                        // method to print a stack trace into a string.
+                        // Where is the love?  Where?
+                    
+                        StringWriter string_writer = new StringWriter();
+                        PrintWriter print_writer   = new PrintWriter(string_writer);
+                        e.printStackTrace(print_writer);
+                    
+                        log.debug( "Exception class:  " + e.getClass().getName() +
+                                   ":  " + e.getMessage() +
+                                   "\n" + string_writer.toString() );
+                    }
+                }
+                else
+                {
+                    if ( log.isInfoEnabled() )
+                        log.info("Could not validate links.  Retrying.  ( "       +
+                                 e.getClass().getName() +  ":  " + e.getMessage() +
+                                 " )");
+                }
             }
 
             // Sleep regardless of whetherthe updateHrefInfo failed
@@ -522,6 +531,156 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             progress_sleepy.abort();
         }
     }
+
+     
+     synchronized Pair<Integer,Integer> getWebappAssetCountInfo( 
+                                            String href_attr)
+     {
+         Pair<Integer,Integer> info = webapp_asset_count_info_.get(href_attr);
+         if ( info != null ) { return info; }
+     
+        return setWebappAssetCountInfo( href_attr );
+     }
+
+
+     /*------------------------------------------------------------------------
+     *  dump_attrs --
+     *       Debugging routine that dumps the table attribute table
+     *-----------------------------------------------------------------------*/
+     void dump_attrs( String href_attr)
+     {
+         MapAttributeValue md5_to_file_attrib = (MapAttributeValue)
+                attr_.getAttribute(href_attr + "/" + MD5_TO_FILE );
+         dump_attr_map( md5_to_file_attrib, 
+                        MD5_TO_FILE + "   Given an MD5 what's the file name");
+
+         MapAttributeValue md5_to_href_attrib = (MapAttributeValue)
+                attr_.getAttribute(href_attr + "/" + MD5_TO_HREF );
+         dump_attr_map( md5_to_href_attrib, 
+                        MD5_TO_HREF + "   Given an MD5 what's the href");
+
+         MapAttributeValue source_to_href_attrib = (MapAttributeValue)
+                attr_.getAttribute(href_attr + "/" +  SOURCE_TO_HREF );
+         dump_attr_map_map( source_to_href_attrib, 
+                            SOURCE_TO_HREF +  
+                                "  Given a source file, what hrefs appear " +
+                                "in it explicitly/implicitly",
+                            md5_to_file_attrib, 
+                            md5_to_href_attrib );
+
+         MapAttributeValue href_to_source_attrib = (MapAttributeValue)
+                attr_.getAttribute(href_attr + "/" +  HREF_TO_SOURCE );
+         dump_attr_map_map( href_to_source_attrib, 
+                            HREF_TO_SOURCE +  
+                                "  Given an href, in what " + 
+                                "source files does it appear explicitly or " +
+                                "implicitly",
+                           md5_to_href_attrib, 
+                           md5_to_file_attrib );
+
+         MapAttributeValue href_to_fdep_attrib = (MapAttributeValue)
+                attr_.getAttribute(href_attr + "/" + HREF_TO_FDEP );
+         dump_attr_map_map( href_to_fdep_attrib, 
+                            HREF_TO_FDEP +  
+                                "  Given an href what files does it depend on",
+                            md5_to_href_attrib, 
+                            md5_to_file_attrib);
+
+         MapAttributeValue file_to_hdep_attrib = (MapAttributeValue)
+                attr_.getAttribute(href_attr + "/" + FILE_TO_HDEP );
+         dump_attr_map_map( file_to_hdep_attrib, 
+                            FILE_TO_HDEP  +  
+                                "  Given a file, what hrefs depend on it",
+                            md5_to_file_attrib, 
+                            md5_to_href_attrib);
+     }
+
+     void dump_attr_map( MapAttributeValue  attr_map, String heading )
+     {
+         System.out.println("\n\nDump of: "  + heading);
+         if ( attr_map == null )
+         {
+             System.out.println("    NULL");
+             return;
+         }
+
+         for (String key : attr_map.keySet() )
+         {
+             System.out.println("    " + key + "   " +  attr_map.get(key).getStringValue());
+         }
+     }
+
+
+     void dump_attr_map_map( MapAttributeValue  attr_map_map, 
+                             String             heading,
+                             MapAttributeValue  xlate_parent,
+                             MapAttributeValue  xlate_child )
+     {
+         System.out.println("\n\n\nDump of: "  + heading);
+         if ( attr_map_map == null )
+         {
+             System.out.println("    NULL");
+             return;
+         }
+
+         for ( String parent : attr_map_map.keySet() )
+         {
+             System.out.println("    " + parent + "   " + 
+                                ((xlate_parent != null)
+                                    ?  xlate_parent.get(parent).getStringValue()
+                                    :  parent)
+                               );
+
+             MapAttributeValue attr_map = 
+                 (MapAttributeValue) attr_map_map.get( parent );
+
+             if ( attr_map != null )
+             {
+                 for ( String child : attr_map.keySet() )
+                 {
+                     System.out.println("                    " + child + "   " + 
+                                ((xlate_child != null)
+                                    ?  xlate_child.get(child).getStringValue()
+                                    :  child));
+                 }
+             }
+             else
+             {
+                 System.out.println("        NULL");
+             }
+             System.out.println("");
+         }
+     }
+
+
+     synchronized Pair<Integer,Integer> setWebappAssetCountInfo( 
+                                            String href_attr)
+     {
+         int file_count = 0;
+         int href_count = 0;
+
+         try 
+         {
+             file_count = attr_.getCount( href_attr + "/" + MD5_TO_FILE );
+             href_count = attr_.getCount( href_attr + "/" + MD5_TO_HREF );
+
+             // RESUME HERE  - low level debugging (heavy)
+             // if ( log.isDebugEnabled() )
+             //    dump_attrs( href_attr );
+         }
+         catch (Exception e) 
+         {
+            if ( log.isDebugEnabled() )
+                log.debug("Could not fetch count info for: " + href_attr);
+         }
+
+         Pair<Integer,Integer> info = 
+                new Pair<Integer,Integer>( file_count, href_count );
+
+        webapp_asset_count_info_.put(href_attr, info);
+        return  info;
+     }
+
 
     /*-------------------------------------------------------------------------
     *  getLatestSnapshotID --
@@ -1352,11 +1511,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                  "/|" + webapp_name +
                                  "/"  + BASE_VERSION_ALIAS;
 
+        String dst_store       = dp.getStore();
+        int dst_latest_version = getLatestSnapshotID( dst_store );
+
         HrefDifference href_diff = new HrefDifference(href_attr,
                                                       srcVersion,
                                                       sp.getStore(),
                                                       dstVersion,
-                                                      dp.getStore(),
+                                                      dst_store,
+                                                      dst_latest_version,
                                                       src_webapp_url_base,
                                                       dst_webapp_url_base);
 
@@ -1572,6 +1735,143 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         //    getHrefManifestBrokenInNewOrMod()
 
         return href_diff;
+    }
+
+    /*-------------------------------------------------------------------------
+    *  getBrokenHrefManifest --
+    *      Equivalent to calling getHrefManifestBrokenByDelete and
+    *      getHrefManifestBrokenByNewOrMod, then merging the manifests.
+    *------------------------------------------------------------------------*/
+    public HrefManifest  getBrokenHrefManifest( HrefDifference href_diff )
+                                        throws  AVMNotFoundException,
+                                                SocketException
+    {
+        if ( log.isDebugEnabled() )
+            log.debug("getBrokenHrefManifest( hdiff )");
+
+        HrefManifest manifest = new HrefManifest();
+
+        String src_webapp_url_base = href_diff.getSrcWebappUrlBase();
+        String src_store           = href_diff.getSrcStore();
+        String dst_store           = href_diff.getDstStore();
+        int dst_store_length       = dst_store.length();
+
+        TreeMap<String, TreeMap<String,String> >  broken_map =
+            new TreeMap<String, TreeMap<String,String> >();
+
+        Map<String, List<String>> broken_manifest_map =
+                href_diff.getBrokenManifestMap();
+
+        ArrayList<String> dst_broken_file_list =
+            new ArrayList<String>( broken_manifest_map.keySet() );
+
+        for (String dst_broken_file : dst_broken_file_list)
+        {
+            List<String> rel_broken_href_list =
+                broken_manifest_map.get(dst_broken_file);
+
+            TreeMap<String,String>  src_broken_href_treemap =
+                                        new TreeMap<String,String>();
+
+            for ( String rel_broken_href : rel_broken_href_list )
+            {
+                String src_broken_href;
+                if ( rel_broken_href.charAt(0) == '/')
+                {
+                    src_broken_href = src_webapp_url_base + rel_broken_href;
+                }
+                else
+                {
+                    src_broken_href = rel_broken_href;
+                }
+                src_broken_href_treemap.put( src_broken_href, null );
+            }
+
+            String src_broken_file =
+                  src_store +
+                  dst_broken_file.substring( dst_store_length );
+
+            broken_map.put( src_broken_file, src_broken_href_treemap );
+
+        }
+
+
+        // Derived a pruned version of the href_manifest to get only those
+        // new/modified files with at least one broken link.  Note that
+        // href_diff.broken_in_newmod_ is a subset of href_diff.href_manifest_
+        // in both files mentioned and hrefs per file.
+
+        List<HrefManifestEntry> src_manifest_entry_list =
+                href_diff.getHrefManifest().getManifestEntries();
+
+        HrefStatusMap src_href_status_map  = href_diff.getHrefStatusMap();
+
+        for ( HrefManifestEntry src_manifest_entry : src_manifest_entry_list )
+        {
+            TreeMap<String,String>  src_broken_href_treemap =
+                broken_map.get( src_manifest_entry.getFileName() );
+
+            if ( src_broken_href_treemap == null )
+            {
+                src_broken_href_treemap = new TreeMap<String,String>();
+                 broken_map.put( src_manifest_entry.getFileName(),
+                                 src_broken_href_treemap );
+            }
+
+            List<String>  src_href_list = src_manifest_entry.getHrefs();
+
+            for (String src_parsed_url : src_href_list)
+            {
+                Pair<Integer,List<String>> tuple =
+                    src_href_status_map.get(src_parsed_url);
+
+                int status_code;
+
+                if ( tuple != null ) { status_code =  tuple.getFirst(); }
+                else                 { status_code = 400; }
+
+                if (status_code >= 400 )
+                {
+                    src_broken_href_treemap.put( src_parsed_url, null );
+                }
+            }
+        }
+
+
+        // Create an href manifest out of the broken_map
+        List<HrefManifestEntry> broken_entry_list =
+                new ArrayList<HrefManifestEntry>( broken_map.size() );
+
+        for ( String src_broken_file : broken_map.keySet() )
+        {
+            if ( (broken_map.get( src_broken_file )).size() > 0 )
+            {
+                broken_entry_list.add(
+                   new HrefManifestEntry(
+                         src_broken_file,
+                         new ArrayList<String>(
+                             (broken_map.get( src_broken_file )).keySet())));
+            }
+        }
+
+        Pair<Integer,Integer> count_info = 
+            getWebappAssetCountInfo( href_diff.getHrefAttr() ); 
+
+        int base_file_count = count_info.getFirst();
+        int base_link_count = count_info.getSecond() ;
+
+        if ( log.isDebugEnabled() )
+        {
+            log.debug("Base file count: " + base_file_count);
+            log.debug("Base link count: " + base_link_count);
+        }
+
+    
+        return new HrefManifest( broken_entry_list,
+                                 href_diff.getDstBaseVersion(),
+                                 href_diff.getDstLatestVersion(),
+                                 base_file_count,
+                                 base_link_count);
     }
 
 
@@ -2246,10 +2546,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                                                rel_url_md5,
                                                stale_fdep_md5);
 
-                        attr_.removeAttribute(href_attr    + "/" +
-                                              FILE_TO_HDEP + "/" +
-                                              stale_fdep_md5,
-                                              rel_url_md5);
+                        try 
+                        {
+                            attr_.removeAttribute(href_attr    + "/" +
+                                                  FILE_TO_HDEP + "/" +
+                                                  stale_fdep_md5,
+                                                  rel_url_md5);
+                        }
+                        catch (Exception e) 
+                        { 
+                            // Nothing to do (already purged)
+                        }
                     }
                 }
             }
@@ -2375,12 +2682,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  Merges href difference into destnation table (e.g.: for staging)
     */
     //-------------------------------------------------------------------------
-    public void mergeHrefDiff( HrefDifference         href_diff,
-                               HrefValidationProgress progress)
-                throws         AVMNotFoundException,
-                               SocketException,
-                               SSLException,
-                               LinkValidationAbortedException
+    void mergeHrefDiff( HrefDifference         href_diff,
+                        HrefValidationProgress progress)
+         throws         AVMNotFoundException,
+                        SocketException,
+                        SSLException,
+                        LinkValidationAbortedException
     {
         if ( log.isDebugEnabled() )
             log.debug("mergeHrefDiff");
@@ -2524,8 +2831,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         Map<String,String>  deleted_file_md5_map;
         deleted_file_md5_map = href_diff.getDeletedFileMd5();
 
+
+        if ( log.isDebugEnabled() )
+            log.debug("Cleaning up after deleted files....");
+
         for (String deleted_file_md5 : deleted_file_md5_map.keySet() )
         {
+            if ( log.isDebugEnabled() )
+                log.debug("Cleaning up after deleted files: " + deleted_file_md5);
+
+
             attr_.removeAttribute(href_attr + "/" + SOURCE_TO_HREF,
                                   deleted_file_md5);
 
@@ -2537,7 +2852,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // Let's see if any hrefs depend on the deleted file
             if ( old_hdep_attribute != null )
             {
-                if ( old_hdep_attribute.size() == 0 )
+                // If there's only 1 link dependent upon this deleted
+                // file, then it's got to be the dead reconned link...
+                // which is going away too now.
+
+                if ( old_hdep_attribute.size() <= 1 ) 
                 {
                     attr_.removeAttribute( href_attr   + "/" + FILE_TO_HDEP,
                                            deleted_file_md5);
@@ -2545,6 +2864,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                     // No hrefs depend on this, so md5 -> file isn't needed
                     attr_.removeAttribute( href_attr   + "/" + MD5_TO_FILE,
                                            deleted_file_md5);
+                }
+                else
+                {
+                    // if ( log.isDebugEnabled() )
+                    // {
+                    //     log.debug("old_hdep_attribute.size(): " + old_hdep_attribute.size() );
+                    //     for (String key :   ((MapAttributeValue)old_hdep_attribute).keySet() )
+                    //     {
+                    //         System.out.println("    " + key );
+                    //     }
+                    // }
                 }
             }
             else
@@ -2555,7 +2885,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
-        if ( href_diff.getDstVersion() == 0 )
+        if ( log.isDebugEnabled() )
+            log.debug("Done cleaning up after deleted files");
+
+
+        if ( href_diff.getDstBaseVersion() == 0 )
         {
             // We're done!
 
@@ -2644,7 +2978,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 if (  rel_href_str_attr == null )
                 {
                     if ( log.isDebugEnabled() )
-                        log.debug("No MD5_TO_HREF (purged): " + href_md5);
+                        log.debug("No MD5_TO_HREF (purged):  " + href_md5);
 
                     continue;
                 }
@@ -3435,7 +3769,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
 
     /*-------------------------------------------------------------------------
-    *  getBrokenHrefManifestEntries --
+    *  getBrokenHrefManifest --
     *
     *   File: test:/www/avm_webapps/ROOT/index.html
     *      /bad_internal.html
@@ -3445,27 +3779,27 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *
     *
     *------------------------------------------------------------------------*/
-    public List<HrefManifestEntry> getBrokenHrefManifestEntries(
-                                          String      storeNameOrWebappPath)
-                                   throws AVMNotFoundException,
-                                          SocketException
+    public HrefManifest  getBrokenHrefManifest( String webappPath)
+                                         throws AVMNotFoundException,
+                                                SocketException,
+                                                IllegalArgumentException
     {
-        return getHrefManifestEntries( storeNameOrWebappPath, 400, 599);
+        return getHrefManifest( webappPath, 400, 599);
     }
 
     /*-------------------------------------------------------------------------
-    *  getHrefManifestEntries --
+    *  getHrefManifest --
     *
     *------------------------------------------------------------------------*/
-    public List<HrefManifestEntry> getHrefManifestEntries(
-                                          String      storeNameOrWebappPath,
-                                          int         statusGTE,
-                                          int         statusLTE)
-                                   throws AVMNotFoundException,
-                                          SocketException
+    public HrefManifest getHrefManifest( String  webappPath,
+                                         int     statusGTE,
+                                         int     statusLTE)
+                                  throws AVMNotFoundException,
+                                         SocketException,
+                                         IllegalArgumentException
     {
         ValidationPathParser p =
-            new ValidationPathParser(avm_, storeNameOrWebappPath);
+            new ValidationPathParser(avm_, webappPath);
 
         String store           = p.getStore();
         String webapp_name     = p.getWebappName();
@@ -3482,48 +3816,35 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         String store_attr_base =
                getAttributeStemForDnsName( dns_name );
 
-        int version = getLatestSnapshotID( store );
+        int latest_version = getLatestSnapshotID( store );
+        int base_version   = 0;
+
+
+        String webapp_attr_base = null;
+        String href_attr        =  null;
 
         if  ( webapp_name != null )
         {
-            getHrefManifestEntriesFromWebapp( href_manifest_map,
-                                              webapp_name,
-                                              store_attr_base,
-                                              status_gte,
-                                              status_lte,
-                                              dns_name);
+            // Example value: .href/mysite/|ROOT
+            webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
+
+            // Example value: .href/mysite/|ROOT/-2
+            href_attr =  webapp_attr_base + "/"  + BASE_VERSION_ALIAS;
+
+            base_version = getHrefManifestEntriesFromWebapp(
+                                href_manifest_map,
+                                webapp_name,
+                                store_attr_base,
+                                webapp_attr_base,
+                                href_attr,
+                                status_gte,
+                                status_lte,
+                                dns_name);
         }
         else
         {
-            Map<String, AVMNodeDescriptor> webapp_entries = null;
-
-            // e.g.:   42, "mysite:/www/avm_webapps"
-            webapp_entries = avm_.getDirectoryListing(version, app_base );
-
-            for ( Map.Entry<String, AVMNodeDescriptor>
-                  webapp_entry  :  webapp_entries.entrySet()
-                )
-            {
-                webapp_name = webapp_entry.getKey();  // my_webapp
-                AVMNodeDescriptor avm_node    = webapp_entry.getValue();
-
-                if ( webapp_name.equalsIgnoreCase("META-INF")  ||
-                     webapp_name.equalsIgnoreCase("WEB-INF")
-                   )
-                {
-                    continue;
-                }
-
-                if  ( avm_node.isDirectory() )
-                {
-                    getHrefManifestEntriesFromWebapp( href_manifest_map,
-                                                      webapp_name,
-                                                      store_attr_base,
-                                                      status_gte,
-                                                      status_lte,
-                                                      dns_name );
-                }
-            }
+            throw new IllegalArgumentException("Invalid webapp path: " + 
+                                               webappPath);
         }
 
         // The user will always want to see the list of files sorted
@@ -3544,30 +3865,47 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             href_manifest_list.add( new HrefManifestEntry(file_name, hlist ) );
         }
 
-        return href_manifest_list;
+
+        Pair<Integer,Integer> count_info = 
+            setWebappAssetCountInfo( href_attr );
+
+        int base_file_count = count_info.getFirst();
+        int base_link_count = count_info.getSecond() ;
+
+        if ( log.isDebugEnabled() )
+        {
+            log.debug("Base file count: " + base_file_count);
+            log.debug("Base link count: " + base_link_count);
+        }
+
+
+        return new HrefManifest( href_manifest_list,
+                                 base_version,
+                                 latest_version,
+                                 base_file_count,
+                                 base_link_count);
     }
 
 
     /*-------------------------------------------------------------------------
     *  getHrefManifestEntriesFromWebapp --
     *
+    *     Fetches a list of href manifest entries that satisfy that
+    *     status constraint.   Returns the baseline version of the
+    *     store from which this list of manifest entries was obtained.
+    *
     *------------------------------------------------------------------------*/
-    void getHrefManifestEntriesFromWebapp(
+    int getHrefManifestEntriesFromWebapp(
                 HashMap<String, ArrayList<String> > href_manifest_map,
                 String webapp_name,
                 String store_attr_base,
+                String webapp_attr_base,
+                String href_attr,
                 String status_gte,
                 String status_lte,
                 String dns_name)
          throws SocketException
     {
-        // Example value: .href/mysite/|ROOT
-        String webapp_attr_base = store_attr_base  +  "/|"  +  webapp_name;
-
-        // Example value: .href/mysite/|ROOT/-2
-        String href_attr =  webapp_attr_base +
-                            "/"  + BASE_VERSION_ALIAS;
-
         String virt_domain = virtreg_.getVirtServerFQDN();
         int    virt_port;
 
@@ -3621,7 +3959,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
-        if  ( links == null ) {return;}
+        if  ( links == null ) {return base_version;}
 
         HashMap<String,String> md5_to_file_cache = new HashMap<String,String>();
 
@@ -3680,6 +4018,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 }
             }
         }
+        return base_version;
     }
 
 

@@ -142,9 +142,6 @@
                 <value>getBrokenHrefConcordance</value>
                 <value>getHrefConcordance</value>
 
-                <value>getBrokenHrefManifests</value>
-                <value>getHrefManifests</value>
-
                 <value>getBrokenHrefManifest</value>
                 <value>getHrefManifest</value>
             </list>
