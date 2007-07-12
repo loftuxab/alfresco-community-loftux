@@ -60,4 +60,24 @@
       </property>
    </bean>
 	
+   <!-- A bean to make sure that never-ending processes can be handled -->
+   <bean id="commandNeverEnding" class="org.alfresco.util.exec.RuntimeExec" >
+      <property name="commandMap">
+          <map>
+              <entry key="Windows.*">
+                  <value>cmd</value>
+              </entry>
+              <entry key=".*">
+                  <value>ls</value>
+              </entry>
+          </map>
+      </property>
+      <property name="waitForCompletion">
+          <value>false</value>
+      </property>
+      <property name="errorCodes">
+          <value>1</value>
+      </property>
+   </bean>
+
 </beans>

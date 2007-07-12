@@ -72,6 +72,7 @@ public class RuntimeExec
     private static Log logger = LogFactory.getLog(RuntimeExec.class);
 
     private String command;
+    private boolean waitForCompletion;
     private Map<String, String> defaultProperties;
     private Set<Integer> errCodes;
 
@@ -80,6 +81,7 @@ public class RuntimeExec
      */
     public RuntimeExec()
     {
+        this.waitForCompletion = true;
         defaultProperties = Collections.emptyMap();
         // set default error codes
         this.errCodes = new HashSet<Integer>(2);
@@ -96,7 +98,24 @@ public class RuntimeExec
     {
         this.command = command;
     }
-    
+
+    /**
+     * Set whether to wait for completion of the command or not.  If there is no wait for completion,
+     * then the return value of <i>out</i> and <i>err</i> buffers cannot be relied upon as the
+     * command may still be in progress.  Failure is therefore not possible unless the calling thread
+     * waits for execution.
+     * 
+     * @param waitForCompletion     <tt>true</tt> (default) is to wait for the command to exit,
+     *                              or <tt>false</tt> to just return an exit code of 0 and whatever
+     *                              output is available at that point.
+     * 
+     * @since 2.1
+     */
+    public void setWaitForCompletion(boolean waitForCompletion)
+    {
+        this.waitForCompletion = waitForCompletion;
+    }
+
     /**
      * Supply a choice of commands to execute based on a mapping from the <i>os.name</i> system
      * property to the command to execute.  The {@link #KEY_OS_DEFAULT *} key can be used
@@ -248,7 +267,10 @@ public class RuntimeExec
         int exitValue = 0;
         try
         {
-            exitValue = process.waitFor();
+            if (waitForCompletion)
+            {
+                exitValue = process.waitFor();
+            }
         }
         catch (InterruptedException e)
         {
@@ -257,9 +279,12 @@ public class RuntimeExec
             exitValue = defaultFailureExitValue;
         }
 
-        // ensure that the stream gobblers get to finish
-        stdOutGobbler.waitForCompletion();
-        stdErrGobbler.waitForCompletion();
+        if (waitForCompletion)
+        {
+            // ensure that the stream gobblers get to finish
+            stdOutGobbler.waitForCompletion();
+            stdErrGobbler.waitForCompletion();
+        }
 
         // get the stream values
         String execOut = stdOutGobbler.getBuffer();
