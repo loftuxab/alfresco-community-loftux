@@ -22,6 +22,7 @@ namespace AlfrescoWord2003
          // Register event interest with the Word Application
          Application.WindowActivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowActivateEventHandler(Application_WindowActivate);
          Application.WindowDeactivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowDeactivateEventHandler(Application_WindowDeactivate);
+         // we don't need DocumentOpen because DocumentChange fires for each one (and is more useful)
          // Application.DocumentOpen += new Word.ApplicationEvents4_DocumentOpenEventHandler(Application_DocumentOpen);
          Application.DocumentBeforeClose += new Word.ApplicationEvents4_DocumentBeforeCloseEventHandler(Application_DocumentBeforeClose);
          Application.DocumentChange += new Microsoft.Office.Interop.Word.ApplicationEvents4_DocumentChangeEventHandler(Application_DocumentChange);
@@ -200,7 +201,14 @@ namespace AlfrescoWord2003
          if (Show)
          {
             m_AlfrescoPane.Show();
-            m_AlfrescoPane.showHome(false);
+            if (Application.ActiveDocument != null)
+            {
+               m_AlfrescoPane.OnDocumentChanged();
+            }
+            else
+            {
+               m_AlfrescoPane.showHome(false);
+            }
             Application.Activate();
          }
       }

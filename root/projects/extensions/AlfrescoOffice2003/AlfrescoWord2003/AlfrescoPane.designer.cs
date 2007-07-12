@@ -314,6 +314,7 @@ namespace AlfrescoWord2003
            this.webBrowser.Size = new System.Drawing.Size(292, 654);
            this.webBrowser.TabIndex = 1;
            this.webBrowser.WebBrowserShortcutsEnabled = false;
+           this.webBrowser.Navigated += new System.Windows.Forms.WebBrowserNavigatedEventHandler(this.webBrowser_Navigated);
            // 
            // tipGeneral
            // 
@@ -352,6 +353,7 @@ namespace AlfrescoWord2003
            this.Text = "Alfresco";
            this.TopMost = true;
            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.AlfrescoPane_FormClosing);
+           this.Load += new System.EventHandler(this.AlfrescoPane_Load);
            this.pnlConfiguration.ResumeLayout(false);
            this.grpConfiguration.ResumeLayout(false);
            this.groupBox1.ResumeLayout(false);
