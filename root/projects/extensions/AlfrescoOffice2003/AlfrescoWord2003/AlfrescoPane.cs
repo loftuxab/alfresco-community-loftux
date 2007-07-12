@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Security.Permissions;
@@ -55,6 +56,11 @@ namespace AlfrescoWord2003
          LoadSettings();
       }
 
+      ~AlfrescoPane()
+      {
+         m_ServerDetails.saveWindowPosition(this);
+      }
+
       public void OnDocumentOpen()
       {
          m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
@@ -89,37 +95,19 @@ namespace AlfrescoWord2003
          }
       }
 
-      delegate void ShowCallback();
       public void OnWindowActivate()
       {
          if (m_ShowPaneOnActivate && !m_ManuallyHidden)
          {
-            if (this.InvokeRequired)
-            {
-               ShowCallback s = new ShowCallback(OnWindowActivate);
-               this.Invoke(s);
-            }
-            else
-            {
-               this.Show();
-               m_WordApplication.Activate();
-            }
+            this.Show();
+            m_WordApplication.Activate();
          }
       }
 
-      delegate void HideCallback();
       public void OnWindowDeactivate()
       {
          m_ShowPaneOnActivate = true;
-         if (this.InvokeRequired)
-         {
-            HideCallback h = new HideCallback(OnWindowDeactivate);
-            this.Invoke(h);
-         }
-         else
-         {
-            this.Hide();
-         }
+         this.Hide();
       }
 
       public void OnDocumentBeforeClose()
@@ -143,17 +131,6 @@ namespace AlfrescoWord2003
          }
       }
 
-      private void AlfrescoPane_FormClosing(object sender, FormClosingEventArgs e)
-      {
-         // Override the close box
-         if (e.CloseReason == CloseReason.UserClosing)
-         {
-            e.Cancel = true;
-            m_ManuallyHidden = true;
-            this.Hide();
-         }
-      }
-
       public void showHome(bool isClosing)
       {
          // Do we have a valid web server address?
@@ -165,8 +142,7 @@ namespace AlfrescoWord2003
          else
          {
             // Yes - navigate to the home template
-//            string theURI = string.Format(@"{0}{1}my_alfresco.ftl&contextPath=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
-            string theURI = string.Format(@"{0}{1}myAlfresco?p=/Company%20Home", m_ServerDetails.WebClientURL, m_TemplateRoot);
+            string theURI = string.Format(@"{0}{1}myAlfresco?p=", m_ServerDetails.WebClientURL, m_TemplateRoot);
             // We don't prompt the user if the document is closing
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
             if (strAuthTicket != "")
@@ -176,13 +152,14 @@ namespace AlfrescoWord2003
             if (!isClosing || (strAuthTicket != ""))
             {
                webBrowser.ObjectForScripting = this;
-               webBrowser.Navigate(new Uri(theURI));
+               UriBuilder uriBuilder = new UriBuilder(theURI);
+               webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
                PanelMode = PanelModes.WebBrowser;
             }
          }
       }
 
-      public void showDocumentDetails(string documentPath)
+      public void showDocumentDetails(string relativePath)
       {
          // Do we have a valid web server address?
          if (m_ServerDetails.WebClientURL == "")
@@ -192,8 +169,17 @@ namespace AlfrescoWord2003
          }
          else
          {
-//            string theURI = string.Format(@"{0}{1}document_details.ftl&contextPath=/Company%20Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
-            string theURI = string.Format(@"{0}{1}documentDetails?p=/Company Home{2}", m_ServerDetails.WebClientURL, m_TemplateRoot, documentPath);
+            if (relativePath.Length > 0)
+            {
+               relativePath = "/Company Home" + relativePath;
+               // Strip off any additional parameters
+               int paramPos = relativePath.IndexOf("?");
+               if (paramPos != -1)
+               {
+                  relativePath = relativePath.Substring(0, paramPos);
+               }
+            }
+            string theURI = string.Format(@"{0}{1}documentDetails?p={2}", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
             if (strAuthTicket != "")
             {
@@ -206,11 +192,11 @@ namespace AlfrescoWord2003
          }
       }
 
-      public void openDocument(string documentURL)
+      public void openDocument(string documentPath)
       {
          object missingValue = Type.Missing;
-         // TODO: WebDAV or CIFS - need generic solution
-         string strFullPath = string.Format(@"{0}webdav/{1}", m_ServerDetails.WebClientURL, documentURL);
+         // WebDAV or CIFS?
+         string strFullPath = m_ServerDetails.getFullPath(documentPath, "");
          object file = strFullPath;
          try
          {
@@ -218,6 +204,7 @@ namespace AlfrescoWord2003
                ref file, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
                ref missingValue, ref missingValue, ref missingValue, ref missingValue,
                ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue);
+            
          }
          catch (Exception e)
          {
@@ -225,13 +212,62 @@ namespace AlfrescoWord2003
          }
       }
 
-      public void compareDocument(string documentPath)
+      public void compareDocument(string relativeURL)
       {
          object missingValue = Type.Missing;
 
+         if (relativeURL.StartsWith("/"))
+         {
+            relativeURL = relativeURL.Substring(1);
+         }
+
          m_WordApplication.ActiveDocument.Compare(
-            m_ServerDetails.WebClientURL + documentPath, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
+            m_ServerDetails.WebClientURL + relativeURL, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
             ref missingValue, ref missingValue, ref missingValue);
+      }
+
+      public void insertDocument(string relativePath)
+      {
+         object missingValue = Type.Missing;
+         object trueValue = true;
+         object falseValue = false;
+
+         // Create a new document if no document currently open
+         if (m_WordApplication.Selection == null)
+         {
+            m_WordApplication.Documents.Add(ref missingValue, ref missingValue, ref missingValue, ref missingValue);
+         }
+
+         object range = m_WordApplication.Selection.Range;
+
+         // WebDAV or CIFS?
+         string strFullPath = m_ServerDetails.getFullPath(relativePath, m_WordApplication.ActiveDocument.FullName);
+         string strExtn = Path.GetExtension(relativePath).ToLower();
+
+         if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
+         {
+            m_WordApplication.ActiveDocument.InlineShapes.AddPicture(strFullPath, ref falseValue, ref trueValue, ref range);
+         }
+         else if (".doc".IndexOf(strExtn) != -1)
+         {
+            m_WordApplication.Selection.InsertFile(strFullPath, ref missingValue, ref trueValue, ref missingValue, ref missingValue);
+         }
+         else
+         {
+            object filename = strFullPath;
+            object iconFilename = Type.Missing;
+            object iconIndex = Type.Missing;
+            object iconLabel = Path.GetFileName(strFullPath);
+            string defaultIcon = Util.DefaultIcon(Path.GetExtension(strFullPath));
+            if (defaultIcon.Contains(","))
+            {
+               string[] iconData = defaultIcon.Split(new char[] { ',' });
+               iconFilename = iconData[0];
+               iconIndex = iconData[1];
+            }
+            m_WordApplication.ActiveDocument.InlineShapes.AddOLEObject(ref missingValue, ref filename, ref falseValue, ref trueValue,
+               ref iconFilename, ref iconIndex, ref iconLabel, ref range);
+         }
       }
 
       public bool docHasExtension()
@@ -244,53 +280,27 @@ namespace AlfrescoWord2003
          saveToAlfrescoAs(documentPath, m_WordApplication.ActiveDocument.Name);
       }
 
-      public void saveToAlfrescoAs(string documentPath, string docName)
+      public void saveToAlfrescoAs(string relativeDirectory, string documentName)
       {
          object missingValue = Type.Missing;
 
-         // Remove leading "/"
-         if (documentPath.StartsWith("/"))
+         string currentDocPath = m_WordApplication.ActiveDocument.FullName;
+         // Ensure last separator is present
+         if (!relativeDirectory.EndsWith("/"))
          {
-            documentPath = documentPath.Substring(1);
+            relativeDirectory += "/";
          }
-
-         // CIFS or WebDAV path?
-         string docPath = m_WordApplication.ActiveDocument.FullName;
-         string savePath = "";
-
-         if (m_ServerDetails.MatchCIFSServer(docPath))
-         {
-            // Use CIFS
-            savePath = m_ServerDetails.CIFSServer + documentPath.Replace("/", "\\") + "\\".Replace("%20", " ");
-         }
-         else if (m_ServerDetails.MatchWebDAVURL(docPath))
-         {
-            // Use WebDAV
-            savePath = m_ServerDetails.WebDAVURL + documentPath + "/";
-         }
-         else
-         {
-            // No match - what config have we been given?
-            if (m_ServerDetails.CIFSServer != "")
-            {
-               // Default to CIFS if we've been given a server
-               savePath = m_ServerDetails.CIFSServer + documentPath.Replace("/", "\\").Replace("%20", " ") + "\\";
-            }
-            else
-            {
-               // Otherwise use WebDAV
-               savePath = m_ServerDetails.WebDAVURL + documentPath + "/";
-            }
-         }
-
-         // Add the Word filename
-         savePath += docName;
 
          // Have the correct file extension already?
-         if (!savePath.EndsWith(".doc"))
+         if (!documentName.EndsWith(".doc"))
          {
-            savePath += ".doc";
+            documentName += ".doc";
          }
+         // Add the Word filename
+         relativeDirectory += documentName;
+
+         // CIFS or WebDAV path?
+         string savePath = m_ServerDetails.getFullPath(relativeDirectory, currentDocPath);
 
          // Box into object - Word requirement
          object file = savePath;
@@ -302,7 +312,6 @@ namespace AlfrescoWord2003
                ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue);
 
             this.OnDocumentChanged();
-//            showDocumentDetails(documentPath + "/" + m_WordApplication.ActiveDocument.Name);
          }
          catch (Exception e)
          {
@@ -350,6 +359,24 @@ namespace AlfrescoWord2003
             chkRememberAuth.Checked = false;
          }
          m_SettingsChanged = false;
+      }
+
+      private void AlfrescoPane_Load(object sender, EventArgs e)
+      {
+         m_ServerDetails.loadWindowPosition(this);
+      }
+
+      private void AlfrescoPane_FormClosing(object sender, FormClosingEventArgs e)
+      {
+         m_ServerDetails.saveWindowPosition(this);
+
+         // Override the close box
+         if (e.CloseReason == CloseReason.UserClosing)
+         {
+            e.Cancel = true;
+            m_ManuallyHidden = true;
+            this.Hide();
+         }
       }
 
       private void btnDetailsOK_Click(object sender, EventArgs e)
@@ -440,6 +467,15 @@ namespace AlfrescoWord2003
          PanelMode = PanelModes.Configuration;
       }
       #endregion
+
+      private void webBrowser_Navigated(object sender, WebBrowserNavigatedEventArgs e)
+      {
+         if (webBrowser.Url.ToString().EndsWith("login.jsp"))
+         {
+            m_ServerDetails.clearAuthenticationTicket();
+            showHome(false);
+         }
+      }
 
    }
 }

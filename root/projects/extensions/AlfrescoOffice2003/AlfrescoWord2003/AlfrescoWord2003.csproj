@@ -191,6 +191,7 @@
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
     <Compile Include="ToolbarPicture.cs" />
+    <Compile Include="Util.cs" />
     <Compile Include="WebDAVHelper.cs" />
     <AppDesigner Include="Properties\" />
   </ItemGroup>

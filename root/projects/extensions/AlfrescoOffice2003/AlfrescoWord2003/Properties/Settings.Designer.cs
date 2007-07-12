@@ -31,30 +31,5 @@ namespace AlfrescoWord2003.Properties {
                 return ((string)(this["DefaultTemplate"]));
             }
         }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("template?templatePath=/Company%20Home/Data%20Dictionary/Presentation%20Templates/" +
-            "office/")]
-        public string OldTemplate {
-            get {
-                return ((string)(this["OldTemplate"]));
-            }
-            set {
-                this["OldTemplate"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("wcservice/office/")]
-        public string NewTemplate {
-            get {
-                return ((string)(this["NewTemplate"]));
-            }
-            set {
-                this["NewTemplate"] = value;
-            }
-        }
     }
 }

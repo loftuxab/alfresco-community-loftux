@@ -12,6 +12,8 @@ namespace AlfrescoWord2003
    public class ServerDetails
    {
       private const string HKCU_APP = @"Software\Alfresco\Word2003";
+      private const string REG_WINDOWTOP = "WindowTop";
+      private const string REG_WINDOWLEFT = "WindowLeft";
       private const string REG_WEBCLIENTURL = "WebClientURL";
       private const string REG_WEBDAVURL = "WebDAVURL";
       private const string REG_CIFSSERVER = "CIFSServer";
@@ -19,6 +21,8 @@ namespace AlfrescoWord2003
       private const string REG_PASSWORD = "Password";
 
       // Persisted settings
+      private int m_WindowTop = -1;
+      private int m_WindowLeft = -1;
       private string m_ServerName = "";
       private string m_WebClientURL = "";
       private string m_WebDAVURL = "";
@@ -83,8 +87,10 @@ namespace AlfrescoWord2003
          }
          set
          {
+            if (value == "/") value = "";
+
             m_WebDAVURL = value;
-            if (!m_WebDAVURL.EndsWith("/"))
+            if ((value != "") && !m_WebDAVURL.EndsWith("/"))
             {
                m_WebDAVURL += "/";
             }
@@ -99,8 +105,10 @@ namespace AlfrescoWord2003
          }
          set
          {
+            if (value == "\\") value = "";
+
             m_CIFSServer = value;
-            if (!m_CIFSServer.EndsWith("\\"))
+            if ((value != "") && !m_CIFSServer.EndsWith("\\"))
             {
                m_CIFSServer += "\\";
             }
@@ -224,6 +232,7 @@ namespace AlfrescoWord2003
       public void SaveToRegistry()
       {
          RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(HKCU_APP, true);
+
          try
          {
             rootKey.DeleteSubKey(this.ServerName);
@@ -269,6 +278,48 @@ namespace AlfrescoWord2003
             }
             return m_DocumentAlfrescoPath;
          }
+      }
+
+      public string getFullPath(string relativePath, string currentDocPath)
+      {
+         // CIFS or WebDAV path?
+         string fullPath = "";
+         // Default to CIFS
+         bool usingCIFS = true;
+
+         // Remove leading "/"
+         if (relativePath.StartsWith("/"))
+         {
+            relativePath = relativePath.Substring(1);
+         }
+
+         if (MatchWebDAVURL(currentDocPath))
+         {
+            // Looks like a WebDAV path, so use that
+            usingCIFS = false;
+         }
+         else
+         {
+            // No match - what config have we been given?
+            // Default to CIFS if we've been given a server
+            usingCIFS = (CIFSServer != "");
+         }
+
+         // Build the path depending on which method
+         if (usingCIFS)
+         {
+            // Use CIFS
+            fullPath = CIFSServer + relativePath.Replace("/", "\\");
+            fullPath = Uri.UnescapeDataString(fullPath);
+         }
+         else
+         {
+            // Use WebDAV
+            fullPath = WebDAVURL + relativePath;
+            fullPath += "?ticket=" + getAuthenticationTicket(false);
+         }
+
+         return fullPath;
       }
 
       public string getAuthenticationTicket(bool promptUser)
@@ -354,14 +405,69 @@ namespace AlfrescoWord2003
          return m_AuthenticationTicket;
       }
 
+      public void clearAuthenticationTicket()
+      {
+         m_AuthenticationTicket = "";
+      }
+
       public bool MatchWebDAVURL(string urlToMatch)
       {
-         return (urlToMatch.IndexOf(this.WebDAVURL) == 0);
+         return (urlToMatch.ToLower().IndexOf(this.WebDAVURL.ToLower()) == 0);
       }
 
       public bool MatchCIFSServer(string serverToMatch)
       {
-         return (serverToMatch.IndexOf(this.CIFSServer) == 0);
+         return (serverToMatch.ToLower().IndexOf(this.CIFSServer.ToLower()) == 0);
+      }
+
+      public void loadWindowPosition(Form theForm)
+      {
+         int windowTop = -1;
+         int windowLeft = -1;
+
+         RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(HKCU_APP, false);
+         try
+         {
+            windowTop = Convert.ToInt32(rootKey.GetValue(REG_WINDOWTOP, -1));
+            windowLeft = Convert.ToInt32(rootKey.GetValue(REG_WINDOWLEFT, -1));
+         }
+         catch
+         {
+         }
+
+         if ((windowTop != -1) && (windowLeft != -1))
+         {
+            // Check window is not completely off screen
+            bool bPositionOK = false;
+            foreach (Screen screen in Screen.AllScreens)
+            {
+               if (screen.WorkingArea.Contains(windowLeft, windowTop))
+               {
+                  bPositionOK = true;
+                  break;
+               }
+            }
+            // If the top-left corner is in a screen rect, then ok to position the form
+            if (bPositionOK)
+            {
+               theForm.Top = windowTop;
+               theForm.Left = windowLeft;
+            }
+         }
+      }
+
+      public void saveWindowPosition(Form theForm)
+      {
+         RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(HKCU_APP, true);
+
+         try
+         {
+            rootKey.SetValue(REG_WINDOWTOP, theForm.Top, RegistryValueKind.DWord);
+            rootKey.SetValue(REG_WINDOWLEFT, theForm.Left, RegistryValueKind.DWord);
+         }
+         catch
+         {
+         }
       }
    }
 }
