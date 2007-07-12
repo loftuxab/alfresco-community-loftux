@@ -3,6 +3,11 @@
 
 <beans>
 
+    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/bootstrap-context.xml" />
+    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/script-context.xml" />
+    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/action-context.xml" />
+    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/behaviour-context.xml" />
+    
     <bean id="org_alfresco_module_RecordsManagement_ConfigBootstrap" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
        <property name="configs">
          <list>
@@ -10,10 +15,5 @@
          </list>
        </property>
     </bean>
-
-    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/bootstrap-context.xml" />
-    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/script-context.xml" />
-    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/action-context.xml" />
-    <import resource="classpath:alfresco/module/org.alfresco.module.RecordsManagement/context/behaviour-context.xml" />
     
 </beans>
