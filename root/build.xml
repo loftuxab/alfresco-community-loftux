@@ -453,9 +453,6 @@
                     test-jndi, 
                     test-catalinavirtual, 
                     test-webclient, 
-                    test-rm, 
-		    test-blog,
-                    test-php, 
                     test-webserviceclient" />
 
    <target name="run-junit-test" 
