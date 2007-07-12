@@ -156,9 +156,6 @@
                     generate-javadocs-linkvalidation, 
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
-                    generate-javadocs-rm, 
-		              generate-javadocs-blog,
-                    generate-javadocs-php,
                     generate-javadocs-webserviceclient,
                     generate-javadocs-benchmarkframework,
                     generate-javadocs-benchmarktests" />
@@ -172,10 +169,7 @@
                     incremental-jndi, 
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    incremental-webclient, 
-                    incremental-rm, 
-		    incremental-blog,
-                    incremental-php, 
+                    incremental-webclient,  
                     incremental-webserviceclient" />
 
 
@@ -196,7 +190,7 @@
                     clean-linkvalidation, 
                     clean-webclient, 
                     clean-rm,
-		    clean-blog,
+                    clean-blog,
                     clean-php, 
                     clean-webserviceclient, 
                     clean-benchmarkframework, 
