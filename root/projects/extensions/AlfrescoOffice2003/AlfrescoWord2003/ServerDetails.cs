@@ -328,76 +328,70 @@ namespace AlfrescoWord2003
          if (m_AuthenticationTicket == "")
          {
             // Do we recognise the path as belonging to an Alfresco server?
-            if ((m_DocumentPhysicalPath.StartsWith("http")) || (m_DocumentPhysicalPath == ""))
+            if (this.MatchCIFSServer(m_DocumentPhysicalPath))
+            {
+               // Try CIFS
+               IServerHelper myAuthTicket = new CIFSHelper(this.CIFSServer);
+               m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
+            }
+            else
             {
                // Try WebDAV
-               if ((this.MatchWebDAVURL(m_DocumentPhysicalPath)) || (m_DocumentPhysicalPath == ""))
+               IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
+               strAuthTicket = myAuthTicket.GetAuthenticationTicket();
+               if (strAuthTicket != "401")
                {
-                  IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
-                  strAuthTicket = myAuthTicket.GetAuthenticationTicket();
+                  m_AuthenticationTicket = strAuthTicket;
+               }
+               else
+               {
+                  // Authentication failed - do we have a saved username/password?
+                  if ((this.Username.Length > 0) && (this.Password.Length > 0))
+                  {
+                     strAuthTicket = myAuthTicket.GetAuthenticationTicket(this.Username, this.Password);
+                  }
                   if (strAuthTicket != "401")
                   {
                      m_AuthenticationTicket = strAuthTicket;
                   }
                   else
                   {
-                     // Authentication failed - do we have a saved username/password?
-                     if ((this.Username.Length > 0) && (this.Password.Length > 0))
+                     // Last option - pop up the login form
+                     using (Login myLogin = new Login())
                      {
-                        strAuthTicket = myAuthTicket.GetAuthenticationTicket(this.Username, this.Password);
-                     }
-                     if (strAuthTicket != "401")
-                     {
-                        m_AuthenticationTicket = strAuthTicket;
-                     }
-                     else
-                     {
-                        // Last option - pop up the login form
-                        using (Login myLogin = new Login())
+                        bool bRetry = true;
+
+                        // Pre-populate with values already configured
+                        myLogin.Username = this.Username;
+                        myLogin.Password = this.Password;
+
+                        // Retry loop for typos
+                        while (bRetry)
                         {
-                           bool bRetry = true;
-
-                           // Pre-populate with values already configured
-                           myLogin.Username = this.Username;
-                           myLogin.Password = this.Password;
-
-                           // Retry loop for typos
-                           while (bRetry)
+                           if (myLogin.ShowDialog() == DialogResult.OK)
                            {
-                              if (myLogin.ShowDialog() == DialogResult.OK)
+                              // Try to authenticate with entered credentials
+                              strAuthTicket = myAuthTicket.GetAuthenticationTicket(myLogin.Username, myLogin.Password);
+                              if ((strAuthTicket == "401") || (strAuthTicket == ""))
                               {
-                                 // Try to authenticate with entered credentials
-                                 strAuthTicket = myAuthTicket.GetAuthenticationTicket(myLogin.Username, myLogin.Password);
-                                 if ((strAuthTicket == "401") || (strAuthTicket == ""))
-                                 {
-                                    // Retry?
-                                    bRetry = (MessageBox.Show("Couldn't authenticate with Alfresco server.", "Alfresco Authentication", MessageBoxButtons.RetryCancel) == DialogResult.Retry);
-                                 }
-                                 else
-                                 {
-                                    // Successful login
-                                    m_AuthenticationTicket = strAuthTicket;
-                                    bRetry = false;
-                                 }
+                                 // Retry?
+                                 bRetry = (MessageBox.Show("Couldn't authenticate with Alfresco server.", "Alfresco Authentication", MessageBoxButtons.RetryCancel) == DialogResult.Retry);
                               }
                               else
                               {
-                                 // Cancel or close chosen on login dialog
+                                 // Successful login
+                                 m_AuthenticationTicket = strAuthTicket;
                                  bRetry = false;
                               }
+                           }
+                           else
+                           {
+                              // Cancel or close chosen on login dialog
+                              bRetry = false;
                            }
                         }
                      }
                   }
-               }
-            }
-            else
-            {
-               // Try CIFS
-               if (this.MatchCIFSServer(m_DocumentPhysicalPath))
-               {
-                  IServerHelper myAuthTicket = new CIFSHelper(this.CIFSServer);
-                  m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
                }
             }
          }
@@ -412,12 +406,22 @@ namespace AlfrescoWord2003
 
       public bool MatchWebDAVURL(string urlToMatch)
       {
-         return (urlToMatch.ToLower().IndexOf(this.WebDAVURL.ToLower()) == 0);
+         bool bMatch = false;
+         if (this.WebDAVURL.Length > 0)
+         {
+            bMatch = urlToMatch.ToLower().IndexOf(this.WebDAVURL.ToLower()) == 0;
+         }
+         return bMatch;
       }
 
       public bool MatchCIFSServer(string serverToMatch)
       {
-         return (serverToMatch.ToLower().IndexOf(this.CIFSServer.ToLower()) == 0);
+         bool bMatch = false;
+         if (this.CIFSServer.Length > 0)
+         {
+            bMatch = serverToMatch.ToLower().IndexOf(this.CIFSServer.ToLower()) == 0;
+         }
+         return bMatch;
       }
 
       public void loadWindowPosition(Form theForm)
