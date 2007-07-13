@@ -1073,57 +1073,48 @@
    <!-- ******************************** -->
 
    <target name="incremental-rm" 
-           description="Performs an incremental build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm"
-           if="enable.module.rm" />
+           description="Performs an incremental build of the records management project."
+           depends="package-rm" />
 
    <target name="build-rm" 
-           description="Performs a clean build of the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="clean-rm, 
-                    incremental-rm" 
-                    if="enable.module.rm" />
+           description="Performs a clean build of the records management project."
+           depends="clean-rm, incremental-rm" />
 
    <target name="clean-rm" 
            description="Cleans the records management project" 
-           depends="init" 
-           if="enable.module.rm">
+           depends="init">
       <clean projectdir="${dir.module.rm}" />
    </target>
 
    <target name="compile-rm" 
-           description="Compiles the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="init" 
-           if="enable.module.rm">
+           description="Compiles the records management project."
+           depends="init">
       <compile-java projectdir="${dir.module.rm}" />
    </target>
 
    <target name="package-rm"
-           description="Packages the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm-war"
-           if="enable.module.rm" />
+           description="Packages the records management project."
+           depends="package-rm-war" />
 
    <target name="package-rm-jar"
-           description="Packages the JAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="compile-rm" 
-           if="enable.module.rm">
+           description="Packages the JAR file for the records management project."
+           depends="compile-rm">
       <mkdir dir="${dir.module.rm.dist}" />
       <jar jarfile="${dir.module.rm.dist}/${file.name.jar.rm}" 
            basedir="${dir.module.rm.classes}" />
    </target>
 
    <target name="package-rm-war"
-           description="Packages the WAR file for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm-extension"
-           if="enable.module.rm">
+           description="Packages the WAR file for the records management project."
+           depends="package-rm-extension">
       <echo>Installing records management into WAR...</echo>
       <install-amp ampfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
    <target name="package-rm-extension"
-           description="Packages the records management extension.  Enable with '-Denable.module.rm=TRUE'."
-           depends="package-rm-jar"
-           if="enable.module.rm">
+           description="Packages the records management extension."
+           depends="package-rm-jar">
       <zip destfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
            update="true">
          <zipfileset file="${dir.module.rm.property}/module.properties"/>
@@ -1137,16 +1128,14 @@
    </target>
 
    <target name="test-rm" 
-           description="Runs the tests for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="compile-rm" 
-           if="enable.module.rm">
+           description="Runs the tests for the records management project."
+           depends="compile-rm">
       <run-tests projectdir="${dir.module.rm}" />
    </target>
 
    <target name="generate-javadocs-rm"
-           description="Generates the JavaDocs for the records management project.  Enable with '-Denable.module.rm=TRUE'."
-           depends="init"
-           if="enable.module.rm">
+           description="Generates the JavaDocs for the records management project."
+           depends="init">
       <generate-javadocs documenttitle="Alfresco Records Management Extension"
                          windowtitle="Records Management"
                          projectdir="${dir.module.rm}"/>
@@ -1157,39 +1146,32 @@
    <!-- ******************************** -->
 
    <target name="incremental-blog"
-           description="Performs an incremental build of the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="package-blog"
-           if="enable.module.blog" />
+           description="Performs an incremental build of the blog integration project."
+           depends="package-blog" />
 
    <target name="build-blog"
-           description="Performs a clean build of the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="clean-blog,
-                    incremental-blog"
-                    if="enable.module.blog" />
+           description="Performs a clean build of the blog integration project."
+           depends="clean-blog, incremental-blog" />
 
    <target name="clean-blog"
            description="Cleans the blog integration project"
-           depends="init"
-           if="enable.module.blog">
+           depends="init">
       <clean projectdir="${dir.module.blog}" />
    </target>
 
    <target name="compile-blog"
-           description="Compiles the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="init"
-           if="enable.module.blog">
+           description="Compiles the blog integration project."
+           depends="init">
       <compile-java projectdir="${dir.module.blog}" />
    </target>
 
    <target name="package-blog"
-           description="Packages the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="package-blog-war"
-           if="enable.module.blog" />
+           description="Packages the blog integration project."
+           depends="package-blog-war" />
 
    <target name="package-blog-jar"
-           description="Packages the JAR file for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="compile-blog"
-           if="enable.module.blog">
+           description="Packages the JAR file for the blog integration project."
+           depends="compile-blog">
       <mkdir dir="${dir.module.blog.dist}" />
       <jar jarfile="${dir.module.blog.dist}/${file.name.jar.blog}"
            basedir="${dir.module.blog.classes}">
@@ -1200,18 +1182,16 @@
    </target>
 
    <target name="package-blog-war"
-           description="Packages the WAR file for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="package-blog-extension"
-           if="enable.module.blog">
+           description="Packages the WAR file for the blog integration project."
+           depends="package-blog-extension">
       <echo>Installing blog integration into WAR...</echo>
       <install-amp ampfile="${dir.module.blog.dist}/${file.name.amp.blog}"
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
    <target name="package-blog-extension"
-           description="Packages the blog integration extension.  Enable with '-Denable.module.blog=TRUE'."
-           depends="package-blog-jar"
-           if="enable.module.blog">
+           description="Packages the blog integration extension."
+           depends="package-blog-jar">
       <zip destfile="${dir.module.blog.dist}/${file.name.amp.blog}"
            update="true">
          <zipfileset file="${dir.module.blog.property}/module.properties"/>
@@ -1227,16 +1207,14 @@
    </target>
 
    <target name="test-blog"
-           description="Runs the tests for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="compile-blog"
-           if="enable.module.blog">
+           description="Runs the tests for the blog integration project."
+           depends="compile-blog">
       <run-tests projectdir="${dir.module.blog}" />
    </target>
 
    <target name="generate-javadocs-blog"
-           description="Generates the JavaDocs for the blog integration project.  Enable with '-Denable.module.blog=TRUE'."
-           depends="init"
-           if="enable.module.blog">
+           description="Generates the JavaDocs for the blog integration project."
+           depends="init">
       <generate-javadocs documenttitle="Alfresco Blog Integration Extension"
                          windowtitle="Blog Integration"
                          projectdir="${dir.module.blog}"/>
@@ -1248,33 +1226,27 @@
 
    <target name="incremental-php" 
            description="Performs an incremental build of the PHP SDK project"
-           depends="package-php" 
-           if="enable.module.php" />
+           depends="package-php" />
 
    <target name="build-php" 
            description="Performs a clean build of the PHP SDK project"
-           depends="clean-php, 
-                    incremental-php" 
-           if="enable.module.php" />
+           depends="clean-php, incremental-php" />
 
    <target name="clean-php" 
            description="Cleans the PHP SDK project" 
-           depends="init" 
-           if="enable.module.php">
+           depends="init">
       <clean projectdir="${dir.module.php}" />
    </target>
 
    <target name="compile-php" 
            description="Compiles the PHP SDK project" 
-           depends="init" 
-           if="enable.module.php">
+           depends="init">
       <compile-java projectdir="${dir.module.php}" />
    </target>
 
    <target name="package-php" 
            description="Packages the PHP SDK project"
-           depends="package-php-war"
-           if="enable.module.php" />
+           depends="package-php-war" />
            
    <target name="package-php-lib"
            description="Package the PHP client library"
@@ -1295,8 +1267,7 @@
 
    <target name="package-php-jar" 
            description="Packages the JAR file for the PHP SDK project"
-           depends="compile-php" 
-           if="enable.module.php">
+           depends="compile-php">
       <mkdir dir="${dir.module.php.dist}" />
       <jar jarfile="${dir.module.php.dist}/${file.name.jar.php}" 
            basedir="${dir.module.php.classes}" />
@@ -1304,8 +1275,7 @@
 
    <target name="package-php-war" 
            description="Packages the WAR file installing the PHP integration module"
-           depends="package-php-module" 
-           if="enable.module.php">
+           depends="package-php-module">
       <echo>Installing PHP Integration into WAR...</echo>
       <install-amp ampfile="${dir.module.php.dist}/${file.name.amp.php}" 
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
@@ -1313,8 +1283,7 @@
 
    <target name="package-php-module" 
            description="Packages the PHP Integration module into an AMP"
-           depends="package-php-jar" 
-           if="enable.module.php">
+           depends="package-php-jar">
       <zip destfile="${dir.module.php.dist}/${file.name.amp.php}" 
            update="true">
          <zipfileset file="${dir.module.php.property}/module.properties"/>
@@ -1335,24 +1304,24 @@
 
    <target name="test-php" 
            description="Runs the tests for the PHP SDK project"
-           depends="compile-php" 
-           if="enable.module.php">
+           depends="compile-php">
       <run-tests projectdir="${dir.module.php}" />
    </target>
 
    <target name="generate-javadocs-php" 
            description="Generates the JavaDocs for the records management project"
-           depends="init" 
-           if="enable.module.php">
+           depends="init">
       <generate-javadocs documenttitle="Alfresco Records Management Extension" 
                          windowtitle="Records Management" 
                          projectdir="${dir.module.php}"/>
    </target>
    
-   <target name="refresh-mediawiki" description="Refreshes the media wiki integration files" depends="init">
-           <copy todir="${dir.mediawiki}/extensions">
-                 <fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
-           </copy>
+   <target name="refresh-mediawiki" 
+   	     description="Refreshes the media wiki integration files" 
+   	     depends="init">
+   	<copy todir="${dir.mediawiki}/extensions">
+      	<fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
+      </copy>
    </target>
 
 
