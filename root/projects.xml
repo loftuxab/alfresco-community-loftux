@@ -130,6 +130,23 @@
       <mkdir dir="${dir.project.deployment.dist}" />
       <jar jarfile="${dir.project.deployment.dist}/${file.name.jar.deployment}" 
            basedir="${dir.project.deployment.classes}" />
+      <copy todir="${dir.project.deployment.dist}">
+          <fileset dir="${dir.project.deployment}/config">
+              <include name="*"/>
+          </fileset>
+          <fileset dir="${dir.project.3rdparty.lib}">
+              <include name="spring-*.jar"/>
+              <include name="jug.jar"/>
+          </fileset> 
+          <fileset dir="${dir.project.3rdparty.lib}/commons">
+              <filename name="commons-logging-*.jar"/>
+          </fileset>
+          <fileset dir="${dir.project.core.dist}">
+              <filename name="alfresco-core.jar"/>
+          </fileset>
+      </copy>
+      <zip basedir="${dir.project.deployment.dist}" compress="yes" 
+           destfile="${dir.project.deployment}/build/alfresco-deployment.zip"/>
    </target>
    
    <target name="test-deployment" 

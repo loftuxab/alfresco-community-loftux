@@ -132,6 +132,8 @@ public class Target implements Serializable
     {
         File metadata = new File(fMetaDataDirectory);
         metadata.mkdir();
+        File root = new File(fRootDirectory);
+        root.mkdir();
         recursiveInitialize(fMetaDataDirectory, fRootDirectory);
     }
 
