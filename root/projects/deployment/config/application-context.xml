@@ -25,6 +25,7 @@
         <property name="metaDataDirectory">
             <value>${dep.metadatadir}</value>
         </property>
+        <!-- Target Configuration. Modify for your site. -->
         <property name="targetData">
             <map>
             	<entry key="default">
