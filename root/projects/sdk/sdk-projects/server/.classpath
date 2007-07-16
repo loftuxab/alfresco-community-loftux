@@ -6,6 +6,8 @@
 	<classpathentry exported="true" kind="lib" path="alfresco-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="alfresco-remote-api.jar"/>
 	<classpathentry exported="true" kind="lib" path="alfresco-web-client.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco-deployment.jar"/>
+	<classpathentry exported="true" kind="lib" path="alfresco-linkvalidation.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/activation.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/antlr-2.7.5H3.jar"/>
@@ -87,6 +89,8 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/cglib-nodep-2.2_beta1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.2.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/lucene-core-2.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/lucene-analyzers-2.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/lucene-snowball-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/pdfbox-0.7.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/quartz-1.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xalan-2.7.0/xalan.jar"/>
@@ -96,5 +100,11 @@
 	<classpathentry exported="true" kind="lib" path="alfresco-repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R4.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-httpclient-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/fontbox-0.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/guessencoding-1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/hsqldb.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/icu4j_3_6_1.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/truezip.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
