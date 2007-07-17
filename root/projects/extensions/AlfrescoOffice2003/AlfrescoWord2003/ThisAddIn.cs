@@ -63,8 +63,9 @@ namespace AlfrescoWord2003
          }
          catch
          {
+            object falseValue = false;
             // Toolbar named Alfresco does not exist so we should create it.
-            m_CommandBar = Application.CommandBars.Add("Alfresco", Office.MsoBarPosition.msoBarTop, false, true);
+            m_CommandBar = Application.CommandBars.Add("Alfresco", Office.MsoBarPosition.msoBarTop, falseValue, falseValue);
          }
 
          // Try to get a handle to the Alfresco CommandButton
@@ -200,7 +201,10 @@ namespace AlfrescoWord2003
 
       public void CloseAlfrescoPane()
       {
-         m_AlfrescoPane.Hide();
+         if (m_AlfrescoPane != null)
+         {
+            m_AlfrescoPane.Hide();
+         }
       }
    }
 }

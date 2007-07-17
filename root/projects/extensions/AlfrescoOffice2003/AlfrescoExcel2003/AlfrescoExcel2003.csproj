@@ -17,6 +17,8 @@
     <NoStandardLibraries>false</NoStandardLibraries>
     <RootNamespace>AlfrescoExcel2003</RootNamespace>
     <AssemblyName>AlfrescoExcel2003</AssemblyName>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>AlfrescoExcel2003.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <!-- 
@@ -132,6 +134,21 @@
      be found.
   -->
   <ItemGroup>
+    <Compile Include="AlfrescoPane.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AlfrescoPane.designer.cs">
+      <DependentUpon>AlfrescoPane.cs</DependentUpon>
+    </Compile>
+    <Compile Include="AppWatcher.cs" />
+    <Compile Include="CIFSHelper.cs" />
+    <Compile Include="Interfaces.cs" />
+    <Compile Include="Login.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login.Designer.cs">
+      <DependentUpon>Login.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -143,7 +160,10 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="AlfrescoExcel2003.pfx" />
+    <None Include="app.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -151,7 +171,9 @@
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="ServerDetails.cs" />
     <Compile Include="ThisAddIn.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -161,7 +183,24 @@
     <Compile Include="ThisAddIn.Designer.cs">
       <DependentUpon>ThisAddIn.Designer.xml</DependentUpon>
     </Compile>
+    <Compile Include="ToolbarPicture.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="WebDAVHelper.cs" />
     <AppDesigner Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="toolbar.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="AlfrescoPane.resx">
+      <DependentUpon>AlfrescoPane.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login.resx">
+      <DependentUpon>Login.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="toolbar_mask.ico" />
   </ItemGroup>
   <!-- Include the build rules for a C# project.-->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -173,7 +212,7 @@
       <FlavorProperties GUID="{BAA0C2D2-18E2-41B9-852F-F413020CAA33}">
         <ProjectProperties HostName="Excel" HostPackage="{D53BAEDE-5B63-42BE-8267-3DED11EDC582}" ApplicationType="Excel" Language="cs" TemplatesPath="" DebugInfoExeName="#Software\Microsoft\Office\11.0\Excel\InstallRoot\Path#EXCEL.exe" />
         <Host Name="Excel" GeneratedCodeNamespace="AlfrescoExcel2003" IconIndex="0">
-          <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="ThisAddIn" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
+          <HostItem Name="ThisAddIn" Code="ThisAddIn.cs" CanonicalName="AddIn" CanActivate="false" IconIndex="1" Blueprint="ThisAddIn.Designer.xml" GeneratedCode="ThisAddIn.Designer.cs" />
         </Host>
         <ProjectClient>
           <VSTO_CompatibleProducts ErrorProduct="This project requires Microsoft Office Excel 2003, but this application is not installed." ErrorPIA="This project references the primary interop assembly for Microsoft Office Excel 2003, but this primary interop assembly is not installed.">
