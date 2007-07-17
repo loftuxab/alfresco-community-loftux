@@ -21,8 +21,6 @@ namespace AlfrescoWord2003
       private const string REG_PASSWORD = "Password";
 
       // Persisted settings
-      private int m_WindowTop = -1;
-      private int m_WindowLeft = -1;
       private string m_ServerName = "";
       private string m_WebClientURL = "";
       private string m_WebDAVURL = "";
@@ -232,6 +230,11 @@ namespace AlfrescoWord2003
       public void SaveToRegistry()
       {
          RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(HKCU_APP, true);
+
+         if (rootKey == null)
+         {
+            rootKey = Registry.CurrentUser.CreateSubKey(HKCU_APP);
+         }
 
          try
          {
