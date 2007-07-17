@@ -4,9 +4,10 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.IO;
+using System.Runtime.InteropServices;
+using System.Security.Permissions;
 using System.Text;
 using System.Windows.Forms;
-using System.Security.Permissions;
 using Microsoft.VisualStudio.Tools.Applications.Runtime;
 using Word = Microsoft.Office.Interop.Word;
 using Office = Microsoft.Office.Core;
@@ -23,6 +24,9 @@ namespace AlfrescoWord2003
       private bool m_ShowPaneOnActivate = false;
       private bool m_ManuallyHidden = false;
 
+      // Win32 SDK functions
+      [DllImport("user32.dll")]
+      public static extern int SetFocus(int hWnd);
 
       public Word.Application WordApplication
       {
@@ -61,16 +65,6 @@ namespace AlfrescoWord2003
          m_ServerDetails.saveWindowPosition(this);
       }
 
-      public void OnDocumentOpen()
-      {
-         m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
-         this.showDocumentDetails(m_ServerDetails.DocumentPath);
-         if (!m_ManuallyHidden)
-         {
-            this.Show();
-         }
-      }
-
       public void OnDocumentChanged()
       {
          try
@@ -95,19 +89,39 @@ namespace AlfrescoWord2003
          }
       }
 
+      delegate void OnWindowActivateCallback();
+
       public void OnWindowActivate()
       {
          if (m_ShowPaneOnActivate && !m_ManuallyHidden)
          {
-            this.Show();
-            m_WordApplication.Activate();
+            if (this.InvokeRequired)
+            {
+               OnWindowActivateCallback callback = new OnWindowActivateCallback(OnWindowActivate);
+               this.Invoke(callback);
+            }
+            else
+            {
+               this.Show();
+               m_WordApplication.Activate();
+            }
          }
       }
 
+      delegate void OnWindowDeactivateCallback();
+
       public void OnWindowDeactivate()
       {
-         m_ShowPaneOnActivate = true;
-         this.Hide();
+         if (this.InvokeRequired)
+         {
+            OnWindowDeactivateCallback callback = new OnWindowDeactivateCallback(OnWindowDeactivate);
+            this.Invoke(callback);
+         }
+         else
+         {
+            m_ShowPaneOnActivate = true;
+            this.Hide();
+         }
       }
 
       public void OnDocumentBeforeClose()
@@ -142,7 +156,7 @@ namespace AlfrescoWord2003
          else
          {
             // Yes - navigate to the home template
-            string theURI = string.Format(@"{0}{1}myAlfresco?p=", m_ServerDetails.WebClientURL, m_TemplateRoot);
+            string theURI = string.Format(@"{0}{1}myAlfresco?p=&e=doc", m_ServerDetails.WebClientURL, m_TemplateRoot);
             // We don't prompt the user if the document is closing
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(!isClosing);
             if (strAuthTicket != "")
@@ -171,6 +185,10 @@ namespace AlfrescoWord2003
          {
             if (relativePath.Length > 0)
             {
+               if (!relativePath.StartsWith("/"))
+               {
+                  relativePath = "/" + relativePath;
+               }
                relativePath = "/Company Home" + relativePath;
                // Strip off any additional parameters
                int paramPos = relativePath.IndexOf("?");
@@ -179,7 +197,7 @@ namespace AlfrescoWord2003
                   relativePath = relativePath.Substring(0, paramPos);
                }
             }
-            string theURI = string.Format(@"{0}{1}documentDetails?p={2}", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
+            string theURI = string.Format(@"{0}{1}documentDetails?p={2}&e=doc", m_ServerDetails.WebClientURL, m_TemplateRoot, relativePath);
             string strAuthTicket = m_ServerDetails.getAuthenticationTicket(true);
             if (strAuthTicket != "")
             {

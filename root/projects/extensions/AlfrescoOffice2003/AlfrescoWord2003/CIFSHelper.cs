@@ -124,9 +124,18 @@ namespace AlfrescoWord2003
             return "";
          }
          // Does the documentPath belong to the server?
-         if (documentPath.ToLower().IndexOf(m_RootPath.ToLower()) == 0)
+         if (documentPath.ToLower().IndexOf(m_AlfrescoServer.ToLower()) == 0)
          {
-            alfrescoPath = documentPath.Remove(0, m_RootPath.Length).Replace("\\", "/");
+            alfrescoPath = documentPath.Remove(0, m_AlfrescoServer.Length).Replace("\\", "/");
+         }
+         else
+         {
+            // Office likes mapping UNC paths to mapped drive letters
+            string path = MappedDriveToUNC(documentPath);
+            if (path.ToLower().IndexOf(m_AlfrescoServer.ToLower()) == 0)
+            {
+               alfrescoPath = path.Remove(0, m_AlfrescoServer.Length).Replace("\\", "/");
+            }
          }
          return alfrescoPath;
       }
@@ -143,37 +152,13 @@ namespace AlfrescoWord2003
             CloseHandle(m_handle);
          }
 
-         string path = rootPath;
          string uncPath = rootPath;
 
-         // Deal with drive mapping
-         if ((uncPath.Length >= 3) && (uncPath.Substring(1,3).Equals(":\\")))
+         // See if the path was a valid drive mapping
+         string path = MappedDriveToUNC(uncPath);
+         if (path != "")
          {
-            // Try and convert the local path to a UNC path
-            string mappedDrive = uncPath.Substring(0, 2);
-
-            // Create a string buffer
-            int BufferSize = MAX_PATH;
-            StringBuilder Buffer = new StringBuilder(BufferSize);
-
-            // Call the windows API
-            int ret = WNetGetConnection(mappedDrive, Buffer, ref BufferSize);
-            if (ret != NO_ERROR)
-            {
-               return false;
-            }
-
-            // Build the UNC path to the folder
-            uncPath = Buffer.ToString();
-            if (!uncPath.EndsWith(PATH_SEPARATOR))
-            {
-               uncPath += PATH_SEPARATOR;
-            }
-
-            if (path.Length > 3)
-            {
-               uncPath += path.Substring(3);
-            }
+            uncPath = path;
          }
 
          // Check if the UNC path is valid
@@ -216,6 +201,47 @@ namespace AlfrescoWord2003
          }
 
          return this.IsAlfrescoFolder();
+      }
+
+      private string MappedDriveToUNC(string mappedPath)
+      {
+         string uncPath = mappedPath;
+
+         // Convert the drive mapping to a UNC path
+         if ((uncPath.Length >= 3) && (uncPath.Substring(1, 2).Equals(":\\")))
+         {
+            // Try and convert the local path to a UNC path
+            string mappedDrive = uncPath.Substring(0, 2);
+
+            // Create a string buffer
+            int BufferSize = MAX_PATH;
+            StringBuilder Buffer = new StringBuilder(BufferSize);
+
+            // Call the windows API
+            int ret = WNetGetConnection(mappedDrive, Buffer, ref BufferSize);
+            if (ret != NO_ERROR)
+            {
+               return "";
+            }
+
+            // Build the UNC path to the folder
+            uncPath = Buffer.ToString();
+            if (!uncPath.EndsWith(PATH_SEPARATOR))
+            {
+               uncPath += PATH_SEPARATOR;
+            }
+
+            if (mappedPath.Length > 3)
+            {
+               uncPath += mappedPath.Substring(3);
+            }
+         }
+         else
+         {
+            uncPath = "";
+         }
+
+         return uncPath;
       }
 
       // Define a structure suitable to receive the output of the FSCTL_ALFRESCO_PROBE request

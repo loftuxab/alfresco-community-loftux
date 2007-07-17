@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using System.Threading;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Tools.Applications.Runtime;
 using Word = Microsoft.Office.Interop.Word;
@@ -22,8 +21,6 @@ namespace AlfrescoWord2003
          // Register event interest with the Word Application
          Application.WindowActivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowActivateEventHandler(Application_WindowActivate);
          Application.WindowDeactivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowDeactivateEventHandler(Application_WindowDeactivate);
-         // we don't need DocumentOpen because DocumentChange fires for each one (and is more useful)
-         // Application.DocumentOpen += new Word.ApplicationEvents4_DocumentOpenEventHandler(Application_DocumentOpen);
          Application.DocumentBeforeClose += new Word.ApplicationEvents4_DocumentBeforeCloseEventHandler(Application_DocumentBeforeClose);
          Application.DocumentChange += new Microsoft.Office.Interop.Word.ApplicationEvents4_DocumentChangeEventHandler(Application_DocumentChange);
 
@@ -170,18 +167,6 @@ namespace AlfrescoWord2003
          if (m_AlfrescoPane != null)
          {
             m_AlfrescoPane.OnDocumentBeforeClose();
-         }
-      }
-
-      /// <summary>
-      /// Fired upon opening a Word document
-      /// </summary>
-      /// <param name="wordDoc"></param>
-      void Application_DocumentOpen(Word.Document wordDoc)
-      {
-         if (m_AlfrescoPane != null)
-         {
-            m_AlfrescoPane.OnDocumentOpen();
          }
       }
 
