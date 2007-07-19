@@ -463,7 +463,8 @@
            description="Creates the Office 2003 Extensions distribution files"
            depends="distribute-extensions-office2003-word,
                     distribute-extensions-office2003-excel,
-                    distribute-extensions-office2003-powerpoint" />
+                    distribute-extensions-office2003-powerpoint,
+                    distribute-extensions-office2003-all" />
 
    <target name="distribute-extensions-office2003-word"
            description="Creates the Word 2003 Extensions distribution files"
@@ -508,6 +509,22 @@
                                setup.exe,
                                AlfrescoPowerPoint2003Setup.msi" />
          <zipfileset dir="${dir.project.extension.office.powerpoint2003}/Office2003PIA"
+                     prefix="Office2003PIA"
+                     includes="o2003pia.msi" />
+      </zip>
+   </target>
+
+   <target name="distribute-extensions-office2003-all"
+           description="Creates the 3-in-1 Office 2003 Extensions distribution files"
+           depends="init">
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-all}.zip">
+         <zipfileset dir="${dir.project.extension.office.all2003}"
+                     includes="readme.txt,
+                               setup.exe,
+                               AlfrescoOffice2003Setup.msi" />
+         <zipfileset dir="${dir.project.extension.office.all2003}/Office2003PIA"
                      prefix="Office2003PIA"
                      includes="o2003pia.msi" />
       </zip>

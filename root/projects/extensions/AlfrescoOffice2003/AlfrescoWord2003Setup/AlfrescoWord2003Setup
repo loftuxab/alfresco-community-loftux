@@ -69,6 +69,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_855E5DACD3C046718BF99724F87411C9"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_A07721C221A44762920C45C9DF4A8B5E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -476,6 +482,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_855E5DACD3C046718BF99724F87411C9"
+            {
+            "SourcePath" = "8:..\\addRemove.ico"
+            "TargetName" = "8:addRemove.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_4EF5D9A5E8604C89A74FEBF3AF7613A6"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A07721C221A44762920C45C9DF4A8B5E"
             {
             "SourcePath" = "8:..\\alfrescoInstall.jpg"
@@ -599,7 +625,7 @@
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:Alfresco Add-In for Microsoft Word 2003"
         "ARPURLINFOABOUT" = "8:http://www.alfresco.com/"
-        "ARPPRODUCTICON" = "8:"
+        "ARPPRODUCTICON" = "8:_855E5DACD3C046718BF99724F87411C9"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -614,27 +640,7 @@
             {
                 "Keys"
                 {
-                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_AB9FA87C383241B9AFA9336F9DA0D770"
-                    {
-                    "Name" = "8:Software"
-                    "Condition" = "8:"
-                    "AlwaysCreate" = "11:FALSE"
-                    "DeleteAtUninstall" = "11:FALSE"
-                    "Transitive" = "11:FALSE"
-                        "Keys"
-                        {
-                        }
-                        "Values"
-                        {
-                        }
-                    }
-                }
-            }
-            "HKCU"
-            {
-                "Keys"
-                {
-                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_6C0ED25191BB413095E19AE7075748B9"
+                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_7763CC8410604F86898E32F208DBF9CD"
                     {
                     "Name" = "8:Software"
                     "Condition" = "8:"
@@ -956,6 +962,12 @@
                         {
                         }
                     }
+                }
+            }
+            "HKCU"
+            {
+                "Keys"
+                {
                 }
             }
             "HKCR"
@@ -1393,7 +1405,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_D145E0A88A774B3EBE36719150AF5574"
             {
-            "SourcePath" = "8:..\\AlfrescoWord2003\\obj\\Debug\\AlfrescoWord2003.dll"
+            "SourcePath" = "8:C:\\Dev\\HEAD\\root\\projects\\extensions\\AlfrescoOffice2003\\AlfrescoWord2003\\obj\\Debug\\AlfrescoWord2003.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_4EF5D9A5E8604C89A74FEBF3AF7613A6"

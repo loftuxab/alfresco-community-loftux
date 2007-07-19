@@ -20,7 +20,9 @@ Alfresco Add-In for Microsoft Word 2003
 
  2. The Add-In will try to help with the correct settings once the Web Client URL is set.
 
- 3. You can return to the configuration screen later via the link at the bottom of the Add-In panel.
+ 3. All Office 2003 Add-Ins share the server configuration, so you only need to set the values once.
+
+ 4. You can return to the configuration screen later via the link at the bottom of the Add-In panel.
 
 
 

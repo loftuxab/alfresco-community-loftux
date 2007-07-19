@@ -11,9 +11,10 @@ namespace AlfrescoWord2003
 {
    public class ServerDetails
    {
-      private const string HKCU_APP = @"Software\Alfresco\Word2003";
-      private const string REG_WINDOWTOP = "WindowTop";
-      private const string REG_WINDOWLEFT = "WindowLeft";
+      private const string HKCU_APP = @"Software\Alfresco\Office2003";
+      private const string HKCU_APP_LEGACY = @"Software\Alfresco\Word2003";
+      private const string REG_WINDOWTOP = "WordWindowTop";
+      private const string REG_WINDOWLEFT = "WordWindowLeft";
       private const string REG_WEBCLIENTURL = "WebClientURL";
       private const string REG_WEBDAVURL = "WebDAVURL";
       private const string REG_CIFSSERVER = "CIFSServer";
@@ -178,18 +179,44 @@ namespace AlfrescoWord2003
          }
          return val;
       }
-     
+
 
       public bool LoadFromRegistry()
       {
          bool bResult = true;
+         bool copyLegacyEntries = false;
          RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(HKCU_APP, true);
 
+         // Have entries in the registry yet?
          if (rootKey == null)
          {
-            // No entries in the registry yet
-            rootKey = Registry.CurrentUser.CreateSubKey(HKCU_APP);
-            bResult = false;
+            // Do we have any legacy entries?
+            RegistryKey rootKeyLegacy = Registry.CurrentUser.OpenSubKey(HKCU_APP_LEGACY, false);
+            if (rootKeyLegacy != null)
+            {
+               try
+               {
+                  string serverNameLegacy = rootKeyLegacy.GetValue("").ToString();
+                  string webClientURLLegacy = rootKeyLegacy.OpenSubKey(serverNameLegacy, false).GetValue(REG_WEBCLIENTURL).ToString();
+                  if (webClientURLLegacy.Length > 0)
+                  {
+                     // Got here ok, so let's copy the old entries
+                     copyLegacyEntries = true;
+                  }
+               }
+               catch
+               {
+               }
+            }
+            if (copyLegacyEntries)
+            {
+               rootKey = rootKeyLegacy;
+            }
+            else
+            {
+               rootKey = Registry.CurrentUser.CreateSubKey(HKCU_APP);
+               bResult = false;
+            }
          }
 
          try
@@ -216,12 +243,26 @@ namespace AlfrescoWord2003
                   }
                }
             }
+
+            if (copyLegacyEntries)
+            {
+               SaveToRegistry();
+            }
+
+            // Try to get rid of legacy entries
+            try
+            {
+               Registry.CurrentUser.DeleteSubKeyTree(HKCU_APP_LEGACY);
+            }
+            catch
+            {
+            }
          }
          catch
          {
             bResult = false;
          }
-         
+
          m_AuthenticationTicket = "";
 
          return bResult;
