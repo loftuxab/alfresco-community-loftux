@@ -189,7 +189,6 @@ namespace AlfrescoWord2003
                {
                   relativePath = "/" + relativePath;
                }
-               relativePath = "/Company Home" + relativePath;
                // Strip off any additional parameters
                int paramPos = relativePath.IndexOf("?");
                if (paramPos != -1)

@@ -44,7 +44,7 @@ namespace AlfrescoExcel2003
 
       ~AppWatcher()
       {
-         if (m_Worker.IsBusy)
+         if ((m_Worker != null) && (m_Worker.IsBusy))
          {
             m_Worker.CancelAsync();
          }

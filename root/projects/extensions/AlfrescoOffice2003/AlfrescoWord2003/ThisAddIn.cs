@@ -1,5 +1,6 @@
 using System;
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Microsoft.VisualStudio.Tools.Applications.Runtime;
 using Word = Microsoft.Office.Interop.Word;
@@ -9,6 +10,10 @@ namespace AlfrescoWord2003
 {
    public partial class ThisAddIn
    {
+      // Win32 SDK functions
+      [DllImport("user32.dll")]
+      public static extern int GetForegroundWindow();
+
       private AlfrescoPane m_AlfrescoPane;
       private string m_DefaultTemplate = null;
       private Office.CommandBar m_CommandBar;
@@ -26,9 +31,6 @@ namespace AlfrescoWord2003
 
          // Add the Alfresco button to the Office toolbar
          AddToolbar();
-
-         // Open the AddIn main window
-         // OpenAlfrescoPane();
       }
 
       private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
@@ -154,7 +156,10 @@ namespace AlfrescoWord2003
       {
          if (m_AlfrescoPane != null)
          {
-            m_AlfrescoPane.OnWindowDeactivate();
+            if (m_AlfrescoPane.Handle.ToInt32() != GetForegroundWindow())
+            {
+               m_AlfrescoPane.OnWindowDeactivate();
+            }
          }
       }
 

@@ -75,6 +75,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5BAA43E874034010B435629D26DB46AE"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_782AEAD5743F47E39B06A1F8DD553AB5"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -83,6 +89,12 @@
         {
         "MsmKey" = "8:_9CCF1CDEEA7B1B12E4D27301379D08AD"
         "OwnerKey" = "8:_D15763DEFD42833563F2F5648D616C88"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_9F4F7F027A6D402FB9918961ACE45440"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -336,7 +348,7 @@
             "Sequence" = "3:1"
             "Identifier" = "8:_35E61B15_A6C9_477A_B369_353BC3181B72"
             "InstallerClass" = "11:TRUE"
-            "CustomActionData" = "8:/assemblyName=\"AlfrescoExcel2003.dll\" /targetDir=\"[TARGETDIR]\\\" /solutionCodeGroupName=\"Alfresco.AlfrescoExcel2003\" /solutionCodeGroupDescription=\"Code group for ExcelAddin\" /assemblyCodeGroupName=\"AlfrescoExcel2003\" /assemblyCodeGroupDescription=\"Code group for excelAddin\" /allUsers=[ALLUSERS]"
+            "CustomActionData" = "8:/assemblyName=\"AlfrescoExcel2003.dll\" /targetDir=\"[TARGETDIR]\\\" /solutionCodeGroupName=\"Alfresco.AlfrescoExcel2003\" /solutionCodeGroupDescription=\"Code group for ExcelAddin\" /assemblyCodeGroupName=\"AlfrescoExcel2003\" /assemblyCodeGroupDescription=\"Code group for ExcelAddin\" /allUsers=[ALLUSERS]"
             }
         }
         "DefaultFeature"
@@ -485,6 +497,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5BAA43E874034010B435629D26DB46AE"
+            {
+            "SourcePath" = "8:..\\addRemove.ico"
+            "TargetName" = "8:addRemove.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_2902F31063034A8BB290E2FC334E97FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9CCF1CDEEA7B1B12E4D27301379D08AD"
             {
             "SourcePath" = "8:Microsoft.VisualStudio.Tools.Applications.Runtime.tlb"
@@ -503,6 +535,26 @@
             "Register" = "3:2"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9F4F7F027A6D402FB9918961ACE45440"
+            {
+            "SourcePath" = "8:..\\alfrescoInstall.jpg"
+            "TargetName" = "8:alfrescoInstall.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_2902F31063034A8BB290E2FC334E97FE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_B3FE423F7DBAD09C4F54FC71BF1EBFA5"
@@ -683,25 +735,25 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:AlfrescoExcel2003Setup"
+        "ProductName" = "8:Alfresco Add-In for Microsoft Excel 2003"
         "ProductCode" = "8:{3C0BCDF3-E9D4-441F-9351-3522C108CA95}"
-        "PackageCode" = "8:{01689541-7B02-4EAA-B3D2-65DB94FCD172}"
+        "PackageCode" = "8:{C037E71C-4989-479C-B120-50D707AD294E}"
         "UpgradeCode" = "8:{A881A7DA-1A3C-494E-9F8A-2EE68B7CA1EF}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Default Company Name"
+        "Manufacturer" = "8:Alfresco"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:AlfrescoExcel2003Setup"
+        "Title" = "8:Alfresco Add-In for Microsoft Excel 2003"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Default Company Name"
+        "ARPCONTACT" = "8:Alfresco"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:"
-        "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPCOMMENTS" = "8:Alfresco Add-In for Microsoft Excel 2003"
+        "ARPURLINFOABOUT" = "8:http://www.alfresco.com/"
+        "ARPPRODUCTICON" = "8:_5BAA43E874034010B435629D26DB46AE"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -725,27 +777,117 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
-                        }
-                        "Values"
-                        {
-                        }
-                    }
-                }
-            }
-            "HKCU"
-            {
-                "Keys"
-                {
-                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_3E60C230839B4A24B52215F9E1286A47"
-                    {
-                    "Name" = "8:Software"
-                    "Condition" = "8:"
-                    "AlwaysCreate" = "11:FALSE"
-                    "DeleteAtUninstall" = "11:FALSE"
-                    "Transitive" = "11:FALSE"
-                        "Keys"
-                        {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_6E8193CCE1EC415AB137BEDA3D6D9778"
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_38D71F5010344E4493F858CFB284DD30"
+                            {
+                            "Name" = "8:Microsoft"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:TRUE"
+                            "DeleteAtUninstall" = "11:FALSE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_71EFA78FA8EC475DAFF9875B59E9BAD9"
+                                    {
+                                    "Name" = "8:Office"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:TRUE"
+                                    "DeleteAtUninstall" = "11:FALSE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_0A0EA74AFF0B41598A69DB78BE5C63DD"
+                                            {
+                                            "Name" = "8:Excel"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:TRUE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_77095CEB0CEF46CDB74F39E94D62191B"
+                                                    {
+                                                    "Name" = "8:Addins"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:TRUE"
+                                                    "DeleteAtUninstall" = "11:FALSE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_96100244945C4246B6D3663955AE7BCD"
+                                                            {
+                                                            "Name" = "8:AlfrescoExcel2003"
+                                                            "Condition" = "8:"
+                                                            "AlwaysCreate" = "11:TRUE"
+                                                            "DeleteAtUninstall" = "11:TRUE"
+                                                            "Transitive" = "11:FALSE"
+                                                                "Keys"
+                                                                {
+                                                                }
+                                                                "Values"
+                                                                {
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_0944894733D54208B42CFFD1E71407EB"
+                                                                    {
+                                                                    "Name" = "8:FriendlyName"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:AlfrescoExcel2003"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8595CE8F52874E4284C8A3FD114FA6CB"
+                                                                    {
+                                                                    "Name" = "8:Manifest"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:[TARGETDIR]AlfrescoExcel2003.dll.manifest"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8DFD9565A7254D5A8DEBC3ACEE4CFA21"
+                                                                    {
+                                                                    "Name" = "8:CommandLineSafe"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:3"
+                                                                    "Value" = "3:1"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9362817533A6467EB8FF689B10CCB87E"
+                                                                    {
+                                                                    "Name" = "8:Description"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:AlfrescoExcel2003  -- an addin created with VSTO technology"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_EDF16E5D280C483F8B8480CFCE866768"
+                                                                    {
+                                                                    "Name" = "8:LoadBehavior"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:3"
+                                                                    "Value" = "3:3"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        "Values"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                                "Values"
+                                                {
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
+                                }
+                                "Values"
+                                {
+                                }
+                            }
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_88D0AA95BE224FC8AE3D7422CB670717"
                             {
                             "Name" = "8:Classes"
                             "Condition" = "8:"
@@ -943,121 +1085,17 @@
                                 {
                                 }
                             }
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_B1B7F10346A24F18B0871780E57BA956"
-                            {
-                            "Name" = "8:Microsoft"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:TRUE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_71EFA78FA8EC475DAFF9875B59E9BAD9"
-                                    {
-                                    "Name" = "8:Office"
-                                    "Condition" = "8:"
-                                    "AlwaysCreate" = "11:TRUE"
-                                    "DeleteAtUninstall" = "11:FALSE"
-                                    "Transitive" = "11:FALSE"
-                                        "Keys"
-                                        {
-                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_0A0EA74AFF0B41598A69DB78BE5C63DD"
-                                            {
-                                            "Name" = "8:Excel"
-                                            "Condition" = "8:"
-                                            "AlwaysCreate" = "11:TRUE"
-                                            "DeleteAtUninstall" = "11:FALSE"
-                                            "Transitive" = "11:FALSE"
-                                                "Keys"
-                                                {
-                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_77095CEB0CEF46CDB74F39E94D62191B"
-                                                    {
-                                                    "Name" = "8:Addins"
-                                                    "Condition" = "8:"
-                                                    "AlwaysCreate" = "11:TRUE"
-                                                    "DeleteAtUninstall" = "11:FALSE"
-                                                    "Transitive" = "11:FALSE"
-                                                        "Keys"
-                                                        {
-                                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_96100244945C4246B6D3663955AE7BCD"
-                                                            {
-                                                            "Name" = "8:AlfrescoExcel2003"
-                                                            "Condition" = "8:"
-                                                            "AlwaysCreate" = "11:TRUE"
-                                                            "DeleteAtUninstall" = "11:TRUE"
-                                                            "Transitive" = "11:FALSE"
-                                                                "Keys"
-                                                                {
-                                                                }
-                                                                "Values"
-                                                                {
-                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_0944894733D54208B42CFFD1E71407EB"
-                                                                    {
-                                                                    "Name" = "8:FriendlyName"
-                                                                    "Condition" = "8:"
-                                                                    "Transitive" = "11:FALSE"
-                                                                    "ValueTypes" = "3:1"
-                                                                    "Value" = "8:AlfrescoExcel2003"
-                                                                    }
-                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8595CE8F52874E4284C8A3FD114FA6CB"
-                                                                    {
-                                                                    "Name" = "8:Manifest"
-                                                                    "Condition" = "8:"
-                                                                    "Transitive" = "11:FALSE"
-                                                                    "ValueTypes" = "3:1"
-                                                                    "Value" = "8:[TARGETDIR]AlfrescoExcel2003.dll.manifest"
-                                                                    }
-                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8DFD9565A7254D5A8DEBC3ACEE4CFA21"
-                                                                    {
-                                                                    "Name" = "8:CommandLineSafe"
-                                                                    "Condition" = "8:"
-                                                                    "Transitive" = "11:FALSE"
-                                                                    "ValueTypes" = "3:3"
-                                                                    "Value" = "3:1"
-                                                                    }
-                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_9362817533A6467EB8FF689B10CCB87E"
-                                                                    {
-                                                                    "Name" = "8:Description"
-                                                                    "Condition" = "8:"
-                                                                    "Transitive" = "11:FALSE"
-                                                                    "ValueTypes" = "3:1"
-                                                                    "Value" = "8:AlfrescoExcel2003  -- an addin created with VSTO technology"
-                                                                    }
-                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_EDF16E5D280C483F8B8480CFCE866768"
-                                                                    {
-                                                                    "Name" = "8:LoadBehavior"
-                                                                    "Condition" = "8:"
-                                                                    "Transitive" = "11:FALSE"
-                                                                    "ValueTypes" = "3:3"
-                                                                    "Value" = "3:3"
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        "Values"
-                                                        {
-                                                        }
-                                                    }
-                                                }
-                                                "Values"
-                                                {
-                                                }
-                                            }
-                                        }
-                                        "Values"
-                                        {
-                                        }
-                                    }
-                                }
-                                "Values"
-                                {
-                                }
-                            }
                         }
                         "Values"
                         {
                         }
                     }
+                }
+            }
+            "HKCU"
+            {
+                "Keys"
+                {
                 }
             }
             "HKCR"
@@ -1111,7 +1149,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -1167,7 +1206,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1189,7 +1229,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "InstallAllUsersVisible"
@@ -1224,7 +1265,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1281,7 +1323,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1312,7 +1355,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "UpdateText"
@@ -1356,7 +1400,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -1400,7 +1445,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1422,7 +1468,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1470,7 +1517,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_9F4F7F027A6D402FB9918961ACE45440"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }

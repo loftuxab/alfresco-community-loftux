@@ -11,10 +11,10 @@ namespace AlfrescoPowerPoint2003
 {
    public class ServerDetails
    {
-      private const string HKCU_APP = @"Software\Alfresco\PowerPoint2003";
-      private const string HKCU_APP_WORD2003 = @"Software\Alfresco\Word2003";
-      private const string REG_WINDOWTOP = "WindowTop";
-      private const string REG_WINDOWLEFT = "WindowLeft";
+      private const string HKCU_APP = @"Software\Alfresco\Office2003";
+      private const string HKCU_APP_LEGACY = @"Software\Alfresco\PowerPoint2003";
+      private const string REG_WINDOWTOP = "PowerPointWindowTop";
+      private const string REG_WINDOWLEFT = "PowerPointWindowLeft";
       private const string REG_WEBCLIENTURL = "WebClientURL";
       private const string REG_WEBDAVURL = "WebDAVURL";
       private const string REG_CIFSSERVER = "CIFSServer";
@@ -184,33 +184,33 @@ namespace AlfrescoPowerPoint2003
       public bool LoadFromRegistry()
       {
          bool bResult = true;
-         bool copyWordEntries = false;
+         bool copyLegacyEntries = false;
          RegistryKey rootKey = Registry.CurrentUser.OpenSubKey(HKCU_APP, true);
 
          // Have entries in the registry yet?
          if (rootKey == null)
          {
-            // Do we have and Word2003 entries?
-            RegistryKey rootKeyWord = Registry.CurrentUser.OpenSubKey(HKCU_APP_WORD2003, false);
-            if (rootKeyWord != null)
+            // Do we have any legacy entries?
+            RegistryKey rootKeyLegacy = Registry.CurrentUser.OpenSubKey(HKCU_APP_LEGACY, false);
+            if (rootKeyLegacy != null)
             {
                try
                {
-                  string serverNameWord = rootKeyWord.GetValue("").ToString();
-                  string webClientURLWord = rootKeyWord.OpenSubKey(serverNameWord, false).GetValue(REG_WEBCLIENTURL).ToString();
-                  if (webClientURLWord.Length > 0)
+                  string serverNameLegacy = rootKeyLegacy.GetValue("").ToString();
+                  string webClientURLLegacy = rootKeyLegacy.OpenSubKey(serverNameLegacy, false).GetValue(REG_WEBCLIENTURL).ToString();
+                  if (webClientURLLegacy.Length > 0)
                   {
-                     // Got here ok, so let's copy the Word2003 entries
-                     copyWordEntries = true;
+                     // Got here ok, so let's copy the old entries
+                     copyLegacyEntries = true;
                   }
                }
                catch
                {
                }
             }
-            if (copyWordEntries)
+            if (copyLegacyEntries)
             {
-               rootKey = rootKeyWord;
+               rootKey = rootKeyLegacy;
             }
             else
             {
@@ -244,9 +244,18 @@ namespace AlfrescoPowerPoint2003
                }
             }
 
-            if (copyWordEntries)
+            if (copyLegacyEntries)
             {
                SaveToRegistry();
+            }
+
+            // Try to get rid of legacy entries
+            try
+            {
+               Registry.CurrentUser.DeleteSubKeyTree(HKCU_APP_LEGACY);
+            }
+            catch
+            {
             }
          }
          catch

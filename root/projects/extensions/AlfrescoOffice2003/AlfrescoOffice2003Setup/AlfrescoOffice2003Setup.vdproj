@@ -34,12 +34,24 @@
         "Entry"
         {
         "MsmKey" = "8:_0A3F675A92FB3D995B97D4D928A44668"
+        "OwnerKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0A3F675A92FB3D995B97D4D928A44668"
         "OwnerKey" = "8:_1469AF279E3A453382F9D6DBB15E5E22"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_1469AF279E3A453382F9D6DBB15E5E22"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_2842B6B171244F90928193B5EC8CCE8D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -53,6 +65,18 @@
         {
         "MsmKey" = "8:_4047EA89427F32ED92F78781A6AD3572"
         "OwnerKey" = "8:_85430D6FD213F4F798974F1820A52356"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4047EA89427F32ED92F78781A6AD3572"
+        "OwnerKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4047EA89427F32ED92F78781A6AD3572"
+        "OwnerKey" = "8:_937A495C01E3B74AB880ED2532ED0AFE"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -83,6 +107,12 @@
         {
         "MsmKey" = "8:_48008030BBE22735B6B263E59D5F250D"
         "OwnerKey" = "8:_ADB44C3D925DED7F1C0044362333501D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_48008030BBE22735B6B263E59D5F250D"
+        "OwnerKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -129,8 +159,26 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_937A495C01E3B74AB880ED2532ED0AFE"
+        "OwnerKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_ADB44C3D925DED7F1C0044362333501D"
         "OwnerKey" = "8:_0536E3C8E9BE4C18B1D68AB07753EFA8"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_ADB44C3D925DED7F1C0044362333501D"
+        "OwnerKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -178,6 +226,12 @@
         "Entry"
         {
         "MsmKey" = "8:_EF08F37E1C1830639199E19F20782726"
+        "OwnerKey" = "8:_937A495C01E3B74AB880ED2532ED0AFE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_EF08F37E1C1830639199E19F20782726"
         "OwnerKey" = "8:_C71F7ABFF1EC88CDA1997E47E6A6A4A9"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -191,6 +245,12 @@
         {
         "MsmKey" = "8:_F08411F76DBF26F2F2FF51E01D958902"
         "OwnerKey" = "8:_48008030BBE22735B6B263E59D5F250D"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FC3BB6C2913A40EBA71714745428B93A"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -220,6 +280,12 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_937A495C01E3B74AB880ED2532ED0AFE"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_58FA9BB29BA27F569A2C43E88EB5746D"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -233,6 +299,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_0A3F675A92FB3D995B97D4D928A44668"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_8E9A4E7BFC39416FBA60CB97C15F90AA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -342,6 +414,20 @@
     {
         "CustomAction"
         {
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_20450EEC7FB64B2AAB0A111E3F490C08"
+            {
+            "Name" = "8:SetSecurity (PowerPoint)"
+            "Condition" = "8:"
+            "Object" = "8:_5C121DDF1D31496286FF17A77DD14AB0"
+            "FileType" = "3:1"
+            "InstallAction" = "3:1"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:3"
+            "Identifier" = "8:_F3E1E440_8588_4B06_9057_FD0927C5418D"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:/assemblyName=\"AlfrescoPowerPoint2003.dll\" /targetDir=\"[TARGETDIR]\\\" /solutionCodeGroupName=\"Alfresco.AlfrescoPowerPoint2003\" /solutionCodeGroupDescription=\"Code group for PowerPointAddin\" /assemblyCodeGroupName=\"AlfrescoPowerPoint2003\" /assemblyCodeGroupDescription=\"Code group for PowerPointAddin\" /allUsers=[ALLUSERS]"
+            }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_2EC0A2DE9C2147378460DAD00E8B869E"
             {
             "Name" = "8:SetSecurity (Excel)"
@@ -426,6 +512,20 @@
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
             }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_B77146D99DCC4A01863C2D0128BFC22C"
+            {
+            "Name" = "8:SetSecurity (PowerPoint)"
+            "Condition" = "8:"
+            "Object" = "8:_5C121DDF1D31496286FF17A77DD14AB0"
+            "FileType" = "3:1"
+            "InstallAction" = "3:2"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:3"
+            "Identifier" = "8:_D22652A7_20A4_4D53_A5D0_37E04E7B4BE2"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:"
+            }
             "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_D1A2F2C7DC1B4E40810700EF7B259CAE"
             {
             "Name" = "8:SetSecurity (Excel)"
@@ -453,6 +553,34 @@
             "Identifier" = "8:_DC7ADB4C_F411_481D_AD68_B48C6EE45093"
             "InstallerClass" = "11:TRUE"
             "CustomActionData" = "8:"
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_F0D1C46A53E2438AB1EC7D7BEAB8F67B"
+            {
+            "Name" = "8:SetSecurity (PowerPoint)"
+            "Condition" = "8:"
+            "Object" = "8:_5C121DDF1D31496286FF17A77DD14AB0"
+            "FileType" = "3:1"
+            "InstallAction" = "3:4"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:3"
+            "Identifier" = "8:_2B0F6950_1607_4281_96C7_DC01412014ED"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:/solutionCodeGroupName=\"Alfresco.AlfrescoPowerPoint2003\""
+            }
+            "{4AA51A2D-7D85-4A59-BA75-B0809FC8B380}:_F45283ECA2724F3F954A260A05C6C672"
+            {
+            "Name" = "8:SetSecurity (PowerPoint)"
+            "Condition" = "8:"
+            "Object" = "8:_5C121DDF1D31496286FF17A77DD14AB0"
+            "FileType" = "3:1"
+            "InstallAction" = "3:3"
+            "Arguments" = "8:"
+            "EntryPoint" = "8:"
+            "Sequence" = "3:3"
+            "Identifier" = "8:_B976C1CD_3AE4_4603_B640_F380110A1196"
+            "InstallerClass" = "11:TRUE"
+            "CustomActionData" = "8:/solutionCodeGroupName=\"Alfresco.AlfrescoPowerPoint2003\""
             }
         }
         "DefaultFeature"
@@ -506,6 +634,26 @@
             "Register" = "3:1"
             "Exclude" = "11:TRUE"
             "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2842B6B171244F90928193B5EC8CCE8D"
+            {
+            "SourcePath" = "8:..\\alfrescoInstall.jpg"
+            "TargetName" = "8:alfrescoInstall.jpg"
+            "Tag" = "8:"
+            "Folder" = "8:_055EEC6B625E44A3B8346B20FC9DDF5B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_4047EA89427F32ED92F78781A6AD3572"
@@ -615,6 +763,37 @@
                     }
                 }
             "SourcePath" = "8:Microsoft.Office.Tools.Excel.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_055EEC6B625E44A3B8346B20FC9DDF5B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:TRUE"
+            "IsolateTo" = "8:"
+            }
+            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_937A495C01E3B74AB880ED2532ED0AFE"
+            {
+            "AssemblyRegister" = "3:1"
+            "AssemblyIsInGAC" = "11:TRUE"
+            "AssemblyAsmDisplayName" = "8:Microsoft.Office.Interop.PowerPoint, Version=11.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c"
+                "ScatterAssemblies"
+                {
+                    "_937A495C01E3B74AB880ED2532ED0AFE"
+                    {
+                    "Name" = "8:Microsoft.Office.Interop.PowerPoint.dll"
+                    "Attributes" = "3:512"
+                    }
+                }
+            "SourcePath" = "8:Microsoft.Office.Interop.PowerPoint.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_055EEC6B625E44A3B8346B20FC9DDF5B"
@@ -776,6 +955,26 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FC3BB6C2913A40EBA71714745428B93A"
+            {
+            "SourcePath" = "8:..\\addRemove.ico"
+            "TargetName" = "8:addRemove.ico"
+            "Tag" = "8:"
+            "Folder" = "8:_055EEC6B625E44A3B8346B20FC9DDF5B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:TRUE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -830,25 +1029,25 @@
         "Product"
         {
         "Name" = "8:Microsoft Visual Studio"
-        "ProductName" = "8:AlfrescoOffice2003Setup"
+        "ProductName" = "8:Alfresco Add-In for Microsoft Office 2003"
         "ProductCode" = "8:{44FAD16F-3F82-497C-B420-AE1AC56FEA93}"
-        "PackageCode" = "8:{8930DEF0-A4DB-46FF-BC91-25E3495E2D3A}"
+        "PackageCode" = "8:{BD607EB5-C7CA-4B4F-ABB6-1AB2C68736C2}"
         "UpgradeCode" = "8:{0BA17513-4590-46FA-90A6-5596B2A0877B}"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"
-        "Manufacturer" = "8:Default Company Name"
+        "Manufacturer" = "8:Alfresco"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
-        "Title" = "8:AlfrescoOffice2003Setup"
+        "Title" = "8:Alfresco Add-In for Microsoft Office 2003"
         "Subject" = "8:"
-        "ARPCONTACT" = "8:Default Company Name"
+        "ARPCONTACT" = "8:Alfresco"
         "Keywords" = "8:"
-        "ARPCOMMENTS" = "8:"
-        "ARPURLINFOABOUT" = "8:"
-        "ARPPRODUCTICON" = "8:"
+        "ARPCOMMENTS" = "8:Alfresco Add-In for Microsoft Office 2003"
+        "ARPURLINFOABOUT" = "8:http://www.alfresco.com/"
+        "ARPPRODUCTICON" = "8:_FC3BB6C2913A40EBA71714745428B93A"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
         "UseSystemSearchPath" = "11:TRUE"
@@ -863,7 +1062,7 @@
             {
                 "Keys"
                 {
-                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_F108CA794E4343BC8264EB27CED33939"
+                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_00442ABEBD374AE9B8664E20FAF39917"
                     {
                     "Name" = "8:Software"
                     "Condition" = "8:"
@@ -872,54 +1071,6 @@
                     "Transitive" = "11:FALSE"
                         "Keys"
                         {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_263025F0CF0F4AE68EAB88FAA38CB926"
-                            {
-                            "Name" = "8:[Manufacturer]"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:FALSE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                }
-                                "Values"
-                                {
-                                }
-                            }
-                        }
-                        "Values"
-                        {
-                        }
-                    }
-                }
-            }
-            "HKCU"
-            {
-                "Keys"
-                {
-                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_3E60C230839B4A24B52215F9E1286A47"
-                    {
-                    "Name" = "8:Software"
-                    "Condition" = "8:"
-                    "AlwaysCreate" = "11:FALSE"
-                    "DeleteAtUninstall" = "11:FALSE"
-                    "Transitive" = "11:FALSE"
-                        "Keys"
-                        {
-                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_358A74A22FFE4749908EFA118E9A2D70"
-                            {
-                            "Name" = "8:[Manufacturer]"
-                            "Condition" = "8:"
-                            "AlwaysCreate" = "11:FALSE"
-                            "DeleteAtUninstall" = "11:FALSE"
-                            "Transitive" = "11:FALSE"
-                                "Keys"
-                                {
-                                }
-                                "Values"
-                                {
-                                }
-                            }
                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_6E8193CCE1EC415AB137BEDA3D6D9778"
                             {
                             "Name" = "8:Classes"
@@ -1190,6 +1341,132 @@
                                                     }
                                                 }
                                             }
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_92FA4ABE276441FAB96127438F7AB3FC"
+                                            {
+                                            "Name" = "8:{C6F30316-2712-4301-BEA7-6C106BB6268D}"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:TRUE"
+                                            "DeleteAtUninstall" = "11:TRUE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_8A1A8FE6F2734D74AEAC07E13BB1FBFA"
+                                                    {
+                                                    "Name" = "8:Programmable"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:TRUE"
+                                                    "DeleteAtUninstall" = "11:TRUE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                        }
+                                                        "Values"
+                                                        {
+                                                        }
+                                                    }
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_B587BEAB04DE4B789B690C331F1D8F48"
+                                                    {
+                                                    "Name" = "8:VersionIndependentProgID"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:TRUE"
+                                                    "DeleteAtUninstall" = "11:TRUE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                        }
+                                                        "Values"
+                                                        {
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_E3AF238703144281A4CE9AB9DAAC2743"
+                                                            {
+                                                            "Name" = "8:"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:AlfrescoPowerPoint2003"
+                                                            }
+                                                        }
+                                                    }
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_E6EF00C989F8422A86E0A6BF5F9B474A"
+                                                    {
+                                                    "Name" = "8:InprocServer32"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:TRUE"
+                                                    "DeleteAtUninstall" = "11:TRUE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                        }
+                                                        "Values"
+                                                        {
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_32D4B12F110141488ED7B3ACF5867FAC"
+                                                            {
+                                                            "Name" = "8:ManifestLocation"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:[TARGETDIR]"
+                                                            }
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A23A872A455E4E1DAAFCA2ABC495A0FC"
+                                                            {
+                                                            "Name" = "8:ManifestName"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:AlfrescoPowerPoint2003.dll.manifest"
+                                                            }
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_B7996D406617411DB5D9BBADCD1E3DF4"
+                                                            {
+                                                            "Name" = "8:ThreadingModel"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:Both"
+                                                            }
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_D447543ECE8044BE937EE6336750EA5D"
+                                                            {
+                                                            "Name" = "8:"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:2"
+                                                            "Value" = "8:%CommonProgramFiles%\\Microsoft Shared\\VSTO\\8.0\\AddinLoader.dll"
+                                                            }
+                                                        }
+                                                    }
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_FF8829CDDC044612972D8667AFAE8A9C"
+                                                    {
+                                                    "Name" = "8:ProgID"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:TRUE"
+                                                    "DeleteAtUninstall" = "11:TRUE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                        }
+                                                        "Values"
+                                                        {
+                                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_40BF3C1FB9CE498A851C2FD6649F830D"
+                                                            {
+                                                            "Name" = "8:"
+                                                            "Condition" = "8:"
+                                                            "Transitive" = "11:FALSE"
+                                                            "ValueTypes" = "3:1"
+                                                            "Value" = "8:AlfrescoPowerPoint2003"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_3246B49FB4CD4016B7B51CCE5134427B"
+                                                    {
+                                                    "Name" = "8:"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:AlfrescoPowerPoint2003  -- an addin created with VSTO technology"
+                                                    }
+                                                }
+                                            }
                                         }
                                         "Values"
                                         {
@@ -1230,6 +1507,50 @@
                                         "Values"
                                         {
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_F433874BA251445FAE28E2D3CF7EDCC3"
+                                            {
+                                            "Name" = "8:"
+                                            "Condition" = "8:"
+                                            "Transitive" = "11:FALSE"
+                                            "ValueTypes" = "3:1"
+                                            "Value" = "8:"
+                                            }
+                                        }
+                                    }
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_741B8C428004418393FEFBF84A1555DA"
+                                    {
+                                    "Name" = "8:AlfrescoPowerPoint2003"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:TRUE"
+                                    "DeleteAtUninstall" = "11:TRUE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_E13DC94D004A4C458D666236EF4CE046"
+                                            {
+                                            "Name" = "8:CLSID"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:TRUE"
+                                            "DeleteAtUninstall" = "11:TRUE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_96FA13200B894112A5C434A978A4BAA5"
+                                                    {
+                                                    "Name" = "8:"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:{C6F30316-2712-4301-BEA7-6C106BB6268D}"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_35464C023A084E268D8947904D70C401"
                                             {
                                             "Name" = "8:"
                                             "Condition" = "8:"
@@ -1388,6 +1709,88 @@
                                                 {
                                                 }
                                             }
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_7AA56D07AB7A47AEAB38C3D73D12749E"
+                                            {
+                                            "Name" = "8:PowerPoint"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:TRUE"
+                                            "DeleteAtUninstall" = "11:FALSE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_3D49393BC07A4D7E8982A5F49697A85C"
+                                                    {
+                                                    "Name" = "8:Addins"
+                                                    "Condition" = "8:"
+                                                    "AlwaysCreate" = "11:TRUE"
+                                                    "DeleteAtUninstall" = "11:FALSE"
+                                                    "Transitive" = "11:FALSE"
+                                                        "Keys"
+                                                        {
+                                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_7CE38DE7FFE64F4290A94024637BB865"
+                                                            {
+                                                            "Name" = "8:AlfrescoPowerPoint2003"
+                                                            "Condition" = "8:"
+                                                            "AlwaysCreate" = "11:TRUE"
+                                                            "DeleteAtUninstall" = "11:TRUE"
+                                                            "Transitive" = "11:FALSE"
+                                                                "Keys"
+                                                                {
+                                                                }
+                                                                "Values"
+                                                                {
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_265086D2D1BB40A5924CDEA1B353F0C6"
+                                                                    {
+                                                                    "Name" = "8:LoadBehavior"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:3"
+                                                                    "Value" = "3:3"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_4C69CAF077E84F7E920DA47F4A35B4F1"
+                                                                    {
+                                                                    "Name" = "8:Manifest"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:[TARGETDIR]AlfrescoPowerPoint2003.dll.manifest"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_BCD5A891FF7342D2963D33AC6BB903CD"
+                                                                    {
+                                                                    "Name" = "8:FriendlyName"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:AlfrescoPowerPoint2003"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_BFEECB234F204BEBA00FF896B1C11572"
+                                                                    {
+                                                                    "Name" = "8:CommandLineSafe"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:3"
+                                                                    "Value" = "3:1"
+                                                                    }
+                                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_EBF22BE53A564F969E63DD2B8D070012"
+                                                                    {
+                                                                    "Name" = "8:Description"
+                                                                    "Condition" = "8:"
+                                                                    "Transitive" = "11:FALSE"
+                                                                    "ValueTypes" = "3:1"
+                                                                    "Value" = "8:AlfrescoPowerPoint2003  -- an addin created with VSTO technology"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                        "Values"
+                                                        {
+                                                        }
+                                                    }
+                                                }
+                                                "Values"
+                                                {
+                                                }
+                                            }
                                             "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_B4D1C2AA35914EE58F686127B72DC13D"
                                             {
                                             "Name" = "8:Word"
@@ -1487,6 +1890,12 @@
                     }
                 }
             }
+            "HKCU"
+            {
+                "Keys"
+                {
+                }
+            }
             "HKCR"
             {
                 "Keys"
@@ -1544,7 +1953,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1575,7 +1985,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1623,7 +2034,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1645,7 +2057,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1676,7 +2089,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -1720,7 +2134,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "ShowProgress"
@@ -1764,7 +2179,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "UpdateText"
@@ -1814,7 +2230,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "CopyrightWarning"
@@ -1862,7 +2279,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                         }
@@ -1884,7 +2302,8 @@
                             "Type" = "3:8"
                             "ContextData" = "8:Bitmap"
                             "Attributes" = "3:4"
-                            "Setting" = "3:1"
+                            "Setting" = "3:2"
+                            "Value" = "8:_2842B6B171244F90928193B5EC8CCE8D"
                             "UsePlugInResources" = "11:TRUE"
                             }
                             "InstallAllUsersVisible"
@@ -1940,7 +2359,7 @@
             }
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_1469AF279E3A453382F9D6DBB15E5E22"
             {
-            "SourcePath" = "8:..\\AlfrescoWord2003\\obj\\Debug\\AlfrescoWord2003.dll"
+            "SourcePath" = "8:C:\\Dev\\HEAD\\root\\projects\\extensions\\AlfrescoOffice2003\\AlfrescoWord2003\\obj\\Debug\\AlfrescoWord2003.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_055EEC6B625E44A3B8346B20FC9DDF5B"
@@ -1989,6 +2408,34 @@
             "OutputConfiguration" = "8:"
             "OutputGroupCanonicalName" = "8:Built"
             "OutputProjectGuid" = "8:{56E8E807-0807-45E0-B19A-98912AE47630}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_8E9A4E7BFC39416FBA60CB97C15F90AA"
+            {
+            "SourcePath" = "8:..\\AlfrescoPowerPoint2003\\obj\\Debug\\AlfrescoPowerPoint2003.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_055EEC6B625E44A3B8346B20FC9DDF5B"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:1"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{C6F30316-2712-4301-BEA7-6C106BB6268D}"
             "ShowKeyOutput" = "11:TRUE"
                 "ExcludeFilters"
                 {
