@@ -41,10 +41,10 @@
                     <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/${spaces.templates.childname}</prop>
                     <prop key="location">alfresco/module/org.alfresco.module.RecordsManagement/bootstrap/rm_file_plan.xml</prop>
                 </props> -->
-                <!-- <props>
+                <props>
                     <prop key="path">/${spaces.company_home.childname}</prop>
                     <prop key="location">alfresco/module/org.alfresco.module.RecordsManagement/bootstrap/records_space.acp</prop>
-                </props> -->
+                </props>
             </list>
         </property>
     </bean>
