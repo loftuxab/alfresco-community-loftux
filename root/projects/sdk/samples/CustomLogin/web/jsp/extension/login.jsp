@@ -67,7 +67,7 @@
    <f:loadBundle basename="alfresco.version" var="version"/>
    <f:loadBundle basename="alfresco.extension.webclient" var="customMsg"/>
    
-   <h:form acceptCharset="UTF-8" id="loginForm" >
+   <h:form acceptcharset="UTF-8" id="loginForm" >
    
    <table width=100% height=98% align=center>
       <tr width=100% align=center>
@@ -122,8 +122,8 @@
                   </td>
                   <td>
                      <%-- language selection drop-down --%>
-                     <h:selectOneMenu id="language" value="#{LoginBean.language}" style="width:150px" onchange="document.forms['loginForm'].submit(); return true;">
-                        <f:selectItems value="#{LoginBean.languages}" />
+                     <h:selectOneMenu id="language" value="#{UserPreferencesBean.language}" style="width:150px" onchange="document.forms['loginForm'].submit(); return true;">
+                        <f:selectItems value="#{UserPreferencesBean.languages}" />
                      </h:selectOneMenu>
                   </td>
                </tr>

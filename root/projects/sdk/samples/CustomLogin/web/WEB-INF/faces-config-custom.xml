@@ -30,6 +30,10 @@
          <property-name>browseBean</property-name>
          <value>#{BrowseBean}</value>
       </managed-property>
+      <managed-property>
+         <property-name>userPreferencesBean</property-name>
+         <value>#{UserPreferencesBean}</value>
+      </managed-property>
    </managed-bean>
    
 </faces-config>
