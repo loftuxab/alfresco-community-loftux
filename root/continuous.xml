@@ -274,7 +274,10 @@
                      includes="licenses/**,amps/**" />
          <tarfileset dir="${dir.project.installer}" 
                      includes="tomcat/alfresco.sh" 
-                     fullpath="alfresco.sh,apply_amps.sh"
+                     fullpath="alfresco.sh"
+                     mode="755" />
+         <tarfileset dir="${dir.project.installer}" 
+                     includes="apply_amps.sh"
                      mode="755" />
          <tarfileset dir="${dir.project.installer}" 
                      includes="tomcat/README_linux.txt" 
