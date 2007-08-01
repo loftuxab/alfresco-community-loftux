@@ -120,7 +120,7 @@ public class UrlConfigSource extends BaseConfigSource
         }
         else if (sourceUrl.indexOf(':') > -1)
         {
-            throw new ConfigException("Config source cannot be determined: " + sourceString);
+            throw new ConfigException("Config source cannot be determined: " + sourceUrl);
         }
         else
         {

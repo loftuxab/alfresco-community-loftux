@@ -52,8 +52,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     private static final Log logger = LogFactory.getLog(XMLConfigService.class);
 
     private Map<String, ConfigElementReader> elementReaders;
-    private String currentArea;
-
+    
     /**
      * Constructs an XMLConfigService using the given config source
      * 
@@ -73,7 +72,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         super.init();
 
         // initialise the element readers map with built-in readers
-        this.elementReaders = new HashMap<String, ConfigElementReader>();
+        putElementReaders(new HashMap<String, ConfigElementReader>());
 
         parse();
 
@@ -83,11 +82,8 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
     
     public void destroy()
     {
-       this.elementReaders.clear();
-       this.elementReaders = null;
-       this.currentArea = null;
-       
-       super.destroy();
+        removeElementReaders();
+        super.destroy();
     }
 
     protected void parse(InputStream stream)
@@ -100,7 +96,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             Element rootElement = document.getRootElement();
 
             // see if there is an area defined
-            this.currentArea = rootElement.attributeValue("area");
+            String currentArea = rootElement.attributeValue("area");
 
             // parse the plug-ins section first
             Element pluginsConfig = rootElement.element(ELEMENT_PLUG_INS);
@@ -111,7 +107,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             while (configElements.hasNext())
             {
                 Element configElement = (Element) configElements.next();
-                parseConfigElement(configElement);
+                parseConfigElement(configElement, currentArea);
             }
         }
         catch (Throwable e)
@@ -216,8 +212,9 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
      * Parses a config element of a config file
      * 
      * @param configElement The config element
+     * @param currentArea The current area
      */
-    private void parseConfigElement(Element configElement)
+    private void parseConfigElement(Element configElement, String currentArea)
     {
         if (configElement != null)
         {
@@ -264,7 +261,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
             // now all the config elements are added, add the section to the
             // config service
-            addConfigSection(section, this.currentArea);
+            addConfigSection(section, currentArea);
         }
     }
 
@@ -290,20 +287,60 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
         }
 
-        this.elementReaders.put(elementName, elementReader);
+        putConfigElementReader(elementName, elementReader);
 
         if (logger.isDebugEnabled())
             logger.debug("Added element reader '" + elementName + "': " + className);
     }
 
     /**
-     * Retrieves the element reader for the given element name
+     * Gets the element reader from the in-memory 'cache' for the given element name
      * 
      * @param elementName Name of the element to get the reader for
      * @return ConfigElementReader object or null if it doesn't exist
      */
     private ConfigElementReader getConfigElementReader(String elementName)
     {
-        return (ConfigElementReader) this.elementReaders.get(elementName);
+        return (ConfigElementReader) getElementReaders().get(elementName);
     }
+    
+    /**
+     * Put the config element reader into the in-memory 'cache' for the given element name
+     * 
+     * @param elementName
+     * @param elementReader
+     */
+    private void putConfigElementReader(String elementName, ConfigElementReader elementReader)
+    {
+        getElementReaders().put(elementName, elementReader);
+    }
+    
+    /**
+     * Get the elementReaders from the in-memory 'cache'
+     * 
+     * @return elementReaders
+     */
+    protected Map<String, ConfigElementReader> getElementReaders()
+    {
+        return elementReaders;
+    }  
+    
+    /**
+     * Put the elementReaders into the in-memory 'cache'
+     * 
+     * @param elementReaders
+     */
+    protected void putElementReaders(Map<String, ConfigElementReader> elementReaders)
+    {
+        this.elementReaders = elementReaders;
+    }  
+    
+    /**
+     * Remove the elementReaders from the in-memory 'cache'
+     */
+    protected void removeElementReaders()
+    {
+        elementReaders.clear();
+        elementReaders = null;
+    } 
 }

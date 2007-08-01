@@ -31,8 +31,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.config.evaluator.Evaluator;
+import org.alfresco.util.AbstractLifecycleBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationEvent;
 
 /**
  * Base class for all config service implementations. This class implements the
@@ -51,15 +53,16 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author gavinc
  */
-public abstract class BaseConfigService implements ConfigService
+public abstract class BaseConfigService extends AbstractLifecycleBean implements ConfigService
 {
     private static final Log logger = LogFactory.getLog(BaseConfigService.class);
 
     protected ConfigSource configSource;
-    protected ConfigImpl globalConfig;
-    protected Map<String, Evaluator> evaluators;
-    protected Map<String, List<ConfigSection>> sectionsByArea;
-    protected List<ConfigSection> sections;
+    
+    private ConfigImpl globalConfig;   
+    private Map<String, Evaluator> evaluators;
+    private Map<String, List<ConfigSection>> sectionsByArea;
+    private List<ConfigSection> sections;
 
     /**
      * Construct the service with the source from which it must read
@@ -81,10 +84,10 @@ public abstract class BaseConfigService implements ConfigService
      */
     public void init()
     {
-        this.sections = new ArrayList<ConfigSection>();
-        this.sectionsByArea = new HashMap<String, List<ConfigSection>>();
-        this.evaluators = new HashMap<String, Evaluator>();
-        this.globalConfig = new ConfigImpl();
+        putSections(new ArrayList<ConfigSection>());
+        putSectionsByArea(new HashMap<String, List<ConfigSection>>());
+        putEvaluators(new HashMap<String, Evaluator>());
+        putGlobalConfig(new ConfigImpl());
 
         // Add the built-in evaluators
         addEvaluator("string-compare", "org.alfresco.config.evaluator.StringEvaluator");
@@ -96,13 +99,10 @@ public abstract class BaseConfigService implements ConfigService
      */
     public void destroy()
     {
-        this.sections.clear();
-        this.sectionsByArea.clear();
-        this.evaluators.clear();
-
-        this.sections = null;
-        this.sectionsByArea = null;
-        this.evaluators = null;
+        removeSections();
+        removeSectionsByArea();
+        removeEvaluators();
+        removeGlobalConfig();
     }
     
     /**
@@ -137,7 +137,7 @@ public abstract class BaseConfigService implements ConfigService
 
         if (context.includeGlobalSection())
         {
-            results = new ConfigImpl(this.globalConfig);
+            results = new ConfigImpl(getGlobalConfigImpl());
 
             if (logger.isDebugEnabled())
                 logger.debug("Created initial config results using global section");
@@ -157,9 +157,12 @@ public abstract class BaseConfigService implements ConfigService
 
             // add all the config elements from all sections (that match) in
             // each named area to the results
+            
+            Map<String, List<ConfigSection>> sectionsByArea = getSectionsByArea();           
+            
             for (String area : context.getAreas())
             {
-                List<ConfigSection> areaSections = this.sectionsByArea.get(area);
+                List<ConfigSection> areaSections = sectionsByArea.get(area);
                 if (areaSections == null)
                 {
                     throw new ConfigException("Requested area '" + area + "' has not been defined");
@@ -174,7 +177,8 @@ public abstract class BaseConfigService implements ConfigService
         else
         {
             // add all the config elements from all sections (that match) to the results
-            for (ConfigSection section: this.sections)
+            
+            for (ConfigSection section: getSections())
             {
                 processSection(section, object, context, results);
             }
@@ -188,7 +192,7 @@ public abstract class BaseConfigService implements ConfigService
      */
     public Config getGlobalConfig()
     {
-        return this.globalConfig;
+        return getGlobalConfigImpl();
     }
     
     /**
@@ -215,13 +219,17 @@ public abstract class BaseConfigService implements ConfigService
     {
         for (InputStream inputStream : this.configSource)
         {
-            if (logger.isDebugEnabled())
-               logger.debug("Commencing parse of input stream");
-            
-            parse(inputStream);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Completed parse of input stream");
+            // skip if null (e.g. from RepoUrlConfigSource)
+            if (inputStream != null)
+            {
+                if (logger.isDebugEnabled())
+                   logger.debug("Commencing parse of input stream");
+                
+                parse(inputStream);
+                
+                if (logger.isDebugEnabled())
+                   logger.debug("Completed parse of input stream");
+            }
         }
     }
 
@@ -249,17 +257,20 @@ public abstract class BaseConfigService implements ConfigService
         {
             // get all the config elements from this section and add them to the
             // global section, if any already exist we must combine or replace them
+            
+            ConfigImpl globalConfig = getGlobalConfigImpl();
+            
             for (ConfigElement ce : section.getConfigElements())
-            {
-               ConfigElement existing = this.globalConfig.getConfigElement(ce.getName());
+            {               
+               ConfigElement existing = globalConfig.getConfigElement(ce.getName());
                
                if (existing != null)
                {
                   if (section.isReplace())
                   {
                      // if the section has been marked as 'replace' and a config element
-                     // with this name has already been found, replace it
-                     this.globalConfig.putConfigElement(ce);
+                     // with this name has already been found, replace it                     
+                     globalConfig.putConfigElement(ce);
                      
                      if (logger.isDebugEnabled())
                         logger.debug("Replaced " + existing + " with " + ce);
@@ -267,8 +278,8 @@ public abstract class BaseConfigService implements ConfigService
                   else
                   {
                      // combine the config elements
-                     ConfigElement combined = existing.combine(ce);
-                     this.globalConfig.putConfigElement(combined);
+                     ConfigElement combined = existing.combine(ce);                     
+                     globalConfig.putConfigElement(combined);
                      
                      if (logger.isDebugEnabled())
                      {
@@ -279,7 +290,7 @@ public abstract class BaseConfigService implements ConfigService
                }
                else
                {
-                  this.globalConfig.putConfigElement(ce);
+                   globalConfig.putConfigElement(ce);
                }
             }
             
@@ -293,11 +304,13 @@ public abstract class BaseConfigService implements ConfigService
             {
                 // get the list of sections for the given area name (create the
                 // list if required)
-                List<ConfigSection> areaSections = this.sectionsByArea.get(area);
+                Map<String, List<ConfigSection>> sectionsByArea = getSectionsByArea();               
+                List<ConfigSection> areaSections = sectionsByArea.get(area);
+                
                 if (areaSections == null)
                 {
-                    areaSections = new ArrayList<ConfigSection>();
-                    this.sectionsByArea.put(area, areaSections);
+                    areaSections = new ArrayList<ConfigSection>();                   
+                    sectionsByArea.put(area, areaSections);
                 }
 
                 // add the section to the list
@@ -309,7 +322,7 @@ public abstract class BaseConfigService implements ConfigService
             else
             {
                 // add the section to the relevant collections
-                this.sections.add(section);
+                getSections().add(section);
 
                 if (logger.isDebugEnabled())
                     logger.debug("Added " + section + " to the sections list");
@@ -326,7 +339,7 @@ public abstract class BaseConfigService implements ConfigService
      */
     protected Evaluator getEvaluator(String name)
     {
-        return (Evaluator) this.evaluators.get(name);
+        return (Evaluator)getEvaluators().get(name);
     }
 
     /**
@@ -350,8 +363,8 @@ public abstract class BaseConfigService implements ConfigService
         {
             throw new ConfigException("Could not instantiate evaluator for '" + name + "' with class: " + className, e);
         }
-
-        this.evaluators.put(name, evaluator);
+   
+        getEvaluators().put(name, evaluator);
 
         if (logger.isDebugEnabled())
             logger.debug("Added evaluator '" + name + "': " + className);
@@ -383,5 +396,138 @@ public abstract class BaseConfigService implements ConfigService
         }
 
         context.getAlgorithm().process(section, evaluator, object, results);
+    }
+    
+    /**
+     * Get globalConfig from the in-memory 'cache'
+     * 
+     * @return globalConfig
+     */
+    protected ConfigImpl getGlobalConfigImpl()
+    {
+        return globalConfig;
+    }
+    
+    /**
+     * Put globalConfig into the in-memory 'cache'
+     * 
+     * @param globalConfig
+     */
+    protected void putGlobalConfig(ConfigImpl globalConfig)
+    {
+        this.globalConfig = globalConfig;
+    }  
+    
+    /**
+     * Remove globalConfig from the in-memory 'cache'
+     */
+    protected void removeGlobalConfig()
+    {
+        this.globalConfig = null;
+    } 
+
+    /**
+     * Get evaluators from the in-memory 'cache'
+     * 
+     * @return
+     */
+    protected Map<String, Evaluator> getEvaluators()
+    {
+        return evaluators;
+    } 
+
+    /**
+     * Put evaluators into the in-memory 'cache'
+     * 
+     * @param evaluators
+     */
+    protected void putEvaluators(Map<String, Evaluator> evaluators)
+    {
+        this.evaluators = evaluators;
+    }  
+    
+    /**
+     * Remove evaluators from in-memory 'cache'
+     */
+    protected void removeEvaluators()
+    {        
+        evaluators.clear();
+        evaluators = null;
+    } 
+    
+    /**
+     * Get the sectionsByArea from the in-memory 'cache'
+     * 
+     * @return sectionsByArea
+     */
+    protected Map<String, List<ConfigSection>> getSectionsByArea()
+    {
+        return sectionsByArea;
+    }  
+    
+    /**
+     * Put the sectionsByArea into the in-memory 'cache'
+     * 
+     * @param sectionsByArea
+     */
+    protected void putSectionsByArea(Map<String, List<ConfigSection>> sectionsByArea)
+    {
+        this.sectionsByArea = sectionsByArea;
+    }  
+    
+    /**
+     * Remove the sectionsByArea from the in-memory 'cache'
+     */
+    protected void removeSectionsByArea()
+    {
+        sectionsByArea.clear();
+        sectionsByArea = null;
+    } 
+    
+    /**
+     * Get the sections from the in-memory 'cache'
+     * 
+     * @return sections
+     */
+    protected List<ConfigSection> getSections()
+    {
+        return sections;
+    }  
+
+    /**
+     * Put the sections into the in-memory 'cache'
+     * 
+     * @param sections
+     */
+    protected void putSections(List<ConfigSection> sections)
+    {
+        this.sections = sections;
+    }  
+    
+    /**
+     * Remove the sections from the in-memory 'cache'
+     */
+    protected void removeSections()
+    {
+        sections.clear();
+        sections = null;
+    } 
+    
+    /**
+     * Initialise config on bootstrap
+     */
+    @Override
+    protected void onBootstrap(ApplicationEvent event)
+    {        
+        init();
+    }
+    
+    /**
+     * Destroy config in shutdown
+     */
+    @Override
+    protected void onShutdown(ApplicationEvent event)
+    {
+        destroy();
     }
 }
