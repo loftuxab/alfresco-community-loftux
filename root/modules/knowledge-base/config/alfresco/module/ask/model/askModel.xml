@@ -58,20 +58,7 @@
             </list>
          </parameter>
       </constraint>
-      <constraint name="ask:alfresco_version" type="LIST">
-         <parameter name="allowedValues">
-            <list>
-            	 <value>Any</value>
-               <value>1.0</value>
-               <value>1.1</value>
-               <value>1.2</value>
-               <value>1.3</value>
-               <value>1.3.1</value>
-               <value>1.3.2</value>
-               <value>1.4</value>
-            </list>
-         </parameter>
-      </constraint>
+     
       <constraint name="ask:visibility" type="LIST">
          <parameter name="allowedValues">
             <list>
@@ -90,8 +77,7 @@
     
     
     <aspects>
-      
-      <aspect name="ask:status">
+       <aspect name="ask:status">
          <title>Status</title>
          <properties>
             <property name="ask:status">
@@ -103,11 +89,14 @@
                </constraints>
             </property>
          </properties>
-      </aspect>    
+       </aspect>    
+       
+          
 
       <aspect name="ask:article">
          <title>Article</title>
          <properties>
+            
             <property name="ask:article_type">
                <title>Article Type</title>
                <type>d:text</type>
@@ -116,21 +105,27 @@
                   <constraint ref="ask:article_type" />
                </constraints>
             </property>
-            <property name="ask:alfresco_version">
-               <title>Alfresco Version</title>
-               <type>d:text</type>
-               <multiple>true</multiple>
-            </property>
+
+            
+
             <property name="ask:tags">
                <title>Tag(s)</title>
                <type>d:text</type>
                <multiple>true</multiple>
             </property>
+            
+            <property name="ask:alfresco_version">
+               <title>Alfresco Version</title>
+               <type>d:category</type>
+               <multiple>true</multiple>
+            </property>
+            
             <property name="ask:error_messages">
                <title>Error Message(s)</title>
                <type>d:text</type>
                <multiple>true</multiple>
             </property>
+            
             <property name="ask:visibility">
                <title>Visibility</title>
                <type>d:text</type>
@@ -138,6 +133,7 @@
                   <constraint ref="ask:visibility" />
                </constraints>
             </property>
+            
             <property name="ask:askid">
                <title>ASKID</title>
                <type>d:text</type>
@@ -146,7 +142,6 @@
         </properties>
          
          <mandatory-aspects>
-            <aspect>cm:generalclassifiable</aspect>
             <aspect>cm:ownable</aspect>
             <aspect>ask:status</aspect>
          </mandatory-aspects>
