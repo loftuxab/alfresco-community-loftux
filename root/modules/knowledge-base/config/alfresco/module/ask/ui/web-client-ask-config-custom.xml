@@ -162,7 +162,7 @@ End for Ask -->
 
    <config evaluator="aspect-name" condition="ask:article">
       <property-sheet>
-         <separator name="sep" display-label="Ask Article Properties" component-generator="HeaderSeparatorGenerator"  show-in-edit-mode="false"/>      
+         <separator name="sep" display-label="Ask Articled Properties" component-generator="HeaderSeparatorGenerator"  show-in-edit-mode="false"/>      
          <show-property name="ask:askid"  show-in-edit-mode="true"/>
          <show-property name="ask:article_type"  show-in-edit-mode="false"/>
          <show-property name="cm:categories"  show-in-edit-mode="false"/>
