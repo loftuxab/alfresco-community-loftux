@@ -25,19 +25,23 @@
       <namespace uri="ask.new.model" prefix="ask"/>
    </namespaces>
    
-      <constraints>
+   <constraints>
+      
       <constraint name="cm:filename" type="REGEX">
          <parameter name="expression"><value><![CDATA[[^\"\*\\\>\<\?\/\:\|\¬\£\%\&\+\;]+]]></value></parameter>
          <parameter name="requiresMatch"><value>true</value></parameter>
       </constraint>
+      
       <constraint name="ask:authorisedBy" type="LENGTH">
          <parameter name="minLength"><value>3</value></parameter>
          <parameter name="maxLength"><value>6</value></parameter>
       </constraint>
+      
       <constraint name="ask:daysAuthorised" type="MINMAX">
          <parameter name="minValue"><value>1</value></parameter>
          <parameter name="maxValue"><value>365</value></parameter>
       </constraint>
+      
       <constraint name="ask:status" type="LIST">
          <parameter name="allowedValues">
             <list>
@@ -48,6 +52,7 @@
             </list>
          </parameter>
       </constraint>
+      
       <constraint name="ask:article_type" type="LIST">
          <parameter name="allowedValues">
             <list>
@@ -70,13 +75,9 @@
       </constraint>
 
    </constraints>
-   
-   <types>
-          
-   </types>
+        
+   <aspects>
     
-    
-    <aspects>
        <aspect name="ask:status">
          <title>Status</title>
          <properties>

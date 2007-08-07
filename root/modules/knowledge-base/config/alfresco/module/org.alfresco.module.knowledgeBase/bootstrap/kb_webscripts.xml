@@ -44,7 +44,7 @@
              <view:properties>
                <app:editInline>true</app:editInline>
                <cm:description></cm:description>
-               <cm:content>contentUrl=classpath:alfresco/module/ask/bootstrap/webscripts/kbsearch.get.js|mimetype=application/x-javascript|size=|encoding=UTF-8|locale=en_US_</cm:content>
+               <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/webscripts/kbsearch.get.js|mimetype=application/x-javascript|size=|encoding=UTF-8|locale=en_US_</cm:content>
                <cm:title>kbsearch.get.js</cm:title>
                <cm:author></cm:author>
                <cm:name>kbsearch.get.js</cm:name>
@@ -61,7 +61,7 @@
               <view:properties>
                 <app:editInline>true</app:editInline>
                 <cm:description></cm:description>
-                <cm:content>contentUrl=classpath:alfresco/module/ask/bootstrap/webscripts/kbsearch.get.atom.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
+                <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/webscripts/kbsearch.get.atom.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
                 <cm:title>kbsearch.get.atom.ftl</cm:title>
                 <cm:author></cm:author>
                 <sys:store-protocol>workspace</sys:store-protocol>
@@ -79,7 +79,7 @@
                <view:properties>
                  <app:editInline>true</app:editInline>
                  <cm:description></cm:description>
-                 <cm:content>contentUrl=classpath:alfresco/module/ask/bootstrap/webscripts/kbsearch.get.desc.xml|mimetype=text/xml|size=|encoding=UTF-8|locale=en_US_</cm:content>
+                 <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/webscripts/kbsearch.get.desc.xml|mimetype=text/xml|size=|encoding=UTF-8|locale=en_US_</cm:content>
                  <cm:title>kbsearch.get.desc.xml</cm:title>
                  <cm:author></cm:author>
                  <cm:name>kbsearch.get.desc.xml</cm:name>
@@ -96,7 +96,7 @@
                <view:properties>
                  <app:editInline>true</app:editInline>
                  <cm:description></cm:description>
-                 <cm:content>contentUrl=classpath:alfresco/module/ask/bootstrap/webscripts/kbsearch.get.html.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
+                 <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/webscripts/kbsearch.get.html.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
                  <cm:title>kbsearch.get.html.ftl</cm:title>
                  <cm:author></cm:author>
                  <cm:name>kbsearch.get.html.ftl</cm:name>
@@ -113,7 +113,7 @@
                <view:properties>
                  <app:editInline>true</app:editInline>
                  <cm:description></cm:description>
-                 <cm:content>contentUrl=classpath:alfresco/module/ask/bootstrap/webscripts/kbsearch.get.html.400.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
+                 <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/webscripts/kbsearch.get.html.400.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
                  <cm:title>kbsearch.get.html.400.ftl</cm:title>
                  <cm:author></cm:author>
                  <cm:name>kbsearch.get.html.400.ftl</cm:name>
@@ -130,7 +130,7 @@
                 <view:properties>
                   <app:editInline>true</app:editInline>
                   <cm:description></cm:description>
-                  <cm:content>contentUrl=classpath:alfresco/module/ask/bootstrap/webscripts/kbsearch.get.atom.400.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
+                  <cm:content>contentUrl=classpath:alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/webscripts/kbsearch.get.atom.400.ftl|mimetype=text/plain|size=|encoding=UTF-8|locale=en_US_</cm:content>
                   <cm:title>kbsearch.get.atom.400.ftl</cm:title>
                   <cm:author></cm:author>
                   <cm:name>kbsearch.get.atom.400.ftl</cm:name>

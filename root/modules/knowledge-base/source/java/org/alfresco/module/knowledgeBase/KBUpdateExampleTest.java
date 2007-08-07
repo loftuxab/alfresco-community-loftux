@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.module.ask;
+package org.alfresco.module.knowledgeBase;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
