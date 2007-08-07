@@ -1,0 +1,10 @@
+<webscript>
+  <shortname>Blog Search Sample</shortname>
+  <description>Sample that finds all blog entries whose content contains the specified search term</description>
+   <url>/sample/kb/search?q={searchTerm}&amp;p={startPage?}&amp;c={count?}</url>
+   <url>/sample/kb/search.atom?q={searchTerm}&amp;p={startPage?}&amp;c={count?}</url>
+   
+   <format default="html">extension</format>
+   <authentication>guest</authentication>
+   <transaction>required</transaction>
+</webscript>
