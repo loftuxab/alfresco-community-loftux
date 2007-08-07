@@ -1,0 +1,54 @@
+<view:view xmlns:view="http://www.alfresco.org/view/repository/1.0" 
+           xmlns:sys="http://www.alfresco.org/model/system/1.0" 
+           xmlns:cm="http://www.alfresco.org/model/content/1.0">
+    <cm:category>
+        <cm:name>Alfresco Knowledge Base</cm:name>
+        <sys:node-uuid>ask:kb-root</sys:node-uuid>
+        <cm:subcategories>
+		           
+		   <!-- Remove this for now as we are not sure what it is used for -->
+		   <!-- <cm:category>
+		       <cm:name>Article Category</cm:name>
+		       <sys:node-uuid>kbCategory-root</sys:node-uuid>
+		       <cm:subcategories>
+		       		<cm:category>
+		           		<cm:name>General</cm:name>
+		           		<sys:node-uuid>ask:general-root</sys:node-uuid>
+		            </cm:category>
+		       </cm:subcategories>
+		   </cm:category> -->
+		
+		   <cm:category>
+		       <cm:name>Alfresco Versions</cm:name>
+		       <sys:node-uuid>ask:kbVersions-root</sys:node-uuid>
+		       <cm:subcategories>
+		           <cm:category>
+		               <cm:name>1.3</cm:name>
+		               <sys:node-uuid>ask:13-root</sys:node-uuid>
+		           </cm:category>
+		           <cm:category>
+		               <cm:name>1.2</cm:name>
+		               <sys:node-uuid>ask:12-root</sys:node-uuid>
+		           </cm:category>
+		           <cm:category>
+		               <cm:name>1.4</cm:name>
+		               <sys:node-uuid>ask:14-root</sys:node-uuid>
+		           </cm:category>
+		           <cm:category>
+		               <cm:name>1.4.3</cm:name>
+		               <sys:node-uuid>ask:143-root</sys:node-uuid>
+		           </cm:category>
+		           <cm:category>
+		               <cm:name>2.0</cm:name>
+		               <sys:node-uuid>ask:20-root</sys:node-uuid>
+		           </cm:category>
+		           <cm:category>
+		               <cm:name>2.0.1</cm:name>
+		               <sys:node-uuid>ask:201-root</sys:node-uuid>
+		           </cm:category>
+		       </cm:subcategories>
+		   </cm:category>
+				   
+		</cm:subcategories>	   
+	</cm:category>
+</view:view>

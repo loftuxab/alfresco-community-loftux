@@ -10,11 +10,11 @@
    <!-- ****************** -->
    
    <target name="incremental-core" 
-           description="Performs an incremental build of the core project" 
+           description="Performs an incremental build of the core project"
            depends="package-core" />
       
    <target name="build-core" 
-           description="Performs a clean build of the core project" 
+           description="Performs a clean build of the core project"
            depends="clean-core, 
                     incremental-core" />
    
@@ -1339,6 +1339,80 @@
    	<copy todir="${dir.mediawiki}/extensions">
       	<fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
       </copy>
+   </target>
+   
+   <!-- ******************************** -->
+   <!-- ** Knowledge Base Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-kb"
+           description="Performs an incremental build of the knowledge base project."
+           depends="package-kb" />
+
+   <target name="build-kb"
+           description="Performs a clean build of the knowledge base project."
+           depends="clean-kb, incremental-kb" />
+
+   <target name="clean-kb"
+           description="Cleans the knowledge base project"
+           depends="init">
+      <clean projectdir="${dir.module.kb}" />
+   </target>
+
+   <target name="compile-kb"
+           description="Compiles the knowledge base project."
+           depends="init">
+      <compile-java projectdir="${dir.module.kb}" />
+   </target>
+
+   <target name="package-kb"
+           description="Packages the knowledge base project."
+           depends="package-kb-war, deploy-tomcat" />
+
+   <target name="package-kb-jar"
+           description="Packages the JAR file for the knowledge base project."
+           depends="compile-kb">
+      <mkdir dir="${dir.module.kb.dist}" />
+      <jar jarfile="${dir.module.kb.dist}/${file.name.jar.kb}"
+           basedir="${dir.module.kb.classes}" />
+   </target>
+
+   <target name="package-kb-war"
+           description="Packages the WAR file for the knowledge base project."
+           depends="package-kb-extension">
+      <echo>Installing knowledge base into WAR...</echo>
+      <install-amp ampfile="${dir.module.kb.dist}/${file.name.amp.kb}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-kb-extension"
+           description="Packages the knowledge base extension."
+           depends="package-kb-jar">
+      <zip destfile="${dir.module.kb.dist}/${file.name.amp.kb}"
+           update="true">
+         <zipfileset file="${dir.module.kb.property}/module.properties"/>
+         <zipfileset file="${dir.module.kb.dist}/${file.name.jar.kb}"
+                     prefix="lib"/>
+         <zipfileset file="${dir.module.kb.web}" prefix="web"/>
+         <zipfileset dir="${dir.module.kb.config}"
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-kb"
+           description="Runs the tests for the knowledge base project."
+           depends="compile-kb">
+      <run-tests projectdir="${dir.module.kb}" />
+   </target>
+
+   <target name="generate-javadocs-kb"
+           description="Generates the JavaDocs for the knowledge base project."
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Knowledge Base Extension"
+                         windowtitle="Knowledge Base"
+                         projectdir="${dir.module.kb}"/>
    </target>
 
 

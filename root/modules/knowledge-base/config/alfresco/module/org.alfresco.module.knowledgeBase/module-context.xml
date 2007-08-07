@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+	<bean id="kb.dictionaryBootstrap" parent="dictionaryModelBootstrap" depends-on="dictionaryBootstrap">
+		<property name="models">
+		  	<list>
+		    	<value>alfresco/module/org.alfresco.module.knowledgeBase/model/askModel.xml</value>        
+		    </list>
+		</property>
+	</bean> 
+   
+	<bean id="kb.configBootstrap" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
+       <property name="configs">
+         <list>
+            <value>classpath:alfresco/module/org.alfresco.module.knowledgeBase/ui/web-client-ask-config-custom.xml</value>
+         </list>
+       </property>
+    </bean>
+    
+    <bean id="kb.workflowBootstrap" parent="workflowDeployer">
+		<property name="workflowDefinitions">
+      <list>
+            <props>
+              <prop key="engineId">jbpm</prop>
+              <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/model/ask-review-process-definition.xml</prop>
+              <prop key="mimetype">text/xml</prop>
+              <prop key="redeploy">true</prop>
+            </props>
+      </list>
+		</property>
+		<property name="models">
+			<list>
+			   <!-- NOTE: The above process definition relies on the default workflowModel.xml -->
+			   <!--       which is already registered during Alfresco startup. -->
+			   <!--       See bootstrap-context.xml (workflowBootstrap). -->
+			   <!-- <value>alfresco/extension/workflow/workflow_lifecycle_model.xml</value> -->
+			</list>
+		</property>
+		<property name="labels">
+			<list>
+			   <!-- NOTE: The above process definition relies on the default workflow-messages.properties -->
+			   <!--       which is already registered during Alfresco startup -->
+			   <!--       See bootstrap-context.xml (workflowBootstrap). -->
+			   <!-- <value>alfresco/extension/workflow/workflow-messages</value> -->
+			</list>
+		</property>
+	</bean>      
+	   
+  <bean id="kb.bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+  	<property name="moduleId" value="org.alfresco.module.knowledgeBase" />
+    <property name="name" value="bootstrapSpaces" />
+    <property name="description" value="Initial data requirements" />
+    <property name="sinceVersion" value="1.0" />
+    <property name="appliesFromVersion" value="1.0" />    
+    <property name="importer" ref="spacesBootstrap"/>
+    <property name="bootstrapViews">
+    	<list>
+    		<!-- Knowledge base categories -->
+	    	<props>
+	        	<prop key="path">/cm:categoryRoot/cm:generalclassifiable</prop>
+	            <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_categories.xml</prop>
+	        </props>
+	        <!-- Knowledge base templates and scripts -->
+	        <props>
+	            <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
+	        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_data_dictionary.xml</prop>
+	      	</props>	    	
+	      	<!-- Knowledge space -->
+			<props>
+	      		<prop key="path">/${spaces.company_home.childname}</prop>
+	        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_space.xml</prop>
+	      	</props>         	    
+	      	<!-- Knowledge base web scripts -->    
+	        <props>
+	            <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/cm:webscripts/cm:org/cm:alfresco</prop>
+	            <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_webscripts.xml</prop>
+	        </props>      	
+    	</list>
+    </property>
+  </bean>
+    
+</beans>
+
