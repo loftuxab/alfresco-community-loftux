@@ -1,174 +1,65 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0">
-  <view:metadata>
-    <view:exportBy>admin</view:exportBy>
-    <view:exportDate>2007-07-19T12:00:11.350+01:00</view:exportDate>
-    <view:exporterVersion>2.1.0 (R2-dev @build-number@)</view:exporterVersion>
-    <view:exportOf>/app:company_home/cm:Knowledge_x0020_Base</view:exportOf>
-  </view:metadata>
-  <cm:folder xmlns:act="http://www.alfresco.org/model/action/1.0" 
-             xmlns:ask="ask.new.model" 
-             xmlns:app="http://www.alfresco.org/model/application/1.0" 
-             xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" 
-             xmlns:mix="http://www.jcp.org/jcr/mix/1.0" 
-             xmlns:jcr="http://www.jcp.org/jcr/1.0" 
-             xmlns:ch="extension.contenthits" 
-             xmlns:wcm="http://www.alfresco.org/model/wcmmodel/1.0" 
-             xmlns:wcmwf="http://www.alfresco.org/model/wcmworkflow/1.0" 
-             xmlns:rule="http://www.alfresco.org/model/rule/1.0" 
-             xmlns:fm="http://www.alfresco.org/model/forum/1.0"
-             xmlns:d="http://www.alfresco.org/model/dictionary/1.0" 
-             xmlns:view="http://www.alfresco.org/view/repository/1.0" 
-             xmlns:alf="http://www.alfresco.org" 
-             xmlns:nt="http://www.jcp.org/jcr/nt/1.0" 
-             xmlns:wf="http://www.alfresco.org/model/workflow/1.0" 
-             xmlns:usr="http://www.alfresco.org/model/user/1.0" 
-             xmlns:cm="http://www.alfresco.org/model/content/1.0" 
-             xmlns:sv="http://www.jcp.org/jcr/sv/1.0" 
-             xmlns:sys="http://www.alfresco.org/model/system/1.0" 
-             xmlns:wca="http://www.alfresco.org/model/wcmappmodel/1.0" 
-             xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" 
-             xmlns:custom="custom.model" 
-             xmlns:reg="http://www.alfresco.org/system/registry/1.0" 
-             xmlns:module="http://www.alfresco.org/system/modules/1.0" 
-             view:childName="cm:Knowledge Base">
+  <cm:folder xmlns:act="http://www.alfresco.org/model/action/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0" xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:wcm="http://www.alfresco.org/model/wcmmodel/1.0" xmlns:wcmwf="http://www.alfresco.org/model/wcmworkflow/1.0" xmlns:rule="http://www.alfresco.org/model/rule/1.0" xmlns:fm="http://www.alfresco.org/model/forum/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:alf="http://www.alfresco.org" xmlns:d="http://www.alfresco.org/model/dictionary/1.0" xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:kb="http://www.alfresco.org/model/knowledgebase/1.0" xmlns:wf="http://www.alfresco.org/model/workflow/1.0" xmlns:usr="http://www.alfresco.org/model/user/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:wca="http://www.alfresco.org/model/wcmappmodel/1.0" xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" xmlns:custom="custom.model" xmlns:reg="http://www.alfresco.org/system/registry/1.0" xmlns:module="http://www.alfresco.org/system/modules/1.0" xmlns="" view:childName="cm:Knowledge Base">
     <view:aspects>
-      <cm:auditable></cm:auditable>
-      <sys:referenceable></sys:referenceable>
       <app:uifacets></app:uifacets>
       <rule:rules></rule:rules>
     </view:aspects>
     <view:properties>
-      <cm:description></cm:description>
-      <app:icon>space-icon-default</app:icon>
-      <sys:node-uuid>6dcdb4e0-35e6-11dc-b471-df612ad7cee1</sys:node-uuid>
-      <sys:node-dbid>481</sys:node-dbid>
-      <cm:title>Knowledge Base</cm:title>
-      <cm:created>2007-07-19T11:54:31.585+01:00</cm:created>
-      <cm:modifier>admin</cm:modifier>
-      <cm:modified>2007-07-19T11:56:11.730+01:00</cm:modified>
-      <cm:creator>admin</cm:creator>
-      <sys:store-protocol>workspace</sys:store-protocol>
+      <app:icon>space-icon-pen</app:icon>
+      <cm:description></cm:description>      
+      <cm:title></cm:title>
       <cm:name>Knowledge Base</cm:name>
-      <sys:store-identifier>SpacesStore</sys:store-identifier>
     </view:properties>
     <view:associations>
-      <cm:contains>
-           
-      </cm:contains>
       <rule:ruleFolder>
         <cm:systemfolder view:childName="rule:ruleFolder">
-          <view:aspects>
-            <cm:auditable></cm:auditable>
-            <sys:referenceable></sys:referenceable>
-          </view:aspects>
-          <view:properties>
-            <sys:node-uuid>6df1c57f-007f-11dc-9e06-6d80e03fd06b</sys:node-uuid>
-            <sys:node-dbid>433</sys:node-dbid>
-            <cm:created>2007-05-12T12:53:42.000+01:00</cm:created>
-            <cm:modifier>admin</cm:modifier>
-            <cm:modified>2007-05-12T12:53:42.187+01:00</cm:modified>
-            <cm:creator>admin</cm:creator>
-            <sys:store-protocol>workspace</sys:store-protocol>
-            <cm:name>101</cm:name>
-            <sys:store-identifier>SpacesStore</sys:store-identifier>
-          </view:properties>
           <view:associations>
             <cm:contains>
-              <rule:rule view:childName="rule:rules6df8f172-007f-11dc-9e06-6d80e03fd06a">
+              <rule:rule view:childName="rule:rulesb8f0416c-44fd-11dc-ba06-375cc7a0ca6d">
                 <view:aspects>
                   <cm:titled></cm:titled>
-                  <cm:auditable></cm:auditable>
-                  <sys:referenceable></sys:referenceable>
                 </view:aspects>
                 <view:properties>
-                  <cm:description>Files Articles according to there creation date</cm:description>
-                  <sys:node-uuid>6df8f173-007f-11dc-9e06-6d80e03fd06b</sys:node-uuid>
-                  <sys:node-dbid>434</sys:node-dbid>
-                  <cm:title>File Articles By Date</cm:title>
-                  <cm:created>2007-05-12T12:53:42.031+01:00</cm:created>
-                  <cm:modifier>admin</cm:modifier>
-                  <rule:disabled>false</rule:disabled>
-                  <cm:modified>2007-05-12T12:53:42.187+01:00</cm:modified>
-                  <rule:applyToChildren>false</rule:applyToChildren>
-                  <cm:creator>admin</cm:creator>
-                  <sys:store-protocol>workspace</sys:store-protocol>
+                  <cm:description>Apply the article aspect to all children</cm:description>                  
+                  <cm:title>Apply Article Aspect</cm:title>                  
+                  <rule:disabled>false</rule:disabled>                  
+                  <rule:applyToChildren>true</rule:applyToChildren>
+                  <rule:executeAsynchronously>false</rule:executeAsynchronously>
                   <rule:ruleType>
                     <view:values>
                       <view:value>inbound</view:value>
                     </view:values>
                   </rule:ruleType>
-                  <rule:executeAsynchronously>true</rule:executeAsynchronously>
-                  <cm:name>6df8f173-007f-11dc-9e06-6d80e03fd06b</cm:name>
-                  <sys:store-identifier>SpacesStore</sys:store-identifier>
                 </view:properties>
                 <view:associations>
                   <rule:action>
                     <act:compositeaction view:childName="rule:action">
-                      <view:aspects>
-                        <cm:auditable></cm:auditable>
-                        <sys:referenceable></sys:referenceable>
-                      </view:aspects>
                       <view:properties>
                         <act:executeAsynchronously>false</act:executeAsynchronously>
                         <act:actionDescription>
                           <view:value view:isNull="true"></view:value>
-                        </act:actionDescription>
-                        <sys:node-uuid>6ded0a8b-007f-11dc-9e06-6d80e03fd06d</sys:node-uuid>
-                        <sys:node-dbid>435</sys:node-dbid>
-                        <cm:created>2007-05-12T12:53:42.062+01:00</cm:created>
-                        <cm:modifier>admin</cm:modifier>
-                        <cm:modified>2007-05-12T12:53:42.203+01:00</cm:modified>
+                        </act:actionDescription>                       
                         <act:actionTitle>
                           <view:value view:isNull="true"></view:value>
-                        </act:actionTitle>
-                        <cm:creator>admin</cm:creator>
+                        </act:actionTitle>                        
                         <act:definitionName>composite-action</act:definitionName>
-                        <sys:store-protocol>workspace</sys:store-protocol>
-                        <cm:name>6ded0a8b-007f-11dc-9e06-6d80e03fd06a</cm:name>
-                        <sys:store-identifier>SpacesStore</sys:store-identifier>
                       </view:properties>
                       <view:associations>
                         <act:conditions>
                           <act:actioncondition view:childName="act:conditions">
-                            <view:aspects>
-                              <cm:auditable></cm:auditable>
-                              <sys:referenceable></sys:referenceable>
-                            </view:aspects>
                             <view:properties>
-                              <sys:node-uuid>6ded0a8c-007f-11dc-9e06-6d80e03fd06s</sys:node-uuid>
-                              <sys:node-dbid>436</sys:node-dbid>
-                              <cm:created>2007-05-12T12:53:42.078+01:00</cm:created>
-                              <cm:modifier>admin</cm:modifier>
-                              <cm:modified>2007-05-12T12:53:42.203+01:00</cm:modified>
-                              <cm:creator>admin</cm:creator>
-                              <act:definitionName>has-aspect</act:definitionName>
-                              <sys:store-protocol>workspace</sys:store-protocol>
+                              <act:definitionName>is-subtype</act:definitionName>
                               <act:invert>false</act:invert>
-                              <cm:name>6ded0a8c-007f-11dc-9e06-6d80e03fd06a</cm:name>
-                              <sys:store-identifier>SpacesStore</sys:store-identifier>
                             </view:properties>
                             <view:associations>
                               <act:parameters>
                                 <act:actionparameter view:childName="act:parameters">
-                                  <view:aspects>
-                                    <cm:auditable></cm:auditable>
-                                    <sys:referenceable></sys:referenceable>
-                                  </view:aspects>
                                   <view:properties>
                                     <act:parameterValue>
-                                      <view:value view:datatype="d:qname">{ask.new.model}article</view:value>
+                                      <view:value view:datatype="d:qname">{http://www.alfresco.org/model/content/1.0}content</view:value>
                                     </act:parameterValue>
-                                    <act:parameterName>aspect</act:parameterName>
-                                    <sys:node-uuid>6e07495a-007f-11dc-9e06-6d80e03fd06h</sys:node-uuid>
-                                    <sys:node-dbid>437</sys:node-dbid>
-                                    <cm:created>2007-05-12T12:53:42.125+01:00</cm:created>
-                                    <cm:modifier>admin</cm:modifier>
-                                    <cm:modified>2007-05-12T12:53:42.203+01:00</cm:modified>
-                                    <cm:creator>admin</cm:creator>
-                                    <sys:store-protocol>workspace</sys:store-protocol>
-                                    <cm:name>6e07495a-007f-11dc-9e06-6d80e03fd06h</cm:name>
-                                    <sys:store-identifier>SpacesStore</sys:store-identifier>
+                                    <act:parameterName>type</act:parameterName>
                                   </view:properties>
                                   <view:associations></view:associations>
                                 </act:actionparameter>
@@ -178,50 +69,24 @@
                         </act:conditions>
                         <act:actions>
                           <act:action view:childName="act:actions">
-                            <view:aspects>
-                              <cm:auditable></cm:auditable>
-                              <sys:referenceable></sys:referenceable>
-                            </view:aspects>
                             <view:properties>
                               <act:executeAsynchronously>false</act:executeAsynchronously>
                               <act:actionDescription>
                                 <view:value view:isNull="true"></view:value>
                               </act:actionDescription>
-                              <sys:node-uuid>6ded0a8d-007f-11dc-9e06-6d80e03fd06z</sys:node-uuid>
-                              <sys:node-dbid>438</sys:node-dbid>
-                              <cm:created>2007-05-12T12:53:42.140+01:00</cm:created>
-                              <cm:modifier>admin</cm:modifier>
-                              <cm:modified>2007-05-12T12:53:42.203+01:00</cm:modified>
                               <act:actionTitle>
                                 <view:value view:isNull="true"></view:value>
                               </act:actionTitle>
-                              <cm:creator>admin</cm:creator>
-                              <act:definitionName>script</act:definitionName>
-                              <sys:store-protocol>workspace</sys:store-protocol>
-                              <cm:name>6ded0a8d-007f-11dc-9e06-6d80e03fd06z</cm:name>
-                              <sys:store-identifier>SpacesStore</sys:store-identifier>
+                              <act:definitionName>add-features</act:definitionName>
                             </view:properties>
                             <view:associations>
                               <act:parameters>
                                 <act:actionparameter view:childName="act:parameters">
-                                  <view:aspects>
-                                    <cm:auditable></cm:auditable>
-                                    <sys:referenceable></sys:referenceable>
-                                  </view:aspects>
                                   <view:properties>
                                     <act:parameterValue>
-                                      <view:value view:datatype="d:category">../../../../../cm:file_articles_by_date.js</view:value>
+                                      <view:value view:datatype="d:qname">{http://www.alfresco.org/model/knowledgebase/1.0}article</view:value>
                                     </act:parameterValue>
-                                    <act:parameterName>script-ref</act:parameterName>
-                                    <sys:node-uuid>6e0e7550-007f-11dc-9e06-6d80e03fd06g</sys:node-uuid>
-                                    <sys:node-dbid>439</sys:node-dbid>
-                                    <cm:created>2007-05-12T12:53:42.171+01:00</cm:created>
-                                    <cm:modifier>admin</cm:modifier>
-                                    <cm:modified>2007-05-12T12:53:42.203+01:00</cm:modified>
-                                    <cm:creator>admin</cm:creator>
-                                    <sys:store-protocol>workspace</sys:store-protocol>
-                                    <cm:name>6e0e7550-007f-11dc-9e06-6d80e03fd06g</cm:name>
-                                    <sys:store-identifier>SpacesStore</sys:store-identifier>
+                                    <act:parameterName>aspect-name</act:parameterName>                                    
                                   </view:properties>
                                   <view:associations></view:associations>
                                 </act:actionparameter>

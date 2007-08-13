@@ -1,0 +1,101 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+    
+    <bean id="org_alfresco_module_knowledgeBase_kbScriptUtils" parent="baseJavaScriptExtension" class="org.alfresco.module.knowledgeBase.KbScriptUtils">
+        <property name="extensionName">
+            <value>kb</value>
+        </property>               
+        <property name="serviceRegistry">
+            <ref bean="ServiceRegistry"/>
+        </property>
+    </bean>
+
+    <bean id="org_alfresco_module_knowledgeBase_onCreateChildAssociation_cmFolder_cmContains" class="org.alfresco.repo.policy.registration.AssociationPolicyRegistration" parent="policyRegistration">   
+        <property name="policyNames">
+           <list>
+        	  <value>{http://www.alfresco.org}onCreateChildAssociation</value>
+              <value>{http://www.alfresco.org}onCreateNodeAssociation</value>
+           </list>
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/content/1.0}folder</value>
+        </property> 	        	   
+        <property name="associationType">
+            <value>{http://www.alfresco.org/model/content/1.0}contains</value>
+        </property>    
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/module/org.alfresco.module.knowledgeBase/behaviour/onCreateChildAssociation_cmFolder_cmContains.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+        
+    <bean id="org_alfresco_module_knowledgeBase_onAddAspect_kbArticle" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onAddAspect</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/knowledgebase/1.0}article</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/module/org.alfresco.module.knowledgeBase/behaviour/onAddAspect_kmArticle.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>    
+        
+    <bean id="org_alfresco_module_knowledgeBase_onUpdateProperties_kbArticle" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onUpdateProperties</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/knowledgebase/1.0}article</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/module/org.alfresco.module.knowledgeBase/behaviour/onUpdateProperties_kmArticle.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>          
+        
+    <bean id="org_alfresco_module_knowledgeBase_onUpdateContent_kbArticle" class="org.alfresco.repo.policy.registration.ClassPolicyRegistration" parent="policyRegistration">   
+        <property name="policyName">
+           <value>{http://www.alfresco.org}onContentUpdate</value>           
+        </property>  	   
+        <property name="className">
+            <value>{http://www.alfresco.org/model/knowledgebase/1.0}article</value>
+        </property> 	
+        <property name="behaviour">
+           <bean class="org.alfresco.repo.jscript.ScriptBehaviour" parent="scriptBehaviour">
+		        <property name="location">
+		        	<bean class="org.alfresco.repo.jscript.ClasspathScriptLocation">
+		            	<constructor-arg>
+		            		<value>alfresco/module/org.alfresco.module.knowledgeBase/behaviour/onUpdateContent_kmArticle.js</value>
+		            	</constructor-arg>
+		            </bean>
+				</property>
+			</bean>        
+        </property> 
+    </bean>
+    
+</beans>

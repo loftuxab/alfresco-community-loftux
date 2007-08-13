@@ -44,7 +44,7 @@ public class KBUpdateExampleTest extends BaseSpringTest
     {                       
         //importFile("alfresco/module/ask/script/script-import.xml", "/app:company_home/app:dictionary/app:scripts");
         //importFile("alfresco/module/ask/template/template-import.xml", "/app:company_home/app:dictionary/app:content_templates");
-        importFile("alfresco/module/ask/bootstrap/kb_datadictionary.xml", "/app:company_home/app:dictionary/app:content_templates");
+        //importFile("alfresco/module/ask/bootstrap/kb_datadictionary.xml", "/app:company_home/app:dictionary/app:content_templates");
         setComplete();
         endTransaction();
     }
