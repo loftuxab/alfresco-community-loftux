@@ -1,0 +1,9 @@
+<alfresco-config>
+
+	<config evaluator="string-compare" condition="Action Wizards">
+      <aspects>
+         <aspect name="kb:article"/>
+      </aspects>
+   </config>
+
+</alfresco-config>

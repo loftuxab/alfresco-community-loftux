@@ -9,12 +9,12 @@
             <event type="node-leave"> <!-- Call script once the package exists i.e. on node-leave -->
             <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
               <!-- Check we have a document attached to the package -->
-		          <!-- Apply the ASK Aspect (ask:status) if not set already. Note: The default ask:status property is draft -->
+		          <!-- Apply the ASK Aspect (kb:status) if not set already. Note: The default kb:status property is draft -->
 		          <!-- Note: Logging to the console requires jscript logging to be enabled in log4j -->
 		          <script>
 		            if (bpm_package.children.length > 0) {
-							  	if (!bpm_package.children[0].hasAspect("ask:status")) {
-										bpm_package.children[0].addAspect("ask:status");
+							  	if (!bpm_package.children[0].hasAspect("kb:status")) {
+										bpm_package.children[0].addAspect("kb:status");
 										bpm_package.children[0].save();									
 										}																								
 								}
@@ -37,7 +37,7 @@
         <event type="node-enter">
             <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
 		          <script>
-									bpm_package.children[0].properties["ask:status"] = "Pending Approval";																
+									bpm_package.children[0].properties["kb:status"] = "Pending Approval";																
 									bpm_package.children[0].save();
     		      </script>
     		    </action>
@@ -66,7 +66,7 @@
         <event type="node-enter">
             <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
 		          <script>
-									bpm_package.children[0].properties["ask:status"] = "Draft";																
+									bpm_package.children[0].properties["kb:status"] = "Draft";																
 									bpm_package.children[0].save();
     		      </script>
     		    </action>
@@ -81,7 +81,7 @@
         <event type="node-enter">
             <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
 		          <script>
-									bpm_package.children[0].properties["ask:status"] = "Current";																
+									bpm_package.children[0].properties["kb:status"] = "Current";																
 									bpm_package.children[0].save();
     		      </script>
     		    </action>
@@ -98,8 +98,8 @@
             <action class="org.alfresco.repo.workflow.jbpm.AlfrescoJavaScript">
 		          <script>
 			        	if (cancelled) {
-			        			if (bpm_package.children[0].hasAspect("ask:status")) {
-			        				bpm_package.children[0].properties["ask:status"] = "Draft";																
+			        			if (bpm_package.children[0].hasAspect("kb:status")) {
+			        				bpm_package.children[0].properties["kb:status"] = "Draft";																
 											bpm_package.children[0].save();
 											}
 									if (logger.isLoggingEnabled()) {
