@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <view:view xmlns:view="http://www.alfresco.org/view/repository/1.0">
-  <cm:folder xmlns:act="http://www.alfresco.org/model/action/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0" xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:wcm="http://www.alfresco.org/model/wcmmodel/1.0" xmlns:wcmwf="http://www.alfresco.org/model/wcmworkflow/1.0" xmlns:rule="http://www.alfresco.org/model/rule/1.0" xmlns:fm="http://www.alfresco.org/model/forum/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:alf="http://www.alfresco.org" xmlns:d="http://www.alfresco.org/model/dictionary/1.0" xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:kb="http://www.alfresco.org/model/knowledgebase/1.0" xmlns:wf="http://www.alfresco.org/model/workflow/1.0" xmlns:usr="http://www.alfresco.org/model/user/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:wca="http://www.alfresco.org/model/wcmappmodel/1.0" xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" xmlns:custom="custom.model" xmlns:reg="http://www.alfresco.org/system/registry/1.0" xmlns:module="http://www.alfresco.org/system/modules/1.0" xmlns="" view:childName="cm:Knowledge Base">
+  <kb:knowledgeBase xmlns:act="http://www.alfresco.org/model/action/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0" xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:wcm="http://www.alfresco.org/model/wcmmodel/1.0" xmlns:wcmwf="http://www.alfresco.org/model/wcmworkflow/1.0" xmlns:rule="http://www.alfresco.org/model/rule/1.0" xmlns:fm="http://www.alfresco.org/model/forum/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:alf="http://www.alfresco.org" xmlns:d="http://www.alfresco.org/model/dictionary/1.0" xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:kb="http://www.alfresco.org/model/knowledgebase/1.0" xmlns:wf="http://www.alfresco.org/model/workflow/1.0" xmlns:usr="http://www.alfresco.org/model/user/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:wca="http://www.alfresco.org/model/wcmappmodel/1.0" xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" xmlns:custom="custom.model" xmlns:reg="http://www.alfresco.org/system/registry/1.0" xmlns:module="http://www.alfresco.org/system/modules/1.0" xmlns="" view:childName="cm:Knowledge Base">
     <view:aspects>
       <app:uifacets></app:uifacets>
-      <rule:rules></rule:rules>
     </view:aspects>
     <view:properties>
       <app:icon>space-icon-pen</app:icon>
@@ -11,98 +10,5 @@
       <cm:title></cm:title>
       <cm:name>Knowledge Base</cm:name>
     </view:properties>
-    <view:associations>
-      <rule:ruleFolder>
-        <cm:systemfolder view:childName="rule:ruleFolder">
-          <view:associations>
-            <cm:contains>
-              <rule:rule view:childName="rule:rulesb8f0416c-44fd-11dc-ba06-375cc7a0ca6d">
-                <view:aspects>
-                  <cm:titled></cm:titled>
-                </view:aspects>
-                <view:properties>
-                  <cm:description>Apply the article aspect to all children</cm:description>                  
-                  <cm:title>Apply Article Aspect</cm:title>                  
-                  <rule:disabled>false</rule:disabled>                  
-                  <rule:applyToChildren>true</rule:applyToChildren>
-                  <rule:executeAsynchronously>false</rule:executeAsynchronously>
-                  <rule:ruleType>
-                    <view:values>
-                      <view:value>inbound</view:value>
-                    </view:values>
-                  </rule:ruleType>
-                </view:properties>
-                <view:associations>
-                  <rule:action>
-                    <act:compositeaction view:childName="rule:action">
-                      <view:properties>
-                        <act:executeAsynchronously>false</act:executeAsynchronously>
-                        <act:actionDescription>
-                          <view:value view:isNull="true"></view:value>
-                        </act:actionDescription>                       
-                        <act:actionTitle>
-                          <view:value view:isNull="true"></view:value>
-                        </act:actionTitle>                        
-                        <act:definitionName>composite-action</act:definitionName>
-                      </view:properties>
-                      <view:associations>
-                        <act:conditions>
-                          <act:actioncondition view:childName="act:conditions">
-                            <view:properties>
-                              <act:definitionName>is-subtype</act:definitionName>
-                              <act:invert>false</act:invert>
-                            </view:properties>
-                            <view:associations>
-                              <act:parameters>
-                                <act:actionparameter view:childName="act:parameters">
-                                  <view:properties>
-                                    <act:parameterValue>
-                                      <view:value view:datatype="d:qname">{http://www.alfresco.org/model/content/1.0}content</view:value>
-                                    </act:parameterValue>
-                                    <act:parameterName>type</act:parameterName>
-                                  </view:properties>
-                                  <view:associations></view:associations>
-                                </act:actionparameter>
-                              </act:parameters>
-                            </view:associations>
-                          </act:actioncondition>
-                        </act:conditions>
-                        <act:actions>
-                          <act:action view:childName="act:actions">
-                            <view:properties>
-                              <act:executeAsynchronously>false</act:executeAsynchronously>
-                              <act:actionDescription>
-                                <view:value view:isNull="true"></view:value>
-                              </act:actionDescription>
-                              <act:actionTitle>
-                                <view:value view:isNull="true"></view:value>
-                              </act:actionTitle>
-                              <act:definitionName>add-features</act:definitionName>
-                            </view:properties>
-                            <view:associations>
-                              <act:parameters>
-                                <act:actionparameter view:childName="act:parameters">
-                                  <view:properties>
-                                    <act:parameterValue>
-                                      <view:value view:datatype="d:qname">{http://www.alfresco.org/model/knowledgebase/1.0}article</view:value>
-                                    </act:parameterValue>
-                                    <act:parameterName>aspect-name</act:parameterName>                                    
-                                  </view:properties>
-                                  <view:associations></view:associations>
-                                </act:actionparameter>
-                              </act:parameters>
-                            </view:associations>
-                          </act:action>
-                        </act:actions>
-                      </view:associations>
-                    </act:compositeaction>
-                  </rule:action>
-                </view:associations>
-              </rule:rule>
-            </cm:contains>
-          </view:associations>
-        </cm:systemfolder>
-      </rule:ruleFolder>
-    </view:associations>
-  </cm:folder>
+  </kb:knowledgeBase>
 </view:view>
