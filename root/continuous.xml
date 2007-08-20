@@ -580,7 +580,7 @@
       <mkdir dir="${dir.continuous.assemble.mmt}" />
 
       <!-- extract the one-jar file -->
-      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.95.jar" 
+      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.96-RC4.jar" 
              dest="${dir.continuous.assemble.mmt}" 
              overwrite="true" />
       <!-- remove unwanted files -->
@@ -627,7 +627,7 @@
       </copy>
       <!-- jar the main mmt classes -->
       <mkdir dir="${dir.continuous.assemble.mmt}/main" />
-      <jar destfile="${dir.continuous.assemble.mmt}/main/mmt.jar" 
+      <jar destfile="${dir.continuous.assemble.mmt}/main/main.jar" 
            manifest="${dir.continuous.assemble.mmt}/tmp-mmt-jar/META-INF/MANIFEST.MF" 
            update="false" >
          <fileset dir="${dir.continuous.assemble.mmt}/tmp-mmt-jar">
