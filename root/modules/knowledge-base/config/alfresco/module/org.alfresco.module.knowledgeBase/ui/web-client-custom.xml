@@ -1,0 +1,24 @@
+<alfresco-config>
+
+    <!-- Adds the article aspect to the action wizard -->
+	<config evaluator="string-compare" condition="Action Wizards">
+      <aspects>
+         <aspect name="kb:article"/>
+      </aspects>
+   </config>
+   
+   <!-- UI configuration for article aspect -->
+   <config evaluator="aspect-name" condition="kb:article">
+      <property-sheet>
+         <separator name="sepkbArticle" display-label="Article Details" component-generator="HeaderSeparatorGenerator" />         
+         <show-property name="kb:kbId" show-in-edit-mode="false"/>
+         <show-property name="kb:articleType"/>
+		 <show-property name="kb:status"/>
+		 <show-property name="kb:visibility"/>
+		 <show-property name="kb:alfrescoVersion"/>
+		 <show-property name="kb:tags"/>
+		 <show-property name="kb:relatedMessages"/>
+      </property-sheet>
+   </config>
+
+</alfresco-config>

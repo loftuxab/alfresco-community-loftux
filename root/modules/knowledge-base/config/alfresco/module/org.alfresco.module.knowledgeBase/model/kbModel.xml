@@ -82,13 +82,11 @@
             <association name="kb:knowledgeBase">
                <title>Knowledge Base</title>
                <source>
-                  <role>kb:knowledgeBase</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </source>
                <target>
                   <class>kb:knowledgeBase</class>
-                  <role>kb:article</role>
                   <mandatory>false</mandatory>
                   <many>true</many>
                </target>
@@ -97,13 +95,11 @@
             
             <child-association name="kb:published">
                <source>                  
-                  <role>kb:published</role>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </source>
                <target>
                   <class>cm:content</class>
-                  <role>kb:article</role>
                   <mandatory>false</mandatory>
                   <many>false</many>
                </target>

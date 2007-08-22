@@ -39,7 +39,7 @@
 	-->    
 	
 	<!-- Knowledge base data bootstrap bean -->   
-	<bean id="kb_bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+	<bean id="kb_bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent" depends-on="kb_dictionaryBootstrap">
 	  	<property name="moduleId" value="org.alfresco.module.knowledgeBase" />
 	    <property name="name" value="bootstrapSpaces" />
 	    <property name="description" value="Initial data requirements" />
@@ -83,13 +83,13 @@
 	<import resource="classpath:alfresco/module/org.alfresco.module.knowledgeBase/transform/custom-transform-context.xml" /> 
    
     <!-- Knowledge base web client configuration bootstrap bean -->
-	<bean id="kb_configBootstrap" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init">
+	<bean id="kb_configBootstrap" class="org.alfresco.web.config.WebClientConfigBootstrap" init-method="init" depends-on="kb_dictionaryBootstrap">
        <property name="configs">
          <list>
-            <value>classpath:alfresco/module/org.alfresco.module.knowledgeBase/ui/web-client-config.xml</value>
+            <value>classpath:alfresco/module/org.alfresco.module.knowledgeBase/ui/web-client-custom.xml</value>
          </list>
        </property>
-    </bean>
+    </bean>  
     
 </beans>
 
