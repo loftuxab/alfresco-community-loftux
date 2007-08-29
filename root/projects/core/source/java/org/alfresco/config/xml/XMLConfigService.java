@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.config.BaseConfigService;
+import org.alfresco.config.ConfigDeployer;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.ConfigSectionImpl;
@@ -64,17 +65,23 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         super(configSource);
     }
 
-    public void init()
+    public void initConfig()
     {
         if (logger.isDebugEnabled())
             logger.debug("Commencing initialisation");
 
-        super.init();
+        super.initConfig();
 
         // initialise the element readers map with built-in readers
         putElementReaders(new HashMap<String, ConfigElementReader>());
 
         parse();
+                
+    	// append additional config, if any
+        for (ConfigDeployer configDeployer : configDeployers)
+        {
+            configDeployer.initConfig();
+        }
 
         if (logger.isDebugEnabled())
             logger.debug("Completed initialisation");

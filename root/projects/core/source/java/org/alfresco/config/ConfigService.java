@@ -57,4 +57,6 @@ public interface ConfigService
    public Config getGlobalConfig();
    
    public void appendConfig(ConfigSource configSource);
+   
+   public void addDeployer(ConfigDeployer configDeployer);
 }
