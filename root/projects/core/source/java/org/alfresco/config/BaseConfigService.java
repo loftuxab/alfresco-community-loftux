@@ -63,6 +63,11 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
     private Map<String, Evaluator> evaluators;
     private Map<String, List<ConfigSection>> sectionsByArea;
     private List<ConfigSection> sections;
+    
+    private boolean isInited = false;
+    
+    // registered list of additional config deployers, if any
+    protected List<ConfigDeployer> configDeployers = new ArrayList<ConfigDeployer>();
 
     /**
      * Construct the service with the source from which it must read
@@ -80,9 +85,20 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
     }
 
     /**
-     * Initialises the config service
+     * Initialises the config service - via init-method
+     * 
+     * @deprecated Should now be initialised via bootstrap mechanism.
      */
     public void init()
+    {
+        initConfig();
+        isInited = true;
+    }
+    
+    /**
+     * Initialises the config service - via bootstrap
+     */
+    public void initConfig()
     {
         putSections(new ArrayList<ConfigSection>());
         putSectionsByArea(new HashMap<String, List<ConfigSection>>());
@@ -103,6 +119,8 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
         removeSectionsByArea();
         removeEvaluators();
         removeGlobalConfig();
+        
+        isInited = false;
     }
     
     /**
@@ -114,7 +132,20 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
          logger.debug("Resetting config service");
        
        destroy();
-       init();
+       initConfig();
+    }
+    
+    /**
+     * Register deployer
+     * 
+     * @param configDeployer
+     */
+    public void addDeployer(ConfigDeployer configDeployer)
+    {
+        if (! configDeployers.contains(configDeployer))
+        {
+        	configDeployers.add(configDeployer);
+        }
     }
 
     /**
@@ -518,8 +549,12 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
      */
     @Override
     protected void onBootstrap(ApplicationEvent event)
-    {        
-        init();
+    {       
+    	// TODO - see JIRA Task AR-1714 - can remove isInited flag, as and when configService (and its callers) come under bootstrap control
+    	if (! isInited)
+    	{
+    		initConfig();
+    	}
     }
     
     /**
