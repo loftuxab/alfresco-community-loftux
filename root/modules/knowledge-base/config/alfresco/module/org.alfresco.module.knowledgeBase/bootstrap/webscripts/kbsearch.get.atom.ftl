@@ -53,8 +53,8 @@
   <#list resultset as row>
   <#if (row_index>=index?number)>
   <entry>
-    <title>${row.name}</title>
-    <link rel="alternate" href="${absurl(url.context)}${row.url}"/>
+    <title>${row.childAssocs["kb:published"][0].name}</title>
+    <link rel="alternate" href="${absurl(url.context)}${row.childAssocs["kb:published"][0].downloadUrl}"/>
     <icon>${absurl(url.context)}${row.icon16}</icon>       <#comment>TODO: What's the standard for entry icons?</#comment>
     <id>urn:uuid:${row.id}</id>
     <alf:noderef>${row.nodeRef}</alf:noderef>
