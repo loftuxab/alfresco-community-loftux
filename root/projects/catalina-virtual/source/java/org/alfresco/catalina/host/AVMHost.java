@@ -369,6 +369,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             //  System.out.println("pre Spring Class/Method Name Here: parent classLoader == null");
 
             boolean done_trying = false;
+            int retry_count = 0;
             while ( ! done_trying )
             {
                 try 
@@ -402,25 +403,46 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                 }
                 catch (org.springframework.beans.factory.BeanCreationException e)
                 {
+                    retry_count ++;
+
                     // When using RMI, the nested exception 
                     // is: java.rmi.ConnectException
                     // However, you might configure Spring to use
                     // some other transport besides RMI; therefore
                     // only require a java.io.IOException.
 
-                    Throwable cause =  e.getCause();
-                    
-                    if ( (cause == null) ||
-                         ! (cause instanceof java.io.IOException)
-                       )
+                    boolean retry_op = false;
+                    for ( Throwable cause =  e.getCause(); 
+                          cause != null; 
+                          cause = cause.getCause()
+                        )
                     {
+                        if ( (cause instanceof java.io.IOException ) ||
+                             (cause instanceof java.rmi.NotBoundException )
+                           )
+                        { 
+                            retry_op = true; break;
+                        }
+                    }
+                    if ( ! retry_op )
+                    {
+                        log.error("Bean creation error: " + e.getClass().getName() );
                         throw e;
                     }
+
                     log.warn("Retrying connection...");
                     try { Thread.currentThread().sleep( 5000 ); }
                     catch (Exception te) { /* ignored */ }
+
+                    if ( Context_ != null ) 
+                    {
+                        try {  Context_.close();  }
+                        catch (Exception e2 ) { /* nothing to do */ }
+                    }
                 }
             }
+
+            log.info("Succeeded connecting to authentication service");
 
 
             // Initialize RPC to talk to AVM 
@@ -540,7 +562,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                                          ".*$";
             }
 
-            System.out.println("Reverse proxy binding: " + reverse_proxy_binding_ );
+            log.debug("Reverse proxy binding: " + reverse_proxy_binding_ );
 
             // Register this AVMHost with the static list of all AVMHosts
             // This allows the AVMUrlValve to map forward proxy names
