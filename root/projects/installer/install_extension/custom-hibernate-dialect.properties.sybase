@@ -1,0 +1,9 @@
+# Sample Hibernate configuration to disnable Hibernate schema updates
+# Values are "validate" or "update" (default)
+#hibernate.hbm2ddl.auto=validate
+
+#
+# Sybase dialect
+#
+hibernate.dialect=org.hibernate.dialect.SybaseAnywhereDialect
+

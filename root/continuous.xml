@@ -158,17 +158,19 @@
    <target name="distribute-wcm" 
            description="Creates the distibution files for WCM"
            depends="distribute-wcm-windows, 
-                    distribute-wcm-linux" />
+                    distribute-wcm-linux,
+                    distribute-wcm-installers" />
 
    <target name="distribute-wcm-windows" 
            depends="assemble-virtual">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.wcm}.zip">
          <zipfileset dir="${dir.continuous.assemble.virtualtomcat}" 
                      prefix="virtual-tomcat" />
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="README_wcm.txt,wcm-bootstrap-context.xml" />
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="virtual_start.bat,
+         <zipfileset dir="${dir.project.installer}"
+                     includes="wcm-bootstrap-context.xml" />
+         <zipfileset dir="${dir.project.installer.windows}"
+                     includes="README_wcm.txt,
+                               virtual_start.bat,
                                virtual_stop.bat,
                                virtual_alf.bat" />
          <zipfileset dir="${dir.project.installer}/extras-wcm" 
@@ -176,7 +178,7 @@
       </zip>
    </target>
 
-   <target name="distribute-wcm-linux" 
+   <target name="distribute-wcm-linux"
            depends="assemble-virtual">
       <tar destfile="${dir.continuous.dist}/${file.name.dist.wcm}.tar.gz" 
            longfile="gnu" 
@@ -184,30 +186,46 @@
          <tarfileset dir="${dir.continuous.assemble.virtualtomcat}" 
                      prefix="virtual-tomcat" 
                      excludes="**/bin/*.sh,**/bin/*.bat" />
-         <tarfileset dir="${dir.continuous.assemble.virtualtomcat}/bin" 
-                     prefix="virtual-tomcat/bin" 
+         <tarfileset dir="${dir.continuous.assemble.virtualtomcat}/bin"
+                     prefix="virtual-tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer}" 
+         <tarfileset dir="${dir.project.installer.linux}"
                      includes="README_wcm.txt,
                                wcm-bootstrap-context.xml" />
-         <tarfileset dir="${dir.project.installer}" 
+         <tarfileset dir="${dir.project.installer.linux}"
                      includes="virtual_alf.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer}/extras-wcm" 
+         <tarfileset dir="${dir.project.installer}/extras-wcm"
                      prefix="extras/wcm" />
       </tar>
    </target>
- 
-   <target name="assemble-virtual" 
+
+   <target name="distribute-wcm-installers"
+           depends="assemble-virtual">
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.project.installer.builder}/wcm-installer/output" />
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="error-ij.txt">
+         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.wcm}"' />
+      </exec>
+      <move todir="${dir.continuous.dist}">
+         <fileset dir="${dir.project.installer.builder}/wcm-installer/output">
+            <include name="**/*"/>
+         </fileset>
+      </move>
+
+   </target>
+
+   <target name="assemble-virtual"
            depends="init">
       <mkdir dir="${dir.continuous.dist}" />
-      <delete quiet="yes" 
-              includeEmptyDirs="true" 
+      <delete quiet="yes"
+              includeEmptyDirs="true"
               dir="${dir.continuous.assemble.virtualtomcat}" />
       <unzip src="${dir.project.3rdparty.distro}/${file.name.distro.tomcat}" 
              dest="${dir.continuous.assemble}" />
-      <move file="${dir.continuous.assemble}/${dir.name.distro.tomcat}" 
+      <move file="${dir.continuous.assemble}/${dir.name.distro.tomcat}"
             tofile="${dir.continuous.assemble.virtualtomcat}" />
       <move file="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.renametojar" 
             tofile="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.jar" />
@@ -226,7 +244,8 @@
    <target name="distribute-tomcat" 
            description="Creates the distibution files for Tomcat"
            depends="distribute-tomcat-windows, 
-                    distribute-tomcat-linux" />
+                    distribute-tomcat-linux,
+                    distribute-tomcat-installers" />
 
    <target name="distribute-tomcat-windows" 
            depends="assemble-tomcat">
@@ -234,18 +253,18 @@
          <zipfileset dir="${dir.continuous.assemble.tomcat}" 
                      prefix="tomcat" 
                      excludes="bin/*.sh" />
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="alf_start.bat,restart_alf.bat,alf_stop.bat,apply_amps.bat" />
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="tomcat/alfresco.bat" 
-                     fullpath="alfresco.bat" />
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="tomcat/README_win.txt" 
-                     fullpath="README.txt" />
-         <zipfileset dir="${dir.project.installer}" 
-                     includes="licenses/**,amps/**,README_mysql.txt" />
+         <zipfileset dir="${dir.project.installer.windows}"
+                     includes="alfresco.bat,
+                               alf_start.bat,
+                               restart_alf.bat,
+                               alf_stop.bat,
+                               apply_amps.bat,
+                               README_mysql.txt,
+                               README.txt" />
+         <zipfileset dir="${dir.project.installer}"
+                     includes="licenses/**,amps/**" />
          <zipfileset dir="${dir.project.installer.extras}" 
-                     prefix="extras" 
+                     prefix="extras"
                      excludes="**/*.sh" />
          <zipfileset dir="${dir.project.installer.alfdata}" 
                      prefix="alf_data" />
@@ -264,7 +283,7 @@
       <tar destfile="${dir.continuous.dist}/${file.name.dist.tomcat}.tar.gz" 
            longfile="gnu" 
            compression="gzip">
-         <tarfileset dir="${dir.continuous.assemble.tomcat}" 
+         <tarfileset dir="${dir.continuous.assemble.tomcat}"
                      prefix="tomcat" 
                      excludes="bin/*.sh,bin/*.bat,bin/*.exe" />
          <tarfileset dir="${dir.continuous.assemble.tomcat}/bin" 
@@ -273,29 +292,17 @@
                      mode="755" />
          <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**,amps/**" />
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="tomcat/alfresco.sh" 
-                     fullpath="alfresco.sh"
+         <tarfileset dir="${dir.project.installer.linux}"
+                     includes="*.sh"
                      mode="755" />
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="apply_amps.sh"
-                     mode="755" />
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="tomcat/README_linux.txt" 
-                     fullpath="README.txt" />
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="README_mysql_linux.txt" 
-                     fullpath="README_mysql.txt" />
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="tomcat/README_osx.txt" 
-                     fullpath="README_osx.txt" />
-         <tarfileset dir="${dir.project.installer}" 
-                     includes="zstart_oo.sh" 
-                     mode="755" />
-         <tarfileset dir="${dir.project.installer.extras}" 
-                     prefix="extras" 
+         <tarfileset dir="${dir.project.installer.linux}"
+                     includes="README.txt,
+                               README_mysql.txt,
+                               README_osx.txt" />
+         <tarfileset dir="${dir.project.installer.extras}"
+                     prefix="extras"
                      excludes="**/*.bat" />
-         <tarfileset dir="${dir.project.installer.alfdata}" 
+         <tarfileset dir="${dir.project.installer.alfdata}"
                      prefix="alf_data" />
          <tarfileset dir="${dir.project.installer.binlin}"
                      prefix="bin" />
@@ -305,7 +312,28 @@
       </tar>
    </target>
 
-   <target name="assemble-tomcat" 
+   <target name="distribute-tomcat-installers"
+           depends="assemble-virtual">
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.project.installer.builder}/configwizard/output" />
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.project.installer.builder}/core-installer/output" />
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="error-ij.txt">
+         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.config}"'/>
+      </exec>
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="error-ij.txt">
+         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.core}"'/>
+      </exec>
+      <move todir="${dir.continuous.dist}">
+         <fileset dir="${dir.project.installer.builder}/core-installer/output">
+            <include name="**/*"/>
+         </fileset>
+      </move>
+   </target>
+
+   <target name="assemble-tomcat"
            depends="init">
       <mkdir dir="${dir.continuous.dist}" />
 
