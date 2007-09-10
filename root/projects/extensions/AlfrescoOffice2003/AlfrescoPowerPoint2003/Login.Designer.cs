@@ -94,11 +94,13 @@ namespace AlfrescoPowerPoint2003
          // 
          // Login
          // 
+         this.AcceptButton = this.btnOK;
          this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
          this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
          this.BackColor = System.Drawing.Color.White;
          this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
          this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
+         this.CancelButton = this.btnCancel;
          this.ClientSize = new System.Drawing.Size(292, 223);
          this.Controls.Add(this.btnOK);
          this.Controls.Add(this.btnCancel);
@@ -111,6 +113,7 @@ namespace AlfrescoPowerPoint2003
          this.MaximizeBox = false;
          this.MinimizeBox = false;
          this.Name = "Login";
+         this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
          this.Text = "Login";
          this.TopMost = true;
          this.ResumeLayout(false);

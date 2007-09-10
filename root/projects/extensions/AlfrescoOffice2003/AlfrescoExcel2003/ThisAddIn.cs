@@ -11,7 +11,6 @@ namespace AlfrescoExcel2003
    {
       private AlfrescoPane m_AlfrescoPane;
       private AppWatcher m_AppWatcher;
-      private string m_DefaultTemplate = null;
       private Office.CommandBar m_CommandBar;
       private Office.CommandBarButton m_AlfrescoButton;
 
@@ -22,8 +21,6 @@ namespace AlfrescoExcel2003
          this.Application = (Excel.Application)Microsoft.Office.Tools.Excel.ExcelLocale1033Proxy.Wrap(typeof(Excel.Application), this.Application);
 
          #endregion
-
-         m_DefaultTemplate = Properties.Settings.Default.DefaultTemplate;
 
          // Register event interest with the Excel Application
          Application.WorkbookBeforeClose += new Microsoft.Office.Interop.Excel.AppEvents_WorkbookBeforeCloseEventHandler(Application_WorkbookBeforeClose);
@@ -218,15 +215,15 @@ namespace AlfrescoExcel2003
          {
             m_AlfrescoPane = new AlfrescoPane();
             m_AlfrescoPane.ExcelApplication = Application;
-            m_AlfrescoPane.DefaultTemplate = m_DefaultTemplate;
+            m_AlfrescoPane.DefaultTemplate = "wcservice/office/";
          }
 
          if (Show)
          {
             m_AlfrescoPane.Show();
-            if (Application.ActiveWorkbook != null)
+            if (Application.Workbooks.Count > 0)
             {
-               m_AlfrescoPane.OnDocumentChanged();
+               m_AlfrescoPane.showDocumentDetails();
             }
             else
             {

@@ -40,7 +40,7 @@ namespace AlfrescoExcel2003
       {
          AssemblyCompanyAttribute assemblyCompany = (AssemblyCompanyAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyCompanyAttribute));
          m_IV = Encoding.ASCII.GetBytes(assemblyCompany.Company.Substring(0, 8));
-         for (int i=8; i>0; m_Key[i-1] = (byte)(m_IV[8-(i--)] ^ 0x20));
+         for (int i = 8; i > 0; m_Key[i - 1] = (byte)(m_IV[8 - (i--)] ^ 0x20)) ;
       }
 
       public string ServerName
@@ -179,7 +179,7 @@ namespace AlfrescoExcel2003
          }
          return val;
       }
-     
+
 
       public bool LoadFromRegistry()
       {
@@ -262,7 +262,7 @@ namespace AlfrescoExcel2003
          {
             bResult = false;
          }
-         
+
          m_AuthenticationTicket = "";
 
          return bResult;
@@ -305,20 +305,29 @@ namespace AlfrescoExcel2003
          {
             if (m_DocumentAlfrescoPath == "")
             {
-               IServerHelper serverHelper;
+               IServerHelper serverHelper = null;
 
                if (m_DocumentPhysicalPath.StartsWith("http"))
                {
                   // WebDAV path
-                  serverHelper = new WebDAVHelper(this.WebDAVURL);
+                  if (this.WebDAVURL.Length > 0)
+                  {
+                     serverHelper = new WebDAVHelper(this.WebDAVURL);
+                  }
                }
                else
                {
                   // CIFS path
-                  serverHelper = new CIFSHelper(this.CIFSServer);
+                  if (this.CIFSServer.Length > 0)
+                  {
+                     serverHelper = new CIFSHelper(this.CIFSServer);
+                  }
                }
 
-               m_DocumentAlfrescoPath = serverHelper.GetAlfrescoPath(m_DocumentPhysicalPath);
+               if (serverHelper != null)
+               {
+                  m_DocumentAlfrescoPath = serverHelper.GetAlfrescoPath(m_DocumentPhysicalPath);
+               }
             }
             return m_DocumentAlfrescoPath;
          }
@@ -371,14 +380,16 @@ namespace AlfrescoExcel2003
          string strAuthTicket = "";
          if (m_AuthenticationTicket == "")
          {
-            // Do we recognise the path as belonging to an Alfresco server?
-            if (this.MatchCIFSServer(m_DocumentPhysicalPath))
+            // If we've been given a CIFS server then try to authenticate against it
+            if (this.CIFSServer.Length > 0)
             {
                // Try CIFS
                IServerHelper myAuthTicket = new CIFSHelper(this.CIFSServer);
                m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
             }
-            else
+
+            // Did we fail to get a ticket from the CIFS server?
+            if (m_AuthenticationTicket == "")
             {
                // Try WebDAV
                IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
@@ -398,7 +409,7 @@ namespace AlfrescoExcel2003
                   {
                      m_AuthenticationTicket = strAuthTicket;
                   }
-                  else
+                  else if (promptUser)
                   {
                      // Last option - pop up the login form
                      using (Login myLogin = new Login())

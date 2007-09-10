@@ -1,9 +1,0 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="AlfrescoWord2003.Properties" GeneratedClassName="Settings">
-  <Profiles />
-  <Settings>
-    <Setting Name="DefaultTemplate" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">wcservice/office/</Value>
-    </Setting>
-  </Settings>
-</SettingsFile>

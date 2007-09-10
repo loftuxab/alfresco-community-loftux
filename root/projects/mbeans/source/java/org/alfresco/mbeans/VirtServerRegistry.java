@@ -406,16 +406,14 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
                   "virtualization server " + 
                   "(this may be a transient error.)");
 
-            // NEON:
-            //     Trace through all possible failure cases to figure out
-            //     the right way to re-initiate the connection if the
-            //     virt server shuts down, then comes back up.
-            //     It's not clear if tossing conn_ w/o closing it is ok
-            //     if an exception can happen for other reasons...
-            //     yet close() can be very slow if the host is down,
-            //     so it should be avoided if possible... or pushed into
-            //     another thread... or something.   Investigate.
-            conn_ = null;
+            // Close the connection asynchronously.
+            // This avoids having to wait for a network 
+            // timout if the remote server crashed. 
+
+            JMXConnectorCloser conn_closer = new JMXConnectorCloser( conn_ );
+            new Thread( conn_closer ).start();
+
+            conn_ = null; 
 
             return false;
         }
@@ -442,3 +440,29 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     //    }
 }
 
+
+/**
+*  Helper class to close a JMXConnector in a separate thread.
+* 
+*  Closing a connection is a potentially slow operation. 
+*  For example, if the server has crashed, the close operation might 
+*  have to wait for a network protocol timeout. 
+*
+*  See also: 
+*  http://java.sun.com/j2se/1.5.0/docs/api/javax/management/remote/JMXConnector.html#close()
+*/  
+class JMXConnectorCloser implements Runnable
+{
+    JMXConnector conn_;
+
+    JMXConnectorCloser(JMXConnector conn ) { conn_ = conn; }
+
+    public void run()
+    {
+        try 
+        { 
+            if ( conn_ != null) {  conn_.close(); }
+        }
+        catch (Exception e){}
+    }
+}
