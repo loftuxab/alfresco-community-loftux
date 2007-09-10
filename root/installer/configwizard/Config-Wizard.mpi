@@ -188,8 +188,8 @@ SetupType ::977C5E71-6DA2-4BC4-B16C-54AEBE0FBB2A -setup Install -active Yes -pla
 SetupType ::7E424F2F-6B56-4490-99F5-015BE274307D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
 
 InstallComponent 3DF0B70C-AD68-4F74-9D20-726FFC704CC3 -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
-InstallComponent DEAC32B9-E63E-48B0-9000-58F681A0D075 -setup Install -type pane -conditions {BBC31899-9929-461B-8AC1-DEC4EFA7EE26 F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
-Condition BBC31899-9929-461B-8AC1-DEC4EFA7EE26 -active Yes -parent DEAC32B9-E63E-48B0-9000-58F681A0D075 -title {String Is Condition} -component StringIsCondition
+InstallComponent DEAC32B9-E63E-48B0-9000-58F681A0D075 -setup Install -type pane -conditions {18BF318D-79DD-4ECC-A3CC-660D6CE59DBA F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
+Condition 18BF318D-79DD-4ECC-A3CC-660D6CE59DBA -active Yes -parent DEAC32B9-E63E-48B0-9000-58F681A0D075 -title {File Exists Condition} -component FileExistsCondition
 Condition F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60 -active Yes -parent DEAC32B9-E63E-48B0-9000-58F681A0D075 -title {File Exists Condition} -component FileExistsCondition
 InstallComponent 6C5D6843-62DA-44BB-AC96-04FCEA01778A -setup Install -type pane -title {Select Database} -component CustomBlankPane2 -active Yes -parent StandardInstall
 InstallComponent CF8DBD05-C829-4248-9C7C-2DB759F94E18 -setup Install -type pane -title {Select Content Location} -component CustomBlankPane2 -active Yes -parent StandardInstall
@@ -225,9 +225,11 @@ InstallComponent 9C78E53E-F120-4068-8AAE-BE39B98D8B8B -setup Install -type actio
 InstallComponent F334E2E5-5ECF-4E31-A277-908A0F3B458C -setup Install -type actiongroup -title {Cancel Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 4D09D6A5-0255-4031-B8F0-0925A946A25D -setup Install -type actiongroup -title {Setup Text Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 9083F1F4-CFEA-4112-B209-63CEECFB4D19 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
+InstallComponent 30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC -setup Install -type action -conditions EAB2D1F3-286A-4060-AB4B-0488045AF5E2 -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
+Condition EAB2D1F3-286A-4060-AB4B-0488045AF5E2 -active Yes -parent 30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC -title {String Equal Condition} -component StringEqualCondition
+InstallComponent 661E9BE7-F650-4906-BCF4-EE5A81647D96 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
 InstallComponent 5F146269-23A0-4DFE-9CB9-367F6D73F7F2 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
 InstallComponent 3B0EC46B-A088-47D1-9053-A1F79BB8F72C -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
-InstallComponent 661E9BE7-F650-4906-BCF4-EE5A81647D96 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
 InstallComponent 48591C0D-9135-4CAD-8866-C54A4526F8C3 -setup Install -type actiongroup -title {Setup Properties Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 441D19D1-1AC9-47D8-BDE6-8906455FCDD6 -setup Install -type action -title {Get Java Property} -component GetJavaProperty -active Yes -parent 48591C0D-9135-4CAD-8866-C54A4526F8C3
 InstallComponent 85DA221A-DE3D-46AE-8BC6-6994DFF34FC5 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent 48591C0D-9135-4CAD-8866-C54A4526F8C3
@@ -321,6 +323,12 @@ return [expr {[lsearch -exact $options <%DatabaseOption%>] > -1}]}
 11EBC3D5-D8BB-4EAB-9119-7DD312434CAC,ExitType
 Finish
 
+18BF318D-79DD-4ECC-A3CC-660D6CE59DBA,Filename
+<%InstallDir%>/tomcat/webapps/alfresco.war
+
+18BF318D-79DD-4ECC-A3CC-660D6CE59DBA,Operator
+{does not exist}
+
 1AD6F40B-80FA-42F9-82F4-5588F2E76899,BackButton,subst
 1
 
@@ -409,6 +417,18 @@ The user will never see this screen.}
 
 2FBC27CA-9E2B-44D9-A3C1-AD9097325884,Conditions
 {1 condition}
+
+30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC,Conditions
+{1 condition}
+
+30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC,SubstituteValue
+Yes
+
+30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC,Value
+<%PreviousInstallDir%>
+
+30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC,VirtualText
+InstallDir
 
 32E19F2C-5DD4-4782-8393-449D963BA4A9,CheckCondition
 {Before Action is Executed}
@@ -675,7 +695,7 @@ ALF_OO
 {<%ExtensionDir%>/custom-repository.properties;<%ExtensionDir%>/custom-hibernate-dialect.properties;<%BootstrapDir%>/openoffice-startup-context.xml}
 
 79590A21-FFDA-46DC-B803-83C9245EFB82,LineFeed
-Windows
+Unix
 
 79590A21-FFDA-46DC-B803-83C9245EFB82,StringMap
 {"@@ALF_HOME@@" "<%Dir <%InstallDir%> forward%>"
@@ -756,7 +776,7 @@ set ::info(DatabaseOption) [lsearch -exact $dbs <%ALF_DB%>]}
 Yes
 
 9083F1F4-CFEA-4112-B209-63CEECFB4D19,Value
-<%PreviousInstallDir%>
+<%InstallSource%>
 
 9083F1F4-CFEA-4112-B209-63CEECFB4D19,VirtualText
 InstallDir
@@ -912,6 +932,9 @@ A8E5D6B1-BCE1-4748-8FEF-7A3904EE6CF9,Action
 A8E5D6B1-BCE1-4748-8FEF-7A3904EE6CF9,Conditions
 {0 conditions}
 
+AEF6F111-401A-4A75-BC7D-762CFAD4D483,Alias
+{Console OO Actions}
+
 AEF6F111-401A-4A75-BC7D-762CFAD4D483,Conditions
 {0 conditions}
 
@@ -1000,12 +1023,6 @@ BB227074-7E4D-491E-8981-6ECCC7F5A86B,Alias
 
 BB227074-7E4D-491E-8981-6ECCC7F5A86B,Conditions
 {0 conditions}
-
-BBC31899-9929-461B-8AC1-DEC4EFA7EE26,Operator
-false
-
-BBC31899-9929-461B-8AC1-DEC4EFA7EE26,String
-<%PreviousInstallExists%>
 
 BBEC66D1-1076-4B0F-90B3-5BA9A9FB6B53,ExitType
 Finish
@@ -1148,6 +1165,12 @@ E98415CC-BE92-4980-8617-9D15358FC79E,Alias
 E98415CC-BE92-4980-8617-9D15358FC79E,Conditions
 {0 conditions}
 
+EAB2D1F3-286A-4060-AB4B-0488045AF5E2,CheckCondition
+{Before Action is Executed}
+
+EAB2D1F3-286A-4060-AB4B-0488045AF5E2,String1
+<%InstallDir%>
+
 EB48A9F9-0E9F-43BE-8268-459575F98927,Conditions
 {0 conditions}
 
@@ -1155,13 +1178,13 @@ EB48A9F9-0E9F-43BE-8268-459575F98927,Message,subst
 1
 
 F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60,CheckCondition
-{Before Next Pane is Displayed}
+{Before Pane is Finished}
 
 F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60,FailureMessage
 {The directory specified does not look like an Alfresco installation.}
 
 F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60,Filename
-<%InstallDir%>/tomcat
+<%InstallDir%>/tomcat/webapps/alfresco.war
 
 F22B8F86-39E5-4B64-BE11-74095F79C970,Action
 {Setup Text Actions}

@@ -36,7 +36,7 @@ proc CreateWindow.6C5D6843-62DA-44BB-AC96-04FCEA01778A {wizard id} {
 
     grid columnconfigure $base.clientarea 0 -weight 1
 
-    ttk::radiobutton $base.clientarea.hsql -text "HSQLDB" -value "hsql"  -variable ::info(ALF_DB)
+    ttk::radiobutton $base.clientarea.hsql -text "HSQLDB (Evaluation purposes only)" -value "hsql"  -variable ::info(ALF_DB)
     grid $base.clientarea.hsql -row 0 -column 0 -sticky nw -padx 20 -pady 2
 
     ttk::radiobutton $base.clientarea.mysql -text "MySQL" -value "mysql"  -variable ::info(ALF_DB)
@@ -45,8 +45,14 @@ proc CreateWindow.6C5D6843-62DA-44BB-AC96-04FCEA01778A {wizard id} {
     ttk::radiobutton $base.clientarea.oracle -text "Oracle" -value "oracle"  -variable ::info(ALF_DB)
     grid $base.clientarea.oracle -row 2 -column 0 -sticky nw -padx 20 -pady 2
 
+    ttk::radiobutton $base.clientarea.postgres -text "PostgreSql" -value "postgres"  -variable ::info(ALF_DB)
+    grid $base.clientarea.postgres -row 3 -column 0 -sticky nw -padx 20 -pady 2
+
+    ttk::radiobutton $base.clientarea.sqlserver -text "SQL Server" -value "sqlserver"  -variable ::info(ALF_DB)
+    grid $base.clientarea.sqlserver -row 4 -column 0 -sticky nw -padx 20 -pady 2
+
     ttk::radiobutton $base.clientarea.sybase -text "Sybase" -value "sybase"  -variable ::info(ALF_DB)
-    grid $base.clientarea.sybase -row 3 -column 0 -sticky nw -padx 20 -pady 2
+    grid $base.clientarea.sybase -row 5 -column 0 -sticky nw -padx 20 -pady 2
 
     Label $base.message -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text4]
     grid $base.message -row 4 -sticky nsew -padx 8 -pady [list 4 8]
