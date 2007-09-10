@@ -89,6 +89,15 @@ public class RuntimeExec
         errCodes.add(2);
     }
     
+    public String toString()
+    {
+        StringBuffer sb = new StringBuffer(256);
+        sb.append("RuntimeExec:\n")
+          .append("   command:    ").append(command).append("\n")
+          .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n");
+        return sb.toString();
+    }
+    
     /**
      * Set the command to execute regardless of operating system
      * 
@@ -247,7 +256,7 @@ public class RuntimeExec
             String execOut = "";
             String execErr = e.getMessage();
             int exitValue = defaultFailureExitValue;
-            ExecutionResult result = new ExecutionResult(commandToExecute, errCodes, exitValue, execOut, execErr);
+            ExecutionResult result = new ExecutionResult(null, commandToExecute, errCodes, exitValue, execOut, execErr);
             if (logger.isDebugEnabled())
             {
                 logger.debug(result);
@@ -291,7 +300,7 @@ public class RuntimeExec
         String execErr = stdErrGobbler.getBuffer();
         
         // construct the return value
-        ExecutionResult result = new ExecutionResult(commandToExecute, errCodes, exitValue, execOut, execErr);
+        ExecutionResult result = new ExecutionResult(process, commandToExecute, errCodes, exitValue, execOut, execErr);
 
         // done
         if (logger.isDebugEnabled())
@@ -360,15 +369,6 @@ public class RuntimeExec
         return sb.toString();
     }
     
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer(256);
-        sb.append("RuntimeExec:\n")
-          .append("   command:    ").append(command).append("\n")
-          .append("   os:         ").append(System.getProperty(KEY_OS_NAME)).append("\n");
-        return sb.toString();
-    }
-    
     /**
      * Object to carry the results of an execution to the caller.
      * 
@@ -376,19 +376,26 @@ public class RuntimeExec
      */
     public static class ExecutionResult
     {
+        private final Process process;
         private final String command;
         private final Set<Integer> errCodes;
         private final int exitValue;
         private final String stdOut;
         private final String stdErr;
        
+        /**
+         * 
+         * @param process           the process attached to Java - <tt>null</tt> is allowed
+         */
         private ExecutionResult(
+                final Process process,
                 final String command,
                 final Set<Integer> errCodes,
                 final int exitValue,
                 final String stdOut,
                 final String stdErr)
         {
+            this.process = process;
             this.command = command;
             this.errCodes = errCodes;
             this.exitValue = exitValue;
@@ -411,6 +418,33 @@ public class RuntimeExec
               .append("   out:        ").append(out).append("\n")
               .append("   err:        ").append(err);
             return sb.toString();
+        }
+        
+        /**
+         * A helper method to force a kill of the process that generated this result.  This is
+         * useful in cases where the process started is not expected to exit, or doesn't exit
+         * quickly.  If the {@linkplain RuntimeExec#setWaitForCompletion(boolean) "wait for completion"}
+         * flag is <tt>false</tt> then the process may still be running when this result is returned.
+         * 
+         * @return
+         *      <tt>true</tt> if the process was killed, otherwise <tt>false</tt>
+         */
+        public boolean killProcess()
+        {
+            if (process == null)
+            {
+                return true;
+            }
+            try
+            {
+                process.destroy();
+                return true;
+            }
+            catch (Throwable e)
+            {
+                logger.warn(e.getMessage());
+                return false;
+            }
         }
         
         /**
