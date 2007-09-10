@@ -10,6 +10,7 @@ namespace AlfrescoExcel2003
    public partial class ThisAddIn
    {
       private AlfrescoPane m_AlfrescoPane;
+      private string m_DefaultTemplate = "wcservice/office/";
       private AppWatcher m_AppWatcher;
       private Office.CommandBar m_CommandBar;
       private Office.CommandBarButton m_AlfrescoButton;
@@ -21,6 +22,8 @@ namespace AlfrescoExcel2003
          this.Application = (Excel.Application)Microsoft.Office.Tools.Excel.ExcelLocale1033Proxy.Wrap(typeof(Excel.Application), this.Application);
 
          #endregion
+
+         m_DefaultTemplate = Properties.Settings.Default.DefaultTemplate;
 
          // Register event interest with the Excel Application
          Application.WorkbookBeforeClose += new Microsoft.Office.Interop.Excel.AppEvents_WorkbookBeforeCloseEventHandler(Application_WorkbookBeforeClose);
@@ -215,7 +218,7 @@ namespace AlfrescoExcel2003
          {
             m_AlfrescoPane = new AlfrescoPane();
             m_AlfrescoPane.ExcelApplication = Application;
-            m_AlfrescoPane.DefaultTemplate = "wcservice/office/";
+            m_AlfrescoPane.DefaultTemplate = m_DefaultTemplate;
          }
 
          if (Show)
