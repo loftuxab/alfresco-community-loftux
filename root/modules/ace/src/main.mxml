@@ -26,16 +26,14 @@
  */
  --> 
 <mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+	xmlns:logout="app.logout.*" 
 	xmlns:fc="com.flexcapacitor.controls.*"
-	xmlns:local="*"
-	backgroundColor="#FFFFFF"
-	backgroundGradientColors="[#417daf, #ffffff]"
 	xmlns:filters="flash.filters.*"
 	creationComplete="appLogin()">
 
 	<mx:Script>
 	<![CDATA[  
-	
+			
 			import mx.collections.ArrayCollection;
 			import mx.controls.Alert;
 			import mx.rpc.events.ResultEvent;
@@ -47,6 +45,72 @@
 			private var myLinks:XMLList;
 			private var urls:ArrayCollection;
 			
+			import mx.events.MenuEvent;
+            import mx.controls.Alert;
+            import mx.collections.*;
+            import mx.managers.DragManager; 
+            
+            import mx.events.CloseEvent;
+            
+            [Bindable]
+            public var menuBarCollection:XMLListCollection;
+    
+    		var sortbyValues = [ {label:"Relevance", data:1}, {label:"Size", data:2}, {label:"Alphabetical", data:3} ];
+    		
+            private var menubarXML:XMLList =
+                <>
+                    <menuitem label="Home" type="check" data="top">
+                      
+                    </menuitem>
+                    <menuitem label="Knowledge Base"  type="check" data="top">
+                        <menuitem label="Articles" type="check"  data="Articles"/>
+                        <menuitem type="separator"/>
+                        <menuitem label="Content" data="ss"/>
+                      </menuitem>
+                    <menuitem label="My issues" data="top">
+                         <menuitem label="issues" type="check"  data="Articles"/>
+                        <menuitem type="separator"/>
+                        <menuitem label="Content" data="ss"/>
+                    </menuitem>
+                    <menuitem label="Documentation" data="top">
+                        <menuitem label="documentation" type="check"  data="Articles"/>
+                        <menuitem type="separator"/>
+                        <menuitem label="Content" data="ss"/>
+                    </menuitem>
+                    <menuitem label="Webscripts" data="top">
+                        <menuitem label="webscripts" type="check"  data="Articles"/>
+                        <menuitem type="separator"/>
+                        <menuitem label="Content" data="ss"/>
+                    </menuitem>
+                    <menuitem label="Contact Us" data="top">
+                        <menuitem label="contact us" type="check"  data="Articles"/>
+                        <menuitem type="separator"/>
+                        <menuitem label="Content" data="ss"/>
+                    </menuitem>
+                    
+                </>;
+            
+            private function clickevent():void{
+            	if(searchTxt.text!=""){
+					 if(!cb1.selected){
+						tabnav.visible=false;
+						tabnav1.visible=true;
+						cb1.selected=true;
+					}
+					else
+					{
+						tabnav.visible=true;
+						tabnav1.visible=false;
+						cb1.selected=false;
+						
+					}
+            	}
+            	else{
+            		searchTxt.setFocus();
+            		Alert.show('Search String is empty');
+            	}
+			}
+			
 			/**
 			 * initializations when application loads
 			 * @appLogin
@@ -56,6 +120,7 @@
 			{
 				username.setFocus();	
 				myframe.visible=false;
+				cb1.selected=true;
 			}
 			
 			/**
@@ -66,13 +131,16 @@
 		                
 			private function onLoginComplete(event:ResultEvent):void
             {
-                myframe.visible=false;
+                //myframe.visible=false;
                 searchPanel.visible=true;
+                //tab.visible=true;
+                tabnav.visible=true;
+                tabnav1.visible=false;
                 loginPanel.visible=false;
                 var result:Object = event.result;
 				ticketTxt.text=event.result.ticket;
-				logTxt.text=username.text;
 				signinTxt.text="Logged as "+username.text;
+				
 				searchTxt.setFocus();
 			}
 			
@@ -86,21 +154,23 @@
 			private function onLogoutComplete(event:ResultEvent):void
             {
                 searchPanel.visible=false;
-                resultArea.visible=false;
+                //resultArea.visible=false;
+                //resultBar.visible=false;
                 loginPanel.visible=true;
                 username.text="";
                 password.text="";
-                logTxt.text="";
                 ticketTxt.text="";
                 searchTxt.text="";
-                clearAll();
+                //clearAll();
                 username.setFocus();
-                myframe.visible=false;
+               // myframe.visible=false;
                 myframe.source='';
-                closeBtn.visible=false;
-                titleTxt.visible=false;
-                resultArea.width=1000;
-                searchResults.dataProvider="";    
+                //closeBtn.visible=false;
+                //titleTxt.visible=false;
+                resultsDispPanel.width=maxWidth;
+                swfPanel.visible=false;
+                searchResults.dataProvider="";  
+                cb1.selected=true;  
             }
             
             /**
@@ -111,21 +181,31 @@
 			 
             private function onSearchComplete(event:ResultEvent):void
             {
-               resultArea.visible=true;
+               //resultArea.visible=true;
+             //  resultBar.visible=true;
                searchResults.dataProvider=event.result.feed.entry;
                myList=new ArrayCollection();
                urls=new ArrayCollection();
                myList.removeAll();
                urls.removeAll();
                var i:int;
-               clearAll();
-               for(i=0;i<event.result.feed.link.length;i++)
+             //  clearAll();
+              /*for(i=0;i<event.result.feed.link.length;i++)
                {
                		myList.addItem({href:event.result.feed.link[i].href , rel:event.result.feed.link[i].rel});
                		if(myList[i].rel=="first") fpage.enabled=true;
                		if(myList[i].rel=="previous") ppage.enabled=true;
                		if(myList[i].rel=="next") npage.enabled=true;
 					if(myList[i].rel=="last") lpage.enabled=true;
+               }*/
+               if(searchTxt.text!=""){
+               	tabnav1.visible=true;
+               	resultsDispPanel.visible=true;
+               	//searchTxt.text="";
+               }
+               else {
+               		tabnav1.visible=false;
+               		myframe.source='';
                }
              }
            
@@ -140,19 +220,33 @@
             {
             	loginService.headers["alf-force-success-status"] = "TRUE";
             	loginService.useProxy=false;
+            	
             	loginService.send();
+				
             }
             
             private function onLogout():void
             {	
             	myframe.visible=false;
+            	resultsDispPanel.visible=false;
+            	tabnav.visible=false;
+            	tabnav1.visible=false;
+            	//resultArea.visible=false;
+            	loginPanel.visible=true;
+            	//cb1.selected=true;
             	logoutService.send();
             }
             
             private function onSearch():void
             {	
-            	searchService.url="http://localhost:8080/alfresco/service/api/search/keyword.atom?q="+searchTxt.text;
+            	
+            	searchService.url="http://localhost:8080/alfresco/service/sample/kb/search.atom?q="+searchTxt.text;
+            	
+            	//cb1.selected=false;
+            	
+            			
             	searchService.send();
+            	
             }
             
             /**
@@ -163,7 +257,7 @@
 			 * @lpageClick - LastPage Click event
 			 * @npageClick - NextPage Click event
 			 */
-			 
+			/*
             private function getUrl(str:String):String
             {
             	var i:int;
@@ -209,6 +303,7 @@
 				npage.enabled=false;
 				lpage.enabled=false;
             }
+            */
             
              /**
 			 * function for displaying the search content 
@@ -216,12 +311,13 @@
 			 * @resultClick
 			 */
 			 
-            private function resultClick(url:String, title:String):void
+            private function resultClick(url:String):void
             {
-            	titleTxt.visible=true;
-            	closeBtn.visible=true;
-            	titleTxt.text=title;
-            	resultArea.width=300;
+            	//titleTxt.visible=true;
+            	//closeBtn.visible=true;
+            	//titleTxt.text=title;
+            	resultsDispPanel.width=400;
+            	swfPanel.visible=true;
             	myframe.visible=true;
             	myframe.source=url;            	
             }
@@ -229,6 +325,30 @@
 	
 	]]>
 	</mx:Script>
+	<mx:Style>
+		searchCanvas {
+			backgroundColor: #275065;
+			borderStyle: solid;
+		}
+	
+		searchCanvas1 {
+			backgroundColor: #cccccc;
+			borderStyle: solid;
+		}
+		
+		labelStyle {
+			color: #477916;
+		}
+		TabNavigator {
+		   tabHeight: 29;
+		   tabWidth: 150;
+		   paddingLeft: 50;
+		}
+		ApplicationControlBar {
+		   cornerRadius: 0;
+		}
+			
+	</mx:Style>
 		
 		<!-- 
 			HTTPServices used
@@ -240,7 +360,7 @@
 	<mx:HTTPService id="loginService"
 					method="GET" 
 	   	 			result="onLoginComplete(event);" 
-	   	 			fault="username.setFocus(); Alert.show(event.fault.faultString, 'Error Log');"
+	   	 			fault="username.setFocus(); mx.controls.Alert.show('Invalid Username/Password', 'Error Log');"
 	   				url="http://localhost:8080/alfresco/service/api/login">
     	 <mx:request xmlns="">
         	 <u>{username.text}</u>
@@ -251,7 +371,7 @@
     <mx:HTTPService id="logoutService"
     				method="POST" 
 	   	 			result="onLogoutComplete(event);" 
-	   				fault="Alert.show(event.fault.faultString, 'Error Log');"
+	   				fault="mx.controls.Alert.show('Invalid username/Password', 'Error Log');"
 	   				url="http://localhost:8080/alfresco/service/api/login/ticket/{ticketTxt.text}">
   		  <mx:request xmlns="" >
   		  		<alf_method>DELETE</alf_method>
@@ -262,122 +382,171 @@
 	 <mx:HTTPService id="searchService" 
 	   				 method="GET"
 	   				 result="onSearchComplete(event);" 
-    	 			 fault="Alert.show(event.fault.faultString, 'Error Log');"
-    	 			 url="http://localhost:8080/alfresco/service/api/search/keyword.atom?q={searchTxt.text}">
+    	 			 fault="Alert.show('Check your Search Criterial', 'Error Log');"
+    	 			 url="http://localhost:8080/alfresco/service/sample/kb/search.atom?q={searchTxt.text}">
   	 </mx:HTTPService>  
   	 
+  			<mx:WipeUp id="wipeOut" duration="500"/>
+		    <mx:WipeDown id="wipeIn" duration="500"/>
+		    <mx:WipeRight id="wipeR" duration="500"/>
+		    <mx:WipeLeft id="wipeL" duration="500"/>
+				
+  	   
   	 <!-- loginPanel has the controls for Login -->
-		<mx:Panel x="63.5" y="52" id="loginPanel" visible="true" title="Alfresco Login">					
+		<mx:Panel x="466.5" y="127" id="loginPanel" visible="true" headerHeight="12" >					
 					<mx:Form>
+							<mx:Image source="@Embed(source='images/ace_white.png')" x="503" y="67"/>
 							<mx:FormItem label="User:">
-								<mx:TextInput id="username"/>
+								<mx:TextInput id="username" enter="onLogin()"/>
 							</mx:FormItem>						
 							<mx:FormItem label="Password:">
-								<mx:TextInput id="password" displayAsPassword="true"/>
+								<mx:TextInput id="password" displayAsPassword="true" enter="onLogin()"/>
 							</mx:FormItem>
 							<mx:FormItem>
 								<mx:Button label="Login"   click="onLogin();" id="loginBtn"/>								
 							</mx:FormItem>	
-							<mx:FormItem>
-								<mx:TextInput id="logTxt"  visible="false"/>
-							</mx:FormItem>
+							
+							
 					</mx:Form>				
 		</mx:Panel>
-       <!-- @searchPanel has the repeater control for displaying the search results -->
-		<mx:Panel   backgroundColor="#FFFFFF" 
-					id="searchPanel" height="100%"  width="100%" layout="absolute" visible="false">
-				
-				<mx:TextInput x="145" y="42" width="281" id="searchTxt"/>
-				<mx:Button x="444" y="42" label="Go" width="44" id="SearchBtn" click="onSearch();"/>
-				<mx:Button x="909" y="42" label="Logout" click="onLogout();"/>
-				<mx:Label x="786" y="44" id="signinTxt"/>
-				<mx:Label x="85" y="44" text="Search"/>
 		
-		<!-- @resultArea is a canvas for holding the search results  -->
-		<mx:Canvas id="resultArea"  backgroundColor="#FFFFFF" visible="false" x="85" y="140" width="100%" height="100%"  >
-			
+		<mx:HBox>
 		
-		<mx:Tile horizontalScrollPolicy="auto"  horizontalGap="10" width="100%" height="100%">            
-           
-            <mx:Repeater id="searchResults" x="85" y="140" width="100%" height="100%" >                
-                <mx:VBox   
-                    xmlns:mx="http://www.adobe.com/2006/mxml" 
-                     verticalAlign="left" >
-                <mx:LinkButton x="85"  id="titleBtn" fontSize="12" label="{searchResults.currentItem.title}" 
-                 	click="resultClick(event.currentTarget.getRepeaterItem().link.href,event.currentTarget.getRepeaterItem().title);"
-					/>
-					
-                <mx:HRule left="85"  strokeColor="blue"   width="100%"/>
-                <mx:Label text="{searchResults.currentItem.updated} | {searchResults.currentItem.author.name} "/>    
-                
-                    <mx:LinkButton id="linkBtn" 
-                        label="{searchResults.currentItem.summary}" 
-                        click="resultClick(event.currentTarget.getRepeaterItem().link.href,event.currentTarget.getRepeaterItem().title);"
-                        fontFamily="Timesnewroman" 
-                    />    
-                             
-                </mx:VBox>    
-                
-            </mx:Repeater>
-
-        </mx:Tile>
-        </mx:Canvas>
-      
-       
-        		<mx:Label id="titleTxt" x="430" y="140" visible="true" fontSize="14"/>
-      			  <mx:LinkButton id="closeBtn" label="close" 
-      			  		 click="myframe.visible=false; myframe.source=''; closeBtn.visible=false; titleTxt.text=''; resultArea.width=1000;"
-      			  		 x="1060" y="136" visible="false"  fontSize="12"/>
-      		
-      		<!-- The HTML component which renders the html contents on to this block -->
-      		<!-- This component seems to be having compatibility issues, works fine in mozilla-->	  		 
-      		
-					<fc:HTML  id="myframe" backgroundColor="#FFFFFF"  
-							  borderStyle="solid" 
-							  borderThickness="4" 
-							  x="430" y="160" 
-							  width="674" height="100%"  
-							  visible="false"/>
- 
-				<mx:TextInput id="ticketTxt" visible="false"/>	
-				<mx:TextInput id="dummyTxt" visible="false"/>			
-				
-				<mx:Button x="496" y="42" label="Clear" 
-						   click="searchResults.dataProvider=''; 
-						   searchTxt.setFocus();
-						   myframe.visible=false;
-						   myframe.source='';
-						   resultArea.visible=false;
-						   resultArea.width=1000;
-						   titleTxt.text='';
-						   closeBtn.visible=false;
-						   clearAll();"/>
-			
-			<!-- the control HBox holds the page navigation controls -->
-				<mx:HBox x="85" y="96" width="100%" height="36" backgroundColor="#FFFFFF">
+			<mx:Canvas width="100%"  id="searchPanel"  visible="false" backgroundColor="#275065" height="91"  borderStyle="solid">	
 						
-						<mx:Label text="Search Results "/>
-						<mx:Label text=" Found" width="81"/>
-						<mx:Label text="displaying "/>
-						<mx:Label text="1"/>
-						<mx:Label text="-"/>
-						<mx:Label text="10"/>
-						<mx:Label id="countTxt" text="123 Results for"/>
-						<mx:Label text="Alfresco"/>
+				<mx:Image source="@Embed(source='images/ace-mark.png')" x="37" y="10"/>
+				<mx:TextInput x="167" y="35" width="238"  id="searchTxt"  enter="cb1.selected=false;onSearch();clickevent();"/>
+				<mx:Button id="SearchBtn" x="413" y="35" label="Search"  click="cb1.selected=false;onSearch();clickevent();"  cornerRadius="0" color="#FFFFFF"/>
+				<mx:Button id="Clear" x="485" y="35" label="Clear"  click="searchTxt.setFocus();"   cornerRadius="0" color="#FFFFFF"/>
+				
+				<mx:LinkButton label="Advanced Search" x="550.5" y="35" textDecoration="underline" color="#FFFFFF"/>			
+										
+			</mx:Canvas>
+			
+			<logout:logout/>
+	
+		</mx:HBox>				
+				
+			<mx:Canvas   id="resultArea"   visible="true"  y="90" width="100%" height="100%">
+			
+				 <mx:VBox width="100%" height="100%"    id="tabnav" visible="false" hideEffect="{wipeIn}" showEffect="{wipeOut}">
+    			
+	        			<mx:ApplicationControlBar id="navigation" backgroundColor="#cccccc" width="100%">
+	        				<mx:Spacer width="50%"/>
+	        				<mx:Button  label="Search Results" click="cb1.selected=false; clickevent();swfPanel.visible=false; resultsDispPanel.width=maxWidth;"/>
+	        				<mx:CheckBox  id="cb1" visible="false" />
+	        			</mx:ApplicationControlBar>
+    			
+						<mx:TabNavigator id="mytab" width="100%"  height="100%" >
+		
+				       		 	<mx:Canvas label="Home" width="100%" height="100%" horizontalScrollPolicy="off">
+					        		<mx:Panel width="100%"  borderStyle="none" x="150">
+				        				<mx:Image source="@Embed(source='images/getting_started_portlet.png')"  width="100%" height="100%"/>
+				        				<mx:Image source="@Embed(source='images/tech_webscritps_portlets.png')"  width="100%" height="100%" x="657" y="0"/>
+							        </mx:Panel>
+				        		</mx:Canvas>
+			 
+					        	<mx:Canvas label="Knowledge Base" enabled="false">
+					        	</mx:Canvas>
 					
-						<mx:LinkButton id="fpage"   label="First"  toolTip="move first"
-                       				   click="fpageClick(event); "  enabled="false"/> 
-                        
-                        <mx:LinkButton id="ppage"   label="Prev"  toolTip="move previous"
-                       				   click="ppageClick(event); " enabled="false"/> 
-                       
-                        <mx:LinkButton id="npage" 	label="Next" toolTip="move next"
-                      				   click="npageClick(event); " enabled="false"/> 
-                        
-                        <mx:LinkButton id="lpage" 	label="Last"  toolTip="move last"
-                        			   click="lpageClick(event); " enabled="false"/> 
-                        			   
-                 </mx:HBox>
-		</mx:Panel>
+						        <mx:Canvas label="My issues" enabled="false">
+					    	    </mx:Canvas>
+					        
+					        	<mx:Canvas label="Documentations" enabled="false">
+					         		<mx:Accordion id="contentspace" width="100%" height="100%">
+										<mx:VBox  id="navbox" label="Navigation panel" width="820" height="237">
+												<mx:Label text="one"/>
+										</mx:VBox>
+									</mx:Accordion>
+					        	</mx:Canvas>
+					        
+					        	<mx:Canvas label="Webscripts" enabled="false">
+					        	</mx:Canvas>
+					        
+					       	    <mx:Canvas label="Contact Us" enabled="false">
+					            </mx:Canvas>
+					        
+						        <mx:Canvas label="Help" enabled="false">
+						        </mx:Canvas>
+					        
+					  	</mx:TabNavigator>
+						<mx:ApplicationControlBar  backgroundColor="#cccccc" width="100%" height="28"/> 
+				</mx:VBox>
+		
+				<mx:VBox width="100%" height="100%"    id="tabnav1" backgroundColor="#d6e3ec" visible="false" hideEffect="{wipeOut}" showEffect="{wipeIn}">
+						
+						<mx:ApplicationControlBar   dock="false"  y="0" width="100%"  backgroundColor="#cccccc">
+									
+									<mx:HBox>
+											<mx:Label text="Search Results: " styleName="labelStyle"/>
+											<mx:Label text=" 45 " styleName="labelStyle"/>
+											<mx:Label text=" Items found" width="81" styleName="labelStyle"/>
+											<mx:Spacer width="25" />
+											<mx:Label text=" | " styleName="labelStyle"/>
+											<mx:Spacer width="25" />
+											<mx:Label text=" Sort by " styleName="labelStyle"/>
+											<mx:ComboBox dataProvider="{sortbyValues}" width="100" styleName="labelStyle"/>
+											<mx:Spacer width="25" />
+											<mx:Label text="A" fontSize="12" styleName="labelStyle"/>
+											<mx:HSlider id="slider" minimum="1" maximum="10" width="50"/>
+											<mx:Label text="A" fontSize="16" styleName="labelStyle"/>
+											<mx:Spacer width="450"/>
+											<mx:Button label="Search Results"  click="cb1.selected=true;clickevent();swfPanel.visible=false;resultsDispPanel.width=maxWidth;"/>
+									</mx:HBox>
+									
+						</mx:ApplicationControlBar> 
+				
+				
+						<mx:Canvas   width="100%" height="100%" horizontalScrollPolicy="off" id="resultsCanvas">   
+							
+								  <mx:Canvas width="100%"   height="100%"   horizontalScrollPolicy="off" >
+										<mx:Panel width="100%"   height="100%" backgroundColor="#f1f7fc" 
+											  id="resultsDispPanel"  verticalScrollPolicy="auto" horizontalScrollPolicy="off">
+												<mx:Repeater id="searchResults" x="85" y="140" width="100%" height="100%" >                
+											   			
+											   			<mx:LinkButton icon="@Embed(source='images/ftl.gif')" x="85"  id="titleBtn" fontSize="12" 
+											   				label="{searchResults.currentItem.title}" 
+											             	click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>
+														 <mx:HRule left="85"  strokeColor="blue"   width="100%"/>
+											             <mx:Label text="{searchResults.currentItem.updated} | {searchResults.currentItem.author.name} "/>
+											             <mx:LinkButton id="linkBtn" 
+											                label="{searchResults.currentItem.summary}" 
+											                click="resultClick(event.currentTarget.getRepeaterItem().link.href);"
+											                fontFamily="Timesnewroman"/> 
+											                
+											    </mx:Repeater>
+			   							</mx:Panel>
+						           </mx:Canvas>
+						          <mx:Canvas width="100%"   height="100%" x="400" id="swfPanel" visible="false"  
+						          	 		showEffect="{wipeL}" horizontalScrollPolicy="off" >
+							      		<mx:Panel  headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5" >
+											
+											<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
+												<mx:HBox >
+													<mx:Label text="Rate Document" color="#FFFFFF"/>
+												</mx:HBox>
+											</mx:ApplicationControlBar>
+											<mx:SWFLoader  id="myframe" maintainAspectRatio="true"/>	
+										 
+						          		</mx:Panel>
+						           </mx:Canvas>
+						   
+						   </mx:Canvas>  
+            	
+            		
+				            <mx:ApplicationControlBar  backgroundColor="#cccccc" width="100%">
+				        				<mx:Spacer width="50%"/>
+				        				<mx:Button  label="Search Results"  click="clickevent();cb1.selected=true;swfPanel.visible=false;resultsDispPanel.width=maxWidth;"/>
+				        	</mx:ApplicationControlBar>
+				</mx:VBox>
+           
+		
+        	 
+        
+        <mx:TextInput id="ticketTxt" visible="false"/>	
+		<mx:TextInput id="dummyTxt" visible="false"/>
+		
+		
+        </mx:Canvas>
 		
 </mx:Application>
