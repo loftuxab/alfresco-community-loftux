@@ -505,7 +505,7 @@
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-word}.zip">
          <zipfileset dir="${dir.project.extension.office.word2003}"
-                     includes="readme.txt,
+                     includes="readme.rtf,
                                setup.exe,
                                AlfrescoWord2003Setup.msi" />
          <zipfileset dir="${dir.project.extension.office.word2003}/Office2003PIA"
@@ -521,7 +521,7 @@
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-excel}.zip">
          <zipfileset dir="${dir.project.extension.office.excel2003}"
-                     includes="readme.txt,
+                     includes="readme.rtf,
                                setup.exe,
                                AlfrescoExcel2003Setup.msi" />
          <zipfileset dir="${dir.project.extension.office.excel2003}/Office2003PIA"
@@ -537,7 +537,7 @@
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-powerpoint}.zip">
          <zipfileset dir="${dir.project.extension.office.powerpoint2003}"
-                     includes="readme.txt,
+                     includes="readme.rtf,
                                setup.exe,
                                AlfrescoPowerPoint2003Setup.msi" />
          <zipfileset dir="${dir.project.extension.office.powerpoint2003}/Office2003PIA"
@@ -553,7 +553,7 @@
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.extension-office2003-all}.zip">
          <zipfileset dir="${dir.project.extension.office.all2003}"
-                     includes="readme.txt,
+                     includes="readme.rtf,
                                setup.exe,
                                AlfrescoOffice2003Setup.msi" />
          <zipfileset dir="${dir.project.extension.office.all2003}/Office2003PIA"

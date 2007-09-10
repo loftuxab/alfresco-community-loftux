@@ -24,6 +24,7 @@
  */
 package org.alfresco.util.exec;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,15 +47,24 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
     
     private List<RuntimeExec> startupCommands;
     private boolean failOnError;
+    private boolean killProcessesOnShutdown;
+    
+    /** Keep track of the processes so that we can kill them on shutdown */
+    private List<ExecutionResult> executionResults;
 
     /**
-     * Initializes the bean with empty defaults, i.e. it will do nothing
+     * Initializes the bean
+     * <ul>
+     *   <li>failOnError = true</li>
+     *   <li>killProcessesOnShutdown = true</li>
+     * </ul>
      */
     public RuntimeExecBootstrapBean()
     {
         this.startupCommands = Collections.emptyList();
-        // Error are terminal by default
+        this.executionResults = new ArrayList<ExecutionResult>(1);
         failOnError = true;
+        killProcessesOnShutdown = true;
     }
 
     /**
@@ -84,8 +94,24 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
         this.failOnError = failOnError;
     }
 
+    /**
+     * Set whether or not to force a shutdown of successfully started processes.  As most
+     * bootstrap processes are kicked off in order to provide the server with some or other
+     * service, this is <tt>true</tt> by default.
+     * 
+     * @param killProcessesOnShutdown
+     *          <tt>true</tt> to force any successfully executed commands' processes to
+     *          be forcibly killed when the server shuts down.
+     * 
+     * @since 2.1.0
+     */
+    public void setKillProcessesOnShutdown(boolean killProcessesOnShutdown)
+    {
+        this.killProcessesOnShutdown = killProcessesOnShutdown;
+    }
+
     @Override
-    protected void onBootstrap(ApplicationEvent event)
+    protected synchronized void onBootstrap(ApplicationEvent event)
     {
         // execute
         for (RuntimeExec command : startupCommands)
@@ -104,6 +130,17 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
                     logger.error(msg);
                 }
             }
+            else
+            {
+                // It executed, so keep track of it
+                executionResults.add(result);
+            }
+        }
+        if (killProcessesOnShutdown)
+        {
+            // Force a shutdown on VM termination as we can't rely on the Spring context termination
+            Thread shutdownThread = new KillProcessShutdownThread();
+            Runtime.getRuntime().addShutdownHook(shutdownThread);
         }
         // done
         if (logger.isDebugEnabled())
@@ -112,9 +149,32 @@ public class RuntimeExecBootstrapBean extends AbstractLifecycleBean
         }
     }
 
-    @Override
-    protected void onShutdown(ApplicationEvent event)
+    /**
+     * A thread that serves to kill the successfully created process, if required
+     * 
+     * @since 2.1
+     * @author Derek Hulley
+     */
+    private class KillProcessShutdownThread extends Thread
     {
-        // NOOP
+        @Override
+        public void run()
+        {
+            if (!killProcessesOnShutdown)
+            {
+                // Do not force a kill
+                return;
+            }
+            for (ExecutionResult executionResult : executionResults)
+            {
+                executionResult.killProcess();
+            }
+        }
+    }
+
+    /** NO-OP */
+    @Override
+    protected synchronized void onShutdown(ApplicationEvent event)
+    {
     }
 }
