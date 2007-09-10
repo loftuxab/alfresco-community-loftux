@@ -196,6 +196,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="app.ico" />
     <EmbeddedResource Include="toolbar.ico" />
     <EmbeddedResource Include="toolbar_mask.ico" />
   </ItemGroup>

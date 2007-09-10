@@ -189,9 +189,9 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="app.ico" />
     <EmbeddedResource Include="toolbar.ico" />
-  </ItemGroup>
-  <ItemGroup>
+    <EmbeddedResource Include="toolbar_mask.ico" />
     <EmbeddedResource Include="AlfrescoPane.resx">
       <DependentUpon>AlfrescoPane.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -200,7 +200,6 @@
       <DependentUpon>Login.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="toolbar_mask.ico" />
   </ItemGroup>
   <!-- Include the build rules for a C# project.-->
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

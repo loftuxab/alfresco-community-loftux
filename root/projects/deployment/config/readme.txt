@@ -1,8 +1,8 @@
 Setting up the Alfresco Deployment Receiver
 -------------------------------------------
 
-1. Unzip alfresco-deployment.zip into a convenient location. (It does not
-   make it's own directory.) For discussion's sake let's say that alfresco-deployment.zip
+1. Unzip the deployment zip file into a convenient location. (It does not
+   make it's own directory.) For discussion's sake let's say that the zip file
    has been unzipped into /opt/deployment.
    
 2. Configure deployment.properties. Open deployment.properties in your
@@ -73,7 +73,7 @@ Setting up the Alfresco Deployment Receiver
    
 nohup java -server -cp /opt/deployment/alfresco-deployment.jar:/opt/deployment/spring-2.0.2.jar:/opt/deployment/commons-logging-1.0.4.jar:/opt/deployment/alfresco-core.jar:/opt/deployment/jug.jar:/opt/deployment org.alfresco.deployment.Main /opt/deployment/application-context.xml >/opt/deployment/deployment.log 2>&1 &
 
-   Not the final member of the classpath: /opt/deployment. This is necessary for the
+   Note the final member of the classpath: /opt/deployment. This is necessary for the
    deployment receiver to properly configure itself.
 
 5. Run the receiver. Execute start.sh (or start.bat) as the user you want your deployed

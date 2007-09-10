@@ -61,8 +61,9 @@
                     distribute-sdk, 
                     distribute-webserviceclient,
                     distribute-extensions-office2003, 
+                    distribute-deployment,
                     distribute-benchmark, 
-   					  distribute-amps,
+                    distribute-amps,
                     distribute-sample-extensions,
                     distribute-docs" />
 
@@ -533,9 +534,21 @@
       </zip>
    </target>
 
-   <!-- ************************************ -->
-   <!-- ** Module Management Tool targets ** -->
-   <!-- ************************************ -->
+   <!-- ************************ -->
+   <!-- ** Deployment targets ** -->
+   <!-- ************************ -->
+      
+   <target name="distribute-deployment" 
+           depends="init"
+           description="Creates a zip file containing the deployment receiver">
+      <mkdir dir="${dir.continuous.dist}" />
+      <copy file="${dir.project.deployment.dist}/${file.name.zip.deployment}" 
+            tofile="${dir.continuous.dist}/${file.name.dist.deployment}.zip" />
+   </target>
+   
+   <!-- ******************************* -->
+   <!-- ** Sample Extensions targets ** -->
+   <!-- ******************************* -->
    
    <target name="assemble-sample-extensions" 
            depends="init">
