@@ -12,7 +12,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/addressing-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/antlr-2.7.5H3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/aopalliance.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/axis.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/axis-1.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/axis-ant.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/bcel.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/bcprov-jdk15-137.jar"/>
