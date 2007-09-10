@@ -36,6 +36,10 @@ namespace AlfrescoExcel2003
       private byte[] m_IV = new byte[8];
       private byte[] m_Key = new byte[8];
 
+      // Normally we default to CIFS if it's been configured, but this gets cleared if the user had
+      // to manually log-in, as it means the CIFS interface couldn't do it automatically
+      private bool m_DefaultToCIFS = true;
+
       public ServerDetails()
       {
          AssemblyCompanyAttribute assemblyCompany = (AssemblyCompanyAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyCompanyAttribute));
@@ -354,8 +358,8 @@ namespace AlfrescoExcel2003
          else
          {
             // No match - what config have we been given?
-            // Default to CIFS if we've been given a server
-            usingCIFS = (CIFSServer != "");
+            // Default to CIFS if we've been given a server, unless manual log-in earlier
+            usingCIFS = (CIFSServer != "") && m_DefaultToCIFS;
          }
 
          // Build the path depending on which method
@@ -388,10 +392,15 @@ namespace AlfrescoExcel2003
                m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
             }
 
-            // Did we fail to get a ticket from the CIFS server?
-            if (m_AuthenticationTicket == "")
+            // Did we get a ticket from the CIFS server?
+            if (m_AuthenticationTicket != "")
+            {
+               m_DefaultToCIFS = true;
+            }
+            else
             {
                // Try WebDAV
+               m_DefaultToCIFS = false;
                IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
                strAuthTicket = myAuthTicket.GetAuthenticationTicket();
                if (strAuthTicket != "401")

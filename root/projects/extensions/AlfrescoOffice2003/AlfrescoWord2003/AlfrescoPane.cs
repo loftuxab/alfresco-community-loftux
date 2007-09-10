@@ -24,6 +24,7 @@ namespace AlfrescoWord2003
       private bool m_ShowPaneOnActivate = false;
       private bool m_ManuallyHidden = false;
       private bool m_LastWebPageSuccessful = true;
+      private bool m_DebugMode = false;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
@@ -222,10 +223,15 @@ namespace AlfrescoWord2003
       public void openDocument(string documentPath)
       {
          object missingValue = Type.Missing;
+         // WebDAV or CIFS?
          string strFullPath = m_ServerDetails.getFullPath(documentPath, "");
          object file = strFullPath;
          try
          {
+            if (m_DebugMode)
+            {
+               MessageBox.Show("Document path=\n" + strFullPath, "Open Document", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             Word.Document doc = m_WordApplication.Documents.Open(
                ref file, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
                ref missingValue, ref missingValue, ref missingValue, ref missingValue,
@@ -247,6 +253,10 @@ namespace AlfrescoWord2003
             relativeURL = relativeURL.Substring(1);
          }
 
+         if (m_DebugMode)
+         {
+            MessageBox.Show("Document path=\n" + m_ServerDetails.WebClientURL + relativeURL, "Compare Document", MessageBoxButtons.OK, MessageBoxIcon.Information);
+         }
          m_WordApplication.ActiveDocument.Compare(
             m_ServerDetails.WebClientURL + relativeURL, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
             ref missingValue, ref missingValue, ref missingValue);
@@ -272,10 +282,18 @@ namespace AlfrescoWord2003
 
          if (".bmp .gif .jpg .jpeg .png".IndexOf(strExtn) != -1)
          {
+            if (m_DebugMode)
+            {
+               MessageBox.Show("Image path=\n" + strFullPath, "Insert Image", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             m_WordApplication.ActiveDocument.InlineShapes.AddPicture(strFullPath, ref falseValue, ref trueValue, ref range);
          }
          else if (".doc".IndexOf(strExtn) != -1)
          {
+            if (m_DebugMode)
+            {
+               MessageBox.Show("Document path=\n" + strFullPath, "Insert Document", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             m_WordApplication.Selection.InsertFile(strFullPath, ref missingValue, ref trueValue, ref missingValue, ref missingValue);
          }
          else
@@ -290,6 +308,10 @@ namespace AlfrescoWord2003
                string[] iconData = defaultIcon.Split(new char[] { ',' });
                iconFilename = iconData[0];
                iconIndex = iconData[1];
+            }
+            if (m_DebugMode)
+            {
+               MessageBox.Show("Object path=\n" + strFullPath, "Insert OLE Object", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             m_WordApplication.ActiveDocument.InlineShapes.AddOLEObject(ref missingValue, ref filename, ref falseValue, ref trueValue,
                ref iconFilename, ref iconIndex, ref iconLabel, ref range);
@@ -332,6 +354,10 @@ namespace AlfrescoWord2003
          object file = savePath;
          try
          {
+            if (m_DebugMode)
+            {
+               MessageBox.Show("Save path=\n" + savePath, "Save Document", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
             m_WordApplication.ActiveDocument.SaveAs(
                ref file, ref missingValue, ref missingValue, ref missingValue, ref missingValue, ref missingValue,
                ref missingValue, ref missingValue, ref missingValue, ref missingValue,
@@ -407,6 +433,7 @@ namespace AlfrescoWord2003
 
       private void btnDetailsOK_Click(object sender, EventArgs e)
       {
+         m_DebugMode = (Control.ModifierKeys == (Keys.Control | Keys.Shift));
          m_ServerDetails.WebClientURL = txtWebClientURL.Text;
          m_ServerDetails.WebDAVURL = txtWebDAVURL.Text;
          m_ServerDetails.CIFSServer = txtCIFSServer.Text;

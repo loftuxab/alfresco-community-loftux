@@ -238,7 +238,10 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
 
         UserQueryResults results = WebServiceFactory.getAdministrationService().queryUsers(userFilter);
         assertNotNull(results);
-        assertTrue(results.getUserDetails().length != 0);
+        if (results.getUserDetails() != null)
+        {
+        	assertTrue(results.getUserDetails().length != 0);
+        }
         
         UserFilter userFilter2 = new UserFilter("^bob.*");
 

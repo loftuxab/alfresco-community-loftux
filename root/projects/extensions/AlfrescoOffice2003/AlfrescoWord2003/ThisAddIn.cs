@@ -15,11 +15,14 @@ namespace AlfrescoWord2003
       public static extern int GetForegroundWindow();
 
       private AlfrescoPane m_AlfrescoPane;
+      private string m_DefaultTemplate = "wcservice/office/";
       private Office.CommandBar m_CommandBar;
       private Office.CommandBarButton m_AlfrescoButton;
 
       private void ThisAddIn_Startup(object sender, System.EventArgs e)
       {
+         m_DefaultTemplate = Properties.Settings.Default.DefaultTemplate;
+
          // Register event interest with the Word Application
          Application.WindowActivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowActivateEventHandler(Application_WindowActivate);
          Application.WindowDeactivate += new Microsoft.Office.Interop.Word.ApplicationEvents4_WindowDeactivateEventHandler(Application_WindowDeactivate);
@@ -183,7 +186,7 @@ namespace AlfrescoWord2003
          {
             m_AlfrescoPane = new AlfrescoPane();
             m_AlfrescoPane.WordApplication = Application;
-            m_AlfrescoPane.DefaultTemplate = "wcservice/office/";
+            m_AlfrescoPane.DefaultTemplate = m_DefaultTemplate;
          }
 
          if (Show)
