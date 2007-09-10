@@ -278,7 +278,7 @@
            depends="-deploy-tomcat-common">
       
       <!-- copy the class files from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/classes">
+      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/classes" verbose="${copy.verbose}">
       
          <!-- copy class files -->
          <fileset dir="${dir.project.core.classes}" />
@@ -304,7 +304,6 @@
                   includes="**/extension/dev-context.xml"/>
       </copy>
 
-
       <!-- 
            Temporary measure to help Eclipse users deal with 
            link validation dependencies.  This should be cleaned
@@ -315,14 +314,14 @@
 
 
       <!-- copy webclient web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat}/alfresco">
+      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webclient.src.web}" 
                   excludes="WEB-INF/jboss*.xml, WEB-INF/portlet*.xml, 
                             WEB-INF/alfresco-object.xml" />
       </copy>
       
       <!-- copy required 3rd party libs -->
-      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/lib">
+      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty.lib}" includes="*.jar" 
                   excludes="${dir.name.devenv}/**" />
          <fileset dir="${dir.project.3rdparty.lib}/jibx" includes="*.jar" />
@@ -335,10 +334,10 @@
       </copy>
       
       <!-- copy webservices files -->
-      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF">
+      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF" verbose="${copy.verbose}">
          <fileset dir="${dir.project.remoteapi.src.webinf}"/>
       </copy>
-      <copy todir="${dir.deploy.tomcat}/alfresco/wsdl">
+      <copy todir="${dir.deploy.tomcat}/alfresco/wsdl" verbose="${copy.verbose}">
          <fileset dir="${dir.project.remoteapi.src.wsdl}" />
       </copy>
    </target>
@@ -350,7 +349,7 @@
    </target>
    
    <target name="deploy-webclient-changes" depends="init">
-      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="true">
+      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
       </copy>
    </target>
