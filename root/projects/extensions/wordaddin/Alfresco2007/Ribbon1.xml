@@ -2,7 +2,7 @@
   <ribbon>
     <tabs>
       <tab id="Alfresco" label="Alfresco" >
-        <group id="Group1" label="Alfreco Actions" visible ="1">
+        <group id="Group1" label="Alfresco Actions" visible ="1">
           <button id="ShowAlfresco" label="Show Alfresco Pane" 
            onAction="AlfrescoShowClick" 
            image="alfresco.ico"/>

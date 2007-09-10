@@ -92,8 +92,9 @@ public class DNSNameMangler
 
     // Regular expressions.
     private static final Pattern RX_DNS_LEGAL =
-        Pattern.compile("[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9]" + 
-                        "(?:\\.[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9])*");
+        Pattern.compile(
+            "[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?" + 
+            "(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*");
 
     private static final Pattern RX_ILLEGAL_CHARS =
         Pattern.compile("[^a-zA-Z0-9]");

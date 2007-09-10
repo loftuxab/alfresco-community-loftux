@@ -18,7 +18,7 @@
   <!-- CacheControlFilter *does* apply to all webapps, so it's defined here -->
     <filter>
         <!-- Adds host-specific HTTP header:  "Cache-control: max-age=..."  -->
-        <filter-name>alfrecoCacheControlFilter</filter-name>
+        <filter-name>alfrescoCacheControlFilter</filter-name>
         <filter-class>
           org.alfresco.filter.CacheControlFilter
         </filter-class>
@@ -29,7 +29,7 @@
 
     </filter>
     <filter-mapping>
-        <filter-name>alfrecoCacheControlFilter</filter-name>
+        <filter-name>alfrescoCacheControlFilter</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 

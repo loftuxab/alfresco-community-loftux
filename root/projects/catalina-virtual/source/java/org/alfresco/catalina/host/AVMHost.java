@@ -310,7 +310,7 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         //        interesting information for JNDI has been tunneled into
         //        the 1st segment of the request path.  In a very real sense,
         //        the only "actual" virtual host is avm.alfresco.localhost
-        //        (hence, that's the only Alfreco-related "work" dir created).
+        //        (hence, that's the only Alfresco-related "work" dir created).
         //
         //        As for JNDI, AVMFileDirContext.setDocBase() now just gets:
         //         <AvmFileDirAppBase>/<value-determined-by-AVMHostConfig>
