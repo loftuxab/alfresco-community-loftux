@@ -50,9 +50,9 @@ import org.mozilla.javascript.Scriptable;
 public class RecordsManagementScript extends BaseProcessorExtension implements Scopeable, RecordsManagementModel 
 {
     /** The disposition action names and parameters */
-    public static final String TRANSFER_DISPOSITION_ACTION = "transferDispositionAction";
-    public static final String DESTROY_DISPOSITION_ACTION = "destroyDispositionAction";
-    public static final String ACCESSION_DISPOSITION_ACTION = "accessionDispositionAction";
+    public static final String TRANSFER_DISPOSITION_ACTION = "org_alfresco_module_RecordsManagement_transferDispositionAction";
+    public static final String DESTROY_DISPOSITION_ACTION = "org.alfresco.module.recordsManagement.action.DestroyDispositionAction";
+    public static final String ACCESSION_DISPOSITION_ACTION = "org_alfresco_module_RecordsManagement_accessionDispositionAction";
     public static final String PARAM_LOCATION = "location";
     
    /** Scriptable scope object */

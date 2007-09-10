@@ -54,7 +54,7 @@
         </property>
         <property name="cronExpression">
             <!-- Execute @ 2:30 am every day -->
-            <value>0 30 2 * * ?</value>
+            <value>0 * * * * ?</value>
         </property>
     </bean>   
     
@@ -90,7 +90,7 @@
         </property>
         <property name="cronExpression">
             <!-- Execute @ 2:30 am every day -->
-            <value>0 30 2 * * ?</value>
+            <value>0 * * * * ?</value>
         </property>
     </bean>
     

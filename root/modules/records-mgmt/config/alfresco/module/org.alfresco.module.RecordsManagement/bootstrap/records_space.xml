@@ -1534,7 +1534,7 @@
       </cm:contains>
     </view:associations>
   </cm:folder>
-  <!-- <view:reference xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:alf="http://www.alfresco.org" xmlns:d="http://www.alfresco.org/model/dictionary/1.0" xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:act="http://www.alfresco.org/model/action/1.0" xmlns:rma="http://www.alfresco.org/model/record/1.0" xmlns:wf="http://www.alfresco.org/model/workflow/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0" xmlns:usr="http://www.alfresco.org/model/user/1.0" xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:rule="http://www.alfresco.org/model/rule/1.0" xmlns:fm="http://www.alfresco.org/model/forum/1.0" xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" xmlns:custom="custom.model" xmlns="" view:pathref="cm:Records_x0020_Space/cm:DOD_x0020_Records/cm:Series_x0020_0942/cm:_x0030_942-01_x0020_Science_x0020_Advisor_x0020_Records/cm:Ft._x0020_Huachuca_x0020_Pollution_x0020_Advisory_x0020_Report">
+  <view:reference xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:alf="http://www.alfresco.org" xmlns:d="http://www.alfresco.org/model/dictionary/1.0" xmlns:view="http://www.alfresco.org/view/repository/1.0" xmlns:act="http://www.alfresco.org/model/action/1.0" xmlns:rma="http://www.alfresco.org/model/record/1.0" xmlns:wf="http://www.alfresco.org/model/workflow/1.0" xmlns:app="http://www.alfresco.org/model/application/1.0" xmlns:usr="http://www.alfresco.org/model/user/1.0" xmlns:ver="http://www.alfresco.org/model/versionstore/1.0" xmlns:cm="http://www.alfresco.org/model/content/1.0" xmlns:sv="http://www.jcp.org/jcr/sv/1.0" xmlns:mix="http://www.jcp.org/jcr/mix/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:sys="http://www.alfresco.org/model/system/1.0" xmlns:rule="http://www.alfresco.org/model/rule/1.0" xmlns:fm="http://www.alfresco.org/model/forum/1.0" xmlns:bpm="http://www.alfresco.org/model/bpm/1.0" xmlns:custom="custom.model" xmlns="" view:pathref="cm:Records_x0020_Space/cm:DOD_x0020_Records/cm:Series_x0020_0942/cm:_x0030_942-01_x0020_Science_x0020_Advisor_x0020_Records/cm:Ft._x0020_Huachuca_x0020_Pollution_x0020_Advisory_x0020_Report">
     <view:associations>
       <rma:filePlan>
         <view:reference view:pathref="cm:Records_x0020_Space/cm:DOD_x0020_Records/cm:Series_x0020_0942/cm:_x0030_942-01_x0020_Science_x0020_Advisor_x0020_Records"></view:reference>
@@ -1589,5 +1589,5 @@
         <view:reference view:pathref="cm:Records_x0020_Space/cm:DOD_x0020_Records/cm:Series_x0020_0106/cm:_x0030_106-01_x0020_ManpowerStudies_x0020_Supporting_x0020_Data"></view:reference>
       </rma:filePlan>
     </view:associations>
-  </view:reference>-->
+  </view:reference>
 </view:view>

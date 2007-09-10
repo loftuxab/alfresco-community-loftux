@@ -46,7 +46,6 @@
          <show-property name="rma:defaultMediaType" />
          <show-property name="rma:defaultMarkingList" />
          <show-property name="rma:defaultOriginatingOrganization" />
-         <show-property name="rma:recordCounter" />
          <separator name="sepfp2" display-label="Process Vital Records" component-generator="HeaderSeparatorGenerator" />
          <show-property name="rma:vitalRecordIndicator" />
          <show-property name="rma:vitalRecordReviewPeriodUnit" />
@@ -72,7 +71,7 @@
          <show-property name="rma:transferLocation" />
          <show-property name="rma:transferImmediately" />         
          <show-property name="rma:transferBlockUnit" />
-         <show-property name="rma:transferBlock" />         
+         <show-property name="rma:transferBlockValue" />         
       </property-sheet>
    </config>
    
@@ -81,7 +80,7 @@
          <separator name="seprmDestroyInstructions" display-label="Destroy Instructions" component-generator="HeaderSeparatorGenerator" />         
          <show-property name="rma:destroyImmediately" />         
          <show-property name="rma:destroyBlockUnit" />
-         <show-property name="rma:destroyBlock" />         
+         <show-property name="rma:destroyBlockValue" />         
       </property-sheet>
    </config>
 
@@ -98,7 +97,7 @@
          <show-property name="rma:originator" />
          <show-property name="rma:originatingOrganization" />
          <show-property name="rma:addressee" />
-         <show-property name="rma:otherAddressee" />
+         <show-property name="rma:otherAddressees" />
          <show-property name="rma:supplementalMarkingList" />
          <show-property name="rma:recordNote" />
       </property-sheet>
