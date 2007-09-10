@@ -197,9 +197,8 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="app.ico" />
     <EmbeddedResource Include="toolbar.ico" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="toolbar_mask.ico" />
   </ItemGroup>
   <!-- Include the build rules for a C# project.-->

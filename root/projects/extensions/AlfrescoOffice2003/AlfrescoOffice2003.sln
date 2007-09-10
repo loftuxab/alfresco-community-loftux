@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoWord2003Setup", "AlfrescoWord2003Setup\AlfrescoWord2003Setup", "{40F79A8B-E31A-4C48-B508-9ECC78FE2A6C}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoWord2003Setup", "AlfrescoWord2003Setup\AlfrescoWord2003Setup.vdproj", "{40F79A8B-E31A-4C48-B508-9ECC78FE2A6C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoExcel2003", "AlfrescoExcel2003\AlfrescoExcel2003.csproj", "{EA962E85-BCA1-4A8D-9B32-61CD0A764A4B}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoExcel2003Setup", "AlfrescoExcel2003Setup\AlfrescoExcel2003Setup", "{95D993E9-E097-4CB3-AA75-C0D4483FB5CE}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoExcel2003Setup", "AlfrescoExcel2003Setup\AlfrescoExcel2003Setup.vdproj", "{95D993E9-E097-4CB3-AA75-C0D4483FB5CE}"
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoOffice2003Setup", "AlfrescoOffice2003Setup\AlfrescoOffice2003Setup.vdproj", "{BC31007C-0B44-406A-88D7-DAEF94D0C05B}"
 EndProject
@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoWord2003", "C:\Dev\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoPowerPoint2003", "AlfrescoPowerPoint2003\AlfrescoPowerPoint2003.csproj", "{C6F30316-2712-4301-BEA7-6C106BB6268D}"
 EndProject
-Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoPowerPoint2003Setup", "AlfrescoPowerPoint2003Setup\AlfrescoPowerPoint2003Setup", "{02150173-5AEF-4171-A8EE-FA1B85E0F01E}"
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoPowerPoint2003Setup", "AlfrescoPowerPoint2003Setup\AlfrescoPowerPoint2003Setup.vdproj", "{02150173-5AEF-4171-A8EE-FA1B85E0F01E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
