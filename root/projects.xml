@@ -1111,7 +1111,7 @@
 
    <target name="package-rm"
            description="Packages the records management project."
-           depends="package-rm-war" />
+           depends="package-rm-war, deploy-tomcat" />
 
    <target name="package-rm-jar"
            description="Packages the JAR file for the records management project."
@@ -1184,7 +1184,7 @@
 
    <target name="package-blog"
            description="Packages the blog integration project."
-           depends="package-blog-war" />
+           depends="package-blog-war, deploy-tomcat" />
 
    <target name="package-blog-jar"
            description="Packages the JAR file for the blog integration project."
@@ -1263,7 +1263,7 @@
 
    <target name="package-php" 
            description="Packages the PHP SDK project"
-           depends="package-php-war" />
+           depends="package-php-war, deploy-tomcat" />
            
    <target name="package-php-lib"
            description="Package the PHP client library"

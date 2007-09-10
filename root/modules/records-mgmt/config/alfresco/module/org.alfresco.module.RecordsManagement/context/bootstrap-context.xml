@@ -43,7 +43,7 @@
                 </props> -->
                 <props>
                     <prop key="path">/${spaces.company_home.childname}</prop>
-                    <prop key="location">alfresco/module/org.alfresco.module.RecordsManagement/bootstrap/records_space.acp</prop>
+                    <prop key="location">alfresco/module/org.alfresco.module.RecordsManagement/bootstrap/records_space.xml</prop>
                 </props>
             </list>
         </property>
