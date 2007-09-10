@@ -1316,7 +1316,7 @@ public class AVMHostConfig extends HostConfig
         //        partitioning by regex type. It can also base decision
         //        on who the user is and/or what preference the user
         //        has specified (if any).  By default, all virt servers
-        //        that register with the alfreco webapp can go in a global
+        //        that register with the alfresco webapp can go in a global
         //        pool (this way, at least you get some load balancing
         //        by default).  If the servlet periodically does a
         //        heartbeat check on registered virt servers, then you
@@ -1845,7 +1845,7 @@ public class AVMHostConfig extends HostConfig
         {
             //
             // AVMHostConfig checking AVMDeployedApplication:
-            //          /$-1$alfreco-staging$my_webapp
+            //          /$-1$alfresco-staging$my_webapp
             //
 
             if (log.isDebugEnabled())
@@ -1856,7 +1856,7 @@ public class AVMHostConfig extends HostConfig
         }
 
         //         AVMHostConfig checkResources using appBase:
-        //              alfreco-staging:/www/avm_webapps
+        //              alfresco-staging:/www/avm_webapps
 
 
         if (log.isDebugEnabled())

@@ -145,8 +145,8 @@
               <filename name="alfresco-core.jar"/>
           </fileset>
       </copy>
-      <zip basedir="${dir.project.deployment.dist}" compress="yes" 
-           destfile="${dir.project.deployment}/build/alfresco-deployment.zip"/>
+      <zip basedir="${dir.project.deployment.dist}" compress="yes" excludes="*.zip"
+           destfile="${dir.project.deployment.dist}/alfresco-deployment.zip"/>
    </target>
    
    <target name="test-deployment" 

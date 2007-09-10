@@ -671,7 +671,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
          catch (Exception e) 
          {
             if ( log.isDebugEnabled() )
-                log.debug("Could not fetch count info for: " + href_attr);
+                log.debug("Uninitialized file/attribute count (using 0): " + 
+                          href_attr);
          }
 
          Pair<Integer,Integer> info = 
