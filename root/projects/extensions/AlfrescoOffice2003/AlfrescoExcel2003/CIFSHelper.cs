@@ -16,7 +16,7 @@ namespace AlfrescoExcel2003
       const string UNC_PATH_PREFIX = @"\\";
       const string PATH_SEPARATOR = @"\";
       const string IOSIGNATURE = "ALFRESCO";
-	   const int IOSIGNATURE_LEN = 8;
+      const int IOSIGNATURE_LEN = 8;
 
       // CreateFile constants
       readonly static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
@@ -65,10 +65,11 @@ namespace AlfrescoExcel2003
          StringBuilder remoteName,
          ref int remoteNameLength);
 
-
-      private string m_AlfrescoServer = "";
+      // The user-entered configuration value
+      private string m_CIFSServer = "";
+      // The UNC version of the configuration value
+      private string m_UNCRootPath = "";
       private IntPtr m_handle = INVALID_HANDLE_VALUE;
-      private string m_RootPath = "";
       private bool m_IsValidAlfrescoServer = false;
 
       /// <summary>
@@ -77,12 +78,12 @@ namespace AlfrescoExcel2003
       /// <param name="AlfrescoServer">UNC path to the Alfresco CIFS server</param>
       public CIFSHelper(string AlfrescoServer)
       {
-         m_AlfrescoServer = AlfrescoServer;
-         if (!m_AlfrescoServer.EndsWith("\\"))
+         m_CIFSServer = AlfrescoServer;
+         if (!m_CIFSServer.EndsWith("\\"))
          {
-            m_AlfrescoServer += "\\";
+            m_CIFSServer += "\\";
          }
-         m_IsValidAlfrescoServer = SetRootPath(AlfrescoServer);
+         m_IsValidAlfrescoServer = SetUNCRootPath(AlfrescoServer);
       }
 
       /// <summary>
@@ -124,28 +125,28 @@ namespace AlfrescoExcel2003
             return "";
          }
          // Does the documentPath belong to the server?
-         if (documentPath.ToLower().IndexOf(m_AlfrescoServer.ToLower()) == 0)
+         if (documentPath.ToLower().IndexOf(m_CIFSServer.ToLower()) == 0)
          {
-            alfrescoPath = documentPath.Remove(0, m_AlfrescoServer.Length).Replace("\\", "/");
+            alfrescoPath = documentPath.Remove(0, m_CIFSServer.Length).Replace("\\", "/");
          }
          else
          {
             // Office likes mapping UNC paths to mapped drive letters
             string path = MappedDriveToUNC(documentPath);
-            if (path.ToLower().IndexOf(m_AlfrescoServer.ToLower()) == 0)
+            if (path.ToLower().IndexOf(m_CIFSServer.ToLower()) == 0)
             {
-               alfrescoPath = path.Remove(0, m_AlfrescoServer.Length).Replace("\\", "/");
+               alfrescoPath = path.Remove(0, m_CIFSServer.Length).Replace("\\", "/");
             }
          }
          return alfrescoPath;
       }
 
       /// <summary>
-      /// Set the root path to be used as the working directory
+      /// Set the UNC root path to be used as the working directory
       /// </summary>
       /// <param name="rootPath">(string) Path to be used</param>
       /// <returns>(bool) true=Success</returns>
-      private bool SetRootPath(string rootPath)
+      private bool SetUNCRootPath(string rootPath)
       {
          if (m_handle != INVALID_HANDLE_VALUE)
          {
@@ -191,11 +192,11 @@ namespace AlfrescoExcel2003
                pos = uncPath.IndexOf(PATH_SEPARATOR, pos + 1);
                if (pos == -1)
                {
-                  m_RootPath = uncPath;
+                  m_UNCRootPath = uncPath;
                }
                else
                {
-                  m_RootPath = uncPath.Substring(0, pos);
+                  m_UNCRootPath = uncPath.Substring(0, pos);
                }
             }
          }
@@ -296,7 +297,7 @@ namespace AlfrescoExcel2003
       }
 
       // Define a structure suitable to receive the output of the FSCTL_ALFRESCO_GETAUTHTICKET request
-      [StructLayout(LayoutKind.Sequential, CharSet=CharSet.Unicode)]
+      [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
       private struct ioctlAuthTicket
       {
          [MarshalAs(UnmanagedType.I4)]
@@ -336,7 +337,7 @@ namespace AlfrescoExcel2003
          {
             System.Diagnostics.Debug.Print(e.Message);
          }
-         
+
          return strAuthTicket;
       }
 

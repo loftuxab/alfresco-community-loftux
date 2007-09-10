@@ -11,14 +11,11 @@ namespace AlfrescoPowerPoint2003
    {
       private AlfrescoPane m_AlfrescoPane;
       private AppWatcher m_AppWatcher;
-      private string m_DefaultTemplate = null;
       private Office.CommandBar m_CommandBar;
       private Office.CommandBarButton m_AlfrescoButton;
 
       private void ThisAddIn_Startup(object sender, System.EventArgs e)
       {
-         m_DefaultTemplate = Properties.Settings.Default.DefaultTemplate;
-
          // Register event interest with the PowerPoint Application
          Application.WindowActivate += new Microsoft.Office.Interop.PowerPoint.EApplication_WindowActivateEventHandler(Application_WindowActivate);
          Application.PresentationClose += new Microsoft.Office.Interop.PowerPoint.EApplication_PresentationCloseEventHandler(Application_PresentationClose);
@@ -176,15 +173,15 @@ namespace AlfrescoPowerPoint2003
          {
             m_AlfrescoPane = new AlfrescoPane();
             m_AlfrescoPane.PowerPointApplication = Application;
-            m_AlfrescoPane.DefaultTemplate = m_DefaultTemplate;
+            m_AlfrescoPane.DefaultTemplate = "wcservice/office/";
          }
 
          if (Show)
          {
             m_AlfrescoPane.Show();
-            if (Application.ActivePresentation != null)
+            if (Application.Presentations.Count > 0)
             {
-               m_AlfrescoPane.OnDocumentChanged();
+               m_AlfrescoPane.showDocumentDetails();
             }
             else
             {

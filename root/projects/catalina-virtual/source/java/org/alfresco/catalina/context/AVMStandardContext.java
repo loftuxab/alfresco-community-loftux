@@ -36,6 +36,8 @@ import org.apache.catalina.LifecycleException;
 public class   AVMStandardContext 
        extends    StandardContext
 {
+    private String encoded_path_ = null;
+
     /**
      * Create a new StandardContext component with the default basic Valve.
      */
@@ -108,6 +110,55 @@ public class   AVMStandardContext
 
 
     }
+        
+    //-------------------------------------------------------------------------
+    /**
+    *   Returns the URL-encoded path of this context, stripping away any
+    *   context path mangling created within a virtualized subrequest.
+    *
+    *   The value returned by getEncodedPath() is typically used when 
+    *   generating cookies  (e.g.:  session cookies).   It's important
+    *   to strip away context path manging info because the end user's
+    *   browser doesn't know anything about this, and won't send
+    *   path/scope-restricted cookies properly if it's concept of 
+    *   the context path differs from the context path announced by 
+    *   the cookie.
+    *
+    *   <pre>
+    *
+    *   Example 1: 
+    *        URL:  http://alice.mysite.www--sandbox.<...>:8180/hello.txt
+    *        webapp:           "ROOT "
+    *        getPath()         "/$-1$mysite--alice$ROOT"
+    *        getEncodedPath()  "/"
+    *
+    *   Example 2: 
+    *        URL:  http://alice.mysite.www--sandbox.<...>:8180/moo/hello.txt
+    *        webapp:           "moo"
+    *        getPath()         "/$-1$mysite--alice$moo"
+    *        getEncodedPath()  "/moo"
+    *   </pre>
+    */
+    //-------------------------------------------------------------------------
+    public String getEncodedPath() 
+    {
+        if ( encoded_path_ != null ) { return encoded_path_; }
+        encoded_path_ = getPath();
+        
+        int index =  encoded_path_.lastIndexOf('$');
+        if ( index < 0 || ! encoded_path_.startsWith("/$") )
+        { 
+            return encoded_path_;
+        }
+
+        encoded_path_ =  encoded_path_.substring(index + 1);
+        if ( encoded_path_.equals("ROOT") ) { encoded_path_ = ""; }
+
+        encoded_path_ = urlEncoder.encode( "/" + encoded_path_ );
+
+        return encoded_path_ ;
+    }
+
     
 
     /**

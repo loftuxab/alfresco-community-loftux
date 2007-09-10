@@ -23,6 +23,7 @@ namespace AlfrescoExcel2003
       private string m_TemplateRoot = "";
       private bool m_ShowPaneOnActivate = false;
       private bool m_ManuallyHidden = false;
+      private bool m_LastWebPageSuccessful = true;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
@@ -67,18 +68,20 @@ namespace AlfrescoExcel2003
 
       public void OnDocumentChanged()
       {
+         bool bHaveDocument = (m_ExcelApplication.Workbooks.Count > 0);
+
          try
          {
-            if ((m_ExcelApplication.ActiveWorkbook != null) && (m_ServerDetails.getAuthenticationTicket(false) != ""))
+            if (bHaveDocument)
             {
-               m_ServerDetails.DocumentPath = m_ExcelApplication.ActiveWorkbook.FullName;
-               this.showDocumentDetails(m_ServerDetails.DocumentPath);
+               this.showDocumentDetails();
             }
             else
             {
                m_ServerDetails.DocumentPath = "";
-               this.showHome(false);
+               this.showHome(!bHaveDocument);
             }
+
             if (!m_ManuallyHidden)
             {
                this.Show();
@@ -127,7 +130,11 @@ namespace AlfrescoExcel2003
       public void OnDocumentBeforeClose()
       {
          m_ServerDetails.DocumentPath = "";
-         this.showHome(true);
+         if (m_ExcelApplication.Workbooks.Count == 1)
+         {
+            // Closing last spreadsheet, but might also be closing app
+            this.showHome(true);
+         }
       }
 
       public void OnToggleVisible()
@@ -173,8 +180,10 @@ namespace AlfrescoExcel2003
          }
       }
 
-      public void showDocumentDetails(string relativePath)
+      public void showDocumentDetails()
       {
+         string relativePath = "";
+
          // Do we have a valid web server address?
          if (m_ServerDetails.WebClientURL == "")
          {
@@ -183,6 +192,9 @@ namespace AlfrescoExcel2003
          }
          else
          {
+            m_ServerDetails.DocumentPath = m_ExcelApplication.ActiveWorkbook.FullName;
+            relativePath = m_ServerDetails.DocumentPath;
+
             if (relativePath.Length > 0)
             {
                if (!relativePath.StartsWith("/"))
@@ -418,6 +430,7 @@ namespace AlfrescoExcel2003
 
          m_ServerDetails.SaveToRegistry();
 
+         m_ServerDetails.clearAuthenticationTicket();
          this.OnDocumentChanged();
       }
 
@@ -494,7 +507,21 @@ namespace AlfrescoExcel2003
          if (webBrowser.Url.ToString().EndsWith("login.jsp"))
          {
             m_ServerDetails.clearAuthenticationTicket();
-            showHome(false);
+
+            bool bLastPageOK = m_LastWebPageSuccessful;
+            m_LastWebPageSuccessful = false;
+            if (bLastPageOK)
+            {
+               showHome(true);
+            }
+         }
+         else
+         {
+            if (!m_LastWebPageSuccessful)
+            {
+               m_LastWebPageSuccessful = true;
+               this.OnDocumentChanged();
+            }
          }
       }
 

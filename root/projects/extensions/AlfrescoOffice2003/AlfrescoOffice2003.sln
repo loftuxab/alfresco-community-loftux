@@ -11,7 +11,7 @@ Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AlfrescoOffice2003Setup", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SetSecurity", "SetSecurity\SetSecurity.csproj", "{56E8E807-0807-45E0-B19A-98912AE47630}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoWord2003", "C:\Dev\HEAD\root\projects\extensions\AlfrescoOffice2003\AlfrescoWord2003\AlfrescoWord2003.csproj", "{6DAC899A-0BAD-4946-B7D7-3EFF828CC7D9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoWord2003", "AlfrescoWord2003\AlfrescoWord2003.csproj", "{6DAC899A-0BAD-4946-B7D7-3EFF828CC7D9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AlfrescoPowerPoint2003", "AlfrescoPowerPoint2003\AlfrescoPowerPoint2003.csproj", "{C6F30316-2712-4301-BEA7-6C106BB6268D}"
 EndProject

@@ -305,20 +305,29 @@ namespace AlfrescoWord2003
          {
             if (m_DocumentAlfrescoPath == "")
             {
-               IServerHelper serverHelper;
+               IServerHelper serverHelper = null;
 
                if (m_DocumentPhysicalPath.StartsWith("http"))
                {
                   // WebDAV path
-                  serverHelper = new WebDAVHelper(this.WebDAVURL);
+                  if (this.WebDAVURL.Length > 0)
+                  {
+                     serverHelper = new WebDAVHelper(this.WebDAVURL);
+                  }
                }
                else
                {
                   // CIFS path
-                  serverHelper = new CIFSHelper(this.CIFSServer);
+                  if (this.CIFSServer.Length > 0)
+                  {
+                     serverHelper = new CIFSHelper(this.CIFSServer);
+                  }
                }
 
-               m_DocumentAlfrescoPath = serverHelper.GetAlfrescoPath(m_DocumentPhysicalPath);
+               if (serverHelper != null)
+               {
+                  m_DocumentAlfrescoPath = serverHelper.GetAlfrescoPath(m_DocumentPhysicalPath);
+               }
             }
             return m_DocumentAlfrescoPath;
          }
@@ -371,14 +380,16 @@ namespace AlfrescoWord2003
          string strAuthTicket = "";
          if (m_AuthenticationTicket == "")
          {
-            // Do we recognise the path as belonging to an Alfresco server?
-            if (this.MatchCIFSServer(m_DocumentPhysicalPath))
+            // If we've been given a CIFS server then try to authenticate against it
+            if (this.CIFSServer.Length > 0)
             {
                // Try CIFS
                IServerHelper myAuthTicket = new CIFSHelper(this.CIFSServer);
                m_AuthenticationTicket = myAuthTicket.GetAuthenticationTicket();
             }
-            else
+
+            // Did we fail to get a ticket from the CIFS server?
+            if (m_AuthenticationTicket == "")
             {
                // Try WebDAV
                IServerHelper myAuthTicket = new WebDAVHelper(this.WebDAVURL);
@@ -398,7 +409,7 @@ namespace AlfrescoWord2003
                   {
                      m_AuthenticationTicket = strAuthTicket;
                   }
-                  else
+                  else if (promptUser)
                   {
                      // Last option - pop up the login form
                      using (Login myLogin = new Login())

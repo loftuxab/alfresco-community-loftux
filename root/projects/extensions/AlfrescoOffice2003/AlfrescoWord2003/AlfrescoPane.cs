@@ -23,6 +23,7 @@ namespace AlfrescoWord2003
       private string m_TemplateRoot = "";
       private bool m_ShowPaneOnActivate = false;
       private bool m_ManuallyHidden = false;
+      private bool m_LastWebPageSuccessful = true;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
@@ -67,18 +68,20 @@ namespace AlfrescoWord2003
 
       public void OnDocumentChanged()
       {
+         bool bHaveDocument = (m_WordApplication.Documents.Count > 0);
+
          try
          {
-            if ((m_WordApplication.ActiveDocument != null) && (m_ServerDetails.getAuthenticationTicket(false) != ""))
+            if (bHaveDocument)
             {
-               m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
-               this.showDocumentDetails(m_ServerDetails.DocumentPath);
+               this.showDocumentDetails();
             }
             else
             {
                m_ServerDetails.DocumentPath = "";
-               this.showHome(false);
+               this.showHome(!bHaveDocument);
             }
+
             if (!m_ManuallyHidden)
             {
                this.Show();
@@ -127,7 +130,11 @@ namespace AlfrescoWord2003
       public void OnDocumentBeforeClose()
       {
          m_ServerDetails.DocumentPath = "";
-         this.showHome(true);
+         if (m_WordApplication.Documents.Count == 1)
+         {
+            // Closing last document, but might also be closing app
+            this.showHome(true);
+         }
       }
 
       public void OnToggleVisible()
@@ -163,18 +170,18 @@ namespace AlfrescoWord2003
             {
                theURI += "&ticket=" + strAuthTicket;
             }
-            if (!isClosing || (strAuthTicket != ""))
-            {
-               webBrowser.ObjectForScripting = this;
-               UriBuilder uriBuilder = new UriBuilder(theURI);
-               webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
-               PanelMode = PanelModes.WebBrowser;
-            }
+
+            webBrowser.ObjectForScripting = this;
+            UriBuilder uriBuilder = new UriBuilder(theURI);
+            webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
+            PanelMode = PanelModes.WebBrowser;
          }
       }
 
-      public void showDocumentDetails(string relativePath)
+      public void showDocumentDetails()
       {
+         string relativePath = "";
+
          // Do we have a valid web server address?
          if (m_ServerDetails.WebClientURL == "")
          {
@@ -183,6 +190,9 @@ namespace AlfrescoWord2003
          }
          else
          {
+            m_ServerDetails.DocumentPath = m_WordApplication.ActiveDocument.FullName;
+            relativePath = m_ServerDetails.DocumentPath;
+
             if (relativePath.Length > 0)
             {
                if (!relativePath.StartsWith("/"))
@@ -212,7 +222,6 @@ namespace AlfrescoWord2003
       public void openDocument(string documentPath)
       {
          object missingValue = Type.Missing;
-         // WebDAV or CIFS?
          string strFullPath = m_ServerDetails.getFullPath(documentPath, "");
          object file = strFullPath;
          try
@@ -490,7 +499,21 @@ namespace AlfrescoWord2003
          if (webBrowser.Url.ToString().EndsWith("login.jsp"))
          {
             m_ServerDetails.clearAuthenticationTicket();
-            showHome(false);
+
+            bool bLastPageOK = m_LastWebPageSuccessful;
+            m_LastWebPageSuccessful = false;
+            if (bLastPageOK)
+            {
+               showHome(true);
+            }
+         }
+         else
+         {
+            if (!m_LastWebPageSuccessful)
+            {
+               m_LastWebPageSuccessful = true;
+               this.OnDocumentChanged();
+            }
          }
       }
 
