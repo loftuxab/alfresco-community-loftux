@@ -65,8 +65,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 {
-    private static Log logger = LogFactory
-            .getLog(RepositoryServiceSystemTest.class);
+    private static Log logger = LogFactory.getLog(RepositoryServiceSystemTest.class);
 
     @Override
     protected void setUp() throws Exception
@@ -76,8 +75,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
     /**
      * Tests the getStores method
-     * 
-     * @throws Exception
      */
     public void testGetStores() throws Exception
     {
@@ -88,8 +85,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
     /**
      * Tests the query service call
-     * 
-     * @throws Exception
      */
     public void testQuery() throws Exception
     {
@@ -137,8 +132,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
     /**
      * Tests the queryParents service method
-     * 
-     * @throws Exception
      */
     public void testQueryParents() throws Exception
     {
@@ -214,8 +207,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
     /**
      * Tests the queryChildren service method
-     * 
-     * @throws Exception
      */
     public void testQueryChildren() throws Exception
     {
@@ -260,10 +251,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         }
     }
             
-    /*
+    /**
      * Tests the queryAssociated service method
-     * 
-     * @throws Exception
      */
     public void testQueryAssociated() throws Exception
     {
@@ -298,8 +287,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 
     /**
      * Tests the describe service method
-     * 
-     * @throws Exception
      */
     public void testDescribe() throws Exception
     {
@@ -312,8 +299,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         assertNotNull("queryResult should not be null", queryResult);
         ResultSet resultSet = queryResult.getResultSet();
         assertNotNull("The result set should not be null", resultSet);
-        assertTrue("There should be at least one result", resultSet
-                .getTotalRowCount() > 0);
+        assertTrue("There should be at least one result",
+                resultSet.getTotalRowCount() > 0);
         String id = resultSet.getRows(0).getNode().getId();
         assertNotNull("Id of Alfresco Tutorial PDF should not be null", id);
 
@@ -335,61 +322,66 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         assertNotNull("Type definition should not be null", typeDef);
 
         assertEquals("Type name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}content", typeDef
-                        .getName());
+                "{http://www.alfresco.org/model/content/1.0}content",
+                typeDef.getName());
         assertEquals("Superclass type name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}cmobject", typeDef
-                        .getSuperClass());
+                "{http://www.alfresco.org/model/content/1.0}cmobject",
+                typeDef.getSuperClass());
         assertEquals("Type title is incorrect", "Content", typeDef.getTitle());
-        assertEquals("Type description is incorrect", "Base Content Object", typeDef
-                .getDescription());
-        assertFalse("Type is an aspect and it shouldn't be", typeDef
-                .isIsAspect());
-        assertNull("There should not be any associations", typeDef
-                .getAssociations());
+        assertEquals("Type description is incorrect", "Base Content Object",
+                typeDef.getDescription());
+        assertFalse("Type is an aspect and it shouldn't be",
+                typeDef.isIsAspect());
+        assertNull("There should not be any associations",
+                typeDef.getAssociations());
         assertNotNull("Properties should not be null", typeDef.getProperties());
-        assertEquals("There should be 2 properties", 2,
-                typeDef.getProperties().length);
+        assertEquals("There should be 2 properties", 2, typeDef.getProperties().length);
 
-        // check the name and type of each of the properties
-        assertEquals("Property1 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}content", typeDef
-                        .getProperties(0).getName());
-        assertEquals("Property1 type name is incorrect",
-                "{http://www.alfresco.org/model/dictionary/1.0}content", typeDef
-                        .getProperties(0).getDataType());
-
-        assertEquals("Property5 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}name", typeDef
-                        .getProperties(1).getName());
-        assertEquals("Property5 type name is incorrect",
-                "{http://www.alfresco.org/model/dictionary/1.0}text", typeDef
-                        .getProperties(1).getDataType());
-
+        // Check that we have all some of the properties we expect
+        PropertyDefinition[] propertyDefs = typeDef.getProperties();
+        boolean foundContent = false;
+        boolean foundName = false;
+        for (PropertyDefinition propertyDef : propertyDefs)
+        {
+            String name = propertyDef.getName();
+            if (name.equals("{http://www.alfresco.org/model/content/1.0}content"))
+            {
+                foundContent = true;
+                assertEquals("cm:content property data type is incorrect",
+                        "{http://www.alfresco.org/model/dictionary/1.0}content",
+                        propertyDef.getDataType());
+            }
+            else if (name.equals("{http://www.alfresco.org/model/content/1.0}name"))
+            {
+                foundName = true;
+                assertEquals("cm:name property data type is incorrect",
+                        "{http://www.alfresco.org/model/dictionary/1.0}text",
+                        propertyDef.getDataType());
+            }
+        }
+        assertTrue(foundContent);
+        assertTrue(foundName);
+        
         // check the aspects
-        ClassDefinition[] aspects = nodeDef.getAspects();
-        assertNotNull("aspects should not be null", aspects);
-        assertEquals("There should be 3 aspects", 3, aspects.length);
+        ClassDefinition[] aspectDefs = nodeDef.getAspects();
+        assertNotNull("aspects should not be null", aspectDefs);
+        assertEquals("There should be 3 aspects", 3, aspectDefs.length);
 
-        // check the first aspect
-        ClassDefinition aspect1 = aspects[1];
-        assertEquals("Aspect1 name is incorrect",
-                "{http://www.alfresco.org/model/system/1.0}referenceable",
-                aspect1.getName());
-        assertTrue("Aspect1 should be an aspect", aspect1.isIsAspect());
-        assertNotNull("Aspect1 should have properties", aspect1.getProperties());
-        assertEquals("Aspect1 has wrong number of properties", 4, aspect1
-                .getProperties().length);
+        for (ClassDefinition aspectDef : aspectDefs)
+        {
+            assertTrue("Not an aspect", aspectDef.isIsAspect());
+            assertNotNull("Aspect should have properties", aspectDef.getProperties());
 
-        // check the second aspect
-        ClassDefinition aspect2 = aspects[0];
-        assertEquals("Aspect2 name is incorrect",
-                "{http://www.alfresco.org/model/content/1.0}auditable", aspect2
-                        .getName());
-        assertTrue("Aspect2 should be an aspect", aspect2.isIsAspect());
-        assertNotNull("Aspect2 should have properties", aspect2.getProperties());
-        assertEquals("Aspect2 has wrong number of properties", 5, aspect2
-                .getProperties().length);
+            String name = aspectDef.getName();
+            if (name.equals("{http://www.alfresco.org/model/system/1.0}referenceable"))
+            {
+                assertEquals("Wrong number of properties", 4, aspectDef.getProperties().length);
+            }
+            else if (name.equals("{http://www.alfresco.org/model/content/1.0}auditable"))
+            {
+                assertEquals("Wrong number of properties", 5, aspectDef.getProperties().length);
+            }
+        }
     }
 
     /**
@@ -792,8 +784,6 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
     
     /**
      * Tests the ability to retrieve the results of a query in batches
-     * 
-     * @throws Exception
      */
     public void xtestQuerySession() throws Exception
     {
