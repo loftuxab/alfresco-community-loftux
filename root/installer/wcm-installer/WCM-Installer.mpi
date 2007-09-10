@@ -329,7 +329,7 @@ File ::C7D27260-D516-4612-A2EA-E754988CBF6D -name web.xml -parent D55980FC-2911-
 File ::3C87D08D-5B72-49EA-9C3A-3978985BACD2 -type dir -name lib -parent D55980FC-2911-496C-8EF2-C68A26335B21
 File ::E16FE391-17B3-4AC2-8F57-DE632C409855 -name catalina-root.jar -parent 3C87D08D-5B72-49EA-9C3A-3978985BACD2
 File ::D39F894B-BC5A-4BFB-9270-32DA8F0CB881 -type dir -name work -parent DF54BCFC-550C-4352-ABCB-F7BB7234B9FD
-File ::E582E831-F953-4453-88CF-AE4E3DF1DB39 -name W:/V21/root/projects/installer/wcm-bootstrap-context.xml -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::E582E831-F953-4453-88CF-AE4E3DF1DB39 -directory <%InstallDir%>/tomcat/shared/classes/alfresco/extension -name W:/V21/root/projects/installer/wcm-bootstrap-context.xml -location ../../projects/installer -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::7097FF95-AEBE-4371-8D94-94D679BF360E -type dir -directory <%InstallDir%>/extras/wcm -name W:/V21/root/projects/installer/extras-wcm -location ../../projects/installer/extras-wcm -parent 9C895371-373A-4923-840C-4F98632E4A99
 File ::782B5CD8-1C83-4633-BDC2-B848EA74A751 -name alfresco-sample-website.war -parent 7097FF95-AEBE-4371-8D94-94D679BF360E
 File ::8F6B2E39-63AE-4381-BC0A-DAEA196BCF1E -name alfresco-wsf-website.war -parent 7097FF95-AEBE-4371-8D94-94D679BF360E
@@ -651,14 +651,17 @@ Condition 05688F0D-447E-4A70-B1DC-1B9433C0F842 -active Yes -parent 9B6636CA-B716
 Condition 2C9998AE-3A35-4709-8148-E361FCC88B70 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {Ask Yes or No} -component AskYesOrNo
 InstallComponent DAFEBC2A-575A-4986-9018-E1E8760F43B0 -setup Install -type action -title {Create Install Panes} -component CreateInstallPanes -active Yes -parent D7C4D154-102D-4E69-BCE9-DE736306B3F2
 InstallComponent A88C91B3-4613-42A4-8B24-8A95EE4C72CB -setup Install -type actiongroup -title {Install Actions} -active Yes -parent ActionGroupsInstall
-InstallComponent 8E3418B4-6A28-498A-85EA-6BE77638C1D1 -setup Install -type action -title {Install Windows Shortcut} -component InstallWindowsShortcut -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 InstallComponent 1F4F3EE9-AAFC-4A65-8F54-4ED69DE1E047 -setup Install -type action -title {Install Selected Files} -component InstallSelectedFiles -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 InstallComponent FA8418AE-1213-4FEC-B2DE-ABA3AD6B0762 -setup Install -type action -conditions C58D266E-9F05-4233-80A6-DE03A0259B23 -title {Install Uninstaller} -component InstallUninstaller -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition C58D266E-9F05-4233-80A6-DE03A0259B23 -active Yes -parent FA8418AE-1213-4FEC-B2DE-ABA3AD6B0762 -title {String Is Condition} -component StringIsCondition
 InstallComponent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -setup Install -type action -conditions 27CE19A4-5473-40A5-BF94-434825CB85B6 -title {Windows Uninstall Registry} -component AddWindowsUninstallEntry -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition 27CE19A4-5473-40A5-BF94-434825CB85B6 -active Yes -parent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -title {String Is Condition} -component StringIsCondition
-InstallComponent 27951917-16C4-4604-BC60-F67560355F36 -setup Install -type action -title {Install Windows Shortcut} -component InstallWindowsShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-InstallComponent 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68 -setup Install -type action -title {Install Windows Shortcut} -component InstallWindowsShortcut -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+InstallComponent 27951917-16C4-4604-BC60-F67560355F36 -setup Install -type action -title {Win Start Shortcut} -component InstallWindowsShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+InstallComponent 866731A5-0954-4EFC-8A47-20EFC1398504 -setup Install -type action -conditions A6A56774-42B3-4BA4-A026-726EEB98383F -title {Nix Start Shortcut} -component InstallDesktopShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+Condition A6A56774-42B3-4BA4-A026-726EEB98383F -active Yes -parent 866731A5-0954-4EFC-8A47-20EFC1398504 -title {Platform Condition} -component PlatformCondition
+InstallComponent 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68 -setup Install -type action -title {Win Stop Shortcut} -component InstallWindowsShortcut -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+InstallComponent 776A577D-90EB-4CDA-A881-BAA643FD698D -setup Install -type action -conditions BAC94ABE-77BA-40D2-B427-C641FCE5559E -title {Nix Stop Shortcut} -component InstallDesktopShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+Condition BAC94ABE-77BA-40D2-B427-C641FCE5559E -active Yes -parent 776A577D-90EB-4CDA-A881-BAA643FD698D -title {Platform Condition} -component PlatformCondition
 InstallComponent 679A07B2-4D09-4796-8F0F-BC470030E967 -setup Install -type action -conditions A7E780FF-A1A2-429A-B9C5-4956E763D1C2 -title {Replace Text In File} -component ReplaceTextInFile -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition A7E780FF-A1A2-429A-B9C5-4956E763D1C2 -active Yes -parent 679A07B2-4D09-4796-8F0F-BC470030E967 -title {Platform Condition} -component PlatformCondition
 InstallComponent 1872EB29-D3C3-49FD-B375-0E33A95CA384 -setup Install -type action -conditions EFFFBFA5-266A-4EC5-B904-A29CF90966FF -title {Uninstall Shortcut} -component InstallProgramFolderShortcut -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
@@ -711,6 +714,9 @@ array set Properties {
 0157B67A-505B-4411-A8FA-D32E045725A5,Caption,subst
 1
 
+0157B67A-505B-4411-A8FA-D32E045725A5,Conditions
+{0 conditions}
+
 0157B67A-505B-4411-A8FA-D32E045725A5,FileValue,subst
 1
 
@@ -736,7 +742,7 @@ array set Properties {
 {Windows scripts}
 
 03791E78-4713-45B0-8559-C66EA67DB28A,Size
-1531
+2939
 
 05688F0D-447E-4A70-B1DC-1B9433C0F842,CheckCondition
 {Before Action is Executed}
@@ -1077,6 +1083,21 @@ Yes
 76737D66-740C-407E-848A-1CCCADF7D84C,Title,subst
 1
 
+776A577D-90EB-4CDA-A881-BAA643FD698D,Conditions
+{1 condition}
+
+776A577D-90EB-4CDA-A881-BAA643FD698D,IconPath
+<%InstallDir%>/AlfrescoLogo32.gif
+
+776A577D-90EB-4CDA-A881-BAA643FD698D,ShortcutName
+{Stop Virtual Server}
+
+776A577D-90EB-4CDA-A881-BAA643FD698D,TargetFileName
+<%InstallDir%>/virtual_stop.sh
+
+776A577D-90EB-4CDA-A881-BAA643FD698D,WorkingDirectory
+<%InstallDir%>
+
 77F3EF54-333D-4039-8ACC-F729F99502AB,CheckCondition
 {Before Action is Executed}
 
@@ -1122,6 +1143,21 @@ Custom
 840E153B-F29E-4184-8941-3C26F456EB0D,ShowSetupType
 No
 
+866731A5-0954-4EFC-8A47-20EFC1398504,Conditions
+{1 condition}
+
+866731A5-0954-4EFC-8A47-20EFC1398504,IconPath
+<%InstallDir%>/AlfrescoLogo32.gif
+
+866731A5-0954-4EFC-8A47-20EFC1398504,ShortcutName
+{Start Virtual Server}
+
+866731A5-0954-4EFC-8A47-20EFC1398504,TargetFileName
+<%InstallDir%>/virtual_start.sh
+
+866731A5-0954-4EFC-8A47-20EFC1398504,WorkingDirectory
+<%InstallDir%>
+
 8B62889B-949F-41CC-B2DE-0C03145DE416,CheckCondition
 {Before Next Action is Executed}
 
@@ -1133,9 +1169,6 @@ No
 
 8B62889B-949F-41CC-B2DE-0C03145DE416,Permission
 {can create}
-
-8E3418B4-6A28-498A-85EA-6BE77638C1D1,Conditions
-{0 conditions}
 
 9357639A-760D-4BDB-AE1C-863ACFDBAEE5,Action
 {Uninstall Actions}
@@ -1168,7 +1201,16 @@ Finish
 {Program Files}
 
 9C895371-373A-4923-840C-4F98632E4A99,Size
-17048606
+19486052
+
+A6A56774-42B3-4BA4-A026-726EEB98383F,CheckCondition
+{Before Action is Executed}
+
+A6A56774-42B3-4BA4-A026-726EEB98383F,Operator
+{is not}
+
+A6A56774-42B3-4BA4-A026-726EEB98383F,Platform
+Windows
 
 A6E46E2E-88B0-450E-8080-CA4034227A6C,BackButton,subst
 1
@@ -1293,6 +1335,15 @@ B8789CBA-5346-4622-B110-5C07D63D8D1B,Message,subst
 B8789CBA-5346-4622-B110-5C07D63D8D1B,NextButton,subst
 1
 
+BAC94ABE-77BA-40D2-B427-C641FCE5559E,CheckCondition
+{Before Action is Executed}
+
+BAC94ABE-77BA-40D2-B427-C641FCE5559E,Operator
+{is not}
+
+BAC94ABE-77BA-40D2-B427-C641FCE5559E,Platform
+Windows
+
 C0127B2B-279D-41E9-B5BF-E8C61362F845,Message,subst
 1
 
@@ -1318,7 +1369,7 @@ C3FE0508-0773-40D6-97C4-1FE52205D032,Name
 {Linux scripts}
 
 C3FE0508-0773-40D6-97C4-1FE52205D032,Size
-492
+1866
 
 C58D266E-9F05-4233-80A6-DE03A0259B23,CheckCondition
 {Before Action is Executed}

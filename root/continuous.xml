@@ -206,7 +206,7 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/wcm-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
          <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.wcm}"' />
       </exec>
       <move todir="${dir.continuous.dist}">
@@ -287,7 +287,7 @@
                      prefix="tomcat" 
                      excludes="bin/*.sh,bin/*.bat,bin/*.exe" />
          <tarfileset dir="${dir.continuous.assemble.tomcat}/bin" 
-                     prefix="tomcat/bin" 
+                     prefix="tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
          <tarfileset dir="${dir.project.installer}"
@@ -320,10 +320,10 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/core-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
          <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.config}"'/>
       </exec>
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
          <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.core}"'/>
       </exec>
       <move todir="${dir.continuous.dist}">

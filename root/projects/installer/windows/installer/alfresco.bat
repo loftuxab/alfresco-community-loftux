@@ -5,7 +5,7 @@ rem ---------------------------------------------------------------------------
 
 rem set Alfresco home (includes trailing \  e.g. c:\alfresco\)
 set ALF_HOME=%~dp0
-set ALF_HOME_URI=%ALF_HOME:\=/%
+rem set ALF_HOME_URI=%ALF_HOME:\=/%
 
 set CATALINA_HOME=%ALF_HOME%tomcat
 
@@ -18,7 +18,7 @@ set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server
 rem The following options are only required for Sun JVMs prior to 1.5 update 8
 set JAVA_OPTS=%JAVA_OPTS% -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeIndexes -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeDeletions
 
-set OPENOFFICE_PATH=%ALF_HOME%OpenOfficePortable
+rem set OPENOFFICE_PATH=%ALF_HOME%OpenOfficePortable
 
 :start
 set PATH=%JAVA_HOME%\bin;%ALF_HOME%bin;%PATH%
@@ -43,7 +43,7 @@ rem if exist "%~dp0virtual_start.bat" call "%~dp0virtual_start.bat"
 rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\OpenOfficePortable.exe" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///%ALF_HOME_URI%oouser" -nologo -headless -nofirststartwizard
+rem if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\OpenOfficePortable.exe" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///%ALF_HOME_URI%oouser" -nologo -headless -nofirststartwizard
 
 goto nostop
 :nostart
@@ -59,6 +59,6 @@ call "%CATALINA_HOME%\bin\shutdown.bat"
 
 rem if exist "%~dp0virtual_start.bat" call "%~dp0virtual_stop.bat" 
 
-if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
+rem if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
 :nostop

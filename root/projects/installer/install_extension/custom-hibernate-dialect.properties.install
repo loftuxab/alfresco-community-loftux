@@ -1,0 +1,35 @@
+#
+# Sample Hibernate configuration for changing Database dialect
+# For a full list: http://www.hibernate.org/hib_docs/v3/reference/en/html_single/#configuration-optional-dialects
+#
+
+#
+# HSQL dialect
+#
+#hsql#hibernate.dialect=org.hibernate.dialect.HSQLDialect
+
+#
+# MySQL dialect (default)
+#
+#mysql#hibernate.dialect=org.hibernate.dialect.MySQLInnoDBDialect
+
+#
+# Oracle dialect
+#
+#oracle#hibernate.dialect=org.hibernate.dialect.Oracle9Dialect
+
+#
+# Sybase dialect
+#
+#sybase#hibernate.dialect=org.alfresco.repo.domain.hibernate.dialect.AlfrescoSybaseAnywhereDialect
+
+#
+# SQLServer dialect
+#
+#sqlserver#hibernate.dialect=org.alfresco.repo.domain.hibernate.dialect.AlfrescoSQLServerDialect
+
+#
+# PostgreSQL dialect
+#
+#postgresql#hibernate.dialect=org.hibernate.dialect.PostgreSQLDialect
+#postgresql#hibernate.query.substitutions=true TRUE, false FALSE
