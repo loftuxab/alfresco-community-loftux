@@ -48,7 +48,7 @@ rem if exist "~dp0virtual_start.bat" call "~dp0virtual_start.bat"
 rem ---------------------------------------
 rem Start OpenOffice for transformations
 rem ---------------------------------------
-if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///%ALF_HOME_URI%oouser" -nologo -headless -nofirststartwizard
+rem if not "%OPENOFFICE_PATH%" == "" call "%OPENOFFICE_PATH%\soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///%ALF_HOME_URI%oouser" -nologo -headless -nofirststartwizard
 
 goto nostop
 :nostart
@@ -64,6 +64,6 @@ call "%CATALINA_HOME%\bin\shutdown.bat"
 
 rem if exist "virtual_start.bat" call virtual_stop.bat 
 
-if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
+rem if not "%OPENOFFICE_PATH%" == "" "%ALF_HOME%bin\process" -k soffice.bin
 
 :nostop

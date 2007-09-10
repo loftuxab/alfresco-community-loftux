@@ -60,7 +60,7 @@
                     distribute-wcm, 
                     distribute-sdk, 
                     distribute-webserviceclient,
-                    distribute-extensions-office2003, 
+                    distribute-extensions-office2003,
                     distribute-deployment,
                     distribute-benchmark, 
                     distribute-amps,
@@ -191,8 +191,9 @@
                      includes="*.sh" 
                      mode="755" />
          <tarfileset dir="${dir.project.installer.linux}"
-                     includes="README_wcm.txt,
-                               wcm-bootstrap-context.xml" />
+                     includes="README_wcm.txt" />
+         <tarfileset dir="${dir.project.installer}"
+                     includes="wcm-bootstrap-context.xml" />
          <tarfileset dir="${dir.project.installer.linux}"
                      includes="virtual_alf.sh" 
                      mode="755" />
@@ -243,7 +244,8 @@
 
    <target name="distribute-tomcat" 
            description="Creates the distibution files for Tomcat"
-           depends="distribute-tomcat-windows, 
+           depends="distribute-config,
+                    distribute-tomcat-windows,
                     distribute-tomcat-linux,
                     distribute-tomcat-installers" />
 
@@ -261,12 +263,16 @@
                                apply_amps.bat,
                                README_mysql.txt,
                                README.txt" />
+         <zipfileset dir="${dir.project.installer.builder}/configwizard/output"
+                     includes="configure.exe" />
+         <zipfileset dir="${dir.project.installer}/install_extension"
+                     prefix="install_extension" />
          <zipfileset dir="${dir.project.installer}"
                      includes="licenses/**,amps/**" />
          <zipfileset dir="${dir.project.installer.extras}" 
                      prefix="extras"
                      excludes="**/*.sh" />
-         <zipfileset dir="${dir.project.installer.alfdata}" 
+         <zipfileset dir="${dir.project.installer.alfdata}"
                      prefix="alf_data" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
@@ -290,10 +296,14 @@
                      prefix="tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
+         <tarfileset dir="${dir.project.installer.builder}/configwizard/output"
+                     includes="configure.bin" />
+         <tarfileset dir="${dir.project.installer}"
+                     includes="install_extension/**" />
          <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**,amps/**" />
          <tarfileset dir="${dir.project.installer.linux}"
-                     includes="*.sh"
+                     includes="**/*.sh"
                      mode="755" />
          <tarfileset dir="${dir.project.installer.linux}"
                      includes="README.txt,
@@ -313,16 +323,10 @@
    </target>
 
    <target name="distribute-tomcat-installers"
-           depends="assemble-virtual">
-      <delete quiet="yes"
-              includeEmptyDirs="true"
-              dir="${dir.project.installer.builder}/configwizard/output" />
+           depends="assemble-virtual, distribute-config">
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/core-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
-         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.config}"'/>
-      </exec>
       <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
          <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.core}"'/>
       </exec>
@@ -331,6 +335,15 @@
             <include name="**/*"/>
          </fileset>
       </move>
+   </target>
+
+   <target name="distribute-config" depends="init">
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.project.installer.builder}/configwizard/output" />
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.config}"'/>
+      </exec>
    </target>
 
    <target name="assemble-tomcat"

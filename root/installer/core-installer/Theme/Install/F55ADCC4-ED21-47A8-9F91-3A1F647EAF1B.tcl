@@ -45,8 +45,8 @@ proc CreateWindow.F55ADCC4-ED21-47A8-9F91-3A1F647EAF1B {wizard id} {
     ttk::checkbutton $base.clientarea.openoffice -text "Download and install OpenOffice.org component"  -variable ::info(InstallOpenOffice)
     grid $base.clientarea.openoffice -row 1 -column 0 -sticky nw
 
-    ttk::checkbutton $base.clientarea.64bit -text "Use 64 bit components when available" -variable ::info(Download64BitComponents)
-    grid $base.clientarea.64bit -row 2 -column 0 -sticky nw -pady {20 0}
+#    ttk::checkbutton $base.clientarea.64bit -text "Use 64 bit components when available" -variable ::info(Download64BitComponents)
+#    grid $base.clientarea.64bit -row 2 -column 0 -sticky nw -pady {20 0}
 
     Label $base.message -anchor nw -justify left -autowrap 1  -textvariable [$wizard variable $id -text4]
     grid $base.message -row 4 -sticky nsew -padx 8 -pady [list 4 8]

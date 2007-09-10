@@ -12,15 +12,15 @@ if [ "$1" = "start" ]; then
 #  if [ -r ./virtual_start.sh ]; then
 #    sh ./virtual_start.sh
 #  fi
-  if [ -r ./start_oo.sh ]; then
-    sh ./start_oo.sh
-  fi
+#  if [ -r ./start_oo.sh ]; then
+#    sh ./start_oo.sh
+#  fi
 elif [ "$1" = "stop" ]; then
   "$APPSERVER"/bin/shutdown.sh
 #  if [ -r ./virtual_start.sh ]; then
 #    sh ./virtual_stop.sh
 #  fi
-  if [ -r ./start_oo.sh ]; then
-    killall soffice.bin
-  fi
+#  if [ -r ./start_oo.sh ]; then
+#    killall soffice.bin
+#  fi
 fi

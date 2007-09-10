@@ -1136,9 +1136,9 @@ Condition 86FE7E21-540A-4308-B218-58F119315CFF -active Yes -parent 28F3EC22-F62C
 InstallComponent 1801A1B1-5BF3-4FC3-8DF4-082F6964EAC2 -setup Install -type action -title {Create Install Panes} -component CreateInstallPanes -active Yes -parent 3456E921-CDE5-424E-8959-EAA4C0B38FBE
 InstallComponent F0D925F6-6364-4BF3-BFED-6F8B51DA9235 -setup Install -type actiongroup -title {Install Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 03D50B48-5783-43C0-9DCD-0E7FD10E1FC6 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
-InstallComponent 2058D4E7-03DC-41E5-B696-5C92D31AC950 -setup Install -type action -conditions 87533E82-F0AC-4809-B317-1BE4CD0F3BCD -title {Execute Script} -component ExecuteScript -command insert -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
+InstallComponent 2058D4E7-03DC-41E5-B696-5C92D31AC950 -setup Install -type action -conditions 87533E82-F0AC-4809-B317-1BE4CD0F3BCD -title {Execute Script} -component ExecuteScript -command reorder -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
 Condition 87533E82-F0AC-4809-B317-1BE4CD0F3BCD -active Yes -parent 2058D4E7-03DC-41E5-B696-5C92D31AC950 -title {Port Test Condition} -component PortTestCondition
-InstallComponent D3C7C471-C755-404B-9668-89C76F2E8FC7 -setup Install -type action -conditions A869AF59-5D98-431A-A562-4FB191B0E470 -title {Download Zip Files} -component FetchURL -command insert -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
+InstallComponent D3C7C471-C755-404B-9668-89C76F2E8FC7 -setup Install -type action -conditions A869AF59-5D98-431A-A562-4FB191B0E470 -title {Download Zip Files} -component FetchURL -command reorder -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
 Condition A869AF59-5D98-431A-A562-4FB191B0E470 -active Yes -parent D3C7C471-C755-404B-9668-89C76F2E8FC7 -title {Virtual Text Test Condition} -component VirtualTextTestCondition
 InstallComponent FEE08BFB-5B3D-421E-AC72-C71A6BE0BFC0 -setup Install -type action -title {Install Selected Files} -component InstallSelectedFiles -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
 InstallComponent 84719F76-386D-4CAC-837C-20C29C17EB48 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
@@ -1391,9 +1391,9 @@ http://localhost:8080/alfresco
 
 2058D4E7-03DC-41E5-B696-5C92D31AC950,TclScript
 {set bits 32
-if {<%Download64BitComponents%>} {
-    set bits 64
-}
+#if {<%Download64BitComponents%>} {
+#    set bits 64
+#}
 
 if {<%InstallJDK%>} {
     set ::info(JavaZipFile) java-<%Platform%>-$bits.zip
@@ -2144,8 +2144,8 @@ Windows
 87533E82-F0AC-4809-B317-1BE4CD0F3BCD,CheckCondition
 {Before Action is Executed}
 
-87533E82-F0AC-4809-B317-1BE4CD0F3BCD,Operator
-{cannot bind}
+87533E82-F0AC-4809-B317-1BE4CD0F3BCD,FailureMessage
+{Unable to acces download location: ignoring download request.}
 
 87533E82-F0AC-4809-B317-1BE4CD0F3BCD,Port
 <%DownloadURL%>
@@ -2359,7 +2359,7 @@ Windows
 {Program Files}
 
 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1,Size
-62595431
+62626233
 
 9A4AB9E2-2B87-47C2-894E-8A8C9D6FCA7F,ObjectID
 {Java File Group}
@@ -2386,7 +2386,7 @@ Windows
 {Windows Files}
 
 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D,Size
-6190111
+6137382
 
 A0BB5354-D39E-4ACA-A63E-1C635EA36CE5,Conditions
 {1 condition}
@@ -2866,7 +2866,7 @@ E5891213-6EC8-4636-B2E5-9CEE82670119,Name
 {Linux Files}
 
 E5891213-6EC8-4636-B2E5-9CEE82670119,Size
-1230077
+1230572
 
 EA10E9B0-F564-46FE-A7E2-88C53396D8BD,Conditions
 {1 condition}
@@ -3693,7 +3693,7 @@ ECEFADA4-0700-4EBA-92CB-829E9EFC8229,Description
 <%ProgramFilesDescription%>
 
 F55ADCC4-ED21-47A8-9F91-3A1F647EAF1B,Caption
-Caption
+{If you do not already have a JDK or OpenOffice you may download them now.}
 
 F55ADCC4-ED21-47A8-9F91-3A1F647EAF1B,Message
 {<%Status%> }

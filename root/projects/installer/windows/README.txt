@@ -77,8 +77,16 @@ done at any point after Alfresco has been installed.
 - Browse to http://download.openoffice.org
 - Download the Windows version
 - Install OpenOffice with defaults (except file associations, unless you wish to)
-- Start one of the OpenOffice programs to go through initial registration, then close it
+- Run the Alfresco configuration wizard (below) and set the installed location
 - Stop and restart the Alfresco server if it is already running
+
+
+Configuration Wizard
+--------------------
+
+A configuration wizard (configure) is provided as part of the bundle.  This can be
+used to modify the content store, indexes and OpenOffice locations.  It can also be
+used to set the basic DB configuration.  This wizard may be run as often as desired.
 
 
 ===========================

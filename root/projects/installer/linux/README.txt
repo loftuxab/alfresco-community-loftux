@@ -91,10 +91,19 @@ done at any point after Alfresco has been installed.
 - Browse to http://download.openoffice.org
 - Download the Linux version
 - Install OpenOffice
-- Start one of the OpenOffice programs to go through initial registration, then close it
-- Rename '/opt/alfresco/zstart_oo.sh' to '/opt/alfresco/start_oo.sh'
-- Edit '/opt/alfresco/start_oo.sh' and set the correct location for OpenOffice
+- Run the Alfresco configuration wizard (below) and set the installed location
 - Stop and restart the Alfresco server if it is already running
+
+
+Configuration Wizard
+--------------------
+
+A configuration wizard (configure) is provided as part of the bundle.  This can be
+used to modify the content store, indexes and OpenOffice locations.  It can also be
+used to set the basic DB configuration.  This wizard may be run as often as desired.
+
+The wizard can be run in console mode using the command:
+   ./configure.bin -mode Console
 
 
 ===========================
