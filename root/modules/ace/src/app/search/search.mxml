@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"    backgroundColor="#275065" width="83%" height="91">	
+
+	<!-- Import css style sheet -->
+    <mx:Style source="search.css"/> 
+   
+   	<!-- Import action script -->
+   	<mx:Script source="searchScript.as"/> 
+					
+	<mx:Image source="@Embed(source='../../images/ace-mark.png')" />
+	
+	<mx:HBox paddingTop="25" paddingLeft="145">
+		
+		<mx:TextInput   id="searchTxt"  />
+		<mx:Button id="SearchBtn"  label="Search"  cornerRadius="0" color="#FFFFFF" click="onSearchButtonLinkClick()"/>
+		<mx:LinkButton label="Advanced Search" x="498.5" y="35" textDecoration="underline" color="#FFFFFF"/>
+					
+	</mx:HBox>
+	
+</mx:Canvas>			
