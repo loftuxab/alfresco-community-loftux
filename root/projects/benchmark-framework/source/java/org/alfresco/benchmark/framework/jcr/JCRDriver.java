@@ -43,7 +43,8 @@ import org.alfresco.benchmark.framework.UnitsOfWork;
 import org.alfresco.benchmark.framework.dataprovider.DataProviderComponent;
 import org.alfresco.benchmark.framework.dataprovider.PropertyProfile;
 import org.alfresco.benchmark.framework.dataprovider.RepositoryProfile;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.sun.japex.TestCase;
 
@@ -52,7 +53,7 @@ import com.sun.japex.TestCase;
  */
 public class JCRDriver extends BaseBenchmarkDriver implements UnitsOfWork
 {
-    private static final Logger logger = Logger.getLogger(JCRDriver.class);
+    private static final Log    logger = LogFactory.getLog(JCRDriver.class);
     
     protected Repository repository;
     

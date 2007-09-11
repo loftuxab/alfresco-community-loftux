@@ -48,7 +48,8 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.EqualsHelper;
 import org.alfresco.util.GUID;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.NullValue;
@@ -62,7 +63,7 @@ import com.caucho.quercus.env.Value;
 public class Node implements ScriptObject
 {
     /** Logger **/
-    private static Logger logger = Logger.getLogger(Node.class);
+    private static Log    logger = LogFactory.getLog(Node.class);
     
     /** Script object name */
     private static final String SCRIPT_OBJECT_NAME = "Node";
