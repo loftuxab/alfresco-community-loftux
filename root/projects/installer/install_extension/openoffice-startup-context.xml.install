@@ -18,7 +18,7 @@
       <property name="commandMap">
           <map>
               <entry key=".*">
-                  <value><![CDATA["@@ALF_OO@@/program/soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///@@ALF_HOME@@/oouser" -nologo -headless -nofirststartwizard]]></value>
+                  <value><![CDATA["@@ALF_OO@@/program/soffice" "-accept=socket,host=localhost,port=8100;urp;StarOffice.ServiceManager" "-env:UserInstallation=file:///@@ALF_HOME@@/oouser" -nologo -headless -nofirststartwizard -nocrashrep -norestore]]></value>
               </entry>
           </map>
       </property>

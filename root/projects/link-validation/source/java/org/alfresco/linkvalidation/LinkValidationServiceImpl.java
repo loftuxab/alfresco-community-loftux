@@ -220,6 +220,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     VirtServerRegistry virtreg_;
 
+    Thread validation_update_thread_;
+    
     public LinkValidationServiceImpl() { }
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
@@ -325,9 +327,13 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     //-------------------------------------------------------------------------
     public synchronized void onBootstrap()
     {
+        // It's important that validation_update_thread_ is a member variable 
+        // not just local;  otherwise, the class could get tossed before
+        // the thread using the class is done executing.
+
         Shutdown_ = false;
-        Thread validation_update_thread = new Thread(this);
-        validation_update_thread.start();
+        validation_update_thread_ = new Thread(this);
+        validation_update_thread_.start();
     }
     //-------------------------------------------------------------------------
     /**
@@ -335,7 +341,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  that any link status checking operation in progress is abandoned.
     */
     //-------------------------------------------------------------------------
-    public synchronized void onShutdown() { Shutdown_ = true; }
+    public synchronized void onShutdown() 
+    {
+        Shutdown_ = true;
+        if ( validation_update_thread_ != null)
+        {
+            try { validation_update_thread_.interrupt(); }
+            catch ( Exception ex) { /* nothing to do */ }
+        }
+    }
 
 
     //-------------------------------------------------------------------------
@@ -510,9 +524,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             // Sleep regardless of whether the updateHrefInfo failed
             try { Thread.sleep( poll_interval_ ); }
-            catch (Exception e)
+            catch (InterruptedException ie)
             {
                 /* nothing to do */
+            }
+            catch (Exception e)
+            {
                 if ( log.isDebugEnabled() )
                     log.debug("Troubled sleep(): " + e.getMessage());
             }
