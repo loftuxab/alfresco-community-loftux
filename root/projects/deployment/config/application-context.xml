@@ -2,7 +2,22 @@
 <!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
 
 <beans>
-    <bean id="properties" 
+     <!-- Sample FSDeploymentRunnable implementation - add others here -->
+     <bean id="sampleRunnable" class="org.alfresco.deployment.SampleRunnable"/>
+     
+     <bean id="sampleProgramRunnable" class="org.alfresco.deployment.ProgramRunnable">
+         <property name="program"><value>/bin/cp</value></property>
+         <!-- Arguments that get appended to the final command line -->
+         <property name="arguments">
+             <list>
+                 <value>/Users/britt/dump.txt</value>
+             </list>
+         </property>
+         <!-- The directory that the program runs in. -->
+         <property name="directory"><value>/</value></property>
+     </bean>
+  
+     <bean id="properties" 
           class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="ignoreUnresolvablePlaceholders">
             <value>true</value>
@@ -33,10 +48,6 @@
             	    	<entry key="root"><value>target</value></entry>
             	    	<entry key="user"><value>admin</value></entry>
             	    	<entry key="password"><value>admin</value></entry>
-            	    	<entry key="runnable"><value>org.alfresco.deployment.SampleRunnable</value></entry>
-            	    	<!-- 
-            	    	<entry key="program"><value>/path/to/program</value></entry>
-            	    	 -->
             	    </map>
             	</entry>
                <entry key="sampleTarget">
@@ -44,10 +55,12 @@
                      <entry key="root"><value>target</value></entry>
                      <entry key="user"><value>Giles</value></entry>
                      <entry key="password"><value>Watcher</value></entry>
-                     <entry key="runnable"><value>org.alfresco.deployment.SampleRunnable</value></entry>
-                     <!-- 
-                     <entry key="program"><value>/path/to/program</value></entry>
-                      -->
+                     <entry key="runnables">
+                         <list>
+                             <ref bean="sampleRunnable"/>
+                             <!-- <ref bean="sampleProgramRunnable"/> -->
+                         </list>
+                     </entry>
                    </map>
                </entry>
             </map>

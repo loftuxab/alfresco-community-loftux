@@ -26,7 +26,9 @@
 package org.alfresco.deployment.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -43,7 +45,7 @@ public class Configuration
 {
     private String fMetaDataDirectory;
     
-    private Map<String, Map<String, String>> fTargetData;
+    private Map<String, Map<String, Object>> fTargetData;
     
     private Map<String, Target> fTargets;
 
@@ -56,7 +58,7 @@ public class Configuration
         fTargets = new HashMap<String, Target>();
     }
     
-    public void setTargetData(Map<String, Map<String, String>> targetData)
+    public void setTargetData(Map<String, Map<String, Object>> targetData)
     {
         fTargetData = targetData;
     }
@@ -76,6 +78,7 @@ public class Configuration
         fDataDirectory = dataDirectory;
     }
     
+    @SuppressWarnings("unchecked")
     public void init()
     {
         // Create the various necessary directories if they don't already exits.
@@ -94,47 +97,37 @@ public class Configuration
         {
             data.mkdirs();
         }
-        for (Map.Entry<String, Map<String, String>> entry : fTargetData.entrySet())
+        for (Map.Entry<String, Map<String, Object>> entry : fTargetData.entrySet())
         {
-            Map<String, String> targetEntry = entry.getValue();
+            Map<String, Object> targetEntry = entry.getValue();
             String targetName = entry.getKey();
-            String root = targetEntry.get("root");
+            String root = (String)targetEntry.get("root");
             if (root == null)
             {
                 throw new DeploymentException("No root specification for target " +
                                               targetName);
             }
-            String user = targetEntry.get("user");
+            String user = (String)targetEntry.get("user");
             if (user == null)
             {
                 throw new DeploymentException("No user specification for target " +
                                               targetName);
             }
-            String password = targetEntry.get("password");
+            String password = (String)targetEntry.get("password");
             if (password == null)
             {
                 throw new DeploymentException("No password specification for target " +
                                               targetName);
             }
-            FSDeploymentRunnable runner = null;
-            String runnable = targetEntry.get("runnable");
-            if (runnable != null)
+            List<FSDeploymentRunnable> runnables = (List<FSDeploymentRunnable>)targetEntry.get("runnables");
+            if (runnables == null)
             {
-                try
-                {
-                    runner = (FSDeploymentRunnable)Class.forName(runnable).newInstance();
-                }
-                catch (Exception e)
-                {
-                    throw new DeploymentException("Could not instantiate " + runnable + " in target " + targetName);
-                }
+                runnables = new ArrayList<FSDeploymentRunnable>();
             }
-            String program = targetEntry.get("program");
             fTargets.put(targetName, new Target(targetName,
                                                 root,
                                                 fMetaDataDirectory + File.separator + targetName + ".md",
-                                                runner,
-                                                program,
+                                                runnables,
                                                 user,
                                                 password));
         }

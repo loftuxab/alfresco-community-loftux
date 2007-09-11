@@ -28,15 +28,12 @@ package org.alfresco.deployment.impl.server;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.SortedSet;
 
 import org.alfresco.deployment.FSDeploymentRunnable;
@@ -84,14 +81,9 @@ public class Target implements Serializable
     private String fPassword;
     
     /**
-     * A special runnable that will be invoked after commit.
+     * Runnables that will be invoked after commit.
      */
-    private FSDeploymentRunnable fRunnable;
-    
-    /**
-     * An external program to be run after a commit.
-     */
-    private String fProgram;
+    private List<FSDeploymentRunnable> fRunnables;
     
     /**
      * Make one up.
@@ -102,16 +94,14 @@ public class Target implements Serializable
     public Target(String name,
                   String root,
                   String metadata,
-                  FSDeploymentRunnable runnable,
-                  String program,
+                  List<FSDeploymentRunnable> runnables,
                   String user,
                   String password)
     {
         fTargetName = name;
         fRootDirectory = root;
         fMetaDataDirectory = metadata;
-        fRunnable = runnable;
-        fProgram = program;
+        fRunnables = runnables;
         fUser = user;
         fPassword = password;
         // On initial server bringup, there will be no metadata directory.
@@ -515,42 +505,20 @@ public class Target implements Serializable
 
     public void runPostCommit(Deployment deployment)
     {
-        if (fRunnable != null)
+        if (fRunnables != null && fRunnables.size() > 0)
         {
-            fRunnable.init(deployment);
-            fRunnable.run();
-            return;
-        }
-        if (fProgram != null)
-        {
-            try
+            for (FSDeploymentRunnable runnable : fRunnables)
             {
-                File tempFile = File.createTempFile("deployment", "txt");
-                Writer out = new FileWriter(tempFile);
-                for (DeployedFile file : deployment)
+                try
                 {
-                    out.write(file.getType().toString() + " " + file.getPath() + " " + file.getGuid() + "\n");
+                    deployment.resetLog();
+                    runnable.init(deployment);
+                    runnable.run();
                 }
-                out.close();
-                Runtime runTime = Runtime.getRuntime();
-                String[] command = { fProgram, tempFile.getAbsolutePath() };
-                Map<String, String> envMap = System.getenv();
-                String[] env = new String[envMap.size()];
-                int off = 0;
-                for (Map.Entry<String, String> entry : envMap.entrySet())
+                catch (IOException e)
                 {
-                    env[off++] = entry.getKey() + '=' + entry.getValue();
+                    // Do Nothing for Now.
                 }
-                Process process = runTime.exec(command, env, new File(fRootDirectory));
-                process.waitFor();
-            }
-            catch (IOException ie)
-            {
-                // Do nothing for now.
-            }
-            catch (InterruptedException inte)
-            {
-                // Do nothing for now.
             }
         }
     }

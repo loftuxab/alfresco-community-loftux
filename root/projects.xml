@@ -785,12 +785,6 @@
            basedir="${dir.project.jndi.classes}" />
    </target>
    
-   <target name="test-jndi" 
-           description="Runs the tests for the JNDI project" 
-           depends="compile-jndi">
-      <run-tests projectdir="${dir.project.jndi}" />
-   </target>
-   
    <target name="generate-javadocs-jndi" 
            description="Generates the JavaDocs for the JNDI project"
            depends="init">
