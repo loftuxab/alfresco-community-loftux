@@ -1,6 +1,0 @@
-
- Even though everything in repo-1 gets loaded into the AVM,
- the AVMHostConfig class only loads things under appBase.
-
- Therefore, this file should not show up in Alice's avm_webapp.
-

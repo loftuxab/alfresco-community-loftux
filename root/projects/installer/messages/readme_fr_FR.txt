@@ -70,4 +70,4 @@ http://forge.alfresco.com/projects/languagefr/
 
 Auteur(s) Originaux : L'équipe Alfresco
 Traduction originale Anglais - Français : Camille Bégnis, Laurent Genier, Christian Roy, Philippe Seillier, Frank Shipley
-Contributeurs à cette version : Laurent Genier
+Contributeurs à cette version : Jean-Luc Borie, Jean-Loup Darnay, Laurent Genier, Michael Harlaut, Frank Shipley 

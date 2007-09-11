@@ -443,7 +443,6 @@
                     test-deployment, 
                     test-repository, 
                     test-remoteapi, 
-                    test-jndi, 
                     test-catalinavirtual, 
                     test-webclient, 
                     test-webserviceclient" />
