@@ -31,7 +31,8 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.web.app.servlet.DownloadContentServlet;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -42,7 +43,7 @@ import org.apache.log4j.Logger;
 public class ContentData implements ScriptObject
 {
     /** Logger **/
-    private static Logger logger = Logger.getLogger(ContentData.class);
+    private static Log    logger = LogFactory.getLog(ContentData.class);
     
     /** The name of the script extension */
     private static final String SCRIPT_OBJECT_NAME = "ContentData";

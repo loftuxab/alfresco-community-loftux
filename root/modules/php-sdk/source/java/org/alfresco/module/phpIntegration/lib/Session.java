@@ -36,7 +36,8 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.namespace.QName;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * The PHP Session object implementation.
@@ -46,7 +47,7 @@ import org.apache.log4j.Logger;
 public class Session implements ScriptObject
 {
     /** Logger */
-    private static Logger logger = Logger.getLogger(Session.class);
+    private static Log    logger = LogFactory.getLog(Session.class);
     
     /** Script object name */
     private static final String SCRIPT_OBJECT_NAME = "Session";

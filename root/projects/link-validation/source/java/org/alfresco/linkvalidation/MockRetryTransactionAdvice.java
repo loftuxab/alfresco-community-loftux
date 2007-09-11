@@ -29,7 +29,8 @@ package  org.alfresco.linkvalidation;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.apache.log4j.Logger;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.aop.framework.ReflectiveMethodInvocation;
 
@@ -38,7 +39,7 @@ import org.springframework.aop.framework.ReflectiveMethodInvocation;
 */
 public class MockRetryTransactionAdvice implements MethodInterceptor 
 {
-    private static Logger log = Logger.getLogger(MockRetryTransactionAdvice.class);
+    private static Log    log = LogFactory.getLog(MockRetryTransactionAdvice.class);
     
     public MockRetryTransactionAdvice()
     {

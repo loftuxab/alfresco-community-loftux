@@ -388,12 +388,28 @@ public class AVMHostConfig extends HostConfig
                     //     Function Q :  What  am I directly overlaying? | B | B | B |
                     //                                                   +-----------+
 
+                    String webapp_entry_path = 
+                               webapp_entry.getValue().getPath();
+
+
+                    if (log.isErrorEnabled())
+                        log.debug("webapp_entry_path: " + webapp_entry_path);
+
+                    String webapp_entry_indirection_path = 
+                               AVMRemote_.getIndirectionPath( -1, webapp_entry_path );
+
+                    if (log.isErrorEnabled())
+                        log.debug( "AVMWebappDescriptor: -1"      + "," +
+                                    store_name                    + "," + 
+                                    webapp_entry_indirection_path + "," + 
+                                    dns_store_path                + "," +
+                                    webapp_name);
+
                     AVMWebappDescriptor webapp_desc =
                         new AVMWebappDescriptor(
                         -1,             // version
                         store_name,     // mysite
-                        AVMRemote_.getIndirectionPath(
-                            -1, webapp_entry.getValue().getPath()),
+                        webapp_entry_indirection_path,
                             // this gets the indirection path even if,
                             // physically, the path is not a layered
                             // directory, as long as the
@@ -1211,6 +1227,10 @@ public class AVMHostConfig extends HostConfig
 
             if ( desc.indirection_name_ != null )
             {
+                if( log.isDebugEnabled() )
+                    log.debug("Indirection name for:  " +  
+                               store_path  + " is: "+ desc.indirection_name_ );
+
                 // This webapp dir is shadowing something in another layer.
                 // By convention, webapp overlays always span 2 different
                 // AVM stores because each AVM store is associated with
@@ -1227,6 +1247,10 @@ public class AVMHostConfig extends HostConfig
                     String parent_store =
                         desc.indirection_name_.substring(0,index);
 
+                    if( log.isDebugEnabled() )
+                        log.debug("parent_store for:  " +  
+                                   desc.store_name_  + " is: "+ parent_store);
+
                     if ( ! parent_store.equals( desc.store_name_ ) )
                     {
                         // See comment in previous invocation of
@@ -1236,6 +1260,11 @@ public class AVMHostConfig extends HostConfig
                                                   parent_store);
                     }
                 }
+            }
+            else
+            {
+                if( log.isDebugEnabled() )
+                    log.debug("Indirection name is null for: " +  store_path);
             }
         }
 
