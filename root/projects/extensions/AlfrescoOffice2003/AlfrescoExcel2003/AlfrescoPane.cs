@@ -319,7 +319,11 @@ namespace AlfrescoExcel2003
 
          string currentDocPath = m_ExcelApplication.ActiveWorkbook.FullName;
          // Ensure last separator is present
-         if (!relativeDirectory.EndsWith("/"))
+         if (relativeDirectory == null)
+         {
+            relativeDirectory = "/";
+         }
+         else if (!relativeDirectory.EndsWith("/"))
          {
             relativeDirectory += "/";
          }

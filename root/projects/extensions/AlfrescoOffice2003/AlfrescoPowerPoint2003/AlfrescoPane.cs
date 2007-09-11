@@ -389,7 +389,11 @@ namespace AlfrescoPowerPoint2003
 
          string currentDocPath = m_PowerPointApplication.ActivePresentation.FullName;
          // Ensure last separator is present
-         if (!relativeDirectory.EndsWith("/"))
+         if (relativeDirectory == null)
+         {
+            relativeDirectory = "/";
+         }
+         else if (!relativeDirectory.EndsWith("/"))
          {
             relativeDirectory += "/";
          }

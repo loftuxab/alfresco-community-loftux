@@ -80,6 +80,9 @@
          <!-- Multilingual Tests -->
          <exclude name="**/org/alfresco/repo/model/ml/**/*Test.java" />
          <include name="**/org/alfresco/repo/model/ml/MultilingualTestSuite.java" />
+         <!-- FileFolder Tests -->
+         <exclude name="**/org/alfresco/repo/model/filefolder/**/*Test.java" />
+         <include name="**/org/alfresco/repo/model/filefolder/FileFolderTestSuite.java" />
          <!-- All other tests -->
          <include name="**/*Test.java" />
          <!-- include the updated indexer tests -->

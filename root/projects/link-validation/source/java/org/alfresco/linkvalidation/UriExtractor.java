@@ -160,7 +160,8 @@ public class UriExtractor
         byte [] dec = new byte[ length ];
         byte [] enc = str.getBytes();
 
-        for (int i=0, j=0; i<length; i++, j++)
+        int j=0;
+        for (int i=0; i<length; i++, j++)
         {
             int x1, x2;
             if ( (enc[i] == '%') && ( i + 2 < length ) &&
@@ -172,7 +173,7 @@ public class UriExtractor
             }
             else { dec[j] = enc[i]; }
         }
-        return new String( dec );
+        return new String( dec, 0, j );   // dec might be smaller than enc
     }
 
 

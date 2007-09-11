@@ -80,6 +80,9 @@ InstallPassword
 InstallVersion
 2.1.0.0
 
+InstallWCM
+No
+
 JavaZipFile
 java-<%Platform%>-32.zip
 
@@ -168,7 +171,7 @@ UpgradeApplicationID
 {}
 
 Version
-2.1
+2.1.0
 
 ViewReadme
 Yes
@@ -397,6 +400,10 @@ File ::AA631ABE-D9CE-45B1-89BE-E4693D5733B1 -type dir -name bootstrap -parent 87
 File ::36339C28-2185-4595-B250-E8617DC09ADD -name split-person-cleanup-context.xml.sample -parent AA631ABE-D9CE-45B1-89BE-E4693D5733B1
 File ::9BC0B623-D1C3-4AAB-A116-6103B185F4AE -type dir -name license -parent 8785BD63-5AA7-4C63-BBC1-104C71ABAE78
 File ::26080561-5CF6-4A88-950E-F84216AF5848 -name howToInstallLicense.txt -parent 9BC0B623-D1C3-4AAB-A116-6103B185F4AE
+File ::32AE4349-D6F3-494F-B87F-C2255E147379 -name asynchronous-avm-indexing-context.xml.sample -parent 8785BD63-5AA7-4C63-BBC1-104C71ABAE78
+File ::64941435-62F3-45A1-8055-0BEF17177401 -name ldap-authentication.properties -parent 8785BD63-5AA7-4C63-BBC1-104C71ABAE78
+File ::BF26CE3F-0245-4487-A6D7-057A6B6AA89C -name ldap-synchronisation-context.xml.sample -parent 8785BD63-5AA7-4C63-BBC1-104C71ABAE78
+File ::E41ED09A-C800-4636-9C3C-ADBFCCEEB84F -name ldap-synchronisation.properties -parent 8785BD63-5AA7-4C63-BBC1-104C71ABAE78
 File ::D77195E7-38C8-43B5-AE35-2BC7C7618C52 -type dir -name messages -parent 8D8D8048-9A6E-41B2-A74C-1E78840FF2DB
 File ::888D80DD-D0B4-494A-BE90-4DF0EADC6A6E -name _glossary_ru_ru.txt -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::337067F6-127A-475F-84E9-AC17C835FC14 -name _release_notes_ru_ru.txt -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
@@ -811,6 +818,23 @@ File ::3E219DF1-A38B-457B-A4EB-74DE8D043837 -name workflow-messages_hr_HR.proper
 File ::27EC327F-85F7-480C-97F7-01F78B1D0678 -name workflow-messages_pl_PL.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::AF23EE85-4207-4BA6-8AFD-7CD73848CFCA -name workflow-messages_ru_RU.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::504857F3-E4B7-40E4-AA01-4F71B9DD6FAB -name workflow_pt_PT-interpreter-help.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::9F26BAB9-BA5D-4B82-8476-3D683F94AD0F -name avm-messages_hr_HR.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::82B49D15-D4E4-4622-BB3E-58BBC296D6B9 -name avm-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::0FC4B4DC-9081-4382-B802-CE615159815E -name bpm-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::6D795D7A-A9A4-4A96-9E76-32910E0A07C8 -name content-filter-languages_hr_HR.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::0AF05AEB-CA4E-4EBC-939F-0C8041A4CA5A -name content-filter-languages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::6E2CCA08-DDB1-4E19-B7BD-36D5BB6C816E -name copy-service_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::C1C273EC-A10A-4AB4-8691-18A133CE184B -name jbpm_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::87270C1D-87BC-4166-BFD4-EBD8E9416BF1 -name module-messages_hr_HR.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::DC381F1B-B5A4-45A0-ADF7-80226F17E8FF -name module-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::2E225363-6CD1-486D-96EE-230797C80215 -name schema-update_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::6F62EACB-7543-41ED-B534-BAC6F3DE55F9 -name wcm-workflow-messages_fr_FR.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::2EBCAD4A-5C17-4445-AD94-4587D95AAFB7 -name wcm-workflow-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::B7DF9531-C2F8-4386-9B2E-4FE3BB605EB0 -name webdav-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::E67D1CA5-40F2-4643-BAF0-7BBE6A9AF015 -name webscripts_hr_HR.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::959D48B3-1CAA-48FB-AF5A-0A4CAE0DABA2 -name webscripts_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::1B60EF72-CF24-423B-8F22-ED5683948084 -name workflow-interpreter-help_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::93430A4B-BD65-48D3-AB1E-E316617781D8 -name workflow-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::561191B3-A37D-4A18-83C2-6269E4526CDF -type dir -name lib -parent 0AAF8C4E-700B-4343-A448-3154AACB83C1
 File ::4FDA2F80-1DB2-4D84-9477-DD6A76BA45C6 -type dir -name temp -parent F7441516-B2B2-4AD9-A9E5-5EC1AF95FE78
 File ::7865F8E2-C505-4214-BD9D-D2EFA47983C9 -name bugzilla37035-safeToDelete.tmp -parent 4FDA2F80-1DB2-4D84-9477-DD6A76BA45C6
@@ -1085,8 +1109,7 @@ InstallComponent FA24A94E-4A51-4286-A46E-B7E699A99231 -setup Install -type pane 
 InstallComponent C256CB22-CF9A-4043-9CBF-FAF9DE404970 -setup Install -type action -conditions {ACEA288F-0E6C-4E40-947B-3D41AABBF094 791C2282-8F41-4524-9F68-6EED04077AC0} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent FA24A94E-4A51-4286-A46E-B7E699A99231
 Condition ACEA288F-0E6C-4E40-947B-3D41AABBF094 -active Yes -parent C256CB22-CF9A-4043-9CBF-FAF9DE404970 -title {File Exists Condition} -component FileExistsCondition
 Condition 791C2282-8F41-4524-9F68-6EED04077AC0 -active Yes -parent C256CB22-CF9A-4043-9CBF-FAF9DE404970 -title {String Is Condition} -component StringIsCondition
-InstallComponent DF7FBDEA-2FCC-4191-8A25-ED638D0D6413 -setup Install -type action -conditions AAAE9D52-7D91-48A7-9A8B-8157C932AD08 -title {Configure Checkbutton} -component AddWidget -command insert -active Yes -parent FA24A94E-4A51-4286-A46E-B7E699A99231
-Condition AAAE9D52-7D91-48A7-9A8B-8157C932AD08 -active Yes -parent DF7FBDEA-2FCC-4191-8A25-ED638D0D6413 -title {File Exists Condition} -component FileExistsCondition
+InstallComponent DF7FBDEA-2FCC-4191-8A25-ED638D0D6413 -setup Install -type action -title {Configure Checkbutton} -component AddWidget -command reorder -active Yes -parent FA24A94E-4A51-4286-A46E-B7E699A99231
 InstallComponent A2E5CDBD-9AD5-4788-8634-6A7FB8291670 -setup Install -type action -conditions {6B2303C2-71BB-420E-BD0C-F64FDE038B95 8F3E0707-A6FB-4648-8925-09B1B789B185} -title {Desktop Shortcut Checkbutton} -component AddWidget -command insert -active Yes -parent FA24A94E-4A51-4286-A46E-B7E699A99231
 Condition 6B2303C2-71BB-420E-BD0C-F64FDE038B95 -active Yes -parent A2E5CDBD-9AD5-4788-8634-6A7FB8291670 -title {File Exists Condition} -component FileExistsCondition
 Condition 8F3E0707-A6FB-4648-8925-09B1B789B185 -active Yes -parent A2E5CDBD-9AD5-4788-8634-6A7FB8291670 -title {String Is Condition} -component StringIsCondition
@@ -1124,7 +1147,10 @@ InstallComponent A5937CD6-64FE-4CA3-9A0F-96C8793AFBC9 -setup Install -type actio
 InstallComponent BFFCE934-43EF-4784-B822-103B01E58400 -setup Install -type action -title {Console Ask Yes Or No} -component ConsoleAskYesOrNo -active Yes -parent ConsoleInstall
 InstallComponent 76FD34D3-36B2-43B0-A15C-2AEDBB7E4A91 -setup Install -type action -title {Console Ask Yes Or No} -component ConsoleAskYesOrNo -active Yes -parent ConsoleInstall
 InstallComponent 2D85D65D-5315-411B-89A8-0DE5187A2459 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
+InstallComponent D885C80D-187B-4EFE-BBA7-F5CBF9830D31 -setup Install -type action -conditions 6076A084-55BF-4FC7-80BE-A8A06082D7F8 -title {Console Message} -component ConsoleMessage -command insert -active Yes -parent ConsoleInstall
+Condition 6076A084-55BF-4FC7-80BE-A8A06082D7F8 -active Yes -parent D885C80D-187B-4EFE-BBA7-F5CBF9830D31 -title {Virtual Text Test Condition} -component VirtualTextTestCondition
 InstallComponent BB57FF40-4A3A-4C47-A903-613C469436F0 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent ConsoleInstall
+InstallComponent 74BF8C6B-F3E6-4CB9-AEFF-B7DB7C7BAA62 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
 InstallComponent CE4F5BF4-236D-4BC8-8F4D-5CEF9336BDC3 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
 InstallComponent FB0A66D3-41AF-4B54-AA23-00CDB7102F94 -setup Install -type action -title Exit -component Exit -active Yes -parent ConsoleInstall
 InstallComponent DCB1750E-2C54-4F23-AB46-771024BAE222 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent SilentInstall
@@ -1136,9 +1162,9 @@ Condition 86FE7E21-540A-4308-B218-58F119315CFF -active Yes -parent 28F3EC22-F62C
 InstallComponent 1801A1B1-5BF3-4FC3-8DF4-082F6964EAC2 -setup Install -type action -title {Create Install Panes} -component CreateInstallPanes -active Yes -parent 3456E921-CDE5-424E-8959-EAA4C0B38FBE
 InstallComponent F0D925F6-6364-4BF3-BFED-6F8B51DA9235 -setup Install -type actiongroup -title {Install Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 03D50B48-5783-43C0-9DCD-0E7FD10E1FC6 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
-InstallComponent 2058D4E7-03DC-41E5-B696-5C92D31AC950 -setup Install -type action -conditions 87533E82-F0AC-4809-B317-1BE4CD0F3BCD -title {Execute Script} -component ExecuteScript -command reorder -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
+InstallComponent 2058D4E7-03DC-41E5-B696-5C92D31AC950 -setup Install -type action -conditions 87533E82-F0AC-4809-B317-1BE4CD0F3BCD -title {Execute Script} -component ExecuteScript -command insert -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
 Condition 87533E82-F0AC-4809-B317-1BE4CD0F3BCD -active Yes -parent 2058D4E7-03DC-41E5-B696-5C92D31AC950 -title {Port Test Condition} -component PortTestCondition
-InstallComponent D3C7C471-C755-404B-9668-89C76F2E8FC7 -setup Install -type action -conditions A869AF59-5D98-431A-A562-4FB191B0E470 -title {Download Zip Files} -component FetchURL -command reorder -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
+InstallComponent D3C7C471-C755-404B-9668-89C76F2E8FC7 -setup Install -type action -conditions A869AF59-5D98-431A-A562-4FB191B0E470 -title {Download Zip Files} -component FetchURL -command insert -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
 Condition A869AF59-5D98-431A-A562-4FB191B0E470 -active Yes -parent D3C7C471-C755-404B-9668-89C76F2E8FC7 -title {Virtual Text Test Condition} -component VirtualTextTestCondition
 InstallComponent FEE08BFB-5B3D-421E-AC72-C71A6BE0BFC0 -setup Install -type action -title {Install Selected Files} -component InstallSelectedFiles -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
 InstallComponent 84719F76-386D-4CAC-837C-20C29C17EB48 -setup Install -type action -title {Execute Script} -component ExecuteScript -active Yes -parent F0D925F6-6364-4BF3-BFED-6F8B51DA9235
@@ -1186,8 +1212,18 @@ InstallComponent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -setup Install -type actio
 Condition 246295CB-E5A7-401B-A5BE-202E55B910B9 -active Yes -parent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -title {String Is Condition} -component StringIsCondition
 Condition 94D48815-A65A-4BE6-8CF7-62A84DEF5669 -active Yes -parent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -title {String Is Condition} -component StringIsCondition
 Condition 8A0F57EB-A4DD-470D-B38A-8E94D387662C -active Yes -parent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -title {File Exists Condition} -component FileExistsCondition
-InstallComponent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -setup Install -type action -conditions 33FC8933-4F3B-42B1-88E8-6C534DFDA7E7 -title {Launch Configure Wizard} -component ExecuteExternalProgram -command insert -active Yes -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+InstallComponent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -setup Install -type action -conditions {CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016 33FC8933-4F3B-42B1-88E8-6C534DFDA7E7} -title {Launch Win Configure Wizard} -component ExecuteExternalProgram -command reorder -active Yes -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+Condition CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016 -active Yes -parent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -title {Platform Condition} -component PlatformCondition
 Condition 33FC8933-4F3B-42B1-88E8-6C534DFDA7E7 -active Yes -parent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -title {String Is Condition} -component StringIsCondition
+InstallComponent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -setup Install -type action -conditions {35DE9DD4-AF91-4EDC-8506-B933E7438395 484CCEDA-8775-44CD-8B08-5725A7C17B98} -title {Launch Lin Configure Console} -component ExecuteExternalProgram -command reorder -active No -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+Condition 35DE9DD4-AF91-4EDC-8506-B933E7438395 -active Yes -parent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -title {Platform Condition} -component PlatformCondition
+Condition 484CCEDA-8775-44CD-8B08-5725A7C17B98 -active Yes -parent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -title {String Is Condition} -component StringIsCondition
+InstallComponent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -setup Install -type action -conditions {717E9619-744F-47FE-A9C6-79E54508E2CD E5804B10-F9A0-4B47-9D76-B8B575B39064 1CC0E610-D7DE-4F40-A82C-BC39A8A4AAE7} -title {Launch Lin Configure Wizard} -component ExecuteExternalProgram -command insert -active Yes -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+Condition 717E9619-744F-47FE-A9C6-79E54508E2CD -active Yes -parent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -title {Platform Condition} -component PlatformCondition
+Condition E5804B10-F9A0-4B47-9D76-B8B575B39064 -active Yes -parent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -title {String Is Condition} -component StringIsCondition
+Condition 1CC0E610-D7DE-4F40-A82C-BC39A8A4AAE7 -active Yes -parent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -title {String Is Condition} -component StringIsCondition
+InstallComponent 09A53DB3-6C5B-45B9-852E-5AFEC520C8A5 -setup Install -type action -conditions B11EE88C-A0C4-4353-9999-5F4D1FBA93D6 -title {Launch Registration} -component LaunchWebBrowser -command reorder -active No -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+Condition B11EE88C-A0C4-4353-9999-5F4D1FBA93D6 -active Yes -parent 09A53DB3-6C5B-45B9-852E-5AFEC520C8A5 -title {String Is Condition} -component StringIsCondition
 InstallComponent 8802D9A8-C20D-4EDB-9DA1-BF3E95EC78D7 -setup Install -type actiongroup -title {Cancel Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 715C8558-572D-47F8-9F08-F2C3E9214315 -setup Uninstall -type pane -title Uninstall -component Uninstall -active Yes -parent StandardUninstall
 InstallComponent 5AB3FDB5-4F17-4717-968D-61074831393E -setup Uninstall -type action -title {Modify Widget} -component ModifyWidget -active Yes -parent 715C8558-572D-47F8-9F08-F2C3E9214315
@@ -1299,6 +1335,15 @@ false
 093DBE6B-FC10-4F76-8217-B539F23A4B1C,WorkingDirectory
 <%InstallDir%>
 
+09A53DB3-6C5B-45B9-852E-5AFEC520C8A5,Active
+No
+
+09A53DB3-6C5B-45B9-852E-5AFEC520C8A5,Conditions
+{1 condition}
+
+09A53DB3-6C5B-45B9-852E-5AFEC520C8A5,URL
+http://www.alfresco.com/community/register/?source=inst210e
+
 0C217CC3-68A1-4B1C-89FC-471758339520,ExitType
 Finish
 
@@ -1374,6 +1419,12 @@ http://localhost:8080/alfresco
 1C2E4AA6-3AAE-4DB1-826A-A6610D2BF1CA,Action
 {Uninstall Actions}
 
+1CC0E610-D7DE-4F40-A82C-BC39A8A4AAE7,CheckCondition
+{Before Action is Executed}
+
+1CC0E610-D7DE-4F40-A82C-BC39A8A4AAE7,String
+<%GuiMode%>
+
 1E204907-8DE7-4BBB-9768-2EA35BF089BC,Conditions
 {1 condition}
 
@@ -1423,6 +1474,18 @@ if {<%InstallOpenOffice%>} {
 
     if {![::InstallAPI::URLIsValid -url $url]} {
         ::InstallAPI::ErrorMessage -message "Could not locate OpenOffice download file.  OpenOffice will not be installed."
+    } else {
+        lappend list $url
+    }
+}
+
+if {<%InstallWCM%>} {
+    set ::info(WCMFile) AlfrescoWCM<%Codeline%>-<%Version%>-<%Platform%>-Install<%Ext%>
+    
+    set url <%DownloadURL%>$::info(WCMFile)
+
+    if {![::InstallAPI::URLIsValid -url $url]} {
+        ::InstallAPI::ErrorMessage -message "Could not locate WCM download file.  WCM will not be installed."
     } else {
         lappend list $url
     }
@@ -1594,6 +1657,15 @@ Windows
 3456E921-CDE5-424E-8959-EAA4C0B38FBE,Conditions
 {0 conditions}
 
+35DE9DD4-AF91-4EDC-8506-B933E7438395,CheckCondition
+{Before Action is Executed}
+
+35DE9DD4-AF91-4EDC-8506-B933E7438395,Operator
+{is not}
+
+35DE9DD4-AF91-4EDC-8506-B933E7438395,Platform
+Windows
+
 362FB074-068A-470B-8DD9-169FD4C3F953,CheckCondition
 {Before Action is Executed}
 
@@ -1638,6 +1710,18 @@ disabled
 
 404A9CC9-CC76-41C8-A831-753B2CA9C4E9,Action
 {Install Actions}
+
+40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F,Active
+No
+
+40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F,Conditions
+{2 conditions}
+
+40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F,ProgramCommandLine
+{<%InstallDir%>/configure.bin -mode Console --from-installer}
+
+40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F,WaitForProgram
+No
 
 40F91905-4613-4F8E-A263-FD894A9D0AAE,Background
 white
@@ -1719,6 +1803,12 @@ false
 
 47953C48-9D68-49E7-81BA-30273C1CA457,Alias
 {Finish Actions}
+
+484CCEDA-8775-44CD-8B08-5725A7C17B98,CheckCondition
+{Before Action is Executed}
+
+484CCEDA-8775-44CD-8B08-5725A7C17B98,String
+<%ConsoleMode%>
 
 49875A22-E198-4CF2-A2E3-B82DAE5E7731,Active
 No
@@ -1951,6 +2041,12 @@ No
 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF,Title,subst
 1
 
+6076A084-55BF-4FC7-80BE-A8A06082D7F8,CheckCondition
+{Before Action is Executed}
+
+6076A084-55BF-4FC7-80BE-A8A06082D7F8,VirtualText
+Downloads
+
 62259982-B0DE-413E-BA9D-BEAE488D2E41,ExitType
 Finish
 
@@ -1987,6 +2083,21 @@ Finish
 715C8558-572D-47F8-9F08-F2C3E9214315,Title,subst
 1
 
+717E9619-744F-47FE-A9C6-79E54508E2CD,CheckCondition
+{Before Action is Executed}
+
+717E9619-744F-47FE-A9C6-79E54508E2CD,Operator
+{is not}
+
+717E9619-744F-47FE-A9C6-79E54508E2CD,Platform
+Windows
+
+74BF8C6B-F3E6-4CB9-AEFF-B7DB7C7BAA62,Conditions
+{0 conditions}
+
+74BF8C6B-F3E6-4CB9-AEFF-B7DB7C7BAA62,Message,subst
+1
+
 75E5683E-2533-4909-8E15-136CA0F03D29,BackButton,subst
 1
 
@@ -2018,7 +2129,7 @@ Finish
 No
 
 76FD34D3-36B2-43B0-A15C-2AEDBB7E4A91,Prompt
-{Do you want to download and install the OpenOffice portable component?}
+{Do you want to download and install the OpenOffice component?}
 
 76FD34D3-36B2-43B0-A15C-2AEDBB7E4A91,VirtualText
 InstallOpenOffice
@@ -2359,7 +2470,7 @@ Windows
 {Program Files}
 
 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1,Size
-62626233
+64397880
 
 9A4AB9E2-2B87-47C2-894E-8A8C9D6FCA7F,ObjectID
 {Java File Group}
@@ -2386,7 +2497,7 @@ Windows
 {Windows Files}
 
 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D,Size
-6137382
+6137189
 
 A0BB5354-D39E-4ACA-A63E-1C635EA36CE5,Conditions
 {1 condition}
@@ -2514,12 +2625,6 @@ false
 AA5C7C1C-E31F-4EB4-BC37-CC64DDA0C352,String
 <%InstallStopped%>
 
-AAAE9D52-7D91-48A7-9A8B-8157C932AD08,CheckCondition
-{Before Action is Executed}
-
-AAAE9D52-7D91-48A7-9A8B-8157C932AD08,Filename
-<%InstallDir%>/configure.exe
-
 ACEA288F-0E6C-4E40-947B-3D41AABBF094,CheckCondition
 {Before Action is Executed}
 
@@ -2576,6 +2681,15 @@ No
 
 AIX-ppc,RootInstallDir
 /usr/local/<%ShortAppName%>
+
+B11EE88C-A0C4-4353-9999-5F4D1FBA93D6,CheckCondition
+{Before Action is Executed}
+
+B11EE88C-A0C4-4353-9999-5F4D1FBA93D6,Operator
+false
+
+B11EE88C-A0C4-4353-9999-5F4D1FBA93D6,String
+<%ConsoleMode%>
 
 B5733739-7235-4105-A404-E0B5D556E90D,Conditions
 {1 condition}
@@ -2679,6 +2793,12 @@ CCD28F51-1D0F-4EB2-8499-188E51CA857D,Pattern
 CCD28F51-1D0F-4EB2-8499-188E51CA857D,String
 <%InstallDir%>
 
+CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016,CheckCondition
+{Before Action is Executed}
+
+CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016,Platform
+Windows
+
 CE4F5BF4-236D-4BC8-8F4D-5CEF9336BDC3,Conditions
 {0 conditions}
 
@@ -2742,6 +2862,18 @@ D4F01D1E-EBA6-40AA-8243-87105D4D3F3B,Message,subst
 D4F01D1E-EBA6-40AA-8243-87105D4D3F3B,Title,subst
 1
 
+D70E21CE-64B2-4C80-9614-CF5E63DE3527,Conditions
+{3 conditions}
+
+D70E21CE-64B2-4C80-9614-CF5E63DE3527,ProgramCommandLine
+{<%InstallDir%>/configure.bin --from-installer}
+
+D885C80D-187B-4EFE-BBA7-F5CBF9830D31,Conditions
+{1 condition}
+
+D885C80D-187B-4EFE-BBA7-F5CBF9830D31,Message,subst
+1
+
 D8C928A0-BE3A-483A-B966-C75A54EDCC8E,CheckCondition
 {Before Action is Executed}
 
@@ -2779,7 +2911,7 @@ DF7FBDEA-2FCC-4191-8A25-ED638D0D6413,Background
 white
 
 DF7FBDEA-2FCC-4191-8A25-ED638D0D6413,Conditions
-{1 condition}
+{0 conditions}
 
 DF7FBDEA-2FCC-4191-8A25-ED638D0D6413,Text,subst
 1
@@ -2859,6 +2991,12 @@ Windows
 E57D1707-9F5A-4242-B117-73A3FCB4A577,Action
 {Uninstall Actions}
 
+E5804B10-F9A0-4B47-9D76-B8B575B39064,CheckCondition
+{Before Action is Executed}
+
+E5804B10-F9A0-4B47-9D76-B8B575B39064,String
+<%RunConfigureWizard%>
+
 E5891213-6EC8-4636-B2E5-9CEE82670119,Destination
 <%InstallDir%>
 
@@ -2866,7 +3004,7 @@ E5891213-6EC8-4636-B2E5-9CEE82670119,Name
 {Linux Files}
 
 E5891213-6EC8-4636-B2E5-9CEE82670119,Size
-1230572
+1230385
 
 EA10E9B0-F564-46FE-A7E2-88C53396D8BD,Conditions
 {1 condition}
@@ -2911,7 +3049,7 @@ F0D925F6-6364-4BF3-BFED-6F8B51DA9235,Conditions
 {0 conditions}
 
 F1200E8B-6EE5-4FE9-AD22-B2525181CF27,Conditions
-{1 condition}
+{2 conditions}
 
 F1200E8B-6EE5-4FE9-AD22-B2525181CF27,ProgramCommandLine
 {<%InstallDir%>/configure.exe --from-installer}
@@ -2996,6 +3134,9 @@ FA24A94E-4A51-4286-A46E-B7E699A99231,Message,subst
 
 FA24A94E-4A51-4286-A46E-B7E699A99231,NextButton,subst
 1
+
+FB0A66D3-41AF-4B54-AA23-00CDB7102F94,Conditions
+{0 conditions}
 
 FB0A66D3-41AF-4B54-AA23-00CDB7102F94,ExitType
 Finish
@@ -3259,7 +3400,7 @@ Linux-x86,RequireRoot
 No
 
 Linux-x86,RootInstallDir
-/usr/local/<%ShortAppName%>
+/opt/<%ShortAppName%>
 
 Solaris-sparc,Active
 No
@@ -3471,6 +3612,9 @@ It is recommended that you close all other applications before  continuing.
 
 Click Next to continue or Cancel to exit Setup.}
 
+345E557F-C7CE-4D81-9410-AF0D67C64A21,Message
+{step 10}
+
 35B472EF-0FCE-4E59-BA60-57CFE76FCF18,Text
 {Content Store Location:}
 
@@ -3509,6 +3653,9 @@ The Alfresco Content Community ensures you can get the latest guides and documen
 43B46DAF-108D-4B65-A74A-088F78CE1354,Title
 {Register with the Alfresco Content Community}
 
+4AC47DD6-9CF7-473E-B8A6-728DA0A4639C,Message
+{step 7}
+
 55BFAA53-67EC-492A-AFAC-6EE283F5BA8F,Description
 {All OpenOffice components required for document transformations and ODF support}
 
@@ -3531,11 +3678,23 @@ Setup Type:
 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF,Title
 <%ApplicationReadmeText%>
 
+6829890F-01EA-4994-9A2B-BC92880D4BBA,Message
+{step 8}
+
+6F79D9AF-F2F5-45A6-BA97-9B2C45F9A1C3,Message
+{step 4}
+
+74BF8C6B-F3E6-4CB9-AEFF-B7DB7C7BAA62,Message
+{To configure Alfresco, run <%InstallDir%>/configure.bin -mode Console}
+
 78C2A117-18A6-4BFD-A41D-08C13DC8800F,Subtitle
 {Downloading and installing selected components}
 
 78C2A117-18A6-4BFD-A41D-08C13DC8800F,Title
 Downloading
+
+7C3458AC-9BAA-4D5F-B326-6F6D7BB41EFD,Message
+{step 5}
 
 85A6D77F-DAAF-4A27-AF4E-9906F9F8E1AC,Message
 <%UninstallStartupText%>
@@ -3650,8 +3809,14 @@ Oracle
 A2E5CDBD-9AD5-4788-8634-6A7FB8291670,Text
 <%CreateDesktopShortcutText%>
 
+AA85B4D2-4D10-4F6D-A3C4-2C8FFFA860C1,Message
+{step 6}
+
 B9FC6AC4-70CF-4F3E-88F5-34C45C9C0F57,Description
 <%CustomInstallDescription%>
+
+BC762304-B4A6-4957-B2AA-EDD03C13D4BC,Message
+{step 2}
 
 BCB019F1-3272-484E-AFFC-F084461F767F,Caption
 {Which type of database do you wish to use for Alfresco?}
@@ -3680,6 +3845,12 @@ D4F01D1E-EBA6-40AA-8243-87105D4D3F3B,Message
 D4F01D1E-EBA6-40AA-8243-87105D4D3F3B,Title
 {Uninstall <%AppName%>}
 
+D74C7695-9A9A-4E2F-B037-9ED5606122BD,Message
+{step 1}
+
+D885C80D-187B-4EFE-BBA7-F5CBF9830D31,Message
+{Downloading components may take some time, please be patient...}
+
 D994B6DB-F545-4810-A7EB-394F488EB70F,Text
 <%LaunchApplicationText%>
 
@@ -3688,6 +3859,9 @@ DF7FBDEA-2FCC-4191-8A25-ED638D0D6413,Text
 
 E08FCBF1-EBDE-4D6D-9290-DDFEC7D03319,Text
 <%CreateDesktopShortcutText%>
+
+E47060B1-FC5E-4121-A497-3AD815832E07,Message
+{step 9}
 
 ECEFADA4-0700-4EBA-92CB-829E9EFC8229,Description
 <%ProgramFilesDescription%>
@@ -3703,6 +3877,9 @@ F55ADCC4-ED21-47A8-9F91-3A1F647EAF1B,Subtitle
 
 F55ADCC4-ED21-47A8-9F91-3A1F647EAF1B,Title
 {Extra Components}
+
+F81A8CB9-CCB6-4CE6-9CE0-7A3BCB30C2EF,Message
+{step 3}
 
 FD5BDE0A-EA9C-466E-BF13-4AB77A39369B,StatusText
 {Installing JDK component...}
