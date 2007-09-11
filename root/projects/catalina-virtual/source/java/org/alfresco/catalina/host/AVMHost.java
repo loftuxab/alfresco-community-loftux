@@ -223,7 +223,13 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
         {
             host    = avmHost;
             regex   = reverseProxyBinding;
-            pattern = Pattern.compile( regex );
+
+            // Even though the hosts within the wildcard domain are 
+            // wildcarded, make the reverse proxy match case-insensitive  
+            // anyway in order to treat fixed parts of the FQDN properly
+            // (e.g.:  "www--sandbox").
+
+            pattern = Pattern.compile( regex, Pattern.CASE_INSENSITIVE);
         }
     }
 
