@@ -1,5 +1,5 @@
 // Logout Action Script 
-import mx.controls.Alert;
+import mx.controls.Alert;import util.authentication.AuthenticationService;
 
 /**
  * Event handler for logout button link.  
@@ -8,9 +8,5 @@ import mx.controls.Alert;
  */
 private function onLogoutButtonLinkClick():void
 {
-	// TODO need to make call to authentication service to logout user
-	
-	// TODO redirect main application to login dialog
-	
-	Alert.show("TODO: execute logout");
+	// Make call to authentication service to logout user	AuthenticationService.instance.logout();
 }

@@ -1,6 +1,7 @@
 // Login Action Script 
 
 import mx.controls.Alert;
+import util.authentication.AuthenticationService;
 
 /**
  * Event handler for login button link.  
@@ -9,9 +10,6 @@ import mx.controls.Alert;
  */
 private function onLoginButtonLinkClick():void
 {
-	// TODO need to make call to authentication service to login user
-	
-	// TODO redirect main application to Search dialog
-	
-	Alert.show("TODO: execute login Service");
+	// Call authentication service to log user in
+	AuthenticationService.instance.login(username.text, password.text);
 }

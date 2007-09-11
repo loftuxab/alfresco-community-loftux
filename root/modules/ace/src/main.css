@@ -1,0 +1,30 @@
+/* CSS file */
+
+searchCanvas 
+{
+	backgroundColor: #275065;
+	borderStyle: solid;
+}
+	
+searchCanvas1 
+{
+	backgroundColor: #cccccc;
+	borderStyle: solid;
+}
+		
+labelStyle 
+{
+	color: #477916;
+}
+
+TabNavigator 
+{
+	tabHeight: 29;
+	tabWidth: 150;
+	paddingLeft: 50;
+}
+
+ApplicationControlBar 
+{
+	cornerRadius: 0;
+}

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" >
+	
 	<!-- Import css style sheet -->
     <mx:Style source="login.css"/> 
    
@@ -16,7 +17,7 @@
 						<mx:TextInput id="password" displayAsPassword="true"  styleName="passinput"/>
 					</mx:FormItem>
 					<mx:FormItem>
-						<mx:Button label="Login"    id="loginBtn" click="onLogin()"/>								
+						<mx:Button label="Login" id="loginBtn" click="onLoginButtonLinkClick()"/>								
 					</mx:FormItem>	
 			</mx:Form>
 	</mx:Panel>
