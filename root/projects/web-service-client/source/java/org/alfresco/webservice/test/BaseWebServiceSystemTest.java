@@ -74,6 +74,7 @@ public abstract class BaseWebServiceSystemTest extends TestCase
     protected static Store store;
     protected static Reference rootReference;    
     protected static Reference contentReference;
+    protected static Reference contentReference2;
     protected static Reference folderReference;
     
     protected RepositoryServiceSoapBindingStub repositoryService;
@@ -130,9 +131,9 @@ public abstract class BaseWebServiceSystemTest extends TestCase
             CMLCreate createFolder = new CMLCreate("testFolder", folderParentRef, null, null, null, Constants.TYPE_FOLDER, folderProperties);
             
             // Create an associatin between the content
-            CMLAddAspect cmlAddAspect = new CMLAddAspect("{http://www.alfresco.org/model/content/1.0}translatable", null, null, "testContent");
+            CMLAddAspect cmlAddAspect = new CMLAddAspect("{http://www.alfresco.org/model/content/1.0}attachable", null, null, "testContent");
             CMLCreateAssociation createAssoc = new CMLCreateAssociation(null, "testContent", null, "testContent2", Constants.createQNameString(
-                    Constants.NAMESPACE_CONTENT_MODEL, "translations"));
+                    Constants.NAMESPACE_CONTENT_MODEL, "attachments"));
             
             CML cml = new CML();
             cml.setCreate(new CMLCreate[]{createContent, createContent2, createFolder});
@@ -141,7 +142,8 @@ public abstract class BaseWebServiceSystemTest extends TestCase
             
             UpdateResult[] updateResult = this.repositoryService.update(cml);
             BaseWebServiceSystemTest.contentReference = updateResult[0].getDestination();
-            BaseWebServiceSystemTest.folderReference = updateResult[1].getDestination();
+            BaseWebServiceSystemTest.contentReference2 = updateResult[1].getDestination();
+            BaseWebServiceSystemTest.folderReference = updateResult[2].getDestination();
             
             // Write the test content to the reference
             this.contentService.write(BaseWebServiceSystemTest.contentReference, Constants.PROP_CONTENT, TEST_CONTENT.getBytes(), new ContentFormat(Constants.MIMETYPE_TEXT_PLAIN, "UTF-8"));

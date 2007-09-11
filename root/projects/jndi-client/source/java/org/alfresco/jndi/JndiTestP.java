@@ -36,11 +36,11 @@ import org.alfresco.service.cmr.avm.locking.AVMLockingService;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
-public class JndiTest extends TestCase
+public class JndiTestP extends TestCase
 {
     private FileSystemXmlApplicationContext context_;
 
-    public JndiTest(String name)
+    public JndiTestP(String name)
     {
         super(name);
     }

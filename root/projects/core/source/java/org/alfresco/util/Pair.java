@@ -16,12 +16,12 @@ public final class Pair<F, S> implements Serializable
     /**
      * The first member of the pair.
      */
-    private final F fFirst;
+    private F fFirst;
     
     /**
      * The second member of the pair.
      */
-    private final S fSecond;
+    private S fSecond;
     
     /**
      * Make a new one.
@@ -51,6 +51,16 @@ public final class Pair<F, S> implements Serializable
     public S getSecond()
     {
         return fSecond;
+    }
+    
+    public void setFirst(F first)
+    {
+        fFirst = first;
+    }
+    
+    public void setSecond(S second)
+    {
+        fSecond = second;
     }
     
     /**
