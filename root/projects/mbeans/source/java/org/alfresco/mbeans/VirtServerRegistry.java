@@ -78,7 +78,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     public VirtServerRegistry() 
     {
         if ( log.isInfoEnabled() )
-            log.info("--------------Creating VirtServerRegistry MBean");
+            log.info("Creating VirtServerRegistry MBean");
     }
 
 

@@ -1688,6 +1688,9 @@
             <fileset dir="${dir.project.benchmarkframework.lib}">
                <include name="*.jar"/>
             </fileset>
+            <fileset dir="${dir.project.3rdparty.lib}/commons">
+               <filename name="commons-logging-*.jar" />
+            </fileset>
          </classpath>
       </javac>
    </target>

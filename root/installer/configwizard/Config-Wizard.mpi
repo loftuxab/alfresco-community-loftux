@@ -188,7 +188,7 @@ SetupType ::977C5E71-6DA2-4BC4-B16C-54AEBE0FBB2A -setup Install -active Yes -pla
 SetupType ::7E424F2F-6B56-4490-99F5-015BE274307D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
 
 InstallComponent 3DF0B70C-AD68-4F74-9D20-726FFC704CC3 -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
-InstallComponent DEAC32B9-E63E-48B0-9000-58F681A0D075 -setup Install -type pane -conditions {18BF318D-79DD-4ECC-A3CC-660D6CE59DBA F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
+InstallComponent DEAC32B9-E63E-48B0-9000-58F681A0D075 -setup Install -type pane -conditions {18BF318D-79DD-4ECC-A3CC-660D6CE59DBA F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60} -title {Select Destination} -component SelectDestination -command reorder -active Yes -parent StandardInstall
 Condition 18BF318D-79DD-4ECC-A3CC-660D6CE59DBA -active Yes -parent DEAC32B9-E63E-48B0-9000-58F681A0D075 -title {File Exists Condition} -component FileExistsCondition
 Condition F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60 -active Yes -parent DEAC32B9-E63E-48B0-9000-58F681A0D075 -title {File Exists Condition} -component FileExistsCondition
 InstallComponent 6C5D6843-62DA-44BB-AC96-04FCEA01778A -setup Install -type pane -title {Select Database} -component CustomBlankPane2 -active Yes -parent StandardInstall
@@ -198,9 +198,9 @@ InstallComponent 9D32E8EB-5195-4D1A-9751-AF648B7392A6 -setup Install -type pane 
 InstallComponent 61F2C13B-6CF2-4D61-82A6-574B7965CD5B -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
 InstallComponent 014ED041-C921-4C1E-98D7-3E18CB93C17E -setup Install -type action -title Exit -component Exit -active Yes -parent 61F2C13B-6CF2-4D61-82A6-574B7965CD5B
 InstallComponent 291AD3B8-FA65-4C8E-97D6-C5284F697F8E -setup Install -type pane -title {Custom Blank Pane 1} -component CustomBlankPane1 -active Yes -parent StandardInstall
-InstallComponent 977DCFD4-6370-4F11-A7A3-42DE175D2E52 -setup Install -type action -conditions {A108B612-0519-4176-B52B-030B73D1C681 0B9EBC1D-90E4-42FB-B9BF-7EBD31953D10} -title {Execute Directory Actions} -component ExecuteAction -command insert -active Yes -parent ConsoleInstall
-Condition A108B612-0519-4176-B52B-030B73D1C681 -active Yes -parent 977DCFD4-6370-4F11-A7A3-42DE175D2E52 -title {String Is Condition} -component StringIsCondition
+InstallComponent 977DCFD4-6370-4F11-A7A3-42DE175D2E52 -setup Install -type action -conditions {0B9EBC1D-90E4-42FB-B9BF-7EBD31953D10 BF70FCFB-942B-442C-BDC7-CC64E7DB555D} -title {Execute Directory Actions} -component ExecuteAction -command reorder -active Yes -parent ConsoleInstall
 Condition 0B9EBC1D-90E4-42FB-B9BF-7EBD31953D10 -active Yes -parent 977DCFD4-6370-4F11-A7A3-42DE175D2E52 -title {File Exists Condition} -component FileExistsCondition
+Condition BF70FCFB-942B-442C-BDC7-CC64E7DB555D -active Yes -parent 977DCFD4-6370-4F11-A7A3-42DE175D2E52 -title {File Exists Condition} -component FileExistsCondition
 InstallComponent A8E5D6B1-BCE1-4748-8FEF-7A3904EE6CF9 -setup Install -type action -title {Execute DB Actions} -component ExecuteAction -active Yes -parent ConsoleInstall
 InstallComponent 80B69B7D-59EF-43B6-B2ED-DFDD0854B5C8 -setup Install -type action -title {Execute Content Actions} -component ExecuteAction -active Yes -parent ConsoleInstall
 InstallComponent 8CF72B82-8C0F-4E34-B8DE-6CF121B186AC -setup Install -type action -title {Execute Index Actions} -component ExecuteAction -active Yes -parent ConsoleInstall
@@ -208,11 +208,10 @@ InstallComponent 1D81B2F3-9B95-437A-8DAB-938E256E2BB0 -setup Install -type actio
 InstallComponent 7AE4A6A3-E0FC-4410-AC00-0A0A4C86F9F4 -setup Install -type action -title Exit -component Exit -active Yes -parent ConsoleInstall
 InstallComponent E98415CC-BE92-4980-8617-9D15358FC79E -setup Install -type actiongroup -title {Setup Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent DEFA18E2-6206-4815-A191-2EAB7C0D675C -setup Install -type actiongroup -title {Startup Actions} -active Yes -parent ActionGroupsInstall
-InstallComponent 8554334D-E211-4B2A-AC4C-A8B06C545C75 -setup Install -type action -conditions 5A19564C-199C-47D8-BE16-DE17D034B11F -title Wait -component Wait -command insert -active Yes -parent DEFA18E2-6206-4815-A191-2EAB7C0D675C
+InstallComponent 8554334D-E211-4B2A-AC4C-A8B06C545C75 -setup Install -type action -conditions 5A19564C-199C-47D8-BE16-DE17D034B11F -title Wait -component Wait -command reorder -active Yes -parent DEFA18E2-6206-4815-A191-2EAB7C0D675C
 Condition 5A19564C-199C-47D8-BE16-DE17D034B11F -active Yes -parent 8554334D-E211-4B2A-AC4C-A8B06C545C75 -title {Command Line Test Condition} -component CommandLineTestCondition
 InstallComponent 88DC6FC4-DD95-4573-A5CA-B7999493AD7F -setup Install -type action -title {Check for Previous Install} -component CheckForPreviousInstall -active Yes -parent DEFA18E2-6206-4815-A191-2EAB7C0D675C
-InstallComponent F22B8F86-39E5-4B64-BE11-74095F79C970 -setup Install -type action -conditions C10638D3-6025-4C2A-93E1-2B31732ACCFC -title {Execute Action} -component ExecuteAction -command insert -active Yes -parent DEFA18E2-6206-4815-A191-2EAB7C0D675C
-Condition C10638D3-6025-4C2A-93E1-2B31732ACCFC -active Yes -parent F22B8F86-39E5-4B64-BE11-74095F79C970 -title {String Is Condition} -component StringIsCondition
+InstallComponent F22B8F86-39E5-4B64-BE11-74095F79C970 -setup Install -type action -title {Execute Action} -component ExecuteAction -command reorder -active Yes -parent DEFA18E2-6206-4815-A191-2EAB7C0D675C
 InstallComponent 2FBC27CA-9E2B-44D9-A3C1-AD9097325884 -setup Install -type action -conditions FFB957E8-1B0B-4378-A291-ED870608A9C7 -title {Execute Action} -component ExecuteAction -command insert -active Yes -parent DEFA18E2-6206-4815-A191-2EAB7C0D675C
 Condition FFB957E8-1B0B-4378-A291-ED870608A9C7 -active Yes -parent 2FBC27CA-9E2B-44D9-A3C1-AD9097325884 -title {File Exists Condition} -component FileExistsCondition
 InstallComponent BB227074-7E4D-491E-8981-6ECCC7F5A86B -setup Install -type actiongroup -title {Install Actions} -active Yes -parent ActionGroupsInstall
@@ -225,7 +224,7 @@ InstallComponent 9C78E53E-F120-4068-8AAE-BE39B98D8B8B -setup Install -type actio
 InstallComponent F334E2E5-5ECF-4E31-A277-908A0F3B458C -setup Install -type actiongroup -title {Cancel Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 4D09D6A5-0255-4031-B8F0-0925A946A25D -setup Install -type actiongroup -title {Setup Text Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 9083F1F4-CFEA-4112-B209-63CEECFB4D19 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
-InstallComponent 30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC -setup Install -type action -conditions EAB2D1F3-286A-4060-AB4B-0488045AF5E2 -title {Set Virtual Text} -component SetVirtualText -command reorder -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
+InstallComponent 30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC -setup Install -type action -conditions EAB2D1F3-286A-4060-AB4B-0488045AF5E2 -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
 Condition EAB2D1F3-286A-4060-AB4B-0488045AF5E2 -active Yes -parent 30C24A20-0F08-4A81-AAB8-39E2A4DE9EEC -title {String Equal Condition} -component StringEqualCondition
 InstallComponent 661E9BE7-F650-4906-BCF4-EE5A81647D96 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
 InstallComponent 5F146269-23A0-4DFE-9CB9-367F6D73F7F2 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 4D09D6A5-0255-4031-B8F0-0925A946A25D
@@ -315,7 +314,7 @@ return [expr {[lsearch -exact $options <%DatabaseOption%>] > -1}]}
 {Before Action is Executed}
 
 0B9EBC1D-90E4-42FB-B9BF-7EBD31953D10,Filename
-<%InstallDir%>/tomcat
+<%InstallDir%>/tomcat/webapps/alfresco.war
 
 0B9EBC1D-90E4-42FB-B9BF-7EBD31953D10,Operator
 {does not exist}
@@ -908,15 +907,6 @@ A0F210B4-D273-417F-A976-57CAF6C0DB1B,Alias
 A0F210B4-D273-417F-A976-57CAF6C0DB1B,Conditions
 {1 condition}
 
-A108B612-0519-4176-B52B-030B73D1C681,CheckCondition
-{Before Action is Executed}
-
-A108B612-0519-4176-B52B-030B73D1C681,Operator
-false
-
-A108B612-0519-4176-B52B-030B73D1C681,String
-<%PreviousInstallExists%>
-
 A8267C6E-5FAC-45A9-A103-AD6689AFB7AB,Conditions
 {0 conditions}
 
@@ -993,7 +983,7 @@ B11ECA4D-3225-4B30-A0E0-4B4618D491F3,Conditions
 {0 conditions}
 
 B11ECA4D-3225-4B30-A0E0-4B4618D491F3,TclScript
-{set dbs {hsql mysql oracle sybase}
+{set dbs {hsql mysql oracle postgresql sqlserver sybase}
 
 if {[string is integer -strict <%DatabaseOption%>]
     && <%DatabaseOption%> >= 1 && <%DatabaseOption%> <= 4} {
@@ -1033,11 +1023,14 @@ BE0101E1-13DF-48E5-B152-FA8B588E1E70,CheckCondition
 BE0101E1-13DF-48E5-B152-FA8B588E1E70,String
 <%GuiMode%>
 
-C10638D3-6025-4C2A-93E1-2B31732ACCFC,CheckCondition
-{Before Action is Executed}
+BF70FCFB-942B-442C-BDC7-CC64E7DB555D,CheckCondition
+{Before Next Action is Executed}
 
-C10638D3-6025-4C2A-93E1-2B31732ACCFC,String
-<%PreviousInstallExists%>
+BF70FCFB-942B-442C-BDC7-CC64E7DB555D,FailureMessage
+{The directory specified does not look like an Alfresco installation.}
+
+BF70FCFB-942B-442C-BDC7-CC64E7DB555D,Filename
+<%InstallDir%>/tomcat/webapps/alfresco.war
 
 C729D72E-28CD-446D-A9DC-067D96113074,Alias
 {Startup Actions}
@@ -1190,7 +1183,7 @@ F22B8F86-39E5-4B64-BE11-74095F79C970,Action
 {Setup Text Actions}
 
 F22B8F86-39E5-4B64-BE11-74095F79C970,Conditions
-{1 condition}
+{0 conditions}
 
 F334E2E5-5ECF-4E31-A277-908A0F3B458C,Alias
 {Cancel Actions}
@@ -1379,7 +1372,7 @@ Linux-x86,FallBackToConsole
 Yes
 
 Linux-x86,InstallDir
-<%Home%>/alfresco
+<%Home%>/Alfresco
 
 Linux-x86,InstallMode
 Standard
@@ -1388,7 +1381,7 @@ Linux-x86,InstallType
 Typical
 
 Linux-x86,ProgramExecutable
-{}
+<%InstallDir%>/configure.bin
 
 Linux-x86,ProgramFolderAllUsers
 No
@@ -1412,7 +1405,7 @@ Linux-x86,RequireRoot
 No
 
 Linux-x86,RootInstallDir
-/usr/local/<%ShortAppName%>
+/opt/Alfresco
 
 Solaris-sparc,Active
 No
@@ -1597,7 +1590,9 @@ Which type of database do you wish to use for Alfresco?
 1.  HSQLDB
 2.  MySQL
 3.  Oracle
-4.  Sybase
+4.  PostgreSQL
+5.  SQL Server
+6.  Sybase
 
 If you choose any option other than HSQLDB, you will need to prepare the appropriate database before starting Alfresco.}
 

@@ -334,7 +334,11 @@ namespace AlfrescoWord2003
 
          string currentDocPath = m_WordApplication.ActiveDocument.FullName;
          // Ensure last separator is present
-         if (!relativeDirectory.EndsWith("/"))
+         if (relativeDirectory == null)
+         {
+            relativeDirectory = "/";
+         }
+         else if (!relativeDirectory.EndsWith("/"))
          {
             relativeDirectory += "/";
          }

@@ -380,6 +380,16 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             return;                                     // terminate service
         }
 
+        if ( poll_interval_ <= 0 )
+        {
+            if ( log.isWarnEnabled() )                 // LinkValidationService
+                log.warn(
+                "LinkValidationService disabled in " + 
+                "linkvalidation-service-context.xml  pollInterval " + 
+                 poll_interval_ + " <= 0");
+
+            return;
+        }
 
         // Initiate background process to check links
         // For now, hard-code initial update

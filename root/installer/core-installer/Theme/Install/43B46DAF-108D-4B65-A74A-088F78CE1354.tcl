@@ -41,7 +41,7 @@ proc CreateWindow.43B46DAF-108D-4B65-A74A-088F78CE1354 {wizard id} {
     grid rowconfigure $base.clientarea 0 -weight 1
     grid columnconfigure $base.clientarea 0 -weight 1
 
-    set url "http://www.alfresco.com/community/register/?source=inst201e"
+    set url "http://www.alfresco.com/community/register/?source=inst210e"
     Label $base.clientarea.url -foreground blue -cursor hand2  -text "Click here to register with the Alfresco Content Community"
     grid $base.clientarea.url -row 0 -column 0 -sticky nw
     bind $base.clientarea.url <1> [list LaunchURL $url]
