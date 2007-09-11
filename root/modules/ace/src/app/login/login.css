@@ -1,0 +1,36 @@
+/* CSS file for login*/
+	
+	Canvas {
+	  horizontal-center: 0;
+	  vertical-center: 0;
+	  width: 275;
+	  height: 150;
+	  layout: absolute;
+	}
+	
+	Panel {
+	  width: 275;
+	  height: 150;
+	  layout: absolute;
+	}
+	
+	TextInput {
+	  left: 85;
+	  right: 10;
+	}
+	
+	.userlabel {
+	  top: 12;
+	}
+	
+	.userinput {
+	  top: 10;
+	}
+	
+	.passlabel {
+	  top: 42;
+	}
+	
+	.passinput {
+	  top: 40;
+	}
