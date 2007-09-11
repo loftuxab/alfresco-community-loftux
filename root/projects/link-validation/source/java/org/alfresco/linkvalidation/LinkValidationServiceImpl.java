@@ -44,7 +44,6 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -164,7 +163,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     static private final int Schema_version_  = 2;
 
     // Shutdown flag for service
-    private static AtomicBoolean Shutdown_ = new AtomicBoolean( false );
+    private static boolean Shutdown_ = false;
 
     static String HREF               = ".href";    // top level href key
     static String SCHEMA_VERSION     = "schema";   // vers # of  info schema
@@ -324,10 +323,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  that the link status in all stores is up to date.
     */
     //-------------------------------------------------------------------------
-    public void onBootstrap()
+    public synchronized void onBootstrap()
     {
+        Shutdown_ = false;
         Thread validation_update_thread = new Thread(this);
-        Shutdown_.set( false );
         validation_update_thread.start();
     }
     //-------------------------------------------------------------------------
@@ -336,7 +335,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     *  that any link status checking operation in progress is abandoned.
     */
     //-------------------------------------------------------------------------
-    public void onShutdown() { Shutdown_.set( true ); }
+    public synchronized void onShutdown() { Shutdown_ = true; }
 
 
     //-------------------------------------------------------------------------
@@ -451,9 +450,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             }
         }
 
-
-        while ( ! Shutdown_.get() )
+        while ( true )
         {
+            synchronized (this ) { if (Shutdown_)  { break;} }
+
             if ( log.isDebugEnabled() )
                 log.debug( "LinkValidationService polling webapps...");
 
@@ -508,7 +508,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
                 }
             }
 
-            // Sleep regardless of whetherthe updateHrefInfo failed
+            // Sleep regardless of whether the updateHrefInfo failed
             try { Thread.sleep( poll_interval_ ); }
             catch (Exception e)
             {

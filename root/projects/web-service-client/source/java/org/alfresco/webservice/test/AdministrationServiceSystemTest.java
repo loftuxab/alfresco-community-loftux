@@ -48,7 +48,7 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
     
     public void testGetUsersBatching() throws Exception
     {
-        int batchSize = 5;
+        int batchSize = 1;
         QueryConfiguration queryCfg = new QueryConfiguration();
         queryCfg.setFetchSize(batchSize);
         WebServiceFactory.getAdministrationService().setHeader(

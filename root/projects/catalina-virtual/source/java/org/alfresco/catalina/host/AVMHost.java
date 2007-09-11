@@ -51,6 +51,7 @@ import org.apache.catalina.valves.ValveBase;
 import org.apache.commons.modeler.Registry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
+import org.alfresco.repo.security.authentication.AuthenticationException;
 import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.repo.remote.ClientTicketHolder;
 import org.alfresco.jndi.JndiInfoBean;
@@ -436,15 +437,16 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
                         throw e;
                     }
 
-                    log.warn("Retrying connection...");
-                    try { Thread.currentThread().sleep( 5000 ); }
-                    catch (Exception te) { /* ignored */ }
+                    sleepBeforeRetryingConnection();
+                }
+                catch ( AuthenticationException auth_ex )
+                {
+                    retry_count ++;
 
-                    if ( Context_ != null ) 
-                    {
-                        try {  Context_.close();  }
-                        catch (Exception e2 ) { /* nothing to do */ }
-                    }
+                    log.error("Authentication error (may be transient): " + 
+                              auth_ex.getMessage());
+
+                    sleepBeforeRetryingConnection();
                 }
             }
 
@@ -655,6 +657,20 @@ public class AVMHost extends org.apache.catalina.core.StandardHost
             }
         }
     }
+
+    void sleepBeforeRetryingConnection()
+    {
+        log.warn("Retrying connection...");
+        try { Thread.currentThread().sleep( 5000 ); }
+        catch (Exception te) { /* ignored */ }
+
+        if ( Context_ != null ) 
+        {
+            try {  Context_.close();  }
+            catch (Exception e2 ) { /* nothing to do */ }
+        }
+    }
+
 
     /**
      * Start this host.
