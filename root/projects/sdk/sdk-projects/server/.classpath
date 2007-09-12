@@ -19,7 +19,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/bcmail-jdk15-137.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/comment-stripper.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/dom4j-1.6.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/freemarker.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/freemarker-2.3.10.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/hrtlib.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/htmlparser-1.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jakarta-oro-2.0.8.jar"/>
@@ -99,7 +99,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/xercesImpl-2.8.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="alfresco-repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.0.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R4.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R7.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-httpclient-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/fontbox-0.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/guessencoding-1.0.jar"/>
