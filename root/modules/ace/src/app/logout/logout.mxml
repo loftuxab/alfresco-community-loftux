@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">	
+<logout:LogoutClass 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:logout="app.logout.*" 
+	width="100%" height="100%">	
 
    <!-- Import css style sheet -->
    <mx:Style source="logout.css"/> 
-   
-   <!-- Import action script -->
-   <mx:Script source="logoutScript.as"/> 
 
    <mx:HBox paddingTop="5" paddingLeft="5" paddingRight="5" paddingBottom="5">
 
@@ -21,5 +21,5 @@
   
 	</mx:HBox>	
 	
-</mx:Canvas>
+</logout:LogoutClass>
 				            

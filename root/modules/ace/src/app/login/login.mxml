@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"  width="362" height="326">
+<login:LoginClass 
+	  xmlns:mx="http://www.adobe.com/2006/mxml"
+	  xmlns:login="app.login.*" 
+	  width="362" height="326">
     
     <!-- State defintitions -->
-    <mx:states>
+    <login:states>
         <mx:State name="InvalidCredentials">
             <mx:AddChild relativeTo="{hBox}" position="lastChild">
                 <mx:Text id="errorMessage" />
             </mx:AddChild>
         </mx:State>
-    </mx:states>
+    </login:states> 
 	
 	<!-- Import css style sheet -->
     <mx:Style source="login.css"/> 
-   
-   	<!-- Import action script -->
-   	<mx:Script source="loginScript.as"/> 
    	
 	<mx:Panel>
 	    <mx:VBox id="hBox">	    		    
@@ -33,4 +33,4 @@
 		</mx:VBox>
 	</mx:Panel>
 	
-</mx:Canvas>
+</login:LoginClass>

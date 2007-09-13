@@ -25,12 +25,12 @@
  * http://www.alfresco.com/legal/licensing"
  */
  --> 
-<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+<app:MainClass xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" 
+	xmlns:app="*" 
 	xmlns:logout="app.logout.*" 
 	xmlns:login="app.login.*" 
 	xmlns:fc="com.flexcapacitor.controls.*"
-	xmlns:filters="flash.filters.*"
-	creationComplete="onCreateApplication()">
+	xmlns:filters="flash.filters.*">
 
 	<mx:Script>
 	<![CDATA[  
@@ -166,9 +166,6 @@
             }	
 	]]>
 	</mx:Script>
-	
-	<!-- Include the main action script file -->
-	<mx:Script source="mainScript.as"/>
 	
 	<!-- Include the main CSS -->
 	<mx:Style source="main.css"/>
@@ -320,4 +317,4 @@
         
         </mx:Canvas>
 		
-</mx:Application>
+</app:MainClass>
