@@ -63,7 +63,7 @@ public class XMLConfigServiceTest extends BaseTest
         // setup the config service
         String configFile = getResourcesDir() + "config.xml";
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
 
         // try and get the global item
         Config global = svc.getGlobalConfig();
@@ -98,7 +98,7 @@ public class XMLConfigServiceTest extends BaseTest
         // setup the config service using a missing file source
         String configFile = "file:" + getResourcesDir() + "missing.xml";
         XMLConfigService svc = new XMLConfigService(new UrlConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
 
         // make sure attempts to retrieve config don't fail
         Config global = svc.getGlobalConfig();
@@ -114,7 +114,7 @@ public class XMLConfigServiceTest extends BaseTest
         // do the same test for a classpath resource
         configFile = "classpath:alfresco/missing.xml";
         svc = new XMLConfigService(new UrlConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
 
         // make sure attempts to retrieve config don't fail
         global = svc.getGlobalConfig();
@@ -130,7 +130,7 @@ public class XMLConfigServiceTest extends BaseTest
         // do the same test for a HTTP resource
         configFile = "http://localhost:8080/missing.xml";
         svc = new XMLConfigService(new UrlConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
 
         // make sure attempts to retrieve config don't fail
         global = svc.getGlobalConfig();
@@ -152,7 +152,7 @@ public class XMLConfigServiceTest extends BaseTest
        // setup the config service
         String configFile = getResourcesDir() + "config.xml";
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
         
         // get the "Named Child Test" config
         Config cfg = svc.getConfig("Named Child Test");
@@ -199,7 +199,7 @@ public class XMLConfigServiceTest extends BaseTest
        // setup the config service
         String configFile = getResourcesDir() + "config.xml";
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
 
         // try and get the global item
         Config unitTest = svc.getConfig("Unit Test");
@@ -220,7 +220,7 @@ public class XMLConfigServiceTest extends BaseTest
     {
         String configFile = "org/alfresco/config-classpath.xml"; 
         XMLConfigService svc = new XMLConfigService(new ClassPathConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
         
         Config config = svc.getGlobalConfig();
         assertNotNull(config);
@@ -236,7 +236,7 @@ public class XMLConfigServiceTest extends BaseTest
         List<String> configFile = new ArrayList<String>(1);
         configFile.add("http://localhost:8080/alfresco/config-http.xml");
         XMLConfigService svc = new XMLConfigService(new HTTPConfigSource(configFile));
-        svc.init();
+        svc.initConfig();
         
         Config config = svc.getGlobalConfig();
         assertNotNull(config);
@@ -251,7 +251,7 @@ public class XMLConfigServiceTest extends BaseTest
        String jarFile = "jar:file:/" + resDir + "custom-config.jar!/META-INF/web-client-config-custom.xml";
        JarConfigSource source = new JarConfigSource(jarFile);
        XMLConfigService svc = new XMLConfigService(source);
-       svc.init();
+       svc.initConfig();
       
        // make sure the global config is present
        Config config = svc.getGlobalConfig();
@@ -280,7 +280,7 @@ public class XMLConfigServiceTest extends BaseTest
        configFiles.add("jar:*!/META-INF/web-client-config-custom.xml");
        UrlConfigSource configSrc = new UrlConfigSource(configFiles);
        XMLConfigService svc = new XMLConfigService(configSrc);
-       svc.init();
+       svc.initConfig();
        
        // try and get the global config section
        Config globalSection = svc.getGlobalConfig();
@@ -310,7 +310,7 @@ public class XMLConfigServiceTest extends BaseTest
         configFiles.add(getResourcesDir() + "config.xml");
         configFiles.add(getResourcesDir() + "config-multi.xml");
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
-        svc.init();
+        svc.initConfig();
 
         // try and get the global config section
         Config globalSection = svc.getGlobalConfig();
@@ -347,7 +347,7 @@ public class XMLConfigServiceTest extends BaseTest
         configFiles.add(getResourcesDir() + "config.xml");
         configFiles.add(getResourcesDir() + "config-areas.xml");
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
-        svc.init();
+        svc.initConfig();
 
         // try and get a section defined in an area (without restricting the
         // area), the result should be null
@@ -394,7 +394,7 @@ public class XMLConfigServiceTest extends BaseTest
         configFiles.add(getResourcesDir() + "config.xml");
         configFiles.add(getResourcesDir() + "config-multi.xml");
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
-        svc.init();
+        svc.initConfig();
         
         // try and get the global config section
         Config globalSection = svc.getGlobalConfig();
@@ -447,7 +447,7 @@ public class XMLConfigServiceTest extends BaseTest
         configFiles.add(getResourcesDir() + "config.xml");
         configFiles.add(getResourcesDir() + "config-replace.xml");
         XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFiles));
-        svc.init();
+        svc.initConfig();
         
         // try and get the global config section
         Config globalSection = svc.getGlobalConfig();
