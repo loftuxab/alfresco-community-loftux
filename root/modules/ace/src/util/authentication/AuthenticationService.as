@@ -15,9 +15,12 @@ package util.authentication
 	import util.webscript.SuccessEvent;
 	import util.webscript.FailureEvent;
 	import flash.events.EventDispatcher;
+	import util.error.ErrorService;
 
 	/**
-	 * Web script service object.  Encapsulates access to an Alfresco web script
+	 * Authentication service class.
+	 * 
+	 * @author Roy Wetherall
 	 */
 	public class AuthenticationService extends EventDispatcher
 	{
@@ -41,64 +44,55 @@ package util.authentication
 			}
 			return AuthenticationService._instance;
 		}
-		
+			
 		/**
-		 * Default constructor
-		 */
-		public function AuthenticationService()
-		{
-		}
-				
+		 * Getter for the ticket property
+		 */		
 		public function get ticket():String
 		{
 			return this._ticket;
-		}
+		}		
 		
-		// TEMP
-		//public function set ticket(ticket:String):void
-		//{
-	//		this._ticket = ticket;
-//		}
-		
-		
+		/**
+		 * Getter for the userName property
+		 */
 		public function get userName():String
 		{
 			return this._userName;
 		}
 		
+		/**
+		 * Log in a user to the Alfresco repository and store the ticket.
+		 */
 		public function login(userName:String, password:String):void
 		{
-			try
-			{
-				var url:String = "http://localhost:8080/alfresco/service/api/login";
-				var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onLoginSuccess, onFailure);
-				
-				var params:Object = new Object();
-				params.u = userName;
-				params.pw = password;
+			// Create the web script obejct
+			var url:String = "http://localhost:8080/alfresco/service/api/login";
+			var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onLoginSuccess, onLoginFailure, false);
 			
-				webScript.execute(params);
-			}
-			catch (error:Error)
-			{
-				Alert.show(error.message);
-			}
+			// Build the parameter object
+			var params:Object = new Object();
+			params.u = userName;
+			params.pw = password;
+		
+			// Execute the web script
+			webScript.execute(params);
 		}
 		
+		/**
+		 * Log the current user out of the Alfresco repository
+		 */
 		public function logout():void
 		{
-			try
-			{
-				var url:String = "http://localhost:8080/alfresco/service/api/login/ticket/" + this._ticket;				
-				var webScript:WebScriptService = new WebScriptService(url, WebScriptService.DELETE, onLogoutSuccess, onFailure);
-				webScript.execute();										
-			}
-			catch (error:Error)
-			{
-				Alert.show(error.message);
-			}
+			// Execute the logout web script
+			var url:String = "http://localhost:8080/alfresco/service/api/login/ticket/" + this._ticket;				
+			var webScript:WebScriptService = new WebScriptService(url, WebScriptService.DELETE, onLogoutSuccess);
+			webScript.execute();										
 		}
 		
+		/**
+		 * On logout success event handler
+		 */
 		public function onLogoutSuccess(event:SuccessEvent):void
 		{
 			// Clear the current ticket information
@@ -109,6 +103,9 @@ package util.authentication
 			dispatchEvent(new LogoutCompleteEvent(LogoutCompleteEvent.LOGOUT_COMPLETE));			
 		}
 		
+		/**
+		 * On login success event handler
+		 */
 		public function onLoginSuccess(event:SuccessEvent):void
 		{
 			// Store the ticket in the authentication service
@@ -119,9 +116,28 @@ package util.authentication
 			dispatchEvent(new LoginCompleteEvent(LoginCompleteEvent.LOGIN_COMPLETE, this._ticket, ""));
 		}
 		
-		public function onFailure(event:FailureEvent):void
+		/**
+		 * On login failure event handler
+		 */
+		public function onLoginFailure(event:FailureEvent):void
 		{
-			Alert.show("Error occured: " + event.fault.faultString);	
+			// Get the error details from the failure event
+			var code:String = event.fault.faultCode;
+			var message:String = event.fault.faultString;
+			var details:String = event.fault.faultDetail;
+			
+			if (code == "403")
+			{
+				// Raise invalid credentials error	
+				ErrorService.instance.raiseError(InvalidCredentialsError.INVALID_CREDENTIALS, new InvalidCredentialsError());
+			}
+			else
+			{
+				// TODO extend the parameters provided here ...
+				
+				// Raise general authentication error
+				ErrorService.instance.raiseError(ErrorService.APPLICATION_ERROR, new AuthenticationError(message));
+			}
 		}
 	}
 }
