@@ -55,6 +55,7 @@
            depends="set-build-number, 
                     incremental, 
                     distribute-mmt,
+                    distribute-bm-remote,
                     distribute-tomcat,
                     distribute-war, 
                     distribute-wcm, 
@@ -281,6 +282,9 @@
          <zipfileset dir="${dir.continuous.dist}"
                      includes="${file.name.dist.mmt}.jar"
                      fullpath="bin/alfresco-mmt.jar" />
+         <zipfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.dist.bm-remote}.jar"
+                     fullpath="bin/alfresco-bm-remote.jar" />
       </zip>
    </target>
 
@@ -319,6 +323,9 @@
          <tarfileset dir="${dir.continuous.dist}"
                      includes="${file.name.dist.mmt}.jar"
                      fullpath="bin/alfresco-mmt.jar" />
+         <zipfileset dir="${dir.continuous.dist}"
+                     includes="${file.name.dist.bm-remote}.jar"
+                     fullpath="bin/alfresco-bm-remote.jar" />
       </tar>
    </target>
 
@@ -700,6 +707,95 @@
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.mmt}.jar">
          <zipfileset dir="${dir.continuous.assemble.mmt}" />
+      </zip>
+   </target>
+
+   <!-- ************************************ -->
+   <!-- ** Benchmark Remote targets       ** -->
+   <!-- ************************************ -->
+   
+   <target name="assemble-bm-remote" 
+           depends="init">
+
+      <!-- Create the required directory structure -->
+      <mkdir dir="${dir.continuous.dist}" />
+      <mkdir dir="${dir.continuous.assemble.bm-remote}" />
+
+      <!-- extract the one-jar file -->
+      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.96-RC4.jar" 
+             dest="${dir.continuous.assemble.bm-remote}" 
+             overwrite="true" />
+      <!-- remove unwanted files -->
+      <delete >
+         <fileset dir="${dir.continuous.assemble.bm-remote}">
+            <include name="**/*.java" />
+            <include name="**/boot-manifest.mf" />
+         </fileset>
+      </delete>
+
+      <!-- copy required jars into lib folder -->
+      <copy todir="${dir.continuous.assemble.bm-remote}/lib" 
+            flatten="false">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="**/spring-2.0.2.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="**/jug.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="**/commons/commons-logging-1.0.4.jar" />
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="**/log4j-1.2.8.jar" />
+      </copy>
+
+      <!-- get the files for the main bm-remote jar -->
+      <copy todir="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar" 
+            flatten="false">
+         <fileset dir="${dir.project.core.src}" 
+                  includes="log4j.properties" />
+         <fileset dir="${dir.project.core.classes}" 
+                  includes="org/alfresco/error/AlfrescoRuntimeException.class" />
+         <fileset dir="${dir.project.core.classes}" 
+                  includes="org/alfresco/util/GUID.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/model/ContentModel.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/repo/remote/FileFolderRemoteClient.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/repo/model/filefolder/**/*.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/service/cmr/model/*.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/service/cmr/repository/*.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/service/cmr/remote/*.class" />
+         <fileset dir="${dir.project.repository.classes}" 
+                  includes="org/alfresco/service/namespace/*.class" />
+      </copy>
+      <!-- copy in a manifest file -->
+      <copy tofile="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar/META-INF/MANIFEST.MF" >
+         <fileset dir="${dir.project.repository}/source/meta-inf" 
+                  includes="bm-remote-manifest.mf" />
+      </copy>
+      <!-- jar the main bm-remote classes -->
+      <mkdir dir="${dir.continuous.assemble.bm-remote}/main" />
+      <jar destfile="${dir.continuous.assemble.bm-remote}/main/main.jar" 
+           manifest="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar/META-INF/MANIFEST.MF" 
+           update="false" >
+         <fileset dir="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar">
+            <include name="**/*" />
+         </fileset>
+      </jar>
+      <!-- Remove temp files -->
+      <delete dir="${dir.continuous.assemble.mmt}/tmp-mmt-jar" />
+
+   </target>
+   
+   <target name="distribute-bm-remote" 
+           depends="assemble-bm-remote"
+           description="Creates the Alfresco Remote Benchmark Tool distribution file for all platforms">
+      <mkdir dir="${dir.continuous.dist}" />
+
+      <zip destfile="${dir.continuous.dist}/${file.name.dist.bm-remote}.jar">
+         <zipfileset dir="${dir.continuous.assemble.bm-remote}" />
       </zip>
    </target>
 
