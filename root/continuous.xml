@@ -323,7 +323,7 @@
          <tarfileset dir="${dir.continuous.dist}"
                      includes="${file.name.dist.mmt}.jar"
                      fullpath="bin/alfresco-mmt.jar" />
-         <zipfileset dir="${dir.continuous.dist}"
+         <tarfileset dir="${dir.continuous.dist}"
                      includes="${file.name.dist.bm-remote}.jar"
                      fullpath="bin/alfresco-bm-remote.jar" />
       </tar>
