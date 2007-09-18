@@ -2,13 +2,13 @@
 <login:LoginClass 
 	  xmlns:mx="http://www.adobe.com/2006/mxml"
 	  xmlns:login="app.login.*" 
-	  width="362" height="326">
+	  width="300" height="326">
     
     <!-- State defintitions -->
     <login:states>
         <mx:State name="InvalidCredentials">
             <mx:AddChild relativeTo="{hBox}" position="lastChild">
-                <mx:Text id="errorMessage" />
+                <mx:Text id="errorMessage"/>
             </mx:AddChild>
         </mx:State>
     </login:states> 
@@ -16,19 +16,22 @@
 	<!-- Import css style sheet -->
     <mx:Style source="login.css"/> 
    	
-	<mx:Panel>
-	    <mx:VBox id="hBox">	    		    
-			<mx:Form>
-				<mx:Image source="@Embed(source='../../images/ace_white.png')"/>
-				<mx:FormItem label="User:" styleName="userlabel">
-					<mx:TextInput id="username" styleName="userinput" />
+	<mx:Panel width="100%">
+	    <mx:VBox id="hBox" width="100%">
+	    	<mx:Image source="@Embed(source='../../images/ace_white.png')"/>	    		    
+			<mx:Form width="100%">				
+				<mx:FormItem label="User:" styleName="userlabel" width="100%">
+					<mx:TextInput id="username" styleName="userinput" width="100%"/>
 				</mx:FormItem>						
-				<mx:FormItem label="Password:" styleName="passlabel">
-					<mx:TextInput id="password" displayAsPassword="true"  styleName="passinput"/>
+				<mx:FormItem label="Password:" styleName="passlabel" width="100%">
+					<mx:TextInput id="password" displayAsPassword="true" styleName="passinput" width="100%"/>
 				</mx:FormItem>
-				<mx:FormItem>
-					<mx:Button label="Login" id="loginBtn" click="onLoginButtonLinkClick()"/>								
-				</mx:FormItem>	
+				<mx:FormItem width="100%">
+					<mx:HBox width="100%">
+						<mx:Spacer width="100%"/>
+						<mx:Button label="Login" id="loginBtn" click="onLoginButtonLinkClick()"/>								
+					</mx:HBox>						
+				</mx:FormItem>
 			</mx:Form>
 		</mx:VBox>
 	</mx:Panel>

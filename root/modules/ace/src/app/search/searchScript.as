@@ -11,6 +11,5 @@ import app.*;
  */
 private function onSearchButtonLinkClick():void
 {
-	SearchService.instance.search(searchTxt.text);
-	
+	SearchService.instance.search(searchTxt.text);	
 }

@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"    backgroundColor="#275065" width="83%" height="91">	
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+	styleName="search">	
 
 	<!-- Import css style sheet -->
     <mx:Style source="search.css"/> 
    
    	<!-- Import action script -->
    	<mx:Script source="searchScript.as"/> 
-					
-	<mx:Image source="@Embed(source='../../images/ace-mark.png')" />
 	
-	<mx:HBox paddingTop="25" paddingLeft="145">
+	<mx:HBox width="100%" height="100%" verticalAlign="middle">
 		
-		<mx:TextInput   id="searchTxt" enter="onSearchButtonLinkClick()" />
+		<mx:Spacer width="25"/>	
+		<mx:Image source="@Embed(source='../../images/ace-mark.png')" />	
+		<mx:Spacer width="30"/>	
+		<mx:TextInput id="searchTxt" width="250" enter="onSearchButtonLinkClick()" />
+		<mx:Spacer width="15"/>
 		<mx:Button id="SearchBtn"  label="Search"  cornerRadius="0" color="#FFFFFF" click="onSearchButtonLinkClick()"/>
-		<mx:LinkButton label="Advanced Search" x="498.5" y="35" textDecoration="underline" color="#FFFFFF"/>
+		<mx:Spacer width="25"/>
+		<mx:Label text="Advanced Search" textDecoration="underline" color="#FFFFFF"/>
 					
 	</mx:HBox>
 	
