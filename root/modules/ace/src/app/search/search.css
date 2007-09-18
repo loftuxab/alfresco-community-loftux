@@ -1,6 +1,11 @@
 /* CSS file for Search form */
 
-Canvas
+.search
 {
-   backgroundColor:#275065;
+   border-style:solid;
+   border-thickness:1;
+   border-color:#FFFFFF;
+   
+   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   fill-colors: #6B7680, #1B2C3C;
 }

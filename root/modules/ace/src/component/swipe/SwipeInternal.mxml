@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SwipeInternalClass xmlns="component.swipe.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+	
+	<mx:WipeUp id="myWU" duration="792"/>
+	<mx:WipeDown id="myWD" duration="792"/>
+	
+	<states>		
+		<mx:State name="secondaryState">			
+			<mx:SetProperty target="{canvasOne}" name="visible" value="false"/>
+			<mx:SetProperty target="{canvasOne}" name="includeInLayout" value="false"/>			
+			<mx:SetProperty target="{canvasTwo}" name="visible" value="true"/>		
+			<mx:SetProperty target="{canvasTwo}" name="includeInLayout" value="true"/>
+			<mx:SetProperty target="{swipeButton}" name="y" value="{canvasTwo.height+1}"/>
+		</mx:State>		
+	</states>
+	
+	<transitions>
+		<mx:Transition fromState="*" toState="*">
+			<mx:Parallel targets="{[swipeButton]}">							
+				<mx:Move duration="792" xBy="1" />	
+			</mx:Parallel>
+		</mx:Transition>		
+	</transitions>
+	
+	<mx:Style>
+        
+        .swipeButton
+        {
+            border-style: solid;
+            border-thickness: 1;
+            border-color: #DDDDDD;
+            border-skin: ClassReference("component.util.SimpleGradientBorder");
+            fill-colors: #D6D6D6, #B3B3B3; 
+        }
+        
+    </mx:Style>
+			
+	<mx:Canvas id="swipeButton" height="30" width="100%" x="0" y="0" styleName="swipeButton">
+		<mx:Box verticalAlign="middle" horizontalAlign="center" width="100%" height="100%">
+			<mx:Label text="Navigation" fontWeight="bold" color="#727272"/>
+		</mx:Box>
+	</mx:Canvas>
+	
+	<mx:Canvas id="canvasOne" width="100%" height="100%" x="0" y="{swipeButton.height+1}" borderStyle="solid" borderThickness="1" borderColor="white" 
+			hideEffect="{myWD}"
+			showEffect="{myWU}"
+			visible="true">	
+	</mx:Canvas>
+
+	<mx:Canvas id="canvasTwo" width="100%" height="{canvasOne.height}" x="0" y="0" borderStyle="solid"  borderThickness="1" borderColor="white"
+			hideEffect="{myWU}"
+			showEffect="{myWD}"
+			visible="false" includeInLayout="false">
+	</mx:Canvas>	
+	
+</SwipeInternalClass>

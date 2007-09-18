@@ -37,12 +37,12 @@ package util.webscript
 		private var _alwaysTunnelGetMethod:Boolean = true;
 		
 		/** Indicates whether the ticket is required to make the web service request */
-		private var _ticketRequired = true;
+		private var _ticketRequired:Boolean = true;
 		
 		/**
 		 * Constructor
 		 */
-		public function WebScriptService(url:String, method:String, onSuccess:Function=null, onFailure:Function=null, ticketRequired=true, alwaysTunnelGetMethod:Boolean = true)
+		public function WebScriptService(url:String, method:String, onSuccess:Function=null, onFailure:Function=null, ticketRequired:Boolean=true, alwaysTunnelGetMethod:Boolean = true)
 		{
 			// Inherited constructor
 			super();

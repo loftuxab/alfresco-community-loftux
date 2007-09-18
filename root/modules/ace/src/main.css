@@ -1,5 +1,28 @@
 /* CSS file */
 
+VBox
+{
+	horizontalGap:1; 
+	verticalGap:1;
+}
+
+HBox
+{
+	horizontalGap:1; 
+	verticalGap:1;
+}
+
+.mainApplication
+{
+	background-color: #9FA9B2;
+	border-thickness: 1;
+	border-style: solid;
+	border-color: #9FA9B2;
+}
+
+
+/* Old stuff that may need removing */
+
 searchCanvas 
 {
 	backgroundColor: #275065;

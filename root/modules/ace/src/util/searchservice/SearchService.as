@@ -66,7 +66,7 @@ package util.searchservice{
 		
 		public function onSearchSuccess(event:SuccessEvent):void
 		{
-			dispatchEvent(new SearchCompleteEvent(SearchCompleteEvent.SEARCH_COMPLETE, event.result, ""));
+			dispatchEvent(new SearchCompleteEvent(SearchCompleteEvent.SEARCH_COMPLETE, event.result));
 		}
 		
 		public function onFailure(event:FailureEvent):void

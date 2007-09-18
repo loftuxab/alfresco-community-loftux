@@ -1,6 +1,11 @@
 /* CSS file for logout form */
 
-Canvas
+.logout
 {
-   backgroundColor:#cccccc;	
+   border-style:solid;
+   border-thickness:1;
+   border-color:#FFFFFF;
+   
+   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   fill-colors: #ECEEF1, #D9DDE0;
 }
