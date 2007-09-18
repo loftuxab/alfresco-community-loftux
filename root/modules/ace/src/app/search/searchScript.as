@@ -1,6 +1,8 @@
 // Search Action Script 
 
 import mx.controls.Alert;
+import util.searchservice.SearchService;
+import app.*;
 
 /**
  * Event handler for logout button link.  
@@ -9,9 +11,6 @@ import mx.controls.Alert;
  */
 private function onSearchButtonLinkClick():void
 {
-	// TODO need to make call to authentication service to logout user
+	SearchService.instance.search(searchTxt.text);
 	
-	// TODO redirect main application to login dialog
-	
-	Alert.show("TODO: execute Search");
 }

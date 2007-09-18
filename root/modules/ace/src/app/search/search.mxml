@@ -11,7 +11,7 @@
 	
 	<mx:HBox paddingTop="25" paddingLeft="145">
 		
-		<mx:TextInput   id="searchTxt"  />
+		<mx:TextInput   id="searchTxt" enter="onSearchButtonLinkClick()" />
 		<mx:Button id="SearchBtn"  label="Search"  cornerRadius="0" color="#FFFFFF" click="onSearchButtonLinkClick()"/>
 		<mx:LinkButton label="Advanced Search" x="498.5" y="35" textDecoration="underline" color="#FFFFFF"/>
 					
