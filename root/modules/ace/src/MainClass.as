@@ -1,7 +1,7 @@
 // ActionScript filepackage{
 	import util.authentication.AuthenticationService;
 	import util.authentication.LoginCompleteEvent;
-	import util.authentication.LogoutCompleteEvent;
+	import util.authentication.LogoutCompleteEvent;	import util.searchservice.*;
 	import app.logout.logout;
 	import util.error.ErrorService;
 	import util.error.ErrorRaisedEvent;
@@ -10,7 +10,11 @@
 	import mx.containers.Canvas;
 	import mx.containers.Panel;
 	import app.login.login;
-	/**	 * Main class	 */	public class MainClass extends Application	{		/** UI components */		public var mainCanvas:Canvas;		public var loginPanel:login;				/**		 * Constructor		 */		public function MainClass():void		{			// Register interest in the error service events			ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);						// Register interest in authentication service events			AuthenticationService.instance.addEventListener(LoginCompleteEvent.LOGIN_COMPLETE, doLoginComplete);			AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, doLogoutComplete);			
+	import mx.core.Repeater;
+	import mx.controls.SWFLoader;
+	import mx.controls.CheckBox;
+	import mx.rpc.events.FaultEvent;
+	/**	 * Main class	 */	public class MainClass extends Application	{		/** UI components */		public var mainCanvas:Canvas;		public var loginPanel:login;		public var myframe:SWFLoader;		public var cb1:CheckBox;		public var resultsDispPanel:Panel;				public var searchResults:Repeater;						/**		 * Constructor		 */		public function MainClass():void		{			// Register interest in the error service events			ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);						// Register interest in authentication service events			AuthenticationService.instance.addEventListener(LoginCompleteEvent.LOGIN_COMPLETE, doLoginComplete);			AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, doLogoutComplete);							// Register interest in search service events			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 		
 		}
 				/**		 * Event handler called when login is successfully completed		 * 		 * @param	event	login complete event		 */
 		private function doLoginComplete(event:LoginCompleteEvent):void
@@ -21,13 +25,7 @@
 				/**		 * Event handler called when logout is successfully completed		 * 		 * @param	event	logout complete event		 */
 		private function doLogoutComplete(event:LogoutCompleteEvent):void
 		{
-			mainCanvas.visible = false;
-		    loginPanel.visible=true;
-		
-		    //myframe.source='';
-		    //resultsDispPanel.width=maxWidth;    
-		    //searchResults.dataProvider="";  
-		    //cb1.selected=true; 
-		}				/**		 * Event handler called when error is raised		 * 		 */		private function onErrorRaised(event:ErrorRaisedEvent):void		{			// TODO figure out how we react to ApplicationError's raised			if (event.errorType == ErrorService.APPLICATION_ERROR)			{				Alert.show("Application Error: " + event.error.message);			}
+			mainCanvas.visible = false;		    loginPanel.visible=true;				    //myframe.source='';		    //resultsDispPanel.width=maxWidth;    		    //searchResults.dataProvider="";  		    //cb1.selected=true; 
+		}				/**		 * Event handler called when search is successfully completed		 * 		 * @param	event	search complete event		 */		private function doSearchComplete(event:SearchCompleteEvent):void		{			try			{				this.searchResults.dataProvider = event.result.feed.entry;			   			}			catch (error:Error)			{				ErrorService.instance.raiseError(ErrorService.APPLICATION_ERROR, error.message);				}		}				/**		 * Event handler called when error is raised		 * 		 */		private function onErrorRaised(event:ErrorRaisedEvent):void		{			// TODO figure out how we react to ApplicationError's raised			if (event.errorType == ErrorService.APPLICATION_ERROR)			{				Alert.show("Application Error: " + event.error.message);			}
 		}	}}
 
