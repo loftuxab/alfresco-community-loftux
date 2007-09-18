@@ -24,7 +24,6 @@
  */
 package org.alfresco.error;
 
-import java.io.File;
 
 /**
  * Helper class around outputting stack traces.
@@ -54,17 +53,7 @@ public class StackTraceUtil
             StringBuilder sb,
             int maxDepth)
     {
-        String lineEnding = null;
-        if (File.separatorChar == '/')
-        {
-            // It's unix
-            lineEnding = "\n";
-        }
-        else
-        {
-            // Windows
-            lineEnding = "\r\n";
-        }
+        String lineEnding = System.getProperty("line.separator", "\n");
 
         sb.append(msg).append(" ").append(lineEnding)
           .append("   Started at: ").append(lineEnding);
