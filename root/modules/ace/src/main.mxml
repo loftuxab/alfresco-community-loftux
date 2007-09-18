@@ -30,7 +30,7 @@
 	xmlns:logout="app.logout.*" 
 	xmlns:login="app.login.*" 
 	xmlns:fc="com.flexcapacitor.controls.*"
-	xmlns:filters="flash.filters.*">
+	xmlns:filters="flash.filters.*" xmlns:search="app.search.*">
 
 	<mx:Script>
 	<![CDATA[  
@@ -96,9 +96,7 @@
                         
             private function clickevent():void
             {
-            	/*
-            	if(searchTxt.text!=""){
-					 if(!cb1.selected){
+           			if(!cb1.selected){
 						tabnav.visible=false;
 						tabnav1.visible=true;
 						cb1.selected=true;
@@ -108,55 +106,9 @@
 						tabnav.visible=true;
 						tabnav1.visible=false;
 						cb1.selected=false;
-						
 					}
-            	}
-            	else{
-            		searchTxt.setFocus();
-            		Alert.show('Search String is empty');
-            	}
-            	*/
-			}	 						
+            }
             
-            /**
-			 * handle result event when Search is complete
-			 * @onSearchComplete
-			 */
-            private function onSearchComplete(event:ResultEvent):void
-            {
-			   /*
-               searchResults.dataProvider=event.result.feed.entry;
-               myList=new ArrayCollection();
-               urls=new ArrayCollection();
-               myList.removeAll();
-               urls.removeAll();
-               var i:int;
-
-               if(searchTxt.text!="")
-               {
-               	tabnav1.visible=true;
-               	resultsDispPanel.visible=true;
-               }
-               else 
-               {
-               		tabnav1.visible=false;
-               		myframe.source='';
-               }
-               */
-             }
-           
-            
-            private function onSearch():void
-            {	            	
-            	//searchService.url="http://localhost:8080/alfresco/service/sample/kb/search.atom?q="+searchTxt.text;
-            	//searchService.send();            	
-            }        
-            
-             /**
-			 * function for displaying the search content 
-			 * from the search list
-			 * @resultClick
-			 */			 
             private function resultClick(url:String):void
             {
             	resultsDispPanel.width=400;
@@ -191,8 +143,7 @@
 					
 		<mx:HBox width="100%">
 				
-			<mx:Canvas width="100%"  id="searchPanel" backgroundColor="#275065" height="91"  borderStyle="solid">							
-			</mx:Canvas>
+			<search:search/>
 			
 			<logout:logout/>	
 	
