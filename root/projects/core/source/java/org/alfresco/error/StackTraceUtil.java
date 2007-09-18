@@ -24,6 +24,8 @@
  */
 package org.alfresco.error;
 
+import java.io.File;
+
 /**
  * Helper class around outputting stack traces.
  * 
@@ -52,8 +54,20 @@ public class StackTraceUtil
             StringBuilder sb,
             int maxDepth)
     {
-        sb.append(msg).append(" \n")
-          .append("   Started at: \n");
+        String lineEnding = null;
+        if (File.separatorChar == '/')
+        {
+            // It's unix
+            lineEnding = "\n";
+        }
+        else
+        {
+            // Windows
+            lineEnding = "\r\n";
+        }
+
+        sb.append(msg).append(" ").append(lineEnding)
+          .append("   Started at: ").append(lineEnding);
         for (int i = 0; i < stackTraceElements.length; i++)
         {
             if (i > maxDepth && maxDepth > 0)
@@ -64,7 +78,7 @@ public class StackTraceUtil
             sb.append("      ").append(stackTraceElements[i]);
             if (i < stackTraceElements.length - 1)
             {
-                sb.append("\n");
+                sb.append(lineEnding);
             }
         }
     }
