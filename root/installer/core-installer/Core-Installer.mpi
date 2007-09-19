@@ -3,7 +3,7 @@ AllowLanguageSelection
 No
 
 AppName
-{Alfresco Enterprise Network}
+{Alfresco <%Codeline%> Network}
 
 ApplicationID
 E09DCA7F-DEF7-416C-89B7-ABCA4FBB9F7D
@@ -21,7 +21,7 @@ CleanupCancelledInstall
 Yes
 
 Codeline
-Enterprise
+Community
 
 CommandLineFailureAction
 {Fail (recommended)}
@@ -171,7 +171,7 @@ UpgradeApplicationID
 {}
 
 Version
-2.1.0
+2.1
 
 ViewReadme
 Yes
@@ -835,6 +835,8 @@ File ::E67D1CA5-40F2-4643-BAF0-7BBE6A9AF015 -name webscripts_hr_HR.properties -p
 File ::959D48B3-1CAA-48FB-AF5A-0A4CAE0DABA2 -name webscripts_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::1B60EF72-CF24-423B-8F22-ED5683948084 -name workflow-interpreter-help_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::93430A4B-BD65-48D3-AB1E-E316617781D8 -name workflow-messages_ja_JP.properties -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::962CEE68-FC9D-4978-81A7-6D82E8DD2279 -name readme_fi_FI.txt -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
+File ::863A6F3C-7A3E-4E6B-A2C1-DE31372FB8D5 -name readme_pl_PL.txt -parent D77195E7-38C8-43B5-AE35-2BC7C7618C52
 File ::561191B3-A37D-4A18-83C2-6269E4526CDF -type dir -name lib -parent 0AAF8C4E-700B-4343-A448-3154AACB83C1
 File ::4FDA2F80-1DB2-4D84-9477-DD6A76BA45C6 -type dir -name temp -parent F7441516-B2B2-4AD9-A9E5-5EC1AF95FE78
 File ::7865F8E2-C505-4214-BD9D-D2EFA47983C9 -name bugzilla37035-safeToDelete.tmp -parent 4FDA2F80-1DB2-4D84-9477-DD6A76BA45C6
@@ -1212,17 +1214,17 @@ InstallComponent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -setup Install -type actio
 Condition 246295CB-E5A7-401B-A5BE-202E55B910B9 -active Yes -parent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -title {String Is Condition} -component StringIsCondition
 Condition 94D48815-A65A-4BE6-8CF7-62A84DEF5669 -active Yes -parent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -title {String Is Condition} -component StringIsCondition
 Condition 8A0F57EB-A4DD-470D-B38A-8E94D387662C -active Yes -parent 606BF7AF-87C0-4F73-B8A3-98AC0D7B3BFF -title {File Exists Condition} -component FileExistsCondition
-InstallComponent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -setup Install -type action -conditions {CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016 33FC8933-4F3B-42B1-88E8-6C534DFDA7E7} -title {Launch Win Configure Wizard} -component ExecuteExternalProgram -command reorder -active Yes -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+InstallComponent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -setup Install -type action -conditions {CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016 33FC8933-4F3B-42B1-88E8-6C534DFDA7E7} -title {Launch Win Configure Wizard} -component ExecuteExternalProgram -command insert -active Yes -parent 94ECFB9E-F422-4958-A381-868BB47EED32
 Condition CE24E6D0-EA4C-4E6B-9D3B-EE1FDBE77016 -active Yes -parent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -title {Platform Condition} -component PlatformCondition
 Condition 33FC8933-4F3B-42B1-88E8-6C534DFDA7E7 -active Yes -parent F1200E8B-6EE5-4FE9-AD22-B2525181CF27 -title {String Is Condition} -component StringIsCondition
-InstallComponent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -setup Install -type action -conditions {35DE9DD4-AF91-4EDC-8506-B933E7438395 484CCEDA-8775-44CD-8B08-5725A7C17B98} -title {Launch Lin Configure Console} -component ExecuteExternalProgram -command reorder -active No -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+InstallComponent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -setup Install -type action -conditions {35DE9DD4-AF91-4EDC-8506-B933E7438395 484CCEDA-8775-44CD-8B08-5725A7C17B98} -title {Launch Lin Configure Console} -component ExecuteExternalProgram -command insert -active No -parent 94ECFB9E-F422-4958-A381-868BB47EED32
 Condition 35DE9DD4-AF91-4EDC-8506-B933E7438395 -active Yes -parent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -title {Platform Condition} -component PlatformCondition
 Condition 484CCEDA-8775-44CD-8B08-5725A7C17B98 -active Yes -parent 40A881B7-F4D3-4F5B-9C8C-9A7620BC9C2F -title {String Is Condition} -component StringIsCondition
 InstallComponent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -setup Install -type action -conditions {717E9619-744F-47FE-A9C6-79E54508E2CD E5804B10-F9A0-4B47-9D76-B8B575B39064 1CC0E610-D7DE-4F40-A82C-BC39A8A4AAE7} -title {Launch Lin Configure Wizard} -component ExecuteExternalProgram -command insert -active Yes -parent 94ECFB9E-F422-4958-A381-868BB47EED32
 Condition 717E9619-744F-47FE-A9C6-79E54508E2CD -active Yes -parent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -title {Platform Condition} -component PlatformCondition
 Condition E5804B10-F9A0-4B47-9D76-B8B575B39064 -active Yes -parent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -title {String Is Condition} -component StringIsCondition
 Condition 1CC0E610-D7DE-4F40-A82C-BC39A8A4AAE7 -active Yes -parent D70E21CE-64B2-4C80-9614-CF5E63DE3527 -title {String Is Condition} -component StringIsCondition
-InstallComponent 09A53DB3-6C5B-45B9-852E-5AFEC520C8A5 -setup Install -type action -conditions B11EE88C-A0C4-4353-9999-5F4D1FBA93D6 -title {Launch Registration} -component LaunchWebBrowser -command reorder -active No -parent 94ECFB9E-F422-4958-A381-868BB47EED32
+InstallComponent 09A53DB3-6C5B-45B9-852E-5AFEC520C8A5 -setup Install -type action -conditions B11EE88C-A0C4-4353-9999-5F4D1FBA93D6 -title {Launch Registration} -component LaunchWebBrowser -command insert -active No -parent 94ECFB9E-F422-4958-A381-868BB47EED32
 Condition B11EE88C-A0C4-4353-9999-5F4D1FBA93D6 -active Yes -parent 09A53DB3-6C5B-45B9-852E-5AFEC520C8A5 -title {String Is Condition} -component StringIsCondition
 InstallComponent 8802D9A8-C20D-4EDB-9DA1-BF3E95EC78D7 -setup Install -type actiongroup -title {Cancel Actions} -active Yes -parent ActionGroupsInstall
 InstallComponent 715C8558-572D-47F8-9F08-F2C3E9214315 -setup Uninstall -type pane -title Uninstall -component Uninstall -active Yes -parent StandardUninstall
@@ -2470,7 +2472,7 @@ Windows
 {Program Files}
 
 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1,Size
-64397880
+61106391
 
 9A4AB9E2-2B87-47C2-894E-8A8C9D6FCA7F,ObjectID
 {Java File Group}
@@ -2497,7 +2499,7 @@ Windows
 {Windows Files}
 
 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D,Size
-6137189
+5035984
 
 A0BB5354-D39E-4ACA-A63E-1C635EA36CE5,Conditions
 {1 condition}
@@ -3004,7 +3006,7 @@ E5891213-6EC8-4636-B2E5-9CEE82670119,Name
 {Linux Files}
 
 E5891213-6EC8-4636-B2E5-9CEE82670119,Size
-1230385
+13187
 
 EA10E9B0-F564-46FE-A7E2-88C53396D8BD,Conditions
 {1 condition}

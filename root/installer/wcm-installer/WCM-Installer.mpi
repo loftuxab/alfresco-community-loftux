@@ -3,7 +3,7 @@ AllowLanguageSelection
 Yes
 
 AppName
-{Alfresco WCM Enterprise}
+{Alfresco WCM <%Codeline%>}
 
 ApplicationID
 5873894B-85ED-4B0B-BFD6-9F9AD53FC801
@@ -657,10 +657,10 @@ Condition C58D266E-9F05-4233-80A6-DE03A0259B23 -active Yes -parent FA8418AE-1213
 InstallComponent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -setup Install -type action -conditions 27CE19A4-5473-40A5-BF94-434825CB85B6 -title {Windows Uninstall Registry} -component AddWindowsUninstallEntry -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition 27CE19A4-5473-40A5-BF94-434825CB85B6 -active Yes -parent 4C7D2162-0B33-4BEE-ACB3-365BB28E91E3 -title {String Is Condition} -component StringIsCondition
 InstallComponent 27951917-16C4-4604-BC60-F67560355F36 -setup Install -type action -title {Win Start Shortcut} -component InstallWindowsShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-InstallComponent 866731A5-0954-4EFC-8A47-20EFC1398504 -setup Install -type action -conditions A6A56774-42B3-4BA4-A026-726EEB98383F -title {Nix Start Shortcut} -component InstallDesktopShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+InstallComponent 866731A5-0954-4EFC-8A47-20EFC1398504 -setup Install -type action -conditions A6A56774-42B3-4BA4-A026-726EEB98383F -title {Nix Start Shortcut} -component InstallDesktopShortcut -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition A6A56774-42B3-4BA4-A026-726EEB98383F -active Yes -parent 866731A5-0954-4EFC-8A47-20EFC1398504 -title {Platform Condition} -component PlatformCondition
 InstallComponent 0C9D77AA-E5A2-4E5E-A47D-1094A62A6C68 -setup Install -type action -title {Win Stop Shortcut} -component InstallWindowsShortcut -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
-InstallComponent 776A577D-90EB-4CDA-A881-BAA643FD698D -setup Install -type action -conditions BAC94ABE-77BA-40D2-B427-C641FCE5559E -title {Nix Stop Shortcut} -component InstallDesktopShortcut -command reorder -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+InstallComponent 776A577D-90EB-4CDA-A881-BAA643FD698D -setup Install -type action -conditions BAC94ABE-77BA-40D2-B427-C641FCE5559E -title {Nix Stop Shortcut} -component InstallDesktopShortcut -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition BAC94ABE-77BA-40D2-B427-C641FCE5559E -active Yes -parent 776A577D-90EB-4CDA-A881-BAA643FD698D -title {Platform Condition} -component PlatformCondition
 InstallComponent 679A07B2-4D09-4796-8F0F-BC470030E967 -setup Install -type action -conditions A7E780FF-A1A2-429A-B9C5-4956E763D1C2 -title {Replace Text In File} -component ReplaceTextInFile -command insert -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
 Condition A7E780FF-A1A2-429A-B9C5-4956E763D1C2 -active Yes -parent 679A07B2-4D09-4796-8F0F-BC470030E967 -title {Platform Condition} -component PlatformCondition
