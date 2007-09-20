@@ -793,7 +793,7 @@
          </fileset>
       </jar>
       <!-- Remove temp files -->
-      <delete dir="${dir.continuous.assemble.mmt}/tmp-mmt-jar" />
+      <delete dir="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar" />
 
    </target>
    
