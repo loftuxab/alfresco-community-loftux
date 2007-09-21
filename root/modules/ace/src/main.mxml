@@ -25,6 +25,7 @@
  * http://www.alfresco.com/legal/licensing"
  */
  --> 
+
 <app:MainClass  xmlns:mx="http://www.adobe.com/2006/mxml" 
 				verticalScrollPolicy="off"
 				layout="absolute" 
@@ -36,59 +37,9 @@
 				xmlns:fc="com.flexcapacitor.controls.*"
 				xmlns:filters="flash.filters.*" 
 				xmlns:search="app.search.*"
+				xmlns:navigation="app.navigation.*" 
 				styleName="mainApplication" 
-				xmlns:RepeaterElements="app.RepeaterElements.*" 
 				xmlns:searchResults="app.searchResults.*">
-
-	<mx:Script>
-	<![CDATA[  
-			
-			import mx.collections.ArrayCollection;
-			import mx.controls.Alert;
-			import mx.rpc.events.ResultEvent;
-			import mx.rpc.events.FaultEvent;
-			import mx.core.IUIComponent;
-			import flash.net.navigateToURL;
-			
-			import mx.events.MenuEvent;
-            import mx.controls.Alert;
-            import mx.collections.*;
-            import mx.managers.DragManager; 
-            
-            import mx.events.CloseEvent;            
-            import util.authentication.AuthenticationService;
-            
-            // TODO .. the following needs to reviewed and refactored as appropriate ...            
-            
-            private var myList:ArrayCollection;		
-			private var myLinks:XMLList;
-			private var urls:ArrayCollection;			
-            
-           
-            private function clickevent():void
-            {
-           			if(!cb1.selected){
-						tabnav.visible=false;
-						tabnav1.visible=true;
-						cb1.selected=true;
-					}
-					else
-					{
-						tabnav.visible=true;
-						tabnav1.visible=false;
-						cb1.selected=false;
-					}
-            }
-            
-            private function resultClick(url:String):void
-            {
-            	resultsDispPanel.width=400;
-            	//swfPanel.visible=true;
-            	myframe.visible=true;
-            	myframe.source=url;            	
-            }	
-	]]>
-	</mx:Script>
 	
 	<!-- Include the main CSS -->
 	<mx:Style source="main.css"/>
@@ -112,41 +63,12 @@
 				<logout:logout width="180" height="100%"/>
 		
 			</mx:HBox>
-							
-			<swipe:Swipe id="swipe" width="100%" height="100%"  verticalScrollPolicy="off">
-				<mx:TabNavigator  width="100%"  height="100%" id="tabnav" >
 			
-					       		 	<mx:Canvas label="Home" width="100%" height="100%" horizontalScrollPolicy="off">
-						        		<mx:Panel width="100%"  borderStyle="none" x="150">
-					        				<mx:Image source="@Embed(source='images/getting_started_portlet.png')"  width="100%" height="100%"/>
-					        				<mx:Image source="@Embed(source='images/tech_webscritps_portlets.png')"  width="100%" height="100%" x="657" y="0"/>
-								        </mx:Panel>
-					        		</mx:Canvas>
-				 
-						        	<mx:Canvas label="Knowledge Base" enabled="false">
-						        	</mx:Canvas>
-						
-							        <mx:Canvas label="My issues" enabled="false">
-						    	    </mx:Canvas>
-						        
-						        	<mx:Canvas label="Documentations" enabled="false">
-						         		<mx:Accordion id="contentspace" width="100%" height="100%">
-											<mx:VBox  id="navbox" label="Navigation panel" width="820" height="237">
-													<mx:Label text="one"/>
-											</mx:VBox>
-										</mx:Accordion>
-						        	</mx:Canvas>
-						        
-						        	<mx:Canvas label="Webscripts" enabled="false">
-						        	</mx:Canvas>
-						        
-						       	    <mx:Canvas label="Contact Us" enabled="false">
-						            </mx:Canvas>
-						        
-							        <mx:Canvas label="Help" enabled="false">
-							        </mx:Canvas>
-						        
-				</mx:TabNavigator>
+			<!-- Main instance of the swipe control -->				
+			<swipe:Swipe id="swipe" width="100%" height="100%" primaryStateLabel="Navigation" secondaryStateLabel="Search Results">
+				
+				<!-- Main navigation componenet -->
+				<navigation:Navigation width="100%" height="100%"/>
 						  
 				<searchResults:searchResults id="tabnav1" horizontalScrollPolicy="off"/>
 							

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NavigationClass 
+	xmlns="app.navigation.*" 
+	xmlns:avs="component.advancedViewStack.*" 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	borderThickness="0" xmlns:home="app.home.*">
+	
+	<mx:Style source="navigation.css"/>
+	
+	<mx:VBox width="100%" height="100%" verticalGap="0" horizontalGap="0" backgroundColor="#E1E2E3">
+		
+		<mx:HBox width="100%" backgroundColor="#FFFFFF">
+			<mx:Spacer height="3"/>
+		</mx:HBox>
+		
+		<mx:HBox width="100%" backgroundColor="#E1E2E3">			
+			<mx:Spacer width="35"/> 
+			<mx:TabBar dataProvider="viewStack" backgroundColor="#FFFFFF" horizontalGap="3" tabStyleName="navTab" selectedTabTextStyleName="navSelectedTab"/>
+		</mx:HBox>
+		
+		<mx:HBox width="100%" backgroundColor="#FFFFFF">
+			<mx:Spacer height="3"/>
+		</mx:HBox>
+		
+		<mx:ViewStack id="viewStack" width="100%" height="100%" styleName="navViewStack" >
+			
+    		<avs:AdvancedViewStack label="Home" horizontalAlign="center" width="100%" height="100%" 
+    				paddingTop="15" paddingLeft="15" paddingRight="15" paddingBottom="15" verticalGap="15">        			        		
+				<home:GettingStarted width="90%"/>
+	        </avs:AdvancedViewStack>
+ 
+        	<mx:Canvas label="Knowledge Base" enabled="true" width="100%" height="100%">
+        	</mx:Canvas>
+
+	        <mx:Canvas label="My Issues" enabled="true" width="100%" height="100%">
+    	    </mx:Canvas>
+        
+        	<mx:Canvas label="Documentation" enabled="true" width="100%" height="100%">
+        	</mx:Canvas>
+			
+		</mx:ViewStack>
+		
+	</mx:VBox>
+	
+</NavigationClass>
