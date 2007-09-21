@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<home:HomePanelContainer xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:home="app.home.*" label="Getting Started">
+
+	<mx:VBox id="box" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" backgroundColor="#F0F6F6">
+		
+		<mx:Label text="Welcome to Alfresco Enterprise Connections!"/>
+		
+	</mx:VBox>
+	
+</home:HomePanelContainer>

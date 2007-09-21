@@ -36,16 +36,18 @@ package app.searchResults
         }	
         
         /** default Constructor */
-       public function searchResultsClass(){
+       public function searchResultsClass()
+       {
+       	 	super();
+       	 	
        	 	// Register interest in search service events
-			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	
-       		super();
+			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
        }
        
-       public function geturl():String{
+       public function geturl():String
+       {
        		return this.url;
-       }
-		
+       }		
      
        /**
 		 * Event handler called when search is successfully completed

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search:SearchClass xmlns:mx="http://www.adobe.com/2006/mxml" 
 		   			xmlns:search="app.search.*"
+		   			xmlns:sb="*" 
 					styleName="search">	
 
 	<!-- Import css style sheet -->
@@ -14,7 +15,7 @@
 		<mx:Spacer width="30"/>	
 		<mx:TextInput id="searchTxt" width="250"  enter="onSearchButtonLinkClick(searchTxt.text)" />
 		<mx:Spacer width="15"/>
-		<mx:Button id="SearchBtn"  label="Search"  cornerRadius="0" color="#FFFFFF" click="onSearchButtonLinkClick(searchTxt.text);"/>
+		<sb:SearchButton click="onSearchButtonLinkClick(searchTxt.text)"/>
 		<mx:Spacer width="25"/>
 		<mx:Label text="Advanced Search" textDecoration="underline" color="#FFFFFF"/>
 					

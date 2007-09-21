@@ -1,0 +1,33 @@
+/* CSS file */
+
+.homePanelTop
+{
+   border-style:solid;
+   border-thickness:1;
+   border-color:#FFFFFF;
+   
+   cornerRadius: 15;
+   bottomCornerRadius: 0;
+   
+   border-skin: ClassReference("component.util.GlossGradientBorder");
+   fill-colors: #6B7680, #384654, #1B2C3C ,#1B2C3C;
+}
+
+.homePanelTitle
+{
+	color: #FFFFFF;
+	font-weight: bold;
+}
+
+.homePanelBottom
+{
+   border-style:solid;
+   border-thickness:1;
+   border-color:#FFFFFF;
+   
+   cornerRadius: 0;
+   bottomCornerRadius: 15;
+   
+   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   fill-colors: #6B7680, #1B2C3C;
+}

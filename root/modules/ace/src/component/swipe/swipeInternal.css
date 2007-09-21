@@ -1,0 +1,23 @@
+/* Swipe control CSS file */
+
+.swipeButton
+{
+    border-style: solid;
+    border-thickness: 1;
+    border-color: #DDDDDD;
+    border-skin: ClassReference("component.util.SimpleGradientBorder");
+    fill-colors: #D6D6D6, #B3B3B3; 
+}
+
+.swipeLabel
+{
+	font-weight: bold; 
+	color: #727272;
+}
+
+.swipeCanvas
+{
+	border-style: solid;
+	border-thickness: 1;
+	border-color: #FFFFFF;
+}

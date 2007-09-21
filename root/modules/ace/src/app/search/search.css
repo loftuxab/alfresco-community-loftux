@@ -6,6 +6,6 @@
    border-thickness:1;
    border-color:#FFFFFF;
    
-   border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #6B7680, #1B2C3C;
+   border-skin: ClassReference("component.util.GlossGradientBorder");
+   fill-colors: #6B7680, #384654, #1B2C3C ,#1B2C3C;
 }

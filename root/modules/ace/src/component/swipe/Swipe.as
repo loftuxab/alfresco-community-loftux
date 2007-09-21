@@ -14,6 +14,12 @@ package component.swipe
 		/** Internal swipe control */
 		private var swipe:SwipeInternal;
 		
+		/** Control labels */
+		[Inspectable]
+		private var _primaryStateLabel:String;
+		[Inspectable]
+		private var _secondaryStateLabel:String;
+		
 		/**
 		 * Constructor
 		 */
@@ -23,7 +29,27 @@ package component.swipe
 			
 			// Register interest in the creation complete event
 			this.addEventListener(FlexEvent.CREATION_COMPLETE, onCreationComplete);
-		}				
+		}	
+		
+		public function get primaryStateLabel():String
+		{
+			return this._primaryStateLabel;	
+		}			
+		
+		public function set primaryStateLabel(label:String):void
+		{
+			this._primaryStateLabel = label;
+		}		
+		
+		public function get secondaryStateLabel():String
+		{
+			return this._secondaryStateLabel;	
+		}			
+		
+		public function set secondaryStateLabel(label:String):void
+		{
+			this._secondaryStateLabel = label;
+		}
 		
 		/**
 		 * Create complete event handler
@@ -42,8 +68,8 @@ package component.swipe
 			this.removeAllChildren();
 			
 			this.swipe = new SwipeInternal();
-			swipe.setChildOne(childOne);
-			swipe.setChildTwo(childTwo);
+			swipe.setChildOne(childOne, this._primaryStateLabel);
+			swipe.setChildTwo(childTwo, this._secondaryStateLabel);
 			
 			// Add the configured swipe control
 			this.addChild(swipe);	
@@ -63,8 +89,6 @@ package component.swipe
 		public function showSecondaryState():void
 		{
 			swipe.showSecondaryState();	
-		}
-		
-		
+		}		
 	}
 }

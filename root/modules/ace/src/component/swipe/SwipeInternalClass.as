@@ -8,19 +8,42 @@ package component.swipe
 	import mx.core.UIComponent;
 	import flash.display.DisplayObject;
 	import flash.events.MouseEvent;
+	import mx.controls.Label;
+	import mx.events.EffectEvent;
 
+	/**
+	 * Internal swipe control class
+	 */
 	public class SwipeInternalClass extends Canvas
 	{
+		/** Display object to be contained inside the swiped canvas' */
 		private var _childOne:DisplayObject;		
 		private var _childTwo:DisplayObject;
 		
+		/** Control labels */
+		private var _primaryStateLabel:String;
+		private var _secondaryStateLabel:String;
+		
+		/** UI controls */
+		public var swipeLabel:Label;
+		
+		/** Indicates whether the swipe button is enabled or not */
+		private var _swipeButtonEnabled:Boolean = true;
+		
+		/**
+		 * Constructor
+		 */
 		public function SwipeInternalClass()
 		{
 			super();	
 		}
 		
+		/**
+		 * On click event fired when swipe button is clicked.  Does a wipe of the
+		 * canvas'
+		 */
 		public function doWipe(event:Event):void
-		{
+		{			
 			if (currentState == null)
 			{
 				showSecondaryState();									
@@ -31,35 +54,88 @@ package component.swipe
 			}
 		}
 		
+		/**
+		 * Shows the primary state, ie the first child control
+		 */
 		public function showPrimaryState():void
 		{
-			currentState = null;	
+			if (this._swipeButtonEnabled == true)
+			{
+				currentState = null;	
+			}
 		}
 		
+		/**
+		 * Shows the secondard state, ie the second child control
+		 */
 		public function showSecondaryState():void
 		{
-			currentState = "secondaryState";	
+			if (this._swipeButtonEnabled == true)
+			{
+				currentState = "secondaryState";	
+			}
 		}
 		
-		public function setChildOne(childOne:DisplayObject):void
+		/**
+		 * Set the first child control
+		 */
+		public function setChildOne(childOne:DisplayObject, label:String):void
 		{
 			this._childOne = childOne;
+			this._primaryStateLabel = label;
 		}
 		
-		public function setChildTwo(childTwo:DisplayObject):void
+		/**
+		 * Set the second child control
+		 */
+		public function setChildTwo(childTwo:DisplayObject, label:String):void
 		{
 			this._childTwo = childTwo;
+			this._secondaryStateLabel = label;
 		}
 		
+		/**
+		 * Override for the createChild function.  Positions the child controls in the correct place in
+		 * the swipe control
+		 */
 		override protected function createChildren():void
 		{
 			super.createChildren();
 			
+			// Add the child controls
 			(this.getChildByName("canvasOne") as Canvas).addChild(this._childOne);
 			(this.getChildByName("canvasTwo") as Canvas).addChild(this._childTwo);
 			
+			// Register interest in the swipeButton events
 			var swipeButton:Canvas = getChildByName("swipeButton") as Canvas;
 			swipeButton.addEventListener(MouseEvent.CLICK, doWipe);	
+			swipeButton.addEventListener(EffectEvent.EFFECT_START, effectStart);
+			swipeButton.addEventListener(EffectEvent.EFFECT_END, effectEnd);
+			
+			// Set the initial swipe label value
+			swipeLabel.text = this._secondaryStateLabel;
+		}
+		
+		private function effectStart(event:Event):void
+		{
+			// Disable the button
+			this._swipeButtonEnabled = false;		
+		}
+		
+		private function effectEnd(event:Event):void
+		{
+			// Change the swipe label accordingly
+			if (currentState == null)
+			{
+				swipeLabel.text = this._secondaryStateLabel;									
+			}
+			else
+			{
+				swipeLabel.text = this._primaryStateLabel;
+			}	
+			
+			// Re-enable the button
+			this._swipeButtonEnabled = true;
 		}
 	}
 }

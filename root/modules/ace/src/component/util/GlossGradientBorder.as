@@ -9,7 +9,7 @@ package component.util
 	import mx.utils.ColorUtil;
 	import mx.utils.GraphicsUtil;
 	
-	public class SimpleGradientBorder extends HaloBorder 
+	public class GlossGradientBorder extends HaloBorder 
 	{
 		
 		private var topCornerRadius:Number;		// top corner radius
@@ -22,7 +22,7 @@ package component.util
 		private function setupStyles():void
 		{
 			fillColors = getStyle("fillColors") as Array;
-			if (!fillColors) fillColors = [0xFFFFFF, 0xFFFFFF];
+			if (!fillColors) fillColors = [0xFFFFFF, 0xFFFFFF, 0xFFFFFF, 0xFFFFFF];
 			
 			if (getStyle("cornerRadius") != null)
 			{
@@ -40,8 +40,7 @@ package component.util
 			else
 			{
 				bottomCornerRadius = topCornerRadius;		
-			}
-		
+			}		
 		}
 		
 		// ------------------------------------------------------------------------------------- //
@@ -57,8 +56,9 @@ package component.util
 			var w:Number = unscaledWidth - b.left - b.right;
 			var h:Number = unscaledHeight - b.top - b.bottom;
 			var m:Matrix = verticalGradientMatrix(0, 0, w, h);
-						
-			g.beginGradientFill("linear", fillColors, [1, 1], [0, 255], m);
+				
+		
+			g.beginGradientFill("linear", fillColors, [1, 1, 1, 1], [0, 127, 127, 255], m);
 			
 			var tr:Number = Math.max(topCornerRadius-2, 0);
 			var br:Number = Math.max(bottomCornerRadius-2, 0);
