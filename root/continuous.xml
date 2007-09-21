@@ -778,6 +778,12 @@
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/service/namespace/*.class" />
       </copy>
+      <!-- copy the ehcache file -->
+      <copy todir="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar" 
+            flatten="false">
+         <fileset dir="${dir.project.repository.src.java}" 
+                  includes="org/alfresco/repo/model/filefolder/**/loader-ehcache.xml" />
+      </copy>
       <!-- copy in a manifest file -->
       <copy tofile="${dir.continuous.assemble.bm-remote}/tmp-bm-remote-jar/META-INF/MANIFEST.MF" >
          <fileset dir="${dir.project.repository}/source/meta-inf" 
