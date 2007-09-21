@@ -25,20 +25,20 @@
  * http://www.alfresco.com/legal/licensing"
  */
  --> 
-<app:MainClass xmlns:mx="http://www.adobe.com/2006/mxml" 
-	
-	layout="absolute" 
-	frameRate="99"
-	
-	xmlns:app="*" 
-	xmlns:logout="app.logout.*" 
-	xmlns:login="app.login.*" 
-	xmlns:swipe="component.swipe.*" 
-	xmlns:fc="com.flexcapacitor.controls.*"
-	xmlns:filters="flash.filters.*" 
-	xmlns:search="app.search.*"
-	
-	styleName="mainApplication">
+<app:MainClass  xmlns:mx="http://www.adobe.com/2006/mxml" 
+				verticalScrollPolicy="off"
+				layout="absolute" 
+				frameRate="99"
+				xmlns:app="*" 
+				xmlns:logout="app.logout.*" 
+				xmlns:login="app.login.*" 
+				xmlns:swipe="component.swipe.*" 
+				xmlns:fc="com.flexcapacitor.controls.*"
+				xmlns:filters="flash.filters.*" 
+				xmlns:search="app.search.*"
+				styleName="mainApplication" 
+				xmlns:RepeaterElements="app.RepeaterElements.*" 
+				xmlns:searchResults="app.searchResults.*">
 
 	<mx:Script>
 	<![CDATA[  
@@ -64,44 +64,7 @@
 			private var myLinks:XMLList;
 			private var urls:ArrayCollection;			
             
-            [Bindable]
-            public var menuBarCollection:XMLListCollection;
-    
-    		var sortbyValues = [ {label:"Relevance", data:1}, {label:"Size", data:2}, {label:"Alphabetical", data:3} ];
-    		
-            private var menubarXML:XMLList =
-                <>
-                    <menuitem label="Home" type="check" data="top">
-                      
-                    </menuitem>
-                    <menuitem label="Knowledge Base"  type="check" data="top">
-                        <menuitem label="Articles" type="check"  data="Articles"/>
-                        <menuitem type="separator"/>
-                        <menuitem label="Content" data="ss"/>
-                      </menuitem>
-                    <menuitem label="My issues" data="top">
-                         <menuitem label="issues" type="check"  data="Articles"/>
-                        <menuitem type="separator"/>
-                        <menuitem label="Content" data="ss"/>
-                    </menuitem>
-                    <menuitem label="Documentation" data="top">
-                        <menuitem label="documentation" type="check"  data="Articles"/>
-                        <menuitem type="separator"/>
-                        <menuitem label="Content" data="ss"/>
-                    </menuitem>
-                    <menuitem label="Webscripts" data="top">
-                        <menuitem label="webscripts" type="check"  data="Articles"/>
-                        <menuitem type="separator"/>
-                        <menuitem label="Content" data="ss"/>
-                    </menuitem>
-                    <menuitem label="Contact Us" data="top">
-                        <menuitem label="contact us" type="check"  data="Articles"/>
-                        <menuitem type="separator"/>
-                        <menuitem label="Content" data="ss"/>
-                    </menuitem>
-                    
-                </>;
-                        
+           
             private function clickevent():void
             {
            			if(!cb1.selected){
@@ -120,7 +83,7 @@
             private function resultClick(url:String):void
             {
             	resultsDispPanel.width=400;
-            	swfPanel.visible=true;
+            	//swfPanel.visible=true;
             	myframe.visible=true;
             	myframe.source=url;            	
             }	
@@ -136,7 +99,7 @@
 	<!-- The login control -->	
 	<login:login top="50" left="50" id="loginPanel" visible="true"/>
 		
-	<mx:Canvas id="mainCanvas" width="100%" height="100%" visible="false">					
+	<mx:Canvas id="mainCanvas" width="100%" height="100%" visible="false" horizontalScrollPolicy="off" verticalScrollPolicy="off">					
 			
 		<mx:VBox width="100%" height="100%">
 					
@@ -150,11 +113,8 @@
 		
 			</mx:HBox>
 							
-			<swipe:Swipe id="swipe" width="100%" height="100%">
-				
-					 <mx:VBox width="100%" height="100%" id="tabnav">
-	    			
-		        			<mx:TabNavigator id="mytab" width="100%"  height="100%" >
+			<swipe:Swipe id="swipe" width="100%" height="100%"  verticalScrollPolicy="off">
+				<mx:TabNavigator  width="100%"  height="100%" id="tabnav" >
 			
 					       		 	<mx:Canvas label="Home" width="100%" height="100%" horizontalScrollPolicy="off">
 						        		<mx:Panel width="100%"  borderStyle="none" x="150">
@@ -186,71 +146,10 @@
 							        <mx:Canvas label="Help" enabled="false">
 							        </mx:Canvas>
 						        
-						  	</mx:TabNavigator>
-					</mx:VBox>
-			
-					<mx:VBox width="100%" height="100%" id="tabnav1" backgroundColor="#d6e3ec">
-					
-						<mx:ApplicationControlBar   dock="false"  y="0" width="100%"  backgroundColor="#cccccc">
-								
-								<mx:HBox>
-										<mx:Label text="Search Results: " styleName="labelStyle"/>
-										<mx:Label text=" 45 " styleName="labelStyle"/>
-										<mx:Label text=" Items found" width="81" styleName="labelStyle"/>
-										<mx:Spacer width="25" />
-										<mx:Label text=" | " styleName="labelStyle"/>
-										<mx:Spacer width="25" />
-										<mx:Label text=" Sort by " styleName="labelStyle"/>
-										<mx:ComboBox dataProvider="{sortbyValues}" width="100" styleName="labelStyle"/>
-										<mx:Spacer width="25" />
-										<mx:Label text="A" fontSize="12" styleName="labelStyle"/>
-										<mx:HSlider id="slider" minimum="1" maximum="10" width="50"/>
-										<mx:Label text="A" fontSize="16" styleName="labelStyle"/>
-										<mx:Spacer width="450"/>
-										<mx:Button label="Search Results"  click="Alert.show('TODO');"/>
-								</mx:HBox>
-								
-					</mx:ApplicationControlBar> 
-			
-			
-					<mx:Canvas   width="100%" height="100%" horizontalScrollPolicy="off" id="resultsCanvas">   
-						
-							  <mx:Canvas width="100%"   height="100%"   horizontalScrollPolicy="off" >
-									<mx:Panel width="100%"   height="100%" backgroundColor="#f1f7fc" 
-										  id="resultsDispPanel"  verticalScrollPolicy="auto" horizontalScrollPolicy="off">
-											<mx:Repeater id="searchResults" x="85" y="140" width="100%" height="100%" >                
-										   			
-										   			<mx:LinkButton icon="@Embed(source='images/ftl.gif')" x="85"  id="titleBtn" fontSize="12" 
-										   				label="{searchResults.currentItem.title}" 
-										             	click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>
-													 <mx:HRule left="85"  strokeColor="blue"   width="100%"/>
-										             <mx:Label text="{searchResults.currentItem.updated} | {searchResults.currentItem.author.name} "/>
-										             <mx:LinkButton id="linkBtn" 
-										                label="{searchResults.currentItem.summary}" 
-										                click="resultClick(event.currentTarget.getRepeaterItem().link.href);"
-										                fontFamily="Timesnewroman"/> 
-										                
-										    </mx:Repeater>
-		   							</mx:Panel>
-					          </mx:Canvas>
-					           
-					          <mx:Canvas width="100%"   height="100%" x="400" id="swfPanel" visible="false"  
-					          	 		showEffect="{wipeL}" horizontalScrollPolicy="off" >
-						      		<mx:Panel  headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5" >
-										
-										<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
-											<mx:HBox >
-												<mx:Label text="Rate Document" color="#FFFFFF"/>
-											</mx:HBox>
-										</mx:ApplicationControlBar>
-										
-										<mx:SWFLoader  id="myframe" maintainAspectRatio="true"/>	
-									 
-					          		</mx:Panel>
-					           </mx:Canvas>
-					   
-					   </mx:Canvas>  
-				</mx:VBox>		
+				</mx:TabNavigator>
+						  
+				<searchResults:searchResults id="tabnav1" horizontalScrollPolicy="off"/>
+							
 	    	</swipe:Swipe>    
     	
     	</mx:VBox>
