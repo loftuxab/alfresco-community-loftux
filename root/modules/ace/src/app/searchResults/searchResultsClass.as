@@ -11,6 +11,7 @@ package app.searchResults
 	import mx.containers.Canvas;
 	import util.searchservice.*;
 	import mx.collections.ArrayCollection;
+	import component.dashedline.DashedLine;
 	
 	public class searchResultsClass extends Canvas
 	{
@@ -24,15 +25,16 @@ package app.searchResults
 		public var resultsDispPanel:Canvas;
 		public var url:String;
 		
+		
 		public function resultClick(url:String):void
         {
-          	resultsDispPanel.width=400;
-          	swfPanel.visible=true;
-          	swfPanel.x=400;
-          	swfPanel.y=35;
-          	myframe.visible=true;
-           	myframe.source=url;        
-            url = url;   	
+          	resultsDispPanel.width = 400;
+          	swfPanel.visible = true;
+          	swfPanel.x = 400;
+          	swfPanel.y = 35;
+          	myframe.visible = true;
+           	myframe.source = url;        
+            this.url = url;   	
         }	
         
         /** default Constructor */
@@ -47,8 +49,9 @@ package app.searchResults
        public function geturl():String
        {
        		return this.url;
-       }		
-     
+       }	
+       
+      
        /**
 		 * Event handler called when search is successfully completed
 		 * 
