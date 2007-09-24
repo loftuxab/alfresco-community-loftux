@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <results:searchResultsClass xmlns:mx="http://www.adobe.com/2006/mxml" 
 							xmlns:results="app.searchResults.*"
+							xmlns:searchDetails="app.searchDetails.*"
 							width="100%"   height="100%"   horizontalScrollPolicy="off" 
 							verticalScrollPolicy="off" xmlns:searchResults="app.searchResults.*">
 	
+	
+	<!-- Import css style sheet -->
+    <mx:Style source="searchResults.css"/> 
+   
 	<mx:WipeRight id="wipeR" duration="500"/>
 	<mx:WipeLeft id="wipeL" duration="500"/>
 	
@@ -26,24 +31,21 @@
 			</mx:HBox>
 	</mx:ApplicationControlBar> 
 	
-	<mx:Canvas   borderStyle="none" width="100%"    y="35" height="100%"  id="resultsDispPanel" showEffect="{wipeL}" horizontalScrollPolicy="off">
-			<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="none"
+	<mx:Canvas borderStyle="none" width="100%"    y="35" height="100%"  id="resultsDispPanel" showEffect="{wipeL}" horizontalScrollPolicy="off">
+			<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="solid"
 					     horizontalScrollPolicy="off">
 					<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
-							<mx:LinkButton icon="@Embed(source='../../images/ftl.gif')" x="85"  id="titleBtn" fontSize="12" 
-									       label="{results.currentItem.title}" 
-									       click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>
-							<mx:HRule left="85"  strokeColor="blue"   width="100%"/>
-							<mx:Label text="{results.currentItem.updated} | {results.currentItem.author.name} "/>
-							<mx:LinkButton 	id="linkBtn" 
-											label="{results.currentItem.summary}" 
-											click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>
+							<searchDetails:searchDetails horizontalScrollPolicy="off"  
+								doctitle = "{results.currentItem.title}"
+								summary  = "{results.currentItem.summary}"
+							    click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>	
+												
 					</mx:Repeater>
 			</mx:Panel>
 	</mx:Canvas>
 		
-	<mx:Canvas   borderStyle="none" width="100%"   height="100%" x="400" id="swfPanel" visible="false"  showEffect="{wipeL}" horizontalScrollPolicy="off">
-		<mx:Panel   borderStyle="none" headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
+	<mx:Canvas    width="100%"   height="100%" x="300" id="swfPanel" visible="false"  showEffect="{wipeL}" horizontalScrollPolicy="off">
+		<mx:Panel    headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
 			<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
 				<mx:HBox >
 					<mx:Label text="Rate Document" color="#FFFFFF"/>

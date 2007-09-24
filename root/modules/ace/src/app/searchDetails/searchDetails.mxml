@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<searchDetails:searchDetailsClass xmlns:line="component.dashedline.*"
+							      xmlns:searchDetails="app.searchDetails.*" 
+							      xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
+	
+	<!-- Import css style sheet -->
+    <mx:Style source="searchDetails.css"/>
+    
+	<mx:VBox width="100%">
+	
+		<mx:LinkButton    id="summaryBtn" icon="@Embed(source='../../images/ftl.gif')"   fontSize="12" />
+		
+		<mx:Text   fontSize="10.5" text="We simply use the Alert control and call its show method with the appropriate parameters to create a pop-up dialog box with the right buttons. We listen to the Alert control’s close event and take care of the response"/> 
+		<mx:Text  fontSize="10.5" text="from the user, whether it’s a yes or a no. We can also modify the Alert control’s appearance through setStyle."/>
+				
+		<line:DrawLine />
+		<mx:Spacer width="100%"/>
+	</mx:VBox>
+	
+</searchDetails:searchDetailsClass>

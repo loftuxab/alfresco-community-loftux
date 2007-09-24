@@ -3,8 +3,10 @@
 <logout:LogoutClass 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:logout="app.logout.*" 
+	width="17%" height="100%"	
 	styleName="logout">	
-
+	
+	
    <!-- Import css style sheet -->
    <mx:Style source="logout.css"/> 
 
@@ -20,10 +22,12 @@
    			
         <!-- User name and logout link -->
 		<mx:VBox horizontalAlign="left">
-      		<mx:Text id="logoutLinkButton" styleName="myStyle" text="Logout" click="onLogoutButtonLinkClick()"/>
+			
+      		<mx:LinkButton id="logoutLinkButton" styleName="myStyle"  label="Logout" click="confirm()"/>
       		<mx:Spacer height="1"/>
-  	  		<mx:Image source="@Embed(source='../../images/enterprise_label.png')" />	   
-		</mx:VBox>
+  	  		<mx:Image source="@Embed(source='../../images/enterprise_label.png')" />
+  	  		
+  	  	</mx:VBox>
   
 	</mx:HBox>	
 	
