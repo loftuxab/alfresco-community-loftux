@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <results:searchResultsClass xmlns:mx="http://www.adobe.com/2006/mxml" 
 							xmlns:results="app.searchResults.*"
+							xmlns:hLink="component.hyperlink.*"
 							xmlns:searchDetails="app.searchDetails.*"
 							width="100%"   height="100%"   horizontalScrollPolicy="off" 
 							verticalScrollPolicy="off" xmlns:searchResults="app.searchResults.*">
@@ -12,48 +13,40 @@
 	<mx:WipeRight id="wipeR" duration="500"/>
 	<mx:WipeLeft id="wipeL" duration="500"/>
 	
-	<mx:ApplicationControlBar   dock="false"  y="0" width="100%"  backgroundColor="#cccccc">
-			<mx:HBox>
-					<mx:Label text="Search Results: " styleName="labelStyle"/>
-					<mx:Label text=" 45 " styleName="labelStyle"/>
-					<mx:Label text=" Items found" width="81" styleName="labelStyle"/>
-					<mx:Spacer width="25" />
-					<mx:Label text=" | " styleName="labelStyle"/>
-					<mx:Spacer width="25" />
-					<mx:Label text=" Sort by " styleName="labelStyle"/>
-					<mx:ComboBox dataProvider="{sortbyValues}" width="100" styleName="labelStyle"/>
-					<mx:Spacer width="25" />
-					<mx:Label text="A" fontSize="12" styleName="labelStyle"/>
-					<mx:HSlider id="slider" minimum="1" maximum="10" width="50"/>
-					<mx:Label text="A" fontSize="16" styleName="labelStyle"/>
-					<mx:Spacer width="450"/>
-					<mx:Button label="Search Results"  click="mx.controls.Alert.show('TODO');"/>
-			</mx:HBox>
+		
+
+	<mx:ApplicationControlBar  horizontalAlign="center" verticalAlign="middle" dock="false"  height="30" width="100%"  backgroundColor="#cccccc">
+		
 	</mx:ApplicationControlBar> 
 	
-	<mx:Canvas borderStyle="none" width="100%"    y="35" height="100%"  id="resultsDispPanel" showEffect="{wipeL}" horizontalScrollPolicy="off">
-			<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="solid"
-					     horizontalScrollPolicy="off">
-					<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
-							<searchDetails:searchDetails horizontalScrollPolicy="off"  
-								doctitle = "{results.currentItem.title}"
-								summary  = "{results.currentItem.summary}"
-							    click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>	
-												
-					</mx:Repeater>
-			</mx:Panel>
-	</mx:Canvas>
 		
-	<mx:Canvas    width="100%"   height="100%" x="300" id="swfPanel" visible="false"  showEffect="{wipeL}" horizontalScrollPolicy="off">
-		<mx:Panel    headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
-			<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
-				<mx:HBox >
-					<mx:Label text="Rate Document" color="#FFFFFF"/>
-				</mx:HBox>
-			</mx:ApplicationControlBar>
-			
-			<mx:SWFLoader  id="myframe"   source="{geturl()}" maintainAspectRatio="true"/>	
-		</mx:Panel>
-	</mx:Canvas>
+	<mx:HDividedBox width="100%" height="100%" y="35">
+
+			<mx:Canvas borderStyle="none" width="100%"     height="100%"  id="resultsDispPanel" showEffect="{wipeL}" hideEffect="{wipeR}" horizontalScrollPolicy="off">
+					<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="none" showEffect="{wipeL}" hideEffect="{wipeR}"
+							     horizontalScrollPolicy="off">
+							<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
+									<searchDetails:searchDetails horizontalScrollPolicy="off"  
+										doctitle = "{results.currentItem.title}"
+										summary  = "{results.currentItem.summary}"
+									    click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>	
+						
+							</mx:Repeater>
+					</mx:Panel>
+			</mx:Canvas>
+				
+			<mx:Canvas    width="0%"   height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}"  showEffect="{wipeL}" horizontalScrollPolicy="off">
+				<mx:Panel  hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="false"  headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
+					<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
+						<mx:HBox  width="100%">
+							<mx:LinkButton id="closeBtn"  label="Close" color="#FFFFFF" click="CloseBtnClick();"/>
+						</mx:HBox>
+					</mx:ApplicationControlBar>
+					
+					<mx:SWFLoader  id="myframe"    source="{geturl()}" maintainAspectRatio="true" width="100%"/>	
+				</mx:Panel>
+			</mx:Canvas>
+		
+	</mx:HDividedBox>
 	
 </results:searchResultsClass>

@@ -1,6 +1,6 @@
 package app.search
 {
-
+	
 	import mx.controls.Alert;
 	import util.searchservice.SearchService;
 	import app.*;
