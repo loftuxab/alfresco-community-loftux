@@ -26,9 +26,9 @@ package org.alfresco.config.source;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.alfresco.config.ConfigDeployment;
 import org.alfresco.config.ConfigException;
 import org.alfresco.config.ConfigSource;
 import org.apache.commons.logging.Log;
@@ -86,7 +86,7 @@ public abstract class BaseConfigSource implements ConfigSource
      * 
      * @see #getInputStream(String)
      */
-    public final Iterator<InputStream> iterator()
+    public final List<ConfigDeployment> getConfigDeployments()
     {
         // check that we have some kind of source
         int size = this.sourceStrings.size();
@@ -96,7 +96,7 @@ public abstract class BaseConfigSource implements ConfigSource
         }
         
         // build a list of input streams
-        List<InputStream> inputStreams = new ArrayList<InputStream>(size);
+        List<ConfigDeployment> configDeployments = new ArrayList<ConfigDeployment>(size);
         for (String sourceString : sourceStrings)
         {
             if (logger.isDebugEnabled())
@@ -105,13 +105,10 @@ public abstract class BaseConfigSource implements ConfigSource
             }
             
             InputStream is = getInputStream(sourceString);
-            if (is != null)
-            {
-               inputStreams.add(is);
-            }
+            configDeployments.add(new ConfigDeployment(sourceString, is));
         }
         // done
-        return inputStreams.iterator();
+        return configDeployments;
     }
 
     /**

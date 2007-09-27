@@ -25,6 +25,8 @@
 package org.alfresco.config;
 
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -98,7 +100,7 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
     /**
      * Initialises the config service - via bootstrap
      */
-    public void initConfig()
+    public List<ConfigDeployment> initConfig()
     {
         putSections(new ArrayList<ConfigSection>());
         putSectionsByArea(new HashMap<String, List<ConfigSection>>());
@@ -106,8 +108,17 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
         putGlobalConfig(new ConfigImpl());
 
         // Add the built-in evaluators
-        addEvaluator("string-compare", "org.alfresco.config.evaluator.StringEvaluator");
-        addEvaluator("object-type", "org.alfresco.config.evaluator.ObjectTypeEvaluator");
+        String stringCompare = "string-compare";
+        addEvaluator(stringCompare, createEvaluator(stringCompare, "org.alfresco.config.evaluator.StringEvaluator"));
+        String objectType = "object-type";
+        addEvaluator(objectType, createEvaluator(objectType, "org.alfresco.config.evaluator.ObjectTypeEvaluator"));
+        
+        ConfigDeployment builtin = new ConfigDeployment("<Built-in evaluators>", null);
+        builtin.setDeploymentStatus(ConfigDeployment.STATUS_OK);
+
+        List<ConfigDeployment> builtins = new ArrayList<ConfigDeployment>();
+        builtins.add(builtin);
+        return builtins;
     }
 
     /**
@@ -229,39 +240,49 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
     /**
      * @see org.alfresco.config.ConfigService#appendConfig(org.alfresco.config.ConfigSource)
      */
-    public void appendConfig(ConfigSource configSource)
+    public List<ConfigDeployment> appendConfig(ConfigSource configSource)
     {
-        for (InputStream inputStream : configSource)
+    	List<ConfigDeployment> configDeployments = configSource.getConfigDeployments();
+        for (ConfigDeployment configDeployment : configDeployments)
         {
-            if (logger.isDebugEnabled())
-               logger.debug("Commencing parse of input stream for appended config");
-            
-            parse(inputStream);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Completed parse of input stream for appended config");
+            if (configDeployment.getStream() != null)
+            {
+	            if (logger.isDebugEnabled())
+	               logger.debug("Commencing parse of input stream for source: " + configDeployment.getName());
+	            
+	            try
+	            {
+	            	parse(configDeployment.getStream());
+	            	configDeployment.setDeploymentStatus(ConfigDeployment.STATUS_OK);
+	            }
+	            catch (Throwable t)
+	            {
+	                logger.error("Input stream invalid - skipped for source: " + configDeployment.getName() + "' ", t);
+	                
+	            	StringWriter stringWriter = new StringWriter();
+	                t.printStackTrace(new PrintWriter(stringWriter));
+	                configDeployment.setDeploymentStatus("Skipped - invalid: " + stringWriter.toString());
+	            }
+	            
+	            if (logger.isDebugEnabled())
+	               logger.debug("Completed parse of input stream for source: " + configDeployment.getName());
+	        }
+            else
+            {
+            	logger.debug("Input stream not available - skipped for source: " + configDeployment.getName());
+            	configDeployment.setDeploymentStatus("Skipped - not available");
+            }
         }
+        
+        return configDeployments;
     }
 
     /**
      * Parses all the files passed to this config service
      */
-    protected void parse()
+    protected List<ConfigDeployment> parse()
     {
-        for (InputStream inputStream : this.configSource)
-        {
-            // skip if null (e.g. from RepoUrlConfigSource)
-            if (inputStream != null)
-            {
-                if (logger.isDebugEnabled())
-                   logger.debug("Commencing parse of input stream");
-                
-                parse(inputStream);
-                
-                if (logger.isDebugEnabled())
-                   logger.debug("Completed parse of input stream");
-            }
-        }
+        return appendConfig(configSource);
     }
 
     /**
@@ -374,31 +395,44 @@ public abstract class BaseConfigService extends AbstractLifecycleBean implements
     }
 
     /**
-     * Adds the evaluator with the given name and class to the config service
+     * Adds the evaluator to the config service
+     * 
+     * @param name
+     *            Name of the evaluator
+     * @param evaluator
+     *            The evaluator
+     */
+    protected void addEvaluator(String name, Evaluator evaluator)
+    {
+        getEvaluators().put(name, evaluator);
+
+        if (logger.isDebugEnabled())
+            logger.debug("Added evaluator '" + name + "': " + evaluator.getClass().getName());
+    }
+    
+    /**
+     * Instantiate the evaluator with the given name and class
      * 
      * @param name
      *            Name of the evaluator
      * @param className
      *            Class name of the evaluator
      */
-    protected void addEvaluator(String name, String className)
+    protected Evaluator createEvaluator(String name, String className)
     {
-        Evaluator evaluator = null;
-
-        try
-        {
-            Class clazz = Class.forName(className);
-            evaluator = (Evaluator) clazz.newInstance();
-        } 
-        catch (Throwable e)
-        {
-            throw new ConfigException("Could not instantiate evaluator for '" + name + "' with class: " + className, e);
-        }
-   
-        getEvaluators().put(name, evaluator);
-
-        if (logger.isDebugEnabled())
-            logger.debug("Added evaluator '" + name + "': " + className);
+    	Evaluator evaluator = null;
+    	
+	    try
+	    {
+	        Class clazz = Class.forName(className);
+	        evaluator = (Evaluator) clazz.newInstance();
+	    } 
+	    catch (Throwable e)
+	    {
+	        throw new ConfigException("Could not instantiate evaluator for '" + name + "' with class: " + className, e);
+	    }
+	    
+	    return evaluator;
     }
     
     /**

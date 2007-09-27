@@ -24,6 +24,8 @@
  */
 package org.alfresco.config;
 
+import java.util.List;
+
 /**
  * Config Deployer interface.
  * <p>
@@ -35,7 +37,7 @@ package org.alfresco.config;
 public interface ConfigDeployer
 {        
     // callback for (re-)initialising the config caches
-    public void initConfig();
+    public List<ConfigDeployment> initConfig();
     
     // register prior to bootstrap
     public void register();
