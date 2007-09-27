@@ -8,3 +8,9 @@ Canvas
    border-skin: ClassReference("component.util.SimpleGradientBorder");
    fill-colors: #ECEEF1, #D9DDE0;
 }
+
+LinkButton {
+     colorLink : #FF0000;
+     colorHover : #00FF00;
+     colorActive : #0000FF;
+ }
