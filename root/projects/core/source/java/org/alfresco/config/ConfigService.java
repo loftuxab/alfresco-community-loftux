@@ -24,6 +24,8 @@
  */
 package org.alfresco.config;
 
+import java.util.List;
+
 /**
  * Definition of a Configuration Service
  * 
@@ -56,7 +58,7 @@ public interface ConfigService
     */
    public Config getGlobalConfig();
    
-   public void appendConfig(ConfigSource configSource);
+   public List<ConfigDeployment> appendConfig(ConfigSource configSource);
    
    public void addDeployer(ConfigDeployer configDeployer);
 }

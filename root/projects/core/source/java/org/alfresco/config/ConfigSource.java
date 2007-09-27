@@ -24,13 +24,15 @@
  */
 package org.alfresco.config;
 
-import java.io.InputStream;
+import java.util.List;
+
 
 /**
  * Definition of a configuration source
  * 
  * @author gavinc
  */
-public interface ConfigSource extends Iterable<InputStream>
+public interface ConfigSource
 {
+	public List<ConfigDeployment> getConfigDeployments();
 }

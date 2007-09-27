@@ -25,16 +25,21 @@
 package org.alfresco.config.xml;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.config.BaseConfigService;
 import org.alfresco.config.ConfigDeployer;
+import org.alfresco.config.ConfigDeployment;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigException;
+import org.alfresco.config.ConfigSection;
 import org.alfresco.config.ConfigSectionImpl;
 import org.alfresco.config.ConfigSource;
+import org.alfresco.config.evaluator.Evaluator;
 import org.alfresco.config.xml.elementreader.ConfigElementReader;
 import org.alfresco.config.xml.elementreader.GenericElementReader;
 import org.apache.commons.logging.Log;
@@ -65,26 +70,30 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         super(configSource);
     }
 
-    public void initConfig()
+    public List<ConfigDeployment> initConfig()
     {
         if (logger.isDebugEnabled())
             logger.debug("Commencing initialisation");
 
-        super.initConfig();
+        List<ConfigDeployment> configDeployments = super.initConfig();
 
         // initialise the element readers map with built-in readers
         putElementReaders(new HashMap<String, ConfigElementReader>());
 
-        parse();
+        List<ConfigDeployment> deployments = parse();
+        configDeployments.addAll(deployments);
                 
     	// append additional config, if any
         for (ConfigDeployer configDeployer : configDeployers)
         {
-            configDeployer.initConfig();
+        	deployments = configDeployer.initConfig();
+        	configDeployments.addAll(deployments);
         }
 
         if (logger.isDebugEnabled())
             logger.debug("Completed initialisation");
+        
+        return configDeployments;
     }
     
     public void destroy()
@@ -95,6 +104,11 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
     protected void parse(InputStream stream)
     {
+    	Map<String, ConfigElementReader> parsedElementReaders = null;
+    	Map<String, Evaluator> parsedEvaluators = null;
+    	List<ConfigSection> parsedConfigSections = new ArrayList<ConfigSection>();
+    	
+    	String currentArea = null;
         try
         {
             // get the root element
@@ -103,18 +117,25 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
             Element rootElement = document.getRootElement();
 
             // see if there is an area defined
-            String currentArea = rootElement.attributeValue("area");
+            currentArea = rootElement.attributeValue("area");
 
-            // parse the plug-ins section first
-            Element pluginsConfig = rootElement.element(ELEMENT_PLUG_INS);
-            parsePluginsElement(pluginsConfig);
+            // parse the plug-ins section of a config file
+            Element pluginsElement = rootElement.element(ELEMENT_PLUG_INS);
+            if (pluginsElement != null)
+            {
+                // parse the evaluators section
+            	parsedEvaluators = parseEvaluatorsElement(pluginsElement.element(ELEMENT_EVALUATORS));
+
+                // parse the element readers section
+            	parsedElementReaders = parseElementReadersElement(pluginsElement.element(ELEMENT_ELEMENT_READERS));
+            }
 
             // parse each config section in turn
             Iterator configElements = rootElement.elementIterator(ELEMENT_CONFIG);
             while (configElements.hasNext())
             {
                 Element configElement = (Element) configElements.next();
-                parseConfigElement(configElement, currentArea);
+                parsedConfigSections.add(parseConfigElement(parsedElementReaders, configElement, currentArea));
             }
         }
         catch (Throwable e)
@@ -128,35 +149,56 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
                throw new ConfigException("Failed to parse config stream", e);
             }
         }
-    }
-
-    /**
-     * Parses the plug-ins section of a config file
-     * 
-     * @param pluginsElement
-     *            The plug-ins element
-     */
-    private void parsePluginsElement(Element pluginsElement)
-    {
-        if (pluginsElement != null)
+        
+        try 
         {
-            // parese the evaluators section
-            parseEvaluatorsElement(pluginsElement.element(ELEMENT_EVALUATORS));
-
-            // parse the element readers section
-            parseElementReadersElement(pluginsElement.element(ELEMENT_ELEMENT_READERS));
-        }
+	        // valid for this stream, now add to config service ...
+	        
+	        if (parsedEvaluators != null)
+	        {
+		        for (Map.Entry<String, Evaluator> entry : parsedEvaluators.entrySet())
+		        {
+		        	// add the evaluators to the config service
+		        	addEvaluator(entry.getKey(), entry.getValue());
+		        }
+	        }
+	        
+	        if (parsedElementReaders != null)
+	        {
+		        for (Map.Entry<String, ConfigElementReader> entry : parsedElementReaders.entrySet())
+		        {
+		        	// add the element readers to the config service
+		        	addConfigElementReader(entry.getKey(), entry.getValue());
+		        }
+	        }
+	        
+	        if (parsedConfigSections != null)
+	        {
+	        	for (ConfigSection section : parsedConfigSections)
+		        {
+	        		// add the config sections to the config service
+	        		addConfigSection(section, currentArea);
+		        }
+	        }
+	    }
+	    catch (Throwable e)
+	    {
+	        throw new ConfigException("Failed to add config to config service", e);
+	    }
     }
+
 
     /**
      * Parses the evaluators element
      * 
      * @param evaluatorsElement
      */
-    private void parseEvaluatorsElement(Element evaluatorsElement)
+    private Map<String, Evaluator> parseEvaluatorsElement(Element evaluatorsElement)
     {
         if (evaluatorsElement != null)
         {
+        	Map<String, Evaluator> parsedEvaluators = new HashMap<String, Evaluator>();
+        	
             Iterator evaluators = evaluatorsElement.elementIterator();
             while (evaluators.hasNext())
             {
@@ -177,9 +219,13 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
                 }
 
                 // add the evaluator
-                this.addEvaluator(evaluatorName, evaluatorClass);
+                parsedEvaluators.put(evaluatorName, createEvaluator(evaluatorName, evaluatorClass));
             }
+            
+            return parsedEvaluators;
         }
+        
+        return null;
     }
 
     /**
@@ -187,10 +233,12 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
      * 
      * @param readersElement
      */
-    private void parseElementReadersElement(Element readersElement)
+    private Map<String, ConfigElementReader> parseElementReadersElement(Element readersElement)
     {
         if (readersElement != null)
         {
+        	Map<String, ConfigElementReader> parsedElementReaders = new HashMap<String, ConfigElementReader>();
+        	
             Iterator readers = readersElement.elementIterator();
             while (readers.hasNext())
             {
@@ -209,10 +257,14 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
                             + "' must define a class attribute");
                 }
 
-                // add the evaluator
-                addConfigElementReader(readerElementName, readerElementClass);
+                // add the element reader
+                parsedElementReaders.put(readerElementName, createConfigElementReader(readerElementName, readerElementClass));
             }
+            
+            return parsedElementReaders;
         }
+        
+        return null;
     }
 
     /**
@@ -221,7 +273,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
      * @param configElement The config element
      * @param currentArea The current area
      */
-    private void parseConfigElement(Element configElement, String currentArea)
+    private ConfigSection parseConfigElement(Map<String, ConfigElementReader> parsedElementReaders, Element configElement, String currentArea)
     {
         if (configElement != null)
         {
@@ -245,7 +297,17 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
                 String elementName = child.getName();
 
                 // get the element reader for the child
-                ConfigElementReader elementReader = getConfigElementReader(elementName);
+                ConfigElementReader elementReader = null;
+                if (parsedElementReaders != null)
+                {
+                	elementReader = parsedElementReaders.get(elementName);
+                }
+                
+                if (elementReader == null)
+                {
+                	elementReader = getConfigElementReader(elementName);
+                }
+                
                 if (logger.isDebugEnabled())
                     logger.debug("Retrieved element reader " + elementReader + " for element named '" + elementName
                             + "'");
@@ -265,20 +327,38 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
                 if (logger.isDebugEnabled())
                     logger.debug("Added " + cfgElement + " to " + section);
             }
-
-            // now all the config elements are added, add the section to the
-            // config service
-            addConfigSection(section, currentArea);
+            
+            return section;
         }
+        
+        return null;
     }
 
     /**
-     * Adds the config element reader with the given name and class name
+     * Adds the config element reader to the config service
      * 
-     * @param elementName Name of the element the reader is for
-     * @param className Class name of element reader implementation
+     * @param name
+     *            Name of the element
+     * @param elementReader
+     *            The element reader
      */
-    private void addConfigElementReader(String elementName, String className)
+    private void addConfigElementReader(String elementName, ConfigElementReader elementReader)
+    {
+        putConfigElementReader(elementName, elementReader);
+
+        if (logger.isDebugEnabled())
+            logger.debug("Added element reader '" + elementName + "': " + elementReader.getClass().getName());
+    }
+    
+    /**
+     * Instantiate the config element reader with the given name and class
+     * 
+     * @param name
+     *            Name of the element
+     * @param className
+     *            Class name of the element reader
+     */
+    private ConfigElementReader createConfigElementReader(String elementName, String className)
     {
         ConfigElementReader elementReader = null;
 
@@ -294,10 +374,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
         }
 
-        putConfigElementReader(elementName, elementReader);
-
-        if (logger.isDebugEnabled())
-            logger.debug("Added element reader '" + elementName + "': " + className);
+        return elementReader;
     }
 
     /**
