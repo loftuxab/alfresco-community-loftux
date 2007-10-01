@@ -1,10 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<home:HomePanelContainer xmlns:mx="http://www.adobe.com/2006/mxml" xmlns:home="app.home.*" label="Getting Started">
+<home:GettingStartedClass 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:home="app.home.*" 
+	xmlns:acc="component.textAccordian.*"
+	label="Getting Started">
 
-	<mx:VBox id="box" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" backgroundColor="#F0F6F6">
+	<mx:VBox id="mainVBox" width="100%" height="100%" minHeight="{mainVBox.height}" verticalAlign="middle" horizontalAlign="center" backgroundColor="#F0F6F6">		
 		
-		<mx:Label text="Welcome to Alfresco Enterprise Connections!"/>
+		<mx:Spacer width="25"/>
 		
+		<mx:HBox width="100%">
+		
+			<mx:Spacer width="25"/>
+			
+			<acc:TextAccordian id="textAccordian" height="100%" width="100%" verticalAlign="top">
+				<acc:TextAccordianItem 
+					title="Welcome to Alfresco Enterprise Connections" 
+					content="I have clearly change this content does it appear in the UI???"
+					value="assets/testFilm1.flv"/>				
+				<acc:TextAccordianItem 
+					title="Search Introduction" 
+					content="This is some content ... blar blar blar"
+					value="assets/testFilm2.flv"/>			
+				<acc:TextAccordianItem 
+					title="Knowledge Base Introduction" 
+					content="This is some content ... blar blar blar"
+					value="assets/testFilm1.flv"/>				
+			</acc:TextAccordian>
+			
+			<mx:Spacer width="25"/>	
+		
+			<mx:Box horizontalAlign="right" height="100%" verticalAlign="middle">							
+				
+				<mx:VideoDisplay  
+					id="videoDisplay"
+					styleName="homeVideo"
+					source="assets/testFilm1.flv"
+					height="150" width="200" autoPlay="false" autoRewind="true" alpha="0.25">					
+				</mx:VideoDisplay>	 
+				
+				<mx:VBox id="playBox" verticalAlign="middle" horizontalAlign="center" includeInLayout="false" visible="false" height="150" width="200">		
+					<mx:Label text=">"/>
+					<mx:Label text="Play"/>
+				</mx:VBox>
+				
+				<mx:VBox id="pauseBox" verticalAlign="middle" horizontalAlign="center" includeInLayout="false" visible="false" height="150" width="200">		
+					<mx:Label text="||"/>
+					<mx:Label text="Paused"/>
+				</mx:VBox>
+				
+			</mx:Box>
+			
+			<mx:Spacer width="25"/>	
+				
+		</mx:HBox>		
+		
+		<mx:Spacer width="25"/>
+				
 	</mx:VBox>
+				
+		
 	
-</home:HomePanelContainer>
+</home:GettingStartedClass>

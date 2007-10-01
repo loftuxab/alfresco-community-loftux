@@ -16,6 +16,7 @@ package util.authentication
 	import util.webscript.FailureEvent;
 	import flash.events.EventDispatcher;
 	import util.error.ErrorService;
+	import util.webscript.ConfigService;
 
 	/**
 	 * Authentication service class.
@@ -67,7 +68,7 @@ package util.authentication
 		public function login(userName:String, password:String):void
 		{
 			// Create the web script obejct
-			var url:String = "http://localhost:8080/alfresco/service/api/login";
+			var url:String = ConfigService.instance.url + "/alfresco/service/api/login";
 			var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onLoginSuccess, onLoginFailure, false);
 			
 			// Build the parameter object
@@ -85,7 +86,7 @@ package util.authentication
 		public function logout():void
 		{
 			// Execute the logout web script
-			var url:String = "http://localhost:8080/alfresco/service/api/login/ticket/" + this._ticket;				
+			var url:String = ConfigService.instance.url + "/alfresco/service/api/login/ticket/" + this._ticket;				
 			var webScript:WebScriptService = new WebScriptService(url, WebScriptService.DELETE, onLogoutSuccess);
 			webScript.execute();										
 		}

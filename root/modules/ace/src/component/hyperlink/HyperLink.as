@@ -139,9 +139,14 @@ package component.hyperlink
 	   			this._colorHover = hoverColor;
 	   		}
 	   		
-	   		public function linkText(linkText:String):void
+	   		public function set linkText(linkText:String):void
 	   		{
 	   			this._linkText = linkText;
+	   		}
+	   		
+	   		public function get linkText():String
+	   		{
+	   			return this._linkText;
 	   		}
 	   		
 		} // end of class HyperLink

@@ -41,3 +41,11 @@
 {
 	background-color: #FFFFFF;
 }
+
+.dropShadow
+{				
+ 	shadowDistance:20;
+   	shadowDirection:center;
+   	dropShadowColor:#999999;			
+   	dropShadowEnabled:true;	
+}

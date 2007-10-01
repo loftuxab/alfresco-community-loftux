@@ -45,7 +45,8 @@ package app.searchDetails
 		public var summaryBtn:HyperLink = new HyperLink();
 		private var _url:String;
 		private var _title:String;
-		
+		private var _summary:String;		
+
 		public var myframe:SWFLoader;
 		public var swfPanel:Canvas;
 		public var resultsDispPanel:Canvas;
@@ -66,27 +67,34 @@ package app.searchDetails
 		 */		
 		public function set summary(summary:String):void
 		{
-			if(summary!= null)
+			if (summary != null && summary.length != 0)
 			{
-				summaryBtn.linkText(summary);
+				summaryBtn.linkText = summary;
 			}
 			else 
 			{	
-				summaryBtn.linkText(this._title);
+				summaryBtn.linkText = this._title;
 			}
-			
 		}
 			
+		/**
+		 * Link property setter
+		 */
 		public function set link(link:String):void
 		{
-			this._url = link;
-			
+			this._url = link;			
 		}
 		
+		/**
+		 * Document title setter
+		 */
 		public function set doctitle(title:String):void
 		{
 			this._title = title;
-		}
-	
+			if (summaryBtn.linkText == null || summaryBtn.linkText.length == 0)
+			{
+				summaryBtn.linkText = this._title;
+			}
+		}	
 	}
 }
