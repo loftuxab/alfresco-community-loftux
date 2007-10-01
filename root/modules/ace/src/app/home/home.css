@@ -3,10 +3,9 @@
 .homePanelTop
 {
    border-style:solid;
-   border-thickness:1;
-   border-color:#FFFFFF;
+   border-thickness:0;
    
-   cornerRadius: 15;
+   cornerRadius: 20;
    bottomCornerRadius: 0;
    
    border-skin: ClassReference("component.util.GlossGradientBorder");
@@ -22,12 +21,21 @@
 .homePanelBottom
 {
    border-style:solid;
-   border-thickness:1;
-   border-color:#FFFFFF;
+   border-thickness:0;
    
    cornerRadius: 0;
-   bottomCornerRadius: 15;
+   bottomCornerRadius: 20;
    
    border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #6B7680, #1B2C3C;
+   fill-colors: #1B2C3C, #1B2C3C;
+}	
+
+.homeSeparator
+{
+	color:#3E4D5B;
+}
+
+.homeVideo
+{
+	background-alpha:0.0;
 }

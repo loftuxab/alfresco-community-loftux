@@ -11,6 +11,8 @@ package util.searchservice{
 	import mx.core.Repeater;
 	import mx.rpc.events.ResultEvent;
 	import util.error.ErrorService;
+	import util.webscript.ConfigService;
+	import mx.core.Application;
 	
 	public class SearchService extends EventDispatcher
 	{
@@ -50,7 +52,7 @@ package util.searchservice{
 			try
 			{	
 				
-				var url:String = "http://localhost:8080/alfresco/service/sample/kb/search.atom";
+				var url:String = ConfigService.instance.url +  "/alfresco/service/sample/kb/search.atom";
 				var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onSearchSuccess, onFailure);
 				
 				var params:Object = new Object();

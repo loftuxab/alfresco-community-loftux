@@ -10,12 +10,16 @@ package component.swipe
 	import flash.events.MouseEvent;
 	import mx.controls.Label;
 	import mx.events.EffectEvent;
+	import mx.events.ResizeEvent;
 
 	/**
 	 * Internal swipe control class
 	 */
 	public class SwipeInternalClass extends Canvas
 	{
+		/** Control states */
+		private static const STATE_SECONDARY = "secondaryState";
+		
 		/** Display object to be contained inside the swiped canvas' */
 		private var _childOne:DisplayObject;		
 		private var _childTwo:DisplayObject;
@@ -72,7 +76,7 @@ package component.swipe
 		{
 			if (this._swipeButtonEnabled == true)
 			{
-				currentState = "secondaryState";	
+				currentState = STATE_SECONDARY;	
 			}
 		}
 		
@@ -103,14 +107,19 @@ package component.swipe
 			super.createChildren();
 			
 			// Add the child controls
-			(this.getChildByName("canvasOne") as Canvas).addChild(this._childOne);
-			(this.getChildByName("canvasTwo") as Canvas).addChild(this._childTwo);
+			var canvasOne:Canvas = getChildByName("canvasOne") as Canvas;
+			var canvasTwo:Canvas = getChildByName("canvasTwo") as Canvas;
+			canvasOne.addChild(this._childOne);
+			canvasTwo.addChild(this._childTwo);
 			
 			// Register interest in the swipeButton events
 			var swipeButton:Canvas = getChildByName("swipeButton") as Canvas;
 			swipeButton.addEventListener(MouseEvent.CLICK, doWipe);	
 			swipeButton.addEventListener(EffectEvent.EFFECT_START, effectStart);
 			swipeButton.addEventListener(EffectEvent.EFFECT_END, effectEnd);
+			
+			// Register interest in the resize event
+			canvasTwo.addEventListener(ResizeEvent.RESIZE, onResize);
 			
 			// Set the initial swipe label value
 			swipeLabel.text = this._secondaryStateLabel;
@@ -136,6 +145,15 @@ package component.swipe
 			
 			// Re-enable the button
 			this._swipeButtonEnabled = true;
+		}
+		
+		private function onResize(event:Event):void
+		{
+			if (currentState == STATE_SECONDARY)
+			{
+				// Reset the position of the swipe button
+				getChildByName("swipeButton").y = getChildByName("canvasTwo").height+1;
+			}
 		}
 	}
 }

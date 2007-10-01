@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextAccordianItemClass 
+	xmlns="component.textAccordian.*" 
+	xmlns:mx="http://www.adobe.com/2006/mxml">
+
+	<mx:HBox height="100%" width="100%">
+			 
+		<mx:Label id="itemPointer" text="->"/>
+		<mx:Spacer width="5"/>
+		
+		<mx:VBox height="100%" width="100%">
+			<mx:Label id="itemTitle"/>
+			<mx:VBox id="contentVBox" height="100%" width="100%" visible="false" includeInLayout="false">
+				<mx:Spacer height="5"/>
+				<mx:Text id="itemContent"/>				
+				<mx:Spacer height="5"/>
+			</mx:VBox>
+		</mx:VBox>
+		
+	</mx:HBox>	
+	
+</TextAccordianItemClass>
