@@ -590,10 +590,22 @@
            depends="init"
            description="Creates a zip file containing the deployment receiver">
       <mkdir dir="${dir.continuous.dist}" />
-      <copy file="${dir.project.deployment.dist}/${file.name.zip.deployment}" 
+      <copy file="${dir.project.deployment.dist}/${file.name.zip.deployment}"
             tofile="${dir.continuous.dist}/${file.name.dist.deployment}.zip" />
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.project.installer.builder}/deploy-installer/output" />
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.deploy}"'/>
+      </exec>
+      <move todir="${dir.continuous.dist}">
+         <fileset dir="${dir.project.installer.builder}/deploy-installer/output">
+            <include name="**/*"/>
+         </fileset>
+      </move>
    </target>
    
+
    <!-- ******************************* -->
    <!-- ** Sample Extensions targets ** -->
    <!-- ******************************* -->
@@ -641,7 +653,7 @@
       <mkdir dir="${dir.continuous.assemble.mmt}" />
 
       <!-- extract the one-jar file -->
-      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.96-RC4.jar" 
+      <unjar src="${dir.project.3rdparty.lib}/one-jar/one-jar-boot-0.96-RC4.jar"
              dest="${dir.continuous.assemble.mmt}" 
              overwrite="true" />
       <!-- remove unwanted files -->
@@ -708,6 +720,9 @@
       <zip destfile="${dir.continuous.dist}/${file.name.dist.mmt}.jar">
          <zipfileset dir="${dir.continuous.assemble.mmt}" />
       </zip>
+      <!-- Version-independent name for installers and bundles -->
+      <copy file="${dir.continuous.dist}/${file.name.dist.mmt}.jar"
+            tofile="${dir.continuous.dist}/alfresco-mmt.jar" />
    </target>
 
    <!-- ************************************ -->

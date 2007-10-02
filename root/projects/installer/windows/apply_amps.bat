@@ -11,7 +11,7 @@ call SetPaths.bat
 goto start
 
 :getpaths
-call %ALF_HOME%bin\RegPaths.exe
+call "%ALF_HOME%bin\RegPaths.exe"
 call SetPaths.bat
 del SetPaths.bat
 
@@ -19,6 +19,10 @@ del SetPaths.bat
 echo This script will apply all the AMPs in %ALF_HOME%amps to the alfresco.war file in %CATALINA_HOME%\webapps
 echo Press control-c to stop this script . . .
 pause
-java -jar %ALF_HOME%bin\alfresco-mmt.jar install %ALF_HOME%amps %CATALINA_HOME%\webapps\alfresco.war -directory
-
-call %ALF_HOME%bin\clean_tomcat.bat
+java -jar "%ALF_HOME%bin\alfresco-mmt.jar" install "%ALF_HOME%amps" "%CATALINA_HOME%\webapps\alfresco.war" -directory
+java -jar "%ALF_HOME%bin\alfresco-mmt.jar" list "%CATALINA_HOME%\webapps\alfresco.war"
+echo About to clean out tomcat/webapps/alfresco directory and temporary files...
+echo Press control-c to stop this script . . .
+pause
+rmdir /S /Q "%CATALINA_HOME%\webapps\alfresco"
+call "%ALF_HOME%bin\clean_tomcat.bat"

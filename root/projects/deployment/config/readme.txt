@@ -24,7 +24,7 @@ Setting up the Alfresco Deployment Receiver
       
         dep.metadatadir=/opt/deployment/depmetadata
         
-   D. dep.rmi.port - The port number to use for RMI. Choose this so as not to 
+   D. dep.rmi.port - The port number to use for RMI. Choose this so as not to
       conflict with any other services.
       
 3. Configure application-context.xml. Open the file in a text editor and modify
@@ -76,7 +76,7 @@ nohup java -server -cp /opt/deployment/alfresco-deployment.jar:/opt/deployment/s
    Note the final member of the classpath: /opt/deployment. This is necessary for the
    deployment receiver to properly configure itself.
 
-5. Run the receiver. Execute start.sh (or start.bat) as the user you want your deployed
+5. Run the receiver. Execute deploy_start.sh (or deploy_start.bat) as the user you want your deployed
    content to be owned by.
    
    
