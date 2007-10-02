@@ -856,7 +856,6 @@ File ::602807A4-7BA3-4CC1-9E5B-87668210CABE -name web.xml -parent E6A7188C-C3D5-
 File ::4CD51EAA-A869-4495-B8C8-148C8288321A -type dir -name lib -parent E6A7188C-C3D5-4797-B469-0C164B82DA74
 File ::F019A594-D6E6-4515-9D18-0482E71CC63C -name catalina-root.jar -parent 4CD51EAA-A869-4495-B8C8-148C8288321A
 File ::F899A2A7-E597-416E-8D8E-97B0610917C2 -type dir -name work -parent F7441516-B2B2-4AD9-A9E5-5EC1AF95FE78
-File ::C2074AB0-D03B-4E7B-AF74-5FA6E0CB3303 -directory <%InstallDir%>/bin -targetfilename alfresco-mmt.jar -name W:/V21/root/build/assemble/mmt/main/mmt.jar -location ../../build/assemble/mmt/main -parent 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1
 File ::EDFC7686-0CF3-4266-A855-72B47A30E3E3 -type dir -name W:/V21/root/projects/installer/alf_data -location ../../projects/installer/alf_data -parent 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1
 File ::3030C503-7739-4466-A5FB-0AE4381EE157 -type dir -name .svn -active 0 -parent EDFC7686-0CF3-4266-A855-72B47A30E3E3
 File ::A2A8DE60-3053-49A2-A8E1-7326E8B285A3 -name entries -parent 3030C503-7739-4466-A5FB-0AE4381EE157
@@ -883,7 +882,7 @@ File ::53EEC385-2826-4E8A-99D0-A0EFE608D728 -type dir -name tmp -parent 597B68C7
 File ::704D35EA-42FC-4D62-A0FD-6355C201EA4C -type dir -name prop-base -parent 53EEC385-2826-4E8A-99D0-A0EFE608D728
 File ::6F27762C-10D5-45BC-A7DE-B05B8C224FD6 -type dir -name props -parent 53EEC385-2826-4E8A-99D0-A0EFE608D728
 File ::074D7DCA-EB80-4516-AF76-9AC475F99C67 -type dir -name text-base -parent 53EEC385-2826-4E8A-99D0-A0EFE608D728
-File ::0ECD17E8-BDBF-4D84-937E-E0D96E6327D7 -type dir -name W:/V21/root/projects/installer/amps -location ../../projects/installer/amps -parent 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1
+File ::0ECD17E8-BDBF-4D84-937E-E0D96E6327D7 -type dir -name W:/V21/root/projects/installer/amps -location ../../projects/installer/amps -active 0 -parent 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1
 File ::2F929AE0-25B2-4777-9567-D563E7B09D57 -name add-amps-here.txt -parent 0ECD17E8-BDBF-4D84-937E-E0D96E6327D7
 File ::DDE3137B-655D-4633-A84E-EFE9D0814286 -type dir -name .svn -active 0 -parent 0ECD17E8-BDBF-4D84-937E-E0D96E6327D7
 File ::CAAB6FB5-8E49-4A87-B414-50F1C45E615C -name entries -parent DDE3137B-655D-4633-A84E-EFE9D0814286
@@ -1007,38 +1006,9 @@ File ::3A574F3E-2295-401B-9F69-8649A02C263C -name custom-repository.properties.i
 File ::6111BE93-C182-48A8-AB3D-658D73A4A8C6 -name custom-hibernate-dialect.properties.install -parent 0AB1D1E7-69C1-475E-89D0-220BC380FB89
 File ::ECA3DE40-BBF7-4B5A-85FF-F21FE2ABF30B -name !DoNotModifyTheseFiles -parent 0AB1D1E7-69C1-475E-89D0-220BC380FB89
 File ::55EF1D21-6B52-4DBC-8F95-1C6C1CA7A4A7 -name openoffice-startup-context.xml.install -parent 0AB1D1E7-69C1-475E-89D0-220BC380FB89
-FileGroup ::49875A22-E198-4CF2-A2E3-B82DAE5E7731 -setup Install -active No -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name {Java 6.0} -parent FileGroups
-File ::369EC1E6-605C-481E-B46B-1B5DAE277A26 -name {C:/Documents and Settings/dcourtney/My Documents/Alfresco/newinstall/java-Windows-32.zip} -location ../resources -parent 49875A22-E198-4CF2-A2E3-B82DAE5E7731
-FileGroup ::2ACEDA9E-1976-4A21-9A6B-CC37C1867634 -setup Install -active No -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name OpenOffice -parent FileGroups
-File ::AA019DCB-AFB9-4656-A95C-1042E84F5B13 -name {C:/Documents and Settings/dcourtney/My Documents/Alfresco/newinstall/ooo-Windows-32.zip} -location ../resources -parent 2ACEDA9E-1976-4A21-9A6B-CC37C1867634
+File ::1B060CC0-E1BE-4C3F-88CE-0FF6F7683E9E -directory <%InstallDir%>/bin -name W:/V21/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 97758F1B-F4A5-4114-A457-3F4C0FF9D5D1
 FileGroup ::9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D -setup Install -active Yes -platforms Windows -name {Windows Files} -parent FileGroups
 File ::F15C75D6-8CFD-4C09-B7DE-4F2C8AABCE44 -name {C:/Documents and Settings/dcourtney/My Documents/Alfresco/newinstall/configwizard/output/configure.exe} -location ../configwizard/output -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
-File ::6AF4EEEC-4056-4416-8864-87873C7AAD64 -type dir -directory <%InstallDir%>/bin -name W:/V21/root/projects/installer/bin-win -location ../../projects/installer/bin-win -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
-File ::1D39345D-BE9C-44F4-A0F8-1CB8F47E361B -name AlfrescoHome.URL -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::5FA36F8A-2106-4BF7-965E-AAF08B8F8EC1 -name AlfrescoWebClient.URL -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::62F9C56F-E694-4A8A-94F9-57A882464491 -name clean_tomcat.bat -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::239AAF21-D823-4E83-A3B2-0E4043589B11 -name imconvert.exe -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::C9BF1C6D-3FBE-4D45-B4C6-F375ED7902D2 -name Process.exe -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::54B74C32-9F37-4C75-BD5C-4BCE924E55BB -name RegPaths.exe -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::1AB7F84B-5A6D-42C9-A363-980DF8942B99 -type dir -name .svn -active 0 -parent 6AF4EEEC-4056-4416-8864-87873C7AAD64
-File ::D363F003-E621-47DC-A1C0-D9642C52ED25 -name entries -parent 1AB7F84B-5A6D-42C9-A363-980DF8942B99
-File ::43CC70F0-3F43-4BDE-95A9-DAC2C111644A -name format -parent 1AB7F84B-5A6D-42C9-A363-980DF8942B99
-File ::0B06330E-2F03-40AE-8FD6-83CCF3DBA316 -type dir -name prop-base -parent 1AB7F84B-5A6D-42C9-A363-980DF8942B99
-File ::A0014006-375B-468C-AB9A-CD69182A7D2C -name imconvert.exe.svn-base -parent 0B06330E-2F03-40AE-8FD6-83CCF3DBA316
-File ::A1D98D13-9A47-4EC6-85DA-23C75F4B5E26 -name Process.exe.svn-base -parent 0B06330E-2F03-40AE-8FD6-83CCF3DBA316
-File ::40CE3BC0-312C-48EC-AD9C-5E3F038CFAEF -name RegPaths.exe.svn-base -parent 0B06330E-2F03-40AE-8FD6-83CCF3DBA316
-File ::BDA31AFD-9738-4F10-8526-825F020CFF30 -type dir -name props -parent 1AB7F84B-5A6D-42C9-A363-980DF8942B99
-File ::BA3287C3-4703-4022-B07C-64F18290EF9A -type dir -name text-base -parent 1AB7F84B-5A6D-42C9-A363-980DF8942B99
-File ::6EA04F76-0DC9-4E38-B278-8E9D858D6548 -name AlfrescoHome.URL.svn-base -parent BA3287C3-4703-4022-B07C-64F18290EF9A
-File ::88D10F40-68F2-4CE2-8F8F-BD8F0079F3C6 -name AlfrescoWebClient.URL.svn-base -parent BA3287C3-4703-4022-B07C-64F18290EF9A
-File ::65C86580-234B-4134-BB08-D81B91BB868D -name clean_tomcat.bat.svn-base -parent BA3287C3-4703-4022-B07C-64F18290EF9A
-File ::8EC7D21B-678A-4C41-BA20-A6A4C3FBCA0F -name imconvert.exe.svn-base -parent BA3287C3-4703-4022-B07C-64F18290EF9A
-File ::4298A943-D5C6-4979-83F7-C63D0D21B0F9 -name Process.exe.svn-base -parent BA3287C3-4703-4022-B07C-64F18290EF9A
-File ::31448A09-F3C7-4D29-A124-7A9DD8C7910B -name RegPaths.exe.svn-base -parent BA3287C3-4703-4022-B07C-64F18290EF9A
-File ::0D09602F-4736-4D4D-A669-A0D302BD1622 -type dir -name tmp -parent 1AB7F84B-5A6D-42C9-A363-980DF8942B99
-File ::83E69537-2902-4FBC-9E46-1B93EE55F1CF -type dir -name prop-base -parent 0D09602F-4736-4D4D-A669-A0D302BD1622
-File ::0BAEF7AA-D8E4-4B70-8722-8583CA0957AB -type dir -name props -parent 0D09602F-4736-4D4D-A669-A0D302BD1622
-File ::19A8FEB9-3415-4E5B-B0D3-0C82B3AF44CF -type dir -name text-base -parent 0D09602F-4736-4D4D-A669-A0D302BD1622
 File ::F474BB31-5834-4EF3-9AD9-186351F8911D -name W:/V21/root/projects/installer/alf_start.bat -location ../../projects/installer/windows/ -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::D1319FF8-CE8F-40E5-9B37-505CCB844DF8 -name W:/V21/root/projects/installer/alf_stop.bat -location ../../projects/installer/windows -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::CFF05A1D-F413-4FF6-BCE3-DC62FC12360E -name W:/V21/root/projects/installer/README_mysql.txt -location ../../projects/installer/windows -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
@@ -1048,21 +1018,32 @@ File ::C486296D-5E76-42CE-BB38-E4AAAA05EF03 -name W:/V21/root/projects/installer
 File ::7BA9B0D7-0EA5-4792-939E-3789D58487C9 -name W:/V21/root/projects/installer/windows/restart_alf.bat -location ../../projects/installer/windows -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::2A8E79DA-9AFF-4119-A8D9-C7EED04ECEEA -directory <%InstallDir%>/bin -name W:/V21/root/projects/netbios/dll/Win32NetBIOS.dll -location ../../projects/netbios/dll -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::693FE81A-BBA4-4D6F-8A37-D5003C358414 -directory <%InstallDir%>/bin -name W:/V21/root/projects/netbios/dll/Win32NetBIOSx64.dll -location ../../projects/netbios/dll -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
+File ::BE73F6ED-A902-4A0C-98C5-AD88BA81E9F7 -name W:/V21/root/projects/installer/windows/apply_amps.bat -location ../../projects/installer/windows -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
+File ::89BEF6D3-2062-40C4-AD08-97181FB1255A -type dir -name W:/V21/root/projects/installer/windows/bin -location ../../projects/installer/windows/bin -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
+File ::399B141A-ADD0-47ED-A115-89921C34DD72 -name AlfrescoHome.URL -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
+File ::7E474D68-9851-4D8E-9A1E-9D6F0E2DCE14 -name AlfrescoWebClient.URL -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
+File ::B5512D41-B7EF-4D3E-ACB5-9311B3F5CAA8 -name clean_tomcat.bat -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
+File ::6EF963A4-28A5-4738-85E0-921057DB14AE -name imconvert.exe -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
+File ::1C00B886-357D-46FA-9CBB-8E6080B7D22A -name RegPaths.exe -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
+File ::CCAF52FB-9C24-4FA9-9D60-CF5FE548B499 -type dir -name .svn -active 0 -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
+File ::2B788993-5C11-4600-8BEB-EAA8F0F7D881 -name entries -parent CCAF52FB-9C24-4FA9-9D60-CF5FE548B499
+File ::15E07B0B-4E02-45E4-899B-643EFDE7C91E -name format -parent CCAF52FB-9C24-4FA9-9D60-CF5FE548B499
+File ::E8718F29-B550-4173-98AF-D19DDB82C20B -type dir -name prop-base -parent CCAF52FB-9C24-4FA9-9D60-CF5FE548B499
+File ::8CDBC813-5D51-41C9-A8B5-2D9BBDC49D07 -name imconvert.exe.svn-base -parent E8718F29-B550-4173-98AF-D19DDB82C20B
+File ::09F42669-5F77-41C5-9465-9DBCDBAD1A03 -name RegPaths.exe.svn-base -parent E8718F29-B550-4173-98AF-D19DDB82C20B
+File ::5E55002E-DA85-4B1A-AC2A-17CF03474D55 -type dir -name props -parent CCAF52FB-9C24-4FA9-9D60-CF5FE548B499
+File ::FC40AB1D-D67F-4B58-8BE5-AD992B46F8F2 -type dir -name text-base -parent CCAF52FB-9C24-4FA9-9D60-CF5FE548B499
+File ::04780DC6-A7B8-4766-930A-9573896D31C3 -name AlfrescoHome.URL.svn-base -parent FC40AB1D-D67F-4B58-8BE5-AD992B46F8F2
+File ::CA1E941C-1155-4808-AE3A-C4CCA1F0E0B6 -name AlfrescoWebClient.URL.svn-base -parent FC40AB1D-D67F-4B58-8BE5-AD992B46F8F2
+File ::D9265BA2-AE67-4D7D-8DAE-875DD29FFCEA -name clean_tomcat.bat.svn-base -parent FC40AB1D-D67F-4B58-8BE5-AD992B46F8F2
+File ::C4F7C507-19BC-4475-8173-E4C41A4EAE50 -name imconvert.exe.svn-base -parent FC40AB1D-D67F-4B58-8BE5-AD992B46F8F2
+File ::0DE2117B-C744-4126-B4BD-56994E962471 -name RegPaths.exe.svn-base -parent FC40AB1D-D67F-4B58-8BE5-AD992B46F8F2
+File ::E65C1F3C-18DB-4CE2-94FE-992DA3B5208B -type dir -name tmp -parent CCAF52FB-9C24-4FA9-9D60-CF5FE548B499
+File ::FCBECFC2-6E7B-4E18-982F-4384CC48CDD0 -type dir -name prop-base -parent E65C1F3C-18DB-4CE2-94FE-992DA3B5208B
+File ::4933EAF6-96B9-4035-8398-0C918E6545FB -type dir -name props -parent E65C1F3C-18DB-4CE2-94FE-992DA3B5208B
+File ::E6A5D04C-F06B-46B7-92C7-2E1037F4752E -type dir -name text-base -parent E65C1F3C-18DB-4CE2-94FE-992DA3B5208B
 FileGroup ::E5891213-6EC8-4636-B2E5-9CEE82670119 -setup Install -active Yes -platforms Linux-x86 -name {Linux Files} -parent FileGroups
 File ::3AED898E-8837-4A8E-BC5D-9821A5BB0E9B -name {C:/Documents and Settings/dcourtney/My Documents/Alfresco/newinstall/configwizard/output/configure.bin} -location ../configwizard/output -parent E5891213-6EC8-4636-B2E5-9CEE82670119
-File ::CAA7FF8D-9025-4884-81DF-57F331991AA6 -type dir -directory <%InstallDir%>/bin -name W:/V21/root/projects/installer/bin-lin -location ../../projects/installer/bin-lin -parent E5891213-6EC8-4636-B2E5-9CEE82670119
-File ::29F28D04-E45F-4A7B-9307-4A0CFDC11347 -name clean_tomcat.sh -parent CAA7FF8D-9025-4884-81DF-57F331991AA6
-File ::72E43938-4550-4F87-AFE2-47C5BF848906 -type dir -name .svn -active 0 -parent CAA7FF8D-9025-4884-81DF-57F331991AA6
-File ::363E56A5-873C-4C13-96D0-5CAB74539D97 -name entries -parent 72E43938-4550-4F87-AFE2-47C5BF848906
-File ::C5F40E93-7545-49B2-990A-20125C18948F -name format -parent 72E43938-4550-4F87-AFE2-47C5BF848906
-File ::ECC2412E-3B1E-4275-B61C-78D3A257AF82 -type dir -name prop-base -parent 72E43938-4550-4F87-AFE2-47C5BF848906
-File ::E3D9C0A3-6B4F-4370-93F2-46AB408A583B -type dir -name props -parent 72E43938-4550-4F87-AFE2-47C5BF848906
-File ::72C0C719-5E68-4A71-ADC9-54202C8D27B8 -type dir -name text-base -parent 72E43938-4550-4F87-AFE2-47C5BF848906
-File ::58E64497-2A98-42FE-8BE4-EC0D92D5156F -name clean_tomcat.sh.svn-base -parent 72C0C719-5E68-4A71-ADC9-54202C8D27B8
-File ::8E892374-A506-4AD0-A051-6F241AFDC7DA -type dir -name tmp -parent 72E43938-4550-4F87-AFE2-47C5BF848906
-File ::19742D88-93B1-4738-8B9B-0103AE23D9D4 -type dir -name prop-base -parent 8E892374-A506-4AD0-A051-6F241AFDC7DA
-File ::F226B89C-6263-4422-B57D-A611BBB6BA23 -type dir -name props -parent 8E892374-A506-4AD0-A051-6F241AFDC7DA
-File ::46CBEDA4-0C4B-41B3-8498-527A2F589A8B -type dir -name text-base -parent 8E892374-A506-4AD0-A051-6F241AFDC7DA
 File ::C112DB12-C712-4044-B236-F74A36C7D70E -name W:/V21/root/projects/installer/linux/installer/alf_start.sh -location ../../projects/installer/linux/installer -parent E5891213-6EC8-4636-B2E5-9CEE82670119
 File ::204B44B1-A267-4F68-9732-A9AAA5601F91 -name W:/V21/root/projects/installer/linux/installer/alf_stop.sh -location ../../projects/installer/linux/installer -parent E5891213-6EC8-4636-B2E5-9CEE82670119
 File ::AEE51014-BF46-4719-B806-3EEC378FAEF9 -name W:/V21/root/projects/installer/linux/installer/alfresco.sh -location ../../projects/installer/linux/installer -parent E5891213-6EC8-4636-B2E5-9CEE82670119
@@ -1070,9 +1051,21 @@ File ::99546A96-3DCA-462C-9D42-91FEFA4CD238 -name W:/V21/root/projects/installer
 File ::4D9AE172-CC88-4ADF-B6D7-9CD31382046F -name W:/V21/root/projects/installer/linux/README_mysql.txt -location ../../projects/installer/linux -parent E5891213-6EC8-4636-B2E5-9CEE82670119
 File ::C85FEB5E-6F43-459D-8E00-DD03505E6E36 -name W:/V21/root/projects/installer/linux/installer/start_oo.sh -location ../../projects/installer/linux/installer -parent E5891213-6EC8-4636-B2E5-9CEE82670119
 File ::6EE6FF79-46B9-492A-A67B-D9381C6F7157 -name W:/V21/root/installer/resources/AlfrescoLogo32.gif -location ../resources -parent E5891213-6EC8-4636-B2E5-9CEE82670119
+File ::2834AA69-0021-4CF7-B4D2-BDBA81A722CC -name W:/V21/root/projects/installer/linux/apply_amps.sh -location ../../projects/installer/linux -parent E5891213-6EC8-4636-B2E5-9CEE82670119
+File ::DE24BC27-AB3B-4DCB-8314-33F04D71BFE3 -type dir -name W:/V21/root/projects/installer/linux/bin -location ../../projects/installer/linux/bin -active 0 -parent E5891213-6EC8-4636-B2E5-9CEE82670119
+File ::BCE7B03F-EB92-48A8-853B-D05A959F0185 -name clean_tomcat.sh -parent DE24BC27-AB3B-4DCB-8314-33F04D71BFE3
+File ::C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6 -type dir -name .svn -active 0 -parent DE24BC27-AB3B-4DCB-8314-33F04D71BFE3
+File ::7DEDFD3F-EAA3-46D0-BD6E-EAB88DE83243 -name entries -parent C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6
+File ::73A1B2C2-D375-43AB-8BA4-5EB94D883B86 -name format -parent C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6
+File ::FD2CA99E-DF4C-40B6-8311-F40C4EB947B2 -type dir -name prop-base -parent C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6
+File ::D64D5CA9-CDEF-4A23-BDD0-BA85D35D8258 -type dir -name props -parent C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6
+File ::986E6DF3-2666-4D33-9F7B-BACA5C264FDF -type dir -name text-base -parent C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6
+File ::CF19DD34-B33E-4777-9905-FB911F781ECD -name clean_tomcat.sh.svn-base -parent 986E6DF3-2666-4D33-9F7B-BACA5C264FDF
+File ::6ECB69CA-5B7E-4B4A-A34A-8CB9D9B6939E -type dir -name tmp -parent C1CA6CBF-7588-4154-8B07-5F5FA01FD4D6
+File ::BA2CC5C0-267B-4F55-ABA1-7D3BDDFE91E4 -type dir -name prop-base -parent 6ECB69CA-5B7E-4B4A-A34A-8CB9D9B6939E
+File ::97CAB5BB-E699-4657-B64A-D13991B5DF74 -type dir -name props -parent 6ECB69CA-5B7E-4B4A-A34A-8CB9D9B6939E
+File ::9876B270-52F3-4EB6-A76B-179259A7CF6F -type dir -name text-base -parent 6ECB69CA-5B7E-4B4A-A34A-8CB9D9B6939E
 Component ::ECEFADA4-0700-4EBA-92CB-829E9EFC8229 -setup Install -active Yes -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name {Alfresco Server} -parent Components
-Component ::5E779E69-3AC8-4921-A174-9D41914AF31B -setup Install -active Yes -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name {Java 6.0} -parent Components
-Component ::55BFAA53-67EC-492A-AFAC-6EE283F5BA8F -setup Install -active Yes -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name OpenOffice -parent Components
 SetupType ::90BD7F9C-8247-4B22-BB53-5A1B3D35D893 -setup Install -active Yes -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name Typical -parent SetupTypes
 SetupType ::B9FC6AC4-70CF-4F3E-88F5-34C45C9C0F57 -setup Install -active Yes -platforms {Linux-x86 Windows AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Solaris-sparc} -name Custom -parent SetupTypes
 
@@ -1551,21 +1544,6 @@ false
 2A6E72F5-45B4-4F9D-9B29-03AFB4F924E4,Message,subst
 1
 
-2ACEDA9E-1976-4A21-9A6B-CC37C1867634,Active
-No
-
-2ACEDA9E-1976-4A21-9A6B-CC37C1867634,Alias
-{OpenOffice File Group}
-
-2ACEDA9E-1976-4A21-9A6B-CC37C1867634,Destination
-<%InstallDir%>
-
-2ACEDA9E-1976-4A21-9A6B-CC37C1867634,Name
-OpenOffice
-
-2ACEDA9E-1976-4A21-9A6B-CC37C1867634,Size
-621088125
-
 2B42F3BC-2A3A-475F-99F8-E5F7C585E8CB,CheckCondition
 {Before Action is Executed}
 
@@ -1812,21 +1790,6 @@ false
 484CCEDA-8775-44CD-8B08-5725A7C17B98,String
 <%ConsoleMode%>
 
-49875A22-E198-4CF2-A2E3-B82DAE5E7731,Active
-No
-
-49875A22-E198-4CF2-A2E3-B82DAE5E7731,Alias
-{Java File Group}
-
-49875A22-E198-4CF2-A2E3-B82DAE5E7731,Destination
-<%InstallDir%>
-
-49875A22-E198-4CF2-A2E3-B82DAE5E7731,Name
-{Java 6.0}
-
-49875A22-E198-4CF2-A2E3-B82DAE5E7731,Size
-36405564
-
 4F1C6578-B04F-45D7-BC36-70D19A082DC5,State
 disabled
 
@@ -1883,15 +1846,6 @@ false
 
 525BDD33-9818-4959-AE56-9A25F6F67A81,Platform
 Windows
-
-55BFAA53-67EC-492A-AFAC-6EE283F5BA8F,Description,subst
-1
-
-55BFAA53-67EC-492A-AFAC-6EE283F5BA8F,FileGroups
-2ACEDA9E-1976-4A21-9A6B-CC37C1867634
-
-55BFAA53-67EC-492A-AFAC-6EE283F5BA8F,Name
-OpenOffice
 
 5A1470C0-6919-401C-A2A4-F01FAC652D7F,Conditions
 {1 condition}
@@ -1955,15 +1909,6 @@ No
 
 5DBC64A9-E8F7-4932-AF4C-EFF423369200,Prompt
 {Do you accept the terms of this license agreement?}
-
-5E779E69-3AC8-4921-A174-9D41914AF31B,Description,subst
-1
-
-5E779E69-3AC8-4921-A174-9D41914AF31B,FileGroups
-49875A22-E198-4CF2-A2E3-B82DAE5E7731
-
-5E779E69-3AC8-4921-A174-9D41914AF31B,Name
-{Java 6.0}
 
 6020AC5C-AF91-4D05-A688-BEC95567D717,CheckCondition
 {Before Next Action is Executed}
@@ -2360,7 +2305,7 @@ Yes
 1
 
 90BD7F9C-8247-4B22-BB53-5A1B3D35D893,Components
-{ECEFADA4-0700-4EBA-92CB-829E9EFC8229 5E779E69-3AC8-4921-A174-9D41914AF31B 55BFAA53-67EC-492A-AFAC-6EE283F5BA8F}
+ECEFADA4-0700-4EBA-92CB-829E9EFC8229
 
 90BD7F9C-8247-4B22-BB53-5A1B3D35D893,Description,subst
 1
@@ -2709,7 +2654,7 @@ B5733739-7235-4105-A404-E0B5D556E90D,WorkingDirectory
 <%InstallDir%>
 
 B9FC6AC4-70CF-4F3E-88F5-34C45C9C0F57,Components
-{ECEFADA4-0700-4EBA-92CB-829E9EFC8229 5E779E69-3AC8-4921-A174-9D41914AF31B 55BFAA53-67EC-492A-AFAC-6EE283F5BA8F}
+ECEFADA4-0700-4EBA-92CB-829E9EFC8229
 
 B9FC6AC4-70CF-4F3E-88F5-34C45C9C0F57,Description,subst
 1
