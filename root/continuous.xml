@@ -1198,6 +1198,9 @@
       <copy todir="${dir.continuous.assemble.docs.java}/repository">
          <fileset dir="${dir.project.repository.docs.java}" />
       </copy>
+      <copy todir="${dir.continuous.assemble.docs.java}/web-framework">
+         <fileset dir="${dir.project.webframework.docs.java}" />
+      </copy>
       <copy todir="${dir.continuous.assemble.docs.java}/web-client">
          <fileset dir="${dir.project.webclient.docs.java}" />
       </copy>
