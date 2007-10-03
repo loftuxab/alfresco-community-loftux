@@ -44,6 +44,8 @@ package component.hyperlink
 		 {
 			  private var _colorNormal:String;   //Link text color.
 			  private var _colorHover:String;    //Link hover text color.
+			  
+			  [Inspectable]
 			  private var _linkText:String;      //Displayed Hyperlink text
 			
 			  /**
@@ -69,12 +71,12 @@ package component.hyperlink
 				   		//only do this if we have link text
 				    	setHtmlTextHoverOut();
 				   }
-				   else  {
+				   else  
+				   {
 				     htmlText = "Property 'linkText' is REQUIRED";
 				   }
-			  }//onCreationComplete
-			  
-			  
+			  }
+			  			  
 			  /**
 			   * Concatenates the htmlText value and assigns it to the property
 			   */
@@ -88,7 +90,7 @@ package component.hyperlink
 				   this.htmlText = sHTML;
 				   this.percentWidth = 100;
 				   // option to set up tool tip this.toolTip = "Click to show " + linkText;
-			  }//setHtmlText
+			  }
 			  
 			 /**
 			   * Concatenates the htmlText value and assigns it to the property
@@ -104,7 +106,7 @@ package component.hyperlink
 				   this.percentWidth = 100;
 				   
 				   // option to set up tool tip this.toolTip = "Click to show " + linkText;
-			  }//setHtmlText
+			  }
 			  
 			  
 			  /** called by the mouseOver and mouseOut events of the control.
@@ -122,7 +124,7 @@ package component.hyperlink
 				    	this.setHtmlTextHoverOut();
 				    	this.htmlText = String(this.htmlText).replace(_colorHover,_colorNormal);
 				   }
-			  }//hover  
+			  }
 			  
 			
 			/**
@@ -149,5 +151,5 @@ package component.hyperlink
 	   			return this._linkText;
 	   		}
 	   		
-		} // end of class HyperLink
+		} 
 }

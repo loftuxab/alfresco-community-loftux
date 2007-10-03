@@ -125,7 +125,7 @@ package component.textAccordian
 		/**
 		 * Indicates whether the content of the control is currently being shown
 		 */
-		public function get showContent():Boolean
+		public function get expanded():Boolean
 		{
 			return this._expanded;
 		}
@@ -133,7 +133,7 @@ package component.textAccordian
 		/**
 		 * Set value to hide/show the content of the item
 		 */
-		public function set showContent(value:Boolean):void
+		public function set expanded(value:Boolean):void
 		{
 			if (value != this._expanded)
 			{

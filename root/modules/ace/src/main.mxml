@@ -48,19 +48,21 @@
 	<mx:WipeLeft id="wipeL" duration="500"/>
 				
 	<!-- The login control -->	
-	<login:login top="50" left="50" id="loginPanel" visible="true"/>
+	<mx:Box id="loginPanel" visible="true" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
+		<login:login/>
+	</mx:Box>
 		
 	<mx:Canvas id="mainCanvas" width="100%" height="100%" visible="false" horizontalScrollPolicy="off" verticalScrollPolicy="off">					
 			
 		<mx:VBox width="100%" height="100%">
 					
-			<mx:HBox width="100%">
+			<mx:HBox width="100%" height="55">
 					
 				<!-- Show search form -->	
-				<search:search width="100%" height="100%"/>		
+				<search:search width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off" minWidth="650" maxHeight="55"/>		
 				
 				<!-- Show logout form -->	
-				<logout:logout width="180" height="100%"/>
+				<logout:logout width="160" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off"/>
 		
 			</mx:HBox>
 			

@@ -28,8 +28,12 @@ package component.textAccordian
 		{
 			super.createChildren();
 			
+			this.verticalScrollPolicy = "off";
+			this.horizontalScrollPolicy = "off";
+			
 			var numChildren:int = this.getChildren().length;
 			var i:int;
+			var itemSelected:Boolean = false;
 			this._items = new Array(numChildren);
 			for (i = 0; i < numChildren; i++) 
 			{
@@ -37,19 +41,35 @@ package component.textAccordian
 				if (child is TextAccordianItem)
 				{
 					var item:TextAccordianItem = child as TextAccordianItem;
-					this._items.push(item);	
+					this._items[i] = item;	
 					
-					if (i == 0)
+					if (item.expanded == true)
 					{
-						this.selectedItem = item;
+						if (itemSelected == false)
+						{
+							this._selectedItem = item;
+						}	
+						else
+						{
+							// We already have an expanded item so shrink this one
+							item.expanded = false;
+						}
 					}
 					
+					// Register interest in events
 					item.addEventListener(MouseEvent.CLICK, onClick);
 				}
 				else
 				{
 					throw new Error("All children of the TextAccordian control must be TextAccordianItem's");
 				}
+			}
+			
+			// Expand the first text item if none have been expanded
+			if (itemSelected == false)
+			{
+				(this._items[0] as TextAccordianItem).expanded = true;
+				this._selectedItem = this._items[0] as TextAccordianItem;
 			}
 		}	
 		
@@ -60,12 +80,12 @@ package component.textAccordian
 		{
 			if (this._selectedItem != null)
 			{
-				this._selectedItem.showContent = false;
+				this._selectedItem.expanded = false;
 			}
 			if (value != null)
 			{
 				this._selectedItem = value;
-				this._selectedItem.showContent = true;
+				this._selectedItem.expanded = true;
 				
 				// Dispatch the selection change event
 				dispatchEvent(new TextAccordianSelectionChangeEvent(TextAccordianSelectionChangeEvent.SELECTION_CHANGE, this._selectedItem));

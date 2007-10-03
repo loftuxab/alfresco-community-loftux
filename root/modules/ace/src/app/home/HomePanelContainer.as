@@ -130,6 +130,8 @@ package app.home
 				this._mainCanvas.height = this._innerHeight;
 				this._mainCanvas.setStyle("borderStyle", "none");
 				this._mainCanvas.setStyle("borderWidth", 0);
+				this._mainCanvas.horizontalScrollPolicy = "off";
+				this._mainCanvas.verticalScrollPolicy = "off";
 	
 				// Create the botton bar
 				this._bottomCanvas = new HomePanelBottom();
