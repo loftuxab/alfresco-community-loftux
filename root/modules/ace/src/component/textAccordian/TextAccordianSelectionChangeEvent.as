@@ -10,7 +10,7 @@ package component.textAccordian
 	public class TextAccordianSelectionChangeEvent extends Event
 	{
 		/** Event name */
-		public static const SELECTION_CHANGE = "textAccordianSelectionChange";
+		public static const SELECTION_CHANGE:String = "textAccordianSelectionChange";
 		
 		/** The selected item */
 		private var _selectedItem:TextAccordianItem;

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TabControlItemClass 
+	xmlns="component.tabControl.*" 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	height="23"
+	borderStyle="none"
+	borderThickness="0"
+	verticalGap="0">
+	
+	<mx:Style source="tabControl.css"/>
+
+	<states>
+		<mx:State name="highlighted">
+			<mx:SetProperty target="{mainArea}" name="styleName" value="highlightedMainArea"/>
+		</mx:State>
+	</states>
+		
+	<mx:HBox id="mainArea" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center" styleName="mainArea" click="onClick()">				
+		<mx:Spacer width="5"/>
+		<mx:Label id="itemLabel"/>		
+		<mx:Spacer width="5"/>		
+	</mx:HBox>
+	
+</TabControlItemClass>

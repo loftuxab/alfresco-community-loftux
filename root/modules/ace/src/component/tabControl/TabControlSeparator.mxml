@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="5" height="23"
+	styleName="mainArea">
+	
+	<mx:Style source="tabControl.css"/>
+
+	<mx:states>
+		<mx:State name="highlightedLeft">
+			<mx:SetProperty target="{this}" name="styleName" value="highlightedLeft"/>
+			<mx:SetProperty target="{divider}" name="visible" value="false"/>
+		</mx:State>
+		
+		<mx:State name="highlightedRight">
+			<mx:SetProperty target="{this}" name="styleName" value="highlightedRight"/>
+			<mx:SetProperty target="{divider}" name="visible" value="false"/>			
+		</mx:State>
+	</mx:states>
+	
+	<mx:VBox id="divider" verticalAlign="middle" horizontalAlign="center" width="100%">
+		<mx:Spacer height="6"/>
+		<mx:VRule height="11" styleName="tabSeparator"/>
+		<mx:Spacer height="6"/>
+	</mx:VBox>
+	
+</mx:Canvas>

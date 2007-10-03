@@ -7,28 +7,34 @@
 
 	<mx:VBox id="mainVBox" width="100%" height="100%" minHeight="{mainVBox.height}" verticalAlign="middle" horizontalAlign="center" backgroundColor="#F0F6F6">		
 		
-		<mx:Spacer width="25"/>
+		<mx:Spacer width="15"/>
 		
-		<mx:HBox width="100%">
+		<mx:HBox width="100%" height="100%">
 		
-			<mx:Spacer width="25"/>
+			<mx:Spacer width="15"/>
 			
-			<acc:TextAccordian id="textAccordian" height="100%" width="100%" verticalAlign="top">
-				<acc:TextAccordianItem 
-					title="Welcome to Alfresco Enterprise Connections" 
-					content="I have clearly change this content does it appear in the UI???"
-					value="assets/testFilm1.flv"/>				
-				<acc:TextAccordianItem 
-					title="Search Introduction" 
-					content="This is some content ... blar blar blar"
-					value="assets/testFilm2.flv"/>			
-				<acc:TextAccordianItem 
-					title="Knowledge Base Introduction" 
-					content="This is some content ... blar blar blar"
-					value="assets/testFilm1.flv"/>				
-			</acc:TextAccordian>
+			<mx:VBox height="100%" width="100%" verticalAlign="top">
+							
+				<mx:Spacer height="20"/>
+				
+				<acc:TextAccordian id="textAccordian" height="100%" width="100%" verticalAlign="top">
+					<acc:TextAccordianItem 
+						title="Welcome to Alfresco Enterprise Connections" 
+						content="I have clearly change this content does it appear in the UI??? dsf asdf asdf wef sdfqewfasdf aedfsdf asdfqwef aasdf qwefsadf aedf asdf asdfqwefdfv asdf qwefs df asdfqwef adsf qasdf awef asdfqwef asdf wef asdf adf"
+						value="assets/testFilm1.flv"/>				
+					<acc:TextAccordianItem 
+						title="Search Introduction" 
+						content="This is some content ... blar blar blar"
+						value="assets/testFilm2.flv"/>			
+					<acc:TextAccordianItem 
+						title="Knowledge Base Introduction" 
+						content="This is some content ... blar blar blar"
+						value="assets/testFilm1.flv"/>				
+				</acc:TextAccordian>
 			
-			<mx:Spacer width="25"/>	
+			</mx:VBox>
+			
+			<mx:Spacer width="15"/>	
 		
 			<mx:Box horizontalAlign="right" height="100%" verticalAlign="middle">							
 				
@@ -51,11 +57,11 @@
 				
 			</mx:Box>
 			
-			<mx:Spacer width="25"/>	
+			<mx:Spacer width="15"/>	
 				
 		</mx:HBox>		
 		
-		<mx:Spacer width="25"/>
+		<mx:Spacer width="15"/>
 				
 	</mx:VBox>
 				

@@ -1,0 +1,57 @@
+/* CSS file */
+
+.mainArea
+{
+	background-color: #929292;
+	color: #636363;
+}
+
+.highlightedMainArea
+{
+	border-style:none;
+   	border-thickness:1;
+   	border-color:#FFFFFF;
+   
+   	border-skin: ClassReference("component.util.SimpleGradientBorder");
+   	fill-colors: #E8E8E8, #FFFFFF;
+   	
+   	color: #0E9EE5;
+}
+
+.highlightedLeft
+{
+	cornerRadius: 10;
+	side: right;
+	
+	border-style:none;
+   	border-thickness:1;   	
+   	border-color:#FFFFFF;
+   
+   	border-skin: ClassReference("component.tabControl.CurvedBorder");
+   	fill-colors: #929292, #929292;
+
+	background-color: #FFFFFF;
+}
+
+.highlightedRight
+{
+	cornerRadius: 10;
+	side: left;
+	
+	border-style:none;
+   	border-thickness:1;   	
+   	border-color:#FFFFFF;
+   
+   	border-skin: ClassReference("component.tabControl.CurvedBorder");
+   	fill-colors: #929292, #929292;
+
+	background-color: #FFFFFF;
+}
+
+.tabSeparator
+{
+	stroke-color:#7F7F7F;
+	stroke-width:2;
+	shadow-color:#BABABA;
+}
+	

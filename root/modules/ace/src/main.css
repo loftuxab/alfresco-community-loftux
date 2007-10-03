@@ -12,42 +12,23 @@ HBox
 	verticalGap:1;
 }
 
+Text
+{
+	font-family: Tahoma; 
+	font-size: 12;
+}
+
+Label
+{
+	font-family: Tahoma; 
+	font-size: 12;
+}
+
 .mainApplication
 {
-	background-color: #9FA9B2;
-	border-thickness: 1;
-	border-style: solid;
-	border-color: #9FA9B2;
-}
-
-
-/* Old stuff that may need removing */
-
-searchCanvas 
-{
-	backgroundColor: #275065;
-	borderStyle: solid;
-}
+	background-color: #929292; 
 	
-searchCanvas1 
-{
-	backgroundColor: #cccccc;
-	borderStyle: solid;
-}
-		
-labelStyle 
-{
-	color: #477916;
-}
-
-TabNavigator 
-{
-	tabHeight: 29;
-	tabWidth: 150;
-	paddingLeft: 50;
-}
-
-ApplicationControlBar 
-{
-	cornerRadius: 0;
+	border-thickness: 5;
+	border-style: solid;
+	border-color: #929292;
 }
