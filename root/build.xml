@@ -134,6 +134,7 @@
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
+                    incremental-webframework,
                     package-webclient-jar,
                     deploy-tomcat-exploded" />
    
@@ -156,7 +157,8 @@
                     generate-javadocs-remoteapi, 
                     generate-javadocs-jndi,
                     generate-javadocs-catalinavirtual, 
-                    generate-javadocs-linkvalidation, 
+                    generate-javadocs-linkvalidation,
+                    generate-javadocs-webframework, 
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
                     generate-javadocs-webserviceclient,
@@ -172,6 +174,7 @@
                     incremental-jndi, 
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
+                    incremental-webframework,
                     incremental-webclient,  
                     incremental-webserviceclient" />
 
@@ -191,6 +194,7 @@
                     clean-jndi, 
                     clean-catalinavirtual, 
                     clean-linkvalidation, 
+                    clean-webframework,
                     clean-webclient, 
                     clean-rm,
                     clean-blog,
@@ -292,6 +296,7 @@
          <fileset dir="${dir.project.remoteapi.classes}" />
          <fileset dir="${dir.project.catalinavirtual.classes}" />
          <fileset dir="${dir.project.linkvalidation.classes}" />
+         <fileset dir="${dir.project.webframework.classes}" />
          <fileset dir="${dir.project.webclient.classes}" 
                   excludes="**/extension/**" />
         
@@ -446,7 +451,8 @@
                     test-deployment, 
                     test-repository, 
                     test-remoteapi, 
-                    test-catalinavirtual, 
+                    test-catalinavirtual,
+                    test-webframework, 
                     test-webclient, 
                     test-webserviceclient" />
 

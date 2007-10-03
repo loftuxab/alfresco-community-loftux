@@ -840,6 +840,53 @@
                          projectdir="${dir.project.catalinavirtual}"/>
    </target>
 
+   <!-- *************************** -->
+   <!-- ** Web-Framework Project ** -->
+   <!-- *************************** -->
+   
+   <target name="incremental-webframework" 
+           description="Performs an incremental build of the web framework project"
+           depends="package-webframework" />
+      
+   <target name="build-webframework" 
+           description="Performs a clean build of the web framework project"
+           depends="clean-webframework, 
+                    incremental-webframework" />
+   
+   <target name="clean-webframework" 
+           description="Cleans the web framework project" 
+           depends="init">
+      <clean projectdir="${dir.project.webframework}" />
+   </target>
+   
+   <target name="compile-webframework" 
+           description="Compiles the web framework project" 
+           depends="init">
+      <compile-java projectdir="${dir.project.webframework}" />
+   </target>
+   
+   <target name="package-webframework"
+           description="Packages the web framework project"
+           depends="compile-webframework">
+      <mkdir dir="${dir.project.webframework.dist}" />
+      <jar jarfile="${dir.project.webframework.dist}/${file.name.jar.webframework}" 
+           basedir="${dir.project.webframework.classes}" />
+   </target>
+   
+   <target name="test-webframework" 
+           description="Runs the tests for the web framework project" 
+           depends="compile-webframework">
+      <run-tests projectdir="${dir.project.webframework}" />
+   </target>
+   
+   <target name="generate-javadocs-webframework" 
+           description="Generates the JavaDocs for the web framework project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Web Framework" 
+                         windowtitle="Alfresco Web Framework" 
+                         projectdir="${dir.project.webframework}"/>
+   </target>
+
    <!-- ************************ -->
    <!-- ** Web Client Project ** -->
    <!-- ************************ -->
@@ -976,6 +1023,8 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
          <fileset dir="${dir.project.linkvalidation.dist}" 
                   includes="${file.name.jar.linkvalidation}" />
          <fileset dir="${dir.project.mbeans.dist}" 
