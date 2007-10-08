@@ -32,7 +32,7 @@ import org.alfresco.module.blogIntegration.BlogIntegrationService;
 import org.alfresco.module.blogIntegration.BlogIntegrationServiceImpl;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
-import org.alfresco.web.action.ActionEvaluator;
+import org.alfresco.web.action.evaluator.BaseActionEvaluator;
 import org.alfresco.web.bean.repository.Node;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.jsf.FacesContextUtils;
@@ -43,7 +43,7 @@ import org.springframework.web.jsf.FacesContextUtils;
  * 
  * @author Roy Wetherall
  */
-public class PostBlogEvaluator implements ActionEvaluator, BlogIntegrationModel
+public class PostBlogEvaluator extends BaseActionEvaluator implements BlogIntegrationModel
 {
     /**
      * @see org.alfresco.web.action.ActionEvaluator#evaluate(org.alfresco.web.bean.repository.Node)

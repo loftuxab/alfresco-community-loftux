@@ -25,7 +25,7 @@
 package org.alfresco.module.blogIntegration.ui;
 
 import org.alfresco.module.blogIntegration.BlogIntegrationModel;
-import org.alfresco.web.action.ActionEvaluator;
+import org.alfresco.web.action.evaluator.BaseActionEvaluator;
 import org.alfresco.web.bean.repository.Node;
 
 
@@ -34,7 +34,7 @@ import org.alfresco.web.bean.repository.Node;
  * 
  * @author Roy Wetherall
  */
-public class RemoveBlogDetailsEvaluator implements ActionEvaluator, BlogIntegrationModel
+public class RemoveBlogDetailsEvaluator extends BaseActionEvaluator implements BlogIntegrationModel
 {
     /**
      * @see org.alfresco.web.action.ActionEvaluator#evaluate(org.alfresco.web.bean.repository.Node)
