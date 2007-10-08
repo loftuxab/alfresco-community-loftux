@@ -30,7 +30,7 @@ import javax.faces.context.FacesContext;
 
 import org.alfresco.module.recordsManagement.RecordsManagementModel;
 import org.alfresco.service.ServiceRegistry;
-import org.alfresco.web.action.ActionEvaluator;
+import org.alfresco.web.action.evaluator.BaseActionEvaluator;
 import org.alfresco.web.bean.repository.Repository;
 
 
@@ -38,7 +38,7 @@ import org.alfresco.web.bean.repository.Repository;
  * 
  * @author Roy Wetherall
  */
-public abstract class BaseEvaluator implements ActionEvaluator
+public abstract class BaseEvaluator extends BaseActionEvaluator
 {
     protected ServiceRegistry getServiceRegistry()
     {
