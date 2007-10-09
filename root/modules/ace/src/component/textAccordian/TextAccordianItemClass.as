@@ -10,6 +10,7 @@ package component.textAccordian
 	import mx.effects.WipeDown;
 	import mx.effects.WipeUp;
 	import mx.effects.Move;
+	import mx.controls.Image;
 
 	/**
 	 * Text accordian item UI control
@@ -25,7 +26,8 @@ package component.textAccordian
 		public var itemTitle:Label;
 		public var itemContent:Label;
 		public var contentVBox:VBox;
-		public var itemPointer:Label;
+		public var itemPointer:Image;
+		public var itemPointerExpanded:Image;
 		
 		/** Title property */
 		[Inspectable]
@@ -70,6 +72,7 @@ package component.textAccordian
 			// Register interest in events
 			this.itemTitle.addEventListener(MouseEvent.CLICK, onClick);	
 			this.itemPointer.addEventListener(MouseEvent.CLICK, onClick);
+			this.itemPointerExpanded.addEventListener(MouseEvent.CLICK, onClick);
 		}
 		
 		/**
@@ -140,6 +143,21 @@ package component.textAccordian
 				this._expanded = value;
 				this.contentVBox.includeInLayout = value;
 				this.contentVBox.visible = value;
+				
+				if (value == true)
+				{
+					itemPointer.visible = false;
+					itemPointer.includeInLayout = false;
+					itemPointerExpanded.visible = true;
+					itemPointerExpanded.includeInLayout = true;	
+				}
+				else
+				{
+					itemPointer.visible = true;
+					itemPointer.includeInLayout = true;
+					itemPointerExpanded.visible = false;
+					itemPointerExpanded.includeInLayout = false;
+				}
 			}
 		}
 		

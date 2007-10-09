@@ -5,7 +5,11 @@
 	xmlns:acc="component.textAccordian.*"
 	label="Getting Started">
 
-	<mx:VBox id="mainVBox" width="100%" height="100%" minHeight="{mainVBox.height}" verticalAlign="middle" horizontalAlign="center" backgroundColor="#F0F6F6">		
+	<mx:VBox id="mainVBox" 
+		     width="100%" height="100%" 
+			 minHeight="{mainVBox.height}" 
+			 verticalAlign="middle" horizontalAlign="center" 
+			 styleName="homeMain">		
 		
 		<mx:Spacer width="15"/>
 		

@@ -14,8 +14,9 @@ package app.login
 	import mx.controls.TextInput;
 	import mx.states.State;
 	import mx.rpc.mxml.IMXMLSupport;
+	import mx.containers.VBox;
 
-    public class LoginClass extends Canvas
+    public class LoginClass extends VBox
 	{
 		/** UI controls */
 		public var username:TextInput;

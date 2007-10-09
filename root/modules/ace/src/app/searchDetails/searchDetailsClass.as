@@ -69,11 +69,11 @@ package app.searchDetails
 		{
 			if (summary != null && summary.length != 0)
 			{
-				summaryBtn.linkText = summary;
+				summaryBtn.text = summary;
 			}
 			else 
 			{	
-				summaryBtn.linkText = this._title;
+				summaryBtn.text = this._title;
 			}
 		}
 			
@@ -91,9 +91,9 @@ package app.searchDetails
 		public function set doctitle(title:String):void
 		{
 			this._title = title;
-			if (summaryBtn.linkText == null || summaryBtn.linkText.length == 0)
+			if (summaryBtn.text == null || summaryBtn.text.length == 0)
 			{
-				summaryBtn.linkText = this._title;
+				summaryBtn.text = this._title;
 			}
 		}	
 	}

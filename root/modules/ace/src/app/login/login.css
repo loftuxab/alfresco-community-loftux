@@ -1,43 +1,34 @@
 /* CSS file for login*/
 	
-	Canvas 
-	{
-	  horizontal-center: 0;
-	  vertical-center: 0;
-	  width: 275;
-	  height: 150;
-	  layout: absolute;
-	}
-	
-	Panel 
-	{
-	  width: 275;
-	  height: 150;
-	  layout: absolute;
-	}
-	
-	TextInput 
-	{
-	  left: 85;
-	  right: 10;
-	}
-	
-	.userlabel 
-	{
-	  top: 12;
-	}
-	
-	.userinput 
-	{
-	  top: 10;
-	}
-	
-	.passlabel 
-	{
-	  top: 42;
-	}
-	
-	.passinput 
-	{
-	  top: 40;
-	}
+.loginTopCanvas
+{
+   border-style:solid;
+   border-thickness:0;
+   
+   cornerRadius: 20;
+   bottomCornerRadius: 0;
+   
+   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   fill-colors: #DCDFDF, #C5CACA;
+   
+   background-color: #929292;
+}
+
+.loginBottomCanvas
+{
+   border-style:solid;
+   border-thickness:0;
+   
+   cornerRadius: 0;
+   bottomCornerRadius: 20;
+   
+   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   fill-colors: #DCDFDF, #C5CACA;   
+   
+   background-color: #929292;
+}
+
+.loginMain
+{
+	background-color: #ffffff;
+}

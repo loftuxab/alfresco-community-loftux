@@ -7,5 +7,16 @@
    border-color:#FFFFFF;
    
    border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #ECEEF1, #D9DDE0;
+   fill-colors: #e1e1e1, #D9DDE0;
+}
+
+.logoutLink
+{
+	color: #6AA44D;
+}
+
+.logoutLinkRollOver
+{
+	color: #6AA44D;
+	text-decoration: underline;
 }

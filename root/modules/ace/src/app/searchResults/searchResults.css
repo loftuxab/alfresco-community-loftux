@@ -1,28 +1,14 @@
 /* CSS file */
-Canvas
+
+.searchResultsDetailsBar
 {
-   border-style:solid;
-   border-thickness:1;
-   border-color:#FFFFFF;
-   
-   border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #ECEEF1, #D9DDE0;
+	background-color: #CECECE;
+	border-thickness: 1;
+	border-style: solid;
+	border-color: #E6EAEB;
 }
-Panel
+
+.searchResultsLabel
 {
-   border-style:solid;
-   border-thickness:5;
-   border-color:#c8886c;
-   
-   border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #ECEEF1, #D9DDE0;
-}
-ApplicationControlBar
-{
-   border-style:solid;
-   border-thickness:1;
-   border-color:#FFFFFF;
-   
-   border-skin: ClassReference("component.util.GlossGradientBorder");
-   fill-colors: #6B7680, #384654, #1B2C3C ,#1B2C3C;
+	color:#284C4C;
 }

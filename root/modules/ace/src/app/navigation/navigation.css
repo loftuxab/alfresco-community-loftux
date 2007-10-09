@@ -1,51 +1,29 @@
 /* CSS file */
 
-.navTab
-{
-	color: #848484;
-	text-roll-over-color: #848484;
-	
-	corner-radius: 0;
-	
-	highlightAlphas: 0, 0;
-    fillAlphas: 0, 0, 0, 0;
-    background-color: #FFFFFF;
-	
-	border-color: #E1E2E3;
-	border-alpha: 0; 
-	border-thickness: 0;
-	border-style: none;
-	
-	shadow-distance: 0; 
-	shadow-color: #E1E2E3;
-}
-
-.navSelectedTab
-{
-	color: #4199C6;	
-	background-color: #FFFFFF;
-	
-	highlightAlphas: 0, 0;
-    fillAlphas: 0, 0, 0, 0;
-    fillColors: #ffffff, #ffffff, #ffffff, #ffffff;
-	
-	text-roll-over-color: #4199C6;
-	
-	border-color: #FFFFFF;
-	border-alpha: 1; 
-	border-thickness: 0;
-	border-style: none;
-}
-
 .navViewStack
 {
-	background-color: #FFFFFF;
+	border-style:solid;
+   	border-thickness:0;
+   
+   	border-skin: ClassReference("component.util.SimpleGradientBorder");
+   	fill-colors: #ffffff, #fafdfd;
 }
 
-.dropShadow
-{				
- 	shadowDistance:20;
-   	shadowDirection:center;
-   	dropShadowColor:#999999;			
-   	dropShadowEnabled:true;	
+.navViewLightBackground
+{
+	background-color: #ffffff;
+}
+
+.navViewShadowBackground
+{
+	border-style:solid;
+   	border-thickness:0;
+   
+   	border-skin: ClassReference("component.util.SimpleGradientBorder");
+   	fill-colors: #d0d0d0, #ffffff;
+}
+
+.navViewTabControl
+{
+	background-color: #e1e2e3;
 }

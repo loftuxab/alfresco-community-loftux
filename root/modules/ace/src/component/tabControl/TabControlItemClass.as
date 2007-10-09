@@ -33,6 +33,11 @@ package component.tabControl
 		 */
 		protected override function createChildren():void
 		{
+			// Ensure the hand cursor is shown on roll over
+			this.useHandCursor = true;
+			this.buttonMode = true;
+			this.mouseChildren = false;
+			
 			super.createChildren();
 			
 			// Set the value of the label

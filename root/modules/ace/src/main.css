@@ -14,13 +14,13 @@ HBox
 
 Text
 {
-	font-family: Tahoma; 
+	font-family: Arial; 
 	font-size: 12;
 }
 
 Label
 {
-	font-family: Tahoma; 
+	font-family: Arial; 
 	font-size: 12;
 }
 
@@ -31,4 +31,9 @@ Label
 	border-thickness: 5;
 	border-style: solid;
 	border-color: #929292;
+}
+
+.lightBackground
+{
+	background-color: #ffffff;
 }

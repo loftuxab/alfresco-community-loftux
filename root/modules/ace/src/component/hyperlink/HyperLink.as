@@ -25,131 +25,84 @@
  
 package component.hyperlink
 {
-		import mx.controls.Text;
-		import mx.controls.Text;
-	  	import flash.events.Event;
-	  	import flash.events.TextEvent;
-	  	import flash.net.*;
-	  	import mx.controls.Alert;
+	import mx.controls.Text;
+	import flash.events.MouseEvent;
+
+	/**
+	 * Hyper link control
+	 * 
+	 * @author Saravanan Sellathurai
+	 * @author Roy Wetherall
+	 */
+	public class HyperLink extends Text
+	{
+		/** The rolled over state name */
+		[Inspectable]
+		private var _rolledOverStyleName:Object;
+		
+		/** Indicates whether the control is currently rolled over or not */
+		private var _rolledOver:Boolean = false;
+		
+		/** The origional style name, used to recover after roll out */
+		private var _origionalStyleName:Object;
+			
+		/**		
+		 * Constructor
+		 */
+		public function HyperLink()
+		{
+			// Ensure the hand cursor is shown on roll over
+			this.useHandCursor = true;
+			this.buttonMode = true;
+			this.mouseChildren = false;
+			
+			// Call the super class
+			super();
+			
+			// Register interest in the event handlers
+			addEventListener(MouseEvent.ROLL_OVER, onRollOver);
+			addEventListener(MouseEvent.ROLL_OUT, onRollOut);
+		}
 		
 		/**
-		 * Custom HyperLink Component.
-		 * 
-		 * This provides an encapsulated way for handling HTML type URLS
-		 * 
-		 * @author Saravanan Sellathurai
+		 * On roll over event handler
 		 */
+		private function onRollOver(event:MouseEvent):void
+		{
+			if (this._rolledOver == false)
+			{
+				this._origionalStyleName = this.styleName;	
+				this.styleName = this._rolledOverStyleName;
+				this._rolledOver = true;
+			}		
+		}
 		
-		 public class HyperLink extends Text
-		 {
-			  private var _colorNormal:String;   //Link text color.
-			  private var _colorHover:String;    //Link hover text color.
-			  
-			  [Inspectable]
-			  private var _linkText:String;      //Displayed Hyperlink text
-			
-			  /**
-			   * Constructor
-			   */    
-			  public function HyperLink()
-			  {
-				   this.addEventListener("mouseOver",hover);
-				   this.addEventListener("mouseOut",hover);
-				   this.addEventListener("creationComplete",onCreationComplete);
-				   super();
-			  }//Constructor
-			  
-			  
-			  /**
-			   * Run by creation complete.  This is here to initialize this control
-			   */   
-			  private function onCreationComplete(oEvent:Event):void
-			  {
-				   
-				   if (_linkText && _linkText.length > 0)  
-				   {  	
-				   		//only do this if we have link text
-				    	setHtmlTextHoverOut();
-				   }
-				   else  
-				   {
-				     htmlText = "Property 'linkText' is REQUIRED";
-				   }
-			  }
-			  			  
-			  /**
-			   * Concatenates the htmlText value and assigns it to the property
-			   */
-			  private function setHtmlTextHoverOut():void
-			  {
-				   var sHTML:String = '<font color="' + _colorNormal + '">';
-				   sHTML += '<a href="event:myEvent" >';  
-				   sHTML += _linkText;
-				   sHTML += '</a>';
-				   sHTML += '</font>';
-				   this.htmlText = sHTML;
-				   this.percentWidth = 100;
-				   // option to set up tool tip this.toolTip = "Click to show " + linkText;
-			  }
-			  
-			 /**
-			   * Concatenates the htmlText value and assigns it to the property
-			   */
-			  private function setHtmlTextHover():void
-			  {
-				   var sHTML:String = '<font color="' + _colorNormal + '">';
-				   sHTML += '<a href="event:myEvent" ><u>';  
-				   sHTML += _linkText;
-				   sHTML += '</u></a>';
-				   sHTML += '</font>';
-				   this.htmlText = sHTML;
-				   this.percentWidth = 100;
-				   
-				   // option to set up tool tip this.toolTip = "Click to show " + linkText;
-			  }
-			  
-			  
-			  /** called by the mouseOver and mouseOut events of the control.
-			   *  Toggles the color of the linkText
-			   */
-			  private function hover(oEvent:Event):void
-			  {
-				   if (oEvent.type == 'mouseOver')  
-				   {
-				   	 	 this.setHtmlTextHover();
-				   	 	 this.htmlText = String(this.htmlText).replace(_colorNormal,_colorHover);
-				   }
-				   else  
-				   {
-				    	this.setHtmlTextHoverOut();
-				    	this.htmlText = String(this.htmlText).replace(_colorHover,_colorNormal);
-				   }
-			  }
-			  
-			
-			/**
-			* @setter methods for mousehover and normal colors
-			*/			  
-	   		
-	   		public function set colorNormal(normalColor:String):void
-	   		{
-	   			this._colorNormal = normalColor;
-	   		}
-	   		
-	   		public function set colorHover(hoverColor:String):void
-	   		{
-	   			this._colorHover = hoverColor;
-	   		}
-	   		
-	   		public function set linkText(linkText:String):void
-	   		{
-	   			this._linkText = linkText;
-	   		}
-	   		
-	   		public function get linkText():String
-	   		{
-	   			return this._linkText;
-	   		}
-	   		
-		} 
+		/**
+		 * On roll out event handler
+		 */
+		private function onRollOut(event:MouseEvent):void
+		{
+			if (this._rolledOver == true)
+			{
+				this.styleName = this._origionalStyleName;
+				this._rolledOver = false;
+			}	
+		}
+		
+		/**
+		 * Getter for the rolled over style name
+		 */
+		public function get rolledOverStyleName():Object
+		{
+			return this._rolledOverStyleName;
+		}
+		
+		/** 
+		 * Setter for the rolled over style name
+		 */		
+		public function set rolledOverStyleName(value:Object):void
+		{
+			this._rolledOverStyleName = value;
+		}
+	}
 }

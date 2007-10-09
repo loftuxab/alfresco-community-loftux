@@ -32,12 +32,24 @@ package app.home
 	import mx.core.Container;
 	import mx.events.StateChangeEvent;
 	import mx.effects.effectClasses.FadeInstance;
+	import panel_shadow;
+	import mx.controls.Spacer;
+	import mx.containers.HBox;
+	import mx.controls.Image;
+	import mx.validators.EmailValidator;
 
+	/**
+	 * Home panel container class
+	 * 
+	 * @author Roy Wetherall
+	 */
 	public class HomePanelContainer extends Canvas
 	{
+		/** State names */
 		public static const STATE_START:String = "startState";
 		public static const STATE_COLLAPSED:String = "collapsedState";
 		
+		/** Transition speed */
 		private static const TRANSITION_SPEED:Number = 495;
 		
 		/** UI controls */
@@ -45,19 +57,25 @@ package app.home
 		private var _topCanvas:HomePanelTop;
 		private var _mainCanvas:Canvas;
 		private var _bottomCanvas:HomePanelBottom;
+		private var _panelShadow:HomePanelShadow;
 		
 		/** Transitions */
 		private var _collapseResize:Resize;
 		private var _showResize:Sequence;
 		
+		/** Indicates whether a transformation is running */
 		private var _transformationRunning:Boolean = false;
 		
+		/** The default show pause */
 		private var _showPause:Number = 1;	
 		
+		/** Indicates wherher the panel has focus or not */
 		private var _hasFocus:Boolean = true;	
 		
+		/** The inner height of the panel */
 		private var _innerHeight:Number = 100;
 		
+		/** Indicates whether the panel is showing or not */
 		private var _showing:Boolean = false;
 		
 		/**
@@ -68,11 +86,17 @@ package app.home
 			super();		
 		}
 		
+		/**
+		 * Setter for the showPause property
+		 */
 		public function set showPause(value:Number):void
 		{
 			this._showPause = value;
 		}
 		
+		/**
+		 * Getter for the showPause property
+		 */
 		public function get showPause():Number
 		{
 			return this._showPause;	
@@ -87,16 +111,25 @@ package app.home
 			}
 		}
 		
+		/**
+		 * Getter for the hasFocus property
+		 */
 		public function get hasFocus():Boolean
 		{
 			return this._hasFocus;
 		}
 		
+		/**
+		 * Setter for the innerHeight property
+		 */
 		public function set innerHeight(value:Number):void
 		{
 			this._innerHeight = value;
 		}
 		
+		/**
+		 * Getter for the innnerHeight property
+		 */
 		public function get innerHeight():Number
 		{
 			return this._innerHeight;	
@@ -121,7 +154,7 @@ package app.home
 				// Create the top bar 
 				this._topCanvas = new HomePanelTop();
 				this._topCanvas.percentWidth = 100;
-				this._topCanvas.height = 23;	
+				this._topCanvas.height = 31;	
 				this._topCanvas.title= this.label;	
 				
 				// Create the main canvas where the content of the panel resides
@@ -136,12 +169,17 @@ package app.home
 				// Create the botton bar
 				this._bottomCanvas = new HomePanelBottom();
 				this._bottomCanvas.percentWidth = 100;
-				this._bottomCanvas.height = 23;			
+				this._bottomCanvas.height = 31;			
+				
+				// Create the panel shadow
+				this._panelShadow = new HomePanelShadow();
+				this._panelShadow.percentWidth = 100;
 				
 				// Place the controls in the VBox
 				this._vBox.addChild(this._topCanvas);
 				this._vBox.addChild(this._mainCanvas);
-				this._vBox.addChild(this._bottomCanvas);					
+				this._vBox.addChild(this._bottomCanvas);	
+				this._vBox.addChild(this._panelShadow);					
 				
 				// Call the super method
 				super.createChildren();
@@ -180,6 +218,9 @@ package app.home
 			}
 		}
 		
+		/**
+		 * Initialises the states and transitions
+		 */
 		private function initStatesAndTransitions():void
 		{
 			// Create collapsed state
@@ -187,12 +228,15 @@ package app.home
 			collapsed.name = STATE_COLLAPSED;
 			collapsed.overrides.push(new SetProperty(this._mainCanvas, "height", 0));	
 			collapsed.overrides.push(new SetProperty(this._bottomCanvas, "alpha", 0.2));
+			collapsed.overrides.push(new SetProperty(this._panelShadow, "visible", false));
+			collapsed.overrides.push(new SetProperty(this._panelShadow, "includeInLayout", false));
 			
 			// Create start state
 			var start:State = new State();
 			start.name = STATE_START;
 			start.overrides.push(new SetProperty(this._mainCanvas, "height", 0));	
-			start.overrides.push(new SetProperty(this._vBox, "alpha", 0.0));
+			start.overrides.push(new SetProperty(this._vBox, "alpha", 0.0));			
+			collapsed.overrides.push(new SetProperty(this._panelShadow, "visible", false));
 			
 			// Add the states
 			this.states.push(collapsed);
@@ -250,12 +294,18 @@ package app.home
 			this.transitions.push(fromStart);
 		}
 		
+		/**
+		 * onEffectStart event handler
+		 */
 		private function onEffectStart(event:EffectEvent):void
 		{
 			// Set the transaction running marker flag
 			this._transformationRunning = true;
 		}
 		
+		/**
+		 * onEffectEnd event handler
+		 */
 		private function onEffectEnd(event:EffectEvent):void
 		{
 			// Remove the resize effect
@@ -271,6 +321,9 @@ package app.home
 			}
 		}			
 		
+		/**
+		 * onCurrentStateChange event handler
+		 */
 		private function onCurrentStateChange(event:StateChangeEvent):void
 		{	
 			if (event.oldState == STATE_START)
@@ -279,6 +332,11 @@ package app.home
 			}
 		}
 		
+		/**
+		 * Empty implemenation of showComplete method.
+		 * 
+		 * Override this to specifiy behaviour that should be executed whent the panel is complete.
+		 */
 		protected function showComplete():void
 		{
 			// Empty implementation	
@@ -306,6 +364,9 @@ package app.home
 			}
 		}	
 		
+		/**
+		 * onLoginComplete event handler
+		 */
 		private function onLoginComplete(event:Event):void	
 		{
 			this._mainCanvas.setStyle("resizeEffect", this._showResize);
@@ -316,6 +377,9 @@ package app.home
 			}
 		}
 		
+		/**
+		 * Updates the form to reflect the current focus
+		 */
 		private function updateFocus():void
 		{
 			if (this.currentState == "" || this.currentState == STATE_COLLAPSED && this._vBox != null)

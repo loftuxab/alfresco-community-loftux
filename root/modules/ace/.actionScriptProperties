@@ -10,7 +10,9 @@
 <libraryPathEntry kind="3" linkType="1" path="${FRAMEWORKS}/libs/rpc.swc"/>
 <libraryPathEntry kind="3" linkType="1" path="${FRAMEWORKS}/libs/charts.swc" sourcepath="${FRAMEWORKS}/source"/>
 <libraryPathEntry kind="1" linkType="1" path="${FRAMEWORKS}/locale/{locale}"/>
-<libraryPathEntry kind="3" linkType="1" path="C:\work\community\root\modules\ace\lib\search_button_render.swc"/>
+<libraryPathEntry kind="3" linkType="1" path="${ACE_LIB}\search_button_render.swc"/>
+<libraryPathEntry kind="3" linkType="1" path="${ACE_LIB}\panel_shadow.swc"/>
+<libraryPathEntry kind="3" linkType="1" path="${ACE_LIB}\close.swc"/>
 </libraryPath>
 <sourceAttachmentPath>
 <sourceAttachmentPathEntry kind="3" linkType="1" path="${FRAMEWORKS}/libs/flex.swc" sourcepath="${FRAMEWORKS}/source"/>

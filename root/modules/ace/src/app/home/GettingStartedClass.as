@@ -18,6 +18,9 @@ package app.home
 	import component.textAccordian.TextAccordian;
 	import component.textAccordian.TextAccordianSelectionChangeEvent;
 	
+	/**
+	 * Getting started panel
+	 */
 	public class GettingStartedClass extends HomePanelContainer
 	{	
 		public var videoDisplay:VideoDisplay;
