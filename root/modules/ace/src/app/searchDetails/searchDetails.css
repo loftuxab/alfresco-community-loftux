@@ -1,5 +1,5 @@
 /* CSS file */
-Canvas
+/*Canvas
 {
    border-style:solid;
    border-thickness:1;
@@ -9,8 +9,22 @@ Canvas
    fill-colors: #ECEEF1, #D9DDE0;
 }
 
-LinkButton {
+LinkButton 
+{
      colorLink : #FF0000;
      colorHover : #00FF00;
      colorActive : #0000FF;
- }
+}*/
+
+.searchDetailsLink
+{
+	color:#757577;
+	font-size:14;
+}
+
+.searchDetailsRollOverLink
+{
+	color:#0E9EE5;	
+	font-size:14;
+	text-decoration:underline
+}

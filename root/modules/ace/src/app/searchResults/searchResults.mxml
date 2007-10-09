@@ -13,40 +13,47 @@
 	<mx:WipeRight id="wipeR" duration="500"/>
 	<mx:WipeLeft id="wipeL" duration="500"/>
 	
+	<mx:VBox width="100%" height="100%">
 		
-
-	<mx:ApplicationControlBar  horizontalAlign="center" verticalAlign="middle" dock="false"  height="30" width="100%"  backgroundColor="#cccccc">
-		
-	</mx:ApplicationControlBar> 
-	
-		
-	<mx:HDividedBox width="100%" height="100%" y="35">
-
-			<mx:Canvas borderStyle="none" width="100%"     height="100%"  id="resultsDispPanel" showEffect="{wipeL}" hideEffect="{wipeR}" horizontalScrollPolicy="off">
-					<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="none" showEffect="{wipeL}" hideEffect="{wipeR}"
-							     horizontalScrollPolicy="off">
-							<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
-									<searchDetails:searchDetails horizontalScrollPolicy="off"  
-										doctitle = "{results.currentItem.title}"
-										summary  = "{results.currentItem.summary}"
-									    click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>	
-						
-							</mx:Repeater>
-					</mx:Panel>
-			</mx:Canvas>
+		<!-- The details bar -->
+		<mx:Canvas width="100%" height="25" styleName="searchResultsDetailsBar">		
+			<mx:HBox width="100%" height="100%" verticalAlign="middle">
 				
-			<mx:Canvas    width="0%"   height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}"  showEffect="{wipeL}" horizontalScrollPolicy="off">
-				<mx:Panel  hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="false"  headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
-					<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
-						<mx:HBox  width="100%">
-							<mx:LinkButton id="closeBtn"  label="Close" color="#FFFFFF" click="CloseBtnClick();"/>
-						</mx:HBox>
-					</mx:ApplicationControlBar>
-					
-					<mx:SWFLoader  id="myframe"    source="{geturl()}" maintainAspectRatio="true" width="100%"/>	
-				</mx:Panel>
-			</mx:Canvas>
+				<mx:Spacer width="15"/>
+				<mx:Label id="labelResultsFound" styleName="searchResultsLabel"/>
+				
+			</mx:HBox>				
+		</mx:Canvas>
 		
-	</mx:HDividedBox>
+		<mx:HDividedBox width="100%" height="100%" dividerAlpha="0.0">
+	
+				<mx:Canvas borderStyle="none" width="100%"     height="100%"  id="resultsDispPanel" showEffect="{wipeL}" hideEffect="{wipeR}" horizontalScrollPolicy="off">
+						<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="none" showEffect="{wipeL}" hideEffect="{wipeR}"
+								     horizontalScrollPolicy="off">
+								<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
+										<searchDetails:searchDetails horizontalScrollPolicy="off"  
+											doctitle = "{results.currentItem.title}"
+											summary  = "{results.currentItem.summary}"
+										    click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>	
+							
+								</mx:Repeater>
+						</mx:Panel>
+				</mx:Canvas>
+					
+				<mx:Canvas    width="0%"   height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}"  showEffect="{wipeL}" horizontalScrollPolicy="off">
+					<mx:Panel  hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="false"  headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
+						<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
+							<mx:HBox  width="100%">
+								<mx:LinkButton id="closeBtn"  label="Close" color="#FFFFFF" click="CloseBtnClick();"/>
+							</mx:HBox>
+						</mx:ApplicationControlBar>
+						
+						<mx:SWFLoader id="myframe" source="{geturl()}" maintainAspectRatio="true" width="100%"/>	
+					</mx:Panel>
+				</mx:Canvas>
+			
+		</mx:HDividedBox>
+	
+	</mx:VBox>		
 	
 </results:searchResultsClass>

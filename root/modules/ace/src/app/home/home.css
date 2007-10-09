@@ -9,12 +9,19 @@
    bottomCornerRadius: 0;
    
    border-skin: ClassReference("component.util.GlossGradientBorder");
-   fill-colors: #6B7680, #384654, #1B2C3C ,#1B2C3C;
+   fill-colors: #6B7680, #384654, #1a2c3c, #1a2c3c;
 }
 
 .homePanelTitle
 {
-	color: #FFFFFF;
+	color: #DFE1E3;
+	font-size: 14;
+}
+
+.homeMain
+{
+	background-alpha: 0.6;
+	background-color: #deeaeb;
 }
 
 .homePanelBottom
@@ -26,7 +33,7 @@
    bottomCornerRadius: 20;
    
    border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #1B2C3C, #1B2C3C;
+   fill-colors: #1a2c3c, #1a2c3c;
 }	
 
 .homeSeparator
@@ -37,4 +44,15 @@
 .homeVideo
 {
 	background-alpha:0.0;
+}
+
+.homePanelShadow
+{
+   /*
+   border-style:solid;
+   border-thickness:0;
+   
+   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   fill-colors: #c4c4c4, #ffffff;
+   */
 }

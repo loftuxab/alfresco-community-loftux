@@ -11,12 +11,15 @@
 		
 		<mx:HBox width="100%" horizontalGap="10">
 			<mx:Image source="@Embed(source='../../images/ftl.png')"/>
-			<hLink:HyperLink id="summaryBtn"  colorNormal="#757577"  colorHover="#0E9EE5" fontSize="16" paddingRight="10"/>
+			<mx:VBox width="100%">
+			
+				<hLink:HyperLink id="summaryBtn" paddingRight="10" styleName="searchDetailsLink" rolledOverStyleName="searchDetailsRollOverLink"/>
+				<mx:Spacer width="100%" height="5"/>					
+				<mx:Text id="content" width="100%" text="We simply use the Alert control and call its show method with the appropriate parameters to create a pop-up dialog box with the right buttons. We listen to the Alert control’s close event and take care of the response from the user, whether it’s a yes or a no. We can also modify the Alert control’s appearance through setStyle."/> 
+		
+		   </mx:VBox>
 		</mx:HBox>
 				
-		<mx:Spacer width="100%" height="5"/>			
-		
-		<mx:Text id="content" width="100%" fontSize="13" text="We simply use the Alert control and call its show method with the appropriate parameters to create a pop-up dialog box with the right buttons. We listen to the Alert control’s close event and take care of the response from the user, whether it’s a yes or a no. We can also modify the Alert control’s appearance through setStyle."/> 
 		<mx:Spacer width="100%" height="15"/>
 		<line:DrawLine right="10"/>
 		<mx:Spacer width="100%" height="10"/>

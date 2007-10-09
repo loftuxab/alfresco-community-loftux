@@ -25,7 +25,7 @@
 		<mx:VBox horizontalAlign="left" verticalAlign="top" height="100%">
 			
 			<mx:Spacer height="5"/>
-      		<link:HyperLink id="logoutLinkButton" linkText="Logout" click="confirm()"/>
+      		<link:HyperLink id="logoutLinkButton" text="Logout" click="confirm()" styleName="logoutLink" rolledOverStyleName="logoutLinkRollOver"/>
   	  		<mx:Image source="@Embed(source='../../images/enterprise_label.png')" />
   	  		
   	  	</mx:VBox>

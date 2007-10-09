@@ -37,6 +37,7 @@ package app.searchResults
 	import mx.collections.ArrayCollection;
 	import mx.controls.Text;
 	import util.authentication.AuthenticationService;
+	import mx.controls.Label;
 	
 	/**
 	 * SearchResults Class
@@ -44,20 +45,19 @@ package app.searchResults
 	 * This provides an encapsulation for the SearchResults
 	 * 
 	 * @author Saravanan Sellathurai
-	 */
-	 
+	 */	 
 	public class searchResultsClass extends Canvas
 	{
 	    [Bindable]
 		public var results:Repeater;
-		[Bindable]
-		public var sortbyValues:Array = [ {label:"Relevance", data:1}, {label:"Size", data:2}, {label:"Alphabetical", data:3} ];
-		public var swipe:Swipe;	
+		
 		public var myframe:SWFLoader;
 		public var swfPanel:Canvas;
 		public var resultsDispPanel:Canvas;
-		private var _url:String;
 		public var content:Text;
+		public var labelResultsFound:Label;
+		
+		private var _url:String;
 		
 		/** Result Click event for the Repeater */
 		public function resultClick(str_url:String):void
@@ -67,7 +67,7 @@ package app.searchResults
            	swfPanel.percentWidth = 70;
           	myframe.visible = true;
            	myframe.source = str_url;        
-            this._url = str_url + "?alf_ticket=" + AuthenticationService.instance.ticket;  
+            this._url = str_url + "?ticket=" + AuthenticationService.instance.ticket;  
            
          }	
         

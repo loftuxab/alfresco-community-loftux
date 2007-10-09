@@ -10,7 +10,7 @@ package component.tabControl
 	public class TabControlSelectionChangeEvent extends Event
 	{
 		/** Selection change event name */
-		public static const SELECTION_CHANGE = "tabControlSelectionChange";
+		public static const SELECTION_CHANGE:String = "tabControlSelectionChange";
 		
 		/** Selected tab control item */
 		private var _selectedItem:TabControlItem;

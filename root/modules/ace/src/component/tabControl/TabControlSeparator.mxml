@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mx:Canvas 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
-	width="5" height="23"
+	width="11" height="28"
 	styleName="mainArea">
 	
 	<mx:Style source="tabControl.css"/>

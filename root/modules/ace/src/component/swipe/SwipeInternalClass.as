@@ -18,7 +18,7 @@ package component.swipe
 	public class SwipeInternalClass extends Canvas
 	{
 		/** Control states */
-		private static const STATE_SECONDARY = "secondaryState";
+		private static const STATE_SECONDARY:String = "secondaryState";
 		
 		/** Display object to be contained inside the swiped canvas' */
 		private var _childOne:DisplayObject;		

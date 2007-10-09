@@ -56,10 +56,10 @@
 			
 		<mx:VBox width="100%" height="100%">
 					
-			<mx:HBox width="100%" height="55">
+			<mx:HBox width="100%" height="66">
 					
 				<!-- Show search form -->	
-				<search:search width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off" minWidth="650" maxHeight="55"/>		
+				<search:search width="100%" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off" minWidth="650" maxHeight="66"/>		
 				
 				<!-- Show logout form -->	
 				<logout:logout width="160" height="100%" verticalScrollPolicy="off" horizontalScrollPolicy="off"/>

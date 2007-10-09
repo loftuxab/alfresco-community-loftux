@@ -3,10 +3,10 @@
 .swipeButton
 {
     border-style: solid;
-    border-thickness: 1;
-    border-color: #DDDDDD;
+    border-thickness: 2;
+    border-color: #e1e1e1;
     border-skin: ClassReference("component.util.SimpleGradientBorder");
-    fill-colors: #D6D6D6, #B3B3B3; 
+    fill-colors: #d7d7d7, #b0b0b0; 
 }
 
 .swipeLabel
@@ -17,6 +17,6 @@
 .swipeCanvas
 {
 	border-style: solid;
-	border-thickness: 1;
+	border-thickness: 0;
 	border-color: #FFFFFF;
 }

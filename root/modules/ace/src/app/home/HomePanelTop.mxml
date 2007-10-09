@@ -2,7 +2,8 @@
 <home:HomePanelTopClass 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:home="app.home.*"
-	height="25" 
+	xmlns:local="*"
+	height="31" 
 	styleName="homePanelTop">
 
 	<mx:Style source="home.css"/>
@@ -18,7 +19,8 @@
 			<mx:Spacer width="2"/>
 			<mx:VRule height="15" width="1" styleName="homeSeparator"/>
 			<mx:Spacer width="2"/>
-			<mx:Label id="closeButton" styleName="homePanelTitle" text="X"/>
+			<mx:Label id="closeButton" styleName="homePanelTitle" text="X"/> 
+			<!-- <local:close id="closeButton"/> -->
 								
 		</mx:HBox>
 	</mx:HBox>

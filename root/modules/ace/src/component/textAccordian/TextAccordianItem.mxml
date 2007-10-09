@@ -7,11 +7,16 @@
 	<mx:Style source="textAccordian.css"/>
 
 	<mx:HBox id="accHBox" height="100%" width="100%">
-			 
-		<mx:Label id="itemPointer" text="->"/>
+			  
+		<mx:VBox>			
+			<mx:Spacer height="3" />
+			<mx:Image id="itemPointerExpanded" source="@Embed(source='arrow_green.png')" visible="false" includeInLayout="false"/>
+			<mx:Image id="itemPointer" source="@Embed(source='./arrow_grey.png')"/>
+		</mx:VBox>
+				
 		<mx:Spacer width="5"/>
 		
-		<mx:VBox height="100%" width="100%">
+		<mx:VBox height="100%" width="100%" verticalAlign="top">
 			<mx:Label id="itemTitle" styleName="titleText"/>
 			<mx:VBox id="contentVBox" height="100%" width="100%" visible="false" includeInLayout="false">
 				<mx:Spacer height="5"/>
