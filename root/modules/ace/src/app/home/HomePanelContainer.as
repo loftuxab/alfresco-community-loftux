@@ -37,6 +37,8 @@ package app.home
 	import mx.containers.HBox;
 	import mx.controls.Image;
 	import mx.validators.EmailValidator;
+	import mx.charts.chartClasses.DualStyleObject;
+	import mx.effects.WipeDown;
 
 	/**
 	 * Home panel container class
@@ -229,7 +231,7 @@ package app.home
 			collapsed.overrides.push(new SetProperty(this._mainCanvas, "height", 0));	
 			collapsed.overrides.push(new SetProperty(this._bottomCanvas, "alpha", 0.2));
 			collapsed.overrides.push(new SetProperty(this._panelShadow, "visible", false));
-			collapsed.overrides.push(new SetProperty(this._panelShadow, "includeInLayout", false));
+			//collapsed.overrides.push(new SetProperty(this._panelShadow, "includeInLayout", false));
 			
 			// Create start state
 			var start:State = new State();
@@ -292,6 +294,16 @@ package app.home
 			this.transitions.push(toCollapse);
 			this.transitions.push(fromCollapse);	
 			this.transitions.push(fromStart);
+			
+			// Add swipe effects for shadow
+			var shadowWipeUp:WipeUp = new WipeUp(this._panelShadow);
+			shadowWipeUp.duration = TRANSITION_SPEED;
+			shadowWipeUp.suspendBackgroundProcessing = true;
+			this._panelShadow.setStyle("hideEffect", shadowWipeUp);			
+			var shadowWipeDown:WipeDown = new WipeDown(this._panelShadow);
+			shadowWipeDown.duration = TRANSITION_SPEED;
+			shadowWipeDown.suspendBackgroundProcessing = true;			
+			this._panelShadow.setStyle("showEffect", shadowWipeDown);
 		}
 		
 		/**

@@ -43,9 +43,6 @@
 	
 	<!-- Include the main CSS -->
 	<mx:Style source="main.css"/>
-	
-	<mx:WipeRight id="wipeR" duration="500"/>
-	<mx:WipeLeft id="wipeL" duration="500"/>
 				
 	<!-- The login control -->	
 	<mx:Box id="loginPanel" visible="true" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
