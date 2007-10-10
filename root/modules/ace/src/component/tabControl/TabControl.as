@@ -44,7 +44,8 @@ package component.tabControl
 			this._separators = new Array(numChildren+1);
 			var itemIndex:int = 0;
 			var sepIndex:int = 0;
-			for (var i:int = 0; i < (numChildren*2)+1; i++) 
+			var maxIndex:int = (numChildren*2)+1;
+			for (var i:int = 0; i < maxIndex; i++) 
 			{
 	    		var child:DisplayObject = getChildAt(i);	
 				if (child is TabControlItem)
@@ -56,17 +57,22 @@ package component.tabControl
 					if (i == 0)
 					{
 						// Add a separator before the first tab
-						var sep:TabControlSeparator = new TabControlSeparator();
-						this._separators[sepIndex] = sep;
+						var firstSep:TabControlSeparator = new TabControlSeparator();
+						firstSep.showDivider = false;
+						this._separators[sepIndex] = firstSep;
 						sepIndex ++;
-						this.addChildAt(sep, i);
+						this.addChildAt(firstSep, i);
 						i++;						
 					}
 					
 					// Add a separator after the item
 					var sep:TabControlSeparator = new TabControlSeparator();
+					if (sepIndex == numChildren)
+					{
+						sep.showDivider = false;
+					}
 					this._separators[sepIndex] = sep;
-					sepIndex ++;
+					sepIndex ++;					
 					this.addChildAt(sep, i+1);
 					i++;
 					
