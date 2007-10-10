@@ -43,6 +43,17 @@ package app.home
 		{
 			super.createChildren();		
 			
+			// Ensure the hand cursor is shown on roll over of the video control
+			this.videoDisplay.useHandCursor = true;
+			this.videoDisplay.buttonMode = true;
+			this.videoDisplay.mouseChildren = false;
+			this.playBox.useHandCursor = true;
+			this.playBox.buttonMode = true;
+			this.playBox.mouseChildren = false;
+			this.pauseBox.useHandCursor = true;
+			this.pauseBox.buttonMode = true;
+			this.pauseBox.mouseChildren = false;
+			
 			// Create the fade effects
 			this._beforePlayEffect = new Fade();
 			this._beforePlayEffect.target = this.videoDisplay;
