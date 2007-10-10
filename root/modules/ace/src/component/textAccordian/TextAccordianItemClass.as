@@ -54,6 +54,17 @@ package component.textAccordian
 		{
 			super.createChildren();
 			
+			// Show hand cursor over clickable controls
+			this.itemTitle.useHandCursor = true;
+			this.itemTitle.buttonMode = true;
+			this.itemTitle.mouseChildren = false;
+			this.itemPointer.useHandCursor = true;
+			this.itemPointer.buttonMode = true;
+			this.itemPointer.mouseChildren = false;
+			this.itemPointerExpanded.useHandCursor = true;
+			this.itemPointerExpanded.buttonMode = true;
+			this.itemPointerExpanded.mouseChildren = false;
+			
 			// Set-up display
 			this._created = true;
 			refreshDisplay();	
@@ -150,6 +161,7 @@ package component.textAccordian
 					itemPointer.includeInLayout = false;
 					itemPointerExpanded.visible = true;
 					itemPointerExpanded.includeInLayout = true;	
+					itemTitle.styleName = "titleText";
 				}
 				else
 				{
@@ -157,6 +169,7 @@ package component.textAccordian
 					itemPointer.includeInLayout = true;
 					itemPointerExpanded.visible = false;
 					itemPointerExpanded.includeInLayout = false;
+					itemTitle.styleName = "collapsedTitleText";
 				}
 			}
 		}

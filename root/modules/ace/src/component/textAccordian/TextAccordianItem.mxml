@@ -17,7 +17,7 @@
 		<mx:Spacer width="5"/>
 		
 		<mx:VBox height="100%" width="100%" verticalAlign="top">
-			<mx:Label id="itemTitle" styleName="titleText"/>
+			<mx:Label id="itemTitle" styleName="collapsedTitleText"/>
 			<mx:VBox id="contentVBox" height="100%" width="100%" visible="false" includeInLayout="false">
 				<mx:Spacer height="5"/>
 				<mx:Text id="itemContent" height="70" width="100%"/>				
