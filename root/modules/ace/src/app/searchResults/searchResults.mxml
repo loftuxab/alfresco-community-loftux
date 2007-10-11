@@ -13,47 +13,55 @@
 	<mx:WipeRight id="wipeR" duration="500"/>
 	<mx:WipeLeft id="wipeL" duration="500"/>
 	
-	<mx:VBox width="100%" height="100%">
+	<mx:VBox width="100%" height="100%" borderSkin="component.util.GlossGradientBorder">
 		
 		<!-- The details bar -->
-		<mx:Canvas width="100%" height="25" styleName="searchResultsDetailsBar">		
+		<mx:Canvas width="100%" height="30" styleName="searchResultsDetailsBar">		
 			<mx:HBox width="100%" height="100%" verticalAlign="middle">
-				
 				<mx:Spacer width="15"/>
-				<mx:Label id="labelResultsFound" styleName="searchResultsLabel"/>
-				
+				<mx:Label fontSize="14" text="Results Found:" id="labelResultsFound" styleName="searchResultsLabel"/>
 			</mx:HBox>				
 		</mx:Canvas>
-		
-		<mx:HDividedBox width="100%" height="100%" dividerAlpha="0.0">
 	
-				<mx:Canvas borderStyle="none" width="100%"     height="100%"  id="resultsDispPanel" showEffect="{wipeL}" hideEffect="{wipeR}" horizontalScrollPolicy="off">
-						<mx:Panel  width="100%"   height="100%" backgroundColor="#f1f7fc"  borderStyle="none" showEffect="{wipeL}" hideEffect="{wipeR}"
-								     horizontalScrollPolicy="off">
-								<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
-										<searchDetails:searchDetails horizontalScrollPolicy="off"  
-											doctitle = "{results.currentItem.title}"
-											summary  = "{results.currentItem.summary}"
-										    click="resultClick(event.currentTarget.getRepeaterItem().link.href);"/>	
-							
-								</mx:Repeater>
-						</mx:Panel>
-				</mx:Canvas>
-					
-				<mx:Canvas    width="0%"   height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}"  showEffect="{wipeL}" horizontalScrollPolicy="off">
-					<mx:Panel  hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="false"  headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
-						<mx:ApplicationControlBar  backgroundColor="#275065" width="100%">
-							<mx:HBox  width="100%">
-								<mx:LinkButton id="closeBtn"  label="Close" color="#FFFFFF" click="CloseBtnClick();"/>
-							</mx:HBox>
-						</mx:ApplicationControlBar>
-						
-						<mx:SWFLoader id="myframe" source="{geturl()}" maintainAspectRatio="true" width="100%"/>	
-					</mx:Panel>
-				</mx:Canvas>
+		<mx:HDividedBox width="100%" height="100%"   horizontalGap="1" dividerAlpha="0.0">
+				
+			<!-- Search Results Repeater elements -->
+			<mx:Canvas borderStyle="solid" width="100%" height="100%" id="resultsDispPanel" showEffect="{wipeL}" hideEffect="{wipeR}" horizontalScrollPolicy="off">
+				<mx:Panel  width="100%" height="100%" backgroundColor="#f1f7fc"  borderStyle="none" showEffect="{wipeL}" hideEffect="{wipeR}"
+						     horizontalScrollPolicy="off">
+					<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
+							<searchDetails:searchDetails horizontalScrollPolicy="off"  
+								doctitle = "{results.currentItem.title}"
+								modified = "{results.currentItem.updated}"
+								summary  = "{results.currentItem.summary}"
+								category = "{results.currentItem.category}"
+							    dataUrl  = "{results.currentItem.link.href}"
+							 />	
+					</mx:Repeater>
+				</mx:Panel>
+			</mx:Canvas>
 			
+			<!-- Search Results display space -->
+			<mx:VBox  borderSkin="component.util.SimpleGradientBorder"  borderStyle="solid" width="0%"  height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}" showEffect="{wipeL}" horizontalScrollPolicy="off">
+					<mx:Canvas cornerRadius="6" id="swfTabbar" backgroundColor="#275065" 
+							   width="100%" height="30" borderStyle="solid" horizontalScrollPolicy="off">
+						<mx:HBox width="100%">
+							<hLink:HyperLink  id="closeBtn"  click="CloseBtnClick()" text="Close" 
+											  styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
+							<mx:Spacer width="445"/>
+							<hLink:HyperLink text="Previous"  styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
+							<hLink:HyperLink text="Next" styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
+						</mx:HBox>
+					</mx:Canvas>
+					<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off" borderSkin="component.util.GlossGradientBorder">
+						<mx:Panel borderSkin="component.util.SimpleGradientBorder" borderStyle="solid" hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="true" 
+							      headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
+							<mx:SWFLoader autoLoad="true" scaleContent="true"  id="myframe"  source="{geturl()}" width="100%"/>	
+						</mx:Panel>	
+					</mx:Canvas>
+			</mx:VBox>
+		
 		</mx:HDividedBox>
-	
-	</mx:VBox>		
-	
+
+	</mx:VBox>
 </results:searchResultsClass>

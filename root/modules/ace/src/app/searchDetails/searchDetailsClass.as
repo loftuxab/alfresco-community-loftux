@@ -26,12 +26,15 @@
 package app.searchDetails
 {
 	import mx.containers.Canvas;
-	import mx.controls.Alert;
-	import mx.controls.LinkButton;
-	import mx.controls.Label;
 	import mx.controls.SWFLoader;
 	import component.hyperlink.HyperLink;
-	
+	import mx.controls.Text;
+	import flash.events.Event;
+	import mx.controls.Image;
+	import app.searchDetails.searchDetailsClickEvent;
+	import mx.events.DividerEvent;
+	import mx.events.ResizeEvent;
+
 	/**
 	 * Search Details Class
 	 * 
@@ -42,52 +45,52 @@ package app.searchDetails
 	
 	public class searchDetailsClass extends Canvas
 	{
-		public var summaryBtn:HyperLink = new HyperLink();
+		private var eventObj:Event;
 		private var _url:String;
 		private var _title:String;
-		private var _summary:String;		
-
+		private var _summary:String;	
+		private var _modified:String;	
+		private static const DEFAULT_HIDE_WIDTH:int = 450;
+		private var _hideWidth:int = DEFAULT_HIDE_WIDTH;
+		
+	    public var imgTag:Image;
 		public var myframe:SWFLoader;
 		public var swfPanel:Canvas;
 		public var resultsDispPanel:Canvas;
+		public var summaryBtn:HyperLink = new HyperLink();
+		public var content:Text;
+		public var updated:Text;
+		public var _dataUrl:String = "";		
+		
 		
 		/**
 		 * Default Constructor
 		 */		
 		public function searchDetailsClass()
 		{
-			super();
-			
+			super(); 
+			this.addEventListener(ResizeEvent.RESIZE, onResize);
 		}
 		
+			
 		/**
+		 * @setter methods
 		 * 
-		 * @set summary, doctitle & link property for the repeater
-		 * 
-		 */		
+		 */
+		 	
 		public function set summary(summary:String):void
 		{
-			if (summary != null && summary.length != 0)
-			{
-				summaryBtn.text = summary;
-			}
-			else 
-			{	
-				summaryBtn.text = this._title;
-			}
-		}
-			
-		/**
-		 * Link property setter
-		 */
-		public function set link(link:String):void
-		{
-			this._url = link;			
+				if(summary != null && summary.length != 0)
+				{
+					this._summary = summary;
+					content.text = this._summary;
+				}
+				else
+				{
+					content.visible = false;
+				}
 		}
 		
-		/**
-		 * Document title setter
-		 */
 		public function set doctitle(title:String):void
 		{
 			this._title = title;
@@ -96,5 +99,45 @@ package app.searchDetails
 				summaryBtn.text = this._title;
 			}
 		}	
+		
+		public function set category(cat:String):void
+		{
+			if (cat == "FAQ") imgTag.source = "images/faq.png";
+			else if (cat == "Article") imgTag.source = "images/article.PNG";
+			else if (cat == "White Paper") imgTag.source = "images/white_paper.png";
+		}
+		
+		public function set modified(modified:String):void
+		{
+			this._modified = modified;
+			this.updated.text = "Modified : " + modified;
+		}
+		
+		public function set dataUrl(str:String):void
+		{
+			this._dataUrl = str;
+		}
+		
+		/** Implementation for the search Details Click event*/
+		public function onSearchDetailsClick():void
+		{
+		    dispatchEvent(new searchDetailsClickEvent(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT,this._dataUrl,true,true));
+		}
+		
+				
+		/**  Implementation for resize event */
+		private function onResize(event:ResizeEvent):void
+		{
+			if (this.width < this._hideWidth)
+			{
+				content.visible = false;
+				content.includeInLayout = false;
+			}
+			else
+			{
+				content.visible = true;
+				content.includeInLayout = true;
+			}
+		}
 	}
 }

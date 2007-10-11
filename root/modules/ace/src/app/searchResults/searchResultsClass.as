@@ -25,19 +25,19 @@
  
 package app.searchResults
 {
-	import mx.containers.Panel;
 	import mx.controls.SWFLoader;
 	import mx.controls.Alert;
 	import mx.core.Repeater;
-	import util.searchservice.*;
 	import util.error.*;
 	import component.swipe.*;
 	import mx.containers.Canvas;
 	import util.searchservice.*;
-	import mx.collections.ArrayCollection;
-	import mx.controls.Text;
 	import util.authentication.AuthenticationService;
 	import mx.controls.Label;
+	import mx.containers.VBox;
+	import flash.events.Event;
+	import app.searchDetails.searchDetailsClickEvent;
+	
 	
 	/**
 	 * SearchResults Class
@@ -46,48 +46,52 @@ package app.searchResults
 	 * 
 	 * @author Saravanan Sellathurai
 	 */	 
+	
 	public class searchResultsClass extends Canvas
 	{
-	    [Bindable]
-		public var results:Repeater;
-		
+		[Bindable]
+	   	public var results:Repeater;
+		public var swfTabbar:Canvas;
 		public var myframe:SWFLoader;
-		public var swfPanel:Canvas;
+		public var swfPanel:VBox;
 		public var resultsDispPanel:Canvas;
-		public var content:Text;
 		public var labelResultsFound:Label;
-		
+		private var _resultObj:Object;
 		private var _url:String;
-		
+	 
+	    /** default Constructor */
+	    public function searchResultsClass()
+	    {
+	       super();
+	     	// Register interest in events
+			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
+       		this.addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onSearchDetailsClick);
+       		
+     	}
+      
 		/** Result Click event for the Repeater */
-		public function resultClick(str_url:String):void
+		private function onSearchDetailsClick(oEvent:searchDetailsClickEvent):void
         {
           	resultsDispPanel.percentWidth = 30;
           	swfPanel.visible = true;
+          	//swfTabbar.visible = true;
            	swfPanel.percentWidth = 70;
-          	myframe.visible = true;
-           	myframe.source = str_url;        
-            this._url = str_url + "?ticket=" + AuthenticationService.instance.ticket;  
-           
-         }	
+           	myframe.visible = true;
+			myframe.source = oEvent.data.toString();        
+            this._url = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;  
+		 }	
         
+       
         /**Close Button Click event for the swf panel */
         public function CloseBtnClick():void
         {
  			resultsDispPanel.percentWidth = 100;
           	swfPanel.percentWidth = 0;
-         	myframe.source = '';        
-         }
-        
-        /** default Constructor */
-       public function searchResultsClass()
-       {
-       	 	super();
-       	 	
-       	 	// Register interest in search service events
-			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
-       }
-      
+          	//swfTabbar.visible = false;
+          	myframe.source = ''; 
+         	this.results.dataProvider = this._resultObj;  
+        }
+       
        /** get method for url */
        public function geturl():String 
        {
@@ -110,15 +114,20 @@ package app.searchResults
 		{
 			try
 			{	
+				this._resultObj = event.result.feed.entry;
 				this.results.dataProvider = event.result.feed.entry;
+				this.labelResultsFound.text = "Search Results :  "+ event.totalresults + " Items Found ";
+				if(event.totalresults == "0") 
+				{
+					Alert.show("Result not found");
+				}
 			}
 			catch (error:Error)
 			{
 				ErrorService.instance.raiseError(ErrorService.APPLICATION_ERROR, error.message);	
 			}
 		}
-        
-        
+       
 	}
 
 }
