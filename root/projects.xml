@@ -568,7 +568,7 @@
                  serverSide="true" 
                  skeletondeploy="false" 
                  all="true">
-         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0" 
+         <mapping namespace="http://www.alfresco.org/ws/service/authentication/1.0"
                   package="org.alfresco.repo.webservice.authentication" />
          <mapping namespace="http://www.alfresco.org/ws/model/content/1.0" 
                   package="org.alfresco.repo.webservice.types" />
@@ -1479,15 +1479,104 @@
                          projectdir="${dir.module.kb}"/>
    </target>
 
+   <!-- ******************************** -->
+   <!-- ** ACE Project                ** -->
+   <!-- ******************************** -->
+
+   <target name="clean-ace"
+           description="Cleans the current ACE application build"
+           depends="init">
+
+      <!-- Remove the contents of the bin directory -->
+      <delete includeemptydirs="true">
+         <fileset dir="${dir.ace.bin}" includes="**/*"/>
+      </delete>
+
+   </target>
+
+   <target name="incremental-ace"
+           description="Incrementally builds the ACE application"
+           depends="init">
+
+      <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+
+      <!-- Declare the mxmlc task -->
+      <taskdef name="mxmlc"
+               classname="flex2.ant.MxmlcTask">
+         <classpath refid="classpath.compile"/>
+      </taskdef>
+
+      <!-- Build the ACE application -->
+      <mxmlc file="${dir.ace.src}/${app.ace.mxml}.mxml"
+             output="${dir.ace.bin}/${app.ace.swf}.swf"
+             incremental="true">
+
+         <!-- Load standard build config -->
+         <load-config filename="${FLEX_HOME}/frameworks/flex-config.xml" />
+         
+         <!-- Set the source path -->
+         <source-path path-element="${FLEX_HOME}/frameworks" />
+
+         <!-- Include required SWC's -->
+         <library-path dir="${dir.ace.lib}" append="true">
+              <include name="close.swc"/>
+              <include name="search_button_render.swc"/>
+          </library-path>
+
+         <!-- Include standard Flex SWC's and libraries -->
+         <compiler.library-path dir="${FLEX_HOME}/frameworks" append="true">
+              <include name="libs" />
+              <include name="../bundles/{locale}" />
+          </compiler.library-path>
+
+      </mxmlc>
+      
+      <!-- Copy the config into the bin directory -->
+      <copy todir="${dir.ace.bin}">
+            <fileset file="${dir.ace.src}/ace-config.xml"/>
+      </copy>
+
+      <!-- Copy the static assets into the bin directory -->
+      <copy todir="${dir.ace.bin}/assets">
+            <fileset dir="${dir.ace.src}/assets"/>
+      </copy>
+
+   </target>
+   
+   <target name="wrapper-ace"
+           description="Generates HTML wrapper for ACE application"
+           depends="init">
+
+      <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+
+      <!-- Declare the html-wrapper task -->
+      <taskdef name="html-wrapper"
+               classname="flex2.ant.HtmlWrapperTask">
+         <classpath refid="classpath.compile"/>
+      </taskdef>
+
+      <!-- Generate the html wrapper for the ACE application -->
+      <html-wrapper
+         title="${app.ace.title}"
+         width="100%"
+         height="100%"
+         output="${dir.ace.bin}"
+         swf="${app.ace.swf}"/>
+
+   </target>
+
+   <target name="build-ace"
+           description="Builds the ACE application"
+           depends="clean-ace, incremental-ace, wrapper-ace"/>
 
    <!-- ******************************** -->
    <!-- ** Web Service Client Project ** -->
    <!-- ******************************** -->
-   
+
    <target name="incremental-webserviceclient" 
            description="Performs an incremental build of the web service client project" 
            depends="package-webserviceclient" />
-      
+
    <target name="build-webserviceclient" 
            description="Performs a clean build of the web service client project" 
            depends="clean-webserviceclient, 
@@ -1848,7 +1937,7 @@
            description="Packages the devenv tools project" 
            depends="compile-devenv">
       <mkdir dir="${dir.project.devenv.dist}" />
-      <jar jarfile="${dir.project.devenv.dist}/${file.name.jar.devenv}" 
+      <jar jarfile="${dir.project.devenv.dist}/${file.name.jar.devenv}"
            basedir="${dir.project.devenv.classes}" />
       <copy todir="${dir.project.3rdparty.lib}/devenv" 
             file="${dir.project.devenv.dist}/${file.name.jar.devenv}" />
