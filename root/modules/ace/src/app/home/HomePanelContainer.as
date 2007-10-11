@@ -32,7 +32,6 @@ package app.home
 	import mx.core.Container;
 	import mx.events.StateChangeEvent;
 	import mx.effects.effectClasses.FadeInstance;
-	import panel_shadow;
 	import mx.controls.Spacer;
 	import mx.containers.HBox;
 	import mx.controls.Image;
