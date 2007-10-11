@@ -27,15 +27,18 @@ package component.hyperlink
 {
 	import mx.controls.Text;
 	import flash.events.MouseEvent;
-
+	import app.searchDetails.searchDetailsClickEvent;
+	
 	/**
 	 * Hyper link control
 	 * 
 	 * @author Saravanan Sellathurai
 	 * @author Roy Wetherall
 	 */
+
 	public class HyperLink extends Text
 	{
+		
 		/** The rolled over state name */
 		[Inspectable]
 		private var _rolledOverStyleName:Object;
@@ -62,7 +65,9 @@ package component.hyperlink
 			// Register interest in the event handlers
 			addEventListener(MouseEvent.ROLL_OVER, onRollOver);
 			addEventListener(MouseEvent.ROLL_OUT, onRollOut);
+			addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onLinkClick);
 		}
+	  	
 		
 		/**
 		 * On roll over event handler
@@ -76,7 +81,7 @@ package component.hyperlink
 				this._rolledOver = true;
 			}		
 		}
-		
+
 		/**
 		 * On roll out event handler
 		 */
@@ -87,6 +92,11 @@ package component.hyperlink
 				this.styleName = this._origionalStyleName;
 				this._rolledOver = false;
 			}	
+		}
+		
+		public function onLinkClick(oEvent:searchDetailsClickEvent):void
+		{
+		    dispatchEvent(new searchDetailsClickEvent(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT,oEvent.data.toString(),true,true));
 		}
 		
 		/**
@@ -105,4 +115,5 @@ package component.hyperlink
 			this._rolledOverStyleName = value;
 		}
 	}
+
 }

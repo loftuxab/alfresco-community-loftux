@@ -1,8 +1,8 @@
 package util.searchservice
 {
 	import flash.events.Event;
-	import mx.controls.Alert;
 	import mx.rpc.events.ResultEvent;
+	
 
 	/**
 	 * Search complete event object
@@ -11,9 +11,11 @@ package util.searchservice
 	{
 		/** Event name */
 		public static const SEARCH_COMPLETE:String = "searchComplete";
-		
+
 		/** Result object instance */
 		private var _result:Object;
+		
+		private var _totalresults:String;
 		
 		/**
 		 * Constructor
@@ -23,7 +25,7 @@ package util.searchservice
 			super(type, bubbles, cancelable);
 			
 			this._result= result;
-			
+			this._totalresults = result.feed.totalResults;
 		}
 		
 		/**
@@ -33,6 +35,17 @@ package util.searchservice
 		{
 			return this._result;
 		}
+		
+		/**
+		 * 
+		 * @Getter method for totalresults from search  
+		 * 
+		 */		
+		public function get totalresults():String
+		{
+			return this._totalresults;
+		}
+		
 		
 	}
 }
