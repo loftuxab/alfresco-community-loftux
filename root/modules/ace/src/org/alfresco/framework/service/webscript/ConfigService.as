@@ -23,13 +23,13 @@
  * http://www.alfresco.com/legal/licensing"
  */
 
-package util.webscript
+package org.alfresco.framework.service.webscript
 {
 	import flash.xml.XMLDocument;
 	import flash.xml.XMLNode;
 	import flash.net.URLLoader;
     import flash.net.URLRequest;
-    import util.error.ErrorService;
+    import org.alfresco.framework.service.error.ErrorService;
     import flash.events.Event;
     import mx.controls.Alert; 
     

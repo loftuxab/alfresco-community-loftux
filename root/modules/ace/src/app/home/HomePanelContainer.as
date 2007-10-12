@@ -6,7 +6,6 @@ package app.home
 	import mx.controls.Alert;
 	import mx.core.IChildList;
 	import mx.utils.DisplayUtil;
-	import util.error.ErrorService;
 	import component.util.SimpleGradientBorder;
 	import component.util.GlossGradientBorder;
 	import mx.core.EdgeMetrics;
@@ -21,8 +20,6 @@ package app.home
 	import mx.controls.LinkBar;
 	import mx.effects.Fade;
 	import mx.events.FlexEvent;
-	import util.authentication.LoginCompleteEvent;
-	import util.authentication.AuthenticationService;
 	import mx.effects.Pause;
 	import mx.effects.Sequence;
 	import mx.events.EffectEvent;
@@ -38,6 +35,9 @@ package app.home
 	import mx.validators.EmailValidator;
 	import mx.charts.chartClasses.DualStyleObject;
 	import mx.effects.WipeDown;
+	import org.alfresco.framework.service.error.ErrorService;
+	import org.alfresco.framework.service.authentication.AuthenticationService;
+	import org.alfresco.framework.service.authentication.LoginCompleteEvent;
 
 	/**
 	 * Home panel container class

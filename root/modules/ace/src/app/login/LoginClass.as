@@ -2,12 +2,8 @@
 package app.login
 {
 	import mx.controls.Alert;
-	import util.authentication.AuthenticationService;
-	import util.error.ErrorService;
-	import util.error.ErrorRaisedEvent;
 	import flash.events.Event;
 	import flash.utils.describeType;
-	import util.authentication.InvalidCredentialsError;
 	import mx.core.ClassFactory;
 	import mx.containers.Canvas;
 	import mx.controls.Text;
@@ -15,6 +11,10 @@ package app.login
 	import mx.states.State;
 	import mx.rpc.mxml.IMXMLSupport;
 	import mx.containers.VBox;
+	import org.alfresco.framework.service.error.ErrorRaisedEvent;
+	import org.alfresco.framework.service.error.ErrorService;
+	import org.alfresco.framework.service.authentication.AuthenticationService;
+	import org.alfresco.framework.service.authentication.InvalidCredentialsError;
 
     public class LoginClass extends VBox
 	{
