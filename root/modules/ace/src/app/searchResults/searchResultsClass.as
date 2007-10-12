@@ -56,13 +56,15 @@ package app.searchResults
 		public var swfPanel:VBox;
 		public var resultsDispPanel:Canvas;
 		public var labelResultsFound:Label;
+		
 		private var _resultObj:Object;
-		private var _url:String;
+		//private var _url:String;
 	 
 	    /** default Constructor */
 	    public function searchResultsClass()
 	    {
 	       super();
+	       
 	     	// Register interest in events
 			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
        		this.addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onSearchDetailsClick);
@@ -77,8 +79,9 @@ package app.searchResults
           	//swfTabbar.visible = true;
            	swfPanel.percentWidth = 70;
            	myframe.visible = true;
-			myframe.source = oEvent.data.toString();        
-            this._url = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;  
+			myframe.source = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;        
+            //this._url = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;  
+           // Alert.show(this._url);
 		 }	
         
        
@@ -93,16 +96,16 @@ package app.searchResults
         }
        
        /** get method for url */
-       public function geturl():String 
-       {
-       		return this._url;
-       }	
+       //public function geturl():String 
+      // {
+       //		return this._url;
+      // }	
        
        /** set method for url */
-       public function set url(str_url:String):void
-       {
-       		this._url = str_url;	
-       }
+       //public function set url(str_url:String):void
+      // {
+      // 		this._url = str_url;	
+      // }
        
       
         /**
