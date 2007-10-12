@@ -56,7 +56,7 @@
 					<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off" borderSkin="component.util.GlossGradientBorder">
 						<mx:Panel borderSkin="component.util.SimpleGradientBorder" borderStyle="solid" hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="true" 
 							      headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
-							<mx:SWFLoader autoLoad="true" scaleContent="true"  id="myframe"  source="{geturl()}" width="100%"/>	
+							<mx:SWFLoader autoLoad="true" scaleContent="true"  id="myframe"  width="100%"/>	
 						</mx:Panel>	
 					</mx:Canvas>
 			</mx:VBox>
