@@ -28,7 +28,6 @@ package app.searchResults
 	import mx.controls.SWFLoader;
 	import mx.controls.Alert;
 	import mx.core.Repeater;
-	import component.swipe.*;
 	import mx.containers.Canvas;
 	import mx.controls.Label;
 	import mx.containers.VBox;
