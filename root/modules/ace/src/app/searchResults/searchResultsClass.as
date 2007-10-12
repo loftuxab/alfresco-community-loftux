@@ -32,11 +32,14 @@ package app.searchResults
 	import component.swipe.*;
 	import mx.containers.Canvas;
 	import util.searchservice.*;
-	import util.authentication.AuthenticationService;
 	import mx.controls.Label;
 	import mx.containers.VBox;
 	import flash.events.Event;
 	import app.searchDetails.searchDetailsClickEvent;
+	import org.alfresco.framework.service.error.ErrorService;
+	import org.alfresco.framework.service.authentication.AuthenticationService;
+	import org.alfresco.ace.service.articlesearchservice.ArticleSearchCompleteEvent;
+	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
 	
 	
 	/**
@@ -66,7 +69,7 @@ package app.searchResults
 	       super();
 	       
 	     	// Register interest in events
-			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
+			ArticleSearchService.instance.addEventListener(ArticleSearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
        		this.addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onSearchDetailsClick);
        		
      	}
@@ -76,12 +79,9 @@ package app.searchResults
         {
           	resultsDispPanel.percentWidth = 30;
           	swfPanel.visible = true;
-          	//swfTabbar.visible = true;
            	swfPanel.percentWidth = 70;
            	myframe.visible = true;
 			myframe.source = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;        
-            //this._url = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;  
-           // Alert.show(this._url);
 		 }	
         
        
@@ -90,30 +90,16 @@ package app.searchResults
         {
  			resultsDispPanel.percentWidth = 100;
           	swfPanel.percentWidth = 0;
-          	//swfTabbar.visible = false;
           	myframe.source = ''; 
          	this.results.dataProvider = this._resultObj;  
-        }
-       
-       /** get method for url */
-       //public function geturl():String 
-      // {
-       //		return this._url;
-      // }	
-       
-       /** set method for url */
-       //public function set url(str_url:String):void
-      // {
-      // 		this._url = str_url;	
-      // }
-       
+        }       
       
         /**
 		 * Event handler called when search is successfully completed
 		 * 
 		 * @event	search complete event
 		 */
-		private function doSearchComplete(event:SearchCompleteEvent):void
+		private function doSearchComplete(event:ArticleSearchCompleteEvent):void
 		{
 			try
 			{	

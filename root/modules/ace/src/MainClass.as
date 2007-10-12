@@ -1,10 +1,5 @@
-// ActionScript filepackage{
-	import util.authentication.AuthenticationService;
-	import util.authentication.LoginCompleteEvent;
-	import util.authentication.LogoutCompleteEvent;	import util.searchservice.*;
+// ActionScript filepackage{	import util.searchservice.*;
 	import app.logout.logout;
-	import util.error.ErrorService;
-	import util.error.ErrorRaisedEvent;
 	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.containers.Canvas;
@@ -16,9 +11,16 @@
 	import mx.rpc.events.FaultEvent;
 	import component.swipe.Swipe;
 	import flash.events.Event;
-	import util.webscript.ConfigService;
 	import mx.containers.Box;
-	/**	 * Main class	 */	public class MainClass extends Application	{		/** UI components */		public var mainCanvas:Canvas;		public var loginPanel:Box;		public var myframe:SWFLoader;		public var cb1:CheckBox;		public var resultsDispPanel:Panel;				public var searchResults:Repeater;			public var swipe:Swipe;					/**		 * Constructor		 */		public function MainClass():void		{			// Register interest in the error service events			ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);						// Register interest in authentication service events			AuthenticationService.instance.addEventListener(LoginCompleteEvent.LOGIN_COMPLETE, doLoginComplete);			AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, doLogoutComplete);							// Register interest in search service events			SearchService.instance.addEventListener(SearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 						// Ensure the configuration service has been initialise			ConfigService.instance;		}
+	import org.alfresco.framework.service.authentication.LoginCompleteEvent;
+	import org.alfresco.framework.service.authentication.LogoutCompleteEvent;
+	import org.alfresco.framework.service.error.ErrorRaisedEvent;
+	import org.alfresco.framework.service.error.ErrorService;
+	import org.alfresco.framework.service.authentication.AuthenticationService;
+	import org.alfresco.framework.service.webscript.ConfigService;
+	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
+	import org.alfresco.ace.service.articlesearchservice.ArticleSearchCompleteEvent;
+	/**	 * Main class	 */	public class MainClass extends Application	{		/** UI components */		public var mainCanvas:Canvas;		public var loginPanel:Box;		public var myframe:SWFLoader;		public var cb1:CheckBox;		public var resultsDispPanel:Panel;				public var searchResults:Repeater;			public var swipe:Swipe;					/**		 * Constructor		 */		public function MainClass():void		{			// Register interest in the error service events			ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);						// Register interest in authentication service events			AuthenticationService.instance.addEventListener(LoginCompleteEvent.LOGIN_COMPLETE, doLoginComplete);			AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, doLogoutComplete);							// Register interest in search service events			ArticleSearchService.instance.addEventListener(ArticleSearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 						// Ensure the configuration service has been initialise			ConfigService.instance;		}
 				/**		 * Event handler called when login is successfully completed		 * 		 * @param	event	login complete event		 */
 		private function doLoginComplete(event:LoginCompleteEvent):void
 		{

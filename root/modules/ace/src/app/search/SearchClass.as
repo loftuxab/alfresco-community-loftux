@@ -2,13 +2,14 @@ package app.search
 {
 	
 	import mx.controls.Alert;
-	import util.searchservice.SearchService;
 	import app.*;
 	import mx.containers.Canvas;
+	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
+	
 	/**
+	 * Search UI backing class
 	 * 
-	 * @author saravanan
-	 * 
+	 * @author saravanan 
 	 */	
 	public class SearchClass extends Canvas
 	{
@@ -31,7 +32,7 @@ package app.search
 			else if (searchText.length == 0) Alert.show("Null string not allowed");
 			else if (searchText.search(pattern)!=-1) Alert.show("Special Characters not allowed");
 			else if (searchText.search(numPattern)!=-1) Alert.show("Numbers not allowed");
-			else SearchService.instance.search(searchText);	
+			else ArticleSearchService.instance.search(searchText);	
 		}
 	}
 }

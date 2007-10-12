@@ -1,5 +1,6 @@
-// Logout Action Script package app.logout{	import mx.controls.Alert;	import util.authentication.AuthenticationService;	import mx.containers.Canvas;
-	import mx.controls.Label;		import mx.events.FlexEvent;	import mx.effects.Fade;	import mx.controls.Alert;	import mx.events.CloseEvent;		public class LogoutClass extends Canvas	{
+// Logout Action Script package app.logout{	import mx.controls.Alert;	import mx.containers.Canvas;
+	import mx.controls.Label;		import mx.events.FlexEvent;	import mx.effects.Fade;	import mx.controls.Alert;	import mx.events.CloseEvent;
+	import org.alfresco.framework.service.authentication.AuthenticationService;		public class LogoutClass extends Canvas	{
 				/**
 		 * Event handler for logout button link.  
 		 * 
