@@ -1,4 +1,4 @@
-package component.util
+package org.alfresco.ace.control.tabControl
 {
 	import flash.display.*;
 	import flash.geom.*;
@@ -9,15 +9,18 @@ package component.util
 	import mx.utils.ColorUtil;
 	import mx.utils.GraphicsUtil;
 	
-	public class SimpleGradientBorder extends HaloBorder 
+	/**
+	 * Custom border class used in the creation of the tab control
+	 *
+	 * @author Roy Wetherall
+	 */
+	public class CurvedBorder extends HaloBorder 
 	{
 		
-		private var topCornerRadius:Number;		// top corner radius
-		private var bottomCornerRadius:Number;	// bottom corner radius
-		private var fillColors:Array;			// fill colors (two)
+		private var cornerRadius:Number;		
+		private var fillColors:Array;			
 		private var setup:Boolean;
-		
-		// ------------------------------------------------------------------------------------- //
+		private var side:String = "right";
 		
 		private function setupStyles():void
 		{
@@ -26,25 +29,18 @@ package component.util
 			
 			if (getStyle("cornerRadius") != null)
 			{
-				topCornerRadius = getStyle("cornerRadius") as Number;
+				cornerRadius = getStyle("cornerRadius") as Number;
 			}
 			else
 			{				
-				topCornerRadius = 0;	
-			}
-
-			if (getStyle("bottomCornerRadius") != null)
+				cornerRadius = 0;	
+			}	
+			
+			if (getStyle("side") != null)
 			{
-				bottomCornerRadius = getStyle("bottomCornerRadius") as Number;
-			}
-			else
-			{
-				bottomCornerRadius = topCornerRadius;		
-			}
-		
+				this.side = getStyle("side") as String;
+			}	
 		}
-		
-		// ------------------------------------------------------------------------------------- //
 		
 		override protected function updateDisplayList(unscaledWidth:Number, unscaledHeight:Number):void
 		{
@@ -60,10 +56,16 @@ package component.util
 						
 			g.beginGradientFill("linear", fillColors, [1, 1], [0, 255], m);
 			
-			var tr:Number = Math.max(topCornerRadius-2, 0);
-			var br:Number = Math.max(bottomCornerRadius-2, 0);
+			var cr:int = Math.max(cornerRadius-2, 0);
 			
-			GraphicsUtil.drawRoundRectComplex(g, b.left, b.top, w, h, tr, tr, br, br);
+			if (this.side == "right")
+			{
+				GraphicsUtil.drawRoundRectComplex(g, b.left, b.top, w, h, 0, 0, 0, cr);
+			}
+			else if (this.side == "left")
+			{
+				GraphicsUtil.drawRoundRectComplex(g, b.left, b.top, w, h, 0, 0, cr, 0);			
+			}
 			g.endFill();
 				
 		}

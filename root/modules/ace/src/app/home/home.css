@@ -8,7 +8,7 @@
    cornerRadius: 20;
    bottomCornerRadius: 0;
    
-   border-skin: ClassReference("component.util.GlossGradientBorder");
+   border-skin: ClassReference("org.alfresco.framework.control.gradient.GlossGradientBorder");
    fill-colors: #6B7680, #384654, #1a2c3c, #1a2c3c;
 }
 
@@ -32,7 +32,7 @@
    cornerRadius: 0;
    bottomCornerRadius: 20;
    
-   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   border-skin: ClassReference("org.alfresco.framework.control.gradient.SimpleGradientBorder");
    fill-colors: #1a2c3c, #1a2c3c;
 }	
 
@@ -52,7 +52,7 @@
    border-style:solid;
    border-thickness:0;
    
-   border-skin: ClassReference("component.util.SimpleGradientBorder");
+   border-skin: ClassReference("org.alfresco.framework.control.gradient.SimpleGradientBorder");
    fill-colors: #c4c4c4, #ffffff;
    */
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextAccordianItemClass 
-	xmlns="component.textAccordian.*" 
+	xmlns="org.alfresco.ace.control.textAccordian.*" 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	width="100%">
 

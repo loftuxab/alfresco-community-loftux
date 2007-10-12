@@ -27,13 +27,13 @@ package app.searchDetails
 {
 	import mx.containers.Canvas;
 	import mx.controls.SWFLoader;
-	import component.hyperlink.HyperLink;
 	import mx.controls.Text;
 	import flash.events.Event;
 	import mx.controls.Image;
 	import app.searchDetails.searchDetailsClickEvent;
 	import mx.events.DividerEvent;
 	import mx.events.ResizeEvent;
+	import org.alfresco.framework.control.hyperlink.HyperLink;
 
 	/**
 	 * Search Details Class

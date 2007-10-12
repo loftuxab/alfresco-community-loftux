@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SwipeInternalClass xmlns="component.swipe.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
+<SwipeInternalClass xmlns="org.alfresco.ace.control.swipe.*" xmlns:mx="http://www.adobe.com/2006/mxml" width="100%" height="100%">
 	
 	<mx:WipeUp id="myWU" duration="792"/>
 	<mx:WipeDown id="myWD" duration="792"/>

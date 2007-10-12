@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <NavigationClass 
 	xmlns="app.navigation.*" 
-	xmlns:avs="component.advancedViewStack.*"
-	xmlns:tab = "component.tabControl.*" 
+	xmlns:avs="org.alfresco.ace.control.advancedViewStack.*"
+	xmlns:tab = "org.alfresco.ace.control.tabControl.*" 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	borderThickness="0" xmlns:home="app.home.*"
 	verticalScrollPolicy="off" horizontalScrollPolicy="off">

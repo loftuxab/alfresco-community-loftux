@@ -1,4 +1,4 @@
-package component.swipe
+package org.alfresco.ace.control.swipe
 {
 	import mx.containers.Canvas;
 	import mx.events.FlexEvent;

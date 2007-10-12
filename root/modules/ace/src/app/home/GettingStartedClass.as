@@ -15,8 +15,8 @@ package app.home
 	import mx.events.MoveEvent;
 	import mx.events.ResizeEvent;
 	import mx.controls.Alert;
-	import component.textAccordian.TextAccordian;
-	import component.textAccordian.TextAccordianSelectionChangeEvent;
+	import org.alfresco.ace.control.textAccordian.TextAccordian;
+	import org.alfresco.ace.control.textAccordian.TextAccordianSelectionChangeEvent;
 	
 	/**
 	 * Getting started panel

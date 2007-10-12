@@ -2,8 +2,8 @@ package app.navigation
 {
 	import mx.containers.Canvas;
 	import mx.containers.ViewStack;
-	import component.tabControl.TabControl;
-	import component.tabControl.TabControlSelectionChangeEvent;
+	import org.alfresco.ace.control.tabControl.TabControl;
+	import org.alfresco.ace.control.tabControl.TabControlSelectionChangeEvent;
 
 	public class NavigationClass extends Canvas
 	{

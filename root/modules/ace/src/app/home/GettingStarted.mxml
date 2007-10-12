@@ -2,7 +2,7 @@
 <home:GettingStartedClass 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:home="app.home.*" 
-	xmlns:acc="component.textAccordian.*"
+	xmlns:acc="org.alfresco.ace.control.textAccordian.*"
 	label="Getting Started">
 
 	<mx:VBox id="mainVBox" 

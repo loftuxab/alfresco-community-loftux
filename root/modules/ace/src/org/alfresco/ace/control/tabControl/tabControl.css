@@ -12,7 +12,7 @@
    	border-thickness:1;
    	border-color:#FFFFFF;
    
-   	border-skin: ClassReference("component.util.SimpleGradientBorder");
+   	border-skin: ClassReference("org.alfresco.framework.control.gradient.SimpleGradientBorder");
    	fill-colors: #E8E8E8, #FFFFFF;
    	
    	color: #0E9EE5;
@@ -32,7 +32,7 @@
    	border-thickness:1;   	
    	border-color:#FFFFFF;
    
-   	border-skin: ClassReference("component.tabControl.CurvedBorder");
+   	border-skin: ClassReference("org.alfresco.ace.control.tabControl.CurvedBorder");
    	fill-colors: #e1e2e3, #e1e2e3;
 
 	background-color: #FFFFFF;
@@ -47,7 +47,7 @@
    	border-thickness:1;   	
    	border-color:#FFFFFF;
    
-   	border-skin: ClassReference("component.tabControl.CurvedBorder");
+   	border-skin: ClassReference("org.alfresco.ace.control.tabControl.CurvedBorder");
    	fill-colors: #e1e2e3, #e1e2e3;
 
 	background-color: #FFFFFF;

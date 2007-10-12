@@ -1,4 +1,4 @@
-package component.advancedViewStack
+package org.alfresco.ace.control.advancedViewStack
 {
 	import mx.containers.VBox;
 

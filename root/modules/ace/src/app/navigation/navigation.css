@@ -5,7 +5,7 @@
 	border-style:solid;
    	border-thickness:0;
    
-   	border-skin: ClassReference("component.util.SimpleGradientBorder");
+   	border-skin: ClassReference("org.alfresco.framework.control.gradient.SimpleGradientBorder");
    	fill-colors: #ffffff, #fafdfd;
 }
 
@@ -19,7 +19,7 @@
 	border-style:solid;
    	border-thickness:0;
    
-   	border-skin: ClassReference("component.util.SimpleGradientBorder");
+   	border-skin: ClassReference("org.alfresco.framework.control.gradient.SimpleGradientBorder");
    	fill-colors: #d0d0d0, #ffffff;
 }
 

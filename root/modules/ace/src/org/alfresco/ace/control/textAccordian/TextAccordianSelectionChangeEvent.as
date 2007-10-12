@@ -1,4 +1,4 @@
-package component.textAccordian
+package org.alfresco.ace.control.textAccordian
 {
 	import flash.events.Event;
 

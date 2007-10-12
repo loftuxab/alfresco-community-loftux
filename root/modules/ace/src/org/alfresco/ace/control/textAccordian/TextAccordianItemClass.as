@@ -1,4 +1,4 @@
-package component.textAccordian
+package org.alfresco.ace.control.textAccordian
 {
 	import mx.containers.Canvas;
 	import mx.controls.Label;
@@ -6,7 +6,7 @@ package component.textAccordian
 	import flash.events.MouseEvent;
 	import flash.events.Event;
 	import mx.controls.Alert;
-	import component.swipe.Swipe;
+	import org.alfresco.ace.control.swipe.Swipe;
 	import mx.effects.WipeDown;
 	import mx.effects.WipeUp;
 	import mx.effects.Move;

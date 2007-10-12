@@ -1,4 +1,4 @@
-// ActionScript filepackage{	import util.searchservice.*;
+// ActionScript filepackage{
 	import app.logout.logout;
 	import mx.controls.Alert;
 	import mx.core.Application;
@@ -9,7 +9,7 @@
 	import mx.controls.SWFLoader;
 	import mx.controls.CheckBox;
 	import mx.rpc.events.FaultEvent;
-	import component.swipe.Swipe;
+	import org.alfresco.ace.control.swipe.Swipe;
 	import flash.events.Event;
 	import mx.containers.Box;
 	import org.alfresco.framework.service.authentication.LoginCompleteEvent;

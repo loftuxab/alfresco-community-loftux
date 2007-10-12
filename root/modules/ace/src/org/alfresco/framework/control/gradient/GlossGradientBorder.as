@@ -1,4 +1,4 @@
-package component.util
+package org.alfresco.framework.control.gradient
 {
 	import flash.display.*;
 	import flash.geom.*;

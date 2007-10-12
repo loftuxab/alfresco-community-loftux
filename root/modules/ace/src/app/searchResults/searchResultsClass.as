@@ -28,10 +28,8 @@ package app.searchResults
 	import mx.controls.SWFLoader;
 	import mx.controls.Alert;
 	import mx.core.Repeater;
-	import util.error.*;
 	import component.swipe.*;
 	import mx.containers.Canvas;
-	import util.searchservice.*;
 	import mx.controls.Label;
 	import mx.containers.VBox;
 	import flash.events.Event;
