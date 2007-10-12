@@ -6,8 +6,8 @@ package app.home
 	import mx.controls.Alert;
 	import mx.core.IChildList;
 	import mx.utils.DisplayUtil;
-	import component.util.SimpleGradientBorder;
-	import component.util.GlossGradientBorder;
+	import org.alfresco.framework.control.gradient.SimpleGradientBorder;
+	import org.alfresco.framework.control.gradient.GlossGradientBorder;
 	import mx.core.EdgeMetrics;
 	import mx.states.State;
 	import mx.states.SetProperty;

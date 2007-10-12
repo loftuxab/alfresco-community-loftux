@@ -1,20 +1,4 @@
 /* CSS file */
-/*Canvas
-{
-   border-style:solid;
-   border-thickness:1;
-   border-color:#FFFFFF;
-   
-   border-skin: ClassReference("component.util.SimpleGradientBorder");
-   fill-colors: #ECEEF1, #D9DDE0;
-}
-
-LinkButton 
-{
-     colorLink : #FF0000;
-     colorHover : #00FF00;
-     colorActive : #0000FF;
-}*/
 
 .searchDetailsLink
 {

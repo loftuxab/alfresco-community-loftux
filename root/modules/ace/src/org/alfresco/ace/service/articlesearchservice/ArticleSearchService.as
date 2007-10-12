@@ -1,7 +1,6 @@
 package org.alfresco.ace.service.articlesearchservice
 {	
 	import mx.rpc.http.HTTPService;
-	import util.authentication.*;
 	import mx.controls.Alert;
 	import flash.events.EventDispatcher;
 	import mx.controls.Alert;

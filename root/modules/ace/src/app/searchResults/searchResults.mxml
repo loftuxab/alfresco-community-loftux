@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <results:searchResultsClass xmlns:mx="http://www.adobe.com/2006/mxml" 
 							xmlns:results="app.searchResults.*"
-							xmlns:hLink="component.hyperlink.*"
+							xmlns:hLink="org.alfresco.framework.control.hyperlink.*"
 							xmlns:searchDetails="app.searchDetails.*"
 							width="100%"   height="100%"   horizontalScrollPolicy="off" 
 							verticalScrollPolicy="off" xmlns:searchResults="app.searchResults.*">
@@ -13,7 +13,7 @@
 	<mx:WipeRight id="wipeR" duration="500"/>
 	<mx:WipeLeft id="wipeL" duration="500"/>
 	
-	<mx:VBox width="100%" height="100%" borderSkin="component.util.GlossGradientBorder">
+	<mx:VBox width="100%" height="100%" borderSkin="org.alfresco.framework.control.gradient.GlossGradientBorder">
 		
 		<!-- The details bar -->
 		<mx:Canvas width="100%" height="30" styleName="searchResultsDetailsBar">		
@@ -42,7 +42,7 @@
 			</mx:Canvas>
 			
 			<!-- Search Results display space -->
-			<mx:VBox  borderSkin="component.util.SimpleGradientBorder"  borderStyle="solid" width="0%"  height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}" showEffect="{wipeL}" horizontalScrollPolicy="off">
+			<mx:VBox  borderSkin="org.alfresco.framework.control.gradient.SimpleGradientBorder"  borderStyle="solid" width="0%"  height="100%" id="swfPanel" visible="false" hideEffect="{wipeR}" showEffect="{wipeL}" horizontalScrollPolicy="off">
 					<mx:Canvas cornerRadius="6" id="swfTabbar" backgroundColor="#275065" 
 							   width="100%" height="30" borderStyle="solid" horizontalScrollPolicy="off">
 						<mx:HBox width="100%">
@@ -53,8 +53,8 @@
 							<hLink:HyperLink text="Next" styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
 						</mx:HBox>
 					</mx:Canvas>
-					<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off" borderSkin="component.util.GlossGradientBorder">
-						<mx:Panel borderSkin="component.util.SimpleGradientBorder" borderStyle="solid" hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="true" 
+					<mx:Canvas width="100%" height="100%" horizontalScrollPolicy="off" borderSkin="org.alfresco.framework.control.gradient.GlossGradientBorder">
+						<mx:Panel borderSkin="org.alfresco.framework.control.gradient.SimpleGradientBorder" borderStyle="solid" hideEffect="{wipeR}"  showEffect="{wipeL}" dropShadowEnabled="true" 
 							      headerHeight="1"  width="100%"  height="100%" backgroundColor="#f5f8e5"  horizontalScrollPolicy="off">
 							<mx:SWFLoader autoLoad="true" scaleContent="true"  id="myframe"  width="100%"/>	
 						</mx:Panel>	

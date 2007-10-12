@@ -1,4 +1,4 @@
-package component.tabControl
+package org.alfresco.ace.control.tabControl
 {
 	import flash.events.Event;
 

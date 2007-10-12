@@ -3,7 +3,7 @@
 <logout:LogoutClass 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
 	xmlns:logout="app.logout.*" 
-	xmlns:link="component.hyperlink.*" 
+	xmlns:link="org.alfresco.framework.control.hyperlink.*" 
 	width="17%" height="100%"	
 	styleName="logout">	
 	

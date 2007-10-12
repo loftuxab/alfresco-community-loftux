@@ -23,7 +23,7 @@
  * http://www.alfresco.com/legal/licensing"
  */
  
-package component.hyperlink
+package org.alfresco.framework.control.hyperlink
 {
 	import mx.controls.Text;
 	import flash.events.MouseEvent;

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<searchDetails:searchDetailsClass xmlns:line="component.dashedline.*" 
+<searchDetails:searchDetailsClass xmlns:line="org.alfresco.framework.control.dashedline.*" 
 							      xmlns:searchDetails="app.searchDetails.*" 
-							      xmlns:hLink="component.hyperlink.*"
+							      xmlns:hLink="org.alfresco.framework.control.hyperlink.*"
 							      xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
 	
 	<!-- Import css style sheet -->

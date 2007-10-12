@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search:SearchClass xmlns:mx="http://www.adobe.com/2006/mxml" 
 		   			xmlns:search="app.search.*"
-		   			xmlns:link="component.hyperlink.*" 
+		   			xmlns:link="org.alfresco.framework.control.hyperlink.*" 
 		   			xmlns:local="*" 
 					styleName="search">	
 

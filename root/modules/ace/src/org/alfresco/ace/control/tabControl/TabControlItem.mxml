@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TabControlItemClass 
-	xmlns="component.tabControl.*" 
+	xmlns="org.alfresco.ace.control.tabControl.*" 
 	xmlns:mx="http://www.adobe.com/2006/mxml"
 	height="28"
 	borderStyle="none"

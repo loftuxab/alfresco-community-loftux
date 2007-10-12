@@ -33,7 +33,7 @@
 				xmlns:app="*" 
 				xmlns:logout="app.logout.*" 
 				xmlns:login="app.login.*" 
-				xmlns:swipe="component.swipe.*" 
+				xmlns:swipe="org.alfresco.ace.control.swipe.*" 
 				xmlns:fc="com.flexcapacitor.controls.*"
 				xmlns:filters="flash.filters.*" 
 				xmlns:search="app.search.*"
