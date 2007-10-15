@@ -2,7 +2,7 @@
 
 <logout:LogoutClass 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
-	xmlns:logout="app.logout.*" 
+	xmlns:logout="org.alfresco.ace.application.logout.*" 
 	xmlns:link="org.alfresco.framework.control.hyperlink.*" 
 	width="17%" height="100%"	
 	styleName="logout">	
@@ -16,7 +16,7 @@
 		<!-- Show image -->
 		<mx:VBox height="100%">
 			<mx:Spacer height="10"/>
-			<mx:Image source="@Embed(source='../../images/user_icon.png')"/>	
+			<mx:Image source="@Embed(source='/images/user_icon.png')"/>	
 		</mx:VBox>   
    		
    		<mx:Spacer width="5"/>
@@ -26,7 +26,7 @@
 			
 			<mx:Spacer height="5"/>
       		<link:HyperLink id="logoutLinkButton" text="Logout" click="confirm()" styleName="logoutLink" rolledOverStyleName="logoutLinkRollOver"/>
-  	  		<mx:Image source="@Embed(source='../../images/enterprise_label.png')" />
+  	  		<mx:Image source="@Embed(source='/images/enterprise_label.png')" />
   	  		
   	  	</mx:VBox>
   

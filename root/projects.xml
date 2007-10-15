@@ -1519,8 +1519,9 @@
 
          <!-- Include required SWC's -->
          <library-path dir="${dir.ace.lib}" append="true">
-              <include name="close.swc"/>
-              <include name="search_button_render.swc"/>
+              <!--<include name="close.swc"/>
+              <include name="search_button_render.swc"/>-->
+              <include name="*.swc"/>
           </library-path>
 
          <!-- Include standard Flex SWC's and libraries -->

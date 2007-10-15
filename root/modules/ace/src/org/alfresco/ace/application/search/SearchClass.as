@@ -1,8 +1,6 @@
-package app.search
+package org.alfresco.ace.application.search
 {
-	
 	import mx.controls.Alert;
-	import app.*;
 	import mx.containers.Canvas;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
 	

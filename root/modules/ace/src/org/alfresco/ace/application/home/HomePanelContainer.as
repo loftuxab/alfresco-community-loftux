@@ -1,4 +1,4 @@
-package app.home
+package org.alfresco.ace.application.home
 {
 	import mx.containers.Canvas;
 	import mx.containers.VBox;
