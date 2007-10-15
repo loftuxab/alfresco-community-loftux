@@ -181,11 +181,17 @@ function AC_FL_RunContent(){
      , "application/x-shockwave-flash"
     );
   AC_Generateobj(ret.objAttrs, ret.params, ret.embedAttrs);
+
+  document.body.onload=new function()
+  {
+  	document.main.focus();
+  }
 }
 
 function AC_GetArgs(args, ext, srcParamName, classid, mimeType){
   var ret = new Object();
   ret.embedAttrs = new Object();
+  ret.embedAttrs["wmode"] = "opaque";
   ret.params = new Object();
   ret.objAttrs = new Object();
   for (var i=0; i < args.length; i=i+2){

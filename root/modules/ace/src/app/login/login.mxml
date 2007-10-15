@@ -22,10 +22,10 @@
 		<mx:Image source="@Embed(source='../../images/ace_white.png')"/>		    		    
 		<mx:Form width="100%">				
 			<mx:FormItem label="User:" styleName="userlabel" width="100%">
-				<mx:TextInput id="username" styleName="userinput" width="100%"/>
+				<mx:TextInput id="username" styleName="userinput" width="100%" enter="onLoginButtonLinkClick()"/>
 			</mx:FormItem>						
 			<mx:FormItem label="Password:" styleName="passlabel" width="100%">
-				<mx:TextInput id="password" displayAsPassword="true" styleName="passinput" width="100%"/>
+				<mx:TextInput id="password" displayAsPassword="true" styleName="passinput" width="100%" enter="onLoginButtonLinkClick()"/>
 			</mx:FormItem>
 			<mx:FormItem width="100%">
 				<mx:HBox width="100%">

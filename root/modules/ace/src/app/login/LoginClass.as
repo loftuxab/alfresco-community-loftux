@@ -34,6 +34,17 @@ package app.login
 			// Register interest with the error service
 			ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);	
 		}
+		
+		/**
+		 * Set focus to the first text box when it's ready
+		 */
+		protected override function initializationComplete():void
+		{
+			super.initializationComplete();
+			
+			// Focus the user input box
+			focusManager.setFocus(username);
+		}
 	
 		/**
 		 * Event handler for login button link.  
