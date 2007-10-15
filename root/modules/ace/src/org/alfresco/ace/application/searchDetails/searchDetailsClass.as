@@ -23,14 +23,14 @@
  * http://www.alfresco.com/legal/licensing"
  */
  
-package app.searchDetails
+package org.alfresco.ace.application.searchDetails
 {
 	import mx.containers.Canvas;
 	import mx.controls.SWFLoader;
 	import mx.controls.Text;
 	import flash.events.Event;
 	import mx.controls.Image;
-	import app.searchDetails.searchDetailsClickEvent;
+	import org.alfresco.ace.application.searchDetails.searchDetailsClickEvent;
 	import mx.events.DividerEvent;
 	import mx.events.ResizeEvent;
 	import org.alfresco.framework.control.hyperlink.HyperLink;

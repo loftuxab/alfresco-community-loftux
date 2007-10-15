@@ -23,7 +23,7 @@
  * http://www.alfresco.com/legal/licensing"
  */
  
-package app.searchResults
+package org.alfresco.ace.application.searchResults
 {
 	import mx.controls.SWFLoader;
 	import mx.controls.Alert;
@@ -32,7 +32,7 @@ package app.searchResults
 	import mx.controls.Label;
 	import mx.containers.VBox;
 	import flash.events.Event;
-	import app.searchDetails.searchDetailsClickEvent;
+	import org.alfresco.ace.application.searchDetails.searchDetailsClickEvent;
 	import org.alfresco.framework.service.error.ErrorService;
 	import org.alfresco.framework.service.authentication.AuthenticationService;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchCompleteEvent;

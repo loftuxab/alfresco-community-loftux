@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <home:GettingStartedClass 
 	xmlns:mx="http://www.adobe.com/2006/mxml" 
-	xmlns:home="app.home.*" 
+	xmlns:home="org.alfresco.ace.application.home.gettingStarted.*" 
 	xmlns:acc="org.alfresco.ace.control.textAccordian.*"
 	label="Getting Started">
 
@@ -49,14 +49,22 @@
 					height="150" width="200" autoPlay="false" autoRewind="true" alpha="0.25">					
 				</mx:VideoDisplay>	 
 				
-				<mx:VBox id="playBox" verticalAlign="middle" horizontalAlign="center" includeInLayout="false" visible="false" height="150" width="200">		
-					<mx:Label text=">"/>
-					<mx:Label text="Play"/>
+				<mx:VBox id="playBox" 
+						 verticalAlign="middle" horizontalAlign="center" 
+						 includeInLayout="false" visible="false" 
+						 height="150" width="200"
+						 horizontalScrollPolicy="off"
+						 verticalScrollPolicy="off">		
+					<mx:Image source="@Embed(source='play_control.png')"/>	
 				</mx:VBox>
 				
-				<mx:VBox id="pauseBox" verticalAlign="middle" horizontalAlign="center" includeInLayout="false" visible="false" height="150" width="200">		
-					<mx:Label text="||"/>
-					<mx:Label text="Paused"/>
+				<mx:VBox id="pauseBox" 
+					     verticalAlign="middle" horizontalAlign="center" 
+					     includeInLayout="false" visible="false" 
+					     height="150" width="200"
+						 horizontalScrollPolicy="off"
+						 verticalScrollPolicy="off">						
+					<mx:Image source="@Embed(source='pause_control.png')"/>
 				</mx:VBox>
 				
 			</mx:Box>

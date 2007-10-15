@@ -1,5 +1,5 @@
 // Login Action Script 
-package app.login
+package org.alfresco.ace.application.login
 {
 	import mx.controls.Alert;
 	import flash.events.Event;

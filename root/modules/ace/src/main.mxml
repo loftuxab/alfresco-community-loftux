@@ -31,15 +31,15 @@
 				layout="absolute" 
 				frameRate="99"
 				xmlns:app="*" 
-				xmlns:logout="app.logout.*" 
-				xmlns:login="app.login.*" 
+				xmlns:logout="org.alfresco.ace.application.logout.*" 
+				xmlns:login="org.alfresco.ace.application.login.*" 
 				xmlns:swipe="org.alfresco.ace.control.swipe.*" 
 				xmlns:fc="com.flexcapacitor.controls.*"
 				xmlns:filters="flash.filters.*" 
-				xmlns:search="app.search.*"
-				xmlns:navigation="app.navigation.*" 
+				xmlns:search="org.alfresco.ace.application.search.*"
+				xmlns:navigation="org.alfresco.ace.application.navigation.*" 
 				styleName="mainApplication" 
-				xmlns:searchResults="app.searchResults.*">
+				xmlns:searchResults="org.alfresco.ace.application.searchResults.*">
 	
 	<!-- Include the main CSS -->
 	<mx:Style source="main.css"/>

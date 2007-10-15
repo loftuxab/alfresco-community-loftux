@@ -1,4 +1,4 @@
-package app.navigation
+package org.alfresco.ace.application.navigation
 {
 	import mx.containers.Canvas;
 	import mx.containers.ViewStack;

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <searchDetails:searchDetailsClass xmlns:line="org.alfresco.framework.control.dashedline.*" 
-							      xmlns:searchDetails="app.searchDetails.*" 
+							      xmlns:searchDetails="org.alfresco.ace.application.searchDetails.*" 
 							      xmlns:hLink="org.alfresco.framework.control.hyperlink.*"
 							      xmlns:mx="http://www.adobe.com/2006/mxml" width="100%">
 	

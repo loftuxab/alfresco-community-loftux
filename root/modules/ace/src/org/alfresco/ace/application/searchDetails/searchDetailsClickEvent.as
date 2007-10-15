@@ -1,4 +1,4 @@
-package app.searchDetails
+package org.alfresco.ace.application.searchDetails
 {
 	 import flash.events.Event;
 	 /**
@@ -14,8 +14,8 @@ package app.searchDetails
 		  /** Constructor */
 		  public function searchDetailsClickEvent(type:String, data:Object, bubbles:Boolean=false, cancelable:Boolean=false)
 		  {
-		   super(type, bubbles, cancelable);
-		   this.data = data;
+		  	super(type, bubbles, cancelable);
+		   	this.data = data;
 		  }
 	
 		   /** Override the inherited clone() method. */

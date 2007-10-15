@@ -1,4 +1,4 @@
-package app.home
+package org.alfresco.ace.application.home
 {
 	import mx.containers.Canvas;
 	import mx.controls.Label;
@@ -12,8 +12,9 @@ package app.home
 		
 		/** UI controls */
 		public var labelTitle:Label;
-		public var minMaxButton:Label;
-		public var closeButton:Label;
+		public var minMaxButton:mmButton;
+		// TODO
+		//public var closeButton:Label;
 		
 		/** Panel title string */
 		private var _title:String;
@@ -46,7 +47,8 @@ package app.home
 						
 			// Register event handlers
 			this.minMaxButton.addEventListener(MouseEvent.CLICK, onMinMaxClick);
-			this.closeButton.addEventListener(MouseEvent.CLICK, onCloseClick);
+			// TODO
+			//this.closeButton.addEventListener(MouseEvent.CLICK, onCloseClick);
 		}
 	
 		/**
@@ -57,12 +59,13 @@ package app.home
 			this.dispatchEvent(new Event(MINMAX_CLICK_EVENT));		
 		}
 		
+		// TODO
 		/**
 		 * On close button click event handler
 		 */
-		private function onCloseClick(event:Event):void
-		{
-			this.dispatchEvent(new Event(CLOSE_CLICK_EVENT));	
-		}		
+		//private function onCloseClick(event:Event):void
+		//{
+		//	this.dispatchEvent(new Event(CLOSE_CLICK_EVENT));	
+		//}		
 	}
 }

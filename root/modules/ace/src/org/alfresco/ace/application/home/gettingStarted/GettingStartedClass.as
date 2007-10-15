@@ -1,4 +1,4 @@
-package app.home
+package org.alfresco.ace.application.home.gettingStarted
 {
 	import mx.controls.VideoDisplay;
 	import mx.containers.Box;
@@ -17,6 +17,7 @@ package app.home
 	import mx.controls.Alert;
 	import org.alfresco.ace.control.textAccordian.TextAccordian;
 	import org.alfresco.ace.control.textAccordian.TextAccordianSelectionChangeEvent;
+	import org.alfresco.ace.application.home.HomePanelContainer;
 	
 	/**
 	 * Getting started panel

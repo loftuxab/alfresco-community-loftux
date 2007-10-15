@@ -1,10 +1,10 @@
 // ActionScript filepackage{
-	import app.logout.logout;
+	import org.alfresco.ace.application.logout.logout;
 	import mx.controls.Alert;
 	import mx.core.Application;
 	import mx.containers.Canvas;
 	import mx.containers.Panel;
-	import app.login.login;
+	import org.alfresco.ace.application.login.login;
 	import mx.core.Repeater;
 	import mx.controls.SWFLoader;
 	import mx.controls.CheckBox;

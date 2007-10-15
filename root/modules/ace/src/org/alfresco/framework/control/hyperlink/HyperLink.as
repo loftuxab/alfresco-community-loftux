@@ -27,7 +27,6 @@ package org.alfresco.framework.control.hyperlink
 {
 	import mx.controls.Text;
 	import flash.events.MouseEvent;
-	import app.searchDetails.searchDetailsClickEvent;
 	
 	/**
 	 * Hyper link control
@@ -65,7 +64,6 @@ package org.alfresco.framework.control.hyperlink
 			// Register interest in the event handlers
 			addEventListener(MouseEvent.ROLL_OVER, onRollOver);
 			addEventListener(MouseEvent.ROLL_OUT, onRollOut);
-			addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onLinkClick);
 		}
 	  	
 		
@@ -92,11 +90,6 @@ package org.alfresco.framework.control.hyperlink
 				this.styleName = this._origionalStyleName;
 				this._rolledOver = false;
 			}	
-		}
-		
-		public function onLinkClick(oEvent:searchDetailsClickEvent):void
-		{
-		    dispatchEvent(new searchDetailsClickEvent(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT,oEvent.data.toString(),true,true));
 		}
 		
 		/**

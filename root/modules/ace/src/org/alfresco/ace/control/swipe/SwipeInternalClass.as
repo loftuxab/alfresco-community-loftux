@@ -11,6 +11,7 @@ package org.alfresco.ace.control.swipe
 	import mx.controls.Label;
 	import mx.events.EffectEvent;
 	import mx.events.ResizeEvent;
+	import mx.controls.Image;
 
 	/**
 	 * Internal swipe control class
@@ -30,6 +31,8 @@ package org.alfresco.ace.control.swipe
 		
 		/** UI controls */
 		public var swipeLabel:Label;
+		public var downArrow:Image;
+		public var upArrow:Image;
 		
 		/** Indicates whether the swipe button is enabled or not */
 		private var _swipeButtonEnabled:Boolean = true;
@@ -136,11 +139,19 @@ package org.alfresco.ace.control.swipe
 			// Change the swipe label accordingly
 			if (currentState == null)
 			{
-				swipeLabel.text = this._secondaryStateLabel;									
+				swipeLabel.text = this._secondaryStateLabel;	
+				downArrow.visible = true;
+				downArrow.includeInLayout = true;
+				upArrow.visible = false;
+				upArrow.includeInLayout = false;								
 			}
 			else
 			{
-				swipeLabel.text = this._primaryStateLabel;
+				swipeLabel.text = this._primaryStateLabel;	
+				downArrow.visible = false;
+				downArrow.includeInLayout = false;
+				upArrow.visible = true;
+				upArrow.includeInLayout = true;
 			}	
 			
 			// Re-enable the button
