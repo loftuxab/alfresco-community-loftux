@@ -60,9 +60,8 @@ package org.alfresco.ace.application.searchDetails
 		public var summaryBtn:HyperLink = new HyperLink();
 		public var content:Text;
 		public var updated:Text;
-		public var _dataUrl:String = "";		
-		
-		
+		public var _dataUrl:String = "";	
+	
 		/**
 		 * Default Constructor
 		 */		
@@ -89,6 +88,7 @@ package org.alfresco.ace.application.searchDetails
 				{
 					content.visible = false;
 				}
+				
 		}
 		
 		public function set doctitle(title:String):void
@@ -124,7 +124,7 @@ package org.alfresco.ace.application.searchDetails
 		    dispatchEvent(new searchDetailsClickEvent(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT,this._dataUrl,true,true));
 		}
 		
-				
+		
 		/**  Implementation for resize event */
 		private function onResize(event:ResizeEvent):void
 		{
@@ -139,5 +139,6 @@ package org.alfresco.ace.application.searchDetails
 				content.includeInLayout = true;
 			}
 		}
+		
 	}
 }

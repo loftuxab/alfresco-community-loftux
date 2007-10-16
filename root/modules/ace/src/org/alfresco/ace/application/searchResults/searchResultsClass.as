@@ -37,6 +37,8 @@ package org.alfresco.ace.application.searchResults
 	import org.alfresco.framework.service.authentication.AuthenticationService;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchCompleteEvent;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
+	import mx.collections.ArrayCollection;
+	import org.alfresco.framework.control.hyperlink.HyperLink;
 	
 	
 	/**
@@ -56,29 +58,62 @@ package org.alfresco.ace.application.searchResults
 		public var swfPanel:VBox;
 		public var resultsDispPanel:Canvas;
 		public var labelResultsFound:Label;
+		public var moveNext:HyperLink;
+		public var movePrevious:HyperLink;
 		
 		private var _resultObj:Object;
-		//private var _url:String;
-	 
+		private var _url:String;
+		private var _myList:ArrayCollection;
+		private var _currentSelectedItem:String;
+		private var _currentSelectedItemIndex:int;
+		
+	
 	    /** default Constructor */
 	    public function searchResultsClass()
 	    {
 	       super();
-	       
 	     	// Register interest in events
 			ArticleSearchService.instance.addEventListener(ArticleSearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
        		this.addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onSearchDetailsClick);
-       		
-     	}
+      	}
+     	
       
 		/** Result Click event for the Repeater */
 		private function onSearchDetailsClick(oEvent:searchDetailsClickEvent):void
         {
+          	this._currentSelectedItem = oEvent.data.toString();
+          	for(var i:int=0; i<this._myList.length; i++)
+            {
+           		if(this._currentSelectedItem == this._myList[i].href)
+           		{
+           			this._currentSelectedItemIndex = i;
+           		}
+            }
+           
+           	if(this._currentSelectedItemIndex == this._myList.length-1)
+           	{
+           		this.moveNext.enabled = false;
+           	} 
+           	else
+           	{
+           		this.moveNext.enabled = true;
+           	}
+           	
+           	if(this._currentSelectedItemIndex == 0) 
+           	{
+           		this.movePrevious.enabled = false;	
+           	}
+           	else
+           	{
+           		this.movePrevious.enabled = true;
+           	}
           	resultsDispPanel.percentWidth = 30;
           	swfPanel.visible = true;
-           	swfPanel.percentWidth = 70;
+          	swfPanel.percentWidth = 70;
            	myframe.visible = true;
-			myframe.source = oEvent.data.toString() + "?ticket=" + AuthenticationService.instance.ticket;        
+			this._url = this._currentSelectedItem + "?ticket=" + AuthenticationService.instance.ticket;  
+            myframe.source = this._url;
+           
 		 }	
         
        
@@ -87,9 +122,24 @@ package org.alfresco.ace.application.searchResults
         {
  			resultsDispPanel.percentWidth = 100;
           	swfPanel.percentWidth = 0;
+          	swfPanel.visible = false;
           	myframe.source = ''; 
          	this.results.dataProvider = this._resultObj;  
-        }       
+         	
+        }
+       
+       /** get method for url */
+       public function geturl():String 
+       {
+       		return this._url;
+       }	
+       
+       /** set method for url */
+       public function set url(str_url:String):void
+       {
+       		this._url = str_url;	
+       }
+       
       
         /**
 		 * Event handler called when search is successfully completed
@@ -107,11 +157,60 @@ package org.alfresco.ace.application.searchResults
 				{
 					Alert.show("Result not found");
 				}
-			}
+				else
+				{				
+					swfPanel.percentWidth = 0;
+					swfPanel.visible = false;
+					resultsDispPanel.percentWidth = 100;
+					_myList = new ArrayCollection();
+					for(var i:int=0; i<event.result.feed.entry.length; i++)
+	                {
+	               		this._myList.addItem({href:event.result.feed.entry[i].link.href , rel:event.result.feed.entry[i].link.rel});
+	               	}
+	  			}
+       		}
 			catch (error:Error)
 			{
 				ErrorService.instance.raiseError(ErrorService.APPLICATION_ERROR, error.message);	
 			}
+		}
+		
+		public function onNextClick():void
+		{
+			if(this.moveNext.enabled)
+			{
+				this.myframe.source = this._myList[this._currentSelectedItemIndex + 1].href + "?ticket=" + AuthenticationService.instance.ticket;
+				this._currentSelectedItemIndex = this._currentSelectedItemIndex + 1;
+				if(this._currentSelectedItemIndex == this._myList.length-1)
+	           	{
+	           		this.moveNext.enabled = false;
+	           		this.movePrevious.enabled = true;
+	           	} 
+	           	else
+	           	{
+	           		this.moveNext.enabled = true;
+	           		this.movePrevious.enabled = true;
+	           	}
+   			}
+		}
+		
+		public function onPreviousClick():void
+		{
+			if(this.movePrevious.enabled)
+			{
+				this.myframe.source = this._myList[this._currentSelectedItemIndex - 1].href + "?ticket=" + AuthenticationService.instance.ticket;
+				this._currentSelectedItemIndex = this._currentSelectedItemIndex - 1;
+				if(this._currentSelectedItemIndex == 0) 
+	           	{
+	           		this.movePrevious.enabled = false;
+	           		this.moveNext.enabled = true;	
+	           	}
+	           	else
+	           	{
+	           		this.movePrevious.enabled = true;
+	           		this.moveNext.enabled = true;
+	           	}
+   			}
 		}
        
 	}

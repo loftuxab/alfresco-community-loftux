@@ -26,7 +26,7 @@
  */
  --> 
 
-<app:MainClass  xmlns:mx="http://www.adobe.com/2006/mxml" 
+<app:MainClass  xmlns:mx="http://www.adobe.com/2006/mxml"  
 				verticalScrollPolicy="off"
 				layout="absolute" 
 				frameRate="99"
@@ -43,7 +43,7 @@
 	
 	<!-- Include the main CSS -->
 	<mx:Style source="main.css"/>
-				
+
 	<!-- The login control -->	
 	<mx:Box id="loginPanel" visible="true" width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
 		<login:login/>
@@ -68,7 +68,7 @@
 				
 				<!-- Main navigation componenet -->
 				<navigation:Navigation width="100%" height="100%"/>
-						  
+				 
 				<searchResults:searchResults id="tabnav1" horizontalScrollPolicy="off"/>
 							
 	    	</swipe:Swipe>    
