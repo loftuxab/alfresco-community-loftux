@@ -12,3 +12,22 @@
 {
 	color:#284C4C;
 }
+.searchResultsPanel
+{
+	borderThicknessLeft: 0;
+   	borderThicknessTop: 0;
+   	borderThicknessBottom: 0;
+   	borderThicknessRight: 0;
+   	roundedBottomCorners: false;
+   	cornerRadius: 0;
+   	borderStyle: none;
+   	dropShadowEnabled: true;
+   	backgroundColor: #f5f8e5;
+   	headerHeight: 1;
+}
+.searchResultsSpace
+{
+   	borderColor: #ffffff;
+    borderThickness: 3;
+    borderStyle: solid;
+}
