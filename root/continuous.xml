@@ -224,9 +224,9 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.continuous.assemble.virtualtomcat}" />
-      <unzip src="${dir.project.3rdparty.distro}/${file.name.distro.tomcat}" 
+      <unzip src="${dir.project.3rdparty.distro}/${file.name.zip.tomcatvirt.custom}" 
              dest="${dir.continuous.assemble}" />
-      <move file="${dir.continuous.assemble}/${dir.name.distro.tomcat}"
+      <move file="${dir.continuous.assemble}/${file.name.base.zip.tomcatvirt.custom}"
             tofile="${dir.continuous.assemble.virtualtomcat}" />
       <move file="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.renametojar" 
             tofile="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.jar" />

@@ -793,6 +793,140 @@
                          projectdir="${dir.project.jndi}"/>
    </target>
 
+
+   <!-- ******************************************************************** -->
+   <!-- ** Tomcat-virtserver Project                                         -->
+   <!-- **                                                                   -->
+   <!-- **   Normally, you just want to build the various .jar files used    -->
+   <!-- **   by the virtualization server, not the virtualization server     -->
+   <!-- **   itself.   This target builds the virtualization server itself.  -->
+   <!-- **                                                                   -->
+   <!-- **   This target is only run by hand on an as-needed basis           -->
+   <!-- **   because the Tomcat build requires network access.  The build    -->
+   <!-- **   artifact created by running this project is automatically put   -->
+   <!-- **   in 3rd-party/distro/apache-tomcat-[vers]-virtserver-[vers].zip  -->
+   <!-- **   This arragement preserves the desriable quality of allowing     -->
+   <!-- **   builds to run disconnected from any network.                    -->
+   <!-- **                                                                   -->
+   <!-- **   There are only 3 things that force you to re-run this project:  -->
+   <!-- **                                                                   -->
+   <!-- **   [1]  Changing file(s) in dir.project.tomcatvirt.src.java        -->
+   <!-- **   [2]  Changing the Tomcat version used by the virt server.       -->
+   <!-- **   [3]  Changing the Tomcat build config (see replaceregexp below) -->
+   <!-- **                                                                   -->
+   <!-- **  If you do run this target, be sure to checkin its build artifact -->
+   <!-- **  (3rd-party/distro/apache-tomcat-[vers]-virtserver-[vers].zip)    -->
+   <!-- **                                                                   -->
+   <!-- **                                                                   -->
+   <!-- **   Devloper note:                                                  -->
+   <!-- **                                                                   -->
+   <!-- **       To assemble a virt server with all the libs it needs:       -->
+   <!-- **              ant -f continuous.xml  assemble-virtual              -->
+   <!-- **       Then on UNIX chmod +x all the .sh files in                  -->
+   <!-- **               build/assemble/virtual-tomcat/bin                   -->
+   <!-- **       (the real installer takes care of the chmod step).          -->
+   <!-- ******************************************************************** -->
+   <target name="tomcat-virtserver"
+           description="Builds the version of Tomcat used by the virt server"
+           depends="init, incremental-catalinavirtual">
+
+      <property name  ="dir.name.src.tomcatvirt.custom"
+                value="${dir.project.tomcatvirt.custom.src}/${file.name.base.src.zip.tomcatvirt.apache}" />
+
+      <!-- Expand pristine tomcat source code that will be modified for virt server -->
+      <unzip src="${dir.project.tomcatvirt.apache.src}/${file.name.src.zip.tomcatvirt.apache}"
+             dest="${dir.project.tomcatvirt.custom.src}" />
+       
+
+
+      <!-- Include extras: tomcat5.exe  (which is just prunsrv.exe)           -->
+      <!--            and: tomcat5w.exe (which is just prunmgr.exe)           -->
+      <!--                                                                    -->
+      <!-- This makes it easy to configure the virt server as a daemon        --> 
+      <!-- For more details, see:  http://jakarta.apache.org/commons/daemon   -->
+      <!-- and:  "What's the proper way to start the virtualization server?"  -->
+      <!-- in:   http://wiki.alfresco.com/wiki/Virtualization_Server_FAQ      -->
+
+      <copy        todir = "${dir.name.src.tomcatvirt.custom}/build/build/bin">
+            <fileset dir = "${dir.name.src.tomcatvirt.custom}/connectors/procrun/bin"/>
+      </copy>
+ 
+      <!-- Add/override any files in Tomcat's source code with customized files -->
+      <copy        todir = "${dir.name.src.tomcatvirt.custom}">
+            <fileset dir = "${dir.project.tomcatvirt.src.java}" />
+      </copy>
+
+      <!-- Make a custom configuration file -->
+      <!-- 
+        Note:  An alternative to the following copy an 3 replaceregexp tasks 
+               would have been to just include the build.properties file in
+               the customized file tree (see: dir.name.src.tomcatvirt.custom).
+               However, as the tomcat prop file has a lot of obscure stuff
+               in it, in-place surgery was deemed preferable.   This could
+               change if the "surgery approach" gets significantly more 
+               complex over time.
+      -->
+
+      <copy   file="${dir.name.src.tomcatvirt.custom}/build/build.properties.default"
+            tofile="${dir.name.src.tomcatvirt.custom}/build/build.properties"/>
+
+      <!-- Set base.path so tomcat's build can download/cache its required libs  -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
+            match="^base\.path=.*"
+            replace="base.path=${dir.project.tomcatvirt.lib}"
+            byline="true"/>
+
+      <!-- Build everything (note: adds 10k to zip file) -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
+            match="^#full\.dist=.*"
+            replace="full\.dist=on"
+            byline="true"/>
+
+      <!-- Oddly, we need to tell the build where mail.jar is, but no other libs.  -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/build/build.properties"  
+            match="^mail\.lib=.*"
+            replace="mail.lib=${dir.project.3rdparty.lib}"
+            byline="true"/>
+
+      <!-- 
+           Augment the classpath of the catatalina project within 
+           the tomcat virtserver's build so it can reference the
+           path umangling logic within AVMUrlValve. 
+
+           XML-escaped regexes are pretty darned ugly!
+           Oh well.
+       -->
+      <replaceregexp
+            file="${dir.name.src.tomcatvirt.custom}/container/catalina/build.xml"  
+            match="^\s*&lt;path\s+id\s*=\s*&quot;catalina\.classpath&quot;&gt;"
+            replace="  &lt;path id=&quot;catalina.classpath&quot;&gt;&#xD;&#xA;    &lt;pathelement location=&quot;${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}&quot;/&gt;"
+            byline="true"/>
+         
+
+      <!-- Comple the modified version of tomcat used as the virt server -->
+      <ant dir="${dir.name.src.tomcatvirt.custom}"
+           inheritAll="false"/>
+
+      <!-- Set +rx permissions on all the .sh files for UNIX (for testing only) -->
+      <chmod dir="${dir.name.src.tomcatvirt.custom}/build/build"
+             perm="ugo+rx"
+             includes="**/*.sh"/>
+
+      <!-- Refresh cached base virtserver tomcat distro in 3rd party 
+           Note:  During the install process, other files are added/removed 
+                  from this zip file (e.g.: jndi-related stuff).  
+                  See continuous.xml for the gory details.
+      -->
+      <zip destfile="${dir.project.3rdparty}/distro/${file.name.zip.tomcatvirt.custom}">
+           <zipfileset dir="${dir.name.src.tomcatvirt.custom}/build/build"
+                       prefix="${file.name.base.zip.tomcatvirt.custom}"/>
+      </zip>
+   </target>
+
+
    <!-- **************************** -->
    <!-- ** Virtual Tomcat Project ** -->
    <!-- **************************** -->
@@ -915,6 +1049,7 @@
       <compile-java projectdir="${dir.project.webclient}" />
    </target>
    
+   
    <target name="package-webclient" 
            description="Packages the webclient project" 
            depends="package-webclient-war, 
@@ -981,7 +1116,7 @@
          dev-context.xml does not become part of the normal source
          code tree (it's excluded from check-in automatically).
          -->
-         <fileset dir="${dir.project.repository.config}" 
+         <fileset dir="${dir.project.repository.config}"
                   includes="**/extension/dev-context.xml"/>
       </copy>
       <!-- 
