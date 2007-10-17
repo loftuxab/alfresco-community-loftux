@@ -39,6 +39,8 @@ package org.alfresco.ace.application.searchResults
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
 	import mx.collections.ArrayCollection;
 	import org.alfresco.framework.control.hyperlink.HyperLink;
+	import mx.effects.Resize;
+	import mx.events.EffectEvent;
 	
 	
 	/**
@@ -81,7 +83,7 @@ package org.alfresco.ace.application.searchResults
 		/** Result Click event for the Repeater */
 		private function onSearchDetailsClick(oEvent:searchDetailsClickEvent):void
         {
-          	this._currentSelectedItem = oEvent.data.toString();
+        	this._currentSelectedItem = oEvent.data.toString();
           	for(var i:int=0; i<this._myList.length; i++)
             {
            		if(this._currentSelectedItem == this._myList[i].href)
@@ -106,11 +108,20 @@ package org.alfresco.ace.application.searchResults
            	else
            	{
            		this.movePrevious.enabled = true;
-           	}
-          	resultsDispPanel.percentWidth = 30;
-          	swfPanel.visible = true;
-          	swfPanel.percentWidth = 70;
-           	myframe.visible = true;
+           	}          	
+          	
+          	if (swfPanel.visible == false)
+          	{
+	          	swfPanel.visible = true;
+	          	swfPanel.includeInLayout = true;
+	           	myframe.visible = true;
+	           	
+	           	var resizeEffect:Resize = new Resize(resultsDispPanel);
+	           	resizeEffect.widthFrom = resultsDispPanel.width;
+	           	resizeEffect.widthTo = 350;
+	           	resizeEffect.play();	        
+	        }
+			
 			this._url = this._currentSelectedItem + "?ticket=" + AuthenticationService.instance.ticket;  
             myframe.source = this._url;
            
@@ -123,6 +134,7 @@ package org.alfresco.ace.application.searchResults
  			resultsDispPanel.percentWidth = 100;
           	swfPanel.percentWidth = 0;
           	swfPanel.visible = false;
+          	swfPanel.includeInLayout = false;
           	myframe.source = ''; 
          	this.results.dataProvider = this._resultObj;  
          	

@@ -27,7 +27,7 @@
 		</mx:HBox>
 		
 		<mx:Spacer  height="15" width="100%"/>
-		<line:DrawLine lineWidth="{this.width}"/>
+		<line:DrawLine/>
 		<mx:Spacer  height="10"/>
 		
 	</mx:VBox>

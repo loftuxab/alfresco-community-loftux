@@ -52,7 +52,7 @@ package org.alfresco.ace.service.articlesearchservice
 		{
 			try
 			{					
-				var url:String = ConfigService.instance.url +  "/alfresco/service/sample/kb/search.atom";
+				var url:String = ConfigService.instance.url +  "/alfresco/service/kb/search.atom";
 				var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onSearchSuccess);
 				
 				var params:Object = new Object();
