@@ -62,8 +62,6 @@
 
       <path id="classpath.javadoc">
          <path refid="classpath.compile"/>
-         <pathelement location="${dir.project.benchmarkframework.lib}/japex/japex.jar"/>
-         <pathelement location="${dir.project.benchmarkframework.lib}/ostermillerutils_1_06_00.jar"/>
       </path>
 
       <patternset id="files.tests">
@@ -106,9 +104,7 @@
 
    <target name="incremental" 
            description="Performs an incremental build of all projects"
-           depends="-tomcat, 
-                   incremental-benchmarkframework, 
-                   incremental-benchmarktests" />
+           depends="-tomcat" />
 
    <target name="build-tomcat" 
            description="Performs a clean build for Tomcat and deploys the WAR file"
@@ -160,9 +156,7 @@
                     generate-javadocs-linkvalidation,
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
-                    generate-javadocs-webserviceclient,
-                    generate-javadocs-benchmarkframework,
-                    generate-javadocs-benchmarktests" />
+                    generate-javadocs-webserviceclient" />
 
    <target name="-tomcat"
            depends="incremental-core,
@@ -198,9 +192,7 @@
                     clean-rm,
                     clean-blog,
                     clean-php, 
-                    clean-webserviceclient, 
-                    clean-benchmarkframework, 
-                    clean-benchmarktests" />
+                    clean-webserviceclient" />
 
    <target name="clean-tomcat-deploy" 
            description="Cleans the Alfresco application from Tomcat" 

@@ -1,8 +1,0 @@
-<project name="build-common" basedir=".">
-   <path id="class.path">
-		<pathelement path="../benchmark-framework/build/classes"/>   
-		<fileset dir="../benchmark-framework/lib">
-			<include name="**/*.jar"/>
-		</fileset>				    	
-    </path>
-</project>
