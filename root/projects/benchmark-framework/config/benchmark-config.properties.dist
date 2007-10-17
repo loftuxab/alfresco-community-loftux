@@ -1,4 +1,0 @@
-## Benchmark configuration properties
-benchmark.data_content_location=./data/content
-benchmark.output_folder=./data/output
-benchmark.JCR.type=Alfresco

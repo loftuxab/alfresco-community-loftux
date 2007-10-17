@@ -63,7 +63,6 @@
                     distribute-webserviceclient,
                     distribute-extensions-office2003,
                     distribute-deployment,
-                    distribute-benchmark, 
                     distribute-amps,
                     distribute-sample-extensions,
                     distribute-docs" />
@@ -843,77 +842,6 @@
 	   </copy>
 	</target>
 	
-   <!-- *********************** -->
-   <!-- ** Benchmark targets ** -->
-   <!-- *********************** -->
-
-   <target name="distribute-benchmark" 
-           description="Creates the Alfresco benchmark distribution file for all platforms"
-           depends="assemble-benchmark">
-      <zip destfile="${dir.continuous.dist}/${file.name.dist.benchmark}.zip">
-         <zipfileset dir="${dir.continuous.assemble.benchmark}" />
-      </zip>
-
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.benchmark}.tar.gz" 
-           longfile="gnu" 
-           compression="gzip">
-         <tarfileset dir="${dir.continuous.assemble.benchmark}" />
-      </tar>
-   </target>
-
-   <target name="assemble-benchmark" 
-           depends="init">
-      <mkdir dir="${dir.continuous.dist}" />
-
-      <!-- Get the jars -->
-      <mkdir dir="${dir.continuous.assemble.benchmark}/lib" />
-      <copy todir="${dir.continuous.assemble.benchmark}/lib">
-         <fileset dir="${dir.project.benchmarkframework.lib}" 
-                  includes="**/*.jar" />
-         <fileset dir="${dir.project.benchmarktests.lib}" 
-                  includes="**/*.jar" />
-         <fileset dir="${dir.project.benchmarkframework.dist}" 
-                  includes="${file.name.jar.benchmarkframework}"/>
-         <fileset dir="${dir.project.benchmarktests.dist}" 
-                  includes="${file.name.jar.benchmarktests}"/>
-      </copy>
-
-      <!-- Get the configuration files -->
-      <mkdir dir="${dir.continuous.assemble.benchmark}/config" />
-      <copy todir="${dir.continuous.assemble.benchmark}/config">
-         <fileset dir="${dir.project.benchmarkframework.config}" 
-                  includes="repository-profile*.properties" />
-         <fileset dir="${dir.project.benchmarktests.config}" 
-                  includes="**/*.xml" />
-         <fileset dir="${dir.project.benchmarktests.config}" 
-                  includes="**/*.sample" />
-      </copy>
-      <copy file="${dir.project.benchmarktests.config}/classpath.config.dist" 
-            tofile="${dir.continuous.assemble.benchmark}/config/classpath.config" />
-      <copy file="${dir.project.benchmarkframework.config}/benchmark-config.properties.dist" 
-            tofile="${dir.continuous.assemble.benchmark}/config/benchmark-config.properties" />
-
-      <!-- Create the data folders -->
-      <mkdir dir="${dir.continuous.assemble.benchmark}/data" />
-      <mkdir dir="${dir.continuous.assemble.benchmark}/data/output" />
-      <mkdir dir="${dir.continuous.assemble.benchmark}/data/content" />
-      <copy file="${dir.project.benchmarkframework}/data/content/SmallTextDocument.java" 
-            todir="${dir.continuous.assemble.benchmark}/data/content" />
-
-      <!-- Get the documentation -->
-      <!-- TODO -->
-
-      <!-- Get the ant file -->
-      <copy todir="${dir.continuous.assemble.benchmark}" 
-            file="${dir.project.benchmarktests}/build.xml" />
-      <copy todir="${dir.continuous.assemble.benchmark}" 
-            file="${dir.project.benchmarktests}/build-jvm-args.xml" />
-      <copy tofile="${dir.continuous.assemble.benchmark}/build-common.xml"    
-            file="${dir.project.benchmarktests}/build-common.xml.dist" />
-      <copy tofile="${dir.continuous.assemble.benchmark}/build-classpath.xml" 
-            file="${dir.project.benchmarktests}/build-classpath.xml.dist" />
-   </target>
-
    <!-- ***************** -->
    <!-- ** SDK targets ** -->
    <!-- ***************** -->

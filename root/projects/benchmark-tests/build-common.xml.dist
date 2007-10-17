@@ -1,7 +1,0 @@
-<project name="build-common" basedir=".">
-   <path id="class.path">
-		<fileset dir="./lib">
-			<include name="**/*.jar"/>
-		</fileset>				    	
-    </path>
-</project>

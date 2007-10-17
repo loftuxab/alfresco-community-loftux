@@ -1,4 +1,0 @@
-<project name="BenchmarkClasspath" basedir=".">
-   <path id="path.generated">
-   </path>
-</project>
