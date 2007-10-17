@@ -386,7 +386,7 @@
             overwrite="true"/>
 
       <!-- place latest Xalan jars to ensure they are used -->
-      <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed" 
+      <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed"
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.xalan}" />
       <copy todir="${dir.continuous.assemble.tomcat}/common/endorsed" 
             file="${dir.project.3rdparty.lib}/${dir.name.xalan}/${file.name.jar.serializer}" />
@@ -418,56 +418,56 @@
    <!-- ** WAR targets ** -->
    <!-- ***************** -->
 
-   <target name="distribute-war" 
+   <target name="distribute-war"
            description="Creates the WAR file distribution for all platforms"
            depends="init" >
       <mkdir dir="${dir.continuous.dist}" />
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
-         <zipfileset dir="${dir.project.netbios}/dll" 
+         <zipfileset dir="${dir.project.netbios}/dll"
                      prefix="bin"/>
-         <zipfileset dir="${dir.project.installer.extras}" 
-                     prefix="extras" 
+         <zipfileset dir="${dir.project.installer.extras}"
+                     prefix="extras"
                      excludes="**/*.sh" />
-         <zipfileset dir="${dir.project.installer.alfdata}" 
+         <zipfileset dir="${dir.project.installer.alfdata}"
                      prefix="alf_data" />
-         <zipfileset dir="${dir.project.installer}" 
+         <zipfileset dir="${dir.project.installer}"
                      includes="licenses/**,
                                README_war.txt" />
-         <zipfileset dir="${dir.project.installer}" 
+         <zipfileset dir="${dir.project.installer}"
                      includes="README_mysql.txt" />
-         <zipfileset dir="${dir.project.webclient.dist}" 
+         <zipfileset dir="${dir.project.webclient.dist}"
                      includes="${file.name.war.webclient}" />
-         <zipfileset dir="${dir.project.repository.config}/alfresco/extension" 
+         <zipfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
-         <zipfileset dir="${dir.project.webclient.config}/alfresco/extension" 
+         <zipfileset dir="${dir.project.webclient.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.installer.extension}"
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.installer.messages}"
                      prefix="extensions/messages" />
-         <zipfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}" 
-                     includes="${file.name.jar.xalan},${file.name.jar.serializer}" 
+         <zipfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}"
+                     includes="${file.name.jar.xalan},${file.name.jar.serializer}"
                      prefix="endorsed" />
       </zip>
 
-      <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz" 
-           longfile="gnu" 
+      <tar destfile="${dir.continuous.dist}/${file.name.dist.war}.tar.gz"
+           longfile="gnu"
            compression="gzip">
-         <tarfileset dir="${dir.project.installer.extras}" 
-                     prefix="extras" 
+         <tarfileset dir="${dir.project.installer.extras}"
+                     prefix="extras"
                      excludes="**/*.bat" />
-         <tarfileset dir="${dir.project.installer.alfdata}" 
+         <tarfileset dir="${dir.project.installer.alfdata}"
                      prefix="alf_data" />
-         <tarfileset dir="${dir.project.installer}" 
+         <tarfileset dir="${dir.project.installer}"
                      includes="licenses/**,
                                README_war.txt" />
-         <tarfileset dir="${dir.project.installer}" 
+         <tarfileset dir="${dir.project.installer}"
                      includes="README_mysql_linux.txt"
                      fullpath="README_mysql.txt" />
-         <tarfileset dir="${dir.project.webclient.dist}" 
+         <tarfileset dir="${dir.project.webclient.dist}"
                      includes="${file.name.war.webclient}" />
-         <tarfileset dir="${dir.project.repository.config}/alfresco/extension" 
+         <tarfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"
                      prefix="extensions/extension" />
@@ -475,11 +475,30 @@
                      prefix="extensions/extension" />
          <tarfileset dir="${dir.project.installer.messages}"
                      prefix="extensions/messages" />
-         <tarfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}" 
+         <tarfileset dir="${dir.project.3rdparty.lib}/${dir.name.xalan}"
                      includes="${file.name.jar.xalan},
-                               ${file.name.jar.serializer}" 
+                               ${file.name.jar.serializer}"
                      prefix="endorsed" />
       </tar>
+
+      <!-- Installer -->
+      <delete quiet="yes"
+              includeEmptyDirs="true"
+              dir="${dir.project.installer.builder}/upgrade-installer/output" />
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+         <arg line='--build --quiet -DVersion "${version.number}" -DCodeline ${file.name.codeline} "${file.name.installer.war}"' />
+      </exec>
+      <move todir="${dir.continuous.dist}">
+         <fileset dir="${dir.project.installer.builder}/upgrade-installer/output">
+            <include name="**/*"/>
+         </fileset>
+      </move>
+
+   </target>
+
+   <target name="distribute-war-installers"
+           depends="assemble-tomcat">
+
    </target>
 
    <!-- ******************************** -->

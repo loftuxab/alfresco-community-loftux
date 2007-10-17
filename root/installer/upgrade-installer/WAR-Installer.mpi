@@ -1,0 +1,1290 @@
+array set info {
+AllowLanguageSelection
+Yes
+
+AppName
+{Alfresco Upgrade <%Codeline%>}
+
+ApplicationID
+29ae322c-7c01-11dc-8314-0800200c9a66
+
+ApplicationURL
+{}
+
+AutoFileGroups
+No
+
+CancelledInstallAction
+{Cancel and Stop}
+
+CleanupCancelledInstall
+Yes
+
+Codeline
+{}
+
+CommandLineFailureAction
+{Fail (recommended)}
+
+Company
+Alfresco
+
+CompressionLevel
+9
+
+CompressionMethod
+zlib
+
+Copyright
+{}
+
+DefaultLanguage
+English
+
+Ext
+.exe
+
+ExtractSolidArchivesOnStartup
+No
+
+Icon
+../resources/logo.png
+
+Image
+../resources/leftImage.png
+
+IncludeDebugging
+Yes
+
+InstallPassword
+{}
+
+InstallVersion
+2.1.0.0
+
+Language,de
+Yes
+
+Language,en
+Yes
+
+Language,es
+Yes
+
+Language,fr
+Yes
+
+Language,pl
+Yes
+
+Language,pt_br
+Yes
+
+PackageDescription
+{}
+
+PackageLicense
+{}
+
+PackageMaintainer
+{}
+
+PackageName
+<%ShortAppName%>
+
+PackagePackager
+{}
+
+PackageRelease
+<%PatchVersion%>
+
+PackageSummary
+{}
+
+PackageVersion
+<%MajorVersion%>.<%MinorVersion%>
+
+PreserveFilePermissions
+Yes
+
+ProjectID
+CB2C8E57-4826-4821-B9A1-7191DEB3B6CD
+
+ProjectVersion
+1.2.0.2
+
+SaveOnlyToplevelDirs
+No
+
+ScriptExt
+.bat
+
+ShortAppName
+AlfrescoUpgrade
+
+SkipUnusedFileGroups
+Yes
+
+Theme
+Modern_Wizard
+
+ThemeDir
+Modern_Wizard
+
+ThemeVersion
+1
+
+UpgradeApplicationID
+{}
+
+Version
+2.1
+
+ViewReadme
+Yes
+
+}
+
+array set ::InstallJammer::InstallCommandLineOptions {
+debug
+{Debugging Switch Yes No {} {run installer in debug mode}}
+
+debugconsole
+{ShowConsole Switch Yes No {} {run installer with a debug console open}}
+
+mode
+{InstallMode Choice No No {Console Default Silent Standard} {set the mode to run the installer in}}
+
+prefix
+{InstallDir String No No {} {set the installation directory}}
+
+test
+{Testing Switch Yes No {} {run installer without installing any files}}
+
+}
+array set ::InstallJammer::UninstallCommandLineOptions {
+debugconsole
+{ShowConsole Switch Yes No {} {run uninstaller with a debug console open}}
+
+mode
+{UninstallMode Choice No No {Console Silent Standard} {set the mode to run the uninstaller in}}
+
+test
+{Testing Switch Yes No {} {run uninstaller without uninstalling any files}}
+
+}
+FileGroup ::9C895371-373A-4923-840C-4F98632E4A99 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows TarArchive} -name {Program Files} -parent FileGroups
+File ::FBCB951B-D20D-42D5-B5A0-E578227F55E7 -directory <%InstallDir%>/upgrades/<%Version%> -name W:/HEAD/root/build/assemble/tomcat/webapps/alfresco.war -location ../../build/assemble/tomcat/webapps -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::05C93680-7EDD-46D8-A54F-58DF7A2364A1 -type dir -directory <%InstallDir%>/upgrades/<%Version%>/extension-samples -name W:/HEAD/root/build/assemble/extension-samples -location ../../build/assemble/extension-samples -parent 9C895371-373A-4923-840C-4F98632E4A99
+File ::5584FFAA-3CDE-404E-B7D7-6838BD219693 -type dir -name alfresco -parent 05C93680-7EDD-46D8-A54F-58DF7A2364A1
+File ::361CDBDC-8E13-4548-8581-D142EC7358CE -type dir -name extension -parent 5584FFAA-3CDE-404E-B7D7-6838BD219693
+File ::8C9CC508-1955-4839-A902-90C846C02801 -name chaining-authentication-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::3C6ABA69-72B1-44C8-AC8E-6DA34116BB3B -name custom-connection-pool-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::DC5FB086-429A-432C-8AC6-88BF80DE2FC5 -name custom-hibernate-dialect.properties.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::2F0BD192-059A-41F6-A537-95CCBF163300 -name custom-metadata-extrators-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::4E90DC1E-C777-41D2-ADC5-AD91FF97D897 -name custom-model-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::3F0F4ECF-A337-4EB5-BE68-B03319268A31 -name custom-repository-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::619DD7F3-556D-481F-BDB2-54522B1B201B -name custom-repository.properties.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::20DF49DD-9164-4100-A5D8-B59926F74DAE -name customModel.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::01F425F3-C93D-4E76-8429-87D80EE662A0 -name disabled-avm-indexing-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::0E25622F-80C8-4333-A751-C03CF022B9C3 -name ehcache-custom.xml.sample.cluster -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::6D357C66-7505-4107-BB3C-5E55A88CE979 -name example-model-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::927A80B2-57D5-4E48-9728-B63E68C31625 -name exampleModel.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::D5C06853-62F9-495D-B5B2-D87EA49F768D -name file-servers-custom.xml -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::A7E3A869-8F2D-4528-AEB6-0426BFCC45CC -name file-servers-custom.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::C4CDAB31-B30A-4C26-83A6-48C119638B98 -name index-recovery-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::0D7D4D9D-9089-4EAC-96AB-2C12D3C4674C -name index-tracking-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::7A025533-143A-42F8-8F35-6421DD46C099 -name jaas-authentication-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::5C57AAAD-04D2-45AC-9CC1-C6CB3C1E0F5F -name language-specific-index-and-search-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::8C2D789C-358D-4B7E-AB67-B2120E128789 -name ldap-authentication-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::92259D7F-C61E-4045-A432-46BAF014173F -name lifecycle-messages.properties -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::990B09B9-5FCC-494D-8503-42FD7F61CA88 -name lifecycle-workflow-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::115CD241-F901-4809-9224-C6BAB8072A4A -name lifecycle_processdefinition.xml -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::088D03A5-27EB-4EBE-B49C-2238F2AD8219 -name lifecycleModel.xml -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::4905FB4E-D3E4-4B57-8387-996BC25B6753 -name mimetype-map-extension.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::19BF0E03-40AB-48DD-83A8-76ECC3A26198 -name mimetypes-extension.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::8DF65CAB-37C4-4688-B9B3-662E84D18C2C -name network-protocol-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::8EE0F3AE-C9B1-464D-9CF2-5EA177C08A6A -name ntlm-authentication-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::B1A116DB-F206-4656-BC33-FBA3DB6B051A -name replicating-content-services-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::2DECBBBB-2F13-49C7-912F-10507AB4676B -name restore-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::886D8991-43B7-4519-84CA-379A99F7C4BF -name scheduled-action-services-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::B328A024-5E65-42FA-B610-8AFFE8D2B53D -name synchronous-avm-indexing-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::D987206F-7FDE-40B4-AD39-2E7051911167 -name wcm-xml-metadata-extracter-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::36BC95F0-1690-43E6-8493-D7A6EE529983 -name workflow-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::3ECD8D74-2BF5-434E-A613-BBD96F358CED -type dir -name bootstrap -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::B34DCA53-F259-459A-B8AA-F735D15D9F9E -name split-person-cleanup-context.xml.sample -parent 3ECD8D74-2BF5-434E-A613-BBD96F358CED
+File ::233AF211-AE95-4983-94C1-C7A6E8CD6C21 -name asynchronous-avm-indexing-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::1857A8B7-109A-47BE-B6FF-CE7721549D7B -name bm-remote-loader-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::CDA8ACC9-C237-43D7-A4D6-361ED56CE271 -name content-expiration-debug-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::EA4A064D-3D8D-468C-A2E5-9E77773D9843 -name custom-email-service-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::DCA22C5A-5506-4E25-A885-4E937EE6B783 -name ldap-authentication.properties -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::594777D7-686F-40D4-B9D6-308C17C2E283 -name ldap-synchronisation-context.xml.sample -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::E734A3EB-6A6C-4CBF-8870-E91524797787 -name ldap-synchronisation.properties -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::8F096A1B-F7EA-4167-85F2-45A6B5EAA40D -type dir -name mt -parent 361CDBDC-8E13-4548-8581-D142EC7358CE
+File ::E335A2DE-66B3-45B6-BEAA-DC12A5027D2C -name mt-admin-context.xml.sample -parent 8F096A1B-F7EA-4167-85F2-45A6B5EAA40D
+File ::34DF159E-DD1E-4C26-B048-5AE976AF861E -name mt-contentstore-context.xml.sample -parent 8F096A1B-F7EA-4167-85F2-45A6B5EAA40D
+File ::73D81375-DECD-4BEB-AD28-F8BF7DF8160D -name mt-context.xml.sample -parent 8F096A1B-F7EA-4167-85F2-45A6B5EAA40D
+File ::A1B6D7E7-BFA9-49D2-9ECE-45C906A057EF -directory <%InstallDir%>/upgrades/<%Version%> -name W:/HEAD/root/build/dist/alfresco-mmt.jar -location ../../build/dist -parent 9C895371-373A-4923-840C-4F98632E4A99
+Component ::A92DA43F-C102-49A4-89FB-F2A2B18949D1 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Default Component} -parent Components
+SetupType ::F6005EED-F116-409B-82E7-662D4A7065E8 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Typical -parent SetupTypes
+SetupType ::840E153B-F29E-4184-8941-3C26F456EB0D -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name Custom -parent SetupTypes
+
+InstallComponent 185DEE53-68ED-4921-9CA3-E480BE16988A -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
+InstallComponent D700B54B-CEAC-48E9-8AC8-94D982B73406 -setup Install -type pane -conditions {3FB18EB1-8713-42CF-AF1C-26756FA05D10 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B E4263D69-552B-472B-9E4B-0B6107059767} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
+Condition 3FB18EB1-8713-42CF-AF1C-26756FA05D10 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {Script Condition} -component ScriptCondition
+Condition 9C2D555B-3A2C-4590-B66D-8D0C54B8B35B -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Permission Condition} -component FilePermissionCondition
+Condition E4263D69-552B-472B-9E4B-0B6107059767 -active Yes -parent D700B54B-CEAC-48E9-8AC8-94D982B73406 -title {File Exists Condition} -component FileExistsCondition
+InstallComponent 349F9BC3-104C-4982-A1AF-5353A02DE035 -setup Install -type pane -title {Start Copying Files} -component StartCopyingFiles -active Yes -parent StandardInstall
+InstallComponent D3C20805-32F3-4D27-A208-14416A55DC0A -setup Install -type pane -title {Copying Files} -component CopyFiles -active Yes -parent StandardInstall
+InstallComponent 5B747634-BDE6-4E1C-9D67-3E45A888DB9B -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent D3C20805-32F3-4D27-A208-14416A55DC0A
+InstallComponent F46C9198-80E1-466C-9034-9BC1AA83A5C6 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent D3C20805-32F3-4D27-A208-14416A55DC0A
+InstallComponent 098C7D04-1810-423D-B546-0B9530DB442E -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent D3C20805-32F3-4D27-A208-14416A55DC0A
+InstallComponent 987C8D98-115B-485D-AF3B-3EECD5A76A9F -setup Install -type pane -title {Start Moving Files} -component StartCopyingFiles -active Yes -parent StandardInstall
+InstallComponent F4AB0B2F-294E-4D24-8C3E-DB67F03F4517 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 987C8D98-115B-485D-AF3B-3EECD5A76A9F
+InstallComponent B8789CBA-5346-4622-B110-5C07D63D8D1B -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
+InstallComponent 76737D66-740C-407E-848A-1CCCADF7D84C -setup Install -type pane -title {Copying Files} -component CopyFiles -active Yes -parent DefaultInstall
+InstallComponent EEB924A9-DD95-45D6-A6D4-940B4EE700D2 -setup Install -type action -title {Disable Buttons} -component ModifyWidget -active Yes -parent 76737D66-740C-407E-848A-1CCCADF7D84C
+InstallComponent 4FAEC1C0-72BE-4D92-A9C4-26B3D9D061FD -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 76737D66-740C-407E-848A-1CCCADF7D84C
+InstallComponent 4D20F123-6E6F-4C03-92DC-D953FB62F7CE -setup Install -type action -title {Move Forward} -component MoveForward -active Yes -parent 76737D66-740C-407E-848A-1CCCADF7D84C
+InstallComponent 5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent DefaultInstall
+InstallComponent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -setup Install -type action -conditions {77F3EF54-333D-4039-8ACC-F729F99502AB 10199168-B558-4610-AC84-91459D922A2F} -title {View Readme Checkbutton} -component AddWidget -command insert -active Yes -parent 5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E
+Condition 77F3EF54-333D-4039-8ACC-F729F99502AB -active Yes -parent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -title {File Exists Condition} -component FileExistsCondition
+Condition 10199168-B558-4610-AC84-91459D922A2F -active Yes -parent 4961FB8A-BDAE-4264-9BFE-576BDE388928 -title {String Is Condition} -component StringIsCondition
+InstallComponent 1ECDBB48-FBA6-4FE7-80D8-892A0D43E8EC -setup Install -type action -title {Console Ask Yes Or No} -component ConsoleAskYesOrNo -active Yes -parent ConsoleInstall
+InstallComponent A4FABD03-7CBF-47CF-B451-E90B072314E6 -setup Install -type action -conditions ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2 -title Exit -component Exit -command insert -active Yes -parent ConsoleInstall
+Condition ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2 -active Yes -parent A4FABD03-7CBF-47CF-B451-E90B072314E6 -title {String Is Condition} -component StringIsCondition
+InstallComponent 3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E -setup Install -type action -conditions 8B62889B-949F-41CC-B2DE-0C03145DE416 -title {Console Get User Input} -component ConsoleGetUserInput -command insert -active Yes -parent ConsoleInstall
+Condition 8B62889B-949F-41CC-B2DE-0C03145DE416 -active Yes -parent 3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E -title {File Permission Condition} -component FilePermissionCondition
+InstallComponent 3AD5798F-A12B-4033-81BE-280FE617C152 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
+InstallComponent 82FEF2F0-F699-460A-8722-BA4DC8EB08D5 -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent ConsoleInstall
+InstallComponent 01472B6B-51CF-4489-8D7B-930E4CC4DA03 -setup Install -type action -title {Console Message} -component ConsoleMessage -active Yes -parent ConsoleInstall
+InstallComponent 7B691192-946F-4A3A-BB64-75C902F95C85 -setup Install -type action -title Exit -component Exit -active Yes -parent ConsoleInstall
+InstallComponent 97BCC0F7-92F0-4962-8E8E-C6D1654BCF5A -setup Install -type action -title {Execute Action} -component ExecuteAction -active Yes -parent SilentInstall
+InstallComponent 79909EDE-134A-4BBF-8671-BEEB6461346D -setup Install -type action -title Exit -component Exit -active Yes -parent SilentInstall
+InstallComponent EA91E082-AE52-4F66-8547-16F25AB2BB05 -setup Install -type actiongroup -title {Setup Actions} -active Yes -parent ActionGroupsInstall
+InstallComponent D7C4D154-102D-4E69-BCE9-DE736306B3F2 -setup Install -type actiongroup -title {Startup Actions} -active Yes -parent ActionGroupsInstall
+InstallComponent 9B6636CA-B716-42BA-9086-1A696378A545 -setup Install -type action -conditions {05688F0D-447E-4A70-B1DC-1B9433C0F842 2C9998AE-3A35-4709-8148-E361FCC88B70} -title Exit -component Exit -command insert -active Yes -parent D7C4D154-102D-4E69-BCE9-DE736306B3F2
+Condition 05688F0D-447E-4A70-B1DC-1B9433C0F842 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {String Is Condition} -component StringIsCondition
+Condition 2C9998AE-3A35-4709-8148-E361FCC88B70 -active Yes -parent 9B6636CA-B716-42BA-9086-1A696378A545 -title {Ask Yes or No} -component AskYesOrNo
+InstallComponent DAFEBC2A-575A-4986-9018-E1E8760F43B0 -setup Install -type action -title {Create Install Panes} -component CreateInstallPanes -active Yes -parent D7C4D154-102D-4E69-BCE9-DE736306B3F2
+InstallComponent A88C91B3-4613-42A4-8B24-8A95EE4C72CB -setup Install -type actiongroup -title {Install Actions} -active Yes -parent ActionGroupsInstall
+InstallComponent 1F4F3EE9-AAFC-4A65-8F54-4ED69DE1E047 -setup Install -type action -title {Install Selected Files} -component InstallSelectedFiles -active Yes -parent A88C91B3-4613-42A4-8B24-8A95EE4C72CB
+InstallComponent 4E511E67-0388-4572-BC5E-A168E4AE3E30 -setup Install -type actiongroup -title {Finish Actions} -active Yes -parent ActionGroupsInstall
+InstallComponent 28BA537C-B491-4591-AEB3-A8FF3488D9D3 -setup Install -type actiongroup -title {Cancel Actions} -active Yes -parent ActionGroupsInstall
+InstallComponent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2 -setup Install -type actiongroup -title {Do Update} -active Yes -parent ActionGroupsInstall
+InstallComponent 6934A28D-F8FC-4D76-9AB5-B211EE6B8C7B -setup Install -type action -title {Backup File} -component BackupFile -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
+InstallComponent B7C3E1EF-C8E1-49C6-ABA8-660A9D0D8A1E -setup Install -type action -title {Rename File} -component RenameFile -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
+InstallComponent 0EB18C57-85CA-4541-B173-15DF0DF81EFA -setup Install -type action -title {Delete Temp} -component DeleteFile -active Yes -parent A5C014A8-4626-47DA-BE89-A7EEBB81D2E2
+
+array set Properties {
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Conditions
+{0 conditions}
+
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Message,subst
+1
+
+05688F0D-447E-4A70-B1DC-1B9433C0F842,CheckCondition
+{Before Action is Executed}
+
+05688F0D-447E-4A70-B1DC-1B9433C0F842,String
+<%GuiMode%>
+
+0EB18C57-85CA-4541-B173-15DF0DF81EFA,Conditions
+{0 conditions}
+
+0EB18C57-85CA-4541-B173-15DF0DF81EFA,Files
+{<%InstallDir%>/tomcat/temp/Alfresco;<%InstallDir%>/tomcat/work/Catalina/localhost/alfresco;<%InstallDir%>/tomcat/webapps/alfresco}
+
+10199168-B558-4610-AC84-91459D922A2F,CheckCondition
+{Before Action is Executed}
+
+10199168-B558-4610-AC84-91459D922A2F,Operator
+false
+
+10199168-B558-4610-AC84-91459D922A2F,String
+<%InstallStopped%>
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,BackButton,subst
+1
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,CancelButton,subst
+1
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,Caption,subst
+1
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,Conditions
+{0 conditions}
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,Message,subst
+1
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,NextButton,subst
+1
+
+1ECDBB48-FBA6-4FE7-80D8-892A0D43E8EC,Conditions
+{0 conditions}
+
+1ECDBB48-FBA6-4FE7-80D8-892A0D43E8EC,Default
+Yes
+
+1ECDBB48-FBA6-4FE7-80D8-892A0D43E8EC,Prompt
+<%InstallStartupText%>
+
+1F4F3EE9-AAFC-4A65-8F54-4ED69DE1E047,Conditions
+{0 conditions}
+
+28BA537C-B491-4591-AEB3-A8FF3488D9D3,Alias
+{Cancel Actions}
+
+2C9998AE-3A35-4709-8148-E361FCC88B70,CheckCondition
+{Before Action is Executed}
+
+2C9998AE-3A35-4709-8148-E361FCC88B70,Message,subst
+1
+
+2C9998AE-3A35-4709-8148-E361FCC88B70,Title,subst
+1
+
+2C9998AE-3A35-4709-8148-E361FCC88B70,TrueValue
+No
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,BackButton,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,CancelButton,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,Caption,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,Conditions
+{0 conditions}
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,Message,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,NextButton,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,Subtitle,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,Text,subst
+1
+
+349F9BC3-104C-4982-A1AF-5353A02DE035,Title,subst
+1
+
+3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E,Conditions
+{1 condition}
+
+3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E,Prompt
+{Where is your existing Alfresco server installed?}
+
+3513D0C8-DED3-45EC-92E5-62DDC1A7CC0E,VirtualText
+InstallDir
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Conditions
+{0 conditions}
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Message,subst
+1
+
+3FB18EB1-8713-42CF-AF1C-26756FA05D10,Comment
+{Do not display this pane if this is an upgrade install unless there is more than one installation present}
+
+3FB18EB1-8713-42CF-AF1C-26756FA05D10,Script
+{!<%UpgradeInstall%> || <%PreviousInstallCount%> != 1}
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,Background
+white
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,Text,subst
+1
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,Type
+checkbutton
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,VirtualText
+ViewReadme
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,X
+185
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,Y
+140
+
+4E511E67-0388-4572-BC5E-A168E4AE3E30,Alias
+{Finish Actions}
+
+4E511E67-0388-4572-BC5E-A168E4AE3E30,Conditions
+{0 conditions}
+
+4FAEC1C0-72BE-4D92-A9C4-26B3D9D061FD,Action
+{Install Actions}
+
+5B747634-BDE6-4E1C-9D67-3E45A888DB9B,State
+disabled
+
+5B747634-BDE6-4E1C-9D67-3E45A888DB9B,Widget
+{Back Button;Next Button}
+
+5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E,BackButton,subst
+1
+
+5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E,CancelButton,subst
+1
+
+5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E,Caption,subst
+1
+
+5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E,Message,subst
+1
+
+5E8807DE-62FC-4B53-AC9F-FC4FB6C9C14E,NextButton,subst
+1
+
+6934A28D-F8FC-4D76-9AB5-B211EE6B8C7B,Conditions
+{0 conditions}
+
+6934A28D-F8FC-4D76-9AB5-B211EE6B8C7B,FileExtension
+.upg%d
+
+6934A28D-F8FC-4D76-9AB5-B211EE6B8C7B,Files
+<%InstallDir%>/tomcat/webapps/alfresco.war
+
+6934A28D-F8FC-4D76-9AB5-B211EE6B8C7B,RenameFiles
+Yes
+
+76737D66-740C-407E-848A-1CCCADF7D84C,BackButton,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,CancelButton,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,Caption,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,FileLabel,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,Message,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,NextButton,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,ProgressValue,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,Subtitle,subst
+1
+
+76737D66-740C-407E-848A-1CCCADF7D84C,Title,subst
+1
+
+77F3EF54-333D-4039-8ACC-F729F99502AB,CheckCondition
+{Before Action is Executed}
+
+77F3EF54-333D-4039-8ACC-F729F99502AB,Filename
+<%ProgramReadme%>
+
+79909EDE-134A-4BBF-8671-BEEB6461346D,ExitType
+Finish
+
+7B691192-946F-4A3A-BB64-75C902F95C85,ExitType
+Finish
+
+82FEF2F0-F699-460A-8722-BA4DC8EB08D5,Action
+{Install Actions}
+
+82FEF2F0-F699-460A-8722-BA4DC8EB08D5,Conditions
+{0 conditions}
+
+840E153B-F29E-4184-8941-3C26F456EB0D,Components
+A92DA43F-C102-49A4-89FB-F2A2B18949D1
+
+840E153B-F29E-4184-8941-3C26F456EB0D,Description,subst
+1
+
+840E153B-F29E-4184-8941-3C26F456EB0D,Name
+Custom
+
+840E153B-F29E-4184-8941-3C26F456EB0D,ShowSetupType
+No
+
+8B62889B-949F-41CC-B2DE-0C03145DE416,CheckCondition
+{Before Next Action is Executed}
+
+8B62889B-949F-41CC-B2DE-0C03145DE416,FailureMessage
+<%DirectoryPermissionText%>
+
+8B62889B-949F-41CC-B2DE-0C03145DE416,Filename
+<%InstallDir%>
+
+8B62889B-949F-41CC-B2DE-0C03145DE416,Permission
+{can create}
+
+97BCC0F7-92F0-4962-8E8E-C6D1654BCF5A,Action
+{Install Actions}
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,BackButton,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,CancelButton,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Caption,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Conditions
+{0 conditions}
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Message,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,NextButton,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Subtitle,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Text,subst
+1
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Title,subst
+1
+
+9B6636CA-B716-42BA-9086-1A696378A545,Comment
+{Ask the user if they want to proceed with the install.}
+
+9C2D555B-3A2C-4590-B66D-8D0C54B8B35B,CheckCondition
+{Before Next Pane is Displayed}
+
+9C2D555B-3A2C-4590-B66D-8D0C54B8B35B,FailureMessage
+<%DirectoryPermissionText%>
+
+9C2D555B-3A2C-4590-B66D-8D0C54B8B35B,Filename
+<%InstallDir%>
+
+9C2D555B-3A2C-4590-B66D-8D0C54B8B35B,Permission
+{can create}
+
+9C895371-373A-4923-840C-4F98632E4A99,Destination
+<%InstallDir%>
+
+9C895371-373A-4923-840C-4F98632E4A99,Name
+{Program Files}
+
+9C895371-373A-4923-840C-4F98632E4A99,Size
+55368226
+
+A5C014A8-4626-47DA-BE89-A7EEBB81D2E2,Alias
+{Do Update}
+
+A5C014A8-4626-47DA-BE89-A7EEBB81D2E2,Conditions
+{0 conditions}
+
+A88C91B3-4613-42A4-8B24-8A95EE4C72CB,Alias
+{Install Actions}
+
+A92DA43F-C102-49A4-89FB-F2A2B18949D1,Description,subst
+1
+
+A92DA43F-C102-49A4-89FB-F2A2B18949D1,FileGroups
+9C895371-373A-4923-840C-4F98632E4A99
+
+A92DA43F-C102-49A4-89FB-F2A2B18949D1,Name
+{Default Component}
+
+A92DA43F-C102-49A4-89FB-F2A2B18949D1,RequiredComponent
+Yes
+
+ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2,CheckCondition
+{Before Action is Executed}
+
+ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2,Operator
+false
+
+ADBC8B6B-4BA4-4D31-9056-AC20948CD4D2,String
+<%Answer%>
+
+AIX-ppc,Active
+No
+
+AIX-ppc,DefaultDirectoryPermission
+0755
+
+AIX-ppc,DefaultFilePermission
+0755
+
+AIX-ppc,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+AIX-ppc,FallBackToConsole
+Yes
+
+AIX-ppc,InstallDir
+<%Home%>/<%ShortAppName%>
+
+AIX-ppc,InstallMode
+Standard
+
+AIX-ppc,InstallType
+Typical
+
+AIX-ppc,ProgramExecutable
+<%InstallDir%>/virtual_start.sh
+
+AIX-ppc,ProgramFolderAllUsers
+No
+
+AIX-ppc,ProgramFolderName
+<%AppName%>
+
+AIX-ppc,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+AIX-ppc,ProgramName
+{}
+
+AIX-ppc,ProgramReadme
+<%InstallDir%>/README.txt
+
+AIX-ppc,PromptForRoot
+Yes
+
+AIX-ppc,RequireRoot
+No
+
+AIX-ppc,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+B7C3E1EF-C8E1-49C6-ABA8-660A9D0D8A1E,Conditions
+{0 conditions}
+
+B7C3E1EF-C8E1-49C6-ABA8-660A9D0D8A1E,Destination
+<%InstallDir%>/tomcat/webapps/alfresco.war
+
+B7C3E1EF-C8E1-49C6-ABA8-660A9D0D8A1E,Source
+<%InstallDir%>/upgrades/<%Version%>/alfresco.war
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,BackButton,subst
+1
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,CancelButton,subst
+1
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,Caption,subst
+1
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,Conditions
+{0 conditions}
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,Message,subst
+1
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,NextButton,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,BackButton,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,CancelButton,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,Caption,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,Conditions
+{0 conditions}
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,FileLabel,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,Message,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,NextButton,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,ProgressValue,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,Subtitle,subst
+1
+
+D3C20805-32F3-4D27-A208-14416A55DC0A,Title,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,BackButton,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,BrowseButton,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,BrowseText,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,CancelButton,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Conditions
+{3 conditions}
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,DestinationLabel,subst
+0
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Message,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,NextButton,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Subtitle,subst
+1
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Title,subst
+1
+
+D7C4D154-102D-4E69-BCE9-DE736306B3F2,Alias
+{Startup Actions}
+
+E4263D69-552B-472B-9E4B-0B6107059767,CheckCondition
+{Before Next Pane is Displayed}
+
+E4263D69-552B-472B-9E4B-0B6107059767,FailureMessage
+{No Alfresco installation found at this location}
+
+E4263D69-552B-472B-9E4B-0B6107059767,Filename
+<%InstallDir%>/tomcat/webapps/alfresco.war
+
+EA91E082-AE52-4F66-8547-16F25AB2BB05,Alias
+{Setup Actions}
+
+EEB924A9-DD95-45D6-A6D4-940B4EE700D2,State
+disabled
+
+EEB924A9-DD95-45D6-A6D4-940B4EE700D2,Widget
+{Back Button;Next Button}
+
+F46C9198-80E1-466C-9034-9BC1AA83A5C6,Action
+{Install Actions}
+
+F46C9198-80E1-466C-9034-9BC1AA83A5C6,Conditions
+{0 conditions}
+
+F4AB0B2F-294E-4D24-8C3E-DB67F03F4517,Action
+{Do Update}
+
+F4AB0B2F-294E-4D24-8C3E-DB67F03F4517,Conditions
+{0 conditions}
+
+F4AB0B2F-294E-4D24-8C3E-DB67F03F4517,ExecuteAction
+{Before Next Pane is Displayed}
+
+F6005EED-F116-409B-82E7-662D4A7065E8,Components
+A92DA43F-C102-49A4-89FB-F2A2B18949D1
+
+F6005EED-F116-409B-82E7-662D4A7065E8,Description,subst
+1
+
+F6005EED-F116-409B-82E7-662D4A7065E8,Name
+Typical
+
+FreeBSD-4-x86,Active
+No
+
+FreeBSD-4-x86,DefaultDirectoryPermission
+0755
+
+FreeBSD-4-x86,DefaultFilePermission
+0755
+
+FreeBSD-4-x86,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+FreeBSD-4-x86,FallBackToConsole
+Yes
+
+FreeBSD-4-x86,InstallDir
+<%Home%>/<%ShortAppName%>
+
+FreeBSD-4-x86,InstallMode
+Standard
+
+FreeBSD-4-x86,InstallType
+Typical
+
+FreeBSD-4-x86,ProgramExecutable
+<%InstallDir%>/virtual_start.sh
+
+FreeBSD-4-x86,ProgramFolderAllUsers
+No
+
+FreeBSD-4-x86,ProgramFolderName
+<%AppName%>
+
+FreeBSD-4-x86,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+FreeBSD-4-x86,ProgramName
+{}
+
+FreeBSD-4-x86,ProgramReadme
+<%InstallDir%>/README.txt
+
+FreeBSD-4-x86,PromptForRoot
+Yes
+
+FreeBSD-4-x86,RequireRoot
+No
+
+FreeBSD-4-x86,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+FreeBSD-x86,Active
+No
+
+FreeBSD-x86,DefaultDirectoryPermission
+0755
+
+FreeBSD-x86,DefaultFilePermission
+0755
+
+FreeBSD-x86,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+FreeBSD-x86,FallBackToConsole
+Yes
+
+FreeBSD-x86,InstallDir
+<%Home%>/<%ShortAppName%>
+
+FreeBSD-x86,InstallMode
+Standard
+
+FreeBSD-x86,InstallType
+Typical
+
+FreeBSD-x86,ProgramExecutable
+<%InstallDir%>/virtual_start.sh
+
+FreeBSD-x86,ProgramFolderAllUsers
+No
+
+FreeBSD-x86,ProgramFolderName
+<%AppName%>
+
+FreeBSD-x86,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+FreeBSD-x86,ProgramName
+{}
+
+FreeBSD-x86,ProgramReadme
+<%InstallDir%>/README.txt
+
+FreeBSD-x86,PromptForRoot
+Yes
+
+FreeBSD-x86,RequireRoot
+No
+
+FreeBSD-x86,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+HPUX-hppa,Active
+No
+
+HPUX-hppa,DefaultDirectoryPermission
+0755
+
+HPUX-hppa,DefaultFilePermission
+0755
+
+HPUX-hppa,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+HPUX-hppa,FallBackToConsole
+Yes
+
+HPUX-hppa,InstallDir
+<%Home%>/<%ShortAppName%>
+
+HPUX-hppa,InstallMode
+Standard
+
+HPUX-hppa,InstallType
+Typical
+
+HPUX-hppa,ProgramExecutable
+<%InstallDir%>/virtual_start.sh
+
+HPUX-hppa,ProgramFolderAllUsers
+No
+
+HPUX-hppa,ProgramFolderName
+<%AppName%>
+
+HPUX-hppa,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+HPUX-hppa,ProgramName
+{}
+
+HPUX-hppa,ProgramReadme
+<%InstallDir%>/README.txt
+
+HPUX-hppa,PromptForRoot
+Yes
+
+HPUX-hppa,RequireRoot
+No
+
+HPUX-hppa,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+Linux-x86,Active
+Yes
+
+Linux-x86,DefaultDirectoryPermission
+0755
+
+Linux-x86,DefaultFilePermission
+0755
+
+Linux-x86,Executable
+<%ShortAppName%><%Codeline%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+Linux-x86,FallBackToConsole
+Yes
+
+Linux-x86,InstallDir
+<%Home%>/Alfresco
+
+Linux-x86,InstallMode
+Standard
+
+Linux-x86,InstallType
+Typical
+
+Linux-x86,ProgramExecutable
+{}
+
+Linux-x86,ProgramFolderAllUsers
+No
+
+Linux-x86,ProgramFolderName
+<%AppName%>
+
+Linux-x86,ProgramLicense
+{}
+
+Linux-x86,ProgramName
+{}
+
+Linux-x86,ProgramReadme
+{}
+
+Linux-x86,PromptForRoot
+Yes
+
+Linux-x86,RequireRoot
+No
+
+Linux-x86,RootInstallDir
+/opt/Alfresco
+
+Solaris-sparc,Active
+No
+
+Solaris-sparc,DefaultDirectoryPermission
+0755
+
+Solaris-sparc,DefaultFilePermission
+0755
+
+Solaris-sparc,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+Solaris-sparc,FallBackToConsole
+Yes
+
+Solaris-sparc,InstallDir
+<%Home%>/<%ShortAppName%>
+
+Solaris-sparc,InstallMode
+Standard
+
+Solaris-sparc,InstallType
+Typical
+
+Solaris-sparc,ProgramExecutable
+<%InstallDir%>/virtual_start.sh
+
+Solaris-sparc,ProgramFolderAllUsers
+No
+
+Solaris-sparc,ProgramFolderName
+<%AppName%>
+
+Solaris-sparc,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+Solaris-sparc,ProgramName
+{}
+
+Solaris-sparc,ProgramReadme
+<%InstallDir%>/README.txt
+
+Solaris-sparc,PromptForRoot
+Yes
+
+Solaris-sparc,RequireRoot
+No
+
+Solaris-sparc,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+TarArchive,Active
+No
+
+TarArchive,CompressionLevel
+6
+
+TarArchive,DefaultDirectoryPermission
+0755
+
+TarArchive,DefaultFilePermission
+0755
+
+TarArchive,Executable
+<%AppName%>-<%Version%>-<%Platform%>-Install<%Ext%>
+
+TarArchive,FallBackToConsole
+Yes
+
+TarArchive,InstallDir
+<%Home%>/<%ShortAppName%>
+
+TarArchive,InstallMode
+Standard
+
+TarArchive,InstallType
+Typical
+
+TarArchive,OutputFileName
+<%ShortAppName%>-<%Version%>.tar.gz
+
+TarArchive,ProgramExecutable
+{}
+
+TarArchive,ProgramFolderAllUsers
+No
+
+TarArchive,ProgramFolderName
+<%AppName%>
+
+TarArchive,ProgramLicense
+<%InstallDir%>/LICENSE.txt
+
+TarArchive,ProgramName
+{}
+
+TarArchive,ProgramReadme
+<%InstallDir%>/README.txt
+
+TarArchive,PromptForRoot
+Yes
+
+TarArchive,RequireRoot
+No
+
+TarArchive,RootInstallDir
+/usr/local/<%ShortAppName%>
+
+TarArchive,VirtualTextMap
+{<%InstallDir%> <%ShortAppName%>}
+
+Windows,Active
+Yes
+
+Windows,Executable
+<%ShortAppName%><%Codeline%>-<%Version%>-Setup<%Ext%>
+
+Windows,IncludeTWAPI
+No
+
+Windows,InstallDir
+C:/Alfresco
+
+Windows,InstallMode
+Standard
+
+Windows,InstallType
+Typical
+
+Windows,ProgramExecutable
+{}
+
+Windows,ProgramFolderAllUsers
+No
+
+Windows,ProgramFolderName
+<%AppName%>
+
+Windows,ProgramLicense
+{}
+
+Windows,ProgramName
+{}
+
+Windows,ProgramReadme
+{}
+
+Windows,WindowsIcon
+{Setup Blue Screen.ico}
+
+}
+
+::msgcat::mcmset de {
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Message
+<%InstallationCompleteText%>
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Message
+<%InstallingApplicationText%>
+
+4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59,Message
+<%UninstallCompleteText%>
+
+C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
+<%UninstallingApplicationText%>
+
+}
+::msgcat::mcmset en {
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Message
+<%InstallationCompleteText%>
+
+185DEE53-68ED-4921-9CA3-E480BE16988A,Caption
+{Welcome to <%AppName%>}
+
+2C9998AE-3A35-4709-8148-E361FCC88B70,Message
+<%InstallStartupText%>
+
+2C9998AE-3A35-4709-8148-E361FCC88B70,Title
+<%InstallApplicationText%>
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Message
+<%InstallingApplicationText%>
+
+4961FB8A-BDAE-4264-9BFE-576BDE388928,Text
+<%ViewReadmeText%>
+
+4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59,Message
+<%UninstallCompleteText%>
+
+60993F14-4B6A-4F15-AD0D-F2419D5D27D0,Text
+<%ViewReadmeText%>
+
+840E153B-F29E-4184-8941-3C26F456EB0D,Description
+<%CustomInstallDescription%>
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Caption
+{Updated files have been copied to your existing Alfresco installation.  You may stop now or continue to perform the upgrade.}
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Subtitle
+{Decide if you wish your installation to be automatically updated.}
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Text
+{Updated files have been copied to your existing Alfresco installation ready for upgrade.  If you do not wish the setup to upgrade your installation automatically, click Cancel.  You can then perform the upgrade by hand, ensuring you have backed up old files as necessary.  As part of the automatic upgrade the temporary folders in Tomcat will be removed.  It will also removed the expanded Alfresco, so please make sure you have backed up any modifications.  Click Next to begin the automatic upgrade.}
+
+987C8D98-115B-485D-AF3B-3EECD5A76A9F,Title
+{Start Updating Files}
+
+A92DA43F-C102-49A4-89FB-F2A2B18949D1,Description
+<%ProgramFilesDescription%>
+
+B8789CBA-5346-4622-B110-5C07D63D8D1B,Message
+{Your Alfresco Upgrade has been finished successfully.   Click Finish to exit the wizard.}
+
+C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
+<%UninstallingApplicationText%>
+
+C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Caption
+<%ApplicationReadmeText%>
+
+C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Message
+{}
+
+C24DB57E-8A2F-4608-BF39-34DE6FFAD232,Title
+<%ApplicationReadmeText%>
+
+D48D5141-FE42-4E9F-94A0-B318959410E7,Message
+<%UninstallStartupText%>
+
+D48D5141-FE42-4E9F-94A0-B318959410E7,Title
+<%UninstallApplicationText%>
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Caption
+{Please locate the existing Alfresco server on which you wish to enable WCM.
+
+Use the Browse... button to navigate to find an existing Alfresco installation.}
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Subtitle
+{Where is your existing Alfresco for WCM to be enabled?}
+
+D700B54B-CEAC-48E9-8AC8-94D982B73406,Title
+{Choose Existing Alfresco  Location}
+
+F6005EED-F116-409B-82E7-662D4A7065E8,Description
+<%TypicalInstallDescription%>
+
+}
+::msgcat::mcmset es {
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Message
+<%InstallationCompleteText%>
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Message
+<%InstallingApplicationText%>
+
+4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59,Message
+<%UninstallCompleteText%>
+
+C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
+<%UninstallingApplicationText%>
+
+}
+::msgcat::mcmset fr {
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Message
+<%InstallationCompleteText%>
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Message
+<%InstallingApplicationText%>
+
+4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59,Message
+<%UninstallCompleteText%>
+
+C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
+<%UninstallingApplicationText%>
+
+}
+::msgcat::mcmset pt_br {
+01472B6B-51CF-4489-8D7B-930E4CC4DA03,Message
+<%InstallationCompleteText%>
+
+3AD5798F-A12B-4033-81BE-280FE617C152,Message
+<%InstallingApplicationText%>
+
+4A33C6CC-6E8C-48BA-8F7A-5F35CAD42D59,Message
+<%UninstallCompleteText%>
+
+C0127B2B-279D-41E9-B5BF-E8C61362F845,Message
+<%UninstallingApplicationText%>
+
+}
+
