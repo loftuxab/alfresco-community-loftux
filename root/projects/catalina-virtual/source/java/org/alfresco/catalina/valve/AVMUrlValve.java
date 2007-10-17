@@ -259,11 +259,12 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     */
 
     @SuppressWarnings("unchecked")
-    public void invoke( Request  request, 
+    public void invoke( Request  request,
                         Response response
                       ) throws IOException, ServletException
     {
         // Request/Response implement HttpServlet{Request|Response}
+        // Concretely, Request is:    org.apache.catalina.connector.Request
 
         if (AVMUrlValve_invoked_.get() == Boolean.TRUE)
         {
@@ -813,8 +814,23 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
     *   <pre>
     *     /$4$store-1$servlets-examples/servlet/RequestInfoExample
     *   </pre>
+    *
+    *  The URI would still contain the webapp name after unmangling:
+    *   <pre>
+    *     /servlets-examples/servlet/RequestInfoExample
+    *   </pre>
+    *
+    *  However, if this is the ROOT webapp, because the context path
+    *  is "", a mangle name like this:
+    *  <pre>
+    *     /$-1$store-1$ROOT/servlet/RequestInfoExample
+    *  </pre>
+    *  becomes:
+    *  <pre>
+    *     /servlet/RequestInfoExample
+    *  </pre>
     */
-    String unMangleAVMuri( String uri )
+    public static String unMangleAVMuri( String uri )
     {
 
         int offset;
@@ -848,7 +864,11 @@ public class AVMUrlValve extends ValveBase implements Lifecycle
             // /$-1$store-1$ROOT/moo/cow/...
         }
 
-        return "/" + uri.substring( offset, uri.length() );
+        String unmangled_uri =  "/" + uri.substring( offset, uri.length() );
+
+        return unmangled_uri.equals("/ROOT")  
+               ? ""                           // handle the "empty path"
+               : unmangled_uri;
     }
 
 
