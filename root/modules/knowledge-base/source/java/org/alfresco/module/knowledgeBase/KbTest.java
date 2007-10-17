@@ -200,7 +200,13 @@ public class KbTest extends BaseSpringTest implements KbModel
         NodeRef kb = assocs.get(0).getTargetRef();
         assertEquals(expectedKnowledgeBase, kb);
         
-        // Check the default values have been set correctly
+        System.out.println(props.get(PROP_STATUS).getClass().getName());
+        
+        //this.nodeService.setProperty(article, PROP_STATUS, STATUS_DRAFT);
+        //props = this.nodeService.getProperties(article);
+        //System.out.println(props.get(PROP_STATUS).getClass().getName());
+        
+        // Check the default values have been set correctly        
         assertEquals(STATUS_DRAFT, 
                      props.get(PROP_STATUS));
         

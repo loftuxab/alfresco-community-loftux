@@ -303,6 +303,8 @@ package org.alfresco.ace.application.home
 			shadowWipeDown.duration = TRANSITION_SPEED;
 			shadowWipeDown.suspendBackgroundProcessing = true;			
 			this._panelShadow.setStyle("showEffect", shadowWipeDown);
+			
+			
 		}
 		
 		/**
