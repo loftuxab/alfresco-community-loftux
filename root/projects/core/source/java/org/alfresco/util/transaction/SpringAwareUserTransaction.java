@@ -510,6 +510,16 @@ public class SpringAwareUserTransaction
     }
     
     @Override
+    protected void completeTransactionAfterThrowing(TransactionInfo txInfo, Throwable ex)
+    {
+        if (logger.isDebugEnabled())
+        {
+            logger.debug("Exception attempting to pass transaction boundaries.", ex);
+        }
+        super.completeTransactionAfterThrowing(txInfo, ex);
+    }
+
+    @Override
     protected String methodIdentification(Method method)
     {
         // note: override for debugging purposes - this method called by Spring
