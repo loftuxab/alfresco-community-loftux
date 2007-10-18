@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.transaction.UserTransaction;
+
 import org.alfresco.model.ContentModel;
 import org.alfresco.repo.content.MimetypeMap;
 import org.alfresco.repo.security.authentication.AuthenticationComponent;
@@ -47,6 +49,7 @@ import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.service.transaction.TransactionService;
 import org.alfresco.util.BaseSpringTest;
+import org.alfresco.util.GUID;
 
 /**
  * Knowledge Base Unit Test
@@ -86,13 +89,14 @@ public class KbTest extends BaseSpringTest implements KbModel
 		ResultSet results1 = this.searchService.query(KbTest.SPACES_STORE, SearchService.LANGUAGE_XPATH, "app:company_home");
 		this.companyHome = results1.getNodeRefs().get(0);
 		
+        String name = "KnowledgeBaseTest" + GUID.generate();
 		Map<QName, Serializable> props = new HashMap<QName, Serializable>(10);
-		props.put(ContentModel.PROP_NAME, "KnowledgeBaseTest");
+		props.put(ContentModel.PROP_NAME, name);
 		
 		this.kbNode = this.nodeService.createNode(
 				this.companyHome, 
 				ContentModel.ASSOC_CONTAINS, 
-				QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, "KnowledgeBaseTest"),
+				QName.createQName(NamespaceService.CONTENT_MODEL_1_0_URI, name),
                 QName.createQName("{http://www.alfresco.org/model/knowledgebase/1.0}knowledgeBase"), 
                 props).getChildRef();
                      
@@ -135,9 +139,10 @@ public class KbTest extends BaseSpringTest implements KbModel
     }
     
     public void testUpdateStatus()
+        throws Exception
     {
         // Create article directly beneth the knowledge base
-        NodeRef article = createTestNode(this.kbNode, "testArticle1", ContentModel.TYPE_CONTENT);
+        NodeRef article = createTestNode(this.kbNode, "testArticle1" + GUID.generate(), ContentModel.TYPE_CONTENT);
         
         // Set some content on the article
         ContentWriter writer = this.contentService.getWriter(article, ContentModel.PROP_CONTENT, true);
@@ -162,6 +167,13 @@ public class KbTest extends BaseSpringTest implements KbModel
         
         // Change the status to published and check
         this.nodeService.setProperty(article, PROP_STATUS, STATUS_PUBLISHED);
+       
+        setComplete();
+        endTransaction();
+        
+        UserTransaction tx = transactionService.getUserTransaction();
+        tx.begin();
+        
         List<ChildAssociationRef> children3 = this.nodeService.getChildAssocs(article, ASSOC_PUBLISHED, RegexQNamePattern.MATCH_ALL);
         assertEquals(1, children3.size());
         
@@ -173,10 +185,13 @@ public class KbTest extends BaseSpringTest implements KbModel
         assertEquals(1, children4.size());
         String contentString = ((ContentData)this.nodeService.getProperty(children4.get(0).getChildRef(), ContentModel.PROP_CONTENT)).getContentUrl();
         assertFalse((origContentString == contentString));
+        
+        tx.commit();
     }
     
     private NodeRef createTestNode(NodeRef parent, String name, QName type)
     {
+        name = name + GUID.generate();        
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(ContentModel.PROP_NAME, name);
         return this.nodeService.createNode(
