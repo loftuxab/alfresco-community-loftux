@@ -230,11 +230,6 @@
             tofile="${dir.continuous.assemble.virtualtomcat}" />
       <move file="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.renametojar" 
             tofile="${dir.continuous.assemble.virtualtomcat}/server/lib/servlets-ssi.jar" />
-      <delete dir="${dir.continuous.assemble.virtualtomcat}/webapps/balancer" />
-      <delete dir="${dir.continuous.assemble.virtualtomcat}/webapps/jsp-examples" />
-      <delete dir="${dir.continuous.assemble.virtualtomcat}/webapps/servlets-examples" />
-      <delete dir="${dir.continuous.assemble.virtualtomcat}/webapps/tomcat-docs" />
-      <delete dir="${dir.continuous.assemble.virtualtomcat}/webapps/webdav" />
       <deploy-virtual-tomcat location="${dir.continuous.assemble.virtualtomcat}" />
    </target>
 

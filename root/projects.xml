@@ -915,6 +915,17 @@
              perm="ugo+rx"
              includes="**/*.sh"/>
 
+
+      <!-- Get rid of stuff that the virt server does not actually need -->
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/balancer"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/jsp-examples"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/servlet-examples"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/tomcat-docs"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/webapps/webdav"/>
+      <delete dir="${dir.name.src.tomcatvirt.custom}/build/build/server/webapps/admin"/>
+      <delete file="${dir.name.src.tomcatvirt.custom}/build/build/conf/Catalina/localhost/admin.xml"/>
+
+
       <!-- Refresh cached base virtserver tomcat distro in 3rd party 
            Note:  During the install process, other files are added/removed 
                   from this zip file (e.g.: jndi-related stuff).  
