@@ -10,33 +10,7 @@
 		    	<value>alfresco/module/org.alfresco.module.knowledgeBase/model/kbModel.xml</value>        
 		    </list>
 		</property>
-	</bean> 
-    
-    <!-- Comment out for now -->
-    <!--
-    <bean id="kb_workflowBootstrap" parent="workflowDeployer">
-		<property name="workflowDefinitions">
-			<list>
-			    <props>
-			      <prop key="engineId">jbpm</prop>
-			      <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/model/ask-review-process-definition.xml</prop>
-			      <prop key="mimetype">text/xml</prop>
-			      <prop key="redeploy">true</prop>
-			    </props>
-			</list>
-		</property>
-		<property name="models">
-			<list>
-
-			</list>
-		</property>
-		<property name="labels">
-			<list>
-
-			</list>
-		</property>
-	</bean>  
-	-->    
+	</bean>   
 	
 	<!-- Knowledge base data bootstrap bean -->   
 	<bean id="kb_bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent" depends-on="kb_dictionaryBootstrap">
@@ -64,20 +38,29 @@
 				<props>
 		      		<prop key="path">/${spaces.company_home.childname}</prop>
 		        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_space.xml</prop>
-		      	</props>         	    
-		      	<!-- Knowledge base web scripts -->    
-		        <!--
-		        <props>
-		            <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}/cm:webscripts/cm:org/cm:alfresco</prop>
-		            <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_webscripts.xml</prop>
-		        </props>
-		        -->      	
+		      	</props>         	        	
 	    	</list>
 	    </property>
 	</bean>
 	
-	<!-- Import the behaviour configuration -->	
-	<import resource="classpath:alfresco/module/org.alfresco.module.knowledgeBase/behaviour/behaviour-context.xml" />    
+	<!-- Article aspect behaviour bean -->
+	<bean id="kb_articleAspect" class="org.alfresco.module.knowledgeBase.ArticleAspect" init-method="init">
+		<property name="policyComponent">
+            <ref bean="policyComponent" />
+        </property>
+        <property name="nodeService">
+            <ref bean="NodeService" />
+        </property>
+        <property name="contentService">
+            <ref bean="ContentService" />
+        </property>
+        <property name="actionService">
+            <ref bean="ActionService" />
+        </property>
+        <property name="dictionaryService">
+            <ref bean="DictionaryService" />
+        </property>
+	</bean>
 	
 	<!-- Import the transform configuration -->
 	<import resource="classpath:alfresco/module/org.alfresco.module.knowledgeBase/transform/custom-transform-context.xml" /> 
