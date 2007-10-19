@@ -865,7 +865,7 @@
            depends="verify-sdk">
       <zip destfile="${dir.continuous.dist}/${file.name.dist.sdk}.zip">
          <zipfileset dir="${dir.continuous.assemble.sdk}" />
-         <zipfileset dir="${dir.project.installer.extras}" 
+         <zipfileset dir="${dir.project.installer.extras}"
                      prefix="extras" 
                      excludes="**/*.sh" />
       </zip>
@@ -1110,12 +1110,6 @@
       <mkdir dir="${dir.continuous.assemble.docs.taglib}" />
       
       <!-- java docs -->
-      <copy todir="${dir.continuous.assemble.docs.java}/benchmark-framework">
-         <fileset dir="${dir.project.benchmarkframework.docs.java}" />
-      </copy>
-      <copy todir="${dir.continuous.assemble.docs.java}/benchmark-tests">
-         <fileset dir="${dir.project.benchmarktests.docs.java}" />
-      </copy>
       <copy todir="${dir.continuous.assemble.docs.java}/catalina-virtual">
          <fileset dir="${dir.project.catalinavirtual.docs.java}" />
       </copy>
