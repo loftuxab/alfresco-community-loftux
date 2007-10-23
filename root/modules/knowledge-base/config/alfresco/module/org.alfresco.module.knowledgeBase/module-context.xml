@@ -58,6 +58,16 @@
 	    </property>
 	</bean>
 	
+	<!-- KB Script Util Methods -->
+	<bean id="kb_scriptUtil" parent="baseJavaScriptExtension" class="org.alfresco.module.knowledgeBase.KbScriptUtil">
+        <property name="extensionName">
+            <value>kb</value>
+        </property>               
+        <property name="authorityService">
+            <ref bean="AuthorityService"/>
+        </property>
+    </bean>
+	
 	<!-- Article aspect behaviour bean -->
 	<bean id="kb_articleAspect" class="org.alfresco.module.knowledgeBase.ArticleAspect" init-method="init">
 		<property name="policyComponent">

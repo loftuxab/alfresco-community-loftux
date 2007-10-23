@@ -66,5 +66,4 @@ public interface KbModel
     public static final NodeRef VISIBILITY_TIER_1 = new NodeRef(SPACES_STORE, "kb:visibility-tier-one");
     public static final NodeRef VISIBILITY_TIER_2 = new NodeRef(SPACES_STORE, "kb:visibility-tier-two");
     public static final NodeRef VISIBILITY_TIER_3 = new NodeRef(SPACES_STORE, "kb:visibility-tier-three");
-    
 }
