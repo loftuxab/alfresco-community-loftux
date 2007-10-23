@@ -49,6 +49,9 @@ import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
+import org.alfresco.service.cmr.security.AuthenticationService;
+import org.alfresco.service.cmr.security.OwnableService;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -63,39 +66,111 @@ public class ArticleAspect implements KbModel,
                                       NodeServicePolicies.OnUpdatePropertiesPolicy,
                                       NodeServicePolicies.OnAddAspectPolicy,
                                       NodeServicePolicies.OnCreateChildAssociationPolicy,
-                                      ContentServicePolicies.OnContentUpdatePolicy
+                                      ContentServicePolicies.OnContentUpdatePolicy,
+                                      NodeServicePolicies.OnCreateNodePolicy
 {
+    /** Policy component */
     private PolicyComponent policyComponent;
+    
+    /** Node service */
     private NodeService nodeService;
+    
+    /** Content service */
     private ContentService contentService;
+    
+    /** Action service */
     private ActionService actionService;
+    
+    /** Dictionary service */
     private DictionaryService dictionaryService;
     
-    public void setpolicyComponent(PolicyComponent policyComponent)
+    /** Permission service */
+    private PermissionService permissionService;
+    
+    /** Ownable service */
+    private OwnableService ownableService;
+    
+    /** Authentication service */
+    private AuthenticationService authenticationService;
+    
+    /**
+     * Sets the policy component
+     * 
+     * @param policyComponent   the policy component
+     */
+    public void setPolicyComponent(PolicyComponent policyComponent)
     {
         this.policyComponent = policyComponent;
     }
     
+    /**
+     * Set the node service 
+     * 
+     * @param nodeService   the node service
+     */
     public void setNodeService(NodeService nodeService)
     {
         this.nodeService = nodeService;
     }
     
+    /**
+     * Set the content service
+     * 
+     * @param contentService    the content service
+     */
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
     }
     
+    /**
+     * Set the action service
+     * 
+     * @param actionService     the action service
+     */
     public void setActionService(ActionService actionService)
     {
         this.actionService = actionService;
     }
     
+    /**
+     * Set the dictionary service
+     * 
+     * @param dictionaryService     the dictionary service
+     */
     public void setDictionaryService(DictionaryService dictionaryService)
     {
         this.dictionaryService = dictionaryService;
     }
     
+    /**
+     * Set the permission service
+     * 
+     * @param permissionService     the permission service
+     */
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
+    }
+    
+    /**
+     * Set the ownable service
+     * 
+     * @param ownableService    the ownable service
+     */
+    public void setOwnableService(OwnableService ownableService)
+    {
+        this.ownableService = ownableService;
+    }
+    
+    public void setAuthenticationService(AuthenticationService authenticationService)
+    {
+        this.authenticationService = authenticationService;
+    }
+    
+    /**
+     * Initialisation method.  Registers the various behaviours for the aspect.
+     */
     public void init()
     {
 
@@ -120,8 +195,17 @@ public class ArticleAspect implements KbModel,
                 ContentModel.TYPE_FOLDER,
                 ContentModel.ASSOC_CONTAINS,
                 new JavaBehaviour(this, "onCreateChildAssociation", NotificationFrequency.FIRST_EVENT));
+        this.policyComponent.bindClassBehaviour(
+                QName.createQName(NamespaceService.ALFRESCO_URI, "onCreateNode"),
+                TYPE_KNOWLEDGE_BASE,
+                new JavaBehaviour(this, "onCreateNode", NotificationFrequency.FIRST_EVENT));
     }
     
+    /**
+     * The article aspect should not be copied.
+     * 
+     * @see org.alfresco.repo.copy.CopyServicePolicies.OnCopyNodePolicy#onCopyNode(org.alfresco.service.namespace.QName, org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.cmr.repository.StoreRef, boolean, org.alfresco.repo.policy.PolicyScope)
+     */
     public void onCopyNode(
             QName sourceClassRef, 
             NodeRef sourceNodeRef, 
@@ -132,6 +216,9 @@ public class ArticleAspect implements KbModel,
         // Do nothing since we do not want to copy the article aspect
     }
 
+    /**
+     * @see org.alfresco.repo.node.NodeServicePolicies.OnUpdatePropertiesPolicy#onUpdateProperties(org.alfresco.service.cmr.repository.NodeRef, java.util.Map, java.util.Map)
+     */
     public void onUpdateProperties(NodeRef nodeRef, Map<QName, Serializable> before, Map<QName, Serializable> after)
     {
         if (this.nodeService.exists(nodeRef) == true && 
@@ -144,9 +231,34 @@ public class ArticleAspect implements KbModel,
             {
                 updatePublishedArticle(nodeRef);
             }
+            
+            String beforeVisibility = (String)before.get(PROP_VISIBILITY).toString();
+            String afterVisibility = (String)after.get(PROP_VISIBILITY).toString();
+            if (afterVisibility.equals(beforeVisibility) == false)
+            {
+                updateArticlePermissions(nodeRef);
+            }
         }        
     }    
+    
+    /*
+     * OnCreate KnowledgeBase node behaviour.
+     * 
+     * @see org.alfresco.repo.node.NodeServicePolicies.OnCreateNodePolicy#onCreateNode(org.alfresco.service.cmr.repository.ChildAssociationRef)
+     */
+    public void onCreateNode(ChildAssociationRef childAssocRef)
+    {
+        // Get the newly created knowledge base node reference
+        NodeRef knowledgeBase = childAssocRef.getChildRef();
+        
+        // Set the permissions for the groups     
+        this.permissionService.setPermission(knowledgeBase, GROUP_INTERNAL, PermissionService.COORDINATOR, true);
+        this.permissionService.setPermission(knowledgeBase, GROUP_TIER_1, PermissionService.CONTRIBUTOR, true);  
+    }
 
+    /**
+     * @see org.alfresco.repo.node.NodeServicePolicies.OnAddAspectPolicy#onAddAspect(org.alfresco.service.cmr.repository.NodeRef, org.alfresco.service.namespace.QName)
+     */
     public void onAddAspect(NodeRef nodeRef, QName aspectTypeQName)
     {
         if (this.nodeService.exists(nodeRef) == true)
@@ -159,10 +271,23 @@ public class ArticleAspect implements KbModel,
             String id = this.nodeService.getProperty(kb, ContentModel.PROP_COUNTER).toString();
                
             // Set the kb id
-            this.nodeService.setProperty(nodeRef, PROP_KB_ID, pad(id, 4));
+            this.nodeService.setProperty(nodeRef, PROP_KB_ID, pad(id, 4));            
+
+            // Give coordinator permissions to the internal group
+            this.permissionService.setPermission(nodeRef, GROUP_INTERNAL, PermissionService.COORDINATOR, true);
+            
+            // Set the article permissions
+            updateArticlePermissions(nodeRef);
         }        
     }
     
+    /**
+     * Pads a given string to a given length
+     * 
+     * @param  s        the string
+     * @param  len      the required length
+     * @return String   the padded string  
+     */
     private String pad(String s, int len)
     {
        String result = s;
@@ -173,6 +298,9 @@ public class ArticleAspect implements KbModel,
        return result;
     }
 
+    /**
+     * @see org.alfresco.repo.node.NodeServicePolicies.OnCreateChildAssociationPolicy#onCreateChildAssociation(org.alfresco.service.cmr.repository.ChildAssociationRef, boolean)
+     */
     public void onCreateChildAssociation(ChildAssociationRef childAssocRef, boolean isNewNode)
     {
         NodeRef nodeRef = childAssocRef.getChildRef();   
@@ -186,16 +314,23 @@ public class ArticleAspect implements KbModel,
                 
                 if (kb != null)
                 {   
+                    // For some reason we need to set the owner by hand
+                    String userName = this.authenticationService.getCurrentUserName();
+                    this.ownableService.setOwner(nodeRef, userName);
+                    
                     // Link the article to the relevant knowledge base
                     this.nodeService.createAssociation(nodeRef, kb, ASSOC_KNOWLEDGE_BASE);
                     
                     // Apply the article aspect
-                    this.nodeService.addAspect(nodeRef, ASPECT_ARTICLE, null);
+                    this.nodeService.addAspect(nodeRef, ASPECT_ARTICLE, null);                    
                 }
             }
         }
     }
 
+    /**
+     *  @see org.alfresco.repo.content.ContentServicePolicies.OnContentUpdatePolicy#onContentUpdate(org.alfresco.service.cmr.repository.NodeRef, boolean)
+     */
     public void onContentUpdate(NodeRef nodeRef, boolean newContent)
     {
         if (this.nodeService.exists(nodeRef) == true && 
@@ -206,10 +341,15 @@ public class ArticleAspect implements KbModel,
             if (STATUS_PUBLISHED.toString().equals(status) == true)
             {
                 updatePublishedArticle(nodeRef);
-            }
+            }            
         }        
     }
     
+    /**
+     * Updates the SWF of a published article
+     * 
+     * @param article   the article
+     */
     private void updatePublishedArticle(NodeRef article)
     {
         // See if a rendition of the article already exists or not
@@ -245,6 +385,60 @@ public class ArticleAspect implements KbModel,
         }              
     }
     
+    /**
+     * Update the articles permissions based on the value of the visibility property
+     * 
+     * @param article   the article node reference
+     */
+    private void updateArticlePermissions(NodeRef article)
+    {
+        NodeRef visibility = (NodeRef)this.nodeService.getProperty(article, PROP_VISIBILITY);
+        if (visibility.equals(VISIBILITY_INTERNAL) == true)
+        {
+            // Clear tier one and two
+            this.permissionService.clearPermission(article, GROUP_TIER_1);
+            this.permissionService.clearPermission(article, GROUP_TIER_2);
+            
+            // Ensure inherted permissions are removed    
+            this.permissionService.setInheritParentPermissions(article, false);
+        }
+        else if (visibility.equals(VISIBILITY_TIER_1) == true)
+        {
+            // Clear tier two
+            this.permissionService.clearPermission(article, GROUP_TIER_2);
+            
+            // Add tier one
+            this.permissionService.setPermission(article, GROUP_TIER_1, PermissionService.CONSUMER, true);
+            
+            // Ensure inherted permissions are removed    
+            this.permissionService.setInheritParentPermissions(article, false);
+        }
+        else if (visibility.equals(VISIBILITY_TIER_2) == true)
+        {
+            // Add tier one and two
+            this.permissionService.setPermission(article, GROUP_TIER_1, PermissionService.CONSUMER, true);
+            this.permissionService.setPermission(article, GROUP_TIER_2, PermissionService.CONSUMER, true);
+            
+            // Ensure inherted permissions are removed    
+            this.permissionService.setInheritParentPermissions(article, false);
+        }
+        else if (visibility.equals(VISIBILITY_TIER_3) == true)
+        {
+            // Add tier one and two
+            this.permissionService.setPermission(article, GROUP_TIER_1, PermissionService.CONSUMER, true);
+            this.permissionService.setPermission(article, GROUP_TIER_2, PermissionService.CONSUMER, true);
+            
+            // Ensure inherted permissions are included  
+            this.permissionService.setInheritParentPermissions(article, true);            
+        }
+    }
+    
+    /**
+     * Get the name of the rendition
+     * 
+     * @param original  the origional article name
+     * @return String   the name of the rendition
+     */
     private String getRenditionName(String original)
     {
         // get the current extension
@@ -266,6 +460,12 @@ public class ArticleAspect implements KbModel,
         return sb.toString();
     }   
     
+    /**
+     * Get the knowledge base
+     * 
+     * @param nodeRef   the node reference
+     * @return NodeRef  the related knowledge base reference, null if none
+     */
     private NodeRef getKnowledgeBase(NodeRef nodeRef)
     {
        NodeRef result = null;
@@ -288,6 +488,12 @@ public class ArticleAspect implements KbModel,
        return result;
     }
 
+    /**
+     * Traverse up the node hierarchy to find the containing knowledge base, null if none
+     * 
+     * @param nodeRef   the node reference
+     * @return NodeRef  the knowledge base node reference, null if none
+     */
     private NodeRef findKnowledgeBase(NodeRef nodeRef)
     {
        NodeRef result = null;
@@ -312,5 +518,4 @@ public class ArticleAspect implements KbModel,
        
        return result;
     }
-
 }

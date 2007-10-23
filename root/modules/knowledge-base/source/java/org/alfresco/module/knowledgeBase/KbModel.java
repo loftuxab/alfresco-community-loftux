@@ -35,6 +35,8 @@ import org.alfresco.service.namespace.QName;
  */
 public interface KbModel
 {
+    public static final StoreRef SPACES_STORE = new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+    
     public static final String KB_URI = "http://www.alfresco.org/model/knowledgebase/1.0";
     public static final String KB_PREFIX = "kb";
     
@@ -43,14 +45,26 @@ public interface KbModel
     
     public static final QName PROP_KB_ID = QName.createQName(KB_URI, "kbId");
     public static final QName PROP_STATUS = QName.createQName(KB_URI, "status");
+    public static final QName PROP_VISIBILITY = QName.createQName(KB_URI, "visibility");
     
     public static final QName ASSOC_KNOWLEDGE_BASE = QName.createQName(KB_URI, "knowledgeBase");
     public static final QName ASSOC_PUBLISHED = QName.createQName(KB_URI, "published");
     
+    // Group names
+    public static final String GROUP_INTERNAL = "GROUP_KnowledgeBase_Internal";
+    public static final String GROUP_TIER_1 = "GROUP_KnowledgeBase_Tier_1";
+    public static final String GROUP_TIER_2 = "GROUP_KnowledgeBase_Tier_2";
+    
     // Categories
-    public static final NodeRef STATUS_DRAFT = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), "kb:status-draft");
-    public static final NodeRef STATUS_PENDING = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), "kb:status-pending");
-    public static final NodeRef STATUS_PUBLISHED = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), "kb:status-published");
-    public static final NodeRef STATUS_ARCHIVED = new NodeRef(new StoreRef(StoreRef.PROTOCOL_WORKSPACE, "SpacesStore"), "kb:status-archived");
+    public static final NodeRef STATUS_DRAFT = new NodeRef(SPACES_STORE, "kb:status-draft");
+    public static final NodeRef STATUS_PENDING = new NodeRef(SPACES_STORE, "kb:status-pending");
+    public static final NodeRef STATUS_PUBLISHED = new NodeRef(SPACES_STORE, "kb:status-published");
+    public static final NodeRef STATUS_ARCHIVED = new NodeRef(SPACES_STORE, "kb:status-archived");
+    
+    // Visibility
+    public static final NodeRef VISIBILITY_INTERNAL = new NodeRef(SPACES_STORE, "kb:visibility-internal");
+    public static final NodeRef VISIBILITY_TIER_1 = new NodeRef(SPACES_STORE, "kb:visibility-tier-one");
+    public static final NodeRef VISIBILITY_TIER_2 = new NodeRef(SPACES_STORE, "kb:visibility-tier-two");
+    public static final NodeRef VISIBILITY_TIER_3 = new NodeRef(SPACES_STORE, "kb:visibility-tier-three");
     
 }

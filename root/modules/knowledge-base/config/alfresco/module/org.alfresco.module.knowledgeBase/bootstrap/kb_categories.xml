@@ -92,12 +92,16 @@
 		               <sys:node-uuid>kb:visibility-internal</sys:node-uuid>
 		           </cm:category>
 		           <cm:category>
-		               <cm:name>Partners</cm:name>
-		               <sys:node-uuid>kb:visibility-partners</sys:node-uuid>
+		               <cm:name>Tier 1</cm:name>
+		               <sys:node-uuid>kb:visibility-tier-one</sys:node-uuid>
 		           </cm:category>
 		           <cm:category>
-		               <cm:name>Partners and Customers</cm:name>
-		               <sys:node-uuid>kb:visibility-partners-customers</sys:node-uuid>
+		               <cm:name>Tier 2</cm:name>
+		               <sys:node-uuid>kb:visibility-tier-two</sys:node-uuid>
+		           </cm:category>
+		           <cm:category>
+		               <cm:name>Tier 3</cm:name>
+		               <sys:node-uuid>kb:visibility-tier-three</sys:node-uuid>
 		           </cm:category>
 
 		       </cm:subcategories>
