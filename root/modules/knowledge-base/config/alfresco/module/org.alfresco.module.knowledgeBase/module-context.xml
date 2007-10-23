@@ -11,7 +11,26 @@
 		    </list>
 		</property>
 	</bean>   
-	
+		
+	<!-- Bootstrap Groups -->
+	<bean id="kb_bootstrapGroups" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent">
+        <property name="moduleId" value="org.alfresco.module.knowledgeBase" />
+        <property name="name" value="org.alfresco.module.knowledgeBase.bootstrapGroups" />
+        <property name="description" value="Initial data requirements" />
+        <property name="sinceVersion" value="1.0" />
+        <property name="appliesFromVersion" value="1.0" />
+        <!-- Data properties -->
+        <property name="importer" ref="userBootstrap"/>
+        <property name="bootstrapViews">
+            <list>
+                <props>
+                    <prop key="path">/${alfresco_user_store.system_container.childname}/sys:authorities</prop>
+                    <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_groups.xml</prop>
+                </props>
+            </list>
+        </property>
+    </bean>
+        
 	<!-- Knowledge base data bootstrap bean -->   
 	<bean id="kb_bootstrapSpaces" class="org.alfresco.repo.module.ImporterModuleComponent" parent="module.baseComponent" depends-on="kb_dictionaryBootstrap">
 	  	<property name="moduleId" value="org.alfresco.module.knowledgeBase" />
@@ -22,23 +41,19 @@
 	    <property name="importer" ref="spacesBootstrap"/>
 	    <property name="bootstrapViews">
 	    	<list>
+	    		
 	    		<!-- Knowledge base categories -->
 		    	<props>
 		        	<prop key="path">/cm:categoryRoot/cm:generalclassifiable</prop>
 		            <prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_categories.xml</prop>
 		        </props>
-		        <!-- Knowledge base templates and scripts -->
-		        <!-- 
-		        <props>
-		            <prop key="path">/${spaces.company_home.childname}/${spaces.dictionary.childname}</prop>
-		        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_data_dictionary.xml</prop>
-		      	</props>
-		      	-->	    	
+		            	
 		      	<!-- Knowledge space -->
 				<props>
 		      		<prop key="path">/${spaces.company_home.childname}</prop>
 		        	<prop key="location">alfresco/module/org.alfresco.module.knowledgeBase/bootstrap/kb_space.xml</prop>
 		      	</props>         	        	
+		      	
 	    	</list>
 	    </property>
 	</bean>
@@ -59,6 +74,15 @@
         </property>
         <property name="dictionaryService">
             <ref bean="DictionaryService" />
+        </property>
+        <property name="permissionService">
+            <ref bean="PermissionService" />
+        </property>
+        <property name="ownableService">
+            <ref bean="OwnableService" />
+        </property>
+        <property name="authenticationService">
+            <ref bean="AuthenticationService" />
         </property>
 	</bean>
 	
