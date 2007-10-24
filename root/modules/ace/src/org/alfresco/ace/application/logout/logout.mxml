@@ -24,9 +24,9 @@
         <!-- User name and logout link -->
 		<mx:VBox horizontalAlign="left" verticalAlign="top" height="100%">
 			
-			<mx:Spacer height="5"/>
-      		<link:HyperLink id="logoutLinkButton" text="Logout" click="confirm()" styleName="logoutLink" rolledOverStyleName="logoutLinkRollOver"/>
-  	  		<mx:Image source="@Embed(source='/images/enterprise_label.png')" />
+			<mx:Spacer height="7"/>
+      		<link:HyperLink id="logoutBtn" text="Logout" click="logout()" styleName="logoutLink" rolledOverStyleName="logoutLinkRollOver"/>
+  	  		<mx:Image id="visibilityImage" source="@Embed(source='/images/enterprise_label.png')" />
   	  		
   	  	</mx:VBox>
   
