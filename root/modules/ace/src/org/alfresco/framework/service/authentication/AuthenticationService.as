@@ -87,10 +87,26 @@
 		}
 		
 		/**
+		 * Indicates whether we are logged in or not
+		 */
+		public function get isLoggedIn():Boolean
+		{
+			var result:Boolean = false;
+			if (this._ticket != null)
+			{
+				result = true;
+			}
+			return result;
+		}
+		
+		/**
 		 * Log in a user to the Alfresco repository and store the ticket.
 		 */
 		public function login(userName:String, password:String):void
 		{
+			// Store the user name
+			this._userName = userName;
+			
 			// Create the web script obejct
 			var url:String = ConfigService.instance.url + "/alfresco/service/api/login";
 			var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onLoginSuccess, onLoginFailure, false);
@@ -135,7 +151,6 @@
 		{
 			// Store the ticket in the authentication service
 			this._ticket = event.result.ticket;
-			// TODO stash the user in here too ...
 			
 			// Raise on login success event
 			dispatchEvent(new LoginCompleteEvent(LoginCompleteEvent.LOGIN_COMPLETE, this._ticket, ""));
@@ -146,6 +161,9 @@
 		 */
 		public function onLoginFailure(event:FailureEvent):void
 		{
+			// Clear the user name
+			this._userName = null;
+			
 			// Get the error details from the failure event
 			var code:String = event.fault.faultCode;
 			var message:String = event.fault.faultString;

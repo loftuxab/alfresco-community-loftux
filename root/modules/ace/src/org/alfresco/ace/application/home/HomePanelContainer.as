@@ -38,6 +38,7 @@ package org.alfresco.ace.application.home
 	import org.alfresco.framework.service.error.ErrorService;
 	import org.alfresco.framework.service.authentication.AuthenticationService;
 	import org.alfresco.framework.service.authentication.LoginCompleteEvent;
+	import org.alfresco.framework.service.authentication.LogoutCompleteEvent;
 
 	/**
 	 * Home panel container class
@@ -203,6 +204,7 @@ package org.alfresco.ace.application.home
 				// Register interest in events
 				this._topCanvas.addEventListener(HomePanelTopClass.MINMAX_CLICK_EVENT, onMinMaxClick);
 				AuthenticationService.instance.addEventListener(LoginCompleteEvent.LOGIN_COMPLETE, onLoginComplete);
+				AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, onLogoutComplete);
 				this._bottomCanvas.addEventListener(EffectEvent.EFFECT_START, onEffectStart);
 				this._bottomCanvas.addEventListener(EffectEvent.EFFECT_END, onEffectEnd);
 				this._vBox.addEventListener(EffectEvent.EFFECT_END, onEffectStart);
@@ -388,6 +390,14 @@ package org.alfresco.ace.application.home
 			{
 				this.currentState = null;
 			}
+		}
+		
+		/**
+		 * onLogout event handler
+		 */
+		private function onLogoutComplete(event:Event):void
+		{
+			this.currentState = STATE_START;	
 		}
 		
 		/**

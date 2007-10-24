@@ -79,6 +79,9 @@ package org.alfresco.ace.application.home.gettingStarted
 		
 		override protected function showComplete():void
 		{
+			this._videoPaused = false;
+			this.pauseBox.visible = false;
+			this.playBox.visible = false;
 			this._beforePlayEffect.play();
 		}
 		
