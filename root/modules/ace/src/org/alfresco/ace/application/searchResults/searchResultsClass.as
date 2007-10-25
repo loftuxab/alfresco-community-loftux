@@ -38,7 +38,7 @@ package org.alfresco.ace.application.searchResults
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchCompleteEvent;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
 	import mx.collections.ArrayCollection;
-	import org.alfresco.framework.control.hyperlink.HyperLink;
+	import org.alfresco.ace.control.hyperlink.HyperLink;
 	import mx.effects.Resize;
 	import mx.events.EffectEvent;
 	

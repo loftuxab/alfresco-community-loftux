@@ -3,6 +3,7 @@
 	<name>ACE</name>
 	<comment></comment>
 	<projects>
+		<project>Alfresco-Flex-Framework</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
