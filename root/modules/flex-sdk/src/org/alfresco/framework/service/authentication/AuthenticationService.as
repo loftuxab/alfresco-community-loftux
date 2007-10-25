@@ -24,8 +24,6 @@
  */
  package org.alfresco.framework.service.authentication
 {
-	import org.alfresco.ace.application.logout.logout;
-	
 	import flash.events.Event;
 	import flash.profiler.showRedrawRegions;
 	

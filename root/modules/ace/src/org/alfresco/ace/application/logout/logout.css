@@ -6,7 +6,7 @@
    border-thickness:1;
    border-color:#FFFFFF;
    
-   border-skin: ClassReference("org.alfresco.framework.control.gradient.SimpleGradientBorder");
+   border-skin: ClassReference("org.alfresco.ace.control.gradient.SimpleGradientBorder");
    fill-colors: #e1e1e1, #D9DDE0;
 }
 

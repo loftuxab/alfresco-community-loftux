@@ -33,7 +33,7 @@ package org.alfresco.ace.application.searchDetails
 	import org.alfresco.ace.application.searchDetails.searchDetailsClickEvent;
 	import mx.events.DividerEvent;
 	import mx.events.ResizeEvent;
-	import org.alfresco.framework.control.hyperlink.HyperLink;
+	import org.alfresco.ace.control.hyperlink.HyperLink;
 
 	/**
 	 * Search Details Class
