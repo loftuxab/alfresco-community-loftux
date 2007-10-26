@@ -49,13 +49,13 @@ dir.indexes=@@ALF_INDEXES@@
 #sybase#db.url=jdbc:sybase:Tds:localhost:2638/alfresco
 
 #
-# SQLServer connection (requires jdts-1.2.jar or equivalent - http://jtds.sourceforge.net/)
+# SQLServer connection (requires jtds-1.2.jar or equivalent - http://jtds.sourceforge.net/)
 #
 #sqlserver#db.driver=net.sourceforge.jtds.jdbc.Driver
 #sqlserver#db.url=jdbc:jtds:sqlserver://localhost/alfresco
 
 #
-# SQLServer connection using Microsoft JDDB driver
+# SQLServer connection using Microsoft JDBC driver
 #
 #db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
 #db.url=jdbc:sqlserver://localhost;DatabaseName=alfresco
