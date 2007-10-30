@@ -55,6 +55,8 @@ package org.alfresco.ace.application.login
 		{	
 			// Call authentication service to log user in
 			AuthenticationService.instance.login(username.text, password.text);
+			username.text = "";
+			password.text = "";
 		}
 		
 		/**
@@ -67,7 +69,7 @@ package org.alfresco.ace.application.login
 				// Switch to the alternative state and set the error message
 				currentState = "InvalidCredentials";
 				errorMessage.text = event.error.message;
-				
+				focusManager.setFocus(username);
 			}
 		}
 	}	

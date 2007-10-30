@@ -9,7 +9,7 @@
 	
 	<!-- Import css style sheet -->
     <mx:Style source="searchResults.css"/> 
-	
+    
 	<mx:VBox width="100%" height="100%" borderSkin="org.alfresco.ace.control.gradient.GlossGradientBorder">
 		
 		<!-- The details bar -->
@@ -20,7 +20,9 @@
 			</mx:HBox>				
 		</mx:Canvas>
 	
-		<mx:HDividedBox width="100%" height="100%"   horizontalGap="1" dividerAlpha="0.0">
+	
+		
+		<mx:HDividedBox width="100%" height="100%"   horizontalGap="1" dividerAlpha="0.0" verticalAlign="middle">
 				
 			<!-- Search Results Repeater elements -->
 			<mx:Canvas borderStyle="solid" width="100%" height="100%" id="resultsDispPanel"  horizontalScrollPolicy="off">
@@ -28,6 +30,7 @@
 						     horizontalScrollPolicy="off">
 					<mx:Repeater id="results" x="85" y="140" width="100%" height="100%">	
 							<searchDetails:searchDetails horizontalScrollPolicy="off"  
+								articleName = "{results.currentItem.name}"
 								doctitle = "{results.currentItem.title}"
 								modified = "{results.currentItem.updated}"
 								summary  = "{results.currentItem.summary}"
@@ -39,30 +42,38 @@
 			</mx:Canvas>
 			
 			<!-- Search Results display space -->
-			<mx:VBox verticalGap="4" borderStyle="solid" width="100%"  height="100%" id="swfPanel" visible="false" includeInLayout="false">
-					<mx:Canvas  borderColor="#E6EAEB"  borderThickness="2" cornerRadius="4" id="swfTabbar" backgroundColor="#275065" 
-							   width="100%" height="40" borderStyle="solid" horizontalScrollPolicy="off">
-						<mx:HBox width="100%" horizontalAlign="middle" verticalAlign="middle">
+			<mx:VBox verticalGap="4" borderStyle="solid" width="100%"  height="100%"  effectEnd="swfPanel.visible=false;" id="swfPanel" includeInLayout="false" verticalAlign="middle" showEffect="test()">
+					
+						<mx:HBox width="100%" id="swfTabbar" styleName="swfTabbar"  height="40" borderStyle="solid" verticalAlign="middle">
 							
 							<mx:Spacer width="10"/>
-							<hLink:HyperLink  id="closeBtn"  click="CloseBtnClick()" text="X"  toolTip="Close"
-											  styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
+							<mx:LinkButton id="closeBtn"  click="CloseBtnClick()" icon="@Embed(source='/images/back_to_list.png')"  toolTip="Close"
+											  styleName="advancedSeachLink" rollOverColor="#275065"/>
+							<mx:Spacer width="15"/>
+							<mx:LinkButton icon="@Embed(source='/images/print_icon.png')" click="doPrint();" toolTip="Print"/>
+							<mx:Spacer width="20"/>
+							<mx:Label text="A" fontSize="9" color="#ffffff"/>
+							<mx:HSlider id="zoomer" width="50" liveDragging="true" minimum="0.75" maximum="1.5" change="zoomContent()"/>
+							<mx:Label text="A" fontSize="14" color="#ffffff"/>
 							<mx:Spacer width="100%"/>
 							<hLink:HyperLink  id="movePrevious" text="Previous" toolTip="Previous" click="onPreviousClick()" styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
-							<mx:Spacer width="10"/>
+							<mx:Spacer width="8"/>
+							<mx:Image source="images/doc_icon.png"/>
+							<mx:Spacer width="8"/>
 							<hLink:HyperLink  id="moveNext" text="Next" toolTip="Next" click="onNextClick()" styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
 							<mx:Spacer width="10"/>
+							
 						</mx:HBox> 
-					</mx:Canvas>
-					<mx:Canvas   width="100%" height="100%" horizontalScrollPolicy="off" styleName="searchResultsSpace" >
-						<mx:Panel title="{geturl()}" styleName="searchResultsPanel" 
-							      width="100%"  height="100%" horizontalScrollPolicy="off">
-							<mx:SWFLoader autoLoad="true" scaleContent="true"  id="myframe"  width="100%"/>	
+				
+					<mx:Canvas   width="100%" height="100%" styleName="searchResultsSpace" horizontalScrollPolicy="off">
+						<mx:Panel title="{geturl()}" styleName="searchResultsPanel" id="contentPanel"
+							      width="100%"  height="100%" horizontalScrollPolicy="off"> 
+							<mx:SWFLoader id="myframe" autoLoad="true"/>	
 						</mx:Panel>	
 					</mx:Canvas>
 			</mx:VBox>
 		
-		</mx:HDividedBox>
-
+		</mx:HDividedBox> 
+		
 	</mx:VBox>
 </results:searchResultsClass>

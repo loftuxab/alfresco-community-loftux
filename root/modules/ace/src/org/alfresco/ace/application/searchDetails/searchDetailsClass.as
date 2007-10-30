@@ -52,15 +52,19 @@ package org.alfresco.ace.application.searchDetails
 		private var _modified:String;	
 		private static const DEFAULT_HIDE_WIDTH:int = 450;
 		private var _hideWidth:int = DEFAULT_HIDE_WIDTH;
+		private var _flag:Boolean;
+		private var _dataUrl:String = "";
+		private var _name:String = "";
 		
 	    public var imgTag:Image;
 		public var myframe:SWFLoader;
 		public var swfPanel:Canvas;
 		public var resultsDispPanel:Canvas;
-		public var summaryBtn:HyperLink = new HyperLink();
+		public var titleBtn:HyperLink = new HyperLink();
 		public var content:Text;
 		public var updated:Text;
-		public var _dataUrl:String = "";	
+		
+			
 	
 		/**
 		 * Default Constructor
@@ -88,29 +92,38 @@ package org.alfresco.ace.application.searchDetails
 				{
 					content.visible = false;
 				}
-				
+		}
+		
+		public function set articleName(name:String):void
+		{
+			this._name = name;
+			if(this._title == null) titleBtn.text = this._name;
 		}
 		
 		public function set doctitle(title:String):void
 		{
 			this._title = title;
-			if (summaryBtn.text == null || summaryBtn.text.length == 0)
+			if (title == null || title.length == 0)
 			{
-				summaryBtn.text = this._title;
+				titleBtn.text = this._name;
+			}
+			else
+			{
+				titleBtn.text = this._title;
 			}
 		}	
 		
 		public function set category(cat:String):void
 		{
 			if (cat == "FAQ") imgTag.source = "images/faq.png";
-			else if (cat == "Article") imgTag.source = "images/article.PNG";
+			else if (cat == "Article") imgTag.source = "images/article.png";
 			else if (cat == "White Paper") imgTag.source = "images/white_paper.png";
 		}
 		
 		public function set modified(modified:String):void
 		{
 			this._modified = modified;
-			this.updated.text = "Modified : " + modified;
+			this.updated.text = "  " + modified;
 		}
 		
 		public function set dataUrl(str:String):void
@@ -121,7 +134,7 @@ package org.alfresco.ace.application.searchDetails
 		/** Implementation for the search Details Click event*/
 		public function onSearchDetailsClick():void
 		{
-		    dispatchEvent(new searchDetailsClickEvent(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT,this._dataUrl,true,true));
+		   dispatchEvent(new searchDetailsClickEvent(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT,this._dataUrl,true,true));
 		}
 		
 		
