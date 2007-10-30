@@ -1717,6 +1717,76 @@
            description="Builds the ACE application"
            depends="clean-ace, incremental-ace, wrapper-ace"/>
 
+   <!-- **************************************** -->
+   <!-- ** Facebook Alfresco Document Library ** -->
+   <!-- **************************************** -->
+
+   <target name="incremental-fb-doclib"
+           description="Performs an incremental build of the Facebook Doc Lib project."
+           depends="package-fb-doclib" />
+
+   <target name="build-fb-doclib"
+           description="Performs a clean build of the Facebook Doc Lib project."
+           depends="clean-fb-doclib, incremental-fb-doclib" />
+
+   <target name="clean-fb-doclib"
+           description="Cleans the Facebook Doc Lib project"
+           depends="init">
+      <clean projectdir="${dir.module.fb.doclib}" />
+   </target>
+
+   <target name="compile-fb-doclib"
+           description="Compiles the Facebook Doc Lib project."
+           depends="init">
+      <compile-java projectdir="${dir.module.fb.doclib}" />
+   </target>
+
+   <target name="package-fb-doclib"
+           description="Packages the Facebook Doc Lib project."
+           depends="package-fb-doclib-war, deploy-tomcat" />
+
+   <target name="package-fb-doclib-jar"
+           description="Packages the JAR file for the Facebook Doc Lib project."
+           depends="compile-fb-doclib">
+      <mkdir dir="${dir.module.fb.doclib.dist}" />
+      <jar jarfile="${dir.module.fb.doclib.dist}/${file.name.jar.fb.doclib}"
+           basedir="${dir.module.fb.doclib.classes}" />
+   </target>
+
+   <target name="package-fb-doclib-war"
+           description="Packages the WAR file for the Facebook Doc Lib project."
+           depends="package-fb-doclib-extension">
+      <echo>Installing Facebook Alfresco Document Library into WAR...</echo>
+      <install-amp ampfile="${dir.module.fb.doclib.dist}/${file.name.amp.fb.doclib}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-fb-doclib-extension"
+           description="Packages the Facebook Doc Lib extension."
+	   depends="init">
+      <zip destfile="${dir.module.fb.doclib.dist}/${file.name.amp.fb.doclib}"
+           update="true">
+         <zipfileset file="${dir.module.fb.doclib.property}/module.properties"/>
+         <zipfileset dir="${dir.module.fb.doclib.config}" prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+      </zip>
+   </target>
+
+   <target name="test-fb-doclib"
+           description="Runs the tests for the Facebook Doc Lib project."
+           depends="compile-fb-doclib">
+      <run-tests projectdir="${dir.module.fb.doclib}" />
+   </target>
+
+   <target name="generate-javadocs-fb-doclib"
+           description="Generates the JavaDocs for the Facebook Doc Lib project."
+           depends="init">
+      <generate-javadocs documenttitle="Facebook Alfresco Document Library Extension"
+                         windowtitle="Knowledge Base"
+                         projectdir="${dir.module.fb.doclib}"/>
+   </target>
+
    <!-- ******************************** -->
    <!-- ** Web Service Client Project ** -->
    <!-- ******************************** -->
