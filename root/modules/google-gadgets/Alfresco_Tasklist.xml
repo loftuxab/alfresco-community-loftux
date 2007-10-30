@@ -3,7 +3,7 @@
 
 <ModulePrefs
    title="Alfresco Tasks"
-   description="Alfresco User Task List"
+   description="Alfresco Task List"
    author="Alfresco Software"
    scrolling="true"
    height="350">
@@ -11,7 +11,7 @@
 
 <Content
    type="url"
-   href="http://kevmonkey:8080/alfresco/wcservice/aggadget/tasks?dummy=1"
+   href="http://localhost:8080/alfresco/wcservice/aggadget/tasks?dummy=1"
 />
 
 </Module>
