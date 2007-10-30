@@ -11,13 +11,13 @@
 		
 		<mx:HBox width="100%" horizontalGap="10">
 			<mx:Image id="imgTag" /> 
-			<hLink:HyperLink  click="onSearchDetailsClick()" id="summaryBtn"  paddingRight="10" 
+			<hLink:HyperLink  click="onSearchDetailsClick()" id="titleBtn"  paddingRight="10" 
 				 			  styleName="searchDetailsLink" rolledOverStyleName="searchDetailsRollOverLink"/>
 		</mx:HBox>
 		
 		<mx:HBox width="100%" horizontalGap="15">
 			<mx:Spacer  width="20"/>
-			<mx:Text  id="updated" fontSize="14" color="#757577" width="100%"/>
+			<mx:Text  id="updated" fontSize="12" color="#757577" width="100%"/>
 				
 		</mx:HBox>
 		
@@ -27,7 +27,7 @@
 		</mx:HBox>
 		
 		<mx:Spacer  height="15" width="100%"/>
-		<line:DrawLine/>
+		<line:DrawLine width="100%"/>
 		<mx:Spacer  height="10"/>
 		
 	</mx:VBox>

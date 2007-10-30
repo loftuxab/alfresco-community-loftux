@@ -32,16 +32,29 @@ package org.alfresco.ace.application.searchResults
 	import mx.controls.Label;
 	import mx.containers.VBox;
 	import flash.events.Event;
+	import mx.collections.ArrayCollection;
+	import mx.printing.*;
+	import mx.effects.Resize;
+	import mx.effects.WipeLeft;
+	import mx.effects.WipeRight;
+	import mx.containers.Panel;
+	import mx.events.DragEvent;
+	import mx.controls.HSlider;
+	import flash.display.MovieClip;
+	import flash.display.Loader;
+	import flash.net.URLRequest;
 	import org.alfresco.ace.application.searchDetails.searchDetailsClickEvent;
 	import org.alfresco.framework.service.error.ErrorService;
 	import org.alfresco.framework.service.authentication.AuthenticationService;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchCompleteEvent;
 	import org.alfresco.ace.service.articlesearchservice.ArticleSearchService;
-	import mx.collections.ArrayCollection;
 	import org.alfresco.ace.control.hyperlink.HyperLink;
+	import org.alfresco.framework.service.authentication.LogoutCompleteEvent;
+	import mx.events.FlexEvent;
+	import mx.events.ResizeEvent;
 	import mx.effects.Resize;
 	import mx.events.EffectEvent;
-	
+
 	
 	/**
 	 * SearchResults Class
@@ -55,20 +68,28 @@ package org.alfresco.ace.application.searchResults
 	{
 		[Bindable]
 	   	public var results:Repeater;
-		public var swfTabbar:Canvas;
 		public var myframe:SWFLoader;
 		public var swfPanel:VBox;
 		public var resultsDispPanel:Canvas;
 		public var labelResultsFound:Label;
 		public var moveNext:HyperLink;
 		public var movePrevious:HyperLink;
+		public var contentPanel:Panel;
+		public var zoomer:HSlider;
 		
 		private var _resultObj:Object;
 		private var _url:String;
 		private var _myList:ArrayCollection;
 		private var _currentSelectedItem:String;
 		private var _currentSelectedItemIndex:int;
+		private var _resultsWidth:int;
+		private var _closeWidth:int = 0;
+		private var _finalWidth:int = 0;
+		public var clip:MovieClip;
+		public var loader:Loader;
 		
+		private var swfWidth:Number=0;
+        private var swfHeight:Number=0
 	
 	    /** default Constructor */
 	    public function searchResultsClass()
@@ -77,13 +98,22 @@ package org.alfresco.ace.application.searchResults
 	     	// Register interest in events
 			ArticleSearchService.instance.addEventListener(ArticleSearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
        		this.addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onSearchDetailsClick);
-      	}
+       		this.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, onLogoutComplete);
+        }
      	
+     	public function onLogoutComplete(event:LogoutCompleteEvent):void
+		{
+			myframe.source = "";
+			swfPanel.visible = false;
+			Alert.show('logoutcomplete');
+		}
+		
       
 		/** Result Click event for the Repeater */
 		private function onSearchDetailsClick(oEvent:searchDetailsClickEvent):void
         {
         	this._currentSelectedItem = oEvent.data.toString();
+        	
           	for(var i:int=0; i<this._myList.length; i++)
             {
            		if(this._currentSelectedItem == this._myList[i].href)
@@ -108,37 +138,64 @@ package org.alfresco.ace.application.searchResults
            	else
            	{
            		this.movePrevious.enabled = true;
-           	}          	
+		 	}          	
           	
           	if (swfPanel.visible == false)
           	{
 	          	swfPanel.visible = true;
 	          	swfPanel.includeInLayout = true;
 	           	myframe.visible = true;
-	           	
-	           	var resizeEffect:Resize = new Resize(resultsDispPanel);
+	          	var resizeEffect:Resize = new Resize(resultsDispPanel);
 	           	resizeEffect.widthFrom = resultsDispPanel.width;
-	           	resizeEffect.widthTo = 350;
+	           	resizeEffect.widthTo = 30*this.width/100;
+	           	resizeEffect.suspendBackgroundProcessing = true;
+	           	resizeEffect.duration = 1000;
 	           	resizeEffect.play();	        
+	           	resultsDispPanel.percentWidth = 30;
+	           	swfPanel.percentWidth = 70;
+	           	
 	        }
 			
 			this._url = this._currentSelectedItem + "?ticket=" + AuthenticationService.instance.ticket;  
-            myframe.source = this._url;
-           
+			myframe.source = this._url;
+            this._resultsWidth = resultsDispPanel.width;
+          	
 		 }	
         
        
+   		// Create a PrintJob instance.
+        public function doPrint():void 
+        {
+            // Create an instance of the FlexPrintJob class.
+            var printJob:FlexPrintJob = new FlexPrintJob();
+
+            // Start the print job.
+            if (printJob.start() != true) return;
+
+            // Add the object to print. Scale it to match the width.
+            printJob.addObject(contentPanel, FlexPrintJobScaleType.MATCH_WIDTH);
+			
+            // Send the job to the printer.
+            printJob.send();
+        }
+        
         /**Close Button Click event for the swf panel */
         public function CloseBtnClick():void
         {
- 			resultsDispPanel.percentWidth = 100;
-          	swfPanel.percentWidth = 0;
-          	swfPanel.visible = false;
-          	swfPanel.includeInLayout = false;
+ 			swfPanel.percentWidth = 0;
+          	resultsDispPanel.percentWidth = 100;
+          	
+          	this._closeWidth = resultsDispPanel.width;
+          	var resize:Resize = new Resize(swfPanel);
+          	resize.duration = 1000;
+          	
+          	resize.widthFrom = swfPanel.width;
+          	resize.widthTo = 0;
+          	resize.suspendBackgroundProcessing = true;
+          	
+          	resize.play();
           	myframe.source = ''; 
-         	this.results.dataProvider = this._resultObj;  
-         	
-        }
+         }
        
        /** get method for url */
        public function geturl():String 
@@ -162,19 +219,22 @@ package org.alfresco.ace.application.searchResults
 		{
 			try
 			{	
+				this._resultsWidth = this.width;
+				swfPanel.percentWidth = 0;
+				swfPanel.visible = false;
+				swfPanel.includeInLayout = false;
+				resultsDispPanel.percentWidth = 100;
 				this._resultObj = event.result.feed.entry;
-				this.results.dataProvider = event.result.feed.entry;
+				this.results.dataProvider = this._resultObj;
 				this.labelResultsFound.text = "Search Results :  "+ event.totalresults + " Items Found ";
+				
 				if(event.totalresults == "0") 
 				{
 					Alert.show("Result not found");
 				}
 				else
 				{				
-					swfPanel.percentWidth = 0;
-					swfPanel.visible = false;
-					resultsDispPanel.percentWidth = 100;
-					_myList = new ArrayCollection();
+					this._myList = new ArrayCollection();
 					for(var i:int=0; i<event.result.feed.entry.length; i++)
 	                {
 	               		this._myList.addItem({href:event.result.feed.entry[i].link.href , rel:event.result.feed.entry[i].link.rel});
@@ -187,6 +247,11 @@ package org.alfresco.ace.application.searchResults
 			}
 		}
 		
+		/**
+		 *@onNextClick 	   - function to handle page next
+		 *@onPreviousClick - function to handle page previous
+		 */		
+		 
 		public function onNextClick():void
 		{
 			if(this.moveNext.enabled)
@@ -204,6 +269,7 @@ package org.alfresco.ace.application.searchResults
 	           		this.movePrevious.enabled = true;
 	           	}
    			}
+   			
 		}
 		
 		public function onPreviousClick():void
@@ -224,7 +290,17 @@ package org.alfresco.ace.application.searchResults
 	           	}
    			}
 		}
-       
-	}
+		
+        /**
+         * function to zoom content
+         * 
+         */        
+        public function zoomContent():void
+        {
+        	myframe.scaleX = zoomer.value;
+        	myframe.scaleY = zoomer.value;
+        }
+        
+     }
 
 }

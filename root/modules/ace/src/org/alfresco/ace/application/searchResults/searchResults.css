@@ -22,7 +22,7 @@
    	cornerRadius: 0;
    	borderStyle: none;
    	dropShadowEnabled: true;
-   	backgroundColor: #f5f8e5;
+   	/*backgroundColor: #f5f8e5;*/
    	headerHeight: 1;
 }
 .searchResultsSpace
@@ -30,4 +30,12 @@
    	borderColor: #ffffff;
     borderThickness: 3;
     borderStyle: solid;
+}
+
+.swfTabbar
+{
+	borderColor: #E6EAEB;
+	borderThickness: 2;
+	cornerRadius: 4;
+	backgroundColor: #275065; 
 }
