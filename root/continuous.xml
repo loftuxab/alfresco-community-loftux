@@ -853,6 +853,7 @@
 			<fileset dir="${dir.module.php.dist}" includes="${file.name.amp.php}" />
 			<fileset dir="${dir.module.rm.dist}" includes="${file.name.amp.rm}" />
 			<fileset dir="${dir.module.blog.dist}" includes="${file.name.amp.blog}" />
+			<fileset dir="${dir.module.fb.doclib.dist}" includes="${file.name.amp.fb.doclib}" />
 	   </copy>
 	</target>
 	
