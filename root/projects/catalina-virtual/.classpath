@@ -20,6 +20,6 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-beanutils-1.7.0.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-collections-3.1.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-digester-1.6.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-logging-1.0.4.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-logging-1.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
