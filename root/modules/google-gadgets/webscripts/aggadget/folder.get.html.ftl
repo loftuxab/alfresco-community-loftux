@@ -82,7 +82,7 @@ div.header
 div.nodeActions
 {
    float: right;
-   padding-right: 4px;
+   padding: 0px 4px 0px 4px;
 }
       </style>
       
