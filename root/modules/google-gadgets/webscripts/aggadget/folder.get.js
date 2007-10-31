@@ -35,13 +35,15 @@ model.path = path;
 model.folder = home;
 
 // get user prefs from url args
-model.sortby = "name";  // default
+model.sortby = "name";  // defaults
+model.up_sortby = "Name";
 var sortby = args["up_sortby"];
 if (sortby != null)
 {
    if (sortby == "Name") model.sortby = "name";
    if (sortby == "Date") model.sortby = "cm:modified";
    if (sortby == "Size") model.sortby = "size";
+   model.up_sortby = sortby;
 }
 
 model.filter = 0;

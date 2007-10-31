@@ -1,7 +1,20 @@
 <#assign datetimeformat="EEE, dd MMM yyyy HH:mm">
 <#assign weekms=1000*60*60*24*7>
 <#assign user=person.properties.userName>
-<#assign returl=url.service?url + "?f="?url + filter + "&up_sortby="?url + args["up_sortby"] + "&m="?url + mode>
+<#assign returl=url.service?url + "?f="?url + filter + "&up_sortby="?url + up_sortby + "&m="?url + mode>
+
+<!-- macros and functions -->
+<#function folderLink f>
+<#if f.parent.parent?exists><#return folderLink(f.parent) + " &gt; <a class='breadcrumb' href=\"${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${args.up_sortby}&m=${mode}\">${f.name?html}</a>"><#else><#return "<a class='breadcrumb' href=\"${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${args.up_sortby}&m=${mode}\">${f.name?html}</a>"></#if>
+</#function>
+
+<#function encodepath node>
+<#if node.parent?exists><#return encodepath(node.parent) + "/" + node.name?url><#else><#return ""></#if>
+</#function>
+
+<#macro urlargs>
+f=${filter}&up_sortby=${up_sortby}&m=${mode}
+</#macro>
 
 <html>
    <head>
@@ -69,7 +82,7 @@ div.header
 div.nodeActions
 {
    float: right;
-   padding: 0 4 0 4;
+   padding-right: 4px;
 }
       </style>
       
@@ -89,11 +102,11 @@ div.nodeActions
    <div class="header">
       <table border="0" cellspacing="4" cellpadding="0" width="100%">
          <tr>
-            <th><a class="filterLink <#if filter=0>filterLinkSelected</#if>" href="${url.service}?f=0&up_sortby=${args["up_sortby"]}&m=${mode}">All</a></th>
-            <th><a class="filterLink <#if filter=1>filterLinkSelected</#if>" href="${url.service}?f=1&up_sortby=${args["up_sortby"]}&m=${mode}">Folders</a></th>
-            <th><a class="filterLink <#if filter=2>filterLinkSelected</#if>" href="${url.service}?f=2&up_sortby=${args["up_sortby"]}&m=${mode}">Documents</a></th>
-            <th><a class="filterLink <#if filter=3>filterLinkSelected</#if>" href="${url.service}?f=3&up_sortby=${args["up_sortby"]}&m=${mode}">My Items</a></th>
-            <th><a class="filterLink <#if filter=4>filterLinkSelected</#if>" href="${url.service}?f=4&up_sortby=${args["up_sortby"]}&m=${mode}">Recent</a></th>
+            <th><a class="filterLink <#if filter=0>filterLinkSelected</#if>" href="${url.service}?f=0&up_sortby=${up_sortby}&m=${mode}">All</a></th>
+            <th><a class="filterLink <#if filter=1>filterLinkSelected</#if>" href="${url.service}?f=1&up_sortby=${up_sortby}&m=${mode}">Folders</a></th>
+            <th><a class="filterLink <#if filter=2>filterLinkSelected</#if>" href="${url.service}?f=2&up_sortby=${up_sortby}&m=${mode}">Documents</a></th>
+            <th><a class="filterLink <#if filter=3>filterLinkSelected</#if>" href="${url.service}?f=3&up_sortby=${up_sortby}&m=${mode}">My Items</a></th>
+            <th><a class="filterLink <#if filter=4>filterLinkSelected</#if>" href="${url.service}?f=4&up_sortby=${up_sortby}&m=${mode}">Recent</a></th>
          </tr>
       </table>
    </div>
@@ -110,8 +123,8 @@ div.nodeActions
          <a href="${url.serviceContext}/aggadget/folder${encodepath(userhome)}?<@urlargs/>">My&nbsp;Home</a>
          &nbsp;
          <!-- View Mode toggle -->
-         <#if mode=0><a href="${url.service}?f=${filter}&up_sortby=${args["up_sortby"]}&m=1">Mini&nbsp;View</a></#if>
-         <#if mode=1><a href="${url.service}?f=${filter}&up_sortby=${args["up_sortby"]}&m=0">Full&nbsp;View</a></#if>
+         <#if mode=0><a href="${url.service}?f=${filter}&up_sortby=${up_sortby}&m=1">Mini&nbsp;View</a></#if>
+         <#if mode=1><a href="${url.service}?f=${filter}&up_sortby=${up_sortby}&m=0">Full&nbsp;View</a></#if>
          &nbsp;
          <#if folder.hasPermission("Write")>
             <!-- Create Folder action -->
@@ -139,19 +152,24 @@ div.nodeActions
           (filter=4 && (dateCompare(c.properties["cm:modified"],date,weekms) == 1 || dateCompare(c.properties["cm:created"],date,weekms) == 1)))>
          <#assign count=count+1>
          <#if c.isContainer>
-            <#assign curl=url.serviceContext + "/aggadget/folder" + encodepath(c) + "?f=" + filter + "&up_sortby=" + args["up_sortby"] + "&m=" + mode>
+            <#assign curl=url.serviceContext + "/aggadget/folder" + encodepath(c) + "?f=" + filter + "&up_sortby=" + up_sortby + "&m=" + mode>
+         <#elseif c.isDocument>
+            <#assign curl=url.serviceContext + "/api/node/content/" + c.nodeRef.storeRef.protocol + "/" + c.nodeRef.storeRef.identifier + "/" + c.nodeRef.id + "/" + c.name?url>
+         </#if>
+         <#if c.isContainer || c.isDocument>
             <div class="${(count%2=0)?string("rowEven", "rowOdd")}">
                <div style="float:left">
-                  <a href="${curl}"><img src="${url.context}<#if mode=0>${c.icon32}" width="32" height="32"<#else>${c.icon16}" width="16" height="16"</#if> border="0" alt="${c.name?html}" title="${c.name?html}"></a>
+                  <a href="${curl}" <#if c.isDocument>target="alfnew"</#if>><img src="${url.context}<#if mode=0>${c.icon32}" width="32" height="32"<#else>${c.icon16}" width="16" height="16"</#if> border="0" alt="${c.name?html}" title="${c.name?html}"></a>
                </div>
                <div style="margin-left:<#if mode=0>36px<#else>20px</#if>">
                   <div>
-                     <#if c.hasPermission("Delete")>
                      <div class="nodeActions">
+                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}&returl=${returl}" alt="Details" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0"></a>
+                        <#if c.hasPermission("Delete")>
                         <a href="${url.serviceContext}/aggadget/delete?name=${c.name?url}&id=${c.id}&returl=${returl}" alt="Delete" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0"></a>
+                        </#if>
                      </div>
-                     </#if>
-                     <a class="nodeLink" href="${curl}" <#if mode=1>title="${c.properties.modified?string(datetimeformat)} <#if c.properties.description?exists>'${c.properties.description?html}'</#if>"</#if>>${c.name?html}</a>
+                     <a class="nodeLink" href="${curl}" <#if c.isDocument>target="alfnew"</#if> <#if mode=1>title="${c.properties.modified?string(datetimeformat)} <#if c.properties.description?exists>'${c.properties.description?html}'</#if>"</#if>>${c.name?html}</a>
                   </div>
                   <#if mode=0>
                   <div>
@@ -160,33 +178,9 @@ div.nodeActions
                   <div>
                      <span class="metaTitle">Modified:</span>&nbsp;<span class="metaData">${c.properties.modified?string(datetimeformat)}</span>&nbsp;
                      <span class="metaTitle">Modified&nbsp;By:</span>&nbsp;<span class="metaData">${c.properties.modifier}</span>
-                  </div>
-                  </#if>
-               </div>
-            </div>
-         <#elseif c.isDocument>
-            <#assign curl=url.serviceContext + "/api/node/content/" + c.nodeRef.storeRef.protocol + "/" + c.nodeRef.storeRef.identifier + "/" + c.nodeRef.id + "/" + c.name?url>
-            <div class="${(count%2=0)?string("rowEven", "rowOdd")}">
-               <div style="float:left">
-                  <a href="${curl}"><img src="${url.context}<#if mode=0>${c.icon32}" width="32" height="32"<#else>${c.icon16}" width="16" height="16"</#if> border="0" alt="${c.name?html}" title="${c.name?html}"></a>
-               </div>
-               <div style="margin-left:<#if mode=0>36px<#else>20px</#if>">
-                  <div>
-                     <#if c.hasPermission("Delete")>
-                     <div class="nodeActions">
-                        <a href="${url.serviceContext}/aggadget/delete?name=${c.name?url}&id=${c.id}&returl=${returl}" alt="Delete" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0"></a>
-                     </div>
-                     </#if>
-                     <a class="nodeLink" href="${curl}" target="alfnew" <#if mode=1>title="${c.properties.modified?string(datetimeformat)} <#if c.properties.description?exists>'${c.properties.description?html}'</#if>"</#if>>${c.name?html}</a>
-                  </div>
-                  <#if mode=0>
-                  <div>
-                     <#if c.properties.description?exists>${c.properties.description?html}</#if>
-                  </div>
-                  <div>
-                     <span class="metaTitle">Modified:</span>&nbsp;<span class="metaData">${c.properties.modified?string(datetimeformat)}</span>&nbsp;
-                     <span class="metaTitle">Modified&nbsp;By:</span>&nbsp;<span class="metaData">${c.properties.modifier}</span>&nbsp;
+                     <#if c.isDocument>
                      <span class="metaTitle">Size:</span>&nbsp;<span class="metaData">${(c.size/1000)?string("0.##")}&nbsp;KB</span>
+                     </#if>
                   </div>
                   </#if>
                </div>
@@ -199,16 +193,3 @@ div.nodeActions
    
    </body>
 </html>
-
-<!-- macros and functions -->
-<#function folderLink f>
-<#if f.parent.parent?exists><#return folderLink(f.parent) + " &gt; <a class='breadcrumb' href='${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${args.up_sortby}&m=${mode}'>${f.name}</a>"><#else><#return "<a class='breadcrumb' href='${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${args.up_sortby}&m=${mode}'>${f.name}</a>"></#if>
-</#function>
-
-<#function encodepath node>
-<#if node.parent?exists><#return encodepath(node.parent) + "/" + node.name?html><#else><#return ""></#if>
-</#function>
-
-<#macro urlargs>
-f=${filter}&up_sortby=${args["up_sortby"]}&m=${mode}
-</#macro>

@@ -151,8 +151,3 @@ div.taskItemToday
    
    </body>
 </html>
-
-<!-- macros and functions -->
-<#macro urlargs>
-f=${filter}&m=${mode}
-</#macro>
