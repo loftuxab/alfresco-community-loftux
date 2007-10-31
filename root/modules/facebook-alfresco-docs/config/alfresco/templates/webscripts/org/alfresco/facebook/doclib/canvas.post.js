@@ -15,7 +15,7 @@ script:
   {
     // build the query
     var recentDocsQuery = "";
-    for each (friend in facebook.friends)
+    for each (friend in facebook.appFriends)
     {
       var userFolder = appFolder.childByNamePath("FB" + friend);
       if (userFolder != undefined)
