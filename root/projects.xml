@@ -1209,7 +1209,7 @@
       </delete>
       <delete verbose="true">
          <fileset dir="${dir.project.webclient.assemble}/WEB-INF/lib" 
-                  includes="log4j-1.2.8.jar,portlet-api-lib.jar,myfaces-api.jar,myfaces-impl.jar" />
+                  includes="log4j-1.2.15.jar,portlet-api-lib.jar,myfaces-api.jar,myfaces-impl.jar" />
       </delete>
 
       <delete file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
