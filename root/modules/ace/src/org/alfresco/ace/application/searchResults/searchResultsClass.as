@@ -82,9 +82,9 @@ package org.alfresco.ace.application.searchResults
 		private var _myList:ArrayCollection;
 		private var _currentSelectedItem:String;
 		private var _currentSelectedItemIndex:int;
-		private var _resultsWidth:int;
 		private var _closeWidth:int = 0;
 		private var _finalWidth:int = 0;
+		private var _totalResults:String;
 		public var clip:MovieClip;
 		public var loader:Loader;
 		
@@ -98,14 +98,16 @@ package org.alfresco.ace.application.searchResults
 	     	// Register interest in events
 			ArticleSearchService.instance.addEventListener(ArticleSearchCompleteEvent.SEARCH_COMPLETE, doSearchComplete); 	       		
        		this.addEventListener(searchDetailsClickEvent.SEARCH_LINK_CLICK_EVENT, onSearchDetailsClick);
-       		this.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, onLogoutComplete);
+       		AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, onLogoutComplete);
         }
      	
      	public function onLogoutComplete(event:LogoutCompleteEvent):void
 		{
-			myframe.source = "";
-			swfPanel.visible = false;
-			Alert.show('logoutcomplete');
+			swfPanel.percentWidth = 0;
+          	resultsDispPanel.percentWidth = 100;
+          	this._totalResults = null;
+          	this.setResultsLabel();
+          	results.dataProvider = null;
 		}
 		
       
@@ -153,14 +155,11 @@ package org.alfresco.ace.application.searchResults
 	           	resizeEffect.play();	        
 	           	resultsDispPanel.percentWidth = 30;
 	           	swfPanel.percentWidth = 70;
-	           	
-	        }
+	      	}
 			
 			this._url = this._currentSelectedItem + "?ticket=" + AuthenticationService.instance.ticket;  
 			myframe.source = this._url;
-            this._resultsWidth = resultsDispPanel.width;
-          	
-		 }	
+         }	
         
        
    		// Create a PrintJob instance.
@@ -219,14 +218,14 @@ package org.alfresco.ace.application.searchResults
 		{
 			try
 			{	
-				this._resultsWidth = this.width;
 				swfPanel.percentWidth = 0;
 				swfPanel.visible = false;
 				swfPanel.includeInLayout = false;
 				resultsDispPanel.percentWidth = 100;
 				this._resultObj = event.result.feed.entry;
 				this.results.dataProvider = this._resultObj;
-				this.labelResultsFound.text = "Search Results :  "+ event.totalresults + " Items Found ";
+				this._totalResults = event.totalresults;
+				this.setResultsLabel();
 				
 				if(event.totalresults == "0") 
 				{
@@ -247,6 +246,13 @@ package org.alfresco.ace.application.searchResults
 			}
 		}
 		
+		
+		 // function to set results label
+		 		
+		private function setResultsLabel():void
+		{
+			this.labelResultsFound.text = "Search Results :  "+ this._totalResults + " Items Found ";
+		}
 		/**
 		 *@onNextClick 	   - function to handle page next
 		 *@onPreviousClick - function to handle page previous
