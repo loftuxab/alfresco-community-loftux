@@ -5,7 +5,7 @@
 
 <!-- macros and functions -->
 <#function folderLink f>
-<#if f.parent.parent?exists><#return folderLink(f.parent) + " &gt; <a class='breadcrumb' href=\"${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${args.up_sortby}&m=${mode}\">${f.name?html}</a>"><#else><#return "<a class='breadcrumb' href=\"${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${args.up_sortby}&m=${mode}\">${f.name?html}</a>"></#if>
+<#if f.parent.parent?exists><#return folderLink(f.parent) + " &gt; <a class='breadcrumb' href=\"${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${up_sortby}&m=${mode}\">${f.name?html}</a>"><#else><#return "<a class='breadcrumb' href=\"${url.serviceContext}/aggadget/folder" + encodepath(f) + "?f=${filter}&up_sortby=${up_sortby}&m=${mode}\">${f.name?html}</a>"></#if>
 </#function>
 
 <#function encodepath node>
@@ -154,7 +154,7 @@ div.nodeActions
          <#if c.isContainer>
             <#assign curl=url.serviceContext + "/aggadget/folder" + encodepath(c) + "?f=" + filter + "&up_sortby=" + up_sortby + "&m=" + mode>
          <#elseif c.isDocument>
-            <#assign curl=url.serviceContext + "/api/node/content/" + c.nodeRef.storeRef.protocol + "/" + c.nodeRef.storeRef.identifier + "/" + c.nodeRef.id + "/" + c.name?url>
+            <#assign curl=url.context + c.url>
          </#if>
          <#if c.isContainer || c.isDocument>
             <div class="${(count%2=0)?string("rowEven", "rowOdd")}">
