@@ -847,7 +847,7 @@
 	
 	<target name="distribute-amps" 
 	        description="Creates the distribution AMP file for all extensions"
-	        depends="init, package-php-module, package-rm-extension, package-blog-extension">
+	        depends="init, package-php-module, package-rm-extension, package-blog-extension, package-fb-doclib-extension">
 		
 		<copy todir="${dir.continuous.dist}">
 			<fileset dir="${dir.module.php.dist}" includes="${file.name.amp.php}" />
