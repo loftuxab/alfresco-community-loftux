@@ -192,7 +192,8 @@
                     clean-webclient, 
                     clean-rm,
                     clean-blog,
-                    clean-php, 
+                    clean-php,
+                    clean-fb-doclib, 
                     clean-webserviceclient" />
 
    <target name="clean-tomcat-deploy" 

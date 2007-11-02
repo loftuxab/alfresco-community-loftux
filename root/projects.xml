@@ -1764,6 +1764,7 @@
    <target name="package-fb-doclib-extension"
            description="Packages the Facebook Doc Lib extension."
 	   depends="init">
+	   <mkdir dir="${dir.module.fb.doclib.dist}" />
       <zip destfile="${dir.module.fb.doclib.dist}/${file.name.amp.fb.doclib}"
            update="true">
          <zipfileset file="${dir.module.fb.doclib.property}/module.properties"/>
