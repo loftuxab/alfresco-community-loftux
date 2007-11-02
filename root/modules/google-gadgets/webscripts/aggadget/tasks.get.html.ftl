@@ -42,8 +42,8 @@ div.taskRow
 div.taskIndicator
 {
    float: left;
-   padding-top:6px;
-   padding-left:8px;
+   padding-top: 2px;
+   padding-left: 8px;
 }
 
 div.taskItem
@@ -112,27 +112,27 @@ div.taskItemToday
          <#assign count=count+1>
          <div class="taskRow">
             <div class="taskIndicator">
-            <#if hasDue>
-               <#-- items due today? -->
-               <#if (filter<3) && (dateCompare(date?date, due?date, 0, "==") == 1)>
-                  <img src="${url.context}/images/icons/task_today.gif"></div><div class="taskItem taskItemToday">
-               <#-- items overdue? -->
-               <#elseif (filter=0 || filter=4) && (dateCompare(date?date, due?date) == 1)>
-                  <img src="${url.context}/images/icons/task_overdue.gif"></div><div class="taskItem taskItemOverdue">
-               <#else>
+            <#-- items due today? -->
+            <#if hasDue && filter<3 && (dateCompare(date?date, due?date, 0, "==") == 1)>
+               <img src="${url.context}/images/icons/task_duetoday.png" alt="">
+            </div>
+            <div class="taskItem taskItemToday">
+            <#-- items overdue? -->
+            <#elseif hasDue && (filter=0 || filter=4) && (dateCompare(date?date, due?date) == 1)>
+               <img src="${url.context}/images/icons/task_overdue.png" alt="">
+            </div>
+            <div class="taskItem taskItemOverdue">
+            <#else>
+               <img src="${url.context}/images/icons/task_any.png" alt="">
             </div>
             <div class="taskItem">
                </#if>
-            <#else>
-            </div>
-            <div class="taskItem">
-            </#if>
                <span style="cursor:pointer" onclick="window.location='${url.context}/wcservice/aggadget/taskdetails?id=${t.id}&returl=${returl}';">
-            <#if t.description?exists>
+               <#if t.description?exists>
                ${t.description?html}
-            <#else>
+               <#else>
                ${t.type?html}
-            </#if>
+               </#if>
                (${t.type?html})
                </span>
                <#if mode=0>
