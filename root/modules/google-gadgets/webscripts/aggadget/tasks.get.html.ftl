@@ -107,14 +107,14 @@ div.taskItemToday
       <#if (filter=0) ||
            (filter=3 && !hasDue) ||
            (filter=1 && hasDue && (dateCompare(date?date, due?date, 0, "==") == 1)) ||
-           (filter=2 && hasDue && (dateCompare(due?date, date?date) == 1 && dateCompare(date?date, due?date, weekms) == 1)) ||
+           (filter=2 && hasDue && ((dateCompare(due?date, date?date) == 1 || dateCompare(date?date, due?date, 0, "==") == 1) && dateCompare(date?date, due?date, weekms) == 1)) ||
            (filter=4 && hasDue && (dateCompare(date?date, due?date) == 1))>
          <#assign count=count+1>
          <div class="taskRow">
             <div class="taskIndicator">
             <#if hasDue>
                <#-- items due today? -->
-               <#if (filter=0 || filter=1) && (dateCompare(date?date, due?date, 0, "==") == 1)>
+               <#if (filter<3) && (dateCompare(date?date, due?date, 0, "==") == 1)>
                   <img src="${url.context}/images/icons/task_today.gif"></div><div class="taskItem taskItemToday">
                <#-- items overdue? -->
                <#elseif (filter=0 || filter=4) && (dateCompare(date?date, due?date) == 1)>

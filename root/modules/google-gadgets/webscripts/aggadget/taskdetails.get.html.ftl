@@ -15,7 +15,7 @@ div.taskResources
    border: 1px solid #CCCCCC;
    background-color: #ffffff;
    margin: 2px 6px 8px 6px;
-   height: 80px;
+   height: 88px;
    display: block;
    overflow: auto;
 }
