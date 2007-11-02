@@ -64,12 +64,12 @@ div.breadcrumb
 
 div.rowEven
 {
-   padding: 3px 0px 3px 1px;
+   padding: 4px 2px 4px 2px;
 }
 
 div.rowOdd
 {
-   padding: 3px 0px 3px 1px;
+   padding: 4px 2px 4px 2px;
    background-color: #F1F7FD;
 }
 
