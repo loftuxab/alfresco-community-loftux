@@ -1,7 +1,8 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
    <head>
       <title>Create Folder</title>
-      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css">
+      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css"/>
       <style type="text/css">
 td
 {
@@ -54,17 +55,17 @@ function validate()
       <div class="dialog">
          <table width="100%">
             <form action="${url.service}" method="post" enctype="multipart/form-data" accept-charset="UTF-8" onsubmit="return validate();">
-            <tr><td>Name:&nbsp;</td><td><input name="name" id="name" maxlength="1024"></td></tr>
-            <tr><td>Title:&nbsp;</td><td><input name="title" maxlength="1024"></td></tr>
-            <tr><td>Description:&nbsp;</td><td><input name="desc" maxlength="1024"></td></tr>
+            <tr><td width="33%">Name:&nbsp;</td><td width="66%"><input name="name" id="name" maxlength="1024"/></td></tr>
+            <tr><td width="33%">Title:&nbsp;</td><td width="66%"><input name="title" maxlength="1024"/></td></tr>
+            <tr><td width="33%">Description:&nbsp;</td><td width="66%"><input name="desc" maxlength="1024"/></td></tr>
             <tr>
-               <td colspan=2>
-                  <input type="submit" name="submit" value="OK" style="font-weight:bold;width:60px">
-                  <input type="button" name="cancel" value="Cancel" style="font-weight:bold;width:60px;margin-left:12px;" onclick="javascript:history.back();">
+               <td colspan="2">
+                  <input type="submit" name="submit" value="OK" style="font-weight:bold;width:60px"/>
+                  <input type="button" name="cancel" value="Cancel" style="font-weight:bold;width:60px;margin-left:12px;" onclick="javascript:history.back();"/>
                </td>
             </tr>
-            <input type="hidden" name="fdrnodeid" value="${args.fdrnodeid}">
-            <input type="hidden" name="returl" value="${args.returl}">
+            <input type="hidden" name="fdrnodeid" value="${args.fdrnodeid}"/>
+            <input type="hidden" name="returl" value="${args.returl}"/>
             </form>
          </table>
       </div>

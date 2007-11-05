@@ -2,6 +2,7 @@
 <#assign weekms=1000*60*60*24*7>
 <#assign user=person.properties.userName>
 <#assign returl=url.service?url + "?f="?url + filter + "&up_sortby="?url + up_sortby + "&m="?url + mode>
+<#assign webdav=false>
 
 <!-- macros and functions -->
 <#function folderLink f>
@@ -86,6 +87,7 @@ div.nodeActions
 }
       </style>
       
+      <script type="text/javascript" src="${url.context}/scripts/webdav.js"></script>
       <script type="text/javascript" src="${url.context}/scripts/ajax/mootools.v1.11.js"></script>
       <script type="text/javascript" src="${url.context}/scripts/ajax/common.js"></script>
       <script type="text/javascript">setContextPath('${url.context}');</script> 
@@ -154,7 +156,11 @@ div.nodeActions
          <#if c.isContainer>
             <#assign curl=url.serviceContext + "/aggadget/folder" + encodepath(c) + "?f=" + filter + "&up_sortby=" + up_sortby + "&m=" + mode>
          <#elseif c.isDocument>
-            <#assign curl=url.context + c.url>
+            <#if webdav>
+               <#assign curl=url.context + c.webdavUrl + "?ticket=" + session.ticket>
+            <#else>
+               <#assign curl=url.context + c.url>
+            </#if>
          </#if>
          <#if c.isContainer || c.isDocument>
             <div class="${(count%2=0)?string("rowEven", "rowOdd")}">
