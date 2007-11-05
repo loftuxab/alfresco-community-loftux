@@ -23,7 +23,7 @@ tr
       <div class="dialog">
          <div class="details">
             <table cellspacing="0" cellpadding="0" border="0" width="100%">
-               <tr><td style="vertical-align:middle" rowspan="99" width="44" align="left"><#if node.isDocument><a href="${url.context}${node.webdavUrl}?ticket=${session.ticket}" target="alfnew"></#if><img src="${url.context}${node.icon32}" width="32" height="32" border="0" alt="${node.name?html}" title="${node.name?html}"/><#if node.isDocument></a></#if></td>
+               <tr><td style="vertical-align:middle" rowspan="99" width="44" align="left"><#if node.isDocument><a href="${url.context}${node.url}" target="alfnew"></#if><img src="${url.context}${node.icon32}" width="32" height="32" border="0" alt="${node.name?html}" title="${node.name?html}"/><#if node.isDocument></a></#if></td>
                    <td><span class="metaTitle">Name:</span></td><td rowspan="99" width="8"></td><td><span class="metaData">${node.name?html}</span></td></tr>
                <tr><td><span class="metaTitle">Title:</span></td><td><span class="metaData"><#if node.properties.title?exists>${node.properties.title?html}<#else>&nbsp;</#if></span></td></tr>
                <tr><td><span class="metaTitle">Description:</span></td><td><span class="metaData"><#if node.properties.description?exists>${node.properties.description?html}<#else>&nbsp;</#if></span></td></tr>
