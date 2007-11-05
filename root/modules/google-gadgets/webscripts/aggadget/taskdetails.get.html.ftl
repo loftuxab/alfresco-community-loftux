@@ -1,13 +1,15 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <#assign task=workflow.getTaskById(args.id)>
 
 <html>
    <head>
       <title>Task Details</title>
-      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css">
+      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css"/>
       <style type="text/css">
 div.details
 {
-   padding: 2 4 6 4;
+   padding: 2px 4px 6px 4px;
 }
 
 div.taskResources
@@ -15,7 +17,7 @@ div.taskResources
    border: 1px solid #CCCCCC;
    background-color: #ffffff;
    margin: 2px 6px 8px 6px;
-   height: 88px;
+   height: 84px;
    display: block;
    overflow: auto;
 }
@@ -30,8 +32,14 @@ div.taskActions
    padding: 6px 4px 12px 6px;
 }
 
-.taskResourceOdd
+div.taskResource
 {
+   padding: 1px;
+}
+
+div.taskResourceOdd
+{
+   padding: 1px;
    background-color: #F1F7FD;
 }
 
@@ -41,7 +49,7 @@ a.resourceLink
    color: #5A5741;
 }
 
-.resourceLink
+div.resourceLink
 {
    font-size: 12px;
    color: #5A5741;
@@ -71,7 +79,6 @@ a.taskAction
                <tr><td><span class="metaTitle">Priority:</span></td><td><span class="metaData">${task.properties["bpm:priority"]}</span></td></tr>
                <tr><td><span class="metaTitle">Due Date:</span></td><td><span class="metaData"><#if task.properties["bpm:dueDate"]?exists>${task.properties["bpm:dueDate"]?date}<#else><i>None</i></#if></span></td></tr>
                <tr><td><span class="metaTitle">Status:</span></td><td><span class="metaData">${task.properties["bpm:status"]}</span></td></tr>
-               <tr><td><span class="metaTitle">Complete:</span></td><td><span class="metaData">${task.properties["bpm:percentComplete"]}%</span></td></tr>
                <tr><td><span class="metaTitle">Start Date:</span></td><td><span class="metaData">${task.startDate?date}</span></td></tr>
             </table>
          </div>
@@ -80,26 +87,24 @@ a.taskAction
          
          <div class="taskResources">
             <#assign count=0>
-            <table border="0" cellpadding="2" cellspacing="0" width="100%">
-               <#assign resources=task.packageResources>
-               <#if resources?size != 0>
-                  <#list resources as res>
-                     <#assign count=count+1>
-                     <tr class="taskResource${(count%2=0)?string("Odd", "")}">
-                        <td width="18"><a href="${url.context}${res.url}" target="new"><img src="${url.context}${res.icon16}" border=0></a></td>
-                        <td>
-                        <#if res.isDocument>
-                           <a class="resourceLink" href="${url.context}${res.url}" target="alfnew">${res.name}</a>
-                        <#else>
-                           <span class="resourceLink">${res.name}</span>
-                        </#if>
-                        </td>
-                     </tr>
-                  </#list>
-               <#else>
-                  <tr><td><span class="resourceLink">No task resources</span></td></tr>
-               </#if>
-            </table>
+            <#assign resources=task.packageResources>
+            <#if resources?size != 0>
+               <#list resources as res>
+                  <#assign count=count+1>
+                  <div class="taskResource${(count%2=0)?string("Odd", "")}">
+                     <div style="float:left"><#if res.isDocument><a href="${url.context}${res.url}" target="new"></#if><img src="${url.context}${res.icon16}" border=0/><#if res.isDocument></a></#if></div>
+                     <div style="margin-left:20px;height:19px">
+                     <#if res.isDocument>
+                        <a class="resourceLink" href="${url.context}${res.url}" target="alfnew">${res.name}</a>
+                     <#else>
+                        ${res.name}
+                     </#if>
+                     </div>
+                  </div>
+               </#list>
+            <#else>
+               <div class="resourceLink">No task resources</div>
+            </#if>
          </div>
          
          <div class="taskActions">
@@ -109,7 +114,7 @@ a.taskAction
          </#list>
          </div>
          
-         <div style="display:table;padding-left:4px"><input type="button" onclick="window.location='${args.returl}';" value="Continue"></div>
+         <div style="padding-left:4px"><input style="width:auto" type="button" onclick="window.location='${args.returl}';" value="Continue"/></div>
       </div>
    </div>
    
