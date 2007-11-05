@@ -31,7 +31,7 @@ script:
     // only execute query, if we need to
     if (recentDocsQuery != "")
     {
-      recentDocs = search.luceneSearch(recentDocsQuery, "cm:modified", false);
+      recentDocs = search.luceneSearch(recentDocsQuery, "@cm:modified", false);
     }
   }
 
