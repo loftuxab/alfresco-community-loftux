@@ -1,8 +1,7 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
 <#assign task=workflow.getTaskById(args.id)>
 
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
    <head>
       <title>Task Details</title>
       <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css"/>
@@ -114,7 +113,7 @@ a.taskAction
          </#list>
          </div>
          
-         <div style="padding-left:4px"><input style="width:auto" type="button" onclick="window.location='${args.returl}';" value="Continue"/></div>
+         <div style="padding-left:4px"><input style="width:auto" type="button" onclick="javascript:window.location.href='${args.returl}';" value="Continue"/></div>
       </div>
    </div>
    
