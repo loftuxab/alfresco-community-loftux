@@ -127,7 +127,7 @@ div.taskItemToday
             </div>
             <div class="taskItem">
                </#if>
-               <span style="cursor:pointer" onclick="window.location='${url.context}/wcservice/aggadget/taskdetails?id=${t.id}&returl=${returl}';">
+               <span style="cursor:pointer" onclick="javascript:window.location.href='${url.context}/wcservice/aggadget/taskdetails?id=${t.id}&returl=${returl}';">
                <#if t.description?exists>
                ${t.description?html}
                <#else>

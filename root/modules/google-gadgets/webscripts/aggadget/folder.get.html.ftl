@@ -164,7 +164,7 @@ div.nodeActions
                <div style="margin-left:<#if mode=0>36px<#else>20px</#if>">
                   <div>
                      <div class="nodeActions">
-                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}&returl=${returl}" alt="Details" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0"></a>
+                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}" alt="Details" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0"></a>
                         <#if c.hasPermission("Delete")>
                         <a href="${url.serviceContext}/aggadget/delete?name=${c.name?url}&id=${c.id}&returl=${returl}" alt="Delete" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0"></a>
                         </#if>
