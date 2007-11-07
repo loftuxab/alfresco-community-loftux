@@ -25,15 +25,15 @@
 					<acc:TextAccordianItem 
 						title="Welcome to Alfresco Enterprise Connections" 
 						content="I have clearly change this content does it appear in the UI??? dsf asdf asdf wef sdfqewfasdf aedfsdf asdfqwef aasdf qwefsadf aedf asdf asdfqwefdfv asdf qwefs df asdfqwef adsf qasdf awef asdfqwef asdf wef asdf adf"
-						value="video/testFilm1.flv"/>				
+						value="videos/testFilm1.flv"/>				
 					<acc:TextAccordianItem 
 						title="Search Introduction" 
 						content="This is some content ... blar blar blar"
-						value="video/testFilm2.flv"/>			
+						value="videos/testFilm2.flv"/>			
 					<acc:TextAccordianItem 
 						title="Knowledge Base Introduction" 
 						content="This is some content ... blar blar blar"
-						value="video/testFilm1.flv"/>				
+						value="videos/testFilm1.flv"/>				
 				</acc:TextAccordian>
 			
 			</mx:VBox>
@@ -45,7 +45,7 @@
 				<mx:VideoDisplay  
 					id="videoDisplay"
 					styleName="homeVideo"
-					source="assets/testFilm1.flv"
+					source="videos/testFilm1.flv"
 					height="150" width="200" autoPlay="false" autoRewind="true" alpha="0.25">					
 				</mx:VideoDisplay>	 
 				
