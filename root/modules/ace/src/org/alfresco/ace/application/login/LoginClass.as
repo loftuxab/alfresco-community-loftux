@@ -15,6 +15,7 @@ package org.alfresco.ace.application.login
 	import org.alfresco.framework.service.error.ErrorService;
 	import org.alfresco.framework.service.authentication.AuthenticationService;
 	import org.alfresco.framework.service.authentication.InvalidCredentialsError;
+	import org.alfresco.framework.service.authentication.LoginCompleteEvent;
 
     public class LoginClass extends VBox
 	{
@@ -33,6 +34,9 @@ package org.alfresco.ace.application.login
 			
 			// Register interest with the error service
 			ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);	
+			
+			// Register interest in the authentication service login success event
+			AuthenticationService.instance.addEventListener(LoginCompleteEvent.LOGIN_COMPLETE, onLoginComplete);
 		}
 		
 		/**
@@ -57,6 +61,15 @@ package org.alfresco.ace.application.login
 			AuthenticationService.instance.login(username.text, password.text);
 			username.text = "";
 			password.text = "";
+		}
+		
+		/**
+		 * On log in complete event handler
+		 */
+		public function onLoginComplete(event:Event):void
+		{
+			// Return the control to its base state
+			this.currentState = "";
 		}
 		
 		/**
