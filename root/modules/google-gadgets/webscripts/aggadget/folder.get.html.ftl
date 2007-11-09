@@ -154,7 +154,7 @@ div.nodeActions
          <#if c.isContainer>
             <#assign curl=url.serviceContext + "/aggadget/folder" + encodepath(c) + "?f=" + filter + "&up_sortby=" + up_sortby + "&m=" + mode>
          <#elseif c.isDocument>
-            <#assign curl=url.context + c.url>
+            <#assign curl=url.serviceContext + c.serviceUrl>
          </#if>
          <#if c.isContainer || c.isDocument>
             <div class="${(count%2=0)?string("rowEven", "rowOdd")}">

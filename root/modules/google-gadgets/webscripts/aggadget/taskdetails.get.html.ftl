@@ -91,10 +91,10 @@ a.taskAction
                <#list resources as res>
                   <#assign count=count+1>
                   <div class="taskResource${(count%2=0)?string("Odd", "")}">
-                     <div style="float:left"><#if res.isDocument><a href="${url.context}${res.url}" target="new"></#if><img src="${url.context}${res.icon16}" border=0/><#if res.isDocument></a></#if></div>
+                     <div style="float:left"><#if res.isDocument><a href="${url.serviceContext}${res.serviceUrl}" target="new"></#if><img src="${url.context}${res.icon16}" border=0/><#if res.isDocument></a></#if></div>
                      <div style="margin-left:20px;height:19px">
                      <#if res.isDocument>
-                        <a class="resourceLink" href="${url.context}${res.url}" target="alfnew">${res.name}</a>
+                        <a class="resourceLink" href="${url.serviceContext}${res.serviceUrl}" target="alfnew">${res.name}</a>
                      <#else>
                         ${res.name}
                      </#if>

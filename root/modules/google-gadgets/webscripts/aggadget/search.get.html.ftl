@@ -72,7 +72,7 @@ function searchKeypress(e)
             <#list s.results as row>
                <#if (index>=s.startIndex) && (index<s.startIndex+s.itemsPerPage)>
                <#assign count=count+1>
-               <#assign curl=url.context + row.url>
+               <#assign curl=url.serviceContext + row.serviceUrl>
                <div class="${(count%2=0)?string("rowEven", "rowOdd")}">
                   <div style="float:left;height:18px;padding:2px"><a href="${curl}" target="new"><img src="${url.context}${row.icon16}" border="0" alt="" title="${row.name?html}"/></a></div>
                   <div style="margin-left:18px;padding:2px">
