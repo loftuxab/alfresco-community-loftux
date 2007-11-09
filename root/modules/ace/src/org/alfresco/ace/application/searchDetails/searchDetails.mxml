@@ -6,31 +6,27 @@
 	
 	<!-- Import css style sheet -->
     <mx:Style source="searchDetails.css"/>
+   
+    <mx:HBox width="100%">
+    	
+    	<!-- The image -->
+    	<mx:Image id="imgTag" /> 
+    	<mx:Spacer width="5"/>
+    	
+    	<!-- Content details -->
+    	<mx:VBox width="100%">
+    	
+    		<hLink:HyperLink  click="onSearchDetailsClick()" id="titleBtn" 
+				 			  styleName="searchDetailsLink" rolledOverStyleName="searchDetailsRollOverLink"/>	
+			<mx:Text id="updated" fontSize="10" color="#757577"/>
+			<mx:Text id="content" width="100%" fontSize="13" color="#757577"/>
+    		
+    	</mx:VBox>	
+    	
+    </mx:HBox>
     
-	<mx:VBox width="100%" paddingLeft="10" paddingRight="10"> 
-		
-		<mx:HBox width="100%" horizontalGap="10">
-			<mx:Image id="imgTag" /> 
-			<hLink:HyperLink  click="onSearchDetailsClick()" id="titleBtn"  paddingRight="10" 
-				 			  styleName="searchDetailsLink" rolledOverStyleName="searchDetailsRollOverLink"/>
-		</mx:HBox>
-		
-		<mx:HBox width="100%" horizontalGap="15">
-			<mx:Spacer  width="20"/>
-			<mx:Text  id="updated" fontSize="12" color="#757577" width="100%"/>
-				
-		</mx:HBox>
-		
-		<mx:HBox width="100%" horizontalGap="15">
-			<mx:Spacer  width="20"/>
-			<mx:Text id="content" width="100%" fontSize="13" /> 
-		</mx:HBox>
-		
-		<mx:Spacer  height="15" width="100%"/>
-		<line:DrawLine width="100%"/>
-		<mx:Spacer  height="10"/>
-		
-	</mx:VBox>
-	
+    <mx:Spacer  height="10" width="100%"/>
+	<line:DrawLine width="100%"/>
+	<mx:Spacer  height="10"/>
 	
 </searchDetails:searchDetailsClass>

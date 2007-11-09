@@ -34,6 +34,7 @@ package org.alfresco.ace.application.searchDetails
 	import mx.events.DividerEvent;
 	import mx.events.ResizeEvent;
 	import org.alfresco.ace.control.hyperlink.HyperLink;
+	import mx.containers.VBox;
 
 	/**
 	 * Search Details Class
@@ -43,7 +44,7 @@ package org.alfresco.ace.application.searchDetails
 	 * @author Saravanan Sellathurai
 	 */
 	
-	public class searchDetailsClass extends Canvas
+	public class searchDetailsClass extends VBox
 	{
 		private var eventObj:Event;
 		private var _url:String;
@@ -115,15 +116,24 @@ package org.alfresco.ace.application.searchDetails
 		
 		public function set category(cat:String):void
 		{
-			if (cat == "FAQ") imgTag.source = "images/faq.png";
-			else if (cat == "Article") imgTag.source = "images/article.png";
-			else if (cat == "White Paper") imgTag.source = "images/white_paper.png";
+			if (cat == "FAQ") 
+			{
+				imgTag.source = "images/faq.png";	
+			}
+			else if (cat == "White Paper") 
+			{
+				imgTag.source = "images/white_paper.png";
+			}
+			else 
+			{
+				imgTag.source = "images/article.png";
+			}			
 		}
 		
 		public function set modified(modified:String):void
 		{
 			this._modified = modified;
-			this.updated.text = "  " + modified;
+			this.updated.text = modified;
 		}
 		
 		public function set dataUrl(str:String):void
