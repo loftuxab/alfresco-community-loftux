@@ -938,6 +938,334 @@
    </target>
 
 
+
+   <!-- ******************************************************************** -->
+   <!-- ** Mingw Project                                                     -->
+   <!-- **                                                                   -->
+   <!-- ** Creates a cross compiler for windows.                             -->
+   <!-- ** This target is only run by hand on an as-needed basis.            -->
+   <!-- **                                                                   -->
+   <!-- **   The build  artifact created by running this project is          -->
+   <!-- **   automatically put in 3rd-party/bin/linux/i386/mingw             -->
+   <!-- **   This arragement preserves the desriable quality of allowing     -->
+   <!-- **   builds to run disconnected from any network.                    -->
+   <!-- **                                                                   -->
+   <!-- **   There are only 3 things that force you to re-run this project:  -->
+   <!-- **                                                                   -->
+   <!-- **   [1]  Updating the version of the GCC mingw is based upon        -->
+   <!-- **   [2]  Adding/updating new packages to mingw                      -->
+   <!-- **   [3]  Changing build options                                     -->
+   <!-- **                                                                   -->
+   <!-- **  If you do run this target, be sure to checkin its build artifact -->
+   <!-- **  (3rd-party/bin/linux/i386/mingw/*)                               -->
+   <!-- **                                                                   -->
+   <!-- ******************************************************************** -->
+
+   <condition property="build.platform.supports.mingw">
+       <or>
+           <!-- Linux on an x86 processor -->
+           <and><os name="Linux"/>
+                <or> 
+                   <os arch="x86"/>
+                   <os arch="i386"/>
+                   <os arch="i686"/>
+                   <os arch="x86_64"/>
+                </or>
+           </and>
+
+           <!-- To fetch the proper name/arch strings on a new        -->
+           <!-- platform type,  write a short java program that       -->
+           <!-- prints os.name and os.arch                            -->
+           <!--                                                       -->
+           <!-- Example:  OSX on a PPC processor                      -->
+           <!--                                                       -->
+           <!-- <and><os name="Mac OS X"/>                            -->
+           <!--     <or>                                              -->
+           <!--        <os arch="PowerPC"/>                           -->
+           <!--        <os arch="pc"/>                                -->
+           <!--     </or>                                             -->
+           <!-- </and>                                                -->
+           <!--                                                       -->
+           <!--  ...  and so forth for other supported platforms ...  -->
+       </or>
+   </condition>
+   <condition property="build.platform.does.not.support.mingw">
+        <not>
+          <istrue value="${build.platform.supports.mingw}"/>
+        </not>
+   </condition>
+
+
+   <target name="mingw"
+           description="Builds a mingw cross compiler for windows"
+           depends="init">
+
+      <!-- 
+           Expand mingw compiler builder script & related resources.
+           This package was obtained from:
+
+           http://sourceforge.net/project/showfiles.php?group_id=2435&package_id=12644&release_id=17892
+
+           The somewhat peculiar 'copy' task was used rather than the untar 
+           to allow a mapper to strip away the toplevel dir.  Thus, the 
+           mingw source is dumped directly into the build dir (there's 
+           no point of another dir level here).
+
+           While not used directly, it's also worth having a look at:
+           http://www.profv.de/mingw_cross_env/
+
+           In the end, neither the sourceforge nor the profv.de 
+           solutions were entirely satisfactory as-is, but there 
+           were some goood ideas in both.
+      -->
+     <copy todir="${dir.project.mingw.build}">
+        <tarfileset includes="**/*">
+            <bzip2resource>
+                <file file="${dir.project.3rdparty.src}/${file.name.tar.bz2.mingw}"/>
+            </bzip2resource>
+        </tarfileset>
+        <mapper type="regexp" from="^.*?[/\\](.*)" to="\1"/>
+     </copy>
+
+
+     <!-- Building with shared libs would work, but exe files don't run -->
+     <!--
+     <replaceregexp
+          file="${dir.project.mingw.build}/x86-mingw32-build.sh.conf"
+          match="(^\s*option\s+GLOBAL_USER_OPTIONS\s+&#45;-disable-shared)"
+          replace="# \1"
+          byline="true"/>
+     -->
+
+     <!-- Set the working dir -->
+     <replaceregexp
+          file="${dir.project.mingw.build}/x86-mingw32-build.sh.conf"
+          match="(^\s*assume WORKING_DIR\s+)\$HOME"
+          replace="\1${dir.project.mingw.build}"
+          byline="true"/>
+
+     <!-- Set the package dir -->
+     <replaceregexp
+          file="${dir.project.mingw.build}/x86-mingw32-build.sh.conf"
+          match="(^\s*assume PACKAGE_DIR\s+)\$HOME"
+          replace="\1${dir.project.mingw.build}"
+          byline="true"/>
+
+     <!-- Set the mirror -->
+     <replaceregexp
+          file="${dir.project.mingw.build}/x86-mingw32-build.sh.conf"
+          match="(^\s*assume\s+DOWNLOAD_HOST\s+http://)mirror\.(.*)"
+          replace="\1superb-west.\2"
+          byline="true"/>
+
+     <!-- Get rid of all GCC's front ends except for c and c++  -->
+     <replaceregexp
+          file="${dir.project.mingw.build}/x86-mingw32-build.sh.conf"
+          match="(^\s*option\s+GCC_LANGUAGE_OPTIONS\s+)(ada|f77|java|objc)"
+          replace="#\1\2"
+          byline="true"/>
+
+     <!-- Just worrying about linux on i386 for now -->
+     <replaceregexp
+          file="${dir.project.mingw.build}/x86-mingw32-build.sh.conf"
+          match="(^\s*assume\s+INSTALL_DIR\s+)\$HOME"
+          replace="\1${dir.project.3rdparty.bin.linux.i386}"
+          byline="true"/>
+
+     <!-- 
+           Build mingw 
+               For now, just linux/i386. 
+
+           XML follies:      
+               Consecutive hyphens require encoding (&#45; is a hyphen). 
+     -->
+     <exec dir="${dir.project.mingw.build}"
+           executable="sh">                        
+           <arg value="x86-mingw32-build.sh"/>      
+           <arg value="&#45;-unattended"/>          
+           <arg value="&#45;-download"/>            
+           <arg value="&#45;-use-latest-versions"/> 
+     </exec>
+
+     <!--  ... setup for new targets, lather, rinse, repeat... -->
+   </target>
+
+   <!-- Build Zlib for mingw -->
+   <target name="mingw-zlib"
+           description="Builds zlib for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.bz2.zlib.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="bzip2"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.zlib.src}"
+           executable="make">                        
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+
+           <arg value="-f"/>      
+           <arg path="${dir.project.mingw.src}/zlib-mingw.makefile"/>      
+
+           <arg value="PREFIX=${dir.mingw.target}"/>
+           <arg value="AR=${mingw.target}-ar"/>
+           <arg value="CC=${mingw.target}-gcc"/>
+           <arg value="CXX=${mingw.target}-c++"/>
+           <arg value="DLLTOOL=${mingw.target}-dlltool"/>
+           <arg value="LD=${mingw.target}-ld"/>
+           <arg value="NM=${mingw.target}-nm"/>
+           <arg value="OBJDUMP=${mingw.target}-objdump"/>
+           <arg value="RANLIB=${mingw.target}-ranlib"/>
+           <arg value="RC=${mingw.target}-windres"/>
+           <arg value="STRIP=${mingw.target}-strip"/>
+
+           <arg value="install"/>
+     </exec>
+   </target>
+
+
+   <!-- Build libgpg-error for mingw -->
+   <target name="mingw-libgpg-error"
+           description="Builds libgpg-error for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.bz2.libgpgerror.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="bzip2"/>
+
+     <replaceregexp
+            file="${dir.project.mingw.build}/tmp/${dir.name.libgpgerror.src}/configure"
+            match="cross_compiling=no"
+            replace="cross_compiling=yes"
+            byline="true"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.libgpgerror.src}"
+           executable="sh">                        
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="configure"/>
+           <arg line="&#45;-host=${mingw.target}"/>
+           <arg line="&#45;-prefix=${dir.mingw.target}"/>
+     </exec>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.libgpgerror.src}"
+           executable="make">                        
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="bin_PROGRAMS="/>
+           <arg value="sbin_PROGRAMS="/>
+           <arg value="noinst_PROGRAMS="/>
+           <arg value="install"/>
+     </exec>
+   </target>
+
+   <!-- Build pthreads-w32 for mingw -->
+   <target name="mingw-pthreads-w32"
+           description="Builds pthreads-w32 for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.pthreadsw32.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="gzip"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}"
+           executable="make">
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="GC-inlined"/>
+           <arg value="CROSS=${mingw.target}-"/>
+     </exec>
+
+     <copy file="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}/libpthreadGC2.a"
+           tofile="${dir.mingw.target.lib}/libpthread.dll.a"/>
+     <chmod  file="${dir.mingw.target.lib}/libpthread.dll.a"
+             perm="644"/>
+
+     <copy file="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}/pthreadGC2.dll"
+           tofile="${dir.mingw.target.bin}/pthreadGC2.dll"/>
+     <chmod  file="${dir.mingw.target.bin}/pthreadGC2.dll"
+             perm="755"/>
+   </target>
+
+   <!-- Build gettext for mingw -->
+   <target name="mingw-gettext"
+           description="Builds gettext for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.gettext.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="gzip"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.gettext.src}/gettext-runtime"
+           executable="sh">                        
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="configure"/>
+           <arg line="&#45;-host=${mingw.target}"/>
+           <arg line="&#45;-prefix=${dir.mingw.target}"/>
+           <arg line="&#45;-enable-threads=win32"/>
+     </exec>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.gettext.src}/gettext-runtime"
+           executable="make">
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="install"/>
+           <arg value="-C"/>
+           <arg value="intl"/>
+     </exec>
+   </target>
+
+
+
+
+
+   <!-- ********************************************************************* -->
+   <!-- ** CLT Project (only build on Linux, but cross compiles for Win32) ** -->
+   <!-- **                                                                 ** -->
+   <!-- **      For more info on 'os' family/name/arch values, see:        ** -->
+   <!-- **      http://lopica.sourceforge.net/os.html                      ** -->
+   <!-- ********************************************************************* -->
+
+   <target name="incremental-clt"
+           description="Builds the CLTs (runs on linux only for now)"
+           depends="init,-incremental-clt-build-platform-check"
+           if="build.platform.supports.mingw">
+
+           <!-- *************************** -->
+           <!-- Comiler Target:  linux/x86  -->
+           <!-- *************************** -->
+           <exec dir="${dir.project.clt}/source/c" 
+                 executable="make">
+                 <arg value="BUILD_PLATFORM=${os.name}-${os.arch}"/>
+                 <arg value="MINGW_ROOT=${dir.project.3rdparty.bin.linux.i386.mingw}"/>
+                 <arg value="TARGET_PLATFORM=linux/x86"/>
+           </exec>
+
+           <!-- *************************** -->
+           <!-- Comiler Target:  win32/x86  -->
+           <!-- *************************** -->
+           <exec dir="${dir.project.clt}/source/c" 
+                 executable="make">
+                 <arg value="BUILD_PLATFORM=${os.name}-${os.arch}"/>
+                 <arg value="MINGW_ROOT=${dir.project.3rdparty.bin.linux.i386.mingw}"/>
+                 <arg value="TARGET_PLATFORM=win32/x86"/>
+           </exec>
+   </target>
+   <target name="-incremental-clt-build-platform-check"
+           if="build.platform.does.not.support.mingw">
+           <echo>
+                WARNING:  This build platform cannot create the CLTs.
+                          Currently, this can only be done on:  linux/x86
+            </echo>
+   </target>
+
+   <target name="clean-clt"
+           description="Cleans the CLTs (runs on linux only for now)"
+           depends="init">
+
+           <exec dir="${dir.project.clt}/source/c" executable="make">
+                 <arg line='clean'/>
+           </exec>
+   </target>
+
+
+
+
    <!-- **************************** -->
    <!-- ** Virtual Tomcat Project ** -->
    <!-- **************************** -->
