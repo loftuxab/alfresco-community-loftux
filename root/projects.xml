@@ -1090,6 +1090,36 @@
      <!--  ... setup for new targets, lather, rinse, repeat... -->
    </target>
 
+   <!-- Build pthreads-w32 for mingw -->
+   <target name="mingw-pthreads-w32"
+           description="Builds pthreads-w32 for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.pthreadsw32.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="gzip"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}"
+           executable="make">
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="GC-inlined"/>
+           <arg value="CROSS=${mingw.target}-"/>
+     </exec>
+
+     <copy file="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}/libpthreadGC2.a"
+           tofile="${dir.mingw.target.lib}/libpthread.dll.a"/>
+     <chmod  file="${dir.mingw.target.lib}/libpthread.dll.a"
+             perm="644"/>
+
+     <copy file="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}/pthreadGC2.dll"
+           tofile="${dir.mingw.target.bin}/pthreadGC2.dll"/>
+     <chmod  file="${dir.mingw.target.bin}/pthreadGC2.dll"
+             perm="755"/>
+   </target>
+
+
+
+
    <!-- Build Zlib for mingw -->
    <target name="mingw-zlib"
            description="Builds zlib for mingw"
@@ -1119,6 +1149,61 @@
            <arg value="STRIP=${mingw.target}-strip"/>
 
            <arg value="install"/>
+     </exec>
+   </target>
+
+
+
+   <!-- Build libiconv for mingw -->
+   <target name="mingw-libiconv"
+           description="Builds libiconv for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.libiconv.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="gzip"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.libiconv.src}"
+           executable="sh">                        
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="configure"/>
+           <arg line="&#45;-host=${mingw.target}"/>
+           <arg line="&#45;-prefix=${dir.mingw.target}"/>
+           <arg line="&#45;-enable-extra-encodings"/>
+           <arg line="&#45;-disable-nls"/>
+     </exec>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.libiconv.src}"
+           executable="make">
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="install"/>
+     </exec>
+   </target>
+
+   <!-- Build gettext for mingw -->
+   <target name="mingw-gettext"
+           description="Builds gettext for mingw"
+           depends="init">
+
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.gettext.src}"
+            dest="${dir.project.mingw.build}/tmp"
+            compression="gzip"/>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.gettext.src}/gettext-runtime"
+           executable="sh">                        
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="configure"/>
+           <arg line="&#45;-host=${mingw.target}"/>
+           <arg line="&#45;-prefix=${dir.mingw.target}"/>
+           <arg line="&#45;-enable-threads=win32"/>
+     </exec>
+
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.gettext.src}/gettext-runtime"
+           executable="make">
+           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="install"/>
+           <arg value="-C"/>
+           <arg value="intl"/>
      </exec>
    </target>
 
@@ -1156,59 +1241,63 @@
      </exec>
    </target>
 
-   <!-- Build pthreads-w32 for mingw -->
-   <target name="mingw-pthreads-w32"
-           description="Builds pthreads-w32 for mingw"
+
+   <!-- Build libgcrypt for mingw -->
+   <target name="mingw-libgcrypt"
+           description="Builds libgcrypt for mingw"
            depends="init">
 
-     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.pthreadsw32.src}"
+     <untar src="${dir.project.3rdparty.src}/${file.name.tar.bz2.libgcrypt.src}"
             dest="${dir.project.mingw.build}/tmp"
-            compression="gzip"/>
+            compression="bzip2"/>
 
-     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}"
-           executable="make">
-           <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
-           <arg value="GC-inlined"/>
-           <arg value="CROSS=${mingw.target}-"/>
-     </exec>
+     <replaceregexp
+            file="${dir.project.mingw.build}/tmp/${dir.name.libgcrypt.src}/configure"
+            match="cross_compiling=no"
+            replace="cross_compiling=yes"
+            byline="true"/>
 
-     <copy file="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}/libpthreadGC2.a"
-           tofile="${dir.mingw.target.lib}/libpthread.dll.a"/>
-     <chmod  file="${dir.mingw.target.lib}/libpthread.dll.a"
-             perm="644"/>
+     <replaceregexp
+            file="${dir.project.mingw.build}/tmp/${dir.name.libgcrypt.src}/cipher/random.c"
+            match="sys/times.h"
+            replace="sys/time.h"
+            byline="true"/>
 
-     <copy file="${dir.project.mingw.build}/tmp/${dir.name.pthreadsw32.src}/pthreadGC2.dll"
-           tofile="${dir.mingw.target.bin}/pthreadGC2.dll"/>
-     <chmod  file="${dir.mingw.target.bin}/pthreadGC2.dll"
-             perm="755"/>
-   </target>
+      <replaceregexp
+            file="${dir.project.mingw.build}/tmp/${dir.name.libgcrypt.src}/src/gcrypt.h.in"
+            match  ="^#define _GCRYPT_H"
+            replace ="#define _GCRYPT_H&#xA;#include &lt;ws2tcpip.h>"
+            byline="true"/>
 
-   <!-- Build gettext for mingw -->
-   <target name="mingw-gettext"
-           description="Builds gettext for mingw"
-           depends="init">
+      <replaceregexp
+            file="${dir.project.mingw.build}/tmp/${dir.name.libgcrypt.src}/src/ath.h"
+            match  ="#include &lt;windows.h>"
+            replace ="#include &lt;windows.h>&#xA;#include &lt;ws2tcpip.h>"
+            byline="true"/>
 
-     <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.gettext.src}"
-            dest="${dir.project.mingw.build}/tmp"
-            compression="gzip"/>
-
-     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.gettext.src}/gettext-runtime"
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.libgcrypt.src}"
            executable="sh">                        
            <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
            <arg value="configure"/>
            <arg line="&#45;-host=${mingw.target}"/>
            <arg line="&#45;-prefix=${dir.mingw.target}"/>
-           <arg line="&#45;-enable-threads=win32"/>
+           <arg line="&#45;-with-gpg-error-prefix=${dir.mingw.target}"/>
      </exec>
 
-     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.gettext.src}/gettext-runtime"
-           executable="make">
+     <exec dir="${dir.project.mingw.build}/tmp/${dir.name.libgcrypt.src}"
+           executable="make">                        
            <env key="PATH" path="${dir.mingw.cross.bin}:${env.PATH}"/>
+           <arg value="bin_PROGRAMS="/>
+           <arg value="sbin_PROGRAMS="/>
+           <arg value="noinst_PROGRAMS="/>
+           <arg value="AM_LDFLAGS=-no-undefined"/>
            <arg value="install"/>
-           <arg value="-C"/>
-           <arg value="intl"/>
      </exec>
    </target>
+
+   
+
+
 
 
 
