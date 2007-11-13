@@ -65,30 +65,60 @@
                     distribute-deployment,
                     distribute-amps,
                     distribute-sample-extensions,
-                    distribute-docs" />
+                    distribute-docs,
+                    revert-changes" />
 
-   <target name="set-build-number" 
-           depends="init" 
+   <target name="set-build-number"
+           depends="init, set-build-devbox-number, set-revision-number">
+   </target>
+
+   <target name="set-build-devbox-number"
            if="alf.build.number">
       <exec executable="svn">
          <arg line="revert ${dir.project.repository.config}/alfresco/version.properties"/>
       </exec>
-      <replace file="${dir.project.repository.config}/alfresco/version.properties" 
-               token="@build-number@" 
-               value="${alf.build.number}" 
+      <replace file="${dir.project.repository.config}/alfresco/version.properties"
+               token="@build-number@"
+               value="${alf.build.number}"
                summary="yes" />
-      <echo>Set build number to ${alf.build.number} in ${dir.project.repository.config}/alfresco/version.properties</echo>
    </target>
 
-   <target name="set-build-number-cc" 
-           depends="init" 
+   <target name="set-revision-number"
+           depends="init"
+           unless="alf.build.number">
+      <taskdef name="svn"
+               classname="org.tigris.subversion.svnant.SvnTask">
+         <classpath refid="classpath.compile" />
+      </taskdef>
+
+      <svn>
+         <status path="${basedir}" revisionProperty="svn.revision" />
+      </svn>
+      <exec executable="svn">
+         <arg line="revert ${dir.project.repository.config}/alfresco/version.properties"/>
+      </exec>
+      <replace file="${dir.project.repository.config}/alfresco/version.properties"
+               token="@build-number@"
+               value="r${svn.revision}"
+               summary="yes" />
+   </target>
+
+   <target name="set-build-number-cc"
+           depends="init"
            if="build.release">
       <replace file="${dir.project.repository.config}/alfresco/version.properties" 
                token="@build-number@" 
                value="${label}" />
    </target>
 
-   <target name="generate-checksums" 
+   <target name="revert-changes"
+           depends="init">
+      <exec executable="svn">
+         <arg line="revert ${dir.project.repository.config}/alfresco/version.properties"/>
+      </exec>
+   </target>
+
+   <target name="generate-checksums"
            description="Generates checksum files for the distibution files" 
            depends="init">
       <delete>
@@ -892,7 +922,7 @@
          <fileset dir="${dir.continuous.assemble.sdk}/samples" />
       </copy>
       
-      <taskdef name="verify-classpath" 
+      <taskdef name="verify-classpath"
                classname="org.alfresco.devenv.ant.VerifyEclipseClasspath">
          <classpath refid="classpath.compile" />
       </taskdef>
