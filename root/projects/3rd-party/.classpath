@@ -73,7 +73,7 @@
 	<classpathentry kind="lib" path="lib/fontbox-0.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/truezip.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/xalan-2.7.0/xalan.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.4.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlsec-1.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/devenv/jsp.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/devenv/servlet.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/devenv/junit.jar"/>
