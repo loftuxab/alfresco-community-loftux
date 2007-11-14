@@ -65,13 +65,16 @@ public final class URLEncoder
     };
 
     /**
-     * Encode a string to the UTF-8-in-URL proposal. This is what happens:
+     * Encode a string to the UTF-8-in-URL proposal. There are some changes
+     * from the standard, this is what happens:
      *
      * <ul>
      * <li><p>The ASCII characters 'a' through 'z', 'A' through 'Z',
      *        and '0' through '9' remain the same.
      *
-     * <li><p>The unreserved characters - _ . ! ~ * ' ( ) remain the same.
+     * <li><p>The unreserved characters - _ . ! ~ * ( ) remain the same.
+     *
+     * <li><p>The unreserved character ' is converted into "%27" - it is NOT left unencoded!
      *
      * <li><p>The space character ' ' is converted into "%20" - NOT a plus sign!
      *
@@ -107,19 +110,14 @@ public final class URLEncoder
             { 
                 sbuf.append((char)ch);
             }
-            else if (ch == ' ')                     // space
-            {
-                sbuf.append("%20");
-            }
             else if (ch == '-' || ch == '_'         // unreserved
                      || ch == '.' || ch == '!'
                      || ch == '~' || ch == '*'
-                     || ch == '\'' || ch == '('
-                     || ch == ')')
+                     || ch == '(' || ch == ')')
             {
                 sbuf.append((char)ch);
             }
-            else if (ch <= 0x007f)                  // other ASCII
+            else if (ch <= 0x007f)                  // other ASCII including single quote ' and space
             {
                 sbuf.append(hex[ch]);
             }
