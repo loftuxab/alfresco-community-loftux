@@ -816,6 +816,8 @@
          <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/error/StackTraceUtil.class" />
          <fileset dir="${dir.project.core.classes}" 
+                  includes="org/alfresco/i18n/I18NUtil.class" />
+         <fileset dir="${dir.project.core.classes}" 
                   includes="org/alfresco/util/GUID.class" />
          <fileset dir="${dir.project.repository.classes}" 
                   includes="org/alfresco/model/ContentModel.class" />
