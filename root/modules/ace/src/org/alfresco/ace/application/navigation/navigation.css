@@ -6,7 +6,7 @@
    	border-thickness:0;
    
    	border-skin: ClassReference("org.alfresco.ace.control.gradient.SimpleGradientBorder");
-   	fill-colors: #ffffff, #fafdfd;
+   	fill-colors: #ffffff, #f4fdfd;
 }
 
 .navViewLightBackground

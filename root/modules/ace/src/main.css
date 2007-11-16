@@ -24,6 +24,12 @@ Label
 	font-size: 12;
 }
 
+TextInput
+{
+	font-family: Arial; 
+	font-size: 12;
+}
+
 .mainApplication
 {
 	background-color: #929292; 

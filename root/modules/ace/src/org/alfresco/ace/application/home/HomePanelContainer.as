@@ -334,6 +334,11 @@ package org.alfresco.ace.application.home
 				this._showing = false;
 				showComplete();
 			}
+			
+			//if (this.currentState == STATE_COLLAPSED)
+			//{
+			//	this._bottomCanvas.height = 20;				
+			//}
 		}			
 		
 		/**

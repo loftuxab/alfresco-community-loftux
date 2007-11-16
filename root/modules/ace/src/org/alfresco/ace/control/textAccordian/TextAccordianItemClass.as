@@ -20,7 +20,7 @@ package org.alfresco.ace.control.textAccordian
 	public class TextAccordianItemClass extends Canvas
 	{
 		/** Effect durtaion */
-		private static const EFFECT_DURATION:Number = 200;
+		private static const EFFECT_DURATION:Number = 400;
 		
 		/** UI controls */
 		public var itemTitle:Label;

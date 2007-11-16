@@ -35,6 +35,7 @@ package org.alfresco.ace.application.searchDetails
 	import mx.events.ResizeEvent;
 	import org.alfresco.ace.control.hyperlink.HyperLink;
 	import mx.containers.VBox;
+	import mx.controls.Label;
 
 	/**
 	 * Search Details Class
@@ -62,10 +63,8 @@ package org.alfresco.ace.application.searchDetails
 		public var swfPanel:Canvas;
 		public var resultsDispPanel:Canvas;
 		public var titleBtn:HyperLink = new HyperLink();
-		public var content:Text;
-		public var updated:Text;
-		
-			
+		public var content:Label;
+		public var updated:Label;			
 	
 		/**
 		 * Default Constructor
@@ -92,6 +91,7 @@ package org.alfresco.ace.application.searchDetails
 				else
 				{
 					content.visible = false;
+					content.includeInLayout = false;
 				}
 		}
 		

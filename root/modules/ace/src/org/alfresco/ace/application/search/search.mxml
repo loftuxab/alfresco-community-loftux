@@ -17,12 +17,15 @@
 		
 		<mx:HBox width="100%" horizontalAlign="center">
 			
-			<mx:TextInput id="searchTxt" width="250"  enter="onSearchButtonLinkClick(searchTxt.text)" />
+			<mx:TextInput id="searchTxt" width="250" height="23" enter="onSearchButtonLinkClick(searchTxt.text)" />
 			<mx:Spacer width="8"/> 
 			<local:SearchButton label="Search" click="onSearchButtonLinkClick(searchTxt.text)"/>
+			
+			<!-- TODO advanced search
 			<mx:Spacer width="15"/>  
 			<link:HyperLink text="Advanced Search" styleName="advancedSeachLink" rolledOverStyleName="advancedSeachLinkRollOver"/>
-		
+			-->
+			
 		</mx:HBox>
 					
 	</mx:HBox>

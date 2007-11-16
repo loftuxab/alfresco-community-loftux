@@ -7,15 +7,15 @@
 	  verticalGap="0" horizontalGap="0">
     
     <!-- State defintitions -->
-    <login:states>
+    <!--<login:states>
         <mx:State name="InvalidCredentials">
-            <mx:AddChild relativeTo="{loginForm}" position="lastChild">
+            <mx:AddChild relativeTo="{loginForm}" position="firstChild">
                 <mx:FormItem width="100%">
                 	<mx:Text id="errorMessage" styleName="errorText"/>
                 </mx:FormItem>
             </mx:AddChild>
         </mx:State>
-    </login:states> 
+    </login:states> -->
 	
 	<!-- Import css style sheet -->
     <mx:Style source="login.css"/> 
@@ -24,18 +24,22 @@
 		<mx:HBox width="85%" height="75%">
 			<mx:Image source="@Embed(source='/images/ACE_logo_login.png')"/>		 
 			<mx:VBox id="errorVBox" width="100%" height="100%">
-				<mx:Spacer height="30"/>
-				<mx:Form width="100%" id="loginForm">				
-					<mx:FormItem label="Username:" styleName="loginText" width="100%">
-						<mx:TextInput id="username" styleName="loginInputText" width="100%" enter="onLoginButtonLinkClick()"/>
+				<mx:Spacer height="13"/>
+				<mx:Form width="100%" id="loginForm">		
+					<mx:FormItem styleName="loginText" width="100%">
+						<mx:Text id="errorMessage" styleName="errorText" text=" " />
 					</mx:FormItem>	
-					<mx:Spacer height="5"/>					
+					<mx:Spacer height="2"/>			
+					<mx:FormItem label="Username:" styleName="loginText" width="100%">
+						<mx:TextInput id="username" styleName="loginInputText" height="23" width="180" enter="onLoginButtonLinkClick()"/>
+					</mx:FormItem>	
+					<mx:Spacer height="7"/>					
 					<mx:FormItem label="Password:" styleName="loginText" width="100%">
-						<mx:TextInput id="password" styleName="loginInputText" displayAsPassword="true" width="100%" enter="onLoginButtonLinkClick()"/>
+						<mx:TextInput id="password" styleName="loginInputText" displayAsPassword="true" height="23" width="180" enter="onLoginButtonLinkClick()"/>
 					</mx:FormItem>
-					<mx:Spacer height="5"/>	
+					<mx:Spacer height="7"/>	
 					<mx:FormItem width="100%">
-						<mx:Button label="Login" id="loginBtn" click="onLoginButtonLinkClick()"/>													
+						<mx:Button label="Login" id="loginBtn" click="onLoginButtonLinkClick()" width="90"/>													
 					</mx:FormItem>
 				</mx:Form>
 			</mx:VBox>   		    			

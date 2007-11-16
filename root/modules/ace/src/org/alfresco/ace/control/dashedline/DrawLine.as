@@ -36,7 +36,7 @@ package org.alfresco.ace.control.dashedline
 		{			
 			var line:Canvas = new Canvas();
 			line.percentWidth = 100;
-			drawHorizontal(line, 0, 1250, 0, 3, 1,0xafa0a0);
+			drawHorizontal(line, 0, 1250, 0, 3, 0, 0xafa0a0);
 			this.addChild(line);
 		}
 		
@@ -81,7 +81,6 @@ package org.alfresco.ace.control.dashedline
 			
 			function drawLine():void 
 			{   
-				
 				if (y1 == y2) 
 				{
 					child.graphics.lineTo(x1 + lineLength, y1);
@@ -99,13 +98,13 @@ package org.alfresco.ace.control.dashedline
 			{
 				if (y1 == y2) 
 				{
-					child.graphics.moveTo(x1 + 5, y1);
-					x1 += 5;
+					child.graphics.moveTo(x1 + 2, y1);
+					x1 += 2;
 				} 
 				else 
 				{
-					child.graphics.moveTo(x1, y1 + 5);
-					y1 += 5;
+					child.graphics.moveTo(x1, y1 + 2);
+					y1 += 2;
 				}
 			} 
 		

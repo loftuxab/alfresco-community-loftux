@@ -69,7 +69,8 @@ package org.alfresco.ace.application.login
 		public function onLoginComplete(event:Event):void
 		{
 			// Return the control to its base state
-			this.currentState = "";
+			//this.currentState = " ";
+			errorMessage.text = " ";
 		}
 		
 		/**
@@ -80,7 +81,7 @@ package org.alfresco.ace.application.login
 			if (event.errorType == InvalidCredentialsError.INVALID_CREDENTIALS)
 			{
 				// Switch to the alternative state and set the error message
-				currentState = "InvalidCredentials";
+				//currentState = "InvalidCredentials";
 				errorMessage.text = event.error.message;
 				focusManager.setFocus(username);
 			}

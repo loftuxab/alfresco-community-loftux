@@ -41,7 +41,7 @@
     				id="home" label="Home" horizontalAlign="center" width="100%" height="100%" 
     				paddingTop="15" paddingLeft="15" paddingRight="15" paddingBottom="15" verticalGap="15">        			        		
 				<gettingstarted:GettingStarted width="90%" innerHeight="230"/>				
-				<whatsnew:WhatsNew width="90%" showPause="250"/> 
+				<whatsnew:WhatsNew width="90%" showPause="350"/> 
 	        </avs:AdvancedViewStack>
  
         	<mx:Canvas label="Knowledge Base" id="knowledgeBase" enabled="true" width="100%" height="100%">

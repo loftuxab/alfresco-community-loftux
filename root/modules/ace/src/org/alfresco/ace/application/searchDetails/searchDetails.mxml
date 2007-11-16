@@ -7,26 +7,28 @@
 	<!-- Import css style sheet -->
     <mx:Style source="searchDetails.css"/>
    
-    <mx:HBox width="100%">
+    <mx:HBox width="100%" verticalGap="0" horizontalGap="0">
     	
     	<!-- The image -->
     	<mx:Image id="imgTag" /> 
     	<mx:Spacer width="5"/>
     	
     	<!-- Content details -->
-    	<mx:VBox width="100%">
+    	<mx:VBox width="100%" verticalGap="0" horizontalGap="0">
     	
     		<hLink:HyperLink  click="onSearchDetailsClick()" id="titleBtn" 
-				 			  styleName="searchDetailsLink" rolledOverStyleName="searchDetailsRollOverLink"/>	
-			<mx:Text id="updated" fontSize="10" color="#757577"/>
-			<mx:Text id="content" width="100%" fontSize="13" color="#757577"/>
+				 			  styleName="searchDetailsLink" rolledOverStyleName="searchDetailsRollOverLink"
+				 			  paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0"/>	
+			<mx:Label id="updated" fontSize="10" color="#757577" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0"/>
+			<mx:Label id="content" width="100%" fontSize="13" color="#757577"
+				      paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0"/>
     		
     	</mx:VBox>	
     	
     </mx:HBox>
     
-    <mx:Spacer  height="10" width="100%"/>
+    <mx:Spacer  height="5" width="100%"/>
 	<line:DrawLine width="100%"/>
-	<mx:Spacer  height="10"/>
+	<mx:Spacer  height="5"/>
 	
 </searchDetails:searchDetailsClass>
