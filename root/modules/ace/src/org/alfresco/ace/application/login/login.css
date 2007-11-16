@@ -3,11 +3,12 @@
 .loginText
 {
 	color: #ffffff;
+	font-weight:bold;
 }
 
 .errorText
 {
-	color: #ffffff;
+	color: #ea6363;
 	font-weight: bold;
 }
 

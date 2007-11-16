@@ -15,9 +15,8 @@
 		
 		<mx:HBox width="100%" height="100%" horizontalAlign="right" verticalAlign="middle">
 		
-			<!-- <mx:Label id="minMaxButton" styleName="homePanelTitle" text="^^"/>	-->
 			<local:mmButton id="minMaxButton" />
-			<mx:Spacer width="2"/>
+			<mx:Spacer width="12"/>
 			
 			<!-- Hide for now as close functionality is not implemented 
 			<mx:VRule height="15" width="1" styleName="homeSeparator"/>

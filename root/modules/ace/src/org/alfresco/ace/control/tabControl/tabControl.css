@@ -21,6 +21,8 @@
 .tabControlLabel
 {
 	font-size: 12;
+	font-weight: bold;
+	letter-spacing: 0.5;
 }
 
 .highlightedLeft
