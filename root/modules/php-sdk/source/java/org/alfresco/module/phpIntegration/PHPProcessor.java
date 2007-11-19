@@ -80,11 +80,26 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     public static final String GLOBAL_SESSION = "_ALF_SESSION";
     public static final String GLOBAL_MODEL = "_ALF_MODEL";
     
+    /** Key to value found in $_SERVER indicating that the Alfresco API is available nativly */
+    public static final String ALF_AVAILABLE = "ALF_AVAILABLE";
+    
     /** Key used to store a reference to the service registry in the Quercus engine */
     public static final String KEY_SERVICE_REGISTRY = "ServiceRegistry";
     
     /** Quercus engine */
-    private Quercus quercus = new Quercus(); 
+    private Quercus quercus; 
+    
+    /**
+     * Constructor
+     */
+    public PHPProcessor()
+    {
+    	// Create the quercus engine
+    	this.quercus = new Quercus();
+    	
+    	// Set the ALF_AVAILABLE server value to help with script reuse
+    	this.quercus.setServerEnv(PHPProcessor.ALF_AVAILABLE, "true");
+    }
         
     /**
      * @see org.alfresco.repo.processor.BaseProcessor#register()
@@ -102,7 +117,8 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     /**
      * @see org.alfresco.service.cmr.repository.Processor#registerProcessorExtension(org.alfresco.service.cmr.repository.ProcessorExtension)
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void registerProcessorExtension(ProcessorExtension processorExtension)
     {
         // Call the base implementation
@@ -164,12 +180,13 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
             
             // Execute the page
             WriteStream ws = new WriteStream(writer);
-            Env env = new Env(this.quercus, page, ws, null, null);    
+            Env env = new Env(this.quercus, page, ws, null, null);   
+            env.start();
             
             // Add the repository and session as a global variables
-            Repository repository = new Repository(env);
+            Repository repository = new Repository(env, "");
             env.setGlobalValue(GLOBAL_REPOSITORY, convertToValue(env, null, repository));
-            Session session = repository.createSession();
+            Session session = repository.createSession("");
             env.setGlobalValue(GLOBAL_SESSION, convertToValue(env, null, session));
             
             // Map the contents of the passed model into global variables
@@ -181,7 +198,7 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
             // Execute the page
             Value value = page.executeTop(env);
             
-            // Make sure we flush becuase otherwise the result does not get written
+            // Make sure we flush because otherwise the result does not get written
             ws.flush();
            
             // Write to output
@@ -200,7 +217,8 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
         }
     }
     
-    public static Value convertToValue(Env env, Session session, Object value)
+    @SuppressWarnings("unchecked")
+	public static Value convertToValue(Env env, Session session, Object value)
     {
         Value result = null;
         
@@ -266,7 +284,7 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
             try
             {
                 JavaClassDef def = env.getQuercus().getModuleContext().getJavaClassDefinition(((ScriptObject)value).getScriptObjectName());
-                def.introspect();
+                def.init();
                 result = new JavaValue(env, value, def);
             }
             catch (Exception exception)
@@ -280,7 +298,7 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
             try
             {
                 JavaClassDef def = env.getQuercus().getModuleContext().getJavaClassDefinition(value.getClass().toString());
-                def.introspect();
+                def.init();
                 result = new JavaValue(env, value, def);
             }
             catch (Exception exception)

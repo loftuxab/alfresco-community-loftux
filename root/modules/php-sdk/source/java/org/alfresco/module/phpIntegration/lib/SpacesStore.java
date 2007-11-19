@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
@@ -38,7 +39,7 @@ public class SpacesStore extends Store implements ScriptObject
     
     public SpacesStore(Session session)
     {
-        super(session, StoreRef.PROTOCOL_WORKSPACE, "SpacesStore");
+        super(session, "SpacesStore", StoreRef.PROTOCOL_WORKSPACE);
     }
     
     @Override
@@ -49,10 +50,16 @@ public class SpacesStore extends Store implements ScriptObject
     
     public Node getCompanyHome()
     {
-        SearchService searchService = this.session.getServiceRegistry().getSearchService();
-        ResultSet resultSet = searchService.query(this.storeRef, SearchService.LANGUAGE_LUCENE, "PATH:\"app:company_home\"");
-        NodeRef companyHome = resultSet.getNodeRef(0);
-        return new Node(session, companyHome);
+    	return this.session.doSessionWork(new SessionWork<Node>()
+    	{
+			public Node doWork() 
+			{
+		        SearchService searchService = SpacesStore.this.session.getServiceRegistry().getSearchService();
+		        ResultSet resultSet = searchService.query(SpacesStore.this.storeRef, SearchService.LANGUAGE_LUCENE, "PATH:\"app:company_home\"");
+		        NodeRef companyHome = resultSet.getNodeRef(0);
+		        return new Node(session, companyHome);
+			}
+    	});
     }
 
 }

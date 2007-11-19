@@ -31,15 +31,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.module.phpIntegration.lib.Node;
-import org.alfresco.module.phpIntegration.lib.Repository;
-import org.alfresco.module.phpIntegration.lib.Session;
-import org.alfresco.module.phpIntegration.lib.SpacesStore;
-import org.alfresco.module.phpIntegration.lib.Store;
-import org.alfresco.repo.security.authentication.AuthenticationComponent;
-import org.alfresco.repo.transaction.TransactionUtil;
-import org.alfresco.repo.transaction.TransactionUtil.TransactionWork;
-import org.alfresco.service.transaction.TransactionService;
+import org.alfresco.module.phpIntegration.PHPMethodExtension;
+import org.alfresco.module.phpIntegration.PHPObjectExtension;
+import org.alfresco.module.phpIntegration.PHPProcessor;
+import org.alfresco.module.phpIntegration.PHPProcessorException;
+import org.alfresco.service.cmr.repository.ProcessorExtension;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -47,54 +43,83 @@ import com.caucho.quercus.servlet.PhpClassConfig;
 import com.caucho.quercus.servlet.QuercusServlet;
 
 /**
- * @author royw
- *
+ * Override of the Quercus Servlet.
+ * 
+ * @author Roy Wetherall
  */
 public class AlfrescoQuercusServlet extends QuercusServlet
 {
     private static final long serialVersionUID = 3074706465787671284L;
+    
+    private boolean registered = false;
 
     public AlfrescoQuercusServlet()
     {
-        super();
-        
-        // Add the Alfresco modules and classes
-        registerClass("Repository", Repository.class);
-        registerClass("Session", Session.class);
-        registerClass("Node", Node.class);
-        registerClass("Store", Store.class);
-        registerClass("SpacesStore", SpacesStore.class);
+        super();        
     }
     
-    public void service(final HttpServletRequest request, final HttpServletResponse response)
+    /**
+     * Over ridden service method ensures that the Alfresco PHP API is loaded into the Quercus engine and that the PHP execution occurs 
+     * within a valid transaction and authentication context.
+     * 
+     * @see com.caucho.quercus.servlet.QuercusServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @SuppressWarnings("unchecked")
+	public void service(final HttpServletRequest request, final HttpServletResponse response)
         throws ServletException, IOException
     {
+    	// Set the ALF_AVAILABLE value in $_SERVER
+    	QuercusServlet.ServerEnv serverEnv = createServerEnv();
+    	serverEnv.put(PHPProcessor.ALF_AVAILABLE, "true");
+    	
         ServletContext servletContext = request.getSession().getServletContext();
         ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
         
-        final AuthenticationComponent authenticationComponenet = (AuthenticationComponent)applicationContext.getBean("authenticationComponent");
-        TransactionService transactionService = (TransactionService)applicationContext.getBean("transactionComponent");
-        
-        TransactionUtil.executeInUserTransaction(transactionService, new TransactionWork<Object>()
+        if (this.registered == false)
         {
-            public Object doWork() throws Throwable
-            {
-                authenticationComponenet.setCurrentUser("admin");
-                try
+        	// Get the PHP processor and register the various Alfresco extensions with the PHP engine used
+        	// by the servlet
+        	PHPProcessor phpProcessor = (PHPProcessor)applicationContext.getBean("phpProcessor");
+        	for(ProcessorExtension extension: phpProcessor.getProcessorExtensions())
+        	{
+        		if (extension instanceof PHPMethodExtension)
                 {
-                    AlfrescoQuercusServlet.super.service(request, response);
+        			// TODO ... at the moment we can't do this because we can't get at the quercus instance to 
+        			//          initialise the module
+        			
+                    //addModule((QuercusModule)extension);    
+                    //((PHPMethodExtension)extension).initialiseModule(this.quercus.findModule(extension.getClass().getName()));
                 }
-                finally
+                else if (extension instanceof PHPObjectExtension)
                 {
-                    authenticationComponenet.clearCurrentSecurityContext();
+                    try
+                    {
+                        Class clazz = Class.forName(((PHPObjectExtension)extension).getExtensionClass());
+                        registerClass(extension.getExtensionName(), clazz);
+                    }
+                    catch (ClassNotFoundException exception)
+                    {
+                        throw new PHPProcessorException("PHP Object Extension class '" + ((PHPObjectExtension)extension).getExtensionClass() + "' could not be found.", exception);
+                    }
                 }
-                
-                return null;
-            }
-        });
+        	}
+            
+        	// Indicate that the extensions have been registered
+        	this.registered = true;
+        }
+        
+        // Execute the parent servlet
+        AlfrescoQuercusServlet.super.service(request, response);
     }
     
-    private void registerClass(String name, Class clazz)
+    /**
+     * Helper method to register a new class with the Quercus engine
+     * 
+     * @param name		the name of the class
+     * @param clazz		the class
+     */
+    @SuppressWarnings("unchecked")
+	private void registerClass(String name, Class clazz)
     {
         PhpClassConfig config = new PhpClassConfig();
         config.setName(name);

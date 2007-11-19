@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.QName;
 
@@ -69,18 +70,26 @@ public class DataDictionary implements ScriptObject
      * @param subTypeOf     test whether the class is a sub-type of this class
      * @return boolean      true if it is a sub-class, false otherwise
      */
-    public boolean isSubTypeOf(String clazz, String subTypeOf)
+    public boolean isSubTypeOf(final String clazz, final String subTypeOf)
     {
-        // Convert to full names if required
-        clazz = this.session.getNamespaceMap().getFullName(clazz);
-        subTypeOf = this.session.getNamespaceMap().getFullName(subTypeOf);
-        
-        // Create the QNames for the passes classes
-        QName className = QName.createQName(clazz);
-        QName ofClassName = QName.createQName(subTypeOf);
-        
-        // Return the result
-        return this.dictionaryService.isSubClass(className, ofClassName);
+    	Boolean result = this.session.doSessionWork(new SessionWork<Boolean>()
+    	{
+			public Boolean doWork() 
+			{
+		        // Convert to full names if required
+		        String fullClazz = DataDictionary.this.session.getNamespaceMap().getFullName(clazz);
+		        String fullSubTypeOf = DataDictionary.this.session.getNamespaceMap().getFullName(subTypeOf);
+		        
+		        // Create the QNames for the passes classes
+		        QName className = QName.createQName(fullClazz);
+		        QName ofClassName = QName.createQName(fullSubTypeOf);
+		        
+		        // Return the result
+		        return new Boolean(DataDictionary.this.dictionaryService.isSubClass(className, ofClassName));
+			}
+    	});
+    	
+    	return result.booleanValue();
     }
     
 }

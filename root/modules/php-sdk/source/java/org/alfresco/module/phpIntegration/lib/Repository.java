@@ -26,11 +26,16 @@ package org.alfresco.module.phpIntegration.lib;
 
 import javax.servlet.ServletContext;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.module.phpIntegration.PHPProcessor;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.service.ServiceRegistry;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.caucho.quercus.annotation.Optional;
 import com.caucho.quercus.env.Env;
 
 /**
@@ -38,11 +43,25 @@ import com.caucho.quercus.env.Env;
  */
 public class Repository implements ScriptObject
 {
+	/** The name of the script object */
     private static final String SCRIPT_OBJECT_NAME = "Repository";
     
+    /** The service registry */
     private ServiceRegistry serviceRegistry;
     
-    public Repository(Env env)
+    /**
+     *  The connection URL (this really doesn't have a lot of meaning for the local PHP 
+     * processor but is kept for API consistency)
+     */
+    @SuppressWarnings("unused")
+	private String connectionURL;    
+    
+    /**
+     * Constructor
+     * 
+     * @param env	PHP env object
+     */
+    public Repository(Env env, @Optional("") String connectionURL)
     {
         if (env.getRequest() != null)
         {
@@ -54,19 +73,65 @@ public class Repository implements ScriptObject
         {
             this.serviceRegistry = (ServiceRegistry)env.getQuercus().getSpecial(PHPProcessor.KEY_SERVICE_REGISTRY);
         }
+        
+        // Set the connectionURL
+        this.connectionURL = connectionURL;
     }
     
+    /**
+     * @see org.alfresco.module.phpIntegration.lib.ScriptObject#getScriptObjectName()
+     */
     public String getScriptObjectName()
     {
         return SCRIPT_OBJECT_NAME;
     }
     
-    public Session createSession()
+    /**
+     * Create session object
+     * 
+     * @return	the session object
+     */
+    public Session createSession(@Optional("") String ticket)
     {
-        return new Session(this.serviceRegistry);
+    	if (ticket.length() == 0)
+    	{
+    		// Use the currently authenticated ticket for the session
+    		ticket = this.serviceRegistry.getAuthenticationService().getCurrentTicket();
+    	}
+    	
+        return new Session(this.serviceRegistry, ticket);
     }
     
-    // public String authenticate();
-    
-    // publis Session createSession(String ticket);
+    /**
+     * Authenticates the passed credentials
+     * 
+     * @param user		user name
+     * @param password	password
+     * @return String	ticket, null if unauthenticated
+     */
+    public String authenticate(String user, String password)
+    {
+    	String ticket = null;
+    	
+    	// Get the authentication service
+    	AuthenticationService authenticationService = this.serviceRegistry.getAuthenticationService();
+    	
+    	// Get the current authentication context
+    	Authentication authentication = AuthenticationUtil.getCurrentAuthentication();    	
+        try
+        {
+        	// Try and authenticate with the provided user details
+    		authenticationService.authenticate(user, password.toCharArray());
+    		
+    		// Retrieve the ticket
+    		ticket = authenticationService.getCurrentTicket();
+        }
+        finally
+        {
+        	// Re-establish the previous authentication context
+            AuthenticationUtil.setCurrentAuthentication(authentication);
+        }
+    	
+    	return ticket;
+    }
 }

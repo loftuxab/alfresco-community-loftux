@@ -31,7 +31,7 @@ import com.caucho.quercus.module.AbstractQuercusModule;
 import com.caucho.quercus.module.QuercusModule;
 
 /**
- * Base class representing an extension tot he PHP rpocessor that adds new methods.
+ * Base class representing an extension to the PHP processor that adds new methods.
  * 
  * @author Roy Wetherall
  */
@@ -85,7 +85,7 @@ public class PHPMethodExtension extends AbstractQuercusModule implements Process
     }
     
     /**
-     * Register the method extension wiht the PHP processor.
+     * Register the method extension with the PHP processor.
      */
     public void register()
     {
@@ -94,7 +94,7 @@ public class PHPMethodExtension extends AbstractQuercusModule implements Process
     
     /**
      * Callback used to copy across state to the Quercus module.  This is needed because the Quercus
-     * library creates a new instance of the module once it hsa been added.
+     * library creates a new instance of the module once it has been added.
      * 
      * @param module    the Quercus module
      */

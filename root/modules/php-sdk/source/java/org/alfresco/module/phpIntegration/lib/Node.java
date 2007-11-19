@@ -34,6 +34,7 @@ import java.util.Set;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
+import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -191,11 +192,17 @@ public class Node implements ScriptObject
      */
     public String getType()
     {
-        if (this.type == null)
-        {
-            this.type = this.nodeService.getType(getNodeRef()).toString();
-        }
-        return this.type;
+    	return this.session.doSessionWork(new SessionWork<String>()
+    	{
+			public String doWork() 
+			{
+		        if (Node.this.type == null)
+		        {
+		        	Node.this.type = Node.this.nodeService.getType(getNodeRef()).toString();
+		        }
+		        return Node.this.type;
+			}
+    	});
     }
     
     /**
@@ -282,7 +289,7 @@ public class Node implements ScriptObject
         // Make sure the properties are populated
         populateProperties();
         
-        // Overrite/set the properties with the passed property values
+        // Overwrite/set the properties with the passed property values
         for (Map.Entry<String, Object> entry : properties.entrySet())
         {
             String fullName = this.session.getNamespaceMap().getFullName(entry.getKey());
@@ -662,7 +669,7 @@ public class Node implements ScriptObject
     }
     
     /**
-     * Copyies the node and optionally all its children, to another destination
+     * Copies the node and optionally all its children, to another destination
      * 
      * @param destination       the destination node
      * @param associationType   the association type
@@ -670,38 +677,44 @@ public class Node implements ScriptObject
      * @param copyChildren      indicates whether the children of the node should be copied or not
      * @return Node             the newly created copy of the origional node 
      */
-    public Node copy(Node destination, String associationType, String associationName, boolean copyChildren)
+    public Node copy(final Node destination, final String associationType, final String associationName, final boolean copyChildren)
     {
-        // Get the full names of the assoc type and name
-        associationType = this.session.getNamespaceMap().getFullName(associationType);
-        associationName = this.session.getNamespaceMap().getFullName(associationName);
-        
-        // Check that the destination node is not an unsaved node
-        if (destination.isDirty() == true)
-        {
-            throw new PHPProcessorException("Can not copy node (" + toString() + ") since there are outstanding modifications that require saving on the destination node (" + destination.toString() + ")");
-        }
-        
-        // Check whether there are any outstanding changes
-        if (isDirty() == true)
-        {
-            throw new PHPProcessorException("Can not copy node (" + toString() + ") since there are outstanding modifications that require saving");
-        }
-        
-        // Copy the node
-        CopyService copyService = this.session.getServiceRegistry().getCopyService();
-        NodeRef nodeRef = copyService.copyAndRename(
-                getNodeRef(), 
-                destination.getNodeRef(),
-                QName.createQName(associationType),
-                QName.createQName(associationName),
-                copyChildren);
-        
-        // To ensure information is up to date, clean the destination node
-        destination.cleanNode();
-        
-        // Return the newly created node
-        return this.session.getNodeFromString(nodeRef.toString());
+    	return this.session.doSessionWork(new SessionWork<Node>()
+    	{
+			public Node doWork() 
+			{
+		        // Get the full names of the association type and name
+		        String associationTypeFull = Node.this.session.getNamespaceMap().getFullName(associationType);
+		        String associationNameFull = Node.this.session.getNamespaceMap().getFullName(associationName);
+		        
+		        // Check that the destination node is not an unsaved node
+		        if (destination.isDirty() == true)
+		        {
+		            throw new PHPProcessorException("Can not copy node (" + toString() + ") since there are outstanding modifications that require saving on the destination node (" + destination.toString() + ")");
+		        }
+		        
+		        // Check whether there are any outstanding changes
+		        if (isDirty() == true)
+		        {
+		            throw new PHPProcessorException("Can not copy node (" + toString() + ") since there are outstanding modifications that require saving");
+		        }
+		        
+		        // Copy the node
+		        CopyService copyService = Node.this.session.getServiceRegistry().getCopyService();
+		        NodeRef nodeRef = copyService.copyAndRename(
+		                getNodeRef(), 
+		                destination.getNodeRef(),
+		                QName.createQName(associationTypeFull),
+		                QName.createQName(associationNameFull),
+		                copyChildren);
+		        
+		        // To ensure information is up to date, clean the destination node
+		        destination.cleanNode();
+		        
+		        // Return the newly created node
+		        return Node.this.session.getNodeFromString(nodeRef.toString());
+			}
+    	});
     }
     
     /**
@@ -711,42 +724,50 @@ public class Node implements ScriptObject
      * @param associationType   the assocation type
      * @param assocationName    the association name
      */
-    public void move(Node destination, String associationType, String associationName)    
+    public void move(final Node destination, final String associationType, final String associationName)    
     {
-        // Get the full names of the assoc type and name
-        associationType = this.session.getNamespaceMap().getFullName(associationType);
-        associationName = this.session.getNamespaceMap().getFullName(associationName);
-        
-        // Check the current primary parent for modifications
-        Node currentParent = getPrimaryParent();
-        if (currentParent.isDirty() == true)
-        {
-            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving on the current parent node (" + currentParent.toString() + ")");
-        }
-        
-        // Check that the destination node is not an unsaved node
-        if (destination.isDirty() == true)
-        {
-            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving on the destination node (" + destination.toString() + ")");
-        }
-        
-        // Check whether there are any outstanding changes
-        if (isDirty() == true)
-        {
-            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving");
-        }
-        
-        // Do the move
-        this.nodeService.moveNode(
-                getNodeRef(),
-                destination.getNodeRef(),
-                QName.createQName(associationType),
-                QName.createQName(associationName));    
-        
-        // Clean all 3 nodes involved in the mode to ensure no data is out of date
-        currentParent.cleanNode();
-        destination.cleanNode();
-        cleanNode();
+    	this.session.doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        // Get the full names of the assoc type and name
+		        String fullAssociationType = Node.this.session.getNamespaceMap().getFullName(associationType);
+		        String fullAssociationName = Node.this.session.getNamespaceMap().getFullName(associationName);
+		        
+		        // Check the current primary parent for modifications
+		        Node currentParent = getPrimaryParent();
+		        if (currentParent.isDirty() == true)
+		        {
+		            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving on the current parent node (" + currentParent.toString() + ")");
+		        }
+		        
+		        // Check that the destination node is not an unsaved node
+		        if (destination.isDirty() == true)
+		        {
+		            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving on the destination node (" + destination.toString() + ")");
+		        }
+		        
+		        // Check whether there are any outstanding changes
+		        if (isDirty() == true)
+		        {
+		            throw new PHPProcessorException("Can not move node (" + toString() + ") since there are outstanding modifications that require saving");
+		        }
+		        
+		        // Do the move
+		        Node.this.nodeService.moveNode(
+		                getNodeRef(),
+		                destination.getNodeRef(),
+		                QName.createQName(fullAssociationType),
+		                QName.createQName(fullAssociationName));    
+		        
+		        // Clean all 3 nodes involved in the mode to ensure no data is out of date
+		        currentParent.cleanNode();
+		        destination.cleanNode();
+		        cleanNode();
+		        
+		        return null;
+			}
+    	});
     }
     
     /**
@@ -1067,48 +1088,56 @@ public class Node implements ScriptObject
      */
     private void populateProperties()
     {
-        if (this.properties == null)
-        {
-            if (logger.isDebugEnabled() == true)
-            {
-                logger.debug("Populating properties for node " + this.getId());                
-            }
-            
-            if (isNewNode() == false)
-            {
-                Map<QName, Serializable> properties = this.nodeService.getProperties(getNodeRef());
-                this.properties = new HashMap<String, Object>(properties.size());
-                for (Map.Entry<QName, Serializable> entry : properties.entrySet())
-                {
-                    if (entry.getValue() instanceof ContentData)
-                    {
-                        if (logger.isDebugEnabled() == true)
-                        {
-                            logger.debug("   - Found content property " + entry.getKey());                
-                        }
-                        
-                        ContentData value = (ContentData)entry.getValue();
-                        org.alfresco.module.phpIntegration.lib.ContentData contentData = new org.alfresco.module.phpIntegration.lib.ContentData(
-                                                                                            this,
-                                                                                            entry.getKey().toString(),
-                                                                                            value.getMimetype(),
-                                                                                            value.getEncoding(),
-                                                                                            value.getSize());
-                        this.properties.put(entry.getKey().toString(), contentData);
-                    }
-                    else
-                    {
-                        String value = DefaultTypeConverter.INSTANCE.convert(String.class, entry.getValue());
-                        this.properties.put(entry.getKey().toString(), value);
-                    }
-                }
-            }
-            else
-            {
-                this.properties = new HashMap<String, Object>(10);
-            }
-            this.arePropertiesDirty = false;
-        }
+    	this.session.doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        if (Node.this.properties == null)
+		        {
+		            if (logger.isDebugEnabled() == true)
+		            {
+		                logger.debug("Populating properties for node " + Node.this.getId());                
+		            }
+		            
+		            if (isNewNode() == false)
+		            {
+		                Map<QName, Serializable> properties = Node.this.nodeService.getProperties(getNodeRef());
+		                Node.this.properties = new HashMap<String, Object>(properties.size());
+		                for (Map.Entry<QName, Serializable> entry : properties.entrySet())
+		                {
+		                    if (entry.getValue() instanceof ContentData)
+		                    {
+		                        if (logger.isDebugEnabled() == true)
+		                        {
+		                            logger.debug("   - Found content property " + entry.getKey());                
+		                        }
+		                        
+		                        ContentData value = (ContentData)entry.getValue();
+		                        org.alfresco.module.phpIntegration.lib.ContentData contentData = new org.alfresco.module.phpIntegration.lib.ContentData(
+		                        																	Node.this,
+		                                                                                            entry.getKey().toString(),
+		                                                                                            value.getMimetype(),
+		                                                                                            value.getEncoding(),
+		                                                                                            value.getSize());
+		                        Node.this.properties.put(entry.getKey().toString(), contentData);
+		                    }
+		                    else
+		                    {
+		                        String value = DefaultTypeConverter.INSTANCE.convert(String.class, entry.getValue());
+		                        Node.this.properties.put(entry.getKey().toString(), value);
+		                    }
+		                }
+		            }
+		            else
+		            {
+		            	Node.this.properties = new HashMap<String, Object>(10);
+		            }
+		            Node.this.arePropertiesDirty = false;
+		        }
+		        
+		        return null;
+			}
+    	});
     }
     
     /**
@@ -1118,27 +1147,35 @@ public class Node implements ScriptObject
      */
     private void populateAspects()
     {
-        if (this.aspects == null)
-        {
-            if (isNewNode() == false)
-            {
-                // Populate the aspect list from the node service
-                Set<QName> aspects = this.nodeService.getAspects(getNodeRef());
-                this.aspects = new ArrayList<String>(aspects.size());
-                for (QName aspect : aspects)
-                {
-                    this.aspects.add(aspect.toString());
-                }
-            }
-            else
-            {
-                this.aspects = new ArrayList<String>(5);
-            }
-            
-            // Create the list's used to monitor added and deleted aspects
-            this.addedAspects = new ArrayList<String>();
-            this.removedAspects = new ArrayList<String>();
-        }
+    	this.session.doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        if (Node.this.aspects == null)
+		        {
+		            if (isNewNode() == false)
+		            {
+		                // Populate the aspect list from the node service
+		                Set<QName> aspects = Node.this.nodeService.getAspects(getNodeRef());
+		                Node.this.aspects = new ArrayList<String>(aspects.size());
+		                for (QName aspect : aspects)
+		                {
+		                	Node.this.aspects.add(aspect.toString());
+		                }
+		            }
+		            else
+		            {
+		            	Node.this.aspects = new ArrayList<String>(5);
+		            }
+		            
+		            // Create the list's used to monitor added and deleted aspects
+		            Node.this.addedAspects = new ArrayList<String>();
+		            Node.this.removedAspects = new ArrayList<String>();
+		        }
+		        
+		        return null;
+			}
+    	});
     }
     
     /**
@@ -1146,33 +1183,41 @@ public class Node implements ScriptObject
      */
     private void populateChildren()
     {
-        if (this.children == null)
-        {
-            if (isNewNode() == false)
-            {                
-                List<ChildAssociationRef> assocs = this.nodeService.getChildAssocs(getNodeRef());
-                this.children = new ArrayList<ChildAssociation>(assocs.size());
-                for (ChildAssociationRef assoc : assocs)
-                {
-                    this.children.add(
-                            new ChildAssociation(
-                                    this.session.getNodeFromString(assoc.getParentRef().toString()),
-                                    this.session.getNodeFromString(assoc.getChildRef().toString()),
-                                    assoc.getTypeQName().toString(),
-                                    assoc.getQName().toString(),
-                                    assoc.isPrimary(),
-                                    assoc.getNthSibling()));
-                }
-            }
-            else
-            {
-                this.children = new ArrayList<ChildAssociation>(10);
-            }
-            
-            // Create the added and removed lists
-            this.addedChildren = new ArrayList<ChildAssociation>(5);
-            this.removedChildren = new ArrayList<ChildAssociation>(5);
-        }     
+    	this.session.doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        if (Node.this.children == null)
+		        {
+		            if (isNewNode() == false)
+		            {                
+		                List<ChildAssociationRef> assocs = Node.this.nodeService.getChildAssocs(getNodeRef());
+		                Node.this.children = new ArrayList<ChildAssociation>(assocs.size());
+		                for (ChildAssociationRef assoc : assocs)
+		                {
+		                	Node.this.children.add(
+		                            new ChildAssociation(
+		                            		Node.this.session.getNodeFromString(assoc.getParentRef().toString()),
+		                            		Node.this.session.getNodeFromString(assoc.getChildRef().toString()),
+		                                    assoc.getTypeQName().toString(),
+		                                    assoc.getQName().toString(),
+		                                    assoc.isPrimary(),
+		                                    assoc.getNthSibling()));
+		                }
+		            }
+		            else
+		            {
+		            	Node.this.children = new ArrayList<ChildAssociation>(10);
+		            }
+		            
+		            // Create the added and removed lists
+		            Node.this.addedChildren = new ArrayList<ChildAssociation>(5);
+		            Node.this.removedChildren = new ArrayList<ChildAssociation>(5);
+		        } 
+		        
+		        return null;
+			}
+    	});
     }
     
     /**
@@ -1180,35 +1225,43 @@ public class Node implements ScriptObject
      */
     private void populateParents()
     {
-        if (this.parents == null)
-        {
-            if (isNewNode() == false)
-            {
-                List<ChildAssociationRef> parents = this.nodeService.getParentAssocs(getNodeRef());
-                this.parents = new ArrayList<ChildAssociation>(parents.size());
-                for (ChildAssociationRef assoc : parents)
-                {
-                    ChildAssociation childAssociation = new ChildAssociation(
-                            this.session.getNodeFromString(assoc.getParentRef().toString()),
-                            this.session.getNodeFromString(assoc.getChildRef().toString()),
-                            assoc.getTypeQName().toString(),
-                            assoc.getQName().toString(),
-                            assoc.isPrimary(),
-                            assoc.getNthSibling());
-                    this.parents.add(childAssociation);
-                    
-                    // Set the primary parent when we come across it
-                    if (assoc.isPrimary() == true)
-                    {
-                        this.primaryParent = childAssociation;
-                    }
-                }
-            }
-            else
-            {
-                this.parents = new ArrayList<ChildAssociation>(5);
-            }
-        }
+    	this.session.doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        if (Node.this.parents == null)
+		        {
+		            if (isNewNode() == false)
+		            {
+		                List<ChildAssociationRef> parents = Node.this.nodeService.getParentAssocs(getNodeRef());
+		                Node.this.parents = new ArrayList<ChildAssociation>(parents.size());
+		                for (ChildAssociationRef assoc : parents)
+		                {
+		                    ChildAssociation childAssociation = new ChildAssociation(
+		                    		Node.this.session.getNodeFromString(assoc.getParentRef().toString()),
+		                    		Node.this.session.getNodeFromString(assoc.getChildRef().toString()),
+		                            assoc.getTypeQName().toString(),
+		                            assoc.getQName().toString(),
+		                            assoc.isPrimary(),
+		                            assoc.getNthSibling());
+		                    Node.this.parents.add(childAssociation);
+		                    
+		                    // Set the primary parent when we come across it
+		                    if (assoc.isPrimary() == true)
+		                    {
+		                    	Node.this.primaryParent = childAssociation;
+		                    }
+		                }
+		            }
+		            else
+		            {
+		            	Node.this.parents = new ArrayList<ChildAssociation>(5);
+		            }
+		        }
+				
+				return null;
+			}
+    	});
     }
     
     /**
@@ -1216,30 +1269,38 @@ public class Node implements ScriptObject
      */
     private void populateAssociations()
     {
-        if (this.associations == null)
-        {
-            if (isNewNode() == false)
-            {
-                List<AssociationRef> associations = this.nodeService.getTargetAssocs(getNodeRef(), RegexQNamePattern.MATCH_ALL);
-                this.associations = new ArrayList<Association>(associations.size());
-                for (AssociationRef association : associations)
-                {
-                    this.associations.add(
-                            new Association(
-                                    this.session.getNodeFromString(association.getSourceRef().toString()),
-                                    this.session.getNodeFromString(association.getTargetRef().toString()),
-                                    association.getTypeQName().toString()));
-                }
-            }
-            else
-            {
-                this.associations = new ArrayList<Association>(5);
-            }
-            
-            // Create the added and removes association lists
-            this.addedAssociations = new ArrayList<Association>(5);
-            this.removedAssociations = new ArrayList<Association>(5);
-        }
+    	this.session.doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        if (Node.this.associations == null)
+		        {
+		            if (isNewNode() == false)
+		            {
+		                List<AssociationRef> associations = Node.this.nodeService.getTargetAssocs(getNodeRef(), RegexQNamePattern.MATCH_ALL);
+		                Node.this.associations = new ArrayList<Association>(associations.size());
+		                for (AssociationRef association : associations)
+		                {
+		                	Node.this.associations.add(
+		                            new Association(
+		                            		Node.this.session.getNodeFromString(association.getSourceRef().toString()),
+		                            		Node.this.session.getNodeFromString(association.getTargetRef().toString()),
+		                                    association.getTypeQName().toString()));
+		                }
+		            }
+		            else
+		            {
+		            	Node.this.associations = new ArrayList<Association>(5);
+		            }
+		            
+		            // Create the added and removes association lists
+		            Node.this.addedAssociations = new ArrayList<Association>(5);
+		            Node.this.removedAssociations = new ArrayList<Association>(5);
+		        }
+		        
+		        return null;
+			}
+    	});
     }
     
     @SuppressWarnings("unused")

@@ -93,7 +93,7 @@ public class PHPObjectExtension extends AbstractQuercusModule implements Process
     }
     
     /**
-     * Register the method extension wiht the PHP processor.
+     * Register the method extension with the PHP processor.
      */
     public void register()
     {

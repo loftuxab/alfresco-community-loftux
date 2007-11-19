@@ -24,6 +24,7 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
+import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
@@ -69,7 +70,7 @@ public class Store implements ScriptObject
     }
     
     /**
-     * Constructore
+     * Constructor
      * 
      * @param session   the session
      * @param address   the address
@@ -126,12 +127,18 @@ public class Store implements ScriptObject
      */
     public Node getRootNode()
     {
-        // Get the node service
-        NodeService nodeService = this.session.getServiceRegistry().getNodeService();
-        
-        // Get the root node
-        NodeRef rootNode = nodeService.getRootNode(this.storeRef);        
-        return new Node(this.session, rootNode);        
+    	return this.session.doSessionWork(new SessionWork<Node>()
+    	{
+    		public Node doWork() 
+			{
+	    		// Get the node service
+	    		NodeService nodeService = Store.this.session.getServiceRegistry().getNodeService();
+	        
+	    		// Get the root node
+	    		NodeRef rootNode = nodeService.getRootNode(Store.this.storeRef);        
+	    		return new Node(Store.this.session, rootNode); 
+			}
+    	});
     }
     
     /**

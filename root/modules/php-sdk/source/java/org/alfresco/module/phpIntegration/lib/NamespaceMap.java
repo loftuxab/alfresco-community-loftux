@@ -81,17 +81,6 @@ public class NamespaceMap implements ScriptObject
     }
     
     /**
-     * Utility method to escape a prefix string
-     * 
-     * @param prefix    the prefix string
-     * @return String   the escaped prefix string
-     */
-    //private String escapePrefix(String prefix)
-    //{
-    //    return prefix.replace('_', '-');
-   // }
-    
-    /**
      * @see org.alfresco.module.phpIntegration.lib.ScriptObject#getScriptObjectName()
      */
     public String getScriptObjectName()

@@ -27,12 +27,14 @@ package org.alfresco.module.phpIntegration.methods;
 import org.alfresco.module.phpIntegration.PHPMethodExtension;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
 
+import com.caucho.quercus.annotation.Optional;
+
 /**
  * @author Roy Wetherall
  */
 public class UnitTestMethods extends PHPMethodExtension
 {    
-    public void assertEquals(Object expected, Object value, String message)
+    public void assertEquals(Object expected, Object value, @Optional("") String message)
     {
         if (expected.equals(value) == false)
         {
@@ -44,7 +46,7 @@ public class UnitTestMethods extends PHPMethodExtension
         }
     }
     
-    public void assertNotNull(Object value, String message)
+    public void assertNotNull(Object value, @Optional("") String message)
     {
         if (value == null)
         {
@@ -56,7 +58,7 @@ public class UnitTestMethods extends PHPMethodExtension
         }
     }
     
-    public void assertNull(Object value, String message)
+    public void assertNull(Object value, @Optional("") String message)
     {
         if (value != null)
         {
