@@ -32,5 +32,10 @@ package org.alfresco.module.phpIntegration.lib;
  */
 public interface ScriptObject
 {
+	/**
+	 * Gets the script object name
+	 * 
+	 * @return	String	the script objects name 
+	 */
     String getScriptObjectName();
 }

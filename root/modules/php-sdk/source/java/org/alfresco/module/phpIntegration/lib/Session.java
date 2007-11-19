@@ -28,16 +28,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.acegisecurity.Authentication;
+
 import org.alfresco.model.ContentModel;
+import org.alfresco.repo.security.authentication.AuthenticationUtil;
+import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
+import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.service.namespace.QName;
+import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import com.caucho.quercus.annotation.Optional;
 
 /**
  * The PHP Session object implementation.
@@ -55,6 +63,9 @@ public class Session implements ScriptObject
     /** Service registry */
     private ServiceRegistry serviceRegistry;
     
+    /** The ticket */
+    private String ticket;
+    
     /** Namespace map */
     private NamespaceMap namespaceMap;
     
@@ -68,10 +79,12 @@ public class Session implements ScriptObject
      * Constructor
      * 
      * @param serviceRegistry   the service registry
+     * @param ticket            the authentication context within which this session is operating
      */
-    public Session(ServiceRegistry serviceRegistry)
+    /*package*/ Session(ServiceRegistry serviceRegistry, String ticket)
     {
         this.serviceRegistry = serviceRegistry;
+        this.ticket = ticket;
         this.namespaceMap = new NamespaceMap(this);
         this.dataDictionary = new DataDictionary(this);
         this.nodeMap = new HashMap<String, Node>(10);
@@ -86,24 +99,19 @@ public class Session implements ScriptObject
     }
     
     /**
-     * Get the service registry
-     * 
-     * @return ServiceRegistry  the service registry
-     */
-    public ServiceRegistry getServiceRegistry()
-    {
-        return serviceRegistry;
-    }
-    
-    /**
      * The currently authenticated ticket
      * 
      * @return  String  the ticket
      */
     public String getTicket()
     {
-        return this.serviceRegistry.getAuthenticationService().getCurrentTicket();
+        return this.ticket;
     }
+    
+    /*package*/ ServiceRegistry getServiceRegistry() 
+    {
+		return serviceRegistry;
+	}
     
     /**
      * Get the namespace map
@@ -132,22 +140,28 @@ public class Session implements ScriptObject
      */
     public Store[] getStores()
     {
-        // Get the node service
-        NodeService nodeService = this.serviceRegistry.getNodeService();
-        
-        // Get the stores
-        List<StoreRef> storeRefs = nodeService.getStores();
-        
-        // Buld the result array
-        Store[] result = new Store[storeRefs.size()];
-        int index = 0;
-        for (StoreRef storeRef : storeRefs)
-        {
-            result[index] = new Store(this, storeRef);
-            index ++;
-        }
-        
-        return result;
+    	return doSessionWork(new SessionWork<Store[]>()
+    	{
+			public Store[] doWork() 
+			{
+				// Get the node service
+		        NodeService nodeService = Session.this.serviceRegistry.getNodeService();
+		        
+		        // Get the stores
+		        List<StoreRef> storeRefs = nodeService.getStores();
+		        
+		        // Build the result array
+		        Store[] result = new Store[storeRefs.size()];
+		        int index = 0;
+		        for (StoreRef storeRef : storeRefs)
+		        {
+		            result[index] = new Store(Session.this, storeRef);
+		            index ++;
+		        }
+		        
+		        return result;
+			}
+    	});        
     }
     
     
@@ -158,50 +172,58 @@ public class Session implements ScriptObject
      * @param scheme    the scheme of the store
      * @return Store    the Store object
      */
-    public Store getStore(String address, String scheme)
+    public Store getStore(final String address, @Optional(StoreRef.PROTOCOL_WORKSPACE) final String scheme)
     {
-        Store store = null;
-        
-        // Set the default value
-        if (scheme == null)
-        {
-            scheme = StoreRef.PROTOCOL_WORKSPACE;
-        }
-        
-        // Check for the existance of the store
-        StoreRef storeRef = new StoreRef(scheme, address);
-        if (this.serviceRegistry.getNodeService().exists(storeRef) == true)
-        {
-            store = new Store(this, storeRef);
-        }
-        
-        return store;
+    	return doSessionWork(new SessionWork<Store>()
+    	{
+			public Store doWork() 
+			{
+		    	Store store = null;
+		        
+		        // Check for the existance of the store
+		        StoreRef storeRef = new StoreRef(scheme, address);
+		        if (Session.this.serviceRegistry.getNodeService().exists(storeRef) == true)
+		        {
+		            store = new Store(Session.this, storeRef);
+		        }
+		        
+		        return store;
+			}
+    	});
     }
     
     /**
+     * Gets a store reference from a string value
      * 
-     * @param value
-     * @return
+     * @param value		the value representing the store
+     * @return Store	the store
      */
-    public Store getStoreFromString(String value)
+    public Store getStoreFromString(final String value)
     {
-        Store store = null;
-        StoreRef storeRef = new StoreRef(value);
-        
-        // Check for the existance of the store
-        if (this.serviceRegistry.getNodeService().exists(storeRef) == true)
-        {
-            store = new Store(this, storeRef);
-        }
-        
-        return store;
+    	return doSessionWork(new SessionWork<Store>()
+    	{
+			public Store doWork() 
+			{
+		        Store store = null;
+		        StoreRef storeRef = new StoreRef(value);
+		        
+		        // Check for the existance of the store
+		        if (Session.this.serviceRegistry.getNodeService().exists(storeRef) == true)
+		        {
+		            store = new Store(Session.this, storeRef);
+		        }
+		        
+		        return store;
+			}
+    	});
     }
     
     /**
+     * Get the node object for the provided node details
      * 
-     * @param store
-     * @param id
-     * @return
+     * @param store		the store
+     * @param id		the node id
+     * @return Node		the node
      */
     public Node getNode(Store store, String id)
     {
@@ -210,9 +232,10 @@ public class Session implements ScriptObject
     }
     
     /**
+     * Get a node from a string value
      * 
-     * @param nodeString
-     * @return
+     * @param nodeString	the node string value
+     * @return Node			the node
      */
     public Node getNodeFromString(String nodeString)
     {
@@ -221,37 +244,44 @@ public class Session implements ScriptObject
     }
     
     /**
+     * Gets the node for the node reference provided
      * 
      * @param nodeRef
      * @return
      */
-    private Node getNodeImpl(NodeRef nodeRef)
+    private Node getNodeImpl(final NodeRef nodeRef)
     {
-        Node node = this.nodeMap.get(nodeRef.toString());
-        
-        if (node == null)
-        {        
-            // Check for the existance of the node        
-            if (this.serviceRegistry.getNodeService().exists(nodeRef) == true)
-            {
-                // Get the nodes type
-                QName type = this.serviceRegistry.getNodeService().getType(nodeRef);
-                if (this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_CONTENT) == true)
-                {
-                    node = new File(this, nodeRef);
-                }
-                else if (this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_FOLDER) == true)
-                {
-                    node = new Folder(this, nodeRef);
-                }
-                else
-                {
-                    node = new Node(this, nodeRef);
-                }
-            }
-        }
-        
-        return node;
+    	return doSessionWork(new SessionWork<Node>()
+    	{
+			public Node doWork() 
+			{
+		        Node node = Session.this.nodeMap.get(nodeRef.toString());
+		        
+		        if (node == null)
+		        {        
+		            // Check for the existance of the node        
+		            if (Session.this.serviceRegistry.getNodeService().exists(nodeRef) == true)
+		            {
+		                // Get the nodes type
+		                QName type = Session.this.serviceRegistry.getNodeService().getType(nodeRef);
+		                if (Session.this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_CONTENT) == true)
+		                {
+		                    node = new File(Session.this, nodeRef);
+		                }
+		                else if (Session.this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_FOLDER) == true)
+		                {
+		                    node = new Folder(Session.this, nodeRef);
+		                }
+		                else
+		                {
+		                    node = new Node(Session.this, nodeRef);
+		                }
+		            }
+		        }
+		        
+		        return node;
+			}
+    	});
     }
     
     /**
@@ -293,58 +323,116 @@ public class Session implements ScriptObject
      * @param language
      * @return
      */
-    public Node[] query(Store store, String statement, String language)
+    public Node[] query(final Store store, final String statement, @Optional(SearchService.LANGUAGE_LUCENE) final String language)
     {
-        Node[] result = null;
-        
-        // Get the search service
-        SearchService searchService = this.getServiceRegistry().getSearchService();
-        
-        // Set the default search language
-        if (language == null)
-        {
-            language = SearchService.LANGUAGE_LUCENE;
-        }
-        
-        // Do the search
-        ResultSet resultSet = searchService.query(store.getStoreRef(), language, statement);
-        List<NodeRef> nodeRefs = resultSet.getNodeRefs();
-        result = new Node[nodeRefs.size()];
-        int iIndex = 0;
-        for (NodeRef nodeRef : nodeRefs)
-        {
-            result[iIndex] = getNodeImpl(nodeRef);
-            iIndex++;
-        }        
-        
-        return result;
+    	return doSessionWork(new SessionWork<Node[]>()
+    	{
+			public Node[] doWork() 
+			{
+		        Node[] result = null;
+		        
+		        // Get the search service
+		        SearchService searchService = Session.this.serviceRegistry.getSearchService();
+		        
+		        // Do the search
+		        ResultSet resultSet = searchService.query(store.getStoreRef(), language, statement);
+		        List<NodeRef> nodeRefs = resultSet.getNodeRefs();
+		        result = new Node[nodeRefs.size()];
+		        int iIndex = 0;
+		        for (NodeRef nodeRef : nodeRefs)
+		        {
+		            result[iIndex] = getNodeImpl(nodeRef);
+		            iIndex++;
+		        }        
+		        
+		        return result;
+			}
+    	});
     }
     
+    /**
+     * Save all the changes made to the nodes since the last save was called.
+     */
     public void save()
     {
-        if (logger.isDebugEnabled() == true)
-        {
-            logger.debug("Saving session");
-        }
-        
-        // Prepare for the save
-        for (Node node : this.nodeMap.values())
-        {
-            // Prepare each node for saving
-            node.prepareSave();
-        }
-        
-        // Check each node and see whether the node needs to be saved
-        for (Node node : this.nodeMap.values())
-        {
-            // Do the save processing on each node
-            node.onSave();
-        }
+    	doSessionWork(new SessionWork<Object>()
+    	{
+			public Object doWork() 
+			{
+		        if (logger.isDebugEnabled() == true)
+		        {
+		            logger.debug("Saving session");
+		        }
+		        
+		        // Prepare for the save
+		        for (Node node : Session.this.nodeMap.values())
+		        {
+		            // Prepare each node for saving
+		            node.prepareSave();
+		        }
+		        
+		        // Check each node and see whether the node needs to be saved
+		        for (Node node : Session.this.nodeMap.values())
+		        {
+		            // Do the save processing on each node
+		            node.onSave();
+		        }
+		        
+		        return null;
+			}
+    	});
     }
     
+    /**
+     * Clean the session, all changes will be lost and node will be re-read.
+     */
     public void clean()
     {
         // Clear the node map to clean the session
         this.nodeMap.clear();
+    }
+    
+    /*package*/ <R> R doSessionWork(final SessionWork<R> work)
+    {
+    	R result = null;
+    	
+    	// Get the required services
+    	AuthenticationService authenticationService = this.serviceRegistry.getAuthenticationService();
+    	TransactionService transactionService = this.serviceRegistry.getTransactionService();
+    	
+    	// Get the current authentication context
+    	Authentication authentication = AuthenticationUtil.getCurrentAuthentication();    	
+        try
+        {
+        	// Validate for the currently held ticket
+            authenticationService.validate(ticket);
+            
+            // Do the work in a retrying transaction
+            RetryingTransactionCallback<R> callback = new RetryingTransactionCallback<R>()
+            {
+                public R execute() throws Throwable
+                {
+                    return work.doWork();
+                }
+            };
+            result = transactionService.getRetryingTransactionHelper().doInTransaction(callback, true);
+        }
+        finally
+        {
+        	// Re-establish the previous authentication context
+            AuthenticationUtil.setCurrentAuthentication(authentication);
+        }
+    	
+    	return result;    	
+    }
+    
+    /*package*/ interface SessionWork<Result>
+    {
+        /**
+         * Method containing the work to be done against the session context
+         * 
+         * @return Return the result of the operation
+         */
+        Result doWork();
     }
 }

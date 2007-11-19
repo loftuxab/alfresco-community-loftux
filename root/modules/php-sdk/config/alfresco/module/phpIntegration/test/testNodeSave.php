@@ -19,7 +19,7 @@
 	// Create a child node
 	$newNode1 = $folder->createChild("cm_content", "cm_contains", "cm_file.txt");
 	$newNode1->cm_name = "file.txt";
-	$newNode1->addAspect("sys_referenceable");
+	$newNode1->addAspect("sys_referenceable", array());
 	
 	// Create another child node
 	$newNode2 = $folder->createChild("cm_folder", "cm_contains", "cm_testFolder");

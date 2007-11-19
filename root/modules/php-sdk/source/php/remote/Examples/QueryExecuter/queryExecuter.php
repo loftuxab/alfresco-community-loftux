@@ -23,10 +23,14 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
- 
-require_once('Alfresco/Service/Repository.php');
-require_once('Alfresco/Service/Session.php');
-require_once('Alfresco/Service/SpacesStore.php');
+
+if (isset($_SERVER["ALF_AVAILABLE"]) == false)
+{
+	require_once('Alfresco/Service/Repository.php');
+	require_once('Alfresco/Service/Session.php');
+	require_once('Alfresco/Service/SpacesStore.php');	
+}
+
 require_once('../config.php');
 	
 if (isset($_SESSION) == false)

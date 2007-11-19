@@ -31,6 +31,8 @@ import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
 import org.alfresco.service.cmr.repository.NodeRef;
 
+import com.caucho.quercus.annotation.Optional;
+
 /**
  * Folder object, represents a node of the standard cm_folder type.
  * 
@@ -142,9 +144,9 @@ public class Folder extends Node
         return this.folders;
     }
 
-    public File createFile(String fileName, String type)
+    public File createFile(String fileName, @Optional("") String type)
     {
-        if (type == null)
+        if (type == null || type.length() == 0)
         {
             type = TYPE_FILE;
         }

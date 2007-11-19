@@ -26,6 +26,7 @@ package org.alfresco.module.phpIntegration.lib;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
+import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
@@ -181,25 +182,37 @@ public class ContentData implements ScriptObject
      */
     public String getUrl()
     {
-        // TODO this will do for now ...
-        String url = DownloadContentServlet.generateBrowserURL(
-                                this.node.getNodeRef(), 
-                                (String)this.node.getSession().getServiceRegistry().getNodeService().getProperty(this.node.getNodeRef(), ContentModel.PROP_NAME));
-        return "/alfresco" + url+"?ticket=" + this.node.getSession().getTicket();
+    	return this.node.session.doSessionWork(new SessionWork<String>()
+    	{
+			public String doWork() 
+			{
+		        // TODO this will do for now ...
+		        String url = DownloadContentServlet.generateBrowserURL(
+		                                ContentData.this.node.getNodeRef(), 
+		                                (String)ContentData.this.node.getSession().getServiceRegistry().getNodeService().getProperty(ContentData.this.node.getNodeRef(), ContentModel.PROP_NAME));
+		        return "/alfresco" + url+"?ticket=" + ContentData.this.node.getSession().getTicket();
+			}
+    	});
     }
     
     /**
      * Gets the guest download URL for the content.  This URL can only be used to access the repo as a guest.
      * 
-     * @return String   the guest foenload URL for the content.
+     * @return String   the guest download URL for the content.
      */
     public String getGuestUrl()
     {
-        // TODO this will do for now ...
-        String url = DownloadContentServlet.generateBrowserURL(
-                this.node.getNodeRef(), 
-                (String)this.node.getSession().getServiceRegistry().getNodeService().getProperty(this.node.getNodeRef(), ContentModel.PROP_NAME));
-        return "/alfresco" + url + "?guest=true";
+    	return this.node.session.doSessionWork(new SessionWork<String>()
+    	{
+			public String doWork() 
+			{
+		    	// TODO this will do for now ...
+		        String url = DownloadContentServlet.generateBrowserURL(
+		        		ContentData.this.node.getNodeRef(), 
+		                (String)ContentData.this.node.getSession().getServiceRegistry().getNodeService().getProperty(ContentData.this.node.getNodeRef(), ContentModel.PROP_NAME));
+		        return "/alfresco" + url + "?guest=true";
+			}
+    	});
     }
     
     /**
@@ -221,11 +234,19 @@ public class ContentData implements ScriptObject
         }
         else if (this.node.isNewNode() == false)
         {
-            ContentReader contentReader = this.contentService.getReader(this.node.getNodeRef(), QName.createQName(this.property));
-            if (contentReader != null)
-            {
-                content = contentReader.getContentString();
-            }
+        	content = this.node.session.doSessionWork(new SessionWork<String>()
+	    	{
+				public String doWork() 
+				{
+					String content = null;
+		            ContentReader contentReader = ContentData.this.contentService.getReader(ContentData.this.node.getNodeRef(), QName.createQName(ContentData.this.property));
+		            if (contentReader != null)
+		            {
+		                content = contentReader.getContentString();
+		            }
+		            return content;
+				}
+	    	});
         }
         
         return content;
