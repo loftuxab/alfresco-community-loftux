@@ -97,7 +97,7 @@ class Node extends BaseObject
 		}		
 	}
 	
-	public function setContent($property, $mimetype=null, $encoding=null, $content=null)
+	public function updateContent($property, $mimetype, $encoding="UTF-8", $content=null)
 	{
 		list($property) = $this->_session->namespaceMap->getFullNames(array($property));
 		$contentData = new ContentData($this, $property, $mimetype, $encoding);

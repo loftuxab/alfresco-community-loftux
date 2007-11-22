@@ -70,7 +70,7 @@ class ContentTest extends BaseTest
 
 	public function testSetContent() 
 	{
-		$this->getContentNode()->setContent("cm_content", "text/plain", "UTF-8", ContentTest :: CONTENT);		
+		$this->getContentNode()->updateContent("cm_content", "text/plain", "UTF-8", ContentTest :: CONTENT);		
 		$this->assertNotNull($this->getContentNode()->cm_content);
 		
 		try
@@ -145,7 +145,7 @@ class ContentTest extends BaseTest
 									"cm_contains", 
 									"cm_" .$fileName);
 	    $node->cm_name = $fileName;
-	    $node->setContent("cm_content", "text/plain", "UTF-8", "testTESTtest");
+	    $node->updateContent("cm_content", "text/plain", "UTF-8", "testTESTtest");
 	    
 	    $session->save();	    
 	    $nodeId = $node->id;

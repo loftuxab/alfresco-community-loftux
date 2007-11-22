@@ -108,6 +108,11 @@ public class Session implements ScriptObject
         return this.ticket;
     }
     
+    /**
+     * Get the service registry
+     * 
+     * @return the service registry
+     */
     /*package*/ ServiceRegistry getServiceRegistry() 
     {
 		return serviceRegistry;
@@ -162,34 +167,19 @@ public class Session implements ScriptObject
 		        return result;
 			}
     	});        
-    }
-    
+    }    
     
     /**
      * Get the store object
      * 
-     * @param address   the addess of the store
+     * @param address   the address of the store
      * @param scheme    the scheme of the store
      * @return Store    the Store object
      */
     public Store getStore(final String address, @Optional(StoreRef.PROTOCOL_WORKSPACE) final String scheme)
     {
-    	return doSessionWork(new SessionWork<Store>()
-    	{
-			public Store doWork() 
-			{
-		    	Store store = null;
-		        
-		        // Check for the existance of the store
-		        StoreRef storeRef = new StoreRef(scheme, address);
-		        if (Session.this.serviceRegistry.getNodeService().exists(storeRef) == true)
-		        {
-		            store = new Store(Session.this, storeRef);
-		        }
-		        
-		        return store;
-			}
-    	});
+    	StoreRef storeRef = new StoreRef(scheme, address);
+		return new Store(Session.this, storeRef);
     }
     
     /**
@@ -200,22 +190,8 @@ public class Session implements ScriptObject
      */
     public Store getStoreFromString(final String value)
     {
-    	return doSessionWork(new SessionWork<Store>()
-    	{
-			public Store doWork() 
-			{
-		        Store store = null;
-		        StoreRef storeRef = new StoreRef(value);
-		        
-		        // Check for the existance of the store
-		        if (Session.this.serviceRegistry.getNodeService().exists(storeRef) == true)
-		        {
-		            store = new Store(Session.this, storeRef);
-		        }
-		        
-		        return store;
-			}
-    	});
+    	StoreRef storeRef = new StoreRef(value);
+		return new Store(Session.this, storeRef);
     }
     
     /**
@@ -318,10 +294,10 @@ public class Session implements ScriptObject
     /**
      * Execute a query
      * 
-     * @param store
-     * @param statement
-     * @param language
-     * @return
+     * @param store			the store
+     * @param statement		the query statement
+     * @param language		the query language
+     * @return				the result of the query
      */
     public Node[] query(final Store store, final String statement, @Optional(SearchService.LANGUAGE_LUCENE) final String language)
     {
@@ -392,6 +368,13 @@ public class Session implements ScriptObject
         this.nodeMap.clear();
     }
     
+    /**
+     * Executes some work on the session within the correct security and transaction context
+     * 
+     * @param <R>	the return type
+     * @param work	the work 
+     * @return R	the result of the work
+     */
     /*package*/ <R> R doSessionWork(final SessionWork<R> work)
     {
     	R result = null;
@@ -415,7 +398,7 @@ public class Session implements ScriptObject
                     return work.doWork();
                 }
             };
-            result = transactionService.getRetryingTransactionHelper().doInTransaction(callback, true);
+            result = transactionService.getRetryingTransactionHelper().doInTransaction(callback, false);
         }
         finally
         {
@@ -426,6 +409,11 @@ public class Session implements ScriptObject
     	return result;    	
     }
     
+    /**
+     * Session work interface
+     * 
+     *  @param <Result>		the result type
+     */
     /*package*/ interface SessionWork<Result>
     {
         /**

@@ -36,4 +36,8 @@ require_once("extensions/ExternalStoreAlfresco.php");
 # Configure in some external stores
 $wgDefaultExternalStore = array("alfresco://localhost:8080/alfresco/api");
 $wgExternalStores = array("alfresco");
+
+6. If you are running MediaWiki within Tomcat or an other Java application server add the additional line to LocalSettings.php.
+
+$wgUsePathInfo = false;
 	

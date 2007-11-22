@@ -37,9 +37,12 @@
 	 */ 
   
 	// Include the required Alfresco PHP API objects  
-	require_once "Alfresco/Service/Repository.php";
-	require_once "Alfresco/Service/Session.php";
-	require_once "Alfresco/Service/SpacesStore.php";
+	if (isset($_SERVER["ALF_AVAILABLE"]) == false)
+    {
+    	require_once "Alfresco/Service/Repository.php";
+		require_once "Alfresco/Service/Session.php";
+		require_once "Alfresco/Service/SpacesStore.php";
+    }
 
 	// Specify the connection details
 	$repositoryUrl = "http://localhost:8080/alfresco/api";

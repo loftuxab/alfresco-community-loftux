@@ -37,9 +37,12 @@
 	 */ 
   
 	// Include the required Alfresco PHP API objects  
-	require_once "Alfresco/Service/Repository.php";
-	require_once "Alfresco/Service/Session.php";
-	require_once "Alfresco/Service/SpacesStore.php";
+	if (isset($_SERVER["ALF_AVAILABLE"]) == false)
+    {
+    	require_once "Alfresco/Service/Repository.php";
+		require_once "Alfresco/Service/Session.php";
+		require_once "Alfresco/Service/SpacesStore.php";
+    }
 
 	// Specify the connection details
 	$repositoryUrl = "http://localhost:8080/alfresco/api";
@@ -72,7 +75,7 @@
 		$contentNode = $guestHome->createChild("cm_content", "cm_contains", "cm_".$name);
 		
 		// Add the titles aspect to the new node so that the title and description properties can be set
-		$contentNode->addAspect("cm_titled");
+		$contentNode->addAspect("cm_titled", null);
 		
 		// Set the name, title and description property values
 		$contentNode->cm_name = $name;
@@ -81,7 +84,7 @@
 		
 		// Set the content onto the standard content property for nodes of type cm:content.
 		// We are going to assume the mimetype and encoding for ease
-		$contentNode->setContent("cm_content", "text/plain", "UTF-8", $_REQUEST["text"]);
+		$contentNode->updateContent("cm_content", "text/plain", "UTF-8", $_REQUEST["text"]);
 		
 		// Save the new node
 		$session->save();

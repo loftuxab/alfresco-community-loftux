@@ -80,7 +80,7 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     public static final String GLOBAL_SESSION = "_ALF_SESSION";
     public static final String GLOBAL_MODEL = "_ALF_MODEL";
     
-    /** Key to value found in $_SERVER indicating that the Alfresco API is available nativly */
+    /** Key to value found in $_SERVER indicating that the Alfresco API is available */
     public static final String ALF_AVAILABLE = "ALF_AVAILABLE";
     
     /** Key used to store a reference to the service registry in the Quercus engine */

@@ -26,11 +26,17 @@
  */
  
 require_once("AlfrescoConfig.php"); 
-require_once("Alfresco/Service/Session.php");
-require_once("Alfresco/Service/SpacesStore.php");
-require_once("Alfresco/Service/Node.php");
-require_once("Alfresco/Service/Version.php");
-require_once("Alfresco/Service/Logger/Logger.php");
+
+if (isset($_SERVER["ALF_AVAILABLE"]) == false)
+{
+	require_once("Alfresco/Service/Session.php");
+	require_once("Alfresco/Service/SpacesStore.php");
+	require_once("Alfresco/Service/Node.php");
+	require_once("Alfresco/Service/Version.php");
+}
+
+// TODO .. for now remove this as it it not available when running within Quercus
+//require_once("Alfresco/Service/Logger/Logger.php");
 
 // Register the various event hooks
 $wgHooks['ArticleSave'][] = 'alfArticleSave';
@@ -68,17 +74,17 @@ function alfArticleSave(&$article, &$user, &$text, &$summary, $minor, $watch, $s
 
 function alfTitleMoveComplete(&$title, &$newtitle, &$user, $pageid, $redirid)
 {
-	$logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
+	//$logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
 	
-	if ($logger->isDebugEnabled() == true)
-	{
-		$logger->debug("Handling title move event");
-		$logger->debug(	  "title=".ExternalStoreAlfresco::getTitle($title).
-					    "; newTitle=".ExternalStoreAlfresco::getTitle($newtitle).
-						"; user=".$user->getName().
-						"; pageid=".$pageid.		// is page_id on page table
-						"; redirid=".$redirid);
-	}
+	//if ($logger->isDebugEnabled() == true)
+	//{
+	//	$logger->debug("Handling title move event");
+	//	$logger->debug(	  "title=".ExternalStoreAlfresco::getTitle($title).
+	//				    "; newTitle=".ExternalStoreAlfresco::getTitle($newtitle).
+	//					"; user=".$user->getName().
+	//					"; pageid=".$pageid.		// is page_id on page table
+	//					"; redirid=".$redirid);
+	//}
 	
 	// Do summert :D
 }
@@ -90,7 +96,7 @@ function alfTitleMoveComplete(&$title, &$newtitle, &$user, $pageid, $redirid)
  */
 class ExternalStoreAlfresco 
 {
-	private $logger;
+	//private $logger;
 	private $session;
 	private $store;
 	private $wikiSpace;
@@ -99,7 +105,7 @@ class ExternalStoreAlfresco
 	{
 		global $alfURL, $alfUser, $alfPassword, $alfWikiStore, $alfWikiSpace;
 		
-		$this->logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
+		//$this->logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
 		
 		// Create the session
 		$repository = new Repository($alfURL);
@@ -148,13 +154,13 @@ class ExternalStoreAlfresco
 			$node = $this->wikiSpace->createChild("cm_content", "cm_contains", "cm_".$_SESSION["title"]);
 			$node->cm_name = $_SESSION["title"];
 		
-			$node->addAspect("cm_versionable");
+			$node->addAspect("cm_versionable", null);
 			$node->cm_initialVersion = false;
 			$node->cm_autoVersion = false;
 		}
 		
 		// Set the content and save
-		$node->setContent("cm_content", "text/plain", "UTF-8", $data);		
+		$node->updateContent("cm_content", "text/plain", "UTF-8", $data);		
 		$this->session->save();
 		
 		$description = $_SESSION["description"];

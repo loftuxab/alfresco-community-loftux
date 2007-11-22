@@ -35,9 +35,13 @@
 	 * Note: any changes to this file should be uploaded to the wiki
 	 */ 
   
-	// Include the required Alfresco PHP API objects  
-	require_once "Alfresco/Service/Repository.php";
-	require_once "Alfresco/Service/Session.php";
+    // Use the ALF_AVAILABLE value to make this script work remotely and locally
+  	if (isset($_SERVER["ALF_AVAILABLE"]) == false)
+    {
+		// Include the required Alfresco PHP API objects  
+		require_once "Alfresco/Service/Repository.php";
+		require_once "Alfresco/Service/Session.php";
+    }
 
 	// The web service end point URL for the Alfresco repository
 	$repositoryUrl = "http://localhost:8080/alfresco/api";

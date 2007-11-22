@@ -36,10 +36,13 @@
 	 */  
   
 	// Include the required Alfresco PHP API objects  
-	require_once "Alfresco/Service/Repository.php";
-	require_once "Alfresco/Service/Session.php";
-	require_once "Alfresco/Service/SpacesStore.php";
-	require_once "Alfresco/Service/ContentData.php";
+	if (isset($_SERVER["ALF_AVAILABLE"]) == false)
+    {
+    	require_once "Alfresco/Service/Repository.php";
+		require_once "Alfresco/Service/Session.php";
+		require_once "Alfresco/Service/SpacesStore.php";
+		require_once "Alfresco/Service/ContentData.php";
+    }
 
 	// Specify the connection details
 	$repositoryUrl = "http://localhost:8080/alfresco/api";
@@ -81,7 +84,7 @@
 		
 		// Set the content onto the standard content property for nodes of type cm:content.
 		// We are going to assume the mimetype and encoding for ease
-		$contentData = $contentNode->setContent("cm_content", $_FILES['file']['type'], "UTF-8");
+		$contentData = $contentNode->updateContent("cm_content", $_FILES['file']['type'], "UTF-8");
 		
 		// Set the content to be the content file uploaded from the client
 		$contentData->writeContentFromFile($_FILES["file"]["tmp_name"]);		
