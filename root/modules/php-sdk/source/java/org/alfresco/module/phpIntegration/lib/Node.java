@@ -45,6 +45,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
 import org.alfresco.service.cmr.repository.datatype.DefaultTypeConverter;
 import org.alfresco.service.cmr.security.AccessStatus;
+import org.alfresco.service.cmr.version.VersionService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
 import org.alfresco.util.EqualsHelper;
@@ -52,12 +53,13 @@ import org.alfresco.util.GUID;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.caucho.quercus.annotation.Optional;
 import com.caucho.quercus.env.Env;
 import com.caucho.quercus.env.NullValue;
 import com.caucho.quercus.env.Value;
 
 /**
- * Repository node implementaiton class.
+ * Repository node implementation class.
  * 
  * @author Roy Wetherall
  */
@@ -74,6 +76,9 @@ public class Node implements ScriptObject
     
     /** Node service */
     protected NodeService nodeService;
+    
+    /** Version service */
+    protected VersionService versionService;
     
     /** Session object */
     protected Session session;
@@ -105,23 +110,47 @@ public class Node implements ScriptObject
     private List<Association> addedAssociations;
     private List<Association> removedAssociations;
     
+    /**
+     * @see org.alfresco.module.phpIntegration.lib.ScriptObject#getScriptObjectName()
+     */
     public String getScriptObjectName()
     {
         return SCRIPT_OBJECT_NAME;
     }
     
+    /**
+     * Constructor 
+     * 
+     * @param session	the session
+     * @param nodeRef	the node reference
+     */
     public Node(Session session, NodeRef nodeRef)
     {
         // Call the constructor
         this(session, session.getStoreFromString(nodeRef.getStoreRef().toString()), nodeRef.getId());
     }
     
+    /**
+     * Constructor
+     * 
+     * @param session	the session
+     * @param store		the store
+     * @param id		the node id
+     */
     public Node(Session session, Store store, String id)
     {
         // Call the constructor
         this(session, store, id, null);
     }
     
+    /**
+     * Constructor
+     * 
+     * @param session	the session
+     * @param store		the store
+     * @param id		the node id
+     * @param type		the node type
+     */
     public Node(Session session, Store store, String id, String type)
     {
         // Set the attribute details
@@ -135,13 +164,14 @@ public class Node implements ScriptObject
         
         // Set the node service
         this.nodeService = session.getServiceRegistry().getNodeService();
+        this.versionService = session.getServiceRegistry().getVersionService();
         
         // Add the node to the session
         this.session.addNode(this);
     }
     
     /**
-     * Get the node ref that this node represents
+     * Get the node reference that this node represents
      * 
      * @return  the node reference
      */
@@ -299,7 +329,7 @@ public class Node implements ScriptObject
     }
     
     /**
-     * Callback used to indicate that a content property has been modified directly.
+     * Call back used to indicate that a content property has been modified directly.
      */
     /*package*/ void contentUpdated()
     {
@@ -341,7 +371,7 @@ public class Node implements ScriptObject
      * Adds an aspect to the node
      * 
      * @param aspect        the aspect
-     * @param properties    the propeties of teh aspect
+     * @param properties    the properties of the aspect
      */
     public void addAspect(String aspect, Map<String, Object> properties)
     {
@@ -807,6 +837,38 @@ public class Node implements ScriptObject
     {
         return this.session.getDataDictionary().isSubTypeOf(getType(), subTypeOf);
     }
+    
+    public Version createVersion(@Optional("") final String description, @Optional("false") final boolean major)
+	{
+    	// TODO .. figure out how we deep version?
+    	
+		// We can only create a version if there are no outstanding changes for this node
+		if (this.isDirty() == true)
+		{
+			throw new PHPProcessorException("You must save any outstanding modifications before a new version can be created.");
+		}
+		
+		return this.session.doSessionWork(new SessionWork<Version>()
+    	{
+			public Version doWork() 
+			{
+				// TODO implement major flag ... 
+				//   - send version type correctly
+				//   - set major flag on Version return value creation
+				
+				// Create the new version
+				Map<String, Serializable> versionProperties = new HashMap<String, Serializable>(1);
+				versionProperties.put(org.alfresco.service.cmr.version.Version.PROP_DESCRIPTION, description);
+				org.alfresco.service.cmr.version.Version repoVersion = Node.this.versionService.createVersion(Node.this.getNodeRef(), versionProperties);					      
+				
+				// Clean the node after the version has been created
+				cleanNode();
+				
+				// Create the version 
+				return Version.createVersion(Node.this.session, repoVersion);
+			}
+		});     				      
+	}
     
     /**
      * Dynamic implementation of get properties

@@ -1898,7 +1898,7 @@
       <echo>Packaging Alfresco PHP library</echo>
       <mkdir dir="${dir.module.php.dist}" />
       <zip destfile="${dir.module.php.dist}/alfresco-php-library.zip">
-         <zipfileset dir="${dir.module.php}/source/php/remote"
+         <zipfileset dir="${dir.module.php.web.php}"
                      prefix="alfresco-php-library"/>
       </zip>
       <tar destfile="${dir.module.php.dist}/alfresco-php-library.tar.gz"
@@ -1937,8 +1937,8 @@
                      prefix="lib">
             <exclude name="**/source/**"/>
          </zipfileset>
-	 <zipfileset dir="${dir.module.php.web.php}" 
-                     prefix="web/php"/>
+	 <zipfileset dir="${dir.module.php.web.php}/Examples"
+                     prefix="web/php/Examples"/>
          <zipfileset dir="${dir.module.php.config}" 
                      prefix="config">
             <exclude name="**/module.properties"/>

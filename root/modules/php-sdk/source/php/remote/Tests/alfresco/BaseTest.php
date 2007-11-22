@@ -86,7 +86,7 @@ class BaseTest extends PHPUnit2_Framework_TestCase
 															"cm_contains", 
 															"app_" .$fileName);
 			$contentNode->cm_name = $fileName;
-			$contentNode->setContent("cm_content", "text/plain", "UTF-8", $content);
+			$contentNode->updateContent("cm_content", "text/plain", "UTF-8", $content);
 			
 			// Save new content
 			$this->getSession()->save();
