@@ -12,6 +12,8 @@ package org.alfresco.ace.control.swipe
 	import mx.events.EffectEvent;
 	import mx.events.ResizeEvent;
 	import mx.controls.Image;
+	import mx.containers.HBox;
+	import mx.effects.Fade;
 
 	/**
 	 * Internal swipe control class
@@ -33,6 +35,7 @@ package org.alfresco.ace.control.swipe
 		public var swipeLabel:Label;
 		public var downArrow:Image;
 		public var upArrow:Image;
+		public var swipeButtonHBox:HBox;
 		
 		/** Indicates whether the swipe button is enabled or not */
 		private var _swipeButtonEnabled:Boolean = true;
@@ -136,6 +139,17 @@ package org.alfresco.ace.control.swipe
 		
 		private function effectEnd(event:Event):void
 		{
+			// Fade out the current swipe button label
+			var fadeOut:Fade = new Fade(this.swipeButtonHBox);
+			fadeOut.alphaFrom = 1;
+			fadeOut.alphaTo = 0;
+			fadeOut.duration = 200;
+			fadeOut.addEventListener(EffectEvent.EFFECT_END, doChangeSwipeLabel);
+			fadeOut.play();
+		}
+		
+		private function doChangeSwipeLabel(event:Event):void
+		{			
 			// Change the swipe label accordingly
 			if (currentState == null)
 			{
@@ -152,7 +166,14 @@ package org.alfresco.ace.control.swipe
 				downArrow.includeInLayout = false;
 				upArrow.visible = true;
 				upArrow.includeInLayout = true;
-			}	
+			}
+			
+			// Show a fade in of the label change
+			var fadeIn:Fade = new Fade(this.swipeButtonHBox);
+			fadeIn.alphaFrom = 0;
+			fadeIn.alphaTo = 1;			
+			fadeIn.duration = 200;
+			fadeIn.play();	
 			
 			// Re-enable the button
 			this._swipeButtonEnabled = true;

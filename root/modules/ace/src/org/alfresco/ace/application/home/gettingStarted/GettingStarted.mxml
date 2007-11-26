@@ -23,6 +23,7 @@
 				
 				<acc:TextAccordian id="textAccordian" height="100%" width="100%" verticalAlign="top">
 					<acc:TextAccordianItem 
+						id="firstItem"
 						title="Welcome to Alfresco Enterprise Connections" 
 						content="I have clearly change this content does it appear in the UI??? dsf asdf asdf wef sdfqewfasdf aedfsdf asdfqwef aasdf qwefsadf aedf asdf asdfqwefdfv asdf qwefs df asdfqwef adsf qasdf awef asdfqwef asdf wef asdf adf"
 						value="videos/ACEVideo1.flv"/>				
@@ -45,13 +46,13 @@
 				<mx:VideoDisplay  
 					id="videoDisplay"
 					styleName="homeVideo"
-					source="videos/ACEVideo1.flv"
+					source="videos/ACEVideo1.flv"				
 					height="192" width="240" autoPlay="false" autoRewind="true" alpha="0.25">					
 				</mx:VideoDisplay>	 
 				
 				<mx:VBox id="playBox" 
 						 verticalAlign="middle" horizontalAlign="center" 
-						 includeInLayout="false" visible="false" 
+						 includeInLayout="false" visible="true" 
 						 height="192" width="240"
 						 horizontalScrollPolicy="off"
 						 verticalScrollPolicy="off">		

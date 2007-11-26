@@ -231,8 +231,8 @@ package org.alfresco.ace.application.home
 			collapsed.name = STATE_COLLAPSED;
 			collapsed.overrides.push(new SetProperty(this._mainCanvas, "height", 0));	
 			collapsed.overrides.push(new SetProperty(this._bottomCanvas, "alpha", 0.2));
+			collapsed.overrides.push(new SetProperty(this._bottomCanvas, "height", 20));
 			collapsed.overrides.push(new SetProperty(this._panelShadow, "visible", false));
-			//collapsed.overrides.push(new SetProperty(this._panelShadow, "includeInLayout", false));
 			
 			// Create start state
 			var start:State = new State();
@@ -306,7 +306,10 @@ package org.alfresco.ace.application.home
 			shadowWipeDown.suspendBackgroundProcessing = true;			
 			this._panelShadow.setStyle("showEffect", shadowWipeDown);
 			
-			
+			// Resize of bottom bar effect
+			var resizeEffect:Resize = new Resize();
+			resizeEffect.duration = TRANSITION_SPEED;
+			this._bottomCanvas.setStyle("resizeEffect", resizeEffect);	
 		}
 		
 		/**
