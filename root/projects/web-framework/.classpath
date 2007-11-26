@@ -3,17 +3,5 @@
 	<classpathentry kind="src" path="source/java"/>
 	<classpathentry kind="src" path="config"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/devenv/servlet.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.10.jar" sourcepath="/3rd Party/src/freemarker-2.3.10.zip"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/rhino-js-1.6R7.jar" sourcepath="/3rd Party/src/rhino-js-1.6R7-src.zip"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/myfaces-api-1.1.5.jar" sourcepath="/3rd Party/src/myfaces_src.zip"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/myfaces-impl-1.1.5.jar" sourcepath="/3rd Party/src/myfaces_src.zip"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/devenv/jsp.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-fileupload-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/devenv/spring-mock-2.0.2.jar" sourcepath="/3rd Party/src/spring-mock-2.0.2-src.zip"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/portlet-api-lib.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/facebook_070716.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-io-1.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
