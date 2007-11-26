@@ -1,5 +1,19 @@
 /* CSS file */
 
+@font-face
+{
+	src: url("fonts/arial.ttf");
+	fontFamily: "Alfresco";
+	fontWeight: normal;
+}
+
+@font-face
+{
+	src: url("fonts/arialbd.ttf");
+	fontFamily: "Alfresco";
+	fontWeight: bold;
+}
+
 VBox
 {
 	horizontalGap:1; 
@@ -12,21 +26,9 @@ HBox
 	verticalGap:1;
 }
 
-Text
+Application
 {
-	font-family: Arial; 
-	font-size: 12;
-}
-
-Label
-{
-	font-family: Arial; 
-	font-size: 12;
-}
-
-TextInput
-{
-	font-family: Arial; 
+	font-family: "Alfresco";
 	font-size: 12;
 }
 

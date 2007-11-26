@@ -16,13 +16,23 @@ package org.alfresco.ace.application.login
 	import org.alfresco.framework.service.authentication.AuthenticationService;
 	import org.alfresco.framework.service.authentication.InvalidCredentialsError;
 	import org.alfresco.framework.service.authentication.LoginCompleteEvent;
+	import mx.effects.Fade;
+	import mx.states.SetEventHandler;
 
+	/**
+	 * Login class
+	 * 
+	 * @author Roy Wetherall
+	 */
     public class LoginClass extends VBox
 	{
 		/** UI controls */
 		public var username:TextInput;
 		public var password:TextInput;
 		public var errorMessage:Text;
+		
+		/** Effects */
+		private var fadeIn:Fade;
 		
 		/** 
 		 * Constructor
@@ -46,6 +56,14 @@ package org.alfresco.ace.application.login
 		{
 			super.initializationComplete();
 			
+			// Create the effects
+			this.fadeIn = new Fade();
+			this.fadeIn.alphaFrom = 0;
+			this.fadeIn.alphaTo = 1;
+			
+			// Exectue the fade effect
+			this.fadeIn.play(new Array(this));
+			
 			// Focus the user input box
 			focusManager.setFocus(username);
 		}
@@ -57,10 +75,24 @@ package org.alfresco.ace.application.login
 		 */
 		public function onLoginButtonLinkClick():void
 		{	
-			// Call authentication service to log user in
-			AuthenticationService.instance.login(username.text, password.text);
-			username.text = "";
-			password.text = "";
+			if (username.text != null && username.text.length == 0)
+			{
+				// Remind the user to enter a username
+				showErrorMessage("Enter a user name.");
+				//focusManager.setFocus(username);			
+			}
+			else
+			{
+				// Get the password assuring is it now passed as null
+				var password:String = password.text;
+				if (password == null)
+				{
+					password = "";
+				}
+				
+				// Call authentication service to log user in
+				AuthenticationService.instance.login(username.text, password);
+			}
 		}
 		
 		/**
@@ -69,7 +101,8 @@ package org.alfresco.ace.application.login
 		public function onLoginComplete(event:Event):void
 		{
 			// Return the control to its base state
-			//this.currentState = " ";
+			username.text = "";
+			password.text = "";
 			errorMessage.text = " ";
 		}
 		
@@ -80,11 +113,19 @@ package org.alfresco.ace.application.login
 		{
 			if (event.errorType == InvalidCredentialsError.INVALID_CREDENTIALS)
 			{
-				// Switch to the alternative state and set the error message
-				//currentState = "InvalidCredentials";
-				errorMessage.text = event.error.message;
-				focusManager.setFocus(username);
+				// Show the error message
+				showErrorMessage(event.error.message);
+				//focusManager.setFocus(username);
 			}
+		}
+		
+		private function showErrorMessage(message:String):void
+		{
+			// Set the new error message
+			errorMessage.text = message;
+			
+			// Fade in the error text
+			fadeIn.play(new Array(errorMessage));
 		}
 	}	
 }

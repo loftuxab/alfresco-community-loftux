@@ -11,6 +11,8 @@ package org.alfresco.ace.control.textAccordian
 	import mx.effects.WipeUp;
 	import mx.effects.Move;
 	import mx.controls.Image;
+	import mx.effects.Sequence;
+	import mx.effects.Fade;
 
 	/**
 	 * Text accordian item UI control
@@ -69,13 +71,17 @@ package org.alfresco.ace.control.textAccordian
 			this._created = true;
 			refreshDisplay();	
 			
-			// Create and assign effect
-			var showEffect:WipeDown = new WipeDown(itemContent);
-			showEffect.duration = EFFECT_DURATION;
-			var hideEffect:WipeUp = new WipeUp(itemContent);	
-			hideEffect.duration = EFFECT_DURATION;		
-			this.contentVBox.setStyle("showEffect", showEffect);
-			this.contentVBox.setStyle("hideEffect", hideEffect);
+			// Create and assign effect		
+			var fadeEffect:Fade = new Fade();
+			fadeEffect.duration = EFFECT_DURATION;
+			
+			this.contentVBox.setStyle("showEffect", fadeEffect);
+			this.contentVBox.setStyle("hideEffect", fadeEffect);
+			this.itemPointer.setStyle("showEffect", fadeEffect);
+			this.itemPointer.setStyle("hideEffect", fadeEffect);			
+			this.itemPointerExpanded.setStyle("showEffect", fadeEffect);
+			this.itemPointerExpanded.setStyle("hideEffect", fadeEffect);
+			
 			var moveEffect:Move = new Move(this);	
 			moveEffect.duration = EFFECT_DURATION;	
 			this.setStyle("moveEffect", moveEffect);
@@ -158,17 +164,13 @@ package org.alfresco.ace.control.textAccordian
 				if (value == true)
 				{
 					itemPointer.visible = false;
-					itemPointer.includeInLayout = false;
 					itemPointerExpanded.visible = true;
-					itemPointerExpanded.includeInLayout = true;	
 					itemTitle.styleName = "titleText";
 				}
 				else
 				{
 					itemPointer.visible = true;
-					itemPointer.includeInLayout = true;
 					itemPointerExpanded.visible = false;
-					itemPointerExpanded.includeInLayout = false;
 					itemTitle.styleName = "collapsedTitleText";
 				}
 			}

@@ -18,28 +18,35 @@ package org.alfresco.ace.application.home.gettingStarted
 	import org.alfresco.ace.control.textAccordian.TextAccordian;
 	import org.alfresco.ace.control.textAccordian.TextAccordianSelectionChangeEvent;
 	import org.alfresco.ace.application.home.HomePanelContainer;
+	import org.alfresco.ace.control.textAccordian.TextAccordianItem;
+	import org.alfresco.framework.service.authentication.AuthenticationService;
+	import org.alfresco.framework.service.authentication.LogoutCompleteEvent;
 	
 	/**
-	 * Getting started panel
+	 * Getting started home panel
+	 * 
+	 * @author Roy Wetherall
 	 */
 	public class GettingStartedClass extends HomePanelContainer
 	{	
+		/** UI Controls */
 		public var videoDisplay:VideoDisplay;
 		public var playBox:VBox;
 		public var pauseBox:VBox;
 		public var textAccordian:TextAccordian;
+		public var firstItem:TextAccordianItem;
 		
+		/** Effects */
 		private var _showEffect:Sequence;
 		private var _beforePlayEffect:Fade;
 		private var _afterPlayEffect:Fade;
 		
+		/** Indicates whether the video has been paused or not */
 		private var _videoPaused:Boolean = false;
-		
-		public function GettingStartedClass()
-		{
-			super();
-		}
-		
+				
+		/**
+		 * createChildren override
+		 */
 		override protected function createChildren():void
 		{
 			super.createChildren();		
@@ -75,22 +82,33 @@ package org.alfresco.ace.application.home.gettingStarted
 			this.playBox.addEventListener(MouseEvent.CLICK, onClick);	
 			this.pauseBox.addEventListener(MouseEvent.CLICK, onClick);	
 			this.textAccordian.addEventListener(TextAccordianSelectionChangeEvent.SELECTION_CHANGE, onSelectionChange);		
+			AuthenticationService.instance.addEventListener(LogoutCompleteEvent.LOGOUT_COMPLETE, onLogoutComplete);
 		}
 		
+		/**
+		 * showComplete override
+		 */
 		override protected function showComplete():void
 		{
 			this._videoPaused = false;
 			this.pauseBox.visible = false;
-			this.playBox.visible = false;
-			this._beforePlayEffect.play();
+			this.playBox.visible = true;
+			
+			this.textAccordian.selectedItem = firstItem;
 		}
 		
+		/**
+		 * onComplete event handler
+		 */
 		private function onComplete(event:VideoEvent):void
 		{
 			this._afterPlayEffect.play();
 			this.showPlay = true;				
 		}
 		
+		/**
+		 * onClick event handler for the video control
+		 */
 		private function onClick(event:Event):void
 		{
 			if (this.videoDisplay.playing == false)
@@ -124,14 +142,27 @@ package org.alfresco.ace.application.home.gettingStarted
 			// Set the video source
 			this.videoDisplay.source = textAccordian.selectedItem.value as String;
 			this.videoDisplay.alpha = 0.25;
+			
+			var oldVolume:Number = this.videoDisplay.volume;
+			this.videoDisplay.volume = 0;
 			this.videoDisplay.play();
 			this.videoDisplay.stop();
+			this.videoDisplay.volume = oldVolume;
 	
 			if (this.showPlay == false)
 			{
 				this._afterPlayEffect.play();
 				this.showPlay = true;
 			}
+		}
+		
+		/**
+		 * onLogoutComplete event handler
+		 */
+		private function onLogoutComplete(event:Event):void
+		{
+			// Pause the video
+			this.showPaused = true;
 		}
 		
 		private function onBeforePlayEffectEnd(event:Event):void

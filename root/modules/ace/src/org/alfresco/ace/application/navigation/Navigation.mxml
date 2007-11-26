@@ -25,9 +25,7 @@
 			<mx:Spacer width="25"/> 
 			<tab:TabControl id="tabControl" verticalGap="0" horizontalGap="0">
 				<tab:TabControlItem label="Home" selected="true" value="0"/>	
-				<tab:TabControlItem label="Knowledge Base" value="1"/>
-				<tab:TabControlItem label="My Issues" value="2"/>				
-				<tab:TabControlItem label="Documentation" value="3"/>
+				<tab:TabControlItem label="Contact Us" value="1"/>
 			</tab:TabControl>
 		</mx:HBox>
 		
@@ -44,13 +42,7 @@
 				<whatsnew:WhatsNew width="90%" showPause="350"/> 
 	        </avs:AdvancedViewStack>
  
-        	<mx:Canvas label="Knowledge Base" id="knowledgeBase" enabled="true" width="100%" height="100%">
-        	</mx:Canvas>
-
-	        <mx:Canvas label="My Issues" id="myIssues" enabled="true" width="100%" height="100%">
-    	    </mx:Canvas>
-        
-        	<mx:Canvas label="Documentation" id="documentation" enabled="true" width="100%" height="100%">
+        	<mx:Canvas label="Contact Us" id="contact" enabled="true" width="100%" height="100%">
         	</mx:Canvas>
 			
 		</mx:ViewStack>

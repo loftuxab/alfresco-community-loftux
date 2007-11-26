@@ -78,18 +78,22 @@ package org.alfresco.ace.control.textAccordian
 		 */
 		public function set selectedItem(value:TextAccordianItem):void
 		{
-			if (this._selectedItem != null)
+			if (value != this._selectedItem)
 			{
-				this._selectedItem.expanded = false;
-			}
-			if (value != null)
-			{
-				this._selectedItem = value;
-				this._selectedItem.expanded = true;
+				if (this._selectedItem != null)
+				{
+					this._selectedItem.expanded = false;
+				}
+				if (value != null)
+				{
+					this._selectedItem = value;
+					this._selectedItem.expanded = true;
+					
+				}
 				
 				// Dispatch the selection change event
 				dispatchEvent(new TextAccordianSelectionChangeEvent(TextAccordianSelectionChangeEvent.SELECTION_CHANGE, this._selectedItem));
-			}
+			}			
 		}
 		
 		/**
