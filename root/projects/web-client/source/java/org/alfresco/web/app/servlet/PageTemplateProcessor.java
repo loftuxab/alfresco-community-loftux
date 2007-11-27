@@ -24,7 +24,8 @@
  */
 package org.alfresco.web.app.servlet;
 
-import org.alfresco.web.scripts.TemplateProcessor;
+import org.alfresco.web.scripts.PresentationTemplateProcessor;
+
 
 /**
  * Extension to the webscripts TemplateProcessor class to allow the default encoding
@@ -32,19 +33,7 @@ import org.alfresco.web.scripts.TemplateProcessor;
  * 
  * @author Kevin Roast
  */
-public class PageTemplateProcessor extends TemplateProcessor
+public class PageTemplateProcessor extends PresentationTemplateProcessor
 {
-   public String getDefaultEncoding()
-   {
-      return this.defaultEncoding;
-   }
    
-   /**
-    * Initialise FreeMarker Configuration
-    */
-   public void initConfig()
-   {
-      super.initConfig();
-      templateConfig.setTemplateUpdateDelay(0);
-   }
 }

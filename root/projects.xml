@@ -1535,6 +1535,8 @@
                   includes="log4j.properties" />
          <fileset dir="${dir.project.repository.config}" 
                   excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" 
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/**" />
          <!-- 
