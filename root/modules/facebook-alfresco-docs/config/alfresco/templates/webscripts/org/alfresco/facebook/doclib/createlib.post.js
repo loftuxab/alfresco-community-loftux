@@ -13,7 +13,7 @@ script:
   var userFolder = appFolder.childByNamePath("FB" + facebook.user);
   if (userFolder == undefined)
   {
-    userFolder = facebookFolder.createFolder("FB" + facebook.user);
+    userFolder = appFolder.createFolder("FB" + facebook.user);
     userFolder.save();
   }
 

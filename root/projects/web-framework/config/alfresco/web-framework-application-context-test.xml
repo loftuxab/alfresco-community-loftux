@@ -1,0 +1,23 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+   <!--              -->   
+   <!--  Test Server -->
+   <!--              -->   
+
+   <bean id="webscripts.test" class="org.alfresco.web.scripts.TestWebScriptServer">
+      <property name="container" ref="webscripts.container" />
+      <property name="messages">
+         <bean class="org.springframework.context.support.ResourceBundleMessageSource">
+            <property name="basenames">
+               <list>
+                  <value>alfresco/messages/webscripts</value>
+               </list>
+            </property>
+         </bean>
+      </property>
+   </bean>
+
+</beans>
