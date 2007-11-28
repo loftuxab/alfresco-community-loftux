@@ -1,0 +1,55 @@
+package org.alfresco.jlan.server.auth.acl;
+
+/*
+ * DomainAccessControl.java
+ *
+ * Copyright (c) Starlasoft 2004. All rights reserved.
+ */
+
+import org.alfresco.jlan.server.SrvSession;
+import org.alfresco.jlan.server.auth.ClientInfo;
+import org.alfresco.jlan.server.core.SharedDevice;
+import org.alfresco.jlan.smb.server.SMBSrvSession;
+
+/**
+ * Domain Name Access Control Class
+ * 
+ * <p>Allow/disallow access based on the SMB/CIFS session callers domain name.
+ */
+public class DomainAccessControl extends AccessControl {
+
+	/**
+	 * Class constructor
+	 *
+	 * @param domainName String
+	 * @param type String
+	 * @param access int 
+	 */	
+	protected DomainAccessControl(String domainName, String type, int access) {
+		super(domainName, type, access);
+	}
+	
+	/**
+	 * Check if the domain name matches the access control domain name and return the allowed access.
+	 * 
+	 * @param sess SrvSession
+	 * @param share SharedDevice
+	 * @param mgr AccessControlManager
+	 * @return int
+	 */
+	public int allowsAccess(SrvSession sess, SharedDevice share, AccessControlManager mgr) {
+		
+		//	Check if the session has client information
+		
+		if ( sess.hasClientInformation() == false || sess instanceof SMBSrvSession == false)
+			return Default;
+
+		//	Check if the domain name matches the access control name
+		
+		ClientInfo cInfo = sess.getClientInformation();
+		
+		if ( cInfo.getDomain() != null && cInfo.getDomain().equalsIgnoreCase(getName()))
+			return getAccess();
+		return Default;			
+	}
+}

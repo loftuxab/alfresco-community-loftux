@@ -1,0 +1,101 @@
+package org.alfresco.jlan.server.filesys;
+
+/*
+ * TreeConnectionHash.java
+ *
+ * Copyright (c) 2004 Starlasoft. All rights reserved.
+ */
+ 
+import java.util.Enumeration;
+import java.util.Hashtable;
+
+/**
+ * Tree Connection Hash Class
+ * 
+ * <p>Hashtable of TreeConnections for the available disk shared devices. TreeConnections are indexed using the
+ * hash of the share name to allow mounts to be persistent across server restarts.
+ */
+public class TreeConnectionHash {
+
+	//	Share name hash to tree connection
+	
+	private Hashtable m_connections;
+	
+	/**
+	 * Class constructor
+	 */
+	public TreeConnectionHash() {
+		m_connections = new Hashtable();
+	}
+
+	/**
+	 * Return the number of tree connections in the hash table
+	 * 
+	 * @return int
+	 */	
+	public final int numberOfEntries() {
+		return m_connections.size();
+	}
+	
+	/**
+	 * Add a connection to the list of available connections
+	 * 
+	 * @param tree TreeConnection 
+	 */
+	public final void addConnection(TreeConnection tree) {
+		m_connections.put(new Integer(tree.getSharedDevice().getName().hashCode()), tree);
+	}
+	
+	/**
+	 * Delete a connection from the list
+	 *
+	 * @param shareName String
+	 * @return TreeConnection 
+	 */
+	public final TreeConnection deleteConnection(String shareName) {
+		return (TreeConnection) m_connections.get(new Integer(shareName.hashCode()));
+	}
+	
+	/**
+	 * Find a connection for the specified share name
+	 * 
+	 * @param shareName String
+	 * @return TreeConnection
+	 */
+	public final TreeConnection findConnection(String shareName) {
+		
+		//	Get the tree connection for the associated share name
+		
+		TreeConnection tree = (TreeConnection) m_connections.get(new Integer(shareName.hashCode()));
+			
+		//	Return the tree connection
+		 
+		return tree; 
+	}
+	
+	/**
+	 * Find a connection for the specified share name hash code
+	 *
+	 * @param hashCode int
+	 * @return TreeConnection 
+	 */
+	public final TreeConnection findConnection(int hashCode) {
+		
+		//	Get the tree connection for the associated share name
+		
+		TreeConnection tree = (TreeConnection) m_connections.get(new Integer(hashCode));
+			
+		//	Return the tree connection
+		 
+		return tree; 
+	}
+	
+	/**
+	 * Enumerate the connections
+	 * 
+	 * @return Enumeration
+	 */
+	public final Enumeration enumerateConnections() {
+		return m_connections.elements();
+	}
+}

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="source/java"/>
+	<classpathentry kind="lib" path="libs/cryptix-jce-provider.jar"/>
+	<classpathentry kind="lib" path="service/wrapper.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="jars/alfresco-jlan.jar"/>
+	<classpathentry kind="output" path="build/classes"/>
+</classpath>
