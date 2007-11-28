@@ -31,6 +31,16 @@ You may need to add or update the MySQL Java Connector library (required for WAR
 - Copy the JAR file into <container>/common/lib or <container>/server/default/lib
 
 
+Remove Existing HSQL Database
+-----------------------------
+
+If you have already started the Alfresco server once, then it will have created some
+HSQL database files and content.  You need to remove these for Alfresco to start using
+a new database.  The safest option is to rename the 'alf_data' folder to something like
+'alf_data_hsql'.   As an alternative, you can change the location of the content store
+(for example using the Alfresco configuration tool).
+
+
 Create Database
 ---------------
 

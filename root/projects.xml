@@ -2239,8 +2239,8 @@
       <compile-java-inc-generated projectdir="${dir.project.webserviceclient}" />
    </target>
    
-   <target name="package-webserviceclient" 
-           description="Packages the web service client project"  
+   <target name="package-webserviceclient"
+           description="Packages the web service client project"
            depends="compile-webserviceclient">
       <mkdir dir="${dir.project.webserviceclient.dist}" />
       <copy todir="${dir.project.webserviceclient.classes}" 
@@ -2425,12 +2425,37 @@
       </wsdl2java>
    </target>
 
+
+   <!-- **************************** -->
+   <!-- ** Google Gadgets Project ** -->
+   <!-- **************************** -->
+
+   <target name="package-googlegadgets"
+           description="Packages the google gadgets module"
+           depends="init">
+      <mkdir dir="${dir.module.gg.dist}" />
+      <zip zipfile="${dir.module.gg}/${file.name.zip.gg}">
+         <zipfileset dir="${dir.module.gg}/webscripts/aggadget"
+                     prefix="aggadget" />
+      </zip>
+      <zip zipfile="${dir.module.gg.dist}/${file.name.zip.gg}">
+         <zipfileset dir="${dir.module.gg}"
+                     includes="*.zip" />
+         <zipfileset dir="${dir.module.gg}"
+                     includes="*.xml" />
+         <zipfileset dir="${dir.module.gg}"
+                     includes="*.txt" />
+      </zip>
+   </target>
+
+
+
    <!-- ************************** -->
    <!-- ** Devenv Tools Project ** -->
    <!-- ************************** -->
 
    <target name="incremental-devenv" 
-           description="Performs an incremental build of the devenv tools project" 
+           description="Performs an incremental build of the devenv tools project"
            depends="package-devenv" />
 
    <target name="build-devenv" 
