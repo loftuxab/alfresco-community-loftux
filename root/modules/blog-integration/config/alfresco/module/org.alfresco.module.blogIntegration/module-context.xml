@@ -89,4 +89,18 @@
         <property name="blogIntegrationService" ref="BlogIntegrationService"/>
     </bean>
 
+	<!-- Blog Repository Actions -->
+	
+   <bean id="blog-post" class="org.alfresco.module.blogIntegration.BlogAction" parent="action-executer">
+      <property name="nodeService">
+         <ref bean="nodeService" />
+      </property>
+      <property name="dictionaryService">
+         <ref bean="dictionaryService" />
+      </property>
+      <property name="blogIntegrationService">
+         <ref bean="blogIntegrationService" />
+      </property>
+   </bean>
+
 </beans>
