@@ -22,6 +22,7 @@ package org.alfresco.ace.control.swipe
 	{
 		/** Control states */
 		private static const STATE_SECONDARY:String = "secondaryState";
+		private static const DURATION_TEXT_FADE:int = 100;
 		
 		/** Display object to be contained inside the swiped canvas' */
 		private var _childOne:DisplayObject;		
@@ -143,7 +144,7 @@ package org.alfresco.ace.control.swipe
 			var fadeOut:Fade = new Fade(this.swipeButtonHBox);
 			fadeOut.alphaFrom = 1;
 			fadeOut.alphaTo = 0;
-			fadeOut.duration = 200;
+			fadeOut.duration = DURATION_TEXT_FADE;
 			fadeOut.addEventListener(EffectEvent.EFFECT_END, doChangeSwipeLabel);
 			fadeOut.play();
 		}
@@ -168,11 +169,11 @@ package org.alfresco.ace.control.swipe
 				upArrow.includeInLayout = true;
 			}
 			
-			// Show a fade in of the label change
+			// Show fade in of the label change
 			var fadeIn:Fade = new Fade(this.swipeButtonHBox);
 			fadeIn.alphaFrom = 0;
 			fadeIn.alphaTo = 1;			
-			fadeIn.duration = 200;
+			fadeIn.duration = DURATION_TEXT_FADE;
 			fadeIn.play();	
 			
 			// Re-enable the button
