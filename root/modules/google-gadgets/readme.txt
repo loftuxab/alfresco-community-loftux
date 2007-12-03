@@ -1,3 +1,10 @@
+Alfresco Google Gadgets
+=======================
+
+The Alfresco Google Gadgets are completely powered by Web Scripts.  To use them you
+need to get the Web Scripts installed inside your Alfresco Server.  Details follow 
+below.  For additional information on the Gadgets and installing them, please visit
+http://wiki.alfresco.com/wiki/Google_Gadgets
 
 
 Step 1
@@ -28,5 +35,4 @@ Step 4
 ======
 You may now use these Web Scripts within iGoogle.  The XML definitions can be used to
 register the gadgets with iGoogle, but you will need to modify the server name in the
-href setting to be your Alfresco server.  Alternatively, you may use the public Alfresco
-gadgets listed on iGoogle and use them to set your server address.
+href setting to be your Alfresco server.
