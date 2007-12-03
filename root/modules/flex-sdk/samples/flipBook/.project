@@ -3,6 +3,7 @@
 	<name>Book</name>
 	<comment></comment>
 	<projects>
+		<project>Alfresco-Flex-Framework</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

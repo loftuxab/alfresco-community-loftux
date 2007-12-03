@@ -41,12 +41,6 @@ OTHER DEALINGS IN THE SOFTWARE.
 			border-style: solid;
 		}
 		
-		/*Application 
-		{
-			color: #F1F1CC;
-			textRollOverColor: 	#FFFFFF;
-		}*/
-		
 		ComboBox, NumericStepper, Button 
 		{
 			color: #002F2F;
@@ -57,76 +51,48 @@ OTHER DEALINGS IN THE SOFTWARE.
 	
 	<Script>
 		<![CDATA[
+			import org.alfresco.framework.service.webscript.ConfigCompleteEvent;
+			import org.alfresco.framework.service.error.ErrorRaisedEvent;
+			import org.alfresco.framework.service.error.ErrorService;
+			import org.alfresco.framework.service.authentication.AuthenticationService;
 			import mx.controls.Alert;
 			import org.alfresco.framework.service.webscript.SuccessEvent;
 			import org.alfresco.framework.service.webscript.ConfigService;
 			import org.alfresco.framework.service.webscript.WebScriptService;
 			
-			[Bindable]
-			public var galleries:Array = new Array();
-			
-			[Bindable]
-			public var selectedGallery:Object;
-		
-			private function next():void
-			{
-				if(book.currentPageIndex+1 < book.maximumPageIndex)
-				{
-					book.turnToPage(book.currentPageIndex + 1);
-				}
-					
-			}
-			private function previous():void
-			{
-				if(book.currentPageIndex > 0)
-				{
-					book.turnToPage(book.currentPageIndex - 1);
-				}
-			}
+			private var host:String;
+			private var ticket:String;
 			
 			private function init():void
 			{
-				var url:String = "http://localhost:8080/alfresco/service/sample/galleries?guest=true";
+				ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);
+				
+				this.host = this.parameters.host;
+				this.ticket = this.parameters.ticket;
+				
+				var url:String = host + "/service/sample/gallery/" + this.parameters.galleryPath + "?ticket=" + ticket;
+								
 				var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onWebScriptExecuted);
 				webScript.ticketRequired = false;
 				webScript.execute();
 			}
 			
-			private function onWebScriptExecuted(event:SuccessEvent):void
+			private function onErrorRaised(event:ErrorRaisedEvent):void
 			{
-				if (event.result.galleries.gallery[0] != null)
-				{
-					for(var index:int=0; index<event.result.galleries.gallery.length; index++)
-					{
-						var gallery:Object = event.result.galleries.gallery[index];
-						var item:Object = new Object();
-						item.label = gallery.name;
-						item.data = gallery.image;
-						galleries.push(item);
-					}
-				}
-				else
-				{
-					var gallery:Object = event.result.galleries.gallery;
-					var item:Object = new Object();
-					item.label = gallery.name;
-					item.data = gallery.image;
-					galleries.push(item);	
-				}
-				
-				galleriesCombo.selectedItem = galleries[0];
-				onSelectionChange();
+				Alert.show("Error: " + event.error.message);
 			}
 			
-			private function onSelectionChange():void
-			{
-				var images:Object = galleriesCombo.selectedItem.data;
+			private function onWebScriptExecuted(event:SuccessEvent):void
+			{				
+				var gallery:Object = event.result.gallery;
+				galleryTitleLabel.text = gallery.name;
+				var images:Object = gallery.image;
 				var content:Array = new Array();
 				for (var index:int=0; index<images.length; index++)
 				{
 					var newPage:AlfrescoImagePage = new AlfrescoImagePage();
 					var image:Object = images[index];
-					newPage.source = "http://localhost:8080/alfresco" + image.url;
+					newPage.source = this.host + image.url + "?ticket=" + this.ticket;					
 					newPage.title = image.title;
 					newPage.description = image.description;
 					content.push(newPage);
@@ -144,11 +110,8 @@ OTHER DEALINGS IN THE SOFTWARE.
 		
 		<VBox>			
 			
-			<HBox width="100%">		 		
-				<ComboBox id="galleriesCombo" dataProvider="{galleries}" change="onSelectionChange()"/>
-				<Spacer width="100%"/>				
-				<Button label="Prev" click="previous()"/>
-				<Button label="Next" click="next()"/>			
+			<HBox horizontalAlign="left" width="100%">		 					
+				<Label id="galleryTitleLabel" fontSize="22" fontWeight="bold"/>		
 			</HBox>
 		
 			<Spacer height="1"/>

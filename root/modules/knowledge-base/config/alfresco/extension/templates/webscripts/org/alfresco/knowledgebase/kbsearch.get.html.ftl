@@ -61,7 +61,7 @@
       <td><img src="${url.context}${row.icon16}"/>
       <a href="${absurl(url.context)}${row.childAssocs["kb:published"][0].downloadUrl}">${row.name}</a></td>
       </tr>
-      <#if row.properties.description?? == true>
+      <#if row.properties.description == true>
       <tr>
       <td></td>
       <td>${row.properties.description}</td>

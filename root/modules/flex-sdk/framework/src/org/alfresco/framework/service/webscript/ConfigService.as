@@ -31,7 +31,8 @@ package org.alfresco.framework.service.webscript
     import flash.net.URLRequest;
     import org.alfresco.framework.service.error.ErrorService;
     import flash.events.Event;
-    import mx.controls.Alert; 
+    import mx.controls.Alert;
+    import flash.events.EventDispatcher; 
     
     /**
 	 * Config service.
@@ -41,9 +42,8 @@ package org.alfresco.framework.service.webscript
 	 * @author Saravanan Sellathurai
 	 */
     	
-	public class ConfigService
-	{
-		
+	public class ConfigService extends EventDispatcher
+	{		
 		private var myXML:XML = new XML();
 		private var XML_URL:String;
 		private var myXMLURL:URLRequest;
@@ -58,6 +58,9 @@ package org.alfresco.framework.service.webscript
 	
 		/** Static instance of the authentication service */
 		private static var _instance:ConfigService;
+		
+		/** Name of the configuration file */
+		private static var CONFIG_FILE:String = "alfresco-config.xml";
 		
 		/** url for config */
 		private var _url:String;
@@ -87,19 +90,19 @@ package org.alfresco.framework.service.webscript
 			* Sample contents of the ace-config.xml file
 			* 
 			* <?xml version="1.0"?>
-			*	<ace-config>
+			*	<alfresco-config>
 			*		<url protocol="http" domain="localhost" port="8080"/>
-			*	</ace-config>
+			*	</alfresco-config>
 			* 
 			*/
 			
 			try
 			{
 				myXML = new XML();
-				XML_URL = "ace-config.xml";
+				XML_URL = CONFIG_FILE;
 				myXMLURL = new URLRequest(XML_URL);
 				myLoader = new URLLoader(myXMLURL); 
-				myLoader.addEventListener("complete", xmlLoaded);
+				myLoader.addEventListener("complete", xmlLoaded);				
 			}
 			catch (error:Error)
 			{
@@ -136,6 +139,8 @@ package org.alfresco.framework.service.webscript
 				{
 						this._url = this._protocol + "://" + this._domain;
 				}
+				
+				this.dispatchEvent(new ConfigCompleteEvent(ConfigCompleteEvent.CONFIG_COMPLETE));
 			}
 			catch (error:Error)
 			{
