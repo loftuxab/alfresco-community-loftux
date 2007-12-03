@@ -5,7 +5,7 @@
   	<description>Returns data used to populate the Flex gallery sample.</description>
    	
    	<!-- Web script URL's -->
-   	<url>/sample/galleries</url>
+   	<url>/sample/gallery/{path}</url>
    
    	<format default="xml">extension</format>
    	<authentication>guest</authentication>

@@ -1,4 +1,4 @@
 <?xml version="1.0"?>
-<ace-config>
+<alfresco-config>
    <url protocol="http" domain="localhost" port="8080"/>
-</ace-config>
+</alfresco-config>

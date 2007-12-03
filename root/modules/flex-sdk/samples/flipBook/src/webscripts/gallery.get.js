@@ -1,4 +1,9 @@
 
-// Get all the spaces with 'Gallery' in the title
-var nodes = search.luceneSearch("+TYPE:\"cm:folder\" +@cm\\:name:*Gallery*");
-model.galleries = nodes;
+var gallery = companyhome.childByNamePath(url.extension);
+if (gallery == undefined || gallery.isContainer == false)
+{
+	status.code = 404;
+   	status.message = "Gallery " + url.extension + " not found.";
+   	status.redirect = true;
+ }
+ model.gallery = gallery;
