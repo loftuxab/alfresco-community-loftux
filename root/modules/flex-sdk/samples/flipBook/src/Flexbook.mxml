@@ -3,10 +3,11 @@
 	xmlns="http://www.adobe.com/2006/mxml" 
 	xmlns:l="*" 
 	layout="absolute" 
-	backgroundGradientColors="[#000000, #282828]" backgroundColor="#282828" 
 	xmlns:controls="qs.controls.*"
 	xmlns:filters="flash.filters.*"
 	applicationComplete="init();"
+	backgroundColor="#ffffff"
+	borderStyle="none"
 	>
 <!--
 Copyright (c) 2006 Adobe Systems Incorporated
@@ -33,21 +34,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 -->	
 	
-	<Style>
-		FlexBook 
-		{			
-			color: #000000;
-			textRollOverColor: 	#000000;			
-			border-style: solid;
-		}
-		
-		ComboBox, NumericStepper, Button 
-		{
-			color: #002F2F;
-			textRollOverColor: #002F2F;	
-		}
-		
-	</Style>
 	
 	<Script>
 		<![CDATA[
@@ -60,20 +46,19 @@ OTHER DEALINGS IN THE SOFTWARE.
 			import org.alfresco.framework.service.webscript.ConfigService;
 			import org.alfresco.framework.service.webscript.WebScriptService;
 			
-			private var host:String;
+			private var dataURL:String;
 			private var ticket:String;
 			
 			private function init():void
 			{
 				ErrorService.instance.addEventListener(ErrorRaisedEvent.ERROR_RAISED, onErrorRaised);
 				
-				this.host = this.parameters.host;
+				this.dataURL = this.parameters.dataURL;
 				this.ticket = this.parameters.ticket;
 				
-				var url:String = host + "/service/sample/gallery/" + this.parameters.galleryPath + "?ticket=" + ticket;
-								
-				var webScript:WebScriptService = new WebScriptService(url, WebScriptService.GET, onWebScriptExecuted);
-				webScript.ticketRequired = false;
+				var webScript:WebScriptService = new WebScriptService(this.dataURL, WebScriptService.GET, onWebScriptExecuted);
+				webScript.ticket = this.ticket;
+				webScript.ticketRequired = true;
 				webScript.execute();
 			}
 			
@@ -85,14 +70,13 @@ OTHER DEALINGS IN THE SOFTWARE.
 			private function onWebScriptExecuted(event:SuccessEvent):void
 			{				
 				var gallery:Object = event.result.gallery;
-				galleryTitleLabel.text = gallery.name;
 				var images:Object = gallery.image;
 				var content:Array = new Array();
 				for (var index:int=0; index<images.length; index++)
 				{
 					var newPage:AlfrescoImagePage = new AlfrescoImagePage();
 					var image:Object = images[index];
-					newPage.source = this.host + image.url + "?ticket=" + this.ticket;					
+					newPage.source = image.url + "?ticket=" + this.ticket;					
 					newPage.title = image.title;
 					newPage.description = image.description;
 					content.push(newPage);
@@ -106,25 +90,15 @@ OTHER DEALINGS IN THE SOFTWARE.
 		]]>
 	</Script>
 
-	<VBox left="5" right="5" top="5" bottom="5" backgroundColor="#A7A37E" borderStyle="solid" borderColor="#002F2F" verticalAlign="middle" horizontalAlign="center">
+	<VBox horizontalAlign="center" width="100%" height="100%" verticalAlign="middle">
 		
-		<VBox>			
-			
-			<HBox horizontalAlign="left" width="100%">		 					
-				<Label id="galleryTitleLabel" fontSize="22" fontWeight="bold"/>		
-			</HBox>
-		
-			<Spacer height="1"/>
-			
-			<controls:FlexBook id="book" width="900" height="400" horizontalCenter="0" 
+		<controls:FlexBook id="book" width="900" height="400" horizontalCenter="0" 
 				animateCurrentPageIndex="true"
 				visible="false"
 				itemSize="halfPage"
 				activeGrabArea="edge"
 				edgeAndCornerSize="50">
-			</controls:FlexBook>
-		
-		</VBox>
+		</controls:FlexBook>
 		
 	</VBox>
 

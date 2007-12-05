@@ -63,6 +63,9 @@
 		/** Indicates whether the ticket is required to make the web service request */
 		private var _ticketRequired:Boolean = true;
 		
+		/** The ticket.  If this is not present the ticket will be taken from the AuthenticationService */
+		private var _ticket:String;
+		
 		/**
 		 * Constructor
 		 */
@@ -143,6 +146,14 @@
 		}
 		
 		/**
+		 * Setter for the ticket, if not provided by the AuthenticationService
+		 */
+		public function set ticket(ticket:String):void
+		{
+			this._ticket = ticket;
+		}
+		
+		/**
 		 * Execute the web script with the provided parameter values.
 		 */
 		public function execute(parameters:Object=null):AsyncToken
@@ -159,16 +170,19 @@
 				
 				if (this._ticketRequired == true)
 				{
-					// Add the current ticket to the parameters
-					var ticket:String = AuthenticationService.instance.ticket;
+					// Get the ticket, using the AuthenticationService if required
+					var ticket:String = this._ticket;
 					if (ticket == null)
 					{
-						throw new AuthenticationError("Unable to execute web script because required ticket is not available from the AuthenticationService.");	
+						ticket = AuthenticationService.instance.ticket;
+						if (ticket == null)
+						{
+							throw new AuthenticationError("Unable to execute web script because required ticket is not available from the AuthenticationService.");	
+						}
 					}
-					else
-					{
-						parameters.alf_ticket = ticket;
-					}
+					
+					// Add the ticket parameter to the web service call
+					parameters.alf_ticket = ticket;
 				}
 				
 				// Tunnel methods as required
