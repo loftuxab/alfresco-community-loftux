@@ -4,7 +4,7 @@
 		<#list gallery.children as image>	
 			<#if image.isDocument>			
 				<image>
-					<url>${image.url}</url>	
+					<url>${absurl(url.context)}${image.url}</url>	
 					<#if image.properties["cm:title"]?exists>					
 						<title>${image.properties["cm:title"]}</title>
 					<#else>
