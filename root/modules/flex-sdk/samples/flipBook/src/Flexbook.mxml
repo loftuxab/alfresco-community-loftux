@@ -37,6 +37,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 	
 	<Script>
 		<![CDATA[
+			import mx.utils.URLUtil;
 			import org.alfresco.framework.service.webscript.ConfigCompleteEvent;
 			import org.alfresco.framework.service.error.ErrorRaisedEvent;
 			import org.alfresco.framework.service.error.ErrorService;
@@ -56,6 +57,12 @@ OTHER DEALINGS IN THE SOFTWARE.
 				this.dataURL = this.parameters.dataURL;
 				this.ticket = this.parameters.ticket;
 				
+				// Append the server name onto the front of the URL if it is not present
+				if (this.dataURL.charAt(0) == "/")
+				{
+					this.dataURL = URLUtil.getProtocol(this.url) + "://" + URLUtil.getServerNameWithPort(this.url) + this.dataURL;
+				}
+				
 				var webScript:WebScriptService = new WebScriptService(this.dataURL, WebScriptService.GET, onWebScriptExecuted);
 				webScript.ticket = this.ticket;
 				webScript.ticketRequired = true;
@@ -72,16 +79,29 @@ OTHER DEALINGS IN THE SOFTWARE.
 				var gallery:Object = event.result.gallery;
 				var images:Object = gallery.image;
 				var content:Array = new Array();
-				for (var index:int=0; index<images.length; index++)
-				{
-					var newPage:AlfrescoImagePage = new AlfrescoImagePage();
-					var image:Object = images[index];
-					newPage.source = image.url + "?ticket=" + this.ticket;					
-					newPage.title = image.title;
-					newPage.description = image.description;
-					content.push(newPage);
-				}
 				
+				if (images.length != null)
+				{				
+					for (var index:int=0; index<images.length; index++)
+					{
+						var newPage:AlfrescoImagePage = new AlfrescoImagePage();
+						var image:Object = images[index];
+						
+						newPage.source = image.url + "?ticket=" + this.ticket;					
+						newPage.title = image.title;
+						newPage.description = image.description;
+						content.push(newPage);
+					}
+				}
+				else
+				{
+				    var newPage2:AlfrescoImagePage = new AlfrescoImagePage();
+					newPage2.source = images.url + "?ticket=" + this.ticket;					
+					newPage2.title = images.title;
+					newPage2.description = images.description;
+					content.push(newPage2);	
+				}
+				 
 				book.content = content;				
 				book.visible = true;
 				book.turnToPage(0);
@@ -90,7 +110,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 		]]>
 	</Script>
 
-	<VBox horizontalAlign="center" width="100%" height="100%" verticalAlign="middle">
+	<VBox width="100%" height="100%" verticalAlign="middle" horizontalAlign="center">
 		
 		<controls:FlexBook id="book" width="900" height="400" horizontalCenter="0" 
 				animateCurrentPageIndex="true"
