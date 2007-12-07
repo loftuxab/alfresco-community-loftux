@@ -307,7 +307,7 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
         // Check the return result
         if (result == false)
         {
-            throw new BlogIntegrationRuntimeException("The update of the post unexpected failed.  Check your blog for more information.");
+            throw new BlogIntegrationRuntimeException("The update of the post unexpectedly failed.  Check your blog for more information.");
         }
         
         // Now get the details of the newly created post
@@ -358,7 +358,7 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
         // Check the return result
         if (result == false)
         {
-            throw new BlogIntegrationRuntimeException("The update of the post unexpected failed.  Check your blog for more information.");
+            throw new BlogIntegrationRuntimeException("Deleting the post unexpectedly failed.  Check your blog for more information.");
         }
         
         // Remove the postDetails aspect from the node

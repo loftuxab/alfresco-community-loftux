@@ -102,8 +102,13 @@ public abstract class DefaultBlogIntegrationImplementation extends BaseBlogInteg
         params.add(publish);
         
         // Create the new post
-        Boolean result = (Boolean)execute(getEndpointURL(blogDetails), ACTION_EDIT_POST, params);        
-        return result.booleanValue();
+        Object result = execute(getEndpointURL(blogDetails), ACTION_EDIT_POST, params);
+        if (result.getClass().equals(boolean.class))
+        {
+           return ((Boolean)result).booleanValue();
+        }
+        return false;
+
     }
     
     /**
@@ -137,8 +142,12 @@ public abstract class DefaultBlogIntegrationImplementation extends BaseBlogInteg
         params.add(true); 
         
         // Delete post
-        Boolean result = (Boolean)execute(getEndpointURL(blogDetails), ACTION_DELETE_POST, params);        
-        return result.booleanValue();
+        Object result = execute(getEndpointURL(blogDetails), ACTION_DELETE_POST, params);
+        if (result.getClass().equals(boolean.class))
+        {
+           return ((Boolean)result).booleanValue();
+        }
+        return false;
     }
     
     /**
