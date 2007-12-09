@@ -96,43 +96,55 @@ public class BlogAction extends ActionExecuterAbstractBase implements BlogIntegr
    protected void executeImpl(Action action, NodeRef actionedUponNodeRef)
    {
       String blogAction = (String)action.getParameterValue(PARAM_BLOG_ACTION);
-      if ("post".equals(blogAction) == true)
+      try
       {
-          QName type = this.nodeService.getType(actionedUponNodeRef);
-          if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == true)
-          {
-              List<BlogDetails> list = this.blogIntegrationService.getBlogDetails(actionedUponNodeRef);
-              if (list.size() != 0)
-              {
-                  // Take the 'nearest' blog details
-                  BlogDetails blogDetails = list.get(0);
-                  this.blogIntegrationService.newPost(blogDetails, actionedUponNodeRef, ContentModel.PROP_CONTENT, true);
-              }
-          }
+         if ("post".equals(blogAction) == true)
+         {
+             QName type = this.nodeService.getType(actionedUponNodeRef);
+             if (this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == true)
+             {
+                 List<BlogDetails> list = this.blogIntegrationService.getBlogDetails(actionedUponNodeRef);
+                 if (list.size() != 0)
+                 {
+                     // Take the 'nearest' blog details
+                     BlogDetails blogDetails = list.get(0);
+                     this.blogIntegrationService.newPost(blogDetails, actionedUponNodeRef, ContentModel.PROP_CONTENT, true);
+                 }
+             }
+         }
+         else if ("update".equals(blogAction) == true)
+         {
+             QName type = this.nodeService.getType(actionedUponNodeRef);
+             if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_BLOG_POST) == true &&
+                 this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == true)
+             {
+                 this.blogIntegrationService.updatePost(actionedUponNodeRef, ContentModel.PROP_CONTENT, true);
+             }
+         }
+         else if ("remove".equals(blogAction) == true)
+         {
+             QName type = this.nodeService.getType(actionedUponNodeRef);
+             if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_BLOG_POST) == true &&
+                 this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == true)
+             {
+                 this.blogIntegrationService.deletePost(actionedUponNodeRef);
+             }
+         }
+         else
+         {
+             throw new BlogIntegrationRuntimeException("Invalid action has been specified '" + blogAction + "'");
+         }
+         
+         action.setParameterValue(PARAM_RESULT, "");
       }
-      else if ("update".equals(blogAction) == true)
+      catch (BlogIntegrationRuntimeException ex)
       {
-          QName type = this.nodeService.getType(actionedUponNodeRef);
-          if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_BLOG_POST) == true &&
-              this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == true)
-          {
-              this.blogIntegrationService.updatePost(actionedUponNodeRef, ContentModel.PROP_CONTENT, true);
-          }
+         action.setParameterValue(PARAM_RESULT, ex.getMessage());
       }
-      else if ("remove".equals(blogAction) == true)
+      catch (Exception ex)
       {
-          QName type = this.nodeService.getType(actionedUponNodeRef);
-          if (this.nodeService.hasAspect(actionedUponNodeRef, ASPECT_BLOG_POST) == true &&
-              this.dictionaryService.isSubClass(type, ContentModel.TYPE_CONTENT) == true)
-          {
-              this.blogIntegrationService.deletePost(actionedUponNodeRef);
-          }
+         action.setParameterValue(PARAM_RESULT, "Action failed. Please check blog configuration parameters.");
       }
-      else
-      {
-          throw new BlogIntegrationRuntimeException("Invalid action has been specified '" + blogAction + "'");
-      }
-
    }
 
    /**
@@ -147,5 +159,12 @@ public class BlogAction extends ActionExecuterAbstractBase implements BlogIntegr
             DataTypeDefinition.TEXT, 
             true,
             getParamDisplayLabel(PARAM_BLOG_ACTION)));
+
+      paramList.add(
+            new ParameterDefinitionImpl(PARAM_RESULT,
+            DataTypeDefinition.TEXT, 
+            false,
+            getParamDisplayLabel(PARAM_RESULT)));
+
    }
 }

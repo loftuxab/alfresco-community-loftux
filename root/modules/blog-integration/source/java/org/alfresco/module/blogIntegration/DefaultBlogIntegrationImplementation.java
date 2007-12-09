@@ -103,7 +103,8 @@ public abstract class DefaultBlogIntegrationImplementation extends BaseBlogInteg
         
         // Create the new post
         Object result = execute(getEndpointURL(blogDetails), ACTION_EDIT_POST, params);
-        if (result.getClass().equals(boolean.class))
+        
+        if (result.getClass().equals(Boolean.class))
         {
            return ((Boolean)result).booleanValue();
         }
@@ -143,7 +144,7 @@ public abstract class DefaultBlogIntegrationImplementation extends BaseBlogInteg
         
         // Delete post
         Object result = execute(getEndpointURL(blogDetails), ACTION_DELETE_POST, params);
-        if (result.getClass().equals(boolean.class))
+        if (result.getClass().equals(Boolean.class))
         {
            return ((Boolean)result).booleanValue();
         }
