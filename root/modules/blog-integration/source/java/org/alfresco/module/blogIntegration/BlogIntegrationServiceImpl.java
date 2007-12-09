@@ -198,8 +198,15 @@ public class BlogIntegrationServiceImpl implements BlogIntegrationService, BlogI
         String title = (String)this.nodeService.getProperty(nodeRef, ContentModel.PROP_TITLE);
         if (title == null || title.length() == 0)
         {
-            // Get the title from the first 22 character plus ' ...'
-            title = body.substring(0, 23) + " ...";
+           if (body.length() > 23)
+           {
+              // Get the title from the first 22 character plus ' ...'
+              title = body.substring(0, 23) + " ...";
+           }
+           else
+           {
+              title = body;
+           }
         }
         
         // Post the new blog entry
