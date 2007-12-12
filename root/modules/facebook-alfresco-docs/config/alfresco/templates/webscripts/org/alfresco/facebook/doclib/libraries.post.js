@@ -10,7 +10,7 @@ script:
     break script;
   }
 
-  var userFolder = appFolder.childByNamePath("FB" + facebook.user);
+  var userFolder = appFolder.childByNamePath("FB" + url.extension);
   if (userFolder == undefined)
   {
     if (parseInt(facebook.user) != parseInt(url.extension))
