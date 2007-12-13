@@ -1,10 +1,11 @@
 <#assign weekms=1000*60*60*24*7>
 <#assign returl=url.service?url + "?f="?url + filter + "&m="?url + mode>
 
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
    <head>
       <title>User Tasks</title>
-      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css">
+      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css"/>
       <style type="text/css">
 a.filterLink:link, a.filterLink:visited
 {
@@ -114,16 +115,16 @@ div.taskItemToday
             <div class="taskIndicator">
             <#-- items due today? -->
             <#if hasDue && filter<3 && (dateCompare(date?date, due?date, 0, "==") == 1)>
-               <img src="${url.context}/images/icons/task_duetoday.png" alt="">
+               <img src="${url.context}/images/icons/task_duetoday.png" alt=""/>
             </div>
             <div class="taskItem taskItemToday">
             <#-- items overdue? -->
             <#elseif hasDue && (filter=0 || filter=4) && (dateCompare(date?date, due?date) == 1)>
-               <img src="${url.context}/images/icons/task_overdue.png" alt="">
+               <img src="${url.context}/images/icons/task_overdue.png" alt=""/>
             </div>
             <div class="taskItem taskItemOverdue">
             <#else>
-               <img src="${url.context}/images/icons/task_any.png" alt="">
+               <img src="${url.context}/images/icons/task_any.png" alt=""/>
             </div>
             <div class="taskItem">
                </#if>
