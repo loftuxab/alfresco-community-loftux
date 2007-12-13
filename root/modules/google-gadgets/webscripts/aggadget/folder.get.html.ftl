@@ -16,10 +16,11 @@
 f=${filter}&up_sortby=${up_sortby}&m=${mode}
 </#macro>
 
-<html>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
    <head>
       <title>${folder.name}</title>
-      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css">
+      <link rel="stylesheet" href="${url.context}/css/gg.css" TYPE="text/css"/>
       <style type="text/css">
 a.nodeLink
 {
@@ -115,7 +116,7 @@ div.nodeActions
    <div class="toolbar">
       <#if folder.parent.parent?exists>
          <div style="float:left">
-            <a href="${url.serviceContext}/aggadget/folder${encodepath(folder.parent)}?<@urlargs/>"><img src="${url.context}/images/office/arrow_up.gif" border="0">..</a>
+            <a href="${url.serviceContext}/aggadget/folder${encodepath(folder.parent)}?<@urlargs/>"><img src="${url.context}/images/office/arrow_up.gif" border="0" alt=""/>..</a>
          </div>
       </#if>
       <div style="float:right">
@@ -159,14 +160,17 @@ div.nodeActions
          <#if c.isContainer || c.isDocument>
             <div class="${(count%2=0)?string("rowEven", "rowOdd")}">
                <div style="float:left">
-                  <a href="${curl}" <#if c.isDocument>target="alfnew"</#if>><img src="${url.context}<#if mode=0>${c.icon32}" width="32" height="32"<#else>${c.icon16}" width="16" height="16"</#if> border="0" alt="${c.name?html}" title="${c.name?html}"></a>
+                  <a href="${curl}" <#if c.isDocument>target="alfnew"</#if>><img src="${url.context}<#if mode=0>${c.icon32}" width="32" height="32"<#else>${c.icon16}" width="16" height="16"</#if> border="0" alt="${c.name?html}" title="${c.name?html}"/></a>
                </div>
                <div style="margin-left:<#if mode=0>36px<#else>20px</#if>">
                   <div>
                      <div class="nodeActions">
-                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}" alt="Details" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0"></a>
+                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0" alt="Details" title="Details"/></a>
+                        <#if c.hasPermission("Write") && c.isDocument>
+                        <a href="${url.serviceContext}/aggadget/update?name=${c.name?url}&id=${c.id}&returl=${returl}" title="Update"><img src="${url.context}/images/icons/update.gif" border="0" alt="Update" title="Update"/></a>
+                        </#if>
                         <#if c.hasPermission("Delete")>
-                        <a href="${url.serviceContext}/aggadget/delete?name=${c.name?url}&id=${c.id}&returl=${returl}" alt="Delete" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0"></a>
+                        <a href="${url.serviceContext}/aggadget/delete?name=${c.name?url}&id=${c.id}&returl=${returl}" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0" alt="Delete" title="Delete"/></a>
                         </#if>
                      </div>
                      <a class="nodeLink" href="${curl}" <#if c.isDocument>target="alfnew"</#if> <#if mode=1>title="${c.properties.modified?string(datetimeformat)} <#if c.properties.description?exists>'${c.properties.description?html}'</#if>"</#if>>${c.name?html}</a>
