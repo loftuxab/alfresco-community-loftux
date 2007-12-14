@@ -129,10 +129,10 @@ div.nodeActions
          &nbsp;
          <#if folder.hasPermission("Write")>
             <!-- Create Folder action -->
-            <a href="${url.context}/wcservice/aggadget/createfolder?fdrnodeid=${folder.id}&returl=${returl}">Create&nbsp;Folder</a>
+            <a href="${url.serviceContext}/aggadget/createfolder?fdrnodeid=${folder.id}&returl=${returl}">Create&nbsp;Folder</a>
             &nbsp;
             <!-- Upload action -->
-            <a href="${url.context}/wcservice/aggadget/upload?fdrnodeid=${folder.id}&returl=${returl}">Upload</a>
+            <a href="${url.serviceContext}/aggadget/upload?fdrnodeid=${folder.id}&returl=${returl}">Upload</a>
          </#if>
       </div>
    </div>
@@ -165,7 +165,7 @@ div.nodeActions
                <div style="margin-left:<#if mode=0>36px<#else>20px</#if>">
                   <div>
                      <div class="nodeActions">
-                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0" alt="Details" title="Details"/></a>
+                        <a href="${url.serviceContext}/aggadget/details?id=${c.id}&returl=${returl}" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0" alt="Details" title="Details"/></a>
                         <#if c.hasPermission("Write") && c.isDocument>
                         <a href="${url.serviceContext}/aggadget/update?name=${c.name?url}&id=${c.id}&returl=${returl}" title="Update"><img src="${url.context}/images/icons/update.gif" border="0" alt="Update" title="Update"/></a>
                         </#if>

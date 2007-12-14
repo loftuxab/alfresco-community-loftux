@@ -109,7 +109,7 @@ a.taskAction
          <div class="taskActions">
             Task Actions:
 	      <#list task.transitions as wt>
-            <a class="taskAction" href="${url.context}/wcservice/aggadget/transitiontask?id=${task.id}<#if wt.id?exists>&t=${wt.id}</#if>&m=${wt.label?url}&returl=${args.returl}">${wt.label?html}</a>
+            <a class="taskAction" href="${url.serviceContext}/aggadget/transitiontask?id=${task.id}<#if wt.id?exists>&t=${wt.id}</#if>&m=${wt.label?url}&returl=${args.returl}">${wt.label?html}</a>
          </#list>
          </div>
          
