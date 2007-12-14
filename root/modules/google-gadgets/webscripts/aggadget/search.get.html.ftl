@@ -1,3 +1,5 @@
+<#assign returl=url.full?url>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head> 
@@ -77,12 +79,12 @@ function searchKeypress(e)
                   <div style="float:left;height:18px;padding:2px"><a href="${curl}" target="new"><img src="${url.context}${row.icon16}" border="0" alt="" title="${row.name?html}"/></a></div>
                   <div style="margin-left:18px;padding:2px">
                      <div class="nodeActions">
-                        <a href="${url.serviceContext}/aggadget/details?id=${row.id}" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0" alt="Details" title="Details"/></a>
+                        <a href="${url.serviceContext}/aggadget/details?id=${row.id}&returl=${returl}" title="Details"><img src="${url.context}/images/icons/View_details.gif" border="0" alt="Details" title="Details"/></a>
                         <#if row.hasPermission("Write") && row.isDocument>
-                        <a href="${url.serviceContext}/aggadget/update?name=${row.name?url}&id=${row.id}&returl=${url.full}" title="Update"><img src="${url.context}/images/icons/update.gif" border="0" alt="Update" title="Update"/></a>
+                        <a href="${url.serviceContext}/aggadget/update?name=${row.name?url}&id=${row.id}&returl=${returl}" title="Update"><img src="${url.context}/images/icons/update.gif" border="0" alt="Update" title="Update"/></a>
                         </#if>
                         <#if row.hasPermission("Delete")>
-                        <a href="${url.serviceContext}/aggadget/delete?name=${row.name?url}&id=${row.id}&returl=${url.full}" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0" alt="Delete" title="Delete"/></a>
+                        <a href="${url.serviceContext}/aggadget/delete?name=${row.name?url}&id=${row.id}&returl=${returl}" title="Delete"><img src="${url.context}/images/icons/delete.gif" border="0" alt="Delete" title="Delete"/></a>
                         </#if>
                      </div>
                      <a href="${curl}" target="new">${row.name?html}</a>
