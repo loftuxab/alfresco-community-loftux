@@ -103,7 +103,10 @@ public class WebScriptServlet extends HttpServlet
     {
         if (logger.isDebugEnabled())
             logger.debug("Processing request ("  + req.getMethod() + ") " + req.getRequestURL() + (req.getQueryString() != null ? "?" + req.getQueryString() : ""));
-        
+        if (req.getCharacterEncoding() == null)
+        {
+            req.setCharacterEncoding("UTF-8");
+        }
         WebScriptServletRuntime runtime = new WebScriptServletRuntime(container, authenticatorFactory, req, res, serverProperties);
         runtime.executeScript();
     }
