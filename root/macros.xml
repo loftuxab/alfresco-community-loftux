@@ -17,11 +17,13 @@
    
    <macrodef name="compile-java" description="Compiles Java source files in the given project">
       <attribute name="projectdir" />
+      <attribute name="compileExcludes" default="" />
       <sequential>
          <mkdir dir="@{projectdir}/${dir.name.build}/${dir.name.classes}" />
          <javac destdir="@{projectdir}/${dir.name.build}/${dir.name.classes}" fork="true"
                 memoryMaximumSize="${mem.size.max}" deprecation="${javac.deprecation}" 
-                debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}">
+                debug="${javac.debug}"  target="${javac.target}" source="${javac.source}" encoding="${javac.encoding}"
+                excludes="@{compileExcludes}" >
             <src path="@{projectdir}/${dir.name.source}/${dir.name.java}" />
             <classpath refid="classpath.compile" />
 

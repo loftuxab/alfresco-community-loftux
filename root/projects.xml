@@ -1598,6 +1598,8 @@
                   includes="${file.name.jar.deployment}"/>
          <fileset dir="${dir.project.remoteapi.dist}" 
                   includes="${file.name.jar.remoteapi}" />
+         <fileset dir="${dir.project.jlan.dist}" 
+                  includes="${file.name.jar.jlan}" />
       </copy>
 
       <!-- clean up previously generated properties files -->
@@ -2485,6 +2487,47 @@
             file="${dir.project.devenv.dist}/${file.name.jar.devenv}" />
    </target>
 
+   <!-- *************************** -->
+   <!-- ** Alfresco JLAN Project ** -->
+   <!-- *************************** -->
+   
+   <target name="incremental-jlan" 
+           description="Performs an incremental build of the JLAN project" 
+           depends="package-jlan" />
+      
+   <target name="build-jlan" 
+           description="Performs a clean build of the jlan project" 
+           depends="clean-jlan, 
+                    incremental-jlan" />
+   
+   <target name="clean-jlan" 
+           description="Cleans the jlan project" 
+           depends="init">
+      <clean projectdir="${dir.project.jlan}" />
+   </target>
+   
+   <target name="compile-jlan" 
+           description="Compiles the jlan project" 
+           depends="init">
+      <compile-java projectdir="${dir.project.jlan}" compileExcludes="org/alfresco/jlan/app/** org/alfresco/jlan/server/filesys/db/*/** org/alfresco/jlan/smb/util/** org/alfresco/jlan/util/db/** org/alfresco/config/*/**" />
+   </target>
+   
+   <target name="package-jlan"
+           description="Packages the jlan project"
+           depends="compile-jlan">
+      <mkdir dir="${dir.project.jlan.dist}" />
+      <jar jarfile="${dir.project.jlan.dist}/${file.name.jar.jlan}" 
+           basedir="${dir.project.jlan.classes}" />
+   </target>
+   
+   <target name="generate-javadocs-jlan" 
+           description="Generates the JavaDocs for the JLAN project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco JLAN API Specification" 
+                         windowtitle="Alfresco JLAN API" 
+                         projectdir="${dir.project.jlan}"/>
+   </target>
+	
 </project>
 
 
