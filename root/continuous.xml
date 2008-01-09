@@ -301,7 +301,7 @@
                      prefix="alf_data" />
          <zipfileset dir="${dir.project.installer.binwin}"
                      prefix="bin" />
-         <zipfileset dir="${dir.project.netbios}/dll"
+         <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin" />
          <zipfileset dir="${dir.continuous.dist}"
                      includes="${file.name.dist.mmt}.jar"
@@ -449,7 +449,7 @@
       <mkdir dir="${dir.continuous.dist}" />
 
       <zip destfile="${dir.continuous.dist}/${file.name.dist.war}.zip">
-         <zipfileset dir="${dir.project.netbios}/dll"
+         <zipfileset dir="${dir.project.jlan}/jni"
                      prefix="bin"/>
          <zipfileset dir="${dir.project.installer.extras}"
                      prefix="extras"
@@ -948,7 +948,7 @@
       <!-- -->
       <mkdir dir="${dir.continuous.assemble.sdk}/bin" />
       <copy todir="${dir.continuous.assemble.sdk}/bin">
-         <fileset dir="${dir.project.netbios}/dll" 
+         <fileset dir="${dir.project.jlan}/jni" 
                   includes="*.dll" />
          <fileset dir="${dir.project.installer}" 
                   includes=".hotspot_compiler" />

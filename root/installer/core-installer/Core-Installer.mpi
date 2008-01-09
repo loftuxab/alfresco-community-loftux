@@ -1016,8 +1016,8 @@ File ::187EB6C7-D7A3-423D-8471-6E4EF77FFDB6 -name W:/V21/root/projects/installer
 File ::F0B121A4-74E5-42A9-B4D1-5CDA777FAEBD -directory <%InstallDir%>/bin -name W:/V21/root/installer/resources/alfresco.ico -location ../resources -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::C486296D-5E76-42CE-BB38-E4AAAA05EF03 -name W:/V21/root/projects/installer/windows/installer/README.txt -location ../../projects/installer/windows/installer -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::7BA9B0D7-0EA5-4792-939E-3789D58487C9 -name W:/V21/root/projects/installer/windows/restart_alf.bat -location ../../projects/installer/windows -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
-File ::2A8E79DA-9AFF-4119-A8D9-C7EED04ECEEA -directory <%InstallDir%>/bin -name W:/V21/root/projects/netbios/dll/Win32NetBIOS.dll -location ../../projects/netbios/dll -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
-File ::693FE81A-BBA4-4D6F-8A37-D5003C358414 -directory <%InstallDir%>/bin -name W:/V21/root/projects/netbios/dll/Win32NetBIOSx64.dll -location ../../projects/netbios/dll -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
+File ::2A8E79DA-9AFF-4119-A8D9-C7EED04ECEEA -directory <%InstallDir%>/bin -name W:/V21/root/projects/netbios/dll/Win32NetBIOS.dll -location ../../projects/alfresco-jlan/jni -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
+File ::693FE81A-BBA4-4D6F-8A37-D5003C358414 -directory <%InstallDir%>/bin -name W:/V21/root/projects/netbios/dll/Win32NetBIOSx64.dll -location ../../projects/alfresco-jlan/jni -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::BE73F6ED-A902-4A0C-98C5-AD88BA81E9F7 -name W:/V21/root/projects/installer/windows/apply_amps.bat -location ../../projects/installer/windows -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::89BEF6D3-2062-40C4-AD08-97181FB1255A -type dir -name W:/V21/root/projects/installer/windows/bin -location ../../projects/installer/windows/bin -parent 9E7291DB-E5E7-4B7B-9668-0376CD7C2F8D
 File ::399B141A-ADD0-47ED-A115-89921C34DD72 -name AlfrescoHome.URL -parent 89BEF6D3-2062-40C4-AD08-97181FB1255A
