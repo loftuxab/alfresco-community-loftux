@@ -237,7 +237,7 @@ Condition 5888225B-DD26-4EF1-90F9-0508DDBE0D5C -active Yes -parent 9D32E8EB-5195
 InstallComponent C89B2458-A96B-4399-A74E-E525BBCB659D -setup Install -type pane -conditions {D13A47F2-44A5-4B64-A92E-9DF656474E22 336969F7-2B84-4428-A64A-B890EC608FC4} -title {Set Tomcat Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition D13A47F2-44A5-4B64-A92E-9DF656474E22 -active Yes -parent C89B2458-A96B-4399-A74E-E525BBCB659D -title {String Is Condition} -component StringIsCondition
 Condition 336969F7-2B84-4428-A64A-B890EC608FC4 -active Yes -parent C89B2458-A96B-4399-A74E-E525BBCB659D -title {Port Test Condition} -component PortTestCondition
-InstallComponent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -setup Install -type pane -conditions {7EB2F573-3B51-46A0-A3B9-14B58B030A71 0D426F75-DDD9-4653-B57E-4B95137086BF} -title {Set Rmi Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+InstallComponent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -setup Install -type pane -conditions {7EB2F573-3B51-46A0-A3B9-14B58B030A71 0D426F75-DDD9-4653-B57E-4B95137086BF} -title {Set Rmi Port} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
 Condition 7EB2F573-3B51-46A0-A3B9-14B58B030A71 -active Yes -parent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -title {String Is Condition} -component StringIsCondition
 Condition 0D426F75-DDD9-4653-B57E-4B95137086BF -active Yes -parent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -title {Port Test Condition} -component PortTestCondition
 InstallComponent 61F2C13B-6CF2-4D61-82A6-574B7965CD5B -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
