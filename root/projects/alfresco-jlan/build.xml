@@ -7,8 +7,9 @@
   <!-- Create the JLAN Server Jar (without database interface implementations) -->
 	<target name="createJar">
     <mkdir dir="build/standalone"/>
-    <javac destdir="build/standalone" classpath="service/wrapper.jar">
+    <javac destdir="build/standalone" classpath="service/wrapper.jar" debug="on">
       <src path="source/java"/>
+	  <src path="source/standalone-java"/>
       <include name="**/*.java"/>
       <exclude name="org/alfresco/jlan/server/filesys/db/mysql/**"/>
       <exclude name="org/alfresco/jlan/server/filesys/db/oracle/**"/>
@@ -25,8 +26,9 @@
   <!-- Create the JLAN Server Jar (with database interface implementations for Derby/mySQL) -->
 	<target name="createJarDB">
     <mkdir dir="build/standalone"/>
-    <javac destdir="build/standalone" classpath="service/wrapper.jar:libs/ojdbc14.jar">
+    <javac destdir="build/standalone" classpath="service/wrapper.jar:libs/ojdbc14.jar" debug="on">
       <src path="source/java"/>
+	  <src path="source/standalone-java"/>
       <include name="**/*.java"/>
       <exclude name="org/alfresco/jlan/server/filesys/db/oracle/**"/>
     </javac>
@@ -43,8 +45,9 @@
   
 	<target name="createJarDBOracle">
     <mkdir dir="build/standalone"/>
-    <javac destdir="build/standalone" classpath="service/wrapper.jar:libs/ojdbc14.jar">
+    <javac destdir="build/standalone" classpath="service/wrapper.jar:libs/ojdbc14.jar" debug="on">
       <src path="source/java"/>
+	  <src path="source/standalone-java"/>
       <include name="**/*.java"/>
     </javac>
     
