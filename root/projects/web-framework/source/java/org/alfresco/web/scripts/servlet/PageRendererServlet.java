@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.app.servlet;
+package org.alfresco.web.scripts.servlet;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -37,7 +37,6 @@ import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -50,32 +49,21 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.repo.avm.AVMNodeConverter;
-import org.alfresco.service.ServiceRegistry;
-import org.alfresco.service.cmr.avm.AVMNotFoundException;
-import org.alfresco.service.cmr.avm.AVMService;
-import org.alfresco.service.cmr.repository.NodeRef;
-import org.alfresco.service.cmr.security.AuthenticationService;
 import org.alfresco.util.URLEncoder;
-import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
+import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Match;
+import org.alfresco.web.scripts.PresentationTemplateProcessor;
+import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
 import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.WebScriptResponseImpl;
-import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.servlet.WebScriptServlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import freemarker.cache.TemplateLoader;
@@ -109,8 +97,8 @@ public class PageRendererServlet extends WebScriptServlet
    // timeout to reload default page cache from 
    private static final int DEFAULT_PAGE_CONFIG_CACHE_TIMEOUT = 30000;
    
-   private ServiceRegistry serviceRegistry;
-   private PageTemplateProcessor templateProcessor;
+   //private ServiceRegistry serviceRegistry;
+   private PresentationTemplateProcessor templateProcessor;
    private WebScriptTemplateLoader webscriptTemplateLoader;
    private Map<String, ExpiringValueCache<PageDefinition>> defaultPageDefMap = null;
    
@@ -121,8 +109,8 @@ public class PageRendererServlet extends WebScriptServlet
       
       // init beans
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-      serviceRegistry = (ServiceRegistry)context.getBean("serviceRegistry");
-      templateProcessor = (PageTemplateProcessor)context.getBean("pagerenderer.templateprocessor");
+      //serviceRegistry = (ServiceRegistry)context.getBean("serviceRegistry");
+      templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
       webscriptTemplateLoader = new WebScriptTemplateLoader();
       
       // TODO: Refactor to use web script stores
@@ -255,7 +243,9 @@ public class PageRendererServlet extends WebScriptServlet
          String templatePath, PageDefinition pageDef, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      NodeRef ref = AVMNodeConverter.ToNodeRef(-1, templatePath);
+      // TODO: convert template path to real template location
+      //NodeRef ref = AVMNodeConverter.ToNodeRef(-1, templatePath);
+      String ref = "";
       templateProcessor.process(ref.toString(), getModel(pageDef, req), res.getWriter());
    }
    
@@ -315,7 +305,7 @@ public class PageRendererServlet extends WebScriptServlet
    {
       PageDefinition pageDef = null;
       
-      AVMService avm = this.serviceRegistry.getAVMService();
+      /*AVMService avm = this.serviceRegistry.getAVMService();
       try
       {
          // parse page definition xml config file
@@ -423,7 +413,7 @@ public class PageRendererServlet extends WebScriptServlet
       {
          throw new AlfrescoRuntimeException("Unable to find 'page-definition.xml' for page '" + page +
                "' in expected location path: " + configPath, avmErr);
-      }
+      }*/
       
       return pageDef;
    }
@@ -436,9 +426,10 @@ public class PageRendererServlet extends WebScriptServlet
    private static void authenticate(ServletContext sc, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      WebApplicationContext wc = WebApplicationContextUtils.getRequiredWebApplicationContext(sc);
-      AuthenticationService auth = (AuthenticationService)wc.getBean("AuthenticationService");
-      auth.authenticate("admin", "admin".toCharArray());
+      // TODO: authenticate via call to Alfresco server
+      //WebApplicationContext wc = WebApplicationContextUtils.getRequiredWebApplicationContext(sc);
+      //AuthenticationService auth = (AuthenticationService)wc.getBean("AuthenticationService");
+      //auth.authenticate("admin", "admin".toCharArray());
       //auth.authenticateAsGuest();
    }
    
