@@ -45,7 +45,7 @@ import org.springframework.util.FileCopyUtils;
  */
 public class PresentationScriptProcessor implements ScriptProcessor
 {
-    private static final Log logger = LogFactory.getLog(PresentationTemplateProcessor.class);
+    private static final Log logger = LogFactory.getLog(PresentationScriptProcessor.class);
     private static WrapFactory wrapFactory = new PresentationWrapFactory(); 
     
     protected SearchPath searchPath;
