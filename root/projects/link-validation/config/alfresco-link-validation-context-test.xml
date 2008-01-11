@@ -28,7 +28,7 @@
     <!-- The remote authentication service. -->
     <bean id="authenticationService" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
-            <value>rmi://${avm.remote.host}:${avm.remote.port}/authentication</value>
+            <value>rmi://${alfresco.rmi.services.host}:${alfresco.rmi.services.port}/authentication</value>
         </property>
         <property name="serviceInterface">
             <value>org.alfresco.service.cmr.security.AuthenticationService</value>
@@ -95,7 +95,7 @@
     <!-- The underlying transport. -->
     <bean id="avmRemoteTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
-            <value>rmi://${avm.remote.host}:${avm.remote.port}/avm</value>
+            <value>rmi://${alfresco.rmi.services.host}:${alfresco.rmi.services.port}/avm</value>
         </property>
 
         <property name="serviceInterface">
@@ -379,7 +379,7 @@
     <!-- The underlying transport for AttributeService -->
     <bean id="attributeServiceTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
-            <value>rmi://${avm.remote.host}:${avm.remote.port}/attributes</value>
+            <value>rmi://${alfresco.rmi.services.host}:${alfresco.rmi.services.port}/attributes</value>
         </property>
         <property name="serviceInterface">
             <value>org.alfresco.service.cmr.remote.AttributeServiceTransport</value>
@@ -420,7 +420,7 @@
     <!-- The underlying transport for SyncService -->
     <bean id="avmSyncServiceTransportRaw" class="org.springframework.remoting.rmi.RmiProxyFactoryBean">
         <property name="serviceUrl">
-            <value>rmi://${avm.remote.host}:${avm.remote.port}/avmsync</value>
+            <value>rmi://${alfresco.rmi.services.host}:${alfresco.rmi.services.port}/avmsync</value>
         </property>
         <property name="serviceInterface">
             <value>org.alfresco.service.cmr.remote.AVMSyncServiceTransport</value>
@@ -499,12 +499,12 @@
 
         <!-- remote Alfresco server hostname -->
         <property name="alfrescoJmxRmiHost">
-            <value>${avm.remote.host}</value>
+            <value>${alfresco.rmi.services.host}</value>
         </property>
 
         <!-- remote Alfresco server JMX RMI port -->
         <property name="alfrescoJmxRmiPort">
-            <value>${avm.remote.port}</value>
+            <value>${alfresco.rmi.services.port}</value>
         </property>
 
         <!-- retry interval when network connections fail (in milliseconds)  -->

@@ -218,7 +218,7 @@
 
         <!-- remote Alfresco server hostname -->
         <property name="alfrescoJmxRmiHost">
-            <value>${avm.remote.host}</value>
+            <value>${alfresco.rmi.services.host}</value>
         </property>
 
         <!-- remote Alfresco server JMX RMI port -->
