@@ -26,7 +26,6 @@ package org.alfresco.module.phpIntegration.lib;
 
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
-import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.repository.ContentReader;
 import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;

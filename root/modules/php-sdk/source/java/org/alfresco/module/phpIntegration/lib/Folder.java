@@ -88,7 +88,7 @@ public class Folder extends Node
      */
     public Folder(Session session, Store store, String id, String type)
     {
-        super(session, store, id, type);
+        super(session, store, id, type);        
     }
     
     /**

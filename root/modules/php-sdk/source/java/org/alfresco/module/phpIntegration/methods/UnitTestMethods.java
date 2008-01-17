@@ -70,19 +70,27 @@ public class UnitTestMethods extends PHPMethodExtension
         }
     }
     
-    public void assertTrue(boolean value)
+    public void assertTrue(boolean value, @Optional("") String message)
     {
         if (value == false)
         {
-            throw new PHPProcessorException("Value is not True");
+            if (message == null)
+            {
+                message = "Value is not True";
+            }
+            throw new PHPProcessorException(message);
         }
     }
     
-    public void assertFalse(boolean value)
+    public void assertFalse(boolean value, @Optional("") String message)
     {
         if (value == true)
         {
-            throw new PHPProcessorException("Value is not False");
+            if (message == null)
+            {
+                message = "Value is not False";
+            }
+            throw new PHPProcessorException(message);
         }
     }
     

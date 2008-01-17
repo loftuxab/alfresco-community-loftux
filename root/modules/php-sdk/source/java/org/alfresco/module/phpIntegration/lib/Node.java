@@ -31,10 +31,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.PHPProcessor;
 import org.alfresco.module.phpIntegration.PHPProcessorException;
-import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.cmr.dictionary.PropertyDefinition;
 import org.alfresco.service.cmr.repository.AssociationRef;
@@ -523,47 +521,41 @@ public class Node implements ScriptObject
      * @param associationName   the association name
      * @return Node             the newly create node     
      */
-    public Node createChild(String type, String associationType, String associationName)
+    public Node createChild(final String origType, final String origAssociationType, final String origAssociationName)
     {
-        // Convert to full names
-        type = this.session.getNamespaceMap().getFullName(type);
-        associationType = this.session.getNamespaceMap().getFullName(associationType);
-        associationName = this.session.getNamespaceMap().getFullName(associationName);
-        
-        // Check the children have been populates
-        populateChildren();
-        
-        // Create the new node
-        String id = NEW_NODE_DELIM + GUID.generate();
-        
-        // TODO Need to generalise this at some point
-        Node newNode = null;
-        if (this.session.getServiceRegistry().getDictionaryService().isSubClass(QName.createQName(type), ContentModel.TYPE_CONTENT) == true)
+        return this.session.doSessionWork(new SessionWork<Node>()
         {
-            newNode = new File(this.session, this.getStore(), id, type);
-        }
-        else if (this.session.getServiceRegistry().getDictionaryService().isSubClass(QName.createQName(type), ContentModel.TYPE_FOLDER) == true)
-        {
-            newNode = new Folder(this.session, this.getStore(), id, type);
-        }
-        else
-        {
-            newNode = new Node(this.session, this.getStore(), id, type);
-        }
+            public Node doWork() 
+            {
+                // Convert to full names
+                String type = Node.this.session.getNamespaceMap().getFullName(origType);
+                String associationType = Node.this.session.getNamespaceMap().getFullName(origAssociationType);
+                String associationName = Node.this.session.getNamespaceMap().getFullName(origAssociationName);
                 
-        // Create the child association object
-        ChildAssociation childAssociation = new ChildAssociation(this, newNode, associationType, associationName, true, 0);
-        
-        // Set the parent array of the node node        
-        newNode.parents = new ArrayList<ChildAssociation>(5);
-        newNode.primaryParent = childAssociation;
-        newNode.parents.add(childAssociation);
-        
-        // Add as a child of the parent node
-        this.children.add(childAssociation);
-        this.addedChildren.add(childAssociation);
-        
-        return newNode;
+                // Check the children have been populates
+                populateChildren();
+                
+                // Create the new node
+                String id = NEW_NODE_DELIM + GUID.generate();
+                
+                // Use the node factory to create the node of the correct type
+                Node newNode = Node.this.session.getNodeFactory().createNode(Node.this.session, getStore(), id, type);
+                        
+                // Create the child association object
+                ChildAssociation childAssociation = new ChildAssociation(Node.this, newNode, associationType, associationName, true, 0);
+                
+                // Set the parent array of the node node        
+                newNode.parents = new ArrayList<ChildAssociation>(5);
+                newNode.primaryParent = childAssociation;
+                newNode.parents.add(childAssociation);
+                
+                // Add as a child of the parent node
+                Node.this.children.add(childAssociation);
+                Node.this.addedChildren.add(childAssociation);
+                
+                return newNode;
+            }
+        });
     }
     
     /**

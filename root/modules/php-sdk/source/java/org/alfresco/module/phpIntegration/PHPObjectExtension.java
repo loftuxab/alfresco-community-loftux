@@ -24,7 +24,10 @@
  */
 package org.alfresco.module.phpIntegration;
 
+import org.alfresco.module.phpIntegration.lib.Node;
+import org.alfresco.module.phpIntegration.lib.NodeFactory;
 import org.alfresco.service.cmr.repository.ProcessorExtension;
+import org.alfresco.service.namespace.QName;
 
 import com.caucho.quercus.module.AbstractQuercusModule;
 
@@ -43,6 +46,12 @@ public class PHPObjectExtension extends AbstractQuercusModule implements Process
     
     /** The extension implementation class */
     protected String extensionClass;
+    
+    /** The name of the associated node data dictionary type */
+    protected String nodeType;
+    
+    /** The node factory to register the node type with */
+    protected NodeFactory nodeFactory;
     
     /**
      * Sets the extension name
@@ -83,6 +92,26 @@ public class PHPObjectExtension extends AbstractQuercusModule implements Process
     }
     
     /**
+     * Sets the node type if applicable
+     * 
+     * @param nodeType  the node type
+     */
+    public void setNodeType(String nodeType)
+    {
+        this.nodeType = nodeType;
+    }
+    
+    /**
+     * Sets the node factory
+     * 
+     * @param nodeFactory   the node factory
+     */
+    public void setNodeFactory(NodeFactory nodeFactory)
+    {
+        this.nodeFactory = nodeFactory;
+    }
+    
+    /**
      * Sets the PHP Processor
      * 
      * @param phpProcessor  the PHP processor
@@ -95,8 +124,24 @@ public class PHPObjectExtension extends AbstractQuercusModule implements Process
     /**
      * Register the method extension with the PHP processor.
      */
+    @SuppressWarnings("unchecked")
     public void register()
     {
        this.phpProcessor.registerProcessorExtension(this);
+       
+       // Register the node type if specified
+       if (this.nodeType != null)
+       {
+           try
+           {
+               QName type = QName.createQName(this.nodeType);
+               Class clazz = Class.forName(this.extensionClass);           
+               this.nodeFactory.addNodeType(type, clazz);
+           }
+           catch (ClassNotFoundException exception)
+           {
+               throw new PHPProcessorException("Unable to load node type (" + this.extensionClass + ")", exception);
+           }
+       }
     }      
 }

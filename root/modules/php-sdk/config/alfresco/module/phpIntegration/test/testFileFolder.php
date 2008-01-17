@@ -3,8 +3,8 @@
 $file = $_ALF_MODEL["file"];
 $folder = $_ALF_MODEL["folder"];
 
-assertTrue($file instanceof File);
-assertTrue($folder instanceof Folder);
+assertTrue($file instanceof File, "$file is not a File");
+assertTrue($folder instanceof Folder, "$folder is not a folder");
 
 // Check the file content properties
 assertEquals("UTF-8", $file->encoding);

@@ -22,6 +22,18 @@
     	<property name="scriptService">
     		<ref bean="scriptService"/>
     	</property>   
+    	<property name="nodeFactory">
+    		<ref bean="phpNodeFactory"/>
+    	</property>  
+    </bean>
+    
+    <bean id="phpNodeFactory" class="org.alfresco.module.phpIntegration.lib.NodeFactory">
+    	<property name="dictionaryService">
+    		<ref bean="DictionaryService"/>
+    	</property>
+    	<property name="nodeService">
+    		<ref bean="NodeService"/>
+    	</property>
     </bean>
     
     <!-- Object Extensions -->
@@ -29,7 +41,10 @@
     <bean id="phpObjectExtension" abstract="true" init-method="register">
     	<property name="phpProcessor">
     		<ref bean="phpProcessor"/>
-    	</property>     	 
+    	</property>    
+    	<property name="nodeFactory">
+    		<ref bean="phpNodeFactory"/>
+    	</property> 	 
     </bean>
     
     <bean id="phpRepository" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
@@ -128,7 +143,10 @@
     	</property> 
     	<property name="extensionClass">
     		<value>org.alfresco.module.phpIntegration.lib.File</value>
-    	</property>    	
+    	</property> 
+    	<property name="nodeType">
+    		<value>{http://www.alfresco.org/model/content/1.0}content</value>
+    	</property>   	
     </bean>
     
     <bean id="phpFolder" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
@@ -137,6 +155,9 @@
     	</property> 
     	<property name="extensionClass">
     		<value>org.alfresco.module.phpIntegration.lib.Folder</value>
+    	</property>  
+    	<property name="nodeType">
+    		<value>{http://www.alfresco.org/model/content/1.0}folder</value>
     	</property>    	
     </bean>    
     

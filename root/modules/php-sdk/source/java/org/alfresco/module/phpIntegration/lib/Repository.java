@@ -49,6 +49,9 @@ public class Repository implements ScriptObject
     /** The service registry */
     private ServiceRegistry serviceRegistry;
     
+    /** The node factory */
+    private NodeFactory nodeFactory;
+    
     /**
      *  The connection URL (this really doesn't have a lot of meaning for the local PHP 
      * processor but is kept for API consistency)
@@ -68,10 +71,12 @@ public class Repository implements ScriptObject
             ServletContext servletContext = env.getRequest().getSession().getServletContext();
             ApplicationContext applicationContext = WebApplicationContextUtils.getWebApplicationContext(servletContext);
             this.serviceRegistry = (ServiceRegistry)applicationContext.getBean("ServiceRegistry");
+            this.nodeFactory = (NodeFactory)applicationContext.getBean("phpNodeFactory");
         }
         else
         {
             this.serviceRegistry = (ServiceRegistry)env.getQuercus().getSpecial(PHPProcessor.KEY_SERVICE_REGISTRY);
+            this.nodeFactory = (NodeFactory)env.getQuercus().getSpecial(PHPProcessor.KEY_NODE_FACTORY);
         }
         
         // Set the connectionURL
@@ -84,6 +89,16 @@ public class Repository implements ScriptObject
     public String getScriptObjectName()
     {
         return SCRIPT_OBJECT_NAME;
+    }
+    
+    /*package*/ ServiceRegistry getServiceRegistry()
+    {
+        return this.serviceRegistry;
+    }
+    
+    /*package*/ NodeFactory getNodeFactory()
+    {
+        return this.nodeFactory;
     }
     
     /**
@@ -99,7 +114,7 @@ public class Repository implements ScriptObject
     		ticket = this.serviceRegistry.getAuthenticationService().getCurrentTicket();
     	}
     	
-        return new Session(this.serviceRegistry, ticket);
+        return new Session(this, ticket);
     }
     
     /**

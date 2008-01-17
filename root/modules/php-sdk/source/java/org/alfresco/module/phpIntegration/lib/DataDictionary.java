@@ -24,7 +24,6 @@
  */
 package org.alfresco.module.phpIntegration.lib;
 
-import org.alfresco.module.phpIntegration.lib.Session.SessionWork;
 import org.alfresco.service.cmr.dictionary.DictionaryService;
 import org.alfresco.service.namespace.QName;
 
