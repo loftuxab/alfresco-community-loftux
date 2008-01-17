@@ -84,7 +84,7 @@ public class WebScriptServletRuntime extends AbstractRuntime
     {
         // Is this an overloaded POST request?
         String method = req.getMethod();
-        if (method.equalsIgnoreCase("post"))
+        if (method.equalsIgnoreCase("get") || method.equalsIgnoreCase("post"))
         {
             boolean overloadParam = false;
             String overload = req.getHeader("X-HTTP-Method-Override");
