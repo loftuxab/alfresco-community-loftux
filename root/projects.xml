@@ -1973,6 +1973,115 @@
    </target>
    
    <!-- ******************************** -->
+   <!-- ** MediaWiki Integration Project ** -->
+   <!-- ******************************** -->
+
+   <target name="incremental-mediawiki" 
+           description="Performs an incremental build of the mediawiki project"
+           depends="package-mediawiki" />
+
+   <target name="build-mediawiki"
+           description="Performs a clean build of the mediawiki project"
+           depends="clean-mediawiki, incremental-mediawiki" />
+
+   <target name="clean-mediawiki"
+           description="Cleans the mediawiki project"
+           depends="init">
+      <clean projectdir="${dir.module.mediawiki}" />
+   </target>
+
+   <target name="compile-mediawiki"
+           description="Compiles the mediawiki project"
+           depends="init">
+      <compile-java projectdir="${dir.module.mediawiki}" />
+   </target>
+
+   <target name="package-mediawiki"
+           description="Packages the mediawiki project"
+           depends="package-mediawiki-war, deploy-tomcat" />
+
+   <!--<target name="package-php-lib"
+           description="Package the PHP client library"
+           depends="init">
+      <echo>Packaging Alfresco PHP library</echo>
+      <mkdir dir="${dir.module.php.dist}" />
+      <zip destfile="${dir.module.php.dist}/alfresco-php-library.zip">
+         <zipfileset dir="${dir.module.php.web.php}"
+                     prefix="alfresco-php-library"/>
+      </zip>
+      <tar destfile="${dir.module.php.dist}/alfresco-php-library.tar.gz"
+           longfile="gnu"
+           compression="gzip">
+         <tarfileset dir="${dir.module.php}/source/php/remote"
+                     prefix="alfresco-php-library"/>
+      </tar>
+   </target>  -->
+
+   <target name="package-mediawiki-jar"
+           description="Packages the JAR file for the mediawiki project"
+           depends="compile-mediawiki">
+      <mkdir dir="${dir.module.mediawiki.dist}" />
+      <jar jarfile="${dir.module.mediawiki.dist}/${file.name.jar.mediawiki}"
+           basedir="${dir.module.mediawiki.classes}" />
+   </target>
+
+   <target name="package-mediawiki-war"
+           description="Packages the WAR file installing the mediawiki integration module"
+           depends="package-mediawiki-module">
+      <echo>Installing mediawiki integration into WAR...</echo>
+      <install-amp ampfile="${dir.module.mediawiki.dist}/${file.name.amp.mediawiki}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-mediawiki-module"
+           description="Packages the mediawiki Integration module into an AMP"
+           depends="package-mediawiki-jar">
+      <zip destfile="${dir.module.mediawiki.dist}/${file.name.amp.mediawiki}"
+           update="true">
+         <zipfileset file="${dir.module.mediawiki.property}/module.properties"/>
+         <zipfileset file="${dir.module.mediawiki.dist}/${file.name.jar.mediawiki}"
+                     prefix="lib"/>
+         <zipfileset dir="${dir.module.mediawiki.config}"
+                     prefix="config">
+            <exclude name="**/module.properties"/>
+         </zipfileset>
+         <!-- Copy mediaWiki code into the AMP -->
+	 <zipfileset dir="${dir.module.mediawiki.web.php}/mediawiki"
+                     prefix="web/php/wiki"/>
+         <!-- Copy the extension into the correct place -->
+         <zipfileset dir="${dir.module.mediawiki.web.php}/alfresco-integration"
+                     prefix="web/php/wiki/extensions/alfresco-integration">
+            <exclude name="LocalSettings.php"/>
+         </zipfileset>
+         <!-- Copy the localSetting.php file into the correct location -->
+         <zipfileset file="${dir.module.mediawiki.web.php}/alfresco-integration/LocalSettings.php"
+                     prefix="web/php/wiki"/>
+      </zip>
+   </target>
+
+   <target name="test-mediawiki"
+           description="Runs the tests for the mediawiki project"
+           depends="compile-mediawiki">
+      <run-tests projectdir="${dir.module.mediawiki}" />
+   </target>
+
+   <target name="generate-javadocs-mediawiki"
+           description="Generates the JavaDocs for the mediawiki project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco MediaWiki Extension"
+                         windowtitle="MediaWiki Integration"
+                         projectdir="${dir.module.mediawiki}"/>
+   </target>
+   
+   <!-- <target name="refresh-mediawiki"
+   	     description="Refreshes the media wiki integration files"
+   	     depends="init">
+   	<copy todir="${dir.mediawiki}/extensions">
+      	<fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
+      </copy>
+   </target> -->
+   
+   <!-- ******************************** -->
    <!-- ** Knowledge Base Project ** -->
    <!-- ******************************** -->
 
