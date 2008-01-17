@@ -10,7 +10,7 @@ set ALF_HOME_URI=%ALF_HOME:\=/%
 set CATALINA_HOME=%ALF_HOME%tomcat
 
 rem Set any default JVM options
-set JAVA_OPTS=-Xms128m -Xmx512m -Xss64k -server
+set JAVA_OPTS=-Xms128m -Xmx512m -Xss96k -server
 rem The following options are only required for Sun JVMs prior to 1.5 update 8
 set JAVA_OPTS=%JAVA_OPTS% -XX:CompileCommand=exclude,org/apache/lucene/index/IndexReader$1,doBody -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeIndexes -XX:CompileCommand=exclude,org/alfresco/repo/search/impl/lucene/index/IndexInfo$Merger,mergeDeletions
 
