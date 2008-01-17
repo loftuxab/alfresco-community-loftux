@@ -34,6 +34,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.model.ContentModel;
 import org.alfresco.module.phpIntegration.lib.Node;
+import org.alfresco.module.phpIntegration.lib.NodeFactory;
 import org.alfresco.module.phpIntegration.lib.Repository;
 import org.alfresco.module.phpIntegration.lib.ScriptObject;
 import org.alfresco.module.phpIntegration.lib.Session;
@@ -85,9 +86,13 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     
     /** Key used to store a reference to the service registry in the Quercus engine */
     public static final String KEY_SERVICE_REGISTRY = "ServiceRegistry";
+    public static final String KEY_NODE_FACTORY = "NodeFactory";
     
     /** Quercus engine */
     private Quercus quercus; 
+    
+    /** Node Factory */
+    private NodeFactory nodeFactory;
     
     /**
      * Constructor
@@ -101,6 +106,11 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     	this.quercus.setServerEnv(PHPProcessor.ALF_AVAILABLE, "true");
     }
         
+    public void setNodeFactory(NodeFactory nodeFactory)
+    {
+        this.nodeFactory = nodeFactory;
+    }
+    
     /**
      * @see org.alfresco.repo.processor.BaseProcessor#register()
      */
@@ -109,6 +119,7 @@ public class PHPProcessor extends BaseProcessor implements TemplateProcessor, Sc
     {
         // Add the service registry as a special value
         this.quercus.setSpecial(KEY_SERVICE_REGISTRY, this.services);
+        this.quercus.setSpecial(KEY_NODE_FACTORY, this.nodeFactory);
         
         // Call super class
         super.register();

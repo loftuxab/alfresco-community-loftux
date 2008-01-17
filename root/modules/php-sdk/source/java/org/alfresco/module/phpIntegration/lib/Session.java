@@ -30,7 +30,6 @@ import java.util.Map;
 
 import net.sf.acegisecurity.Authentication;
 
-import org.alfresco.model.ContentModel;
 import org.alfresco.repo.security.authentication.AuthenticationUtil;
 import org.alfresco.repo.transaction.RetryingTransactionHelper.RetryingTransactionCallback;
 import org.alfresco.service.ServiceRegistry;
@@ -40,7 +39,6 @@ import org.alfresco.service.cmr.repository.StoreRef;
 import org.alfresco.service.cmr.search.ResultSet;
 import org.alfresco.service.cmr.search.SearchService;
 import org.alfresco.service.cmr.security.AuthenticationService;
-import org.alfresco.service.namespace.QName;
 import org.alfresco.service.transaction.TransactionService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,9 +57,9 @@ public class Session implements ScriptObject
     
     /** Script object name */
     private static final String SCRIPT_OBJECT_NAME = "Session";
-    
-    /** Service registry */
-    private ServiceRegistry serviceRegistry;
+
+    /** Repository */
+    private Repository repository;
     
     /** The ticket */
     private String ticket;
@@ -78,12 +76,12 @@ public class Session implements ScriptObject
     /**
      * Constructor
      * 
-     * @param serviceRegistry   the service registry
+     * @param repository        the repository
      * @param ticket            the authentication context within which this session is operating
      */
-    /*package*/ Session(ServiceRegistry serviceRegistry, String ticket)
+    /*package*/ Session(Repository repository, String ticket)
     {
-        this.serviceRegistry = serviceRegistry;
+        this.repository = repository;
         this.ticket = ticket;
         this.namespaceMap = new NamespaceMap(this);
         this.dataDictionary = new DataDictionary(this);
@@ -108,6 +106,11 @@ public class Session implements ScriptObject
         return this.ticket;
     }
     
+    public Repository getRepository()
+    {
+        return this.repository;
+    }
+    
     /**
      * Get the service registry
      * 
@@ -115,8 +118,13 @@ public class Session implements ScriptObject
      */
     /*package*/ ServiceRegistry getServiceRegistry() 
     {
-		return serviceRegistry;
+		return this.repository.getServiceRegistry();
 	}
+    
+    /*package*/ NodeFactory getNodeFactory()
+    {
+        return this.repository.getNodeFactory();
+    }
     
     /**
      * Get the namespace map
@@ -150,7 +158,7 @@ public class Session implements ScriptObject
 			public Store[] doWork() 
 			{
 				// Get the node service
-		        NodeService nodeService = Session.this.serviceRegistry.getNodeService();
+		        NodeService nodeService = getServiceRegistry().getNodeService();
 		        
 		        // Get the stores
 		        List<StoreRef> storeRefs = nodeService.getStores();
@@ -236,22 +244,10 @@ public class Session implements ScriptObject
 		        if (node == null)
 		        {        
 		            // Check for the existance of the node        
-		            if (Session.this.serviceRegistry.getNodeService().exists(nodeRef) == true)
+		            if (getServiceRegistry().getNodeService().exists(nodeRef) == true)
 		            {
-		                // Get the nodes type
-		                QName type = Session.this.serviceRegistry.getNodeService().getType(nodeRef);
-		                if (Session.this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_CONTENT) == true)
-		                {
-		                    node = new File(Session.this, nodeRef);
-		                }
-		                else if (Session.this.serviceRegistry.getDictionaryService().isSubClass(type, ContentModel.TYPE_FOLDER) == true)
-		                {
-		                    node = new Folder(Session.this, nodeRef);
-		                }
-		                else
-		                {
-		                    node = new Node(Session.this, nodeRef);
-		                }
+		                // Use the node factory to create the node
+		                node = getNodeFactory().createNode(Session.this, nodeRef);
 		            }
 		        }
 		        
@@ -308,7 +304,7 @@ public class Session implements ScriptObject
 		        Node[] result = null;
 		        
 		        // Get the search service
-		        SearchService searchService = Session.this.serviceRegistry.getSearchService();
+		        SearchService searchService = getServiceRegistry().getSearchService();
 		        
 		        // Do the search
 		        ResultSet resultSet = searchService.query(store.getStoreRef(), language, statement);
@@ -375,13 +371,13 @@ public class Session implements ScriptObject
      * @param work	the work 
      * @return R	the result of the work
      */
-    /*package*/ <R> R doSessionWork(final SessionWork<R> work)
+    public <R> R doSessionWork(final SessionWork<R> work)
     {
     	R result = null;
     	
     	// Get the required services
-    	AuthenticationService authenticationService = this.serviceRegistry.getAuthenticationService();
-    	TransactionService transactionService = this.serviceRegistry.getTransactionService();
+    	AuthenticationService authenticationService = getServiceRegistry().getAuthenticationService();
+    	TransactionService transactionService = getServiceRegistry().getTransactionService();
     	
     	// Get the current authentication context
     	Authentication authentication = AuthenticationUtil.getCurrentAuthentication();    	
@@ -407,20 +403,5 @@ public class Session implements ScriptObject
         }
     	
     	return result;    	
-    }
-    
-    /**
-     * Session work interface
-     * 
-     *  @param <Result>		the result type
-     */
-    /*package*/ interface SessionWork<Result>
-    {
-        /**
-         * Method containing the work to be done against the session context
-         * 
-         * @return Return the result of the operation
-         */
-        Result doWork();
     }
 }
