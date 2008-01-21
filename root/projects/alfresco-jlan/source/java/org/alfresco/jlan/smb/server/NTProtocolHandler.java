@@ -2198,8 +2198,16 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
         //  Set the file action response
 
-        if (FileAction.truncateExistingFile(openFunc))
+        if (FileAction.truncateExistingFile(openFunc)) {
+        	
+          // Truncate the existing file
+        
+       	  disk.truncateFile(m_sess, conn, netFile, 0L);
+
+          // Set the response
+        	
           respAction = FileAction.FileTruncated;
+        }
         else
           respAction = FileAction.FileExisted;
       }
