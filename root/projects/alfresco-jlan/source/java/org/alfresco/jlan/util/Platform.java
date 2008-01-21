@@ -38,7 +38,7 @@ public class Platform {
         _platformType = Type.WINDOWS;
       else if (osName.equalsIgnoreCase("Linux"))
         _platformType = Type.LINUX;
-      else if (osName.startsWith("Mac OS X"))
+      else if (osName.startsWith("Mac OS X") || osName.equals( "Darwin"))
         _platformType = Type.MACOSX;
       else if (osName.startsWith("Solaris") || osName.startsWith("SunOS"))
         _platformType = Type.SOLARIS;
