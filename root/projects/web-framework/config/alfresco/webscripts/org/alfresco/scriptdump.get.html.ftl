@@ -16,7 +16,7 @@
      <span class="mainSubTitle">Script Properties</span>
      <tr><td>Id:</td><td>${script.id}</td></tr>
      <tr><td>Short Name:</td><td>${script.shortName}</td></tr>
-     <tr><td>Description:</td><td>${script.description}</td></tr>
+     <tr><td>Description:</td><td>${script.description!"[undefined]"}</td></tr>
      <tr><td>Authentication:</td><td>${script.requiredAuthentication}</td></tr>
      <tr><td>Transaction:</td><td>${script.requiredTransaction}</td></tr>
      <tr><td>Method:</td><td>${script.method}</td></tr>

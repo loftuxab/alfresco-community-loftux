@@ -55,4 +55,11 @@ public interface ScriptContent
      * @return  path
      */
     public String getPath();
+    
+    /**
+     * Gets path description
+     * 
+     * @return  human readable version of path
+     */
+    public String getPathDescription();
 }

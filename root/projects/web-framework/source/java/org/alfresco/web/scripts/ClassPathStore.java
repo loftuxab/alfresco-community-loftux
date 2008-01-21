@@ -25,7 +25,6 @@
 package org.alfresco.web.scripts;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -38,12 +37,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
-import freemarker.cache.FileTemplateLoader;
+import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.TemplateLoader;
 
 
@@ -54,10 +53,16 @@ import freemarker.cache.TemplateLoader;
  */
 public class ClassPathStore implements Store
 {
+    // Logger
+//    private static final Log logger = LogFactory.getLog(ClassPathStore.class);
+    
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     protected boolean mustExist = false;
     protected String classPath;
-    protected File fileDir;
+    protected Resource storeResource;
+    protected String storeResourcePath;
+    protected int storeResourcePathLength;
+    protected File storeDir;
 
     
     /**
@@ -80,7 +85,8 @@ public class ClassPathStore implements Store
      */
     public void setClassPath(String classPath)
     {
-        this.classPath = classPath;
+        String cleanClassPath = (classPath.endsWith("/")) ? classPath.substring(0, classPath.length() -1) : classPath;
+        this.classPath = cleanClassPath;
     }
 
     /* (non-Javadoc)
@@ -88,34 +94,63 @@ public class ClassPathStore implements Store
      */
     public void init()
     {
-        ClassPathResource resource = new ClassPathResource(classPath);
-        if (resource.exists())
+        try
         {
-            try
+            // NOTE: Locate root of web script store
+            // NOTE: Following awkward approach is used to mirror lookup of web scripts within store.  This
+            //       ensures root paths match.
+            Resource rootResource = null;
+            Resource[] resources = resolver.getResources("classpath*:" + classPath + "*");
+            for (Resource resource : resources)
             {
-				fileDir = resource.getFile();
-			}
-            catch (IOException e)
+                String externalForm = resource.getURL().toExternalForm();
+                if (externalForm.endsWith(classPath) || externalForm.endsWith(classPath + "/"))
+                {
+                    rootResource = resource;
+                    break;
+                }
+            }
+            
+            if (rootResource != null && rootResource.exists())
             {
-            	throw new WebScriptException("Failed to initialise store " + classPath, e);
-			}
+                storeResource = rootResource;
+                storeResourcePath = storeResource.getURL().toExternalForm();
+                String cleanStoreResourcePath = (storeResourcePath.endsWith("/")) ? storeResourcePath.substring(0, storeResourcePath.length() -1) : storeResourcePath;
+                storeResourcePathLength = cleanStoreResourcePath.length();
+    //            if (logger.isDebugEnabled())
+    //                logger.debug("Provided classpath: " + classPath + " , storeRootPath: " + storeResourcePath + ", storeRootPathLength: " + storeResourcePathLength);
+                
+                try
+                {
+                    // retrieve file system directory
+                    storeDir = resources[0].getFile();
+                }
+                catch(FileNotFoundException e)
+                {
+                    // NOTE: this means that installation of web scripts is not possible
+                }
+            }
+            else if (mustExist)
+            {
+                throw new WebScriptException("Web Script Store classpath:" + classPath + " must exist; it was not found");
+            }
         }
-        else if (mustExist)
+        catch(IOException e)
         {
-            throw new WebScriptException("Web Script Store classpath:" + classPath + " must exist; it was not found");
+            throw new WebScriptException("Failed to initialise Web Script Store classpath: " + classPath, e);
         }
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#exists()
+     * @see org.alfresco.web.scripts.WebScriptStore#exists()
      */
     public boolean exists()
     {
-        return (fileDir != null);
+        return (storeResource != null);
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getBasePath()
+     * @see org.alfresco.web.scripts.WebScriptStore#getBasePath()
      */
     public String getBasePath()
     {
@@ -123,7 +158,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
+     * @see org.alfresco.web.scripts.WebScriptStore#getDescriptionDocumentPaths()
      */
     public String[] getDescriptionDocumentPaths()
     {
@@ -133,14 +168,15 @@ public class ClassPathStore implements Store
         {
             List<String> documentPaths = new ArrayList<String>();
             Resource[] resources = resolver.getResources("classpath*:" + classPath + "/**/*.desc.xml");
-            int filePathLength = fileDir.getAbsolutePath().length() +1;
             for (Resource resource : resources)
             {
-                if (resource instanceof FileSystemResource)
+                if (resource.getURL().toExternalForm().startsWith(storeResourcePath))
                 {
-                    String resourcePath = resource.getFile().getAbsolutePath();
-                    String documentPath = resourcePath.substring(filePathLength);
+                    String resourcePath = resource.getURL().toExternalForm();
+                    String documentPath = resourcePath.substring(storeResourcePathLength +1);
                     documentPath = documentPath.replace('\\', '/');
+    //                if (logger.isDebugEnabled())
+    //                    logger.debug("Document resource path: " + resourcePath + " , document path: " + documentPath);
                     documentPaths.add(documentPath);
                 }
             }
@@ -156,7 +192,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
+     * @see org.alfresco.web.scripts.WebScriptStore#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
@@ -164,16 +200,18 @@ public class ClassPathStore implements Store
 
         try
         {
-            int filePathLength = fileDir.getAbsolutePath().length() +1;
             List<String> documentPaths = new ArrayList<String>();
             String scriptPaths = script.getDescription().getId() + ".*";
             Resource[] resources = resolver.getResources("classpath*:" + classPath + "/" + scriptPaths);
             for (Resource resource : resources)
             {
-                if (resource instanceof FileSystemResource)
+                if (resource.getURL().toExternalForm().startsWith(storeResourcePath))
                 {
-                    String documentPath = resource.getFile().getAbsolutePath().substring(filePathLength);
+                    String resourcePath = resource.getURL().toExternalForm();
+                    String documentPath = resourcePath.substring(storeResourcePathLength +1);
                     documentPath = documentPath.replace('\\', '/');
+    //                if (logger.isDebugEnabled())
+    //                    logger.debug("Script resource path: " + resourcePath + " , script path: " + documentPath);
                     documentPaths.add(documentPath);
                 }
             }
@@ -189,34 +227,45 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#hasDocument(java.lang.String)
+     * @see org.alfresco.web.scripts.WebScriptStore#hasDocument(java.lang.String)
      */
     public boolean hasDocument(String documentPath)
     {
-        File document = new File(fileDir, documentPath);
-        return document.exists();
+        boolean exists = false;
+        try
+        {
+            Resource document = createRelative(storeResource, documentPath);
+            exists = document.exists();
+        }
+        catch(IOException e)
+        {
+        }
+        return exists;
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getDocument(java.lang.String)
+     * @see org.alfresco.web.scripts.WebScriptStore#getDescriptionDocument(java.lang.String)
      */
     public InputStream getDocument(String documentPath)      
         throws IOException
     {
-        File document = new File(fileDir, documentPath);
+        Resource document = createRelative(storeResource, documentPath);
+//        if (logger.isDebugEnabled())
+//            logger.debug("getDocument: documentPath: " + documentPath + " , storePath: " + document.getURL().toExternalForm());
+        
         if (!document.exists())
         {
             throw new IOException("Document " + documentPath + " does not exist within store " + getBasePath());
         }
-        return new FileInputStream(document);
+        return document.getInputStream();
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#createDocument(java.lang.String, java.lang.String)
+     * @see org.alfresco.web.scripts.WebScriptStore#createDocument(java.lang.String, java.lang.String)
      */
     public void createDocument(String documentPath, String content) throws IOException
     {
-        File document = new File(fileDir, documentPath);
+        File document = new File(storeDir, documentPath);
         
         // create directory
         File path = document.getParentFile();
@@ -242,29 +291,44 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getTemplateLoader()
+     * @see org.alfresco.web.scripts.WebScriptStore#getTemplateLoader()
      */
     public TemplateLoader getTemplateLoader()
     {
-        FileTemplateLoader loader = null;
-        try
-        {
-            loader = new FileTemplateLoader(fileDir);
-        }
-        catch (IOException e)
-        {
-            // Note: Can't establish loader, so return null
-        }
-        return loader;
+        // ensure classpath starts and ends with /
+        String templateClassPath = (classPath.charAt(0) == '/') ? classPath : "/" + classPath;
+        return new ClassTemplateLoader(ClassPathStore.class, templateClassPath);
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getScriptLoader()
+     * @see org.alfresco.web.scripts.WebScriptStore#getScriptLoader()
      */
     public ScriptLoader getScriptLoader()
     {
         return new ClassPathScriptLoader();
     }        
+
+    /**
+     * Construct a relative resource
+     * 
+     * @param resource  root resource
+     * @param path  relative path
+     * @return  relative resource
+     * @throws IOException
+     */
+    private Resource createRelative(Resource resource, String path)
+        throws IOException
+    {
+        if (storeResourcePath.endsWith("/"))
+        {
+            return resource.createRelative(path);
+        }
+        
+        int prefixIdx = storeResourcePath.lastIndexOf("/");
+        String prefix = (prefixIdx != -1) ? storeResourcePath.substring(prefixIdx) : "";
+        return resource.createRelative(prefix + "/" + path);
+    }
+
     
     /**
      * Class path based script loader
@@ -280,10 +344,16 @@ public class ClassPathStore implements Store
         public ScriptContent getScript(String path)
         {
             ScriptContent location = null;
-            File scriptPath = new File(fileDir, path);
-            if (scriptPath.exists())
+            try
             {
-                location = new ClassPathScriptLocation(scriptPath);
+                Resource script = createRelative(storeResource, path);
+                if (script.exists())
+                {
+                    location = new ClassPathScriptLocation(storeResource, path, script);
+                }
+            }
+            catch(IOException e)
+            {
             }
             return location;
         }
@@ -296,15 +366,21 @@ public class ClassPathStore implements Store
      */
     private static class ClassPathScriptLocation implements ScriptContent
     {
-        private File location;
+        private Resource store;
+        private String path;
+        private Resource location;
 
         /**
          * Construct
          * 
+         * @param store
+         * @param path
          * @param location
          */
-        public ClassPathScriptLocation(File location)
+        public ClassPathScriptLocation(Resource store, String path, Resource location)
         {
+            this.store = store;
+            this.path = path;
             this.location = location;
         }
         
@@ -315,11 +391,11 @@ public class ClassPathStore implements Store
         {
             try
             {
-                return new FileInputStream(location);
+                return location.getInputStream();
             }
-            catch (FileNotFoundException e)
+            catch (IOException e)
             {
-                throw new WebScriptException("Unable to retrieve input stream for script " + location.getAbsolutePath());
+                throw new WebScriptException("Unable to retrieve input stream for script " + getPathDescription());
             }
         }
 
@@ -334,17 +410,47 @@ public class ClassPathStore implements Store
             }
             catch (UnsupportedEncodingException e)
             {
-                throw new WebScriptException("Unsupported Encoding", e);
+                throw new AlfrescoRuntimeException("Unsupported Encoding", e);
             }
         }
 
         /* (non-Javadoc)
          * @see org.alfresco.web.scripts.ScriptContent#getPath()
          */
-		public String getPath()
-		{
-            return location.getAbsolutePath();
-		}
+        public String getPath()
+        {
+            String path = "<unknown path>";
+            try
+            {
+                path = location.getURL().toExternalForm();
+            }
+            catch(IOException ioe)
+            {
+            };
+            return path;
+        }
+
+        /* (non-Javadoc)
+         * @see org.alfresco.web.scripts.ScriptContent#getPathDescription()
+         */
+        public String getPathDescription()
+        {
+            String desc = "<unknown path>";
+            try
+            {
+                desc = "/" + path + " (in classpath store " + store.getURL().toExternalForm() + ")";
+            }
+            catch(IOException ioe)
+            {
+            };
+            return desc;
+        }
+
+        @Override
+        public String toString()
+        {
+            return getPathDescription();
+        }
     }
-    
+
 }

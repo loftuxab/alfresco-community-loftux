@@ -100,7 +100,7 @@ public class DeclarativeWebScript extends AbstractWebScript
             if (executeScript != null)
             {
                 if (logger.isDebugEnabled())
-                    logger.debug("Executing script " + executeScript.getPath());
+                    logger.debug("Executing script " + executeScript.getPathDescription());
                 
                 Map<String, Object> scriptModel = createScriptParameters(req, res, model);
                 // add return model allowing script to add items to template model
@@ -141,7 +141,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                     
                     // NOTE: special case for wrapping JSON results in a javascript function callback
                     res.setContentType(Format.JAVASCRIPT.mimetype() + ";charset=UTF-8");
-                    res.getOutputStream().write((callback + "(").getBytes());
+                    res.getWriter().write((callback + "("));
                 }
                 else
                 {
@@ -157,7 +157,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                 if (format.equals(WebScriptResponse.JSON_FORMAT) && callback != null)
                 {
                     // NOTE: special case for wrapping JSON results in a javascript function callback
-                    res.getOutputStream().write(")".getBytes());
+                    res.getWriter().write(")");
                 }
             }
         }
