@@ -371,24 +371,27 @@ public class ServerConfiguration {
 	  // Close the configuration sections
 	  
 	  if ( m_configSections != null) {
-	    
+
 	    Set<String> keys = m_configSections.keySet();
 	    Iterator<String> keysIter = keys.iterator();
 	    
 	    while ( keysIter.hasNext()) {
 	      String configName = keysIter.next();
 	      ConfigSection configSection = m_configSections.get(configName);
-	      
+		  
 	      try {
 	        
 	        // Close the configuration section and remove
 	        
 	        configSection.closeConfig();
-	        m_configSections.remove( configName);
 	      }
 	      catch ( Exception ex) {
 	      }
 	    }
+	    
+	    // Clear the config sections list
+	    
+	    m_configSections.clear();
 	  }
 	}
 }
