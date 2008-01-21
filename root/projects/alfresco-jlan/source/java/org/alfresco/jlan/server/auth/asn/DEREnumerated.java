@@ -75,8 +75,14 @@ public class DEREnumerated extends DERObject {
     // Pack the type, length and value
     
     buf.packByte( DER.Enumerated);
-    buf.packLength( 4);
-    buf.packInt( m_enum);
+    if ( m_enum < 256) {
+      buf.packLength( 1);
+      buf.packByte( m_enum);
+    }
+    else {
+      buf.packLength( 4);
+      buf.packInt( m_enum);
+    }
   }
   
   /**

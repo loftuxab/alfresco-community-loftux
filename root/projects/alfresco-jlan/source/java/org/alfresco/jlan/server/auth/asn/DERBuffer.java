@@ -477,7 +477,7 @@ public class DERBuffer {
 
       // Pack the length bytes
       
-      int shift = sizByts * 8;
+      int shift = (sizByts - 1) * 8;
       
       while ( shift >= 0) {
         packByte( len >> shift);
@@ -664,7 +664,7 @@ public class DERBuffer {
     
     int sizByts = 1;
     
-    if ( len > 128) {
+    if ( len > 0x00FF) {
       
       // Calculate the number of bytes required to store the length
       
