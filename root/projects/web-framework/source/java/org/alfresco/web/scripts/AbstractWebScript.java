@@ -470,7 +470,7 @@ public abstract class AbstractWebScript implements WebScript
         long start = System.currentTimeMillis();
         container.getScriptProcessor().executeScript(location, model);
         if (logger.isDebugEnabled())
-            logger.debug("Executed script " + location.getPath() + " in " + (System.currentTimeMillis() - start) + "ms");
+            logger.debug("Executed script " + location.getPathDescription() + " in " + (System.currentTimeMillis() - start) + "ms");
     }
     
     
