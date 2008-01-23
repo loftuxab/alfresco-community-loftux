@@ -130,7 +130,9 @@ public class WebScriptServletRuntime extends AbstractRuntime
     @Override
     protected WebScriptRequest createRequest(Match match)
     {
-        servletReq = new WebScriptServletRequest(this, req, match, serverProperties);
+        // TODO: construct org.alfresco.web.scripts.servlet.WebScriptServletResponse when
+        //       org.alfresco.web.scripts.WebScriptServletResponse (deprecated) is removed
+        servletReq = new org.alfresco.web.scripts.WebScriptServletRequest(this, req, match, serverProperties);
         return servletReq;
     }
 
@@ -140,7 +142,9 @@ public class WebScriptServletRuntime extends AbstractRuntime
     @Override
     protected WebScriptResponse createResponse()
     {
-        servletRes = new WebScriptServletResponse(this, res);
+        // TODO: construct org.alfresco.web.scripts.servlet.WebScriptServletResponse when
+        //       org.alfresco.web.scripts.WebScriptServletResponse (deprecated) is removed
+        servletRes = new org.alfresco.web.scripts.WebScriptServletResponse(this, res);
         return servletRes;
     }
 
