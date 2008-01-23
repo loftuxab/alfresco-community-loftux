@@ -237,10 +237,10 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/wcm-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.wcm}"' />
       </exec>
-      <move todir="${dir.continuous.dist}">
+      <move todir="${dir.continuous.dist}" failonerror="no">
          <fileset dir="${dir.project.installer.builder}/wcm-installer/output">
             <include name="**/*"/>
          </fileset>
@@ -288,8 +288,8 @@
                                apply_amps.bat,
                                README_mysql.txt,
                                README.txt" />
-         <zipfileset dir="${dir.project.installer.builder}/configwizard/output"
-                     includes="configure.exe" />
+         <zipfileset dir="${dir.project.installer.builder}/configwizard"
+                     includes="output/*.exe" />
          <zipfileset dir="${dir.project.installer}/install_extension"
                      prefix="install_extension" />
          <zipfileset dir="${dir.project.installer}"
@@ -324,8 +324,8 @@
                      prefix="tomcat/bin"
                      includes="*.sh" 
                      mode="755" />
-         <tarfileset dir="${dir.project.installer.builder}/configwizard/output"
-                     includes="configure.bin" />
+         <tarfileset dir="${dir.project.installer.builder}/configwizard"
+                     includes="output/*.bin" />
          <tarfileset dir="${dir.project.installer}"
                      includes="install_extension/**" />
          <tarfileset dir="${dir.project.installer}"
@@ -358,10 +358,10 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/core-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.core}"'/>
       </exec>
-      <move todir="${dir.continuous.dist}">
+      <move todir="${dir.continuous.dist}" failonerror="no">
          <fileset dir="${dir.project.installer.builder}/core-installer/output">
             <include name="**/*"/>
          </fileset>
@@ -372,7 +372,7 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/configwizard/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.config}"'/>
       </exec>
    </target>
@@ -510,10 +510,10 @@
       <delete quiet="yes"
               includeEmptyDirs="true"
               dir="${dir.project.installer.builder}/upgrade-installer/output" />
-      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt">
+      <exec dir="${dir.project.installer.builder}" executable="${file.name.installer.exe}" output="build/error-ij.txt" failifexecutionfails="false">
          <arg line='-DVersion "${version.number}" -DCodeline ${file.name.codeline} --build --quiet "${file.name.installer.war}"' />
       </exec>
-      <move todir="${dir.continuous.dist}">
+      <move todir="${dir.continuous.dist}" failonerror="false">
          <fileset dir="${dir.project.installer.builder}/upgrade-installer/output">
             <include name="**/*"/>
          </fileset>
