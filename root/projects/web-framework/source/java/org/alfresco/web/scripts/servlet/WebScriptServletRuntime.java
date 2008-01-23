@@ -127,6 +127,7 @@ public class WebScriptServletRuntime extends AbstractRuntime
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScriptRuntime#createRequest(org.alfresco.web.scripts.WebScriptMatch)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected WebScriptRequest createRequest(Match match)
     {
@@ -139,6 +140,7 @@ public class WebScriptServletRuntime extends AbstractRuntime
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScriptRuntime#createResponse()
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected WebScriptResponse createResponse()
     {
