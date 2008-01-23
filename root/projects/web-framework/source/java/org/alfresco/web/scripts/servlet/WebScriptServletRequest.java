@@ -66,7 +66,7 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
      * @param req
      * @param serviceMatch
      */
-    public WebScriptServletRequest(Runtime container, HttpServletRequest req, Match serviceMatch, ServerProperties serverProperties)
+    protected WebScriptServletRequest(Runtime container, HttpServletRequest req, Match serviceMatch, ServerProperties serverProperties)
     {
         super(container);
         this.serverProperties = serverProperties;

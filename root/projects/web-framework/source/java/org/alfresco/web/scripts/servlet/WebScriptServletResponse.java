@@ -58,7 +58,7 @@ public class WebScriptServletResponse extends WebScriptResponseImpl
      * 
      * @param res
      */
-    WebScriptServletResponse(Runtime container, HttpServletResponse res)
+    protected WebScriptServletResponse(Runtime container, HttpServletResponse res)
     {
         super(container);
         this.res = res;

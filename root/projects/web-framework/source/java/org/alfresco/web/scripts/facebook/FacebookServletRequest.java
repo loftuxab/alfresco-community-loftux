@@ -27,18 +27,20 @@ package org.alfresco.web.scripts.facebook;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.config.ServerProperties;
+import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptException;
-import org.alfresco.web.scripts.Match;
-import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 
+// TODO: derive from org.alfresco.web.scripts.servlet.WebScriptServletRequest when
+//       org.alfresco.web.scripts.servlet.WebScriptServletRequest is removed
 
 /**
  * Facebook Servlet Request
  * 
  * @author davidc
  */
-public class FacebookServletRequest extends WebScriptServletRequest
+@SuppressWarnings("deprecation")
+public class FacebookServletRequest extends org.alfresco.web.scripts.WebScriptServletRequest
 {
     private String appId;
     private String secretKey;

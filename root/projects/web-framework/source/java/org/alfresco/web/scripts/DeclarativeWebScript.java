@@ -211,12 +211,27 @@ public class DeclarativeWebScript extends AbstractWebScript
      * @param req  Web Script request
      * @param status Web Script status
      * @return  custom service model
+     * @deprecated
      */
-    protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
+    protected Map<String, Object> executeImpl(WebScriptRequest req, WebScriptStatus status)
     {
         return null;
     }
-    
+
+    /**
+     * Execute custom Java logic
+     * 
+     * @param req  Web Script request
+     * @param status Web Script status
+     * @return  custom service model
+     * @deprecated
+     */
+    @SuppressWarnings("deprecation")
+    protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
+    {
+        return executeImpl(req, new WebScriptStatus(status));
+    }
+
     /**
      * Execute custom Java logic
      * 
@@ -225,9 +240,10 @@ public class DeclarativeWebScript extends AbstractWebScript
      * @param  cache  Web Script cache
      * @return  custom service model
      */
+    @SuppressWarnings("deprecation")
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        // NOTE: Redirect to those web scripts implemented before cache support
+        // NOTE: Redirect to those web scripts implemented before cache support and v2.9
         return executeImpl(req, status);
     }
     
