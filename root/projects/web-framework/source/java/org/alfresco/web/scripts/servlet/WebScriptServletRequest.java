@@ -200,7 +200,8 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         }
         else
         {
-            return formData.getParameters().get(name);
+            String[] vals = formData.getParameters().get(name);
+            return (vals == null) ? null : vals[0];
         }        
     }
 
@@ -215,8 +216,7 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         }
         else
         {
-            String value = formData.getParameters().get(name);
-            return (value == null ) ? new String[] {} : new String[] {value};
+            return formData.getParameters().get(name);
         }
     }
     
