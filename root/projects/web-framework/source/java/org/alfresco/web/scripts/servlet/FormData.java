@@ -27,7 +27,6 @@ package org.alfresco.web.scripts.servlet;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,12 +54,12 @@ public class FormData implements Serializable
     private static final long serialVersionUID = 1832644544828452385L;
 
     private HttpServletRequest req;
-    private ServletFileUpload upload;
-    private Map<String, FormField> fields = null;
-    private Map<String, String> parameters = null;
-    private Map<String, Content> files = null;
     private String encoding = null;
-   
+    private ServletFileUpload upload;
+    private FormField[] fields = null;
+    private Map<String, String[]> parameters = null;
+
+    
     /**
      * Construct
      * 
@@ -89,49 +88,22 @@ public class FormData implements Serializable
      */
     public boolean hasField(String name)
     {
-        Map<String, FormField> fields = getFieldsMap();
-        return fields.containsKey(name);
+        for (FormField field : fields)
+        {
+           if (field.getName().equals(name))
+           {
+               return true;
+           }
+        }
+        return false;
     }
 
-    /**
-     * Gets the Form fields
-     * 
-     * @return  array of FormField
-     */
-    public FormField[] getFields()
-    {
-        Map<String, FormField> fieldsMap = getFieldsMap();
-        FormField[] fields = new FormField[fieldsMap.values().size()];
-        fieldsMap.values().toArray(fields);
-        return fields;        
-    }
-
-    /**
-     * Gets parameters encoded in the form data
-     * 
-     * @return  map (name, value) of parameters
-     */
-    /*package*/ Map<String, String> getParameters()
-    {
-        return getParametersMap();
-    }
-    
-    /**
-     * Gets files encoded in form data
-     * 
-     * @return  map (name, ScriptContent) of files
-     */
-    /*package*/ Map<String, Content> getFiles()
-    {
-        return getFilesMap();
-    }
-    
     /**
      * Helper to parse servlet request form data
      * 
      * @return  map of all form fields
      */
-    private Map<String, FormField> getFieldsMap()
+    public FormField[] getFields()
     {
         // NOTE: This class is not thread safe - it is expected to be constructed on each thread.
         if (fields == null)
@@ -140,69 +112,54 @@ public class FormData implements Serializable
             upload = new ServletFileUpload(factory);
             encoding = req.getCharacterEncoding();
             upload.setHeaderEncoding(encoding);
+            
             try
             {
                 List<FileItem> fileItems = upload.parseRequest(req);
-                fields = new HashMap<String, FormField>();
-                for (FileItem fileItem : fileItems)
+                fields = new FormField[fileItems.size()];
+                for (int i = 0; i < fileItems.size(); i++)
                 {
-                    FormField formField = new FormField(fileItem);
-                    fields.put(fileItem.getFieldName(), formField);
+                    FormField formField = new FormField(fileItems.get(i));
+                    fields[i] = formField;
                 }
             }
             catch(FileUploadException e)
             {
-                // NOTE: assume no files can be located
-                fields = Collections.emptyMap();
+                fields = new FormField[0];
             }
+            
         }
         return fields;
     }
  
     /**
-     * Helper to parse servlet request form data
+     * Gets parameters encoded in the form data
      * 
-     * @return  map of all form parameters
+     * @return  map (name, value) of parameters
      */
-    private Map<String, String> getParametersMap()
+    /*package*/ Map<String, String[]> getParameters()
     {
         if (parameters == null)
         {
-            Map<String, FormField> fields = getFieldsMap();
-            parameters = new HashMap<String, String>();
-            for (Map.Entry<String, FormField> entry : fields.entrySet())
+            FormField[] fields = getFields();
+            parameters = new HashMap<String, String[]>();
+            for (FormField field : fields)
             {
-                FormField field = entry.getValue();
-                if (!field.getIsFile())
+                String[] vals = parameters.get(field.getName());
+                if (vals == null)
                 {
-                    parameters.put(entry.getKey(), field.getValue());
+                    parameters.put(field.getName(), new String[] {field.getValue()});
+                }
+                else
+                {
+                    String[] valsNew = new String[vals.length +1]; 
+                    System.arraycopy(vals, 0, valsNew, 0, vals.length);
+                    valsNew[vals.length] = field.getValue();
+                    parameters.put(field.getName(), valsNew);
                 }
             }
         }
         return parameters;
-    }
-    
-    /**
-     * Helper to parse servlet request form data
-     * 
-     * @return  map of all form files
-     */
-    private Map<String, Content> getFilesMap()
-    {
-        if (files == null)
-        {
-            Map<String, FormField> fields = getFieldsMap();
-            files = new HashMap<String, Content>();
-            for (Map.Entry<String, FormField> entry : fields.entrySet())
-            {
-                FormField field = entry.getValue();
-                if (field.getIsFile())
-                {
-                    files.put(entry.getKey(), field.getContent());
-                }
-            }           
-        }
-        return files;
     }
     
 
