@@ -26,6 +26,7 @@ package org.alfresco.module.blogIntegration.ui;
 
 import java.util.Map;
 
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
@@ -37,7 +38,6 @@ import org.alfresco.web.app.servlet.FacesHelper;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
 
 
 /**
@@ -87,19 +87,9 @@ public class BlogDetailsActionListener implements BlogIntegrationModel
         }
         
         FacesContext context = FacesContext.getCurrentInstance();
-        BrowseBean browseBean = (BrowseBean)FacesHelper.getManagedBean(context, "BrowseBean");
-        //String actionLocation = params.get("actionLocation");
-        //if (actionLocation.equals("document-details") == true)
-        //{
-        //    browseBean.getDocument().reset();
-        //    UIPropertySheet comp = (UIPropertySheet)event.getComponent().findComponent("document-details:document-props");
-        //    comp.getChildren().clear();
-        //}
-        //else if (actionLocation.equals("folder-details") == true)
-        //{
-            browseBean.getActionSpace().reset();
-            UIPropertySheet comp = (UIPropertySheet)event.getComponent().findComponent("space-details:space-props");
-            comp.getChildren().clear();
-        //}  
+        BrowseBean browseBean = (BrowseBean)FacesHelper.getManagedBean(context, "BrowseBean");        
+        browseBean.getActionSpace().reset();
+        UIComponent comp = context.getViewRoot().findComponent("dialog:dialog-body:document-props");
+        comp.getChildren().clear();
     }
 }

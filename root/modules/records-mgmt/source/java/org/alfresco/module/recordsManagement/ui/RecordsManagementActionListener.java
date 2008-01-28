@@ -27,6 +27,7 @@ package org.alfresco.module.recordsManagement.ui;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
@@ -38,7 +39,6 @@ import org.alfresco.web.app.servlet.FacesHelper;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
 
 
 /**
@@ -86,16 +86,17 @@ public class RecordsManagementActionListener
         FacesContext context = FacesContext.getCurrentInstance();
         BrowseBean browseBean = (BrowseBean)FacesHelper.getManagedBean(context, "BrowseBean");
         String actionLocation = params.get("actionLocation");
+        
         if (actionLocation.equals("document-details") == true)
         {
             browseBean.getDocument().reset();
-            UIPropertySheet comp = (UIPropertySheet)event.getComponent().findComponent("document-details:document-props");
+            UIComponent comp = context.getViewRoot().findComponent("dialog:dialog-body:document-props");
             comp.getChildren().clear();
         }
         else if (actionLocation.equals("folder-details") == true)
         {
             browseBean.getActionSpace().reset();
-            UIPropertySheet comp = (UIPropertySheet)event.getComponent().findComponent("space-details:space-props");
+            UIComponent comp = context.getViewRoot().findComponent("dialog:dialog-body:space-props");
             comp.getChildren().clear();
         }  
     }
