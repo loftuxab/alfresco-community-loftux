@@ -27,6 +27,7 @@ package org.alfresco.module.blogIntegration.ui;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 
@@ -42,7 +43,6 @@ import org.alfresco.web.app.servlet.FacesHelper;
 import org.alfresco.web.bean.BrowseBean;
 import org.alfresco.web.bean.repository.Repository;
 import org.alfresco.web.ui.common.component.UIActionLink;
-import org.alfresco.web.ui.repo.component.property.UIPropertySheet;
 
 
 /**
@@ -133,7 +133,7 @@ public class BlogActionListener implements BlogIntegrationModel
         FacesContext context = FacesContext.getCurrentInstance();
         BrowseBean browseBean = (BrowseBean)FacesHelper.getManagedBean(context, "BrowseBean");
         browseBean.getDocument().reset();
-        UIPropertySheet comp = (UIPropertySheet)event.getComponent().findComponent("document-details:document-props");
+        UIComponent comp = context.getViewRoot().findComponent("dialog:dialog-body:document-props");
         comp.getChildren().clear();
           
     }
