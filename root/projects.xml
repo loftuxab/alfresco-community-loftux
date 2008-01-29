@@ -1435,6 +1435,47 @@
            basedir="${dir.project.webframework.classes}" />
    </target>
    
+   <target name="package-webframework-war" 
+           description="Packages the WAR file for the webframework project" 
+           depends="assemble-webframework-war">
+      <war warfile="${dir.project.webframework.dist}/${file.name.war.webframework}" 
+           webxml="${dir.project.webframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-webframework-war" 
+           depends="package-webframework">
+      <mkdir dir="${dir.project.webframework.assemble}" />
+
+      <copy todir="${dir.project.webframework.assemble}">
+         <fileset dir="${dir.project.webframework.src.web}" 
+                  excludes="WEB-INF/**" />
+      </copy>
+
+      <copy todir="${dir.project.webframework.assemble}/WEB-INF">
+         <fileset dir="${dir.project.webframework.src.webinf}" 
+                  excludes="web.xml" />
+      </copy>
+
+      <!-- add config files to WEB-INF/classes -->
+      <copy todir="${dir.project.webframework.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.webframework.config}" 
+                  excludes="**/extension/**" />
+      </copy>
+
+      <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webframework.libs.commons}" />
+      </copy>
+   </target>  
+   
    <target name="test-webframework" 
            description="Runs the tests for the web framework project" 
            depends="compile-webframework">

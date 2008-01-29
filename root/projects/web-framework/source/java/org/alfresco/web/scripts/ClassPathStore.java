@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -54,7 +56,7 @@ import freemarker.cache.TemplateLoader;
 public class ClassPathStore implements Store
 {
     // Logger
-//    private static final Log logger = LogFactory.getLog(ClassPathStore.class);
+    private static final Log logger = LogFactory.getLog(ClassPathStore.class);
     
     PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     protected boolean mustExist = false;
@@ -117,8 +119,8 @@ public class ClassPathStore implements Store
                 storeResourcePath = storeResource.getURL().toExternalForm();
                 String cleanStoreResourcePath = (storeResourcePath.endsWith("/")) ? storeResourcePath.substring(0, storeResourcePath.length() -1) : storeResourcePath;
                 storeResourcePathLength = cleanStoreResourcePath.length();
-    //            if (logger.isDebugEnabled())
-    //                logger.debug("Provided classpath: " + classPath + " , storeRootPath: " + storeResourcePath + ", storeRootPathLength: " + storeResourcePathLength);
+                if (logger.isTraceEnabled())
+                    logger.trace("Provided classpath: " + classPath + " , storeRootPath: " + storeResourcePath + ", storeRootPathLength: " + storeResourcePathLength);
                 
                 try
                 {
@@ -175,8 +177,8 @@ public class ClassPathStore implements Store
                     String resourcePath = resource.getURL().toExternalForm();
                     String documentPath = resourcePath.substring(storeResourcePathLength +1);
                     documentPath = documentPath.replace('\\', '/');
-    //                if (logger.isDebugEnabled())
-    //                    logger.debug("Document resource path: " + resourcePath + " , document path: " + documentPath);
+                    if (logger.isTraceEnabled())
+                        logger.trace("Document resource path: " + resourcePath + " , document path: " + documentPath);
                     documentPaths.add(documentPath);
                 }
             }
@@ -210,8 +212,8 @@ public class ClassPathStore implements Store
                     String resourcePath = resource.getURL().toExternalForm();
                     String documentPath = resourcePath.substring(storeResourcePathLength +1);
                     documentPath = documentPath.replace('\\', '/');
-    //                if (logger.isDebugEnabled())
-    //                    logger.debug("Script resource path: " + resourcePath + " , script path: " + documentPath);
+                    if (logger.isTraceEnabled())
+                        logger.trace("Script resource path: " + resourcePath + " , script path: " + documentPath);
                     documentPaths.add(documentPath);
                 }
             }
@@ -250,8 +252,8 @@ public class ClassPathStore implements Store
         throws IOException
     {
         Resource document = createRelative(storeResource, documentPath);
-//        if (logger.isDebugEnabled())
-//            logger.debug("getDocument: documentPath: " + documentPath + " , storePath: " + document.getURL().toExternalForm());
+        if (logger.isTraceEnabled())
+            logger.trace("getDocument: documentPath: " + documentPath + " , storePath: " + document.getURL().toExternalForm());
         
         if (!document.exists())
         {
@@ -452,5 +454,4 @@ public class ClassPathStore implements Store
             return getPathDescription();
         }
     }
-
 }

@@ -9,7 +9,7 @@
 <table>
  <tr>
     <td><img src="${url.context}/images/logo/AlfrescoLogo32.png" alt="Alfresco" /></td>
-    <td><nobr><span class="mainTitle">Web Script Status ${status.code} - ${status.codeName}</span></nobr></td>
+    <td><nobr><span class="title">Web Script Status ${status.code} - ${status.codeName}</span></nobr></td>
  </tr>
 </table>
 <br>

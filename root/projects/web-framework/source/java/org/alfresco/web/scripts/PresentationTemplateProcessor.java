@@ -63,6 +63,7 @@ public class PresentationTemplateProcessor
     protected String defaultEncoding;
     protected Configuration templateConfig;
     protected Configuration stringConfig;
+    private List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
 
     /**
      * @param searchPath
@@ -221,6 +222,17 @@ public class PresentationTemplateProcessor
     }
     
     /**
+     * Add a template loader to the list used when the config is initialised.
+     * Must be called before the config is first initialised.
+     * 
+     * @param loader    TemplateLoader
+     */
+    public void addTemplateLoader(TemplateLoader loader)
+    {
+        loaders.add(loader);
+    }
+    
+    /**
      * Initialise FreeMarker Configuration
      */
     public void initConfig()
@@ -236,7 +248,6 @@ public class PresentationTemplateProcessor
         {
             templateConfig.setDefaultEncoding(defaultEncoding);
         }
-        List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
         for (Store apiStore : searchPath.getStores())
         {
             TemplateLoader loader = apiStore.getTemplateLoader();
@@ -258,6 +269,14 @@ public class PresentationTemplateProcessor
         {
             stringConfig.setDefaultEncoding(defaultEncoding);
         }
+    }
+    
+    /**
+     * @return the current Configuration object for the template processor
+     */
+    public Configuration getConfig()
+    {
+        return templateConfig; 
     }
     
     /* (non-Javadoc)
@@ -284,5 +303,4 @@ public class PresentationTemplateProcessor
     {
         this.applicationContext = applicationContext;
     }
-
 }
