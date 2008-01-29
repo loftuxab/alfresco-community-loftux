@@ -447,6 +447,21 @@ public class PageRendererServlet extends WebScriptServlet
       {
          return null;
       }
+
+      public String[] getHeaderNames()
+      {
+         return new String[] {};
+      }
+        
+      public String getHeader(String name)
+      {
+         return null;
+      }
+        
+      public String[] getHeaderValues(String name)
+      {
+         return null;
+      }
    }
    
    /**

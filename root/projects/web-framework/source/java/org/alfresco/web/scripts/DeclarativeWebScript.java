@@ -193,7 +193,6 @@ public class DeclarativeWebScript extends AbstractWebScript
      * @param scriptModel  script model
      * @param templateModel  template model
      */
-    @SuppressWarnings("unchecked")
     final private void mergeScriptModelIntoTemplateModel(Map<String, Object> scriptModel, Map<String, Object> templateModel)
     {
         for (Map.Entry<String, Object> entry : scriptModel.entrySet())
@@ -226,7 +225,6 @@ public class DeclarativeWebScript extends AbstractWebScript
      * @return  custom service model
      * @deprecated
      */
-    @SuppressWarnings("deprecation")
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
     {
         return executeImpl(req, new WebScriptStatus(status));
@@ -240,7 +238,6 @@ public class DeclarativeWebScript extends AbstractWebScript
      * @param  cache  Web Script cache
      * @return  custom service model
      */
-    @SuppressWarnings("deprecation")
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
         // NOTE: Redirect to those web scripts implemented before cache support and v2.9

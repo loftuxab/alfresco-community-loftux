@@ -115,6 +115,7 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("server", getDescription());
+        params.put("logger", new ScriptLogger());
         return Collections.unmodifiableMap(params);
     }
 

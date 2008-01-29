@@ -119,6 +119,32 @@ public interface WebScriptRequest
     public String[] getParameterValues(String name);
         
     /**
+     * Gets the names of all headers for this request
+     * 
+     * @return  the names (empty, if none)
+     */
+    public String[] getHeaderNames();
+
+    /**
+     * Gets the value of the named header
+     *
+     * @param name  header name
+     * @return  header value (or null, if header does not exist)
+     */
+    public String getHeader(String name);
+
+    /**
+     * Gets the (array) value of the named header
+     * 
+     * Note: An array of one item is returned when a "single value" named header 
+     *       is requested
+     *       
+     * @param  name  header name
+     * @return  array of values (or null, if header does not exist)
+     */
+    public String[] getHeaderValues(String name);
+    
+    /**
      * Gets the path extension beyond the path registered for this service
      * 
      * e.g.
