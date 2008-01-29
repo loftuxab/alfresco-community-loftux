@@ -1,14 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head> 
     <title>Web Script: ${script.id}</title> 
-    <link rel="stylesheet" href="${url.context}/css/main.css" TYPE="text/css"/>
+    <link rel="stylesheet" href="${url.context}/css/base.css" TYPE="text/css"/>
   </head>
   <body>
     <table>
-     <tr><td><nobr><span class="mainTitle">Web Script: ${script.id}</span></nobr></td></tr>
-     <tr><td>Alfresco ${server.edition} v${server.version}</td></tr>
+     <tr><td><nobr><span class="title">Web Script: ${script.id}</span></nobr></td></tr>
      <tr><td>Generated from ${url.full} on ${date?datetime}</td></tr>
     </table>
 	<p/>

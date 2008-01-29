@@ -19,4 +19,20 @@
       </constructor-arg>
    </bean>
    
+   <!--  Local Template Storage -->
+   <bean id="pagerenderer.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
+
+   <bean id="pagerenderer.store" parent="pagerenderer.classpathstore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/templates</value></property>
+   </bean>
+
+   <bean id="pagerenderer.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+          <list>
+             <ref bean="pagerenderer.store" />
+          </list>
+      </property>
+   </bean>
+   
 </beans>

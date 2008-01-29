@@ -36,6 +36,7 @@ import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -47,7 +48,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
-import org.alfresco.config.JNDIConstants;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLEncoder;
 import org.alfresco.web.scripts.AbstractRuntime;
@@ -56,11 +56,13 @@ import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.PresentationTemplateProcessor;
 import org.alfresco.web.scripts.Runtime;
+import org.alfresco.web.scripts.SearchPath;
+import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
 import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.WebScriptResponseImpl;
-import org.alfresco.web.scripts.servlet.WebScriptServlet;
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -69,20 +71,17 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import freemarker.cache.TemplateLoader;
 
 /**
- * Servlet for rendering templated pages based on Webscript components.
+ * Servlet for rendering pages based a PageTemplate and WebScript based components.
  * 
- * GET: /<context>/<servlet>/store/theme/folderpath/...
+ * GET: /<context>/<servlet>/[resource]...
+ *  resource - app url resource
+ *  url args - passed to all webscript component urls for the page
  * 
- * store=avmstore name
- * theme=theme folder name
- * folderpath=location of page definition file (any length inc none to load root)
+ * Read from page renderer web-app config:
+ *  serverurl - url to Alfresco host repo server (i.e. http://servername:8080/alfresco)
  * 
- * TODO:
- * POST: /<context>/<servlet>/store/theme
- * REQUEST: page definition XML content? Template data?
- * 
- * NOTE: No web-client specific helper classes should be used here! This servlet should be
- *       movable to the new web-script presentation tier with the minimum of work.
+ * Read from object model for spk:site - pass to webscript urls as "well known tokens"
+ *  theme - default theme for the site (can be override in user prefs?) 
  * 
  * @author Kevin Roast
  */
@@ -94,39 +93,40 @@ public class PageRendererServlet extends WebScriptServlet
    private static final String PARAM_COMPONENT_ID  = "_alfId";
    private static final String PARAM_COMPONENT_URL = "_alfUrl";
    
-   // timeout to reload default page cache from 
-   private static final int DEFAULT_PAGE_CONFIG_CACHE_TIMEOUT = 30000;
-   
-   //private ServiceRegistry serviceRegistry;
    private PresentationTemplateProcessor templateProcessor;
-   private WebScriptTemplateLoader webscriptTemplateLoader;
-   private Map<String, ExpiringValueCache<PageDefinition>> defaultPageDefMap = null;
+   private UIComponentTemplateLoader uicomponentTemplateLoader;
+   private SearchPath searchPath;
+   private Map<String, ExpiringValueCache<PageInstance>> defaultPageDefMap = null;
    
    @Override
    public void init() throws ServletException
    {
       super.init();
       
-      // init beans
+      // init required beans - template processor and template loaders
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-      //serviceRegistry = (ServiceRegistry)context.getBean("serviceRegistry");
-      templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
-      webscriptTemplateLoader = new WebScriptTemplateLoader();
       
-      // TODO: Refactor to use web script stores
-//      ClassPathRepoTemplateLoader repoLoader = new ClassPathRepoTemplateLoader(
-//            serviceRegistry.getNodeService(),
-//            serviceRegistry.getContentService(),
-//            templateProcessor.getDefaultEncoding());
-//      templateProcessor.setTemplateLoader(new MultiTemplateLoader(new TemplateLoader[]{
-//         webscriptTemplateLoader, repoLoader}));
-//      templateProcessor.initConfig();
+      searchPath = (SearchPath)context.getBean("pagerenderer.searchpath");
+      templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
+      
+      // custom loader for resolved UI Component reference indirections
+      uicomponentTemplateLoader = new UIComponentTemplateLoader();
+      templateProcessor.addTemplateLoader(uicomponentTemplateLoader);
+      
+      // add template loader for locally stored templates
+      for (Store store : searchPath.getStores())
+      {
+         templateProcessor.addTemplateLoader(store.getTemplateLoader());
+      }
+      
+      // init the config for the template processor - caches and loaders etc. get resolved
+      templateProcessor.initConfig();
       
       // we use a specific config service instance
       configService = (ConfigService)context.getBean("pagerenderer.config");
       
       // create cache for default config
-      defaultPageDefMap = Collections.synchronizedMap(new HashMap<String, ExpiringValueCache<PageDefinition>>());
+      defaultPageDefMap = Collections.synchronizedMap(new HashMap<String, ExpiringValueCache<PageInstance>>());
    }
 
    @Override
@@ -145,94 +145,107 @@ public class PageRendererServlet extends WebScriptServlet
       uri = uri.substring(req.getContextPath().length());   // skip server context path
       StringTokenizer t = new StringTokenizer(uri, "/");
       t.nextToken();    // skip servlet name
-      if (t.countTokens() < 3)
+      if (!t.hasMoreTokens())
       {
          throw new IllegalArgumentException("Invalid URL to PageRendererServlet: " + uri);
       }
       
-      // the AVM store to retrieve pages and config from
-      String store = t.nextToken();
-      
-      // theme directory to retrieve template from
-      String theme = t.nextToken();
-      
-      // path to the config file
-      String page = null;
+      // get the remaining elements of the url ready for AppUrl lookup 
+      StringBuilder buf = new StringBuilder(64);
       while (t.hasMoreTokens())
       {
-         if (page == null)
-         {
-            page = "";
-         }
-         page += t.nextToken();
+         buf.append(t.nextToken());
          if (t.hasMoreTokens())
          {
-            page += '/';
+            buf.append('/');
          }
       }
+      String resource = buf.toString();
       
+      // get URL arguments as a map ready for AppUrl lookup
+      Map<String, String> args = new HashMap<String, String>(req.getParameterMap().size(), 1.0f);
+      Enumeration names = req.getParameterNames();
+      while (names.hasMoreElements())
+      {
+         String name = (String)names.nextElement();
+         args.put(name, req.getParameter(name));
+      }
+      
+      // resolve app url object to process this resource
+      if (logger.isDebugEnabled())
+         logger.debug("Matching resource URL: " + resource + " args: " + args.toString());
+      ApplicationUrl appUrl = matchAppUrl(resource, args);
+      if (appUrl == null)
+      {
+         logger.warn("No Application URL mapping found for resource: " + resource);
+         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+         return;
+      }
+      
+      // TODO: what caching here...?
       setNoCacheHeaders(res);
       
       try
       {
-         // lookup template path from page config in website AVM store
-         PageDefinition pageDefinition;
-         if (req.getMethod().equals("GET"))
-         {
-            pageDefinition = lookupPageDefinition(store, req.getContextPath(), page);
-         }
-         else
-         {
-            throw new UnsupportedOperationException("POST to be implemented.");
-         }
+         // retrieve the page def from the application url - will throw an exception if the page
+         // cannot be found or fails to retrieve from the repository
+         PageInstance page = appUrl.getPageInstance(resource);
+         if (logger.isDebugEnabled())
+            logger.debug("PageInstance: " + page.toString());
          
          // set response content type and charset
          res.setContentType(MIMETYPE_HTML);
          
-         // TODO: What authentication to use here? Guest? Or all templates and webscripts
-         //       must reside in a known AVM repo - i.e. skip permissions. Template API still
-         //       uses NodeService for some calls - even for AVMTemplateNode - so will need
-         //       some kind of security context...
-         authenticate(getServletContext(), req, res);
-         
-         // set the web app context path for the template loader to use when rebuilding urls
-         PageRendererContext context = new PageRendererContext();
-         context.RequestURI = uri;
-         context.RequestPath = req.getContextPath();
-         context.PageDef = pageDefinition;
-         context.AVMStore = store;
-         context.Theme = theme;
-         
-         // look for clicked component id+url
-         // TODO: keep state of page? i.e. multiple webscripts can be hosted and clicked...
-         String compId = req.getParameter(PARAM_COMPONENT_ID);
-         if (compId != null)
+         // TODO: authenticate - or redirect to login page etc...
+         if (authenticate(getServletContext(), page.Authentication))
          {
-            String compUrl = req.getParameter(PARAM_COMPONENT_URL);
+            // setup the webapp context path for the webscript runtime template loader to use when rebuilding urls
+            PageRendererContext context = new PageRendererContext();
+            context.RequestURI = uri;
+            context.RequestPath = req.getContextPath();
+            context.PageInstance = page;
+            
+            // handle a clicked UI component link - look for id+url
+            // TODO: keep state of page? i.e. multiple webscripts can be hosted and clicked...
+            String compId = req.getParameter(PARAM_COMPONENT_ID);
+            if (compId != null)
+            {
+               String compUrl = req.getParameter(PARAM_COMPONENT_URL);
+               if (logger.isDebugEnabled())
+                  logger.debug("Clicked component found: " + compId + " URL: " + compUrl);
+               context.ComponentId = compId;
+               context.ComponentUrl = compUrl;
+            }
+            this.uicomponentTemplateLoader.setContext(context);
+            
+            // Process the page template using our custom loader - the loader will find and buffer
+            // individual included webscript output into the Writer out for the servlet page.
+            // TODO: find the page template path
             if (logger.isDebugEnabled())
-               logger.debug("Clicked component found: " + compId + " URL: " + compUrl);
-            context.ComponentId = compId;
-            context.ComponentUrl = compUrl;
+               logger.debug("Page template resolved as: " + page.PageTemplate);
+            
+            // execute the templte to render the page - based on the current page definition
+            processTemplatePage(page.PageTemplate, page, req, res);
          }
-         pageDefinition.Theme = theme;
-         this.webscriptTemplateLoader.setContext(context);
-         
-         // Process the template page using our custom loader - the loader will find and buffer
-         // individual included webscript output into the main writer for the servlet page.
-         String templatePath = getStoreSitePath(store, req.getContextPath()) + '/' + "themes" + '/' + theme + '/' +
-                               "templates" + '/' + pageDefinition.TemplateName;
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Page template resolved as: " + templatePath);
-         
-         // execute the templte to render the page - based on the current page definition
-         processTemplatePage(templatePath, pageDefinition, req, res);
       }
       catch (Throwable err)
       {
-         throw new AlfrescoRuntimeException("Error occurred during page rendering. Page id: " +
-               page + " with error: " + err.getMessage(), err);
+         throw new AlfrescoRuntimeException("Error occurred during page rendering. App Url: " +
+               appUrl.toString() + " with error: " + err.getMessage(), err);
       }
+   }
+   
+   /**
+    * Match the specified resource url against an app url object, which in turn is responsible
+    * for locating the correct Page. 
+    *  
+    * @param resource   
+    * @param args       
+    */
+   private ApplicationUrl matchAppUrl(String resource, Map<String, String> args)
+   {
+      // TODO: match against app urls loaded from app registry
+      return new ApplicationUrl();
    }
    
    /**
@@ -240,182 +253,24 @@ public class PageRendererServlet extends WebScriptServlet
     * @throws IOException
     */
    private void processTemplatePage(
-         String templatePath, PageDefinition pageDef, HttpServletRequest req, HttpServletResponse res)
+         String templatePath, PageInstance pageDef, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      // TODO: convert template path to real template location
-      //NodeRef ref = AVMNodeConverter.ToNodeRef(-1, templatePath);
-      String ref = "";
-      templateProcessor.process(ref.toString(), getModel(pageDef, req), res.getWriter());
+      // TODO: retrieve the template from the remote repo - or from cache
+      templateProcessor.process(templatePath, getModel(pageDef, req), res.getWriter());
    }
    
    /**
-    * @return model to use for main template page execution
+    * @return model to use for UI Component template page execution
     */
-   private Object getModel(PageDefinition pageDef, HttpServletRequest req)
+   private Object getModel(PageInstance pageDef, HttpServletRequest req)
    {
-      // just a basic minimum model - in the future the repo will not be available!
-      Map<String, Object> model = new HashMap<String, Object>();
+      Map<String, Object> model = new HashMap<String, Object>(8);
       model.put("url", new URLHelper(req.getContextPath()));
+      model.put("description", pageDef.Description);
       model.put("title", pageDef.Title);
       model.put("theme", pageDef.Theme);
       return model;
-   }
-   
-   /**
-    * Get the page definition config object based on the page ID and AVM store.
-    * 
-    * @param store   AVM store to retrieve data from
-    * @param page    Page ID to lookup in web-pagerenderer-config.xml
-    * 
-    * @return Path to the template content
-    */
-   private PageDefinition lookupPageDefinition(String store, String contextPath, String page)
-   {
-      // Lookup (and cache) config for default page-definition file in root
-      ExpiringValueCache<PageDefinition> cache = defaultPageDefMap.get(store);
-      if (cache == null)
-      {
-         cache = new ExpiringValueCache<PageDefinition>(DEFAULT_PAGE_CONFIG_CACHE_TIMEOUT);
-         defaultPageDefMap.put(store, cache);
-      }
-      PageDefinition defaultPageDef = cache.get();
-      if (defaultPageDef == null)
-      {
-         // read default config for the site and cache the result
-         String defaultConfigPath = getPageDefinitionPath(null, store, contextPath);
-         defaultPageDef = readPageDefinitionConfig(defaultConfigPath, page, null);
-         cache.put(defaultPageDef);
-      }
-      
-      // Lookup page xml config in AVM store using page name as location
-      String configPath = getPageDefinitionPath(page, store, contextPath);
-      
-      // read the page definition and return it
-      return readPageDefinitionConfig(configPath, page, defaultPageDef);
-   }
-   
-   /**
-    * Read the page definition config at the specified location. A default config object can be
-    * supplied from which values will be taken if none are supplied in the config that is read.
-    * 
-    * @return PageDefinition representing the config
-    */
-   private PageDefinition readPageDefinitionConfig(String configPath, String page, PageDefinition defaultPageDef)
-   {
-      PageDefinition pageDef = null;
-      
-      /*AVMService avm = this.serviceRegistry.getAVMService();
-      try
-      {
-         // parse page definition xml config file
-         // TODO: convert to pull parser to optimize (see importer ViewParser)
-         SAXReader reader = new SAXReader();
-         try
-         {
-            Document document = reader.read(avm.getFileInputStream(-1, configPath));
-            
-            Element rootElement = document.getRootElement();
-            if (!rootElement.getName().equals("page"))
-            {
-               throw new AlfrescoRuntimeException(
-                     "Expected 'page' root element in page-definition.xml config: " + configPath);
-            }
-            String title = rootElement.attributeValue("title");
-            
-            String templateName = null;
-            if (defaultPageDef != null && defaultPageDef.TemplateName != null)
-            {
-               // take template name from default config in case none is specified locally
-               templateName = defaultPageDef.TemplateName;
-            }
-            Element templateElement = rootElement.element("template");
-            if (defaultPageDef != null && (templateElement == null && templateName == null))
-            {
-               throw new AlfrescoRuntimeException(
-                     "No 'template' element (and no default set) found in page-definition.xml config: " + configPath);
-            }
-            templateName = templateElement.attributeValue("name");
-            if (templateName == null || templateName.length() == 0)
-            {
-               throw new AlfrescoRuntimeException(
-                     "The 'template' element is missing mandatory 'name' attribute in page-definition.xml config: " +
-                     configPath);
-            }
-            
-            // create config object for this page and store template name for this page
-            pageDef = new PageDefinition(templateName);
-            pageDef.Title = title;
-            
-            // copy in component mappings from default config definitions first
-            if (defaultPageDef != null)
-            {
-               pageDef.Components.putAll(defaultPageDef.Components);
-            }
-            
-            // read the component defs for this page
-            // removing 'disabled' components as configured locally
-            Element componentsElements = rootElement.element("components");
-            if (componentsElements != null)
-            {
-               for (Element ce : (List<Element>)componentsElements.elements("component"))
-               {
-                  // read the mandatory component 'id' attribute
-                  String id = ce.attributeValue("id");
-                  if (id == null || id.length() == 0)
-                  {
-                     throw new AlfrescoRuntimeException(
-                           "A 'component' element is missing mandatory 'id' attribute in page-definition.xml config: " + 
-                           configPath);
-                  }
-                  
-                  // next check for the 'disabled' boolean attribute - used to disable components
-                  // that are specified in the default config - we don't need to read further
-                  String disabled = ce.attributeValue("disabled");
-                  if (disabled != null)
-                  {
-                     if (Boolean.parseBoolean(disabled) == true)
-                     {
-                        pageDef.Components.remove(id);
-                        continue;
-                     }
-                  }
-                  
-                  String url = ce.attributeValue("url");
-                  if (url == null || url.length() == 0)
-                  {
-                     throw new AlfrescoRuntimeException(
-                           "A 'component' element is missing mandatory 'url' attribute in page-definition.xml config: " + 
-                           configPath);
-                  }
-                  
-                  // create minimum component config definition
-                  PageComponent component = new PageComponent(id, url);
-                  
-                  // store any other component properties
-                  for (Element pe : (List<Element>)ce.elements())
-                  {
-                     component.Properties.put(pe.getName(), pe.getTextTrim());
-                  }
-                  
-                  // store component definition in the page definition
-                  pageDef.Components.put(component.Id, component);
-               }
-            }
-         }
-         catch (DocumentException docErr)
-         {
-            throw new AlfrescoRuntimeException("Failed to parse 'page-definition.xml' for page '" + page +
-                  "' in config: " + configPath, docErr);
-         }
-      }
-      catch (AVMNotFoundException avmErr)
-      {
-         throw new AlfrescoRuntimeException("Unable to find 'page-definition.xml' for page '" + page +
-               "' in expected location path: " + configPath, avmErr);
-      }*/
-      
-      return pageDef;
    }
    
    private Config getConfig()
@@ -423,35 +278,10 @@ public class PageRendererServlet extends WebScriptServlet
       return this.configService.getConfig("PageRenderer");
    }
    
-   private static void authenticate(ServletContext sc, HttpServletRequest req, HttpServletResponse res)
-      throws IOException
+   private static boolean authenticate(ServletContext sc, RequiredAuthentication auth)
    {
-      // TODO: authenticate via call to Alfresco server
-      //WebApplicationContext wc = WebApplicationContextUtils.getRequiredWebApplicationContext(sc);
-      //AuthenticationService auth = (AuthenticationService)wc.getBean("AuthenticationService");
-      //auth.authenticate("admin", "admin".toCharArray());
-      //auth.authenticateAsGuest();
-   }
-   
-   /**
-    * @return the path to the site assets based on the avm store and webapp context path
-    */
-   private static String getStoreSitePath(String store, String contextPath)
-   {
-      if (contextPath.length() == 0)
-      {
-         contextPath = "/ROOT";      // servlet ROOT - default hidden context path
-      }
-      return store + ":/" + JNDIConstants.DIR_DEFAULT_WWW + '/' + JNDIConstants.DIR_DEFAULT_APPBASE + contextPath;
-   }
-   
-   /**
-    * @return the page to a Page Definition config file for the specified avm store and page
-    */
-   private static String getPageDefinitionPath(String page, String store, String contextPath)
-   {
-      return getStoreSitePath(store, contextPath) + '/' + "WEB-INF" + '/' + "pages" + '/' +
-             (page != null ? page + '/' : "") + "page-definition.xml";
+      // TODO: authenticate via call to Alfresco server - using web-app config?
+      return true;
    }
    
    /**
@@ -509,9 +339,8 @@ public class PageRendererServlet extends WebScriptServlet
          // set the component properties as the additional request attributes 
          Map<String, String> attributes = new HashMap<String, String>();
          attributes.putAll(component.Properties);
-         // add the "well known" attributes - such as avm store
-         attributes.put("store", this.context.AVMStore);
-         attributes.put("theme", this.context.Theme);
+         // TODO: add the "well known" attributes
+         
          return new WebScriptPageRendererRequest(this, scriptUrl, match, attributes);
       }
 
@@ -686,10 +515,10 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    /**
-    * Template loader that resolves and executes webscript components by looking up layout keys
+    * Template loader that resolves and executes UI WebScript components by looking up layout keys
     * in the template against the component definition service URLs for the page.
     */
-   private class WebScriptTemplateLoader implements TemplateLoader
+   private class UIComponentTemplateLoader implements TemplateLoader
    {
       private ThreadLocal<PageRendererContext> context = new ThreadLocal<PageRendererContext>();
       private long last = 0L;
@@ -707,10 +536,10 @@ public class PageRendererServlet extends WebScriptServlet
          // most templates included by this loader will be children of other templates
          // unfortunately FreeMarker attempts to build paths for you to child templates - they are not
          // really children - so this information must be discarded
-         if (name.startsWith("avm://"))
-         {
-            name = name.substring(name.indexOf("/[") + 1);
-         }
+         //if (name.startsWith("avm://"))
+         //{
+         //   name = name.substring(name.indexOf("/[") + 1);
+         //}
          
          if (name.startsWith("[") && name.endsWith("]"))
          {
@@ -738,23 +567,19 @@ public class PageRendererServlet extends WebScriptServlet
          
          // lookup against component def config
          PageRendererContext context = this.context.get();
-         PageComponent component = context.PageDef.Components.get(key);
+         PageComponent component = context.PageInstance.Components.get(key);
          if (component == null)
          {
             // TODO: if the lookup fails, throw exception or just ignore the render and log...?
             throw new AlfrescoRuntimeException("Failed to find component identified by key '" + key +
-                  "' found in template: " + context.PageDef.TemplateName);
+                  "' found in template: " + context.PageInstance.PageTemplate);
          }
          
-         // TODO: remove the /service prefix from all config files?
+         // NOTE: UI component URLs in config files for page instances should not include /service prefix
          String webscript = component.Url;
          if (webscript.lastIndexOf('?') != -1)
          {
-            webscript = webscript.substring("/service".length(), webscript.lastIndexOf('?'));
-         }
-         else
-         {
-            webscript = webscript.substring("/service".length());
+            webscript = webscript.substring(0, webscript.lastIndexOf('?'));
          }
          
          // Execute the webscript and return a Reader to the textual content
@@ -780,9 +605,9 @@ public class PageRendererServlet extends WebScriptServlet
       }
       
       /**
-       * Setter to apply the current context for this template execution. A ThreadLocal is used
-       * to allow multiple servlet threads to execute using the same TemplateLoader (there can only be one)
-       * but with a different context for each thread.
+       * Setter to apply the current context for this template execution. A ThreadLocal wrapper is used
+       * to allow multiple servlet threads to run using the same TemplateLoader (there can only be one)
+       * but with a different context for each execution thread.
        */
       public void setContext(PageRendererContext context)
       {
@@ -795,11 +620,9 @@ public class PageRendererServlet extends WebScriptServlet
     */
    private static class PageRendererContext
    {
-      PageDefinition PageDef;
+      PageInstance PageInstance;
       String RequestURI;
       String RequestPath;
-      String AVMStore;
-      String Theme;
       String ComponentId;
       String ComponentUrl;
    }
@@ -807,7 +630,7 @@ public class PageRendererServlet extends WebScriptServlet
    /**
     * Helper to return context path for generating urls
     */
-   private static class URLHelper
+   public static class URLHelper
    {
       String context;
 
@@ -822,26 +645,50 @@ public class PageRendererServlet extends WebScriptServlet
       }
    }
    
-   /**
-    * Simple structure class representing a single page definition
-    */
-   private static class PageDefinition
+   private static class ApplicationUrl
    {
-      public String TemplateName;
+      public boolean match(String resource)
+      {
+         return false;
+      }
+      
+      public PageInstance getPageInstance(String resource)
+      {
+         // TODO: resolve appropriate page definition from the repo based on uri resource
+         //       once resolved, return from repo with details of template (either where to get
+         //       it or the template content itself) and the configuration of all ui components
+         //       add this data to the PageInstance structure that represents this page
+         PageInstance page = new PageInstance("pagetest01.ftl");
+         page.Title = "The Test Page Title";
+         page.Description = "Some kind of longer description - probably not output";
+         PageComponent component = new PageComponent("test01", "/test/alfwebtest01");
+         page.Components.put("test01", component);
+         return page;
+      }
+   }
+   
+   /**
+    * Simple structure class representing the definition of a single page instance
+    */
+   private static class PageInstance
+   {
+      public String PageTemplate;
       public String Title;
+      public String Description;
       public String Theme;
+      public RequiredAuthentication Authentication;
       public Map<String, PageComponent> Components = new HashMap<String, PageComponent>();
       
-      PageDefinition(String templateId)
+      PageInstance(String templateId)
       {
-         this.TemplateName = templateId;
+         this.PageTemplate = templateId;
       }
       
       @Override
       public String toString()
       {
          StringBuilder buf = new StringBuilder(256);
-         buf.append("TemplateName: ").append(TemplateName);
+         buf.append("PageTemplate: ").append(PageTemplate);
          for (String id : Components.keySet())
          {
             buf.append("\r\n   ").append(Components.get(id).toString());
