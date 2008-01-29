@@ -26,14 +26,17 @@ package org.alfresco.web.scripts.servlet;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.config.ServerProperties;
+import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptException;
-import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.WebScriptRequestImpl;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -218,6 +221,53 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         {
             return formData.getParameters().get(name);
         }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderNames()
+     */
+    @SuppressWarnings("unchecked")
+    public String[] getHeaderNames()
+    {
+        List<String> headersList = new ArrayList<String>();
+        Enumeration<String> enumNames = req.getHeaderNames();
+        while(enumNames.hasMoreElements())
+        {
+            headersList.add(enumNames.nextElement());
+        }
+        String[] headers = new String[headersList.size()];
+        headersList.toArray(headers);
+        return headers;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getHeader(java.lang.String)
+     */
+    public String getHeader(String name)
+    {
+        return req.getHeader(name);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderValues(java.lang.String)
+     */
+    @SuppressWarnings("unchecked")
+    public String[] getHeaderValues(String name)
+    {
+        String[] values = null;
+        Enumeration<String> enumValues = req.getHeaders(name);
+        if (enumValues.hasMoreElements())
+        {
+            List<String> valuesList = new ArrayList<String>();
+            do
+            {
+                valuesList.add(enumValues.nextElement());
+            } 
+            while (enumValues.hasMoreElements());
+            values = new String[valuesList.size()];
+            valuesList.toArray(values);
+        }
+        return values;
     }
     
     /**

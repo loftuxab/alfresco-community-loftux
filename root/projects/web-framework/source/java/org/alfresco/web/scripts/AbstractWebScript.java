@@ -27,6 +27,7 @@ package org.alfresco.web.scripts;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -118,8 +119,10 @@ public abstract class AbstractWebScript implements WebScript
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
-        params.put("args", createScriptArgs(req));
-        params.put("argsM", createScriptArgsM(req));
+        params.put("args", createArgs(req));
+        params.put("argsM", createArgsM(req));
+        params.put("headers", createHeaders(req));
+        params.put("headersM", createHeadersM(req));
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
 
@@ -150,8 +153,10 @@ public abstract class AbstractWebScript implements WebScript
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
-        params.put("args", createTemplateArgs(req));
-        params.put("argsM", createTemplateArgsM(req));
+        params.put("args", createArgs(req));
+        params.put("argsM", createArgsM(req));
+        params.put("headers", createHeaders(req));
+        params.put("headersM", createHeadersM(req));
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
 
@@ -179,24 +184,7 @@ public abstract class AbstractWebScript implements WebScript
      * @param req  Web Script Request
      * @return  argument map
      */
-    final protected Map<String, String> createScriptArgs(WebScriptRequest req)
-    {
-        Map<String, String> args = new HashMap<String, String>();
-        String[] names = req.getParameterNames();
-        for (String name : names)
-        {
-            args.put(name, req.getParameter(name));
-        }
-        return args;
-    }
-
-    /**
-     * Create a map of arguments from Web Script Request (for templating)
-     * 
-     * @param req  Web Script Request
-     * @return  argument map
-     */
-    final protected Map<String, String> createTemplateArgs(WebScriptRequest req)
+    final protected Map<String, String> createArgs(WebScriptRequest req)
     {
         Map<String, String> args = new HashMap<String, String>();
         String[] names = req.getParameterNames();
@@ -213,32 +201,7 @@ public abstract class AbstractWebScript implements WebScript
      * @param req  Web Script Request
      * @return  argument map
      */
-    final protected Map<String, Map<String, String>> createScriptArgsM(WebScriptRequest req)
-    {
-        // TODO: test templateArgsM approach
-        
-        Map<String, Map<String, String>> args = new HashMap<String, Map<String, String>>();
-        String[] names = req.getParameterNames();
-        for (String name : names)
-        {
-            Map<String, String> values = new HashMap<String, String>();
-            int i = 0;
-            for (String value : req.getParameterValues(name))
-            {
-                values.put(new Integer(i++).toString(), value);
-            }
-            args.put(name, values);
-        }
-        return args;
-    }
-
-    /**
-     * Create a map of (array) arguments from Web Script Request (for scripting)
-     * 
-     * @param req  Web Script Request
-     * @return  argument map
-     */
-    final protected Map<String, String[]> createTemplateArgsM(WebScriptRequest req)
+    final protected Map<String, String[]> createArgsM(WebScriptRequest req)
     {
         Map<String, String[]> args = new HashMap<String, String[]>();
         String[] names = req.getParameterNames();
@@ -248,7 +211,41 @@ public abstract class AbstractWebScript implements WebScript
         }
         return args;
     }
-    
+
+    /**
+     * Create a map of headers from Web Script Request (for scripting)
+     * 
+     * @param req  Web Script Request
+     * @return  header map
+     */
+    final protected Map<String, String> createHeaders(WebScriptRequest req)
+    {
+        Map<String, String> headers = new HashMap<String, String>();
+        String[] names = req.getHeaderNames();
+        for (String name : names)
+        {
+            headers.put(name, req.getHeader(name));
+        }
+        return headers;
+    }
+
+    /**
+     * Create a map of (array) headers from Web Script Request (for scripting)
+     * 
+     * @param req  Web Script Request
+     * @return  argument map
+     */
+    final protected Map<String, String[]> createHeadersM(WebScriptRequest req)
+    {
+        Map<String, String[]> args = new HashMap<String, String[]>();
+        String[] names = req.getHeaderNames();
+        for (String name : names)
+        {
+            args.put(name, req.getHeaderValues(name));
+        }
+        return args;
+    }
+
     /**
      * Render a template (identified by path)
      * 
