@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <title>The test page title</title>
+   <template>pagetest01.ftl</template>
+   <components>
+      <component id="header" url="/test/alfwebtest01">
+         <properties>
+            <property name="arg1">arg1value</property>
+            <property name="arg2">arg2value</property>
+         </properties>
+      </component>
+      <component id="nav" url="/test/alfwebtest02">
+         <properties>
+            <property name="location">myhome</property>
+         </properties>
+      </component>
+      <component id="comp01" url="/test/alfwebtest01"/>
+      <component id="comp02" url="/test/alfwebtest02"/>
+   </components>
+</page>
