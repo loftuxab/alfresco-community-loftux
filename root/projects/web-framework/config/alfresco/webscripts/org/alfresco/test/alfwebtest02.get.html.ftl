@@ -1,0 +1,1 @@
+<div>Test 02 Component - has ${args?size} args</div>

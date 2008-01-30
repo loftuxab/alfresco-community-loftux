@@ -33,9 +33,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.io.Writer;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -96,7 +96,6 @@ public class PageRendererServlet extends WebScriptServlet
    private PresentationTemplateProcessor templateProcessor;
    private UIComponentTemplateLoader uicomponentTemplateLoader;
    private SearchPath searchPath;
-   private Map<String, ExpiringValueCache<PageInstance>> defaultPageDefMap = null;
    
    @Override
    public void init() throws ServletException
@@ -124,9 +123,6 @@ public class PageRendererServlet extends WebScriptServlet
       
       // we use a specific config service instance
       configService = (ConfigService)context.getBean("pagerenderer.config");
-      
-      // create cache for default config
-      defaultPageDefMap = Collections.synchronizedMap(new HashMap<String, ExpiringValueCache<PageInstance>>());
    }
 
    @Override
@@ -135,11 +131,13 @@ public class PageRendererServlet extends WebScriptServlet
    {
       String uri = req.getRequestURI();
       
+      long startTime = 0;
       if (logger.isDebugEnabled())
       {
          String qs = req.getQueryString();
          logger.debug("Processing Page Renderer URL: ("  + req.getMethod() + ") " + uri + 
                ((qs != null && qs.length() != 0) ? ("?" + qs) : ""));
+         startTime = System.currentTimeMillis();
       }
       
       uri = uri.substring(req.getContextPath().length());   // skip server context path
@@ -187,8 +185,8 @@ public class PageRendererServlet extends WebScriptServlet
       
       try
       {
-         // retrieve the page def from the application url - will throw an exception if the page
-         // cannot be found or fails to retrieve from the repository
+         // retrieve the page instance via the application url - will throw a runtime exception if
+         // the page cannot be found or fails to retrieve from the local store or repository
          PageInstance page = appUrl.getPageInstance(resource);
          if (logger.isDebugEnabled())
             logger.debug("PageInstance: " + page.toString());
@@ -227,6 +225,11 @@ public class PageRendererServlet extends WebScriptServlet
             // execute the templte to render the page - based on the current page definition
             processTemplatePage(page.PageTemplate, page, req, res);
          }
+         if (logger.isDebugEnabled())
+         {
+            long endTime = System.currentTimeMillis();
+            logger.debug("Time to render page: " + (endTime - startTime) + "ms");
+         }
       }
       catch (Throwable err)
       {
@@ -245,7 +248,9 @@ public class PageRendererServlet extends WebScriptServlet
    private ApplicationUrl matchAppUrl(String resource, Map<String, String> args)
    {
       // TODO: match against app urls loaded from app registry
-      return new ApplicationUrl();
+      //       retrieve the application urls from a Store that may reference the repo and/or a local 
+      ApplicationUrl testUrl = new ApplicationUrl(this.searchPath);
+      return testUrl;
    }
    
    /**
@@ -253,23 +258,23 @@ public class PageRendererServlet extends WebScriptServlet
     * @throws IOException
     */
    private void processTemplatePage(
-         String templatePath, PageInstance pageDef, HttpServletRequest req, HttpServletResponse res)
+         String templatePath, PageInstance page, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
       // TODO: retrieve the template from the remote repo - or from cache
-      templateProcessor.process(templatePath, getModel(pageDef, req), res.getWriter());
+      templateProcessor.process(templatePath, getModel(page, req), res.getWriter());
    }
    
    /**
     * @return model to use for UI Component template page execution
     */
-   private Object getModel(PageInstance pageDef, HttpServletRequest req)
+   private Object getModel(PageInstance page, HttpServletRequest req)
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
       model.put("url", new URLHelper(req.getContextPath()));
-      model.put("description", pageDef.Description);
-      model.put("title", pageDef.Title);
-      model.put("theme", pageDef.Theme);
+      model.put("description", page.Description);
+      model.put("title", page.Title);
+      model.put("theme", page.Theme);
       return model;
    }
    
@@ -336,12 +341,15 @@ public class PageRendererServlet extends WebScriptServlet
       @Override
       protected WebScriptRequest createRequest(Match match)
       {
-         // set the component properties as the additional request attributes 
-         Map<String, String> attributes = new HashMap<String, String>();
-         attributes.putAll(component.Properties);
-         // TODO: add the "well known" attributes
+         // set the component properties as the additional request parameters
+         Map<String, String> properties = new HashMap<String, String>();
+         properties.putAll(component.Properties);
          
-         return new WebScriptPageRendererRequest(this, scriptUrl, match, attributes);
+         //
+         // TODO: add/replace the "well known" context token attributes
+         //
+         
+         return new WebScriptPageRendererRequest(this, scriptUrl, match, properties);
       }
 
       @Override
@@ -394,7 +402,6 @@ public class PageRendererServlet extends WebScriptServlet
       {
          return null;
       }
-
    }
    
    /**
@@ -402,40 +409,36 @@ public class PageRendererServlet extends WebScriptServlet
     */
    private class WebScriptPageRendererRequest extends WebScriptRequestURLImpl
    {
-      private Map<String, String> attributes;
+      private Map<String, String> parameters;
       
       WebScriptPageRendererRequest(Runtime runtime, String scriptUrl, Match match, Map<String, String> attributes)
       {
          super(runtime, scriptUrl, match);
-         this.attributes = attributes;
-      }
-
-      //
-      // TODO: Refactor attribute methods - implement getScriptParameters and getTemplateParameters instead
-      //       
-      
-      /* (non-Javadoc)
-       * @see org.alfresco.web.scripts.WebScriptRequest#getAttribute(java.lang.String)
-       */
-      public Object getAttribute(String name)
-      {
-         return this.attributes.get(name);
+         this.parameters = attributes;
       }
 
       /* (non-Javadoc)
-       * @see org.alfresco.web.scripts.WebScriptRequest#getAttributeNames()
+       * @see org.alfresco.web.scripts.WebScriptRequest#getParameterNames()
        */
-      public String[] getAttributeNames()
+      public String[] getParameterNames()
       {
-         return this.attributes.keySet().toArray(new String[this.attributes.size()]);
+         return this.parameters.keySet().toArray(new String[this.parameters.size()]);
       }
 
       /* (non-Javadoc)
-       * @see org.alfresco.web.scripts.WebScriptRequest#getAttributeValues()
+       * @see org.alfresco.web.scripts.WebScriptRequest#getParameter(java.lang.String)
        */
-      public Object[] getAttributeValues()
+      public String getParameter(String name)
       {
-         return this.attributes.values().toArray(new String[this.attributes.size()]);
+         return this.parameters.get(name);
+      }
+
+      /* (non-Javadoc)
+       * @see org.alfresco.web.scripts.WebScriptRequest#getParameterValues(java.lang.String)
+       */
+      public String[] getParameterValues(String name)
+      {
+         return this.parameters.values().toArray(new String[this.parameters.size()]);
       }
       
       public String getAgent()
@@ -586,7 +589,7 @@ public class PageRendererServlet extends WebScriptServlet
          if (component == null)
          {
             // TODO: if the lookup fails, throw exception or just ignore the render and log...?
-            throw new AlfrescoRuntimeException("Failed to find component identified by key '" + key +
+            return new StringReader("ERROR: Failed to find component identified by key '" + key +
                   "' found in template: " + context.PageInstance.PageTemplate);
          }
          
@@ -657,134 +660,6 @@ public class PageRendererServlet extends WebScriptServlet
       public String getContext()
       {
          return context;
-      }
-   }
-   
-   private static class ApplicationUrl
-   {
-      public boolean match(String resource)
-      {
-         return false;
-      }
-      
-      public PageInstance getPageInstance(String resource)
-      {
-         // TODO: resolve appropriate page definition from the repo based on uri resource
-         //       once resolved, return from repo with details of template (either where to get
-         //       it or the template content itself) and the configuration of all ui components
-         //       add this data to the PageInstance structure that represents this page
-         PageInstance page = new PageInstance("pagetest01.ftl");
-         page.Title = "The Test Page Title";
-         page.Description = "Some kind of longer description - probably not output";
-         PageComponent component = new PageComponent("test01", "/test/alfwebtest01");
-         page.Components.put("test01", component);
-         return page;
-      }
-   }
-   
-   /**
-    * Simple structure class representing the definition of a single page instance
-    */
-   private static class PageInstance
-   {
-      public String PageTemplate;
-      public String Title;
-      public String Description;
-      public String Theme;
-      public RequiredAuthentication Authentication;
-      public Map<String, PageComponent> Components = new HashMap<String, PageComponent>();
-      
-      PageInstance(String templateId)
-      {
-         this.PageTemplate = templateId;
-      }
-      
-      @Override
-      public String toString()
-      {
-         StringBuilder buf = new StringBuilder(256);
-         buf.append("PageTemplate: ").append(PageTemplate);
-         for (String id : Components.keySet())
-         {
-            buf.append("\r\n   ").append(Components.get(id).toString());
-         }
-         return buf.toString();
-      }
-   }
-   
-   /**
-    * Simple structure class representing a single component definition for a page
-    */
-   private static class PageComponent
-   {
-      public String Id;
-      public String Url;
-      public Map<String, String> Properties = new HashMap<String, String>(4, 1.0f);
-      
-      PageComponent(String id, String url)
-      {
-         this.Id = id;
-         this.Url = url;
-      }
-
-      @Override
-      public String toString()
-      {
-         return "Component: " + Id + " URL: " + Url + " Properties: " + Properties.toString(); 
-      }
-   }
-   
-   /**
-    * Helper class to automatically expire a cached value after a timeout 
-    */
-   private static class ExpiringValueCache<T>
-   {
-      private long timeout;
-      private long snapshot = 0;
-      private T value;
-
-      /**
-       * Constructor
-       * 
-       * @param timeout   Timeout in milliseconds before cached value is discarded
-       */
-      public ExpiringValueCache(long timeout)
-      {
-         this.timeout = timeout; 
-      }
-
-      /**
-       * Put a value into the cache. The item will be return from the associated get() method
-       * until the timeout expires then null will be returned.
-       * 
-       * @param value     The object to store in the cache
-       */
-      public void put(T value)
-      {
-         this.value = value;
-         this.snapshot = System.currentTimeMillis();
-      }
-
-      /**
-       * Get the cached object. The set item will be returned until it expires, then null will be returned.
-       *  
-       * @return cached object or null if not set or expired.
-       */
-      public T get()
-      {
-         if (snapshot + timeout < System.currentTimeMillis())
-         {
-            this.value = null;
-         }
-         return this.value;
-      }
-
-      /**
-       * Clear the cache value
-       */
-      public void clear()
-      {
-         this.value = null;
       }
    }
 }
