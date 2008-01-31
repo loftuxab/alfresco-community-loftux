@@ -1,0 +1,49 @@
+<alfresco-config>
+   
+   <!-- Global Config -->
+   <config>
+      <!-- GenericConfigElement test -->
+      <foo name="foo" title="Foo">
+         <bar id="bar1Id" />
+         <bar id="bar2Id" />
+         <bar id="bar3Id">bar3Value</bar>
+      </foo>
+      
+      <!-- ModelAware test -->
+      <!-- TODO: define a test config element reader and config element -->
+      <!--       that implements ModelAware -->
+      <test>
+         <item id="foo">bar</item>
+         <item id="animal">dog</item>
+         <item id="person">gav</item>
+         <actions>
+            <action id="details_doc" label="View Doc Details" />
+            <action id="details_space" label="View Space Details" />
+         </actions>
+      </test>
+      
+      <!-- Override test -->
+      <param>hello</param>
+   </config>
+   
+   <!-- Scoped Config -->
+   <config evaluator="string-compare" condition="NotModelAwareTest">
+      <server>
+         <scheme>http</scheme>
+         <hostname>localhost</hostname>
+         <port>8080</port>
+      </server>
+   </config>
+   
+   <config evaluator="string-compare" condition="OverrideTest">
+      <param>goodbye</param>
+      <test>
+         <item id="animal">cat</item>
+         <actions>
+            <action id="details_doc" label="View Document Details" />
+            <action id="delete_doc" label="Delete Document"/>
+         </actions>
+      </test>
+   </config>
+
+</alfresco-config>

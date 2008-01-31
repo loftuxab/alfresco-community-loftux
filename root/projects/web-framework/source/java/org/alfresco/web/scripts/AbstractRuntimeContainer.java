@@ -28,6 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.config.ConfigModel;
+import org.alfresco.config.ConfigService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -57,7 +59,8 @@ public abstract class AbstractRuntimeContainer
     private FormatRegistry formatRegistry;
     private ScriptProcessor scriptProcessor;
     private TemplateProcessor templateProcessor;
-    
+    private ConfigService configService;
+    private ConfigModel configModel;
 
     /**
      * @param name
@@ -99,6 +102,14 @@ public abstract class AbstractRuntimeContainer
         this.templateProcessor = templateProcessor;
     }
     
+    /**
+     * @param configService
+     */
+    public void setConfigService(ConfigService configService)
+    {
+        this.configService = configService;
+    }
+    
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.RuntimeContainer#getName()
@@ -115,6 +126,7 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("server", getDescription());
+        params.put("config", getConfigModel());
         params.put("logger", new ScriptLogger());
         return Collections.unmodifiableMap(params);
     }
@@ -126,6 +138,7 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>();
         params.put("server", getDescription());
+        params.put("config", getConfigModel());
         return Collections.unmodifiableMap(params);
     }
 
@@ -215,4 +228,18 @@ public abstract class AbstractRuntimeContainer
         return this.applicationContext;
     }
     
+    /**
+     * Gets the ConfigModel object representing the application configuration
+     * 
+     * @return
+     */
+    protected ConfigModel getConfigModel()
+    {
+       if (this.configModel == null)
+       {
+          this.configModel = new ConfigModel(this.configService);
+       }
+       
+       return this.configModel;
+    }
 }
