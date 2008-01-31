@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Config Test</shortname>
+  <description>Tests the webscript configuration integration</description>
+  <url>/test/configtest</url>
+</webscript>
