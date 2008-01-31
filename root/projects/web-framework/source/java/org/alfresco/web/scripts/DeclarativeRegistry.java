@@ -469,6 +469,7 @@ public class DeclarativeRegistry
             
             // retrieve format
             String defaultFormat = "html";
+            String defaultFormatMimetype = null; 
             FormatStyle formatStyle = FormatStyle.any;
             Element formatElement = rootElement.element("format");
             if (formatElement != null)
@@ -488,6 +489,43 @@ public class DeclarativeRegistry
                     {
                         throw new WebScriptException("Format Style '" + formatStyle + "' is not a valid value");
                     }
+                }
+            }
+            if (defaultFormat != null)
+            {
+                defaultFormatMimetype = container.getFormatRegistry().getMimeType(null, defaultFormat);
+                if (defaultFormatMimetype == null)
+                {
+                    throw new WebScriptException("Default format '" + defaultFormat + "' is unknown");
+                }
+            }
+            
+            // retrieve negotiation
+            NegotiatedFormat[] negotiatedFormats = null;
+            List negotiateElements = rootElement.elements("negotiate");
+            if (negotiateElements.size() > 0)
+            {
+                negotiatedFormats = new NegotiatedFormat[negotiateElements.size() + (defaultFormatMimetype == null ? 0 : 1)];
+                int iNegotiate = 0;
+                Iterator iterNegotiateElements = negotiateElements.iterator();
+                while(iterNegotiateElements.hasNext())
+                {
+                    Element negotiateElement = (Element)iterNegotiateElements.next();
+                    String accept = negotiateElement.attributeValue("accept");
+                    if (accept == null || accept.length() == 0)
+                    {
+                        throw new WebScriptException("Expected 'accept' attribute on <negotiate> element");
+                    }
+                    String format = negotiateElement.getTextTrim();
+                    if (format == null || format.length() == 0)
+                    {
+                        throw new WebScriptException("Expected <negotiate> value");
+                    }
+                    negotiatedFormats[iNegotiate++] = new NegotiatedFormat(new MediaType(accept), format);
+                }
+                if (defaultFormatMimetype != null)
+                {
+                    negotiatedFormats[iNegotiate++] = new NegotiatedFormat(new MediaType(defaultFormatMimetype), defaultFormat);
                 }
             }
             
@@ -533,6 +571,7 @@ public class DeclarativeRegistry
             serviceDesc.setMethod(method);
             serviceDesc.setUris(uris.toArray(new String[uris.size()]));
             serviceDesc.setDefaultFormat(defaultFormat);
+            serviceDesc.setNegotiatedFormats(negotiatedFormats);
             serviceDesc.setFormatStyle(formatStyle);
             return serviceDesc;
         }

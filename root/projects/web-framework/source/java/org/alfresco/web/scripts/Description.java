@@ -93,7 +93,6 @@ public interface Description
         argument      // /a/b/c?format=x
     }
     
-    
     /**
      * Gets the root path of the store of this web script
      * 
@@ -193,4 +192,10 @@ public interface Description
      */
     public String getDefaultFormat();
     
+    /**
+     * Gets the formats available for negotiation
+     * 
+     * @return  negotiated formats
+     */
+    public NegotiatedFormat[] getNegotiatedFormats();
 }

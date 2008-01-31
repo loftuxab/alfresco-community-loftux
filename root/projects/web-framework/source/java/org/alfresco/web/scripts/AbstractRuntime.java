@@ -122,7 +122,7 @@ public abstract class AbstractRuntime implements Runtime
                 if (logger.isDebugEnabled())
                 {
                     String reqFormat = scriptReq.getFormat();
-                    String format = (reqFormat == null || reqFormat.length() == 0) ? "default" : scriptReq.getFormat();
+                    String format = (reqFormat == null || reqFormat.length() == 0) ? "default" : reqFormat;
                     Description desc = scriptReq.getServiceMatch().getWebScript().getDescription();
                     logger.debug("Invoking Web Script " + description.getId() + " (format " + format + ", style: " + desc.getFormatStyle() + ", default: " + desc.getDefaultFormat() + ")");
                 }
