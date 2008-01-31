@@ -48,6 +48,7 @@ public class DescriptionImpl implements Description
     private String httpMethod;
     private String[] uris;
     private String defaultFormat;
+    private NegotiatedFormat[] negotiatedFormats;
 
     
     /**
@@ -293,4 +294,22 @@ public class DescriptionImpl implements Description
         return this.defaultFormat;
     }
 
+    /**
+     * Sets the negotiated formats
+     * 
+     * @param defaultFormat
+     */
+    public void setNegotiatedFormats(NegotiatedFormat[] negotiatedFormats)
+    {
+        this.negotiatedFormats = negotiatedFormats;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getNegotiatedFormats()
+     */
+    public NegotiatedFormat[] getNegotiatedFormats()
+    {
+        return this.negotiatedFormats;
+    }
+    
 }

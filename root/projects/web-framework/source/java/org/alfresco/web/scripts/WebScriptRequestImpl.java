@@ -24,7 +24,11 @@
  */
 package org.alfresco.web.scripts;
 
+import javax.servlet.http.HttpServletResponse;
+
 import org.alfresco.web.scripts.Description.FormatStyle;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -34,6 +38,7 @@ import org.alfresco.web.scripts.Description.FormatStyle;
  */
 public abstract class WebScriptRequestImpl implements WebScriptRequest
 {
+    protected static final Log logger = LogFactory.getLog(WebScriptRequestImpl.class);
     private Runtime runtime;
 
     /**
@@ -119,6 +124,24 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
                     format = argFormat;
                 }
             }
+            
+            // negotiate format, if necessary
+            if (format == null || format.length() == 0)
+            {
+                String accept = getHeader("Accept");
+                NegotiatedFormat[] negotiatedFormats = getServiceMatch().getWebScript().getDescription().getNegotiatedFormats();
+                if (accept != null && negotiatedFormats != null)
+                {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Negotiating format for " + accept);
+                        
+                    format = NegotiatedFormat.negotiateFormat(accept, negotiatedFormats);
+                    if (format == null)
+                    {
+                        throw new WebScriptException(HttpServletResponse.SC_NOT_ACCEPTABLE, "Cannot negotiate appropriate response format for Accept: " + accept);
+                    }
+                }
+            }
         }
         
         return (format == null || format.length() == 0) ? "" : format;
@@ -168,5 +191,5 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
     {
         return false;
     }
-
+    
 }
