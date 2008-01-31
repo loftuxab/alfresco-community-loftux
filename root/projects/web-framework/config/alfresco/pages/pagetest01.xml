@@ -3,10 +3,10 @@
    <title>The test page title</title>
    <template>pagetest01.ftl</template>
    <components>
-      <component id="header" url="/test/alfwebtest01">
+      <component id="header" url="/test/alfwebtest01?node={noderef}">
          <properties>
             <property name="arg1">arg1value</property>
-            <property name="arg2">arg2value</property>
+            <property name="arg2">before-{noderef}-middle-{user}-after</property>
          </properties>
       </component>
       <component id="nav" url="/test/alfwebtest02">
