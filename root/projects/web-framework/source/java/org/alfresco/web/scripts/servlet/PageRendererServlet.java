@@ -94,7 +94,7 @@ public class PageRendererServlet extends WebScriptServlet
    private static final String PARAM_COMPONENT_URL = "_alfUrl";
    
    private PresentationTemplateProcessor templateProcessor;
-   private UIComponentTemplateLoader uicomponentTemplateLoader;
+   private PageComponentTemplateLoader pageComponentTemplateLoader;
    private SearchPath searchPath;
    
    @Override
@@ -109,8 +109,8 @@ public class PageRendererServlet extends WebScriptServlet
       templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
       
       // custom loader for resolved UI Component reference indirections
-      uicomponentTemplateLoader = new UIComponentTemplateLoader();
-      templateProcessor.addTemplateLoader(uicomponentTemplateLoader);
+      pageComponentTemplateLoader = new PageComponentTemplateLoader();
+      templateProcessor.addTemplateLoader(pageComponentTemplateLoader);
       
       // add template loader for locally stored templates
       for (Store store : searchPath.getStores())
@@ -197,14 +197,17 @@ public class PageRendererServlet extends WebScriptServlet
          // TODO: authenticate - or redirect to login page etc...
          if (authenticate(getServletContext(), page.Authentication))
          {
-            // setup the webapp context path for the webscript runtime template loader to use when rebuilding urls
+            // Setup the PageRenderer context for the webscript runtime template loade to use
+            // when rebuilding urls for components - there is a single instance of the template loader
+            // and it must be kept thread safe for multiple simultaneous page renderer requests.
             PageRendererContext context = new PageRendererContext();
             context.RequestURI = uri;
             context.RequestPath = req.getContextPath();
             context.PageInstance = page;
+            context.Tokens = args;
             
             // handle a clicked UI component link - look for id+url
-            // TODO: keep state of page? i.e. multiple webscripts can be hosted and clicked...
+            // TODO: keep further state of page? i.e. multiple webscripts can be hosted and clicked
             String compId = req.getParameter(PARAM_COMPONENT_ID);
             if (compId != null)
             {
@@ -214,22 +217,18 @@ public class PageRendererServlet extends WebScriptServlet
                context.ComponentId = compId;
                context.ComponentUrl = compUrl;
             }
-            this.uicomponentTemplateLoader.setContext(context);
+            this.pageComponentTemplateLoader.setContext(context);
             
             // Process the page template using our custom loader - the loader will find and buffer
             // individual included webscript output into the Writer out for the servlet page.
-            // TODO: find the page template path
             if (logger.isDebugEnabled())
                logger.debug("Page template resolved as: " + page.PageTemplate);
             
             // execute the templte to render the page - based on the current page definition
-            processTemplatePage(page.PageTemplate, page, req, res);
+            processTemplatePage(page, req, res);
          }
          if (logger.isDebugEnabled())
-         {
-            long endTime = System.currentTimeMillis();
-            logger.debug("Time to render page: " + (endTime - startTime) + "ms");
-         }
+            logger.debug("Time to render page: " + (System.currentTimeMillis() - startTime) + "ms");
       }
       catch (Throwable err)
       {
@@ -254,15 +253,14 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    /**
-    * Execute the template to render the main page - based on the specified page definition config
+    * Execute the template to render the main page - based on the specified page instance.
+    * 
     * @throws IOException
     */
-   private void processTemplatePage(
-         String templatePath, PageInstance page, HttpServletRequest req, HttpServletResponse res)
+   private void processTemplatePage(PageInstance page, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      // TODO: retrieve the template from the remote repo - or from cache
-      templateProcessor.process(templatePath, getModel(page, req), res.getWriter());
+      templateProcessor.process(page.PageTemplate, getModel(page, req), res.getWriter());
    }
    
    /**
@@ -271,18 +269,25 @@ public class PageRendererServlet extends WebScriptServlet
    private Object getModel(PageInstance page, HttpServletRequest req)
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
-      model.put("url", new URLHelper(req.getContextPath()));
+      model.put("url", new URLHelper(req));
       model.put("description", page.Description);
       model.put("title", page.Title);
       model.put("theme", page.Theme);
       return model;
    }
    
+   /**
+    * @return the configuration object for the PageRenderer
+    */
    private Config getConfig()
    {
       return this.configService.getConfig("PageRenderer");
    }
    
+   /**
+    * Authenticate against the repository using the specified Authentication.
+    * @return success/failure
+    */
    private static boolean authenticate(ServletContext sc, RequiredAuthentication auth)
    {
       // TODO: authenticate via call to Alfresco server - using web-app config?
@@ -298,11 +303,67 @@ public class PageRendererServlet extends WebScriptServlet
       res.setHeader("Pragma", "no-cache");
    }
    
+   /**
+    * Helper to replace tokens in a string with values from a map of token->value.
+    * Token names in the string are delimited by {token} and the entire token name
+    * plus the delimiters are replaced by the value found in the supplied replacement map.
+    * If no replacement value is found for the token name, it is replace by the empty string.
+    * 
+    * @param s       String to work on - cannot be null
+    * @param tokens  Map of token name -> token value for replacements
+    * @return the replaced string or the original if no tokens found or a failure occurs
+    */
+   private static String replaceContextTokens(String s, Map<String, String> tokens)
+   {
+      String result = s;
+      int preIndex = 0;
+      int delimIndex = s.indexOf('{');
+      if (delimIndex != -1)
+      {
+         StringBuilder buf = new StringBuilder(s.length() + 16);
+         do
+         {
+            // copy up to token delimiter start
+            buf.append(s.substring(preIndex, delimIndex));
+            
+            // extract token and replace
+            if (s.length() < delimIndex + 2)
+            {
+               if (logger.isWarnEnabled())
+                  logger.warn("Failed to replace context tokens - malformed input: " + s);
+               return s;
+            }
+            int endDelimIndex = s.indexOf('}', delimIndex + 2);
+            if (endDelimIndex == -1)
+            {
+               if (logger.isWarnEnabled())
+                  logger.warn("Failed to replace context tokens - malformed input: " + s);
+               return s;
+            }
+            String token = s.substring(delimIndex + 1, endDelimIndex);
+            String replacement = tokens.get(token);
+            buf.append(replacement != null ? replacement : "");
+            
+            // locate next delimiter and mark end of previous delimiter
+            preIndex = endDelimIndex + 1; 
+            delimIndex = s.indexOf('{', preIndex);
+            if (delimIndex == -1 && s.length() > preIndex)
+            {
+               // append suffix of original string after the last delimiter found
+               buf.append(s.substring(preIndex));
+            }
+         } while (delimIndex != -1);
+         
+         result = buf.toString();
+      }
+      return result;
+   }
+   
    
    /**
-    * WebScript runtime for the PageRenderer servlet.
+    * WebScript runtime for a Page Component included within the PageRenderer servlet context.
     */
-   private class PageRendererWebScriptRuntime extends AbstractRuntime
+   private class PageComponentWebScriptRuntime extends AbstractRuntime
    {
       private PageComponent component;
       private PageRendererContext context;
@@ -311,8 +372,18 @@ public class PageRendererServlet extends WebScriptServlet
       private String encoding;
       private ByteArrayOutputStream baOut = null;
       
-      PageRendererWebScriptRuntime(
-            PageComponent component, PageRendererContext context, String webScript, String executeUrl, String encoding)
+      /**
+       * Constructor
+       * 
+       * @param component     The Page Component this runtime should execute
+       * @param context       The context for the PageRenderer execution thread
+       * @param webScript     The component WebScript url
+       * @param executeUrl    The full URL to execute including context path
+       * @param encoding      Output encoding
+       */
+      PageComponentWebScriptRuntime(
+            PageComponent component, PageRendererContext context,
+            String webScript, String executeUrl, String encoding)
       {
          super(PageRendererServlet.this.container);
          this.component = component;
@@ -341,15 +412,15 @@ public class PageRendererServlet extends WebScriptServlet
       @Override
       protected WebScriptRequest createRequest(Match match)
       {
-         // set the component properties as the additional request parameters
+         // add/replace the "well known" context tokens in component properties
          Map<String, String> properties = new HashMap<String, String>();
-         properties.putAll(component.Properties);
+         for (String arg : component.Properties.keySet())
+         {
+            properties.put(arg, replaceContextTokens(component.Properties.get(arg), context.Tokens));
+         }
          
-         //
-         // TODO: add/replace the "well known" context token attributes
-         //
-         
-         return new WebScriptPageRendererRequest(this, scriptUrl, match, properties);
+         // build the request to render this component
+         return new WebScriptPageComponentRequest(this, scriptUrl, match, properties);
       }
 
       @Override
@@ -359,10 +430,10 @@ public class PageRendererServlet extends WebScriptServlet
          // we later use that as the source for the webscript "template"
          try
          {
-            this.baOut = new ByteArrayOutputStream(4096);
+            baOut = new ByteArrayOutputStream(4096);
             BufferedWriter wrOut = new BufferedWriter(
                   encoding == null ? new OutputStreamWriter(baOut) : new OutputStreamWriter(baOut, encoding));
-            return new WebScriptPageRendererResponse(this, context, component.Id, wrOut, baOut);
+            return new WebScriptPageComponentResponse(this, context, component.Id, wrOut, baOut);
          }
          catch (UnsupportedEncodingException err)
          {
@@ -404,14 +475,15 @@ public class PageRendererServlet extends WebScriptServlet
       }
    }
    
+   
    /**
-    * Simple implementation of a WebScript URL Request for a webscript on the page
+    * Simple implementation of a WebScript URL Request for a webscript component on the page
     */
-   private class WebScriptPageRendererRequest extends WebScriptRequestURLImpl
+   private class WebScriptPageComponentRequest extends WebScriptRequestURLImpl
    {
       private Map<String, String> parameters;
       
-      WebScriptPageRendererRequest(Runtime runtime, String scriptUrl, Match match, Map<String, String> attributes)
+      WebScriptPageComponentRequest(Runtime runtime, String scriptUrl, Match match, Map<String, String> attributes)
       {
          super(runtime, scriptUrl, match);
          this.parameters = attributes;
@@ -467,17 +539,18 @@ public class PageRendererServlet extends WebScriptServlet
       }
    }
    
+   
    /**
     * Implementation of a WebScript Response object for PageRenderer servlet
     */
-   private class WebScriptPageRendererResponse extends WebScriptResponseImpl
+   private class WebScriptPageComponentResponse extends WebScriptResponseImpl
    {
       private Writer outWriter;
       private OutputStream outStream;
       private PageRendererContext context;
       private String componentId;
       
-      public WebScriptPageRendererResponse(
+      public WebScriptPageComponentResponse(
             Runtime runtime, PageRendererContext context, String componentId, Writer outWriter, OutputStream outStream)
       {
          super(runtime);
@@ -532,33 +605,27 @@ public class PageRendererServlet extends WebScriptServlet
       }
    }
    
+   
    /**
     * Template loader that resolves and executes UI WebScript components by looking up layout keys
     * in the template against the component definition service URLs for the page.
     */
-   private class UIComponentTemplateLoader implements TemplateLoader
+   private class PageComponentTemplateLoader implements TemplateLoader
    {
       private ThreadLocal<PageRendererContext> context = new ThreadLocal<PageRendererContext>();
       private long last = 0L;
       
       public void closeTemplateSource(Object templateSource) throws IOException
       {
-         // nothing to do
+         // nothing to do - we close all sources during getReader()
       }
 
       public Object findTemplateSource(String name) throws IOException
       {
          // The webscript is looked up based on the key in the #include directive - it must
-         // be of the form [somekey] so that it can be recognised by the loader
-         
-         // most templates included by this loader will be children of other templates
-         // unfortunately FreeMarker attempts to build paths for you to child templates - they are not
-         // really children - so this information must be discarded
-         //if (name.startsWith("avm://"))
-         //{
-         //   name = name.substring(name.indexOf("/[") + 1);
-         //}
-         
+         // be of the form "/[somekey]" so that it can be recognised by the loader
+         // The root slash is required to inform FreeMarker that the template is not a child
+         // of the current path - which makes no sense
          if (name.startsWith("[") && name.endsWith("]"))
          {
             String key = name.substring(1, name.length() - 1);
@@ -576,6 +643,8 @@ public class PageRendererServlet extends WebScriptServlet
 
       public long getLastModified(Object templateSource)
       {
+         // TODO: for now we simply ensure the component template is not cached by freemarker
+         //       should this hook into the cache for the Store retrieving the component?
          return last++;
       }
 
@@ -593,8 +662,10 @@ public class PageRendererServlet extends WebScriptServlet
                   "' found in template: " + context.PageInstance.PageTemplate);
          }
          
-         // NOTE: UI component URLs in config files for page instances should not include /service prefix
-         String webscript = component.Url;
+         // NOTE: UI component URIs in page instance config files should not include /service prefix
+         // Replace context/well known tokens in the component url
+         String componentUrl = replaceContextTokens(component.Url, context.Tokens);
+         String webscript = componentUrl;
          if (webscript.lastIndexOf('?') != -1)
          {
             webscript = webscript.substring(0, webscript.lastIndexOf('?'));
@@ -604,14 +675,16 @@ public class PageRendererServlet extends WebScriptServlet
          String executeUrl;
          if (component.Id.equals(context.ComponentId) == false)
          {
-            executeUrl = context.RequestPath + component.Url;
+            executeUrl = context.RequestPath + componentUrl;
          }
          else
          {
-            // found the component url that was passed in on the servlet request
+            // else we found a clicked component url that was passed in on the servlet request
             executeUrl = context.ComponentUrl;
          }
-         PageRendererWebScriptRuntime runtime = new PageRendererWebScriptRuntime(
+         
+         // Generate a runtime to execute the webscript ui component
+         PageComponentWebScriptRuntime runtime = new PageComponentWebScriptRuntime(
                component, context, webscript, executeUrl, encoding);
          runtime.executeScript();
          
@@ -633,6 +706,7 @@ public class PageRendererServlet extends WebScriptServlet
       }
    }
    
+   
    /**
     * Simple structure class representing the current page request context
     */
@@ -643,7 +717,9 @@ public class PageRendererServlet extends WebScriptServlet
       String RequestPath;
       String ComponentId;
       String ComponentUrl;
+      Map<String, String> Tokens;
    }
+   
    
    /**
     * Helper to return context path for generating urls
@@ -651,15 +727,29 @@ public class PageRendererServlet extends WebScriptServlet
    public static class URLHelper
    {
       String context;
+      String url;
+      String args;
 
-      public URLHelper(String context)
+      public URLHelper(HttpServletRequest req)
       {
-         this.context = context;
+         this.context = req.getContextPath();
+         this.url = req.getRequestURI();
+         this.args = (req.getQueryString() != null ? req.getQueryString() : "");
       }
 
       public String getContext()
       {
          return context;
+      }
+      
+      public String getFull()
+      {
+         return url;
+      }
+      
+      public String getArgs()
+      {
+         return this.args;
       }
    }
 }
