@@ -36,27 +36,115 @@ import org.alfresco.web.scripts.Description.RequiredAuthentication;
  */
 public class PageInstance
 {
-   public String PageTemplate;
-   public String Title;
-   public String Description;
-   public String Theme;
-   public RequiredAuthentication Authentication;
-   public Map<String, PageComponent> Components = new HashMap<String, PageComponent>();
+   private String pageTemplate;
+   private String title;
+   private String description;
+   private String theme;
+   private RequiredAuthentication authentication;
+   private Map<String, PageComponent> components = new HashMap<String, PageComponent>();
 
    PageInstance(String templateId)
    {
-      this.PageTemplate = templateId;
+      this.pageTemplate = templateId;
    }
 
    @Override
    public String toString()
    {
       StringBuilder buf = new StringBuilder(256);
-      buf.append("PageTemplate: ").append(PageTemplate);
-      for (String id : Components.keySet())
+      buf.append("PageTemplate: ").append(pageTemplate);
+      for (String id : components.keySet())
       {
-         buf.append("\r\n   ").append(Components.get(id).toString());
+         buf.append("\r\n   ").append(components.get(id).toString());
       }
       return buf.toString();
+   }
+
+   /**
+    * @return the pageTemplate
+    */
+   public String getPageTemplate()
+   {
+      return pageTemplate;
+   }
+
+   /**
+    * @param title the title to set
+    */
+   public void setTitle(String title)
+   {
+      this.title = title;
+   }
+
+   /**
+    * @return the title
+    */
+   public String getTitle()
+   {
+      return title;
+   }
+
+   /**
+    * @param description the description to set
+    */
+   public void setDescription(String description)
+   {
+      this.description = description;
+   }
+
+   /**
+    * @return the description
+    */
+   public String getDescription()
+   {
+      return description;
+   }
+
+   /**
+    * @param theme the theme to set
+    */
+   public void setTheme(String theme)
+   {
+      this.theme = theme;
+   }
+
+   /**
+    * @return the theme
+    */
+   public String getTheme()
+   {
+      return theme;
+   }
+
+   /**
+    * @param authentication the authentication to set
+    */
+   public void setAuthentication(RequiredAuthentication authentication)
+   {
+      this.authentication = authentication;
+   }
+
+   /**
+    * @return the authentication
+    */
+   public RequiredAuthentication getAuthentication()
+   {
+      return authentication;
+   }
+
+   /**
+    * @param components the components to set
+    */
+   public void setComponents(Map<String, PageComponent> components)
+   {
+      this.components = components;
+   }
+
+   /**
+    * @return the components
+    */
+   public Map<String, PageComponent> getComponents()
+   {
+      return components;
    }
 }

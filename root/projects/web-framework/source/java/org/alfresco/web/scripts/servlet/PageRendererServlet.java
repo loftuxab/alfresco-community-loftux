@@ -195,7 +195,7 @@ public class PageRendererServlet extends WebScriptServlet
          res.setContentType(MIMETYPE_HTML);
          
          // TODO: authenticate - or redirect to login page etc...
-         if (authenticate(getServletContext(), page.Authentication))
+         if (authenticate(getServletContext(), page.getAuthentication()))
          {
             // Setup the PageRenderer context for the webscript runtime template loade to use
             // when rebuilding urls for components - there is a single instance of the template loader
@@ -222,7 +222,7 @@ public class PageRendererServlet extends WebScriptServlet
             // Process the page template using our custom loader - the loader will find and buffer
             // individual included webscript output into the Writer out for the servlet page.
             if (logger.isDebugEnabled())
-               logger.debug("Page template resolved as: " + page.PageTemplate);
+               logger.debug("Page template resolved as: " + page.getPageTemplate());
             
             // execute the templte to render the page - based on the current page definition
             processTemplatePage(page, req, res);
@@ -260,7 +260,7 @@ public class PageRendererServlet extends WebScriptServlet
    private void processTemplatePage(PageInstance page, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      templateProcessor.process(page.PageTemplate, getModel(page, req), res.getWriter());
+      templateProcessor.process(page.getPageTemplate(), getModel(page, req), res.getWriter());
    }
    
    /**
@@ -270,9 +270,9 @@ public class PageRendererServlet extends WebScriptServlet
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
       model.put("url", new URLHelper(req));
-      model.put("description", page.Description);
-      model.put("title", page.Title);
-      model.put("theme", page.Theme);
+      model.put("description", page.getDescription());
+      model.put("title", page.getTitle());
+      model.put("theme", page.getTheme());
       return model;
    }
    
@@ -414,9 +414,9 @@ public class PageRendererServlet extends WebScriptServlet
       {
          // add/replace the "well known" context tokens in component properties
          Map<String, String> properties = new HashMap<String, String>();
-         for (String arg : component.Properties.keySet())
+         for (String arg : component.getProperties().keySet())
          {
-            properties.put(arg, replaceContextTokens(component.Properties.get(arg), context.Tokens));
+            properties.put(arg, replaceContextTokens(component.getProperties().get(arg), context.Tokens));
          }
          
          // build the request to render this component
@@ -433,7 +433,7 @@ public class PageRendererServlet extends WebScriptServlet
             baOut = new ByteArrayOutputStream(4096);
             BufferedWriter wrOut = new BufferedWriter(
                   encoding == null ? new OutputStreamWriter(baOut) : new OutputStreamWriter(baOut, encoding));
-            return new WebScriptPageComponentResponse(this, context, component.Id, wrOut, baOut);
+            return new WebScriptPageComponentResponse(this, context, component.getId(), wrOut, baOut);
          }
          catch (UnsupportedEncodingException err)
          {
@@ -620,6 +620,10 @@ public class PageRendererServlet extends WebScriptServlet
          // nothing to do - we close all sources during getReader()
       }
 
+      /**
+       * Resolve the template source for the specified template name.
+       * This custom handles UI component references with the [id] syntax
+       */
       public Object findTemplateSource(String name) throws IOException
       {
          // The webscript is looked up based on the key in the #include directive - it must
@@ -648,23 +652,30 @@ public class PageRendererServlet extends WebScriptServlet
          return last++;
       }
 
+      /**
+       * Return the reader for the specified template source.
+       * This custom loads uses this hook to execute a webscript based UI component within
+       * it's own specific WebScript runtme using the PageRenderer as the outer context.
+       * The output of the UI component is buffered and a reader to it is returned to the
+       * template engine. The stream is then output as the result of the #include directive.
+       */
       public Reader getReader(Object templateSource, String encoding) throws IOException
       {
          String key = templateSource.toString();
          
          // lookup against component def config
          PageRendererContext context = this.context.get();
-         PageComponent component = context.PageInstance.Components.get(key);
+         PageComponent component = context.PageInstance.getComponents().get(key);
          if (component == null)
          {
             // TODO: if the lookup fails, throw exception or just ignore the render and log...?
             return new StringReader("ERROR: Failed to find component identified by key '" + key +
-                  "' found in template: " + context.PageInstance.PageTemplate);
+                  "' found in template: " + context.PageInstance.getPageTemplate());
          }
          
          // NOTE: UI component URIs in page instance config files should not include /service prefix
          // Replace context/well known tokens in the component url
-         String componentUrl = replaceContextTokens(component.Url, context.Tokens);
+         String componentUrl = replaceContextTokens(component.getUrl(), context.Tokens);
          String webscript = componentUrl;
          if (webscript.lastIndexOf('?') != -1)
          {
@@ -673,7 +684,7 @@ public class PageRendererServlet extends WebScriptServlet
          
          // Execute the webscript and return a Reader to the textual content
          String executeUrl;
-         if (component.Id.equals(context.ComponentId) == false)
+         if (component.getId().equals(context.ComponentId) == false)
          {
             executeUrl = context.RequestPath + componentUrl;
          }
