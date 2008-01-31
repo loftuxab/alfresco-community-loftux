@@ -34,19 +34,43 @@ import java.util.Map;
  */
 public class PageComponent
 {
-   public String Id;
-   public String Url;
-   public Map<String, String> Properties = new HashMap<String, String>(4, 1.0f);
+   private String id;
+   private String url;
+   private Map<String, String> properties = new HashMap<String, String>(4, 1.0f);
 
    PageComponent(String id, String url)
    {
-      this.Id = id;
-      this.Url = url;
+      this.id = id;
+      this.url = url;
+   }
+
+   /**
+    * @return the id
+    */
+   public String getId()
+   {
+      return this.id;
+   }
+
+   /**
+    * @return the url
+    */
+   public String getUrl()
+   {
+      return this.url;
    }
 
    @Override
    public String toString()
    {
-      return "Component: " + Id + " URL: " + Url + " Properties: " + Properties.toString(); 
+      return "Component: " + getId() + " URL: " + getUrl() + " Properties: " + getProperties().toString(); 
+   }
+
+   /**
+    * @return the properties
+    */
+   public Map<String, String> getProperties()
+   {
+      return this.properties;
    }
 }

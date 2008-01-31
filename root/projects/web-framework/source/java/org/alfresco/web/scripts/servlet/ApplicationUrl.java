@@ -104,8 +104,8 @@ public class ApplicationUrl
 
                // create config object for this page and store template name for this page
                page = new PageInstance(templateName);
-               page.Title = title;
-               page.Description = description;
+               page.setTitle(title);
+               page.setDescription(description);
 
                // TODO: do we have default config? where does it come from?
                // copy in component mappings from default config definitions first
@@ -154,12 +154,12 @@ public class ApplicationUrl
                      {
                         for (Element p : (List<Element>)ce.element("properties").elements())
                         {
-                           component.Properties.put(p.attributeValue("name"), p.getTextTrim());
+                           component.getProperties().put(p.attributeValue("name"), p.getTextTrim());
                         }
                      }
 
                      // add component mapping to the page definition
-                     page.Components.put(component.Id, component);
+                     page.getComponents().put(component.getId(), component);
                   }
                }
             }
