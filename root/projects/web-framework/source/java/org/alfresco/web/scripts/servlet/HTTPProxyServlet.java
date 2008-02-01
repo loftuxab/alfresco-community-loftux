@@ -22,12 +22,13 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.app.servlet;
+package org.alfresco.web.scripts.servlet;
 
 import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -54,7 +55,7 @@ import javax.servlet.http.HttpServletResponse;
  * 
  * @author davidc
  */
-public class HTTPProxyServlet extends BaseServlet
+public class HTTPProxyServlet extends HttpServlet
 {
     private static final long serialVersionUID = -576405943603122206L;
 
@@ -122,5 +123,4 @@ public class HTTPProxyServlet extends BaseServlet
         
         return proxy;
     }
-    
 }
