@@ -7,14 +7,21 @@
    </plug-ins>
    
    <config evaluator="string-compare" condition="Server">
-      <!-- The public web server hosting this web client -->
       <server>
-         <!-- Enable and adjust the following settings to allow for proxied use of Alfresco 
+         <!-- Enable and adjust the following settings to allow for proxied use of Web Framework 
          <scheme>http</scheme>
          <hostname>localhost</hostname>
          <port>8080</port>
          -->
       </server>
+   </config>
+   
+   <config evaluator="string-compare" condition="Remote">
+      <remote>
+         <!-- Adjust the following settings to reference the default
+              remote Alfresco repository server web application -->
+         <endpoint>http://localhost:8080/alfresco</endpoint>
+      </remote>
    </config>
 
 </alfresco-config>

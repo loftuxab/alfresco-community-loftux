@@ -258,7 +258,7 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         Enumeration<String> enumValues = req.getHeaders(name);
         if (enumValues.hasMoreElements())
         {
-            List<String> valuesList = new ArrayList<String>();
+            List<String> valuesList = new ArrayList<String>(2);
             do
             {
                 valuesList.add(enumValues.nextElement());

@@ -14,7 +14,8 @@
             <property name="location">myhome</property>
          </properties>
       </component>
-      <component id="comp01" url="/test/alfwebtest01"/>
+      <component id="comp01" url="/test/configtest"/>
       <component id="comp02" url="/test/alfwebtest02"/>
+      <component id="comp03" url="/test/remotetest1"/>
    </components>
 </page>

@@ -18,5 +18,9 @@
       <div style="border: 1px solid #dddddd; padding:4px">
          <#include "/[comp02]" parse=false>
       </div>
+      More plain text, and another component...
+      <div style="border: 1px solid #dddddd; padding:4px">
+         <#include "/[comp03]" parse=false>
+      </div>
    </body>
 </html>
