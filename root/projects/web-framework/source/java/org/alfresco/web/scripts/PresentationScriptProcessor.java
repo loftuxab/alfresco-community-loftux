@@ -25,16 +25,22 @@
 package org.alfresco.web.scripts;
 
 import java.io.ByteArrayOutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.IdScriptableObject;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrapFactory;
+import org.mozilla.javascript.Wrapper;
 import org.springframework.util.FileCopyUtils;
 
 
@@ -149,13 +155,101 @@ public class PresentationScriptProcessor implements ScriptProcessor
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.ScriptProcessor#unwrapValue(java.lang.Object)
+    /**
+     * Convert an object from a script wrapper value to a serializable value valid outside
+     * of the Rhino script processor context.
+     * 
+     * This includes converting JavaScript Array objects to Lists of valid objects.
+     * 
+     * @param value     Value to convert from script wrapper object to external object value.
+     * 
+     * @return unwrapped and converted value.
      */
-	public Object unwrapValue(Object value)
-	{
-		return value;
-	}
+	 public Object unwrapValue(Object value)
+	 {
+        if (value == null)
+        {
+            return null;
+        }
+        else if (value instanceof Wrapper)
+        {
+            // unwrap a Java object from a JavaScript wrapper
+            // recursively call this method to convert the unwrapped value
+            value = unwrapValue((Serializable)((Wrapper)value).unwrap());
+        }
+        else if (value instanceof ScriptableObject)
+        {
+            // a scriptable object will probably indicate a multi-value property
+            // set using a JavaScript Array object
+            ScriptableObject values = (ScriptableObject)value;
+            
+            if (value instanceof IdScriptableObject)
+            {
+                if ("Date".equals(((IdScriptableObject)value).getClassName()))
+                {
+                    Object javaObj = Context.jsToJava(value, Date.class);
+                    if (javaObj instanceof Serializable)
+                    {
+                        value = (Serializable)javaObj;
+                    }
+                }
+                else if (value instanceof NativeArray)
+                {
+                    // convert JavaScript array of values to a List of objects
+                    Object[] propIds = values.getIds();
+                    List<Object> propValues = new ArrayList<Object>(propIds.length);
+                    for (int i=0; i<propIds.length; i++)
+                    {
+                        // work on each key in turn
+                        Object propId = propIds[i];
+                        
+                        // we are only interested in keys that indicate a list of values
+                        if (propId instanceof Integer)
+                        {
+                            // get the value out for the specified key
+                            Object val = values.get((Integer)propId, values);
+                            // recursively call this method to convert the value
+                            propValues.add(unwrapValue(val));
+                        }
+                    }
+                    value = propValues;
+                }
+                else
+                {
+                    // convert JavaScript map to values to a Map of objects
+                    Object[] propIds = values.getIds();
+                    Map<String, Object> propValues = new HashMap<String, Object>(propIds.length);
+                    for (int i=0; i<propIds.length; i++)
+                    {
+                        // work on each key in turn
+                        Object propId = propIds[i];
+                        
+                        // we are only interested in keys that indicate a list of values
+                        if (propId instanceof String)
+                        {
+                            // get the value out for the specified key
+                            Object val = values.get((String)propId, values);
+                            // recursively call this method to convert the value
+                            propValues.put((String)propId, unwrapValue(val));
+                        }
+                    }
+                    value = propValues;
+                }
+            }
+        }
+        else if (value instanceof Object[])
+        {
+            // convert back a list Object Java values
+            Object[] array = (Object[])value;
+            ArrayList<Object> list = new ArrayList<Object>(array.length);
+            for (int i=0; i<array.length; i++)
+            {
+                list.add(unwrapValue(array[i]));
+            }
+            value = list;
+        }
+        return value;
+	 }
 
 	/* (non-Javadoc)
 	 * @see org.alfresco.web.scripts.ScriptProcessor#reset()

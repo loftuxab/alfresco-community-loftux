@@ -28,8 +28,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigModel;
 import org.alfresco.config.ConfigService;
+import org.alfresco.web.config.ServerConfigElement;
+import org.alfresco.web.config.ServerProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -128,6 +132,16 @@ public abstract class AbstractRuntimeContainer
         params.put("server", getDescription());
         params.put("config", getConfigModel());
         params.put("logger", new ScriptLogger());
+        
+        // retrieve remote server configuration 
+        Config config = configService.getConfig("Remote");
+        ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
+        String endpoint = remoteConfig.getChild("endpoint").getValue();
+        //
+        // TODO: use appropriate webscript servlet here - one that supports TICKET auth etc!
+        //
+        params.put("remote", new ScriptRemote(endpoint + "/service", "UTF-8"));
+        
         return Collections.unmodifiableMap(params);
     }
 
@@ -139,6 +153,7 @@ public abstract class AbstractRuntimeContainer
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
         params.put("config", getConfigModel());
+        
         return Collections.unmodifiableMap(params);
     }
 
