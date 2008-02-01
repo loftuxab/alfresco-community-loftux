@@ -77,34 +77,19 @@ public class ConfigModel
    @SuppressWarnings("unchecked")
    private void populateMap(Map<String, Object> map, Config config)
    {
-      if (logger.isDebugEnabled())
-         logger.debug("Populating map with config: " + config);
-      
       // go through each top level element and add it to the map
       for (String configElemName : config.getConfigElements().keySet())
       {
          ConfigElement elem = config.getConfigElement(configElemName);
-         if (elem instanceof ModelAware)
-         {
-            // if the config element is model aware get its map and add
-            Map model = ((ModelAware)elem).getModel();
-            map.put(configElemName, model);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Added model to map for '" + configElemName + "': " + model);
-         }
-         else
-         {
-            // just add the config element as is to the map, the
-            // downside to this is that the script & template
-            // writer must be aware of the API of the object, 
-            // this may either be a custom implementation or the
-            // GenericConfigElement implementation
-            map.put(configElemName, elem);
-            
-            if (logger.isDebugEnabled())
-               logger.debug("Added object to map for '" + configElemName + "': " + elem);
-         }
+         // just add the config element as is to the map, the
+         // downside to this is that the script & template
+         // writer must be aware of the API of the object, 
+         // this may either be a custom implementation or the
+         // GenericConfigElement implementation
+         map.put(configElemName, elem);
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Added element '" + configElemName + "': " + elem);
       }
    }
    

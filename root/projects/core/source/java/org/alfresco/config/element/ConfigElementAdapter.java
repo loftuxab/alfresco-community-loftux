@@ -27,6 +27,7 @@ package org.alfresco.config.element;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -118,6 +119,33 @@ public abstract class ConfigElementAdapter implements ConfigElement
        }
        
        return child;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map<String, List<ConfigElement>> getChildrenMap()
+    {
+       Map<String, List<ConfigElement>> map = new LinkedHashMap<String, List<ConfigElement>>();
+       
+       if (hasChildren())
+       {
+          for (ConfigElement ce : this.children)
+          {
+             String name = ce.getName();
+             if (map.containsKey(name))
+             {
+                List list = map.get(name);
+                list.add(ce);
+             }
+             else
+             {
+                List<ConfigElement> list = new ArrayList<ConfigElement>();
+                list.add(ce);
+                map.put(name, list);
+             }
+          }
+       }
+       
+       return map;
     }
     
     public String getName()
