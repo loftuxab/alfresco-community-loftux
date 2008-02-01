@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.app.servlet;
+package org.alfresco.web.scripts.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -91,6 +91,7 @@ public class HTTPProxy
             }
             catch(IOException e)
             {
+               // TODO: log io exceptions?
             }
         }
     }
@@ -129,7 +130,7 @@ public class HTTPProxy
     protected void writeResponse(InputStream input, OutputStream output)
         throws IOException
     {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         int read = input.read(buffer);
         while (read != -1)
         {
@@ -137,5 +138,4 @@ public class HTTPProxy
             read = input.read(buffer);
         }
     }
-    
 }
