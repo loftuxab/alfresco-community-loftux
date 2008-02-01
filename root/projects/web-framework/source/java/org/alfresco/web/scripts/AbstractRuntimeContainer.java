@@ -124,7 +124,7 @@ public abstract class AbstractRuntimeContainer
      */
     public Map<String, Object> getScriptParameters()
     {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
         params.put("config", getConfigModel());
         params.put("logger", new ScriptLogger());
@@ -136,7 +136,7 @@ public abstract class AbstractRuntimeContainer
      */
     public Map<String, Object> getTemplateParameters()
     {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
         params.put("config", getConfigModel());
         return Collections.unmodifiableMap(params);

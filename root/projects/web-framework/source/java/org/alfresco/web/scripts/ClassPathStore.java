@@ -168,7 +168,7 @@ public class ClassPathStore implements Store
 
         try
         {
-            List<String> documentPaths = new ArrayList<String>();
+            List<String> documentPaths = new ArrayList<String>(16);
             Resource[] resources = resolver.getResources("classpath*:" + classPath + "/**/*.desc.xml");
             for (Resource resource : resources)
             {

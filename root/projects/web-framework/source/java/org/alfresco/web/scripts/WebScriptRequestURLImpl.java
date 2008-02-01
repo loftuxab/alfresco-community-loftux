@@ -115,8 +115,8 @@ public abstract class WebScriptRequestURLImpl extends WebScriptRequestImpl
         this.servletPath = scriptUrlParts[1];
         this.pathInfo = scriptUrlParts[2];
         this.queryString = scriptUrlParts[3];
-        this.queryArgs = new HashMap<String, String>();
-        this.queryArgsMulti = new HashMap<String, List<String>>();
+        this.queryArgs = new HashMap<String, String>(8, 1.0f);
+        this.queryArgsMulti = new HashMap<String, List<String>>(8, 1.0f);
         if (this.queryString != null)
         {
             String[] args = this.queryString.split("&");
@@ -128,7 +128,7 @@ public abstract class WebScriptRequestURLImpl extends WebScriptRequestImpl
                     List<String> values = this.queryArgsMulti.get(parts[0]);
                     if (values == null)
                     {
-                        values = new ArrayList<String>();
+                        values = new ArrayList<String>(4);
                         this.queryArgsMulti.put(parts[0], values);
                     }
                     values.add(parts.length == 2 ? parts[1] : "");

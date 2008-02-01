@@ -99,7 +99,7 @@ public class SearchPath implements ApplicationContextAware, ApplicationListener
     @SuppressWarnings("unchecked")
     public Collection<Store> getStores()
     {
-        Collection<Store> aliveStores = new ArrayList<Store>();
+        Collection<Store> aliveStores = new ArrayList<Store>(searchPath.size());
         for (Store store : searchPath)
         {
             if (store.exists())

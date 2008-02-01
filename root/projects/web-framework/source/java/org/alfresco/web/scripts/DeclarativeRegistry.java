@@ -412,7 +412,7 @@ public class DeclarativeRegistry
             {
                 throw new WebScriptException("Expected at least one <url> element");
             }
-            List<String> uris = new ArrayList<String>();
+            List<String> uris = new ArrayList<String>(4);
             Iterator iterElements = urlElements.iterator();
             while(iterElements.hasNext())
             {

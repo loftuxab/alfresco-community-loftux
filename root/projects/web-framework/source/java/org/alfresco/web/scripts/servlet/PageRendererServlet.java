@@ -413,7 +413,7 @@ public class PageRendererServlet extends WebScriptServlet
       protected WebScriptRequest createRequest(Match match)
       {
          // add/replace the "well known" context tokens in component properties
-         Map<String, String> properties = new HashMap<String, String>();
+         Map<String, String> properties = new HashMap<String, String>(8, 1.0f);
          for (String arg : component.getProperties().keySet())
          {
             properties.put(arg, replaceContextTokens(component.getProperties().get(arg), context.Tokens));
@@ -423,11 +423,15 @@ public class PageRendererServlet extends WebScriptServlet
          return new WebScriptPageComponentRequest(this, scriptUrl, match, properties);
       }
 
+      /**
+       * Create the WebScriptResponse for a UI component.
+       * 
+       * Create a response object that we control to write to a temporary output buffer that
+       * we later use that as the source for the UI component webscript include.
+       */
       @Override
       protected WebScriptResponse createResponse()
       {
-         // create a response object that we control to write to a temporary output
-         // we later use that as the source for the webscript "template"
          try
          {
             baOut = new ByteArrayOutputStream(4096);
@@ -447,6 +451,10 @@ public class PageRendererServlet extends WebScriptServlet
          return "GET";
       }
       
+      /**
+       * @return Reader to the UI webscript response. The response has already been buffered
+       *         so just return a Reader directly to it.
+       */
       public Reader getResponseReader()
       {
          try
@@ -477,16 +485,19 @@ public class PageRendererServlet extends WebScriptServlet
    
    
    /**
-    * Simple implementation of a WebScript URL Request for a webscript component on the page
+    * Simple implementation of a WebScript URL Request for a webscript component on the page.
+    * Mostly based on the existing WebScriptRequestURLImpl - just adds support for additional
+    * page level context parameters available to the component as args.
     */
    private class WebScriptPageComponentRequest extends WebScriptRequestURLImpl
    {
       private Map<String, String> parameters;
       
-      WebScriptPageComponentRequest(Runtime runtime, String scriptUrl, Match match, Map<String, String> attributes)
+      WebScriptPageComponentRequest(
+            Runtime runtime, String scriptUrl, Match match, Map<String, String> parameters)
       {
          super(runtime, scriptUrl, match);
-         this.parameters = attributes;
+         this.parameters = parameters;
       }
 
       /* (non-Javadoc)
@@ -541,7 +552,9 @@ public class PageRendererServlet extends WebScriptServlet
    
    
    /**
-    * Implementation of a WebScript Response object for PageRenderer servlet
+    * Implementation of a WebScript Response object for PageRenderer servlet.
+    * Mostly based on the existing WebScriptResponseImpl - just adds support for
+    * encoding URLs to manage user click requests to any component on the page.
     */
    private class WebScriptPageComponentResponse extends WebScriptResponseImpl
    {
@@ -551,7 +564,8 @@ public class PageRendererServlet extends WebScriptServlet
       private String componentId;
       
       public WebScriptPageComponentResponse(
-            Runtime runtime, PageRendererContext context, String componentId, Writer outWriter, OutputStream outStream)
+            Runtime runtime, PageRendererContext context,
+            String componentId, Writer outWriter, OutputStream outStream)
       {
          super(runtime);
          this.context = context;
@@ -719,7 +733,8 @@ public class PageRendererServlet extends WebScriptServlet
    
    
    /**
-    * Simple structure class representing the current page request context
+    * Simple structure class representing the current thread request context for a page.
+    * Holds thread local values to be used by the single instance of the custom Template Loader.
     */
    private static class PageRendererContext
    {

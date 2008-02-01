@@ -171,7 +171,7 @@ public class PresentationScriptProcessor implements ScriptProcessor
      */
     protected void init()
     {
-        List<ScriptLoader> loaders = new ArrayList<ScriptLoader>();
+        List<ScriptLoader> loaders = new ArrayList<ScriptLoader>(searchPath.getStores().size());
         for (Store apiStore : searchPath.getStores())
         {
             ScriptLoader loader = apiStore.getScriptLoader();

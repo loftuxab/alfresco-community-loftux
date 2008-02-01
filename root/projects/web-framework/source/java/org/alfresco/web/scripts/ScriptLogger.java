@@ -61,5 +61,4 @@ public final class ScriptLogger
             System.out.println(str);
         }
     }
-        
 }
