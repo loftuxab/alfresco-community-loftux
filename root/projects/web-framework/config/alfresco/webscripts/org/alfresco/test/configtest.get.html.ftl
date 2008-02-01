@@ -6,14 +6,20 @@ foo element title attribute = ${config.global.foo.attributes["title"]}<br/>
 foo element has ${config.global.foo.children?size} children:
 <ul>
 <#list config.global.foo.children as child>
-<li>bar element with id of '${child.attributes["id"]}'</li>
+<li>element with name of '${child.name}'</li>
 </#list>
 </ul>
-value of bar3Id = ${config.global.foo.children[2].value}
+id of first child = ${config.global.foo.children[0].attributes["id"]}<br/>
+value of bar3Id = ${config.global.foo.children[2].value}<br/>
+value of baz = ${config.global.foo.children[3].value}
+
+<#assign childMap=config.global.foo.childrenMap>
+There are ${childMap["bar"]?size} bar elements<br/>
+value of single baz element is ${childMap["baz"][0].value}
 
 <h3>Testing scoped config...</h3>
 
-<#assign scopedCfg=config.scoped["NotModelAwareTest"]>
+<#assign scopedCfg=config.scoped["ServerConfigElementTest"]>
 scheme = ${scopedCfg.server.scheme}<br/>
 hostname = ${scopedCfg.server.hostName}<br/>
 port = ${scopedCfg.server.port}<br/>
