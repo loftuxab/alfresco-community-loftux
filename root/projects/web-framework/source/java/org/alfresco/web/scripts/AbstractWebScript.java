@@ -115,7 +115,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(7, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
@@ -149,7 +149,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(7, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
@@ -186,7 +186,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String> createArgs(WebScriptRequest req)
     {
-        Map<String, String> args = new HashMap<String, String>();
+        Map<String, String> args = new HashMap<String, String>(8, 1.0f);
         String[] names = req.getParameterNames();
         for (String name : names)
         {
@@ -203,7 +203,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String[]> createArgsM(WebScriptRequest req)
     {
-        Map<String, String[]> args = new HashMap<String, String[]>();
+        Map<String, String[]> args = new HashMap<String, String[]>(8, 1.0f);
         String[] names = req.getParameterNames();
         for (String name : names)
         {
@@ -220,7 +220,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String> createHeaders(WebScriptRequest req)
     {
-        Map<String, String> headers = new HashMap<String, String>();
+        Map<String, String> headers = new HashMap<String, String>(8, 1.0f);
         String[] names = req.getHeaderNames();
         for (String name : names)
         {
@@ -237,7 +237,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected Map<String, String[]> createHeadersM(WebScriptRequest req)
     {
-        Map<String, String[]> args = new HashMap<String, String[]>();
+        Map<String, String[]> args = new HashMap<String, String[]>(8, 1.0f);
         String[] names = req.getHeaderNames();
         for (String name : names)
         {

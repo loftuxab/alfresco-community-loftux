@@ -161,7 +161,7 @@ public abstract class AbstractRuntime implements Runtime
             // create basic model for status template rendering
             WebScriptRequest req = createRequest(null);
             WebScriptResponse res = createResponse();
-            Map<String, Object> model = new HashMap<String, Object>();
+            Map<String, Object> model = new HashMap<String, Object>(8, 1.0f);
             model.put("status", status);
             model.put("url", new URLModel(req));
             model.put("server", container.getDescription());

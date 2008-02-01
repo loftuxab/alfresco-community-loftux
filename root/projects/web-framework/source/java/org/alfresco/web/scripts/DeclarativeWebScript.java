@@ -91,7 +91,7 @@ public class DeclarativeWebScript extends AbstractWebScript
             Map<String, Object> model = executeImpl(req, status, cache);
             if (model == null)
             {
-                model = new HashMap<String, Object>(7, 1.0f);
+                model = new HashMap<String, Object>(8, 1.0f);
             }
             model.put("status", status);
             model.put("cache", cache);
@@ -104,7 +104,7 @@ public class DeclarativeWebScript extends AbstractWebScript
                 
                 Map<String, Object> scriptModel = createScriptParameters(req, res, model);
                 // add return model allowing script to add items to template model
-                Map<String, Object> returnModel = new HashMap<String, Object>();
+                Map<String, Object> returnModel = new HashMap<String, Object>(8, 1.0f);
                 scriptModel.put("model", returnModel);
                 executeScript(executeScript, scriptModel);
                 mergeScriptModelIntoTemplateModel(returnModel, model);
@@ -180,7 +180,7 @@ public class DeclarativeWebScript extends AbstractWebScript
             status.setException(e);
             Cache cache = new Cache();
             cache.setNeverCache(true);
-            Map<String, Object> customModel = new HashMap<String, Object>();
+            Map<String, Object> customModel = new HashMap<String, Object>(8, 1.0f);
             customModel.put("status", status);
             Map<String, Object> templateModel = createTemplateParameters(req, res, customModel);
             sendStatus(req, res, status, cache, format, templateModel);

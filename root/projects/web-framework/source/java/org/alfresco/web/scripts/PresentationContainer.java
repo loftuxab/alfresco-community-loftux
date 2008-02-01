@@ -55,7 +55,7 @@ public class PresentationContainer extends AbstractRuntimeContainer
     }
 
     /**
-     * Presetation Tier Model
+     * Presentation Tier Model
      *
      * TODO: Implement when versioning meta-data is applied to all .jars
 	 *
@@ -111,5 +111,4 @@ public class PresentationContainer extends AbstractRuntimeContainer
         
         private final static String UNKNOWN = "<unknown>"; 
     }
-    
 }
