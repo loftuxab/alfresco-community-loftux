@@ -131,7 +131,7 @@
    <bean id="webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
       <property name="container" ref="webscripts.container" />
       <property name="searchPath" ref="webscripts.searchpath" />
-      <property name="defaultWebScript"><value>webscript_default</value></property>
+      <property name="defaultWebScript"><value>webscript.default</value></property>
    </bean>
  
 
@@ -150,10 +150,14 @@
 
    <!--  Abstract API Service -->
    <bean id="webscript" abstract="true"/>
+   <bean id="webscriptdesc" abstract="true"/>
 
    <!--  Scripted API Service -->
-   <bean id="webscript_default" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebScript" singleton="false"/>
+   <bean id="webscript.default" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebScript" singleton="false"/>
 
+   <!--  ATOM Entry -->
+   <bean id="webscript.atomentry" parent="webscript" class="org.alfresco.web.scripts.AtomEntryWebScript" singleton="false"/>
+   <bean id="webscriptdesc.atomentry" parent="webscriptdesc" class="org.alfresco.web.scripts.AtomEntryDescription"/>
 
    <!--            -->
    <!--  API Beans -->

@@ -23,7 +23,17 @@
      </#list>
      <tr><td>Format Style:</td><td>${script.formatStyle}</td></tr>
      <tr><td>Default Format:</td><td>${script.defaultFormat!"[undefined}]"}</td></tr>
+     <#if script.negotiatedFormats?exists && script.negotiatedFormats?size &gt; 0>
+     <#list script.negotiatedFormats as negotiatedFormat>
+        <tr><td>Negotiated Format:</td><td>${negotiatedFormat.mediatype} => ${negotiatedFormat.format}</td></tr>
+     </#list>
+     <#else>
+        <tr><td>Negotiated Formats:</td><td>[undefined]</td></tr>
+     </#if>
      <tr><td>Implementation:</td><td>${script_class}</td></tr>
+     <#list script.extensions?keys as extensionName>
+        <tr><td>[custom] ${extensionName}:</td><td>${script.extensions[extensionName]}</td></tr>
+     </#list>
     </table>
     <p/>
 	<#list stores as store>
