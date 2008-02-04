@@ -28,9 +28,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLConnection;
 
+import org.alfresco.util.Base64;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,6 +52,10 @@ public class ScriptRemote
    private String endpoint;
    private String defaultEncoding;
    
+   // TODO: remove this - for testing only!
+   private String username;
+   private String password;
+   
    
    /**
     * Construction
@@ -63,6 +68,13 @@ public class ScriptRemote
    {
       this.endpoint = endpoint;
       this.defaultEncoding = defaultEncoding;
+   }
+   
+   // TODO: remove this - for testing only!
+   public void setUsernamePassword(String user, String pass)
+   {
+      this.username = user;
+      this.password = pass;
    }
    
    /**
@@ -116,7 +128,12 @@ public class ScriptRemote
    private String service(URL url, OutputStream out)
       throws IOException
    {
-      URLConnection connection = url.openConnection();
+      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+      if (this.username != null && this.password != null)
+      {
+         String auth = this.username + ':' + this.password;
+         connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
+      }
       
       // locate encoding from the response headers
       String encoding = null;
