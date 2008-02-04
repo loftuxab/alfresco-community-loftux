@@ -3,7 +3,7 @@
 
 <beans>
    
-   <!-- Page Renderer Configuration -->
+   <!-- Page Renderer Servlet configuration -->
    <bean id="pagerenderer.configsource" class="org.alfresco.config.source.UrlConfigSource">
       <constructor-arg>
          <list>
@@ -19,7 +19,8 @@
       </constructor-arg>
    </bean>
    
-   <!--  Local Resource Storage -->
+   
+   <!--  Local Resource Storage configuration -->
    <bean id="pagerenderer.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
 
    <bean id="pagerenderer.templatestore" parent="pagerenderer.classpathstore">
