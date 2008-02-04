@@ -137,10 +137,18 @@ public abstract class AbstractRuntimeContainer
         Config config = configService.getConfig("Remote");
         ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
         String endpoint = remoteConfig.getChild("endpoint").getValue();
+        ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
         //
         // TODO: use appropriate webscript servlet here - one that supports TICKET auth etc!
         //
-        params.put("remote", new ScriptRemote(endpoint + "/service", "UTF-8"));
+        // TODO: remove this block - for testing only!
+        if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
+        {
+           remote.setUsernamePassword(
+                 remoteConfig.getChild("username").getValue(),
+                 remoteConfig.getChild("password").getValue());
+        }
+        params.put("remote", remote);
         
         return Collections.unmodifiableMap(params);
     }

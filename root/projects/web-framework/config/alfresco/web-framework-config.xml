@@ -21,6 +21,8 @@
          <!-- Adjust the following settings to reference the default
               remote Alfresco repository server web application -->
          <endpoint>http://localhost:8080/alfresco</endpoint>
+         <username>admin</username>
+         <password>admin</password>
       </remote>
    </config>
 
