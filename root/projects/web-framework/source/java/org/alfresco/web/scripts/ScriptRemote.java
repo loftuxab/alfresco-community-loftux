@@ -49,27 +49,51 @@ public class ScriptRemote
    private static final int BUFFERSIZE = 4096;
 
    private String endpoint;
-   private String encoding;
+   private String defaultEncoding;
    
    
-   public ScriptRemote(String endpoint, String encoding)
+   /**
+    * Construction
+    * 
+    * @param endpoint         HTTP API endpoint of remote Alfresco server webapp
+    *                         For example http://servername:8080/alfresco
+    * @param defaultEncoding  Encoding to use when converting responses that do not specify one
+    */
+   public ScriptRemote(String endpoint, String defaultEncoding)
    {
       this.endpoint = endpoint;
-      this.encoding = encoding;
+      this.defaultEncoding = defaultEncoding;
    }
    
+   /**
+    * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
+    * as the prefix for the full WebScript url.
+    * 
+    * @param uri     WebScript URI - for example /test/myscript?arg=value
+    * 
+    * @return result from the call
+    */
    public String call(String uri)
    {
       String result = null;
       
       try
       {
+         //
          // TODO: Authentication ticket! Either pass in to constructor (must be authenticated
-         //       before main page is rendered) or assume uri already has ticket argument. 
-         URL url = new URL(this.endpoint + uri);
+         //       before main page is rendered) or assume uri already has ticket argument.
+         //
+         URL url = new URL(endpoint + uri);
          ByteArrayOutputStream bOut = new ByteArrayOutputStream(BUFFERSIZE);
-         service(url, bOut);
-         result = (encoding != null ? bOut.toString(encoding) : bOut.toString());
+         String encoding = service(url, bOut);
+         if (encoding != null)
+         {
+            result = bOut.toString(encoding);
+         }
+         else
+         {
+            result = (defaultEncoding != null ? bOut.toString(defaultEncoding) : bOut.toString());
+         }
       }
       catch (IOException ioErr)
       {
@@ -79,10 +103,34 @@ public class ScriptRemote
       return result;
    }
 
-   private void service(URL url, OutputStream out)
+   /**
+    * Service a remote URL and write the the result into an output stream.
+    * 
+    * @param url     The URL to open and retrieve data from
+    * @param out     The outputstream to write result to
+    * 
+    * @return encoding specified by the source URL - may be null
+    * 
+    * @throws IOException
+    */
+   private String service(URL url, OutputStream out)
       throws IOException
    {
       URLConnection connection = url.openConnection();
+      
+      // locate encoding from the response headers
+      String encoding = null;
+      String ct = connection.getContentType();
+      if (ct != null)
+      {
+         int csi = ct.indexOf("charset=");
+         if (csi != -1)
+         {
+            encoding = ct.substring(csi + 8);
+         }
+      }
+      
+      // write the service result to the output stream
       InputStream input = connection.getInputStream();
       try
       {
@@ -108,10 +156,12 @@ public class ScriptRemote
                out.close();
             }
          }
-         catch(IOException e)
+         catch (IOException e)
          {
-            // TODO: log io exceptions?
+            // TODO: log io exceptions - probably not a fatal error
          }
       }
+      
+      return encoding;
    }
 }
