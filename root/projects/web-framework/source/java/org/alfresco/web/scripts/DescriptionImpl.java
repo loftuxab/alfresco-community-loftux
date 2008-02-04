@@ -26,6 +26,8 @@ package org.alfresco.web.scripts;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -39,6 +41,7 @@ public class DescriptionImpl implements Description
     private String scriptPath;
     private String descPath;
     private String id;
+    private String kind;
     private String shortName;
     private String description;
     private RequiredAuthentication requiredAuthentication;
@@ -49,6 +52,7 @@ public class DescriptionImpl implements Description
     private String[] uris;
     private String defaultFormat;
     private NegotiatedFormat[] negotiatedFormats;
+    private Map<String, Serializable> extensions;
 
     
     /**
@@ -130,6 +134,24 @@ public class DescriptionImpl implements Description
     public String getId()
     {
         return this.id;
+    }
+
+    /**
+     * Sets the service kind
+     * 
+     * @param kind
+     */
+    public void setKind(String kind)
+    {
+        this.kind = kind;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getKind()
+     */
+    public String getKind()
+    {
+        return this.kind;
     }
 
     /**
@@ -311,5 +333,23 @@ public class DescriptionImpl implements Description
     {
         return this.negotiatedFormats;
     }
-    
+
+    /**
+     * Sets Web Script custom extensions
+     * 
+     * @param extensions
+     */
+    public void setExtensions(Map<String, Serializable> extensions)
+    {
+        this.extensions = extensions;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getExtensions()
+     */
+    public Map<String, Serializable> getExtensions()
+    {
+        return extensions;
+    }
+
 }

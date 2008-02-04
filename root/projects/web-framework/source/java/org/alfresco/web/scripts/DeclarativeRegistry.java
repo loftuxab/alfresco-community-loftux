@@ -26,6 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,6 +45,7 @@ import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -54,7 +56,7 @@ import org.springframework.context.ApplicationContextAware;
  * @author davidc
  */
 public class DeclarativeRegistry
-    implements Registry, ApplicationContextAware
+    implements Registry, ApplicationContextAware, InitializingBean
 {
     // Logger
     private static final Log logger = LogFactory.getLog(DeclarativeRegistry.class);
@@ -134,6 +136,18 @@ public class DeclarativeRegistry
     }
 
     /* (non-Javadoc)
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet()
+        throws Exception
+    {
+        if (defaultWebScript == null || defaultWebScript.length() == 0 || !applicationContext.containsBean(defaultWebScript))
+        {
+            throw new WebScriptException("Default Web Script implementation '" + (defaultWebScript == null ? "<undefined>" : defaultWebScript) + "' does not exist.");
+        }
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Registry#reset()
      */
     public void reset()
@@ -172,7 +186,7 @@ public class DeclarativeRegistry
                 try
                 {
                     // build service description
-                    Description serviceDesc = null;
+                    DescriptionImpl serviceDesc = null;
                     InputStream serviceDescIS = null;
                     try
                     {
@@ -211,10 +225,64 @@ public class DeclarativeRegistry
                         continue;
                     }
                     
+                    //
                     // construct service implementation
+                    //
+                    
+                    // establish kind of service implementation
                     ApplicationContext applicationContext = getApplicationContext();
-                    String beanName = "webscript." + id.replace('/', '.');
-                    String serviceImplName = (applicationContext.containsBean(beanName)) ? beanName : defaultWebScript;
+                    String kind = serviceDesc.getKind();
+                    String serviceImplName = null;
+                    if (kind == null)
+                    {
+                        // rely on default mapping of webscript id to service implementation
+                        // NOTE: always fallback to vanilla Declarative Web Script
+                        String beanName = "webscript." + id.replace('/', '.');
+                        serviceImplName = (applicationContext.containsBean(beanName) ? beanName : defaultWebScript);
+                    }
+                    else
+                    {
+                        // rely on explicitly defined web script kind
+                        if (!applicationContext.containsBean("webscript." + kind))
+                        {
+                            throw new WebScriptException("Web Script kind '" + kind + "' is unknown");
+                        }
+                        serviceImplName = "webscript." + kind;
+                    }
+                    
+                    // extract service specific description extensions
+                    String descImplName = serviceImplName.replaceFirst("webscript\\.", "webscriptdesc.");
+                    if (applicationContext.containsBean(descImplName) && applicationContext.isTypeMatch(descImplName, DescriptionExtension.class))
+                    {
+                        DescriptionExtension descriptionExtensions = (DescriptionExtension)applicationContext.getBean(descImplName);
+                        serviceDescIS = null;
+                        try
+                        {
+                            serviceDescIS = apiStore.getDocument(serviceDescPath);
+                            Map<String, Serializable> extensions = descriptionExtensions.parseExtensions(serviceDescPath, serviceDescIS);
+                            serviceDesc.setExtensions(extensions);
+                            
+                            if (logger.isDebugEnabled())
+                                logger.debug("Extracted " + (extensions == null ? "0" : extensions.size()) + " description extension(s) for Web Script " + id);
+                        }
+                        catch(IOException e)
+                        {
+                            throw new WebScriptException("Failed to parse extensions from Web Script description document " + apiStore.getBasePath() + serviceDescPath, e);
+                        }
+                        finally
+                        {
+                            try
+                            {
+                                if (serviceDescIS != null) serviceDescIS.close();
+                            }
+                            catch(IOException e)
+                            {
+                                // NOTE: ignore close exception
+                            }
+                        }
+                    }
+                    
+                    // retrieve service implementation
                     AbstractWebScript serviceImpl = (AbstractWebScript)applicationContext.getBean(serviceImplName);
                     serviceImpl.init(container, serviceDesc);
                     
@@ -362,7 +430,7 @@ public class DeclarativeRegistry
      * 
      * @return  web script service description
      */
-    private Description createDescription(Store store, String serviceDescPath, InputStream serviceDoc)
+    private DescriptionImpl createDescription(Store store, String serviceDescPath, InputStream serviceDoc)
     {
         SAXReader reader = new SAXReader();
         try
@@ -390,6 +458,14 @@ public class DeclarativeRegistry
                 throw new WebScriptException("Expected <webscript> root element - found <" + rootElement.getName() + ">");
             }
 
+            // retrieve kind
+            String kind = null;
+            String attrKindValue = rootElement.attributeValue("kind");
+            if (attrKindValue != null)
+            {
+                kind = attrKindValue.trim();
+            }
+            
             // retrieve short name
             Element shortNameElement = rootElement.element("shortname");
             if (shortNameElement == null || shortNameElement.getTextTrim() == null || shortNameElement.getTextTrim().length() == 0)
@@ -563,6 +639,7 @@ public class DeclarativeRegistry
             serviceDesc.setScriptPath(scriptPath);
             serviceDesc.setDescPath(serviceDescPath);
             serviceDesc.setId(id);
+            serviceDesc.setKind(kind);
             serviceDesc.setShortName(shortName);
             serviceDesc.setDescription(description);
             serviceDesc.setRequiredAuthentication(reqAuth);

@@ -26,6 +26,8 @@ package org.alfresco.web.scripts;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
+import java.util.Map;
 
 
 /**
@@ -130,6 +132,20 @@ public interface Description
     public String getId();
     
     /**
+     * Gets the kind of service.
+     * 
+     * A Web Script may explicitly define its backing-bean implementation. The backing bean
+     * implementation is identified by a Spring bean whose id is:
+     * 
+     * webscript.<kind>
+     * 
+     * The <kind> may be dot separated.
+     * 
+     * @return  the kind of service (or null, for a vanilla declarative web script)
+     */
+    public String getKind();
+    
+    /**
      * Gets the short name of this service
      * 
      * @return  service short name
@@ -198,4 +214,12 @@ public interface Description
      * @return  negotiated formats
      */
     public NegotiatedFormat[] getNegotiatedFormats();
+    
+    /**
+     * Gets web script specific extensions
+     * 
+     * @return  map of extensions by name
+     */
+    public Map<String, Serializable> getExtensions();
+    
 }
