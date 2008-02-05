@@ -121,6 +121,12 @@ public abstract class ConfigElementAdapter implements ConfigElement
        return child;
     }
     
+    public String getChildValue(String name)
+    {
+       ConfigElement ce = getChild(name);
+       return ce != null ? ce.getValue() : null;
+    }
+    
     @SuppressWarnings("unchecked")
     public Map<String, List<ConfigElement>> getChildrenMap()
     {

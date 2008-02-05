@@ -3,6 +3,7 @@
    <head> 
       <title>${title}</title> 
       <link rel="stylesheet" href="${url.context}/css/basic.css" type="text/css"/>
+      <!-- ${header} -->
    </head>
    <body>
       <div style="border: 1px solid #dddddd; padding:4px">

@@ -239,7 +239,7 @@ public class PresentationTemplateProcessor
     {
         // construct template config
         templateConfig = new Configuration();
-        templateConfig.setCacheStorage(new MruCacheStorage(20, 100));
+        templateConfig.setCacheStorage(new MruCacheStorage(32, 64));
         templateConfig.setTemplateUpdateDelay(0);
         templateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfig.setLocalizedLookup(false);

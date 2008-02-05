@@ -55,6 +55,7 @@ import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.PresentationTemplateProcessor;
+import org.alfresco.web.scripts.Registry;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.SearchPath;
 import org.alfresco.web.scripts.Store;
@@ -95,6 +96,7 @@ public class PageRendererServlet extends WebScriptServlet
    
    private PresentationTemplateProcessor templateProcessor;
    private PageComponentTemplateLoader pageComponentTemplateLoader;
+   private Registry webscriptsRegistry;
    private SearchPath searchPath;
    
    @Override
@@ -105,6 +107,7 @@ public class PageRendererServlet extends WebScriptServlet
       // init required beans - template processor and template loaders
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
       
+      webscriptsRegistry = (Registry)context.getBean("webscripts.registry");
       searchPath = (SearchPath)context.getBean("pagerenderer.searchpath");
       templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
       
@@ -269,10 +272,12 @@ public class PageRendererServlet extends WebScriptServlet
    private Object getModel(PageInstance page, HttpServletRequest req)
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
-      model.put("url", new URLHelper(req));
+      URLHelper urlHelper = new URLHelper(req);
+      model.put("url", urlHelper);
       model.put("description", page.getDescription());
       model.put("title", page.getTitle());
       model.put("theme", page.getTheme());
+      model.put("header", page.getHeaderRenderer(webscriptsRegistry, templateProcessor, urlHelper));
       return model;
    }
    
@@ -305,12 +310,13 @@ public class PageRendererServlet extends WebScriptServlet
    
    /**
     * Helper to replace tokens in a string with values from a map of token->value.
-    * Token names in the string are delimited by {token} and the entire token name
+    * Token names in the string are delimited by '{' and '}' - the entire token name
     * plus the delimiters are replaced by the value found in the supplied replacement map.
-    * If no replacement value is found for the token name, it is replace by the empty string.
+    * If no replacement value is found for the token name, it is replaced by the empty string.
     * 
     * @param s       String to work on - cannot be null
     * @param tokens  Map of token name -> token value for replacements
+    * 
     * @return the replaced string or the original if no tokens found or a failure occurs
     */
    private static String replaceContextTokens(String s, Map<String, String> tokens)
@@ -628,6 +634,20 @@ public class PageRendererServlet extends WebScriptServlet
    {
       private ThreadLocal<PageRendererContext> context = new ThreadLocal<PageRendererContext>();
       private long last = 0L;
+      private boolean ignoreMissingComponents = true;
+      
+      PageComponentTemplateLoader()
+      {
+         Config config = configService.getConfig("PageRenderer");
+         if (config != null)
+         {
+            String value = config.getConfigElementValue("ignoreMissingComponents");
+            if (value != null)
+            {
+               this.ignoreMissingComponents = Boolean.parseBoolean(value);
+            }
+         }
+      }
       
       public void closeTemplateSource(Object templateSource) throws IOException
       {
@@ -682,9 +702,15 @@ public class PageRendererServlet extends WebScriptServlet
          PageComponent component = context.PageInstance.getComponents().get(key);
          if (component == null)
          {
-            // TODO: if the lookup fails, throw exception or just ignore the render and log...?
-            return new StringReader("ERROR: Failed to find component identified by key '" + key +
-                  "' found in template: " + context.PageInstance.getPageTemplate());
+            if (this.ignoreMissingComponents)
+            {
+                return new StringReader("");
+            }
+            else
+            {
+               return new StringReader("ERROR: Failed to find component identified by key '" + key +
+                     "' found in template: " + context.PageInstance.getPageTemplate());
+            }
          }
          
          // NOTE: UI component URIs in page instance config files should not include /service prefix

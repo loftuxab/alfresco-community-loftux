@@ -24,10 +24,18 @@
  */
 package org.alfresco.web.scripts.servlet;
 
+import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
+import org.alfresco.web.scripts.Match;
+import org.alfresco.web.scripts.Registry;
+import org.alfresco.web.scripts.TemplateProcessor;
+import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
+import org.alfresco.web.scripts.servlet.PageRendererServlet.URLHelper;
 
 /**
  * Simple structure class representing the definition of a single page instance
@@ -146,5 +154,57 @@ public class PageInstance
    public Map<String, PageComponent> getComponents()
    {
       return components;
+   }
+   
+   /**
+    * @return An object capable of rendering the optional .head.ftl header templates for
+    *         all components on the page when the Object.toString() method is called.
+    */ 
+   public Object getHeaderRenderer(
+         final Registry registry, final TemplateProcessor processor, final URLHelper urlHelper)
+   {
+      return new Object()
+      {
+         @Override
+         public String toString()
+         {
+            Set<String> paths = new HashSet<String>(8);
+            
+            // template model - very simple as we only provide 'url.context' and 'theme'
+            Map<String, Object> model = new HashMap<String, Object>(4, 1.0f);
+            model.put("theme", theme);
+            model.put("url", urlHelper);
+            
+            // for each page component, find the optional .head.ftl template associated with
+            // its webscript - execute each template in turn and return the completed set
+            StringWriter writer = new StringWriter(512);
+            for (PageComponent component : components.values())
+            {
+               // calculate webscript url from the complete component url
+               String url = component.getUrl();
+               if (url.lastIndexOf('?') != -1)
+               {
+                  url = url.substring(0, url.lastIndexOf('?'));
+               }
+               Match match = registry.findWebScript("GET", url);
+               if (match != null)
+               {
+                  WebScript webScript = match.getWebScript();
+                  if (webScript != null)
+                  {
+                     // found a webscript, build the path to the .head.ftl template
+                     String path = webScript.getDescription().getId() + ".head.ftl";
+                     // ensure we render each path once only - no script/css duplicates
+                     if (paths.contains(path) == false && processor.hasTemplate(path))
+                     {
+                        processor.process(path, model, writer);
+                     }
+                     paths.add(path);
+                  }
+               }
+            }
+            return writer.toString();
+         }
+      };
    }
 }

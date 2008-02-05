@@ -30,6 +30,9 @@ import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -39,8 +42,11 @@ import org.alfresco.config.ConfigElement;
  */
 public class PresentationContainer extends AbstractRuntimeContainer
 {
+   private static Log logger = LogFactory.getLog(PresentationContainer.class);
+   
 	/* (non-Javadoc)
-	 * @see org.alfresco.web.scripts.RuntimeContainer#executeScript(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse, org.alfresco.web.scripts.Authenticator)
+	 * @see org.alfresco.web.scripts.RuntimeContainer#executeScript(org.alfresco.web.scripts.WebScriptRequest,
+    *      org.alfresco.web.scripts.WebScriptResponse, org.alfresco.web.scripts.Authenticator)
 	 */
     public void executeScript(WebScriptRequest scriptReq, WebScriptResponse scriptRes, Authenticator auth)
         throws IOException
@@ -74,22 +80,28 @@ public class PresentationContainer extends AbstractRuntimeContainer
        if (config != null)
        {
            ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
-           String endpoint = remoteConfig.getChild("endpoint").getValue();
-           
-           // use appropriate webscript servlet here - one that supports TICKET param auth
-           ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
-           
-           //
-           // TODO: remove this block - for testing only!
-           //
-           if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
+           String endpoint = remoteConfig.getChildValue("endpoint");
+           if (endpoint == null || endpoint.length() == 0)
            {
-               remote.setUsernamePassword(
-                    remoteConfig.getChild("username").getValue(),
-                    remoteConfig.getChild("password").getValue());
-           } 
-           
-           params.put("remote", remote);
+               logger.warn("No 'endpoint' configured for ScriptRemote HTTP API access - remote object not available!");
+           }
+           else
+           {
+               // use appropriate webscript servlet here - one that supports TICKET param auth
+               ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
+               
+               //
+               // TODO: remove this block - for testing only!
+               //
+               if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
+               {
+                   remote.setUsernamePassword(
+                       remoteConfig.getChildValue("username"),
+                       remoteConfig.getChildValue("password"));
+               } 
+               
+               params.put("remote", remote);
+           }
        }
        
        return params;
