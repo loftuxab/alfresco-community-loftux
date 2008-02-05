@@ -44,12 +44,16 @@ import org.apache.commons.logging.LogFactory;
  * Generally remote webscripts will be "data" webscripts (i.e. returning XML/JSON) and
  * will be housed within an Alfresco Repository server.
  * 
+ * A 'Response' is returned containing the response data stream as a String and the Status
+ * object representing the status code and error information if any.
+ * 
  * @author Kevin Roast
  */
 public class ScriptRemote
 {
    private static Log logger = LogFactory.getLog(ScriptRemote.class);
    
+   private static final String CHARSETEQUALS = "charset=";
    private static final int BUFFERSIZE = 4096;
 
    private String endpoint;
@@ -149,10 +153,10 @@ public class ScriptRemote
          String ct = connection.getContentType();
          if (ct != null)
          {
-            int csi = ct.indexOf("charset=");
+            int csi = ct.indexOf(CHARSETEQUALS);
             if (csi != -1)
             {
-               encoding = ct.substring(csi + 8);
+               encoding = ct.substring(csi + CHARSETEQUALS.length());
             }
          }
          
@@ -184,7 +188,8 @@ public class ScriptRemote
             }
             catch (IOException e)
             {
-               // TODO: log IO exceptions from close()? - probably not a fatal error...
+               if (logger.isWarnEnabled())
+                  logger.warn("Exception during close() of HTTP API connection", e);
             }
          }
          

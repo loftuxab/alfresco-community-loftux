@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.config.Config;
@@ -58,10 +59,15 @@ public class PresentationContainer extends AbstractRuntimeContainer
         return new PresentationServerModel();
     }
     
+    /**
+     * Build the script root objects - add the ScriptRemote for remote HTTP API calls.
+     */
     @Override
     public Map<String, Object> getScriptParameters()
     {
-       Map<String, Object> params = super.getScriptParameters();
+       // NOTE: returns unmodifable map from super
+       Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
+       params.putAll(super.getScriptParameters());
        
        // retrieve remote server configuration 
        Config config = this.configService.getConfig("Remote");
@@ -69,17 +75,20 @@ public class PresentationContainer extends AbstractRuntimeContainer
        {
            ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
            String endpoint = remoteConfig.getChild("endpoint").getValue();
+           
+           // use appropriate webscript servlet here - one that supports TICKET param auth
            ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
-           //
-           // TODO: use appropriate webscript servlet here - one that supports TICKET auth etc!
+           
            //
            // TODO: remove this block - for testing only!
+           //
            if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
            {
                remote.setUsernamePassword(
                     remoteConfig.getChild("username").getValue(),
                     remoteConfig.getChild("password").getValue());
            } 
+           
            params.put("remote", remote);
        }
        
