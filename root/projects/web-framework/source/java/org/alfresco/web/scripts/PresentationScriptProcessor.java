@@ -175,7 +175,7 @@ public class PresentationScriptProcessor implements ScriptProcessor
         {
             // unwrap a Java object from a JavaScript wrapper
             // recursively call this method to convert the unwrapped value
-            value = unwrapValue((Serializable)((Wrapper)value).unwrap());
+            value = unwrapValue(((Wrapper)value).unwrap());
         }
         else if (value instanceof ScriptableObject)
         {

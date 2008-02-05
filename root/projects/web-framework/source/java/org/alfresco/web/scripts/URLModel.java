@@ -57,11 +57,6 @@ public class URLModel
         return req.getContextPath();
     }
 
-    public String jsGet_context()
-    {
-        return getContext();
-    }
-    
     /**
      * Gets the Service Context Path
      * 
@@ -72,11 +67,6 @@ public class URLModel
     public String getServiceContext()
     {
         return req.getServiceContextPath();
-    }
-
-    public String jsGet_serviceContext()
-    {
-        return getServiceContext();
     }
 
     /**
@@ -91,11 +81,6 @@ public class URLModel
         return req.getServicePath();
     }
 
-    public String jsGet_service()
-    {
-        return getService();
-    }
-
     /**
      * Gets the full path
      * 
@@ -108,11 +93,6 @@ public class URLModel
         return req.getURL();
     }
     
-    public String jsGet_full()
-    {
-        return getFull();
-    }
-
     /**
      * Gets the URL arguments (query string)
      * 
@@ -122,11 +102,6 @@ public class URLModel
     {
         String args = req.getQueryString();
         return (args == null) ? "" : args;
-    }
-    
-    public String jsGet_args()
-    {
-        return getArgs();
     }
     
     /**
@@ -145,11 +120,6 @@ public class URLModel
         return req.getServiceMatch().getPath();
     }
     
-    public String jsGet_match()
-    {
-        return getMatch();
-    }
-
     /**
      * Gets the Service Extension Path
      * 
@@ -165,10 +135,4 @@ public class URLModel
     {
         return req.getExtensionPath();
     }
-
-    public String jsGet_extension()
-    {
-        return getExtension();
-    }
-    
 }

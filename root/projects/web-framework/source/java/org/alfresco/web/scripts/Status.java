@@ -60,22 +60,12 @@ public class Status
         return exception;
     }
     
-    public Throwable jsGet_exception()
-    {
-        return getException();
-    }
-
     /**
      * @param message
      */
     public void setMessage(String message)
     {
         this.message = message;
-    }
-
-    public void jsSet_message(String message)
-    {
-        setMessage(message);
     }
 
     /**
@@ -86,11 +76,6 @@ public class Status
         return message;
     }
 
-    public String jsGet_message()
-    {
-        return getMessage();
-    }
-
     /**
      * @param redirect  redirect to status code response
      */
@@ -99,22 +84,12 @@ public class Status
         this.redirect = redirect;
     }
 
-    public void jsSet_redirect(boolean redirect)
-    {
-        setRedirect(redirect);
-    }
-
     /**
      * @return redirect to status code response
      */
     public boolean getRedirect()
     {
         return redirect;
-    }
-
-    public boolean jsGet_redirect()
-    {
-        return getRedirect();
     }
 
     /**
@@ -127,11 +102,6 @@ public class Status
         this.code = code;
     }
 
-    public void jsSet_code(int code)
-    {
-        this.code = code;
-    }
-
     /**
      * @return  status code
      */
@@ -140,11 +110,6 @@ public class Status
         return code;
     }
 
-    public int jsGet_code()
-    {
-        return getCode();
-    }
-    
     /**
      * Gets the short name of the status code
      * 
@@ -155,11 +120,6 @@ public class Status
         return I18NUtil.getMessage("webscript.code." + code + ".name");
     }
     
-    public String jsGet_codeName()
-    {
-        return getCodeName();
-    }
-
     /**
      * Gets the description of the status code
      * 
@@ -169,10 +129,4 @@ public class Status
     {
         return I18NUtil.getMessage("webscript.code." + code + ".description");
     }
-    
-    public String jsGet_codeDescription()
-    {
-        return getCodeDescription();
-    }
-    
 }
