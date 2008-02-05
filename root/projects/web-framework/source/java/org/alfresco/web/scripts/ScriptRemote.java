@@ -28,8 +28,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.util.Base64;
 import org.apache.commons.logging.Log;
@@ -83,12 +86,12 @@ public class ScriptRemote
     * 
     * @param uri     WebScript URI - for example /test/myscript?arg=value
     * 
-    * @return result from the call
+    * @return Response object from the call {@link Response}
     */
-   public String call(String uri)
+   public Response call(String uri)
    {
       String result = null;
-      
+      Status status = new Status();
       try
       {
          //
@@ -97,7 +100,7 @@ public class ScriptRemote
          //
          URL url = new URL(endpoint + uri);
          ByteArrayOutputStream bOut = new ByteArrayOutputStream(BUFFERSIZE);
-         String encoding = service(url, bOut);
+         String encoding = service(url, bOut, status);
          if (encoding != null)
          {
             result = bOut.toString(encoding);
@@ -109,10 +112,10 @@ public class ScriptRemote
       }
       catch (IOException ioErr)
       {
-         // TODO: how to handle and report errors?
+         // error information already applied to Status object during service() call
       }
       
-      return result;
+      return new Response(result, status);
    }
 
    /**
@@ -120,65 +123,133 @@ public class ScriptRemote
     * 
     * @param url     The URL to open and retrieve data from
     * @param out     The outputstream to write result to
+    * @param status  The status object to apply the response code too
     * 
     * @return encoding specified by the source URL - may be null
     * 
     * @throws IOException
     */
-   private String service(URL url, OutputStream out)
+   private String service(URL url, OutputStream out, Status status)
       throws IOException
    {
-      HttpURLConnection connection = (HttpURLConnection)url.openConnection();
-      if (this.username != null && this.password != null)
-      {
-         String auth = this.username + ':' + this.password;
-         connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
-      }
-      
-      // locate encoding from the response headers
-      String encoding = null;
-      String ct = connection.getContentType();
-      if (ct != null)
-      {
-         int csi = ct.indexOf("charset=");
-         if (csi != -1)
-         {
-            encoding = ct.substring(csi + 8);
-         }
-      }
-      
-      // write the service result to the output stream
-      InputStream input = connection.getInputStream();
+      HttpURLConnection connection = null;
       try
       {
-         byte[] buffer = new byte[BUFFERSIZE];
-         int read = input.read(buffer);
-         while (read != -1)
+         connection = (HttpURLConnection)url.openConnection();
+         
+         // TODO: remove this once authentication has been added!
+         if (this.username != null && this.password != null)
          {
-            out.write(buffer, 0, read);
-            read = input.read(buffer);
+            String auth = this.username + ':' + this.password;
+            connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
          }
-      }
-      finally
-      {
+         
+         // locate encoding from the response headers
+         String encoding = null;
+         String ct = connection.getContentType();
+         if (ct != null)
+         {
+            int csi = ct.indexOf("charset=");
+            if (csi != -1)
+            {
+               encoding = ct.substring(csi + 8);
+            }
+         }
+         
+         // write the service result to the output stream
+         InputStream input = connection.getInputStream();
          try
          {
-            if (input != null)
+            byte[] buffer = new byte[BUFFERSIZE];
+            int read = input.read(buffer);
+            while (read != -1)
             {
-               input.close();
-            }
-            if (out != null)
-            {
-               out.flush();
-               out.close();
+               out.write(buffer, 0, read);
+               read = input.read(buffer);
             }
          }
-         catch (IOException e)
+         finally
          {
-            // TODO: log io exceptions - probably not a fatal error
+            try
+            {
+               if (input != null)
+               {
+                  input.close();
+               }
+               if (out != null)
+               {
+                  out.flush();
+                  out.close();
+               }
+            }
+            catch (IOException e)
+            {
+               // TODO: log IO exceptions from close()? - probably not a fatal error...
+            }
          }
+         
+         // if we get here call was successful
+         status.setCode(HttpServletResponse.SC_OK);
+         
+         return encoding;
+      }
+      catch (ConnectException conErr)
+      {
+         // caught a connection exception - generic error code as won't get one returned
+         status.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+         status.setException(conErr);
+         status.setMessage(conErr.getMessage());
+         
+         throw conErr;
+      }
+      catch (IOException ioErr)
+      {
+         // caught an IO exception - record the status code and message
+         status.setCode(connection.getResponseCode());
+         status.setException(ioErr);
+         status.setMessage(ioErr.getMessage());
+         
+         throw ioErr;
+      }
+   }
+   
+   
+   /**
+    * Representation of the response from a remote HTTP API call.
+    * 
+    * @author Kevin Roast
+    */
+   public static class Response
+   {
+      private String data;
+      private Status status;
+      
+      Response(String data, Status status)
+      {
+         this.data = data;
+         this.status = status;
       }
       
-      return encoding;
+      /**
+       * @return the data stream from the response object - will be null on error
+       */
+      public String getResponse()
+      {
+         return this.data;
+      }
+      
+      /**
+       * @return Status object representing the response status and any error information {@link Status}
+       */
+      public Status getStatus()
+      {
+         return this.status;
+      }
+
+      @Override
+      public String toString()
+      {
+         return this.data;
+      }
    }
 }
