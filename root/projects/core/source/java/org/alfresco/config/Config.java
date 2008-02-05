@@ -37,11 +37,23 @@ public interface Config
      * Returns the config element with the given name, if there is more
      * than one with the given name the first one added is returned.
      * 
-     * @param name
-     *            Name of the config element to retrieve
+     * @param name   Name of the config element to retrieve
+     * 
      * @return The ConfigElement object or null if it doesn't exist
      */
     public ConfigElement getConfigElement(String name);
+    
+    /**
+     * Shortcut method to get the config element with the given name and
+     * return its value. If the config element does not exist, null is
+     * returned. If there is more than one with the given name the first
+     * one added is returned.
+     * 
+     * @param name   Name of the config element value to retrieve
+     * 
+     * @return The ConfigElement value or null if it doesn't exist
+     */
+    public String getConfigElementValue(String name);
     
     /**
      * Returns all the config elements

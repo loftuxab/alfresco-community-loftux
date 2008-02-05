@@ -90,6 +90,15 @@ public interface ConfigElement
     public ConfigElement getChild(String name);
     
     /**
+     * Shortcut method to return a child config element value of the given name.
+     * Returns null as the value if the element does not exist.
+     * 
+     * @param name The name of the config element to retrieve the value from.
+     * @return The ConfigElement value or null if it does not exist
+     */
+    public String getChildValue(String name);
+    
+    /**
      * Returns a list of children held by this ConfigElement with the given name.
      * 
      * @param name The name of the config element to retrieve

@@ -64,6 +64,15 @@ public class ConfigImpl implements Config
    {
       return (ConfigElement) this.configElements.get(name);
    }
+   
+   /**
+    * @see org.alfresco.config.Config#getConfigElementValue(java.lang.String)
+    */
+   public String getConfigElementValue(String name)
+   {
+      ConfigElement ce = (ConfigElement)this.configElements.get(name);
+      return ce != null ? ce.getValue() : null; 
+   }
 
    /**
     * @see org.alfresco.config.Config#hasConfigElement(java.lang.String)
