@@ -28,12 +28,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigModel;
 import org.alfresco.config.ConfigService;
-import org.alfresco.web.config.ServerConfigElement;
-import org.alfresco.web.config.ServerProperties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.BeansException;
@@ -63,7 +59,7 @@ public abstract class AbstractRuntimeContainer
     private FormatRegistry formatRegistry;
     private ScriptProcessor scriptProcessor;
     private TemplateProcessor templateProcessor;
-    private ConfigService configService;
+    protected ConfigService configService;
     private ConfigModel configModel;
 
     /**
@@ -132,23 +128,6 @@ public abstract class AbstractRuntimeContainer
         params.put("server", getDescription());
         params.put("config", getConfigModel());
         params.put("logger", new ScriptLogger());
-        
-        // retrieve remote server configuration 
-        Config config = configService.getConfig("Remote");
-        ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
-        String endpoint = remoteConfig.getChild("endpoint").getValue();
-        ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
-        //
-        // TODO: use appropriate webscript servlet here - one that supports TICKET auth etc!
-        //
-        // TODO: remove this block - for testing only!
-        if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
-        {
-           remote.setUsernamePassword(
-                 remoteConfig.getChild("username").getValue(),
-                 remoteConfig.getChild("password").getValue());
-        }
-        params.put("remote", remote);
         
         return Collections.unmodifiableMap(params);
     }

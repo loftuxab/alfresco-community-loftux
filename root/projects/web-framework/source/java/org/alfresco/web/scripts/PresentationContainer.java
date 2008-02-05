@@ -25,6 +25,10 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
+import java.util.Map;
+
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
 
 
 /**
@@ -53,17 +57,45 @@ public class PresentationContainer extends AbstractRuntimeContainer
     {
         return new PresentationServerModel();
     }
+    
+    @Override
+    public Map<String, Object> getScriptParameters()
+    {
+       Map<String, Object> params = super.getScriptParameters();
+       
+       // retrieve remote server configuration 
+       Config config = this.configService.getConfig("Remote");
+       if (config != null)
+       {
+           ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
+           String endpoint = remoteConfig.getChild("endpoint").getValue();
+           ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
+           //
+           // TODO: use appropriate webscript servlet here - one that supports TICKET auth etc!
+           //
+           // TODO: remove this block - for testing only!
+           if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
+           {
+               remote.setUsernamePassword(
+                    remoteConfig.getChild("username").getValue(),
+                    remoteConfig.getChild("password").getValue());
+           } 
+           params.put("remote", remote);
+       }
+       
+       return params;
+    }
+
 
     /**
      * Presentation Tier Model
      *
      * TODO: Implement when versioning meta-data is applied to all .jars
-	 *
+	  *
      * @author davidc
      */
     private class PresentationServerModel implements ServerModel
     {
-        
         public String getContainerName()
         {
             return getName();
