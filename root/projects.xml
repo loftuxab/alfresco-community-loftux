@@ -1644,6 +1644,8 @@
                   includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/fop" 
                   includes="*.jar"/>
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"
+                  includes="*.jar"/>
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.repository.dist}" 
