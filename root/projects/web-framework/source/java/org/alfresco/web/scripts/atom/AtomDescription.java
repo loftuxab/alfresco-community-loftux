@@ -22,13 +22,15 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.scripts;
+package org.alfresco.web.scripts.atom;
 
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.web.scripts.DescriptionExtension;
+import org.alfresco.web.scripts.WebScriptException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -38,14 +40,14 @@ import org.dom4j.io.SAXReader;
 
 
 /**
- * ATOM Entry Web Script Description Extensions
+ * ATOM Web Script Description Extensions
  *
  * @author davidc
  */
-public class AtomEntryDescription implements DescriptionExtension 
+public class AtomDescription implements DescriptionExtension 
 {
     // Logger
-    private static final Log logger = LogFactory.getLog(AtomEntryDescription.class);
+    private static final Log logger = LogFactory.getLog(AtomDescription.class);
 
     
     /* (non-Javadoc)
@@ -61,8 +63,8 @@ public class AtomEntryDescription implements DescriptionExtension
             Map<String, Serializable> extensions = new HashMap<String, Serializable>();
             Document document = reader.read(serviceDesc);
             Element rootElement = document.getRootElement();
-            String extension = rootElement.elementText("extension");
-            extensions.put("extension", extension);
+            String extension = rootElement.elementText("qname");
+            extensions.put("qnames", extension);
             return extensions;
         }
         catch(DocumentException e)

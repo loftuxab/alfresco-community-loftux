@@ -1490,6 +1490,8 @@
                   includes="${includes.webframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
+                  includes="${includes.webframework.libs.abdera}" />
       </copy>
    </target>  
    

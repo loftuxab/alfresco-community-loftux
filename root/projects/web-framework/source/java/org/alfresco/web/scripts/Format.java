@@ -34,8 +34,11 @@ public enum Format
 {
     HTML ("text/html"),
     JAVASCRIPT ("text/javascript"),
-    XML ("text/xml");
-    
+    XML ("text/xml"),
+    ATOM ("application/atom+xml"),
+    ATOMFEED ("application/atom+xml;type=feed"),
+    ATOMENTRY ("application/atom+xml;type=entry");
+
     private String mimetype;
 
     Format(String mimetype)

@@ -81,8 +81,7 @@ public abstract class AbstractWebScript implements WebScript
     }
 
     /**
-     * 
-     * @return
+     * @return  web script container
      */
     final protected Container getContainer()
     {
@@ -112,7 +111,7 @@ public abstract class AbstractWebScript implements WebScript
      * 
      * @return  script model
      */
-    final protected Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
+    protected Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         
@@ -146,7 +145,7 @@ public abstract class AbstractWebScript implements WebScript
      *
      * @return  template model
      */
-    final protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
+    protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         
