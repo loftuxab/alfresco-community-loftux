@@ -360,13 +360,13 @@
       </copy>
    </target>
 
-   <target name="deploy-webframework-tomcat" depends="init" description="Deploys WebFramework WAR to tomcat">
-      <delete file="${dir.deploy.tomcat}/${file.name.war.webframework}" />
-      <delete dir="${dir.deploy.tomcat}/alfweb" 
+   <target name="deploy-webframework-tomcat" depends="init" description="Deploys WebFramework WAR to webframework tomcat">
+      <delete file="${dir.deploy.tomcat.webframework}/${file.name.war.webframework}" />
+      <delete dir="${dir.deploy.tomcat.webframework}/alfweb" 
               includeEmptyDirs="true" 
               quiet="yes" />
-      <!-- copy the webframework WAR file to Tomcat's deploy folder -->
-      <copy todir="${dir.deploy.tomcat}" 
+      <!-- copy the webframework WAR file to WebFramework's Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.webframework}" 
             file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
    </target>
 
@@ -384,6 +384,16 @@
            description="Starts the virtual Tomcat server on Windows" 
            depends="init">
       <exec dir="${home.virtualtomcat}/bin" 
+            executable="cmd.exe" 
+            spawn="true">
+         <arg line="/k startup.bat" />
+      </exec>
+   </target>
+
+   <target name="start-tomcat-webframework" 
+           description="Starts the WebFramework Tomcat server on Windows" 
+           depends="init">
+      <exec dir="${home.tomcat.webframework}/bin" 
             executable="cmd.exe" 
             spawn="true">
          <arg line="/k startup.bat" />

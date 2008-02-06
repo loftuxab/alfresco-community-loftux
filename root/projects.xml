@@ -1435,6 +1435,21 @@
            basedir="${dir.project.webframework.classes}" />
    </target>
    
+   <target name="incremental-webframework-war" 
+           description="Performs an incremental build of the web framework WAR file"
+           depends="package-webframework-war" />
+      
+   <target name="build-webframework-war" 
+           description="Performs a clean build of the web framework project"
+           depends="clean-webframework-war, 
+                    incremental-webframework-war" />
+   
+   <target name="clean-webframework-war" 
+           description="Cleans the web framework WAR assemble folder" 
+           depends="init">
+      <delete dir="${dir.project.webframework.assemble}" />
+   </target>
+
    <target name="package-webframework-war" 
            description="Packages the WAR file for the webframework project" 
            depends="assemble-webframework-war">
