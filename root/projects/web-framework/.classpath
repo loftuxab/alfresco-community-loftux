@@ -20,5 +20,16 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-digester-1.6.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-logging-1.1.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/log4j-1.2.15.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/abdera.core.0.3.0-incubating.jar" sourcepath="/3rd Party/src/abdera.0.3.0-incubating.src.zip"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/abdera.parser.0.3.0-incubating.jar" sourcepath="/3rd Party/src/abdera.0.3.0-incubating.src.zip"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/abdera-i18n-0.3.0-incubating.jar" sourcepath="/3rd Party/src/abdera.0.3.0-incubating.src.zip"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/axiom-api-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/axiom-impl-1.2.5.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/stax-api-1.0.1.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/wstx-asl-3.2.1.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/jaxen-1.1-beta-8.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/geronimo-activation_1.0.2_spec-1.1.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/json.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/abdera/abdera.extensions.json.0.3.0-incubating.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

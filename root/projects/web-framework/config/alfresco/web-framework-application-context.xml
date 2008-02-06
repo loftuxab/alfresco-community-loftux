@@ -145,19 +145,42 @@
 
 
    <!--                   -->
-   <!--  Web Script Beans -->
+   <!--  ATOM Support     -->
    <!--                   -->
 
-   <!--  Abstract API Service -->
+   <bean id="webscript.abdera" class="org.alfresco.web.scripts.atom.AbderaServiceImpl">
+      <property name="writers">
+         <list>
+            <value>prettyxml</value>
+            <value>json</value>
+         </list>
+      </property>
+      <property name="QNames">
+         <map>
+            <entry key="UUID" value="{http://www.alfresco.org}uuid" />
+         </map>
+      </property>
+      <!-- TODO: support for parser options -->
+   </bean>
+   
+
+   <!--                             -->
+   <!--  Web Script Implementations -->
+   <!--                             -->
+
+   <!--  Abstract Web Script Implementations -->
    <bean id="webscript" abstract="true"/>
    <bean id="webscriptdesc" abstract="true"/>
 
-   <!--  Scripted API Service -->
+   <!--  Declarative Web Script Implementation -->
    <bean id="webscript.default" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebScript" singleton="false"/>
 
-   <!--  ATOM Entry -->
-   <bean id="webscript.atomentry" parent="webscript" class="org.alfresco.web.scripts.AtomEntryWebScript" singleton="false"/>
-   <bean id="webscriptdesc.atomentry" parent="webscriptdesc" class="org.alfresco.web.scripts.AtomEntryDescription"/>
+   <!--  ATOM Entry Web Script Implementation -->
+   <bean id="webscript.atomentry" parent="webscript" class="org.alfresco.web.scripts.atom.AtomEntryWebScript" singleton="false">
+      <property name="abderaService" ref="webscript.abdera"/>
+   </bean>
+   <bean id="webscriptdesc.atomentry" parent="webscriptdesc" class="org.alfresco.web.scripts.atom.AtomDescription"/>
+
 
    <!--            -->
    <!--  API Beans -->
