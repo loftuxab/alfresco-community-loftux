@@ -49,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.util.Content;
 import org.alfresco.util.URLEncoder;
 import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
@@ -551,6 +552,11 @@ public class PageRendererServlet extends WebScriptServlet
       }
         
       public String[] getHeaderValues(String name)
+      {
+         return null;
+      }
+
+      public Content getContent()
       {
          return null;
       }

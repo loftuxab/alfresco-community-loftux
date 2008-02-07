@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
+import org.alfresco.util.Content;
 import org.alfresco.web.scripts.Description.FormatStyle;
 
 
@@ -157,6 +158,13 @@ public interface WebScriptRequest
      */
     public String getExtensionPath();
 
+    /**
+     * Gets the request body as content
+     * 
+     * @return  request content (or null, if none)
+     */
+    public Content getContent();
+    
     /**
      * Determine if Guest User?
      * 

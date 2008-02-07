@@ -24,7 +24,7 @@
          <tr><td></td><td>&nbsp;</td></tr>
          <@recursestack status.exception/>
          </#if>
-         <tr><td><b>Server</b>:</td><td>Alfresco ${server.edition} v${server.version} schema ${server.schema}</td></tr>
+         <tr><td><b>Server</b>:</td><td>Alfresco ${server.edition?html} v${server.version?html} schema ${server.schema?html}</td></tr>
          <tr><td><b>Time</b>:</td><td>${date?datetime}</td></tr>
          <tr><td></td><td>&nbsp;</td></tr>
          <#if webscript?exists>

@@ -29,12 +29,14 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.util.Content;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Format;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
+import org.apache.abdera.model.Entry;
 
 
 /**
@@ -55,13 +57,15 @@ public class AtomEntryWebScript extends AtomWebScript
         Map<String, Object> model = super.executeImpl(req, status, cache);
 
         // add atom entry (Entry Resource or Media Resource)
+        Entry entry = null;
+        Content media = null;
         String contentType = req.getHeader("Content-Type");
         if (contentType != null && contentType.startsWith(Format.ATOM.mimetype()))
         {
             try
             {
                 String base = req.getServerPath() + req.getServicePath();
-                model.put("entry", abderaService.parseEntry(((WebScriptServletRequest)req).getHttpServletRequest().getInputStream(), base));
+                entry = abderaService.parseEntry(((WebScriptServletRequest)req).getHttpServletRequest().getInputStream(), base);
             }
             catch(IOException e)
             {
@@ -70,10 +74,12 @@ public class AtomEntryWebScript extends AtomWebScript
         }
         else
         {
-            model.put("entry", abderaService.newEntry());
-            // TODO: add media => request content object
+            entry = abderaService.newEntry();
+            media = req.getContent();
         }
         
+        model.put("entry", entry);
+        model.put("media", media);
         return model;
     }
     

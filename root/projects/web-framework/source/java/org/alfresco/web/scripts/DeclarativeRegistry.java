@@ -263,7 +263,7 @@ public class DeclarativeRegistry
                             serviceDesc.setExtensions(extensions);
                             
                             if (logger.isDebugEnabled())
-                                logger.debug("Extracted " + (extensions == null ? "0" : extensions.size()) + " description extension(s) for Web Script " + id);
+                                logger.debug("Extracted " + (extensions == null ? "0" : extensions.size()) + " description extension(s) for Web Script " + id + " (" + extensions + ")");
                         }
                         catch(IOException e)
                         {

@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts.servlet;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -33,6 +34,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.util.Content;
+import org.alfresco.util.InputStreamContent;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;
@@ -269,13 +272,9 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         }
         return values;
     }
-    
-    /**
-     * Get User Agent
-     * 
-     * TODO: Expand on known agents
-     * 
-     * @return  MSIE / Firefox
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getAgent()
      */
     public String getAgent()
     {
@@ -292,6 +291,21 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
             }
         }
         return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getContent()
+     */
+    public Content getContent()
+    {
+        try
+        {
+            return new InputStreamContent(req.getInputStream(), req.getContentType(), req.getCharacterEncoding());
+        }
+        catch(IOException e)
+        {
+            throw new WebScriptException("Failed to retrieve request content", e);
+        }
     }
 
     /**
