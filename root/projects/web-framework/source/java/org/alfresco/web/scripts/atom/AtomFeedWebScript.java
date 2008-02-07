@@ -24,76 +24,59 @@
  */
 package org.alfresco.web.scripts.atom;
 
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.Map;
 
-import javax.xml.namespace.QName;
+import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.scripts.Cache;
-import org.alfresco.web.scripts.DeclarativeWebScript;
+import org.alfresco.web.scripts.Format;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.WebScriptResponse;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
+import org.apache.abdera.model.Feed;
 
 
 /**
- * Abstract ATOM Web Script
+ * ATOM Feed Web Script
  *
  * @author davidc
  */
-public abstract class AtomWebScript extends DeclarativeWebScript 
+public class AtomFeedWebScript extends AtomWebScript 
 {
-    // dependencies
-    protected AbderaService abderaService;
-    
-    /**
-     * Sets the Abdera Service
-     * 
-     * @param abderaService
-     */
-    public void setAbderaService(AbderaService abderaService)
-    {
-       this.abderaService = abderaService; 
-    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.Status, org.alfresco.web.scripts.Cache)
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status, Cache cache)
     {
-        if (!(req instanceof WebScriptServletRequest))
-        {
-            throw new WebScriptException("ATOM Web Scripts require servlet runtime");
-        }
+        // create generic atom root objects
+        Map<String, Object> model = super.executeImpl(req, status, cache);
 
-        Map<String, Object> model = new HashMap<String, Object>();
-        model.put("slug", req.getHeader("Slug"));
-        model.put("type", req.getHeader("Content-Type"));
-        Map<String,QName> qnames = new HashMap<String,QName>();
-        qnames.putAll(abderaService.getQNameExtensions());
-        Map<String,QName> scriptQnames = (Map<String,QName>)req.getServiceMatch().getWebScript().getDescription().getExtensions().get("qnames");
-        if (scriptQnames != null)
+        // add atom feed
+        Feed feed = null;
+        String contentType = req.getHeader("Content-Type");
+        if (contentType != null && contentType.startsWith(Format.ATOM.mimetype()))
         {
-            qnames.putAll(scriptQnames);
+            try
+            {
+                String base = req.getServerPath() + req.getServicePath();
+                feed = abderaService.parseFeed(((WebScriptServletRequest)req).getHttpServletRequest().getInputStream(), base);
+            }
+            catch(IOException e)
+            {
+                throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, e.toString());
+            }
         }
-        model.put("qname", qnames);
+        else
+        {
+            feed = abderaService.newFeed();
+        }
+        
+        model.put("feed", feed);
         return model;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.AbstractWebScript#createTemplateParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse, java.util.Map)
-     */
-    @Override
-    protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
-    {
-        Map<String, Object> superParams = super.createTemplateParameters(req, res, customParams);
-        Map<String, Object> params = new HashMap<String, Object>(superParams);
-        params.put("writeAtom", new AtomWriterMethod(abderaService));
-        return params;
     }
     
 }

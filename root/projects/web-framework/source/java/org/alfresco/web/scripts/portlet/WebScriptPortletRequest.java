@@ -28,6 +28,7 @@ import java.util.Map;
 
 import javax.portlet.PortletRequest;
 
+import org.alfresco.util.Content;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
@@ -138,6 +139,14 @@ public class WebScriptPortletRequest extends WebScriptRequestURLImpl
      * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderValues(java.lang.String)
      */
     public String[] getHeaderValues(String name)
+    {
+        return null;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getContent()
+     */
+    public Content getContent()
     {
         return null;
     }

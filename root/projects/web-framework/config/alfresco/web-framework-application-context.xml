@@ -155,7 +155,7 @@
             <value>json</value>
          </list>
       </property>
-      <property name="QNames">
+      <property name="qnames">
          <map>
             <entry key="UUID" value="{http://www.alfresco.org}uuid" />
          </map>
@@ -175,11 +175,15 @@
    <!--  Declarative Web Script Implementation -->
    <bean id="webscript.default" parent="webscript" class="org.alfresco.web.scripts.DeclarativeWebScript" singleton="false"/>
 
-   <!--  ATOM Entry Web Script Implementation -->
+   <!--  ATOM Web Script Implementations -->
    <bean id="webscript.atomentry" parent="webscript" class="org.alfresco.web.scripts.atom.AtomEntryWebScript" singleton="false">
       <property name="abderaService" ref="webscript.abdera"/>
    </bean>
    <bean id="webscriptdesc.atomentry" parent="webscriptdesc" class="org.alfresco.web.scripts.atom.AtomDescription"/>
+   <bean id="webscript.atomfeed" parent="webscript" class="org.alfresco.web.scripts.atom.AtomFeedWebScript" singleton="false">
+      <property name="abderaService" ref="webscript.abdera"/>
+   </bean>
+   <bean id="webscriptdesc.atomfeed" parent="webscriptdesc" class="org.alfresco.web.scripts.atom.AtomDescription"/>
 
 
    <!--            -->

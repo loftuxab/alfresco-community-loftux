@@ -27,7 +27,11 @@ package org.alfresco.web.scripts.atom;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+
+import javax.xml.namespace.QName;
 
 import org.alfresco.web.scripts.DescriptionExtension;
 import org.alfresco.web.scripts.WebScriptException;
@@ -42,29 +46,56 @@ import org.dom4j.io.SAXReader;
 /**
  * ATOM Web Script Description Extensions
  *
+ * Extract...
+ * 
+ * <atom>
+ *   <qname name="UUID">{http://www.alfresco.org}uuid</qname>
+ *   <qname ... </qname>
+ * </atom>
+ *
  * @author davidc
  */
 public class AtomDescription implements DescriptionExtension 
 {
-    // Logger
-    private static final Log logger = LogFactory.getLog(AtomDescription.class);
-
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.DescriptionExtension#parseExtensions(java.io.InputStream)
      */
     public Map<String, Serializable> parseExtensions(String serviceDescPath, InputStream serviceDesc)
     {
-        // TODO: Replace with actual implementation... just example for now
-        
         SAXReader reader = new SAXReader();
         try
         {
-            Map<String, Serializable> extensions = new HashMap<String, Serializable>();
+            Map<String, Serializable> extensions = null;
             Document document = reader.read(serviceDesc);
             Element rootElement = document.getRootElement();
-            String extension = rootElement.elementText("qname");
-            extensions.put("qnames", extension);
+            Element atomElement = rootElement.element("atom");
+            if (atomElement != null)
+            {
+                extensions = new HashMap<String, Serializable>();
+                List qnameElements = atomElement.elements("qname");
+                if (qnameElements != null && qnameElements.size() > 0)
+                {
+                    HashMap<String,QName> qnames = new HashMap<String,QName>();
+                    Iterator iterElements = qnameElements.iterator();
+                    while(iterElements.hasNext())
+                    {
+                        Element qnameElement = (Element)iterElements.next();
+                        String name = qnameElement.attributeValue("name");
+                        if (name == null || name.length() == 0)
+                        {
+                            throw new WebScriptException("Expected 'name' attribute on <qname> element");
+                        }
+                        String qnameStr = qnameElement.getTextTrim();
+                        if (qnameStr == null || qnameStr.length() == 0)
+                        {
+                            throw new WebScriptException("Expected <qname> element value");
+                        }
+                        qnames.put(name, QName.valueOf(qnameStr));
+                    }
+                    extensions.put("qnames", qnames);
+                }
+            }
             return extensions;
         }
         catch(DocumentException e)

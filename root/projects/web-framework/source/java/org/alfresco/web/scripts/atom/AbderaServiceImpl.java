@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 import org.alfresco.web.scripts.WebScriptException;
@@ -67,7 +68,7 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
      * 
      * @param qNamesAsString  map of {namespaceuri}localname by alias
      */
-    public void setQNames(Map<String, String> qNamesAsString)
+    public void setQnames(Map<String, String> qNamesAsString)
     {
         this.qNamesAsString = qNamesAsString;
     }
@@ -184,7 +185,7 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
         Element root = entryDoc.getRoot();
         if (!Entry.class.isAssignableFrom(root.getClass()))
         {
-            throw new WebScriptException("Expected Atom Entry, but recieved " + root.getClass());
+            throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Expected Atom Entry, but recieved " + root.getClass());
         }
         
         return (Entry)root;
@@ -208,7 +209,7 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
         Element root = feedDoc.getRoot();
         if (!Entry.class.isAssignableFrom(root.getClass()))
         {
-            throw new WebScriptException("Expected Atom Feed, but recieved " + root.getClass());
+            throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Expected Atom Feed, but recieved " + root.getClass());
         }
         
         return (Feed)root;
