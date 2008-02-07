@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -96,7 +98,6 @@ public class SearchPath implements ApplicationContextAware, ApplicationListener
      * 
      * @return  all Web Script Stores
      */
-    @SuppressWarnings("unchecked")
     public Collection<Store> getStores()
     {
         Collection<Store> aliveStores = new ArrayList<Store>(searchPath.size());
@@ -129,4 +130,44 @@ public class SearchPath implements ApplicationContextAware, ApplicationListener
         return null;
     }
     
+    /**
+     * Determines if the document exists anywhere on the search path
+     * 
+     * @param documentPath  document path
+     * @return  true => exists, false => does not exist
+     */
+    public boolean hasDocument(String documentPath)
+    {
+       for (Store store : getStores())
+       {
+           if (store.hasDocument(documentPath))
+           {
+               return true;
+           }
+       }
+       
+       return false;
+    }
+
+    /**
+     * Gets a document from anywhere on the search path
+     * 
+     * @param documentPath  document path
+     * @return input stream onto document or null if it
+     *         does not exist on the search path
+     * 
+     * @throws IOException
+     */
+    public InputStream getDocument(String documentPath) throws IOException
+    {
+       for (Store store : getStores())
+       {
+           if (store.hasDocument(documentPath))
+           {
+               return store.getDocument(documentPath);
+           }
+       }
+       
+       return null;
+    }
 }

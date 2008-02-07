@@ -58,6 +58,11 @@ public interface ConfigService
     */
    public Config getGlobalConfig();
    
+   /**
+    * Resets the Config Service
+    */
+   public void reset();
+   
    public List<ConfigDeployment> appendConfig(ConfigSource configSource);
    
    public void addDeployer(ConfigDeployer configDeployer);

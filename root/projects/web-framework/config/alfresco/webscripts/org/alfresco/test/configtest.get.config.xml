@@ -1,0 +1,7 @@
+<test id="hello">
+   <foo>
+      <bar>bar1Value</bar>
+      <bar>bar2Value</bar>
+      <bar>bar3Value</bar>
+   </foo>
+</test>

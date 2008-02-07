@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,6 +24,7 @@
  */
 package org.alfresco.config;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,30 +32,34 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Object used to represent configuration as a root object in a script or template model.
+ * Abstract base class used for objects that represent configuration 
+ * as a root object in a script or template model.
  * 
  * @author gavinc
  */
-public class ConfigModel
+public abstract class ConfigModel
 {
-   private ConfigService configService;
-   private Map<String, Object> globalConfig = null;
+   protected ConfigService configService;
+   protected Map<String, ConfigElement> globalConfig;
+   protected String scriptConfig;
    
    private static Log logger = LogFactory.getLog(ConfigModel.class);
    
-   public ConfigModel(ConfigService configService)
+   public ConfigModel(ConfigService configService, String scriptConfig)
    {
       this.configService = configService;
-      this.globalConfig = new HashMap<String, Object>();
+      this.scriptConfig = scriptConfig;
       
       if (this.configService != null)
       {
-         if (logger.isDebugEnabled())
-            logger.debug("Constructing ConfigModel from global config...");
-         
-         // get the global config from the config service and
-         // create a map representation of it
-         populateMap(this.globalConfig, this.configService.getGlobalConfig());
+         // get the global config
+         this.globalConfig = this.configService.getGlobalConfig().getConfigElements();
+      }
+      
+      // if no global config was found create an empty map
+      if (this.globalConfig == null)
+      {
+         this.globalConfig = Collections.emptyMap();
       }
    }
 
@@ -63,35 +68,29 @@ public class ConfigModel
     * 
     * @return Map of the global config
     */
-   public Map<String, Object> getGlobal()
+   public Map<String, ConfigElement> getGlobal()
    {
       return this.globalConfig;
    }
    
+   /**
+    * Retrieves scoped configuration as a Map.
+    * 
+    * @return Map of the scoped config
+    */
    @SuppressWarnings("unchecked")
-   public Map<String, Object> getScoped()
+   public Map<String, ConfigElement> getScoped()
    {
       return new ScopedConfigMap();
    }
    
-   @SuppressWarnings("unchecked")
-   private void populateMap(Map<String, Object> map, Config config)
-   {
-      // go through each top level element and add it to the map
-      for (String configElemName : config.getConfigElements().keySet())
-      {
-         ConfigElement elem = config.getConfigElement(configElemName);
-         // just add the config element as is to the map, the
-         // downside to this is that the script & template
-         // writer must be aware of the API of the object, 
-         // this may either be a custom implementation or the
-         // GenericConfigElement implementation
-         map.put(configElemName, elem);
-         
-         if (logger.isDebugEnabled())
-            logger.debug("Added element '" + configElemName + "': " + elem);
-      }
-   }
+   /**
+    * Retrieves the script configuration.<br/>
+    * It's up to the subclass what is returned to represent script config.
+    * 
+    * @return script configuration
+    */
+   public abstract Object getScript();
    
    /**
     * Map to allow access to scoped config in a unified way 
@@ -108,12 +107,20 @@ public class ConfigModel
          if (logger.isDebugEnabled())
             logger.debug("Getting scoped config for '" + identifier + "'");
          
-         Map<String, Object> map = new HashMap<String, Object>();
+         Map<String, ConfigElement> map = null;
          
          if (configService != null)
          {
-            populateMap(map, configService.getConfig(identifier));
+            Config result = configService.getConfig(identifier);
+            map = result.getConfigElements();
          }
+         else
+         {
+            map = Collections.emptyMap();
+         }
+         
+         if (logger.isDebugEnabled())
+            logger.debug("Returning config for '" + identifier + "': " + map);
          
          return map;
       }

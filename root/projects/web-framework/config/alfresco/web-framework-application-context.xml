@@ -120,6 +120,7 @@
       <property name="formatRegistry" ref="webscripts.formatregistry" />
       <property name="templateProcessor" ref="webscripts.web.templateprocessor" />
       <property name="scriptProcessor" ref="webscripts.web.scriptprocessor" />
+      <property name="searchPath" ref="webscripts.searchpath" />
       <property name="configService" ref="web.config" />
    </bean>
 

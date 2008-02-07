@@ -49,9 +49,17 @@ logger.log("param in global config (should be 'hello') = " + config.global["para
 logger.log("param in scoped config (should be 'goodbye') = " + config.scoped["OverrideTest"].param.value);
 
 
-// TODO: test component config
-
-
+// test script config
+logger.log("testing script config...");
+var s =  new XML(config.script);
+// see http://wso2.org/library/1050 for more syntax examples
+logger.log("id of test element = " + s.@id);
+logger.log("value of first bar element = " + s.foo.bar[0]);
+logger.log("values of all bar elements:");
+for each(var b in s..bar)
+{
+   logger.log(b);
+}
 
 
 

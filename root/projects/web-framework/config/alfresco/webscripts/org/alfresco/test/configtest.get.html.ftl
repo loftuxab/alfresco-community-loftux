@@ -29,3 +29,11 @@ port = ${scopedCfg.server.port}<br/>
 param in global config (should be 'hello') = ${config.global["param"].value}<br/>
 param in scoped config (should be 'goodbye') = ${config.scoped["OverrideTest"].param.value}<br/>
 
+<h3>Testing script config...</h3>
+id of test element = ${config.script.test.@id}<br/>
+value of first bar element = ${config.script.test.foo.bar[0]}<br/>
+values of all bar elements:<br/><ul>
+<#list config.script.test.foo.bar as b>
+<li>${b}</li>
+</#list>
+</ul>

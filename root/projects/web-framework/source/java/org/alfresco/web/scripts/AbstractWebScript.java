@@ -24,7 +24,10 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.Date;
 import java.util.HashMap;
@@ -33,6 +36,8 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.config.ScriptConfigModel;
+import org.alfresco.config.TemplateConfigModel;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -51,10 +56,12 @@ public abstract class AbstractWebScript implements WebScript
     private Container container;
     private Description description;
     
+    // script config
+    private String xmlConfig;
+    
     // Status Template cache
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
     private ReentrantReadWriteLock statusTemplateLock = new ReentrantReadWriteLock(); 
-
     
     //
     // Initialisation
@@ -78,6 +85,9 @@ public abstract class AbstractWebScript implements WebScript
         {
             this.statusTemplateLock.writeLock().unlock();
         }
+        
+        // setup the script's config
+        setupScriptConfig();
     }
 
     /**
@@ -127,7 +137,10 @@ public abstract class AbstractWebScript implements WebScript
         // add context & runtime parameters
         params.putAll(req.getRuntime().getScriptParameters());
         params.putAll(container.getScriptParameters());
-
+        
+        // add configuration
+        params.put("config", new ScriptConfigModel(this.container.getConfigService(), this.xmlConfig));
+ 
         // add custom parameters
         if (customParams != null)
         {
@@ -167,6 +180,9 @@ public abstract class AbstractWebScript implements WebScript
         // add context & runtime parameters
         params.putAll(req.getRuntime().getTemplateParameters());
         params.putAll(container.getTemplateParameters());
+        
+        // add configuration
+        params.put("config", new TemplateConfigModel(this.container.getConfigService(), this.xmlConfig));
         
         // add custom parameters
         if (customParams != null)
@@ -452,6 +468,45 @@ public abstract class AbstractWebScript implements WebScript
             return new StatusTemplate(path, WebScriptResponse.HTML_FORMAT);
         }
         throw new WebScriptException("Default status template /status.ftl could not be found");
+    }
+    
+    /**
+     * Looks for the script's config file and reads it's contents
+     * if present. The result is the XML config stored in the
+     * <code>xmlConfig</code> member variable.
+     */
+    private void setupScriptConfig()
+    {
+        InputStream input = null;
+        try
+        {
+            // Look for script's config file
+            String configPath = getDescription().getId() + ".config.xml";
+            input = this.container.getSearchPath().getDocument(configPath);
+            if (input != null)
+            {
+                // if config file found, read contents into buffer
+                StringBuffer fileContents = new StringBuffer(1024);
+                InputStreamReader isr = new InputStreamReader(input);
+                BufferedReader reader = new BufferedReader(isr);
+                char[] buf = new char[1024];
+                int read=0;
+                while((read=reader.read(buf)) != -1)
+                {
+                    fileContents.append(buf, 0, read);
+                }
+                
+                this.xmlConfig = fileContents.toString();
+            }
+        }
+        catch (IOException ioe)
+        {
+            throw new WebScriptException("Failed to read script configuration file", ioe);
+        }
+        finally
+        {
+            if (input != null) try { input.close(); } catch (IOException e) {}
+        }
     }
         
     /**

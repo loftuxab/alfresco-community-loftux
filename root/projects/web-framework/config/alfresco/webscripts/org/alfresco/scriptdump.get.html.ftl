@@ -31,9 +31,13 @@
         <tr><td>Negotiated Formats:</td><td>[undefined]</td></tr>
      </#if>
      <tr><td>Implementation:</td><td>${script_class}</td></tr>
+     <#if script.extensions?exists && script.extensions?size &gt; 0>
      <#list script.extensions?keys as extensionName>
         <tr><td>[custom] ${extensionName}:</td><td>${script.extensions[extensionName]}</td></tr>
      </#list>
+     <#else>
+        <tr><td>Extensions:</td><td>[undefined]</td></tr>
+     </#if>
     </table>
     <p/>
 	<#list stores as store>
