@@ -28,7 +28,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.config.ConfigModel;
 import org.alfresco.config.ConfigService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,8 +58,8 @@ public abstract class AbstractRuntimeContainer
     private FormatRegistry formatRegistry;
     private ScriptProcessor scriptProcessor;
     private TemplateProcessor templateProcessor;
-    protected ConfigService configService;
-    private ConfigModel configModel;
+    private SearchPath searchPath; 
+    private ConfigService configService;
 
     /**
      * @param name
@@ -103,6 +102,14 @@ public abstract class AbstractRuntimeContainer
     }
     
     /**
+     * @param searchPath
+     */
+    public void setSearchPath(SearchPath searchPath)
+    {
+       this.searchPath = searchPath;
+    }
+    
+    /**
      * @param configService
      */
     public void setConfigService(ConfigService configService)
@@ -126,7 +133,6 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
-        params.put("config", getConfigModel());
         params.put("logger", new ScriptLogger());
         
         return Collections.unmodifiableMap(params);
@@ -139,7 +145,6 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
-        params.put("config", getConfigModel());
         
         return Collections.unmodifiableMap(params);
     }
@@ -159,6 +164,14 @@ public abstract class AbstractRuntimeContainer
     {
         return registry;
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Container#getConfigService()
+     */
+    public ConfigService getConfigService()
+    {
+        return configService;
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Container#getScriptProcessor()
@@ -175,6 +188,14 @@ public abstract class AbstractRuntimeContainer
     {
         return templateProcessor;
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Container#getSearchPath()
+     */
+    public SearchPath getSearchPath()
+    {
+        return searchPath;
+    }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Container#reset()
@@ -187,6 +208,9 @@ public abstract class AbstractRuntimeContainer
             scriptProcessor.reset();
             templateProcessor.reset();
             registry.reset();
+            
+            // TODO: test this before uncommenting
+            // configService.reset();
         }
         finally
         {
@@ -228,20 +252,5 @@ public abstract class AbstractRuntimeContainer
     protected ApplicationContext getApplicationContext()
     {
         return this.applicationContext;
-    }
-    
-    /**
-     * Gets the ConfigModel object representing the application configuration
-     * 
-     * @return
-     */
-    protected ConfigModel getConfigModel()
-    {
-       if (this.configModel == null)
-       {
-          this.configModel = new ConfigModel(this.configService);
-       }
-       
-       return this.configModel;
     }
 }

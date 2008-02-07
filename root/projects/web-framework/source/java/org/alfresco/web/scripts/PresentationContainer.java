@@ -76,7 +76,7 @@ public class PresentationContainer extends AbstractRuntimeContainer
        params.putAll(super.getScriptParameters());
        
        // retrieve remote server configuration 
-       Config config = this.configService.getConfig("Remote");
+       Config config = getConfigService().getConfig("Remote");
        if (config != null)
        {
            ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");

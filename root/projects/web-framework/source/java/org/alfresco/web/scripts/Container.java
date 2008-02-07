@@ -26,6 +26,8 @@ package org.alfresco.web.scripts;
 
 import java.util.Map;
 
+import org.alfresco.config.ConfigService;
+
 
 /**
  * Web Script Container
@@ -82,6 +84,20 @@ public interface Container
      * @return  registry of web scripts
      */
     public Registry getRegistry();
+    
+    /**
+     * Gets the Search Path
+     * 
+     * @return search path
+     */
+    public SearchPath getSearchPath();
+    
+    /**
+     * Gets the Config Service
+     * 
+     * @return config service
+     */
+    public ConfigService getConfigService();
 
     /**
      * Re-initialise the Web Script Container
