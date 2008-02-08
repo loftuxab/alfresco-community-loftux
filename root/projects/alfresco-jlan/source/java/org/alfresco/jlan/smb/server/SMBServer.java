@@ -470,7 +470,7 @@ public class SMBServer extends NetworkFileServer implements Runnable, Configurat
 			
 			while ( enm.hasMoreElements()) {
 				SharedDevice share = enm.nextElement();	
-				Debug.println("[SMB]  " + share.toString() + " " + share.getContext().toString());
+				Debug.println("[SMB]  " + share.toString() + " " + (share.getContext() != null ? share.getContext().toString() : ""));
 			}
     }
 
