@@ -49,6 +49,7 @@ import org.alfresco.jlan.server.filesys.SearchContext;
 import org.alfresco.jlan.server.filesys.TreeConnection;
 import org.alfresco.jlan.server.filesys.TreeConnectionHash;
 import org.alfresco.jlan.util.UTF8Normalizer;
+import org.alfresco.jlan.util.WildCard;
 
 /**
  * FTP Server Session Class
@@ -434,6 +435,10 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 					
 					m_cwd.removeDirectory();
 					m_cwd.setSharedDevice(getShareList(), this);
+					
+					// Return the new path
+					
+					return m_cwd;
 				}
 				else
 					return null;
@@ -1082,7 +1087,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 		
 		FTPPath ftpPath = m_cwd;
 		if ( req.hasArgument())
-			ftpPath = generatePathForRequest(req, true);
+			ftpPath = generatePathForRequest(req, true, WildCard.containsWildcards(req.getArgument()) ? false : true);
 			
 		if ( ftpPath == null) {
 			sendFTPResponse(500, "Invalid path");
@@ -4015,13 +4020,13 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				  //  Extended Port command
 						
 					case FTPCommand.EPrt:
-            sendFTPResponse(500, "Command not recognized");
+            sendFTPResponse(522, "Command not recognized");
 					  break;
 					  
 					//  Extended Passive command
 					  
 					case FTPCommand.EPsv:
-            sendFTPResponse(500, "Command not recognized");
+            sendFTPResponse(522, "Command not recognized");
 					  break;
 					  
 					//  SSL/TLS authentication
