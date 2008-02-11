@@ -169,7 +169,7 @@ public class DERSequence extends DERObject {
     buf.packByte( DER.Sequence + DER.Constructed);
     
     buf.packLength( totLen);
-    if ( totLen > 0);
+    if ( totLen > 0)
       buf.packBytes( objBuf);
   }
   

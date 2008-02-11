@@ -615,7 +615,7 @@ public final class AuthSessionFactory {
 
     //	Initialize the default dialect list
 
-    if (m_defDialects != null)
+    if (m_defDialects == null)
       m_defDialects = new DialectSelector();
     else
       m_defDialects.ClearAll();

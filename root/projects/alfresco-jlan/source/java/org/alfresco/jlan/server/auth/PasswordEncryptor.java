@@ -291,7 +291,7 @@ public class PasswordEncryptor {
     // Generate the 16 byte encrypted value using the password string and well
     // known value.
 
-    byte[] s8 = new String("KGS!@#$%").getBytes();
+    byte[] s8 = "KGS!@#$%".getBytes();
     byte[] p16 = P16(pwd, s8);
 
     // Generate the 24 byte encrypted value
@@ -480,7 +480,7 @@ public class PasswordEncryptor {
     // Generate the 16 byte encrypted value using the password string and well
     // known value.
 
-    byte[] s8 = new String("KGS!@#$%").getBytes();
+    byte[] s8 = "KGS!@#$%".getBytes();
     return P16(pwd, s8);
   }
   

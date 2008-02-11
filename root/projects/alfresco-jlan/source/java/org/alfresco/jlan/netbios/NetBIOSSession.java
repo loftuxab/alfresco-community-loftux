@@ -320,7 +320,7 @@ public final class NetBIOSSession extends NetworkSession {
 
 	  //  Convert the NetBIOS name string to the RFC NetBIOS name format
 
-	  String convstr = new String ( "ABCDEFGHIJKLMNOP");
+	  String convstr = "ABCDEFGHIJKLMNOP";
 	  StringBuffer nameBuf = new StringBuffer ( 32);
 
 	  int idx = 0;
@@ -363,7 +363,7 @@ public final class NetBIOSSession extends NetworkSession {
 
 	  //  Convert the RFC NetBIOS name string to a normal NetBIOS name string
 
-	  String convstr = new String ( "ABCDEFGHIJKLMNOP");
+	  String convstr = "ABCDEFGHIJKLMNOP";
 	  StringBuffer nameBuf = new StringBuffer ( 16);
 
 	  int idx = 0;
@@ -421,7 +421,7 @@ public final class NetBIOSSession extends NetworkSession {
 
 	  //  Convert the RFC NetBIOS name string to a normal NetBIOS name string
 
-	  String convstr = new String ( "ABCDEFGHIJKLMNOP");
+	  String convstr = "ABCDEFGHIJKLMNOP";
 	  StringBuffer nameBuf = new StringBuffer ( 16);
 
 	  int idx = 0;
@@ -491,7 +491,7 @@ public final class NetBIOSSession extends NetworkSession {
 
 	  //  Convert the NetBIOS name string to the RFC NetBIOS name format
 
-	  String convstr = new String ( "ABCDEFGHIJKLMNOP");
+	  String convstr = "ABCDEFGHIJKLMNOP";
 	  int idx = 0;
 	  int bufpos = off;
 
@@ -1327,7 +1327,7 @@ public final class NetBIOSSession extends NetworkSession {
 
 	  //  Check if the host name contains a domain name
 
-	  String nbName = new String ( hostName.toUpperCase());
+	  String nbName = hostName.toUpperCase();
 	  int pos = nbName.indexOf( ".");
 
 	  if ( pos != -1) {

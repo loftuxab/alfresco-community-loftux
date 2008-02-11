@@ -107,7 +107,7 @@ public class NotifyRequest {
 		if ( m_watchPath.length() == 0)
 		  m_watchPath = "\\";
 		else if ( m_watchPath.indexOf('/') != -1)
-		  m_watchPath.replace( '/', '\\');
+		  m_watchPath = m_watchPath.replace( '/', '\\');
 	}
 	
 	/**

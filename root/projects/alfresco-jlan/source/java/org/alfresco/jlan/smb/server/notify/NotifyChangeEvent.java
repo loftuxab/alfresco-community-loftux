@@ -49,7 +49,7 @@ public class NotifyChangeEvent {
 		//	Normalize the path
 		
 		if ( m_fileName.indexOf('/') != -1)
-		  m_fileName.replace('/', '\\');
+		  m_fileName = m_fileName.replace('/', '\\');
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class NotifyChangeEvent {
 		//	Normalize the path
 		
 		if ( m_fileName.indexOf('/') != -1)
-		  m_fileName.replace('/', '\\');
+		  m_fileName = m_fileName.replace('/', '\\');
 		
 		if ( m_oldName.indexOf('/') != -1)
 		  m_oldName.replace('/', '\\');

@@ -664,7 +664,7 @@ public class FTPSrvSession extends SrvSession implements Runnable {
     //  DEBUG
     
     if ( Debug.EnableInfo && hasDebug(DBG_TXDATA))
-      debugPrintln("Tx msg=" + msg.toString());
+      debugPrintln("Tx msg=" + msg);
 
     //  Output the FTP response
 
