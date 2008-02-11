@@ -75,8 +75,7 @@ public class TcpipSMBPacketHandler extends SocketPacketHandler {
     	//	Allocate a new buffer to hold the data and copy the existing header
     	
     	byte[] newBuf = new byte[dlen + RFCNetBIOSProtocol.HEADER_LEN];
-    	for ( int i = 0; i < 4; i++)
-    		newBuf[i] = buf[i];
+    	System.arraycopy(buf, 0, newBuf, 0, 4);
     		
     	//	Attach the new buffer to the SMB packet
     	

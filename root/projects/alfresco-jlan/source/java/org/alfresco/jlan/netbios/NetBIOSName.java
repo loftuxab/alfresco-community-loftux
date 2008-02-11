@@ -351,8 +351,7 @@ public class NetBIOSName {
 	    ex.printStackTrace();
 	  }
 
-	  for ( int i = 0; i < nameBytes.length; i++)
-	  	nameBuf[i] = nameBytes[i];
+	  System.arraycopy(nameBytes, 0, nameBuf, 0, nameBytes.length);
 	  for ( int i = nameBytes.length; i < NameLength; i++)
 	    nameBuf[i] = ' ';
 	  nameBuf[NameLength - 1] = (byte) (m_type & 0xFF);
