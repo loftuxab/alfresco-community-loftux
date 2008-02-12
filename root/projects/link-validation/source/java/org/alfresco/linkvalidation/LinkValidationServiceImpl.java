@@ -54,6 +54,7 @@ import java.util.Set;
 import java.util.SortedMap;
 import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
 import org.alfresco.repo.admin.patch.impl.WCMFoldersPatch;
@@ -71,6 +72,7 @@ import org.alfresco.repo.avm.PurgeStoreTxnListener;
 import org.alfresco.repo.avm.PurgeVersionTxnListener;
 import org.alfresco.repo.avm.util.RawServices;
 import org.alfresco.repo.avm.util.UriSchemeNameMatcher;
+import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
@@ -222,6 +224,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     Thread validation_update_thread_;
     
+    // SysAdmin cache - used to cluster certain JMX operations
+    private SimpleCache<String, Object> sysAdminCache;
+    private final static String KEY_SYSADMIN_LINKVALIDATION_DISABLED = "sysAdminCache.linkValidationDisabled"; // Boolean
+    
     public LinkValidationServiceImpl() { }
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
@@ -232,6 +238,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     public void setAvmRemote(AVMRemote svc)               { avm_ = svc; }
     public AVMRemote getAvmRemote()                       { return avm_;}
+    
+    public void setSysAdminCache(SimpleCache<String, Object> sysAdminCache)
+    {
+        this.sysAdminCache = sysAdminCache;
+    }
 
     public void setExcludePathMatcher(NameMatcher matcher)
     {
@@ -318,6 +329,17 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         purge_all_validation_data_on_bootstrap_ = tf;
     }
 
+    public void setLinkValidationDisabled(boolean disabled)
+    {
+    	sysAdminCache.put(KEY_SYSADMIN_LINKVALIDATION_DISABLED, new Boolean(disabled));
+    }
+    
+    @SuppressWarnings("unchecked")
+    public boolean isLinkValidationDisabled()
+    {
+    	Boolean disabled = (Boolean)sysAdminCache.get(KEY_SYSADMIN_LINKVALIDATION_DISABLED);
+    	return (disabled == null ? false : disabled.booleanValue());
+    }
 
     //-------------------------------------------------------------------------
     /**
@@ -478,59 +500,67 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         {
             synchronized (this ) { if (Shutdown_)  { break;} }
 
-            if ( log.isDebugEnabled() )
-                log.debug( "LinkValidationService polling webapps...");
-
-            final HrefValidationProgress progress = new HrefValidationProgress();
-            progress_sleepy = progress;
-
-            try
-            {
-                RetryingTransactionHelper.RetryingTransactionCallback<Object>
-                callback = new RetryingTransactionHelper.
-                               RetryingTransactionCallback<Object>()
-                               {
-                                   public String execute() throws Throwable
-                                   {
-                                           updateHrefInfo( webappPath,
-                                                           incremental,
-                                                           validateExternal,
-                                                           progress);
-                                       return null;
-                                   }
-                               };
-
-                transaction_helper_.doInTransaction(callback);
-            }
-            catch (Exception e)
-            {
-                // Super-low level debug.
-                //
-                if ( true )
-                {
-                    if ( log.isDebugEnabled() )
-                    {
-                        // After all these years, there's still no easy
-                        // method to print a stack trace into a string.
-                        // Where is the love?  Where?
-                    
-                        StringWriter string_writer = new StringWriter();
-                        PrintWriter print_writer   = new PrintWriter(string_writer);
-                        e.printStackTrace(print_writer);
-                    
-                        log.debug( "Exception class:  " + e.getClass().getName() +
-                                   ":  " + e.getMessage() +
-                                   "\n" + string_writer.toString() );
-                    }
-                }
-                else
-                {
-                    if ( log.isInfoEnabled() )
-                        log.info("Could not validate links.  Retrying.  ( "       +
-                                 e.getClass().getName() +  ":  " + e.getMessage() +
-                                 " )");
-                }
-            }
+        	if (isLinkValidationDisabled())
+        	{
+        		if ( log.isDebugEnabled() )
+        			log.debug("Link validation (polling) not performed - currently disabled by system administrator");
+        	}
+        	else
+        	{      		
+	            if ( log.isDebugEnabled() )
+	                log.debug( "LinkValidationService polling webapps...");
+	
+	            final HrefValidationProgress progress = new HrefValidationProgress();
+	            progress_sleepy = progress;
+	
+	            try
+	            {
+	                RetryingTransactionHelper.RetryingTransactionCallback<Object>
+	                callback = new RetryingTransactionHelper.
+	                               RetryingTransactionCallback<Object>()
+	                               {
+	                                   public String execute() throws Throwable
+	                                   {
+	                                           updateHrefInfo( webappPath,
+	                                                           incremental,
+	                                                           validateExternal,
+	                                                           progress);
+	                                       return null;
+	                                   }
+	                               };
+	
+	                transaction_helper_.doInTransaction(callback);
+	            }
+	            catch (Exception e)
+	            {
+	                // Super-low level debug.
+	                //
+	                if ( true )
+	                {
+	                    if ( log.isDebugEnabled() )
+	                    {
+	                        // After all these years, there's still no easy
+	                        // method to print a stack trace into a string.
+	                        // Where is the love?  Where?
+	                    
+	                        StringWriter string_writer = new StringWriter();
+	                        PrintWriter print_writer   = new PrintWriter(string_writer);
+	                        e.printStackTrace(print_writer);
+	                    
+	                        log.debug( "Exception class:  " + e.getClass().getName() +
+	                                   ":  " + e.getMessage() +
+	                                   "\n" + string_writer.toString() );
+	                    }
+	                }
+	                else
+	                {
+	                    if ( log.isInfoEnabled() )
+	                        log.info("Could not validate links.  Retrying.  ( "       +
+	                                 e.getClass().getName() +  ":  " + e.getMessage() +
+	                                 " )");
+	                }
+	            }           
+        	}
 
             // Sleep regardless of whether the updateHrefInfo failed
             try { Thread.sleep( poll_interval_ ); }
