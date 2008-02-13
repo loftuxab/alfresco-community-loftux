@@ -305,6 +305,8 @@
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" 
+                  excludes="**/extension/**" />
          <!-- NOTE: include dev-context.xml to allow developer overrides -->
          <fileset dir="${dir.project.repository.config}" 
                   includes="**/extension/dev-context.xml"/>
@@ -337,6 +339,7 @@
          <fileset dir="${dir.project.3rdparty.lib}/jgroups" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/jbpm" includes="*.jar" />
          <fileset dir="${dir.project.3rdparty.lib}/fop" includes="*.jar"/>
+         <fileset dir="${dir.project.3rdparty.lib}/abdera" includes="*.jar"/>
       </copy>
       
       <!-- copy webservices files -->
