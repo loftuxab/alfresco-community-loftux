@@ -58,7 +58,7 @@ public class CustomCreateContentWizard extends CreateContentWizard
       // add the selected aspect (the properties page after the wizard
       // will allow us to set the properties)
       QName aspectToAdd = Repository.resolveToQName(this.aspect);
-      this.nodeService.addAspect(this.createdNode, aspectToAdd, null);
+      this.getNodeService().addAspect(this.createdNode, aspectToAdd, null);
       
       return outcome;
    }
@@ -99,7 +99,7 @@ public class CustomCreateContentWizard extends CreateContentWizard
                   // if there wasn't a client based label try and get it from the dictionary
                   if (label == null)
                   {
-                     AspectDefinition aspectDef = this.dictionaryService.getAspect(idQName);
+                     AspectDefinition aspectDef = this.getDictionaryService().getAspect(idQName);
                      if (aspectDef != null)
                      {
                         label = aspectDef.getTitle();
