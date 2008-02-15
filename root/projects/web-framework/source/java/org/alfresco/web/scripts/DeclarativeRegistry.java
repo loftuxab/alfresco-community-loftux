@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -154,6 +154,19 @@ public class DeclarativeRegistry
     {
         initWebScripts();
         logger.info("Registered " + webscriptsById.size() + " Web Scripts, " + webscriptsByURL.size() + " URLs");
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Registry#cloneEmpty()
+     */
+    public Registry cloneEmpty()
+    {
+        DeclarativeRegistry registry = new DeclarativeRegistry();
+        registry.setApplicationContext(applicationContext);
+        registry.setContainer(container);
+        registry.setDefaultWebScript(defaultWebScript);
+        registry.setSearchPath(searchPath);
+        return registry;
     }
         
     /**

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -207,7 +207,7 @@ public abstract class AbstractRuntimeContainer
         {
             scriptProcessor.reset();
             templateProcessor.reset();
-            registry.reset();
+            getRegistry().reset();
             
             // TODO: test this before uncommenting
             // configService.reset();
