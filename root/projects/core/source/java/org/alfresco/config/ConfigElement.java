@@ -24,6 +24,7 @@
  */
 package org.alfresco.config;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -32,7 +33,7 @@ import java.util.Map;
  * 
  * @author gavinc
  */
-public interface ConfigElement
+public interface ConfigElement extends Serializable
 {
     /**
      * Returns the name of this config element

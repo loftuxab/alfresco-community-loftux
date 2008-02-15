@@ -24,6 +24,8 @@
  */
 package org.alfresco.util;
 
+import java.io.Serializable;
+
 /**
  * Simple cache of a single Object value.
  * <p>
@@ -31,8 +33,10 @@ package org.alfresco.util;
  * 
  * @author Kevin Roast
  */
-public class ExpiringValueCache<T>
+public class ExpiringValueCache<T> implements Serializable
 {
+    private static final long serialVersionUID = 1036233352030777619L;
+    
     // default is to discard cached object after 1 minute
     private final static long TIMEOUT_DEFAULT = 1000L*60L;
     

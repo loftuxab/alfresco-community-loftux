@@ -50,7 +50,7 @@ public class AddAspectDialog extends BaseDialogBean
       QName aspectToAdd = Repository.resolveToQName(this.aspect);
       
       // add the aspect to the space
-      this.nodeService.addAspect(nodeRef, aspectToAdd, null);
+      this.getNodeService().addAspect(nodeRef, aspectToAdd, null);
       
       // return the default outcome
       return outcome;
