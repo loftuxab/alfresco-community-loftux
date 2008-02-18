@@ -51,6 +51,7 @@
             <prop key="mediawiki">text/plain</prop>
             <prop key="portlet">text/html</prop>
             <prop key="fbml">text/html</prop>
+            <prop key="php">text/htm</prop>
          </props>
       </property>
    </bean>

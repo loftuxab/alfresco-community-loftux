@@ -12,6 +12,12 @@
         </property>
     </bean>
     
+    <!-- Bootstrap the permission model -->
+    <bean id="org_alfresco_module_MediaWikiIntegration_permissionBootstrap" parent="permissionModelBootstrap">
+    	<property name="model" value="alfresco/module/org.alfresco.module.mediawikiintegration/model/mediaWikiIntegrationPermissionDefinitions.xml"/>
+    </bean>
+        
+    <!-- Bootstrap module data -->
     <bean id="org_alfresco_module_MediaWikiIntegration_bootstrap" class="org.alfresco.module.mediawikiintegration.MediaWikiBootstrap" parent="module.baseComponent" depends-on="org_alfresco_module_MediaWikiIntegration_dictionaryBootstrap">
 	  	<property name="moduleId" value="org.alfresco.module.mediawikiintegration" />
 	    <property name="name" value="bootstrapWikiSapce" />
