@@ -421,6 +421,8 @@ public class PageRendererServlet extends WebScriptServlet
       {
          // add/replace the "well known" context tokens in component properties
          Map<String, String> properties = new HashMap<String, String>(8, 1.0f);
+         // Component ID is always available to the component
+         properties.put("id", component.getId());
          for (String arg : component.getProperties().keySet())
          {
             properties.put(arg, replaceContextTokens(component.getProperties().get(arg), context.Tokens));
