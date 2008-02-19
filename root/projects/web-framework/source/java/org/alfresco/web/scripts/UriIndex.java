@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,47 +24,31 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.Collection;
-
-
 /**
- * Web Scripts Registry
- * 
- * @author davidc
+ * Encapsulates the mapping of URIs to Web Scripts
  */
-public interface Registry
+public interface UriIndex
 {
     /**
-     * Gets a Web Script Package
-     * 
-     * @param packagePath
-     * @return  web script path representing package
+     * Clear the index
      */
-    public Path getPackage(String packagePath);
+    public void clear();
     
     /**
-     * Gets a Web Script URL
+     * Gets size of index (i.e. number of Uris indexed)
      * 
-     * @param uriPath
-     * @return  web script path representing uri
+     * @return  index size
      */
-    public Path getUri(String uriPath);
+    public int getSize();
     
     /**
-     * Gets all Web Scripts
+     * Register a URI with a Web Script
      * 
-     * @return  web scripts
+     * @param script
+     * @param uri
      */
-    public Collection<WebScript> getWebScripts();
-
-    /**
-     * Gets a Web Script by Id
-     * 
-     * @param id  web script id
-     * @return  web script
-     */
-    public WebScript getWebScript(String id);
-
+    public void registerUri(WebScript script, String uri);
+    
     /**
      * Gets a Web Script given an HTTP Method and URI
      * 
@@ -73,14 +57,4 @@ public interface Registry
      * @return  script match (pair of script and uri that matched)
      */
     public Match findWebScript(String method, String uri);
-
-    /**
-     * Resets the Web Script Registry
-     */
-    public void reset();
-    
-    /**
-     * Clone empty Web Script Registry
-     */
-    public Registry cloneEmpty();
 }

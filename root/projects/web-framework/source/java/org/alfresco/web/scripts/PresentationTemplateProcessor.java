@@ -113,7 +113,7 @@ public class PresentationTemplateProcessor
             if (logger.isDebugEnabled())
             {
                 logger.debug("Executing template: " + template);// + " on model: " + model);
-                startTime = System.currentTimeMillis();
+                startTime = System.nanoTime();
             }
             
             Template t = templateConfig.getTemplate(template);
@@ -136,8 +136,8 @@ public class PresentationTemplateProcessor
             
             if (logger.isDebugEnabled())
             {
-                long endTime = System.currentTimeMillis();
-                logger.debug("Time to execute template: " + (endTime - startTime) + "ms");
+                long endTime = System.nanoTime();
+                logger.debug("Time to execute template: " + (endTime - startTime)/1000000f + "ms");
             }
         }
         catch (IOException ioerr)
@@ -168,7 +168,7 @@ public class PresentationTemplateProcessor
         if (logger.isDebugEnabled())
         {
             logger.debug("Executing template: " + template);// + " on model: " + model);
-            startTime = System.currentTimeMillis();
+            startTime = System.nanoTime();
         }
         
         try
@@ -178,8 +178,8 @@ public class PresentationTemplateProcessor
             
             if (logger.isDebugEnabled())
             {
-                long endTime = System.currentTimeMillis();
-                logger.debug("Time to execute template: " + (endTime - startTime) + "ms");
+                long endTime = System.nanoTime();
+                logger.debug("Time to execute template: " + (endTime - startTime)/1000000f + "ms");
             }
         }
         catch (Throwable err)

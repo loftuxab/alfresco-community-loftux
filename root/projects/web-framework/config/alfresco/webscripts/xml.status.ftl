@@ -12,7 +12,7 @@
    <@recursestack status.exception/>
   </#if>
   </callstack>
-  <server>Alfresco ${server.edition} v${server.version} schema ${server.schema}</server>
+  <server>Alfresco ${server.edition?xml} v${server.version?xml} schema ${server.schema?xml}</server>
   <time>${date?datetime}</time>
 </response>
 

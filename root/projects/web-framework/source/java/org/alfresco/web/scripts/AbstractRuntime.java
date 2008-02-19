@@ -69,7 +69,7 @@ public abstract class AbstractRuntime implements Runtime
      */
     final public void executeScript()
     {
-        long startRuntime = System.currentTimeMillis();
+        long startRuntime = System.nanoTime();
 
         String method = getScriptMethod();
         String scriptUrl = null;
@@ -113,7 +113,7 @@ public abstract class AbstractRuntime implements Runtime
             if (logger.isDebugEnabled())
                 logger.debug("Agent: " + scriptReq.getAgent());
 
-            long startScript = System.currentTimeMillis();
+            long startScript = System.nanoTime();
             final WebScript script = match.getWebScript();
             final Description description = script.getDescription();
             
@@ -133,8 +133,8 @@ public abstract class AbstractRuntime implements Runtime
             {
                 if (logger.isDebugEnabled())
                 {
-                    long endScript = System.currentTimeMillis();
-                    logger.debug("Web Script " + description.getId() + " executed in " + (endScript - startScript) + "ms");
+                    long endScript = System.nanoTime();
+                    logger.debug("Web Script " + description.getId() + " executed in " + (endScript - startScript)/1000000f + "ms");
                 }
             }
         }
@@ -206,9 +206,9 @@ public abstract class AbstractRuntime implements Runtime
         }
         finally
         {
-            long endRuntime = System.currentTimeMillis();
+            long endRuntime = System.nanoTime();
             if (logger.isDebugEnabled())
-                logger.debug("Processed script url ("  + method + ") " + scriptUrl + " in " + (endRuntime - startRuntime) + "ms");
+                logger.debug("Processed script url ("  + method + ") " + scriptUrl + " in " + (endRuntime - startRuntime)/1000000f + "ms");
         }
     }
 

@@ -29,7 +29,6 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -77,16 +76,14 @@ public class DeclarativeRegistry
     // NOTE: The map is sorted by id (ascending order)
     private Map<String, WebScript> webscriptsById = new TreeMap<String, WebScript>();
     
-    // map of web scripts by url
-    // NOTE: The map is sorted by url (descending order)
-    private Map<String, URLIndex> webscriptsByURL = new TreeMap<String, URLIndex>(Collections.reverseOrder());
-    
     // map of web script packages by path
     private Map<String, PathImpl> packageByPath = new TreeMap<String, PathImpl>();
 
     // map of web script uris by path
     private Map<String, PathImpl> uriByPath = new TreeMap<String, PathImpl>();
 
+    // uri index for mapping a URI to a Web Script
+    private UriIndex uriIndex;
     
     //
     // Initialisation
@@ -100,6 +97,14 @@ public class DeclarativeRegistry
         this.defaultWebScript = defaultWebScript;
     }
 
+    /**
+     * @param uriIndex
+     */
+    public void setUriIndex(UriIndex uriIndex)
+    {
+        this.uriIndex = uriIndex;
+    }
+    
     /**
      * @param searchPath
      */
@@ -145,6 +150,8 @@ public class DeclarativeRegistry
         {
             throw new WebScriptException("Default Web Script implementation '" + (defaultWebScript == null ? "<undefined>" : defaultWebScript) + "' does not exist.");
         }
+        if (logger.isDebugEnabled())
+            logger.debug("Using URI Index provider: " + uriIndex.getClass().getName());
     }
 
     /* (non-Javadoc)
@@ -153,7 +160,7 @@ public class DeclarativeRegistry
     public void reset()
     {
         initWebScripts();
-        logger.info("Registered " + webscriptsById.size() + " Web Scripts, " + webscriptsByURL.size() + " URLs");
+        logger.info("Registered " + webscriptsById.size() + " Web Scripts, " + uriIndex.getSize() + " URLs");
     }
     
     /* (non-Javadoc)
@@ -180,8 +187,8 @@ public class DeclarativeRegistry
             logger.debug("Initialising Web Scripts");
         
         // clear currently registered services
+        uriIndex.clear();
         webscriptsById.clear();
-        webscriptsByURL.clear();
         packageByPath.clear();
         packageByPath.put("/", new PathImpl("/"));
         uriByPath.clear();
@@ -308,50 +315,9 @@ public class DeclarativeRegistry
                     webscriptsById.put(id, serviceImpl);
                     for (String uriTemplate : serviceDesc.getURIs())
                     {
-                        // establish static part of url template
-                        boolean wildcard = false;
-                        boolean extension = true;
-                        int queryArgIdx = uriTemplate.indexOf('?');
-                        if (queryArgIdx != -1)
-                        {
-                            uriTemplate = uriTemplate.substring(0, queryArgIdx);
-                        }
-                        int tokenIdx = uriTemplate.indexOf('{');
-                        if (tokenIdx != -1)
-                        {
-                            uriTemplate = uriTemplate.substring(0, tokenIdx);
-                            wildcard = true;
-                        }
-                        if (serviceDesc.getFormatStyle() != Description.FormatStyle.argument)
-                        {
-                            int extIdx = uriTemplate.lastIndexOf(".");
-                            if (extIdx != -1)
-                            {
-                                uriTemplate = uriTemplate.substring(0, extIdx);
-                            }
-                            extension = false;
-                        }
-                        
-                        // index service by static part of url (ensuring no other service has already claimed the url)
-                        String uriIdx = serviceDesc.getMethod().toString() + ":" + uriTemplate;
-                        if (webscriptsByURL.containsKey(uriIdx))
-                        {
-                            URLIndex urlIndex = webscriptsByURL.get(uriIdx);
-                            WebScript existingService = urlIndex.script;
-                            if (!existingService.getDescription().getId().equals(serviceDesc.getId()))
-                            {
-                                String msg = "Web Script document " + serviceDesc.getDescPath() + " is attempting to define the url '" + uriIdx + "' already defined by " + existingService.getDescription().getDescPath();
-                                throw new WebScriptException(msg);
-                            }
-                        }
-                        else
-                        {
-                            URLIndex urlIndex = new URLIndex(uriTemplate, wildcard, extension, serviceImpl);
-                            webscriptsByURL.put(uriIdx, urlIndex);
-                            
-                            if (logger.isDebugEnabled())
-                                logger.debug("Registered Web Script URL '" + uriIdx + "'");
-                        }
+                        uriIndex.registerUri(serviceImpl, uriTemplate);
+                        if (logger.isDebugEnabled())
+                            logger.debug("Registered Web Script URL '" + serviceImpl.getDescription().getMethod() + ":" + uriTemplate + "'");
                     }
     
                     // build path indexes to web script
@@ -712,127 +678,14 @@ public class DeclarativeRegistry
      */
     public Match findWebScript(String method, String uri)
     {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         
-        // TODO: Replace with more efficient approach
-        String matchedPath = null;
-        DeclarativeWebScriptMatch apiServiceMatch = null;
-        String match = method.toString().toUpperCase() + ":" + uri;
-        String matchNoExt = method.toString().toUpperCase() + ":" + ((uri.indexOf('.') != -1) ? uri.substring(0, uri.indexOf('.')) : uri);
-        
-        // locate full match - on URI and METHOD
-        for (Map.Entry<String, URLIndex> entry : webscriptsByURL.entrySet())
-        {
-            URLIndex urlIndex = entry.getValue();
-            String index = entry.getKey();
-            String test = urlIndex.includeExtension ? match : matchNoExt; 
-            if ((urlIndex.wildcardPath && test.startsWith(index)) || (!urlIndex.wildcardPath && test.equals(index)))
-            {
-                apiServiceMatch = new DeclarativeWebScriptMatch(urlIndex.path, urlIndex.script); 
-                break;
-            }
-            else if ((urlIndex.wildcardPath && uri.startsWith(urlIndex.path)) || (!urlIndex.wildcardPath && uri.equals(urlIndex.path)))
-            {
-                matchedPath = urlIndex.path;
-            }
-        }
-        
-        // locate URI match
-        if (apiServiceMatch == null && matchedPath != null)
-        {
-            apiServiceMatch = new DeclarativeWebScriptMatch(matchedPath);
-        }
+        Match match = uriIndex.findWebScript(method, uri);
         
         if (logger.isDebugEnabled())
-            logger.debug("Web Script index lookup for uri " + uri + " took " + (System.currentTimeMillis() - startTime) + "ms");
+            logger.debug("Web Script index lookup for uri " + uri + " took " + (System.nanoTime() - startTime)/1000000f + "ms");
         
-        return apiServiceMatch;
+        return match;
     }
 
-    /**
-     * Web Script Match
-     * 
-     * @author davidc
-     */
-    public static class DeclarativeWebScriptMatch implements Match
-    {
-        private String path;
-        private WebScript service;
-        private Kind kind;
-
-        /**
-         * Construct
-         * 
-         * @param path
-         * @param service
-         */
-        public DeclarativeWebScriptMatch(String path, WebScript service)
-        {
-            this.kind = Kind.FULL;
-            this.path = path;
-            this.service = service;
-        }
-        
-        /**
-         * Construct
-         * 
-         * @param path
-         * @param service
-         */
-        public DeclarativeWebScriptMatch(String path)
-        {
-            this.kind = Kind.URI;
-            this.path = path;
-        }
-
-        /* (non-Javadoc)
-         * @see org.alfresco.web.scripts.Match#getKind()
-         */
-        public Kind getKind()
-        {
-            return this.kind;
-        }
-
-        /* (non-Javadoc)
-         * @see org.alfresco.web.scripts.Match#getPath()
-         */
-        public String getPath()
-        {
-            return path;
-        }
-
-        /* (non-Javadoc)
-         * @see org.alfresco.web.scripts.Match#getWebScript()
-         */
-        public WebScript getWebScript()
-        {
-            return service;
-        }
-        
-        @Override
-        public String toString()
-        {
-            return path;
-        }
-    }
-    
-    /**
-     * Web Script URL Index Entry
-     */
-    private static class URLIndex
-    {
-        private URLIndex(String path, boolean wildcardPath, boolean includeExtension, WebScript script)
-        {
-            this.path = path;
-            this.wildcardPath = wildcardPath;
-            this.includeExtension = includeExtension;
-            this.script = script;
-        }
-        
-        private String path;
-        private boolean wildcardPath;
-        private boolean includeExtension;
-        private WebScript script;
-    }
-    
 }

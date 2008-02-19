@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.scripts;
 
+import java.util.Collections;
+import java.util.Map;
+
 
 /**
  * Script / Template Model representing Web Script URLs
@@ -32,6 +35,7 @@ package org.alfresco.web.scripts;
  */
 public class URLModel
 {
+    private static Map<String, String> emptyArgs = Collections.emptyMap();
     private WebScriptRequest req;
     
     /**
@@ -135,4 +139,26 @@ public class URLModel
     {
         return req.getExtensionPath();
     }
+    
+    /**
+     * Gets the template form of this path
+     * 
+     * @return  template form of path
+     */
+    public String getTemplate()
+    {
+        return req.getServiceMatch().getTemplate();
+    }
+    
+    /**
+     * Gets the values of template variables
+     * 
+     * @return  map of value indexed by variable name (or the empty map)
+     */
+    public Map<String, String> getTemplateArgs()
+    {
+        Map<String, String> args = req.getServiceMatch().getTemplateVars();
+        return (args == null) ? emptyArgs : args;
+    }
+    
 }

@@ -116,7 +116,7 @@ public class PresentationScriptProcessor implements ScriptProcessor
         long startTime = 0;
         if (logger.isDebugEnabled())
         {
-            startTime = System.currentTimeMillis();
+            startTime = System.nanoTime();
         }
         
         Context cx = Context.enter();
@@ -149,8 +149,8 @@ public class PresentationScriptProcessor implements ScriptProcessor
             
             if (logger.isDebugEnabled())
             {
-                long endTime = System.currentTimeMillis();
-                logger.debug("Time to execute script: " + (endTime - startTime) + "ms");
+                long endTime = System.nanoTime();
+                logger.debug("Time to execute script: " + (endTime - startTime)/1000000f + "ms");
             }
         }
     }
