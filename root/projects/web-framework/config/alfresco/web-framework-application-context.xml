@@ -130,8 +130,16 @@
    <!--  Web Script Registry -->
    <!--                      -->
 
+   <!--
+     // Note: This URI index was used until v3.0. It may be switched back on, if the newer
+     //       Jax-RS index is not compatible with your URIs 
+     <bean id="webscripts.index" class="org.alfresco.web.scripts.PrefixTemplateUriIndex" /> 
+   -->
+   <bean id="webscripts.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />
+   
    <bean id="webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
       <property name="container" ref="webscripts.container" />
+      <property name="uriIndex" ref="webscripts.index" />
       <property name="searchPath" ref="webscripts.searchpath" />
       <property name="defaultWebScript"><value>webscript.default</value></property>
    </bean>

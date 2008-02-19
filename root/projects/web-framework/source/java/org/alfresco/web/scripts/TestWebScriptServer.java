@@ -211,9 +211,9 @@ public class TestWebScriptServer
                 }
                                 
                 // execute command in context of currently selected user
-                long startms = System.currentTimeMillis();
+                long startTime = System.nanoTime();
                 System.out.print(interpretCommand(line));
-                System.out.println("" + (System.currentTimeMillis() - startms) + "ms");
+                System.out.println("" + (System.nanoTime() - startTime)/1000000f + "ms");
             }
             catch (Exception e)
             {

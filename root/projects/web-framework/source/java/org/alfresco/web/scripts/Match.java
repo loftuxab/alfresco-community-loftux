@@ -24,14 +24,25 @@
  */
 package org.alfresco.web.scripts;
 
+import java.util.Map;
+
 
 /**
- * Represents a URL request to Web Script match
+ * Represents a URI to Web Script match
  *  
  * @author davidc
  */
-public interface Match
+public class Match
 {
+    private String templatePath;
+    private Map<String, String> templateVars;
+    private String matchPath;
+    private WebScript script;
+    private Kind kind;
+
+    /**
+     * Kind of Match
+     */
     public enum Kind
     {
         /** URL request matches on URI only */
@@ -39,24 +50,88 @@ public interface Match
         /** URL request matches on URI and Method */
         FULL
     };
+
+    /**
+     * Construct
+     * 
+     * @param templateVars
+     * @param script
+     */
+    public Match(String templatePath, Map<String, String> templateVars, String matchPath, WebScript script)
+    {
+        this.kind = Kind.FULL;
+        this.templatePath = templatePath;
+        this.templateVars = templateVars;
+        this.matchPath = matchPath;
+        this.script = script;
+    }
     
+    /**
+     * Construct
+     * 
+     * @param templatePath
+     */
+    public Match(String templatePath, Map<String, String> templateVars, String matchPath)
+    {
+        this.kind = Kind.URI;
+        this.templatePath = templatePath;
+        this.templateVars = templateVars;
+        this.matchPath = matchPath;
+    }
+
     /**
      * Gets the kind of Match
      */
-    public Kind getKind();
+    public Kind getKind()
+    {
+        return this.kind;
+    }
     
     /**
-     * Gets the part of the request URL that matched the Web Script URL Template
+     * Gets the template request URL that matched the Web Script URL Template
      * 
-     * @return  matching url path
+     * @return  matching url template
      */
-    public String getPath();
+    public String getTemplate()
+    {
+        return templatePath;
+    }
 
+    /**
+     * Gets the template variable substitutions
+     * 
+     * @return  template variable values (value indexed by name)
+     */
+    public Map<String, String> getTemplateVars()
+    {
+        return templateVars;
+    }
+    
+    /**
+     * Gets the static (i.e. without tokens) part of the request URL that matched
+     * the Web Script URL Template
+     * 
+     * @return  matching static url path
+     */
+    public String getPath()
+    {
+        return matchPath;
+    }
+    
     /**
      * Gets the matching web script
      * 
      * @return  service (or null, if match kind is URI)
      */
-    public WebScript getWebScript();
+    public WebScript getWebScript()
+    {
+        return script;
+    }
+
+    @Override
+    public String toString()
+    {
+        return templatePath;
+    }
     
 }

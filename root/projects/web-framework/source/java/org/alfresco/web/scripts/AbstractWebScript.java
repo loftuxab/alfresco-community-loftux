@@ -269,10 +269,10 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected void renderTemplate(String templatePath, Map<String, Object> model, Writer writer)
     {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         container.getTemplateProcessor().process(templatePath, model, writer);
         if (logger.isDebugEnabled())
-            logger.debug("Rendered template " + templatePath + " in " + (System.currentTimeMillis() - start) + "ms");
+            logger.debug("Rendered template " + templatePath + " in " + (System.nanoTime() - start)/1000000f + "ms");
     }
     
     /**
@@ -517,10 +517,10 @@ public abstract class AbstractWebScript implements WebScript
      */
     final protected void executeScript(ScriptContent location, Map<String, Object> model)
     {
-        long start = System.currentTimeMillis();
+        long start = System.nanoTime();
         container.getScriptProcessor().executeScript(location, model);
         if (logger.isDebugEnabled())
-            logger.debug("Executed script " + location.getPathDescription() + " in " + (System.currentTimeMillis() - start) + "ms");
+            logger.debug("Executed script " + location.getPathDescription() + " in " + (System.nanoTime() - start)/1000000f + "ms");
     }
     
     

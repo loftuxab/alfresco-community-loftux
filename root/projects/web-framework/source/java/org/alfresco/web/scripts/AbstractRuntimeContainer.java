@@ -202,7 +202,7 @@ public abstract class AbstractRuntimeContainer
      */
     public void reset() 
     {
-        long startTime = System.currentTimeMillis();
+        long startTime = System.nanoTime();
         try
         {
             scriptProcessor.reset();
@@ -215,7 +215,7 @@ public abstract class AbstractRuntimeContainer
         finally
         {
             if (logger.isInfoEnabled())
-                logger.info("Initialised " + getName() + " Web Script Container (in " + (System.currentTimeMillis() - startTime) + "ms)");
+                logger.info("Initialised " + getName() + " Web Script Container (in " + (System.nanoTime() - startTime)/1000000f + "ms)");
         }        
     }
         
