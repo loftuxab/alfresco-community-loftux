@@ -25,10 +25,10 @@
       
    </permissionSet>
    
-   <permissionSet type="mw:mediaWikiConfig" expose="selected">
+   <!-- <permissionSet type="mw:mediaWikiConfig" expose="selected">
 
       <permissionGroup name="WikiAdministrator" allowFullControl="true" expose="true" />
       
-   </permissionSet>
+   </permissionSet> -->
    
 </permissions>

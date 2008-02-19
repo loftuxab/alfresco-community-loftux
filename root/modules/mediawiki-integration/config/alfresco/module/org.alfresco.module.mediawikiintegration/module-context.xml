@@ -40,6 +40,15 @@
        </property>
     </bean>
     
+    <!-- Bootstrap the web client I18N string -->
+    <bean id="org_alfresco_module_MediaWikiIntegration_messageBootstrap" class="org.alfresco.web.app.ResourceBundleBootstrap">
+    	<property name="resourceBundles">
+    		<list>
+    			<value>alfresco.messages.mediawikiintegration-messages</value>
+    		</list>
+    	</property>
+   </bean>
+    
     <bean id="mediaWikiService" class="org.alfresco.module.mediawikiintegration.MediaWikiService" init-method="init">    
         <property name="url">
             <value>${db.url}</value>
