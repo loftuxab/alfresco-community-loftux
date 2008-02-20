@@ -18,6 +18,15 @@
       <tr><td>${task}<td></tr>
 </#list>
     </table>
+<#if failures?size &gt; 0>
+    <br>
+   <table>
+      <tr align="left"><td><b>Broken Web Scripts</tr>
+<#list failures?keys as failure>
+      <tr><td>${failures[failure]} (<b>${failure}</b>)</tr>
+</#list>
+   </table>
+</#if>
     <br>
     <table><tr><td><a href="${url.serviceContext}${url.match}">List Web Scripts</a></td></tr></table>
 </html>
