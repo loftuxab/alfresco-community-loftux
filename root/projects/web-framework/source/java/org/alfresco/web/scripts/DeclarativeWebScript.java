@@ -124,18 +124,29 @@ public class DeclarativeWebScript extends AbstractWebScript
                 int statusCode = status.getCode();
                 if (statusCode != HttpServletResponse.SC_OK && !req.forceSuccessStatus())
                 {
-                    logger.debug("Force success status header in response: " + req.forceSuccessStatus());
-                    logger.debug("Setting status " + statusCode);
+                    if (logger.isDebugEnabled())
+                    {
+                        logger.debug("Force success status header in response: " + req.forceSuccessStatus());
+                        logger.debug("Setting status " + statusCode);
+                    }
                     res.setStatus(statusCode);
                 }
                 
+                // apply location
+                String location = status.getLocation();
+                if (location != null && location.length() > 0)
+                {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Setting location to " + location);
+                    res.setHeader(WebScriptResponse.HEADER_LOCATION, location);
+                }
+
                 // apply cache
                 res.setCache(cache);
                 
                 String callback = req.getJSONCallback();
                 if (format.equals(WebScriptResponse.JSON_FORMAT) && callback != null)
                 {
-                    
                     if (logger.isDebugEnabled())
                         logger.debug("Rendering JSON callback response: content type=" + Format.JAVASCRIPT.mimetype() + ", status=" + statusCode + ", callback=" + callback);
                     

@@ -134,6 +134,22 @@ public class WebScriptJSFResponse extends WebScriptResponseImpl implements WebSc
    }
     
    /**
+    * @see org.alfresco.web.scripts.WebScriptResponse#setHeader(java.lang.String, java.lang.String)
+    */
+   public void setHeader(String name, String value)
+   {
+       // NOTE: not applicable
+   }
+
+   /**
+    * @see org.alfresco.web.scripts.WebScriptResponse#addHeader(java.lang.String, java.lang.String)
+    */
+   public void addHeader(String name, String value)
+   {
+       // NOTE: not applicable
+   }
+
+   /**
     * @see org.alfresco.web.scripts.WebScriptResponse#setCache()
     */
    public void setCache(Cache cache)

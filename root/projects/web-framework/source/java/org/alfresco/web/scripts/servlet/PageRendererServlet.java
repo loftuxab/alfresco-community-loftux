@@ -622,6 +622,16 @@ public class PageRendererServlet extends WebScriptServlet
          // not supported
       }
 
+      public void setHeader(String name, String value)
+      {
+          // not supported
+      }
+
+      public void addHeader(String name, String value)
+      {
+          // not supported
+      }
+
       public void setContentType(String contentType)
       {
          // not supported
