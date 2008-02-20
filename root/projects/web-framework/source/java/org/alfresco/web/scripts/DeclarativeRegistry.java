@@ -173,6 +173,7 @@ public class DeclarativeRegistry
         registry.setContainer(container);
         registry.setDefaultWebScript(defaultWebScript);
         registry.setSearchPath(searchPath);
+        registry.setUriIndex(uriIndex);
         return registry;
     }
         
