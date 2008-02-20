@@ -28,58 +28,49 @@
 package org.alfresco.linkvalidation;
 
 import java.io.File;
-import java.util.TreeMap;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.SocketException;
 import java.net.URI;
 import java.net.URL;
-import java.net.URLConnection;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
-import java.security.Security;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.Set;
 import java.util.SortedMap;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+
 import javax.net.ssl.SSLException;
+
 import org.alfresco.config.JNDIConstants;
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
+import org.alfresco.repo.admin.RepoServerMgmt;
 import org.alfresco.repo.admin.patch.impl.WCMFoldersPatch;
 import org.alfresco.repo.attributes.Attribute;
-import org.alfresco.repo.attributes.BooleanAttribute;
 import org.alfresco.repo.attributes.BooleanAttributeValue;
-import org.alfresco.repo.attributes.IntAttribute;
 import org.alfresco.repo.attributes.IntAttributeValue;
 import org.alfresco.repo.attributes.MapAttribute;
 import org.alfresco.repo.attributes.MapAttributeValue;
-import org.alfresco.repo.attributes.StringAttribute;
 import org.alfresco.repo.attributes.StringAttributeValue;
 import org.alfresco.repo.avm.CreateVersionTxnListener;
 import org.alfresco.repo.avm.PurgeStoreTxnListener;
 import org.alfresco.repo.avm.PurgeVersionTxnListener;
 import org.alfresco.repo.avm.util.RawServices;
-import org.alfresco.repo.avm.util.UriSchemeNameMatcher;
 import org.alfresco.repo.cache.SimpleCache;
 import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
-import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttrQueryGTE;
 import org.alfresco.service.cmr.attributes.AttrQueryLTE;
+import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.avm.AVMException;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
@@ -228,6 +219,9 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     private SimpleCache<String, Object> sysAdminCache;
     private final static String KEY_SYSADMIN_LINKVALIDATION_DISABLED = "sysAdminCache.linkValidationDisabled"; // Boolean
     
+    private RepoServerMgmt repoServerMgmt;
+    
+    
     public LinkValidationServiceImpl() { }
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
@@ -238,6 +232,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     public void setAvmRemote(AVMRemote svc)               { avm_ = svc; }
     public AVMRemote getAvmRemote()                       { return avm_;}
+    
+     public void setRepoServerMgmt(RepoServerMgmt repoServerMgmt)
+    {
+    	this.repoServerMgmt = repoServerMgmt;
+    }
     
     public void setSysAdminCache(SimpleCache<String, Object> sysAdminCache)
     {
@@ -339,6 +338,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     {
     	Boolean disabled = (Boolean)sysAdminCache.get(KEY_SYSADMIN_LINKVALIDATION_DISABLED);
     	return (disabled == null ? false : disabled.booleanValue());
+    }
+
+	// TODO - temporary workaround, can be removed when link validation is part of repo
+    public void register()
+    {
+    	this.repoServerMgmt.registerLinkValidationService(this);
     }
 
     //-------------------------------------------------------------------------
