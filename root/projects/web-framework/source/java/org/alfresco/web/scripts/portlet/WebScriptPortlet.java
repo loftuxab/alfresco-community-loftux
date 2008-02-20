@@ -105,8 +105,6 @@ public class WebScriptPortlet implements Portlet
      */
     public void processAction(ActionRequest req, ActionResponse res) throws PortletException, PortletSecurityException, IOException
     {
-        // TODO: Implement derived repository version which adds Application.setInPortal Call
-//        Application.setInPortalServer(true);
         Map<String, String[]> params = req.getParameterMap();
         for (Map.Entry<String, String[]> param : params.entrySet())
         {
@@ -123,8 +121,6 @@ public class WebScriptPortlet implements Portlet
      */
     public void render(RenderRequest req, RenderResponse res) throws PortletException, PortletSecurityException, IOException
     {
-        // TODO: Implement derived repository version which adds Application.setInPortal Call
-//      Application.setInPortalServer(true);
         PortletMode portletMode = req.getPortletMode();
         if (PortletMode.VIEW.equals(portletMode))
         {
