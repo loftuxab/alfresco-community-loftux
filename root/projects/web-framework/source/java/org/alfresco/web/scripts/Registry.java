@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts;
 
 import java.util.Collection;
+import java.util.Map;
 
 
 /**
@@ -56,6 +57,13 @@ public interface Registry
      * @return  web scripts
      */
     public Collection<WebScript> getWebScripts();
+
+    /**
+     * Gets all Web Script definitions that failed to register
+     * 
+     * @return map of error by web script definition file path
+     */
+    public Map<String, String> getFailures();
 
     /**
      * Gets a Web Script by Id

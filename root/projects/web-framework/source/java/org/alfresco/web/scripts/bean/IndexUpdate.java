@@ -68,9 +68,15 @@ public class IndexUpdate extends DeclarativeWebScript
         {
             // reset list of web scripts
             int previousCount = getContainer().getRegistry().getWebScripts().size();
+            int previousFailures = getContainer().getRegistry().getFailures().size();
             getContainer().reset();
-            tasks.add("Reset Web Scripts Registry; found " + getContainer().getRegistry().getWebScripts().size() + " Web Scripts.  Previously, there were " + previousCount + ".");
-            
+            tasks.add("Reset Web Scripts Registry; registered " + getContainer().getRegistry().getWebScripts().size() + " Web Scripts.  Previously, there were " + previousCount + ".");
+            int newFailures = getContainer().getRegistry().getFailures().size();
+            if (newFailures != 0 || previousFailures != 0)
+            {
+                tasks.add("Warning: found " + newFailures + " broken Web Scripts.  Previously, there were " + previousFailures + ".");
+            }
+
             // reset facebook service
             // TODO: Determine more appropriate place to put this
             int appCount = facebookService.getAppModels().size();
@@ -84,7 +90,8 @@ public class IndexUpdate extends DeclarativeWebScript
         // create model for rendering
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);
         model.put("tasks", tasks);
-        model.put("webscripts",  getContainer().getRegistry().getWebScripts());
+        model.put("webscripts", getContainer().getRegistry().getWebScripts());
+        model.put("failures", getContainer().getRegistry().getFailures());
         return model;
     }
 

@@ -48,6 +48,7 @@ public class Index extends DeclarativeWebScript
     {
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);
         model.put("webscripts",  getContainer().getRegistry().getWebScripts());
+        model.put("failures", getContainer().getRegistry().getFailures());
         model.put("rooturl", getContainer().getRegistry().getUri("/"));
         model.put("rootpackage", getContainer().getRegistry().getPackage("/"));
         return model;

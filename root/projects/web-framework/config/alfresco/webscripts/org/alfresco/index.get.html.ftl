@@ -12,7 +12,7 @@
                <td width="32"><img src="${url.context}/images/logo/AlfrescoLogo32.png" alt="Alfresco" /></td>
                <td><span class="title">Web Scripts Home</span></td>
             </tr>
-            <tr><td colspan="2">${webscripts?size} Web Scripts - <a href="http://wiki.alfresco.com/wiki/HTTP_API">Online documentation</a>.
+            <tr><td colspan="2">${webscripts?size} (+${failures?size} failed) Web Scripts - <a href="http://wiki.alfresco.com/wiki/HTTP_API">Online documentation</a>.
                                 <input type="submit" name="submit" value="Refresh list of Web Scripts"/></td></tr>
          </table>
       </form>     

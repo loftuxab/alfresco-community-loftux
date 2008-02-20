@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -85,6 +86,10 @@ public class DeclarativeRegistry
     // uri index for mapping a URI to a Web Script
     private UriIndex uriIndex;
     
+    // map of invalid web script definitions (error by path)
+    private Map<String, String> failedWebScriptsByPath = new TreeMap<String, String>();
+
+
     //
     // Initialisation
     // 
@@ -160,7 +165,8 @@ public class DeclarativeRegistry
     public void reset()
     {
         initWebScripts();
-        logger.info("Registered " + webscriptsById.size() + " Web Scripts, " + uriIndex.getSize() + " URLs");
+        if (logger.isInfoEnabled())
+            logger.info("Registered " + webscriptsById.size() + " Web Scripts (+" + failedWebScriptsByPath.size() + " failed), " + uriIndex.getSize() + " URLs");
     }
     
     /* (non-Javadoc)
@@ -190,6 +196,7 @@ public class DeclarativeRegistry
         // clear currently registered services
         uriIndex.clear();
         webscriptsById.clear();
+        failedWebScriptsByPath.clear();
         packageByPath.clear();
         packageByPath.put("/", new PathImpl("/"));
         uriByPath.clear();
@@ -327,23 +334,26 @@ public class DeclarativeRegistry
                 }
                 catch(WebScriptException e)
                 {
-                    if (logger.isWarnEnabled())
+                    // record web script definition failure
+                    String path = apiStore.getBasePath() + "/" + serviceDescPath;
+                    Throwable c = e;
+                    String cause = c.getMessage();
+                    while (c.getCause() != null && !c.getCause().equals(c))                    
                     {
-                        Throwable c = e;
-                        String cause = c.getMessage();
-                        while (c.getCause() != null && !c.getCause().equals(c))
-                        {
-                            c = c.getCause();
-                            cause += " ; " + c.getMessage(); 
-                        }
-                        String msg = "Unable to register script " + apiStore.getBasePath() + "/" + serviceDescPath + " due to error: " + cause;
-                        logger.warn(msg);
+                        c = c.getCause();
+                        cause += " ; " + c.getMessage(); 
                     }
-                    else
-                    {
-                        throw e;
-                    }
+                    failedWebScriptsByPath.put(path, cause);
                 }
+            }
+        }
+        
+        if (logger.isWarnEnabled())
+        {
+            for (Map.Entry<String, String> failedWebScript : failedWebScriptsByPath.entrySet())
+            {
+                String msg = "Unable to register script " + failedWebScript.getKey() + " due to error: " + failedWebScript.getValue();
+                logger.warn(msg);
             }
         }
     }
@@ -499,11 +509,14 @@ public class DeclarativeRegistry
                 {
                     throw new WebScriptException("Expected <authentication> value");
                 }
-                reqAuth = RequiredAuthentication.valueOf(reqAuthStr);
-                if (reqAuth == null)
+                try
+                {
+                    reqAuth = RequiredAuthentication.valueOf(reqAuthStr);
+                }
+                catch(IllegalArgumentException e)
                 {
                     throw new WebScriptException("Authentication '" + reqAuthStr + "' is not a valid value");
-                }
+                }                
             }
             
             // retrieve transaction
@@ -516,8 +529,11 @@ public class DeclarativeRegistry
                 {
                     throw new WebScriptException("Expected <transaction> value");
                 }
-                reqTrx = RequiredTransaction.valueOf(reqTrxStr);
-                if (reqTrx == null)
+                try
+                {
+                    reqTrx = RequiredTransaction.valueOf(reqTrxStr);
+                }
+                catch(IllegalArgumentException e)
                 {
                     throw new WebScriptException("Transaction '" + reqTrxStr + "' is not a valid value");
                 }
@@ -540,8 +556,11 @@ public class DeclarativeRegistry
                 String formatStyleStr = formatElement.getTextTrim();
                 if (formatStyleStr != null && formatStyleStr.length() > 0)
                 {
-                    formatStyle = FormatStyle.valueOf(formatStyleStr);
-                    if (formatStyle == null)
+                    try
+                    {
+                        formatStyle = FormatStyle.valueOf(formatStyleStr);
+                    }
+                    catch(IllegalArgumentException e)
                     {
                         throw new WebScriptException("Format Style '" + formatStyle + "' is not a valid value");
                     }
@@ -664,6 +683,14 @@ public class DeclarativeRegistry
     public Collection<WebScript> getWebScripts()
     {
         return webscriptsById.values();
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRegistry#getFailures()
+     */
+    public Map<String, String> getFailures()
+    {
+        return Collections.unmodifiableMap(failedWebScriptsByPath);
     }
 
     /* (non-Javadoc)
