@@ -33,6 +33,9 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 /**
  * JSR-311 (Jax-RS) URI Index
@@ -41,6 +44,9 @@ import java.util.regex.Pattern;
  */
 public class JaxRSUriIndex implements UriIndex
 {
+    // Logger
+    private static final Log logger = LogFactory.getLog(JaxRSUriIndex.class);
+    
     // map of web scripts by url
     private Map<IndexEntry, IndexEntry> index = new TreeMap<IndexEntry, IndexEntry>(COMPARATOR);
     
@@ -140,6 +146,8 @@ public class JaxRSUriIndex implements UriIndex
         else
         {
             index.put(entry, entry);
+            if (logger.isDebugEnabled())
+                logger.debug("Indexed URI '" + uri + "' as '" + entry.getTemplate() + "'");
         }
     }
 
@@ -184,7 +192,7 @@ public class JaxRSUriIndex implements UriIndex
                 return i;
             }
             
-            // implemenation specific: order by http method
+            // implementation specific: order by http method
             return o2.method.compareTo(o1.method);
         }
     };
@@ -292,7 +300,7 @@ public class JaxRSUriIndex implements UriIndex
      */
     static class UriTemplate
     {
-        private static final Pattern VALID_URI = Pattern.compile("/([\\w;]*\\{([a-zA-Z]\\w*)\\}[\\w;]*)|/([\\w;]+)|/$");
+        private static final Pattern VALID_URI = Pattern.compile("^/|^/(([\\w;]+|\\w*\\{([a-zA-Z][\\w_]*)\\}\\w*)/?)+(\\.\\w+$)?");
         private static final Pattern VARIABLE = Pattern.compile("\\{([a-zA-Z]\\w*)\\}");
         private static final String VARIABLE_REGEX = "(.*?)";
 
@@ -316,12 +324,7 @@ public class JaxRSUriIndex implements UriIndex
             
             // ensure template is syntactically correct
             Matcher validMatcher = VALID_URI.matcher(template);
-            StringBuilder valid = new StringBuilder();
-            while (validMatcher.find())
-            {
-                valid.append(template.substring(validMatcher.start(), validMatcher.end()));
-            }
-            if (!valid.toString().equals(template))
+            if (!validMatcher.matches())
             {
                 throw new WebScriptException("URI Template malformed: " + template);
             }
@@ -444,7 +447,16 @@ public class JaxRSUriIndex implements UriIndex
         @Override
         public final String toString()
         {
-            return regex.toString();
+            String strVars = "";
+            for (int i = 0; i < vars.length; i++)
+            {
+                strVars += vars[i];
+                if (i < vars.length -1)
+                {
+                    strVars += ",";
+                }
+            }
+            return regex.toString() + " (vars=[" + strVars + "])"; 
         }
         
         @Override
