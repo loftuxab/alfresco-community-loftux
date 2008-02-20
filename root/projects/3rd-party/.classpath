@@ -96,5 +96,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/axis-1.4.jar" sourcepath="src/axis-1.4-src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/shale-test-1.0.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/facebook_070716.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/xmlrpc.jar"/>
 	<classpathentry kind="output" path=""/>
 </classpath>
