@@ -80,8 +80,59 @@ public class JaxRSUriIndexTest extends TestCase
             fail("Failed to catch var name beginning with number");
         }
         catch(WebScriptException e) {};
+        try
+        {
+            new UriTemplate("/{1;a}");
+            fail("Failed to catch semi-colon in template var name");
+        }
+        catch(WebScriptException e) {};
     }
- 
+
+    
+    public void testValidTemplate()
+    {
+        try
+        {
+            new UriTemplate("/");
+        }
+        catch(WebScriptException e)
+        {
+            fail("Root path is valid");
+        };
+        try
+        {
+            new UriTemplate("/;");
+        }
+        catch(WebScriptException e)
+        {
+            fail("Semi-colon in path is valid");
+        };
+        try
+        {
+            new UriTemplate("/a;aaaa");
+        }
+        catch(WebScriptException e)
+        {
+            fail("Semi-colon in path is valid");
+        };
+        try
+        {
+            new UriTemplate("/a;;aaaa");
+        }
+        catch(WebScriptException e)
+        {
+            fail("Semi-colon in path is valid");
+        };
+        try
+        {
+            new UriTemplate("/{a_b}");
+        }
+        catch(WebScriptException e)
+        {
+            fail("Underscore in token name is valid");
+        };
+    }
+
     
     public void testParseTemplate()
     {
@@ -91,13 +142,14 @@ public class JaxRSUriIndexTest extends TestCase
         assertEquals(1, i1.getStaticCharacterCount());
         assertEquals(0, i1.getVariableNames().length);
 
-        UriTemplate i2 = new UriTemplate("/a/{a1}/b{b1}b");
-        assertEquals("/a/{a1}/b{b1}b", i2.getTemplate());
-        assertEquals("/a/(.*?)/b(.*?)b", i2.getRegex().pattern());
-        assertEquals(6, i2.getStaticCharacterCount());
-        assertEquals(2, i2.getVariableNames().length);
+        UriTemplate i2 = new UriTemplate("/a/{a1}/b{b1}b/{c_c}");
+        assertEquals("/a/{a1}/b{b1}b/{c_c}", i2.getTemplate());
+        assertEquals("/a/(.*?)/b(.*?)b/(.*?)", i2.getRegex().pattern());
+        assertEquals(7, i2.getStaticCharacterCount());
+        assertEquals(3, i2.getVariableNames().length);
         assertEquals("a1", i2.getVariableNames()[0]);
         assertEquals("b1", i2.getVariableNames()[1]);
+        assertEquals("c_c", i2.getVariableNames()[2]);
     }
  
 
