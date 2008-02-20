@@ -78,6 +78,22 @@ public class WebScriptPortletResponse extends WebScriptResponseImpl
     }
          
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptResponse#setHeader(java.lang.String, java.lang.String)
+     */
+    public void setHeader(String name, String value)
+    {
+        // NOTE: not applicable
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptResponse#addHeader(java.lang.String, java.lang.String)
+     */
+    public void addHeader(String name, String value)
+    {
+        // NOTE: not applicable
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScriptResponse#setContentType(java.lang.String)
      */
     public void setContentType(String contentType)

@@ -39,6 +39,7 @@ import org.alfresco.i18n.I18NUtil;
 public class Status
 {
     private Throwable exception = null;
+    private String location = "";
     private int code = HttpServletResponse.SC_OK;
     private String message = "";
     private boolean redirect = false;
@@ -118,6 +119,24 @@ public class Status
     public String getCodeName()
     {
         return I18NUtil.getMessage("webscript.code." + code + ".name");
+    }
+    
+    /**
+     * @see javax.servlet.http.HTTPServletResponse
+     * 
+     * @param location  location response-header
+     */
+    public void setLocation(String location)
+    {
+        this.location = location;
+    }
+
+    /**
+     * @return  location
+     */
+    public String getLocation()
+    {
+        return location;
     }
     
     /**

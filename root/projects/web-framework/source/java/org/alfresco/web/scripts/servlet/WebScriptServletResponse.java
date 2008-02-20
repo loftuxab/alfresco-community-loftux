@@ -83,6 +83,22 @@ public class WebScriptServletResponse extends WebScriptResponseImpl
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptResponse#setHeader(java.lang.String, java.lang.String)
+     */
+    public void setHeader(String name, String value)
+    {
+        res.setHeader(name, value);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptResponse#addHeader(java.lang.String, java.lang.String)
+     */
+    public void addHeader(String name, String value)
+    {
+        res.addHeader(name, value);
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebScriptResponse#setContentType(java.lang.String)
      */
     public void setContentType(String contentType)

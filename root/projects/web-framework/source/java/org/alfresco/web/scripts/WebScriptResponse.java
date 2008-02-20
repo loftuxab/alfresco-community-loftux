@@ -44,12 +44,34 @@ public interface WebScriptResponse
     public static final String JSON_FORMAT = "json";
     public static final String OPENSEARCH_DESCRIPTION_FORMAT = "opensearchdescription";
 
+    // Headers
+    public static final String HEADER_LOCATION = "Location";
+    
+    
     /**
      * Sets the Response Status
      * 
      * @param status
      */
     public void setStatus(int status);
+    
+    /**
+     * Set a response header with the given name and value.  If the header has
+     * already been set, the new value overwrites the previous one.
+     * 
+     * @param name  header name
+     * @param value  header value
+     */
+    public void setHeader(String name, String value);
+
+    /**
+     * Adds a response header with the given name and value.  This method
+     * allows a response header to have multiple values.
+     * 
+     * @param name  header name
+     * @param value  header value
+     */
+    public void addHeader(String name, String value);
     
     /**
      * Sets the Content Type

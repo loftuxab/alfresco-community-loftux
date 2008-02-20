@@ -331,6 +331,13 @@ public abstract class AbstractWebScript implements WebScript
         res.reset();
         res.setCache(cache);
         res.setStatus(req.forceSuccessStatus() ? HttpServletResponse.SC_OK : statusCode);
+        String location = status.getLocation();
+        if (location != null && location.length() > 0)
+        {
+            if (logger.isDebugEnabled())
+                logger.debug("Setting location to " + location);
+            res.setHeader(WebScriptResponse.HEADER_LOCATION, location);
+        }
         res.setContentType(mimetype + ";charset=UTF-8");
         renderTemplate(template.path, model, res.getWriter());
     }
