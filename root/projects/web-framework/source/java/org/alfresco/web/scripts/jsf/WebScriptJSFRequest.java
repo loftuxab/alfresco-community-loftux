@@ -41,17 +41,12 @@ import org.alfresco.web.scripts.WebScriptRequestURLImpl;
 public class WebScriptJSFRequest extends WebScriptRequestURLImpl
 {
    /**
-    * Constructor
+    * Construct
     * 
-    * @param fc         FacesContext
-    * @param match      WebScriptMatch that matched this webscript
-    * @param scriptUrl  The script URL this request is for
-    */   
-   public WebScriptJSFRequest(Runtime container, String scriptUrl, Match match)
-   {
-       this(container, splitURL(scriptUrl), match);
-   }
-   
+    * @param container
+    * @param scriptUrlParts
+    * @param match
+    */
    public WebScriptJSFRequest(Runtime container, String[] scriptUrlParts, Match match)
    {
        super(container, scriptUrlParts, match);

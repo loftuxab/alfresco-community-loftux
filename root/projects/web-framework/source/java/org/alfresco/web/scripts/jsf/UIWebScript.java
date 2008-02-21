@@ -267,15 +267,14 @@ public class UIWebScript extends SelfRenderingComponent
    private class WebScriptJSFRuntime extends AbstractRuntime
    {
       private FacesContext fc;
-      private String scriptUrl;
-      private String script;
+      private String[] scriptUrlParts;
       
       WebScriptJSFRuntime(RuntimeContainer container, FacesContext fc, String scriptUrl)
       {
          super(container);
          this.fc = fc;
-         this.scriptUrl = scriptUrl;
-         this.script = WebScriptRequestURLImpl.splitURL(scriptUrl)[2];
+         String contextPath = fc.getExternalContext().getRequestContextPath();
+         this.scriptUrlParts = WebScriptRequestURLImpl.splitURL(contextPath.length() > 0, scriptUrl);
       }
 
       /**
@@ -301,7 +300,7 @@ public class UIWebScript extends SelfRenderingComponent
       @Override
       protected WebScriptRequest createRequest(Match match)
       {
-         return new WebScriptJSFRequest(this, this.scriptUrl, match);
+         return new WebScriptJSFRequest(this, this.scriptUrlParts, match);
       }
 
       /**
@@ -328,7 +327,7 @@ public class UIWebScript extends SelfRenderingComponent
       @Override
       protected String getScriptUrl()
       {
-         return this.script;
+         return this.scriptUrlParts[2];
       }
 
    }
