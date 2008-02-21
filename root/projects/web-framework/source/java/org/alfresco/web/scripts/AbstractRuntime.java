@@ -167,7 +167,7 @@ public abstract class AbstractRuntime implements Runtime
             model.put("url", new URLModel(req));
             model.put("server", container.getDescription());
             model.put("date", new Date());
-            if (match.getWebScript() != null)
+            if (match != null && match.getWebScript() != null)
             {
                 model.put("webscript", match.getWebScript().getDescription());
             }
