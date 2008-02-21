@@ -168,20 +168,6 @@ public class DeclarativeRegistry
         if (logger.isInfoEnabled())
             logger.info("Registered " + webscriptsById.size() + " Web Scripts (+" + failedWebScriptsByPath.size() + " failed), " + uriIndex.getSize() + " URLs");
     }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Registry#cloneEmpty()
-     */
-    public Registry cloneEmpty()
-    {
-        DeclarativeRegistry registry = new DeclarativeRegistry();
-        registry.setApplicationContext(applicationContext);
-        registry.setContainer(container);
-        registry.setDefaultWebScript(defaultWebScript);
-        registry.setSearchPath(searchPath);
-        registry.setUriIndex(uriIndex);
-        return registry;
-    }
         
     /**
      * Initialise Web Scripts
