@@ -86,9 +86,4 @@ public interface Registry
      * Resets the Web Script Registry
      */
     public void reset();
-    
-    /**
-     * Clone empty Web Script Registry
-     */
-    public Registry cloneEmpty();
 }
