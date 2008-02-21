@@ -59,6 +59,18 @@ public abstract class WebScriptRequestURLImpl extends WebScriptRequestImpl
      */
     public static String[] splitURL(String scriptUrl)
     {
+        return splitURL(true, scriptUrl);
+    }
+    
+    /**
+     * Splits a Web Script Url into its component parts
+     *
+     * @param context  true => context path is included in scriptUrl
+     * @param scriptUrl  url  e.g. /alfresco/service/mytasks?f=1 
+     * @return  url parts  [0] = context (e.g. alfresco, or empty if no context), [1] = servlet (e.g. service), [2] = script (e.g. mytasks), [3] = args (e.g. f=1)
+     */
+    public static String[] splitURL(boolean context, String scriptUrl)
+    {
         String[] urlParts = new String[4];
         String path;
         String queryString;
@@ -77,21 +89,23 @@ public abstract class WebScriptRequestURLImpl extends WebScriptRequestImpl
         
         String[] pathSegments = path.split("/");
         String pathInfo = "";
-        for (int i = 3; i < pathSegments.length; i++)
+        for (int i = (context ? 3 : 2); i < pathSegments.length; i++)
         {
             pathInfo += "/" + pathSegments[i];
         }
         
-        urlParts[0] = "/" + pathSegments[1];    // context path
-        urlParts[1] = "/" + pathSegments[2];    // servlet path
-        urlParts[2] = pathInfo;                 // path info
-        urlParts[3] = queryString;              // query string
+        urlParts[0] = context ? "/" + pathSegments[1] : "";   // context path
+        urlParts[1] = "/" + pathSegments[context ? 2 : 1];    // servlet path
+        urlParts[2] = pathInfo;                                   // path info
+        urlParts[3] = queryString;                                // query string
     
         return urlParts;
     }
 
     /**
      * Construct
+     * 
+     * Note: It's assumed scriptUrl contains context path
      * 
      * @param scriptUrl
      * @param serviceMatch
