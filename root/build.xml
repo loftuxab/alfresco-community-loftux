@@ -381,8 +381,7 @@
    <target name="deploy-webframework-tomcat-exploded" depends="init">
       <!-- copy webframework web source files i.e. JSPs, images etc. -->
       <copy todir="${dir.deploy.tomcat.webframework}/alfweb" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webframework.src.web}" 
-                  excludes="WEB-INF/**" />
+         <fileset dir="${dir.project.webframework.src.web}" />
       </copy>
 
       <!-- copy the class files from each project to the WEB-INF/classes folder -->
