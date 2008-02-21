@@ -73,6 +73,7 @@ public abstract class AbstractRuntime implements Runtime
 
         String method = getScriptMethod();
         String scriptUrl = null;
+        Match match = null;
 
         try
         {
@@ -86,7 +87,7 @@ public abstract class AbstractRuntime implements Runtime
             if (logger.isDebugEnabled())
                 logger.debug("(Runtime=" + getName() + ", Container=" + container.getName() + ") Processing script url ("  + method + ") " + scriptUrl);
 
-            Match match = container.getRegistry().findWebScript(method, scriptUrl);
+            match = container.getRegistry().findWebScript(method, scriptUrl);
             if (match == null || match.getKind() == Match.Kind.URI)
             {
                 if (match == null)
@@ -166,6 +167,10 @@ public abstract class AbstractRuntime implements Runtime
             model.put("url", new URLModel(req));
             model.put("server", container.getDescription());
             model.put("date", new Date());
+            if (match.getWebScript() != null)
+            {
+                model.put("webscript", match.getWebScript().getDescription());
+            }
             
             // locate status template
             // NOTE: search order...

@@ -146,8 +146,8 @@ public class JaxRSUriIndex implements UriIndex
         else
         {
             index.put(entry, entry);
-            if (logger.isDebugEnabled())
-                logger.debug("Indexed URI '" + uri + "' as '" + entry.getTemplate() + "'");
+            if (logger.isTraceEnabled())
+                logger.trace("Indexed URI '" + uri + "' as '" + entry.getTemplate() + "'");
         }
     }
 

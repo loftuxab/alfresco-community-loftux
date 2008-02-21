@@ -22,7 +22,7 @@
      <tr><td>URL Template:</td><td>${URI}</td></tr>
      </#list>
      <tr><td>Format Style:</td><td>${script.formatStyle}</td></tr>
-     <tr><td>Default Format:</td><td>${script.defaultFormat!"[undefined}]"}</td></tr>
+     <tr><td>Default Format:</td><td>${script.defaultFormat!"[undefined]"}</td></tr>
      <#if script.negotiatedFormats?exists && script.negotiatedFormats?size &gt; 0>
      <#list script.negotiatedFormats as negotiatedFormat>
         <tr><td>Negotiated Format:</td><td>${negotiatedFormat.mediatype} => ${negotiatedFormat.format}</td></tr>

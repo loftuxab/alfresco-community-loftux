@@ -155,8 +155,6 @@ public class DeclarativeRegistry
         {
             throw new WebScriptException("Default Web Script implementation '" + (defaultWebScript == null ? "<undefined>" : defaultWebScript) + "' does not exist.");
         }
-        if (logger.isDebugEnabled())
-            logger.debug("Using URI Index provider: " + uriIndex.getClass().getName());
     }
 
     /* (non-Javadoc)
@@ -177,7 +175,7 @@ public class DeclarativeRegistry
     private void initWebScripts()
     {
         if (logger.isDebugEnabled())
-            logger.debug("Initialising Web Scripts");
+            logger.debug("Initialising Web Scripts (URI index: " + uriIndex.getClass().getName() + ")");
         
         // clear currently registered services
         uriIndex.clear();

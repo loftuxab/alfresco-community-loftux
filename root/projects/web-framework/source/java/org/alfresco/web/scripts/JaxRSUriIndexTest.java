@@ -179,6 +179,18 @@ public class JaxRSUriIndexTest extends TestCase
         UriTemplate i3 = new UriTemplate("/a/{a1}/b/{a1}");
         Map<String, String> values3 = i3.match("/a/1/b/2");
         assertNull(values3);
+        
+        UriTemplate i4 = new UriTemplate("/a/b{b}/{c}");
+        Map<String, String> values4 = i4.match("/a/b/c");
+        assertEquals(2, values4.size());
+        assertEquals("", values4.get("b"));
+        assertEquals("c", values4.get("c"));
+
+        UriTemplate i5 = new UriTemplate("/a/b{b}/{c}");
+        Map<String, String> values5 = i5.match("/a/bb/c");
+        assertEquals(2, values5.size());
+        assertEquals("b", values5.get("b"));
+        assertEquals("c", values5.get("c"));
     }
     
     
