@@ -26,17 +26,6 @@
  */
 
 
-if (isset($_SERVER["ALF_AVAILABLE"]) == false)
-{
-	require_once("Alfresco/Service/Session.php");
-	require_once("Alfresco/Service/SpacesStore.php");
-	require_once("Alfresco/Service/Node.php");
-	require_once("Alfresco/Service/Version.php");
-}
-
-// TODO .. for now remove this as it it not available when running within Quercus
-//require_once("Alfresco/Service/Logger/Logger.php");
-
 /**
  * External Alfresco content store.
  * 
@@ -44,30 +33,8 @@ if (isset($_SERVER["ALF_AVAILABLE"]) == false)
  */
 class ExternalStoreAlfresco 
 {
-	//private $logger;
-	//private $session;
-	//private $store;
-	//private $wikiSpace;
-	
 	public function __construct()
-	{
-		//global $alfURL, $alfUser, $alfPassword, $alfWikiStore, $alfWikiSpace;
-		
-		//$this->logger = new Logger("integration.mediawiki.ExternalStoreAlfresco");
-		
-		// Create the session
-		//$repository = new Repository($alfURL);
-		//$ticket = $repository->authenticate($alfUser, $alfPassword);
-		//$this->session = $repository->createSession($ticket);
-		
-		//$this->wikiSpace = $this->session->getNodeFromString($alfWikiStore);
-		
-		// Get the store
-		//$this->store = $this->session->getStoreFromString($alfWikiStore);
-		
-		// Get the wiki space
-		//$results = $this->session->query($this->store, 'PATH:"'.$alfWikiSpace.'"');
-	    //$this->wikiSpace = $results[0];
+	{		
 	}
 	
 	/**
@@ -77,7 +44,6 @@ class ExternalStoreAlfresco
 	 */
 	public function fetchFromURL($url) 
 	{
-		//$session = $this->getSession();
 		$version = $this->urlToVersion($url);		
 		return $version->cm_content->content;
 	}

@@ -6,7 +6,7 @@
     </view:aspects>    
     <view:properties>
       <cm:description></cm:description>      
-      <cm:title></cm:title>
+      <cm:title>Company Wiki</cm:title>
       <cm:name>Wiki</cm:name>
     </view:properties>
   </mw:mediaWiki>

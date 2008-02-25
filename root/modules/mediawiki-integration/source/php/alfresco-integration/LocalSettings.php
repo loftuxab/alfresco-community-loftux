@@ -123,8 +123,5 @@ $wgCacheEpoch = max( $wgCacheEpoch, $configdate );
 # Alfresco extension
 $wgUsePathInfo = false;
 require_once("extensions/alfresco-integration/Alfresco.php");
-
-// Set the mediaWiki configuration values
-eval($alfMediaWikiNode->getEvaluationString());
 	
 ?>

@@ -20,15 +20,9 @@
       <permissionGroup name="WikiAdministrator" allowFullControl="true" expose="true" />
       
       <permissionGroup name="WikiUser" allowFullControl="false" expose="true">
-         <includePermissionGroup permissionGroup="Consumer" type="cm:cmobject" />
+         <includePermissionGroup permissionGroup="Collaborator" type="cm:cmobject" />
       </permissionGroup>
       
    </permissionSet>
-   
-   <!-- <permissionSet type="mw:mediaWikiConfig" expose="selected">
 
-      <permissionGroup name="WikiAdministrator" allowFullControl="true" expose="true" />
-      
-   </permissionSet> -->
-   
 </permissions>
