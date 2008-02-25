@@ -169,6 +169,15 @@
     		<value>org.alfresco.module.phpIntegration.lib.Version</value>
     	</property>    	
     </bean>
+        
+    <bean id="phpLogger" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
+    	<property name="extensionName">
+    		<value>Logger</value>
+    	</property> 
+    	<property name="extensionClass">
+    		<value>org.alfresco.module.phpIntegration.lib.Logger</value>
+    	</property>    	
+    </bean>
     
     
     <!-- Methods Extensions -->

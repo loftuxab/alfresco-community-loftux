@@ -61,12 +61,14 @@
         </property>    
     	<property name="policyComponent" ref="policyComponent"/>
     	<property name="nodeService" ref="NodeService" />
-    	<property name="contentService" ref="ContentService" />
+    	<property name="contentService" ref="ContentService" />    	
+    	<property name="authorityService" ref="AuthorityService" />    	
+    	<property name="permissionService" ref="PermissionService" />
     </bean>
     
     <bean id="org_alfresco_module_MediaWikiIntegration_MediaWikiSpace" parent="phpObjectExtension" class="org.alfresco.module.phpIntegration.PHPObjectExtension">
     	<property name="extensionName">
-    		<value>MediaWiki</value>
+    		<value>MediaWikiSpace</value>
     	</property> 
     	<property name="extensionClass">
     		<value>org.alfresco.module.mediawikiintegration.MediaWikiSpace</value>

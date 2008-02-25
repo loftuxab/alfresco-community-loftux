@@ -51,6 +51,9 @@ import org.alfresco.service.cmr.repository.ContentService;
 import org.alfresco.service.cmr.repository.ContentWriter;
 import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.repository.NodeService;
+import org.alfresco.service.cmr.security.AuthorityService;
+import org.alfresco.service.cmr.security.AuthorityType;
+import org.alfresco.service.cmr.security.PermissionService;
 import org.alfresco.service.namespace.NamespaceService;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.service.namespace.RegexQNamePattern;
@@ -76,6 +79,12 @@ public class MediaWikiService implements Constants,
     
     /** Content service */
     private ContentService contentService;
+    
+    /** The Authority service */
+    private AuthorityService authorityService;
+    
+    /** The permission service */
+    private PermissionService permissionService;
     
     /** List of executed statements */
     private ThreadLocal<StringBuilder> executedStatementsThreadLocal = new ThreadLocal<StringBuilder>();
@@ -116,6 +125,26 @@ public class MediaWikiService implements Constants,
     public void setContentService(ContentService contentService)
     {
         this.contentService = contentService;
+    }
+    
+    /**
+     * Set the authority service
+     * 
+     * @param authorityService      the authority service
+     */
+    public void setAuthorityService(AuthorityService authorityService)
+    {
+        this.authorityService = authorityService;
+    }
+    
+    /**
+     * Set the permission service
+     * 
+     * @param permissionService     the permission service
+     */
+    public void setPermissionService(PermissionService permissionService)
+    {
+        this.permissionService = permissionService;
     }
     
     /**
@@ -215,6 +244,17 @@ public class MediaWikiService implements Constants,
         Map<QName, Serializable> props = new HashMap<QName, Serializable>(1);
         props.put(ContentModel.PROP_WEBSCRIPT, "/wcs/mediawiki/details/node/" + mediawiki.getId());
         this.nodeService.addAspect(mediawiki, ContentModel.ASPECT_WEBSCRIPTABLE, props);
+        
+        // Create the user groups for this wiki
+        String wikiAdminsGroup = this.authorityService.createAuthority(AuthorityType.GROUP, null, wikiName + "_WikiAdmins");
+        String wikiUsersGroup = this.authorityService.createAuthority(AuthorityType.GROUP, null, wikiName + "_WikiUsers");
+        
+        // Set the permissions on the space and the configuration node
+        this.permissionService.setInheritParentPermissions(mediawiki, false);
+        this.permissionService.setPermission(mediawiki, wikiAdminsGroup, "WikiAdministrator", true);
+        this.permissionService.setPermission(mediawiki, wikiUsersGroup, "WikiUser", true);
+        this.permissionService.setInheritParentPermissions(config, false);
+        this.permissionService.setPermission(config, wikiAdminsGroup, "WikiAdministrator", true);
         
         // Install the mediawiki db
         install(mediawiki, config);        

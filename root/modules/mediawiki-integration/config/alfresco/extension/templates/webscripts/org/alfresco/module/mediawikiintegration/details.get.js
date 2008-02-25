@@ -22,4 +22,12 @@ if (node == null)
 model.mediawiki = node;
 
 // Get all the config nodes
-model.config = node.childAssocs["mw:config"][0];
+model.config = null;
+var assocs = node.childAssocs["mw:config"];
+if (assocs != null && assocs.length > 0)
+{
+   model.config = assocs[0];
+}
+
+// Get the current username
+model.username = person.properties["cm:userName"];

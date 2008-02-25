@@ -91,7 +91,7 @@ public class Repository implements ScriptObject
         return SCRIPT_OBJECT_NAME;
     }
     
-    /*package*/ ServiceRegistry getServiceRegistry()
+    public ServiceRegistry getServiceRegistry()
     {
         return this.serviceRegistry;
     }
