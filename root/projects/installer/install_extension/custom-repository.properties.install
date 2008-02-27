@@ -11,8 +11,9 @@ dir.indexes=@@ALF_INDEXES@@
 #
 # Sample database connection properties
 #
-#db.username=alfresco
-#db.password=alfresco
+db.name=@@ALF_DBNAME@@
+db.username=@@ALF_DB_USERNAME@@
+db.password=@@ALF_DB_PASSWORD@@
 #db.pool.initial=10
 #db.pool.max=100
 
@@ -34,34 +35,34 @@ dir.indexes=@@ALF_INDEXES@@
 # MySQL connection (This is default and requires mysql-connector-java-5.0.3-bin.jar, which ships with the Alfresco server)
 #
 #mysql#db.driver=org.gjt.mm.mysql.Driver
-#mysql#db.url=jdbc:mysql://localhost/alfresco
+#mysql#db.url=jdbc:mysql://localhost/@@ALF_DBNAME@@
 
 #
 # Oracle connection (requires ojdbc14_g.jar or equivalent jar in shared libraries location)
 #
 #oracle#db.driver=oracle.jdbc.OracleDriver
-#oracle#db.url=jdbc:oracle:thin:@localhost:1521:alfresco
+#oracle#db.url=jdbc:oracle:thin:@@ALF_DB_USERNAME@@/@@ALF_DB_PASSWORD@@@//localhost:1521:@@ALF_DBNAME@@
 
 #
 # Sybase connection (requires jconn2d.jar or equivalent jar in shared libraries location)
 #
 #sybase#db.driver=com.sybase.jdbc2.jdbc.SybDriver
-#sybase#db.url=jdbc:sybase:Tds:localhost:2638/alfresco
+#sybase#db.url=jdbc:sybase:Tds:localhost:2638/@@ALF_DBNAME@@
 
 #
 # SQLServer connection (requires jtds-1.2.jar or equivalent - http://jtds.sourceforge.net/)
 #
 #sqlserver#db.driver=net.sourceforge.jtds.jdbc.Driver
-#sqlserver#db.url=jdbc:jtds:sqlserver://localhost/alfresco
+#sqlserver#db.url=jdbc:jtds:sqlserver://localhost/@@ALF_DBNAME@@
 
 #
 # SQLServer connection using Microsoft JDBC driver
 #
 #db.driver=com.microsoft.sqlserver.jdbc.SQLServerDriver
-#db.url=jdbc:sqlserver://localhost;DatabaseName=alfresco
+#db.url=jdbc:sqlserver://localhost;DatabaseName=@@ALF_DBNAME@@
 
 #
 # PostgreSQL connection (requires postgresql-8.2-504.jdbc3.jar or equivalent)
 #
 #postgresql#db.driver=org.postgresql.Driver
-#postgresql#db.url=jdbc:postgresql://localhost:5432/alfresco
+#postgresql#db.url=jdbc:postgresql://localhost:5432/@@ALF_DBNAME@@
