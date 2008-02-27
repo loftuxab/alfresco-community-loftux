@@ -300,7 +300,7 @@ public class JaxRSUriIndex implements UriIndex
      */
     static class UriTemplate
     {
-        private static final Pattern VALID_URI = Pattern.compile("^/|^/(([\\w;]+|\\w*\\{([a-zA-Z][\\w_]*)\\}\\w*)/?)+(\\.\\w+$)?");
+        private static final Pattern VALID_URI = Pattern.compile("^/(([\\w\\-]+|\\{([a-zA-Z][\\w]*)\\})(;*)/?)+(\\.\\w+$)?|^/$");
         private static final Pattern VARIABLE = Pattern.compile("\\{([a-zA-Z]\\w*)\\}");
         private static final String VARIABLE_REGEX = "(.*?)";
 

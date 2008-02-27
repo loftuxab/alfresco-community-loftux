@@ -82,6 +82,12 @@ public class JaxRSUriIndexTest extends TestCase
         catch(WebScriptException e) {};
         try
         {
+            new UriTemplate("/;a");
+            fail("Failed to catch semi-colon without prefix");
+        }
+        catch(WebScriptException e) {};
+        try
+        {
             new UriTemplate("/{1;a}");
             fail("Failed to catch semi-colon in template var name");
         }
@@ -101,7 +107,7 @@ public class JaxRSUriIndexTest extends TestCase
         };
         try
         {
-            new UriTemplate("/;");
+            new UriTemplate("/a;");
         }
         catch(WebScriptException e)
         {
@@ -117,7 +123,7 @@ public class JaxRSUriIndexTest extends TestCase
         };
         try
         {
-            new UriTemplate("/a;;aaaa");
+            new UriTemplate("/a;a;aaaa");
         }
         catch(WebScriptException e)
         {
@@ -130,6 +136,22 @@ public class JaxRSUriIndexTest extends TestCase
         catch(WebScriptException e)
         {
             fail("Underscore in token name is valid");
+        };
+        try
+        {
+            new UriTemplate("/ads/test-2/{storeid}/{path}");   
+        }
+        catch(WebScriptException e)
+        {
+            fail("Hypthen in path is valid");
+        };
+        try
+        {
+            new UriTemplate("/ads/test_2/{storeid}/{path}");   
+        }
+        catch(WebScriptException e)
+        {
+            fail("Hypthen in path is valid");
         };
     }
 
