@@ -1,3 +1,3 @@
 #!/bin/sh
-ALF_HOME=`pwd`
-sh "$ALF_HOME"/alfresco.sh stop
+
+sh @@ALFRESCO_DIR@@/alfresco.sh stop
