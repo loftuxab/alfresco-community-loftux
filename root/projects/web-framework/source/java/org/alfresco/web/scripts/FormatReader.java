@@ -28,37 +28,51 @@ import java.util.Map;
 
 
 /**
- * Web Script Runtime
+ * Convert a mimetype to a Java object.
  * 
  * @author davidc
+ * @param <Type>
  */
-public interface Runtime
+public interface FormatReader<Type>
 {
-	/**
-	 * Gets the name of the Web Script Runtime
-	 * 
-	 * @return  name
-	 */
-    public String getName();
+    /**
+     * Gets the source mimetype to convert from
+     * 
+     * @return  mimetype
+     */
+    public String getSourceMimetype();
     
     /**
-     * Gets the Web Script Container within which this Runtime is hosted
+     * Gets the Java Class to convert to
      * 
-     * @return  web script container
+     * @return  Java Clas
      */
-    public Container getContainer();
+    public Class<? extends Type> getDestinationClass();
+        
+    /**
+     * Converts mimetype to Java Object
+     * 
+     * @param req  web script request
+     * @return  Java Object
+     */
+    public Type read(WebScriptRequest req);
     
     /**
-     * Gets script parameters
+     * Create script parameters specific to source mimetype
      * 
-     * @return  script parameters provided by the runtime
+     * @param req  web script request
+     * @param res  web script response
+     * @return  map of script objects indexed by name
      */
-    public Map<String, Object> getScriptParameters();
+    public Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res);
     
     /**
-     * Gets template parameters
+     * Create template parameters specific to source mimetype
      * 
-     * @return  template parameters provided by the runtime
+     * @param req  web script request
+     * @param res  web script response
+     * @return  map of template objects indexed by name
      */
-    public Map<String, Object> getTemplateParameters();
+    public Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res);
+
 }

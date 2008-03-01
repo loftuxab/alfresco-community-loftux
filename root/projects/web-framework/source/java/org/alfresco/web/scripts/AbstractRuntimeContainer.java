@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -60,6 +61,7 @@ public abstract class AbstractRuntimeContainer
     private TemplateProcessor templateProcessor;
     private SearchPath searchPath; 
     private ConfigService configService;
+    private Map<String, Object> scriptObjects;
 
     /**
      * @param name
@@ -117,6 +119,14 @@ public abstract class AbstractRuntimeContainer
         this.configService = configService;
     }
     
+    /**
+     * @param scriptObjects
+     */
+    public void setScriptObjects(Map<String, Object> scriptObjects)
+    {
+        this.scriptObjects = scriptObjects;
+    }
+
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.RuntimeContainer#getName()
@@ -133,7 +143,7 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
-        params.put("logger", new ScriptLogger());
+        params.putAll(scriptObjects);
         
         return Collections.unmodifiableMap(params);
     }
@@ -145,6 +155,7 @@ public abstract class AbstractRuntimeContainer
     {
         Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
         params.put("server", getDescription());
+        params.put("date", new Date());
         
         return Collections.unmodifiableMap(params);
     }

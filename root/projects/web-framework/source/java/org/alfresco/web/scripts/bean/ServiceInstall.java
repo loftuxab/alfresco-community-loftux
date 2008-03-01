@@ -38,19 +38,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
-import org.alfresco.web.scripts.WebScript;
-import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.Registry;
-import org.alfresco.web.scripts.WebScriptRequest;
+import org.alfresco.web.scripts.SearchPath;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.Store;
-import org.alfresco.web.scripts.SearchPath;
+import org.alfresco.web.scripts.WebScript;
+import org.alfresco.web.scripts.WebScriptException;
+import org.alfresco.web.scripts.WebScriptRequest;
+import org.alfresco.web.scripts.servlet.FormData;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
+import org.alfresco.web.scripts.servlet.FormData.FormField;
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileItemFactory;
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
-import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -90,31 +89,35 @@ public class ServiceInstall extends DeclarativeWebScript
 
         try
         {
-            // extract uploaded file
-            FileItemFactory factory = new DiskFileItemFactory();
-            ServletFileUpload upload = new ServletFileUpload(factory);
-            boolean isMultipart = upload.isMultipartContent(servletReq);
-            if (!isMultipart)
+            // parse request content
+            Object content = req.parseContent();
+            if (content == null || !(content instanceof FormData))
             {
-                throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Web Script install request is not multi-part");
+                throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Web Script install request is not multipart/form-data");
             }
-            FileItem part = null;
-            List<FileItem> files = upload.parseRequest(servletReq);
-            for (FileItem file : files)
+            
+            // locate file upload
+            FormData formData = (FormData)content;
+            FormField file = null;
+            for (FormField field : formData.getFields())
             {
-                if (!file.isFormField())
+                if (field.getIsFile())
                 {
-                    if (part != null)
+                    if (file != null)
                     {
                         throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Web Script install request expects only one file upload");
                     }
-                    part = file;
+                    file = field;
                 }
+            }
+            if (file == null)
+            {
+                throw new WebScriptException(HttpServletResponse.SC_BAD_REQUEST, "Web Script install request is missing file upload");
             }
             
             // find web script definition
             Document document = null;
-            InputStream fileIS = part.getInputStream();
+            InputStream fileIS = file.getContent().getInputStream();
             try
             {
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(fileIS));
@@ -178,10 +181,6 @@ public class ServiceInstall extends DeclarativeWebScript
                 throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failed to install Web Script " + scriptId);
             }
             model.put("installedScript", webscript.getDescription());
-        }
-        catch(FileUploadException e)
-        {
-            throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage());
         }
         catch(DocumentException e)
         {

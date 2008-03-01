@@ -25,6 +25,7 @@
 package org.alfresco.web.scripts.atom;
 
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.Map;
 
 import javax.xml.namespace.QName;
@@ -78,12 +79,22 @@ public interface AbderaService
 
     /**
      * Parse Atom Feed
+     * 
      * @param doc  document to parse
      * @param base  (optional) base path for relative references
      * @return  feed
      */
     public Feed parseFeed(InputStream doc, String base);
-    
+
+    /**
+     * Parse Atom Feed
+     * 
+     * @param doc  document to parse
+     * @param base  (optional) base path for relative references
+     * @return  feed
+     */
+    public Feed parseFeed(Reader doc, String base);
+
     /**
      * Parse Atom Entry
      * @param doc  document to parse
@@ -91,7 +102,15 @@ public interface AbderaService
      * @return  entry
      */
     public Entry parseEntry(InputStream doc, String base);
-    
+
+    /**
+     * Parse Atom Entry
+     * @param doc  document to parse
+     * @param base  (optional) base path for relative references
+     * @return  entry
+     */
+    public Entry parseEntry(Reader doc, String base);
+
     /**
      * Gets an Atom Writer
      * 

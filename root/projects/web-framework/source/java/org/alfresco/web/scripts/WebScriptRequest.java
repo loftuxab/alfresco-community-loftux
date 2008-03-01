@@ -157,13 +157,27 @@ public interface WebScriptRequest
      * @return  extension path
      */
     public String getExtensionPath();
-
+    
+    /**
+     * Gets the mimetype of the request
+     * 
+     * @return  request content mimetype
+     */
+    public String getContentType();
+    
     /**
      * Gets the request body as content
      * 
      * @return  request content (or null, if none)
      */
     public Content getContent();
+    
+    /**
+     * Gets the request body as a parsed entity
+     * 
+     * @return  the parsed entity (or null, if no content, or the content type cannot be parsed)
+     */
+    public Object parseContent();
     
     /**
      * Determine if Guest User?

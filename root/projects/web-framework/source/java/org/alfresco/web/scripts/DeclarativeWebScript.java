@@ -71,10 +71,6 @@ public class DeclarativeWebScript extends AbstractWebScript
     {
         // retrieve requested format
         String format = req.getFormat();
-        if (format == null || format.length() == 0)
-        {
-            format = getDescription().getDefaultFormat();
-        }
 
         try
         {

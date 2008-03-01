@@ -21,7 +21,7 @@
       <tr><td><td>&nbsp;
       <tr><td><td>To create a Web Script file that can be installed:
       <tr><td><td>&nbsp;
-      <tr><td><td>1) Display the full definition of the Web Script via the URL <a href="${url.serviceContext}/script/scriptdump.get">${url.serviceContext}/script/{scriptid}</a>
+      <tr><td><td>1) Display the full definition of the Web Script via the URL <a href="${url.serviceContext}/script/{scriptid}">${url.serviceContext}/script/{scriptid}</a>
       <tr><td><td>&nbsp;
       <tr><td><td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;e.g. to display the "AVM Browse Sample", issue <a href="${url.serviceContext}/script/org/alfresco/sample/avmbrowse.get">${url.serviceContext}/script/org/alfresco/sample/avmbrowse.get</a>
       <tr><td><td>&nbsp;

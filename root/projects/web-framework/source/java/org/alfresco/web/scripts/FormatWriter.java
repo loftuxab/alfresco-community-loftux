@@ -24,31 +24,46 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.OutputStream;
+import java.io.Writer;
+
 
 /**
- * Well known Web Script Formats
+ * Converts a Java Object to a mimetype
  * 
- * @author dcaruana
+ * @author davidc
+ * @param <Type>
  */
-public enum Format
+public interface FormatWriter<Type>
 {
-    HTML ("text/html"),
-    JAVASCRIPT ("text/javascript"),
-    XML ("text/xml"),
-    ATOM ("application/atom+xml"),
-    ATOMFEED ("application/atom+xml;type=feed"),
-    ATOMENTRY ("application/atom+xml;type=entry"),
-    FORMDATA ("multipart/form-data");
-
-    private String mimetype;
-
-    Format(String mimetype)
-    {
-        this.mimetype = mimetype;
-    }
+    /**
+     * Gets the source Java class to convert from
+     * 
+     * @return  Java class
+     */
+    public Class<? extends Type> getSourceClass();
     
-    public String mimetype()
-    {
-        return mimetype;
-    }
+    /**
+     * Gets the mimetype to convert to
+     * 
+     * @return  mimetype
+     */
+    public String getDestinationMimetype();
+
+    /**
+     * Converts Java object to mimetype
+     * 
+     * @param object
+     * @param output
+     */
+    public void write(Type object, Writer output);
+    
+    /**
+     * Converts Java object to mimetype
+     * 
+     * @param object
+     * @param output
+     */
+    public void write(Type object, OutputStream output);
+    
 }

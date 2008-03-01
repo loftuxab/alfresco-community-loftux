@@ -22,46 +22,43 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.scripts.atom;
+package org.alfresco.web.scripts;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.abdera.model.Base;
-import org.apache.abdera.writer.Writer;
-
+import freemarker.core.Environment;
 import freemarker.ext.beans.BeanModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
-import freemarker.template.TemplateScalarModel;
 
 
 /**
  * Custom FreeMarker Template language method.
  * <p>
- * Render atom (feed or entry) to xml.
+ * Render object to mimetype of web script template.  If object cannot be serialized to
+ * mimetype then no output is written.
  * <p>
- * Usage: writeAtom(Feed [,format])
- *        writeAtom(Entry [,format])
+ * Usage: formatwrite(object)
  * 
  * Where:
- *        format => prettyxml (write pretty atom xml)
- *                  json (write json)
+ *        object => object to write
  * 
  * @author davidc
  */
-public final class AtomWriterMethod implements TemplateMethodModelEx
+public final class FormatWriterMethod implements TemplateMethodModelEx
 {
-    private AbderaService abdera;
+    private FormatRegistry formatRegistry;
+    private String mimetype;
 
     /**
      * Construct
      * 
      * @param abdera
      */
-    public AtomWriterMethod(AbderaService abdera)
+    public FormatWriterMethod(FormatRegistry formatRegistry, String format)
     {
-        this.abdera = abdera;
+        this.formatRegistry = formatRegistry;
+        this.mimetype = formatRegistry.getMimeType(null, format);
     }
 
     /* (non-Javadoc)
@@ -69,48 +66,28 @@ public final class AtomWriterMethod implements TemplateMethodModelEx
      */
     public Object exec(List args) throws TemplateModelException
     {
-        Object result = "";
-        
+        String result = "";
         if (args.size() != 0)
         {
-            // retrieve atom element to write
-            Object bean = null;
+            // retrieve object to serialize
+            Object object = null;
             Object arg0 = args.get(0);
             if (arg0 instanceof BeanModel)
             {
-                bean = ((BeanModel)arg0).getWrappedObject();
+                object = ((BeanModel)arg0).getWrappedObject();
             }
             
-            if (bean != null && bean instanceof Base)
+            if (object != null)
             {
-                // retrieve appropriate writer
-                String format = null;
-                if (args.size() > 1)
+                FormatWriter<Object> writer = formatRegistry.getWriter(object, mimetype);
+                if (writer != null)
                 {
-                    Object arg1 = args.get(1);
-                    if (arg1 instanceof TemplateScalarModel)
-                    {
-                        format = ((TemplateScalarModel)arg1).getAsString();
-                    }
-                }
-                Writer writer = abdera.getWriter(format == null ? AbderaService.DEFAULT_WRITER : format);
-                if (writer == null)
-                {
-                    throw new TemplateModelException("Atom writer '" + format + "' does not exist");
-                }
-                
-                try
-                {
-                    // now write
-                    result = writer.write((Base)bean);
-                }
-                catch (IOException e)
-                {
-                    throw new TemplateModelException("Failed to serialize " + bean, e);
+                    // NOTE: For now, streaming directly to freemarker writer i.e. not relying on
+                    //       result to return serialized form
+                    writer.write(object, Environment.getCurrentEnvironment().getOut());
                 }
             }
         }
-        
         return result;
     }
     

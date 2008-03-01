@@ -29,7 +29,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -134,6 +133,13 @@ public abstract class AbstractWebScript implements WebScript
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
 
+        // add request mimetype parameters
+        FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
+        if (reader != null)
+        {
+            params.putAll(reader.createScriptParameters(req, res));
+        }
+        
         // add context & runtime parameters
         params.putAll(req.getRuntime().getScriptParameters());
         params.putAll(container.getScriptParameters());
@@ -175,7 +181,14 @@ public abstract class AbstractWebScript implements WebScript
         params.put("absurl", new AbsoluteUrlMethod(req.getServerPath()));
         params.put("scripturl", new ScriptUrlMethod(req, res));
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
-        params.put("date", new Date());
+        params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
+
+        // add request mimetype parameters
+        FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
+        if (reader != null)
+        {
+            params.putAll(reader.createTemplateParameters(req, res));
+        }
 
         // add context & runtime parameters
         params.putAll(req.getRuntime().getTemplateParameters());

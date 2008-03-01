@@ -41,6 +41,10 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
     protected static final Log logger = LogFactory.getLog(WebScriptRequestImpl.class);
     private Runtime runtime;
 
+    // parsed request content
+    private Object requestContent = this;
+
+
     /**
      * Construct
      * 
@@ -95,7 +99,8 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
         Match match = getServiceMatch();
         if (match != null)
         {
-            FormatStyle style = getServiceMatch().getWebScript().getDescription().getFormatStyle();
+            Description desc = match.getWebScript().getDescription();
+            FormatStyle style = desc.getFormatStyle();
             
             // extract format from extension
             if (style == FormatStyle.extension || style == FormatStyle.any)
@@ -129,7 +134,7 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
             if (format == null || format.length() == 0)
             {
                 String accept = getHeader("Accept");
-                NegotiatedFormat[] negotiatedFormats = getServiceMatch().getWebScript().getDescription().getNegotiatedFormats();
+                NegotiatedFormat[] negotiatedFormats = desc.getNegotiatedFormats();
                 if (accept != null && negotiatedFormats != null)
                 {
                     if (logger.isDebugEnabled())
@@ -141,6 +146,12 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
                         throw new WebScriptException(HttpServletResponse.SC_NOT_ACCEPTABLE, "Cannot negotiate appropriate response format for Accept: " + accept);
                     }
                 }
+            }
+            
+            // fallback to default
+            if (format == null || format.length() == 0)
+            {
+                format = desc.getDefaultFormat();
             }
         }
         
@@ -190,6 +201,44 @@ public abstract class WebScriptRequestImpl implements WebScriptRequest
     public boolean forceSuccessStatus()
     {
         return false;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#getContentType()
+     */
+    public String getContentType()
+    {
+        String contentType = getHeader("Content-Type");
+        if (contentType != null && contentType.startsWith("multipart/form-data"))
+        {
+            contentType = "multipart/form-data";
+        }
+        return contentType;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.WebScriptRequest#parseContent()
+     */
+    public Object parseContent()
+    {
+        if (requestContent == this)
+        {
+            requestContent = null;
+            String contentType = getContentType();
+            if (contentType != null && contentType.length() > 0)
+            {
+                FormatRegistry formatRegistry = getRuntime().getContainer().getFormatRegistry();
+                FormatReader<Object> reader = formatRegistry.getReader(contentType);
+                if (reader != null)
+                {
+                    if (logger.isDebugEnabled())
+                        logger.debug("Converting request (mimetype: " + contentType + ") to " + reader.getClass().getName());
+                    
+                    requestContent = reader.read(this);
+                }
+            }
+        }
+        return requestContent;
     }
     
 }

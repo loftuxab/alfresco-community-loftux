@@ -44,7 +44,9 @@ public class FormatRegistry
     private Map<String, String> mimetypes;
     private Map<String, Map<String, String>> agentFormats;
     private Map<String, Map<String, String>> agentMimetypes;
-    
+    private Map<String, FormatReader<Object>> readers;
+    private Map<String, FormatWriter<Object>> writers;
+
 
     /**
      * Construct
@@ -55,6 +57,37 @@ public class FormatRegistry
         mimetypes = new HashMap<String, String>();
         agentFormats = new HashMap<String, Map<String, String>>();
         agentMimetypes = new HashMap<String, Map<String, String>>();
+        readers = new HashMap<String, FormatReader<Object>>();
+        writers = new HashMap<String, FormatWriter<Object>>();
+    }
+
+    /**
+     * Add a reader
+     * 
+     * @param mimetype
+     * @param reader
+     */
+    public void addReader(FormatReader<Object> reader)
+    {
+        String mimetype = reader.getSourceMimetype();
+        readers.put(reader.getSourceMimetype(), reader);
+        if (logger.isDebugEnabled())
+            logger.debug("Registered format reader: converts mimetype '" + mimetype + "' to class '" + reader.getDestinationClass().getSimpleName() + "'");
+    }
+
+    /**
+     * Add a writer
+     * 
+     * @param mimetype
+     * @param writer
+     */
+    public void addWriter(FormatWriter<Object> writer)
+    {
+        String mimetype = writer.getDestinationMimetype();
+        Class<? extends Object> clazz = writer.getSourceClass();
+        writers.put(clazz.getName() + "||" + mimetype, writer);
+        if (logger.isDebugEnabled())
+            logger.debug("Registered format writer: converts class '" + clazz.getSimpleName() + "' to mimetype '" + mimetype + "'");
     }
     
     /**
@@ -95,7 +128,7 @@ public class FormatRegistry
             mimetypesForAgent.put(entry.getValue(), entry.getKey());
 
             if (logger.isDebugEnabled())
-                logger.debug("Registered Web Script format '" + entry.getKey() + "' with mime type '" + entry.getValue() + "' (agent: " + agent + ")");
+                logger.debug("Registered format '" + entry.getKey() + "' for mime type '" + entry.getValue() + "' (agent: " + agent + ")");
         }
     }
 
@@ -155,4 +188,30 @@ public class FormatRegistry
         return format;
     }
 
+    /**
+     * Gets a Format Reader
+     * 
+     * @param mimetype
+     * @return  reader
+     */
+    public FormatReader<Object> getReader(String mimetype)
+    {
+        // TODO: lookup by sorted mimetype list (most specific -> least specific)
+        return readers.get(mimetype);
+    }
+
+    /**
+     * Gets a Format Writer
+     * 
+     * @param object
+     * @param mimetype
+     * 
+     * @return  writer
+     */
+    public FormatWriter<Object> getWriter(Object object, String mimetype)
+    {
+        // TODO: lookup by sorted mimetype list (most specific -> least specific)
+        return writers.get(object.getClass().getName() + "||" + mimetype);
+    }
+    
 }
