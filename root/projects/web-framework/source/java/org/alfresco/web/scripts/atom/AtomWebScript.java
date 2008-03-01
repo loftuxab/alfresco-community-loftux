@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.alfresco.web.scripts.FormatWriterMethod;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
@@ -84,16 +85,4 @@ public abstract class AtomWebScript extends DeclarativeWebScript
         return model;
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.AbstractWebScript#createTemplateParameters(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse, java.util.Map)
-     */
-    @Override
-    protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
-    {
-        Map<String, Object> superParams = super.createTemplateParameters(req, res, customParams);
-        Map<String, Object> params = new HashMap<String, Object>(superParams);
-        params.put("writeAtom", new AtomWriterMethod(abderaService));
-        return params;
-    }
-    
 }

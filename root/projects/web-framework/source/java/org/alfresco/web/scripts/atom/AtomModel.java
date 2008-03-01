@@ -22,43 +22,78 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.scripts;
+package org.alfresco.web.scripts.atom;
 
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.alfresco.util.Content;
+import org.apache.abdera.model.Entry;
+import org.apache.abdera.model.Feed;
 
 /**
- * Web Script Runtime
+ * Atom Model
  * 
  * @author davidc
  */
-public interface Runtime
+public class AtomModel
 {
-	/**
-	 * Gets the name of the Web Script Runtime
-	 * 
-	 * @return  name
-	 */
-    public String getName();
+    private AbderaService abderaService;
     
     /**
-     * Gets the Web Script Container within which this Runtime is hosted
+     * Sets the Abdera Service
      * 
-     * @return  web script container
+     * @param abderaService
      */
-    public Container getContainer();
+    public void setAbderaService(AbderaService abderaService)
+    {
+       this.abderaService = abderaService; 
+    }
     
     /**
-     * Gets script parameters
+     * Construct an empty Feed
      * 
-     * @return  script parameters provided by the runtime
+     * @return  feed
      */
-    public Map<String, Object> getScriptParameters();
+    public Feed newFeed()
+    {
+        return abderaService.newFeed();
+    }
     
     /**
-     * Gets template parameters
+     * Construct an empty Entry
      * 
-     * @return  template parameters provided by the runtime
+     * @return  entry
      */
-    public Map<String, Object> getTemplateParameters();
+    public Entry newEntry()
+    {
+        return abderaService.newEntry();
+    }
+    
+    /**
+     * Gets pre-configured Atom Extensions (QNames)
+     * 
+     * @return  map of QNames by alias
+     */
+    public Map<String, QName> getQNames()
+    {
+        return abderaService.getQNameExtensions();
+    }
+    
+
+//    TODO: To consider... 
+// 
+//    public Entry parseEntry(Content content)
+//    {
+//        // TODO:
+//        return null;
+//    }
+//    
+//    public Feed parseFeed(Content content)
+//    {
+//        // TODO:
+//        return null;
+//    }
+    
 }

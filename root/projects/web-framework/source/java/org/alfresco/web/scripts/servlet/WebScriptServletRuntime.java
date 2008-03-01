@@ -26,21 +26,18 @@ package org.alfresco.web.scripts.servlet;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.config.ServerProperties;
+import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
-import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.Match;
+import org.alfresco.web.scripts.RuntimeContainer;
+import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptResponse;
-import org.alfresco.web.scripts.AbstractRuntime;
-import org.alfresco.web.scripts.RuntimeContainer;
 
 
 /**
@@ -169,24 +166,6 @@ public class WebScriptServletRuntime extends AbstractRuntime
     public String getName()
     {
         return "ServletRuntime";
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptContainer#getScriptParameters()
-     */
-    public Map<String, Object> getScriptParameters()
-    {
-        FormData formData = servletReq.getFormData();
-        if (formData != null)
-        {
-            Map<String, Object> model = new HashMap<String, Object>(1);
-            model.put("formdata", formData);
-            return model;
-        }
-        else
-        {
-            return Collections.emptyMap();
-        }
     }
 
 }

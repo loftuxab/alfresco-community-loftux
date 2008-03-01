@@ -24,41 +24,71 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.Map;
+import java.util.Set;
+
+import org.springframework.beans.factory.InitializingBean;
 
 
 /**
- * Web Script Runtime
+ * Set of Format Readers and Writers.
  * 
  * @author davidc
  */
-public interface Runtime
+public class FormatAdaptorSet implements InitializingBean
 {
-	/**
-	 * Gets the name of the Web Script Runtime
-	 * 
-	 * @return  name
-	 */
-    public String getName();
+    private FormatRegistry registry;
+    private Set<FormatReader<Object>> readers;
+    private Set<FormatWriter<Object>> writers;
+
+    /**
+     * Sets the Format Registry
+     * 
+     * @param registry
+     */
+    public void setRegistry(FormatRegistry registry)
+    {
+        this.registry = registry;
+    }
     
     /**
-     * Gets the Web Script Container within which this Runtime is hosted
+     * Sets the readers
      * 
-     * @return  web script container
+     * @param readers
      */
-    public Container getContainer();
-    
+    public void setReaders(Set<FormatReader<Object>> readers)
+    {
+        this.readers = readers;
+    }
+
     /**
-     * Gets script parameters
+     * Sets the writers
      * 
-     * @return  script parameters provided by the runtime
+     * @param writers
      */
-    public Map<String, Object> getScriptParameters();
+    public void setWriters(Set<FormatWriter<Object>> writers)
+    {
+        this.writers = writers;
+    }
+
+    /* (non-Javadoc)
+     * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
+     */
+    public void afterPropertiesSet() throws Exception
+    {
+        if (readers != null)
+        {
+            for (FormatReader<Object> reader : readers)
+            {
+                registry.addReader(reader);
+            }
+        }
+        if (writers != null)
+        {
+            for (FormatWriter<Object> writer : writers)
+            {
+                registry.addWriter(writer);
+            }
+        }
+    }
     
-    /**
-     * Gets template parameters
-     * 
-     * @return  template parameters provided by the runtime
-     */
-    public Map<String, Object> getTemplateParameters();
 }

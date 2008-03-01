@@ -25,6 +25,8 @@
 package org.alfresco.web.scripts.atom;
 
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -172,6 +174,15 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
      */
     public Entry parseEntry(InputStream doc, String base)
     {
+        Reader inputReader = new InputStreamReader(doc);
+        return parseEntry(inputReader, base);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parseEntry(java.io.Reader, java.lang.String)
+     */
+    public Entry parseEntry(Reader doc, String base)
+    {
         Document<Element> entryDoc;
         if (base != null && base.length() > 0)
         {
@@ -192,9 +203,18 @@ public class AbderaServiceImpl implements AbderaService, InitializingBean
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.atom.AbderaService#parseFeed(java.io.InputStream, java.lang.String)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parseFeed(java.io.Reader, java.lang.String)
      */
     public Feed parseFeed(InputStream doc, String base)
+    {
+        Reader inputReader = new InputStreamReader(doc);
+        return parseFeed(inputReader, base);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.atom.AbderaService#parseFeed(java.io.Reader, java.lang.String)
+     */
+    public Feed parseFeed(Reader doc, String base)
     {
         Document<Element> feedDoc;
         if (base != null && base.length() > 0)

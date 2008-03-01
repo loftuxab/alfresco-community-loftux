@@ -64,6 +64,14 @@ public abstract class AbstractRuntime implements Runtime
         this.container = container;
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Runtime#getContainer()
+     */
+    public Container getContainer()
+    {
+        return container;
+    }
+    
     /**
      * Execute the Web Script encapsulated by this Web Script Runtime
      */
@@ -123,7 +131,7 @@ public abstract class AbstractRuntime implements Runtime
                 if (logger.isDebugEnabled())
                 {
                     String reqFormat = scriptReq.getFormat();
-                    String format = (reqFormat == null || reqFormat.length() == 0) ? "default" : reqFormat;
+                    String format = (reqFormat == null || reqFormat.length() == 0) ? "[undefined]" : reqFormat;
                     Description desc = scriptReq.getServiceMatch().getWebScript().getDescription();
                     logger.debug("Invoking Web Script " + description.getId() + " (format " + format + ", style: " + desc.getFormatStyle() + ", default: " + desc.getDefaultFormat() + ")");
                 }

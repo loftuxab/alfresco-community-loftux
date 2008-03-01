@@ -62,7 +62,7 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
     /** Service bound to this request */
     private Match serviceMatch;
     
-    /** Form data associated with multipart/form-data */
+    /** Multi-part form data, if provided */
     private FormData formData;
 
     /**
@@ -79,13 +79,13 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         this.req = req;
         this.serviceMatch = serviceMatch;
         
-        String contentType = req.getContentType();
+        String contentType = getContentType();
         if (logger.isDebugEnabled())
             logger.debug("Content Type: " + contentType);
         
-        if (contentType != null && contentType.startsWith("multipart/form-data"))
+        if (contentType != null && contentType.equals("multipart/form-data"))
         {
-            formData = new FormData(req);
+            formData = (FormData)parseContent();
         }
     }
 
@@ -300,7 +300,7 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
     {
         try
         {
-            return new InputStreamContent(req.getInputStream(), req.getContentType(), req.getCharacterEncoding());
+            return new InputStreamContent(req.getInputStream(), getContentType(), req.getCharacterEncoding());
         }
         catch(IOException e)
         {
@@ -373,16 +373,6 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
     {
         String forceSuccess = req.getHeader("alf-force-success-response");
         return Boolean.valueOf(forceSuccess);
-    }
-
-    /**
-     * Gets the Form data associated with this request
-     * 
-     * @return form data, or null if request is not multipart/form-data encoded
-     */
-    public FormData getFormData()
-    {
-        return formData;
     }
 
 }
