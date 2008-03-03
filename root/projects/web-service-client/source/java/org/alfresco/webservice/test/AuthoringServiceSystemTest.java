@@ -42,6 +42,7 @@ import org.alfresco.webservice.types.Version;
 import org.alfresco.webservice.types.VersionHistory;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -328,6 +329,17 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals(4, versionHistory2.getVersions().length);
         // TODO some more tests ...
         
+        // Create a major version
+        NamedValue versionVal = Utils.createNamedValue("versionType","MAJOR");
+        NamedValue descriptionVal = Utils.createNamedValue("description", "new description");
+        NamedValue[] comments = new NamedValue[]{versionVal,descriptionVal};
+        VersionResult result5 = this.authoringService.createVersion(predicate, comments, false);        
+        assertNotNull(result5);
+        assertEquals(1, result5.getNodes().length);
+        assertEquals(1, result5.getVersions().length);
+        Version version5 = result5.getVersions()[0];
+        assertEquals("2.0", version5.getLabel());
+        
         // Confirm the current content of the node
         Content[] contents = this.contentService.read(new Predicate(new Reference[]{reference}, BaseWebServiceSystemTest.store, null), Constants.PROP_CONTENT.toString());
         Content readResult1 = contents[0];
@@ -351,6 +363,8 @@ public class AuthoringServiceSystemTest extends BaseWebServiceSystemTest
         // Check the version history
         VersionHistory versionHistory3 = this.authoringService.getVersionHistory(reference);
         assertNotNull(versionHistory3);
-        assertNull(versionHistory3.getVersions());        
+        assertNull(versionHistory3.getVersions());    
+        
+       
     }
 }
