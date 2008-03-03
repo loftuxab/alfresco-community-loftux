@@ -69,8 +69,8 @@ class ExternalStoreAlfresco
 		}
 		else
 		{
-			$node = $alfMediaWikiNode->createChild("cm_content", "cm_contains", "cm_".$_SESSION["title"]);
-			$node->cm_name = $_SESSION["title"];
+			$node = $alfMediaWikiNode->createChild("cm_content", "cm_contains", "cm_".$_SESSION["title"].".mw");
+			$node->cm_name = $_SESSION["title"].".mw";
 		
 			$node->addAspect("cm_versionable", null);
 			$node->cm_initialVersion = false;
@@ -78,7 +78,7 @@ class ExternalStoreAlfresco
 		}
 		
 		// Set the content and save
-		$node->updateContent("cm_content", "text/plain", "UTF-8", $data);		
+		$node->updateContent("cm_content", "text/mediawiki", "UTF-8", $data);		
 		$alfSession->save();
 		
 		$description = $_SESSION["description"];
