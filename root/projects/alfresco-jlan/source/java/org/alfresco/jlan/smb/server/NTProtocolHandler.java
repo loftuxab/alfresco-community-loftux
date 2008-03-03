@@ -3018,6 +3018,21 @@ public class NTProtocolHandler extends CoreProtocolHandler {
     
     String srchPath = paramBuf.getString(tbuf.isUnicode());
 
+    // Check if the search contains Unicode wildcards
+
+    if (tbuf.isUnicode() && WildCard.containsUnicodeWildcard(srchPath))
+    {
+        
+        // Translate the Unicode wildcards to standard DOS wildcards
+    
+         srchPath = WildCard.convertUnicodeWildcardToDOS(srchPath);
+         
+         // Debug
+         
+         if (Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_SEARCH))
+             m_sess.debugPrintln("Converted Unicode wildcards to:" + srchPath);
+    }
+        
     //  Check if the search path is valid
 
     if (srchPath == null || srchPath.length() == 0) {
@@ -3070,23 +3085,9 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 
 			//	Check if this is a wildcard search or single file search
 			
-			if ( WildCard.containsWildcards(srchPath) || WildCard.containsUnicodeWildcard(srchPath))
+      if (WildCard.containsWildcards(srchPath))
 				wildcardSearch = true;
 				
-			//	Check if the search contains Unicode wildcards
-
-			if ( tbuf.isUnicode() && WildCard.containsUnicodeWildcard(srchPath)) {
-				
-				//	Translate the Unicode wildcards to standard DOS wildcards
-				
-				srchPath = WildCard.convertUnicodeWildcardToDOS(srchPath);
-				
-				//	Debug
-				
-	      if (Debug.EnableInfo && m_sess.hasDebug(SMBSrvSession.DBG_SEARCH))
-	        m_sess.debugPrintln("Converted Unicode wildcards to:" + srchPath);
-			}
-			
       //  Start a new search
 
       ctx = disk.startSearch(m_sess, conn, srchPath, srchAttr);
