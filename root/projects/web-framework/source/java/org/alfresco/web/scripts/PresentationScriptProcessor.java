@@ -124,6 +124,9 @@ public class PresentationScriptProcessor implements ScriptProcessor
         {
             Scriptable scope = cx.initStandardObjects();
             cx.setWrapFactory(wrapFactory);
+            scope.delete("Packages");
+            scope.delete("getClass");
+            scope.delete("java");
 
             // insert supplied object model into root of the default scope
             if (model != null)
