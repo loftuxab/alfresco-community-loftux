@@ -62,4 +62,13 @@ public interface ScriptContent
      * @return  human readable version of path
      */
     public String getPathDescription();
+    
+    /**
+     * Returns true if the script location is considered secure - i.e. on the app-server classpath.
+     * Secure scripts may access java.* libraries and instantiate pure Java objects directly. Unsecure
+     * scripts only have access to pre-configure host objects and cannot access java.* libs.
+     * 
+     * @return true if the script location is considered secure
+     */
+    boolean isSecure();
 }

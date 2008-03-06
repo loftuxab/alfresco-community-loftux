@@ -36,6 +36,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.IdScriptableObject;
+import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -122,11 +123,24 @@ public class PresentationScriptProcessor implements ScriptProcessor
         Context cx = Context.enter();
         try
         {
-            Scriptable scope = cx.initStandardObjects();
             cx.setWrapFactory(wrapFactory);
-            scope.delete("Packages");
-            scope.delete("getClass");
-            scope.delete("java");
+            Scriptable scope;
+            if (!location.isSecure())
+            {
+                scope = cx.initStandardObjects();
+                // remove security issue related objects - this ensures the script may not access
+                // unsecure java.* libraries or import any other classes for direct access - only
+                // the configured root host objects will be available to the script writer
+                scope.delete("Packages");
+                scope.delete("getClass");
+                scope.delete("java");
+            }
+            else
+            {
+                // allow access to all libraries and objects, including the importer
+                // @see http://www.mozilla.org/rhino/ScriptingJava.html
+                scope = new ImporterTopLevel(cx);
+            }
 
             // insert supplied object model into root of the default scope
             if (model != null)
