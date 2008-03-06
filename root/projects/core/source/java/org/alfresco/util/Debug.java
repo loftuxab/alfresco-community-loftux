@@ -33,7 +33,7 @@ import java.net.URL;
  */
 public class Debug
 {
-//    COMPILATION FAILURE EXPECTED:
+    COMPILATION FAILURE EXPECTED:
    /**
     * Returns the location of the file that will be loaded for the given class name 
     * 
