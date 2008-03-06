@@ -446,6 +446,14 @@ public class ClassPathStore implements Store
             };
             return desc;
         }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.web.scripts.ScriptContent#isSecure()
+         */
+        public boolean isSecure()
+        {
+            return true;
+        }
 
         @Override
         public String toString()
