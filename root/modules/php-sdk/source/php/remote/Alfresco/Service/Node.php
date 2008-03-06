@@ -92,7 +92,7 @@ class Node extends BaseObject
 		// Set the property values
 		foreach ($properties as $name=>$value)
 		{
-			$name = $this->expandToFullName($name);
+			$name = $this->_session->namespaceMap->getFullName($name);
 			$this->_properties[$name] = $value;
 		}		
 	}
