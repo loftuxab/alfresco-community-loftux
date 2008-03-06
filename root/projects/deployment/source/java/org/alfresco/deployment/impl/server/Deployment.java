@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * As a special exception to the terms and conditions of version 2.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's
+ * FLOSS exception.  You should have recieved a copy of the text describing
+ * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
  */
 
@@ -56,58 +56,58 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
      * Timestamp of last time this deployment was talked to.
      */
     private long fLastActivity;
-    
+
     /**
      * Flag for whether this deployment is in a state to be timed out.
      */
     private boolean fCanBeStale;
-    
+
     /**
      * The deployment target string.
      */
     private Target fTarget;
-    
+
     /**
      * The path to the log file for this deployment.
      */
     private String fLogFile;
-    
+
     /**
      * The location of the log directory.
-     */ 
+     */
     private String fLogDir;
-    
+
     /**
      * The path to the persistent storage of this Deployment.
      */
     private String fDepFile;
-    
+
     /**
      * The underlying file output stream.  Used for forcing to disk.
      */
     private transient FileOutputStream fFileOut;
-    
+
     /**
      * The object output stream to which deployed files are written.
      */
     private transient ObjectOutputStream fOut;
-    
+
     /**
      * The object input stream for reading in the log.
      */
     private transient ObjectInputStream fIn;
-    
+
     /**
      * The state of this deployment with regards to the transaction.
      */
     private DeploymentState fState;
-    
+
     /**
      * Keeps track of any open output files.
      */
     private transient Map<OutputStream, DeployedFile> fOutputFiles;
-    
-    public Deployment(Target target, 
+
+    public Deployment(Target target,
                       String logDir)
         throws IOException
     {
@@ -125,7 +125,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fOutputFiles = new HashMap<OutputStream, DeployedFile>();
         save();
     }
-    
+
     /**
      * Tell the deployment about a file in transit.
      * @param out
@@ -135,7 +135,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         fOutputFiles.put(out, file);
     }
-    
+
     /**
      * Get the deployed file record for the output stream.
      * @param out
@@ -145,7 +145,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         return fOutputFiles.get(out);
     }
-    
+
     public void closeOutputFile(OutputStream out)
         throws IOException
     {
@@ -157,7 +157,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
             throw new DeploymentException("Closed unknown file.");
         }
     }
-    
+
     /**
      * Log that a file has been deployed.
      * @param file
@@ -169,7 +169,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fOut.writeObject(file);
         fLastActivity = System.currentTimeMillis();
     }
-    
+
     /**
      * Signal that the pre-commit phase of this deployment is finished.
      * @throws IOException
@@ -182,11 +182,13 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fOut.close();
         fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fCanBeStale = false;
-        fTarget.cloneMetaData();
+        fTarget.cloneMetaData(this);
+        fIn.close();
+        fIn = new ObjectInputStream(new FileInputStream(fLogFile));
         fState = DeploymentState.PREPARING;
         save();
     }
-    
+
     public void finishPrepare()
         throws IOException
     {
@@ -195,14 +197,14 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         fState = DeploymentState.COMMITTING;
         save();
     }
-    
+
     public void resetLog()
         throws IOException
     {
         fIn.close();
         fIn = new ObjectInputStream(new FileInputStream(fLogFile));
     }
-    
+
     /**
      * Mark the Deployment as aborting.
      */
@@ -231,7 +233,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         File logDir = new File(fLogDir);
         Deleter.Delete(logDir);
     }
-    
+
     /**
      * Get the Target of this deployment.
      * @return
@@ -240,7 +242,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         return fTarget;
     }
-    
+
     /**
      * Signal that the commit phase is finished and clean up.
      */
@@ -248,7 +250,9 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         try
         {
-            fTarget.commitMetaData();
+            fIn.close();
+            fIn = new ObjectInputStream(new FileInputStream(fLogFile));
+            fTarget.commitMetaData(this);
             fIn.close();
             fIn = new ObjectInputStream(new FileInputStream(fLogFile));
             fTarget.runPostCommit(this);
@@ -274,10 +278,10 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         }
         catch (IOException e)
         {
-            // Do nothing.            
+            // Do nothing.
         }
     }
-    
+
     /**
      * Get the target relative File.
      * @param path
@@ -287,7 +291,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         return fTarget.getFileForPath(path);
     }
-    
+
     /**
      * Report a deployed file during the commit phase.
      * @param file
@@ -296,7 +300,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         fTarget.update(file);
     }
-    
+
     /**
      * Get a listing for a directory. This is the predeployment listing.
      * @param path
@@ -306,7 +310,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         return fTarget.getListing(path);
     }
-    
+
     /**
      * Is the deployment stale.
      * @param timeout
@@ -324,7 +328,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         }
         return false;
     }
-    
+
     /* (non-Javadoc)
      * @see java.lang.Iterable#iterator()
      */
@@ -332,17 +336,17 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
     {
         return new DeployedFileIterator();
     }
-    
+
     public void setGuid(String path, String guid)
         throws IOException
     {
         DeployedFile file = new DeployedFile(FileType.SETGUID,
-                                             null, 
+                                             null,
                                              path,
                                              guid);
         fOut.writeObject(file);
     }
-    
+
     /**
      * Get the state of the deployment.
      * @return
@@ -366,7 +370,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         out.flush();
         fout.getChannel().force(true);
     }
-    
+
     /**
      * Iterator for reading back the log.
      * @author britt
@@ -379,7 +383,7 @@ public class Deployment implements Iterable<DeployedFile>, Serializable
         {
             fNext = null;
         }
-        
+
         /* (non-Javadoc)
          * @see java.util.Iterator#hasNext()
          */

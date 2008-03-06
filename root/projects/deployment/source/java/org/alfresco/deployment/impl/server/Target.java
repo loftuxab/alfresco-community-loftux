@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * As a special exception to the terms and conditions of version 2.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's
+ * FLOSS exception.  You should have recieved a copy of the text describing
+ * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
  */
 
@@ -33,7 +33,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
 
 import org.alfresco.deployment.FSDeploymentRunnable;
@@ -59,32 +61,32 @@ public class Target implements Serializable
      * The name of the target.
      */
     private String fTargetName;
-    
+
     /**
      * The root directory of the target deployment.
      */
     private String fRootDirectory;
-    
+
     /**
      * Where metadata is kept for this target.
      */
     private String fMetaDataDirectory;
-    
+
     /**
      * The user name for authenticating to this target.
      */
     private String fUser;
-    
+
     /**
      * The password for authenticating to this target.
      */
     private String fPassword;
-    
+
     /**
      * Runnables that will be invoked after commit.
      */
     private List<FSDeploymentRunnable> fRunnables;
-    
+
     /**
      * Make one up.
      * @param name
@@ -105,7 +107,7 @@ public class Target implements Serializable
         fUser = user;
         fPassword = password;
         // On initial server bringup, there will be no metadata directory.
-        // If so then we churn through the current contents and generate 
+        // If so then we churn through the current contents and generate
         // initial metadata.
         File meta = new File(fMetaDataDirectory);
         if (meta.exists())
@@ -114,7 +116,7 @@ public class Target implements Serializable
         }
         initialize();
     }
-    
+
     /**
      * Helper to initialize metadata for a new deployment Target.
      */
@@ -156,7 +158,7 @@ public class Target implements Serializable
             }
         }
     }
-    
+
     /**
      * Get the target name.
      * @return
@@ -165,7 +167,7 @@ public class Target implements Serializable
     {
         return fTargetName;
     }
-    
+
     /**
      * Get the root directory.
      * @return
@@ -174,7 +176,7 @@ public class Target implements Serializable
     {
         return fRootDirectory;
     }
-    
+
     /**
      * Get the meta data directory.
      * @return
@@ -183,7 +185,7 @@ public class Target implements Serializable
     {
         return fMetaDataDirectory;
     }
-    
+
     /**
      * Get the username for this target.
      * @return
@@ -192,7 +194,7 @@ public class Target implements Serializable
     {
         return fUser;
     }
-    
+
     /**
      * Get the password for this target.
      * @return
@@ -201,7 +203,7 @@ public class Target implements Serializable
     {
         return fPassword;
     }
-    
+
     /**
      * Get a File object for the given path in this target.
      * @param path
@@ -211,14 +213,14 @@ public class Target implements Serializable
     {
         return new File(fRootDirectory + normalizePath(path));
     }
-    
+
     private static final String fgSeparatorReplacement;
-    
+
     static
     {
-    	fgSeparatorReplacement = File.separator.equals("/") ? "/" : "\\\\"; 
+    	fgSeparatorReplacement = File.separator.equals("/") ? "/" : "\\\\";
     }
-    
+
     /**
      * Utility to normalize a path to platform specific form.
      * @param path
@@ -253,36 +255,45 @@ public class Target implements Serializable
         String mdPath = builder.toString();
         return getDirectory(mdPath).getListing();
     }
-    
+
     /**
      * Clone all the metadata files for the commit phase of a deployment.
      */
-    public void cloneMetaData()
+    public void cloneMetaData(Deployment deployment)
     {
-        recursiveCloneMetaData(fMetaDataDirectory);
-    }
-    
-    /**
-     * Recursive implementation of metadata cloning.
-     * @param dir
-     */
-    private void recursiveCloneMetaData(String dir)
-    {
-        String mdName = dir + File.separatorChar + MD_NAME;
-        DirectoryMetaData md = getDirectory(mdName);
-        String cloneName = mdName + CLONE;
-        putDirectory(cloneName, md);
-        File dFile = new File(dir);
-        File[] listing = dFile.listFiles();
-        for (File file : listing)
+        Set<String> toClone = new HashSet<String>();
+        for (DeployedFile file : deployment)
         {
-            if (file.isDirectory())
+            Path path = new Path(file.getPath());
+            if (file.getType() == FileType.DIR)
             {
-                recursiveCloneMetaData(dir + File.separatorChar + file.getName());
+                String pathString = fMetaDataDirectory + path.toString() + File.separatorChar + MD_NAME;
+                toClone.add(pathString);
             }
+            Path parent = path.getParent();
+            String parentString = fMetaDataDirectory + parent.toString() + File.separatorChar + MD_NAME;
+            toClone.add(parentString);
+        }
+        for (String path : toClone)
+        {
+            File file = new File(path);
+            Path filePath = new Path(path);
+            File dir = new File(filePath.getParent().toString());
+            dir.mkdirs();
+            DirectoryMetaData md = null;
+            if (!file.exists())
+            {
+                md = new DirectoryMetaData();
+            }
+            else
+            {
+                md = getDirectory(path);
+            }
+            String cloneName = path + CLONE;
+            putDirectory(cloneName, md);
         }
     }
-    
+
     /**
      * Update cloned metadata file with the information given.
      * @param file
@@ -291,13 +302,13 @@ public class Target implements Serializable
     {
         Path path = new Path(file.getPath());
         Path parent = path.getParent();
-        String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME + CLONE; 
+        String mdName = fMetaDataDirectory + parent.toString() + File.separatorChar + MD_NAME + CLONE;
         DirectoryMetaData md = getDirectory(mdName);
         switch (file.getType())
         {
             case FILE :
             {
-                FileDescriptor fd = 
+                FileDescriptor fd =
                     new FileDescriptor(path.getBaseName(),
                                        FileType.FILE,
                                        file.getGuid());
@@ -307,7 +318,7 @@ public class Target implements Serializable
             }
             case DIR :
             {
-                FileDescriptor fd = 
+                FileDescriptor fd =
                     new FileDescriptor(path.getBaseName(),
                                        FileType.DIR,
                                        file.getGuid());
@@ -315,10 +326,7 @@ public class Target implements Serializable
                 md.add(fd);
                 String newDirPath = fMetaDataDirectory + File.separatorChar + path.toString();
                 File newDir = new File(newDirPath);
-                if (!newDir.mkdir())
-                {
-                    throw new DeploymentException("Could not create metadata directory " + newDirPath);
-                }
+                newDir.mkdir();
                 DirectoryMetaData newMD = new DirectoryMetaData();
                 putDirectory(newDirPath + File.separatorChar + MD_NAME + CLONE, newMD);
                 break;
@@ -356,7 +364,7 @@ public class Target implements Serializable
         }
         putDirectory(mdName, md);
     }
-    
+
     /**
      * Utility routine to get a metadata object.
      * @param path
@@ -380,7 +388,7 @@ public class Target implements Serializable
             throw new DeploymentException("Configuration error: could not instantiate DirectoryMetaData.");
         }
     }
-    
+
     /**
      * Utility for writing a metadata object to disk.
      * @param path
@@ -402,7 +410,7 @@ public class Target implements Serializable
             throw new DeploymentException("Could not write metadata file " + path, ioe);
         }
     }
-    
+
     /**
      * Roll back metadata changes.
      */
@@ -410,15 +418,62 @@ public class Target implements Serializable
     {
         recursiveRollbackMetaData(fMetaDataDirectory);
     }
-    
+
     /**
      * Commit changed metadata.
      */
-    public void commitMetaData()
+    public void commitMetaData(Deployment deployment)
     {
-        recursiveCommitMetaData(fMetaDataDirectory);
+        Set<String> toCommit = new HashSet<String>();
+        for (DeployedFile file : deployment)
+        {
+            Path path = new Path(file.getPath());
+            if (file.getType() == FileType.DIR)
+            {
+                toCommit.add(fMetaDataDirectory + path.toString() + File.separatorChar + MD_NAME);
+            }
+            String parent = fMetaDataDirectory + path.getParent().toString() +
+                            File.separatorChar + MD_NAME;
+            toCommit.add(parent);
+        }
+        for (String path : toCommit)
+        {
+            File original = new File(path);
+            File old = new File(path + OLD);
+            if (original.exists() && !original.renameTo(old))
+            {
+                throw new DeploymentException("Could not rename meta data file " + path);
+            }
+            DirectoryMetaData md = getDirectory(path + CLONE);
+            List<FileDescriptor> toDelete = new ArrayList<FileDescriptor>();
+            SortedSet<FileDescriptor> mdListing = md.getListing();
+            for (FileDescriptor file : mdListing)
+            {
+                if (file.getType() == FileType.DELETED)
+                {
+                    toDelete.add(file);
+                }
+                else if (file.getType() == FileType.DIR)
+                {
+                    continue;
+                }
+                File mdDir = new File(path + File.separatorChar + file.getName());
+                if (mdDir.exists())
+                {
+                    Deleter.Delete(mdDir);
+                }
+            }
+            for (FileDescriptor file : toDelete)
+            {
+                md.remove(file);
+            }
+            putDirectory(path, md);
+            old.delete();
+            File clone = new File(path + CLONE);
+            clone.delete();
+        }
     }
-    
+
     private void recursiveRollbackMetaData(String dir)
     {
         String mdName = dir + File.separatorChar + MD_NAME;
@@ -448,57 +503,6 @@ public class Target implements Serializable
             if (entry.isDirectory())
             {
                 recursiveRollbackMetaData(dir + File.separatorChar + entry.getName());
-            }
-        }
-    }
-
-    /**
-     * Implementation of metadata commit.
-     * @param dir
-     */
-    private void recursiveCommitMetaData(String dir)
-    {
-        String mdName = dir + File.separatorChar + MD_NAME;
-        File original = new File(mdName);
-        File old = new File(mdName + OLD);
-        if (original.exists() && !original.renameTo(old))
-        {
-            throw new DeploymentException("Could not rename meta data file " + mdName); 
-        }
-        DirectoryMetaData md = getDirectory(mdName + CLONE);
-        List<FileDescriptor> toDelete = new ArrayList<FileDescriptor>();
-        SortedSet<FileDescriptor> mdListing = md.getListing();
-        for (FileDescriptor file : mdListing)
-        {
-            if (file.getType() == FileType.DELETED)
-            {
-                toDelete.add(file);
-            }
-            else if (file.getType() == FileType.DIR)
-            {
-                continue;
-            }
-            File mdDir = new File(dir + File.separatorChar + file.getName());
-            if (mdDir.exists())
-            {
-                Deleter.Delete(mdDir);
-            }
-        }
-        for (FileDescriptor file : toDelete)
-        {
-            md.remove(file);
-        }
-        putDirectory(mdName, md);
-        old.delete();
-        File clone = new File(mdName + CLONE);
-        clone.delete();
-        File dFile = new File(dir);
-        File[] listing = dFile.listFiles();
-        for (File file : listing)
-        {
-            if (file.isDirectory())
-            {
-                recursiveCommitMetaData(dir + File.separatorChar + file.getName());
             }
         }
     }
