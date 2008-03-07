@@ -1917,6 +1917,13 @@
            description="Packages the avmcompare integration project."
            depends="package-avmcompare-war, deploy-tomcat" />
 
+   <target name="generate-javadocs-avmcompare"
+           description="Generates the JavaDocs for the avmcompare project."
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco avmcompare webscript module"
+                         windowtitle="avmcompare"
+                         projectdir="${dir.module.avmcompare}"/>
+   </target>
 
 
 
@@ -1980,7 +1987,13 @@
            description="Packages the truncatemalformedxml integration project."
            depends="package-truncatemalformedxml-war, deploy-tomcat" />
 
-
+   <target name="generate-javadocs-truncatemalformedxml"
+           description="Generates the JavaDocs for the truncatemalformedxml project."
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco truncatemalformedxml webscript module"
+                         windowtitle="truncatemalformedxml"
+                         projectdir="${dir.module.truncatemalformedxml}"/>
+   </target>
 
 
 
