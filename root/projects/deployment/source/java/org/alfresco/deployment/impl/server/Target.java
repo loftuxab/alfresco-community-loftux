@@ -267,11 +267,11 @@ public class Target implements Serializable
             Path path = new Path(file.getPath());
             if (file.getType() == FileType.DIR)
             {
-                String pathString = fMetaDataDirectory + path.toString() + File.separatorChar + MD_NAME;
+                String pathString = fMetaDataDirectory + File.separatorChar + path.toString() + File.separatorChar + MD_NAME;
                 toClone.add(pathString);
             }
             Path parent = path.getParent();
-            String parentString = fMetaDataDirectory + parent.toString() + File.separatorChar + MD_NAME;
+            String parentString = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME;
             toClone.add(parentString);
         }
         for (String path : toClone)
@@ -302,7 +302,7 @@ public class Target implements Serializable
     {
         Path path = new Path(file.getPath());
         Path parent = path.getParent();
-        String mdName = fMetaDataDirectory + parent.toString() + File.separatorChar + MD_NAME + CLONE;
+        String mdName = fMetaDataDirectory + File.separatorChar + parent.toString() + File.separatorChar + MD_NAME + CLONE;
         DirectoryMetaData md = getDirectory(mdName);
         switch (file.getType())
         {
@@ -430,9 +430,9 @@ public class Target implements Serializable
             Path path = new Path(file.getPath());
             if (file.getType() == FileType.DIR)
             {
-                toCommit.add(fMetaDataDirectory + path.toString() + File.separatorChar + MD_NAME);
+                toCommit.add(fMetaDataDirectory + File.separatorChar + path.toString() + File.separatorChar + MD_NAME);
             }
-            String parent = fMetaDataDirectory + path.getParent().toString() +
+            String parent = fMetaDataDirectory + File.separatorChar + path.getParent().toString() +
                             File.separatorChar + MD_NAME;
             toCommit.add(parent);
         }
