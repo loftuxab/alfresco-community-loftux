@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.alfresco.config.ConfigElement;
 import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.server.SessionListener;
 import org.alfresco.jlan.server.SrvSession;
@@ -26,6 +27,10 @@ import org.alfresco.jlan.server.auth.ntlm.TargetInfo;
 import org.alfresco.jlan.server.auth.ntlm.Type1NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type2NTLMMessage;
 import org.alfresco.jlan.server.auth.ntlm.Type3NTLMMessage;
+import org.alfresco.jlan.server.auth.spnego.NegTokenInit;
+import org.alfresco.jlan.server.auth.spnego.NegTokenTarg;
+import org.alfresco.jlan.server.auth.spnego.OID;
+import org.alfresco.jlan.server.auth.spnego.SPNEGO;
 import org.alfresco.jlan.server.config.InvalidConfigurationException;
 import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.alfresco.jlan.server.core.ShareType;
@@ -40,7 +45,6 @@ import org.alfresco.jlan.smb.server.SMBSrvSession;
 import org.alfresco.jlan.smb.server.VirtualCircuit;
 import org.alfresco.jlan.util.DataPacker;
 import org.alfresco.jlan.util.HexDump;
-import org.alfresco.config.ConfigElement;
 
 /**
  * Passthru Authenticator Class
@@ -524,9 +528,9 @@ public class PassthruAuthenticator extends CifsAuthenticator implements SessionL
         respBlob = doNtlmsspSessionSetup(sess, client, buf, secBlobPos, secBlobLen, isUni);
       }
       else {
-        // Invalid blob type
-
-        throw new SMBSrvException(SMBStatus.NTInvalidParameter, SMBStatus.SRVNonSpecificError, SMBStatus.ErrSrv);
+               //  Process an SPNEGO security blob
+               
+               respBlob = doSpnegoSessionSetup( sess, client, buf, secBlobPos, secBlobLen, isUni);
       }
     }
     catch (SMBSrvException ex) {
@@ -952,6 +956,189 @@ public class PassthruAuthenticator extends CifsAuthenticator implements SessionL
     }
   }
 
+    /**
+     * Process an SPNEGO security blob
+     * 
+     * @param sess SMBSrvSession
+     * @param client ClientInfo
+     * @param secbuf byte[]
+     * @param secpos int
+     * @param seclen int
+     * @param unicode boolean
+     * @exception SMBSrvException
+     */
+    private final byte[] doSpnegoSessionSetup( SMBSrvSession sess, ClientInfo client,
+            byte[] secbuf, int secpos, int seclen, boolean unicode) throws SMBSrvException
+    {
+        //  Check the received token type, if it is a target token and there is a stored session setup object, this is the second
+        //  stage of an NTLMSSP session setup that is wrapped with SPNEGO
+
+        int tokType = -1;
+        
+        try
+        {
+            tokType = SPNEGO.checkTokenType( secbuf, secpos, seclen);
+        }
+        catch ( IOException ex)
+        {
+        }
+
+        //  Check for the second stage of an NTLMSSP logon
+        
+        NegTokenTarg negTarg = null;
+        
+        if ( tokType == SPNEGO.NegTokenTarg && sess.hasSetupObject( client.getProcessId()) && sess.getSetupObject( client.getProcessId()) instanceof Type2NTLMMessage)
+        {
+            //  Get the NTLMSSP blob from the NegTokenTarg blob
+            
+            NegTokenTarg negToken = new NegTokenTarg();
+            
+            try
+            {
+                // Decode the security blob
+                
+                negToken.decode( secbuf, secpos, seclen);
+            }
+            catch ( IOException ex)
+            {
+                // Log the error
+                
+                if (hasDebug())
+                    Debug.println("Passthru error on session startup: " + ex.getMessage());
+                
+                // Return a logon failure status
+                
+                throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+            }
+
+            //  Get the second stage NTLMSSP blob
+            
+            byte[] ntlmsspBlob = negToken.getResponseToken();
+
+            //  Perform an NTLMSSP session setup
+            
+            byte[] ntlmsspRespBlob = doNtlmsspSessionSetup( sess, client, ntlmsspBlob, 0, ntlmsspBlob.length, unicode);
+            
+            //  NTLMSSP is a two stage process, set the SPNEGO status
+            
+            int spnegoSts = SPNEGO.AcceptCompleted;
+            
+            if ( sess.hasSetupObject( client.getProcessId()))
+                spnegoSts = SPNEGO.AcceptIncomplete;
+            
+            //  Package the NTLMSSP response in an SPNEGO response
+
+            negTarg = new NegTokenTarg( spnegoSts, null, ntlmsspRespBlob);
+        }
+        else if ( tokType == SPNEGO.NegTokenInit)
+        {
+            //  Parse the SPNEGO security blob to get the Kerberos ticket
+            
+            NegTokenInit negToken = new NegTokenInit();
+            
+            try
+            {
+                // Decode the security blob
+                
+                negToken.decode( secbuf, secpos, seclen);
+            }
+            catch ( IOException ex)
+            {
+                // Log the error
+                
+                if (hasDebug())
+                    Debug.println("Passthru error on session startup: " + ex.getMessage());
+                
+                // Return a logon failure status
+                
+                throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+            }
+    
+            //  Determine the authentication mechanism the client is using and logon
+            
+            String oidStr = null;
+            if ( negToken.numberOfOids() > 0)
+                oidStr = negToken.getOidAt( 0).toString();
+            
+            if ( oidStr != null && oidStr.equals( OID.ID_NTLMSSP))
+            {
+                //  NTLMSSP logon, get the NTLMSSP security blob that is inside the SPNEGO blob
+                
+                byte[] ntlmsspBlob = negToken.getMechtoken();
+    
+                //  Perform an NTLMSSP session setup
+                
+                byte[] ntlmsspRespBlob = doNtlmsspSessionSetup( sess, client, ntlmsspBlob, 0, ntlmsspBlob.length, unicode);
+                
+                //  NTLMSSP is a two stage process, set the SPNEGO status
+                
+                int spnegoSts = SPNEGO.AcceptCompleted;
+                
+                if ( sess.hasSetupObject( client.getProcessId()))
+                    spnegoSts = SPNEGO.AcceptIncomplete;
+                
+                //  Package the NTLMSSP response in an SPNEGO response
+    
+                negTarg = new NegTokenTarg( spnegoSts, OID.NTLMSSP, ntlmsspRespBlob);
+            }
+            else
+            {
+                //  Debug
+                
+                if (hasDebug())
+                {
+                    Debug.println("No matching authentication OID found");
+                    Debug.println("  " + negToken.toString());
+                }
+                    
+                //  No valid authentication mechanism
+                
+                throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+            }
+        }
+        else
+        {
+            //  Unknown SPNEGO token type
+            
+            if (hasDebug())
+            {
+                Debug.println("Unknown SPNEGO token type");
+            }
+            
+            // Return a logon failure status
+            
+            throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+        }
+        
+        // Generate the NegTokenTarg blob
+
+        byte[] respBlob = null;
+        
+        try
+        {
+            // Generate the response blob
+            
+           respBlob = negTarg.encode();
+        }
+        catch ( IOException ex)
+        {
+            //  Debug
+            
+            if (hasDebug())
+            {
+                Debug.println("Failed to encode NegTokenTarg: " + ex.getMessage());
+            }
+
+            //  Failed to build response blob
+            
+            throw new SMBSrvException( SMBStatus.NTLogonFailure, SMBStatus.ErrDos, SMBStatus.DOSAccessDenied);
+        }
+        
+        //  Return the SPNEGO response blob
+        
+        return respBlob;
+    }
+    
   /**
    * Initialzie the authenticator
    * 
