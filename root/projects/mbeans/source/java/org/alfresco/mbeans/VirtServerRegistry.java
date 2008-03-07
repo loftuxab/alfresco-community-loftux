@@ -45,8 +45,8 @@ import java.io.FileInputStream;
 import java.util.Map;
 import java.util.HashMap;
 
-
-
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
 
 public class VirtServerRegistry implements VirtServerRegistryMBean
 {
@@ -65,6 +65,7 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     private JMXServiceURL          jmxServiceUrl_;
     private Map<String,Object>     env_;
     private MBeanServerConnection  mbsc_;
+    private ApplicationContext     context_;
 
 
     // The org.alfresco.mbeans.ContextListener
@@ -82,7 +83,11 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
     }
 
 
-    
+    public void setApplicationContext(ApplicationContext applicationContext)
+    {
+        context_ = applicationContext;
+    }
+
     public void initialize()
     {
         Properties passwordProps = new Properties();
@@ -90,22 +95,37 @@ public class VirtServerRegistry implements VirtServerRegistryMBean
 
         try 
         {
+            // throws exception when there's no password file to be found. 
             passwordProps.load( new FileInputStream( passwordFile_ ) );
+
+            // Given that we've got a valid password file, it's fair to assume 
+            // WCM is enabled.  Therefore, initialize the server connector.
+            //
+            // The Spring context set lazy-init="true" for this bean
+            // so that errors in loading the password file could be
+            // caught in this try/catch block, rather than having 
+            // no such file exceptions occur within the Spring framework
+            // itself (this would cause the entire webapp to fail
+
+            context_.getBean("serverConnector");
+
+            if ( log.isInfoEnabled() )
+                log.info("Created JMX serverConnector");
+
             jmxrmi_password = passwordProps.getProperty("controlRole");
             env_ = new HashMap<String,Object>();
             String[] cred = new String[] { "controlRole", jmxrmi_password };
             env_.put("jmx.remote.credentials", cred );
-
             virtWebappRegistry_ = ObjectName.getInstance(
                 "Alfresco:Name=VirtWebappRegistry,Type=VirtWebappRegistry");
-
         }
         catch (Exception e)
         {
-            if ( log.isErrorEnabled() )
-                log.error(
-                  "Could not find password file for " + 
-                  "remote virtualization server",e);
+            if ( log.isWarnEnabled() )
+                log.warn(
+                  "WCM virtualization disabled "      + 
+                  "(alfresco-jmxrmi.password and/or " +
+                  "alfresco-jmxrmi.access isn't on classpath)");
         }
     }
 

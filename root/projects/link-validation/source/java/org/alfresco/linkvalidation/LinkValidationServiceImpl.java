@@ -99,21 +99,21 @@ import org.springframework.context.ApplicationContext;
  For each file F, calulate a url U.
 
   [1]   Given a source file, what hrefs appear in it explicitly/implicitly:
-            md5_source_to_md5_href[ md5( file ) ]  --> map { md5( url ) }
-            .href/mysite/|mywebapp/-2/md5_source_to_md5_href/
+            source_to_href[ md5( file ) ]  --> map { md5( url ) }
+            .href/mysite/|mywebapp/-2/source_to_href/
 
   [2]   Given an href, in what source files does it appear
         explicitly or implicitly (via dead reconing):
-            md5_href_to_md5_source[ md5( url ) ]  --> map { md5( file ) }
-            .href/mysite/|mywebapp/-2/md5_href_to_source
+            href_to_source[ md5( url ) ]  --> map { md5( file ) }
+            .href/mysite/|mywebapp/-2/href_to_source
 
   [3]   Given an href, what's its status?
-            md5_href_to_status[   md5( url ) ]  --> 200/404, etc.
-            .href/mysite/|mywebapp/-2/md5_href_to_status/
+            href_to_status[   md5( url ) ]  --> 200/404, etc.
+            .href/mysite/|mywebapp/-2/href_to_status/
 
   [4]   Given a status, what hrefs have it?
-            status_to_md5_href[   status  ]  --> map { md5( url ) }
-            .href/mysite/|mywebapp/-2/status_to_md5_href/
+            status_to_href[   status  ]  --> map { md5( url ) }
+            .href/mysite/|mywebapp/-2/status_to_href/
 
   [5]   Given an md5, what's the filename?
             md5_to_file[          md5( file ) ]  --> String( file )
@@ -124,11 +124,11 @@ import org.springframework.context.ApplicationContext;
             .href/mysite/|mywebapp/-2/md5_to_href/
 
   [7]   Given an href what files does it depend on?
-             hamd5_href_to_md5_fdep[ md5( url ) ]  --> map { md5( file ) }
-            .href/mysite/|mywebapp/-2/md5_href_to_md5_fdep/
+             href_to_fdep[ md5( url ) ]  --> map { md5( file ) }
+            .href/mysite/|mywebapp/-2/href_to_fdep/
 
   [8]   Given a file, what hrefs depend on it
-            md5_file_to_md5_hdep[ md5( file ) ]  --> map { md5( url ) }
+            file_to_hdep[ md5( file ) ]  --> map { md5( url ) }
             .href/mysite/|mywebapp/-2/file_to_hdep/
 
 </pre>
@@ -174,10 +174,10 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     static String MD5_TO_HREF        = "md5_to_href";     // key->string
 
     // All files on which a hyperlink depends
-    static String HREF_TO_FDEP         = "href_to_fdep";    // key->map
+    static String HREF_TO_FDEP       = "href_to_fdep";    // key->map
 
     // All hyperinks dependent upon a given file
-    static String FILE_TO_HDEP         = "file_to_hdep";    // key->map
+    static String FILE_TO_HDEP       = "file_to_hdep";    // key->map
 
 
     AVMRemote                    avm_;
@@ -298,6 +298,15 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         poll_interval_ = milliseconds;
     }
 
+    /**
+    *  Returns the poll interval (in milliseconds) used to check for new snapshots in staging.
+    */
+    public int getPollInterval()
+    {
+        return poll_interval_;
+    }
+
+
     public void setCreateVersionTxnListener( CreateVersionTxnListener listener)
     {
         create_version_txn_listener_ = listener;
@@ -407,16 +416,11 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             return;                                     // terminate service
         }
 
-        if ( poll_interval_ <= 0 )
-        {
-            if ( log.isWarnEnabled() )                 // LinkValidationService
-                log.warn(
-                "LinkValidationService disabled in " + 
-                "linkvalidation-service-context.xml  pollInterval " + 
-                 poll_interval_ + " <= 0");
+        // Register transaction callbacks to build a cache that helps to
+        // avoid unnecesary calls to the real AVM getLatestSnapshotID().
+        // Instead, the local version is called (which consults the cache).
 
-            return;
-        }
+        store_latest_version_info_ = new LinkValidationStoreCallbackHandler();
 
         // Initiate background process to check links
         // For now, hard-code initial update
@@ -430,40 +434,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         webapp_asset_count_info_ = new HashMap<String,Pair<Integer,Integer>>();
 
 
-        // Register transaction callbacks to build a cache that helps to
-        // avoid unnecesary calls to the real AVM getLatestSnapshotID().
-        // Instead, the local version is called (which consults the cache).
-
-        store_latest_version_info_ = new LinkValidationStoreCallbackHandler();
-
-        create_version_txn_listener_.addCallback( store_latest_version_info_ );
-        purge_version_txn_listener_.addCallback(  store_latest_version_info_ );
-        purge_store_txn_listener_.addCallback(    store_latest_version_info_ );
-
         // JSSE HTTPS:
         //   Unless a trust store is set, HTTPS connections will fail with:
         //      java.security.InvalidAlgorithmParameterException:
         //           the trustAnchors parameter must be non-empty
-
-        String password =
-                ( (jsse_trust_store_password_ != null) &&
-                  ! jsse_trust_store_password_.equals("")
-                )
-                ? jsse_trust_store_password_
-                : "changeit";                       // That's the JDK default!
-                                                    // Who really changes this?
-        String trust_store_file =
-                ( (jsse_trust_store_file_ != null) &&
-                  !jsse_trust_store_file_.equals("")
-                ) ? jsse_trust_store_file_
-                  : (System.getProperty("java.home") +
-                    "/lib/security/cacerts".replace('/', File.separatorChar));
-
-        System.setProperty("javax.net.ssl.trustStore",trust_store_file);
-        System.setProperty("javax.net.ssl.trustStorePassword",password);
-
-        // Before Java 1.4, you needed to do a dance like the one below;
-        // however, that's no longer necessary.
+        //
+        // Before Java 1.4, you needed to do a dance like the one below:
         //
         // See also:   http://java.sun.com/j2se/1.4.2/docs/guide/security/
         //                    jsse/JSSERefGuide.html
@@ -483,6 +459,42 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         //        "com.sun.net.ssl.internal.www.protocol|".concat(handlers));
         // }
         // System.setProperties(properties);
+        //
+        //
+        // However, that's no longer necessary.
+
+        String password =
+                ( (jsse_trust_store_password_ != null) &&
+                  ! jsse_trust_store_password_.equals("")
+                )
+                ? jsse_trust_store_password_
+                : "changeit";                       // That's the JDK default!
+                                                    // Who really changes this?
+        String trust_store_file =
+                ( (jsse_trust_store_file_ != null) &&
+                  !jsse_trust_store_file_.equals("")
+                ) ? jsse_trust_store_file_
+                  : (System.getProperty("java.home") +
+                    "/lib/security/cacerts".replace('/', File.separatorChar));
+
+        System.setProperty("javax.net.ssl.trustStore",trust_store_file);
+        System.setProperty("javax.net.ssl.trustStorePassword",password);
+
+
+        if ( poll_interval_ <= 0 )
+        {
+            if ( log.isWarnEnabled() )                 // LinkValidationService
+                log.warn(
+                "LinkValidationService disabled in " + 
+                "linkvalidation-service-context.xml  pollInterval " + 
+                 poll_interval_ + " <= 0");
+
+            return;
+        }
+
+        create_version_txn_listener_.addCallback( store_latest_version_info_ );
+        purge_version_txn_listener_.addCallback(  store_latest_version_info_ );
+        purge_store_txn_listener_.addCallback(    store_latest_version_info_ );
 
 
         if ( purge_all_validation_data_on_bootstrap_ )
@@ -1802,7 +1814,7 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
     /*-------------------------------------------------------------------------
     *  getBrokenHrefManifest --
-    *      Equivalent to calling getHrefManifestBrokenByDelete and
+    *      Gets the merger of all hrefs broken by deletes and
     *      getHrefManifestBrokenByNewOrMod, then merging the manifests.
     *------------------------------------------------------------------------*/
     public HrefManifest  getBrokenHrefManifest( HrefDifference href_diff )
@@ -1938,73 +1950,6 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     }
 
 
-    /*-------------------------------------------------------------------------
-    *  getHrefManifestBrokenByDelete --
-    *------------------------------------------------------------------------*/
-    public HrefManifest getHrefManifestBrokenByDelete(HrefDifference href_diff)
-    {
-        if ( log.isDebugEnabled() )
-            log.debug("getHrefManifestBrokenByDelete");
-
-
-        if ( href_diff.broken_by_deletion_ != null )
-        {
-            return href_diff.broken_by_deletion_;
-        }
-
-        href_diff.broken_by_deletion_ = new HrefManifest();
-
-        String src_webapp_url_base = href_diff.getSrcWebappUrlBase();
-        String src_store           = href_diff.getSrcStore();
-        String dst_store           = href_diff.getDstStore();
-        int dst_store_length       = dst_store.length();
-
-        Map<String, List<String>> broken_manifest_map =
-                href_diff.getBrokenManifestMap();
-
-        ArrayList<String> dst_broken_file_list =
-            new ArrayList<String>( broken_manifest_map.keySet() );
-
-        Collections.sort( dst_broken_file_list);
-
-        // push result into href_diff
-
-        for (String dst_broken_file : dst_broken_file_list)
-        {
-            List<String> rel_broken_href_list =
-                broken_manifest_map.get(dst_broken_file);
-
-            List<String> src_broken_href_list =
-                new ArrayList<String>(
-                        ( rel_broken_href_list != null)
-                        ? rel_broken_href_list.size()
-                        : 0 );
-
-            for ( String rel_broken_href : rel_broken_href_list )
-            {
-                String src_broken_href;
-                if ( rel_broken_href.charAt(0) == '/')
-                {
-                    src_broken_href = src_webapp_url_base + rel_broken_href;
-                }
-                else
-                {
-                    src_broken_href = rel_broken_href;
-                }
-                src_broken_href_list.add( src_broken_href );
-            }
-
-            Collections.sort( src_broken_href_list );
-
-            String src_broken_file =
-                  src_store +
-                  dst_broken_file.substring( dst_store_length );
-
-            href_diff.broken_by_deletion_.add(
-                new HrefManifestEntry( src_broken_file, src_broken_href_list ));
-        }
-        return href_diff.broken_by_deletion_;
-    }
 
 
     /*-------------------------------------------------------------------------
@@ -2272,32 +2217,56 @@ public class LinkValidationServiceImpl implements LinkValidationService,
             // Get the set of hrefs that are now gone from deleted file
             //
 
-            List<String> deleted_href_md5_list =
-                            attr_.getKeys( href_attr      + "/" +
-                                           SOURCE_TO_HREF + "/" +
-                                           deleted_file_md5);
-
-
-            for ( String deleted_href_md5 : deleted_href_md5_list )
+            try 
             {
-                // rel_href_in_conc contains as keys any hrefs
-                // present in rel_newmod_conc or deleted_conc.
-                //
-                // Because the href is deleted, there's no need to worry
-                // about the  md5->href mapping, so just use null
-                // to allow some md5 -> href updates to be skipped.
+                List<String> deleted_href_md5_list =
+                                attr_.getKeys( href_attr      + "/" +
+                                               SOURCE_TO_HREF + "/" +
+                                               deleted_file_md5);
 
-                rel_href_in_conc.put( deleted_href_md5, null );
 
-                HashMap<String,String> url_locations =
-                        deleted_conc.get( deleted_file_md5 );
-
-                if (url_locations == null )
+                for ( String deleted_href_md5 : deleted_href_md5_list )
                 {
-                    url_locations = new HashMap<String,String>();
-                    deleted_conc.put( deleted_href_md5, url_locations );
+                    // rel_href_in_conc contains as keys any hrefs
+                    // present in rel_newmod_conc or deleted_conc.
+                    //
+                    // Because the href is deleted, there's no need to worry
+                    // about the  md5->href mapping, so just use null
+                    // to allow some md5 -> href updates to be skipped.
+
+                    rel_href_in_conc.put( deleted_href_md5, null );
+
+                    HashMap<String,String> url_locations =
+                            deleted_conc.get( deleted_file_md5 );
+
+                    if (url_locations == null )
+                    {
+                        url_locations = new HashMap<String,String>();
+                        deleted_conc.put( deleted_href_md5, url_locations );
+                    }
+                    url_locations.put(deleted_file_md5, null );
                 }
-                url_locations.put(deleted_file_md5, null );
+            }
+            catch (Exception e)
+            {
+                // It's ok not to have had any internal hrefs
+                // but let's see more about this file, if possible
+                if ( log.isDebugEnabled() )
+                {
+                    String del_file = "";
+                    try 
+                    {
+                        del_file = attr_.getAttribute( href_attr   + "/" +
+                                                       MD5_TO_FILE + "/" +
+                                                       deleted_file_md5
+                                                     ).getStringValue();
+                    }
+                    catch (Exception e2) { /*  ok if this fails */ }
+
+                    log.debug("build_changeset_concordances empty "  + 
+                              "SOURCE_TO_HREF: "  + del_file + "   " + 
+                              deleted_file_md5 );
+                }
             }
         }
     }
