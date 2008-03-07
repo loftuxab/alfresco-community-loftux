@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * As a special exception to the terms and conditions of version 2.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's
+ * FLOSS exception.  You should have recieved a copy of the text describing
+ * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
  */
 
@@ -34,22 +34,22 @@ import java.io.File;
 public class Path
 {
     private String[] fComponents;
-    
+
     public Path(String path)
     {
-        path = path.replace("^/+", "").replace("/+$", "");
-        fComponents = path.split("/+");
+        path = path.replaceAll("^(/|\\\\)+", "").replaceAll("(/|\\\\)+$", "");
+        fComponents = path.split("(/|\\\\)+");
         if (fComponents.length == 1 && fComponents[0].equals(""))
         {
             fComponents = new String[0];
         }
     }
-    
+
     public Path(String[] components)
     {
         fComponents = components;
     }
-    
+
     /**
      * Get the number of components in the path.
      * @return
@@ -58,7 +58,7 @@ public class Path
     {
         return fComponents.length;
     }
-    
+
     /**
      * Get the indexth component.
      * @param index
@@ -68,7 +68,7 @@ public class Path
     {
         return fComponents[index];
     }
-    
+
     /**
      * Get the parent Path of this Path.
      * @return
@@ -86,7 +86,7 @@ public class Path
         }
         return new Path(result);
     }
-    
+
     /**
      * Get the last component of the Path. Don't call on the root Path.
      * @return
@@ -95,10 +95,10 @@ public class Path
     {
         return fComponents[fComponents.length - 1];
     }
-    
+
     /**
      * Get the Path that is this Path extended by one component.
-     * @param name 
+     * @param name
      * @return
      */
     public Path extend(String name)
