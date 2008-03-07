@@ -172,7 +172,7 @@ public class UIWebScript extends SelfRenderingComponent
             Map<String, Object> scriptContextMap = (Map<String, Object>)scriptContext;
             for (String key : scriptContextMap.keySet())
             {
-               scriptUrl = scriptUrl.replace(key, scriptContextMap.get(key).toString());
+               scriptUrl = scriptUrl.replace("{" + key + "}", scriptContextMap.get(key).toString());
             }
          }
          else
