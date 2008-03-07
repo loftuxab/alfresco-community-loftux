@@ -24,7 +24,7 @@
  */
 package org.alfresco.util;
 
-import org.doomdark.uuid.UUIDGenerator;
+import org.safehaus.uuid.UUIDGenerator;
 
 /**
  * A wrapper class to serve up GUIDs
