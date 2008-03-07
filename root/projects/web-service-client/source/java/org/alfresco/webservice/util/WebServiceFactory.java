@@ -71,6 +71,9 @@ public final class WebServiceFactory
     private static final String DEFAULT_ENDPOINT_ADDRESS = "http://localhost:8080/alfresco/api";
     private static String endPointAddress;
     
+    /** Default timeout **/
+    private static int timeoutMilliseconds = 60000;
+    
     /** Service addresses */
     private static final String AUTHENTICATION_SERVICE_ADDRESS  = "/AuthenticationService";
     private static final String REPOSITORY_SERVICE_ADDRESS      = "/RepositoryService";
@@ -90,6 +93,16 @@ public final class WebServiceFactory
     public static void setEndpointAddress(String endPointAddress)
     {
     	WebServiceFactory.endPointAddress = endPointAddress;
+    }
+    
+    /**
+     * Sets the timeout
+     * 
+     * @param timeoutMilliseconds number of milliseconds to wait before timing out a web service call
+     */
+    public static void setTimeoutMilliseconds(int timeoutMilliseconds)
+    {
+    	WebServiceFactory.timeoutMilliseconds = timeoutMilliseconds;
     }
     
     /**
@@ -157,7 +170,7 @@ public final class WebServiceFactory
         }        
         
         // Time out after a minute
-        authenticationService.setTimeout(60000);
+        authenticationService.setTimeout(timeoutMilliseconds);
         
         return authenticationService;
     }
@@ -197,7 +210,7 @@ public final class WebServiceFactory
 		}        
 	
 		// Time out after a minute
-		repositoryService.setTimeout(60000);      
+		repositoryService.setTimeout(timeoutMilliseconds);      
         
         return repositoryService;
     }
@@ -238,7 +251,7 @@ public final class WebServiceFactory
         }        
         
         // Time out after a minute
-        authoringService.setTimeout(60000);       
+        authoringService.setTimeout(timeoutMilliseconds);       
         
         return authoringService;
     }
@@ -279,7 +292,7 @@ public final class WebServiceFactory
         }        
         
         // Time out after a minute
-        classificationService.setTimeout(60000);        
+        classificationService.setTimeout(timeoutMilliseconds);        
         
         return classificationService;
     }
@@ -320,7 +333,7 @@ public final class WebServiceFactory
         }        
             
         // Time out after a minute
-        actionService.setTimeout(60000);      
+        actionService.setTimeout(timeoutMilliseconds);      
         
         return actionService;
     }
@@ -360,7 +373,7 @@ public final class WebServiceFactory
         }        
         
         // Time out after a minute
-        contentService.setTimeout(60000);       
+        contentService.setTimeout(timeoutMilliseconds);       
         
         return contentService;
     }
@@ -400,7 +413,7 @@ public final class WebServiceFactory
         }        
             
         // Time out after a minute
-        accessControlService.setTimeout(60000);
+        accessControlService.setTimeout(timeoutMilliseconds);
         
         return accessControlService;
     }
@@ -411,7 +424,7 @@ public final class WebServiceFactory
     }
     
     /**
-     * Get the administation service
+     * Get the administration service
      * 
      * @return  the administration service
      */
@@ -441,7 +454,7 @@ public final class WebServiceFactory
         }        
         
         // Time out after a minute
-        administrationService.setTimeout(60000);       
+        administrationService.setTimeout(timeoutMilliseconds);       
         
         return administrationService;
     }
@@ -482,7 +495,7 @@ public final class WebServiceFactory
         }        
         
         // Time out after a minute
-        dictionaryService.setTimeout(60000);
+        dictionaryService.setTimeout(timeoutMilliseconds);
 
         return dictionaryService;
     }

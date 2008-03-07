@@ -297,26 +297,6 @@ public class HrefValidatorTest extends TestCase
 
 
 
-            // Show what is broken due to deleted files
-            System.out.println("\n\n--------------------------------------\n");
-            System.out.println(
-               "\n\nMainfest broken by delete from WORKAREA:\n\n");
-
-            HrefManifest broken_by_deletion    = 
-               LinkValidation_.getHrefManifestBrokenByDelete(href_diff);
-
-            for ( HrefManifestEntry manifest_entry : 
-                  broken_by_deletion.getManifestEntries() 
-                 )
-            {
-                System.out.println("\nFile:  " + manifest_entry.getFileName());
-                for ( String broken_href :  manifest_entry.getHrefs() )
-                {
-                    System.out.println("       " +  broken_href);
-                }
-            }
-
-
             // Show what is broken within new mods:
             System.out.println("\n\n--------------------------------------\n");
             System.out.println(

@@ -29,8 +29,21 @@
 
 package org.alfresco.mbeans;
 
-public interface VirtServerRegistryMBean 
+
+// By making the VirtServerRegistryMBean ApplicationContextAware,
+// it's possible to defer loading of the server connnector bean
+// until the implementation verifies there's a password file
+// at runtime.  By creating the server connector manually, 
+// it's possible to trap any errors that might have occurred
+// loading the password file, and make it non-fatal to the
+// webapp as a whole (though it does disable WCM functionality).
+
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationContext;
+
+public interface VirtServerRegistryMBean extends ApplicationContextAware
 {
+
     public void initialize();
 
     // public void   setVirtServerJmxUrl(String virtServerJmxUrl);
