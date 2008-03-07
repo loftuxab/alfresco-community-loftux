@@ -1851,8 +1851,142 @@
                          projectdir="${dir.module.rm}"/>
    </target>
 
+   <!-- ******************************************************************* -->
+   <!-- Note: avmCompare and truncateMalformedXml have a nearly identical   -->
+   <!--       set of tasks.   It would be very nice if we could use a macro -->
+   <!--       in combination with some javascript/groovy to generate them.  -->
+   <!-- ******************************************************************* -->
+
+
+   <!-- ************************************************* -->
+   <!-- ** avmCompare module                           ** -->
+   <!-- ************************************************* -->
+   <target name="incremental-avmcompare"
+           description="Performs an incremental build of the avmcompare module."
+           depends="package-avmcompare" />
+
+   <target name="build-avmcompare"
+           description="Performs a clean build of the avmcompare module."
+           depends="clean-avmcompare, incremental-avmcompare" />
+
+   <target name="clean-avmcompare"
+           description="Cleans the avmcompare module"
+           depends="init">
+      <clean projectdir="${dir.module.avmcompare}" />
+   </target>
+
+   <target name="compile-avmcompare"
+           description="Compiles the avmcompare module."
+           depends="init">
+      <compile-java projectdir="${dir.module.avmcompare}" />
+   </target>
+
+   <target name="package-avmcompare-jar"
+           description="Packages the avmcompare jar file."
+           depends="compile-avmcompare">
+      <mkdir dir="${dir.module.avmcompare.dist}" />
+      <mkdir dir="${dir.module.avmcompare.lib}" />
+      <jar jarfile="${dir.module.avmcompare.lib}/${file.name.jar.avmcompare}">
+           <fileset dir="${dir.module.avmcompare.classes}"
+                    excludes="**/*Test*"
+                    includes="**/*.class" />
+      </jar>
+   </target>
+
+   <target name="package-avmcompare-extension"
+           description="Packages the avmcompare amp file."
+           depends="package-avmcompare-jar">
+        <zip destfile="${dir.module.avmcompare.dist}/${file.name.amp.avmcompare}" update="true">
+            <zipfileset dir="${dir.module.avmcompare.lib}"     prefix="lib"  includes="*.jar"/>
+            <zipfileset dir="${dir.module.avmcompare.config}"  prefix="config" >
+                <exclude name="**/module.properties"/>
+            </zipfileset>
+            <zipfileset dir="${dir.module.avmcompare.property}"  includes="module.properties" />
+        </zip>
+   </target>
+
+   <target name="package-avmcompare-war"
+           description="Packages the WAR file for the avmcompare integration project."
+           depends="package-avmcompare-extension">
+      <echo>Installing avmcompare into WAR...</echo>
+      <install-amp ampfile="${dir.module.avmcompare.dist}/${file.name.amp.avmcompare}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-avmcompare"
+           description="Packages the avmcompare integration project."
+           depends="package-avmcompare-war, deploy-tomcat" />
+
+
+
+
+   <!-- ************************************************* -->
+   <!-- ** truncateMalformedXml module                 ** -->
+   <!-- ************************************************* -->
+
+   <target name="incremental-truncatemalformedxml"
+           description="Performs an incremental build of the truncatemalformedxml module."
+           depends="package-truncatemalformedxml" />
+
+   <target name="build-truncatemalformedxml"
+           description="Performs a clean build of the truncatemalformedxml module."
+           depends="clean-truncatemalformedxml, incremental-truncatemalformedxml" />
+
+   <target name="clean-truncatemalformedxml"
+           description="Cleans the truncatemalformedxml module"
+           depends="init">
+      <clean projectdir="${dir.module.truncatemalformedxml}" />
+   </target>
+
+   <target name="compile-truncatemalformedxml"
+           description="Compiles the truncatemalformedxml module."
+           depends="init">
+      <compile-java projectdir="${dir.module.truncatemalformedxml}" />
+   </target>
+
+   <target name="package-truncatemalformedxml-jar"
+           description="Packages the truncatemalformedxml jar file."
+           depends="compile-truncatemalformedxml">
+      <mkdir dir="${dir.module.truncatemalformedxml.dist}" />
+      <mkdir dir="${dir.module.truncatemalformedxml.lib}" />
+      <jar jarfile="${dir.module.truncatemalformedxml.lib}/${file.name.jar.truncatemalformedxml}">
+           <fileset dir="${dir.module.truncatemalformedxml.classes}"
+                    excludes="**/*Test*"
+                    includes="**/*.class" />
+      </jar>
+   </target>
+
+   <target name="package-truncatemalformedxml-extension"
+           description="Packages the truncatemalformedxml amp file."
+           depends="package-truncatemalformedxml-jar">
+        <zip destfile="${dir.module.truncatemalformedxml.dist}/${file.name.amp.truncatemalformedxml}" update="true">
+            <zipfileset dir="${dir.module.truncatemalformedxml.lib}"     prefix="lib"  includes="*.jar"/>
+            <zipfileset dir="${dir.module.truncatemalformedxml.config}"  prefix="config" >
+                <exclude name="**/module.properties"/>
+            </zipfileset>
+            <zipfileset dir="${dir.module.truncatemalformedxml.property}"  includes="module.properties" />
+        </zip>
+   </target>
+
+   <target name="package-truncatemalformedxml-war"
+           description="Packages the WAR file for the truncatemalformedxml integration project."
+           depends="package-truncatemalformedxml-extension">
+      <echo>Installing truncatemalformedxml into WAR...</echo>
+      <install-amp ampfile="${dir.module.truncatemalformedxml.dist}/${file.name.amp.truncatemalformedxml}"
+                   warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
+   </target>
+
+   <target name="package-truncatemalformedxml"
+           description="Packages the truncatemalformedxml integration project."
+           depends="package-truncatemalformedxml-war, deploy-tomcat" />
+
+
+
+
+
+
    <!-- ******************************** -->
-   <!-- ** Blog Integration Project ** -->
+   <!-- ** Blog Integration Project   ** -->
    <!-- ******************************** -->
 
    <target name="incremental-blog"
