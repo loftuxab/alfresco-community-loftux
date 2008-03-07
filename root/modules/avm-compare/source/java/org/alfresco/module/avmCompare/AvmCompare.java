@@ -65,6 +65,8 @@ import java.io.PrintWriter;
 */
 public class AvmCompare extends AbstractWebScript
 {
+    static boolean IsInit_ = false;
+
     AVMRemote      avm_;
     AVMSyncService sync_;
     NameMatcher    excluder_;
@@ -83,9 +85,34 @@ public class AvmCompare extends AbstractWebScript
     public void setExcluderNameMatcher(NameMatcher matcher) 
     { excluder_ = matcher; }
 
+    /**
+    *  Called once at startup per instance; however, because there 
+    *  can be both a GET and POST bean, this init() method might 
+    *  be called more than once.  Hence, one portion of this init()
+    *  is devoted to "once per process" initialization, and another
+    *  is "once per instance".
+    */
+    public void init()
+    {    
+        if ( ! IsInit_  )
+        {
+            IsInit_  = true;
 
-    
-    public void init() { reset(); }    // Called once at startup
+            // Once per process init
+            // ---------------------
+        
+
+            if ( log.isInfoEnabled() )
+                   log.info("avmCompare webscript initialized");
+
+        }
+
+
+        // Once per instance init
+        // ----------------------
+
+        reset(); 
+    }
 
     /*-------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
@@ -99,6 +126,9 @@ public class AvmCompare extends AbstractWebScript
         throws IOException
     {
         reset();
+
+        if ( log.isDebugEnabled() )
+               log.debug("execute()");
 
         if (!(webscript_res instanceof WebScriptServletResponse))
         {
@@ -177,7 +207,14 @@ public class AvmCompare extends AbstractWebScript
         { 
             changeset_latest = avm_.getLatestSnapshotID( changeset_store ); 
         }
-        catch (Exception e) { /* do nothing */ }
+        catch (Exception e) 
+        { 
+            if ( log.isDebugEnabled() )
+               log.debug("Could not getLatestSnapshotID() for changeset: " +
+                          changeset_store);
+
+            /* do nothing */ 
+        }
 
 
         changeset_version = get_version_alias( changeset_version, 
@@ -221,7 +258,14 @@ public class AvmCompare extends AbstractWebScript
             { 
                 baseline_latest = avm_.getLatestSnapshotID( baseline_store ); 
             }
-            catch (Exception e) { /* do nothing */ }
+            catch (Exception e) 
+            { 
+                if ( log.isDebugEnabled() )
+                   log.debug("Could not getLatestSnapshotID() for baseline: " +
+                              baseline_store);
+    
+                /* do nothing */ 
+            }
         }
 
         if ( baseline_version_str != null )
@@ -315,6 +359,7 @@ public class AvmCompare extends AbstractWebScript
  
                 }
                 catch (Exception e) { /* do nothing */ }
+
                 String changeset_meta = get_meta_string( changeset_desc );
 
                 // Look up baseline node, even if it's been deleted
@@ -512,8 +557,13 @@ public class AvmCompare extends AbstractWebScript
 
     void emit_error_message(String msg)
     {
+        msg = "ERROR:  " + msg;
+
+        if ( log.isDebugEnabled() )
+               log.debug("Sending error to client: " + msg);
+
         res_.setStatus(400);
-        emit_message( "ERROR:  " + msg );
+        emit_message( msg );
     }
 
     void emit_message(String msg)

@@ -12,7 +12,14 @@
     </bean>
 
 
-    <!-- The POST method is supported for ease of use  -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- The POST method is supported for ease of use                      -->
+    <!--                                                                   -->
+    <!--  Note:  the 'init-method' implementation has a once-per-process   -->
+    <!--         and a once-per-instance section because there may be      -->
+    <!--         more than one instance of the underlying class            -->
+    <!--         (i.e.: the GET and POST instances).                       -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <bean id          = "webscript.org.alfresco.module.avmCompare.avm_compare.post"
           class       = "org.alfresco.module.avmCompare.AvmCompare"
           parent      = "webscript"
@@ -33,7 +40,15 @@
     </bean>
 
 
-    <!-- The GET method is "better form" because this webscript does not modify the repository -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
+    <!-- The GET method is "better form" because this webscript            -->
+    <!-- does not modify the repository                                    -->
+    <!--                                                                   -->
+    <!--  Note:  the 'init-method' implementation has a once-per-process   -->
+    <!--         and a once-per-instance section because there may be      -->
+    <!--         more than one instance of the underlying class            -->
+    <!--         (i.e.: the GET and POST instances).                       -->
+    <!-- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ -->
     <bean id          = "webscript.org.alfresco.module.avmCompare.avm_compare.get"
           class       = "org.alfresco.module.avmCompare.AvmCompare"
           parent      = "webscript"
