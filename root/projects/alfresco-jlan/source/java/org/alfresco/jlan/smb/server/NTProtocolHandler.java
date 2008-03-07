@@ -106,6 +106,10 @@ public class NTProtocolHandler extends CoreProtocolHandler {
 	
 	public static final int FileSizeChangeRate	= 10;
 	
+    // Maximum path size that the filesystem accepts
+    
+    public static final int MaxPathLength  = 255;
+    
   // Security descriptor to allow Everyone access, returned by the QuerySecurityDescrptor NT
   // transaction when NTFS streams are enabled for a virtual filesystem.
 
@@ -3763,7 +3767,7 @@ public class NTProtocolHandler extends CoreProtocolHandler {
         	
         	//	Pack the filesystem type
         	
-        	DiskInfoPacker.packFsAttribute(diskCtx.getFilesystemAttributes(), 255, fsType, tbuf.isUnicode(), replyBuf);
+            DiskInfoPacker.packFsAttribute(diskCtx.getFilesystemAttributes(), MaxPathLength, fsType, tbuf.isUnicode(), replyBuf);
          	break;
          	
         //	Mac filesystem information
