@@ -9,6 +9,7 @@
       <sequential>
          <delete includeEmptyDirs="true" quiet="yes" dir="@{projectdir}/${dir.name.build}/${dir.name.classes}" />
          <delete includeEmptyDirs="true" quiet="yes" dir="@{projectdir}/${dir.name.build}/${dir.name.dist}" />
+         <delete includeEmptyDirs="true" quiet="yes" dir="@{projectdir}/${dir.name.build}/${dir.name.lib}" />
          <delete includeEmptyDirs="true" quiet="yes" dir="@{projectdir}/${dir.name.build}/${dir.name.assemble}" />
          <delete includeEmptyDirs="true" quiet="yes" dir="@{projectdir}/${dir.name.build}/${dir.name.test.results}" />
          <delete includeEmptyDirs="true" quiet="yes" dir="@{projectdir}/${dir.name.build}/${dir.name.docs}" />
