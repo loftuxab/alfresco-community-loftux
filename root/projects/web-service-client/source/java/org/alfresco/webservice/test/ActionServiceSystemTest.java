@@ -32,6 +32,7 @@ import org.alfresco.webservice.action.ActionExecutionResult;
 import org.alfresco.webservice.action.ActionItemDefinition;
 import org.alfresco.webservice.action.ActionItemDefinitionType;
 import org.alfresco.webservice.action.ActionServiceSoapBindingStub;
+import org.alfresco.webservice.action.Condition;
 import org.alfresco.webservice.action.ParameterDefinition;
 import org.alfresco.webservice.action.Rule;
 import org.alfresco.webservice.action.RuleType;
@@ -44,8 +45,10 @@ import org.alfresco.webservice.types.Node;
 import org.alfresco.webservice.types.ParentReference;
 import org.alfresco.webservice.types.Predicate;
 import org.alfresco.webservice.types.Reference;
+import org.alfresco.webservice.types.Store;
 import org.alfresco.webservice.util.ActionUtils;
 import org.alfresco.webservice.util.Constants;
+import org.alfresco.webservice.util.Utils;
 import org.alfresco.webservice.util.WebServiceFactory;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -389,5 +392,50 @@ public class ActionServiceSystemTest extends BaseWebServiceSystemTest
         String scriptResult = ActionUtils.executeScript(folder, script);
         assertNotNull(scriptResult);
         assertEquals("VALUE", scriptResult);
+    }
+    
+    public void testCreateAndEditRule()
+        throws Exception
+    {
+        Store spacesStore = new Store(Constants.WORKSPACE_STORE, "SpacesStore");
+  
+        String folderName = "rulesFolder" + System.currentTimeMillis();
+        ParentReference parentReference = new ParentReference(
+                spacesStore,
+                null, 
+                "/app:company_home",
+                Constants.ASSOC_CONTAINS, 
+                Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, folderName));
+        NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, folderName)};
+        CMLCreate create = new CMLCreate("1", parentReference, null, null, null, Constants.TYPE_FOLDER, properties);
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{create});
+        UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);   
+        Reference folder = results[0].getDestination();
+        
+        // Create the action
+        NamedValue[] parameters = new NamedValue[]{new NamedValue("aspect-name", false, "{http://www.alfresco.org/model/content/1.0}generalclassifiable", null)};        
+        Action newAction = new Action();
+        newAction.setActionName("add-features");
+        newAction.setParameters(parameters);
+        
+        // Create the action condition
+        Condition condition = new Condition();
+        condition.setConditionName("no-condition");    
+        
+        // Create the composite action
+        Action action = new Action();
+        action.setActionName("composite-action");
+        action.setActions(new Action[]{newAction});
+        action.setConditions(new Condition[]{condition});
+        
+        // Create the rule
+        Rule newRule = new Rule();
+        newRule.setRuleTypes(new String[]{"inbound"});
+        newRule.setTitle("This rule adds the classificable aspect");
+        newRule.setDescription("This is the description of the rule");
+        newRule.setAction(action);
+        
+        WebServiceFactory.getActionService().saveRules(folder, new Rule[]{newRule});
     }
 }
