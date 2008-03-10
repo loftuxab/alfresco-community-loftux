@@ -31,6 +31,7 @@ import org.alfresco.webservice.administration.UserQueryResults;
 import org.alfresco.webservice.repository.RepositoryServiceLocator;
 import org.alfresco.webservice.types.NamedValue;
 import org.alfresco.webservice.types.QueryConfiguration;
+import org.alfresco.webservice.util.AuthenticationDetails;
 import org.alfresco.webservice.util.AuthenticationUtils;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.WebServiceFactory;
@@ -328,5 +329,101 @@ public class AdministrationServiceSystemTest extends BaseWebServiceSystemTest
                 new NamedValue(Constants.PROP_USER_EMAIL, false, email, null),
                 new NamedValue(Constants.PROP_USER_ORGID, false, orgId, null)};
     }
+    
+    public void testCreateUsersWithSameName()
+        throws Exception
+    {
+        // Get the details of the new user
+        String homeFolder = store.getScheme() + "://" + store.getAddress() + "/" + folderReference.getUuid();
+        String one = Long.toString(System.currentTimeMillis());
+        NewUserDetails[] newUsers = new NewUserDetails[] 
+        {
+                new NewUserDetails(
+                        "user" + one, 
+                        "password" + one,
+                        createPersonProperties(homeFolder, "first" + one, "middle" + one, "last" + one, "email" + one, "org" + one)),
+                new NewUserDetails(
+                        "user" + one, 
+                        "password" + one,
+                        createPersonProperties(homeFolder, "first" + one, "middle" + one, "last" + one, "email" + one, "org" + one))
+                        
+        };
+        
+        try
+        {
+            // Create the new users
+            WebServiceFactory.getAdministrationService().createUsers(newUsers);
+            fail("This should have failed as we attempted to create the same user twice");
+        }
+        catch (Throwable exception)
+        {
+            // Ignore as we where expecting an exception
+        }        
+    }
 
+    public void testCreateUsersMultiThreaded()
+    {
+        String userName = "user" + Long.toString(System.currentTimeMillis());
+        
+        CreateUser createUser1 = new CreateUser(userName, AuthenticationUtils.getAuthenticationDetails());
+        CreateUser createUser2 = new CreateUser(userName, AuthenticationUtils.getAuthenticationDetails());
+        CreateUser createUser3 = new CreateUser(userName, AuthenticationUtils.getAuthenticationDetails());
+        
+        createUser1.start();
+        createUser2.start();
+        createUser3.start();
+        
+       // try {createUser1.join();} catch (InterruptedException e) {}
+        
+        
+        
+        System.out.println("testCreateUsersMultiThreaded: " + userName);
+    }
+    
+    private class CreateUser extends Thread
+    {
+        private String userName;
+        private AuthenticationDetails authenticationDetails;
+        
+        public CreateUser(String userName, AuthenticationDetails authenticationDetails)
+        {
+            this.userName = userName;
+            this.authenticationDetails = authenticationDetails;
+        }
+        
+        public void run()
+        {
+            try
+            {
+                // Set the ticket up for this thread
+                AuthenticationUtils.setAuthenticationDetails(this.authenticationDetails);
+                
+                // Get the details of the new user
+                String homeFolder = store.getScheme() + "://" + store.getAddress() + "/" + folderReference.getUuid();
+                NewUserDetails[] newUsers = new NewUserDetails[] 
+                {
+                        new NewUserDetails(
+                                this.userName, 
+                                "password",
+                                createPersonProperties( homeFolder, 
+                                                        "first" + this.userName, 
+                                                        "middle" + this.userName, 
+                                                        "last" + this.userName, 
+                                                        "email" + this.userName, 
+                                                        "org" + this.userName))
+                };
+                
+                // Create the new users
+                WebServiceFactory.getAdministrationService().createUsers(newUsers);
+                
+                System.out.println("Creating user in thread: " + this.userName);
+            }
+            catch (Exception exception)
+            {
+                exception.printStackTrace();
+                throw new RuntimeException("Unable to creat user in thread", exception);
+            }
+        }
+    }
+    
 }

@@ -255,8 +255,17 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
    public void testContentUploadServlet()
        throws Exception
    {
-       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/test.jpg");
-       File testFile = File.createTempFile("testImage", ".jpg");
+       uploadContentViaServlet("org/alfresco/webservice/test/resources/test.jpg", "test", "jpg");
+       uploadContentViaServlet("org/alfresco/webservice/test/resources/testUpload.txt", "testUpload", "txt");
+       uploadContentViaServlet("org/alfresco/webservice/test/resources/propertymodel.xml", "propertyModel", "xml");
+       uploadContentViaServlet("org/alfresco/webservice/test/resources/test.jpg", "name#with#es#in", "jpg");
+   }
+  
+   public void uploadContentViaServlet(String filePath, String fileName, String fileExtension)
+       throws Exception
+    {
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream(filePath);
+       File testFile = File.createTempFile(fileName, "." + fileExtension);
        FileOutputStream fos = new FileOutputStream(testFile);
        ContentUtils.copy(viewStream, fos);
        viewStream.close();
@@ -275,7 +284,7 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
        parentRef.setChildName(Constants.ASSOC_CHILDREN);
        
-       String myFile = "test.jpg";
+       String myFile = fileName + "." + fileExtension;
        
        // Create the content
        NamedValue[] properties = new NamedValue[]
@@ -293,8 +302,11 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        assertNotNull(contents);
        assertEquals(1, contents.length);
        Content content = contents[0];
-       File tempFile = File.createTempFile("testText", ".jpg");
+       File tempFile = File.createTempFile(fileName, "." + fileExtension);
+       System.out.println("url: " + content.getUrl());
        System.out.println(tempFile.getPath());
        ContentUtils.copyContentToFile(content, tempFile);
-   }
+    }
+   
+   
 }

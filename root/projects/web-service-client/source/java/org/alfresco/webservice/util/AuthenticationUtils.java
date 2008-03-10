@@ -117,6 +117,11 @@ public class AuthenticationUtils implements CallbackHandler
         }
     }
     
+    /**
+     * Get the ticket for the current authentication details on the current thread
+     * 
+     * @return  String  the ticket
+     */
     public static String getTicket()
     {
         String result = null;
@@ -128,9 +133,24 @@ public class AuthenticationUtils implements CallbackHandler
         return result;
     }
     
+    /**
+     * Get the authentication details for the current thread
+     * 
+     * @return  the authentication details
+     */
     public static AuthenticationDetails getAuthenticationDetails()
     {
         return AuthenticationUtils.authenticationDetails.get();
+    }
+    
+    /**
+     * Manually set the authentication details for the current thread
+     * 
+     * @param authenticationDetails     the authentication details
+     */
+    public static void setAuthenticationDetails(AuthenticationDetails authenticationDetails)
+    {
+        AuthenticationUtils.authenticationDetails.set(authenticationDetails);
     }
     
     /**
@@ -162,7 +182,7 @@ public class AuthenticationUtils implements CallbackHandler
     /**
      * Gets the engine configuration used to create the web service references
      * 
-     * @return
+     * @return  EngineConfiguration     the engine configuration
      */
     public static EngineConfiguration getEngineConfiguration()
     {

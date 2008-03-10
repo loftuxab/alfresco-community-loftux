@@ -101,7 +101,7 @@ public class ContentReadAndWrite extends SamplesBase
             
             // Upload binary content into the repository
             Reference reference = Query1.executeSearch();
-            ParentReference parentReference = new ParentReference(reference.getStore(), reference.getUuid(), null, ASSOC_CONTAINS, ASSOC_CONTAINS);
+            ParentReference parentReference = new ParentReference(reference.getStore(), reference.getUuid(), null, ASSOC_CONTAINS, "{" + Constants.NAMESPACE_CONTENT_MODEL + "}test.jpg");
             
             // Create the content
             NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, "test.jpg")};
@@ -140,14 +140,18 @@ public class ContentReadAndWrite extends SamplesBase
     public static Reference createNewContent(ContentServiceSoapBindingStub contentService, String name, String contentString) 
         throws Exception
     {
+        // Update name
+        name = System.currentTimeMillis() + "_" + name;
+        
         // Create a parent reference, this contains information about the association we are createing to the new content and the
         // parent of the new content (the space retrived from the search)
-        ParentReference parentReference = new ParentReference(STORE, null, "/app:company_home/cm:sample_folder" ,ASSOC_CONTAINS, ASSOC_CONTAINS);
+        ParentReference parentReference = new ParentReference(STORE, null, "/app:company_home/cm:sample_folder", ASSOC_CONTAINS, 
+                "{" + Constants.NAMESPACE_CONTENT_MODEL + "}" + name);
         
         // Define the content format for the content we are adding
         ContentFormat contentFormat = new ContentFormat("text/plain", "UTF-8");
         
-        NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, System.currentTimeMillis() + "_" + name)};
+        NamedValue[] properties = new NamedValue[]{Utils.createNamedValue(Constants.PROP_NAME, name)};
         CMLCreate create = new CMLCreate("1", parentReference, null, null, null, Constants.TYPE_CONTENT, properties);
         CML cml = new CML();
         cml.setCreate(new CMLCreate[]{create});

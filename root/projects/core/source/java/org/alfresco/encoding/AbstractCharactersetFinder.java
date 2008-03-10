@@ -71,7 +71,7 @@ public abstract class AbstractCharactersetFinder implements CharactersetFinder
         // Only support marking streams
         if (!is.markSupported())
         {
-            throw new IllegalArgumentException("The InputStream must support marks");
+            throw new IllegalArgumentException("The InputStream must support marks.  Wrap the stream in a BufferedInputStream.");
         }
         try
         {
