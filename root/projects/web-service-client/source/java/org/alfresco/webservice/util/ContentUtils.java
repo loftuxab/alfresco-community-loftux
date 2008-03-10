@@ -118,9 +118,14 @@ public class ContentUtils
  
         try
         {
-            // Connect to donwload servlet            
+            // Create the url connection to the download servlet            
             URL url = new URL(strUrl);
             URLConnection conn = url.openConnection();
+            
+            // Set the cookie information
+            conn.setRequestProperty("Cookie", "JSESSIONID=" + AuthenticationUtils.getAuthenticationDetails().getSessionId() + ";");
+            
+            // Return the input stream
             return conn.getInputStream();
         }
         catch (Exception exception)
@@ -188,6 +193,7 @@ public class ContentUtils
             }
             
             String request = "PUT " + url + " HTTP/1.1\n" +
+                          "Cookie: JSESSIONID=" + AuthenticationUtils.getAuthenticationDetails().getSessionId() + ";\n" + 
                           "Content-Length: " + file.length() + "\n" +
                           "Host: " + host + ":" + port + "\n" +
                           "Connection: Keep-Alive\n" +
