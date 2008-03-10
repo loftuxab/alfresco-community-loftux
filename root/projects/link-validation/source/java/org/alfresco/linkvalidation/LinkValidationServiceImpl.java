@@ -51,8 +51,8 @@ import javax.net.ssl.SSLException;
 import org.alfresco.config.JNDIConstants;
 import org.alfresco.filter.CacheControlFilter;
 import org.alfresco.mbeans.VirtServerRegistry;
-import org.alfresco.repo.admin.RepoServerMgmt;
 import org.alfresco.repo.admin.patch.impl.WCMFoldersPatch;
+import org.alfresco.repo.admin.RepoServerMgmt;
 import org.alfresco.repo.attributes.Attribute;
 import org.alfresco.repo.attributes.BooleanAttributeValue;
 import org.alfresco.repo.attributes.IntAttributeValue;
@@ -68,15 +68,16 @@ import org.alfresco.repo.domain.PropertyValue;
 import org.alfresco.repo.transaction.RetryingTransactionHelper;
 import org.alfresco.sandbox.SandboxConstants;
 import org.alfresco.service.cmr.attributes.AttrAndQuery;
+import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.attributes.AttrQueryGTE;
 import org.alfresco.service.cmr.attributes.AttrQueryLTE;
-import org.alfresco.service.cmr.attributes.AttributeService;
 import org.alfresco.service.cmr.avm.AVMException;
 import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
 import org.alfresco.service.cmr.avm.AVMNotFoundException;
 import org.alfresco.service.cmr.avmsync.AVMDifference;
 import org.alfresco.service.cmr.avmsync.AVMSyncService;
 import org.alfresco.service.cmr.remote.AVMRemote;
+import org.alfresco.repo.security.authentication.AuthenticationComponent;
 import org.alfresco.service.namespace.QName;
 import org.alfresco.util.MD5;
 import org.alfresco.util.NameMatcher;
@@ -194,6 +195,8 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     LinkValidationStoreCallbackHandler    store_latest_version_info_;
     HashMap<String,Pair<Integer,Integer>> webapp_asset_count_info_;
 
+    AuthenticationComponent     auth_component_;
+
     int local_connect_timeout_  = 10000;
     int remote_connect_timeout_ = 10000;
     int local_read_timeout_     = 30000;
@@ -223,6 +226,12 @@ public class LinkValidationServiceImpl implements LinkValidationService,
     
     
     public LinkValidationServiceImpl() { }
+
+
+    public void setAuthenticationComponent( AuthenticationComponent auth_component)
+    { 
+        auth_component_ = auth_component;
+    }
 
     public void setAttributeService(AttributeService svc) { attr_ = svc; }
     public AttributeService getAttributeService()         { return attr_;}
@@ -399,13 +408,14 @@ public class LinkValidationServiceImpl implements LinkValidationService,
         // an attempt to fetch the "patch.wcmFolders" will fail, indicating
         // that there's no need to run the link validation service.
 
+        ApplicationContext springContext = null;
+
         try
         {
-            ApplicationContext springContext =
-               RawServices.Instance().getContext();
-
+            springContext = RawServices.Instance().getContext();
             WCMFoldersPatch  has_wcm =
                 (WCMFoldersPatch)  springContext.getBean("patch.wcmFolders");
+
         }
         catch ( NoSuchBeanDefinitionException e)        // WCM is not installed
         {                                               // so there's no need for
@@ -415,6 +425,19 @@ public class LinkValidationServiceImpl implements LinkValidationService,
 
             return;                                     // terminate service
         }
+
+        try                                                 // The validator
+        {                                                   // must have auth to
+            auth_component_.setSystemUserAsCurrentUser();   // look see all, so
+        }                                                   // run as system.
+        catch (Exception e)
+        {
+            if ( log.isErrorEnabled() )                 // LinkValidationService
+                log.error( "LinkValidationService disabled: " + e.getMessage());
+
+            return;
+        }
+
 
         // Register transaction callbacks to build a cache that helps to
         // avoid unnecesary calls to the real AVM getLatestSnapshotID().

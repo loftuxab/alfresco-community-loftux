@@ -73,7 +73,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-juh-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-jurt-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/devenv/mysql-connector-java-5.0.3-bin.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/poi-2.5.1_patched.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/poi-3.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-ridl-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-sandbox-2.0.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/openoffice/openoffice-unoil-2.0.3.jar"/>

@@ -148,6 +148,17 @@ public class SpringAwareUserTransaction
         this.timeout = timeout;
     }
     
+    @Override
+    public String toString()
+    {
+        StringBuilder sb = new StringBuilder(256);
+        sb.append("UserTransaction")
+          .append("[object=").append(super.toString())
+          .append(", status=").append(internalStatus)
+          .append("]");
+        return sb.toString();
+    }
+
     /**
      * This class carries all the information required to fullfil requests about the transaction
      * attributes.  It acts as a source of the transaction attributes.
