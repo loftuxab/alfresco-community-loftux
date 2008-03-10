@@ -799,7 +799,7 @@
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/ehcache-1.3.0-patched.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="**/jug.jar" />
+                  includes="**/jug-lgpl-2.0.0.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="**/commons/commons-logging-1.1.jar" />
          <fileset dir="${dir.project.3rdparty.lib}" 
