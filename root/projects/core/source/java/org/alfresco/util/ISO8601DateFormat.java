@@ -106,6 +106,7 @@ public class ISO8601DateFormat
      * 
      * @param isoDate  ISO string to parse
      * @return  the date
+     * @throws AlfrescoRuntimeException         if the parse failed
      */
     public static Date parse(String isoDate)
     {

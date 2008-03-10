@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * As a special exception to the terms and conditions of version 2.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's
+ * FLOSS exception.  You should have recieved a copy of the text describing
+ * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing
  */
 
@@ -40,17 +40,17 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
      * The name of the file.
      */
     private String fName;
-    
+
     /**
      * The type of the file.
      */
     private FileType fType;
-    
+
     /**
      * The GUID of the file.
      */
     private String fGUID;
-    
+
     /**
      * Create a new one.
      * @param name
@@ -63,17 +63,17 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
         fType = type;
         fGUID = guid;
     }
-    
+
     public String getName()
     {
         return fName;
     }
-    
+
     public FileType getType()
     {
         return fType;
     }
-    
+
     public String getGUID()
     {
         return fGUID;
@@ -83,7 +83,7 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
     {
         fGUID = guid;
     }
-    
+
     /* (non-Javadoc)
      * @see java.lang.Object#equals(java.lang.Object)
      */
@@ -99,7 +99,7 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
             return false;
         }
         FileDescriptor other = (FileDescriptor)obj;
-        return fName.equals(other.fName);
+        return fName.equalsIgnoreCase(other.fName);
     }
 
     /* (non-Javadoc)
@@ -133,6 +133,6 @@ public class FileDescriptor implements Serializable, Comparable<FileDescriptor>
      */
     public int compareTo(FileDescriptor o)
     {
-        return fName.compareTo(o.fName);
+        return fName.compareToIgnoreCase(o.fName);
     }
 }
