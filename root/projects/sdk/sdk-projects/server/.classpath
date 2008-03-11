@@ -87,7 +87,7 @@
 	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-pool-1.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/jooconverter-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/cglib-nodep-2.2_beta1.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.2.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/hibernate-3.2.1-patched.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/lucene-core-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/lucene-analyzers-2.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/lucene-snowball-2.1.0.jar"/>
