@@ -62,8 +62,8 @@ public class DefaultRpcAuthenticator implements RpcAuthenticator {
         int nameLen = rpc.unpackInt();
         rpc.skipBytes(nameLen);
 
-        int gid = rpc.unpackInt();
         int uid = rpc.unpackInt();
+        int gid = rpc.unpackInt();
 
         //	Check if the Unix authentication session table is valid
 
