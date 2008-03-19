@@ -101,6 +101,15 @@ No
 InstallVersion
 2.1.0.0
 
+JMX_CONTROLROLE_PWD
+{}
+
+JMX_MONITORROLE_PWD
+{}
+
+JmxDir
+<%InstallDir%>/tomcat/webapps/alfresco/WEB-INF/classes/alfresco
+
 Language,de
 Yes
 
@@ -232,6 +241,7 @@ SetupType ::59E63DF9-10CA-4FFB-9B2A-BC39AE7E3C8B -setup Install -active Yes -pla
 SetupType ::59E90CC6-868F-4E23-96B4-DC9B97B360A9 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Open Office} -parent SetupTypes
 SetupType ::F6E7576B-4961-4945-A170-9A29E9901685 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {Tomcat Port} -parent SetupTypes
 SetupType ::FDD67AB1-D37F-47ED-B20C-A9B8DB5267DF -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {RMI Port} -parent SetupTypes
+SetupType ::A94E00BE-935C-4163-20DF-2D3C9D6B47C0 -setup Install -active Yes -platforms {AIX-ppc FreeBSD-4-x86 FreeBSD-x86 HPUX-hppa Linux-x86 Solaris-sparc Windows} -name {JMX Access} -parent SetupTypes
 
 InstallComponent 3DF0B70C-AD68-4F74-9D20-726FFC704CC3 -setup Install -type pane -title {Welcome Screen} -component Welcome -active Yes -parent StandardInstall
 InstallComponent DEAC32B9-E63E-48B0-9000-58F681A0D075 -setup Install -type pane -conditions {18BF318D-79DD-4ECC-A3CC-660D6CE59DBA F0CFEF8A-7B22-4FCC-A3FB-33D4B73A6C60} -title {Select Destination} -component SelectDestination -command insert -active Yes -parent StandardInstall
@@ -251,11 +261,13 @@ InstallComponent F2AF707B-71F2-48F2-A1F4-E434AD016F45 -setup Install -type actio
 Condition AC1A36E8-2F53-4D47-99C7-63626FB97911 -active Yes -parent F2AF707B-71F2-48F2-A1F4-E434AD016F45 -title {String Equal Condition} -component StringEqualCondition
 InstallComponent 46404B68-7E6A-47A3-A343-202DE66EF235 -setup Install -type action -conditions 232F32EF-474A-4D1E-B34E-46E159881BEF -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent FC6496F5-A6F3-4739-8446-FB439C8221B9
 Condition 232F32EF-474A-4D1E-B34E-46E159881BEF -active Yes -parent 46404B68-7E6A-47A3-A343-202DE66EF235 -title {String Equal Condition} -component StringEqualCondition
+InstallComponent B2DF5A2B-4112-7420-40CD-6C5F5FB45E76 -setup Install -type action -conditions 07477B51-EAD3-DCFE-6FB6-9C0BBB442A4F -title {Set Virtual Text} -component SetVirtualText -command insert -active Yes -parent FC6496F5-A6F3-4739-8446-FB439C8221B9
+Condition 07477B51-EAD3-DCFE-6FB6-9C0BBB442A4F -active Yes -parent B2DF5A2B-4112-7420-40CD-6C5F5FB45E76 -title {String Equal Condition} -component StringEqualCondition
 InstallComponent ED94D4CD-9DB6-4EEF-ACD7-2C7CB89204C5 -setup Install -type action -conditions 03EE9914-87E0-4B9C-BA3A-C71BADEC1FAC -title {Execute Action} -component ExecuteAction -command insert -active Yes -parent FC6496F5-A6F3-4739-8446-FB439C8221B9
 Condition 03EE9914-87E0-4B9C-BA3A-C71BADEC1FAC -active Yes -parent ED94D4CD-9DB6-4EEF-ACD7-2C7CB89204C5 -title {String Equal Condition} -component StringEqualCondition
 InstallComponent 6C5D6843-62DA-44BB-AC96-04FCEA01778A -setup Install -type pane -conditions 166EE61A-F55E-4312-8A05-165FBC71A182 -title {Select Database} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 166EE61A-F55E-4312-8A05-165FBC71A182 -active Yes -parent 6C5D6843-62DA-44BB-AC96-04FCEA01778A -title {String Is Condition} -component StringIsCondition
-InstallComponent 3F2D68D0-5B6C-4E0B-B9B9-C9446D81938B -setup Install -type pane -conditions {42981C52-27D4-49A6-A10A-4667C8655389 7083A026-70FA-44F8-8862-91D77E2943EA 77EA0EF4-4F79-42F6-9C61-003D970B44C4} -title {Database Config} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
+InstallComponent 3F2D68D0-5B6C-4E0B-B9B9-C9446D81938B -setup Install -type pane -conditions {42981C52-27D4-49A6-A10A-4667C8655389 7083A026-70FA-44F8-8862-91D77E2943EA 77EA0EF4-4F79-42F6-9C61-003D970B44C4} -title {Database Config} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition 42981C52-27D4-49A6-A10A-4667C8655389 -active Yes -parent 3F2D68D0-5B6C-4E0B-B9B9-C9446D81938B -title {String Is Condition} -component StringIsCondition
 Condition 7083A026-70FA-44F8-8862-91D77E2943EA -active Yes -parent 3F2D68D0-5B6C-4E0B-B9B9-C9446D81938B -title {Execute Script Condition} -component ExecuteScriptCondition
 Condition 77EA0EF4-4F79-42F6-9C61-003D970B44C4 -active Yes -parent 3F2D68D0-5B6C-4E0B-B9B9-C9446D81938B -title {Execute Script Condition} -component ExecuteScriptCondition
@@ -268,9 +280,11 @@ Condition 5888225B-DD26-4EF1-90F9-0508DDBE0D5C -active Yes -parent 9D32E8EB-5195
 InstallComponent C89B2458-A96B-4399-A74E-E525BBCB659D -setup Install -type pane -conditions {D13A47F2-44A5-4B64-A92E-9DF656474E22 336969F7-2B84-4428-A64A-B890EC608FC4} -title {Set Tomcat Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
 Condition D13A47F2-44A5-4B64-A92E-9DF656474E22 -active Yes -parent C89B2458-A96B-4399-A74E-E525BBCB659D -title {String Is Condition} -component StringIsCondition
 Condition 336969F7-2B84-4428-A64A-B890EC608FC4 -active Yes -parent C89B2458-A96B-4399-A74E-E525BBCB659D -title {Port Test Condition} -component PortTestCondition
-InstallComponent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -setup Install -type pane -conditions {7EB2F573-3B51-46A0-A3B9-14B58B030A71 0D426F75-DDD9-4653-B57E-4B95137086BF} -title {Set Rmi Port} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+InstallComponent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -setup Install -type pane -conditions {7EB2F573-3B51-46A0-A3B9-14B58B030A71 0D426F75-DDD9-4653-B57E-4B95137086BF} -title {Set Rmi Port} -component CustomBlankPane2 -command reorder -active Yes -parent StandardInstall
 Condition 7EB2F573-3B51-46A0-A3B9-14B58B030A71 -active Yes -parent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -title {String Is Condition} -component StringIsCondition
 Condition 0D426F75-DDD9-4653-B57E-4B95137086BF -active Yes -parent 58DBE5C1-8F57-49EE-8CC8-1203885300ED -title {Port Test Condition} -component PortTestCondition
+InstallComponent 8E3926B9-D3BB-3572-A31E-1A158E404977 -setup Install -type pane -conditions AE10640A-FA7F-C848-A4E7-440814C76298 -title {Set JMX Access} -component CustomBlankPane2 -command insert -active Yes -parent StandardInstall
+Condition AE10640A-FA7F-C848-A4E7-440814C76298 -active Yes -parent 8E3926B9-D3BB-3572-A31E-1A158E404977 -title {String Is Condition} -component StringIsCondition
 InstallComponent 61F2C13B-6CF2-4D61-82A6-574B7965CD5B -setup Install -type pane -title {Setup Complete} -component SetupComplete -active Yes -parent StandardInstall
 InstallComponent 014ED041-C921-4C1E-98D7-3E18CB93C17E -setup Install -type action -title Exit -component Exit -active Yes -parent 61F2C13B-6CF2-4D61-82A6-574B7965CD5B
 InstallComponent 291AD3B8-FA65-4C8E-97D6-C5284F697F8E -setup Install -type pane -title {Custom Blank Pane 1} -component CustomBlankPane1 -active Yes -parent StandardInstall
@@ -296,12 +310,14 @@ InstallComponent B8AB2B19-EBB2-409C-BDA6-7616CC23F67C -setup Install -type actio
 InstallComponent E34E15B4-3E61-457D-BC32-CC56DC24439C -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
 InstallComponent 33253D59-DB0A-4AA5-8CEC-7FA37D61974A -setup Install -type action -title {Copy File} -component CopyFile -command reorder -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
 InstallComponent 6CFF73F2-3F6F-490F-BDB0-AC0C96174072 -setup Install -type action -title {Copy File} -component CopyFile -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
-InstallComponent 72C3D10E-3A28-422E-B8EE-8EA8E458081F -setup Install -type action -conditions 180E43F0-38E9-4620-AE74-65D6653B8C28 -title {Copy File} -component CopyFile -command insert -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
+InstallComponent 72C3D10E-3A28-422E-B8EE-8EA8E458081F -setup Install -type action -conditions 180E43F0-38E9-4620-AE74-65D6653B8C28 -title {Copy File} -component CopyFile -command reorder -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
 Condition 180E43F0-38E9-4620-AE74-65D6653B8C28 -active Yes -parent 72C3D10E-3A28-422E-B8EE-8EA8E458081F -title {File Exists Condition} -component FileExistsCondition
 InstallComponent 0FDD1551-6DDC-4366-8FBF-F808E62D2DAF -setup Install -type action -conditions BB7365D4-CC76-40F2-96F9-418601CF223F -title {Copy File} -component CopyFile -command insert -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
 Condition BB7365D4-CC76-40F2-96F9-418601CF223F -active Yes -parent 0FDD1551-6DDC-4366-8FBF-F808E62D2DAF -title {File Exists Condition} -component FileExistsCondition
-InstallComponent 0593F48B-B63B-48C9-A14A-89414961DB21 -setup Install -type action -conditions 88FF09F8-FEFC-488B-BE2D-1B2A29DABD93 -title {Copy File} -component CopyFile -command insert -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
+InstallComponent 0593F48B-B63B-48C9-A14A-89414961DB21 -setup Install -type action -conditions 88FF09F8-FEFC-488B-BE2D-1B2A29DABD93 -title {Copy File} -component CopyFile -command reorder -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
 Condition 88FF09F8-FEFC-488B-BE2D-1B2A29DABD93 -active Yes -parent 0593F48B-B63B-48C9-A14A-89414961DB21 -title {File Exists Condition} -component FileExistsCondition
+InstallComponent E49E2E0E-CF72-1B8F-DB41-FFBFB4520B79 -setup Install -type action -conditions CBADD1B2-9DFB-0C3E-D7B0-F006CBCE04F1 -title {Copy File} -component CopyFile -command reorder -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
+Condition CBADD1B2-9DFB-0C3E-D7B0-F006CBCE04F1 -active Yes -parent E49E2E0E-CF72-1B8F-DB41-FFBFB4520B79 -title {File Exists Condition} -component FileExistsCondition
 InstallComponent 9140BCB6-87AD-0FB4-4F19-B9A2007ECCF1 -setup Install -type action -conditions {D2876A35-EF7D-7154-BE1E-234CD7129C63 FBAF6BDB-94B4-F8C2-3414-838B3871DDDE} -title {Get Java Property} -component GetJavaProperty -command insert -active Yes -parent DD999A7A-B4A5-440D-82C8-A4597E826907
 Condition D2876A35-EF7D-7154-BE1E-234CD7129C63 -active Yes -parent 9140BCB6-87AD-0FB4-4F19-B9A2007ECCF1 -title {File Exists Condition} -component FileExistsCondition
 Condition FBAF6BDB-94B4-F8C2-3414-838B3871DDDE -active Yes -parent 9140BCB6-87AD-0FB4-4F19-B9A2007ECCF1 -title {String Is Condition} -component StringIsCondition
@@ -376,12 +392,14 @@ InstallComponent 8D959A0E-D54F-4AB9-8F4D-B6FE95BB0046 -setup Install -type actio
 InstallComponent C5AF6C1C-ED5D-498B-BFAD-9FE6029BB1C9 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent B4E6B710-65AF-4E4F-93C0-CB3D380C1D2E
 InstallComponent E6EE64D3-EA05-4D30-81F0-57F122417DBD -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent B4E6B710-65AF-4E4F-93C0-CB3D380C1D2E
 InstallComponent E27D2D0E-3498-4A3F-974A-4DF16D6FBB8C -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent B4E6B710-65AF-4E4F-93C0-CB3D380C1D2E
+InstallComponent 6B0A0900-426A-5902-FE3B-461E70CAC7A9 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent B4E6B710-65AF-4E4F-93C0-CB3D380C1D2E
 InstallComponent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83 -setup Install -type actiongroup -title {Reset all options} -active Yes -parent ActionGroupsInstall
 InstallComponent 3C1D43C6-2209-4F75-980E-FFBBDCC18E20 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83
 InstallComponent F616439A-D896-46A8-834D-E2F12D8105B7 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83
 InstallComponent 39AE5DEF-DB95-4E61-89AD-10E7A741D25A -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83
 InstallComponent 38E221E0-9729-4E35-B246-889D75ADF8C2 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83
 InstallComponent 165A2891-8C44-4FC8-BECF-5797E074CB28 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83
+InstallComponent 095A8A72-CC44-EE52-A2ED-70D5EDF459F9 -setup Install -type action -title {Set Virtual Text} -component SetVirtualText -active Yes -parent 8FC6A26C-F1BD-44C6-A12E-CBA7BBB00B83
 InstallComponent 1AD6F40B-80FA-42F9-82F4-5588F2E76899 -setup Uninstall -type pane -title Uninstall -component Uninstall -active Yes -parent StandardUninstall
 InstallComponent 3F403A99-9218-46F0-B3FC-C9EE8AE6BF25 -setup Uninstall -type action -title {Modify Widget} -component ModifyWidget -active Yes -parent 1AD6F40B-80FA-42F9-82F4-5588F2E76899
 InstallComponent 7C729B52-4BF9-4A3C-BF95-2ECA2A6923BD -setup Uninstall -type action -title {Execute Action} -component ExecuteAction -active Yes -parent 1AD6F40B-80FA-42F9-82F4-5588F2E76899
@@ -460,6 +478,24 @@ All
 06981FE9-C6BC-45E4-AD0A-B82BB70E8CBC,Script
 {set options {1 2 3 4}
 return [expr {[lsearch -exact $options <%DatabaseOption%>] > -1}]}
+
+07477B51-EAD3-DCFE-6FB6-9C0BBB442A4F,CheckCondition
+{Before Action is Executed}
+
+07477B51-EAD3-DCFE-6FB6-9C0BBB442A4F,String1
+<%InstallType%>
+
+07477B51-EAD3-DCFE-6FB6-9C0BBB442A4F,String2
+{JMX Access}
+
+095A8A72-CC44-EE52-A2ED-70D5EDF459F9,Conditions
+{0 conditions}
+
+095A8A72-CC44-EE52-A2ED-70D5EDF459F9,Value
+false
+
+095A8A72-CC44-EE52-A2ED-70D5EDF459F9,VirtualText
+SetJmxAccess
 
 0B9EBC1D-90E4-42FB-B9BF-7EBD31953D10,CheckCondition
 {Before Action is Executed}
@@ -1099,6 +1135,15 @@ file rename -force <%ALF_DATA%> <%dirname%>
 6B087FEB-B3DC-4B73-B230-5BAF3C0B6FB2,VirtualText
 InstallDir
 
+6B0A0900-426A-5902-FE3B-461E70CAC7A9,Conditions
+{0 conditions}
+
+6B0A0900-426A-5902-FE3B-461E70CAC7A9,Value
+true
+
+6B0A0900-426A-5902-FE3B-461E70CAC7A9,VirtualText
+SetJmxAccess
+
 6C5D6843-62DA-44BB-AC96-04FCEA01778A,Active
 Yes
 
@@ -1250,7 +1295,7 @@ if\ \{<%ALF_DB%>\ eq\ \"postgresql\"\}\ \{\n\ \ \ set\ cmd\ \[list\ source\ \[fi
 {0 conditions}
 
 79590A21-FFDA-46DC-B803-83C9245EFB82,Files
-{<%ExtensionDir%>/custom-repository.properties;<%ExtensionDir%>/custom-hibernate-dialect.properties;<%BootstrapDir%>/openoffice-startup-context.xml;<%TomcatPortConfig%>/server.xml;<%RmiPortConfig%>/clt-context.xml;<%RmiPortConfig%>/web-client-config-wcm.xml;<%RmiPortConfig%>/remote-avm-test-context.xml;<%InstallDir%>/alfresco.sh;<%InstallDir%>/start_oo.sh;<%InstallDir%>/alf_start.sh;<%InstallDir%>/alf_stop.sh;}
+{<%ExtensionDir%>/custom-repository.properties;<%ExtensionDir%>/custom-hibernate-dialect.properties;<%BootstrapDir%>/openoffice-startup-context.xml;<%TomcatPortConfig%>/server.xml;<%RmiPortConfig%>/clt-context.xml;<%RmiPortConfig%>/web-client-config-wcm.xml;<%RmiPortConfig%>/remote-avm-test-context.xml;<%InstallDir%>/alfresco.sh;<%InstallDir%>/start_oo.sh;<%InstallDir%>/alf_start.sh;<%InstallDir%>/alf_stop.sh;<%JmxDir%>/alfresco-jmxrmi.password;}
 
 79590A21-FFDA-46DC-B803-83C9245EFB82,LineFeed
 Unix
@@ -1266,7 +1311,9 @@ Unix
 "@@ALF_DBNAME@@" "<%Databasename%>"
 "@@ALF_DB_USERNAME@@" "<%ALF_DB_USERNAME%>"
 "@@ALF_DB_PASSWORD@@" "<%ALF_DB_PASSWORD%>"
-"@@ALFRESCO_DIR@@" "<%InstallDir%>"}
+"@@ALFRESCO_DIR@@" "<%InstallDir%>"
+"@@JMX_MONITORROLE_PWD@@" "<%JMX_MONITORROLE_PWD%>"
+"@@JMX_CONTROLROLE_PWD@@" "<%JMX_CONTROLROLE_PWD%>"}
 
 7AE4A6A3-E0FC-4410-AC00-0A0A4C86F9F4,Conditions
 {0 conditions}
@@ -1353,6 +1400,33 @@ true
 
 8D959A0E-D54F-4AB9-8F4D-B6FE95BB0046,VirtualText
 SetContent
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Active
+Yes
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,BackButton,subst
+1
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,CancelButton,subst
+1
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Caption,subst
+1
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Conditions
+{1 condition}
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Message,subst
+1
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,NextButton,subst
+1
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Subtitle,subst
+1
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Title,subst
+1
 
 8F60B26E-E3C6-4A5C-8F28-24C6C9FEF0F4,Conditions
 {0 conditions}
@@ -1586,6 +1660,12 @@ A8E5D6B1-BCE1-4748-8FEF-7A3904EE6CF9,Action
 A8E5D6B1-BCE1-4748-8FEF-7A3904EE6CF9,Conditions
 {0 conditions}
 
+A94E00BE-935C-4163-20DF-2D3C9D6B47C0,Description,subst
+1
+
+A94E00BE-935C-4163-20DF-2D3C9D6B47C0,Name
+{JMX Access}
+
 AC1A36E8-2F53-4D47-99C7-63626FB97911,CheckCondition
 {Before Action is Executed}
 
@@ -1594,6 +1674,9 @@ AC1A36E8-2F53-4D47-99C7-63626FB97911,String1
 
 AC1A36E8-2F53-4D47-99C7-63626FB97911,String2
 {Tomcat Port}
+
+AE10640A-FA7F-C848-A4E7-440814C76298,String
+<%SetJmxAccess%>
 
 AEF6F111-401A-4A75-BC7D-762CFAD4D483,Alias
 {Console OO Actions}
@@ -1662,6 +1745,18 @@ if {[string is integer -strict <%DatabaseOption%>]
     && <%DatabaseOption%> >= 1 && <%DatabaseOption%> <= 4} {
     set ::info(ALF_DB) [lindex $dbs [expr {<%DatabaseOption%> - 1}]]
 }}
+
+B2DF5A2B-4112-7420-40CD-6C5F5FB45E76,Conditions
+{1 condition}
+
+B2DF5A2B-4112-7420-40CD-6C5F5FB45E76,ExecuteAction
+{Before Next Pane is Displayed}
+
+B2DF5A2B-4112-7420-40CD-6C5F5FB45E76,Value
+true
+
+B2DF5A2B-4112-7420-40CD-6C5F5FB45E76,VirtualText
+SetJmxAccess
 
 B4E1B4A5-44A7-299F-F9C3-28AA9F0893A2,CheckCondition
 {Before Action is Executed}
@@ -1819,6 +1914,12 @@ CA5F552B-5576-4E4F-9C77-B66E8B775BDF,Comment
 CA5F552B-5576-4E4F-9C77-B66E8B775BDF,Script
 {[llength [SetupTypes children]] > 1}
 
+CBADD1B2-9DFB-0C3E-D7B0-F006CBCE04F1,CheckCondition
+{Before Action is Executed}
+
+CBADD1B2-9DFB-0C3E-D7B0-F006CBCE04F1,Filename
+<%JmxDir%>/alfresco-jmxrmi.password
+
 CC865C64-9D19-471A-838E-5019EE6106A2,CheckCondition
 {Before Action is Executed}
 
@@ -1974,6 +2075,15 @@ E34E15B4-3E61-457D-BC32-CC56DC24439C,Destination
 
 E34E15B4-3E61-457D-BC32-CC56DC24439C,Source
 <%InstallDir%>/install_extension/custom-repository.properties.install
+
+E49E2E0E-CF72-1B8F-DB41-FFBFB4520B79,Conditions
+{1 condition}
+
+E49E2E0E-CF72-1B8F-DB41-FFBFB4520B79,Destination
+<%JmxDir%>/alfresco-jmxrmi.password
+
+E49E2E0E-CF72-1B8F-DB41-FFBFB4520B79,Source
+<%InstallDir%>/install_extension/alfresco-jmxrmi.password.install
 
 E6157F25-410C-4A0B-AFD0-F8F16188F0EF,CheckCondition
 {Before Action is Executed}
@@ -2696,6 +2806,18 @@ Only change the default value if you have an existing installation of OpenOffice
 8D22273E-A90E-4769-B0C7-577BC5E370D4,Message
 {}
 
+8E3926B9-D3BB-3572-A31E-1A158E404977,Caption
+{Password settings for Jmx access}
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Message
+{Set your passwords for Jmx access}
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Subtitle
+{Jmx access settings}
+
+8E3926B9-D3BB-3572-A31E-1A158E404977,Title
+{JMX Access Settings}
+
 8F60B26E-E3C6-4A5C-8F28-24C6C9FEF0F4,Message
 <%UninstallCompleteText%>
 
@@ -2745,6 +2867,9 @@ alf_rmiport=<%ALF_RMIPORT%>}
 
 9EDF0008-0A0F-46E1-AEF3-0FC215CB1D80,Description
 <%ProgramFilesDescription%>
+
+A94E00BE-935C-4163-20DF-2D3C9D6B47C0,Description
+{JMX Access Password Settings}
 
 B6716913-B00B-45AF-90F4-DB717B6DCB79,NextButton
 {<%Connect%> >}
