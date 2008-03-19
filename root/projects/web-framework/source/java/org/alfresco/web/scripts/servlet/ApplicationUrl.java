@@ -24,16 +24,8 @@
  */
 package org.alfresco.web.scripts.servlet;
 
-import java.io.IOException;
-import java.util.List;
-
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.web.scripts.SearchPath;
 import org.alfresco.web.scripts.Store;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
 
 /**
  * Application URL - matching and Page instance resolving.
@@ -42,143 +34,47 @@ import org.dom4j.io.SAXReader;
  */
 public class ApplicationUrl
 {
-   private SearchPath searchPath;
+   private Store store;
+   private String pageId = null;
 
-   public ApplicationUrl(SearchPath searchPath)
+   public ApplicationUrl(Store store)
    {
-      this.searchPath = searchPath;
+      this.store = store;
    }
 
    public boolean match(String resource)
    {
       // TODO: match against the supplied resource url - is it one of our URLs?
-      return false;
+      
+      // TODO: resolve the page id to lookup from the resource url - attach behaviour to do this?
+      //       for now we always "match" and there is a direct mapping between resource and page Id
+      this.pageId = resource;
+      
+      return true;
    }
 
    /**
-    * Resolve appropriate page definition from local store/repo store based on uri resource.
+    * Resolve appropriate page definition based on page id.
     * 
-    * @param resource
+    * @param pageId     The unique Id of the page instance to retrieve
     * 
     * @return PageInstance structure
     * 
-    * @exception AlfrescoRuntimeException if unable to locate Page for specified resource.
+    * @exception AlfrescoRuntimeException if unable to locate Page for specified page-id.
     */
-   public PageInstance getPageInstance(String resource)
+   public PageInstance getPageInstance()
    {
-      // TODO: Return from repo with details of template (either where to get it or the template
-      //       content itself) and the configuration of all ui components.
-      //       Add this data to the PageInstance structure that represents this page.
-      //       For now the SearchPath will lookup local page definitions in a basic folder structure.
-      // TODO: Decompose the resource url to lookup in correct store etc.
-      PageInstance page = null;
-      String pageDef = resource + ".xml";
-      for (Store store : searchPath.getStores())
+      // TODO: pre-load all documents from a store? i.e. store.getAllDocuments()?
+      //       the store should handle caching and remote refresh etc. as required...
+      String pageDef = pageId + ".xml";
+      
+      if (this.store.hasDocument(pageDef))
       {
-         if (store.hasDocument(pageDef))
-         {
-            // read config for this page instance
-            try
-            {
-               // parse page definition xml config file
-               // TODO: convert to pull parser to optimize (see importer ViewParser)
-               SAXReader reader = new SAXReader();
-               Document document = reader.read(store.getDocument(pageDef));
-
-               Element rootElement = document.getRootElement();
-               if (!rootElement.getName().equals("page"))
-               {
-                  throw new AlfrescoRuntimeException(
-                        "Expected 'page' root element in page definition config: " + pageDef);
-               }
-               String title = rootElement.elementTextTrim("title");
-               String description = rootElement.elementTextTrim("description");
-
-               Element templateElement = rootElement.element("template");
-               if (templateElement == null && templateElement.getTextTrim() == null)
-               {
-                  throw new AlfrescoRuntimeException(
-                        "No 'template' element found in page definition config: " + pageDef);
-               }
-               String templateName = templateElement.getTextTrim();
-
-               // create config object for this page and store template name for this page
-               page = new PageInstance(templateName);
-               page.setTitle(title);
-               page.setDescription(description);
-
-               // TODO: do we have default config? where does it come from?
-               // copy in component mappings from default config definitions first
-               //if (defaultPageDef != null)
-               //{
-               //   pageDef.Components.putAll(defaultPageDef.Components);
-               //}
-
-               // read the component defs for this page
-               Element componentsElements = rootElement.element("components");
-               if (componentsElements != null)
-               {
-                  for (Element ce : (List<Element>)componentsElements.elements("component"))
-                  {
-                     // read the mandatory component 'id' attribute
-                     String id = ce.attributeValue("id");
-                     if (id == null || id.length() == 0)
-                     {
-                        throw new AlfrescoRuntimeException(
-                              "A 'component' element is missing mandatory 'id' attribute in page definition config: " + pageDef);
-                     }
-
-                     // next check for the 'disabled' boolean attribute - used to disable components
-                     // that are specified in the default config - we don't need to read further
-                     /*String disabled = ce.attributeValue("disabled");
-                     if (disabled != null)
-                     {
-                        if (Boolean.parseBoolean(disabled) == true)
-                        {
-                           pageDef.Components.remove(id);
-                           continue;
-                        }
-                     }*/
-
-                     String url = ce.attributeValue("url");
-                     if (url == null || url.length() == 0)
-                     {
-                        throw new AlfrescoRuntimeException(
-                              "A 'component' element is missing mandatory 'url' attribute in page definition config: " + pageDef);
-                     }
-
-                     PageComponent component = new PageComponent(id, url);
-
-                     // store any additional component properties
-                     if (ce.element("properties") != null)
-                     {
-                        for (Element p : (List<Element>)ce.element("properties").elements())
-                        {
-                           component.getProperties().put(p.attributeValue("name"), p.getTextTrim());
-                        }
-                     }
-
-                     // add component mapping to the page definition
-                     page.getComponents().put(component.getId(), component);
-                  }
-               }
-            }
-            catch (IOException ioErr)
-            {
-               throw new AlfrescoRuntimeException("Failed to load page definition for page " + pageDef, ioErr);
-            }
-            catch (DocumentException docErr)
-            {
-               throw new AlfrescoRuntimeException("Failed to parse page definition for page " + pageDef, docErr);
-            }
-
-            break;
-         }
+         return new PageInstance(store, pageDef);
       }
-      if (page == null)
+      else
       {
-         throw new AlfrescoRuntimeException("Unable to locate page instance for resource: " + resource);
+         throw new AlfrescoRuntimeException("Unable to locate page instance for resource: " + pageDef);
       }
-      return page;
    }
 }

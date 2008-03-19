@@ -25,6 +25,8 @@
 package org.alfresco.web.scripts;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,6 +34,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.scripts.ScriptResourceHelper;
+import org.alfresco.scripts.ScriptResourceLoader;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.Context;
@@ -50,10 +55,12 @@ import org.springframework.util.FileCopyUtils;
  * 
  * @author davidc
  */
-public class PresentationScriptProcessor implements ScriptProcessor
+public class PresentationScriptProcessor implements ScriptProcessor, ScriptResourceLoader
 {
     private static final Log logger = LogFactory.getLog(PresentationScriptProcessor.class);
     private static WrapFactory wrapFactory = new PresentationWrapFactory(); 
+    
+    private static final String PATH_CLASSPATH = "classpath:";
     
     protected SearchPath searchPath;
     protected ScriptLoader scriptLoader;
@@ -94,25 +101,96 @@ public class PresentationScriptProcessor implements ScriptProcessor
      */
     public Object executeScript(ScriptContent location, Map<String, Object> model)
     {
-        String script = null;
-        
         // TODO: script caching (compiled version)
         
         // TODO: script imports (as RhinoScriptProcessor does)
         
-        // read script from location
+        // read script content from location
         try
         {   
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             FileCopyUtils.copy(location.getInputStream(), os);  // both streams are closed
             byte[] bytes = os.toByteArray();
-            script = new String(bytes);
+            String script = new String(bytes, "UTF-8");
+            return executeScriptImpl(
+                  ScriptResourceHelper.resolveScriptImports(script, this, logger), model, location.isSecure());
         }
         catch (Throwable e)
         {
             throw new WebScriptException("Failed to load script '" + location.toString() + "': " + e.getMessage(), e);
         }
-        
+    }
+    
+    /**
+     * Load a script content from the specific resource path.
+     *  
+     * @param resource      Script resource to load. Supports either classpath: prefix syntax or a
+     *                      resource path within the webscript stores. 
+     * 
+     * @return the content from the resource, null if not recognised format
+     * 
+     * @throws AlfrescoRuntimeException on any IO or ContentIO error
+     */
+    public String loadScriptResource(String resource)
+    {
+        if (resource.startsWith(PATH_CLASSPATH))
+        {
+            try
+            {
+                // load from classpath
+                String scriptClasspath = resource.substring(PATH_CLASSPATH.length());
+                InputStream stream = getClass().getClassLoader().getResourceAsStream(scriptClasspath);
+                if (stream == null)
+                {
+                    throw new AlfrescoRuntimeException("Unable to load included script classpath resource: " + resource);
+                }
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                FileCopyUtils.copy(stream, os);  // both streams are closed
+                byte[] bytes = os.toByteArray();
+                // create the string from the byte[] using encoding if necessary
+                return new String(bytes, "UTF-8");
+            }
+            catch (IOException err)
+            {
+                throw new AlfrescoRuntimeException("Unable to load included script classpath resource: " + resource);
+            }
+        }
+        else
+        {
+            // locate script within web script stores
+            ScriptContent scriptLocation = findScript(resource);
+            if (scriptLocation == null)
+            {
+                throw new WebScriptException("Unable to locate script " + resource);
+            }
+            try
+            {   
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                FileCopyUtils.copy(scriptLocation.getInputStream(), os);  // both streams are closed
+                byte[] bytes = os.toByteArray();
+                return new String(bytes, "UTF-8");
+            }
+            catch (Throwable e)
+            {
+                throw new WebScriptException(
+                        "Failed to load script '" + scriptLocation.toString() + "': " + e.getMessage(), e);
+            }
+        }
+    }
+    
+    /**
+     * Execute the supplied script content.
+     * 
+     * @param script        The script to execute.
+     * @param model         Data model containing objects to be added to the root scope.
+     * @param secure        True if the script is considered secure and may access java.* libs directly
+     * 
+     * @return result of the script execution, can be null.
+     * 
+     * @throws AlfrescoRuntimeException
+     */
+    private Object executeScriptImpl(String script, Map<String, Object> model, boolean secure)
+    {
         // execute script
         long startTime = 0;
         if (logger.isDebugEnabled())
@@ -125,7 +203,7 @@ public class PresentationScriptProcessor implements ScriptProcessor
         {
             cx.setWrapFactory(wrapFactory);
             Scriptable scope;
-            if (!location.isSecure())
+            if (!secure)
             {
                 scope = cx.initStandardObjects();
                 // remove security issue related objects - this ensures the script may not access

@@ -19,27 +19,52 @@
       </constructor-arg>
    </bean>
    
+
+   <!-- WebScript Implementations -->
+   <!-- TODO: if templates are WebScripts, we'll need this to override and control execution of scripts
+              during 2 pass processing - also need dedicated WebScript runtime and request/response handling -->
+   <!--<bean id="webscript.webtemplate" parent="webscript" class="..." singleton="false" />-->
    
-   <!--  Local Resource Storage configuration -->
+   
+   <!-- Local Resource Storage configuration -->
+   <!-- TODO: replace with AVM Remote store impl - load all resources from remote repo and cache -->
    <bean id="pagerenderer.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
+
+   <bean id="pagerenderer.pagestore" parent="pagerenderer.classpathstore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/pages</value></property>
+   </bean>
+   
+   <bean id="pagerenderer.pageassocstore" parent="pagerenderer.classpathstore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/page-associations</value></property>
+   </bean>
 
    <bean id="pagerenderer.templatestore" parent="pagerenderer.classpathstore">
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/templates</value></property>
    </bean>
    
-   <bean id="pagerenderer.pagestore" parent="pagerenderer.classpathstore">
+   <bean id="pagerenderer.templateconfigstore" parent="pagerenderer.classpathstore">
       <property name="mustExist"><value>true</value></property>
-      <property name="classPath"><value>alfresco/pages</value></property>
+      <property name="classPath"><value>alfresco/template-config</value></property>
+   </bean>
+   
+   <bean id="pagerenderer.componentstore" parent="pagerenderer.classpathstore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/components</value></property>
    </bean>
 
-   <bean id="pagerenderer.searchpath" class="org.alfresco.web.scripts.SearchPath">
+   <!--<bean id="pagerenderer.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
-          <list>
-             <ref bean="pagerenderer.templatestore" />
-             <ref bean="pagerenderer.pagestore" />
-          </list>
+         <list>
+            <ref bean="pagerenderer.pagestore" />
+            <ref bean="pagerenderer.pageassocstore" />
+            <ref bean="pagerenderer.templatestore" />
+            <ref bean="pagerenderer.templateconfigstore" />
+            <ref bean="pagerenderer.componentstore" />
+         </list>
       </property>
-   </bean>
+   </bean>-->
    
 </beans>

@@ -34,6 +34,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -143,7 +144,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#exists()
+     * @see org.alfresco.web.scripts.Store#exists()
      */
     public boolean exists()
     {
@@ -151,7 +152,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#getBasePath()
+     * @see org.alfresco.web.scripts.Store#getBasePath()
      */
     public String getBasePath()
     {
@@ -159,7 +160,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#getDescriptionDocumentPaths()
+     * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
      */
     public String[] getDescriptionDocumentPaths()
     {
@@ -193,7 +194,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
+     * @see org.alfresco.web.scripts.Store#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
@@ -226,9 +227,19 @@ public class ClassPathStore implements Store
         
         return paths;
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#lastModified(java.lang.String)
+     */
+    public long lastModified(String documentPath)
+        throws IOException
+    {
+        Resource document = createRelative(storeResource, documentPath);
+        return document.getURL().openConnection().getLastModified();
+    }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#hasDocument(java.lang.String)
+     * @see org.alfresco.web.scripts.Store#hasDocument(java.lang.String)
      */
     public boolean hasDocument(String documentPath)
     {
@@ -245,7 +256,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#getDescriptionDocument(java.lang.String)
+     * @see org.alfresco.web.scripts.Store#getDescriptionDocument(java.lang.String)
      */
     public InputStream getDocument(String documentPath)      
         throws IOException
@@ -262,7 +273,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#createDocument(java.lang.String, java.lang.String)
+     * @see org.alfresco.web.scripts.Store#createDocument(java.lang.String, java.lang.String)
      */
     public void createDocument(String documentPath, String content) throws IOException
     {
@@ -292,7 +303,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#getTemplateLoader()
+     * @see org.alfresco.web.scripts.Store#getTemplateLoader()
      */
     public TemplateLoader getTemplateLoader()
     {
@@ -302,7 +313,7 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptStore#getScriptLoader()
+     * @see org.alfresco.web.scripts.Store#getScriptLoader()
      */
     public ScriptLoader getScriptLoader()
     {

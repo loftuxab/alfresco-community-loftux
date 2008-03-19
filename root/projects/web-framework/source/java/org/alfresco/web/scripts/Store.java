@@ -72,6 +72,17 @@ public interface Store
     public String[] getScriptDocumentPaths(WebScript script);
 
     /**
+     * Gets the last modified timestamp for the document.
+     * 
+     * @param documentPath  document path to an existing document
+     * @return  last modified timestamp
+     * 
+     * @throws IOException if the document does not exist in the store
+     */
+    public long lastModified(String documentPath)
+        throws IOException;
+    
+    /**
      * Determines if the document exists
      * 
      * @param documentPath  document path
@@ -85,7 +96,7 @@ public interface Store
      * @param documentPath  document path
      * @return  input stream onto document
      * 
-     * @throws IOException
+     * @throws IOException if the document does not exist in the store
      */
     public InputStream getDocument(String documentPath)
         throws IOException;
