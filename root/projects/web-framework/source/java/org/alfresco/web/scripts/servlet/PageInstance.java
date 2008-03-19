@@ -24,18 +24,25 @@
  */
 package org.alfresco.web.scripts.servlet;
 
+import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Registry;
+import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.TemplateProcessor;
 import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.scripts.servlet.PageRendererServlet.URLHelper;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 /**
  * Simple structure class representing the definition of a single page instance
@@ -44,23 +51,69 @@ import org.alfresco.web.scripts.servlet.PageRendererServlet.URLHelper;
  */
 public class PageInstance
 {
-   private String pageTemplate;
+   private String pageId;
+   private String template;
    private String title;
    private String description;
    private String theme;
    private RequiredAuthentication authentication;
    private Map<String, PageComponent> components = new HashMap<String, PageComponent>();
 
-   PageInstance(String templateId)
+   PageInstance(Store store, String path)
    {
-      this.pageTemplate = templateId;
+      // read config for this page instance
+      try
+      {
+         // parse page definition xml config file
+         // TODO: convert to pull parser to optimize (see importer ViewParser)
+         SAXReader reader = new SAXReader();
+         Document document = reader.read(store.getDocument(path));
+
+         Element rootElement = document.getRootElement();
+         if (!rootElement.getName().equals("page"))
+         {
+            throw new AlfrescoRuntimeException(
+                  "Expected 'page' root element in page definition config: " + path);
+         }
+         if (rootElement.element("id") == null)
+         {
+             throw new AlfrescoRuntimeException(
+                  "Expected 'id' element on page element in page definition config: " + path);
+         }
+         this.pageId = rootElement.elementTextTrim("id");
+         this.title = rootElement.elementTextTrim("title");
+         this.description = rootElement.elementTextTrim("description");
+
+         Element templateElement = rootElement.element("template");
+         if (templateElement == null && templateElement.getTextTrim() == null)
+         {
+            throw new AlfrescoRuntimeException(
+                  "No 'template' element found in page definition config: " + path);
+         }
+         this.template = templateElement.getTextTrim();
+      }
+      catch (IOException ioErr)
+      {
+         throw new AlfrescoRuntimeException("Failed to load page definition for page: " + path, ioErr);
+      }
+      catch (DocumentException docErr)
+      {
+         throw new AlfrescoRuntimeException("Failed to parse page definition for page: " + path, docErr);
+      }
+   }
+   
+   PageInstance(String pageId, String template)
+   {
+      this.pageId = pageId;
+      this.template = template;
    }
 
    @Override
    public String toString()
    {
       StringBuilder buf = new StringBuilder(256);
-      buf.append("PageTemplate: ").append(pageTemplate);
+      buf.append("PageId: ").append(pageId);
+      buf.append(", Template: ").append(template);
       for (String id : components.keySet())
       {
          buf.append("\r\n   ").append(components.get(id).toString());
@@ -69,11 +122,19 @@ public class PageInstance
    }
 
    /**
-    * @return the pageTemplate
+    * @return the pageId
     */
-   public String getPageTemplate()
+   public String getPageId()
    {
-      return pageTemplate;
+      return this.pageId;
+   }
+
+   /**
+    * @return the template
+    */
+   public String getTemplate()
+   {
+      return template;
    }
 
    /**
@@ -141,19 +202,19 @@ public class PageInstance
    }
 
    /**
-    * @param components the components to set
+    * @param component  the component to set (will overwrite old if same id)
     */
-   public void setComponents(Map<String, PageComponent> components)
+   public void setComponent(PageComponent component)
    {
-      this.components = components;
+      this.components.put(component.getId(), component);
    }
 
    /**
-    * @return the components
+    * @return the component
     */
-   public Map<String, PageComponent> getComponents()
+   public PageComponent getComponent(String id)
    {
-      return components;
+      return this.components.get(id);
    }
    
    /**
@@ -168,6 +229,8 @@ public class PageInstance
          @Override
          public String toString()
          {
+            if (components.size() == 0) return "";
+            
             Set<String> paths = new HashSet<String>(8);
             
             // template model - very simple as we only provide 'url.context' and 'theme'

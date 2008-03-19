@@ -45,6 +45,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.swing.tree.TreeNode;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
@@ -55,10 +56,11 @@ import org.alfresco.web.scripts.AbstractRuntime;
 import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Match;
+import org.alfresco.web.scripts.PresentationScriptProcessor;
 import org.alfresco.web.scripts.PresentationTemplateProcessor;
 import org.alfresco.web.scripts.Registry;
 import org.alfresco.web.scripts.Runtime;
-import org.alfresco.web.scripts.SearchPath;
+import org.alfresco.web.scripts.ScriptContent;
 import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
@@ -71,6 +73,8 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import freemarker.cache.TemplateLoader;
+import freemarker.core.TemplateElement;
+import freemarker.template.TemplateModelException;
 
 /**
  * Servlet for rendering pages based a PageTemplate and WebScript based components.
@@ -96,9 +100,13 @@ public class PageRendererServlet extends WebScriptServlet
    private static final String PARAM_COMPONENT_URL = "_alfUrl";
    
    private PresentationTemplateProcessor templateProcessor;
+   private PresentationScriptProcessor scriptProcessor;
    private PageComponentTemplateLoader pageComponentTemplateLoader;
    private Registry webscriptsRegistry;
-   private SearchPath searchPath;
+   private Store pageStore;
+   private Store templateStore;
+   private Store templateConfigStore;
+   private Store componentStore;
    
    @Override
    public void init() throws ServletException
@@ -109,18 +117,23 @@ public class PageRendererServlet extends WebScriptServlet
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
       
       webscriptsRegistry = (Registry)context.getBean("webscripts.registry");
-      searchPath = (SearchPath)context.getBean("pagerenderer.searchpath");
+      pageStore = (Store)context.getBean("pagerenderer.pagestore");
+      pageStore.init();
+      componentStore = (Store)context.getBean("pagerenderer.componentstore");
+      componentStore.init();
+      templateStore = (Store)context.getBean("pagerenderer.templatestore");
+      templateStore.init();
+      templateConfigStore = (Store)context.getBean("pagerenderer.templateconfigstore");
+      templateConfigStore.init();
       templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
+      scriptProcessor = (PresentationScriptProcessor)context.getBean("webscripts.web.scriptprocessor");
       
       // custom loader for resolved UI Component reference indirections
       pageComponentTemplateLoader = new PageComponentTemplateLoader();
       templateProcessor.addTemplateLoader(pageComponentTemplateLoader);
       
-      // add template loader for locally stored templates
-      for (Store store : searchPath.getStores())
-      {
-         templateProcessor.addTemplateLoader(store.getTemplateLoader());
-      }
+      // add template loader for the template store
+      templateProcessor.addTemplateLoader(templateStore.getTemplateLoader());
       
       // init the config for the template processor - caches and loaders etc. get resolved
       templateProcessor.initConfig();
@@ -141,7 +154,7 @@ public class PageRendererServlet extends WebScriptServlet
          String qs = req.getQueryString();
          logger.debug("Processing Page Renderer URL: ("  + req.getMethod() + ") " + uri + 
                ((qs != null && qs.length() != 0) ? ("?" + qs) : ""));
-         startTime = System.currentTimeMillis();
+         startTime = System.nanoTime();
       }
       
       uri = uri.substring(req.getContextPath().length());   // skip server context path
@@ -191,7 +204,7 @@ public class PageRendererServlet extends WebScriptServlet
       {
          // retrieve the page instance via the application url - will throw a runtime exception if
          // the page cannot be found or fails to retrieve from the local store or repository
-         PageInstance page = appUrl.getPageInstance(resource);
+         PageInstance page = appUrl.getPageInstance();
          if (logger.isDebugEnabled())
             logger.debug("PageInstance: " + page.toString());
          
@@ -201,9 +214,9 @@ public class PageRendererServlet extends WebScriptServlet
          // TODO: authenticate - or redirect to login page etc...
          if (authenticate(getServletContext(), page.getAuthentication()))
          {
-            // Setup the PageRenderer context for the webscript runtime template loade to use
-            // when rebuilding urls for components - there is a single instance of the template loader
-            // and it must be kept thread safe for multiple simultaneous page renderer requests.
+            // Setup the PageRenderer context for the webscript runtime template loader to use when
+            // rebuilding urls for components - there is a single instance of the template loader
+            // and it must be kept thread safe for multiple asynchronous page renderer requests.
             PageRendererContext context = new PageRendererContext();
             context.RequestURI = uri;
             context.RequestPath = req.getContextPath();
@@ -226,13 +239,16 @@ public class PageRendererServlet extends WebScriptServlet
             // Process the page template using our custom loader - the loader will find and buffer
             // individual included webscript output into the Writer out for the servlet page.
             if (logger.isDebugEnabled())
-               logger.debug("Page template resolved as: " + page.getPageTemplate());
+               logger.debug("Page template resolved as: " + page.getTemplate());
             
-            // execute the templte to render the page - based on the current page definition
+            // execute the template to render the page - based on the current page definition
             processTemplatePage(page, req, res);
          }
          if (logger.isDebugEnabled())
-            logger.debug("Time to render page: " + (System.currentTimeMillis() - startTime) + "ms");
+         {
+            long endTime = System.nanoTime();
+            logger.debug("Page render completed in: " + (endTime - startTime)/1000000f + "ms");
+         }
       }
       catch (Throwable err)
       {
@@ -252,7 +268,8 @@ public class PageRendererServlet extends WebScriptServlet
    {
       // TODO: match against app urls loaded from app registry
       //       retrieve the application urls from a Store that may reference the repo and/or a local 
-      ApplicationUrl testUrl = new ApplicationUrl(this.searchPath);
+      ApplicationUrl testUrl = new ApplicationUrl(this.pageStore);
+      testUrl.match(resource);
       return testUrl;
    }
    
@@ -264,21 +281,153 @@ public class PageRendererServlet extends WebScriptServlet
    private void processTemplatePage(PageInstance page, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      templateProcessor.process(page.getPageTemplate(), getModel(page, req), res.getWriter());
+      // load the config for the specific template instance - resolve the template WebScript
+      // TODO: same issue as ApplicationUrl.getPageInstance()
+      String templateConfig = page.getTemplate() + ".xml";
+      if (this.templateConfigStore.hasDocument(templateConfig))
+      {
+         // load and parse the template instance config document
+         TemplateInstanceConfig templateInstance = new TemplateInstanceConfig(
+               this.templateConfigStore, templateConfig); 
+         
+         // TODO: add 'format' support i.e ".format.ftl"
+         
+         // TODO: execute template WebScript - Runtime required to wrap execution?
+         //       for now execute template directly via the template processor
+         String template = templateInstance.getTemplateType() + ".ftl";
+         
+         // we need to preprocess the template to execute all @region directives
+         // - component dependancies are resolved only when they have all executed
+         
+         // we output to a dummy writer as we don't process the result - the custom
+         // directive is aware of the active/passive rendering mode and will either lookup
+         // the component or execute the component based on the mode.
+         
+         long startTime = 0;
+         if (logger.isDebugEnabled())
+         {
+            logger.debug("Executing 1st template pass, looking up components...");
+            startTime = System.nanoTime();
+         }
+         
+         Map<String, Object> resultModel = new HashMap<String, Object>(8, 1.0f);
+         Map<String, Object> templateModel = getModel(page, req, false);
+         
+         // execute any attached javascript behaviour for this template
+         // the behaviour plus the config is responsible for specialising the template
+         String scriptPath = templateInstance.getTemplateType() + ".js";
+         ScriptContent script = templateStore.getScriptLoader().getScript(scriptPath);
+         if (script != null)
+         {
+            Map<String, Object> scriptModel = new HashMap<String, Object>(8, 1.0f);
+            // add the template config properties to the script model
+            scriptModel.putAll(templateInstance.getPropetries());
+            // results from the script should be placed into the root 'model' object
+            scriptModel.put("model", resultModel);
+            
+            scriptProcessor.executeScript(script, scriptModel);
+            
+            // merge script results model into the template model
+            for (Map.Entry<String, Object> entry : resultModel.entrySet())
+            {
+               // retrieve script model value and unwrap each java object from script object
+               Object value = entry.getValue();
+               Object templateValue = scriptProcessor.unwrapValue(value);
+               templateModel.put(entry.getKey(), templateValue);
+            }
+         }
+         
+         // therefore this is very fast as template pages themselves have very little content themselves
+         // and the logic for the template is executed once only with the result stored for the 2nd pass
+         // the critical performance path is in executing the webscript components - which is only
+         // performed on the second pass of the template once component references are all resolved
+         templateProcessor.process(template, templateModel,
+            new Writer ()
+            {
+               public void write(char[] cbuf, int off, int len) throws IOException
+               {
+               }
+            
+               public void flush() throws IOException
+               {
+               }
+            
+               public void close() throws IOException
+               {
+               }
+            });
+         
+         if (logger.isDebugEnabled())
+         {
+            long endTime = System.nanoTime();
+            logger.debug("...1st pass processed in: " + (endTime - startTime)/1000000f + "ms");
+            logger.debug("Executing 2nd template pass, rendering...");
+            startTime = System.nanoTime();
+         }
+         
+         // construct template model for 2nd pass
+         templateModel = getModel(page, req, true);
+         if (script != null)
+         {
+            // script already executed - so just merge script return model into the template model
+            for (Map.Entry<String, Object> entry : resultModel.entrySet())
+            {
+               // retrieve script model value
+               Object value = entry.getValue();
+               Object templateValue = scriptProcessor.unwrapValue(value);
+               templateModel.put(entry.getKey(), templateValue);
+            }
+         }
+         templateProcessor.process(template, templateModel, res.getWriter());
+         
+         if (logger.isDebugEnabled())
+         {
+            long endTime = System.nanoTime();
+            logger.debug("...2nd pass processed in: " + (endTime - startTime)/1000000f + "ms");
+         }
+      }
+      else
+      {
+         throw new AlfrescoRuntimeException("Unable to find template config: " + templateConfig);
+      }
+   }
+   
+   private static void processTemplateNode(TreeNode t)
+      throws TemplateModelException
+   {
+      if (t instanceof TemplateElement)
+      {
+         if (((TemplateElement)t).getNodeName().equals("UnifiedCall"))
+         {
+            logger.debug(((TemplateElement)t).getCanonicalForm());
+         }
+      }
+      if (t.isLeaf() == false && t.getChildCount() != 0)
+      {
+         for (Enumeration<TreeNode> itr = t.children(); itr.hasMoreElements(); /**/)
+         {
+            processTemplateNode(itr.nextElement());
+         }
+      }
    }
    
    /**
     * @return model to use for UI Component template page execution
     */
-   private Object getModel(PageInstance page, HttpServletRequest req)
+   private Map<String, Object> getModel(PageInstance page, HttpServletRequest req, boolean active)
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
+      
       URLHelper urlHelper = new URLHelper(req);
       model.put("url", urlHelper);
       model.put("description", page.getDescription());
       model.put("title", page.getTitle());
       model.put("theme", page.getTheme());
-      model.put("header", page.getHeaderRenderer(webscriptsRegistry, templateProcessor, urlHelper));
+      model.put("head", page.getHeaderRenderer(webscriptsRegistry, templateProcessor, urlHelper));
+      
+      // add the custom 'region' directive implementation - one instance per model as we pass in template/page 
+      model.put("region", new RegionDirective(this.componentStore, page, active));
+      
       return model;
    }
    
@@ -679,15 +828,13 @@ public class PageRendererServlet extends WebScriptServlet
       public Object findTemplateSource(String name) throws IOException
       {
          // The webscript is looked up based on the key in the #include directive - it must
-         // be of the form "/[somekey]" so that it can be recognised by the loader
-         // The root slash is required to inform FreeMarker that the template is not a child
-         // of the current path - which makes no sense
+         // be of the form "[key]" so that it can be recognised by the loader
          if (name.startsWith("[") && name.endsWith("]"))
          {
             String key = name.substring(1, name.length() - 1);
             
             if (logger.isDebugEnabled())
-               logger.debug("Found webscript component key: " + key);
+               logger.debug("Found WebScript UI component key: " + key);
             
             return key;
          }
@@ -715,9 +862,9 @@ public class PageRendererServlet extends WebScriptServlet
       {
          String key = templateSource.toString();
          
-         // lookup against component def config
+         // lookup against resolved page component map
          PageRendererContext context = this.context.get();
-         PageComponent component = context.PageInstance.getComponents().get(key);
+         PageComponent component = context.PageInstance.getComponent(key);
          if (component == null)
          {
             if (this.ignoreMissingComponents)
@@ -727,7 +874,7 @@ public class PageRendererServlet extends WebScriptServlet
             else
             {
                return new StringReader("ERROR: Failed to find component identified by key '" + key +
-                     "' found in template: " + context.PageInstance.getPageTemplate());
+                     "' found in template: " + context.PageInstance.getTemplate());
             }
          }
          
@@ -758,9 +905,9 @@ public class PageRendererServlet extends WebScriptServlet
          runtime.executeScript();
          
          // Return a reader from the runtime that executed the webscript - this effectively
-         // returns the result as a "template" source to freemarker. Generally this will not itself
-         // be a template but it can contain additional freemarker syntax if required - it is up to
-         // the template writer to add the parse=[true|false] attribute as appropriate to the #include
+         // returns the result as a "template" source to freemarker. In our case the template
+         // result is the output from a webscript based UI component - it is not processed further
+         // by the FreeMarker engine as the @region directive mandates this during template lookup.
          return runtime.getResponseReader();
       }
       
