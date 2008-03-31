@@ -26,11 +26,12 @@ package org.alfresco.config.xml.elementreader;
 
 import java.util.Iterator;
 
-import org.dom4j.Attribute;
-import org.dom4j.Element;
-
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.element.GenericConfigElement;
+import org.alfresco.config.xml.XMLConfigService.PropertyConfigurer;
+import org.dom4j.Attribute;
+import org.dom4j.Element;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 
 /**
  * Implementation of a generic element reader. This class can be used to 
@@ -40,6 +41,18 @@ import org.alfresco.config.element.GenericConfigElement;
  */
 public class GenericElementReader implements ConfigElementReader
 {
+   private PropertyConfigurer propertyConfigurer;
+	
+   /**
+    * Construct
+    * 
+    * @param propertyConfigurer
+    */
+   public GenericElementReader(PropertyConfigurer propertyConfigurer)
+   {
+      this.propertyConfigurer = propertyConfigurer;
+   }
+   
    /**
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
     */
@@ -101,6 +114,10 @@ public class GenericElementReader implements ConfigElementReader
          String value = element.getTextTrim();
          if (value != null && value.length() > 0)
          {
+            if (propertyConfigurer != null)
+            {
+               value = propertyConfigurer.resolveValue(value);
+            }
             configElement.setValue(value);
          }
       }
@@ -112,9 +129,15 @@ public class GenericElementReader implements ConfigElementReader
          String attrName = attr.getName();
          String attrValue = attr.getValue();
          
+         if (propertyConfigurer != null)
+         {
+             attrValue = propertyConfigurer.resolveValue(attrValue);
+         }
+
          configElement.addAttribute(attrName, attrValue);
       }
       
       return configElement;
    }
+   
 }
