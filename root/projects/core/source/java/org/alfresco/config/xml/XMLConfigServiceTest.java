@@ -38,6 +38,8 @@ import org.alfresco.config.source.HTTPConfigSource;
 import org.alfresco.config.source.JarConfigSource;
 import org.alfresco.config.source.UrlConfigSource;
 import org.alfresco.util.BaseTest;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 
 /**
  * Unit tests for the XML based configuration service
@@ -88,6 +90,63 @@ public class XMLConfigServiceTest extends BaseTest
         overrideItem = unitTest.getConfigElement("override");
         assertNotNull("overrideItem should not be null", overrideItem);
         assertEquals("The override item should now be true", "true", overrideItem.getValue());
+    }
+    
+    /**
+     * Tests the config.xml file properties
+     */
+    public void testConfigProperties()
+    {
+        // setup the config service
+        String configFile = getResourcesDir() + "config-props.xml";
+        XMLConfigService svc = new XMLConfigService(new FileConfigSource(configFile));
+        svc.setProperties(new Resource[] {new FileSystemResource(getResourcesDir() + "config-props.properties")});
+        svc.init();
+
+        // try and get the global item
+        Config global = svc.getGlobalConfig();
+        ConfigElement globalItem = global.getConfigElement("global-item");
+        assertNotNull("globalItem should not be null", globalItem);
+        assertEquals("The global-item value should be 'The global value'", "The global value", globalItem.getValue());
+        ConfigElement globalItemProp = global.getConfigElement("global-item-prop");
+        assertNotNull("globalItemProp should not be null", globalItemProp);
+        assertEquals("The global-item value should be 'globalValue'", "globalValue", globalItemProp.getValue());
+        ConfigElement globalItemMissingProp = global.getConfigElement("global-item-missing-prop");
+        assertNotNull("globalItemMissingProp should not be null", globalItemMissingProp);
+        assertEquals("The global-item value should be '${missingGlobalValue}'", "${missingGlobalValue}", globalItemMissingProp.getValue());
+
+        // try and get the override item
+        ConfigElement overrideItem = global.getConfigElement("override");
+        assertNotNull("overrideItem should not be null", overrideItem);
+        assertEquals("The override item should be false", "false", overrideItem.getValue());
+
+        // test the string evaluator by getting the item config element
+        // in the "Unit Test" config section
+        Config unitTest = svc.getConfig("Unit Test");
+        assertNotNull("unitTest config result should not be null", unitTest);
+        ConfigElement item = unitTest.getConfigElement("item");
+        assertNotNull("item should not be null", item);
+        assertEquals("The item value should be 'The value'", "The value", item.getValue());
+        ConfigElement itemProp = unitTest.getConfigElement("item-prop");
+        assertNotNull("item should not be null", itemProp);
+        assertEquals("The item value should be 'theValue'", "theValue", itemProp.getValue());
+        String attrValue = itemProp.getAttribute("item-attr");
+        assertNotNull("item attr should not be null", attrValue);
+        assertEquals("The item attr value should be 'attrValue'", "attrValue", attrValue);
+        ConfigElement itemMissingProp = unitTest.getConfigElement("item-missing-prop");
+        assertNotNull("item should not be null", itemMissingProp);
+        assertEquals("The item value should be '${missingTheValue}'", "${missingTheValue}", itemMissingProp.getValue());
+
+        // make sure the override value has changed when retrieved from item
+        overrideItem = unitTest.getConfigElement("override");
+        assertNotNull("overrideItem should not be null", overrideItem);
+        assertEquals("The override item should now be true", "true", overrideItem.getValue());
+        ConfigElement overrideItemProp = unitTest.getConfigElement("override-prop");
+        assertNotNull("overrideItem should not be null", overrideItemProp);
+        assertEquals("The override item should now be true", "true", overrideItem.getValue());
+        ConfigElement overrideItemMissingProp = unitTest.getConfigElement("override-missing-prop");
+        assertNotNull("overrideItem should not be null", overrideItemMissingProp);
+        assertEquals("The override item should now be true", "${missingTrue}", overrideItemMissingProp.getValue());
     }
     
     /**

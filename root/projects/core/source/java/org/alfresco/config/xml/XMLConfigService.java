@@ -24,12 +24,15 @@
  */
 package org.alfresco.config.xml;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import org.alfresco.config.BaseConfigService;
 import org.alfresco.config.ConfigDeployer;
@@ -47,6 +50,8 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.Element;
 import org.dom4j.io.SAXReader;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
+import org.springframework.core.io.Resource;
 
 /**
  * XML based configuration service
@@ -57,6 +62,8 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 {
     private static final Log logger = LogFactory.getLog(XMLConfigService.class);
 
+    private Resource[] propertyLocations;
+    private PropertyConfigurer propertyConfigurer;
     private Map<String, ConfigElementReader> elementReaders;
     
     /**
@@ -70,12 +77,33 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         super(configSource);
     }
 
-    public List<ConfigDeployment> initConfig()
+	/**
+	 * Set locations of properties files to be loaded.
+	 * <p>Can point to classic properties files or to XML files
+	 * that follow JDK 1.5's properties XML format.
+	 */
+	public void setProperties(Resource[] locations)
+	{
+	    this.propertyLocations = locations;
+	}
+    
+	public List<ConfigDeployment> initConfig()
     {
         if (logger.isDebugEnabled())
             logger.debug("Commencing initialisation");
 
         List<ConfigDeployment> configDeployments = super.initConfig();
+
+        // initialise property configurer
+        propertyConfigurer = null;
+        if (propertyLocations != null)
+        {
+           PropertyConfigurer configurer = new PropertyConfigurer();
+           configurer.setLocations(propertyLocations);
+           configurer.setIgnoreUnresolvablePlaceholders(true);
+           configurer.init();
+           propertyConfigurer = configurer;
+        }
 
         // initialise the element readers map with built-in readers
         putElementReaders(new HashMap<String, ConfigElementReader>());
@@ -89,7 +117,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         	deployments = configDeployer.initConfig();
         	configDeployments.addAll(deployments);
         }
-
+        
         if (logger.isDebugEnabled())
             logger.debug("Completed initialisation");
         
@@ -314,7 +342,7 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
 
                 if (elementReader == null)
                 {
-                    elementReader = new GenericElementReader();
+                    elementReader = new GenericElementReader(propertyConfigurer);
 
                     if (logger.isDebugEnabled())
                         logger.debug("Defaulting to " + elementReader + " as there wasn't an element "
@@ -427,4 +455,39 @@ public class XMLConfigService extends BaseConfigService implements XMLConfigCons
         elementReaders.clear();
         elementReaders = null;
     } 
+        
+    /**
+     * Provides access to property values 
+     */
+    public static class PropertyConfigurer extends PropertyPlaceholderConfigurer
+    {
+        private Properties properties;
+        
+        /**
+         * Initialise
+         */
+        /*package*/ void init()
+        {
+            try
+            {
+                properties = mergeProperties();
+            }
+            catch(IOException e)
+            {
+                throw new ConfigException("Failed to retrieve properties", e);
+            }
+        }
+
+        /**
+         * Replace placeholders with values
+         * 
+         * @param value
+         * @return resolved value
+         */
+        public String resolveValue(String val)
+        {
+            return parseStringValue(val, properties, new HashSet<Object>());
+        }
+    }
+    
 }
