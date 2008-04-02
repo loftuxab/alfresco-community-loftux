@@ -204,6 +204,44 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        ContentUtils.copyContentToFile(content, tempFile);
    }
    
+   public void testContentTransform()
+   	   throws Exception
+   {
+	   // Create source content	   
+       ParentReference parentRef = new ParentReference();
+       parentRef.setStore(BaseWebServiceSystemTest.store);
+       parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+       parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
+       parentRef.setChildName(Constants.ASSOC_CHILDREN);
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "quick2.doc", null)};
+       CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
+       NamedValue[] properties2 = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "destination.txt", null)};
+       CMLCreate create2 = new CMLCreate("2", parentRef, null, null, null, Constants.TYPE_CONTENT, properties2);
+       CML cml = new CML();
+       cml.setCreate(new CMLCreate[]{create, create2});
+       UpdateResult[] result = this.repositoryService.update(cml);     
+       Reference sourceReference = result[0].getDestination();    
+       Reference destinationReference = result[1].getDestination();
+       ContentFormat format = new ContentFormat("application/msword", "UTF-8");  
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/quick.doc");
+       byte[] bytes = ContentUtils.convertToByteArray(viewStream);
+       this.contentService.write(sourceReference, Constants.PROP_CONTENT, bytes, format);
+       
+       assertNotNull(sourceReference);
+       assertNotNull(destinationReference);
+       
+       Content[] contents = this.contentService.read(convertToPredicate(destinationReference), Constants.PROP_CONTENT);
+       assertNotNull(contents);
+       assertNull(contents[0].getUrl());
+       
+       ContentFormat destinationFormat = new ContentFormat(Constants.MIMETYPE_TEXT_PLAIN, "UTF-8");
+       Content transformedContent = this.contentService.transform(sourceReference, Constants.PROP_CONTENT, 
+    		   						 destinationReference, Constants.PROP_CONTENT, destinationFormat);
+	   
+       assertNotNull(transformedContent);
+       assertNotNull(transformedContent.getUrl());
+   }
+   
    /**
     * Test uploading image from file
     * 

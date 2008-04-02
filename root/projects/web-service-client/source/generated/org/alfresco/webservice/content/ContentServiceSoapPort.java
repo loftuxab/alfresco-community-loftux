@@ -23,4 +23,9 @@ public interface ContentServiceSoapPort extends java.rmi.Remote {
      * Clears content from the repository.
      */
     public org.alfresco.webservice.content.Content[] clear(org.alfresco.webservice.types.Predicate items, java.lang.String property) throws java.rmi.RemoteException, org.alfresco.webservice.content.ContentFault;
+
+    /**
+     * Transforms content from one mimetype to another.
+     */
+    public org.alfresco.webservice.content.Content transform(org.alfresco.webservice.types.Reference source, java.lang.String property, org.alfresco.webservice.types.Reference destinationReference, java.lang.String destinationProperty, org.alfresco.webservice.types.ContentFormat destinationFormat) throws java.rmi.RemoteException, org.alfresco.webservice.content.ContentFault;
 }
