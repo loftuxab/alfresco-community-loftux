@@ -16,8 +16,9 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
     static org.apache.axis.description.OperationDesc [] _operations;
 
     static {
-        _operations = new org.apache.axis.description.OperationDesc[9];
+        _operations = new org.apache.axis.description.OperationDesc[17];
         _initOperationDesc1();
+        _initOperationDesc2();
     }
 
     private static void _initOperationDesc1(){
@@ -191,6 +192,154 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
                       true
                      ));
         _operations[8] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getAllAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "filter"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AuthorityFilter"), org.alfresco.webservice.accesscontrol.AuthorityFilter.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "results"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[9] = oper;
+
+    }
+
+    private static void _initOperationDesc2(){
+        org.apache.axis.description.OperationDesc oper;
+        org.apache.axis.description.ParameterDesc param;
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getAuthorities");
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "results"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[10] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("createAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "parentAuthority"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        param.setOmittable(true);
+        param.setNillable(true);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "newAuthorites"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "NewAuthority"), org.alfresco.webservice.accesscontrol.NewAuthority[].class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "results"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[11] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("deleteAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "authorities"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String[].class, false, false);
+        param.setOmittable(true);
+        oper.addParameter(param);
+        oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[12] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("addChildAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "parentAuthority"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "authorities"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String[].class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "results"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[13] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("removeChildAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "parentAuthority"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "authorities"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String[].class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(org.apache.axis.encoding.XMLType.AXIS_VOID);
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[14] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getChildAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "authority"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "filter"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "SiblingAuthorityFilter"), org.alfresco.webservice.accesscontrol.SiblingAuthorityFilter.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "results"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[15] = oper;
+
+        oper = new org.apache.axis.description.OperationDesc();
+        oper.setName("getParentAuthorities");
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "authority"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"), java.lang.String.class, false, false);
+        oper.addParameter(param);
+        param = new org.apache.axis.description.ParameterDesc(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "filter"), org.apache.axis.description.ParameterDesc.IN, new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "SiblingAuthorityFilter"), org.alfresco.webservice.accesscontrol.SiblingAuthorityFilter.class, false, false);
+        oper.addParameter(param);
+        oper.setReturnType(new javax.xml.namespace.QName("http://www.w3.org/2001/XMLSchema", "string"));
+        oper.setReturnClass(java.lang.String[].class);
+        oper.setReturnQName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "results"));
+        oper.setStyle(org.apache.axis.constants.Style.WRAPPED);
+        oper.setUse(org.apache.axis.constants.Use.LITERAL);
+        oper.addFault(new org.apache.axis.description.FaultDesc(
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"),
+                      "org.alfresco.webservice.accesscontrol.AccessControlFault",
+                      new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AccessControlFault"), 
+                      true
+                     ));
+        _operations[16] = oper;
 
     }
 
@@ -447,6 +596,13 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "AuthorityFilter");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.webservice.accesscontrol.AuthorityFilter.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "GetClassPermissionsResult");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.accesscontrol.GetClassPermissionsResult.class;
@@ -468,9 +624,23 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
 
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "NewAuthority");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.webservice.accesscontrol.NewAuthority.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
             qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "OwnerResult");
             cachedSerQNames.add(qName);
             cls = org.alfresco.webservice.accesscontrol.OwnerResult.class;
+            cachedSerClasses.add(cls);
+            cachedSerFactories.add(beansf);
+            cachedDeserFactories.add(beandf);
+
+            qName = new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "SiblingAuthorityFilter");
+            cachedSerQNames.add(qName);
+            cls = org.alfresco.webservice.accesscontrol.SiblingAuthorityFilter.class;
             cachedSerClasses.add(cls);
             cachedSerFactories.add(beansf);
             cachedDeserFactories.add(beandf);
@@ -904,6 +1074,328 @@ public class AccessControlServiceSoapBindingStub extends org.apache.axis.client.
                 return (org.alfresco.webservice.accesscontrol.OwnerResult[]) _resp;
             } catch (java.lang.Exception _exception) {
                 return (org.alfresco.webservice.accesscontrol.OwnerResult[]) org.apache.axis.utils.JavaUtils.convert(_resp, org.alfresco.webservice.accesscontrol.OwnerResult[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public java.lang.String[] getAllAuthorities(org.alfresco.webservice.accesscontrol.AuthorityFilter filter) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[9]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/getAllAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "getAllAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {filter});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public java.lang.String[] getAuthorities() throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[10]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/getAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "getAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public java.lang.String[] createAuthorities(java.lang.String parentAuthority, org.alfresco.webservice.accesscontrol.NewAuthority[] newAuthorites) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[11]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/createAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "createAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {parentAuthority, newAuthorites});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public void deleteAuthorities(java.lang.String[] authorities) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[12]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/deleteAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "deleteAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {authorities});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        extractAttachments(_call);
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public java.lang.String[] addChildAuthorities(java.lang.String parentAuthority, java.lang.String[] authorities) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[13]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/addChildAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "addChildAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {parentAuthority, authorities});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public void removeChildAuthorities(java.lang.String parentAuthority, java.lang.String[] authorities) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[14]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/removeChildAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "removeChildAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {parentAuthority, authorities});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        extractAttachments(_call);
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public java.lang.String[] getChildAuthorities(java.lang.String authority, org.alfresco.webservice.accesscontrol.SiblingAuthorityFilter filter) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[15]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/getChildAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "getChildAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {authority, filter});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
+            }
+        }
+  } catch (org.apache.axis.AxisFault axisFaultException) {
+    if (axisFaultException.detail != null) {
+        if (axisFaultException.detail instanceof java.rmi.RemoteException) {
+              throw (java.rmi.RemoteException) axisFaultException.detail;
+         }
+        if (axisFaultException.detail instanceof org.alfresco.webservice.accesscontrol.AccessControlFault) {
+              throw (org.alfresco.webservice.accesscontrol.AccessControlFault) axisFaultException.detail;
+         }
+   }
+  throw axisFaultException;
+}
+    }
+
+    public java.lang.String[] getParentAuthorities(java.lang.String authority, org.alfresco.webservice.accesscontrol.SiblingAuthorityFilter filter) throws java.rmi.RemoteException, org.alfresco.webservice.accesscontrol.AccessControlFault {
+        if (super.cachedEndpoint == null) {
+            throw new org.apache.axis.NoEndPointException();
+        }
+        org.apache.axis.client.Call _call = createCall();
+        _call.setOperation(_operations[16]);
+        _call.setUseSOAPAction(true);
+        _call.setSOAPActionURI("http://www.alfresco.org/ws/service/accesscontrol/1.0/getParentAuthorities");
+        _call.setEncodingStyle(null);
+        _call.setProperty(org.apache.axis.client.Call.SEND_TYPE_ATTR, Boolean.FALSE);
+        _call.setProperty(org.apache.axis.AxisEngine.PROP_DOMULTIREFS, Boolean.FALSE);
+        _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
+        _call.setOperationName(new javax.xml.namespace.QName("http://www.alfresco.org/ws/service/accesscontrol/1.0", "getParentAuthorities"));
+
+        setRequestHeaders(_call);
+        setAttachments(_call);
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {authority, filter});
+
+        if (_resp instanceof java.rmi.RemoteException) {
+            throw (java.rmi.RemoteException)_resp;
+        }
+        else {
+            extractAttachments(_call);
+            try {
+                return (java.lang.String[]) _resp;
+            } catch (java.lang.Exception _exception) {
+                return (java.lang.String[]) org.apache.axis.utils.JavaUtils.convert(_resp, java.lang.String[].class);
             }
         }
   } catch (org.apache.axis.AxisFault axisFaultException) {
