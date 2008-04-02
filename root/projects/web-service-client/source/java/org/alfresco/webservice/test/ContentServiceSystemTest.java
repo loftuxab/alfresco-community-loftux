@@ -28,6 +28,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import javax.activation.DataHandler;
+import javax.activation.FileDataSource;
+
 import org.alfresco.webservice.content.Content;
 import org.alfresco.webservice.repository.UpdateResult;
 import org.alfresco.webservice.types.CML;
@@ -40,6 +43,7 @@ import org.alfresco.webservice.types.Reference;
 import org.alfresco.webservice.util.Constants;
 import org.alfresco.webservice.util.ContentUtils;
 import org.alfresco.webservice.util.Utils;
+import org.apache.axis.client.Call;
 
 public class ContentServiceSystemTest extends BaseWebServiceSystemTest
 {
@@ -281,6 +285,51 @@ public class ContentServiceSystemTest extends BaseWebServiceSystemTest
        Content content = contents[0];
        File tempFile = File.createTempFile("testImage", ".jpg");
        System.out.println(tempFile.getPath());
+       ContentUtils.copyContentToFile(content, tempFile);
+
+   }
+   
+   public void testUploadWithAttachment() throws Exception
+   {
+       // Create the parent reference
+       ParentReference parentRef = new ParentReference();
+       parentRef.setStore(BaseWebServiceSystemTest.store);
+       parentRef.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+       parentRef.setAssociationType(Constants.ASSOC_CHILDREN);
+       parentRef.setChildName(Constants.ASSOC_CHILDREN);
+       
+       // Create the content
+       NamedValue[] properties = new NamedValue[]{new NamedValue(Constants.PROP_NAME, false, "test.jpg", null)};
+       CMLCreate create = new CMLCreate("1", parentRef, null, null, null, Constants.TYPE_CONTENT, properties);
+       CML cml = new CML();
+       cml.setCreate(new CMLCreate[]{create});
+       UpdateResult[] result = this.repositoryService.update(cml);     
+       
+       // Get the created node and create the format
+       Reference newContentNode = result[0].getDestination();              
+       ContentFormat format = new ContentFormat("image/jpeg", "UTF-8");  
+       
+       InputStream viewStream = getClass().getClassLoader().getResourceAsStream("org/alfresco/webservice/test/resources/test.jpg");
+       File testFile = File.createTempFile("testImage", ".jpg");
+       FileOutputStream fos = new FileOutputStream(testFile);
+       ContentUtils.copy(viewStream, fos);
+       viewStream.close();
+       fos.close();
+       
+       DataHandler attachmentFile = new DataHandler(new FileDataSource(testFile));
+       this.contentService._setProperty(Call.ATTACHMENT_ENCAPSULATION_FORMAT, Call.ATTACHMENT_ENCAPSULATION_FORMAT_DIME);
+       this.contentService.addAttachment(attachmentFile);
+       
+       // Write the content
+       this.contentService.writeWithAttachment(newContentNode, Constants.PROP_CONTENT, format);
+       
+       // Try and get the content, saving it to a file
+       Content[] contents = this.contentService.read(convertToPredicate(newContentNode), Constants.PROP_CONTENT);
+       assertNotNull(contents);
+       assertEquals(1, contents.length);
+       Content content = contents[0];
+       File tempFile = File.createTempFile("testImage", ".jpg");
+       System.out.println("added from attachment: " + tempFile.getPath());
        ContentUtils.copyContentToFile(content, tempFile);
 
    }
