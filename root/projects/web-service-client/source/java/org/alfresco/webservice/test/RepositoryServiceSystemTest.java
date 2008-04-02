@@ -620,8 +620,72 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
         assertEquals(1, results3.length);
         UpdateResult updateResult3 = results3[0];
         assertNull(updateResult3.getDestination());
-        assertEquals(newCopy.getUuid(), updateResult3.getSource().getUuid());
+        assertEquals(newCopy.getUuid(), updateResult3.getSource().getUuid());        
+    }
+    
+    // Test for creation with space in file name
+    public void testADB12()
+    	throws Exception
+    {
+    	String fileName = "this is my file.txt";
+    	String folderName = "this is my folder";
+    	
+    	CMLCreate create = new CMLCreate();
+        create.setId("id1");
+        create.setType(Constants.TYPE_CONTENT);
+
+        ParentReference parentReference = new ParentReference();
+        parentReference.setAssociationType(Constants.ASSOC_CHILDREN);
+        parentReference.setChildName(Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, fileName));
+        parentReference.setStore(BaseWebServiceSystemTest.store);
+        parentReference.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+
+        create.setParent(parentReference);
+        create.setProperty(new NamedValue[] {
+                        new NamedValue(
+                                Constants.PROP_NAME,
+                                false,
+                                fileName,
+                                null)});
         
+        // Create a folder used for later tests
+        ParentReference parentReference2 = new ParentReference();
+        parentReference2.setAssociationType(Constants.ASSOC_CHILDREN);
+        parentReference2.setChildName(Constants.createQNameString(Constants.NAMESPACE_CONTENT_MODEL, folderName));
+        parentReference2.setStore(BaseWebServiceSystemTest.store);
+        parentReference2.setUuid(BaseWebServiceSystemTest.rootReference.getUuid());
+        CMLCreate createFolder = new CMLCreate();
+        createFolder.setId("folder1");
+        createFolder.setType(Constants.TYPE_FOLDER);
+        createFolder.setParent(parentReference2);
+        createFolder.setProperty(new NamedValue[] {
+                new NamedValue(
+                        Constants.PROP_NAME,
+                        false,
+                        folderName,
+                        null)});
+
+        ContentFormat format = new ContentFormat(Constants.MIMETYPE_TEXT_PLAIN, "UTF-8");
+        
+        CMLWriteContent write = new CMLWriteContent();
+        write.setProperty(Constants.PROP_CONTENT);
+        write.setContent("this is a test".getBytes());
+        write.setFormat(format);
+        write.setWhere_id("id1");
+        
+        CML cml = new CML();
+        cml.setCreate(new CMLCreate[]{create, createFolder});
+        cml.setWriteContent(new CMLWriteContent[]{write});
+        
+        UpdateResult[] results = WebServiceFactory.getRepositoryService().update(cml);
+        assertNotNull(results);
+        assertEquals(3, results.length);
+        
+        // Get a reference to the create node
+        Reference reference = results[0].getDestination();
+        assertNotNull(reference);
+        Reference folderReference = results[1].getDestination();
+        assertNotNull(folderReference);
     }
     
     public void testGet() 
