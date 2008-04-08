@@ -1,9 +1,9 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
    <scope>global</scope>
-   <region-id>header</region-id>
+   <region-id>footer</region-id>
    <source-id>global</source-id>
-   <url>/slingshot/header</url>
+   <url>/slingshot/footer</url>
    <chrome>
       <frame>none</frame>
    </chrome>
