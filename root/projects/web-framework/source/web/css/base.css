@@ -13,6 +13,15 @@ div
    color: #515D6B;
 }
 
+
+div.sitemenu
+{
+   margin: 10px 0px 10px 0px; 
+   padding: 5px;
+   border-bottom: 1px solid #dedede;
+   border-top: 1px solid #dedede;
+}
+
 div.title
 {
    font-weight: bold;
@@ -23,9 +32,42 @@ div.titlebar
 {
    font-weight: bold;
    padding: 2px 0px 2px 8px;
-   background-color: #DCE4EB;
-   border-bottom: 1px solid #CCD4DB;
+   /*background-color: #DCE4EB;*/
+   background-color: #CCCCCC;
 }
+
+div.linkbar
+{
+   font-weight: normal;
+   background-color: #dedede; 
+   margin: 0px 0px 0px 0px; 
+   padding: 2px 0px 2px 8px;
+   border-bottom: 1px solid #dedede;
+}
+
+div.footer{
+   padding: 2px 8px 2px 8px;
+   border-top: 1px solid #dedede;   
+}
+
+div.component
+{
+   /*
+   padding: 5px; 
+   border: 1px dashed #dedede; 
+   */
+   padding: 0px; 
+   border: 1px solid #dedede; 
+   width: 100%;
+   height: 100%;
+
+}
+
+div.list
+{
+   overflow:auto;
+}
+
 
 span
 {
