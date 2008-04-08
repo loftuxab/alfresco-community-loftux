@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>A Component</shortname>
+  <description>A component that takes some real estate of the screen for testing</description>
+  <url>/slingshot/simple</url>
+</webscript>
