@@ -200,8 +200,31 @@ public class PassthruServers
     /**
      * Default constructor
      */
-    public PassthruServers()
-    {
+    public PassthruServers() {
+    	commonInit();
+    }
+    
+    /**
+     * Class constructor
+     * 
+     * @param checkInterval In seconds
+     */
+    public PassthruServers(int checkInterval) {
+    	
+    	// Set the offline checker wakeup interval
+    	
+    	m_offlineCheckInterval = ((long) checkInterval) * 1000L;
+    	
+    	// Common initialization
+    	
+    	commonInit();
+    }
+
+    /**
+     * Common constructor
+     */
+    private void commonInit() {
+    	
         // Create the server lists
         
         m_onlineList  = new ArrayList<PassthruServerDetails>();
@@ -521,6 +544,10 @@ public class PassthruServers
     public final void setOfflineCheckInterval(long interval)
     {
         m_offlineCheckInterval = interval * 1000L;
+        
+        // Wakeup the offline checked thread to pickup the new interval
+        
+        m_offlineChecker.processOfflineServers();
     }
     
     /**

@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.StringTokenizer;
 
 import org.alfresco.config.ConfigElement;
 import org.alfresco.jlan.debug.Debug;
@@ -36,6 +37,7 @@ import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.alfresco.jlan.server.core.ShareType;
 import org.alfresco.jlan.server.core.SharedDevice;
 import org.alfresco.jlan.smb.Capability;
+import org.alfresco.jlan.smb.Protocol;
 import org.alfresco.jlan.smb.SMBStatus;
 import org.alfresco.jlan.smb.dcerpc.UUID;
 import org.alfresco.jlan.smb.server.SMBServer;
@@ -55,22 +57,27 @@ import org.alfresco.jlan.util.HexDump;
  * @author GKSpencer
  */
 public class PassthruAuthenticator extends CifsAuthenticator implements SessionListener {
+
   // Constants
 
   public final static int DefaultSessionTmo = 5000; // 5 seconds
+  public final static int MinSessionTmo     = 2000; // 2 seconds
+  public final static int MaxSessionTmo     = 30000; // 30 seconds
 
-  public final static int MinSessionTmo = 2000; // 2 seconds
-
-  public final static int MaxSessionTmo = 30000; // 30 seconds
-
+  public final static int MinCheckInterval = 10;	  // 10 seconds
+  public final static int MaxCheckInterval = 15 * 60; // 15 minutes
+  
   // Passthru keep alive interval
 
   public final static long PassthruKeepAliveInterval = 60000L; // 60 seconds
 
   // NTLM flags mask, used to mask out features that are not supported
 
-  private static final int NTLM_FLAGS = NTLM.Flag56Bit + NTLM.Flag128Bit + NTLM.FlagLanManKey + NTLM.FlagNegotiateNTLM
-      + NTLM.FlagNegotiateUnicode;
+  private static final int NTLM_FLAGS = NTLM.Flag56Bit +
+  										NTLM.Flag128Bit +
+  										NTLM.FlagLanManKey +
+  										NTLM.FlagNegotiateNTLM +
+  										NTLM.FlagNegotiateUnicode;
 
   // Passthru servers used to authenticate users
 
@@ -1152,9 +1159,103 @@ public class PassthruAuthenticator extends CifsAuthenticator implements SessionL
 
     super.initialize(config, params);
 
-    // Create the passthru authentication server list
+    // Check if the passthru session protocol order has been specified
+    
+    ConfigElement protoOrder = params.getChild("protocolOrder");
+    if ( protoOrder != null) {
+    	
+    	// Parse the protocol order list
+    	
+    	StringTokenizer tokens = new StringTokenizer( protoOrder.getValue(), ",");
+    	int primaryProto = Protocol.None;
+    	int secondaryProto = Protocol.None;
 
-    m_passthruServers = new PassthruServers();
+    	// There should only be one or two tokens
+    	
+    	if ( tokens.countTokens() > 2)
+    		throw new InvalidConfigurationException("Invalid protocol order list, " + protoOrder.getValue());
+    	
+    	// Get the primary protocol
+    	
+    	if ( tokens.hasMoreTokens())
+    	{
+    		// Parse the primary protocol
+    		
+    		String primaryStr = tokens.nextToken();
+    		
+    		if ( primaryStr.equalsIgnoreCase( "TCPIP"))
+    			primaryProto = Protocol.NativeSMB;
+    		else if ( primaryStr.equalsIgnoreCase( "NetBIOS"))
+    			primaryProto = Protocol.TCPNetBIOS;
+    		else
+    			throw new InvalidConfigurationException("Invalid protocol type, " + primaryStr);
+    		
+    		// Check if there is a secondary protocol, and validate
+    		
+    		if ( tokens.hasMoreTokens())
+    		{
+    			// Parse the secondary protocol
+    			
+    			String secondaryStr = tokens.nextToken();
+    			
+    			if ( secondaryStr.equalsIgnoreCase( "TCPIP") && primaryProto != Protocol.NativeSMB)
+    				secondaryProto = Protocol.NativeSMB;
+    			else if ( secondaryStr.equalsIgnoreCase( "NetBIOS") && primaryProto != Protocol.TCPNetBIOS)
+    				secondaryProto = Protocol.TCPNetBIOS;
+    			else
+    				throw new InvalidConfigurationException("Invalid secondary protocol, " + secondaryStr);
+    		}
+    	}
+    	
+    	// Set the protocol order used for passthru authentication sessions
+    	
+    	AuthSessionFactory.setProtocolOrder( primaryProto, secondaryProto);
+    	
+    	// DEBUG
+    	
+    	if (hasDebug())
+    		Debug.println("Protocol order primary=" + Protocol.asString(primaryProto) + ", secondary=" + Protocol.asString(secondaryProto));
+    }
+    
+    // Check if the offline check interval has been specified
+    
+    ConfigElement checkInterval = params.getChild("offlineCheckInterval");
+    if ( checkInterval != null)
+    {
+        try
+        {
+            // Validate the check interval value
+
+            int offlineCheck = Integer.parseInt(checkInterval.getValue());
+            
+            // Range check the value
+            
+            if ( offlineCheck < MinCheckInterval || offlineCheck > MaxCheckInterval)
+                throw new InvalidConfigurationException("Invalid offline check interval, valid range is " + MinCheckInterval + " to " + MaxCheckInterval);
+            
+            // Set the offline check interval for offline passthru servers
+            
+            m_passthruServers = new PassthruServers( offlineCheck);
+            
+            // DEBUG
+            
+            if ( hasDebug())
+            	Debug.println("Using offline check interval of " + offlineCheck + " seconds");
+        }
+        catch (NumberFormatException ex)
+        {
+            throw new InvalidConfigurationException("Invalid offline check interval specified");
+        }
+    }
+    else
+    {
+    	// Create the passthru server list with the default offline check interval
+    	
+    	m_passthruServers = new PassthruServers();
+    }
+    
+    // Enable passthru servers debugging, if enabled for the authenticator
+
     if ( hasDebug())
       m_passthruServers.setDebug( true);
 
