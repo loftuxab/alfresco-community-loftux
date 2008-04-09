@@ -1,3 +1,3 @@
 <div class="site-title">
-My Profile
+Collaboration Site
 </div>

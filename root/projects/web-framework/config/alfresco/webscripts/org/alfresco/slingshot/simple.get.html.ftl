@@ -1,15 +1,9 @@
-<!-- Main gui -->
-
 <div class="component">
-  <div class="titlebar">A Component</div>
-  <div class="linkbar">
+  <div class="component-title">A Component</div>
+  <div class="component-links">
     <a href="javascript:alert('Not implemented');">Action ></a>
   </div>
-  <div>
-    <table>
-       <tr>
-          <td>Information</td> 
-       </tr>
-    </table>
+  <div class="component-body">
+    Information
   </div>
 </div>

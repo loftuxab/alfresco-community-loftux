@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>collaboration-doclib</id>
+   <title>Collboration Doclib</title>
+   <description>Collaboration site's doclib page</description>
+   <template>collaboration-doclib</template>
+</page>
