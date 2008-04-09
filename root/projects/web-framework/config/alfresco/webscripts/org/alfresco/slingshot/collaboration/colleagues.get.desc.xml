@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Collaboration colleagues</shortname>
+  <description>Lists colleagues in the collaboration site</description>
+  <url>/slingshot/collaboration/colleagues</url>
+</webscript>

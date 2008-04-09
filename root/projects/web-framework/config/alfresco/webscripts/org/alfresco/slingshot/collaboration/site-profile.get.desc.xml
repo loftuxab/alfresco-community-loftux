@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Site Profile</shortname>
+  <description>Site profile component used in the collaboration site</description>
+  <url>/slingshot/collaboration/site-profile</url>
+</webscript>

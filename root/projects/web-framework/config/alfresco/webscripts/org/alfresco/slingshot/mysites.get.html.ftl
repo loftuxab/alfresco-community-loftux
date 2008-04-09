@@ -1,19 +1,18 @@
 <!-- Main gui -->
 
 <div class="component">
-  <div class="titlebar">My Sites</div>
-  <div class="linkbar">
-    <a href="javascript:showCreateSiteDialog();">Create site</a>
+  <div class="component-title">My Sites</div>
+  <div class="component-links">
+    <a href="javascript:alert('Not implemented');">Create site</a>
+    <!-- showCreateSiteDialog(); -->
   </div>
-  <div class="list">
-    <table>
+  <div class="component-list">
 <#list sites as site>
-      <tr>
-        <td><img src="/SOME-IMAGE-PROXY-PATH/${site.icon}"></td>
-        <td>${site.name}</td>
-      </tr>
+      <div>
+        <!--<img src="/SOME-IMAGE-PROXY-PATH/${site.icon}">-->
+        <a href="${url.context}/page/collaboration/dashboard?doc=${site.name}">${site.name}</href>
+      </div>
 </#list>
-    </table>
   </div>
 </div>
 <!-- Create new site form -->

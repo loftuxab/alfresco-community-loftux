@@ -13,7 +13,7 @@
      <td width="50%"></td>
 
      <td>
-        <a href=""><nobr>Sites</nobr></a>
+        <a id="sitesLink" href=""><nobr>Sites</nobr></a>
      </td>
      <td>&nbsp;&nbsp;&nbsp;</td>
      <td>
