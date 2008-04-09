@@ -10,6 +10,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
@@ -88,13 +89,18 @@ public class TcpipSMBNetworkSession extends NetworkSession {
 
 	  //  Create the socket
 
-	  m_socket = new Socket(toName, m_sessPort);
+	  m_socket = new Socket();
 
 	  //  Enable the timeout on the socket
 
 	  m_socket.setSoTimeout ( getTimeout());
 
-	  //  Attach input/output streams to the socket
+      // Connect to the server
+      
+      InetSocketAddress sockAddr = new InetSocketAddress( toName, m_sessPort);
+      m_socket.connect(sockAddr, getTimeout());
+
+      //  Attach input/output streams to the socket
 
 	  m_in  = new DataInputStream ( m_socket.getInputStream ());
 	  m_out = new DataOutputStream ( m_socket.getOutputStream ());
