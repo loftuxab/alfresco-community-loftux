@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Remove Template Association Wizard</shortname>
+  <description>Remove Template Association Wizard</description>
+  <url>/wizard/removetemplateassociation</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

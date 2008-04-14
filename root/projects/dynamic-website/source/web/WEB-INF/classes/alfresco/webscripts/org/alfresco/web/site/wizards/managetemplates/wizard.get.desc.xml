@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Manage Templates</shortname>
+  <description>Manage Templates</description>
+  <url>/wizard/managetemplates</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>
