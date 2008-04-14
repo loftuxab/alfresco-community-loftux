@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Remove Content Type Association Wizard</shortname>
+  <description>Remove Content Type Association Wizard</description>
+  <url>/ads/wizard/remove-ct-association/{storeid}/{path}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

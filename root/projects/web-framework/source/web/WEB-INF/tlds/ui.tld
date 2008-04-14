@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" 
+"http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"> 
+
+<taglib> 
+	<tlibversion>1.0</tlibversion> 
+	<jspversion>1.1</jspversion>
+	<shortname>ui</shortname>
+	<uri>http://www.alfresco.org/adw/ui</uri>
+	<info>Alfresco UI Tags</info>
+	<tag> 
+		<name>url</name> 
+		<tagclass>org.alfresco.web.site.taglib.ui.URLTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Generic dispatch URL for a node or a content item</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>anchor</name> 
+		<tagclass>org.alfresco.web.site.taglib.ui.ContentAnchorTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Links to a content or navigation object</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>edit</name> 
+		<tagclass>org.alfresco.web.site.taglib.ui.ContentEditTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Links to a content or navigation object</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>endpoint</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>iconUri</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>print</name> 
+		<tagclass>org.alfresco.web.site.taglib.ui.ContentPrintTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Links to a 'print' format for content</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>iconUri</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+</taglib>

@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Alfresco Dynamic Site - Lucene Search Adapter</shortname>
+  <description>Alfresco Dynamic Site - Lucene Search Adapter</description>
+  <url>/ads/search/lucene/{storeid}?q={queryString}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

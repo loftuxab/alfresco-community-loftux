@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Web Project Wizard</shortname>
+  <description>Web Project Wizard</description>
+  <url>/ads/webprojectwizard</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

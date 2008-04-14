@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adw:component-type 	xmlns:adw="http://www.alfresco.org/adw/2.0" 
+			xmlns:alf="http://www.alfresco.org" 
+			xmlns:ev="http://www.w3.org/2001/xml-events" 
+			xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<adw:id>ct-navComponent</adw:id>
+	<adw:name>Navigation Component</adw:name>
+	<adw:description>Navigation Component Description</adw:description>
+	<adw:rendererType>jsp</adw:rendererType>
+	<adw:renderer>/ui/components/navComponent/component.jsp</adw:renderer>
+
+</adw:component-type>

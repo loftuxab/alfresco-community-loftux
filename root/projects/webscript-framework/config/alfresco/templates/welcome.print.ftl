@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head> 
       <title>${title}</title> 
-      <link rel="stylesheet" href="${url.context}/css/basic.css" type="text/css"/>
       <!--${head}-->
    </head>
    <body>

@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Item Component - Render</shortname>
+  <description>Edit Item Component - Render</description>
+  <url>/components/ct-itemComponent/edit/_render</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

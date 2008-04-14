@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Nav Component</shortname>
+  <description>Edit Nav Component</description>
+  <url>/component/ct-navComponent/edit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

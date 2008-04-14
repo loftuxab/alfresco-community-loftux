@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adw:template-type 	xmlns:adw="http://www.alfresco.org/adw/2.0" 
+			xmlns:alf="http://www.alfresco.org" 
+			xmlns:ev="http://www.w3.org/2001/xml-events" 
+			xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<adw:id>tt-basic-content-template</adw:id>
+	<adw:name>basic-content-template</adw:name>
+	<adw:description>basic-content-template</adw:description>
+	<adw:renderer>/build/basic/basic-content-template.jsp</adw:renderer>
+
+</adw:template-type>

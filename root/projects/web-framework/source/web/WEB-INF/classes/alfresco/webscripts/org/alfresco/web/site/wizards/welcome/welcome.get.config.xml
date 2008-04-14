@@ -1,0 +1,38 @@
+<wizard id="welcome">
+	<title>Welcome to Alfresco Dynamic Website</title>
+	<page id="start" start="true" type="url">
+		<buttons>
+			<button id="previous" label="Previous" enabled="false"/>
+			<button id="next" label="Next" action="transition" data="siteconfig"/>
+			<button id="cancel" label="Cancel" action="cancel"/>
+		</buttons>	
+	</page>
+	<page id="siteconfig" type="form">
+		<buttons>
+			<button id="previous" label="Previous" action="transition" data="start"/>
+			<button id="next" label="Next" action="transition" data="prebuilt"/>
+			<button id="cancel" label="Cancel" action="cancel"/>
+		</buttons>
+		<data>
+			<element id="websiteName" type="String" defaultValue="" />
+			<element id="websiteDescription" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="prebuilt" type="form">
+		<buttons>
+			<button id="previous" label="Previous" action="transition" data="siteconfig"/>
+			<button id="next" label="Next" action="transition" data="submit"/>
+			<button id="cancel" label="Cancel" action="cancel"/>
+		</buttons>		
+		<data>
+			<element id="prebuiltType" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="submit" end="true" type="form">
+		<data>
+			<element id="websiteName" type="String" />
+			<element id="websiteDescription" type="String" />
+			<element id="prebuiltType" type="String" />
+		</data>
+	</page>	
+</wizard>

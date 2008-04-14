@@ -62,9 +62,9 @@ public class PageComponent
    
    /** 
     * source Id for this component binding - related to the scope:
-    *  scope=global - "global"
+    *  scope=global   - "global"
     *  scope=template - the source template type name
-    *  scope=page - the source page id
+    *  scope=page     - the source page id
     **/
    private String sourceId;
    
@@ -76,8 +76,6 @@ public class PageComponent
    
    /** URL to the webscript UI component for this binding */
    private String url;
-   
-   private long lastModified;
    
    /** component chrome frame type */
    private ComponentFrameType frameType = ComponentFrameType.DIV;
@@ -98,8 +96,6 @@ public class PageComponent
       InputStream is = null;
       try
       {
-         this.lastModified = store.lastModified(path);
-         
          // parse component instance xml config file
          // TODO: convert to pull parser to optimize (see importer ViewParser)
          SAXReader reader = new SAXReader();
@@ -236,14 +232,6 @@ public class PageComponent
    public ComponentFrameType getFrameType()
    {
       return this.frameType;
-   }
-   
-   /**
-    * @return the last modified timestamp of the component config
-    */
-   public long getLastModified()
-   {
-      return this.lastModified;
    }
 
    @Override

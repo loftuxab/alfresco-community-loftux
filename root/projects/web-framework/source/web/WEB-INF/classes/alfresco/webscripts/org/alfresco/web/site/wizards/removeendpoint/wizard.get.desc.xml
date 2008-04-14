@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Remove Endpoint Wizard</shortname>
+  <description>Remove Endpoint Wizard</description>
+  <url>/wizard/removeendpoint</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

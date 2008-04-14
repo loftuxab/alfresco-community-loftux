@@ -63,7 +63,7 @@ public class PresentationTemplateProcessor
     protected String defaultEncoding;
     protected Configuration templateConfig;
     protected Configuration stringConfig;
-    private List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
+    protected List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
 
     /**
      * @param searchPath
@@ -222,24 +222,13 @@ public class PresentationTemplateProcessor
     }
     
     /**
-     * Add a template loader to the list used when the config is initialised.
-     * Must be called before the config is first initialised.
-     * 
-     * @param loader    TemplateLoader
-     */
-    public void addTemplateLoader(TemplateLoader loader)
-    {
-        loaders.add(loader);
-    }
-    
-    /**
      * Initialise FreeMarker Configuration
      */
-    public void initConfig()
+    protected void initConfig()
     {
         // construct template config
         templateConfig = new Configuration();
-        templateConfig.setCacheStorage(new MruCacheStorage(128, 256));
+        templateConfig.setCacheStorage(new MruCacheStorage(128, 512));
         templateConfig.setTemplateUpdateDelay(0);
         templateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfig.setLocalizedLookup(false);
@@ -248,18 +237,22 @@ public class PresentationTemplateProcessor
         {
             templateConfig.setDefaultEncoding(defaultEncoding);
         }
-        for (Store apiStore : searchPath.getStores())
+        
+        if (searchPath != null)
         {
-            TemplateLoader loader = apiStore.getTemplateLoader();
-            if (loader == null)
-            {
-                throw new WebScriptException("Unable to retrieve template loader for Web Script store " + apiStore.getBasePath());
-            }
-            loaders.add(loader);
+           for (Store apiStore : searchPath.getStores())
+           {
+               TemplateLoader loader = apiStore.getTemplateLoader();
+               if (loader == null)
+               {
+                   throw new WebScriptException("Unable to retrieve template loader for Web Script store " + apiStore.getBasePath());
+               }
+               loaders.add(loader);
+           }
         }
         MultiTemplateLoader loader = new MultiTemplateLoader(loaders.toArray(new TemplateLoader[loaders.size()]));
         templateConfig.setTemplateLoader(loader);
-
+        
         // construct string config
         stringConfig = new Configuration();
         stringConfig.setCacheStorage(new MruCacheStorage(2, 0));
@@ -269,14 +262,6 @@ public class PresentationTemplateProcessor
         {
             stringConfig.setDefaultEncoding(defaultEncoding);
         }
-    }
-    
-    /**
-     * @return the current Configuration object for the template processor
-     */
-    public Configuration getConfig()
-    {
-        return templateConfig; 
     }
     
     /* (non-Javadoc)

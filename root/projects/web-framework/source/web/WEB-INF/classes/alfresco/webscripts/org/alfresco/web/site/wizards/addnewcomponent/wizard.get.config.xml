@@ -1,0 +1,21 @@
+<wizard id="addnewcomponent">
+	<title>Add New Component</title>
+	<page id="start" start="true" type="form">
+		<buttons>
+			<button id="cancel" label="Cancel" action="cancel"/>
+			<button id="save" label="Save" action="transition" data="submit"/>
+		</buttons>
+		<data>
+			<element id="componentName" type="String" defaultValue="" />
+			<element id="componentDescription" type="String" defaultValue="" />
+			<element id="componentTypeId" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="submit" end="true" type="form">
+		<data>
+			<element id="componentName" type="String" />
+			<element id="componentDescription" type="String" />
+			<element id="componentTypeId" type="String" />
+		</data>
+	</page>	
+</wizard>

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+
+	<bean id="site.configsource" class="org.alfresco.config.source.UrlConfigSource">
+		<constructor-arg>
+			<list>
+				<value>classpath:alfresco/web-site-config.xml</value>
+				<value>classpath:alfresco/extension/web-site-config-custom.xml</value>
+			</list>
+		</constructor-arg>
+	</bean>
+
+	<bean id="site.config"
+		class="org.alfresco.config.xml.XMLConfigService" init-method="init">
+		<constructor-arg>
+			<ref bean="site.configsource" />
+		</constructor-arg>
+	</bean>
+
+	<bean id="site.store.modelobjects" class="org.alfresco.web.scripts.ClassPathStore">
+		<property name="mustExist">
+			<value>true</value>
+		</property>
+		<property name="classPath">
+			<value>alfresco</value>
+		</property>
+	</bean>
+
+	<bean id="site.model.searchpath"
+		class="org.alfresco.web.scripts.SearchPath">
+		<property name="searchPath">
+			<list>
+				<ref bean="site.store.modelobjects" />
+			</list>
+		</property>
+	</bean>
+		
+		
+		
+		
+	<!--  Declarative Site Web Script -->
+	<bean id="webscript.site" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWebScript" singleton="false">
+		<constructor-arg>
+			<ref bean="site.store.modelobjects" />
+		</constructor-arg>
+	</bean>
+		
+	<!--  Dynamic Wizard Web Script -->
+	<bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false">
+		<constructor-arg>
+			<ref bean="site.store.modelobjects" />
+		</constructor-arg>
+	</bean>
+
+
+</beans>

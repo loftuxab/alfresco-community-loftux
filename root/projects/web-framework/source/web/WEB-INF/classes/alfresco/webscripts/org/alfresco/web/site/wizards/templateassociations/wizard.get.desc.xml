@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Template Associations Wizard</shortname>
+  <description>Template Associations Wizard</description>
+  <url>/wizard/templateassociations</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

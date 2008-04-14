@@ -55,7 +55,6 @@ import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Cache;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.PresentationScriptProcessor;
-import org.alfresco.web.scripts.PresentationTemplateProcessor;
 import org.alfresco.web.scripts.Registry;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.ScriptContent;
@@ -73,7 +72,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import freemarker.cache.TemplateLoader;
 
 /**
- * Servlet for rendering pages based a PageTemplate and WebScript based components.
+ * Servlet for rendering pages based a behavior driven FreeMarker Template and scoped
+ * WebScript UI components.
  * 
  * GET: /<context>/<servlet>/[resource]...
  *  resource - app url resource
@@ -95,7 +95,7 @@ public class PageRendererServlet extends WebScriptServlet
    private static final String PARAM_COMPONENT_ID  = "_alfId";
    private static final String PARAM_COMPONENT_URL = "_alfUrl";
    
-   private PresentationTemplateProcessor templateProcessor;
+   private PageRendererTemplateProcessor templateProcessor;
    private PresentationScriptProcessor scriptProcessor;
    private PageComponentTemplateLoader pageComponentTemplateLoader;
    private Registry webscriptsRegistry;
@@ -125,7 +125,7 @@ public class PageRendererServlet extends WebScriptServlet
       templateStore.init();
       templateConfigStore = (Store)context.getBean("pagerenderer.templateconfigstore");
       templateConfigStore.init();
-      templateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
+      templateProcessor = (PageRendererTemplateProcessor)context.getBean("pagerenderer.templateprocessor");
       scriptProcessor = (PresentationScriptProcessor)context.getBean("webscripts.web.scriptprocessor");
       
       // custom loader for resolved UI Component reference indirections
@@ -135,7 +135,7 @@ public class PageRendererServlet extends WebScriptServlet
       // add template loader for the template store
       templateProcessor.addTemplateLoader(templateStore.getTemplateLoader());
       
-      // init the config for the template processor - caches and loaders etc. get resolved
+      // init the config for the template processor - loaders etc. get resolved
       templateProcessor.initConfig();
       
       // we use a specific config service instance
@@ -249,6 +249,7 @@ public class PageRendererServlet extends WebScriptServlet
             }
             finally
             {
+               // clean up
                this.pageComponentTemplateLoader.setContext(null);
                
                res.getWriter().flush();
@@ -292,8 +293,7 @@ public class PageRendererServlet extends WebScriptServlet
    private void processTemplatePage(PageInstance page, HttpServletRequest req, HttpServletResponse res)
       throws IOException
    {
-      // load the config for the specific template instance - resolve the template WebScript
-      // TODO: same issue as ApplicationUrl.getPageInstance()
+      // load the config for the specific template instance - then resolve the template and behaviour
       String templateConfig = page.getTemplate() + ".xml";
       if (this.templateConfigStore.hasDocument(templateConfig))
       {
@@ -305,7 +305,7 @@ public class PageRendererServlet extends WebScriptServlet
          String format = req.getParameter("format");
          
          // build template name by convention:
-         // mytemplate[.format].ftl
+         // templatename[.format].ftl
          String template =
             templateInstance.getTemplateType() + 
             ((format != null && format.length() != 0) ? ("." + format + ".ftl") : ".ftl");
@@ -325,6 +325,10 @@ public class PageRendererServlet extends WebScriptServlet
          
          Map<String, Object> resultModel = new HashMap<String, Object>(8, 1.0f);
          Map<String, Object> templateModel = getModel(page, req, false);
+         
+         // add the template config values directly to the template root model - this is useful for
+         // templates that do not require additional processing in JavaScript, they just need the values
+         templateModel.putAll(templateInstance.getPropetries());
          
          // execute any attached javascript behaviour for this template
          // the behaviour plus the config is responsible for specialising the template
@@ -350,10 +354,10 @@ public class PageRendererServlet extends WebScriptServlet
             }
          }
          
-         // therefore this is very fast as template pages themselves have very little content themselves
-         // and the logic for the template is executed once only with the result stored for the 2nd pass
-         // the critical performance path is in executing the webscript components - which is only
-         // performed on the second pass of the template once component references are all resolved
+         // First pass is very fast as template pages themselves have very little implicit content and
+         // any associated behaviour logic is executed only once, with the result stored for the 2nd pass.
+         // The critical performance path is in executing the WebScript components - which is only
+         // performed during the second pass of the template - once component references are all resolved.
          templateProcessor.process(template, templateModel,
             new Writer ()
             {
@@ -380,6 +384,7 @@ public class PageRendererServlet extends WebScriptServlet
          
          // construct template model for 2nd pass
          templateModel = getModel(page, req, true);
+         templateModel.putAll(templateInstance.getPropetries());
          if (script != null)
          {
             // script already executed - so just merge script return model into the template model
@@ -838,30 +843,21 @@ public class PageRendererServlet extends WebScriptServlet
          }
       }
 
+      /**
+       * @return Last modified date of this template - as the result of this component is not
+       *         an actual template but dynamic content, we have no useful last modified date.
+       */
       public long getLastModified(Object templateSource)
       {
-         // calculate this from component config last modified
-         String key = templateSource.toString();
-         
-         // lookup against resolved page component map
-         PageRendererContext context = this.context.get();
-         PageComponent component = context.PageInstance.getComponent(key);
-         if (component != null)
-         {
-            return component.getLastModified();
-         }
-         else
-         {
-            return 0;
-         }
+         return -1L;
       }
 
       /**
        * Return the reader for the specified template source.
-       * This custom loads uses this hook to execute a webscript based UI component within
+       * This custom loader uses this hook to execute a webscript based UI component within
        * it's own specific WebScript runtme using the PageRenderer as the outer context.
        * The output of the UI component is buffered and a reader to it is returned to the
-       * template engine. The stream is then output as the result of the #include directive.
+       * template engine. The stream is then output as the result of the <@region> directive.
        */
       public Reader getReader(Object templateSource, String encoding) throws IOException
       {
@@ -976,7 +972,10 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    
-   public static class CacheValue<T>
+   /**
+    * Simple last modified timestamp based cache value wrapper
+    */
+   static class CacheValue<T>
    {
       public T Value;
       public long LastModified;
