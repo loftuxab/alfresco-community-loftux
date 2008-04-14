@@ -30,9 +30,13 @@ public class FileStateCache implements Runnable {
 	
 	private static final long DEFAULT_EXPIRECHECK	= 3000;	// 60000;	//	1 minute
 	
-  //  File state cache, keyed by file path
+	// File state factory, used to create FileState objects
+	
+	private FileStateFactoryInterface m_stateFactory = new DefaultFileStateFactory();
+	
+	//  File state cache, keyed by file path
 
-  private Hashtable<String, FileState> m_stateCache;
+	private Hashtable<String, FileState> m_stateCache;
 
 	//	Wakeup interval for the expire file state checker thread
 	
@@ -46,10 +50,10 @@ public class FileStateCache implements Runnable {
 	
 	private FileStateListener m_stateListener;
 	
-  //  File state expire daemon thread and shutdown flag
+	//  File state expire daemon thread and shutdown flag
   
-  private Thread m_expireThread;
-  private boolean m_shutdown = false;
+	private Thread m_expireThread;
+	private boolean m_shutdown = false;
   
 	//	Debug enable and output stream
 	
@@ -205,7 +209,7 @@ public class FileStateCache implements Runnable {
   		
   		//	Create a new file state
   		
-  		state = new FileState(path);
+  		state = m_stateFactory.createFileState( path);
   		
 	  	//	Set the file state timeout and add to the cache
 	  	
@@ -504,6 +508,15 @@ public class FileStateCache implements Runnable {
   			Debug.println(ex);
   		}
   	}
+  }
+  
+  /**
+   * Set the file state factory class to be used to create new FileState objects
+   * 
+   * @param factory FileStateFactoryInterface
+   */
+  public final void setFileStateFactory( FileStateFactoryInterface factory) {
+	  m_stateFactory = factory;
   }
   
   /**

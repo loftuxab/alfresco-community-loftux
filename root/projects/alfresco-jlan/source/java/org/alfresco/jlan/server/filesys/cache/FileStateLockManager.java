@@ -14,7 +14,6 @@ import org.alfresco.jlan.locking.NotLockedException;
 import org.alfresco.jlan.server.SrvSession;
 import org.alfresco.jlan.server.filesys.NetworkFile;
 import org.alfresco.jlan.server.filesys.TreeConnection;
-import org.alfresco.jlan.server.filesys.db.DBNetworkFile;
 import org.alfresco.jlan.server.locking.LockManager;
 
 /**
@@ -37,15 +36,15 @@ public class FileStateLockManager implements LockManager {
 	public void lockFile(SrvSession sess, TreeConnection tree, NetworkFile file, FileLock lock)
 		throws LockConflictException, IOException {
 			
-		//	Make sure the file is of the correct type
+		//	Make sure the file implements the file state interface
 		
-		if (( file instanceof DBNetworkFile) == false)
-			throw new IllegalArgumentException("Invalid NetworkFile class");
+		if (( file instanceof NetworkFileStateInterface) == false)
+			throw new IllegalArgumentException("NetworkFile does not implement NetworkFileStateInterface");
 			
 		//	Get the file state associated with the file
 		
-		DBNetworkFile dbFile = (DBNetworkFile) file;
-		FileState fstate = dbFile.getFileState();
+		NetworkFileStateInterface fstateIface = (NetworkFileStateInterface) file;
+		FileState fstate = fstateIface.getFileState();
 		
 		if ( fstate == null)
 			throw new IOException("Open file without state (lock)");
@@ -71,15 +70,15 @@ public class FileStateLockManager implements LockManager {
 	public void unlockFile(SrvSession sess, TreeConnection tree, NetworkFile file, FileLock lock)
 		throws NotLockedException, IOException {
 			
-		//	Make sure the file is of the correct type
-	
-		if (( file instanceof DBNetworkFile) == false)
-			throw new IllegalArgumentException("Invalid NetworkFile class");
+		//	Make sure the file implements the file state interface
 		
+		if (( file instanceof NetworkFileStateInterface) == false)
+			throw new IllegalArgumentException("NetworkFile does not implement NetworkFileStateInterface");
+			
 		//	Get the file state associated with the file
-	
-		DBNetworkFile dbFile = (DBNetworkFile) file;
-		FileState fstate = dbFile.getFileState();
+		
+		NetworkFileStateInterface fstateIface = (NetworkFileStateInterface) file;
+		FileState fstate = fstateIface.getFileState();
 	
 		if ( fstate == null)
 			throw new IOException("Open file without state (unlock)");
