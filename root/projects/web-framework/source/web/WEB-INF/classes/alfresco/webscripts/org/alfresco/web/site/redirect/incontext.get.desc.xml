@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>InContext Redirect</shortname>
-  <description>InContext Redirect</description>
-  <url>/ads/redirect/incontext/{storeid}/{path}</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

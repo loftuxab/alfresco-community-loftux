@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Add Content Type Association Wizard</shortname>
-  <description>Add Content Type Association Wizard</description>
-  <url>/wizard/add-ct-association</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

@@ -22,30 +22,45 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site.ui;
+package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
+import org.alfresco.web.site.renderer.Renderable;
 
 /**
  * @author muzquiano
  */
-public class DynamicLayoutType extends AbstractRenderable
+public abstract class AbstractRenderable implements Renderable
 {
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
+    public void print(HttpServletResponse response, String str)
             throws RendererExecutionException
     {
-        // TODO
-        // this is just an idea but we could have a remote layout
-        // maybe this executes freemarker inside of Alfresco
-        // not sure
-
-        // print out
-        print(response, "Sample dynamic layout - not too dynamic yet!");
-    }    
+        try
+        {
+            response.getWriter().print(str);
+        }
+        catch (Exception ex)
+        {
+            throw new RendererExecutionException(ex);
+        }
+    }
+    
+    public void appendHeadTags(RequestContext context, String tags)
+    {
+        RenderUtil.appendHeadTags(context, tags);
+    }
+    
+    public void setRenderer(String renderer)
+    {
+        this.renderer = renderer;
+    }
+    
+    public String getRenderer()
+    {
+        return this.renderer;
+    }
+    
+    protected String renderer;
 }

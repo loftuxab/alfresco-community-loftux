@@ -110,6 +110,8 @@ public abstract class AbstractConfig
     public abstract String getDefaultServletUri();
 
     public abstract String getDynamicWebsiteServletUri();
+    
+    public abstract String getDefaultPageUri();
 
     //////////////////////////////////////////////////////////////////
     // File Systems
