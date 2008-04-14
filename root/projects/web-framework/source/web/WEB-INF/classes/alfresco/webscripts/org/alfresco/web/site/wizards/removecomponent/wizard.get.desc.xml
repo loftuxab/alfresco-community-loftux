@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Remove Component</shortname>
-  <description>Remove Component</description>
-  <url>/wizard/removecomponent</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

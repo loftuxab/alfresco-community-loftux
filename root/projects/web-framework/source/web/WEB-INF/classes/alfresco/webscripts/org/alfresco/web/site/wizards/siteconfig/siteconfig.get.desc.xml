@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Site Configuration Wizard</shortname>
-  <description>Site Configuration Wizard</description>
-  <url>/wizard/siteconfig</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

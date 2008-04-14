@@ -1,8 +1,0 @@
-<wizard id="managetemplates">
-	<title>Manage Templates</title>
-	<page id="start" start="true" type="checkboxgrid">
-		<buttons>
-			<button id="ok" label="OK" action="cancel"/>
-		</buttons>	
-	</page>
-</wizard>

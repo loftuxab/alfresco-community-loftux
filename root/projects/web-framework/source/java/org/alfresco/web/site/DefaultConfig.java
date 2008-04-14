@@ -310,6 +310,14 @@ public class DefaultConfig extends AbstractConfig
             value = "/";
         return value;
     }
+    
+    public String getDefaultPageUri()
+    {
+        String value = get("page.default.uri");
+        if (value == null)
+            value = "/ui/core/page-default.jsp";
+        return value;    	
+    }
 
     //////////////////////////////////////////////////////////////////
     // File Systems

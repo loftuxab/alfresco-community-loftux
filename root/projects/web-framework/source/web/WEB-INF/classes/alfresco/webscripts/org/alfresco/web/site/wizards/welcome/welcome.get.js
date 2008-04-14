@@ -1,1 +1,0 @@
-wizard.setDialogURL("/ui/misc/welcome-splash.jsp");

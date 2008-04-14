@@ -374,6 +374,15 @@ public class WebScriptFrameworkConfig extends AbstractConfig
         return config.getConfigElement("servlet").getChild("dispatcher").getChildValue(
                 "context");
     }
+    
+    public String getDefaultPageUri()
+    {
+    	try {
+    		return config.getConfigElement("page").getChild("default").getChildValue("uri");
+    	}catch(Exception ex) { }
+    	return "/ui/core/page-default.jsp";
+    }
+    
 
     //////////////////////////////////////////////////////////////////
     // File Systems

@@ -84,8 +84,11 @@ public class DispatcherServlet extends BaseServlet
         // initial state - what if nothing is set up
         if (currentPage == null && currentObjectId == null)
         {
-            // go to GETTING STARTED
-            dispatchJsp(context, request, response, "/ui/misc/getting-started.jsp");
+            // go to default page
+        	String defaultPageUri = context.getConfig().getDefaultPageUri();
+        	if(defaultPageUri == null || "".equals(defaultPageUri))
+        		defaultPageUri = "/ui/core/page-default.jsp";
+            dispatchJsp(context, request, response, defaultPageUri);
         }
         else
         {
