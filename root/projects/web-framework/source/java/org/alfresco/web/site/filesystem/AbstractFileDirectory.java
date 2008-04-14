@@ -24,6 +24,13 @@
  */
 package org.alfresco.web.site.filesystem;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+import org.alfresco.tools.DataUtil;
+
 /**
  * @author muzquiano
  */
@@ -71,6 +78,77 @@ public abstract class AbstractFileDirectory implements IFile
     {
         return this.fileSystem.createFile(this.getPath(), name);
     }
+    
+    public byte[] readBytes()
+    {
+        byte[] array = null;
+
+        if(this.isFile())
+        {        
+            try
+            {
+                InputStream is = getInputStream();
+    
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                int data = 0;
+                while ((data = is.read()) != -1)
+                {
+                    baos.write(data);
+                }
+                baos.close();
+    
+                array = baos.toByteArray();
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();                
+            }
+        }
+        return array;
+    }
+    
+    public void writeBytes(byte[] array)
+    {
+        if(this.isFile())
+        {
+            try
+            {
+                ByteArrayInputStream bais = new ByteArrayInputStream(array);
+                OutputStream os = getOutputStream();
+                DataUtil.copyStream(bais, os);
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
+        }        
+    }
+    
+    public String readContents()
+    {
+        byte[] array = readBytes();
+        return new String(array);        
+    }
+    
+    public void writeContents(String contents)
+    {
+        byte[] array = contents.getBytes();
+        writeBytes(array);        
+    }
+    
+    
+    public InputStream getInputStream() throws Exception
+    {
+        return this.fileSystem.getInputStream(this);
+    }
+    
+    public OutputStream getOutputStream() throws Exception
+    {
+        return this.fileSystem.getOutputStream(this);
+    }
+    
+    
+    
 
     protected IFileSystem fileSystem;
 }

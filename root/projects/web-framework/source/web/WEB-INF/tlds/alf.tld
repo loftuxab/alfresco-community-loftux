@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE taglib PUBLIC "-//Sun Microsystems, Inc.//DTD JSP Tag Library 1.1//EN" 
+"http://java.sun.com/j2ee/dtds/web-jsptaglibrary_1_1.dtd"> 
+
+<taglib> 
+	<tlibversion>1.0</tlibversion> 
+	<jspversion>1.1</jspversion>
+	<shortname>alf</shortname>
+	<uri>http://www.alfresco.org/taglib/alf</uri>
+	<info>Alfresco Web Framework Tags</info>
+	<tag> 
+		<name>region</name> 
+		<tagclass>org.alfresco.web.site.taglib.RegionTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Region within a Layout</info> 
+		<attribute>
+			<name>name</name>
+			<required>true</required>
+		</attribute>
+		<attribute>
+			<name>scope</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>protect</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag>
+		<name>head</name> 
+		<tagclass>org.alfresco.web.site.taglib.HeadTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Imports required dependencies into the HTML HEAD</info> 
+	</tag> 
+	<tag>
+		<name>require</name> 
+		<tagclass>org.alfresco.web.site.taglib.RequireTag</tagclass>
+		<bodycontent>tagdependent</bodycontent>
+		<info>Tags located inside the body of this tag will be placed into the HEAD</info> 
+		<attribute>
+			<name>script</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>link</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>pageTitle</name> 
+		<tagclass>org.alfresco.web.site.taglib.PageTitleTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Throws down the title of the current page / node</info> 
+	</tag> 
+	
+	
+	
+	
+	<tag> 
+		<name>url</name> 
+		<tagclass>org.alfresco.web.site.taglib.URLTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Generic dispatch URL for a node or a content item</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>anchor</name> 
+		<tagclass>org.alfresco.web.site.taglib.ContentAnchorTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Links to a content or navigation object</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>edit</name> 
+		<tagclass>org.alfresco.web.site.taglib.ContentEditTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Links to a content or navigation object</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>endpoint</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>iconUri</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>print</name> 
+		<tagclass>org.alfresco.web.site.taglib.ContentPrintTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Links to a 'print' format for content</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>format</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>iconUri</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	
+</taglib>

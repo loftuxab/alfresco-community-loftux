@@ -25,18 +25,25 @@
 package org.alfresco.web.site;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.site.filesystem.IFile;
+import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Endpoint;
+import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
 import org.alfresco.web.site.model.Template;
 import org.alfresco.web.site.model.TemplateType;
+import org.dom4j.Document;
 
 /**
  * @author muzquiano
@@ -53,42 +60,19 @@ public class ModelUtil
     public static Configuration[] findConfigurations(RequestContext context,
             String sourceId)
     {
-        Configuration[] array = new Configuration[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Configuration.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        Configuration[] array = new Configuration[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            // load all of the component association objects
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "configuration");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    Configuration configuration = (Configuration) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _sourceId = configuration.getSourceId();
-
-                    if (sourceId != null && !sourceId.equalsIgnoreCase(_sourceId))
-                        okay = false;
-
-                    if (okay)
-                        arrayList.add(configuration);
-                }
-
-                array = new Configuration[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (Configuration) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+            array[i] = (Configuration) objects[i];
+        }        
         return array;
     }
 
@@ -103,49 +87,20 @@ public class ModelUtil
             RequestContext context, String sourceId, String destId,
             String associationType)
     {
-        PageAssociation[] array = new PageAssociation[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, PageAssociation.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap, PageAssociation.PROP_DEST_ID, destId);
+        addPropertyConstraint(propertyConstraintMap, PageAssociation.PROP_ASSOC_TYPE, associationType);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, PageAssociation.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        PageAssociation[] array = new PageAssociation[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            // load all of the component association objects
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "page-association");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    PageAssociation pageAssociation = (PageAssociation) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _sourceId = pageAssociation.getSourceId();
-                    String _destId = pageAssociation.getDestId();
-                    String _associationType = pageAssociation.getAssociationType();
-                    //				String _orderId = pageAssociation.getOrderId();
-
-                    if (sourceId != null && !sourceId.equalsIgnoreCase(_sourceId))
-                        okay = false;
-                    if (destId != null && !destId.equalsIgnoreCase(_destId))
-                        okay = false;
-                    if (associationType != null && !associationType.equalsIgnoreCase(_associationType))
-                        okay = false;
-                    //				if(orderId != null && !orderId.equalsIgnoreCase(_orderId))
-                    //					okay = false;
-                    if (okay)
-                        arrayList.add(pageAssociation);
-                }
-
-                array = new PageAssociation[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (PageAssociation) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (PageAssociation) objects[i];
         }
         return array;
     }
@@ -163,14 +118,14 @@ public class ModelUtil
         unassociatePage(context, sourceId, destId, associationType);
 
         // create a new template association
-        PageAssociation pageAssociation = context.getModelManager().newPageAssociation(
+        PageAssociation pageAssociation = context.getModel().newPageAssociation(
                 context);
         pageAssociation.setSourceId(sourceId);
         pageAssociation.setDestId(destId);
         pageAssociation.setAssociationType(associationType);
 
         // save the object
-        context.getModelManager().saveObject(context, pageAssociation);
+        context.getModel().saveObject(context, pageAssociation);
     }
 
     public static void unassociatePage(RequestContext context, String sourceId,
@@ -191,9 +146,9 @@ public class ModelUtil
     public static void unassociatePage(RequestContext context,
             String pageAssociationId)
     {
-        PageAssociation pageAssociation = context.getModelManager().loadPageAssociation(
+        PageAssociation pageAssociation = context.getModel().loadPageAssociation(
                 context, pageAssociationId);
-        context.getModelManager().removeObject(context, pageAssociation);
+        context.getModel().removeObject(context, pageAssociation);
     }
 
     // object associations
@@ -207,49 +162,21 @@ public class ModelUtil
             RequestContext context, String sourceId, String destId,
             String assocType, String formatId)
     {
-        ContentAssociation[] array = new ContentAssociation[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, ContentAssociation.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap, ContentAssociation.PROP_DEST_ID, destId);
+        addPropertyConstraint(propertyConstraintMap, ContentAssociation.PROP_ASSOC_TYPE, assocType);
+        addPropertyConstraint(propertyConstraintMap, ContentAssociation.PROP_FORMAT_ID, formatId);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, ContentAssociation.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        ContentAssociation[] array = new ContentAssociation[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            // load all of the component association objects
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "content-association");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    ContentAssociation association = (ContentAssociation) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _sourceId = association.getSourceId();
-                    String _destId = association.getDestId();
-                    String _assocType = association.getAssociationType();
-                    String _formatId = association.getFormatId();
-
-                    if (sourceId != null && !sourceId.equalsIgnoreCase(_sourceId))
-                        okay = false;
-                    if (destId != null && !destId.equalsIgnoreCase(_destId))
-                        okay = false;
-                    if (assocType != null && !assocType.equalsIgnoreCase(_assocType))
-                        okay = false;
-                    if (formatId != null && !formatId.equalsIgnoreCase(_formatId))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(association);
-                }
-
-                array = new ContentAssociation[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (ContentAssociation) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (ContentAssociation) objects[i];
         }
         return array;
     }
@@ -261,7 +188,7 @@ public class ModelUtil
         unassociateContent(context, sourceId, destId, assocType, formatId);
 
         // create a new association
-        ContentAssociation association = context.getModelManager().newContentAssociation(
+        ContentAssociation association = context.getModel().newContentAssociation(
                 context);
         association.setSourceId(sourceId);
         association.setDestId(destId);
@@ -269,7 +196,7 @@ public class ModelUtil
         association.setFormatId(formatId);
 
         // save the object
-        context.getModelManager().saveObject(context, association);
+        context.getModel().saveObject(context, association);
     }
 
     public static void unassociateContent(RequestContext context,
@@ -284,9 +211,9 @@ public class ModelUtil
     public static void unassociateContent(RequestContext context,
             String objectAssociationId)
     {
-        ContentAssociation association = context.getModelManager().loadContentAssociation(
+        ContentAssociation association = context.getModel().loadContentAssociation(
                 context, objectAssociationId);
-        context.getModelManager().removeObject(context, association);
+        context.getModel().removeObject(context, association);
 
     }
 
@@ -300,60 +227,41 @@ public class ModelUtil
             String scope, String sourceId, String regionId,
             String componentTypeId)
     {
-        Component[] array = new Component[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE, scope);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_REGION_ID, regionId);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_COMPONENT_TYPE_ID, componentTypeId);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Component.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        Component[] array = new Component[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            // load all of the component association objects
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "component");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    Component component = (Component) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _scope = component.getScope();
-                    String _sourceId = component.getSourceId();
-                    String _regionId = component.getRegionId();
-                    String _componentTypeId = component.getComponentTypeId();
-
-                    if (scope != null && !scope.equalsIgnoreCase(_scope))
-                        okay = false;
-                    if (sourceId != null && !sourceId.equalsIgnoreCase(_sourceId))
-                        okay = false;
-                    if (regionId != null && !regionId.equalsIgnoreCase(_regionId))
-                        okay = false;
-                    if (componentTypeId != null && !componentTypeId.equalsIgnoreCase(_componentTypeId))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(component);
-                }
-
-                array = new Component[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (Component) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (Component) objects[i];
         }
         return array;
     }
 
     public static void associateComponent(RequestContext context,
-            String componentId, String scope, String sourceId, String regionId,
-            boolean x)
+            String componentId, String scope, String sourceId, String regionId)
     {
+        // first unassociate any existing components with these bindings
+        Component[] array = findComponents(context, scope, sourceId, regionId, null);
+        if(array != null && array.length > 0)
+        {
+            for(int i = 0; i < array.length; i++)
+            {
+                Component a = (Component) array[i];
+                unassociateComponent(context, a.getId());
+            }
+        }
+        
         // get the component
-        Component component = context.getModelManager().loadComponent(context,
-                componentId);
+        Component component = context.getModel().loadComponent(context, componentId);
 
         // bind it
         component.setScope(scope);
@@ -361,18 +269,18 @@ public class ModelUtil
         component.setRegionId(regionId);
 
         // save the object
-        context.getModelManager().saveObject(context, component);
+        context.getModel().saveObject(context, component);
     }
 
     public static void unassociateComponent(RequestContext context,
             String componentId)
     {
-        Component component = context.getModelManager().loadComponent(context,
+        Component component = context.getModel().loadComponent(context,
                 componentId);
         component.setScope("");
         component.setSourceId("");
         component.setRegionId("");
-        context.getModelManager().saveObject(context, component);
+        context.getModel().saveObject(context, component);
     }
 
     // helpers (for non associations)
@@ -384,40 +292,18 @@ public class ModelUtil
     public static Template[] findTemplates(RequestContext context,
             String templateType)
     {
-        Template[] array = new Template[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, Template.PROP_TEMPLATE_TYPE, templateType);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Template.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        Template[] array = new Template[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            // load all of the component association objects
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "template");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    Template template = (Template) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _templateType = template.getTemplateType();
-
-                    if (templateType != null && !templateType.equalsIgnoreCase(_templateType))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(template);
-                }
-
-                array = new Template[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (Template) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (Template) objects[i];
         }
         return array;
     }
@@ -430,82 +316,26 @@ public class ModelUtil
     public static TemplateType[] findTemplateTypes(RequestContext context,
             String uri)
     {
-        TemplateType[] array = new TemplateType[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, TemplateType.PROP_URI, uri);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, TemplateType.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        TemplateType[] array = new TemplateType[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "template-type");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    TemplateType templateType = (TemplateType) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _uri = templateType.getURI();
-
-                    if (uri != null && !uri.equalsIgnoreCase(_uri))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(templateType);
-                }
-
-                array = new TemplateType[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (TemplateType) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (TemplateType) objects[i];
         }
         return array;
-
     }
 
     public static Component[] findComponents(RequestContext context,
             String componentTypeId)
     {
-        Component[] array = new Component[] {};
-        try
-        {
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "component");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    Component component = (Component) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _componentTypeId = component.getComponentTypeId();
-
-                    if (componentTypeId != null && !componentTypeId.equalsIgnoreCase(_componentTypeId))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(component);
-                }
-
-                array = new Component[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (Component) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-        return array;
+        return findComponents(context, null, null, null, componentTypeId);
     }
 
     public static ComponentType[] findComponentTypes(RequestContext context)
@@ -516,39 +346,18 @@ public class ModelUtil
     public static ComponentType[] findComponentTypes(RequestContext context,
             String uri)
     {
-        ComponentType[] array = new ComponentType[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, ComponentType.PROP_URI, uri);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, ComponentType.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        ComponentType[] array = new ComponentType[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "component-type");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    ComponentType componentType = (ComponentType) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _uri = componentType.getURI();
-
-                    if (uri != null && !uri.equalsIgnoreCase(_uri))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(componentType);
-                }
-
-                array = new ComponentType[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (ComponentType) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (ComponentType) objects[i];
         }
         return array;
     }
@@ -561,47 +370,19 @@ public class ModelUtil
     public static Page[] findPages(RequestContext context, String templateId,
             String rootPage)
     {
-        Page[] array = new Page[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_ID, templateId);
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_ROOT_PAGE, rootPage);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Page.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        Page[] array = new Page[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "page");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    Page page = (Page) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _templateId = page.getTemplateId();
-                    boolean _rootPage = page.getRootPage();
-
-                    if (templateId != null && !templateId.equalsIgnoreCase(_templateId))
-                        okay = false;
-                    if (rootPage != null && !"".equals(rootPage))
-                    {
-                        if ("true".equals(rootPage) && !_rootPage)
-                            okay = false;
-                        if ("false".equals(rootPage) && _rootPage)
-                            okay = false;
-                    }
-                    if (okay)
-                        arrayList.add(page);
-                }
-
-                array = new Page[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (Page) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (Page) objects[i];
         }
         return array;
     }
@@ -614,39 +395,18 @@ public class ModelUtil
     public static Endpoint[] findEndpoints(RequestContext context,
             String endpointId)
     {
-        Endpoint[] array = new Endpoint[] {};
-        try
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap, Endpoint.PROP_ENDPOINT_ID, endpointId);
+        
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Endpoint.TYPE_NAME, propertyConstraintMap);
+        
+        // convert to return type
+        Endpoint[] array = new Endpoint[objects.length];
+        for(int i = 0; i < objects.length; i++)
         {
-            String relativeDirectory = context.getConfig().getModelTypePath(
-                    "endpoint");
-            IFile[] files = context.getModelManager().getFiles(context,
-                    relativeDirectory);
-            if (files != null)
-            {
-                List arrayList = new ArrayList();
-                for (int i = 0; i < files.length; i++)
-                {
-                    // this will load from the cache, potentially
-                    Endpoint endpoint = (Endpoint) context.getModelManager().loadObject(
-                            context, files[i]);
-
-                    boolean okay = true;
-                    String _endpointId = endpoint.getEndpointId();
-
-                    if (endpointId != null && !endpointId.equalsIgnoreCase(_endpointId))
-                        okay = false;
-                    if (okay)
-                        arrayList.add(endpoint);
-                }
-
-                array = new Endpoint[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                    array[j] = (Endpoint) arrayList.get(j);
-            }
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            array[i] = (Endpoint) objects[i];
         }
         return array;
     }
@@ -669,9 +429,9 @@ public class ModelUtil
     public static void associateTemplate(RequestContext context,
             String templateId, String pageId, String formatId)
     {
-        Page page = context.getModelManager().loadPage(context, pageId);
+        Page page = context.getModel().loadPage(context, pageId);
         page.setTemplateId(templateId, formatId);
-        context.getModelManager().saveObject(context, page);
+        context.getModel().saveObject(context, page);
     }
 
     public static void unassociateTemplate(RequestContext context, String pageId)
@@ -682,9 +442,9 @@ public class ModelUtil
     public static void unassociateTemplate(RequestContext context,
             String pageId, String formatId)
     {
-        Page page = context.getModelManager().loadPage(context, pageId);
+        Page page = context.getModel().loadPage(context, pageId);
         page.removeTemplateId(formatId);
-        context.getModelManager().saveObject(context, page);
+        context.getModel().saveObject(context, page);
     }
 
     // extra
@@ -705,4 +465,153 @@ public class ModelUtil
             return configurations[0];
         return null;
     }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    // generic method
+    
+    protected static ModelObject[] findObjects(RequestContext context, String typeName, HashMap propertyConstraintMap)
+    {
+        ModelObject[] array = new ModelObject[] {};
+        try
+        {
+            ModelObject[] objects = context.getModel().loadObjects(context, typeName);
+            if(objects != null && objects.length > 0)
+            {
+                List arrayList = new ArrayList();
+                for (int i = 0; i < objects.length; i++)
+                {
+                    ModelObject object = (ModelObject) objects[i];
+                    boolean success = true;
+
+                    // walk the property map and make sure all matches are satisfied
+                    if(propertyConstraintMap != null)
+                    {
+                        Iterator it = propertyConstraintMap.keySet().iterator();
+                        while(it.hasNext())
+                        {
+                            String propertyName = (String) it.next();
+                            Object propertyValue = propertyConstraintMap.get(propertyName);
+                            if(propertyValue != null)
+                            {
+                                // constraints
+                                if(propertyValue instanceof String)
+                                {
+                                    String currentValue = (String) object.getProperty(propertyName);
+                                    if(!propertyValue.equals(currentValue))
+                                    {
+                                        success = false;
+                                    }
+                                }                                
+                                if(propertyValue instanceof Boolean)
+                                {
+                                    boolean currentValue = object.getBooleanProperty(propertyName);
+                                    if(currentValue != ((Boolean)propertyValue).booleanValue())
+                                    {
+                                        success = false;
+                                    }                                    
+                                }
+                            }
+                        }
+                    }
+                    
+                    if(success)
+                        arrayList.add(object);
+                }
+
+                array = new ModelObject[arrayList.size()];
+                for (int j = 0; j < arrayList.size(); j++)
+                    array[j] = (ModelObject) arrayList.get(j);
+            }
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return array;
+    }
+    
+    public static void addPropertyConstraint(Map propertyConstraintMap, String propertyName, Object propertyValue)
+    {
+        if(propertyValue != null)
+        {
+            propertyConstraintMap.put(propertyName, propertyValue);
+        }
+    }
+    
+    
+    
+    // helpers
+    
+    public static String getFileStringContents(RequestContext context, String relativeFilePath)
+    {
+        IFile file = context.getFileSystem().getFile(relativeFilePath);
+        if(file != null)
+        {
+            return file.readContents();
+        }
+        return null;
+    }
+    
+    public static void writeDocument(RequestContext context, String relativePath,
+            String name, Document xmlDocument)
+    {
+        writeDocument(context.getFileSystem(), relativePath, name, xmlDocument);
+    }
+
+    public static void writeDocument(IFileSystem fileSystem, String relativePath, String name, Document xmlDocument)
+    {
+        // convert to xml       
+        String xml = XMLUtil.toXML(xmlDocument, true);
+
+        // relative file path
+        String relativeFilePath = relativePath + "/" + name;
+
+        // check to see if a file already exists
+        IFile file = fileSystem.getFile(relativeFilePath);
+        if (file == null)
+        {
+            // no existing file, so create it
+            file = fileSystem.createFile(relativeFilePath);
+        }
+        if (file != null)
+        {
+            file.writeBytes(xml.getBytes());
+        }
+    }
+    
+    public static Document readDocument(RequestContext context, String relativeFilePath)
+    {
+        return readDocument(context.getFileSystem(), relativeFilePath);
+    }
+
+    public static Document readDocument(IFileSystem fileSystem, String relativeFilePath)
+    {
+        IFile file = fileSystem.getFile(relativeFilePath);
+        if (file == null)
+            return null;
+        return readDocument(file);
+    }
+    
+    public static Document readDocument(IFile file)
+    {
+        Document doc = null;
+        try
+        {
+            doc = XMLUtil.parse(file.getInputStream());
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+        return doc;
+    }
+    
+    
 }

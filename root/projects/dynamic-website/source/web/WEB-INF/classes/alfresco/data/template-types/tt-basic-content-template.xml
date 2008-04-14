@@ -9,6 +9,7 @@
 	<adw:id>tt-basic-content-template</adw:id>
 	<adw:name>basic-content-template</adw:name>
 	<adw:description>basic-content-template</adw:description>
-	<adw:renderer>/build/basic/basic-content-template.jsp</adw:renderer>
+	<adw:renderer-type>html</adw:renderer-type>
+	<adw:renderer>/build/basic/basic-content-template.html</adw:renderer>
 
 </adw:template-type>

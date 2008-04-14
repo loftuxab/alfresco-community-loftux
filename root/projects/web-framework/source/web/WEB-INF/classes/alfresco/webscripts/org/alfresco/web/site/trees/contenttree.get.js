@@ -1,41 +1,36 @@
 <import resource="/org/alfresco/web/site/include/utils.js">
 <import resource="/org/alfresco/web/site/include/json.js">
 
-var incomingPath = args["path"];
-
-
-var fullpath = url.extension.split("/");	
-var storeid = fullpath[0];
-model.store = avm.lookupStore(storeid);	
-model.path = (fullpath.length == 1 ? "/" : "/" + fullpath.slice(1).join("/"));
-model.node = model.store.lookupNode(model.path);
-
-// kind of a strange way to determine the relative path
-var i = model.path.indexOf("/",1);
-var relativePath = model.path.substring(i, model.path.length);
-if(i == -1)
-	relativePath = "";
-
+var relativePath = args["path"];
+var avmStoreId = args["avmStoreId"];
 
 // return
 var json = new Array();
 
-var children = model.node.children;
+var fs = site.getFileSystem();
+var rootFile = fs.getFile(relativePath);
+
+var children = rootFile.getChildren();
 for(var i = 0; i < children.length; i++)
 {
-	var node = children[i];
+	var scriptFile = children[i];
 	
 	json[i] = { };
+	var fileName = scriptFile.getName();
+	json[i]["text"] = fileName;	
 	json[i]["draggable"] = true;
-	if(node.isFile())
+	json[i]["leaf"] = true;
+	
+	// file case
+	if(scriptFile.isFile())
 	{
-		json[i]["alfType"] = "avmFile";
+		json[i]["alfType"] = "file";
 		
 		// stamp the json with anything interesting that we can tell about this file
-		var z = node.name.indexOf(".");
+		var z = fileName.indexOf(".");
 		if(z > -1)
 		{
-			var fileExtension = node.name.substring(z+1, node.name.length());
+			var fileExtension = fileName.substring(z+1, fileName.length());
 			if("html" == fileExtension)
 				json[i]["alfFileType"] = "html";
 			if("htm" == fileExtension)
@@ -74,14 +69,16 @@ for(var i = 0; i < children.length; i++)
 				json[i]["iconCls"] = "tree-icon-webapplication-textfile";
 		}
 	}
-	if(node.isDirectory())
+	
+	// directory case
+	if(scriptFile.isDirectory())
 	{
-		json[i]["alfType"] = "avmDirectory";
+		json[i]["alfType"] = "directory";
+		if(scriptFile.getChildren() != null && scriptFile.getChildren().length > 0)
+		{
+			json[i]["leaf"] = false;
+		}
 	}
-	if(node.children.length == 0)
-		json[i]["leaf"] = true;
-	json[i]["text"] = node.name;
-	json[i]["draggable"] = true;
 }
 
 var outputString = json.toJSONString();

@@ -29,6 +29,7 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -36,13 +37,16 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
-import org.alfresco.web.site.DefaultModelManager;
+import org.alfresco.web.site.DefaultModel;
 import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.HttpRequestContextFactory;
+import org.alfresco.web.site.IModel;
 import org.alfresco.web.site.RequestContextFactory;
 import org.alfresco.web.site.RequestContextFactoryBuilder;
 import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.filesystem.FileSystemManager;
+import org.alfresco.web.site.filesystem.IFileSystem;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -56,7 +60,7 @@ public class WebScriptFrameworkFilter implements Filter
         super();
     }
 
-    public static void initFramework(ApplicationContext context)
+    public static void initFramework(ServletContext servletContext, ApplicationContext context)
     {
         synchronized (WebScriptFrameworkFilter.class)
         {
@@ -66,12 +70,17 @@ public class WebScriptFrameworkFilter implements Filter
                 ConfigService configService = (ConfigService) context.getBean("site.config");
                 Config config = configService.getConfig("WebFramework");
 
-                WebScriptFrameworkConfig webFrameworkConfig = new WebScriptFrameworkConfig(
-                        config);
-                DefaultModelManager manager = new DefaultModelManager();
-
+                // set the config onto the framework
+                WebScriptFrameworkConfig webFrameworkConfig = new WebScriptFrameworkConfig(config);
                 Framework.setConfig(webFrameworkConfig);
-                Framework.setManager(manager);
+                
+                // set the model onto the framework
+                String modelRootPath = webFrameworkConfig.getModelRootPath();
+                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(servletContext, modelRootPath);
+                IModel model = new DefaultModel(modelFileSystem);
+                Framework.setModel(model);
+                
+                System.out.println("WebScriptFrameworkFilter - Initialized WebScript Framework");
             }
         }
     }
@@ -80,7 +89,8 @@ public class WebScriptFrameworkFilter implements Filter
     {
         // make sure the default framework is loaded
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(config.getServletContext());
-        initFramework(context);
+        ServletContext servletContext = config.getServletContext();
+        initFramework(servletContext, context);
     }
 
     public static void initRequestContext(HttpServletRequest request)

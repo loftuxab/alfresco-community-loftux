@@ -26,6 +26,7 @@ package org.alfresco.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -33,6 +34,8 @@ import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
 
 /**
  * @author muzquiano
@@ -127,7 +130,33 @@ public class XMLUtil
 
     public static String toXML(Document document)
     {
-        return document.asXML();
+        return toXML(document, false);
     }
 
+    public static String toXML(Document document, boolean pretty)
+    {
+        if(pretty)
+        {
+            OutputFormat format = OutputFormat.createPrettyPrint();            
+            format.setSuppressDeclaration(false);
+            
+            StringWriter writer = new StringWriter();
+            XMLWriter xmlWriter = new XMLWriter(writer, format);
+            try
+            {
+                xmlWriter.write(document);
+                xmlWriter.flush();
+                return writer.toString();
+            }
+            catch(IOException ioe)
+            {
+                // if this fails, we'll just opt out and let it serialize
+                // in the default way (which is compact)
+                ioe.printStackTrace();
+            }
+        }
+        
+        return document.asXML();
+    }
+    
 }

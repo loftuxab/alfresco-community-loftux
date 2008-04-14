@@ -27,7 +27,10 @@ package org.alfresco.web.site.ui;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.tools.EncodingUtil;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.ThemeUtil;
+import org.alfresco.web.site.URLUtil;
 import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
@@ -44,13 +47,27 @@ public class MarkupComponentType extends AbstractRenderable
         String markupData = (String) config.get("markupData");
 
         // shimmy the data a bit
-        String data = "";
-        if (markupData == null)
-            data = "Please edit me";
         if (markupData != null)
-            data = markupData;
+        {
+            /**
+             * Append one or more tags that we would like to appear in the
+             * HEAD region of the page.  This is done just to show an
+             * example.
+             */
+            this.appendHeadTags(context, "<!-- Appended to HEAD by MarkupComponentType -->");
 
-        // print out
-        print(response, data);
+            // clean up the data
+            String data = EncodingUtil.decode(markupData);
+
+            // print out to component body
+            print(response, data);
+        }
+        else
+        {
+            String currentThemeId = ThemeUtil.getCurrentThemeId(context);
+            String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+            String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Google Gadget Component'/>";   
+            print(response, renderString);            
+        }
     }
 }

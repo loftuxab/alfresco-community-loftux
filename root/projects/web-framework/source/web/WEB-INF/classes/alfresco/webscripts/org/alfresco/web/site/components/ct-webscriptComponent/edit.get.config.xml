@@ -1,0 +1,17 @@
+<wizard id="ct-webscriptComponent">
+	<title>Webscript Component</title>
+	<page id="start" start="true" type="form">
+		<buttons>
+			<button id="cancel" label="Cancel" action="cancel"/>
+			<button id="save" label="Save" action="transition" data="submit"/>
+		</buttons>
+		<data>
+			<element id="uri" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="submit" end="true" type="form">
+		<data>
+			<element id="uri" type="String" />
+		</data>
+	</page>	
+</wizard>

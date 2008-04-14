@@ -39,7 +39,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  */
 public class JavaClassRenderer extends AbstractRenderer
 {
-    public void executeImpl(RequestContext context, HttpServletRequest request,
+    public void execute(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, RuntimeConfig config)
             throws RendererExecutionException
     {
@@ -56,6 +56,7 @@ public class JavaClassRenderer extends AbstractRenderer
             {
                 // instantiate the java class
                 renderableImpl = (Renderable) Class.forName(renderer).newInstance();
+                renderableImpl.setRenderer(renderer);
                 instances.put(renderer, renderableImpl);
             }
             catch (Exception ex)

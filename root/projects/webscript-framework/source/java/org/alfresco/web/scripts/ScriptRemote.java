@@ -58,11 +58,23 @@ public class ScriptRemote
 
    private String endpoint;
    private String defaultEncoding;
+   private String ticket;
    
    // TODO: remove this - for testing only!
    private String username;
    private String password;
    
+   
+   /**
+    * Construction
+    * 
+    * @param endpoint         HTTP API endpoint of remote Alfresco server webapp
+    *                         For example http://servername:8080/alfresco
+    */
+   public ScriptRemote(String endpoint)
+   {
+      this(endpoint, null);
+   }
    
    /**
     * Construction
@@ -75,6 +87,16 @@ public class ScriptRemote
    {
       this.endpoint = endpoint;
       this.defaultEncoding = defaultEncoding;
+   }
+   
+   /**
+    * Authentication ticket to use
+    * 
+    * @param ticket
+    */
+   public void setTicket(String ticket)
+   {
+      this.ticket = ticket;
    }
    
    // TODO: remove this - for testing only!
@@ -98,11 +120,16 @@ public class ScriptRemote
       Status status = new Status();
       try
       {
-         //
-         // TODO: Authentication ticket! Either pass in to constructor (must be authenticated
-         //       before main page is rendered) or assume uri already has ticket argument.
-         //
-         URL url = new URL(endpoint + uri);
+         URL url;
+         if (this.ticket == null)
+         {
+            url = new URL(endpoint + uri);
+         }
+         else
+         {
+            url = new URL(endpoint + uri +
+                          (uri.lastIndexOf('?') == -1 ? ("?alf_ticket="+ticket) : ("&alf_ticket="+ticket)));
+         }
          ByteArrayOutputStream bOut = new ByteArrayOutputStream(BUFFERSIZE);
          String encoding = service(url, bOut, status);
          if (encoding != null)

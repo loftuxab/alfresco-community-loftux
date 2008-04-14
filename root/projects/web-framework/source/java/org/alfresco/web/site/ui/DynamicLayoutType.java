@@ -47,5 +47,5 @@ public class DynamicLayoutType extends AbstractRenderable
 
         // print out
         print(response, "Sample dynamic layout - not too dynamic yet!");
-    }
+    }    
 }

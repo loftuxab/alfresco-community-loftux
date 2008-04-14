@@ -31,6 +31,20 @@ import org.dom4j.Document;
  */
 public class Endpoint extends ModelObject
 {
+    public static String TYPE_NAME = "endpoint";
+    
+    public static String PROP_ENDPOINT_ID = "endpoint-id";
+    public static String PROP_CONNECTOR_ID = "connector-id";
+    public static String PROP_AUTH_ID = "auth-id";
+    public static String PROP_ENDPOINT_URL = "endpoint-url";
+    public static String PROP_DEFAULT_URI = "default-uri";
+    public static String PROP_IDENTITY = "identity";
+    public static String PROP_USERNAME = "username";
+    public static String PROP_PASSWORD = "password";
+    
+    public static String VALUE_IDENTITY_SPECIFIC_USER = "specific";
+    public static String VALUE_IDENTITY_CURRENT_USER = "current";
+    
     public Endpoint(Document document)
     {
         super(document);
@@ -42,33 +56,90 @@ public class Endpoint extends ModelObject
         return "Endpoint: " + getId() + ", " + toXML();
     }
 
-    public String getConnectorId()
-    {
-        return getProperty("connector-id");
-    }
-
-    public void setConnectorId(String connectorId)
-    {
-        setProperty("connector-id", connectorId);
-    }
-
-    public String getClientId()
-    {
-        return getProperty("client-id");
-    }
-
-    public void setClientId(String clientId)
-    {
-        setProperty("client-id", clientId);
-    }
-
     public String getEndpointId()
     {
-        return getProperty("endpoint-id");
+        return getProperty(PROP_ENDPOINT_ID);
     }
 
     public void setEndpointId(String endpointId)
     {
-        setProperty("endpoint-id", endpointId);
+        setProperty(PROP_ENDPOINT_ID, endpointId);
     }
+    
+    public String getConnectorId()
+    {
+        return getProperty(PROP_CONNECTOR_ID);
+    }
+
+    public void setConnectorId(String connectorId)
+    {
+        setProperty(PROP_CONNECTOR_ID, connectorId);
+    }
+
+    public String getAuthenticatorId()
+    {
+        return getProperty(PROP_AUTH_ID);
+    }
+
+    public void setAuthenticatorId(String authenticatorId)
+    {
+        setProperty(PROP_AUTH_ID, authenticatorId);
+    }
+    
+    public String getEndpointURL()
+    {
+        return getProperty(PROP_ENDPOINT_URL);
+    }
+    
+    public void setEndpointURL(String endpointUrl)
+    {
+        setProperty(PROP_ENDPOINT_URL, endpointUrl);
+    }
+    
+    public String getDefaultURI()
+    {
+        return getProperty(PROP_DEFAULT_URI);
+    }
+    
+    public void setDefaultURI(String defaultUri)
+    {
+        setProperty(PROP_DEFAULT_URI, defaultUri);
+    }
+    
+    public String getIdentity()
+    {
+        return getProperty(PROP_IDENTITY);
+    }
+    
+    public void setIdentity(String identity)
+    {
+        setProperty(PROP_IDENTITY, identity);
+    }
+    
+    public String getUsername()
+    {
+        return getProperty(PROP_USERNAME);
+    }
+    
+    public void setUsername(String username)
+    {
+        setProperty(PROP_USERNAME, username);
+    }
+    
+    public String getPassword()
+    {
+        return getProperty(PROP_PASSWORD);
+    }
+    
+    public void setPassword(String password)
+    {
+        setProperty(PROP_PASSWORD, password);
+    }    
+    
+    
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

@@ -36,7 +36,7 @@
 	if(queryString == null)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-		String unconfiguredImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+		String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
 		String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Query Component'/>";	
 		out.println(renderString);
 		return;
@@ -46,7 +46,7 @@
 	// build the web script connector
 	//String webscriptUri = "/ads/search/lucene/ads--admin";
 	String webscriptUri = "/ads/search/lucene/" + context.getStoreId();
-	WebscriptConnector connector = RemoteFactory.newWebscriptConnector(context, endpoint, webscriptUri);
+	WebscriptConnector connector = ConnectorFactory.newWebscriptConnector(context, endpoint, webscriptUri);
 		
 	// fetch xml
 	HashMap params = new HashMap();
@@ -76,11 +76,11 @@
         		List renditionList = XMLUtil.getChildren(item, "rendition");
         		for(int j = 0; j < renditionList.size(); j++)
         		{
-        			Element rendition = (Element) renditionList.get(j);
-        			String _templateTitle = XMLUtil.getChildValue(rendition, "templateTitle");
-        			if(_templateTitle != null && _templateTitle.equalsIgnoreCase(renderData))
-        			{
-        				String renditionPath = (String) XMLUtil.getChildValue(rendition, "path");
+        	Element rendition = (Element) renditionList.get(j);
+        	String _templateTitle = XMLUtil.getChildValue(rendition, "templateTitle");
+        	if(_templateTitle != null && _templateTitle.equalsIgnoreCase(renderData))
+        	{
+        		String renditionPath = (String) XMLUtil.getChildValue(rendition, "path");
 %>        				
 	<!-- content -->
 		<%

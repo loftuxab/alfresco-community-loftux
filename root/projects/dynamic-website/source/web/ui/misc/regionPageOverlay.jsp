@@ -22,21 +22,21 @@
 	ComponentType componentType = null;
 	if(componentId != null)
 	{
-		component = (Component) context.getModelManager().loadComponent(context, componentId);
+		component = (Component) context.getModel().loadComponent(context, componentId);
 		componentType = (ComponentType) component.getComponentType(context);
 	}
 
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-	String infoImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/info_icon.gif");
+	String infoImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/info_icon.gif");
 	
-	String componentImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/component.gif");
-	String componentImageLargeUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/component_large.gif");
+	String componentImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/component.gif");
+	String componentImageLargeUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/component_large.gif");
 	
-	String missingComponentImageLargeUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
+	String missingComponentImageLargeUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
 	
-	String siteScopeImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/website_large.gif");
-	String templateScopeImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/template_large.gif");
-	String pageScopeImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/page_large.gif");
+	String siteScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/website_large.gif");
+	String templateScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/template_large.gif");
+	String pageScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/page_large.gif");
 	
 	String _regionScopeId = regionScopeId.substring(0,1).toUpperCase() + regionScopeId.substring(1, regionScopeId.length());
 	

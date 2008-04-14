@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.ModelUtil;
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
@@ -65,14 +65,14 @@ public class DispatcherServlet extends BaseServlet
         {
             dispatch(context, request, response);
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            throw new ServletException(ex);
+            throw new ServletException(e);
         }
     }
 
     protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws Exception
+            HttpServletResponse response)
     {
         // we are either navigating to a NODE
         // or to a CONTENT OBJECT (xform object)
@@ -85,7 +85,7 @@ public class DispatcherServlet extends BaseServlet
         if (currentPage == null && currentObjectId == null)
         {
             // go to GETTING STARTED
-            dispatchJsp(request, response, "/ui/misc/getting-started.jsp");
+            dispatchJsp(context, request, response, "/ui/misc/getting-started.jsp");
         }
         else
         {
@@ -103,23 +103,15 @@ public class DispatcherServlet extends BaseServlet
         }
     }
 
-    protected void dispatchJsp(HttpServletRequest request,
+    protected void dispatchJsp(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, String dispatchPage)
-            throws ServletException
     {
-        try
-        {
-            RequestUtil.include(request, response, dispatchPage);
-        }
-        catch (Exception ex)
-        {
-            throw new ServletException(ex);
-        }
+        PresentationUtil.renderJspPage(context, request, response, dispatchPage);
     }
 
     protected void dispatchContent(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String contentId, String formatId) throws Exception
+            String contentId, String formatId)
     {
         // TODO
         // figure out the content type
@@ -151,20 +143,19 @@ public class DispatcherServlet extends BaseServlet
 
     protected void dispatchCurrentPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String formatId) throws Exception
+            String formatId)
     {
         Page page = context.getCurrentPage();
         Template currentTemplate = page.getTemplate(context);
         if (currentTemplate != null)
         {
-            RenderUtil.renderTemplate(context, request, response,
-                    currentTemplate.getId());
+            PresentationUtil.renderPage(context, request, response);
         }
         else
         {
             // no template, so dispatch to a "starter" page
-            String dispatchPath = "/ui/misc/unconfigured-nav-node.jsp";
-            RequestUtil.include(request, response, dispatchPath);
+            String dispatchPage = "/ui/misc/unconfigured-nav-node.jsp";
+            PresentationUtil.renderJspPage(context, request, response, dispatchPage);
         }
     }
 }

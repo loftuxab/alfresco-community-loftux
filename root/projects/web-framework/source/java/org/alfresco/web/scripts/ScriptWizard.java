@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.ScriptConfigModel;
+import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -52,9 +53,9 @@ public final class ScriptWizard extends ScriptBase
 
     protected HttpServletRequest getHttpServletRequest()
     {
-        if (context instanceof ScriptRequestContext)
+        if (context instanceof HttpRequestContext)
         {
-            return ((ScriptRequestContext) context).getRequest();
+            return ((HttpRequestContext) context).getRequest();
         }
         return null;
     }

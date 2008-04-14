@@ -37,7 +37,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  */
 public class HTMLRenderer extends AbstractRenderer
 {
-    public void executeImpl(RequestContext context, HttpServletRequest request,
+    public void execute(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, RuntimeConfig config)
             throws RendererExecutionException
     {
@@ -48,7 +48,6 @@ public class HTMLRenderer extends AbstractRenderer
         {
             String renditionRelativePath = renderer;
             RequestUtil.includeHTML(request, response, renditionRelativePath);
-
         }
         catch (Exception ex)
         {

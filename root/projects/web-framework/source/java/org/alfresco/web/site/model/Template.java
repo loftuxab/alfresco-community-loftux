@@ -32,6 +32,9 @@ import org.dom4j.Document;
  */
 public class Template extends ModelObject
 {
+    public static String TYPE_NAME = "template";
+    public static String PROP_TEMPLATE_TYPE = "template-type";
+    
     public Template(Document document)
     {
         super(document);
@@ -45,12 +48,12 @@ public class Template extends ModelObject
 
     public String getTemplateType()
     {
-        return getProperty("template-type");
+        return getProperty(PROP_TEMPLATE_TYPE);
     }
 
     public void setTemplateType(String templateType)
     {
-        setProperty("template-type", templateType);
+        setProperty(PROP_TEMPLATE_TYPE, templateType);
     }
 
     // Helpers
@@ -58,8 +61,13 @@ public class Template extends ModelObject
     public TemplateType getTemplateType(RequestContext context)
     {
         // either 'global', template or page
-        return context.getModelManager().loadTemplateType(context,
+        return context.getModel().loadTemplateType(context,
                 getTemplateType());
     }
 
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

@@ -80,4 +80,6 @@ public interface IModelObject
     public Map getSettings();
 
     public Map getProperties();
+    
+    public String getTypeName();
 }

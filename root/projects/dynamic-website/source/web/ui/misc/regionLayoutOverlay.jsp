@@ -18,9 +18,9 @@
 	
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
 		
-	String siteScopeImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/website_large.gif");
-	String templateScopeImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/template_large.gif");
-	String pageScopeImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/page_large.gif");
+	String siteScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/website_large.gif");
+	String templateScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/template_large.gif");
+	String pageScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/page_large.gif");
 	
 	String _regionScopeId = regionScopeId.substring(0,1).toUpperCase() + regionScopeId.substring(1, regionScopeId.length());
 	

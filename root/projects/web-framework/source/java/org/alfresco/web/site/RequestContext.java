@@ -26,6 +26,8 @@ package org.alfresco.web.site;
 
 import java.util.HashMap;
 
+import org.alfresco.connector.CredentialsVault;
+import org.alfresco.connector.IdentityVault;
 import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.config.RuntimeConfigManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
@@ -155,9 +157,9 @@ public abstract class RequestContext
 
     // helpers
 
-    public AbstractModelManager getModelManager()
+    public IModel getModel()
     {
-        return Framework.getManager();
+        return Framework.getModel();
     }
 
     public AbstractConfig getConfig()
@@ -169,11 +171,39 @@ public abstract class RequestContext
     {
         return logger;
     }
-
+        
+    public void setUser(User user)
+    {
+        this.user = user;
+    }
+    
+    public User getUser() {
+        return user;
+    }
+    
     protected HashMap map;
     protected Page currentPage;
     protected String currentObjectId;
     protected String currentFormatId;
     protected IFileSystem fileSystem;
     protected String storeId;
+    protected User user;
+    
+    public static String VALUE_HEAD_TAGS = "headTags";
+    public static String VALUE_CREDENTIAL_VAULT = "credential_vault";
+    public static String VALUE_IDENTITY_VAULT = "identity_vault";
+    
+    
+    //
+    
+    public CredentialsVault getUserCredentialVault()
+    {
+        return (CredentialsVault) getValue(VALUE_CREDENTIAL_VAULT);
+    }
+    
+    public IdentityVault getUserIdentityVault()
+    {
+        return (IdentityVault) getValue(VALUE_IDENTITY_VAULT);
+    }
+    
 }

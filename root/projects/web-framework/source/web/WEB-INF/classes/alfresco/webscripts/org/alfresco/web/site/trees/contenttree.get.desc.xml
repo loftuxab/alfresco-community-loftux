@@ -1,4 +1,4 @@
-<webscript kind="wizard">
+<webscript kind="site">
   <shortname>Content Tree Functions</shortname>
   <description>Content Tree Functions</description>
   <url>/tree/content</url>

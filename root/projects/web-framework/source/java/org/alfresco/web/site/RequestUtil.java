@@ -60,17 +60,16 @@ public class RequestUtil
         RequestContext context = getRequestContext(request);
 
         // load the html
-        String unprocessedHtml = context.getModelManager().getDocumentString(
+        String unprocessedHtml = ModelUtil.getFileStringContents(
                 context, renditionRelativePath);
 
         // process the tags in the html
-        String processedHtml = FilterUtil.filterContent(request, response,
-                unprocessedHtml, originalRelativePath);
-
-        // write the result
+        // this executes and commits to the writer
         try
         {
-            response.getWriter().print(processedHtml);
+            String content = FilterUtil.filterContent(context, request, response,
+                    unprocessedHtml, originalRelativePath);
+            response.getWriter().write(content);
         }
         catch (Exception ex)
         {
@@ -92,17 +91,16 @@ public class RequestUtil
         RequestContext context = getRequestContext(request);
 
         // load the html
-        String unprocessedHtml = context.getModelManager().getDocumentString(
+        String unprocessedHtml = ModelUtil.getFileStringContents(
                 context, renditionRelativePath);
 
-        // process the tags in the html
-        String processedHtml = FilterUtil.filterContent(request, response,
-                unprocessedHtml, renditionRelativePath);
-
-        // write the result
         try
         {
-            response.getWriter().print(processedHtml);
+            // process the tags in the html
+            // this executes and commits to the writer
+            String content = FilterUtil.filterContent(context, request, response,
+                    unprocessedHtml, renditionRelativePath);
+            response.getWriter().write(content);
         }
         catch (Exception ex)
         {
@@ -116,10 +114,11 @@ public class RequestUtil
     {
         try
         {
+            // do the include
             request.getRequestDispatcher(dispatchPath).include(request,
                     response);
         }
-        catch (Exception ex)
+        catch (Throwable ex)
         {
             throw new ServletException(ex);
         }
@@ -131,6 +130,7 @@ public class RequestUtil
     {
         try
         {
+            // do the forward
             request.getRequestDispatcher(dispatchPath).forward(request,
                     response);
         }

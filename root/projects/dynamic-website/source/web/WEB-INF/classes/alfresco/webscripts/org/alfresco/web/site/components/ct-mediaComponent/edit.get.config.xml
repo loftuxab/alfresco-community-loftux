@@ -1,0 +1,25 @@
+<wizard id="ct-mediaComponent">
+	<title>Media Component</title>
+	<page id="start" start="true" type="form">
+		<buttons>
+			<button id="cancel" label="Cancel" action="cancel"/>
+			<button id="save" label="Save" action="transition" data="submit"/>
+		</buttons>
+		<data>
+			<element id="mediaType" type="String" defaultValue="" />
+			<element id="url" type="String" defaultValue="" />
+			<element id="unsupportedText" type="String" defaultValue="" />
+			<element id="width" type="String" defaultValue="" />
+			<element id="height" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="submit" end="true" type="form">
+		<data>
+			<element id="mediaType" type="String" />
+			<element id="url" type="String" />
+			<element id="unsupportedText" type="String" />
+			<element id="width" type="String" />
+			<element id="height" type="String" />
+		</data>
+	</page>	
+</wizard>

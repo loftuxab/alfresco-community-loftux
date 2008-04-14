@@ -1,11 +1,9 @@
-<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/utils.js">
-<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/json.js">
-<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/ads-support.js">
-<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/avm-support.js">
+<import resource="/org/alfresco/web/site/include/utils.js">
+<import resource="/org/alfresco/web/site/include/json.js">
+<import resource="/org/alfresco/web/site/include/ads-support.js">
 
 function pushComponentSettings(component)
 {
-	logger.log("PUSH COMPONENT SETTINGS");
 	for(var argName in args)
 	{
 		if(argName.substring(0,1) == "_")
@@ -49,16 +47,18 @@ if(regionScopeId == null)
 if(proceed)
 {
 	var component = null;
+	/*
 	if(componentId != null && componentTypeId == null)
 	{
 		//
 		// binding a component
 		//
 		component = site.getObject(componentId);
-		componentTypeId = component.getProperty("componentTypeId");
+		componentTypeId = component.getProperty("component-type-id");
 		json["componentId"] = componentId;
 		json["componentId"] = componentTypeId;		
 	}
+	*/
 	if(componentId == null && componentTypeId != null)
 	{
 		//
@@ -67,7 +67,7 @@ if(proceed)
 		
 		// build the component
 		component = site.newComponent();
-		component.setProperty("componentTypeId", componentTypeId);
+		component.setProperty("component-type-id", componentTypeId);
 		save(component);
 	
 		// assign component id onto json return
@@ -84,13 +84,7 @@ if(proceed)
 	
 	if(component != null)
 	{
-		// do the association
-		site.associateComponent(componentId, regionScopeId, regionSourceId, regionId);
-		
-		// assign component association id onto json return
-		var associations = site.findComponentAssociations(componentId, regionScopeId, regionSourceId, regionId);
-		if(associations != null && associations.length > 0)
-			json["componentAssociationId"] = associations[0].getProperty("id");
+		site.associateComponent(componentId, regionScopeId, regionSourceId, regionId);		
 	}
 }
 

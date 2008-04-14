@@ -9,7 +9,7 @@
    <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
-         classpath:alfresco/web-framework-application-context.xml
+         classpath:alfresco/webscript-framework-application-context.xml
          classpath:alfresco/web-site-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
@@ -25,10 +25,11 @@
         <filter-name>Web Script Framework Filter</filter-name>
         <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>
     </filter>
-    <filter-mapping>
-        <filter-name>Web Script Framework Filter</filter-name>
-        <url-pattern>/*</url-pattern>
-    </filter-mapping>
+    <filter>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+    </filter>
+    
     
     <!-- Include this filter to run standalone (without Spring) -->
     <!--
@@ -41,6 +42,15 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>    
     -->
+    <filter-mapping>
+        <filter-name>Web Script Framework Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    <filter-mapping>
+        <filter-name>UrlRewriteFilter</filter-name>
+        <url-pattern>/alfresco/*</url-pattern>
+    </filter-mapping>
+
 
 
 

@@ -39,23 +39,23 @@ public class WrappedHttpServletResponse extends HttpServletResponseWrapper
     public WrappedHttpServletResponse(HttpServletResponse response)
     {
         super(response);
-        baos = new ByteArrayOutputStream();
-        writer = new PrintWriter(baos);
+        this.outputStream = new ByteArrayOutputStream();
+        this.printWriter = new PrintWriter(outputStream);
     }
 
-    private PrintWriter writer = null;
-    private ByteArrayOutputStream baos = null;
-
+    private PrintWriter printWriter = null;
+    private ByteArrayOutputStream outputStream = null;
+    
     public PrintWriter getWriter() throws IOException
     {
         // return this instead of the output stream
-        return writer;
+        return printWriter;
     }
 
     public String getOutput()
     {
-        writer.flush();
-        writer.close();
-        return baos.toString();
-    }
+        printWriter.flush();
+        printWriter.close();
+        return this.outputStream.toString();
+    }    
 }

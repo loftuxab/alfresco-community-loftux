@@ -208,12 +208,9 @@ public class LocalFileSystem implements IFileSystem
             IFile childFile = parentDirectory.getChild(fileName);
             if (childFile != null)
             {
-                System.out.println("LocalFileSystem: Deleting " + childFile.getName());
-
                 LocalFile localFile = (LocalFile) childFile;
                 File f = localFile.getFileObject();
 
-                System.out.println("LocalFileSystem 11");
                 return f.delete();
             }
         }

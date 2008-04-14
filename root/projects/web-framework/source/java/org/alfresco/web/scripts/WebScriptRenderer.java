@@ -46,7 +46,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WebScriptRenderer extends AbstractRenderer
 {
-    public void executeImpl(RequestContext context, HttpServletRequest request,
+    public void execute(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, RuntimeConfig modelConfig)
             throws RendererExecutionException
     {
@@ -68,9 +68,6 @@ public class WebScriptRenderer extends AbstractRenderer
         webScriptContext.modelConfig = modelConfig;
         webScriptContext.modelObject = modelConfig.getObject();
         webScriptContext.Tokens = args;
-
-        System.out.println(" -> requesturi: " + webScriptContext.RequestURI);
-        System.out.println(" -> requestpath: " + webScriptContext.RequestPath);
 
         // get the application context
         // get the web script runtime container

@@ -71,7 +71,7 @@ public abstract class ModelObject implements IModelObject
 
     public void save(RequestContext context)
     {
-        context.getModelManager().saveObject(context, this);
+        context.getModel().saveObject(context, this);
     }
 
     // TODO
@@ -81,7 +81,7 @@ public abstract class ModelObject implements IModelObject
 
     public void remove(RequestContext context)
     {
-        context.getModelManager().removeObject(context, this);
+        context.getModel().removeObject(context, this);
     }
 
     public Document getDocument()
@@ -118,7 +118,7 @@ public abstract class ModelObject implements IModelObject
 
         Element el = getDocument().getRootElement().element(propertyName);
         if (el == null)
-            el = getDocument().getRootElement().addElement(propertyName);
+            el = getDocument().getRootElement().addElement("adw:" + propertyName);
 
         // put value
         el.setText(propertyValue);
@@ -157,10 +157,10 @@ public abstract class ModelObject implements IModelObject
         removeSetting(settingName);
 
         // create a new setting
-        Element el = getDocument().getRootElement().addElement("setting");
-        Element nameElement = el.addElement("name");
+        Element el = getDocument().getRootElement().addElement("adw:setting");
+        Element nameElement = el.addElement("adw:name");
         nameElement.setText(settingName);
-        Element valueElement = el.addElement("value");
+        Element valueElement = el.addElement("adw:value");
         valueElement.setText(settingValue);
     }
 
@@ -250,5 +250,7 @@ public abstract class ModelObject implements IModelObject
     {
         return getRelativePath() + "/" + getFileName();
     }
+    
+    public abstract String getTypeName();
 
 }

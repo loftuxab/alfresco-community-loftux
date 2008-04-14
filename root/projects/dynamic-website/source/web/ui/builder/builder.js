@@ -206,7 +206,8 @@ function initializeViewport()
 
 		if(add)
 		{
-			bodyContainer.dom.appendChild(nodes[i]);
+			//bodyContainer.dom.appendChild(nodes[i]);			
+			bodyContainer.dom.insertBefore(nodes[i], bodyContainer.dom.firstChild);
 		}
 	}	
 	
@@ -263,6 +264,8 @@ function initializeViewport()
 
 	// TODO: We need to register a handler to capture clicks and slides on the body
 	//Ext.ComponentMgr.get("bodyPanel").on("afterlayout", bodyPanelScrollHandler);
+	
+	Ext.ComponentMgr.get("bodyPanel").body.on('scroll', bodyPanelScrollHandler);
 		
 	return viewport;
 }
@@ -351,12 +354,14 @@ function bodyPanelResizeHandler()
 	}
 }
 
-/*
 function bodyPanelScrollHandler()
 {
-	//alert('body scrolls');
+	if(isFrameworkInitialized())
+	{
+		///repaintInContext(true, true, true, true);
+		repaintInContext(false, true, false, false);
+	}
 }
-*/
 
 function hideDockContainer()
 {
@@ -1075,7 +1080,7 @@ function toggleInContextMode()
 		var dockPanel = Ext.ComponentMgr.get("dockPanel");
 		dockedX = dockPanel.getSize()["width"];
 		if(dockedX == 0)
-			dockedX = dockPanel.lastSize.width;
+			dockedX = dockPanel.lastSize.width + 6;
 	}
 		
 	if(isInContextEnabled())
@@ -1093,7 +1098,7 @@ function toggleInContextMode()
 		toggleEditor("incontext");		
 
 		// slide the body into place
-		bc.setLocation(0, 0, true);
+		bc.setLocation(1, 0, true);
 	}
 	else
 	{
@@ -1138,11 +1143,12 @@ function dropOntoRegion(region, nodeData, source, e, data)
 	if (data.node instanceof Ext.tree.TreeNode)
 	{
 		// something was dropped here (and it was a tree node)
-		var alfType = data.node.attributes["alfType"];
+		var alfType = data.node.attributes["alfType"];  // file, directory, component, componentType, etc
 		var alfFileType = data.node.attributes["alfFileType"];
+		var alfFileExtension = data.node.attributes["alfFileExtension"];
 		
-		// they dropped an avm file
-		if("avmFile" == alfType)
+		// they dropped a file
+		if("file" == alfType)
 		{
 			var relativePath = getRelativePathForTreeNode(data.node);
 
@@ -1184,7 +1190,36 @@ function dropOntoRegion(region, nodeData, source, e, data)
 				
 				retVal = true;
 			}
+			
+			// they dropped a video
+			if("video" == alfFileType || "audio" == alfFileType)
+			{
+				// create media component params
+				var params = { };
+				params["componentType"] = "ct-mediaComponent";
+				params["_mediaType"] = alfFileType;
+				params["_url"] = relativePath;
+				
+				// bounce component into place
+				plugComponentIntoRegion(region, params);
+				
+				retVal = true;
+			}
+
+
+			
 		}
+		
+		// they dropped a directory
+		if("directory" == alfType)
+		{
+			// TODO: What does it mean to drop a directory into a region?
+			var relativePath = getRelativePathForTreeNode(data.node);
+			retVal = true;
+		}
+		
+		
+		
 		
 		// they dropped a component type
 		if("componentType" == alfType)
@@ -1199,26 +1234,22 @@ function dropOntoRegion(region, nodeData, source, e, data)
 			retVal = true;
 		}
 
-		// they dropped a component
-		if("component" == alfType)
+		// they dropped a webscript component
+		if("webscriptComponent" == alfType)
 		{
-			var componentId = data.node.attributes["nodeId"];
+			var uri = data.node.attributes["uri"];
+			
+			// create a webscript component params
+			var params = { };
+			params["componentType"] = "ct-webscriptComponent";
+			params["_uri"] = uri;
 
 			// bounce component into place
-			var params = { };
-			params["component"] = componentId;
 			plugComponentIntoRegion(region, params);
 
 			retVal = true;
 		}
 
-		// they dropped an avm directory
-		if("avmDirectory" == alfType)
-		{
-			// TODO: What does it mean to drop a directory into a region?
-			var relativePath = getRelativePathForTreeNode(data.node);
-			retVal = true;
-		}
 
 		// they dropped a web script
 		if("webscript" == alfType)
@@ -1352,7 +1383,7 @@ function plugComponentIntoRegion(region, params)
 	params["regionScopeId"] = regionScopeId;
 
 	// fire the event
-	var proxiedURL = getInContextWebScriptURL("/ads/incontext/components");
+	var proxiedURL = getInContextWebScriptURL("/incontext/components");
 	Ext.Ajax.request({
 		url: proxiedURL,
 		method: 'GET',
@@ -1708,7 +1739,7 @@ function makeSpacesTreePanel(panelId)
 	spacesTreeLoader.on('beforeload', function(loader, node) {	
 		var loaderUrl = remoteURL;
 		var relativePath = getRelativePathForTreeNode(node);
-		loaderUrl = loaderUrl + "&path=" + relativePath;
+		loaderUrl = loaderUrl + "?path=" + relativePath;
 		loader.dataUrl = loaderUrl;
 		loader.requestMethod = 'GET';
 	});
@@ -1771,7 +1802,7 @@ function makeContentTreePanel(panelId)
 	contentTreeLoader.on('beforeload', function(loader, node) {	
 		var loaderUrl = remoteURL;
 		var relativePath = getRelativePathForTreeNode(node);
-		loaderUrl = loaderUrl + relativePath;
+		loaderUrl = loaderUrl + "&path=" + relativePath;
 		loader.dataUrl = loaderUrl;
 		loader.requestMethod = 'GET';
 	});
@@ -1801,6 +1832,8 @@ function getRelativePathForTreeNode(node)
 			relativePath = "/" + relativePath;
 		n = n.parentNode;
 	}
+	if("" == relativePath)
+		relativePath = "/";
 	return relativePath;
 }
 
@@ -2081,7 +2114,7 @@ function makeComponentTreePanel(panelId)
 	Ext.ComponentMgr.register(compTreePanel);
 	new Ext.tree.TreeSorter(compTreePanel, {folderSort:true});
 	var compTreeRootNode = new Ext.tree.AsyncTreeNode({ 
-		text: 'Web Components',
+		text: 'Component Library',
 		draggable: true,
 		iconCls: 'tree-icon-componenttree-root',
 		expandable: true,
@@ -2292,6 +2325,7 @@ function showRegionPageEditorOverlay(event, overlay)
 // TODO: unhide frame to bring back grips		
 		win.setPagePosition(el.getLeft(), el.getTop());
 		Ext.ComponentMgr.register(win);
+		
 
 
 		//
@@ -2730,6 +2764,15 @@ function doRepaintInContext()
 
 function formatColorOverlay(regionElement, overlayElement)
 {
+	// offset of the bodyContainer
+	var body = Ext.ComponentMgr.get("bodyPanel").body;
+	var bodyEl = Ext.get(body);
+		
+	var scroll = bodyEl.getScroll();
+	var scrollTop = scroll.top;
+	var scrollLeft = scroll.left;	
+	// end of offsets
+	
 	var regionScopeId = regionElement.dom.getAttribute("regionScopeId");
 	
 	var colorHigh = BUILDER_PAGE_SCOPE_OVERLAY_COLOR1_HIGH;
@@ -2759,6 +2802,8 @@ function formatColorOverlay(regionElement, overlayElement)
 	// determine the maximum right and bottom positions
 	var maxRight = totalWindowWidth;
 	var maxBottom = totalWindowHeight;
+	var maxLeft = Ext.ComponentMgr.get("dockPanel").getSize().width + 6;
+	var maxTop = 26; // toolbar
 	// if scrollable, knock it down a bit
 	var isScrollable = Ext.get("bodyContainer").isScrollable();	
 	if(isScrollable || !isScrollable)
@@ -2774,10 +2819,14 @@ function formatColorOverlay(regionElement, overlayElement)
 	// the width and height of the overlay
 	var newWidth = regionElement.getWidth();
 	var newHeight = regionElement.getHeight();
+	var newTop = regionElement.getTop();
+	var newLeft = regionElement.getLeft();
 	
 	// check whether we need to cut back on width and height for the overlay
 	var showRightBorder = true;
 	var showBottomBorder = true;
+	var showTopBorder = true;
+	var showLeftBorder = true;
 	if(regionElement.getLeft() + newWidth >= maxRight)
 	{
 		newWidth = maxRight - regionElement.getLeft();
@@ -2788,14 +2837,27 @@ function formatColorOverlay(regionElement, overlayElement)
 		newHeight = maxBottom - regionElement.getTop();
 		showBottomBorder = false;
 	}
+	if(newLeft < maxLeft)
+	{
+		newWidth = newWidth + (newLeft - maxLeft);
+		newLeft = maxLeft;
+		showLeftBorder = false;
+	}
+	if(newTop < maxTop)
+	{
+		newHeight = newHeight + (newTop - maxTop);
+		newTop = maxTop;
+		showTopBorder = false;
+	}
+	
 	
 	// set the height and width
 	overlayElement.setHeight(newHeight);
 	overlayElement.setWidth(newWidth);	
 
 	// set the top left
-	overlayElement.setTop(regionElement.getTop());
-	overlayElement.setLeft(regionElement.getLeft());
+	overlayElement.setTop(newTop);
+	overlayElement.setLeft(newLeft);
 
 
 	// and style (color)
@@ -2806,8 +2868,6 @@ function formatColorOverlay(regionElement, overlayElement)
 	// set the borders
 	var borderStringHigh = "2px " + colorHigh + " dotted";
 	var borderStringLow = "2px " + colorLow + " dotted";			
-	overlayElement.setStyle("border-top", borderStringLow);
-	overlayElement.setStyle("border-left", borderStringLow);
 	if(showRightBorder)
 		overlayElement.setStyle("border-right", borderStringHigh);
 	else
@@ -2816,6 +2876,14 @@ function formatColorOverlay(regionElement, overlayElement)
 		overlayElement.setStyle("border-bottom", borderStringHigh);
 	else
 		overlayElement.setStyle("border-bottom", "");
+	if(showTopBorder)
+		overlayElement.setStyle("border-top", borderStringLow);
+	else
+		overlayElement.setStyle("border-top", "");
+	if(showLeftBorder)
+		overlayElement.setStyle("border-left", borderStringLow);
+	else
+		overlayElement.setStyle("border-left", "");
 	overlayElement.setOpacity(0.2);
 
 

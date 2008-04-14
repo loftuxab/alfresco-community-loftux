@@ -29,19 +29,23 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.site.DefaultConfig;
-import org.alfresco.web.site.DefaultModelManager;
+import org.alfresco.web.site.DefaultModel;
 import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.HttpRequestContextFactory;
+import org.alfresco.web.site.IModel;
 import org.alfresco.web.site.RequestContextFactory;
 import org.alfresco.web.site.RequestContextFactoryBuilder;
 import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.filesystem.FileSystemManager;
+import org.alfresco.web.site.filesystem.IFileSystem;
 
 /**
  * The goal of the dynamic site filter is basically to build a
@@ -57,17 +61,21 @@ public class DefaultFilter implements Filter
         super();
     }
 
-    public static void initFramework()
+    public static void initFramework(ServletContext servletContext)
     {
         synchronized (DefaultFilter.class)
         {
             if (!Framework.isInitialized())
             {
+                // set the config onto the framework
                 DefaultConfig config = new DefaultConfig();
-                DefaultModelManager manager = new DefaultModelManager();
-
                 Framework.setConfig(config);
-                Framework.setManager(manager);
+                
+                // set the model onto the framework
+                String modelRootPath = config.getModelRootPath();
+                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(servletContext, modelRootPath);
+                IModel model = new DefaultModel(modelFileSystem);
+                Framework.setModel(model);
 
                 System.out.println("DefaultFilter - Initialized Default Framework");
             }
@@ -77,7 +85,7 @@ public class DefaultFilter implements Filter
     public void init(FilterConfig config) throws ServletException
     {
         // make sure the default framework is loaded
-        initFramework();
+        initFramework(config.getServletContext());
     }
 
     public static void initRequestContext(HttpServletRequest request)

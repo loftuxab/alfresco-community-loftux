@@ -37,7 +37,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  */
 public class JSPRenderer extends AbstractRenderer
 {
-    public void executeImpl(RequestContext context, HttpServletRequest request,
+    public void execute(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, RuntimeConfig config)
             throws RendererExecutionException
     {
@@ -46,7 +46,16 @@ public class JSPRenderer extends AbstractRenderer
         // execute
         try
         {
+            // put the file URI into the config
             String dispatchPath = renderer;
+            config.put("component-file-uri", dispatchPath);
+            
+            // put the folder URI into the config
+            int x = dispatchPath.lastIndexOf("/");
+            String pathUri = dispatchPath.substring(0,x);
+            config.put("component-path-uri", pathUri);
+            
+            // do the include
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)

@@ -5,15 +5,16 @@ if(endpointObjectId != null && endpointObjectId != "")
 {
 	var endpoint = site.getObject(endpointObjectId);
 	
-	endpoint.setProperty("endpointId", endpointId);
-	endpoint.setSetting("protocol", protocol);
-	endpoint.setSetting("host", host);
-	endpoint.setSetting("port", port);
-	endpoint.setSetting("uri", uri);
-	endpoint.setSetting("credentials", credentials);
-	endpoint.setSetting("authentication", authentication);
-	endpoint.setSetting("username", username);
-	endpoint.setSetting("password", password);
+	endpoint.setProperty("endpoint-id", endpointId);
+	
+	endpoint.setProperty("connector-id", connectorId);
+	endpoint.setProperty("endpoint-url", endpointUrl);
+	endpoint.setProperty("default-uri", defaultUri);
+	endpoint.setProperty("auth-id", authId);
+	endpoint.setProperty("identity", identity);
+
+	endpoint.setProperty("username", username);
+	endpoint.setProperty("password", password);
 	save(endpoint);
 
 	wizard.setResponseMessage("Successfully updated endpoint.");

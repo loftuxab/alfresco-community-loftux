@@ -3,14 +3,12 @@
 
 
 wizard.addGridColumn("endpointId", "Endpoint ID");
-wizard.addGridColumn("host", "Host");
-wizard.addGridColumn("port", "Port");
-wizard.addGridColumn("uri", "URI");
+wizard.addGridColumn("url", "URL");
+wizard.addGridColumn("identity", "Identity");
 
-wizard.addGridColumnFormat("endpointId", 120, true);
-wizard.addGridColumnFormat("host", 120, true);
-wizard.addGridColumnFormat("port", 60, false);
-wizard.addGridColumnFormat("uri", 220, true);
+wizard.addGridColumnFormat("endpointId", 100, true);
+wizard.addGridColumnFormat("url", 420, true);
+wizard.addGridColumnFormat("identity", 80, true);
 
 wizard.addGridToolbar("add_endpoint", "New Endpoint", "New Endpoint", "add");
 wizard.addGridToolbarSpacer();
@@ -28,15 +26,16 @@ for(var i = 0; i < endpoints.length; i++)
 	var endpointId = endpoints[i].getProperty("endpoint-id");
 
 	// other data
-	var host = endpoints[i].getSetting("host");
-	var port = endpoints[i].getSetting("port");
-	var uri = endpoints[i].getSetting("uri");
+	var endpointUrl = endpoints[i].getProperty("endpoint-url");
+	var defaultUri = endpoints[i].getProperty("default-uri");
+	if(defaultUri == null)
+		defaultUri = "";
+	var identity = endpoints[i].getProperty("identity");
 	
 	var array = new Array();
 	array[0] = endpointId;
-	array[1] = host;
-	array[2] = port;
-	array[3] = uri;
+	array[1] = endpointUrl + defaultUri;
+	array[2] = identity;
 			
 	wizard.addGridData(array);
 }

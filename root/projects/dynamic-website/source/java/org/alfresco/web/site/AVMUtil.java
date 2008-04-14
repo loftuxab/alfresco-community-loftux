@@ -64,8 +64,7 @@ public class AVMUtil
             String avmFilePath = avmFileSystem.getAVMPath(relativeFilePath);
 
             // check whether the file exists
-            IFile file = context.getModelManager().getFile(context,
-                    relativePath);
+            IFile file = context.getFileSystem().getFile(relativePath);
 
             // if the file exists
             if (file != null)

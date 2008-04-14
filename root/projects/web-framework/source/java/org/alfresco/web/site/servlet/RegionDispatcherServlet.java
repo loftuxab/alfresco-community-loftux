@@ -28,7 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -43,7 +43,7 @@ public class RegionDispatcherServlet extends DispatcherServlet
 
     // this servlet just dispatches regions
     protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws Exception
+            HttpServletResponse response)
     {
         this.setNoCacheHeaders(response);
 
@@ -51,16 +51,7 @@ public class RegionDispatcherServlet extends DispatcherServlet
         String regionScopeId = (String) request.getParameter("regionScopeId");
         String templateId = (String) context.getCurrentTemplate().getId();
 
-        // TODO: I don't think this is implemented correctly...
-
-        try
-        {
-            RenderUtil.renderRegion(context, request, response, templateId,
-                    regionId, regionScopeId);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+        PresentationUtil.renderRegion(context, request, response, templateId,
+                regionId, regionScopeId);
     }
 }

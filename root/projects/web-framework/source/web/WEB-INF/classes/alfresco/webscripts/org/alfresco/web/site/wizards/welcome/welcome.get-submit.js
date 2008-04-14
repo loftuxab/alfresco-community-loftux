@@ -5,8 +5,6 @@
 // Data Binding: prebuiltType
 //
 
-
-
 // clear the current site
 clearSite();
 

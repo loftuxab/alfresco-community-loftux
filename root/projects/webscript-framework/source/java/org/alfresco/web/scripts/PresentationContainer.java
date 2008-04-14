@@ -25,14 +25,6 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.error.AlfrescoRuntimeException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 /**
@@ -42,8 +34,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class PresentationContainer extends AbstractRuntimeContainer
 {
-   private static Log logger = LogFactory.getLog(PresentationContainer.class);
-   
 	/* (non-Javadoc)
 	 * @see org.alfresco.web.scripts.RuntimeContainer#executeScript(org.alfresco.web.scripts.WebScriptRequest,
     *      org.alfresco.web.scripts.WebScriptResponse, org.alfresco.web.scripts.Authenticator)
@@ -52,7 +42,6 @@ public class PresentationContainer extends AbstractRuntimeContainer
         throws IOException
     {
         // TODO: Consider Web Tier Authentication
-    	
         WebScript script = scriptReq.getServiceMatch().getWebScript();
         script.execute(scriptReq, scriptRes);
     }
@@ -65,49 +54,6 @@ public class PresentationContainer extends AbstractRuntimeContainer
         return new PresentationServerModel();
     }
     
-    /**
-     * Build the script root objects - add the ScriptRemote for remote HTTP API calls.
-     */
-    @Override
-    public Map<String, Object> getScriptParameters()
-    {
-       // NOTE: returns unmodifable map from super
-       Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
-       params.putAll(super.getScriptParameters());
-       
-       // retrieve remote server configuration 
-       Config config = getConfigService().getConfig("Remote");
-       if (config != null)
-       {
-           ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
-           String endpoint = remoteConfig.getChildValue("endpoint");
-           if (endpoint == null || endpoint.length() == 0)
-           {
-               logger.warn("No 'endpoint' configured for ScriptRemote HTTP API access - remote object not available!");
-           }
-           else
-           {
-               // use appropriate webscript servlet here - one that supports TICKET param auth
-               ScriptRemote remote = new ScriptRemote(endpoint + "/service", "UTF-8");
-               
-               //
-               // TODO: remove this block - for testing only!
-               //
-               if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
-               {
-                   remote.setUsernamePassword(
-                       remoteConfig.getChildValue("username"),
-                       remoteConfig.getChildValue("password"));
-               } 
-               
-               params.put("remote", remote);
-           }
-       }
-       
-       return params;
-    }
-
-
     /**
      * Presentation Tier Model
      *

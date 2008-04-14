@@ -21,13 +21,13 @@
 	String componentTypeId = (String) configuration.get("component-type-id");
 
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-	String unconfiguredImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
+	String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
 %>
 <div width="100%" id="<%=regionId%>">
 <%
 	if(componentId != null)
 	{
-		RenderUtil.renderComponent(context, request, response, componentId);
+		PresentationUtil.renderComponent(context, request, response, componentId);
 	}
 	else
 	{
@@ -38,7 +38,7 @@
 %>
 </div>
 <script language="Javascript">
-	configureRegion("<%=regionId%>", "<%=regionScopeId%>", "<%=regionSourceId%>");
+	configureRegion("<%=regionId%>", "<%=regionScopeId%>", <%=(regionSourceId == null ? "null" : "\"" + regionSourceId + "\"")%>);
 </script>
 <%
 	// component bindings	

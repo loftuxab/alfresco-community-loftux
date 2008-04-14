@@ -26,6 +26,8 @@ package org.alfresco.web.site.ui;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.Renderable;
 
@@ -46,4 +48,21 @@ public abstract class AbstractRenderable implements Renderable
             throw new RendererExecutionException(ex);
         }
     }
+    
+    public void appendHeadTags(RequestContext context, String tags)
+    {
+        RenderUtil.appendHeadTags(context, tags);
+    }
+    
+    public void setRenderer(String renderer)
+    {
+        this.renderer = renderer;
+    }
+    
+    public String getRenderer()
+    {
+        return this.renderer;
+    }
+    
+    protected String renderer;
 }

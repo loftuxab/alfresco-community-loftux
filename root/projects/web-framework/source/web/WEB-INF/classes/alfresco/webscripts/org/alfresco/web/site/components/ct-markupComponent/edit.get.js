@@ -9,10 +9,11 @@ var component = site.getObject(componentId);
 if(component != null)
 {
 	var markupData = wizard.getSafeSetting(component, "markupData");
+	markupData = site.decode(markupData);
 
 	// the controls
-	markupData = escape(markupData);
+	markupData = site.encode(markupData);
 	wizard.addElement("markupData", markupData);
-	wizard.addElementFormat("markupData", null, "htmleditor", 460, 210);
+	wizard.addElementFormat("markupData", null, "textarea", 460, 210);
 }
 

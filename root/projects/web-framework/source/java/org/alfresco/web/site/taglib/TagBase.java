@@ -30,32 +30,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.Tag;
+import javax.servlet.jsp.tagext.BodyTagSupport;
+import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.parser.tags.JspPageContextImpl;
 
 /**
  * @author muzquiano
  */
-public abstract class TagBase implements Tag, Serializable
+//public abstract class TagBase implements Tag, Serializable
+public abstract class TagBase extends BodyTagSupport implements Serializable
 {
     private PageContext pageContext = null;
-    private Tag parent = null;
 
     public void setPageContext(PageContext pageContext)
     {
         this.pageContext = pageContext;
-    }
-
-    public void setParent(Tag parent)
-    {
-        this.parent = parent;
-    }
-
-    public Tag getParent()
-    {
-        return this.parent;
+        TagSupport a;
     }
 
     public int doEndTag() throws JspException
@@ -66,7 +59,7 @@ public abstract class TagBase implements Tag, Serializable
     public void release()
     {
         this.pageContext = null;
-        this.parent = null;
+        super.release();
     }
 
     protected PageContext getPageContext()

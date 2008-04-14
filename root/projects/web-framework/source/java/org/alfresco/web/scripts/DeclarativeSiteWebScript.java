@@ -29,6 +29,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.RequestUtil;
 
 /**
  * @author muzquiano
@@ -89,13 +90,19 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
         if (req instanceof org.alfresco.web.scripts.servlet.WebScriptServletRequest)
         {
             request = ((org.alfresco.web.scripts.servlet.WebScriptServletRequest) req).getHttpServletRequest();
-        }
 
+            RequestContext context = RequestUtil.getRequestContext(request);
+            return context;
+        }
+        return null;
+
+        /*
         // construct a local request context
         ScriptRequestContextFactory factory = new ScriptRequestContextFactory();
         RequestContext context = factory.newInstance(getStore(), avmStoreId,
                 request);
         return context;
+        */
     }
 
 }

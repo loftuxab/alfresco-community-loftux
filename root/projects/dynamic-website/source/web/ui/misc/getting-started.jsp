@@ -1,10 +1,11 @@
 <%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%@ taglib uri="/WEB-INF/tlds/adw.tld" prefix="adw" %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title><adw:pageTitle/></title>
-    <adw:imports/>
+    <title><alf:pageTitle/></title>
+    <alf:head/>
 </head>
 <body onLoad="showWelcomeWindow()">
 <table width="100%" height="100%" border="0" style="background-image:url('/ui/images/logos/AlfrescoFadedBG.png'); background-repeat:no-repeat;">

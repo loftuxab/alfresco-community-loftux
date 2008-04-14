@@ -32,6 +32,12 @@ import org.dom4j.Document;
  */
 public class ContentAssociation extends ModelObject
 {
+    public static String TYPE_NAME = "content-association";
+    public static String PROP_SOURCE_ID = "source-id";
+    public static String PROP_DEST_ID = "dest-id";
+    public static String PROP_ASSOC_TYPE = "assoc-type";
+    public static String PROP_FORMAT_ID = "format-id";
+    
     public ContentAssociation(Document document)
     {
         super(document);
@@ -45,49 +51,54 @@ public class ContentAssociation extends ModelObject
 
     public String getSourceId()
     {
-        return getProperty("source-id");
+        return getProperty(PROP_SOURCE_ID);
     }
 
     public void setSourceId(String sourceId)
     {
-        setProperty("source-id", sourceId);
+        setProperty(PROP_SOURCE_ID, sourceId);
     }
 
     public String getDestId()
     {
-        return getProperty("dest-id");
+        return getProperty(PROP_DEST_ID);
     }
 
     public void setDestId(String destId)
     {
-        setProperty("dest-id", destId);
+        setProperty(PROP_DEST_ID, destId);
     }
 
     public String getAssociationType()
     {
-        return getProperty("assoc-type");
+        return getProperty(PROP_ASSOC_TYPE);
     }
 
     public void setAssociationType(String associationType)
     {
-        setProperty("assoc-type", associationType);
+        setProperty(PROP_ASSOC_TYPE, associationType);
     }
 
     public String getFormatId()
     {
-        return getProperty("format-id");
+        return getProperty(PROP_FORMAT_ID);
     }
 
     public void setFormatId(String formatId)
     {
-        setProperty("format-id", formatId);
+        setProperty(PROP_FORMAT_ID, formatId);
     }
 
     // Helpers
 
     public Page getPage(RequestContext context)
     {
-        return context.getModelManager().loadPage(context, getDestId());
+        return context.getModel().loadPage(context, getDestId());
     }
 
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

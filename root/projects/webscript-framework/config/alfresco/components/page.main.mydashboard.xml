@@ -3,5 +3,10 @@
    <scope>page</scope>
    <region-id>main</region-id>
    <source-id>mydashboard</source-id>
-   <url>/test/configtest</url>
+   <url>/test/remotetest1</url>
+   <chrome>
+      <frame>div</frame>      <!-- none | div (default) | iframe -->
+      <theme>default</theme>  <!-- optional theme styling for the outer frame -->
+   </chrome>
+   <properties></properties>
 </component>

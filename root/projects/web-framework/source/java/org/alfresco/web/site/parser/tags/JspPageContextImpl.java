@@ -56,10 +56,7 @@ public class JspPageContextImpl extends PageContext
     public JspPageContextImpl(FilterContext cxt, JspWriter out)
     {
         this.cxt = cxt;
-        if (out instanceof JspWriterImpl)
-            this.out = out;
-        else
-            this.out = new JspWriterImpl(out, out.getBufferSize(), true);
+        this.out = out;
         session = cxt.getRequest().getSession(true);
     }
 
@@ -242,31 +239,7 @@ public class JspPageContextImpl extends PageContext
         // use servlet RequestDispatcher mechanism
         RequestDispatcher disp = cxt.getServletContext().getRequestDispatcher(
                 url);
-
-        // get the cache URI (remove extensions for location url's)
-        //String cacheURI = cxt.getServerInstance().getCache().getCacheURI(url);
-
-        // store the original SCRIPT_ITEM and set ourselves as the new one so that all
-        // references and subobjects are evaluated to us
-        //IContent origContent = (IContent) cxt.getRequest().getAttribute("SCRIPT_ITEM");
-        //IContent newContent = (IContent) cxt.getServerInstance().getCache().peekContent( cacheURI );
-        //if(newContent != null)
-        //{
-        //cxt.getRequest().setAttribute("SCRIPT_ITEM", newContent);
-
-        // invoke the request dispatcher
-
-        // TODO: Is this right?
-        //synchronized( this )
-        //{
         disp.forward(cxt.getRequest(), cxt.getResponse());
-        //}
-
-        // restore the original script item
-        // TODO: Is this right?
-        //			if(origContent != null)
-        //			cxt.getRequest().setAttribute("SCRIPT_ITEM", origContent);
-        //}
     }
 
     public void include(String url) throws ServletException, IOException
@@ -283,31 +256,7 @@ public class JspPageContextImpl extends PageContext
         // make sure everything is flushed before doing an include -- important for included JSP files
         flushOut();
 
-        // get the cache URI (remove extensions for location url's)
-        //String cacheURI = cxt.getServerInstance().getCache().getCacheURI(url);
-
-        // store the original SCRIPT_ITEM and set ourselves as the new one so that all
-        // references and subobjects are evaluated to us
-        //IContent origContent = (IContent) cxt.getRequest().getAttribute("SCRIPT_ITEM");
-        //IContent newContent = (IContent) cxt.getServerInstance().getCache().peekContent( cacheURI );
-        //if(newContent != null)
-        //{
-        //	cxt.getRequest().setAttribute("SCRIPT_ITEM", newContent);
-
-        // invoke the request dispatcher
-        //			synchronized( newContent )
-        //			{
         disp.include(cxt.getRequest(), cxt.getResponse());
-
-        // if the content item changed, serialize it to disk
-        //		if(newContent.getCacheInfo().getTouched())
-        //			cxt.getServerInstance().getCache().serialize(newContent);
-        //			}
-
-        // restore the original script item
-        //	if(origContent != null)
-        //		cxt.getRequest().setAttribute("SCRIPT_ITEM", origContent);
-        //}
     }
 
     public void flushOut() throws java.io.IOException

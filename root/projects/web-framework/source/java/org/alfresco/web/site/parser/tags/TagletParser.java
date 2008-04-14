@@ -26,6 +26,7 @@ package org.alfresco.web.site.parser.tags;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,6 +49,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.alfresco.web.site.FilterContext;
+import org.alfresco.web.site.exception.TagletParserException;
 import org.alfresco.web.site.parser.IParser;
 import org.alfresco.web.site.parser.ITagletHandler;
 import org.w3c.dom.Document;
@@ -209,7 +211,8 @@ public class TagletParser implements IParser
      * @return
      */
     public TokenStream parseTaglets(FilterContext cxt, ITagletHandler handler,
-            InputStream is, OutputStream os)
+            InputStream is)
+            throws TagletParserException
     {
         try
         {
@@ -217,8 +220,10 @@ public class TagletParser implements IParser
             tagnames = new ArrayList();
             bodytags = new ArrayList();
             this.cxt = cxt;
-            this.out = new JspWriterImpl(new PrintWriter(os),
-                    JspWriter.DEFAULT_BUFFER, true);
+            
+            PrintWriter writer = cxt.getResponse().getWriter();
+            this.out = new JspWriterImpl(writer, 0, true);
+            
             // make the reader buffered
             this.in = new BufferedReader(new InputStreamReader(is));
             this.pcxt = new JspPageContextImpl(cxt, out);
@@ -552,41 +557,14 @@ public class TagletParser implements IParser
         }
         catch (Exception e)
         {
-            pt.pageError(out);
+            // An exception occurred while parsing or executing the tags
+            // We want to handle this gracefully...
+            e.printStackTrace();
             if (e instanceof JspExceptionWrapper)
                 e = ((JspExceptionWrapper) e).getWrappedException();
-            StringBuffer buf = new StringBuffer();
-            buf.append(e.getMessage());
-            buf.append(": (");
-            buf.append(row);
-            buf.append(",");
-            buf.append(col);
-            buf.append(")\n");
-            buf.append(line, 0, col < line.length ? col : line.length);
-            buf.append("\n");
-            for (int i = 0; i + 1 < (col < line.length ? col : line.length); i++)
-            {
-                if (line[i] == '\t')
-                    buf.append("\t");
-                else
-                    buf.append('-');
-            }
-            buf.append('^');
-            buf.append('\n');
-
-            try
-            {
-                out.flush();
-                PrintWriter pout = new PrintWriter(os);
-                pout.write(buf.toString());
-                e.printStackTrace(pout);
-                pout.flush();
-            }
-            catch (IOException ioe)
-            {
-            }
+            throw new TagletParserException(
+                    "Exception occurred while parsing taglet stream", e);
         }
-        return null;
     }
 
     private boolean fInQuote;

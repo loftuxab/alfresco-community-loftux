@@ -9,6 +9,7 @@
 	<adw:id>ct-remoteWebscriptComponent</adw:id>
 	<adw:name>Remote Webscript Component</adw:name>
 	<adw:description>Remote Webscript Component</adw:description>
+	<adw:renderer-type>jsp</adw:renderer-type>		
 	<adw:renderer>/ui/components/remoteWebscriptComponent/component.jsp</adw:renderer>
 
 </adw:component-type>

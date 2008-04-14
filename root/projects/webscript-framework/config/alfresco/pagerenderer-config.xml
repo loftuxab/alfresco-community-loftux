@@ -1,0 +1,15 @@
+<alfresco-config>
+   
+   <config evaluator="string-compare" condition="PageRenderer">
+      <login-page>/login.jsp</login-page>
+   </config>
+   
+   <config evaluator="string-compare" condition="Remote">
+      <remote>
+         <!-- Adjust the following settings to reference the default
+              remote Alfresco repository server web application -->
+         <endpoint>http://localhost:8080/alfresco</endpoint>
+      </remote>
+   </config>
+   
+</alfresco-config>
