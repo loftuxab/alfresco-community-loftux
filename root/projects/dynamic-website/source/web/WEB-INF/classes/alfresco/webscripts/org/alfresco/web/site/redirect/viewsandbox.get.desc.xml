@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>View Sandbox Redirect</shortname>
+  <description>View Sandbox Redirect</description>
+  <url>/ads/redirect/viewsandbox/{storeid}/{path}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adw:component-type 	xmlns:adw="http://www.alfresco.org/adw/2.0" 
+			xmlns:alf="http://www.alfresco.org" 
+			xmlns:ev="http://www.w3.org/2001/xml-events" 
+			xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<adw:id>ct-googleGadgetComponent</adw:id>
+	<adw:name>Google Gadget Component</adw:name>
+	<adw:description>Google Gadget Component Description</adw:description>
+	<adw:renderer-type>jsp</adw:renderer-type>	
+	<adw:renderer>/ui/components/googleGadgetComponent/component.jsp</adw:renderer>
+
+</adw:component-type>

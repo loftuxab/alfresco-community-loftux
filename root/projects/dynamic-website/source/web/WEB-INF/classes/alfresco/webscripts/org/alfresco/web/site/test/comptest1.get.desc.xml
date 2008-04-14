@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Component Test 1</shortname>
+  <description>The world's simplest component test</description>
+  <url>/test/component1</url>
+</webscript>

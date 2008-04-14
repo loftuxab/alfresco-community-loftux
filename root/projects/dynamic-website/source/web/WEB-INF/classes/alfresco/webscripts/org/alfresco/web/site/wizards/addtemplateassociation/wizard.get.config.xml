@@ -1,0 +1,21 @@
+<wizard id="addtemplateassociation">
+	<title>Associate a Template</title>
+	<page id="start" start="true" type="form">
+		<buttons>
+			<button id="cancel" label="Cancel" action="cancel"/>
+			<button id="save" label="Save" action="transition" data="submit"/>
+		</buttons>
+		<data>
+			<element id="pageId" type="String" defaultValue="" />
+			<element id="formatId" type="String" defaultValue="" />
+			<element id="templateTypeId" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="submit" end="true" type="form">
+		<data>
+			<element id="pageId" type="String" />
+			<element id="formatId" type="String" />
+			<element id="templateTypeId" type="String" />
+		</data>
+	</page>	
+</wizard>

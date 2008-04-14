@@ -1,0 +1,11 @@
+<wizard id="removecomponent">
+	<title>Remove Component</title>
+	<page id="start" start="true" type="html">
+		<buttons>
+			<button id="cancel" label="Cancel" action="cancel"/>
+			<button id="save" label="Save" action="transition" data="submit"/>
+		</buttons>
+	</page>
+	<page id="submit" end="true" type="form">
+	</page>	
+</wizard>
