@@ -645,7 +645,7 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 
     boolean loggedOn = false;
     
-    if ( isNTLMSSP == true || sess.hasSetupObject( client.getProcessId()) || setupObj != null) {
+    if ( respBlob != null || sess.hasSetupObject( client.getProcessId()) || setupObj != null) {
       
       //  NTLMSSP has two stages, if there is a stored setup object then indicate more processing
       //  required
@@ -763,7 +763,9 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
 
     pos = DataPacker.putString("Java", buf, pos, true, isUni);
     pos = DataPacker.putString("Alfresco CIFS Server " + sess.getServer().isVersion(), buf, pos, true, isUni);
-    pos = DataPacker.putString(sess.getSMBServer().getCIFSConfiguration().getDomainName(), buf, pos, true, isUni);
+    
+    if ( respBlob == null)
+    	pos = DataPacker.putString(sess.getSMBServer().getCIFSConfiguration().getDomainName(), buf, pos, true, isUni);
     
     respPkt.setByteCount(pos - respPkt.getByteOffset());
   }
@@ -828,8 +830,8 @@ public class EnterpriseCifsAuthenticator extends CifsAuthenticator implements Ca
       
       tList.add(new TargetInfo(NTLM.TargetDomain, domain));
       tList.add(new TargetInfo(NTLM.TargetServer, sess.getServerName()));
-      tList.add(new TargetInfo(NTLM.TargetDNSDomain, domain));
-      tList.add(new TargetInfo(NTLM.TargetFullDNS, domain));
+      tList.add(new TargetInfo(NTLM.TargetDNSDomain, domain.toLowerCase()));
+      tList.add(new TargetInfo(NTLM.TargetFullDNS, domain.toLowerCase()));
       
       ntlmFlags = NTLM.FlagChallengeAccept + NTLM.FlagRequestTarget +
                   NTLM.Flag128Bit + NTLM.FlagNegotiateNTLM + NTLM.FlagNegotiateUnicode +
