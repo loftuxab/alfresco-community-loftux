@@ -56,12 +56,12 @@ public class DefaultShareMapper implements ShareMapper, ConfigurationListener {
 		
 		m_config = config;
 
-    //  Filesystem configuration will usually be initialized after the security configuration so we need to plug in
-    //  a listener to initialize it later
+		//  Filesystem configuration will usually be initialized after the security configuration so we need to plug in
+		//  a listener to initialize it later
     
-    m_filesysConfig  = (FilesystemsConfigSection) m_config.getConfigSection( FilesystemsConfigSection.SectionName);
-    if ( m_filesysConfig == null)
-      m_config.addListener( this);
+		m_filesysConfig  = (FilesystemsConfigSection) m_config.getConfigSection( FilesystemsConfigSection.SectionName);
+		if ( m_filesysConfig == null)
+			m_config.addListener( this);
     
 		//	Check if debug is enabled
 		
@@ -133,13 +133,13 @@ public class DefaultShareMapper implements ShareMapper, ConfigurationListener {
 		//	Delete the dynamic shares
 		
 		SharedDeviceList shares = sess.getDynamicShareList();
-		Enumeration enm = shares.enumerateShares();
+		Enumeration<SharedDevice> enm = shares.enumerateShares();
 		
 		while ( enm.hasMoreElements()) {
 
 			//	Get the current share from the list
 			
-			SharedDevice shr = (SharedDevice) enm.nextElement();
+			SharedDevice shr = enm.nextElement();
 			
 			//	Close the shared device
 			
@@ -192,7 +192,7 @@ public class DefaultShareMapper implements ShareMapper, ConfigurationListener {
 	}
 
   /**
-   * configuration changed
+   * Configuration changed
    * 
    * @param id int
    * @param config Serverconfiguration
