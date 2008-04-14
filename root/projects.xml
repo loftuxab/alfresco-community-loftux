@@ -1406,107 +1406,107 @@
    <!-- ** Web-Framework Project ** -->
    <!-- *************************** -->
    
-   <target name="incremental-webframework" 
+   <target name="incremental-webscriptframework" 
            description="Performs an incremental build of the web framework project"
-           depends="package-webframework" />
+           depends="package-webscriptframework" />
       
-   <target name="build-webframework" 
+   <target name="build-webscriptframework" 
            description="Performs a clean build of the web framework project"
-           depends="clean-webframework, 
-                    incremental-webframework" />
+           depends="clean-webscriptframework, 
+                    incremental-webscriptframework" />
    
-   <target name="clean-webframework" 
+   <target name="clean-webscriptframework" 
            description="Cleans the web framework project" 
            depends="init">
-      <clean projectdir="${dir.project.webframework}" />
+      <clean projectdir="${dir.project.webscriptframework}" />
    </target>
    
-   <target name="compile-webframework" 
+   <target name="compile-webscriptframework" 
            description="Compiles the web framework project" 
            depends="init">
-      <compile-java projectdir="${dir.project.webframework}" />
+      <compile-java projectdir="${dir.project.webscriptframework}" />
    </target>
    
-   <target name="package-webframework"
+   <target name="package-webscriptframework"
            description="Packages the web framework project"
-           depends="compile-webframework">
-      <mkdir dir="${dir.project.webframework.dist}" />
-      <jar jarfile="${dir.project.webframework.dist}/${file.name.jar.webframework}" 
-           basedir="${dir.project.webframework.classes}" />
+           depends="compile-webscriptframework">
+      <mkdir dir="${dir.project.webscriptframework.dist}" />
+      <jar jarfile="${dir.project.webscriptframework.dist}/${file.name.jar.webscriptframework}" 
+           basedir="${dir.project.webscriptframework.classes}" />
    </target>
    
-   <target name="incremental-webframework-war" 
+   <target name="incremental-webscriptframework-war" 
            description="Performs an incremental build of the web framework WAR file"
-           depends="package-webframework-war" />
+           depends="package-webscriptframework-war" />
       
-   <target name="build-webframework-war" 
+   <target name="build-webscriptframework-war" 
            description="Performs a clean build of the web framework project"
-           depends="clean-webframework-war, 
-                    incremental-webframework-war" />
+           depends="clean-webscriptframework-war, 
+                    incremental-webscriptframework-war" />
    
-   <target name="clean-webframework-war" 
+   <target name="clean-webscriptframework-war" 
            description="Cleans the web framework WAR assemble folder" 
            depends="init">
-      <delete dir="${dir.project.webframework.assemble}" />
+      <delete dir="${dir.project.webscriptframework.assemble}" />
    </target>
 
-   <target name="package-webframework-war" 
-           description="Packages the WAR file for the webframework project" 
-           depends="assemble-webframework-war">
-      <war warfile="${dir.project.webframework.dist}/${file.name.war.webframework}" 
-           webxml="${dir.project.webframework.src.webinf}/web.xml">
-         <fileset dir="${dir.project.webframework.assemble}" />
+   <target name="package-webscriptframework-war" 
+           description="Packages the WAR file for the webscriptframework project" 
+           depends="assemble-webscriptframework-war">
+      <war warfile="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" 
+           webxml="${dir.project.webscriptframework.src.webinf}/web.xml">
+         <fileset dir="${dir.project.webscriptframework.assemble}" />
       </war>
    </target>
 
-   <target name="assemble-webframework-war" 
-           depends="package-webframework">
-      <mkdir dir="${dir.project.webframework.assemble}" />
+   <target name="assemble-webscriptframework-war" 
+           depends="package-webscriptframework">
+      <mkdir dir="${dir.project.webscriptframework.assemble}" />
 
-      <copy todir="${dir.project.webframework.assemble}">
-         <fileset dir="${dir.project.webframework.src.web}" 
+      <copy todir="${dir.project.webscriptframework.assemble}">
+         <fileset dir="${dir.project.webscriptframework.src.web}" 
                   excludes="WEB-INF/**" />
       </copy>
 
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF">
-         <fileset dir="${dir.project.webframework.src.webinf}" 
+      <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF">
+         <fileset dir="${dir.project.webscriptframework.src.webinf}" 
                   excludes="web.xml" />
       </copy>
 
       <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF/classes">
+      <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
-         <fileset dir="${dir.project.webframework.config}" 
+         <fileset dir="${dir.project.webscriptframework.config}" 
                   excludes="**/extension/**" />
       </copy>
 
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
+      <copy todir="${dir.project.webscriptframework.assemble}/WEB-INF/lib">
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webframework.libs}" />
+                  includes="${includes.webscriptframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webframework.libs.commons}" />
+                  includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera" 
-                  includes="${includes.webframework.libs.abdera}" />
+                  includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
    </target>  
    
-   <target name="test-webframework" 
+   <target name="test-webscriptframework" 
            description="Runs the tests for the web framework project" 
-           depends="compile-webframework">
-      <run-tests projectdir="${dir.project.webframework}" />
+           depends="compile-webscriptframework">
+      <run-tests projectdir="${dir.project.webscriptframework}" />
    </target>
    
-   <target name="generate-javadocs-webframework" 
+   <target name="generate-javadocs-webscriptframework" 
            description="Generates the JavaDocs for the web framework project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Web Framework" 
                          windowtitle="Alfresco Web Framework" 
-                         projectdir="${dir.project.webframework}"/>
+                         projectdir="${dir.project.webscriptframework}"/>
    </target>
 
    <!-- ************************ -->
@@ -1595,7 +1595,7 @@
                   includes="log4j.properties" />
          <fileset dir="${dir.project.repository.config}" 
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframework.config}" 
+         <fileset dir="${dir.project.webscriptframework.config}" 
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/**" />
@@ -1650,8 +1650,8 @@
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.repository.dist}" 
                   includes="${file.name.jar.repository}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.linkvalidation.dist}" 
                   includes="${file.name.jar.linkvalidation}" />
          <fileset dir="${dir.project.mbeans.dist}" 

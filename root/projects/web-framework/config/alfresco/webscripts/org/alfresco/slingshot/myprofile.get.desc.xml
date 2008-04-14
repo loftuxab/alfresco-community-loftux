@@ -1,5 +1,0 @@
-<webscript>
-  <shortname>My Profile Component</shortname>
-  <description>Component used to display current user</description>
-  <url>/slingshot/myprofile</url>
-</webscript>
