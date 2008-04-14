@@ -31,7 +31,7 @@ public class Framework
 {
     public static boolean isInitialized()
     {
-        return (getConfig() != null && getManager() != null);
+        return (getConfig() != null && getModel() != null);
     }
 
     public static AbstractConfig getConfig()
@@ -44,16 +44,16 @@ public class Framework
         Framework.config = config;
     }
 
-    public static AbstractModelManager getManager()
+    public static IModel getModel()
     {
-        return Framework.manager;
+        return Framework.model;
     }
 
-    public static void setManager(AbstractModelManager manager)
+    public static void setModel(IModel model)
     {
-        Framework.manager = manager;
+        Framework.model = model;
     }
 
     protected static AbstractConfig config = null;
-    protected static AbstractModelManager manager = null;
+    protected static IModel model = null;
 }

@@ -28,6 +28,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+
 import org.alfresco.web.site.Framework;
 
 /**
@@ -69,23 +71,38 @@ public class FileSystemManager
     protected static void putFileSystem(String cacheKey, IFileSystem fileSystem)
     {
         if (fileSystems == null)
+        {
             fileSystems = new HashMap();
+        }
         fileSystems.put(cacheKey, fileSystem);
     }
 
     public static IFileSystem getFileSystem(String cacheKey)
     {
         if (fileSystems == null)
+        {
             fileSystems = new HashMap();
+        }
 
-        IFileSystem fileSystem = (IFileSystem) fileSystems.get(cacheKey);
-        return fileSystem;
+        return (IFileSystem) fileSystems.get(cacheKey);
     }
 
+    public static IFileSystem getLocalFileSystem(ServletContext servletContext, String relativePath)
+    {
+        String realPath = servletContext.getRealPath(relativePath);
+        return getLocalFileSystem(realPath);
+    }
+    
+    public static IFileSystem getLocalFileSystem(String realPath)
+    {
+        File f = new File(realPath);
+        return getLocalFileSystem(f);
+    }
+    
     public static IFileSystem getLocalFileSystem(File rootDirectory)
     {
-        String cacheKey = "local";
-
+        String cacheKey = rootDirectory.getAbsolutePath();
+        
         IFileSystem fileSystem = getFileSystem(cacheKey);
         if (fileSystem != null)
             return fileSystem;

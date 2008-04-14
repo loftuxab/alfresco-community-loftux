@@ -32,7 +32,13 @@ import org.dom4j.Document;
  */
 public class PageAssociation extends ModelObject
 {
+    public static String TYPE_NAME = "page-association";
     public static String CHILD_ASSOCIATION_TYPE_ID = "child";
+    public static String PROP_SOURCE_ID = "source-id";
+    public static String PROP_DEST_ID = "dest-id";
+    public static String PROP_ASSOC_TYPE = "assoc-type";
+    public static String PROP_ORDER_ID = "order-id";
+    
 
     public PageAssociation(Document document)
     {
@@ -47,42 +53,42 @@ public class PageAssociation extends ModelObject
 
     public String getSourceId()
     {
-        return getProperty("source-id");
+        return getProperty(PROP_SOURCE_ID);
     }
 
     public void setSourceId(String sourceId)
     {
-        setProperty("source-id", sourceId);
+        setProperty(PROP_SOURCE_ID, sourceId);
     }
 
     public String getDestId()
     {
-        return getProperty("dest-id");
+        return getProperty(PROP_DEST_ID);
     }
 
     public void setDestId(String destId)
     {
-        setProperty("dest-id", destId);
+        setProperty(PROP_DEST_ID, destId);
     }
 
     public String getAssociationType()
     {
-        return getProperty("assoc-type");
+        return getProperty(PROP_ASSOC_TYPE);
     }
 
     public void setAssociationType(String associationType)
     {
-        setProperty("assoc-type", associationType);
+        setProperty(PROP_ASSOC_TYPE, associationType);
     }
 
     public String getOrderId()
     {
-        return getProperty("order-id");
+        return getProperty(PROP_ORDER_ID);
     }
 
     public void setOrderId(String orderId)
     {
-        setProperty("order-id", orderId);
+        setProperty(PROP_ORDER_ID, orderId);
     }
 
     // Helpers
@@ -90,13 +96,13 @@ public class PageAssociation extends ModelObject
     public ModelObject getSourceObject(RequestContext context)
     {
         // either 'global', template or page
-        return context.getModelManager().loadObject(context, getSourceId());
+        return context.getModel().loadObject(context, getSourceId());
     }
 
     public ModelObject getDestObject(RequestContext context)
     {
         // either 'global', template or page
-        return context.getModelManager().loadObject(context, getDestId());
+        return context.getModel().loadObject(context, getDestId());
     }
 
     public Page getSourcePage(RequestContext context)
@@ -108,4 +114,10 @@ public class PageAssociation extends ModelObject
     {
         return (Page) getDestObject(context);
     }
+    
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

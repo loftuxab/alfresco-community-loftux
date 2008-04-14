@@ -1,6 +1,6 @@
-<webscript>
-  <shortname>Spaces Tree Functions</shortname>
-  <description>Spaces Tree Functions</description>
+<webscript kind="site">
+  <shortname>Spaces Tree</shortname>
+  <description>Spaces Tree</description>
   <url>/tree/spaces</url>
   <format default="html">argument</format>
   <authentication>user</authentication>

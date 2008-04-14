@@ -9,5 +9,5 @@
 	<adw:id>ct-webscriptComponent</adw:id>
 	<adw:name>Webscript Component</adw:name>
 	<adw:description>Webscript Component</adw:description>
-	<adw:renderer-type>org.alfresco.web.site.renderer.WebScriptRenderer</adw:renderer-type>
+	<adw:renderer-type>webscript</adw:renderer-type>
 </adw:component-type>

@@ -6,6 +6,7 @@
 <%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
+<%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%@ taglib uri="/WEB-INF/tlds/adw.tld" prefix="adw" %>
 <%
 	// get the request context
@@ -15,7 +16,7 @@
 	String pageName = currentPage.getName();
 	
 	String backgroundImageUrl = "/ui/images/logos/AlfrescoFadedBG.png";
-	backgroundImageUrl = RenderUtil.toBrowserUrl(backgroundImageUrl);
+	backgroundImageUrl = URLUtil.toBrowserUrl(backgroundImageUrl);
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

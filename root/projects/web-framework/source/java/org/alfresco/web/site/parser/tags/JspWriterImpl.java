@@ -46,36 +46,32 @@ public class JspWriterImpl extends JspWriter
         super(bufSize, autoFlush);
         if (bufferSize == JspWriter.DEFAULT_BUFFER)
             bufferSize = DEFAULT_BUFFER_SIZE;
+        this.bufferSize = bufSize;
+        this.autoFlush = autoFlush;
         writers = new Array();
         pw = out;
         this.out = new TagBodyContentImpl(this);
-    }
-
-    public JspWriterImpl(JspWriter out, int bufSize, boolean autoFlush)
-    {
-        super(bufSize, autoFlush);
-        if (bufferSize == JspWriter.DEFAULT_BUFFER)
-            bufferSize = DEFAULT_BUFFER_SIZE;
-        writers = new Array();
-        this.out = out;
     }
 
     public void write(String s) throws IOException
     {
         checkOpen();
         out.write(s);
+        this.flush();
     }
 
     public void write(int i) throws IOException
     {
         checkOpen();
         out.write(i);
+        this.flush();
     }
 
     public void write(char c[], int off, int len) throws IOException
     {
         checkOpen();
         out.write(c, off, len);
+        this.flush();
     }
 
     public void print(char c) throws IOException
@@ -194,6 +190,7 @@ public class JspWriterImpl extends JspWriter
     public void flush() throws IOException
     {
         out.flush();
+        
         if (out instanceof BodyContent)
         {
             if (!writers.isEmpty())

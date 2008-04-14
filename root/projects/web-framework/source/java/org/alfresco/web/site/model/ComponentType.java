@@ -31,6 +31,11 @@ import org.dom4j.Document;
  */
 public class ComponentType extends ModelObject
 {
+    public static String TYPE_NAME = "component-type";
+    public static String PROP_URI = "uri";
+    public static String PROP_RENDERER = "renderer";
+    public static String PROP_RENDERER_TYPE = "renderer-type";
+    
     public ComponentType(Document document)
     {
         super(document);
@@ -44,32 +49,37 @@ public class ComponentType extends ModelObject
 
     public String getURI()
     {
-        return getProperty("uri");
+        return getProperty(PROP_URI);
     }
 
     public void setURI(String uri)
     {
-        setProperty("uri", uri);
+        setProperty(PROP_URI, uri);
     }
 
     public void setRenderer(String renderer)
     {
-        setProperty("renderer", renderer);
+        setProperty(PROP_RENDERER, renderer);
     }
 
     public String getRenderer()
     {
-        return getProperty("renderer");
+        return getProperty(PROP_RENDERER);
     }
 
     public void setRendererType(String rendererType)
     {
-        setProperty("renderer-type", rendererType);
+        setProperty(PROP_RENDERER_TYPE, rendererType);
     }
 
     public String getRendererType()
     {
-        return getProperty("renderer-type");
+        return getProperty(PROP_RENDERER_TYPE);
     }
 
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

@@ -16,7 +16,7 @@
 	// text
 	String startEditingString = "Start Editing";
 		
-	String dsContext = RenderUtil.toBrowserUrl("/");
+	String dsContext = URLUtil.toBrowserUrl("/");
 	
 	// things to stamp onto page
 	String rootPageId = null;
@@ -54,33 +54,22 @@ floatingMenuText.on("click", function() { toggleInContextMode(); });
 
 function floatingMenu()
 {
-	var startX = getInContextMenuXOffset(),
-	startY = getInContextMenuYOffset();
-	var ns = (navigator.appName.indexOf("Netscape") != -1);
-	var d = document;
-	function ml(id)
-	{
-		var el=d.getElementById?d.getElementById(id):d.all?d.all[id]:d.layers[id];
-		if(d.layers)el.style=el;
-		el.sP=function(x,y){this.style.left=x;this.style.top=y;};
-		el.x = startX;
-		el.y = ns ? pageYOffset + innerHeight : document.body.scrollTop + document.body.clientHeight;
-		el.y -= startY;
-		return el;
-	}
-	window.stayTopLeft=function()
-	{
-		startX = getInContextMenuXOffset(),
-		startY = getInContextMenuYOffset();
-	
-		var pY = ns ? pageYOffset + innerHeight : document.body.scrollTop + document.body.clientHeight;
-		ftlObj.x = startX;
-		ftlObj.y += (pY - startY - ftlObj.y)/8;
-		ftlObj.sP(ftlObj.x, ftlObj.y);
-		setTimeout("stayTopLeft()", 10);
-	}
-	ftlObj = ml("divFloatingMenu");
-	stayTopLeft();
+	var fEl = Ext.get("divFloatingMenu");
+
+	var padding = 5;
+
+	var maxHeight = Ext.getBody().getHeight();
+	var maxWidth = Ext.getBody().getWidth();
+
+	maxHeight = maxHeight - 16;
+
+	var x = 0 + padding + getInContextMenuXOffset();
+	var y = maxHeight - fEl.getHeight() - padding;
+
+	fEl.setLeft(x);
+	fEl.setTop(y);
+
+	setTimeout("floatingMenu()", 10);
 }
 floatingMenu();
 </script>

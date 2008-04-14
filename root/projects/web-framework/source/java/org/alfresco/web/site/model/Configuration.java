@@ -31,6 +31,9 @@ import org.dom4j.Document;
  */
 public class Configuration extends ModelObject
 {
+    public static String TYPE_NAME = "configuration";
+    public static String PROP_SOURCE_ID = "source-id";
+    
     public Configuration(Document document)
     {
         super(document);
@@ -44,12 +47,17 @@ public class Configuration extends ModelObject
 
     public String getSourceId()
     {
-        return getProperty("source-id");
+        return getProperty(PROP_SOURCE_ID);
     }
 
     public void setSourceId(String sourceId)
     {
-        setProperty("source-id", sourceId);
+        setProperty(PROP_SOURCE_ID, sourceId);
     }
 
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

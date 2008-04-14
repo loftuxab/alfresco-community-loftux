@@ -39,7 +39,6 @@ function assertSiteConfiguration(websiteName, websiteDescription)
 	siteConfiguration.setProperty("description", websiteDescription);
 	siteConfiguration.save();
 
-
 	// ensure that we have a root page
 	var rootPage = site.getRootPage();
 	if(rootPage == null)
@@ -200,24 +199,38 @@ function newItemComponent(name, itemType, itemPath, howToRender, renderData, end
 	c.setSetting("itemPath", itemPath);
 	c.setSetting("howToRender", howToRender);
 	c.setSetting("renderData", renderData);
-	c.setSetting("endpointId", endpointId);
+	c.setSetting("endpoint-id", endpointId);
 	save(c);
 
 	return c;
 }
 
-function newEndpoint(endpointId, protocol, host, port, uri, credentials, authentication, username, password)
+
+function newWebScriptComponent(name, uri)
+{
+	var c = newComponent(name, "ct-webscriptComponent");		
+	c.setSetting("uri", uri);
+	save(c);
+
+	return c;
+}
+
+function newEndpoint(endpointId, connectorId, authId, endpointUrl, defaultUri, identity, username, password)
 {
 	var endpoint = site.newEndpoint();
-	endpoint.setProperty("endpointId", endpointId);
-	endpoint.setSetting("protocol", protocol);
-	endpoint.setSetting("host", host);
-	endpoint.setSetting("port", port);
-	endpoint.setSetting("uri", uri);
-	endpoint.setSetting("credentials", credentials);
-	endpoint.setSetting("authentication", authentication);
-	endpoint.setSetting("username", username);
-	endpoint.setSetting("password", password);
+	endpoint.setProperty("endpoint-id", endpointId);
+
+	endpoint.setProperty("connector-id", connectorId);
+	endpoint.setProperty("auth-id", authId);
+	endpoint.setProperty("endpoint-url", endpointUrl);
+	endpoint.setProperty("default-uri", defaultUri);
+	endpoint.setProperty("identity", identity);
+	
+	if(username != null)
+		endpoint.setProperty("username", username);
+	if(password != null)
+		endpoint.setProperty("password", password);
+
 	save(endpoint);
 
 	return endpoint;

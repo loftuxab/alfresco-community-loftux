@@ -9,6 +9,7 @@
 	<adw:id>tt-basic-landing-template</adw:id>
 	<adw:name>basic-landing-template</adw:name>
 	<adw:description>basic-landing-template</adw:description>
-	<adw:renderer>/build/basic/basic-landing-template.jsp</adw:renderer>
+	<adw:renderer-type>html</adw:renderer-type>
+	<adw:renderer>/build/basic/basic-landing-template.html</adw:renderer>
 
 </adw:template-type>

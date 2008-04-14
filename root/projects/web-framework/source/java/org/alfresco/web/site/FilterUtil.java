@@ -25,7 +25,6 @@
 package org.alfresco.web.site;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +33,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.tools.FakeHttpServletResponse;
+import org.alfresco.tools.WrappedHttpServletRequest;
 import org.alfresco.web.site.parser.ITagletHandler;
 import org.alfresco.web.site.parser.tags.PageTokenizer;
 import org.alfresco.web.site.parser.tags.TagletParser;
@@ -43,6 +44,33 @@ import org.alfresco.web.site.parser.tags.TagletParser;
  */
 public class FilterUtil
 {
+    /**
+     * Standalone method that processes tags on the given content. This hands
+     * back the processed result as a string.
+     * 
+     * @param data
+     * @param relativePath
+     * @return
+     * @throws Exception
+     */
+    public static String filterContent(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String content, String relativePath) throws Exception
+    {        
+        WrappedHttpServletRequest req = new WrappedHttpServletRequest(request);
+        FakeHttpServletResponse resp = new FakeHttpServletResponse();
+        
+        // Create the filter context
+        FilterContext filterContext = new FilterContext(req, resp,
+                request.getSession().getServletContext());
+        filterContext.setRequestContext(context);
+
+        // process the filter
+        executeFilter(filterContext, content, relativePath);
+
+        return resp.getContentAsString();
+    }
+
     /**
      * Processes filtering on the given html data. This will "remember" the
      * current content item (described by relative path). Some tags may use this
@@ -54,35 +82,29 @@ public class FilterUtil
      * @param relativePath
      * @return
      */
-    public static String filterContent(HttpServletRequest request,
-            HttpServletResponse response, String data, String relativePath)
+    protected static void executeFilter(FilterContext filterContext,
+            String data, String relativePath) 
+            throws Exception
     {
-        RequestContext context = RequestUtil.getRequestContext(request);
-
-        FilterContext cxt = new FilterContext(request, response,
-                request.getSession().getServletContext());
-        request.setAttribute("FILTER_CONTEXT", cxt);
-
         // store content identification onto the filter
-        cxt.setValue(FilterContext.CONTENT_ITEM_ID, relativePath);
+        filterContext.setValue(FilterContext.CONTENT_ITEM_ID, relativePath);
 
-        // create a new parser that processes links
-        TagletParser parser = getTagletParser(context);
+        // create a new parser
+        RequestContext requestContext = filterContext.getRequestContext();
+        TagletParser parser = getTagletParser(requestContext);
 
         // create a new handler -- this one executes tags on-the-fly
         ITagletHandler th = new PageTokenizer();
 
-        String result = executeParser(parser, th, cxt, data);
-        return result;
+        // execute the tags in the document
+        executeParser(parser, th, filterContext, data);
     }
 
-    public static String executeParser(TagletParser parser, ITagletHandler th,
-            FilterContext cxt, String data)
+    public static void executeParser(TagletParser parser, ITagletHandler th,
+            FilterContext filterContext, String data) throws Exception
     {
-        InputStream in = new ByteArrayInputStream(data.getBytes());
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        parser.parseTaglets(cxt, th, in, baos);
-        return new String(baos.toByteArray());
+        InputStream is = new ByteArrayInputStream(data.getBytes());
+        parser.parseTaglets(filterContext, th, is);
     }
 
     private static TagletParser defaultTagletParser;
@@ -93,16 +115,26 @@ public class FilterUtil
             return defaultTagletParser;
 
         // tld documents to load
-        // TODO: Make this extensible
+        // and tld url mappings
         Map<String, String> tldMap = new HashMap<String, String>();
-        tldMap.put("ui", "/WEB-INF/tlds/ui.tld");
-        tldMap.put("adw", "/WEB-INF/tlds/adw.tld");
-
-        // tld url mappings
-        // TODO: Make this extensible
         Map<String, String> tldUrlMap = new HashMap<String, String>();
-        tldUrlMap.put("ui", "http://www.alfresco.org/taglib/adw/ui");
-        tldUrlMap.put("adw", "http://www.alfresco.org/taglib/adw");
+
+        // walk the configuration
+        String tldIds[] = Framework.getConfig().getTagLibraryIds();
+        for (int i = 0; i < tldIds.length; i++)
+        {
+            String uri = Framework.getConfig().getTagLibraryUri(tldIds[i]);
+            String namespace = Framework.getConfig().getTagLibraryNamespace(
+                    tldIds[i]);
+
+            // the id is the prefix
+            String prefix = tldIds[i];
+            tldMap.put(prefix, uri);
+            tldUrlMap.put(prefix, namespace);
+
+            // tldMap.put("alf", "/WEB-INF/tlds/alf.tld");
+            // tldUrlMap.put("alf", "http://www.alfresco.org/taglib/alf");
+        }
 
         TagletParser parser = getTagletParser(context, tldMap, tldUrlMap);
         if (parser != null)
@@ -124,11 +156,13 @@ public class FilterUtil
                 String prefix = (String) it.next();
                 String relativePath = (String) tldMap.get(prefix);
                 String tldUrl = (String) tldUrlMap.get(prefix);
-                String xml = context.getModelManager().getDocumentString(
-                        context, relativePath);
-                parser.importNamespace(prefix, tldUrl, xml);
 
-                System.out.println("Successfully imported namespace: " + prefix);
+                // load the xml
+                String xml = ModelUtil.getFileStringContents(context,
+                        relativePath);
+
+                // import the tag library
+                parser.importNamespace(prefix, tldUrl, xml);
             }
         }
         catch (Exception ex)

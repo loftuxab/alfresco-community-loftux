@@ -1,7 +1,7 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
 <%@ page import="org.alfresco.web.site.config.*" %>
-<%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
+<%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
 	// get the request context
@@ -19,7 +19,7 @@
 	String renderString = null;
 	if(imageLocation != null && !"".equals(imageLocation))
 	{
-		imageLocation = RenderUtil.toBrowserUrl(imageLocation);
+		imageLocation = URLUtil.toBrowserUrl(imageLocation);
 		renderString = "<img src=\"" + imageLocation + "\" ";
 		if(width != null)
 			renderString += " width=\"" + width + "\"";
@@ -34,7 +34,7 @@
 	if(renderString == null)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-		String unconfiguredImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+		String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
 		renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component'/>";
 	}
 %>

@@ -3,5 +3,5 @@
    <id>welcome</id>
    <title>The test welcome page</title>
    <template>welcome-main</template>
-   <authentication>guest</authentication>
+   <authentication>none</authentication>
 </page>

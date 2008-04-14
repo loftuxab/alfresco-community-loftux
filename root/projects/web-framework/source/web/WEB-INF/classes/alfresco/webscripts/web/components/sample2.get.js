@@ -1,0 +1,1 @@
+model.html = "WEB COMPONENT #2";

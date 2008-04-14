@@ -46,11 +46,25 @@ public class RendererFactory
         // web script
         if (component.getSetting("uri") != null && component.getSetting("uri").length() > 0)
         {
-            ComponentType componentType = context.getModelManager().loadComponentType(
+            ComponentType componentType = context.getModel().loadComponentType(
                     context, "ct-webscriptComponent");
             return _newRenderer(context, componentType,
                     componentType.getRendererType(),
                     componentType.getRenderer());
+        }
+        
+        // Another special case - if the component type id starts
+        // with / then it is a URI - a web script
+        String componentTypeId = component.getComponentTypeId();
+        if(componentTypeId != null && componentTypeId.startsWith("/"))
+        {
+            // this is either a web script or a freemarker template
+            // lets assume web script...
+            ComponentType componentType = context.getModel().loadComponentType(
+                    context, "ct-webscriptComponent");
+            return _newRenderer(context, componentType,
+                    componentType.getRendererType(),
+                    componentType.getRenderer());            
         }
 
         // Otherwise, proceed as before
@@ -77,33 +91,37 @@ public class RendererFactory
             throws RendererNotFoundException
     {
         // JSP is the default case
-        if (rendererType == null || "".equals(rendererType) || "jsp".equalsIgnoreCase(rendererType))
+        if (rendererType == null || "".equals(rendererType))
         {
-            rendererType = "org.alfresco.web.site.renderer.JSPRenderer";
+            rendererType = "jsp";
         }
 
-        if ("java".equals(rendererType) || "javaclass".equals(rendererType))
+        // look up the class implementation
+        String className = context.getConfig().getRendererClass(rendererType);
+        if (className == null || "".equals(className))
         {
-            rendererType = "org.alfresco.web.site.renderer.JavaClassRenderer";
-        }
-
-        if ("html".equals(rendererType) || "htm".equals(rendererType))
-        {
-            rendererType = "org.alfresco.web.site.renderer.HTMLRenderer";
+            // JSP is the default case
+            className = "org.alfresco.web.site.renderer.JSPRenderer";
         }
 
         // cache the renderers for performance
         if (renderers == null)
+        {
             renderers = new HashMap<String, AbstractRenderer>();
+        }
 
         // look up
-        String cacheKey = rendererType + "_" + renderer;
+        String cacheKey = className + "_" + renderer;
         AbstractRenderer r = (AbstractRenderer) renderers.get(cacheKey);
         if (r == null)
         {
             try
             {
-                r = (AbstractRenderer) Class.forName(rendererType).newInstance();
+                System.out.println("Instantiating renderer: " + className);
+                if(renderer != null)
+                    System.out.println(" -> renderer: " + renderer);
+
+                r = (AbstractRenderer) Class.forName(className).newInstance();
                 r.setRenderer(renderer);
                 renderers.put(cacheKey, r);
             }

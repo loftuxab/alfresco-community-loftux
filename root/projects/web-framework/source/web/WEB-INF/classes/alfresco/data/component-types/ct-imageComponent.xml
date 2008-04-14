@@ -9,6 +9,7 @@
 	<adw:id>ct-imageComponent</adw:id>
 	<adw:name>Image Component</adw:name>
 	<adw:description>Image Component</adw:description>
+	<adw:renderer-type>jsp</adw:renderer-type>		
 	<adw:renderer>/ui/components/imageComponent/component.jsp</adw:renderer>
 
 </adw:component-type>

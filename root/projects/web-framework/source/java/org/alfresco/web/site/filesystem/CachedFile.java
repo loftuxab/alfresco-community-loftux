@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.site.filesystem;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * @author muzquiano
  */
@@ -75,6 +78,37 @@ public class CachedFile implements IFile
             modDate = file.getModificationDate();
         return modDate;
     }
+    
+    public byte[] readBytes()
+    {
+        return file.readBytes();
+    }
+    
+    public void writeBytes(byte[] array)
+    {
+        file.writeBytes(array);
+    }
+    
+    public String readContents()
+    {
+        return new String(readBytes());        
+    }
+    
+    public void writeContents(String contents)
+    {
+        writeBytes(contents.getBytes());        
+    }
+    
+    public InputStream getInputStream() throws Exception
+    {
+        return file.getInputStream();
+    }
+    
+    public OutputStream getOutputStream() throws Exception
+    {
+        return file.getOutputStream();
+    }
+    
 
     protected IFileSystem fileSystem;
     protected IFile file;

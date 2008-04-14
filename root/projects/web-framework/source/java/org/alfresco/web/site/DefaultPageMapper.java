@@ -67,7 +67,7 @@ public class DefaultPageMapper extends PageMapper
         }
         if (pageId != null)
         {
-            Page _page = context.getModelManager().loadPage(context, pageId);
+            Page _page = context.getModel().loadPage(context, pageId);
             if (_page != null)
                 context.setCurrentPage(_page);
         }

@@ -628,5 +628,237 @@ public class WebScriptFrameworkConfig extends AbstractConfig
         }
         return null;
     }
+    
+    public String getModelRootPath()
+    {
+        String rootPath = config.getConfigElement("model").getChildValue("rootpath");
+        if(rootPath == null)
+            rootPath = "/";
+        return rootPath;
+    }
+    
+    //////////////////////////////////////////////////////////////////
+    // Tag Libraries
+    //////////////////////////////////////////////////////////////////
+    
+    public String[] getTagLibraryIds()
+    {
+        List elements = config.getConfigElement("tags").getChild("libraries").getChildren("library");        
+        String[] ids = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            ids[i] = configElement.getChildValue("id");
+        }
+        return ids;        
+    }
+    
+    public String getTagLibraryUri(String id)
+    {
+        List elements = config.getConfigElement("tags").getChild("libraries").getChildren("library");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue("uri");
+        }
+        return null;        
+    }
 
+    public String getTagLibraryNamespace(String id)
+    {
+        List elements = config.getConfigElement("tags").getChild("libraries").getChildren("library");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue("namespace");
+        }
+        return null;        
+    }    
+    
+    //////////////////////////////////////////////////////////////////
+    // User Factories
+    //////////////////////////////////////////////////////////////////
+    
+    public String getDefaultUserFactoryId()
+    {
+        ConfigElement element = config.getConfigElement("defaults").getChild("user-factory");
+        return element.getValue();        
+    }
+    
+    public String[] getUserFactoryIds()
+    {
+        List elements = config.getConfigElement("user").getChild("factories").getChildren("factory");        
+        String[] ids = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            ids[i] = configElement.getChildValue("id");
+        }
+        return ids;                
+    }
+
+    public String getUserFactoryName(String id)
+    {
+        return getUserFactoryProperty(id, "name");
+    }
+
+    public String getUserFactoryDescription(String id)
+    {
+        return getUserFactoryProperty(id, "description");
+    }
+
+    public String getUserFactoryClass(String id)
+    {
+        return getUserFactoryProperty(id, "class");
+    }
+
+    public String getUserFactoryProperty(String id, String property)
+    {
+        List elements = config.getConfigElement("user").getChild("factories").getChildren("factory");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue(property);
+        }
+        return null;                
+    }
+    
+    //////////////////////////////////////////////////////////////////
+    // Remote
+    //////////////////////////////////////////////////////////////////
+    
+    public String[] getRemoteConnectorIds()
+    {
+        List elements = config.getConfigElement("remote").getChild("connectors").getChildren("connector");        
+        String[] ids = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            ids[i] = configElement.getChildValue("id");
+        }
+        return ids;                
+    }
+
+    public String getRemoteConnectorName(String id)
+    {
+        return getRemoteConnectorProperty(id, "name");        
+    }
+
+    public String getRemoteConnectorDescription(String id)
+    {
+        return getRemoteConnectorProperty(id, "description");
+    }
+
+    public String getRemoteConnectorClass(String id)
+    {
+        return getRemoteConnectorProperty(id, "class");
+    }
+    
+    public String getRemoteConnectorProperty(String id, String property)
+    {
+        List elements = config.getConfigElement("remote").getChild("connectors").getChildren("connector");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue(property);
+        }
+        return null;                                
+    }
+
+    public String[] getRemoteAuthenticatorIds()
+    {
+        List elements = config.getConfigElement("remote").getChild("authenticators").getChildren("authenticator");        
+        String[] ids = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            ids[i] = configElement.getChildValue("id");
+        }
+        return ids;                        
+    }
+
+    public String getRemoteAuthenticatorName(String id)
+    {
+        return getRemoteAuthenticatorProperty(id, "name");
+    }
+
+    public String getRemoteAuthenticatorDescription(String id)
+    {
+        return getRemoteAuthenticatorProperty(id, "description");
+    }
+
+    public String getRemoteAuthenticatorClass(String id)
+    {
+        return getRemoteAuthenticatorProperty(id, "class");
+    }
+    
+    public String getRemoteAuthenticatorProperty(String id, String property)
+    {
+        List elements = config.getConfigElement("remote").getChild("authenticators").getChildren("authenticator");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue(property);
+        }
+        return null;                        
+    }
+    
+    
+    //////////////////////////////////////////////////////////////////
+    // Renderers
+    //////////////////////////////////////////////////////////////////
+    
+    public String[] getRendererIds()
+    {
+        List elements = config.getConfigElement("renderers").getChildren("renderer");        
+        String[] ids = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            ids[i] = configElement.getChildValue("id");
+        }
+        return ids;                
+        
+    }
+
+    public String getRendererName(String id)
+    {
+        return getRendererProperty(id, "name");
+        
+    }
+
+    public String getRendererDescription(String id)
+    {
+        return getRendererProperty(id, "description");
+    }
+
+    public String getRendererClass(String id)
+    {
+        return getRendererProperty(id, "class");
+    }
+    
+    public String getRendererProperty(String id, String property)
+    {
+        List elements = config.getConfigElement("renderers").getChildren("renderer");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue(property);
+        }
+        return null;                        
+    }
+    
+    
 }

@@ -39,6 +39,11 @@ import org.dom4j.Element;
  */
 public class Page extends ModelObject
 {
+    public static String TYPE_NAME = "page";
+    public static String PROP_TEMPLATE_ID = "template-id";
+    public static String ATTR_FORMAT_ID = "format-id";
+    public static String PROP_ROOT_PAGE = "root-page";
+    
     public Page(Document document)
     {
         super(document);
@@ -65,18 +70,22 @@ public class Page extends ModelObject
 
     protected Element getTemplateElement(String formatId)
     {
+        if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        {
+            formatId = null;
+        }
+        
         List templateElements = getDocument().getRootElement().elements(
-                "template-id");
+                PROP_TEMPLATE_ID);
         for (int i = 0; i < templateElements.size(); i++)
         {
             Element templateElement = (Element) templateElements.get(i);
-            String _formatId = templateElement.attributeValue("format-id");
+            String _formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
             if ("".equals(_formatId))
                 _formatId = null;
             if (formatId == null)
             {
-                String defaultFormatId = Framework.getConfig().getDefaultFormatId();
-                if (_formatId == null || "".equals(_formatId) || _formatId.equals(defaultFormatId))
+                if (_formatId == null || "".equals(_formatId))
                 {
                     return templateElement;
                 }
@@ -97,19 +106,29 @@ public class Page extends ModelObject
 
     public void setTemplateId(String templateId, String formatId)
     {
+        if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        {
+            formatId = null;
+        }
+        
         Element templateElement = getTemplateElement(formatId);
         if (templateElement == null)
         {
             templateElement = getDocument().getRootElement().addElement(
-                    "template-id");
+                    PROP_TEMPLATE_ID);
             if (formatId != null)
-                templateElement.addAttribute("format-id", formatId);
+                templateElement.addAttribute(ATTR_FORMAT_ID, formatId);
         }
         templateElement.setText(templateId);
     }
 
     public void removeTemplateId(String formatId)
     {
+        if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        {
+            formatId = null;
+        }
+        
         Element templateElement = this.getTemplateElement(formatId);
         if (templateElement != null)
             templateElement.getParent().remove(templateElement);
@@ -120,18 +139,18 @@ public class Page extends ModelObject
         Map map = new HashMap();
 
         List templateElements = getDocument().getRootElement().elements(
-                "template-id");
+                PROP_TEMPLATE_ID);
         for (int i = 0; i < templateElements.size(); i++)
         {
             Element templateElement = (Element) templateElements.get(i);
-            String formatId = templateElement.attributeValue("format-id");
+            String formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
             if (formatId == null || "".equals(formatId))
                 formatId = context.getConfig().getDefaultFormatId();
 
             String templateId = templateElement.getStringValue();
             if (templateId != null)
             {
-                Template template = (Template) context.getModelManager().loadTemplate(
+                Template template = (Template) context.getModel().loadTemplate(
                         context, templateId);
                 map.put(formatId, template);
             }
@@ -142,12 +161,12 @@ public class Page extends ModelObject
 
     public boolean getRootPage()
     {
-        return getBooleanProperty("root-page");
+        return getBooleanProperty(PROP_ROOT_PAGE);
     }
 
     public void setRootPage(boolean b)
     {
-        this.setProperty("root-page", (b ? "true" : "false"));
+        this.setProperty(PROP_ROOT_PAGE, (b ? "true" : "false"));
     }
 
     public Template getTemplate(RequestContext context)
@@ -159,14 +178,14 @@ public class Page extends ModelObject
     {
         String templateId = getTemplateId(formatId);
         if (templateId != null)
-            return context.getModelManager().loadTemplate(context, templateId);
+            return context.getModel().loadTemplate(context, templateId);
         return null;
     }
 
     public Page[] getChildPages(RequestContext context)
     {
         PageAssociation[] associations = ModelUtil.findPageAssociations(
-                context, this.getId(), null, "child");
+                context, this.getId(), null, PageAssociation.CHILD_ASSOCIATION_TYPE_ID);
         Page[] pages = new Page[associations.length];
         for (int i = 0; i < associations.length; i++)
         {
@@ -175,4 +194,10 @@ public class Page extends ModelObject
         }
         return pages;
     }
+    
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
+    
 }

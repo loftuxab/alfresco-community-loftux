@@ -87,7 +87,7 @@ public class AVMRequestContextFactory extends HttpRequestContextFactory
         }
         if (pageId != null)
         {
-            Page _page = context.getModelManager().loadPage(context, pageId);
+            Page _page = context.getModel().loadPage(context, pageId);
             if (_page != null)
                 context.setCurrentPage(_page);
 

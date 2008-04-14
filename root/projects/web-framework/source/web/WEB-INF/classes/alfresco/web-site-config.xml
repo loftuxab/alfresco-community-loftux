@@ -79,7 +79,7 @@
 					<description>Local File System</description>
 					<class>org.alfresco.web.site.filesystem.LocalFileSystem</class>
 					<usecache>false</usecache>
-					<rootpath>/WEB-INF/classes/alfresco</rootpath>
+					<rootpath>/</rootpath>
 				</definition>
 				<definition>
 					<id>store</id>
@@ -212,6 +212,7 @@
 		
 		<!--  Model  -->
 		<model>
+			<rootpath>/WEB-INF/classes/alfresco</rootpath>
 			<types>
 				<type>
 					<id>component</id>
@@ -298,6 +299,110 @@
 		</model>
 		
 		
+		<!-- tag libraries -->
+		<tags>
+			<libraries>
+				<library>
+					<id>alf</id>
+					<uri>/WEB-INF/tlds/alf.tld</uri>
+					<namespace>http://www.alfresco.org/taglib/alf</namespace>				
+				</library>
+			</libraries>
+		</tags>
+		
+
+
+		<!-- user management -->
+		<user>
+			<factories>
+				<factory>
+					<id>guest</id>
+					<name>Guest User Factory</name>
+					<description>Produces Anonymous Users</description>
+					<class>org.alfresco.web.site.GuestUserFactory</class>
+				</factory>
+				<factory>
+					<id>alfresco</id>
+					<name>Alfresco User Factory</name>
+					<description>Produces Users loaded from Alfresco Repository</description>
+					<class>org.alfresco.web.site.AlfrescoUserFactory</class>
+				</factory>
+			</factories>
+		</user>
+		
+		<!-- remote connectors and authenticators -->
+		<remote>
+			<connectors>
+				<connector>
+					<id>http</id>
+					<name>Http Connector</name>
+					<description>HTTP Client Connector</description>
+					<class>org.alfresco.connector.remote.HttpConnector</class>
+				</connector>
+				<connector>
+					<id>web</id>
+					<name>Web Connector</name>
+					<description>Web Connector</description>
+					<class>org.alfresco.connector.remote.WebConnector</class>
+				</connector>
+				<connector>
+					<id>alfresco</id>
+					<name>Alfresco Connector</name>
+					<description>Alfresco Connector</description>
+					<class>org.alfresco.web.site.remote.AlfrescoConnector</class>
+				</connector>
+			</connectors>
+			<authenticators>
+				<authenticator>
+					<id>basic</id>
+					<name>HTTP Basic Authenticator</name>
+					<description>HTTP Basic Authenticator</description>
+					<class>org.alfresco.connector.HTTPBasicAuthenticator</class>
+				</authenticator>
+				<authenticator>
+					<id>alf_ticket</id>
+					<name>Alfresco Ticket Authenticator</name>
+					<description>Alfresco Ticket Authenticator</description>
+					<class>org.alfresco.web.site.remote.AlfrescoAuthenticator</class>
+				</authenticator>
+			</authenticators>
+		</remote>
+		
+		<!-- renderers -->
+		<renderers>
+			<renderer>
+				<id>jsp</id>
+				<name>JSP Renderer</name>
+				<description>JSP Renderer</description>
+				<class>org.alfresco.web.site.renderer.JSPRenderer</class>
+			</renderer>
+			<renderer>
+				<id>html</id>
+				<name>HTML Renderer</name>
+				<description>HTML Renderer</description>
+				<class>org.alfresco.web.site.renderer.HTMLRenderer</class>
+			</renderer>
+			<renderer>
+				<id>java</id>
+				<name>Java Class Renderer</name>
+				<description>Java Class Renderer</description>
+				<class>org.alfresco.web.site.renderer.JavaClassRenderer</class>
+			</renderer>
+			<renderer>
+				<id>webscript</id>
+				<name>Web Script Renderer</name>
+				<description>Web Script Renderer</description>
+				<class>org.alfresco.web.scripts.WebScriptRenderer</class>
+			</renderer>
+			<renderer>
+				<id>freemarker</id>
+				<name>Freemarker Renderer</name>
+				<description>Freemarker Renderer</description>
+				<class>org.alfresco.web.scripts.FreemarkerRenderer</class>
+			</renderer>
+		</renderers>
+		
+
 		<!-- defaults -->
 		<defaults>
 			<request-context>http</request-context>
@@ -305,6 +410,7 @@
 			<link-builder>default</link-builder>			
 			<file-system>local</file-system>
 			<format>default</format>			
+			<user-factory>guest</user-factory>
 		</defaults>
 		
 	</config>

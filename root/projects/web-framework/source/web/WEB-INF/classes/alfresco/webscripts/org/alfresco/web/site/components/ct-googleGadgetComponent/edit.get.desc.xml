@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Google Gadget Component</shortname>
+  <description>Edit Google Gadget Component</description>
+  <url>/component/ct-googleGadgetComponent/edit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

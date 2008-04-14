@@ -30,6 +30,7 @@ import java.util.Hashtable;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspWriter;
 
 /**
  * FilterContext contains the context needed by content filters (which implement IFilter) to
@@ -129,7 +130,18 @@ public class FilterContext
     {
         return timestamp;
     }
+        
+    public void setRequestContext(RequestContext requestContext)
+    {
+        this.requestContext = requestContext;
+    }
+    
+    public RequestContext getRequestContext()
+    {
+        return requestContext;
+    }
 
+    private RequestContext requestContext;
     private Hashtable values;
     private HttpServletRequest request;
     private HttpServletResponse response;

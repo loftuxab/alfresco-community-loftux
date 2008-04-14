@@ -28,8 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.parser.tags.JspPageContextImpl;
 
 /**
  * @author muzquiano
@@ -38,6 +39,7 @@ public class RegionTag extends TagBase
 {
     private String name = null;
     private String scope = null;
+    private String access = null;
 
     public void setName(String name)
     {
@@ -60,6 +62,16 @@ public class RegionTag extends TagBase
             this.scope = "site";
         return this.scope;
     }
+    
+    public void setAccess(String access)
+    {
+        this.access = access;
+    }
+    
+    public String getAccess()
+    {
+        return this.access;
+    }
 
     public int doStartTag() throws JspException
     {
@@ -69,14 +81,13 @@ public class RegionTag extends TagBase
 
         try
         {
-            RenderUtil.renderRegion(context, request, response,
+            PresentationUtil.renderRegion(context, request, response,
                     context.getCurrentTemplate().getId(), getName(), getScope());
         }
-        catch (Exception ex)
+        catch (Throwable t)
         {
-            print("Unable to render this component - an error occurred: ");
-            print(ex.getMessage());
-            ex.printStackTrace();
+            t.printStackTrace();
+            throw new JspException(t);
         }
         return SKIP_BODY;
     }

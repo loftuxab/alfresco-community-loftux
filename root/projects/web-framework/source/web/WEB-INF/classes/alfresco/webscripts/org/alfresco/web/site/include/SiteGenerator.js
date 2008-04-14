@@ -62,12 +62,17 @@ function buildBasicPublicWebsite()
 	var t2 = newTemplate("Landing Template", "tt-basic-landing-template");
 	var t3 = newTemplate("Content Template", "tt-basic-content-template");
 	var t4 = newTemplate("Print Template", "tt-basic-print-template");
+	
+	// freemarker sample template
+	var t5 = newTemplate("Freemarker Sample Template", "tt-freemarker-template");
+	t5.setSetting("uri", "/web/templates/home");
+	t5.save();
 
 	// associate templates
 	associateTemplate(rootPage, t1, "default");
 	associateTemplate(nd1, t2, "default");
 	associateTemplate(nd2, t2, "default");
-	associateTemplate(nd3, t2, "default");
+	associateTemplate(nd3, t5, "default");
 	associateTemplate(nd4, t2, "default");
 	
 	// associate content templates
@@ -88,11 +93,11 @@ function buildBasicPublicWebsite()
 	var c6 = newImageComponent("Home: Gifts and Gadgets", "/build/basic/images/gifts_and_gadgets.jpg");
 	var c7 = newImageComponent("Home: Latest News", "/build/basic/images/latest_news.jpg");
 	associateTemplateComponent(c2, t1, "topNav");
-	associatePageComponent(c3, t1, rootPage, "blurb");
-	associatePageComponent(c4, t1, rootPage, "leftContent1");
-	associatePageComponent(c5, t1, rootPage, "rightContent1");
-	associatePageComponent(c6, t1, rootPage, "leftContent2");
-	associatePageComponent(c7, t1, rootPage, "content");
+	associatePageComponent(c3, rootPage, "blurb");
+	associatePageComponent(c4, rootPage, "leftContent1");
+	associatePageComponent(c5, rootPage, "rightContent1");
+	associatePageComponent(c6, rootPage, "leftContent2");
+	associatePageComponent(c7, rootPage, "content");
 	
 	// set up the products page
 	var c11 = newNavComponent("Horz Nav");
@@ -104,7 +109,15 @@ function buildBasicPublicWebsite()
 	
 	// set up the about us page
 	var c43 = newItemComponent("Article List", "specific", "/test/articles/sample1.xml", "templateTitle", "article-list", "alfresco-webuser");
-	associatePageComponent(c43, t2, nd4, "content");
+	associatePageComponent(c43, nd4, "content");
+	
+	// set up the customers page (freemarker and web script samples)
+	associateTemplateComponent(c11, t5, "topNav");
+	var c31 = newWebScriptComponent("WebScript Sample 1", "/web/components/sample1");
+	var c32 = newWebScriptComponent("WebScript Sample 2", "/web/components/sample2");
+	associatePageComponent(c31, nd3, "content");
+	associateTemplateComponent(c32, t5, nd3, "leftNav");		
+	
 	
 	// set up the content template (for item views)
 	var c91 = newItemComponent("Item Viewer", "current", null, "templateTitle", "article-full", "alfresco-webuser");
@@ -116,8 +129,8 @@ function buildBasicPublicWebsite()
 	associateTemplateComponent(c91, t4, "contentitem");
 	
 	// build the default endpoints
-	var ep1 = newEndpoint("alfresco-webuser", "http", "localhost", "8080", "/alfresco/service", "specificuser", "basic", "admin", "admin");
-	var ep2 = newEndpoint("alfresco", "http", "localhost", "8080", "/alfresco/service", "specificuser", "basic", "admin", "admin");
+	var ep1 = newEndpoint("alfresco-system", "alfresco", "alf-ticket", "http://localhost:8080", "/alfresco/service", "specific", "admin", "admin");
+	var ep2 = newEndpoint("alfresco", "alfresco", "alf-ticket", "http://localhost:8080", "/alfresco/service", "current", null, null);
 }
 
 function buildGreenEnergy()
@@ -129,3 +142,4 @@ function buildProjectWorksite()
 {
 	// TODO
 }
+

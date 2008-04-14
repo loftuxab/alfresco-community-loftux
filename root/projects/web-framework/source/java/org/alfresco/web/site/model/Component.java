@@ -32,6 +32,13 @@ import org.dom4j.Document;
  */
 public class Component extends ModelObject
 {
+    public static String TYPE_NAME = "component";
+    public static String PROP_REGION_ID = "region-id";
+    public static String PROP_SOURCE_ID = "source-id";
+    public static String PROP_SCOPE = "scope";
+    public static String PROP_COMPONENT_TYPE_ID = "component-type-id";
+    public static String PROP_FRAME_TYPE = "frame-type";
+    
     public Component(Document document)
     {
         super(document);
@@ -39,42 +46,52 @@ public class Component extends ModelObject
 
     public String getRegionId()
     {
-        return getProperty("region-id");
+        return getProperty(PROP_REGION_ID);
     }
 
     public void setRegionId(String regionId)
     {
-        setProperty("region-id", regionId);
+        setProperty(PROP_REGION_ID, regionId);
     }
 
     public String getSourceId()
     {
-        return getProperty("source-id");
+        return getProperty(PROP_SOURCE_ID);
     }
 
     public void setSourceId(String sourceId)
     {
-        setProperty("source-id", sourceId);
+        setProperty(PROP_SOURCE_ID, sourceId);
     }
 
     public String getScope()
     {
-        return getProperty("scope");
+        return getProperty(PROP_SCOPE);
     }
 
     public void setScope(String scope)
     {
-        setProperty("scope", scope);
+        setProperty(PROP_SCOPE, scope);
     }
 
     public String getComponentTypeId()
     {
-        return getProperty("component-type-id");
+        return getProperty(PROP_COMPONENT_TYPE_ID);
     }
 
     public void setComponentTypeId(String componentTypeId)
     {
-        setProperty("component-type-id", componentTypeId);
+        setProperty(PROP_COMPONENT_TYPE_ID, componentTypeId);
+    }
+    
+    public String getFrameType()
+    {
+        return getProperty(PROP_FRAME_TYPE);
+    }
+    
+    public void setFrameType(String frameType)
+    {
+        setProperty(PROP_FRAME_TYPE, frameType);
     }
 
     // Helpers
@@ -83,14 +100,18 @@ public class Component extends ModelObject
     public ModelObject getSourceObject(RequestContext context)
     {
         // either 'global', template or page
-        return context.getModelManager().loadObject(context, getSourceId());
+        return context.getModel().loadObject(context, getSourceId());
     }
 
     public ComponentType getComponentType(RequestContext context)
     {
         // either 'global', template or page
-        return context.getModelManager().loadComponentType(context,
+        return context.getModel().loadComponentType(context,
                 getComponentTypeId());
     }
 
+    public String getTypeName() 
+    {
+        return TYPE_NAME;
+    }
 }

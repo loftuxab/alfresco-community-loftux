@@ -2,7 +2,8 @@
 <%@ page import="org.alfresco.website.ads.types.*" %>
 <%@ page import="org.alfresco.website.ads.config.*" %>
 <%@ page import="org.json.simple.*" %>
-<%@ taglib uri="/WEB-INF/tlds/ads.tld" prefix="ads" %>
+<%@ taglib uri="/WEB-INF/tlds/adw.tld" prefix="adw" %>
+<%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%

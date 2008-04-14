@@ -3062,6 +3062,10 @@
                   excludes="web.xml" />
       </copy>
 
+      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes/alfresco" overwrite="true">
+         <fileset dir="${dir.project.dynamicwebsite.src.web}/WEB-INF/classes/alfresco" />
+      </copy>
+
       <!-- add config files to WEB-INF/classes -->
       <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 

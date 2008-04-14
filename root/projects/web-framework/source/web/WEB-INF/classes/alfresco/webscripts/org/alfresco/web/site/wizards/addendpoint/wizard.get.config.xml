@@ -7,10 +7,9 @@
 		</buttons>
 		<data>
 			<element id="endpointId" type="String" defaultValue="" />
-			<element id="protocol" type="String" defaultValue="" />
-			<element id="host" type="String" defaultValue="" />
-			<element id="port" type="String" defaultValue="" />
-			<element id="uri" type="String" defaultValue="" />
+			<element id="connectorId" type="String" defaultValue="" />
+			<element id="endpointUrl" type="String" defaultValue="" />
+			<element id="defaultUri" type="String" defaultValue="" />			
 		</data>
 	</page>
 	<page id="auth" type="form">
@@ -19,23 +18,22 @@
 			<button id="save" label="Save" action="transition" data="submit"/>
 		</buttons>
 		<data>
-			<element id="credentials" type="String" defaultValue="" />
-			<element id="authentication" type="String" defaultValue="" />
+			<element id="authId" type="String" defaultValue="" />
+			<element id="identity" type="String" defaultValue="" />
 			<element id="username" type="String" defaultValue="" />
-			<element id="password" type="String" defaultValue="" />
+			<element id="password" type="String" defaultValue="" />			
 		</data>
 	</page>
 	<page id="submit" end="true" type="form">
 		<data>
-			<element id="endpointId" type="String" />
-			<element id="protocol" type="String" />
-			<element id="host" type="String" />
-			<element id="port" type="String" />
-			<element id="uri" type="String" />
-			<element id="credentials" type="String" />
-			<element id="authentication" type="String" />
+			<element id="endpointId" type="String" />			
+			<element id="connectorId" type="String" />
+			<element id="endpointUrl" type="String" />
+			<element id="defaultUri" type="String" />			
+			<element id="authId" type="String" />
+			<element id="identity" type="String" />
 			<element id="username" type="String" />
-			<element id="password" type="String" />
+			<element id="password" type="String" />			
 		</data>
 	</page>	
 </wizard>

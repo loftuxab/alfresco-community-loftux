@@ -38,6 +38,10 @@ import org.mozilla.javascript.Scriptable;
  */
 public class ScriptBase implements Serializable
 {
+    public ScriptBase()
+    {
+    }
+    
     public ScriptBase(RequestContext context)
     {
         this.context = context;
@@ -116,7 +120,7 @@ public class ScriptBase implements Serializable
 
     public ScriptModelObject getObject(String id)
     {
-        ModelObject modelObject = Framework.getManager().loadObject(context, id);
+        ModelObject modelObject = Framework.getModel().loadObject(context, id);
         if (modelObject != null)
             return new ScriptModelObject(context, modelObject);
         return null;

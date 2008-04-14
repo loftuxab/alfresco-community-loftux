@@ -10,7 +10,7 @@
 		if(context.getCurrentPage() != null)
 			currentPageId = context.getCurrentPage().getId();
 		
-		String id = context.getModelManager().newGUID();
+		String id = context.getModel().newGUID();
 		String href = context.getLinkBuilder().page(context, page.getId(), context.getCurrentFormatId());
 		
 		boolean selected = false;
@@ -47,7 +47,7 @@
 			Page[] childPages = page.getChildPages(context);
 			if(childPages.length > 0)
 			{
-				String id2 = context.getModelManager().newGUID();
+				String id2 = context.getModel().newGUID();
 				buffer.append("<div style='z-index: 1; position: absolute; visibility: hidden;' id='"+id2+"' class='yuimenu yui-module yui-overlay'>");
 				buffer.append("<div class='bd'>");
 				buffer.append("<ul>");
@@ -90,7 +90,7 @@
 	
 	// Stylesheet
 	String stylesheetUri = "/ui/components/navComponent/renderers/horizontalNav1/default/menu.css";
-	stylesheetUri = RenderUtil.toBrowserUrl(stylesheetUri);
+	stylesheetUri = URLUtil.toBrowserUrl(stylesheetUri);
 %>
 	<link rel="stylesheet" type="text/css" href="<%=stylesheetUri%>"/>
 

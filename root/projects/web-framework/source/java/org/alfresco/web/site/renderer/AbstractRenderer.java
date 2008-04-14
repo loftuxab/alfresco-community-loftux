@@ -24,43 +24,13 @@
  */
 package org.alfresco.web.site.renderer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
-import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
  * @author muzquiano
  */
 public abstract class AbstractRenderer
-{
-    protected abstract void executeImpl(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
-            RuntimeConfig config) throws RendererExecutionException;
-
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
-    {
-        try
-        {
-            executeImpl(context, request, response, config);
-        }
-        catch (RendererExecutionException ex)
-        {
-            handleError(context, request, response, config, ex);
-        }
-    }
-
-    public void handleError(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config,
-            RendererExecutionException ex)
-    {
-        // TODO: Handle this gracefully by reporting the error to the admin
-        // TODO: And report up to the UI
-    }
-
+    implements Renderable
+{    
     public void setRenderer(String renderer)
     {
         this.renderer = renderer;

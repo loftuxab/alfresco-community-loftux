@@ -1,7 +1,0 @@
-<alfresco-config>
-   
-   <config evaluator="string-compare" condition="PageRenderer">
-      <ignoreMissingComponents>true</ignoreMissingComponents>
-   </config>
-   
-</alfresco-config>

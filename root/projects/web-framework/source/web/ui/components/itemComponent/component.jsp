@@ -1,12 +1,11 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
+<%@ page import="org.alfresco.web.site.remote.*" %>
 <%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="org.alfresco.tools.*" %>
-<%@ page import="javax.xml.parsers.DocumentBuilder" %>
-<%@ page import="javax.xml.parsers.DocumentBuilderFactory" %>
-<%@ page import="org.w3c.dom.*" %>
+<%@ page import="org.dom4j.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
@@ -41,7 +40,7 @@
 	if(theItemPath == null)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-		String unconfiguredImageUrl = RenderUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+		String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
 		String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Item Component'/>";	
 		out.println(renderString);
 		return;
@@ -85,7 +84,7 @@
         	// for each item, grab the template rendition with this name
         	// and include it
         	
-        	List itemList = XMLUtil.getChildren(xmlDocument.getDocumentElement(), "item");
+        	List itemList = XMLUtil.getChildren(xmlDocument.getRootElement(), "item");
         	for(int i = 0; i < itemList.size(); i++)
         	{
         		Element item = (Element) itemList.get(i);

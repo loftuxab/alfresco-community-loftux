@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Media Component</shortname>
+  <description>Edit Media Component</description>
+  <url>/component/ct-mediaComponent/edit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

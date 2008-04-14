@@ -19,7 +19,7 @@
       </div>
       Additional plain text, and another component...
       <div>
-         <@region id="tools" scope="template" protected=true />
+         <@region id="main" scope="page" protected=true />
       </div>
       More plain text, and another component...
       <div>

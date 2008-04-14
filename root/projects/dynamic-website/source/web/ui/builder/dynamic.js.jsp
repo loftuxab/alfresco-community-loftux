@@ -175,12 +175,12 @@ function getAlfrescoTicket()
 function toBrowser(relativeUrl)
 {
 	if(relativeUrl == null)
-		return "<%=RenderUtil.toBrowserUrl("/")%>";
+		return "<%=URLUtil.toBrowserUrl("/")%>";
 	if(relativeUrl.startsWith("/"))
 	{
 		relativeUrl = relativeUrl.substring(1, relativeUrl.length);
 	}
-	return "<%=RenderUtil.toBrowserUrl("/")%>" + relativeUrl;
+	return "<%=URLUtil.toBrowserUrl("/")%>" + relativeUrl;
 }
 
 

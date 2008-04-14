@@ -24,12 +24,22 @@
  */
 package org.alfresco.web.site;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.tools.WrappedHttpServletRequest;
+import org.alfresco.tools.WrappedHttpServletResponse;
 import org.alfresco.web.site.config.RuntimeConfig;
+import org.alfresco.web.site.exception.ComponentRenderException;
+import org.alfresco.web.site.exception.JspRenderException;
+import org.alfresco.web.site.exception.PageRenderException;
+import org.alfresco.web.site.exception.RegionRenderException;
+import org.alfresco.web.site.exception.TemplateRenderException;
 import org.alfresco.web.site.model.Component;
-import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Template;
 import org.alfresco.web.site.renderer.AbstractRenderer;
@@ -40,6 +50,116 @@ import org.alfresco.web.site.renderer.RendererFactory;
  */
 public class RenderUtil
 {
+    /**
+     * Renders a given JSP page.
+     * 
+     * This wraps the JSP rendering in servlet wrappers and will
+     * do variable substitution on HEAD tags.
+     * 
+     * This method should really only be used for top-level page
+     * elements (i.e. the first dispatch to a JSP page).
+     * 
+     * If you use it for downstream JSP includes, it will work fine,
+     * but it will be less efficient.  For each call to this method,
+     * there exists some extra overhead for the wrapping/unwrapping
+     * of servlet objects and substitution within response text.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param dispatchPath
+     * @throws Exception
+     */
+    public static void renderJspPage(RequestContext context, HttpServletRequest request, HttpServletResponse response, String dispatchPath) throws JspRenderException
+    {
+        try
+        {
+            // wrap the request and response
+            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
+            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(response);
+            
+            // do the include
+            RequestUtil.include(wrappedRequest, wrappedResponse, dispatchPath);
+            
+            // generate the HEAD tag
+            String headTags = generateHeader(context);
+            
+            // Now do a replace on all of the stamp placeholders
+            String responseBody = wrappedResponse.getOutput();
+            int i = -1;
+            do {
+                i = responseBody.indexOf(PAGE_HEAD_DEPENDENCIES_STAMP);
+                if(i > -1)
+                {
+                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(i+PAGE_HEAD_DEPENDENCIES_STAMP.length(), responseBody.length());
+                }
+            }
+            while(i > -1);
+            
+            // Finally, commit the entire thing to the output stream
+            response.getWriter().print(responseBody);
+        }
+        catch(Exception ex)
+        {
+            throw new JspRenderException("Unable to render JSP page", ex);
+        }
+    }
+    
+    /**
+     * Renders the current page instance.
+     */
+    public static void renderPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response)
+            throws PageRenderException
+    {        
+        Page page = context.getCurrentPage();
+        if(page == null)
+        {
+            throw new PageRenderException("Unable to locate current page in request context");
+        }
+        Template currentTemplate = page.getTemplate(context);
+        if(currentTemplate == null)
+        {
+            throw new PageRenderException("Unable to locate template for page: " + page.getId());
+        }
+        
+        try
+        {
+            // Wrap the Request and Response
+            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
+            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(response);
+    
+            // Execute the template        
+            RenderUtil.renderTemplate(context, wrappedRequest, wrappedResponse,
+                    currentTemplate.getId());
+    
+            // At this point, the template and all of the components
+            // have executed.  We must now stamp the <!--${head}-->
+            // onto the output.  To do so, we must first generate
+            // the stamp.        
+            String headTags = generateHeader(context);
+            
+            // Now do a replace on all of the stamp placeholders
+            String responseBody = wrappedResponse.getOutput();
+            int i = -1;
+            do {
+                i = responseBody.indexOf(PAGE_HEAD_DEPENDENCIES_STAMP);
+                if(i > -1)
+                {
+                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(i+PAGE_HEAD_DEPENDENCIES_STAMP.length(), responseBody.length());
+                }
+            }
+            while(i > -1);
+            
+            // Finally, commit the entire thing to the output stream
+            response.getWriter().print(responseBody);
+        }
+        catch(Exception ex)
+        {
+            throw new PageRenderException("An exception occurred while rendering page: " + page.getId(), ex);
+        }
+    }
+    
     /**
      * Renders a given template instance.  This fetches the abstract renderer
      * instance for the given template's type and then binds configuration data
@@ -53,49 +173,27 @@ public class RenderUtil
      */
     public static void renderTemplate(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String templateId) throws Exception
+            String templateId) throws TemplateRenderException
     {
-        Template template = (Template) context.getModelManager().loadTemplate(
+        Template template = (Template) context.getModel().loadTemplate(
                 context, templateId);
+        if(template == null)
+            throw new TemplateRenderException("Unable to locate template: " + templateId);
 
-        // get the configuration for the template
-        RuntimeConfig config = context.loadConfiguration(template);
-        request.setAttribute("template-configuration", config);
-
-        // get the renderer and execute it
-        AbstractRenderer renderer = RendererFactory.newRenderer(context,
-                template.getTemplateType(context));
-        renderer.execute(context, request, response, config);
-    }
-
-    /**
-     * Renders a given component instance.  This fetches the abstract renderer
-     * instance for the given component's type and then binds configuration data
-     * to the rendering engine.  It then executes the component.
-     * 
-     * @param context
-     * @param request
-     * @param response
-     * @param componentId
-     * @throws Exception
-     */
-    public static void renderComponent(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
-            String componentId) throws Exception
-    {
-        Component component = context.getModelManager().loadComponent(context,
-                componentId);
-        if (component != null)
+        try
         {
-            // get the configuration for the component
-            RuntimeConfig config = context.loadConfiguration(component);
-            request.setAttribute("component-configuration", config);
-
-            // build a renderer for this component type
-            //ComponentType componentType = component.getComponentType(context);
+            // get the configuration for the template
+            RuntimeConfig config = context.loadConfiguration(template);
+            request.setAttribute("template-configuration", config);
+    
+            // get the renderer and execute it
             AbstractRenderer renderer = RendererFactory.newRenderer(context,
-                    component);
+                    template.getTemplateType(context));
             renderer.execute(context, request, response, config);
+        }
+        catch(Exception ex)
+        {
+            throw new TemplateRenderException("An exception occurred while rendering template: " + templateId, ex);
         }
     }
 
@@ -113,47 +211,95 @@ public class RenderUtil
     public static void renderRegion(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String templateId, String regionId, String regionScopeId)
-            throws Exception
+            throws RegionRenderException
     {
         // get the template
-        Template template = (Template) context.getModelManager().loadTemplate(
+        Template template = (Template) context.getModel().loadTemplate(
                 context, templateId);
+        if(template == null)
+            throw new RegionRenderException("Unable to locate template: " + templateId);
 
-        // load the baseline configuration for this template
-        RuntimeConfig config = context.loadConfiguration(template);
-        request.setAttribute("template-configuration", config);
-
-        // build the configuration for this region
-        config.put("region-id", regionId);
-        config.put("region-scope-id", regionScopeId);
-        String sourceId = getSourceId(context, regionScopeId);
-        config.put("region-source-id", sourceId);
-
-        // determine the renderer
-        // this can be overridden by a setting on either the layout
-        // or the layout type instances
-        // TODO: Do we want to keep this?
-        String renderer = "/ui/core/region.jsp";
-
-        // if there is already a component associated for this region,
-        // we must let the region know		
-        Component[] components = ModelUtil.findComponents(context,
-                regionScopeId, sourceId, regionId, null);
-        if (components.length > 0)
+        try
         {
-            Component component = components[0];
-
-            // load config for this component
-            RuntimeConfig componentConfig = context.loadConfiguration(component);
-            request.setAttribute("component-configuration", componentConfig);
-
-            // merge in the tempalte data
-            config.merge(componentConfig);
+            // load the baseline configuration for this template
+            RuntimeConfig config = context.loadConfiguration(template);
+            request.setAttribute("template-configuration", config);
+    
+            // build the configuration for this region
+            config.put("region-id", regionId);
+            config.put("region-scope-id", regionScopeId);
+            String sourceId = getSourceId(context, regionScopeId);
+            config.put("region-source-id", sourceId);
+    
+            // determine the renderer
+            // this can be overridden by a setting on either the layout
+            // or the layout type instances
+            // TODO: Do we want to keep this?
+            String renderer = "/ui/core/region.jsp";
+    
+            // if there is already a component associated for this region,
+            // we must let the region know      
+            Component[] components = ModelUtil.findComponents(context,
+                    regionScopeId, sourceId, regionId, null);
+            if (components.length > 0)
+            {
+                Component component = components[0];
+    
+                // load config for this component
+                RuntimeConfig componentConfig = context.loadConfiguration(component);
+                request.setAttribute("component-configuration", componentConfig);
+    
+                // merge in the template data
+                config.merge(componentConfig);
+            }
+    
+            // do the render
+            request.setAttribute("region-configuration", config);
+            RequestUtil.include(request, response, renderer);
         }
+        catch(Exception ex)
+        {
+            throw new RegionRenderException("Unable to render region: " + regionId, ex);
+        }
+    }
+    
+    /**
+     * Renders a given component instance.  This fetches the abstract renderer
+     * instance for the given component's type and then binds configuration data
+     * to the rendering engine.  It then executes the component.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param componentId
+     * @throws Exception
+     */
+    public static void renderComponent(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String componentId) throws ComponentRenderException
+    {
+        Component component = context.getModel().loadComponent(context,
+                componentId);
+        if(component == null)
+            throw new ComponentRenderException("Unable to locate component: " + componentId);
+        
+        try
+        {
+            // get the configuration for the component
+            RuntimeConfig config = context.loadConfiguration(component);
+            request.setAttribute("component-configuration", config);
 
-        // do the render
-        request.setAttribute("region-configuration", config);
-        RequestUtil.include(request, response, renderer);
+            // build a renderer for this component type
+            //ComponentType componentType = component.getComponentType(context);
+            AbstractRenderer renderer = RendererFactory.newRenderer(context,
+                    component);
+            renderer.execute(context, request, response, config);
+        }
+        catch(Exception ex)
+        {
+            throw new ComponentRenderException("An exception occurred while rendering component: " + componentId, ex);
+            
+        }
     }
 
     /**
@@ -200,6 +346,88 @@ public class RenderUtil
         }
     }
 
+    
+    
+    
+    public static void appendHeadTags(RequestContext context, String tags)
+    {
+        getHeadTags(context).add(tags);
+    }
+    
+    public static List getHeadTags(RequestContext context)
+    {
+        List list = (List) context.getValue(RequestContext.VALUE_HEAD_TAGS);
+        if(list == null)
+        {
+            list = new ArrayList();
+            context.setValue(RequestContext.VALUE_HEAD_TAGS, list);
+        }
+        return list;
+    }
+    
+    
+    
+    
+    
+       
+
+    public static String renderScriptImport(HttpServletRequest request, String src)
+    {
+        String queryString = request.getQueryString();
+        if (queryString != null && queryString.length() > 4)
+            src = src + "?" + queryString;
+        
+        return renderScriptImport(src);
+    }
+
+    public static String renderScriptImport(String src)
+    {
+        // make sure references resolve to the configured servlet
+        src = URLUtil.toBrowserUrl(src);
+        
+        return "<script type=\"text/javascript\" src=\"" + src + "\"></script>";
+    }
+
+    public static String renderLinkImport(String href)
+    {
+        return renderLinkImport(href, null);
+    }
+
+    public static String renderLinkImport(String href, String id)
+    {
+        // make sure references resolve to the configured servlet
+        href = URLUtil.toBrowserUrl(href);
+
+        String value = "<link ";
+        if (id != null)
+            value += "id=\"" + id + "\" ";
+        value += "rel=\"stylesheet\" type=\"text/css\" href=\"" + href + "\"></link>";
+        
+        return value;
+    }
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     protected static String getSourceId(RequestContext context, String scopeId)
     {
         // rendering objects
@@ -218,62 +446,75 @@ public class RenderUtil
         return sourceId;
     }
 
-    public static String toBrowserUrl(String rootRelativeUri)
+    protected static void appendBuffer(StringBuffer buffer, String toAppend)
     {
-        if (rootRelativeUri == null)
-            return "";
-
-        // special case: "/"
-        if (rootRelativeUri.equals("/"))
-        {
-            // the browser friendly url is just the preconfigured servlet
-            // (i.e. /myapp/)
-            String newUri = Framework.getConfig().getDefaultServletUri();
-            return newUri;
-        }
-
-        // if it starts with "/", strip it off
-        if (rootRelativeUri.startsWith("/"))
-            rootRelativeUri = rootRelativeUri.substring(1,
-                    rootRelativeUri.length());
-
-        // now build the browser friendly ur
-        String defaultUri = Framework.getConfig().getDefaultServletUri();
-        String newUri = defaultUri + rootRelativeUri;
-        return newUri;
+        buffer.append(toAppend);
+        buffer.append("\r\n"); // cosmetic
     }
-
-    public static String getContentEditURL(RequestContext context,
-            String endpointId, String itemRelativePath)
+    
+    // TODO: Introduce some caching for this
+    protected static String generateHeader(RequestContext context)
     {
-        // use default endpoint id if none specified
-        if (endpointId == null)
-            endpointId = DEFAULT_ALFRESCO_ENDPOINT_ID;
+        StringBuffer buffer = new StringBuffer();
+        appendBuffer(buffer, "");
 
-        // get the endpoint
-        Endpoint endpoint = context.getModelManager().loadEndpoint(context,
-                endpointId);
+        // CSS
+        appendBuffer(buffer, renderLinkImport("/extjs/resources/css/ext-all.css"));
+        appendBuffer(buffer, renderLinkImport("/ui/themes/builder/css/builder-default.css"));
 
-        // if the endpoint isn't found, just exit
-        if (endpoint == null)
+        // Theme CSS
+        String currentThemeId = ThemeUtil.getCurrentThemeId(context);
+        appendBuffer(buffer, renderLinkImport("/ui/themes/extjs/css/xtheme-" + currentThemeId + ".css", "extjs-theme-link"));
+        appendBuffer(buffer, renderLinkImport("/ui/themes/builder/css/builder-" + currentThemeId + ".css", "builder-theme-link"));
+
+        // ExtJS things
+        appendBuffer(buffer, renderScriptImport("/extjs/adapter/ext/ext-base.js"));
+        appendBuffer(buffer, renderScriptImport("/extjs/ext-all.js"));
+
+        // Custom JS things
+        appendBuffer(buffer, renderScriptImport("/ui/builder/utils/miframe-min.js"));
+        appendBuffer(buffer, renderScriptImport("/ui/builder/utils/json.js"));
+        appendBuffer(buffer, renderScriptImport("/ui/builder/dynamic.js.jsp"));
+        appendBuffer(buffer, renderScriptImport("/ui/builder/incontext.js.jsp"));
+        
+        // Web Components (in progress)
+        appendBuffer(buffer, renderScriptImport("/ui/builder/wizard-core.js"));
+        appendBuffer(buffer, renderScriptImport("/ui/builder/wizard-adapter-extjs.js"));
+        appendBuffer(buffer, renderScriptImport("/ui/builder/application.js"));
+        appendBuffer(buffer, renderScriptImport("/ui/builder/builder.js"));
+
+        // YUI things (for menus)
+        // This will be replaced by imports required specifically by
+        // the nav component
+        // and of course, the nav component will be rewritten
+        // to do away with YUI altogether!
+        //
+        //importScript("/yui/build/yahoo-dom-event/yahoo-dom-event.js", false);
+        //importScript("/yui/build/animation/animation-min.js", false);
+        //importScript("/yui/build/container/container-min.js", false);
+        //importScript("/yui/build/menu/menu.js", false);
+
+        // Now import the stuff that the components on the page needed us to import
+        List tagsList = RenderUtil.getHeadTags(context);
+        for(int i = 0; i < tagsList.size(); i++)
         {
-            context.getLogger().debug("RenderUtil.getContentEditURL failed");
-            context.getLogger().debug("Unable to find endpoint: " + endpointId);
-            return "";
+            String tags = (String) tagsList.get(i);
+            appendBuffer(buffer, tags);
         }
-
-        // endpoint settings
-        String host = endpoint.getSetting("host");
-        String port = endpoint.getSetting("port");
-        String sandbox = context.getStoreId();
-        String uri = "/alfresco/service/ads/redirect/incontext/" + sandbox + "/";
-
-        // build the url
-        String path = sandbox + ":/www/avm_webapps/ROOT" + itemRelativePath;
-        String url = "http://" + host + ":" + port + uri + "?sandbox=" + sandbox + "&path=" + path + "&container=plain";
-
-        return url;
+        
+        return buffer.toString();
     }
+    
+    
+    
+    
+    protected static void print(HttpServletResponse response, String str)
+        throws IOException
+    {
+        response.getWriter().print(str);
+    }
+    
 
     public static String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";
+    public static String PAGE_HEAD_DEPENDENCIES_STAMP = "<!--${head}-->";
 }

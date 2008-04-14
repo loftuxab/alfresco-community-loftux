@@ -28,7 +28,6 @@ import java.util.Map;
 
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.Component;
-import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Template;
 

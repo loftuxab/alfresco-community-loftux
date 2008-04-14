@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.site.filesystem;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+
 /**
  * @author muzquiano
  */
@@ -42,4 +45,16 @@ public interface IFile
     public boolean isFile();
 
     public long getModificationDate();
+    
+    public byte[] readBytes();
+    
+    public void writeBytes(byte[] array);
+    
+    public String readContents();
+    
+    public void writeContents(String contents);
+    
+    public InputStream getInputStream() throws Exception;
+    
+    public OutputStream getOutputStream() throws Exception;
 }

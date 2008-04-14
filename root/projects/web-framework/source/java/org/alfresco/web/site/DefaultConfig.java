@@ -441,6 +441,179 @@ public class DefaultConfig extends AbstractConfig
         String key = "model.type." + id + ".prefix";
         return get(key);
     }
+    
+    public String getModelRootPath()
+    {
+        String key = "model.rootpath";
+        String value = get(key);
+        if (value == null)
+            value = "/";
+        return value;        
+    }
+    
+    //////////////////////////////////////////////////////////////////
+    // Tag Libraries
+    //////////////////////////////////////////////////////////////////
+
+    public String[] getTagLibraryIds()
+    {
+        String _car = "tags.libraries.library.";
+        String _cdr = ".id";
+
+        return spliceIds(_car, _cdr);        
+    }
+    
+    public String getTagLibraryUri(String id)
+    {
+        String key = "tags.libraries.library." + id + ".uri";
+        return get(key);        
+    }
+
+    public String getTagLibraryNamespace(String id)
+    {
+        String key = "tags.libraries.library." + id + ".namespace";
+        return get(key);                
+    }
+    
+    
+    //////////////////////////////////////////////////////////////////
+    // User Factories
+    //////////////////////////////////////////////////////////////////
+    
+    public String getDefaultUserFactoryId()
+    {
+        return get("user.factory.default.id");
+    }
+    
+    public String[] getUserFactoryIds()
+    {
+        String _car = "user.factory.definition.";
+        String _cdr = ".name";
+
+        return spliceIds(_car, _cdr);                
+    }
+
+    public String getUserFactoryName(String id)
+    {
+        return getUserFactoryProperty(id, "name");
+    }
+
+    public String getUserFactoryDescription(String id)
+    {
+        return getUserFactoryProperty(id, "description");
+    }
+
+    public String getUserFactoryClass(String id)
+    {
+        return getUserFactoryProperty(id, "class");
+    }
+    
+    public String getUserFactoryProperty(String id, String property)
+    {
+        String key = "user.factory.definition." + id + "." + property;
+        return get(key);
+    }
+    
+    
+    //////////////////////////////////////////////////////////////////
+    // Remote
+    //////////////////////////////////////////////////////////////////
+    
+    public String[] getRemoteConnectorIds()
+    {
+        String _car = "remote.connector.";
+        String _cdr = ".name";
+
+        return spliceIds(_car, _cdr);                
+        
+    }
+
+    public String getRemoteConnectorName(String id)
+    {
+        return getRemoteConnectorProperty(id, "name");
+    }
+
+    public String getRemoteConnectorDescription(String id)
+    {
+        return getRemoteConnectorProperty(id, "description");
+    }
+
+    public String getRemoteConnectorClass(String id)
+    {
+        return getRemoteConnectorProperty(id, "class");
+    }
+
+    public String getRemoteConnectorProperty(String id, String property)
+    {
+        String key = "remote.connector." + id + "." + property;
+        return get(key);
+    }
+    
+    public String[] getRemoteAuthenticatorIds()
+    {
+        String _car = "remote.authenticator.";
+        String _cdr = ".name";
+
+        return spliceIds(_car, _cdr);                
+    }
+
+    public String getRemoteAuthenticatorName(String id)
+    {
+        return getRemoteAuthenticatorProperty(id, "name");
+    }
+
+    public String getRemoteAuthenticatorDescription(String id)
+    {
+        return getRemoteAuthenticatorProperty(id, "description");
+    }
+
+    public String getRemoteAuthenticatorClass(String id)
+    {
+        return getRemoteAuthenticatorProperty(id, "class");
+    }
+    
+    public String getRemoteAuthenticatorProperty(String id, String property)
+    {
+        String key = "remote.authenticator." + id + "." + property;
+        return get(key);
+    }
+    
+    
+    //////////////////////////////////////////////////////////////////
+    // Renderers
+    //////////////////////////////////////////////////////////////////
+    
+    public String[] getRendererIds()
+    {
+        String _car = "renderers.renderer.";
+        String _cdr = ".name";
+
+        return spliceIds(_car, _cdr);        
+    }
+
+    public String getRendererName(String id)
+    {
+        return getRendererProperty(id, "name");
+    }
+
+    public String getRendererDescription(String id)
+    {
+        return getRendererProperty(id, "description");
+    }
+
+    public String getRendererClass(String id)
+    {
+        return getRendererProperty(id, "class");
+    }
+    
+    public String getRendererProperty(String id, String property)
+    {
+        String key = "renderers.renderer." + id + "." + property;
+        return get(key);        
+    }
+    
+    
+    
 
     //////////////////////////////////////////////////////////////////
     // Utils

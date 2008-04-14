@@ -9,6 +9,7 @@
 	<adw:id>ct-queryComponent</adw:id>
 	<adw:name>Query Component</adw:name>
 	<adw:description>Query Component</adw:description>
+	<adw:renderer-type>jsp</adw:renderer-type>		
 	<adw:renderer>/ui/components/queryComponent/component.jsp</adw:renderer>
 
 </adw:component-type>

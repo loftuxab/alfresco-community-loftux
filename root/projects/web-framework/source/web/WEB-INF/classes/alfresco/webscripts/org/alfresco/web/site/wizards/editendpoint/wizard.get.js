@@ -10,45 +10,34 @@ if(endpointId != null)
 {
 	// find the endpoint object
 	var endpoint = site.findEndpoint(endpointId);
-	logger.log("ENDPO: " + endpoint);
 	if(endpoint != null)
 	{
 		// data from the object
-		var protocol = endpoint.getSetting("protocol");
-		if(protocol == null)
-			protocol = "";
-		var host = endpoint.getSetting("host");
-		if(host == null)
-			host = "";
-		var port = endpoint.getSetting("port");
-		if(port == null)
-			port = "";
-		var uri = endpoint.getSetting("uri");
-		if(uri == null)
-			uri = "";
+		var connectorId = wizard.getSafeProperty(endpoint, "connector-id");
+		var endpointUrl = wizard.getSafeProperty(endpoint, "endpoint-url");
+		var defaultUri = wizard.getSafeProperty(endpoint, "default-uri");
 
 		// add the endpoint object id
 		wizard.addHiddenElement("endpointObjectId", endpoint.getProperty("id"));
 
 		// set up form elements
 		wizard.addElement("endpointId", endpointId);
-		wizard.addElement("protocol", protocol);
-		wizard.addElement("host", host);
-		wizard.addElement("port", port);
-		wizard.addElement("uri", uri);
+		wizard.addElement("connectorId", connectorId);
+		wizard.addElement("endpointUrl", endpointUrl);
+		wizard.addElement("defaultUri", defaultUri);
 
 		wizard.addElementFormat("endpointId", "Identifier", "textfield", 220);
-		wizard.addElementFormat("protocol", "Protocol", "combo", 120);
-		wizard.addElementFormat("host", "Host", "textfield", 220);
-		wizard.addElementFormat("port", "Port", "textfield", 120);
-		wizard.addElementFormat("uri", "URI", "textfield", 220);
+		wizard.addElementFormat("connectorId", "Connector", "combo", 220);
+		wizard.addElementFormat("endpointUrl", "URL", "textfield", 220);
+		wizard.addElementFormat("defaultUri", "Service Uri", "textfield", 220);
 
 		//
-		// Protocol dropdown
+		// Connector dropdown
 		//
-		wizard.addElementSelectionValue("protocol", "http", "HTTP");
-		wizard.addElementSelectionValue("protocol", "https", "HTTPS");
-		wizard.updateElement("protocol", protocol);
+		wizard.addElementSelectionValue("connectorId", "http", "HTTP Connector");
+		wizard.addElementSelectionValue("connectorId", "web", "Web Connector");
+		wizard.addElementSelectionValue("connectorId", "alfresco", "Alfresco Connector");
+		wizard.updateElement("connectorId", connectorId);
 	}
 }
 

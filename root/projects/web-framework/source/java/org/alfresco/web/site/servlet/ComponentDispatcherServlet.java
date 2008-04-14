@@ -28,7 +28,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -43,19 +43,12 @@ public class ComponentDispatcherServlet extends DispatcherServlet
 
     // this servlet just dispatches components
     protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws Exception
+            HttpServletResponse response)
     {
         setNoCacheHeaders(response);
 
         String componentId = (String) request.getParameter("componentId");
 
-        try
-        {
-            RenderUtil.renderComponent(context, request, response, componentId);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+        PresentationUtil.renderComponent(context, request, response, componentId);
     }
 }

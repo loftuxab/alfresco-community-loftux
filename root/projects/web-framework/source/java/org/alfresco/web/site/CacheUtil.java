@@ -45,8 +45,12 @@ public class CacheUtil
 
     public static void invalidateADSObjectCache(RequestContext context)
     {
-        context.getModelManager().cacheInvalidateAll(context);
-        System.out.println("Invalidated Object Cache");
+        IModel model = context.getModel();
+        if(model instanceof DefaultModel)
+        {
+            ((DefaultModel)model).cacheInvalidateAll(context);
+            System.out.println("Invalidated Object Cache");
+        }        
     }
 
     public static boolean isFileSystemCacheEnabled(RequestContext context)
