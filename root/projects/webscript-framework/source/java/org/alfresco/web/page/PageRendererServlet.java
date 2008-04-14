@@ -191,15 +191,15 @@ public class PageRendererServlet extends WebScriptServlet
             // apply the ticket to the WebScript runtime container for the current thread
             ((PageRendererRuntimeContainer)container).setTicket(auth.Ticket);
             
-            // Setup the PageRenderer context for the webscript runtime template loader to use when
-            // rebuilding urls for components - there is a single instance of the template loader
-            // and it must be kept thread safe for multiple asynchronous page renderer requests.
+            // Setup the PageRenderer context for the webscript runtime to use when processing
+            // the page components
             PageRendererContext context = new PageRendererContext();
             context.RuntimeContainer = container;
             context.RequestURI = uri;
             context.RequestPath = req.getContextPath();
             context.PageInstance = page;
             context.Tokens = args;
+            context.PageModel = buildPageModel(page, req);
             
             // handle a clicked UI component link - look for id+url
             // TODO: keep further state of page? i.e. multiple webscripts can be hosted and clicked
@@ -303,7 +303,7 @@ public class PageRendererServlet extends WebScriptServlet
          }
          
          Map<String, Object> resultModel = new HashMap<String, Object>(8, 1.0f);
-         Map<String, Object> templateModel = getModel(context, page, req, false);
+         Map<String, Object> templateModel = buildTemplateModel(context, page, req, false);
          
          // add the template config values directly to the template root model - this is useful for
          // templates that do not require additional processing in JavaScript, they just need the values
@@ -362,7 +362,7 @@ public class PageRendererServlet extends WebScriptServlet
          }
          
          // construct template model for 2nd pass
-         templateModel = getModel(context, page, req, true);
+         templateModel = buildTemplateModel(context, page, req, true);
          templateModel.putAll(templateInstance.getPropetries());
          if (script != null)
          {
@@ -392,7 +392,7 @@ public class PageRendererServlet extends WebScriptServlet
    /**
     * @return model to use for UI Component template page execution
     */
-   private Map<String, Object> getModel(
+   private Map<String, Object> buildTemplateModel(
          PageRendererContext context, PageInstance page, HttpServletRequest req, boolean active)
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
@@ -406,6 +406,22 @@ public class PageRendererServlet extends WebScriptServlet
       
       // add the custom 'region' directive implementation - one instance per model as we pass in template/page 
       model.put("region", new RegionDirective(context, componentStore, componentCache, page, active));
+      
+      return model;
+   }
+   
+   /**
+    * @return model to use for UI Component execution on a page
+    */
+   private Map<String, Object> buildPageModel(
+         PageInstance page, HttpServletRequest req)
+   {
+      Map<String, Object> model = new HashMap<String, Object>(4);
+      Map<String, Object> pageModel = new HashMap<String, Object>(4);
+      URLHelper urlHelper = new URLHelper(req);
+      pageModel.put("url", urlHelper);
+      pageModel.put("theme", page.getTheme());
+      model.put("page", pageModel);
       
       return model;
    }
@@ -497,6 +513,7 @@ public class PageRendererServlet extends WebScriptServlet
       String ComponentId;
       String ComponentUrl;
       Map<String, String> Tokens;
+      Map<String, Object> PageModel;
    }
    
    

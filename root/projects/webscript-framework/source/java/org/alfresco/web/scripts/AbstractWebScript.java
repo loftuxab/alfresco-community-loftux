@@ -123,7 +123,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     protected Map<String, Object> createScriptParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(16, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
@@ -167,7 +167,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(16, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());

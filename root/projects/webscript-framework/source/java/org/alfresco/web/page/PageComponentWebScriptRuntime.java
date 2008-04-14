@@ -90,17 +90,19 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
    @Override
    protected WebScriptRequest createRequest(Match match)
    {
-      // add/replace the "well known" context tokens in component properties
+      // create the model for the component request
       Map<String, String> properties = new HashMap<String, String>(8, 1.0f);
-      // Component ID is always available to the component
+      
+      // component ID is always available to the component
       properties.put("id", component.getId());
+      // add/replace the "well known" context tokens in component properties
       for (String arg : component.getProperties().keySet())
       {
          properties.put(
                arg,
                PageRendererServlet.replaceContextTokens(component.getProperties().get(arg), context.Tokens));
       }
-
+      
       // build the request to render this component
       return new WebScriptPageComponentRequest(this, scriptUrl, match, properties);
    }
@@ -115,6 +117,24 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
    protected WebScriptResponse createResponse()
    {
       return new WebScriptPageComponentResponse(this, context, component.getId(), out);
+   }
+   
+   /* (non-Javadoc)
+    * @see org.alfresco.web.scripts.AbstractRuntime#getScriptParameters()
+    */
+   @Override
+   public Map<String, Object> getScriptParameters()
+   {
+      return context.PageModel;
+   }
+
+   /* (non-Javadoc)
+    * @see org.alfresco.web.scripts.AbstractRuntime#getTemplateParameters()
+    */
+   @Override
+   public Map<String, Object> getTemplateParameters()
+   {
+      return context.PageModel;
    }
 
    @Override
