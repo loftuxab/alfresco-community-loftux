@@ -1,0 +1,41 @@
+<wizard id="addendpoint">
+	<title>Add Endpoint</title>
+	<page id="start" start="true" type="form">
+		<buttons>
+			<button id="cancel" label="Cancel" action="cancel"/>
+			<button id="next" label="Next" action="transition" data="auth"/>
+		</buttons>
+		<data>
+			<element id="endpointId" type="String" defaultValue="" />
+			<element id="protocol" type="String" defaultValue="" />
+			<element id="host" type="String" defaultValue="" />
+			<element id="port" type="String" defaultValue="" />
+			<element id="uri" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="auth" type="form">
+		<buttons>
+			<button id="previous" label="Previous" action="transition" data="start"/>
+			<button id="save" label="Save" action="transition" data="submit"/>
+		</buttons>
+		<data>
+			<element id="credentials" type="String" defaultValue="" />
+			<element id="authentication" type="String" defaultValue="" />
+			<element id="username" type="String" defaultValue="" />
+			<element id="password" type="String" defaultValue="" />
+		</data>
+	</page>
+	<page id="submit" end="true" type="form">
+		<data>
+			<element id="endpointId" type="String" />
+			<element id="protocol" type="String" />
+			<element id="host" type="String" />
+			<element id="port" type="String" />
+			<element id="uri" type="String" />
+			<element id="credentials" type="String" />
+			<element id="authentication" type="String" />
+			<element id="username" type="String" />
+			<element id="password" type="String" />
+		</data>
+	</page>	
+</wizard>

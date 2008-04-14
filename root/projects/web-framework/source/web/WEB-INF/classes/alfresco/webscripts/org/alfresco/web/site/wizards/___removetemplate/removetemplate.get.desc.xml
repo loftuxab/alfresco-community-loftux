@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Remove Template Wizard</shortname>
+  <description>Remove Template Wizard</description>
+  <url>/ads/wizard/removetemplate/{storeid}/{path}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

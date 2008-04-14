@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<adw:component-type 	xmlns:adw="http://www.alfresco.org/adw/2.0" 
+			xmlns:alf="http://www.alfresco.org" 
+			xmlns:ev="http://www.w3.org/2001/xml-events" 
+			xmlns:xhtml="http://www.w3.org/1999/xhtml" 
+			xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+	<adw:id>ct-webscriptComponent</adw:id>
+	<adw:name>Webscript Component</adw:name>
+	<adw:description>Webscript Component</adw:description>
+	<adw:renderer-type>org.alfresco.web.site.renderer.WebScriptRenderer</adw:renderer-type>
+</adw:component-type>

@@ -1,0 +1,102 @@
+<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/utils.js">
+<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/json.js">
+<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/ads-support.js">
+<import resource="/Company Home/Data Dictionary/Web Scripts Extensions/org/alfresco/website/include/avm-support.js">
+
+function pushComponentSettings(component)
+{
+	logger.log("PUSH COMPONENT SETTINGS");
+	for(var argName in args)
+	{
+		if(argName.substring(0,1) == "_")
+		{		
+			var settingName = argName.substring(1, argName.length);			
+			var argValue = args[argName];
+			if(argValue != null)
+				component.setSetting(settingName, argValue);
+		}
+	}
+}
+
+// fundamental things
+var componentTypeId = args["componentType"];
+var componentId = args["component"];
+var regionId = args["regionId"];
+var regionSourceId = args["regionSourceId"];
+var regionScopeId = args["regionScopeId"];
+
+var json = { };
+if(componentTypeId != null)
+	json["componentTypeId"] = componentTypeId;
+if(componentId != null)
+	json["componentId"] = componentId;
+json["regionId"] = regionId;
+json["regionSourceId"] = regionSourceId;
+json["regionScopeId"] = regionScopeId;
+
+// we have to have values for all of these
+var proceed = true;
+if(componentTypeId == null && componentId == null)
+	proceed = false;
+if(regionId == null)
+	proceed = false;
+if(regionSourceId == null)
+	proceed = false;
+if(regionScopeId == null)
+	proceed = false;
+
+// should we proceed?
+if(proceed)
+{
+	var component = null;
+	if(componentId != null && componentTypeId == null)
+	{
+		//
+		// binding a component
+		//
+		component = site.getObject(componentId);
+		componentTypeId = component.getProperty("componentTypeId");
+		json["componentId"] = componentId;
+		json["componentId"] = componentTypeId;		
+	}
+	if(componentId == null && componentTypeId != null)
+	{
+		//
+		// binding a component type
+		//
+		
+		// build the component
+		component = site.newComponent();
+		component.setProperty("componentTypeId", componentTypeId);
+		save(component);
+	
+		// assign component id onto json return
+		componentId = component.getProperty("id");
+		json["componentId"] = componentId;
+		json["componentTypeId"] = componentTypeId;
+
+		// push any arguments for prepopulation	
+		pushComponentSettings(component);
+		
+		// save again
+		save(component);
+	}
+	
+	if(component != null)
+	{
+		// do the association
+		site.associateComponent(componentId, regionScopeId, regionSourceId, regionId);
+		
+		// assign component association id onto json return
+		var associations = site.findComponentAssociations(componentId, regionScopeId, regionSourceId, regionId);
+		if(associations != null && associations.length > 0)
+			json["componentAssociationId"] = associations[0].getProperty("id");
+	}
+}
+
+// format the json	
+var outputString = json.toJSONString();
+var callback = args["callback"];
+if(callback != null)
+	outputString = callback + "(" + outputString + ");";
+model.json = outputString;

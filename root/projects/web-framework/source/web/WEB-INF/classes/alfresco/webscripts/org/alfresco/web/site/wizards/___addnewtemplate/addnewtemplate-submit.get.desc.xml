@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Add New Template Wizard</shortname>
+  <description>Add New Template Wizard</description>
+  <url>/ads/wizard/addnewtemplate/_submit/{storeid}/{path}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

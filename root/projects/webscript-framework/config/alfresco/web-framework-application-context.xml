@@ -202,7 +202,7 @@
 
    <bean id="webscripts.web.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
       <property name="searchPath" ref="webscripts.searchpath" />
-      <!-- <property name="defaultEncoding"><value>UTF-8</value></property> -->
+      <property name="defaultEncoding"><value>UTF-8</value></property>
    </bean>
 
    <bean id="webscripts.web.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">

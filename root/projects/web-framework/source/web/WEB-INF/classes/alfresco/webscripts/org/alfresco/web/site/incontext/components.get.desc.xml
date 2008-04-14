@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Components Functions</shortname>
+  <description>Components Functions</description>
+  <url>/ads/incontext/components/{storeid}/{path}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

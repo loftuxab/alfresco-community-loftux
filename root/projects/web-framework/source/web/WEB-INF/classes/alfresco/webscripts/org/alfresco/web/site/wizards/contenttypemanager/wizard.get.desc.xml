@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Content Type Manager</shortname>
+  <description>Content Type Manager</description>
+  <url>/wizard/contenttypemanager</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

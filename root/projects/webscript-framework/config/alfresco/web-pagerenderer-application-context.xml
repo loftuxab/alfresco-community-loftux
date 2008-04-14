@@ -20,14 +20,14 @@
    </bean>
    
 
-   <!-- WebScript Implementations -->
-   <!-- TODO: if templates are WebScripts, we'll need this to override and control execution of scripts
-              during 2 pass processing - also need dedicated WebScript runtime and request/response handling -->
-   <!--<bean id="webscript.webtemplate" parent="webscript" class="..." singleton="false" />-->
+   <!--  Page Renderer Template Processor -->
+   <bean id="pagerenderer.templateprocessor" class="org.alfresco.web.scripts.servlet.PageRendererTemplateProcessor">
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+   </bean>
    
    
-   <!-- Local Resource Storage configuration -->
-   <!-- TODO: replace with AVM Remote store impl - load all resources from remote repo and cache -->
+   <!-- Resource Storage configuration -->
+   <!-- TODO: replace with Remote store impl - load all resources via data WebScripts from remote repo -->
    <bean id="pagerenderer.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
 
    <bean id="pagerenderer.pagestore" parent="pagerenderer.classpathstore">

@@ -370,7 +370,7 @@
 
    <target name="deploy-webscriptframework-tomcat" depends="init" description="Deploys WebFramework WAR to webscriptframework tomcat">
       <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webscriptframework}" />
-      <delete dir="${dir.deploy.tomcat.webscriptframework}/alfweb" 
+      <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwsf" 
               includeEmptyDirs="true" 
               quiet="yes" />
       <!-- copy the webscriptframework WAR file to WebFramework's Tomcat deploy folder -->

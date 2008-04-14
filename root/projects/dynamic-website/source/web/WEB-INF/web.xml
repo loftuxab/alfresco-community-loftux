@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+   <display-name>Alfresco Web Framework</display-name>    
+   <description>Alfresco Web Framework and SPK application</description>
+   
+   <context-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>
+         classpath:alfresco/web-framework-application-context.xml
+         classpath:alfresco/web-site-application-context.xml
+      </param-value>
+      <description>Spring config file locations</description>
+   </context-param>
+
+
+
+	<!--
+	DYNAMIC WEBSITE FILTERS
+	 -->
+    <!-- This filter will bootstrap the Web Script Framework Spring Context -->
+    <filter>
+        <filter-name>Web Script Framework Filter</filter-name>
+        <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Web Script Framework Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
+    <!-- Include this filter to run standalone (without Spring) -->
+    <!--
+    <filter>
+        <filter-name>Default Filter</filter-name>
+        <filter-class>org.alfresco.web.site.filter.DefaultFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>Default Filter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>    
+    -->
+
+
+
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
+         
+   <servlet>
+      <servlet-name>apiServlet</servlet-name>
+      <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
+      <!--<init-param>
+         <param-name>authenticator</param-name>
+         <param-value>webscripts.authenticator.basic</param-value>
+      </init-param>-->
+   </servlet>
+
+   <servlet>
+      <servlet-name>proxyServlet</servlet-name>
+      <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
+   </servlet>
+
+
+
+
+
+
+
+
+
+    <servlet>
+        <servlet-name>Dispatcher Servlet</servlet-name>
+        <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>        
+    <servlet>
+        <servlet-name>Region Dispatcher Servlet</servlet-name>
+        <servlet-class>org.alfresco.web.site.servlet.RegionDispatcherServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>        
+    <servlet>
+        <servlet-name>Theme Servlet</servlet-name>
+        <servlet-class>org.alfresco.web.site.servlet.ThemeServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>        
+    <servlet>
+        <servlet-name>InContext Servlet</servlet-name>
+        <servlet-class>org.alfresco.web.site.servlet.InContextServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>        
+    <servlet>
+        <servlet-name>Cache Control Servlet</servlet-name>
+        <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>        
+    <servlet>
+		<servlet-name>Proxy Servlet</servlet-name>
+		<servlet-class>org.alfresco.web.site.servlet.ProxyServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+		<servlet-name>Proxy Servlet</servlet-name>
+		<url-pattern>/proxy/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+		<servlet-name>Cache Control Servlet</servlet-name>
+		<url-pattern>/cache/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+		<servlet-name>InContext Servlet</servlet-name>
+		<url-pattern>/incontext/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+		<servlet-name>Theme Servlet</servlet-name>
+		<url-pattern>/theme/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+		<servlet-name>Region Dispatcher Servlet</servlet-name>
+		<url-pattern>/region/*</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+		<servlet-name>Dispatcher Servlet</servlet-name>
+		<url-pattern>/adw/*</url-pattern>
+    </servlet-mapping>
+
+
+
+
+
+
+
+
+
+
+   <servlet-mapping>
+      <servlet-name>apiServlet</servlet-name>
+      <url-pattern>/service/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>apiServlet</servlet-name>
+      <url-pattern>/s/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>proxyServlet</servlet-name>
+      <url-pattern>/proxy</url-pattern>
+   </servlet-mapping>
+   
+   <session-config>
+      <session-timeout>60</session-timeout>
+   </session-config>
+
+    <!-- welcome file list precedence order is index.jsp, then index.html -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
+
+</web-app>

@@ -1,0 +1,100 @@
+/*
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * 
+ * As a special exception to the terms and conditions of version 2.0 of the GPL,
+ * you may redistribute this Program in connection with Free/Libre and Open
+ * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
+ * exception. You should have recieved a copy of the text describing the FLOSS
+ * exception, and it is also available here:
+ * http://www.alfresco.com/legal/licensing"
+ */
+package org.alfresco.tools;
+
+import java.util.ArrayList;
+
+/**
+ * Implements a basic Array object that is useful for traversing arrays. This
+ * adds some more complex functionality like pushing and popping to the back and
+ * front of the array.
+ * 
+ * @author muzquiano
+ * 
+ */
+public class Array extends ArrayList
+{
+    private static final long serialVersionUID = 2344161358406531996L;
+
+    public Array()
+    {
+        super();
+    }
+
+    public synchronized ArrayIterator begin()
+    {
+        return new ArrayIterator(this, 0);
+    }
+
+    // return the first item
+    public Object front()
+    {
+        int len = super.size();
+        if (len == 0)
+        {
+            throw new RuntimeException("The array is empty");
+        }
+        return super.get(0);
+    }
+
+    // return the last item
+    public Object back()
+    {
+        int len = super.size();
+        if (len == 0)
+        {
+            throw new RuntimeException("The array is empty");
+        }
+
+        return this.get(len - 1);
+    }
+
+    // same as 'add'
+    public void pushBack(Object object)
+    {
+        add(object);
+    }
+
+    // remove and return the last element
+    public Object popBack()
+    {
+        int len = super.size();
+        if (len == 0)
+        {
+            throw new RuntimeException("The array is empty");
+        }
+
+        Object r = this.get(len - 1);
+        super.remove(len - 1);
+        return r;
+    }
+
+    public ArrayIterator end()
+    {
+        int myLength = super.size();
+        return new ArrayIterator(this, myLength);
+    }
+
+}

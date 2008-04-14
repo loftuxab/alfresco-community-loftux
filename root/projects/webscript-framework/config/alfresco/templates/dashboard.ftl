@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head> 
       <title>${title}</title> 
-      <link rel="stylesheet" href="${url.context}/css/basic.css" type="text/css"/>
+      <link rel="stylesheet" href="${url.context}/css/base.css" type="text/css"/>
       <!--${head}-->
    </head>
    <body>
@@ -18,11 +18,11 @@
          <@region id="nav" scope="global" protected=true />
       </div>
       Additional plain text, and another component...
-      <div style="float:right">
+      <div>
          <@region id="tools" scope="template" protected=true />
       </div>
       More plain text, and another component...
-      <div style="float:left">
+      <div>
          <#--Example of how you might configure a template with template config -->
          <#if columns[0].enabled>
          <@region id="column1" scope="template" />
