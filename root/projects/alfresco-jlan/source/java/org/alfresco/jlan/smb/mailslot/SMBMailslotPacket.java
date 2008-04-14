@@ -1,15 +1,36 @@
+/*
+ * Copyright (C) 2006-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing"
+ */
+
 package org.alfresco.jlan.smb.mailslot;
 
-/*
- * SMBMailslotPacket.java
- *
- * Copyright (c) 2004 Starlasoft. All rights reserved.
- */
- 
 import org.alfresco.jlan.util.DataPacker;
 
 /**
  * SMB Mailslot Packet Class
+ *
+ * @author gkspencer
  */
 public class SMBMailslotPacket {
 
@@ -19,19 +40,19 @@ public class SMBMailslotPacket {
   public static final int COMMAND 		= 4;
   public static final int ERRORCODE 	= 5;
   public static final int ERRORCLASS 	= 5;
-  public static final int ERROR 			= 7;
-  public static final int FLAGS 			= 9;
-  public static final int FLAGS2 			= 10;
+  public static final int ERROR 		= 7;
+  public static final int FLAGS 		= 9;
+  public static final int FLAGS2 		= 10;
   public static final int PIDHIGH 		= 12;
-  public static final int SID 				= 18;
-  public static final int SEQNO 			= 20;
-  public static final int TID 				= 24;
-  public static final int PID 				= 26;
-  public static final int UID 				= 28;
-  public static final int MID 				= 30;
+  public static final int SID 			= 18;
+  public static final int SEQNO 		= 20;
+  public static final int TID 			= 24;
+  public static final int PID 			= 26;
+  public static final int UID 			= 28;
+  public static final int MID 			= 30;
   public static final int WORDCNT 		= 32;
-  public static final int ANDXCOMMAND = 33;
-  public static final int ANDXRESERVED= 34;
+  public static final int ANDXCOMMAND 	= 33;
+  public static final int ANDXRESERVED	= 34;
   public static final int PARAMWORDS 	= 33;
 
   //	SMB packet header length for a transaction type request
@@ -51,17 +72,17 @@ public class SMBMailslotPacket {
   public static final int FLG_SUBDIALECT 	= 0x01;
   public static final int FLG_CASELESS 		= 0x08;
   public static final int FLG_CANONICAL 	= 0x10;
-  public static final int FLG_OPLOCK 			= 0x20;
-  public static final int FLG_NOTIFY 			= 0x40;
+  public static final int FLG_OPLOCK 		= 0x20;
+  public static final int FLG_NOTIFY 		= 0x40;
   public static final int FLG_RESPONSE 		= 0x80;
 
   //	Flag2 bits
 
-  public static final int FLG2_LONGFILENAMES 	= 0x0001;
+  public static final int FLG2_LONGFILENAMES  = 0x0001;
   public static final int FLG2_EXTENDEDATTRIB = 0x0002;
-  public static final int FLG2_READIFEXE 			= 0x2000;
-  public static final int FLG2_LONGERRORCODE 	= 0x4000;
-  public static final int FLG2_UNICODE 				= 0x8000;
+  public static final int FLG2_READIFEXE 	  = 0x2000;
+  public static final int FLG2_LONGERRORCODE  = 0x4000;
+  public static final int FLG2_UNICODE 		  = 0x8000;
 
   //	SMB packet buffer and offset
 
@@ -899,67 +920,4 @@ public class SMBMailslotPacket {
     m_smbbuf[SIGNATURE + 2 + m_offset] = (byte) 'M';
     m_smbbuf[SIGNATURE + 3 + m_offset] = (byte) 'B';
   }
-
-  /**
-   * Test code
-   * 
-   * @param args String[]
-   */
-/**
-  public final static void main(String[] args) {
-    
-    //	Output a startup banner
-    
-    PrintStream out = System.out;
-    
-    out.println("Mailslot Test");
-    out.println("-------------");
-    
-    try {
-      
-      //	Create the datagram socket
-      
-//      DatagramSocket sock = new DatagramSocket(RFCNetBIOSProtocol.DATAGRAM);
-    	NetBIOSDatagram nbdgram = new NetBIOSDatagram(512);
-
-			//	Allocate the mailslot structure and SMB packet buffers
-			
-			byte[] data = new byte[256];
-			SMBMailslotPacket pkt = new SMBMailslotPacket();
-
-			//	Send 10 host announcements
-			
-			for ( int i = 0; i < 10; i++) {
-			  
-  			//	Build the host request data
-  
-  			int pos = MailSlot.createAnnouncementRequest(data,0,"TESTHOST");
-  			
-  			//	Create the mailslot SMB
-  			
-  			pkt.initializeMailslotSMB(TransactionNames.MailslotBrowse,data,pos);
-  			
-  			//	Send the mailslot host announcement
-  			      
-      	nbdgram.SendDatagram(NetBIOSDatagram.DIRECT_GROUP, "TESTHOST", NetBIOSName.WorkStation, "STARLASOFT",
-        										 NetBIOSName.MasterBrowser, pkt.getBuffer(), pkt.getLength(), 0);
-        										 
-        //	Debug
-        
-        out.println("Sent announcement request ... " + i);
-        
-        //	Sleep for a few seconds
-        
-        try {
-          Thread.sleep(5000);
-        }
-        catch (Exception ex) {
-        }
-			}
-    }
-    catch (Exception ex) {
-      out.println("Error: " + ex.toString());
-    }
-  }
-**/
 }
