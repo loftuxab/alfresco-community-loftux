@@ -198,13 +198,16 @@ public class NegTokenTarg {
     throws IOException {
 
     // Create the list of objects to be encoded
-    
-    List objList = new ArrayList();
+	    
+    List<DERObject> objList = new ArrayList<DERObject>();
+    objList.add( new DEROid( OID.ID_SPNEGO));
 
     // Build the sequence of tagged objects
-    
+	    
     DERSequence derSeq = new DERSequence();
-    
+    derSeq.setTagNo( 1);
+    objList.add( derSeq);
+	    
     // Add the result
     
     DEREnumerated derEnum = new DEREnumerated( m_result);
@@ -224,6 +227,7 @@ public class NegTokenTarg {
     if ( m_responseToken != null) {
       DEROctetString derResp = new DEROctetString( m_responseToken);
       derResp.setTagNo( 2);
+      derSeq.addObject( derResp);
     }
     
     // Pack the objects
