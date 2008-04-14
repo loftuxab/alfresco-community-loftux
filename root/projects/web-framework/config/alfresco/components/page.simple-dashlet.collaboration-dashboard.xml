@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>page</scope>
-   <region-id>simple-dashlet</region-id>
-   <source-id>collaboration-dashboard</source-id>
-   <url>/slingshot/simple</url>
-</component>

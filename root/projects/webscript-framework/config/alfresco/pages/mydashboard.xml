@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>mydashboard</id>
+   <title>The test dashboard page</title>
+   <description>Test of a 2 column dashboard page template</description>
+   <template>dashboard-2column</template>
+   <authentication>user</authentication>
+</page>

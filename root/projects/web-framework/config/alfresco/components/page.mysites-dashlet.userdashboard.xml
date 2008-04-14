@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>page</scope>
-   <region-id>mysites-dashlet</region-id>
-   <source-id>userdashboard</source-id>
-   <url>/slingshot/mysites</url>
-</component>

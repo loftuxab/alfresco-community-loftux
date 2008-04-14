@@ -132,14 +132,14 @@
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    incremental-webframework,
+                    incremental-webscriptframework,
                     package-webclient-jar,
                     deploy-tomcat-exploded" />
    
-   <target name="incremental-webframework-tomcat-exploded" 
+   <target name="incremental-webscriptframework-tomcat-exploded" 
            depends="incremental-core,
-                    incremental-webframework,
-                    deploy-webframework-tomcat-exploded" />
+                    incremental-webscriptframework,
+                    deploy-webscriptframework-tomcat-exploded" />
    
    <target name="build-jboss" 
            description="Performs a clean build for JBoss and deploys the WAR file"
@@ -176,7 +176,7 @@
                     incremental-jndi, 
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    incremental-webframework,
+                    incremental-webscriptframework,
                     incremental-webclient,  
                     incremental-webserviceclient" />
 
@@ -197,7 +197,7 @@
                     clean-jndi, 
                     clean-catalinavirtual, 
                     clean-linkvalidation, 
-                    clean-webframework,
+                    clean-webscriptframework,
                     clean-webclient, 
                     clean-rm,
                     clean-blog,
@@ -298,7 +298,7 @@
          <fileset dir="${dir.project.remoteapi.classes}" />
          <fileset dir="${dir.project.catalinavirtual.classes}" />
          <fileset dir="${dir.project.linkvalidation.classes}" />
-         <fileset dir="${dir.project.webframework.classes}" />
+         <fileset dir="${dir.project.webscriptframework.classes}" />
          <fileset dir="${dir.project.webclient.classes}" 
                   excludes="**/extension/**" />
 		  <fileset dir="${dir.project.jlan.classes}" excludes="org/alfresco/config/**" />
@@ -310,7 +310,7 @@
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframework.config}" 
+         <fileset dir="${dir.project.webscriptframework.config}" 
                   excludes="**/extension/**" />
          <!-- NOTE: include dev-context.xml to allow developer overrides -->
          <fileset dir="${dir.project.repository.config}" 
@@ -368,48 +368,48 @@
       </copy>
    </target>
 
-   <target name="deploy-webframework-tomcat" depends="init" description="Deploys WebFramework WAR to webframework tomcat">
-      <delete file="${dir.deploy.tomcat.webframework}/${file.name.war.webframework}" />
-      <delete dir="${dir.deploy.tomcat.webframework}/alfweb" 
+   <target name="deploy-webscriptframework-tomcat" depends="init" description="Deploys WebFramework WAR to webscriptframework tomcat">
+      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webscriptframework}" />
+      <delete dir="${dir.deploy.tomcat.webscriptframework}/alfweb" 
               includeEmptyDirs="true" 
               quiet="yes" />
-      <!-- copy the webframework WAR file to WebFramework's Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.webframework}" 
-            file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
+      <!-- copy the webscriptframework WAR file to WebFramework's Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}" 
+            file="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" />
    </target>
 
-   <target name="deploy-webframework-tomcat-exploded" depends="init">
-      <!-- copy webframework web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat.webframework}/alfweb" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webframework.src.web}" />
+   <target name="deploy-webscriptframework-tomcat-exploded" depends="init">
+      <!-- copy webscriptframework web source files i.e. JSPs, images etc. -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webscriptframework.src.web}" />
       </copy>
 
       <!-- copy the class files from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat.webframework}/alfweb/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webframework.src.webinf}" 
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webscriptframework.src.webinf}" 
                   excludes="web.xml" />
       </copy>
 
       <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.deploy.tomcat.webframework}/alfweb/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
-         <fileset dir="${dir.project.webframework.config}" 
+         <fileset dir="${dir.project.webscriptframework.config}" 
                   excludes="**/extension/**" />
       </copy>
 
       <!-- copy required 3rd party libs -->
-      <copy todir="${dir.deploy.tomcat.webframework}/alfweb/WEB-INF/lib">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb/WEB-INF/lib">
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webframework.dist}" 
-                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webframework.libs}" />
+                  includes="${includes.webscriptframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webframework.libs.commons}" />
+                  includes="${includes.webscriptframework.libs.commons}" />
          <fileset dir="${dir.project.3rdparty.lib}/abdera" 
-                  includes="${includes.webframework.libs.abdera}" />
+                  includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
    </target>
 
@@ -433,10 +433,10 @@
       </exec>
    </target>
 
-   <target name="start-tomcat-webframework" 
+   <target name="start-tomcat-webscriptframework" 
            description="Starts the WebFramework Tomcat server on Windows" 
            depends="init">
-      <exec dir="${home.tomcat.webframework}/bin" 
+      <exec dir="${home.tomcat.webscriptframework}/bin" 
             executable="cmd.exe" 
             spawn="true">
          <arg line="/k startup.bat" />
@@ -513,7 +513,7 @@
                     test-repository, 
                     test-remoteapi, 
                     test-catalinavirtual,
-                    test-webframework, 
+                    test-webscriptframework, 
                     test-webclient, 
                     test-webserviceclient" />
 
