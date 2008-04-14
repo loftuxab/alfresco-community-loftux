@@ -435,14 +435,20 @@ public class CifsOnlyXMLServerConfiguration extends ServerConfiguration {
       }
       
       Element modeElem = findChildNode("mode", authElem.getChildNodes());
-      int accessMode = CifsAuthenticator.SHARE_MODE;
+      int accessMode = CifsAuthenticator.USER_MODE;
       
-      if ( modeElem != null &&
-          ( getText(modeElem).compareToIgnoreCase("user") != 0 && getText(modeElem).compareToIgnoreCase("share") != 0))
-        throw new InvalidConfigurationException("Invalid authentication mode, must be USER or SHARE");
-      
-      if ( getText(modeElem).equalsIgnoreCase("user"))
-        accessMode = CifsAuthenticator.USER_MODE;
+      if ( modeElem != null) {
+    	  
+    	// Validate the authenticator mode
+    	  
+    	String mode = getText(modeElem);
+    	if ( mode.equalsIgnoreCase("user"))
+          accessMode = CifsAuthenticator.USER_MODE;
+    	else if ( mode.equalsIgnoreCase("share"))
+    	  accessMode = CifsAuthenticator.SHARE_MODE;
+    	else
+          throw new InvalidConfigurationException("Invalid authentication mode, must be USER or SHARE");
+      }
       
       //  Get the allow guest setting
       
