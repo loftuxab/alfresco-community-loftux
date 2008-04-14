@@ -8,12 +8,13 @@ package org.alfresco.jlan.server.filesys.db;
  
 import org.alfresco.jlan.server.filesys.NetworkFile;
 import org.alfresco.jlan.server.filesys.cache.FileState;
+import org.alfresco.jlan.server.filesys.cache.NetworkFileStateInterface;
 import org.alfresco.jlan.server.filesys.loader.FileLoader;
 
 /**
  * Database Network File Class
  */
-public abstract class DBNetworkFile extends NetworkFile {
+public abstract class DBNetworkFile extends NetworkFile implements NetworkFileStateInterface {
 
 	//	File state attributes used/set by the database network file
 	
