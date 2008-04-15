@@ -44,6 +44,8 @@ import org.dom4j.io.SAXReader;
  */
 public class PageComponent
 {
+   public static final String PROP_HTMLID = "htmlid";
+   
    /**
     * Enum representing the frame around the component:
     * 
