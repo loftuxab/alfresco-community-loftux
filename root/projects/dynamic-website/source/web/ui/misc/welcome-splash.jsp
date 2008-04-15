@@ -1,8 +1,14 @@
+<%@ page import="org.alfresco.web.site.*" %>
+<%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
+<%
+	RequestContext context = RequestUtil.getRequestContext(request);
+	String logoImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/logos/AlfrescoLogo200.png");
+%>
 <html>
 <table width="100%" height="100%" border="1" bgcolor="#FFFFFF">
 <tr>
 	<td valign="middle" align="center">
-		<img src="/ui/images/logos/AlfrescoLogo200.png"/>
+		<img src="<%=logoImageUrl%>"/>
 		
 		<br/>
 		<br/>

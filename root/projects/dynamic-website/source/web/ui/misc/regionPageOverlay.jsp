@@ -27,16 +27,16 @@
 	}
 
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-	String infoImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/info_icon.gif");
+	String infoImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/info_icon.gif");
 	
-	String componentImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/component.gif");
-	String componentImageLargeUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/component_large.gif");
+	String componentImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/component.gif");
+	String componentImageLargeUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/component_large.gif");
 	
-	String missingComponentImageLargeUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
+	String missingComponentImageLargeUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
 	
-	String siteScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/website_large.gif");
-	String templateScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/template_large.gif");
-	String pageScopeImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/page_large.gif");
+	String siteScopeImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/website_large.gif");
+	String templateScopeImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/template_large.gif");
+	String pageScopeImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/page_large.gif");
 	
 	String _regionScopeId = regionScopeId.substring(0,1).toUpperCase() + regionScopeId.substring(1, regionScopeId.length());
 	

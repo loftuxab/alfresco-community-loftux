@@ -16,7 +16,7 @@
 	String pageName = currentPage.getName();
 	
 	String backgroundImageUrl = "/ui/images/logos/AlfrescoFadedBG.png";
-	backgroundImageUrl = URLUtil.toBrowserUrl(backgroundImageUrl);
+	backgroundImageUrl = URLUtil.browser(context, backgroundImageUrl);
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

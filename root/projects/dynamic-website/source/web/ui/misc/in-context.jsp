@@ -16,7 +16,7 @@
 	// text
 	String startEditingString = "Start Editing";
 		
-	String dsContext = URLUtil.toBrowserUrl("/");
+	String dsContext = URLUtil.browser(context, "/");
 	
 	// things to stamp onto page
 	String rootPageId = null;

@@ -1,5 +1,3 @@
-// INITIALIZATION
-Ext.BLANK_IMAGE_URL = '/extjs/resources/images/default/s.gif';
 
 
 // Page Scope Colors
@@ -35,14 +33,6 @@ Ext.override(Ext.dd.DropZone, {
 	}
 });
 
-function getAdsWebScriptURL(webScript)
-{
-	//var url = getHttpHostPort() + getServiceUri() + webScript + "/" + getStoreId() + getWebappPath();
-	var url = getHttpHostPort() + getServiceUri() + webScript + "?avmStoreId=" + getStoreId();
-	var proxiedURL = buildProxiedUrl(url);
-	return proxiedURL;
-
-}
 function doWindowReload()
 {
 	window.location.reload(true);

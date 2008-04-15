@@ -9,12 +9,6 @@
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 
-	/*
-	String aHost = context.getSiteConfiguration().getAlfrescoAuthoringHost();
-	String aPort = context.getSiteConfiguration().getAlfrescoAuthoringPort();
-	String aWebappUri = context.getSiteConfiguration().getAlfrescoAuthoringWebappUri();
-	String aWebscriptServiceUri = context.getSiteConfiguration().getAlfrescoAuthoringWebscriptServiceUri();
-	*/
 	String aHost = request.getServerName();
 	String aPort = "" + request.getServerPort();
 	String aWebappUri = "/alfresco"; // TODO: Don't need this anymore
@@ -39,7 +33,13 @@
 		requestURL = requestURL.substring(0, requestURL.indexOf("/ui"));
 	
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);	
+	
+	String extBlankImageUrl = URLUtil.browser(context, "/extjs/resources/images/default/s.gif");
 %>
+
+// INITIALIZATION
+Ext.BLANK_IMAGE_URL = '<%=extBlankImageUrl%>';
+
 
 String.prototype.startsWith = function(s) { return this.indexOf(s)==0; }
 
@@ -96,38 +96,6 @@ function getCurrentPageId()
 	return null;
 }
 
-/*
-function getNavigationNodeId()
-{
-	var el = Ext.get("renderingNodeId");
-	if(el != null)
-	{
-		return el.dom.innerHTML;
-	}
-	return null;
-}
-
-function getCurrentLayoutId()
-{
-	var el = Ext.get("renderingLayoutId");
-	if(el != null)
-	{
-		return el.dom.innerHTML;
-	}
-	return null;
-}
-*/
-/*
-function getRootNodeId()
-{
-	var el = Ext.get("rootNodeId");
-	if(el != null)
-	{
-		return el.dom.innerHTML;
-	}
-	return null;
-}
-*/
 function getRootPageId()
 {
 	var el = Ext.get("rootPageId");
@@ -175,12 +143,12 @@ function getAlfrescoTicket()
 function toBrowser(relativeUrl)
 {
 	if(relativeUrl == null)
-		return "<%=URLUtil.toBrowserUrl("/")%>";
+		return "<%=URLUtil.browser(context, "/")%>";
 	if(relativeUrl.startsWith("/"))
 	{
 		relativeUrl = relativeUrl.substring(1, relativeUrl.length);
 	}
-	return "<%=URLUtil.toBrowserUrl("/")%>" + relativeUrl;
+	return "<%=URLUtil.browser(context, "/")%>" + relativeUrl;
 }
 
 
@@ -280,13 +248,10 @@ function buildProxiedUrl(url)
 	return proxiedURL;
 }
 
-
 function getAdsWebScriptURL(webScript)
 {
-	var url = getHttpHostPort() + getServiceUri() + webScript + "/" + getStoreId() + getWebappPath();
-	var proxiedURL = buildProxiedUrl(url);
-	return proxiedURL;
-
+	var url = getServiceUri() + webScript + "?avmStoreId=" + getStoreId();
+	return getHttpHostPort() + toBrowser(url);
 }
 
 

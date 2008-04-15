@@ -22,53 +22,37 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.web.site.renderer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.tools.EncodingUtil;
-import org.alfresco.web.site.AbstractRenderable;
+import org.alfresco.web.site.HTMLUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThemeUtil;
-import org.alfresco.web.site.URLUtil;
 import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
  * @author muzquiano
  */
-public class MarkupComponentType extends AbstractRenderable
+public class HTMLRenderer extends AbstractRenderer
 {
     public void execute(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, RuntimeConfig config)
             throws RendererExecutionException
     {
-        // config values
-        String markupData = (String) config.get("markupData");
+        String renderer = this.getRenderer();
 
-        // shimmy the data a bit
-        if (markupData != null)
+        // execute
+        try
         {
-            /**
-             * Append one or more tags that we would like to appear in the
-             * HEAD region of the page.  This is done just to show an
-             * example.
-             */
-            this.appendHeadTags(context, "<!-- Appended to HEAD by MarkupComponentType -->");
-
-            // clean up the data
-            String data = EncodingUtil.decode(markupData);
-
-            // print out to component body
-            print(response, data);
+            String renditionRelativePath = renderer;
+            HTMLUtil.includeHTML(request, response, renditionRelativePath);
         }
-        else
+        catch (Exception ex)
         {
-            String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-            String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
-            String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Google Gadget Component'/>";   
-            print(response, renderString);            
+            throw new RendererExecutionException(ex,
+                    "Unable to include HTML: " + renderer);
         }
     }
 }

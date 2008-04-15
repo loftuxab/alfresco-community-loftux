@@ -10,6 +10,6 @@
 	<adw:name>Markup Component</adw:name>
 	<adw:description>Markup Component Description</adw:description>
 	<adw:renderer-type>java</adw:renderer-type>
-	<adw:renderer>org.alfresco.web.site.MarkupComponentType</adw:renderer>
+	<adw:renderer>org.alfresco.web.site.ui.MarkupComponentType</adw:renderer>
 
 </adw:component-type>
