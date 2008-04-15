@@ -168,7 +168,7 @@
 
    <target name="-tomcat"
            depends="incremental-core,
-	                incremental-jlan,
+                    incremental-jlan,
                     incremental-mbeans,
                     incremental-deployment,
                     incremental-repository,
@@ -368,12 +368,12 @@
       </copy>
    </target>
 
-   <target name="deploy-webscriptframework-tomcat" depends="init" description="Deploys WebFramework WAR to webscriptframework tomcat">
+   <target name="deploy-webscriptframework-tomcat" depends="init" description="Deploys Web Script Framework WAR to webscriptframework tomcat">
       <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webscriptframework}" />
       <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwsf" 
               includeEmptyDirs="true" 
               quiet="yes" />
-      <!-- copy the webscriptframework WAR file to WebFramework's Tomcat deploy folder -->
+      <!-- copy the webscriptframework WAR file to webscriptframework's Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.webscriptframework}" 
             file="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" />
    </target>
@@ -412,6 +412,17 @@
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
    </target>
+   
+   <target name="deploy-slingshot-tomcat" 
+           depends="package-core, package-webscriptframework-war, package-webframework-war, package-slingshot-war" 
+           description="Deploys Slingshot WAR to webscriptframework tomcat">
+      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
+      <delete dir="${dir.deploy.tomcat.webscriptframework}/slingshot" 
+              includeEmptyDirs="true" quiet="yes" />
+      <!-- copy the slingshot WAR file to webscriptframework's Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}" 
+            file="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
+   </target>
 
    <target name="start-tomcat" 
            description="Starts the Tomcat server on Windows" 
@@ -434,7 +445,7 @@
    </target>
 
    <target name="start-tomcat-webscriptframework" 
-           description="Starts the WebFramework Tomcat server on Windows" 
+           description="Starts the webscriptframework Tomcat server on Windows" 
            depends="init">
       <exec dir="${home.tomcat.webscriptframework}/bin" 
             executable="cmd.exe" 

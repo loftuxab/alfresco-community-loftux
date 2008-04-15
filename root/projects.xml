@@ -1616,6 +1616,107 @@
                          projectdir="${dir.project.webframework}"/>
    </target>
    
+   <!-- **************************************** -->
+   <!-- ** Web Client 3.0 (Slingshot) Project ** -->
+   <!-- **************************************** -->
+   
+   <target name="incremental-slingshot" 
+           description="Performs an incremental build of the slingshot project"
+           depends="package-slingshot" />
+      
+   <target name="build-slingshot" 
+           description="Performs a clean build of the slingshot project"
+           depends="clean-slingshot, 
+                    incremental-slingshot" />
+   
+   <target name="clean-slingshot" 
+           description="Cleans the slingshot project" 
+           depends="init">
+      <clean projectdir="${dir.project.slingshot}" />
+   </target>
+   
+   <target name="compile-slingshot" 
+           description="Compiles the slingshot project" 
+           depends="init">
+      <compile-java projectdir="${dir.project.slingshot}" />
+   </target>
+   
+   <target name="package-slingshot"
+           description="Packages the slingshot project"
+           depends="compile-slingshot">
+      <mkdir dir="${dir.project.slingshot.dist}" />
+      <jar jarfile="${dir.project.slingshot.dist}/${file.name.jar.slingshot}" 
+           basedir="${dir.project.slingshot.classes}" />
+   </target>
+   
+   <target name="incremental-slingshot-war" 
+           description="Performs an incremental build of the slingshot WAR file"
+           depends="package-slingshot-war" />
+      
+   <target name="build-slingshot-war" 
+           description="Performs a clean build of the slingshot project"
+           depends="clean-slingshot-war, 
+                    incremental-slingshot-war" />
+   
+   <target name="clean-slingshot-war" 
+           description="Cleans the slingshot WAR assemble folder" 
+           depends="init">
+      <delete dir="${dir.project.slingshot.assemble}" />
+   </target>
+
+   <target name="package-slingshot-war" 
+           description="Packages the WAR file for the slingshot project" 
+           depends="assemble-slingshot-war">
+      <war warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" 
+           webxml="${dir.project.slingshot.src.webinf}/web.xml">
+         <fileset dir="${dir.project.slingshot.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-slingshot-war" depends="package-slingshot">
+      <mkdir dir="${dir.project.slingshot.assemble}" />
+      
+      <!-- Copy in base WAR file from the "webscript-framework" package -->
+      <copy todir="${dir.project.slingshot.assemble}">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </copy>
+      <!-- End of Copy -->
+
+      <copy todir="${dir.project.slingshot.assemble}" overwrite="yes">
+         <fileset dir="${dir.project.slingshot.src.web}" 
+                  excludes="WEB-INF/**" />
+      </copy>
+
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF" overwrite="yes">
+         <fileset dir="${dir.project.slingshot.src.webinf}" 
+                  excludes="web.xml" />
+      </copy>
+
+      <!-- add config files to WEB-INF/classes -->
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.slingshot.config}" 
+                  excludes="**/extension/**" />
+      </copy>
+
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.slingshot.dist}" 
+                  includes="${file.name.jar.slingshot}" />
+      </copy>
+   </target>  
+   
+   <target name="test-slingshot" 
+           description="Runs the tests for the slingshot project" 
+           depends="compile-slingshot">
+      <run-tests projectdir="${dir.project.slingshot}" />
+   </target>
+   
+   <target name="generate-javadocs-slingshot" 
+           description="Generates the JavaDocs for the slingshot project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Slingshot" 
+                         windowtitle="Alfresco Slingshot" 
+                         projectdir="${dir.project.slingshot}"/>
+   </target>
 
    <!-- ************************ -->
    <!-- ** Web Client Project ** -->
