@@ -44,38 +44,38 @@ import freemarker.template.TemplateModel;
  * 
  * @author Michael Uzquiano
  */
-public class FreemarkerFloatingMenuDirective extends FreemarkerTagSupportDirective
-{   
-   public FreemarkerFloatingMenuDirective(RequestContext context)
-   {
-       super(context);
-   }
-      
-   // TODO: This is a really lame way to work around late binding
-   // for the floating tag
-   // Just doing this for the moment, will fix shortly...
-   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
-         throws TemplateException, IOException
-   {
-       TagBase tag = (TagBase) ReflectionHelper.newObject("org.alfresco.web.site.taglib.FloatingMenuTag");
-       if(tag == null)
-       {
-           System.out.println("The tag 'FloatingMenuTag' is not available, skipping directive");
-           return;
-       }
+public class FreemarkerFloatingMenuDirective extends
+        FreemarkerTagSupportDirective
+{
+    public FreemarkerFloatingMenuDirective(RequestContext context)
+    {
+        super(context);
+    }
 
-       // execute the tag
-       String output = executeTag(tag);
-       
-       // commit the output
-       try
-       {
-           env.getOut().write(output);                  
-       }
-       catch(Exception ex)
-       {
-           ex.printStackTrace();
-       }
-   }
+    // TODO: This is a really lame way to work around late binding
+    // for the floating tag
+    // Just doing this for the moment, will fix shortly...
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+            TemplateDirectiveBody body) throws TemplateException, IOException
+    {
+        TagBase tag = (TagBase) ReflectionHelper.newObject("org.alfresco.web.site.taglib.FloatingMenuTag");
+        if (tag == null)
+        {
+            System.out.println("The tag 'FloatingMenuTag' is not available, skipping directive");
+            return;
+        }
+
+        // execute the tag
+        String output = executeTag(tag);
+
+        // commit the output
+        try
+        {
+            env.getOut().write(output);
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
 }
- 

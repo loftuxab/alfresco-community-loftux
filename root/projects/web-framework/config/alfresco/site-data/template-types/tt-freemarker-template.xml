@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template-type>
+	<id>tt-freemarker-template</id>
+	<name>freemarker-template</name>
+	<description>freemarker-template</description>
+	<renderer-type>freemarker</renderer-type>
+</template-type>

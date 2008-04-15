@@ -52,9 +52,9 @@ public class DefaultModel extends AbstractModel implements IModel
     {
         super(fileSystem);
     }
-    
+
     // load
-    
+
     public Component loadComponent(RequestContext context, String id)
     {
         return (Component) loadObject(context, id);
@@ -101,12 +101,8 @@ public class DefaultModel extends AbstractModel implements IModel
         return (TemplateType) loadObject(context, id);
     }
 
-    
-    
-
-    
     // instantiation
-    
+
     public Component newComponent(RequestContext context)
     {
         return (Component) newObject(context, "component");
@@ -151,17 +147,7 @@ public class DefaultModel extends AbstractModel implements IModel
     {
         return (TemplateType) newObject(context, "template-type");
     }
-    
 
-    
-    
-
-    
-    
-    
-    
-    
-    
     // generics
 
     public void saveObject(RequestContext context, ModelObject obj)
@@ -173,7 +159,8 @@ public class DefaultModel extends AbstractModel implements IModel
             String modelFileName = obj.getFileName();
 
             // write the document to the model's file system
-            ModelUtil.writeDocument(getFileSystem(), modelRelativePath, modelFileName, xmlDocument);
+            ModelUtil.writeDocument(getFileSystem(), modelRelativePath,
+                    modelFileName, xmlDocument);
 
             // make sure that the cache is in sync
             obj.touch();
@@ -196,18 +183,19 @@ public class DefaultModel extends AbstractModel implements IModel
         try
         {
             String modelRelativeFilePath = convertIDToRelativeFilePath(id);
-           
+
             // Read the document from the model's file system
             IFile file = getFileSystem().getFile(modelRelativeFilePath);
             if (file != null)
             {
                 Document document = ModelUtil.readDocument(file);
-                obj = convertDocumentToModelObject(document, file.getModificationDate());
+                obj = convertDocumentToModelObject(document,
+                        file.getModificationDate());
 
                 // get the relative path for this type
                 int u = modelRelativeFilePath.lastIndexOf("/");
                 String relativePath = modelRelativeFilePath.substring(0, u);
-                
+
                 obj.setRelativePath(relativePath);
 
                 // make sure that the cache is in sync
@@ -248,26 +236,27 @@ public class DefaultModel extends AbstractModel implements IModel
 
     public ModelObject newObject(RequestContext context, String typeName)
     {
-        //String namespaces = "xmlns:adw='http://www.alfresco.org/adw/1.0' xmlns:alf='http://www.alfresco.org' xmlns:chiba='http://chiba.sourceforge.net/xforms' xmlns:ev='http://www.w3.org/2001/xml-events' xmlns:xf='http://www.w3.org/2002/xforms' xmlns:xhtml='http://www.w3.org/1999/xhtml' xmlns:xs='http://www.w3.org/2001/XMLSchema' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'";
-        String namespaces = "xmlns:adw='http://www.alfresco.org/adw/1.0'";
-        String xml = "<adw:" + typeName + " " + namespaces + ">";
-        xml += "</adw:" + typeName + ">";
+        // construct the xml
+        String xml = "<" + typeName + "></" + typeName + ">";
 
+        // constructs a new GUID (with prefix if available)
         String id = newGUID(typeName);
 
+        // build the object
         ModelObject obj = null;
         try
         {
             Document d = XMLUtil.parse(xml);
-            XMLUtil.addChildValue(d.getRootElement(), "adw:id", id);
-            XMLUtil.addChildValue(d.getRootElement(), "adw:name", id);
-            XMLUtil.addChildValue(d.getRootElement(), "adw:description", id);
+            XMLUtil.addChildValue(d.getRootElement(), "id", id);
+            XMLUtil.addChildValue(d.getRootElement(), "name", id);
+            XMLUtil.addChildValue(d.getRootElement(), "description", id);
 
             obj = (ModelObject) convertDocumentToModelObject(d,
                     System.currentTimeMillis());
 
             // get the relative path for this type
-            String modelRelativePath = getConfiguration().getModelTypePath(typeName);
+            String modelRelativePath = getConfiguration().getModelTypePath(
+                    typeName);
             obj.setRelativePath(modelRelativePath);
 
         }
@@ -277,52 +266,28 @@ public class DefaultModel extends AbstractModel implements IModel
         }
         return obj;
     }
-    
+
     public ModelObject[] loadObjects(RequestContext context, String typeName)
     {
-        ModelObject[] array = new ModelObject[] { };
-                
-        String modelRelativeDirectoryPath = context.getConfig().getModelTypePath(typeName);
+        ModelObject[] array = new ModelObject[] {};
+
+        String modelRelativeDirectoryPath = context.getConfig().getModelTypePath(
+                typeName);
 
         // read files from the model's file system
         IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);
-        if(files != null)
+        if (files != null)
         {
             array = new ModelObject[files.length];
-            for(int i = 0; i < files.length; i++)
+            for (int i = 0; i < files.length; i++)
             {
                 array[i] = loadObject(context, files[i]);
             }
         }
-        
+
         return array;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     // Internal Cache for Objects
     protected HashMap cacheMap = null;
 
@@ -342,8 +307,7 @@ public class DefaultModel extends AbstractModel implements IModel
         if (cache == null)
         {
             long timeout = 30 * 60 * 1000; // 30 minutes
-            cache = CacheFactory.createADSCache(getFileSystem(),
-                    timeout);
+            cache = CacheFactory.createADSCache(getFileSystem(), timeout);
             cacheMap.put(cacheMapKey, cache);
         }
         return cache;
@@ -374,5 +338,4 @@ public class DefaultModel extends AbstractModel implements IModel
         return cacheGetByPath(context, relativePath);
     }
 
-    
 }

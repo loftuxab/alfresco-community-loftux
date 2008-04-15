@@ -83,7 +83,7 @@ public class ContentEditTag extends ContentTagBase
             String newIconUri = "/ui/images/icons/incontext/edit_content.gif";
             if (iconUri != null)
                 newIconUri = iconUri;
-            newIconUri = URLUtil.toBrowserUrl(newIconUri);
+            newIconUri = URLUtil.browser(context, newIconUri);
 
             // target
             String newTargetString = " target='_blank' ";

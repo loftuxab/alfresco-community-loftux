@@ -24,7 +24,11 @@
  */
 package org.alfresco.web.site;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -46,77 +50,28 @@ public class RequestUtil
         request.setAttribute(ATTR_REQUEST_CONTEXT, context);
     }
 
-    /**
-     * Used to include rendition of a piece of content (xform-driven)
-     * @param request
-     * @param response
-     * @param relativePath
-     * @throws ServletException
-     */
-    public static void includeRendition(HttpServletRequest request,
-            HttpServletResponse response, String renditionRelativePath,
-            String originalRelativePath) throws ServletException
-    {
-        RequestContext context = getRequestContext(request);
-
-        // load the html
-        String unprocessedHtml = ModelUtil.getFileStringContents(
-                context, renditionRelativePath);
-
-        // process the tags in the html
-        // this executes and commits to the writer
-        try
-        {
-            String content = FilterUtil.filterContent(context, request, response,
-                    unprocessedHtml, originalRelativePath);
-            response.getWriter().write(content);
-        }
-        catch (Exception ex)
-        {
-            throw new ServletException(ex);
-        }
-    }
-
-    /**
-     * Performs an HTML include and processes tags
-     * @param request
-     * @param response
-     * @param renditionRelativePath
-     * @throws ServletException
-     */
-    public static void includeHTML(HttpServletRequest request,
-            HttpServletResponse response, String renditionRelativePath)
-            throws ServletException
-    {
-        RequestContext context = getRequestContext(request);
-
-        // load the html
-        String unprocessedHtml = ModelUtil.getFileStringContents(
-                context, renditionRelativePath);
-
-        try
-        {
-            // process the tags in the html
-            // this executes and commits to the writer
-            String content = FilterUtil.filterContent(context, request, response,
-                    unprocessedHtml, renditionRelativePath);
-            response.getWriter().write(content);
-        }
-        catch (Exception ex)
-        {
-            throw new ServletException(ex);
-        }
-    }
-
     public static void include(HttpServletRequest request,
             HttpServletResponse response, String dispatchPath)
             throws ServletException
     {
         try
         {
-            // do the include
-            request.getRequestDispatcher(dispatchPath).include(request,
-                    response);
+            request.getRequestDispatcher(dispatchPath).include(request, response);
+        }
+        catch (Throwable ex)
+        {
+            throw new ServletException(ex);
+        }
+    }
+
+    public static void include(ServletContext context, ServletRequest request,
+            ServletResponse response, String dispatchPath)
+            throws ServletException
+    {
+        try
+        {
+            RequestDispatcher disp = context.getRequestDispatcher(dispatchPath);
+            disp.include(request, response);
         }
         catch (Throwable ex)
         {
@@ -130,9 +85,22 @@ public class RequestUtil
     {
         try
         {
-            // do the forward
-            request.getRequestDispatcher(dispatchPath).forward(request,
-                    response);
+            request.getRequestDispatcher(dispatchPath).forward(request, response);
+        }
+        catch (Exception ex)
+        {
+            throw new ServletException(ex);
+        }
+    }
+
+    public static void forward(ServletContext context, ServletRequest request,
+            ServletResponse response, String dispatchPath)
+            throws ServletException
+    {
+        try
+        {
+            RequestDispatcher disp = context.getRequestDispatcher(dispatchPath);
+            disp.forward(request, response);
         }
         catch (Exception ex)
         {

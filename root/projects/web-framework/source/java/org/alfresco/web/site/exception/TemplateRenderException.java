@@ -33,7 +33,7 @@ public class TemplateRenderException extends Exception
     {
         super(message);
     }
-    
+
     public TemplateRenderException(String message, Exception ex)
     {
         super(message, ex);

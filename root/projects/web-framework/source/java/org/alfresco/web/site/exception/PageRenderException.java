@@ -33,7 +33,7 @@ public class PageRenderException extends Exception
     {
         super(message);
     }
-    
+
     public PageRenderException(String message, Exception ex)
     {
         super(message, ex);

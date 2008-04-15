@@ -70,10 +70,11 @@ public class DefaultFilter implements Filter
                 // set the config onto the framework
                 DefaultConfig config = new DefaultConfig();
                 Framework.setConfig(config);
-                
+
                 // set the model onto the framework
                 String modelRootPath = config.getModelRootPath();
-                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(servletContext, modelRootPath);
+                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(
+                        servletContext, modelRootPath);
                 IModel model = new DefaultModel(modelFileSystem);
                 Framework.setModel(model);
 

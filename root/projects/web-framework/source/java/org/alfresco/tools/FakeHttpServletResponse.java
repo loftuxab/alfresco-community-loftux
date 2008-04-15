@@ -1,3 +1,27 @@
+/*
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * 
+ * As a special exception to the terms and conditions of version 2.0 of the GPL,
+ * you may redistribute this Program in connection with Free/Libre and Open
+ * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
+ * exception. You should have recieved a copy of the text describing the FLOSS
+ * exception, and it is also available here:
+ * http://www.alfresco.com/legal/licensing"
+ */
 package org.alfresco.tools;
 
 import java.io.ByteArrayOutputStream;
@@ -399,8 +423,9 @@ public class FakeHttpServletResponse implements HttpServletResponse
     private String characterEncoding = "ISO-8859-1";
 
     private final ByteArrayOutputStream content = new ByteArrayOutputStream();
-    private final DelegatingServletOutputStream outputStream = new DelegatingServletOutputStream(this.content);
-    
+    private final DelegatingServletOutputStream outputStream = new DelegatingServletOutputStream(
+            this.content);
+
     private PrintWriter writer;
     private int contentLength = 0;
     private String contentType;
@@ -414,34 +439,38 @@ public class FakeHttpServletResponse implements HttpServletResponse
     private String redirectedUrl;
     private String forwardedUrl;
     private String includedUrl;
-    
-    
-    public class DelegatingServletOutputStream extends ServletOutputStream 
+
+    public class DelegatingServletOutputStream extends ServletOutputStream
     {
-        public DelegatingServletOutputStream(OutputStream targetStream) {
+        public DelegatingServletOutputStream(OutputStream targetStream)
+        {
             super();
             this.proxy = targetStream;
         }
 
-        public OutputStream getTargetStream() {
+        public OutputStream getTargetStream()
+        {
             return proxy;
         }
 
-        public void write(int b) throws IOException {
+        public void write(int b) throws IOException
+        {
             proxy.write(b);
         }
 
-        public void flush() throws IOException {
+        public void flush() throws IOException
+        {
             super.flush();
             proxy.flush();
         }
-        
-        public void close() throws IOException {
+
+        public void close() throws IOException
+        {
             super.close();
             proxy.close();
         }
 
         private final OutputStream proxy;
     }
-    
+
 }

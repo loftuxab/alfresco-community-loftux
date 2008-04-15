@@ -1,5 +1,26 @@
 <alfresco-config>
 
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="request-context" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="page-mapper" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="link-builder" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="file-system" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="formats" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="incontext" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="servlet" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="alfresco" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="model" class="org.alfresco.web.config.WebSiteElementReader"/>
+		 <element-reader element-name="tags" class="org.alfresco.web.config.WebSiteElementReader"/>
+		 <element-reader element-name="user" class="org.alfresco.web.config.WebSiteElementReader"/>
+		 <element-reader element-name="remote" class="org.alfresco.web.config.WebSiteElementReader"/>
+		 <element-reader element-name="renderers" class="org.alfresco.web.config.WebSiteElementReader"/>
+		 <element-reader element-name="defaults" class="org.alfresco.web.config.WebSiteElementReader"/>		 
+      </element-readers>
+   </plug-ins>
+
+
+
 	<config evaluator="string-compare" condition="WebFramework">
 	
 		<!-- request context -->
@@ -218,82 +239,91 @@
 					<id>component</id>
 					<name>Component</name>
 					<description>Component</description>
-					<tagname>adw:component</tagname>
+					<namespace></namespace>
+					<tagname>component</tagname>
 					<class>org.alfresco.web.site.model.Component</class>
-					<path>/data/components</path>
-					<prefix>cm-</prefix>
+					<path>/site-data/components</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>component-type</id>
 					<name>Component Type</name>
 					<description>Component Type</description>
-					<tagname>adw:component-type</tagname>
+					<namespace></namespace>
+					<tagname>component-type</tagname>
 					<class>org.alfresco.web.site.model.ComponentType</class>
-					<path>/data/component-types</path>
-					<prefix>ct-</prefix>
+					<path>/site-data/component-types</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>configuration</id>
 					<name>Configuration</name>
 					<description>Configuration</description>
-					<tagname>adw:configuration</tagname>
+					<namespace></namespace>
+					<tagname>configuration</tagname>
 					<class>org.alfresco.web.site.model.Configuration</class>
-					<path>/data/configurations</path>
-					<prefix>co-</prefix>
+					<path>/site-data/configurations</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>content-association</id>
 					<name>Content Association</name>
 					<description>Content Association</description>
-					<tagname>adw:content-association</tagname>
+					<namespace></namespace>
+					<tagname>content-association</tagname>
 					<class>org.alfresco.web.site.model.ContentAssociation</class>
-					<path>/data/content-associations</path>
-					<prefix>as-</prefix>
+					<path>/site-data/content-associations</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>endpoint</id>
 					<name>Endpoint</name>
 					<description>Endpoint</description>
-					<tagname>adw:endpoint</tagname>
+					<namespace></namespace>
+					<tagname>endpoint</tagname>
 					<class>org.alfresco.web.site.model.Endpoint</class>
-					<path>/data/endpoints</path>
-					<prefix>en-</prefix>
+					<path>/site-data/endpoints</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>page</id>
 					<name>Page</name>
 					<description>Page</description>
-					<tagname>adw:page</tagname>
+					<namespace></namespace>
+					<tagname>page</tagname>
 					<class>org.alfresco.web.site.model.Page</class>
-					<path>/data/pages</path>
-					<prefix>pg-</prefix>
+					<path>/site-data/pages</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>page-association</id>
 					<name>Page Association</name>
 					<description>Page Association</description>
-					<tagname>adw:page-association</tagname>
+					<namespace></namespace>
+					<tagname>page-association</tagname>
 					<class>org.alfresco.web.site.model.PageAssociation</class>
-					<path>/data/page-associations</path>
-					<prefix>pa-</prefix>
+					<path>/site-data/page-associations</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>template</id>
 					<name>Template</name>
 					<description>Template</description>
-					<tagname>adw:template</tagname>
+					<namespace></namespace>
+					<tagname>template</tagname>
 					<class>org.alfresco.web.site.model.Template</class>
-					<path>/data/templates</path>
-					<prefix>tm-</prefix>
+					<path>/site-data/template-instances</path>
+					<prefix></prefix>
 				</type>
 				<type>
 					<id>template-type</id>
 					<name>Template Type</name>
 					<description>Template Type</description>
-					<tagname>adw:template-type</tagname>
+					<namespace></namespace>
+					<tagname>template-type</tagname>
 					<class>org.alfresco.web.site.model.TemplateType</class>
-					<path>/data/template-types</path>
-					<prefix>tt-</prefix>
+					<path>/site-data/template-types</path>
+					<prefix></prefix>
 				</type>
 			</types>
 		</model>

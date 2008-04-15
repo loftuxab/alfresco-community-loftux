@@ -37,17 +37,17 @@ import org.dom4j.Document;
 public abstract class AbstractModel
 {
     protected IFileSystem fileSystem;
-    
+
     public AbstractModel(IFileSystem fileSystem)
     {
         this.fileSystem = fileSystem;
     }
-    
+
     public IFileSystem getFileSystem()
     {
         return this.fileSystem;
     }
-    
+
     // guids
 
     public String newGUID()
@@ -69,26 +69,13 @@ public abstract class AbstractModel
         return newGUID();
     }
 
-
     // configuration
-    
+
     public AbstractConfig getConfiguration()
     {
         return Framework.getConfig();
     }
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
-    
     // helper methods
     protected ModelObject convertDocumentToModelObject(Document document)
     {
@@ -153,8 +140,7 @@ public abstract class AbstractModel
         obj.setModificationTime(modificationTime);
         return obj;
     }
-    
-    
+
     protected String getRelativePath(ModelObject object)
     {
         return object.getRelativePath();
@@ -164,5 +150,5 @@ public abstract class AbstractModel
     {
         return object.getRelativeFilePath();
     }
-        
+
 }

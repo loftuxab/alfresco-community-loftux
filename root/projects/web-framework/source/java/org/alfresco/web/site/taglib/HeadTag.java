@@ -31,7 +31,7 @@ import org.alfresco.web.site.RenderUtil;
 /**
  * This tag is a bit unusual.  When executed, it simply emits a
  * <!--${head$}--> token to the output stream.
-  * @author muzquiano
+ * @author muzquiano
  */
 public class HeadTag extends TagBase
 {
@@ -40,5 +40,5 @@ public class HeadTag extends TagBase
         print(RenderUtil.PAGE_HEAD_DEPENDENCIES_STAMP);
         return SKIP_BODY;
     }
-    
+
 }

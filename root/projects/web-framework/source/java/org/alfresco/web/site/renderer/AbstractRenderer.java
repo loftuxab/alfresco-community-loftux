@@ -24,13 +24,11 @@
  */
 package org.alfresco.web.site.renderer;
 
-
 /**
  * @author muzquiano
  */
-public abstract class AbstractRenderer
-    implements Renderable
-{    
+public abstract class AbstractRenderer implements Renderable
+{
     public void setRenderer(String renderer)
     {
         this.renderer = renderer;

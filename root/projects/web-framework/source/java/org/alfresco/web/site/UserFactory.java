@@ -30,59 +30,62 @@ public abstract class UserFactory
 {
     public static String SESSION_ATTRIBUTE_KEY_USER_OBJECT = "USER_OBJECT";
     public static String SESSION_ATTRIBUTE_KEY_USER_ID = "USER_ID";
-    
+
     protected User guestUser = null;
-    
-    protected User getGuestUser(RequestContext context, HttpServletRequest request)
-        throws Exception
+
+    protected User getGuestUser(RequestContext context,
+            HttpServletRequest request) throws Exception
     {
-        if(this.guestUser == null)
+        if (this.guestUser == null)
         {
             User user = new User("guest");
             user.setFirstName("Guest");
-            
-            this.guestUser = user;            
+
+            this.guestUser = user;
         }
         return this.guestUser;
     }
-    
+
     public User getUser(RequestContext context, HttpServletRequest request)
-        throws Exception
+            throws Exception
     {
         // check whether there is a "USER_ID" file in the session
-        String userId = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_ID);
-        if(userId == null)
+        String userId = (String) request.getSession().getAttribute(
+                SESSION_ATTRIBUTE_KEY_USER_ID);
+        if (userId == null)
         {
             // there is no user
         }
-        
+
         // we have a user
-        if(userId != null)
+        if (userId != null)
         {
             // check whether there is a user object loaded already
-            User user = (User) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
-            if(user == null)
+            User user = (User) request.getSession().getAttribute(
+                    SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+            if (user == null)
             {
                 // load the user from whatever store...
                 user = loadUser(context, request, userId);
-                
+
                 // if we got the user, set onto session
-                if(user != null)
+                if (user != null)
                 {
-                    request.getSession().setAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
+                    request.getSession().setAttribute(
+                            SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
                     return user;
                 }
                 else
                 {
                     // unable to load the user
                 }
-            }            
+            }
         }
-        
+
         // return the guest user
         return getGuestUser(context, request);
     }
-    
-    protected abstract User loadUser(RequestContext context, HttpServletRequest request, String user_id)
-        throws Exception;
+
+    protected abstract User loadUser(RequestContext context,
+            HttpServletRequest request, String user_id) throws Exception;
 }

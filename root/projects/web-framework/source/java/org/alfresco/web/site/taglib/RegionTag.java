@@ -30,7 +30,6 @@ import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.parser.tags.JspPageContextImpl;
 
 /**
  * @author muzquiano
@@ -62,12 +61,12 @@ public class RegionTag extends TagBase
             this.scope = "site";
         return this.scope;
     }
-    
+
     public void setAccess(String access)
     {
         this.access = access;
     }
-    
+
     public String getAccess()
     {
         return this.access;

@@ -35,7 +35,6 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
-import org.alfresco.web.site.parser.tags.JspPageContextImpl;
 
 /**
  * @author muzquiano

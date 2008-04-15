@@ -310,13 +310,13 @@ public class DefaultConfig extends AbstractConfig
             value = "/";
         return value;
     }
-    
+
     public String getDefaultPageUri()
     {
         String value = get("page.default.uri");
         if (value == null)
             value = "/ui/core/page-default.jsp";
-        return value;    	
+        return value;
     }
 
     //////////////////////////////////////////////////////////////////
@@ -425,6 +425,12 @@ public class DefaultConfig extends AbstractConfig
         String key = "model.type." + id + ".class";
         return get(key);
     }
+    
+    public String getModelTypeNamespace(String id)
+    {
+        String key = "model.type." + id + ".namespace";
+        return get(key);
+    }
 
     public String getModelTypeTagName(String id)
     {
@@ -449,16 +455,16 @@ public class DefaultConfig extends AbstractConfig
         String key = "model.type." + id + ".prefix";
         return get(key);
     }
-    
+
     public String getModelRootPath()
     {
         String key = "model.rootpath";
         String value = get(key);
         if (value == null)
             value = "/";
-        return value;        
+        return value;
     }
-    
+
     //////////////////////////////////////////////////////////////////
     // Tag Libraries
     //////////////////////////////////////////////////////////////////
@@ -468,37 +474,36 @@ public class DefaultConfig extends AbstractConfig
         String _car = "tags.libraries.library.";
         String _cdr = ".id";
 
-        return spliceIds(_car, _cdr);        
+        return spliceIds(_car, _cdr);
     }
-    
+
     public String getTagLibraryUri(String id)
     {
         String key = "tags.libraries.library." + id + ".uri";
-        return get(key);        
+        return get(key);
     }
 
     public String getTagLibraryNamespace(String id)
     {
         String key = "tags.libraries.library." + id + ".namespace";
-        return get(key);                
+        return get(key);
     }
-    
-    
+
     //////////////////////////////////////////////////////////////////
     // User Factories
     //////////////////////////////////////////////////////////////////
-    
+
     public String getDefaultUserFactoryId()
     {
         return get("user.factory.default.id");
     }
-    
+
     public String[] getUserFactoryIds()
     {
         String _car = "user.factory.definition.";
         String _cdr = ".name";
 
-        return spliceIds(_car, _cdr);                
+        return spliceIds(_car, _cdr);
     }
 
     public String getUserFactoryName(String id)
@@ -515,25 +520,24 @@ public class DefaultConfig extends AbstractConfig
     {
         return getUserFactoryProperty(id, "class");
     }
-    
+
     public String getUserFactoryProperty(String id, String property)
     {
         String key = "user.factory.definition." + id + "." + property;
         return get(key);
     }
-    
-    
+
     //////////////////////////////////////////////////////////////////
     // Remote
     //////////////////////////////////////////////////////////////////
-    
+
     public String[] getRemoteConnectorIds()
     {
         String _car = "remote.connector.";
         String _cdr = ".name";
 
-        return spliceIds(_car, _cdr);                
-        
+        return spliceIds(_car, _cdr);
+
     }
 
     public String getRemoteConnectorName(String id)
@@ -556,13 +560,13 @@ public class DefaultConfig extends AbstractConfig
         String key = "remote.connector." + id + "." + property;
         return get(key);
     }
-    
+
     public String[] getRemoteAuthenticatorIds()
     {
         String _car = "remote.authenticator.";
         String _cdr = ".name";
 
-        return spliceIds(_car, _cdr);                
+        return spliceIds(_car, _cdr);
     }
 
     public String getRemoteAuthenticatorName(String id)
@@ -579,24 +583,23 @@ public class DefaultConfig extends AbstractConfig
     {
         return getRemoteAuthenticatorProperty(id, "class");
     }
-    
+
     public String getRemoteAuthenticatorProperty(String id, String property)
     {
         String key = "remote.authenticator." + id + "." + property;
         return get(key);
     }
-    
-    
+
     //////////////////////////////////////////////////////////////////
     // Renderers
     //////////////////////////////////////////////////////////////////
-    
+
     public String[] getRendererIds()
     {
         String _car = "renderers.renderer.";
         String _cdr = ".name";
 
-        return spliceIds(_car, _cdr);        
+        return spliceIds(_car, _cdr);
     }
 
     public String getRendererName(String id)
@@ -613,15 +616,12 @@ public class DefaultConfig extends AbstractConfig
     {
         return getRendererProperty(id, "class");
     }
-    
+
     public String getRendererProperty(String id, String property)
     {
         String key = "renderers.renderer." + id + "." + property;
-        return get(key);        
+        return get(key);
     }
-    
-    
-    
 
     //////////////////////////////////////////////////////////////////
     // Utils

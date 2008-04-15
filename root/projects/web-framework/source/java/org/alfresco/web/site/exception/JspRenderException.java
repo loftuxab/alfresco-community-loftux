@@ -38,5 +38,5 @@ public class JspRenderException extends Exception
     {
         super(message, ex);
     }
-    
+
 }

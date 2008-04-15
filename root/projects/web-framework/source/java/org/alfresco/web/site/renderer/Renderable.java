@@ -39,8 +39,8 @@ public interface Renderable
     public void execute(RequestContext context, HttpServletRequest request,
             HttpServletResponse response, RuntimeConfig config)
             throws RendererExecutionException;
-    
+
     public void setRenderer(String renderer);
-    
+
     public String getRenderer();
 }

@@ -33,7 +33,7 @@ public class ComponentRenderException extends Exception
     {
         super(message);
     }
-    
+
     public ComponentRenderException(String message, Exception ex)
     {
         super(message, ex);

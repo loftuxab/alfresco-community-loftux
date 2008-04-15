@@ -24,19 +24,12 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.PrintWriter;
-
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.tools.FakeHttpServletResponse;
-import org.alfresco.tools.WrappedHttpServletRequest;
-import org.alfresco.web.site.FilterContext;
+import org.alfresco.tools.TagUtil;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.parser.tags.JspPageContextImpl;
-import org.alfresco.web.site.parser.tags.JspWriterImpl;
 import org.alfresco.web.site.taglib.TagBase;
 
 import freemarker.template.TemplateDirectiveModel;
@@ -47,58 +40,33 @@ import freemarker.template.TemplateDirectiveModel;
  * 
  * @author Michael Uzquiano
  */
-public abstract class FreemarkerTagSupportDirective implements TemplateDirectiveModel
-{   
-   private RequestContext context;
-   
-   public FreemarkerTagSupportDirective(RequestContext context)
-   {
-       this(context, context.getCurrentPage());
-   }
-   
-   public FreemarkerTagSupportDirective(RequestContext context, Page page)
-   {
-       this.context = context;
-   }
-   
-   public String executeTag(TagBase tag)
-   {
-       // render the component into dummy objects
-       // currently, we can only do this for HttpRequestContext instances
-       if(context instanceof HttpRequestContext)
-       {
-           HttpServletRequest r = (HttpServletRequest) ((HttpRequestContext)context).getRequest();
-          
-           // execute component with a wrapped request
-           WrappedHttpServletRequest request = new WrappedHttpServletRequest(r);
-          
-           // execute component with a fake response
-           FakeHttpServletResponse response = new FakeHttpServletResponse();
-           try
-           {
-               // set up the tag to be processed in wrapped objects
-               ServletContext servletContext = r.getSession().getServletContext();
-               FilterContext filterContext = new FilterContext(request, response, servletContext);
-               PrintWriter writer = new PrintWriter(response.getOutputStream());
-               JspWriterImpl jspWriter = new JspWriterImpl(writer, 8*1024, true);
-               JspPageContextImpl pageContextImpl = new JspPageContextImpl(filterContext, jspWriter);
-               
-               // process the tag
-               tag.setPageContext(pageContextImpl);
-               tag.doStartTag();
-               tag.doEndTag();
+public abstract class FreemarkerTagSupportDirective implements
+        TemplateDirectiveModel
+{
+    private RequestContext context;
 
-               // render the output
-               jspWriter.flush();
-               String output = response.getContentAsString();
-               return output;                 
-           }
-           catch(Exception ex)
-           {
-               ex.printStackTrace();
-           }
-       }
-       return null;
-   }
+    public FreemarkerTagSupportDirective(RequestContext context)
+    {
+        this(context, context.getCurrentPage());
+    }
+
+    public FreemarkerTagSupportDirective(RequestContext context, Page page)
+    {
+        this.context = context;
+    }
+
+    public String executeTag(TagBase tag)
+    {
+        // render the component into dummy objects
+        // currently, we can only do this for HttpRequestContext instances
+        if (context instanceof HttpRequestContext)
+        {
+            HttpServletRequest response = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
+
+            // execute the tag
+            String output = TagUtil.execute(tag, response);
+            return output;
+        }
+        return null;
+    }
 }
- 

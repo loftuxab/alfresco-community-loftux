@@ -59,131 +59,129 @@ import freemarker.template.TemplateScalarModel;
  * @author Michael Uzquiano
  */
 public class FreemarkerRegionDirective extends FreemarkerTagSupportDirective
-{   
-   private RequestContext context;
-   
-   public FreemarkerRegionDirective(RequestContext context)
-   {
-       super(context);
-   }
-      
-   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
-         throws TemplateException, IOException
-   {
-      // parse and validate the parameters to the region directive
-      TemplateModel idValue = (TemplateModel)params.get("id");
-      if (idValue instanceof TemplateScalarModel == false)
-      {
-         throw new TemplateModelException("The 'id' parameter to a region directive must be a string.");
-      }
-      String regionId = ((TemplateScalarModel)idValue).getAsString();
-      
-      TemplateModel scopeValue = (TemplateModel)params.get("scope");
-      if (scopeValue instanceof TemplateScalarModel == false)
-      {
-         throw new TemplateModelException("The 'scope' parameter to a region directive must be a string.");
-      }
-      String scope = ((TemplateScalarModel)scopeValue).getAsString();
-      
-      //boolean protectedRegion = false;
-      String access = null;
-      TemplateModel accessValue = (TemplateModel)params.get("access");
-      if (accessValue != null)
-      {
-         if (accessValue instanceof TemplateScalarModel == false)
+{
+    private RequestContext context;
+
+    public FreemarkerRegionDirective(RequestContext context)
+    {
+        super(context);
+    }
+
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+            TemplateDirectiveBody body) throws TemplateException, IOException
+    {
+        // parse and validate the parameters to the region directive
+        TemplateModel idValue = (TemplateModel) params.get("id");
+        if (idValue instanceof TemplateScalarModel == false)
+        {
+            throw new TemplateModelException(
+                    "The 'id' parameter to a region directive must be a string.");
+        }
+        String regionId = ((TemplateScalarModel) idValue).getAsString();
+
+        TemplateModel scopeValue = (TemplateModel) params.get("scope");
+        if (scopeValue instanceof TemplateScalarModel == false)
+        {
+            throw new TemplateModelException(
+                    "The 'scope' parameter to a region directive must be a string.");
+        }
+        String scope = ((TemplateScalarModel) scopeValue).getAsString();
+
+        //boolean protectedRegion = false;
+        String access = null;
+        TemplateModel accessValue = (TemplateModel) params.get("access");
+        if (accessValue != null)
+        {
+            if (accessValue instanceof TemplateScalarModel == false)
+            {
+                throw new TemplateModelException(
+                        "The 'access' parameter to a region directive must be a string.");
+            }
+            access = ((TemplateScalarModel) accessValue).getAsString();
+        }
+
+        /*
+         // resolve the source Id - relative to the component scope
+         String sourceId;
+         if (scope.equalsIgnoreCase(Constants.SCOPE_GLOBAL))
          {
-            throw new TemplateModelException("The 'access' parameter to a region directive must be a string.");
-         }
-         access = ((TemplateScalarModel)accessValue).getAsString();
-      }
-      
-      
-      /*
-      // resolve the source Id - relative to the component scope
-      String sourceId;
-      if (scope.equalsIgnoreCase(Constants.SCOPE_GLOBAL))
-      {
          sourceId = Constants.SCOPE_GLOBAL;
-      }
-      else if (scope.equalsIgnoreCase(Constants.SCOPE_TEMPLATE))
-      {
+         }
+         else if (scope.equalsIgnoreCase(Constants.SCOPE_TEMPLATE))
+         {
          sourceId = this.page.getTemplateId();
-      }
-      else if (scope.equalsIgnoreCase(Constants.SCOPE_PAGE))
-      {
+         }
+         else if (scope.equalsIgnoreCase(Constants.SCOPE_PAGE))
+         {
          sourceId = this.page.getId();
-      }
-      else
-      {
+         }
+         else
+         {
          throw new AlfrescoRuntimeException("Unknown component scope: " + scope +
-               ". Was expecting one of 'global', 'template' or 'page'.");
-      }
-      */
-      
-      
-      // the tag we want to execute
-      RegionTag tag = new RegionTag();
-      tag.setAccess(access);
-      tag.setName(regionId);
-      tag.setScope(scope);
-      
-      // execute the tag
-      String output = executeTag(tag);
-      
-      // commit the output
-      try
-      {
-          env.getOut().write(output);
-          env.getOut().flush();
-      }
-      catch(Exception ex)
-      {
-          ex.printStackTrace();
-      }
+         ". Was expecting one of 'global', 'template' or 'page'.");
+         }
+         */
 
-      
-      
-      
-/*      
-      
-      
-      
-      
-      // find any components that match these bindings
-      Component[] components = ModelUtil.findComponents(context, scope, sourceId, regionId, null);
-      
-      // do we have at least one?
-      if(components != null && components.length > 0)
-      {
-          // just render the first one
-          Component component = components[0];
-          String componentId = component.getId();
-          
-          // render the component into dummy objects
-          // currently, we can only do this for HttpRequestContext instances
-          if(context instanceof HttpRequestContext)
-          {
-              HttpServletRequest r = (HttpServletRequest) ((HttpRequestContext)context).getRequest();
-              
-              // execute component with a wrapped request
-              WrappedHttpServletRequest request = new WrappedHttpServletRequest(r);
-              
-              // execute component with a fake response
-              FakeHttpServletResponse response = new FakeHttpServletResponse();
-              try
-              {
-                  RenderUtil.renderComponent(context, request, response, componentId);
+        // the tag we want to execute
+        RegionTag tag = new RegionTag();
+        tag.setAccess(access);
+        tag.setName(regionId);
+        tag.setScope(scope);
 
-                  // render the output
-                  String output = response.getContentAsString();
-                  env.getOut().write(output);                  
-              }
-              catch(Exception ex)
-              {
-                  ex.printStackTrace();
-              }    
-          }
-      }
-*/          
-   }
+        // execute the tag
+        String output = executeTag(tag);
+
+        // commit the output
+        try
+        {
+            env.getOut().write(output);
+            env.getOut().flush();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+
+        /*      
+         
+         
+         
+         
+         // find any components that match these bindings
+         Component[] components = ModelUtil.findComponents(context, scope, sourceId, regionId, null);
+         
+         // do we have at least one?
+         if(components != null && components.length > 0)
+         {
+         // just render the first one
+         Component component = components[0];
+         String componentId = component.getId();
+         
+         // render the component into dummy objects
+         // currently, we can only do this for HttpRequestContext instances
+         if(context instanceof HttpRequestContext)
+         {
+         HttpServletRequest r = (HttpServletRequest) ((HttpRequestContext)context).getRequest();
+         
+         // execute component with a wrapped request
+         WrappedHttpServletRequest request = new WrappedHttpServletRequest(r);
+         
+         // execute component with a fake response
+         FakeHttpServletResponse response = new FakeHttpServletResponse();
+         try
+         {
+         RenderUtil.renderComponent(context, request, response, componentId);
+
+         // render the output
+         String output = response.getContentAsString();
+         env.getOut().write(output);                  
+         }
+         catch(Exception ex)
+         {
+         ex.printStackTrace();
+         }    
+         }
+         }
+         */
+    }
 }

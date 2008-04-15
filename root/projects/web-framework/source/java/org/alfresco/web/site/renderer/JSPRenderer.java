@@ -49,12 +49,12 @@ public class JSPRenderer extends AbstractRenderer
             // put the file URI into the config
             String dispatchPath = renderer;
             config.put("component-file-uri", dispatchPath);
-            
+
             // put the folder URI into the config
             int x = dispatchPath.lastIndexOf("/");
-            String pathUri = dispatchPath.substring(0,x);
+            String pathUri = dispatchPath.substring(0, x);
             config.put("component-path-uri", pathUri);
-            
+
             // do the include
             RequestUtil.include(request, response, dispatchPath);
         }

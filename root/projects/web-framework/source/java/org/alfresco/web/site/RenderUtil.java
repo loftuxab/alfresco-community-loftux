@@ -44,6 +44,8 @@ import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Template;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererFactory;
+import org.dom4j.Document;
+import org.dom4j.Element;
 
 /**
  * @author muzquiano
@@ -70,96 +72,112 @@ public class RenderUtil
      * @param dispatchPath
      * @throws Exception
      */
-    public static void renderJspPage(RequestContext context, HttpServletRequest request, HttpServletResponse response, String dispatchPath) throws JspRenderException
+    public static void renderJspPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String dispatchPath) throws JspRenderException
     {
         try
         {
             // wrap the request and response
-            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
-            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(response);
-            
+            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
+                    request);
+            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(
+                    response);
+
             // do the include
             RequestUtil.include(wrappedRequest, wrappedResponse, dispatchPath);
-            
+
             // generate the HEAD tag
             String headTags = generateHeader(context);
-            
+
             // Now do a replace on all of the stamp placeholders
             String responseBody = wrappedResponse.getOutput();
             int i = -1;
-            do {
+            do
+            {
                 i = responseBody.indexOf(PAGE_HEAD_DEPENDENCIES_STAMP);
-                if(i > -1)
+                if (i > -1)
                 {
-                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(i+PAGE_HEAD_DEPENDENCIES_STAMP.length(), responseBody.length());
+                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
+                            i + PAGE_HEAD_DEPENDENCIES_STAMP.length(),
+                            responseBody.length());
                 }
             }
-            while(i > -1);
-            
+            while (i > -1);
+
             // Finally, commit the entire thing to the output stream
             response.getWriter().print(responseBody);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new JspRenderException("Unable to render JSP page", ex);
         }
     }
-    
+
     /**
      * Renders the current page instance.
      */
     public static void renderPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response)
             throws PageRenderException
-    {        
+    {
         Page page = context.getCurrentPage();
-        if(page == null)
+        if (page == null)
         {
-            throw new PageRenderException("Unable to locate current page in request context");
+            throw new PageRenderException(
+                    "Unable to locate current page in request context");
         }
         Template currentTemplate = page.getTemplate(context);
-        if(currentTemplate == null)
+        if (currentTemplate == null)
         {
-            throw new PageRenderException("Unable to locate template for page: " + page.getId());
+            throw new PageRenderException(
+                    "Unable to locate template for page: " + page.getId());
         }
-        
+
         try
         {
             // Wrap the Request and Response
-            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
-            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(response);
-    
+            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
+                    request);
+            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(
+                    response);
+
             // Execute the template        
             RenderUtil.renderTemplate(context, wrappedRequest, wrappedResponse,
                     currentTemplate.getId());
-    
+
             // At this point, the template and all of the components
             // have executed.  We must now stamp the <!--${head}-->
             // onto the output.  To do so, we must first generate
             // the stamp.        
             String headTags = generateHeader(context);
-            
+
             // Now do a replace on all of the stamp placeholders
             String responseBody = wrappedResponse.getOutput();
             int i = -1;
-            do {
+            do
+            {
                 i = responseBody.indexOf(PAGE_HEAD_DEPENDENCIES_STAMP);
-                if(i > -1)
+                if (i > -1)
                 {
-                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(i+PAGE_HEAD_DEPENDENCIES_STAMP.length(), responseBody.length());
+                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
+                            i + PAGE_HEAD_DEPENDENCIES_STAMP.length(),
+                            responseBody.length());
                 }
             }
-            while(i > -1);
-            
+            while (i > -1);
+
             // Finally, commit the entire thing to the output stream
             response.getWriter().print(responseBody);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            throw new PageRenderException("An exception occurred while rendering page: " + page.getId(), ex);
+            throw new PageRenderException(
+                    "An exception occurred while rendering page: " + page.getId(),
+                    ex);
         }
     }
-    
+
     /**
      * Renders a given template instance.  This fetches the abstract renderer
      * instance for the given template's type and then binds configuration data
@@ -175,25 +193,28 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String templateId) throws TemplateRenderException
     {
-        Template template = (Template) context.getModel().loadTemplate(
-                context, templateId);
-        if(template == null)
-            throw new TemplateRenderException("Unable to locate template: " + templateId);
+        Template template = (Template) context.getModel().loadTemplate(context,
+                templateId);
+        if (template == null)
+            throw new TemplateRenderException(
+                    "Unable to locate template: " + templateId);
 
         try
         {
             // get the configuration for the template
             RuntimeConfig config = context.loadConfiguration(template);
             request.setAttribute("template-configuration", config);
-    
+
             // get the renderer and execute it
             AbstractRenderer renderer = RendererFactory.newRenderer(context,
                     template.getTemplateType(context));
             renderer.execute(context, request, response, config);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            throw new TemplateRenderException("An exception occurred while rendering template: " + templateId, ex);
+            throw new TemplateRenderException(
+                    "An exception occurred while rendering template: " + templateId,
+                    ex);
         }
     }
 
@@ -214,29 +235,30 @@ public class RenderUtil
             throws RegionRenderException
     {
         // get the template
-        Template template = (Template) context.getModel().loadTemplate(
-                context, templateId);
-        if(template == null)
-            throw new RegionRenderException("Unable to locate template: " + templateId);
+        Template template = (Template) context.getModel().loadTemplate(context,
+                templateId);
+        if (template == null)
+            throw new RegionRenderException(
+                    "Unable to locate template: " + templateId);
 
         try
         {
             // load the baseline configuration for this template
             RuntimeConfig config = context.loadConfiguration(template);
             request.setAttribute("template-configuration", config);
-    
+
             // build the configuration for this region
             config.put("region-id", regionId);
             config.put("region-scope-id", regionScopeId);
             String sourceId = getSourceId(context, regionScopeId);
             config.put("region-source-id", sourceId);
-    
+
             // determine the renderer
             // this can be overridden by a setting on either the layout
             // or the layout type instances
             // TODO: Do we want to keep this?
             String renderer = "/ui/core/region.jsp";
-    
+
             // if there is already a component associated for this region,
             // we must let the region know      
             Component[] components = ModelUtil.findComponents(context,
@@ -244,25 +266,26 @@ public class RenderUtil
             if (components.length > 0)
             {
                 Component component = components[0];
-    
+
                 // load config for this component
                 RuntimeConfig componentConfig = context.loadConfiguration(component);
                 request.setAttribute("component-configuration", componentConfig);
-    
+
                 // merge in the template data
                 config.merge(componentConfig);
             }
-    
+
             // do the render
             request.setAttribute("region-configuration", config);
             RequestUtil.include(request, response, renderer);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            throw new RegionRenderException("Unable to render region: " + regionId, ex);
+            throw new RegionRenderException(
+                    "Unable to render region: " + regionId, ex);
         }
     }
-    
+
     /**
      * Renders a given component instance.  This fetches the abstract renderer
      * instance for the given component's type and then binds configuration data
@@ -280,9 +303,10 @@ public class RenderUtil
     {
         Component component = context.getModel().loadComponent(context,
                 componentId);
-        if(component == null)
-            throw new ComponentRenderException("Unable to locate component: " + componentId);
-        
+        if (component == null)
+            throw new ComponentRenderException(
+                    "Unable to locate component: " + componentId);
+
         try
         {
             // get the configuration for the component
@@ -295,10 +319,12 @@ public class RenderUtil
                     component);
             renderer.execute(context, request, response, config);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            throw new ComponentRenderException("An exception occurred while rendering component: " + componentId, ex);
-            
+            throw new ComponentRenderException(
+                    "An exception occurred while rendering component: " + componentId,
+                    ex);
+
         }
     }
 
@@ -346,88 +372,101 @@ public class RenderUtil
         }
     }
 
-    
-    
-    
     public static void appendHeadTags(RequestContext context, String tags)
     {
         getHeadTags(context).add(tags);
     }
-    
+
     public static List getHeadTags(RequestContext context)
     {
         List list = (List) context.getValue(RequestContext.VALUE_HEAD_TAGS);
-        if(list == null)
+        if (list == null)
         {
             list = new ArrayList();
             context.setValue(RequestContext.VALUE_HEAD_TAGS, list);
         }
         return list;
     }
-    
-    
-    
-    
-    
-       
 
-    public static String renderScriptImport(HttpServletRequest request, String src)
+    public static String renderScriptImport(RequestContext context, String src)
+    {
+        if (context instanceof HttpRequestContext)
+        {
+            HttpServletRequest request = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
+            return renderScriptImport(request, src);
+        }
+        return null;
+    }
+
+    public static String renderScriptImport(HttpServletRequest request,
+            String src)
+    {
+        return renderScriptImport(request, src, true);
+    }
+
+    public static String renderScriptImport(HttpServletRequest request,
+            String src, boolean includeQueryString)
     {
         String queryString = request.getQueryString();
         if (queryString != null && queryString.length() > 4)
             src = src + "?" + queryString;
-        
-        return renderScriptImport(src);
-    }
 
-    public static String renderScriptImport(String src)
-    {
         // make sure references resolve to the configured servlet
-        src = URLUtil.toBrowserUrl(src);
-        
+        src = URLUtil.browser(request, src);
+
         return "<script type=\"text/javascript\" src=\"" + src + "\"></script>";
     }
 
-    public static String renderLinkImport(String href)
+    public static String renderLinkImport(RequestContext context, String href)
     {
-        return renderLinkImport(href, null);
+        if (context instanceof HttpRequestContext)
+        {
+            HttpServletRequest request = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
+            return renderLinkImport(request, href, null, true);
+        }
+        return null;
     }
 
-    public static String renderLinkImport(String href, String id)
+    public static String renderLinkImport(RequestContext context, String href,
+            String id)
     {
+        if (context instanceof HttpRequestContext)
+        {
+            HttpServletRequest request = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
+            return renderLinkImport(request, href, id, true);
+        }
+        return null;
+    }
+
+    public static String renderLinkImport(HttpServletRequest request,
+            String href)
+    {
+        return renderLinkImport(request, href, null, true);
+    }
+
+    public static String renderLinkImport(HttpServletRequest request,
+            String href, String id, boolean includeQueryString)
+    {
+        if (includeQueryString)
+        {
+            String queryString = request.getQueryString();
+            if (queryString != null && queryString.length() > 4)
+                href = href + "?" + queryString;
+        }
+
         // make sure references resolve to the configured servlet
-        href = URLUtil.toBrowserUrl(href);
+        href = URLUtil.browser(request, href);
 
         String value = "<link ";
         if (id != null)
+        {
             value += "id=\"" + id + "\" ";
+        }
         value += "rel=\"stylesheet\" type=\"text/css\" href=\"" + href + "\"></link>";
-        
+
         return value;
     }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     protected static String getSourceId(RequestContext context, String scopeId)
     {
         // rendering objects
@@ -451,69 +490,106 @@ public class RenderUtil
         buffer.append(toAppend);
         buffer.append("\r\n"); // cosmetic
     }
-    
+
     // TODO: Introduce some caching for this
     protected static String generateHeader(RequestContext context)
     {
         StringBuffer buffer = new StringBuffer();
         appendBuffer(buffer, "");
 
+        String currentThemeId = ThemeUtil.getCurrentThemeId(context);
+        
+
+// TODO: Make this load from dynamic source
+        
         // CSS
-        appendBuffer(buffer, renderLinkImport("/extjs/resources/css/ext-all.css"));
-        appendBuffer(buffer, renderLinkImport("/ui/themes/builder/css/builder-default.css"));
+        appendBuffer(buffer, renderLinkImport(context,
+                "/extjs/resources/css/ext-all.css"));
+        appendBuffer(buffer, renderLinkImport(context,
+                "/ui/themes/builder/css/builder-default.css"));
 
         // Theme CSS
-        String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-        appendBuffer(buffer, renderLinkImport("/ui/themes/extjs/css/xtheme-" + currentThemeId + ".css", "extjs-theme-link"));
-        appendBuffer(buffer, renderLinkImport("/ui/themes/builder/css/builder-" + currentThemeId + ".css", "builder-theme-link"));
+        appendBuffer(buffer, renderLinkImport(context,
+                "/ui/themes/extjs/css/xtheme-" + currentThemeId + ".css",
+                "extjs-theme-link"));
+        appendBuffer(buffer, renderLinkImport(context,
+                "/ui/themes/builder/css/builder-" + currentThemeId + ".css",
+                "builder-theme-link"));
 
         // ExtJS things
-        appendBuffer(buffer, renderScriptImport("/extjs/adapter/ext/ext-base.js"));
-        appendBuffer(buffer, renderScriptImport("/extjs/ext-all.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/extjs/adapter/ext/ext-base.js"));
+        appendBuffer(buffer, renderScriptImport(context, "/extjs/ext-all.js"));
 
         // Custom JS things
-        appendBuffer(buffer, renderScriptImport("/ui/builder/utils/miframe-min.js"));
-        appendBuffer(buffer, renderScriptImport("/ui/builder/utils/json.js"));
-        appendBuffer(buffer, renderScriptImport("/ui/builder/dynamic.js.jsp"));
-        appendBuffer(buffer, renderScriptImport("/ui/builder/incontext.js.jsp"));
-        
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/utils/miframe-min.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/utils/json.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/dynamic.js.jsp"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/incontext.js.jsp"));
+
         // Web Components (in progress)
-        appendBuffer(buffer, renderScriptImport("/ui/builder/wizard-core.js"));
-        appendBuffer(buffer, renderScriptImport("/ui/builder/wizard-adapter-extjs.js"));
-        appendBuffer(buffer, renderScriptImport("/ui/builder/application.js"));
-        appendBuffer(buffer, renderScriptImport("/ui/builder/builder.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/wizard-core.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/wizard-adapter-extjs.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/application.js"));
+        appendBuffer(buffer, renderScriptImport(context,
+                "/ui/builder/builder.js"));
+// End TODO
 
-        // YUI things (for menus)
-        // This will be replaced by imports required specifically by
-        // the nav component
-        // and of course, the nav component will be rewritten
-        // to do away with YUI altogether!
-        //
-        //importScript("/yui/build/yahoo-dom-event/yahoo-dom-event.js", false);
-        //importScript("/yui/build/animation/animation-min.js", false);
-        //importScript("/yui/build/container/container-min.js", false);
-        //importScript("/yui/build/menu/menu.js", false);
+/*        
+        // Import the stuff that the global site requires
+        Document doc = context.getSiteConfiguration().getDocument();
+        if(doc != null)
+        {
+            Element headElement = doc.getRootElement().element("head");
+            if(headElement != null)
+            {
+                List requireList = headElement.elements("require");
+                for(int z = 0; z < requireList.size(); z++)
+                {
+                    Element requireElement = (Element) requireList.get(z);
+                    
 
+                    String link = requireElement.attributeValue("link");
+                    if(link != null && !"".equals(link))
+                    {
+                        String id = requireElement.attributeValue("id");
+                        
+                        appendBuffer(buffer, renderLinkImport(context, link, id));
+                    }
+
+                    String script = requireElement.attributeValue("script");
+                    if(script != null && !"".equals(script))
+                    {
+                        appendBuffer(buffer, renderScriptImport(context, script));
+                    }
+                }
+            }
+        }
+*/        
+        
         // Now import the stuff that the components on the page needed us to import
         List tagsList = RenderUtil.getHeadTags(context);
-        for(int i = 0; i < tagsList.size(); i++)
+        for (int i = 0; i < tagsList.size(); i++)
         {
             String tags = (String) tagsList.get(i);
             appendBuffer(buffer, tags);
         }
-        
+
         return buffer.toString();
     }
-    
-    
-    
-    
+
     protected static void print(HttpServletResponse response, String str)
-        throws IOException
+            throws IOException
     {
         response.getWriter().print(str);
     }
-    
 
     public static String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";
     public static String PAGE_HEAD_DEPENDENCIES_STAMP = "<!--${head}-->";

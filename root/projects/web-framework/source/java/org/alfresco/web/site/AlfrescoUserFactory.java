@@ -37,30 +37,29 @@ import org.alfresco.web.site.remote.ConnectorFactory;
  * 
  * @author muzquiano
  */
-public class AlfrescoUserFactory
-    extends UserFactory
+public class AlfrescoUserFactory extends UserFactory
 {
-    protected User loadUser(RequestContext context, HttpServletRequest request, String user_id)
-        throws Exception
+    protected User loadUser(RequestContext context, HttpServletRequest request,
+            String user_id) throws Exception
     {
         // TODO: Somehow get the endpoint id...
         String endpointId = "";
-        
+
         // Load the endpoint
         Endpoint endpoint = ModelUtil.getEndpoint(context, endpointId);
-        
+
         // Webscript to use
         String webscriptUri = "/service/user";
-        
+
         // Use the remote
         Connector conn = ConnectorFactory.newInstance(context, endpoint);
         Response response = conn.call(webscriptUri);
         String responseString = response.getResponse();
-        
+
         // This is a JSON response...
         // TODO: Load into JSON parser and work with it
         User user = new User(user_id);
-        
+
         return user;
     }
 }

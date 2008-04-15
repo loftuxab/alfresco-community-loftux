@@ -36,16 +36,16 @@ import org.alfresco.web.site.filesystem.IFileSystem;
 public final class ScriptFileSystem extends ScriptBase
 {
     protected IFileSystem fileSystem;
-    
+
     public ScriptFileSystem(IFileSystem fileSystem)
     {
         super();
-        this.fileSystem = fileSystem;        
+        this.fileSystem = fileSystem;
     }
-    
+
     protected ScriptFile wrapFile(IFile file)
     {
-        if(file == null)
+        if (file == null)
         {
             return null;
         }
@@ -54,55 +54,55 @@ public final class ScriptFileSystem extends ScriptBase
 
     protected Object[] wrapFiles(IFile[] files)
     {
-        if(files == null)
+        if (files == null)
         {
             return null;
         }
-        
+
         Object[] scriptFiles = new Object[files.length];
-        for(int i = 0; i < files.length; i++)
+        for (int i = 0; i < files.length; i++)
         {
             scriptFiles[i] = wrapFile(files[i]);
         }
-        
-        return scriptFiles;        
+
+        return scriptFiles;
     }
-    
+
     // API
-    
+
     public ScriptFile getRoot()
     {
         return wrapFile(fileSystem.getRoot());
     }
-    
+
     public ScriptFile getFile(String path)
     {
-        return wrapFile(fileSystem.getFile(path));        
+        return wrapFile(fileSystem.getFile(path));
     }
 
     public ScriptFile getFile(String path, String name)
     {
-        return wrapFile(fileSystem.getFile(path, name));        
+        return wrapFile(fileSystem.getFile(path, name));
     }
 
     public Object[] getFiles(String path)
     {
-        return wrapFiles(fileSystem.getFiles(path));        
+        return wrapFiles(fileSystem.getFiles(path));
     }
 
     public ScriptFile createFile(String relativePath)
     {
-        return wrapFile(fileSystem.createFile(relativePath));        
+        return wrapFile(fileSystem.createFile(relativePath));
     }
 
     public ScriptFile createFile(String relativeDirectoryPath, String fileName)
     {
-        return wrapFile(fileSystem.createFile(relativeDirectoryPath, fileName));        
+        return wrapFile(fileSystem.createFile(relativeDirectoryPath, fileName));
     }
 
     public boolean deleteFile(String relativePath)
     {
-        return fileSystem.deleteFile(relativePath);        
+        return fileSystem.deleteFile(relativePath);
     }
 
     public boolean deleteFile(String relativeDirectoryPath, String fileName)
@@ -114,22 +114,20 @@ public final class ScriptFileSystem extends ScriptBase
     {
         return wrapFile(fileSystem.getParent(path));
     }
-    
-    
-    
+
     // inner classes
-    
+
     public class ScriptFile implements Serializable
     {
         public ScriptFileSystem scriptFileSystem;
         public IFile file;
-        
+
         public ScriptFile(ScriptFileSystem scriptFileSystem, IFile file)
         {
             this.scriptFileSystem = scriptFileSystem;
             this.file = file;
         }
-        
+
         public String getName()
         {
             return file.getName();
@@ -159,7 +157,7 @@ public final class ScriptFileSystem extends ScriptBase
         {
             return file.isFile();
         }
-        
+
         public boolean isDirectory()
         {
             return !file.isFile();
@@ -169,45 +167,45 @@ public final class ScriptFileSystem extends ScriptBase
         {
             return file.getModificationDate();
         }
-        
+
         public String readContents()
         {
-            return file.readContents();            
+            return file.readContents();
         }
-        
+
         public void writeContents(String contents)
         {
-            file.writeContents(contents);            
+            file.writeContents(contents);
         }
-        
+
         // for directories
-        
+
         public Object[] getChildren()
         {
-            if(file.isFile())
+            if (file.isFile())
             {
                 return null;
             }
-            
-            IFile[] files = ((IDirectory)file).getChildren();
+
+            IFile[] files = ((IDirectory) file).getChildren();
             return scriptFileSystem.wrapFiles(files);
         }
 
         public ScriptFile getChild(String name)
         {
-            if(file.isFile())
+            if (file.isFile())
             {
                 return null;
             }
-            
-            IFile child = ((IDirectory)file).getChild(name);
+
+            IFile child = ((IDirectory) file).getChild(name);
             return scriptFileSystem.wrapFile(child);
         }
 
         public ScriptFile createFile(String name)
         {
-            return scriptFileSystem.createFile(file.getPath(), name);            
+            return scriptFileSystem.createFile(file.getPath(), name);
         }
-        
+
     }
 }

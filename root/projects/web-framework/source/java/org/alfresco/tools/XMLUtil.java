@@ -135,11 +135,11 @@ public class XMLUtil
 
     public static String toXML(Document document, boolean pretty)
     {
-        if(pretty)
+        if (pretty)
         {
-            OutputFormat format = OutputFormat.createPrettyPrint();            
+            OutputFormat format = OutputFormat.createPrettyPrint();
             format.setSuppressDeclaration(false);
-            
+
             StringWriter writer = new StringWriter();
             XMLWriter xmlWriter = new XMLWriter(writer, format);
             try
@@ -148,15 +148,15 @@ public class XMLUtil
                 xmlWriter.flush();
                 return writer.toString();
             }
-            catch(IOException ioe)
+            catch (IOException ioe)
             {
                 // if this fails, we'll just opt out and let it serialize
                 // in the default way (which is compact)
                 ioe.printStackTrace();
             }
         }
-        
+
         return document.asXML();
     }
-    
+
 }

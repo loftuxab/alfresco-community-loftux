@@ -22,57 +22,68 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site.parser.tags;
+
+package org.alfresco.tools;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.Servlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.PageContext;
 import javax.servlet.jsp.el.ExpressionEvaluator;
 import javax.servlet.jsp.el.VariableResolver;
-import javax.servlet.jsp.tagext.BodyContent;
 
-import org.alfresco.web.site.FilterContext;
+import org.alfresco.web.site.RequestUtil;
 
 /**
- * The PageContext implementation used when pages are being interpreted
- * by PageTokenizer.  It wraps a FilterContext, and provides all of the scoped
- * accessors, as well as an output stream and forward and include capabilities.
- * 
+ * Fake Jsp PageContext implementation which wraps predescribed HTTP objects
+ *
  * @author muzquiano
  */
-public class JspPageContextImpl extends PageContext
+public class FakeJspPageContext
+	extends PageContext
 {
-    public JspPageContextImpl(FilterContext cxt, JspWriter out)
+    protected Exception exception;
+	protected Map<String, Object> values;
+	protected ServletContext context;
+	protected HttpServletRequest request;
+	protected HttpServletResponse response;
+	protected JspWriter out;
+	
+    public FakeJspPageContext(ServletContext context, HttpServletRequest request, HttpServletResponse response, JspWriter out)
     {
-        this.cxt = cxt;
-        this.out = out;
-        session = cxt.getRequest().getSession(true);
+    	this.context = context;
+    	this.request = request;
+    	this.response = response;
+    	this.out = out;
     }
 
     public ServletRequest getRequest()
     {
-        return cxt.getRequest();
+    	return this.request;
     }
 
     public ServletResponse getResponse()
     {
-        return cxt.getResponse();
+    	return this.response;
     }
 
     public ServletContext getServletContext()
     {
-        return cxt.getServletContext();
+    	return this.context;
     }
 
     public ServletConfig getServletConfig()
@@ -80,17 +91,14 @@ public class JspPageContextImpl extends PageContext
         return null;
     }
 
-    /**
-     * Get the current Writer for output.  May be a BodyContent object if pushBody has been called.
-     */
     public JspWriter getOut()
     {
-        return out;
+        return this.out;
     }
 
     public HttpSession getSession()
     {
-        return session;
+    	return this.request.getSession();
     }
 
     public Object findAttribute(String name)
@@ -112,7 +120,7 @@ public class JspPageContextImpl extends PageContext
 
     public Object getAttribute(String name)
     {
-        return cxt.getValue(name);
+    	return findAttribute(name);
     }
 
     public Object getAttribute(String name, int scope)
@@ -120,26 +128,26 @@ public class JspPageContextImpl extends PageContext
         switch (scope)
         {
             case APPLICATION_SCOPE:
-                return cxt.getServletContext().getAttribute(name);
+                return getServletContext().getAttribute(name);
             case REQUEST_SCOPE:
-                Object ret = cxt.getRequest().getAttribute(name);
+                Object ret = getRequest().getAttribute(name);
                 if (ret == null)
-                    ret = cxt.getRequest().getParameter(name);
+                    ret = getRequest().getParameter(name);
                 return ret;
             case SESSION_SCOPE:
-                if (session != null)
-                    return session.getValue(name);
+                if (getSession() != null)
+                    return getSession().getAttribute(name);
                 else
                     return null;
             case PAGE_SCOPE:
-                return cxt.getValue(name);
+                return getValue(name);
         }
         return null;
     }
 
     public void setAttribute(String name, Object obj)
     {
-        cxt.setValue(name, obj);
+    	setValue(name, obj);
     }
 
     public void setAttribute(String name, Object obj, int scope)
@@ -147,24 +155,24 @@ public class JspPageContextImpl extends PageContext
         switch (scope)
         {
             case APPLICATION_SCOPE:
-                cxt.getServletContext().setAttribute(name, obj);
+                getServletContext().setAttribute(name, obj);
                 break;
             case REQUEST_SCOPE:
-                cxt.getRequest().setAttribute(name, obj);
+                getRequest().setAttribute(name, obj);
                 break;
             case SESSION_SCOPE:
-                if (session != null)
-                    session.putValue(name, obj);
+                if (getSession() != null)
+                    getSession().setAttribute(name, obj);
                 break;
             case PAGE_SCOPE:
-                cxt.setValue(name, obj);
+                setValue(name, obj);
                 break;
         }
     }
 
     public void removeAttribute(String name)
     {
-        cxt.removeValue(name);
+        removeValue(name);
     }
 
     public void removeAttribute(String name, int scope)
@@ -172,16 +180,17 @@ public class JspPageContextImpl extends PageContext
         switch (scope)
         {
             case APPLICATION_SCOPE:
-                cxt.getServletContext().removeAttribute(name);
+                getServletContext().removeAttribute(name);
                 break;
             case REQUEST_SCOPE:
+            	getRequest().removeAttribute(name);
                 break;
             case SESSION_SCOPE:
-                if (session != null)
-                    session.removeValue(name);
+                if (getSession() != null)
+                    getSession().removeAttribute(name);
                 break;
             case PAGE_SCOPE:
-                cxt.removeValue(name);
+                removeValue(name);
                 break;
         }
     }
@@ -191,44 +200,30 @@ public class JspPageContextImpl extends PageContext
         switch (scope)
         {
             case APPLICATION_SCOPE:
-                return cxt.getServletContext().getAttributeNames();
+                return getServletContext().getAttributeNames();
             case REQUEST_SCOPE:
-                return cxt.getRequest().getAttributeNames();
+                return getRequest().getAttributeNames();
             case SESSION_SCOPE:
-                if (session != null)
-                {
-                    String names[] = session.getValueNames();
-                    ArrayList namearray = new ArrayList();
-                    for (int i = 0; i < names.length; i++)
-                        namearray.add(names[i]);
-                    return java.util.Collections.enumeration(namearray);
-                }
-                else
-                    return null;
+            	return getSession().getAttributeNames();
             case PAGE_SCOPE:
-                return cxt.getNames();
+                return getValueNames();
         }
         return null;
     }
 
     public int getAttributesScope(String name)
     {
-        if (cxt.getValue(name) != null)
+        if (getValue(name) != null)
             return PAGE_SCOPE;
 
         // allow request attributes to override request parameters
-        if (cxt.getRequest().getAttribute(name) != null)
+        if (getRequest().getAttribute(name) != null)
             return REQUEST_SCOPE;
-        if (cxt.getRequest().getParameter(name) != null)
+        if (getRequest().getParameter(name) != null)
             return REQUEST_SCOPE;
-
-        if (session != null)
-        {
-            if (session.getValue(name) != null)
-                return SESSION_SCOPE;
-        }
-
-        if (cxt.getServletContext().getAttribute(name) != null)
+        if (getSession().getAttribute(name) != null)
+            return SESSION_SCOPE;
+        if (getServletContext().getAttribute(name) != null)
             return APPLICATION_SCOPE;
 
         return 0;
@@ -236,60 +231,30 @@ public class JspPageContextImpl extends PageContext
 
     public void forward(String url) throws ServletException, IOException
     {
-        // use servlet RequestDispatcher mechanism
-        RequestDispatcher disp = cxt.getServletContext().getRequestDispatcher(
-                url);
-        disp.forward(cxt.getRequest(), cxt.getResponse());
+    	RequestUtil.forward(getServletContext(), getRequest(), getResponse(), url);    	
     }
 
     public void include(String url) throws ServletException, IOException
     {
-        include(url, false);
+    	include(url, true);
     }
 
     public void include(String url, boolean b) throws ServletException,
             IOException
     {
-        // use servlet RequestDispatcher mechanism
-        RequestDispatcher disp = cxt.getServletContext().getRequestDispatcher(
-                url);
+    	RequestUtil.include(getServletContext(), getRequest(), getResponse(), url);
+    	
         // make sure everything is flushed before doing an include -- important for included JSP files
         flushOut();
-
-        disp.include(cxt.getRequest(), cxt.getResponse());
     }
 
     public void flushOut() throws java.io.IOException
     {
-        if (out instanceof JspWriterImpl)
-        {
-            // make sure ALL output is flushed
-            ((JspWriterImpl) out).flushAll();
-        }
-        else
-        {
-            out.flush();
-        }
+    	out.flush();
     }
 
     public void release()
     {
-        cxt = null;
-        session = null;
-        out = null;
-        error = null;
-    }
-
-    public BodyContent pushBody()
-    {
-        // the push is just passed through to the JspWriter
-        return ((JspWriterImpl) out).pushWriter();
-    }
-
-    public JspWriter popBody()
-    {
-        // the pop is just passed through to the JspWriter
-        return ((JspWriterImpl) out).popWriter();
     }
 
     public ExpressionEvaluator getExpressionEvaluator()
@@ -306,22 +271,18 @@ public class JspPageContextImpl extends PageContext
 
     public void handlePageException(Throwable t)
     {
-        // TODO: Work it
+    	// TODO?
     }
 
     public void handlePageException(Exception e)
     {
-        error = e;
+        exception = e;
     }
 
     public Exception getException()
     {
-        Exception e = error;
-        error = null;
-        return e;
+    	return exception;
     }
-
-    // dummy methods
 
     public Object getPage()
     {
@@ -332,9 +293,43 @@ public class JspPageContextImpl extends PageContext
             ServletResponse res, String s1, boolean b1, int i1, boolean b2)
     {
     }
+    
+    
+    // local page context helper methods
+    
+    protected Object getValue(String key)
+    {
+    	if(values == null)
+    		values = new HashMap<String, Object>();
+    	return values.get(key);
+    }
+    
+    protected void setValue(String key, Object value)
+    {
+    	if(values == null)
+    		values = new HashMap<String, Object>();
+    	values.put(key, value);
+    }
+    
+    protected void removeValue(String key)
+    {
+    	if(values == null)
+    		values = new HashMap<String, Object>();
+    	values.remove(key);
+    }
+    
+    protected Enumeration getValueNames()
+    {
+    	ArrayList<Object> array = new ArrayList<Object>();
 
-    private FilterContext cxt;
-    private HttpSession session;
-    private JspWriter out;
-    private Exception error;
+    	Iterator it = values.keySet().iterator();
+    	while(it.hasNext())
+    	{
+    		array.add(it.next());
+    	}
+
+    	return java.util.Collections.enumeration(array);
+    }
+
+
 }
