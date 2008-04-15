@@ -305,6 +305,9 @@ public class PageInstance
                      // ensure we render each path once only - no script/css duplicates
                      if (paths.contains(path) == false && processor.hasTemplate(path))
                      {
+                        // add the 'htmlid' for the component so it is available to script writers
+                        model.put(PageComponent.PROP_HTMLID, component.getId());
+                        // render the head template for this component
                         processor.process(path, model, writer);
                      }
                      paths.add(path);

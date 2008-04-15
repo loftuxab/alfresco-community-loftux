@@ -209,7 +209,7 @@ public class RegionDirective implements TemplateDirectiveModel
                   // write an ID into the div element - this can be used by the component writer
                   env.getOut().write("<div id='" + component.getId() + "'>");
                   // inform the component writer of the element id via 'htmlid' component properties
-                  component.getProperties().put("htmlid", component.getId());
+                  component.getProperties().put(PageComponent.PROP_HTMLID, component.getId());
                   break;
                case IFRAME:
                   // TODO: token context replacement on the URL here?
