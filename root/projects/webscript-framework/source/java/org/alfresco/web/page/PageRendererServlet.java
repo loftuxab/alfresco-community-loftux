@@ -77,6 +77,7 @@ public class PageRendererServlet extends WebScriptServlet
    static final String PARAM_COMPONENT_URL = "_alfUrl";
    
    private PresentationTemplateProcessor templateProcessor;
+   private PresentationTemplateProcessor webScriptsTemplateProcessor;
    private PresentationScriptProcessor scriptProcessor;
    private Registry webscriptsRegistry;
    private Store pageStore;
@@ -106,6 +107,7 @@ public class PageRendererServlet extends WebScriptServlet
       templateConfigStore = (Store)context.getBean("pagerenderer.templateconfigstore");
       templateConfigStore.init();
       templateProcessor = (PresentationTemplateProcessor)context.getBean("pagerenderer.templateprocessor");
+      webScriptsTemplateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
       scriptProcessor = (PresentationScriptProcessor)context.getBean("webscripts.web.scriptprocessor");
       
       // we use a specific config service instance
@@ -402,7 +404,7 @@ public class PageRendererServlet extends WebScriptServlet
       model.put("description", page.getDescription());
       model.put("title", page.getTitle());
       model.put("theme", page.getTheme());
-      model.put("head", page.getHeaderRenderer(webscriptsRegistry, templateProcessor, urlHelper));
+      model.put("head", page.getHeaderRenderer(webscriptsRegistry, webScriptsTemplateProcessor, urlHelper));
       
       // add the custom 'region' directive implementation - one instance per model as we pass in template/page 
       model.put("region", new RegionDirective(context, componentStore, componentCache, page, active));
