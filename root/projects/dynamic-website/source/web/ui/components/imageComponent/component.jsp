@@ -19,7 +19,7 @@
 	String renderString = null;
 	if(imageLocation != null && !"".equals(imageLocation))
 	{
-		imageLocation = URLUtil.toBrowserUrl(imageLocation);
+		imageLocation = URLUtil.browser(context, imageLocation);
 		renderString = "<img src=\"" + imageLocation + "\" ";
 		if(width != null)
 			renderString += " width=\"" + width + "\"";
@@ -34,7 +34,7 @@
 	if(renderString == null)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-		String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+		String unconfiguredImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
 		renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component'/>";
 	}
 %>

@@ -138,35 +138,6 @@ function dialogButtonHandler(item, e)
  **  DEFAULT DIALOG (FOR BASIC FORMS)
  ****************************************/
 
-/*
-function focusWindow(data, window)
-{
-	if(data.focus != null)
-	{
-		var focusId = data.focus.id;
-		var selectText = data.focus.selectText;
-		//var focusCls = data.focus.focusCls;
-		
-		if(window.items != null)
-		{
-			var fp = window.items.item(0);
-			if(fp.items.length > 0)
-			{
-				for(var i = 0; i < fp.items.length; i++)
-				{
-					var elementName = fp.items.item(i).name;
-					if(elementName == focusId)
-					{
-						var component = fp.items.item(i);
-						component.focus();
-					}
-				}
-			}
-		}
-	}
-}
-*/
-
 function DefaultDialog(id, initialUri)
 {
 	this.id = id;
@@ -584,6 +555,7 @@ function DefaultDialog(id, initialUri)
 
 		if(current.dialogtype == "url")
 		{
+			current.url = toBrowser(current.url);
 			config["items"] = new Ext.ux.ManagedIframePanel({defaultSrc: current.url, iframeStyle: "iframeStyle1" });
 		}
 

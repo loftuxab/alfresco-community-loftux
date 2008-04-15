@@ -86,7 +86,7 @@
 	
 	// Stylesheet
 	String stylesheetUri = "/ui/components/navComponent/renderers/verticalNav1/default/menu.css";
-	stylesheetUri = URLUtil.toBrowserUrl(stylesheetUri);
+	stylesheetUri = URLUtil.browser(context, stylesheetUri);
 	
 %>
 	<link rel="stylesheet" type="text/css" href="<%=stylesheetUri%>"/>
