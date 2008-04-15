@@ -1,8 +1,10 @@
+<%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
+	RequestContext context = RequestUtil.getRequestContext(request);
 	String pageId = (String) request.getAttribute("error-pageId");
 	Throwable t = (Throwable) request.getAttribute("error");
 	if(t != null)
@@ -11,8 +13,8 @@
 
 <!-- allows the error to be expanded and viewed -->
 <%
-	String collapsedImage = org.alfresco.web.site.URLUtil.toBrowserUrl("/ui/images/misc/collapsed.gif");
-	String expandedImage = org.alfresco.web.site.URLUtil.toBrowserUrl("/ui/images/misc/expanded.gif");
+	String collapsedImage = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/misc/collapsed.gif");
+	String expandedImage = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/misc/expanded.gif");
 %>	
 <script language="Javascript">
 var display = false;

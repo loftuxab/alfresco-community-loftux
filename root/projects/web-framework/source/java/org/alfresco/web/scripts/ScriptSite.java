@@ -51,7 +51,7 @@ public final class ScriptSite extends ScriptBase
 {
     protected ScriptFileSystem rootFileSystem;
     protected ScriptFileSystem modelFileSystem;
-    
+
     public ScriptSite(RequestContext context)
     {
         super(context);
@@ -64,26 +64,27 @@ public final class ScriptSite extends ScriptBase
         ModelObject modelObject = context.getRootPage();
         return toScriptModelObject(context, modelObject);
     }
-    
-    
+
     public ScriptFileSystem getFileSystem()
     {
-        if(rootFileSystem == null)
-            rootFileSystem = new ScriptFileSystem(getRequestContext().getFileSystem());
+        if (rootFileSystem == null)
+            rootFileSystem = new ScriptFileSystem(
+                    getRequestContext().getFileSystem());
         return rootFileSystem;
     }
 
     public ScriptFileSystem getModelFileSystem()
     {
-        if(modelFileSystem == null)
-            modelFileSystem = new ScriptFileSystem(getRequestContext().getModel().getFileSystem());
+        if (modelFileSystem == null)
+            modelFileSystem = new ScriptFileSystem(
+                    getRequestContext().getModel().getFileSystem());
         return modelFileSystem;
     }
 
     public String callEndpoint(String endpointId, String uri)
     {
         Endpoint endpoint = ModelUtil.getEndpoint(context, endpointId);
-        if(endpoint == null)
+        if (endpoint == null)
         {
             return null;
         }
@@ -94,7 +95,7 @@ public final class ScriptSite extends ScriptBase
         ep.append(endpoint.getSetting("host"));
         ep.append(":");
         ep.append(endpoint.getSetting("port"));
-        
+
         String endpointString = ep.toString();
         String user = endpoint.getSetting("username");
         String pass = endpoint.getSetting("password");
@@ -102,21 +103,21 @@ public final class ScriptSite extends ScriptBase
         return callRemote(endpointString, user, pass, uri);
     }
 
-    public String callRemote(String endpointString, String user, String pass, String uri)
+    public String callRemote(String endpointString, String user, String pass,
+            String uri)
     {
         ScriptRemote remote = new ScriptRemote(endpointString, null);
         remote.setUsernamePassword(user, pass);
-        
+
         Response r = remote.call(uri);
         return r.getResponse();
     }
-    
-    
+
     public RequestContext getRequestContext()
     {
         return context;
     }
-        
+
     //
     // Arrays
     //
@@ -262,8 +263,7 @@ public final class ScriptSite extends ScriptBase
 
     public ScriptModelObject newComponentType()
     {
-        ModelObject modelObject = Framework.getModel().newComponentType(
-                context);
+        ModelObject modelObject = Framework.getModel().newComponentType(context);
         return toScriptModelObject(context, modelObject);
     }
 
@@ -307,15 +307,13 @@ public final class ScriptSite extends ScriptBase
 
     public ScriptModelObject newTemplate()
     {
-        Template template = (Template) Framework.getModel().newTemplate(
-                context);
+        Template template = (Template) Framework.getModel().newTemplate(context);
         return toScriptModelObject(context, template);
     }
 
     public ScriptModelObject newTemplate(String templateType)
     {
-        Template template = (Template) Framework.getModel().newTemplate(
-                context);
+        Template template = (Template) Framework.getModel().newTemplate(context);
         template.setTemplateType(templateType);
         return toScriptModelObject(context, template);
     }
@@ -323,8 +321,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject newTemplate(String templateType, String name,
             String description)
     {
-        Template template = (Template) Framework.getModel().newTemplate(
-                context);
+        Template template = (Template) Framework.getModel().newTemplate(context);
         template.setTemplateType(templateType);
         template.setName(name);
         template.setDescription(description);
@@ -529,18 +526,17 @@ public final class ScriptSite extends ScriptBase
         return null;
     }
 
-    
     // helper methods
     public String encode(String input)
     {
         return EncodingUtil.encode(input);
     }
-    
+
     public String encode(String input, String encoding)
     {
         return EncodingUtil.encode(input, encoding);
     }
-    
+
     public String decode(String input)
     {
         return EncodingUtil.decode(input);
@@ -549,5 +545,5 @@ public final class ScriptSite extends ScriptBase
     public String decode(String input, String encoding)
     {
         return EncodingUtil.decode(input, encoding);
-    }    
+    }
 }

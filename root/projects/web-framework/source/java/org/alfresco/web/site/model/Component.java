@@ -38,7 +38,7 @@ public class Component extends ModelObject
     public static String PROP_SCOPE = "scope";
     public static String PROP_COMPONENT_TYPE_ID = "component-type-id";
     public static String PROP_FRAME_TYPE = "frame-type";
-    
+
     public Component(Document document)
     {
         super(document);
@@ -83,12 +83,12 @@ public class Component extends ModelObject
     {
         setProperty(PROP_COMPONENT_TYPE_ID, componentTypeId);
     }
-    
+
     public String getFrameType()
     {
         return getProperty(PROP_FRAME_TYPE);
     }
-    
+
     public void setFrameType(String frameType)
     {
         setProperty(PROP_FRAME_TYPE, frameType);
@@ -110,7 +110,7 @@ public class Component extends ModelObject
                 getComponentTypeId());
     }
 
-    public String getTypeName() 
+    public String getTypeName()
     {
         return TYPE_NAME;
     }

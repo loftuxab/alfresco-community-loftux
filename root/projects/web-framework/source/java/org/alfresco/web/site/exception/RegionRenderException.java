@@ -33,7 +33,7 @@ public class RegionRenderException extends Exception
     {
         super(message);
     }
-    
+
     public RegionRenderException(String message, Exception ex)
     {
         super(message, ex);

@@ -49,6 +49,7 @@ public class ComponentDispatcherServlet extends DispatcherServlet
 
         String componentId = (String) request.getParameter("componentId");
 
-        PresentationUtil.renderComponent(context, request, response, componentId);
+        PresentationUtil.renderComponent(context, request, response,
+                componentId);
     }
 }

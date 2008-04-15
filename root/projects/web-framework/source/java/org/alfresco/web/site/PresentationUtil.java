@@ -55,18 +55,21 @@ public class PresentationUtil
      * @param response
      * @param dispatchPath
      */
-    public static void renderJspPage(RequestContext context, HttpServletRequest request, HttpServletResponse response, String dispatchPath)
+    public static void renderJspPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String dispatchPath)
     {
         try
         {
             RenderUtil.renderJspPage(context, request, response, dispatchPath);
         }
-        catch(JspRenderException ex)
+        catch (JspRenderException ex)
         {
-            handlePageRenderProblem(context, request, response, ex, dispatchPath);
-        }        
+            handlePageRenderProblem(context, request, response, ex,
+                    dispatchPath);
+        }
     }
-    
+
     /**
      * Renders the current page
      * 
@@ -81,10 +84,11 @@ public class PresentationUtil
         {
             RenderUtil.renderPage(context, request, response);
         }
-        catch(PageRenderException ex)
+        catch (PageRenderException ex)
         {
-            handlePageRenderProblem(context, request, response, ex, context.getCurrentPage().getId());
-        }        
+            handlePageRenderProblem(context, request, response, ex,
+                    context.getCurrentPage().getId());
+        }
     }
 
     /**
@@ -103,10 +107,10 @@ public class PresentationUtil
         {
             RenderUtil.renderTemplate(context, request, response, templateId);
         }
-        catch(TemplateRenderException ex)
+        catch (TemplateRenderException ex)
         {
             handlePageRenderProblem(context, request, response, ex, templateId);
-        }                
+        }
     }
 
     public static void renderRegion(RequestContext context,
@@ -115,14 +119,16 @@ public class PresentationUtil
     {
         try
         {
-            RenderUtil.renderRegion(context, request, response, templateId, regionId, regionScopeId);
+            RenderUtil.renderRegion(context, request, response, templateId,
+                    regionId, regionScopeId);
         }
-        catch(RegionRenderException ex)
+        catch (RegionRenderException ex)
         {
-            handleRegionRenderProblem(context, request, response, ex, templateId, regionId, regionScopeId);
-        }                
+            handleRegionRenderProblem(context, request, response, ex,
+                    templateId, regionId, regionScopeId);
+        }
     }
-    
+
     public static void renderComponent(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String componentId)
@@ -131,17 +137,18 @@ public class PresentationUtil
         {
             RenderUtil.renderComponent(context, request, response, componentId);
         }
-        catch(ComponentRenderException ex)
+        catch (ComponentRenderException ex)
         {
-            handleComponentRenderProblem(context, request, response, ex, componentId);
-        }                        
+            handleComponentRenderProblem(context, request, response, ex,
+                    componentId);
+        }
     }
-    
-    
-    
+
     // pretty methods
 
-    protected static void handlePageRenderProblem(RequestContext context, HttpServletRequest request, HttpServletResponse response, Throwable t, String pageId)
+    protected static void handlePageRenderProblem(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            Throwable t, String pageId)
     {
         // log the error
         context.getLogger().error("A Page Rendering problem was handled");
@@ -152,18 +159,21 @@ public class PresentationUtil
         {
             request.setAttribute("error", t);
             request.setAttribute("error-pageId", pageId);
-            
+
             String dispatchPath = "/ui/core/page-error.jsp";
             RequestUtil.include(request, response, dispatchPath);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            context.getLogger().error("Unable to include presentation for page error");
+            context.getLogger().error(
+                    "Unable to include presentation for page error");
             context.getLogger().error(ex);
         }
     }
 
-    protected static void handleTemplateRenderProblem(RequestContext context, HttpServletRequest request, HttpServletResponse response, Throwable t, String templateId)
+    protected static void handleTemplateRenderProblem(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            Throwable t, String templateId)
     {
         // log the error
         context.getLogger().error("A Template Rendering problem was handled");
@@ -173,18 +183,22 @@ public class PresentationUtil
         {
             request.setAttribute("error", t);
             request.setAttribute("error-templateId", templateId);
-            
+
             String dispatchPath = "/ui/core/template-error.jsp";
             RequestUtil.include(request, response, dispatchPath);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            context.getLogger().error("Unable to include presentation for template error");
+            context.getLogger().error(
+                    "Unable to include presentation for template error");
             context.getLogger().error(ex);
         }
     }
 
-    protected static void handleRegionRenderProblem(RequestContext context, HttpServletRequest request, HttpServletResponse response, Throwable t, String templateId, String regionId, String regionScopeId)
+    protected static void handleRegionRenderProblem(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            Throwable t, String templateId, String regionId,
+            String regionScopeId)
     {
         // log the error
         context.getLogger().error("A Region Rendering problem was handled");
@@ -198,18 +212,21 @@ public class PresentationUtil
             request.setAttribute("error-templateId", templateId);
             request.setAttribute("error-regionId", regionId);
             request.setAttribute("error-regionScopeId", regionScopeId);
-            
+
             String dispatchPath = "/ui/core/region-error.jsp";
             RequestUtil.include(request, response, dispatchPath);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            context.getLogger().error("Unable to include presentation for region error");
+            context.getLogger().error(
+                    "Unable to include presentation for region error");
             context.getLogger().error(ex);
         }
     }
 
-    protected static void handleComponentRenderProblem(RequestContext context, HttpServletRequest request, HttpServletResponse response, Throwable t, String componentId)
+    protected static void handleComponentRenderProblem(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            Throwable t, String componentId)
     {
         // log the error
         context.getLogger().error("A Component Rendering problem was handled");
@@ -219,15 +236,16 @@ public class PresentationUtil
         {
             request.setAttribute("error", t);
             request.setAttribute("error-componentId", componentId);
-            
+
             String dispatchPath = "/ui/core/component-error.jsp";
             RequestUtil.include(request, response, dispatchPath);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
-            context.getLogger().error("Unable to include presentation for region error");
+            context.getLogger().error(
+                    "Unable to include presentation for region error");
             context.getLogger().error(ex);
         }
     }
-    
+
 }

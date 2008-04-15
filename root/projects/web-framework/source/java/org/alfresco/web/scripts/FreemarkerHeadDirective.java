@@ -42,31 +42,30 @@ import freemarker.template.TemplateModel;
  * @author Michael Uzquiano
  */
 public class FreemarkerHeadDirective extends FreemarkerTagSupportDirective
-{   
-   public FreemarkerHeadDirective(RequestContext context)
-   {
-       super(context);
-   }
-      
-   public void execute(Environment env, Map params, TemplateModel[] loopVars, TemplateDirectiveBody body)
-         throws TemplateException, IOException
-   {
-       // the tag we want to execute
-       HeadTag tag = new HeadTag();
-       
-       // execute the tag
-       String output = executeTag(tag);
-       
-       // commit the output
-       try
-       {
-           env.getOut().write(output);
-           env.getOut().flush();
-       }
-       catch(Exception ex)
-       {
-           ex.printStackTrace();
-       }
-   }
+{
+    public FreemarkerHeadDirective(RequestContext context)
+    {
+        super(context);
+    }
+
+    public void execute(Environment env, Map params, TemplateModel[] loopVars,
+            TemplateDirectiveBody body) throws TemplateException, IOException
+    {
+        // the tag we want to execute
+        HeadTag tag = new HeadTag();
+
+        // execute the tag
+        String output = executeTag(tag);
+
+        // commit the output
+        try
+        {
+            env.getOut().write(output);
+            env.getOut().flush();
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
 }
- 

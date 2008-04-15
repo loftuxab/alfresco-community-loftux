@@ -60,7 +60,8 @@ public class WebScriptFrameworkFilter implements Filter
         super();
     }
 
-    public static void initFramework(ServletContext servletContext, ApplicationContext context)
+    public static void initFramework(ServletContext servletContext,
+            ApplicationContext context)
     {
         synchronized (WebScriptFrameworkFilter.class)
         {
@@ -71,15 +72,17 @@ public class WebScriptFrameworkFilter implements Filter
                 Config config = configService.getConfig("WebFramework");
 
                 // set the config onto the framework
-                WebScriptFrameworkConfig webFrameworkConfig = new WebScriptFrameworkConfig(config);
+                WebScriptFrameworkConfig webFrameworkConfig = new WebScriptFrameworkConfig(
+                        config);
                 Framework.setConfig(webFrameworkConfig);
-                
+
                 // set the model onto the framework
                 String modelRootPath = webFrameworkConfig.getModelRootPath();
-                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(servletContext, modelRootPath);
+                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(
+                        servletContext, modelRootPath);
                 IModel model = new DefaultModel(modelFileSystem);
                 Framework.setModel(model);
-                
+
                 System.out.println("WebScriptFrameworkFilter - Initialized WebScript Framework");
             }
         }

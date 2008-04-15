@@ -46,21 +46,21 @@ public abstract class AbstractRenderable implements Renderable
             throw new RendererExecutionException(ex);
         }
     }
-    
+
     public void appendHeadTags(RequestContext context, String tags)
     {
         RenderUtil.appendHeadTags(context, tags);
     }
-    
+
     public void setRenderer(String renderer)
     {
         this.renderer = renderer;
     }
-    
+
     public String getRenderer()
     {
         return this.renderer;
     }
-    
+
     protected String renderer;
 }

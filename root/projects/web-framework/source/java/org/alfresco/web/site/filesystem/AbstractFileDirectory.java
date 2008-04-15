@@ -78,17 +78,17 @@ public abstract class AbstractFileDirectory implements IFile
     {
         return this.fileSystem.createFile(this.getPath(), name);
     }
-    
+
     public byte[] readBytes()
     {
         byte[] array = null;
 
-        if(this.isFile())
-        {        
+        if (this.isFile())
+        {
             try
             {
                 InputStream is = getInputStream();
-    
+
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 int data = 0;
                 while ((data = is.read()) != -1)
@@ -96,20 +96,20 @@ public abstract class AbstractFileDirectory implements IFile
                     baos.write(data);
                 }
                 baos.close();
-    
+
                 array = baos.toByteArray();
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();                
+                ex.printStackTrace();
             }
         }
         return array;
     }
-    
+
     public void writeBytes(byte[] array)
     {
-        if(this.isFile())
+        if (this.isFile())
         {
             try
             {
@@ -121,34 +121,30 @@ public abstract class AbstractFileDirectory implements IFile
             {
                 ex.printStackTrace();
             }
-        }        
+        }
     }
-    
+
     public String readContents()
     {
         byte[] array = readBytes();
-        return new String(array);        
+        return new String(array);
     }
-    
+
     public void writeContents(String contents)
     {
         byte[] array = contents.getBytes();
-        writeBytes(array);        
+        writeBytes(array);
     }
-    
-    
+
     public InputStream getInputStream() throws Exception
     {
         return this.fileSystem.getInputStream(this);
     }
-    
+
     public OutputStream getOutputStream() throws Exception
     {
         return this.fileSystem.getOutputStream(this);
     }
-    
-    
-    
 
     protected IFileSystem fileSystem;
 }

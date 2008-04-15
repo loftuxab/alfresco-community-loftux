@@ -45,7 +45,7 @@ public class WrappedHttpServletResponse extends HttpServletResponseWrapper
 
     private PrintWriter printWriter = null;
     private ByteArrayOutputStream outputStream = null;
-    
+
     public PrintWriter getWriter() throws IOException
     {
         // return this instead of the output stream
@@ -57,5 +57,5 @@ public class WrappedHttpServletResponse extends HttpServletResponseWrapper
         printWriter.flush();
         printWriter.close();
         return this.outputStream.toString();
-    }    
+    }
 }

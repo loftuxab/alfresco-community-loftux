@@ -1,32 +1,43 @@
 package org.alfresco.web.site;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.alfresco.web.site.model.Endpoint;
 
 public class URLUtil
 {
-    public static String toBrowserUrl(String rootRelativeUri)
+    /**
+     * Converts the web application relative URL to a browser URL
+     * @param context
+     * @param relativeUrl
+     * @return
+     */
+    public static String browser(RequestContext context, String relativeUrl)
     {
-        if (rootRelativeUri == null)
-            return "";
-
-        // special case: "/"
-        if (rootRelativeUri.equals("/"))
+        if (context != null && context instanceof HttpRequestContext)
         {
-            // the browser friendly url is just the preconfigured servlet
-            // (i.e. /myapp/)
-            String newUri = Framework.getConfig().getDefaultServletUri();
-            return newUri;
+            HttpServletRequest request = ((HttpRequestContext) context).getRequest();
+            return browser(request, relativeUrl);
+        }
+        return null;
+    }
+
+    public static String browser(HttpServletRequest request, String relativeUrl)
+    {
+        if (relativeUrl == null)
+            relativeUrl = "";
+
+        String path = request.getContextPath();
+        if (path.endsWith("/"))
+        {
+            path = path.substring(0, path.length() - 1);
+        }
+        if (!relativeUrl.startsWith("/"))
+        {
+            relativeUrl = "/" + relativeUrl;
         }
 
-        // if it starts with "/", strip it off
-        if (rootRelativeUri.startsWith("/"))
-            rootRelativeUri = rootRelativeUri.substring(1,
-                    rootRelativeUri.length());
-
-        // now build the browser friendly ur
-        String defaultUri = Framework.getConfig().getDefaultServletUri();
-        String newUri = defaultUri + rootRelativeUri;
-        return newUri;
+        return path + relativeUrl;
     }
 
     public static String getContentEditURL(RequestContext context,
@@ -37,8 +48,7 @@ public class URLUtil
             endpointId = RenderUtil.DEFAULT_ALFRESCO_ENDPOINT_ID;
 
         // get the endpoint
-        Endpoint endpoint = context.getModel().loadEndpoint(context,
-                endpointId);
+        Endpoint endpoint = context.getModel().loadEndpoint(context, endpointId);
 
         // if the endpoint isn't found, just exit
         if (endpoint == null)
@@ -60,5 +70,5 @@ public class URLUtil
 
         return url;
     }
-    
+
 }

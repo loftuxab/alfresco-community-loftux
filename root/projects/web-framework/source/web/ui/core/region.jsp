@@ -21,7 +21,7 @@
 	String componentTypeId = (String) configuration.get("component-type-id");
 
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-	String unconfiguredImageUrl = URLUtil.toBrowserUrl("/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
+	String unconfiguredImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
 %>
 <div width="100%" id="<%=regionId%>">
 <%

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+	<id>tm-freemarker-home</id>
+	<name>tm-freemarker-home</name>
+	<description>tm-freemarker-home</description>
+	<template-type>tt-freemarker-template</template-type>
+
+	<setting>
+		<name>uri</name>
+		<value>/web/templates/home</value>
+	</setting>
+
+</template>

@@ -33,7 +33,7 @@ public class TagletParserException extends Exception
     {
         super(message, e);
     }
-    
+
     public TagletParserException(String message)
     {
         super(message);

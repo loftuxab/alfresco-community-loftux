@@ -110,7 +110,7 @@ public abstract class AbstractConfig
     public abstract String getDefaultServletUri();
 
     public abstract String getDynamicWebsiteServletUri();
-    
+
     public abstract String getDefaultPageUri();
 
     //////////////////////////////////////////////////////////////////
@@ -154,13 +154,15 @@ public abstract class AbstractConfig
     public abstract String getModelTypeDescription(String id);
 
     public abstract String getModelTypeTagName(String id);
+    
+    public abstract String getModelTypeNamespace(String id);
 
     public abstract String getModelTypeClass(String id);
 
     public abstract String getModelTypePath(String id);
 
     public abstract String getModelTypePrefix(String id);
-    
+
     public abstract String getModelRootPath();
 
     //////////////////////////////////////////////////////////////////
@@ -168,17 +170,17 @@ public abstract class AbstractConfig
     //////////////////////////////////////////////////////////////////
 
     public abstract String[] getTagLibraryIds();
-    
+
     public abstract String getTagLibraryUri(String id);
 
     public abstract String getTagLibraryNamespace(String id);
-    
+
     //////////////////////////////////////////////////////////////////
     // User Identity 
     //////////////////////////////////////////////////////////////////
-    
+
     public abstract String getDefaultUserFactoryId();
-    
+
     public abstract String[] getUserFactoryIds();
 
     public abstract String getUserFactoryName(String id);
@@ -186,14 +188,13 @@ public abstract class AbstractConfig
     public abstract String getUserFactoryDescription(String id);
 
     public abstract String getUserFactoryClass(String id);
-    
+
     public abstract String getUserFactoryProperty(String id, String property);
 
-    
     //////////////////////////////////////////////////////////////////
     // Remote
     //////////////////////////////////////////////////////////////////
-    
+
     public abstract String[] getRemoteConnectorIds();
 
     public abstract String getRemoteConnectorName(String id);
@@ -201,7 +202,7 @@ public abstract class AbstractConfig
     public abstract String getRemoteConnectorDescription(String id);
 
     public abstract String getRemoteConnectorClass(String id);
-    
+
     public abstract String getRemoteConnectorProperty(String id, String property);
 
     public abstract String[] getRemoteAuthenticatorIds();
@@ -211,14 +212,14 @@ public abstract class AbstractConfig
     public abstract String getRemoteAuthenticatorDescription(String id);
 
     public abstract String getRemoteAuthenticatorClass(String id);
-    
-    public abstract String getRemoteAuthenticatorProperty(String id, String property);
-    
-    
+
+    public abstract String getRemoteAuthenticatorProperty(String id,
+            String property);
+
     //////////////////////////////////////////////////////////////////
     // Renderers
     //////////////////////////////////////////////////////////////////
-    
+
     public abstract String[] getRendererIds();
 
     public abstract String getRendererName(String id);
@@ -226,8 +227,7 @@ public abstract class AbstractConfig
     public abstract String getRendererDescription(String id);
 
     public abstract String getRendererClass(String id);
-    
+
     public abstract String getRendererProperty(String id, String property);
-    
-    
+
 }

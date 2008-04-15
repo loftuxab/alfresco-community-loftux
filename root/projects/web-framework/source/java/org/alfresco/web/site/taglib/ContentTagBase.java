@@ -26,10 +26,6 @@ package org.alfresco.web.site.taglib;
 
 import javax.servlet.jsp.PageContext;
 
-import org.alfresco.web.site.FilterContext;
-import org.alfresco.web.site.parser.tags.JspPageContextImpl;
-import org.alfresco.web.site.taglib.TagBase;
-
 /**
  * @author muzquiano
  */
@@ -47,12 +43,12 @@ public abstract class ContentTagBase extends TagBase
         if (this.id == null)
         {
             PageContext pc = (PageContext) getPageContext();
-            if (pc instanceof JspPageContextImpl)
+
+            // TODO: Fix this behavior
+            String newId = (String) pc.getAttribute("content.item.id");
+            if (newId != null)
             {
-                JspPageContextImpl jspPc = (JspPageContextImpl) pc;
-                String newId = (String) jspPc.getAttribute(FilterContext.CONTENT_ITEM_ID);
-                if (newId != null)
-                    this.id = newId;
+                this.id = newId;
             }
         }
         return this.id;

@@ -56,7 +56,7 @@ public class ContentPrintTag extends ContentAnchorTag
         String theIconUri = getIconUri();
         if (theIconUri == null)
             theIconUri = "/ui/images/icons/incontext/print_content.gif";
-        theIconUri = URLUtil.toBrowserUrl(theIconUri);
+        theIconUri = URLUtil.browser(getRequestContext(), theIconUri);
 
         try
         {

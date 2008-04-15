@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -91,7 +92,7 @@ public abstract class ModelObject implements IModelObject
 
     public String toXML()
     {
-        return this.document.asXML();
+        return XMLUtil.toXML(document, true);
     }
 
     public boolean getBooleanProperty(String propertyName)
@@ -118,7 +119,9 @@ public abstract class ModelObject implements IModelObject
 
         Element el = getDocument().getRootElement().element(propertyName);
         if (el == null)
-            el = getDocument().getRootElement().addElement("adw:" + propertyName);
+        {
+            el = getDocument().getRootElement().addElement(propertyName);
+        }
 
         // put value
         el.setText(propertyValue);
@@ -157,10 +160,10 @@ public abstract class ModelObject implements IModelObject
         removeSetting(settingName);
 
         // create a new setting
-        Element el = getDocument().getRootElement().addElement("adw:setting");
-        Element nameElement = el.addElement("adw:name");
+        Element el = getDocument().getRootElement().addElement("setting");
+        Element nameElement = el.addElement("name");
         nameElement.setText(settingName);
-        Element valueElement = el.addElement("adw:value");
+        Element valueElement = el.addElement("value");
         valueElement.setText(settingValue);
     }
 
@@ -250,7 +253,7 @@ public abstract class ModelObject implements IModelObject
     {
         return getRelativePath() + "/" + getFileName();
     }
-    
+
     public abstract String getTypeName();
 
 }

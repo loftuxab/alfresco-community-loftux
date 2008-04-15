@@ -85,9 +85,9 @@ public class DispatcherServlet extends BaseServlet
         if (currentPage == null && currentObjectId == null)
         {
             // go to default page
-        	String defaultPageUri = context.getConfig().getDefaultPageUri();
-        	if(defaultPageUri == null || "".equals(defaultPageUri))
-        		defaultPageUri = "/ui/core/page-default.jsp";
+            String defaultPageUri = context.getConfig().getDefaultPageUri();
+            if (defaultPageUri == null || "".equals(defaultPageUri))
+                defaultPageUri = "/ui/core/page-default.jsp";
             dispatchJsp(context, request, response, defaultPageUri);
         }
         else
@@ -106,8 +106,9 @@ public class DispatcherServlet extends BaseServlet
         }
     }
 
-    protected void dispatchJsp(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, String dispatchPage)
+    protected void dispatchJsp(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String dispatchPage)
     {
         PresentationUtil.renderJspPage(context, request, response, dispatchPage);
     }
@@ -158,7 +159,8 @@ public class DispatcherServlet extends BaseServlet
         {
             // no template, so dispatch to a "starter" page
             String dispatchPage = "/ui/misc/unconfigured-nav-node.jsp";
-            PresentationUtil.renderJspPage(context, request, response, dispatchPage);
+            PresentationUtil.renderJspPage(context, request, response,
+                    dispatchPage);
         }
     }
 }

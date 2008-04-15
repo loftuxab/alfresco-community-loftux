@@ -31,6 +31,7 @@ import org.alfresco.connector.IdentityVault;
 import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.config.RuntimeConfigManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
+import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Template;
@@ -48,28 +49,42 @@ public abstract class RequestContext
     {
         this.map = new HashMap();
     }
+    
+    public Configuration getSiteConfiguration()
+    {
+        return ModelUtil.getSiteConfiguration(this);
+    }
 
     public String getWebsiteTitle()
     {
-        String title = "Web Framework - Website";
-
-        // TODO: How do we store web site title?
-
+        String title = "Website";
+        
+        if(getSiteConfiguration() != null)
+        {
+            title = getSiteConfiguration().getName();
+        }
+        
         return title;
     }
 
     public String getPageTitle()
     {
         String title = "Default Page";
+        
         if (getCurrentPage() != null)
+        {
             title = getCurrentPage().getName();
+        }
+        
         return title;
     }
 
     public void setValue(String key, Object value)
     {
         if (key != null && value != null)
+        {
             map.put(key, value);
+        }
     }
 
     public Object getValue(String key)
@@ -80,7 +95,9 @@ public abstract class RequestContext
     public void removeValue(String key)
     {
         if (map.containsKey(key))
+        {
             map.remove(key);
+        }
     }
 
     public RuntimeConfig loadConfiguration(ModelObject obj)
@@ -146,7 +163,9 @@ public abstract class RequestContext
     public String getStoreId()
     {
         if (this.storeId == null)
+        {
             this.storeId = "";
+        }
         return this.storeId;
     }
 
@@ -171,16 +190,17 @@ public abstract class RequestContext
     {
         return logger;
     }
-        
+
     public void setUser(User user)
     {
         this.user = user;
     }
-    
-    public User getUser() {
+
+    public User getUser()
+    {
         return user;
     }
-    
+
     protected HashMap map;
     protected Page currentPage;
     protected String currentObjectId;
@@ -188,22 +208,21 @@ public abstract class RequestContext
     protected IFileSystem fileSystem;
     protected String storeId;
     protected User user;
-    
+
     public static String VALUE_HEAD_TAGS = "headTags";
     public static String VALUE_CREDENTIAL_VAULT = "credential_vault";
     public static String VALUE_IDENTITY_VAULT = "identity_vault";
-    
-    
+
     //
-    
+
     public CredentialsVault getUserCredentialVault()
     {
         return (CredentialsVault) getValue(VALUE_CREDENTIAL_VAULT);
     }
-    
+
     public IdentityVault getUserIdentityVault()
     {
         return (IdentityVault) getValue(VALUE_IDENTITY_VAULT);
     }
-    
+
 }

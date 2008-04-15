@@ -35,27 +35,27 @@ public class RequireTag extends TagBase
 {
     protected String script;
     protected String link;
-    
+
     public void setScript(String script)
     {
         this.script = script;
     }
-    
-    public String getScript() 
+
+    public String getScript()
     {
-        return this.script;        
+        return this.script;
     }
-    
+
     public void setLink(String link)
     {
         this.link = link;
     }
-    
+
     public String getLink()
     {
         return this.link;
     }
-    
+
     public int doStartTag() throws JspException
     {
         // don't execute the body
@@ -65,29 +65,31 @@ public class RequireTag extends TagBase
     public int doEndTag() throws JspException
     {
         // get the body content and include if it is there
-        if(getBodyContent() != null && !"".equals(getBodyContent()))
+        if (getBodyContent() != null && !"".equals(getBodyContent()))
         {
             String tags = getBodyContent().getString();
-            if(tags != null && !"".equals(tags))
+            if (tags != null && !"".equals(tags))
             {
                 RenderUtil.appendHeadTags(getRequestContext(), tags);
             }
         }
-        
+
         // is there a script tag?  if so, include it
-        if(getScript() != null)
+        if (getScript() != null)
         {
-            String scriptImport = RenderUtil.renderScriptImport(getScript());
+            String scriptImport = RenderUtil.renderScriptImport(
+                    getRequestContext(), getScript());
             RenderUtil.appendHeadTags(getRequestContext(), scriptImport);
         }
-        
+
         // is there a link tag?  if so, include it
-        if(getLink() != null)
+        if (getLink() != null)
         {
-            String linkImport = RenderUtil.renderLinkImport(getLink());
+            String linkImport = RenderUtil.renderLinkImport(
+                    getRequestContext(), getLink());
             RenderUtil.appendHeadTags(getRequestContext(), linkImport);
         }
-        
+
         return SKIP_BODY;
     }
 }

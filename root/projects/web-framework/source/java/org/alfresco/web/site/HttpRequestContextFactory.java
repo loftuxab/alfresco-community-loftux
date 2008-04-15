@@ -51,7 +51,7 @@ public class HttpRequestContextFactory extends RequestContextFactory
             throws Exception
     {
         HttpRequestContext context = new HttpRequestContext(request);
-        
+
         // load the user onto the context
         // TODO: Make User Factory pluggable
         UserFactory userFactory = new AlfrescoUserFactory();
@@ -78,10 +78,10 @@ public class HttpRequestContextFactory extends RequestContextFactory
     {
         ServletContext servletContext = request.getSession().getServletContext();
         String realPath = servletContext.getRealPath(rootPath);
-        
+
         // System.out.println("INITFILESYSTEM rootPath: " + rootPath);        
         // System.out.println("INITFILESYSTEM: " + realPath);
-        
+
         //System.out.println("GETFILESYSTEM.realPath = " + realPath);
         // D:\tomcat-test\webapps\green
 

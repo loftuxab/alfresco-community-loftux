@@ -87,22 +87,23 @@ public class FileSystemManager
         return (IFileSystem) fileSystems.get(cacheKey);
     }
 
-    public static IFileSystem getLocalFileSystem(ServletContext servletContext, String relativePath)
+    public static IFileSystem getLocalFileSystem(ServletContext servletContext,
+            String relativePath)
     {
         String realPath = servletContext.getRealPath(relativePath);
         return getLocalFileSystem(realPath);
     }
-    
+
     public static IFileSystem getLocalFileSystem(String realPath)
     {
         File f = new File(realPath);
         return getLocalFileSystem(f);
     }
-    
+
     public static IFileSystem getLocalFileSystem(File rootDirectory)
     {
         String cacheKey = rootDirectory.getAbsolutePath();
-        
+
         IFileSystem fileSystem = getFileSystem(cacheKey);
         if (fileSystem != null)
             return fileSystem;

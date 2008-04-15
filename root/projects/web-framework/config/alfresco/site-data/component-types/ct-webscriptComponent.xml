@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<id>ct-webscriptComponent</id>
+	<name>Webscript Component</name>
+	<description>Webscript Component</description>
+	<renderer-type>webscript</renderer-type>
+</component-type>

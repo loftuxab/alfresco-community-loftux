@@ -46,11 +46,11 @@ public class CacheUtil
     public static void invalidateADSObjectCache(RequestContext context)
     {
         IModel model = context.getModel();
-        if(model instanceof DefaultModel)
+        if (model instanceof DefaultModel)
         {
-            ((DefaultModel)model).cacheInvalidateAll(context);
+            ((DefaultModel) model).cacheInvalidateAll(context);
             System.out.println("Invalidated Object Cache");
-        }        
+        }
     }
 
     public static boolean isFileSystemCacheEnabled(RequestContext context)
