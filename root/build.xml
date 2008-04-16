@@ -424,6 +424,17 @@
       </copy>
    </target>
    
+   <target name="deploy-webframework-tomcat" 
+           depends="package-core, package-webframework-war" 
+           description="Deploys WebFramework WAR to webscriptframework tomcat">
+      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webframework}" />
+      <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwf" 
+              includeEmptyDirs="true" quiet="yes" />
+      <!-- copy the WebFramework WAR file to webscriptframework's Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}" 
+            file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
+   </target>
+   
    <target name="deploy-slingshot-tomcat" 
            depends="package-core, package-webscriptframework-war, package-webframework-war, package-slingshot-war" 
            description="Deploys Slingshot WAR to webscriptframework tomcat">
