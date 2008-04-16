@@ -37,6 +37,13 @@ import org.alfresco.config.ConfigService;
 public interface Container
 {
 	/**
+	 * Gets the name of the Container
+	 * 
+	 * @return  name
+	 */
+    public String getName();
+    	
+	/**
 	 * Gets the Container Description
 	 * 
 	 * @return  description

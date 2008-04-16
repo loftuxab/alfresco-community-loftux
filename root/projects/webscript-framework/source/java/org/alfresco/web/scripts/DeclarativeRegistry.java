@@ -175,7 +175,7 @@ public class DeclarativeRegistry
     private void initWebScripts()
     {
         if (logger.isDebugEnabled())
-            logger.debug("Initialising Web Scripts (URI index: " + uriIndex.getClass().getName() + ")");
+            logger.debug("Initialising Web Scripts (Container: " + container.getName() + ", URI index: " + uriIndex.getClass().getName() + ")");
         
         // clear currently registered services
         uriIndex.clear();
