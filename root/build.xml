@@ -488,6 +488,10 @@
          <fileset dir="${dir.project.3rdparty.lib}/abdera" 
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
+
+      <!-- unzip and add 3rd party javascript library -->
+      <unzip src="${file.zip.slingshot.yui}"
+             dest="${dir.deploy.tomcat.webscriptframework}/slingshot" />
    </target>
 
    <target name="start-tomcat" 
