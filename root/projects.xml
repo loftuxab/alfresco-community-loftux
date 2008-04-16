@@ -1553,7 +1553,7 @@
 
    <target name="package-webframework-war" 
            description="Packages the WAR file for the webframework project" 
-           depends="assemble-webframework-war">
+           depends="package-webscriptframework-war, assemble-webframework-war">
       <war warfile="${dir.project.webframework.dist}/${file.name.war.webframework}" 
            webxml="${dir.project.webframework.src.webinf}/web.xml">
          <fileset dir="${dir.project.webframework.assemble}" />

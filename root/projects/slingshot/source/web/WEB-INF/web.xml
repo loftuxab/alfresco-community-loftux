@@ -4,16 +4,21 @@
 <web-app>
 
    <display-name>Alfresco Project Slingshot</display-name>    
-   <description>Alfresco Project Slingshot</description>
+   <description>Alfresco Project Slingshot application</description>
    
    <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
+         classpath:alfresco/pagerenderer-application-context.xml
          classpath:alfresco/web-site-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>
+   
+   <listener>
+      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+   </listener>
    
    <!-- This filter will bootstrap the Web Script Framework Spring Context -->
    <filter>
@@ -25,23 +30,25 @@
       <filter-name>Web Script Framework Filter</filter-name>
       <url-pattern>/*</url-pattern>
    </filter-mapping>
-
-   <listener>
-      <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-   </listener>
          
    <servlet>
       <servlet-name>apiServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
-      <!--<init-param>
-         <param-name>authenticator</param-name>
-         <param-value>webscripts.authenticator.basic</param-value>
-      </init-param>-->
    </servlet>
 
    <servlet>
       <servlet-name>proxyServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
+   </servlet>
+
+   <servlet>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
+   </servlet>
+   
+   <servlet>
+      <servlet-name>pageAuthenticationServlet</servlet-name>
+      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
    </servlet>
 
    <servlet-mapping>
@@ -59,8 +66,23 @@
       <url-pattern>/proxy</url-pattern>
    </servlet-mapping>
    
+   <servlet-mapping>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <url-pattern>/page/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <url-pattern>/p/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>pageAuthenticationServlet</servlet-name>
+      <url-pattern>/auth/*</url-pattern>
+   </servlet-mapping>
+   
    <session-config>
-      <session-timeout>60</session-timeout>
+      <session-timeout>20</session-timeout>
    </session-config>
 
     <!-- welcome file list precedence order is index.jsp, then index.html -->
