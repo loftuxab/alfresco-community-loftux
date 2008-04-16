@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<template>
+<template-instance>
    <id>documentlibrary-full</id>
    <template-type>documentlibrary</template-type>
    <properties>
@@ -7,4 +7,4 @@
       <hasTreeview>true</hasTreeview>
       <hasPackager>true</hasPackager>
    </properties>
-</template>
+</template-instance>

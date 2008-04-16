@@ -74,10 +74,10 @@ public class TemplateInstanceConfig
          Document document = reader.read(is);
 
          Element rootElement = document.getRootElement();
-         if (!rootElement.getName().equals("template"))
+         if (!rootElement.getName().equals("template-instance"))
          {
             throw new AlfrescoRuntimeException(
-                  "Expected 'template' root element in template instance config: " + path);
+                  "Expected 'template-instance' root element in template instance config: " + path);
          }
          if (rootElement.element("id") == null)
          {

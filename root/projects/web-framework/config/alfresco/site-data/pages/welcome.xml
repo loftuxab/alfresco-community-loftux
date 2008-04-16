@@ -2,6 +2,6 @@
 <page>
    <id>welcome</id>
    <title>The test welcome page</title>
-   <template>welcome-main</template>
+   <template-instance>welcome-main</template-instance>
    <authentication>none</authentication>
 </page>

@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<template>
+<template-instance>
    <id>dashboard-2column</id>
    <template-type>dashboard</template-type>
    <properties>
       <columns>2</columns>
    </properties>
-</template>
+</template-instance>
