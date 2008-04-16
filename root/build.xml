@@ -213,6 +213,17 @@
               includeEmptyDirs="true" 
               quiet="yes" />
    </target>
+   
+   <target name="clean-webscriptframework-tomcat-deploy" 
+              description="Cleans slingshot from the webscriptframework Tomcat" 
+              depends="init">
+         <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webscriptframework}" />
+         <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwsf" 
+                 includeEmptyDirs="true" quiet="yes" />
+         <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
+         <delete dir="${dir.deploy.tomcat.webscriptframework}/slingshot" 
+                 includeEmptyDirs="true" quiet="yes" />
+      </target>
 
    <target name="clean-virtual-tomcat-deploy"
            description="Cleans the Virtual Tomcat deployment" 
@@ -380,18 +391,18 @@
 
    <target name="deploy-webscriptframework-tomcat-exploded" depends="init">
       <!-- copy webscriptframework web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webscriptframework.src.web}" />
       </copy>
 
       <!-- copy the class files from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webscriptframework.src.webinf}" 
                   excludes="web.xml" />
       </copy>
 
       <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" 
@@ -399,7 +410,7 @@
       </copy>
 
       <!-- copy required 3rd party libs -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfweb/WEB-INF/lib">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf/WEB-INF/lib">
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
          <fileset dir="${dir.project.webscriptframework.dist}" 
@@ -422,6 +433,48 @@
       <!-- copy the slingshot WAR file to webscriptframework's Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.webscriptframework}" 
             file="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
+   </target>
+   
+   <target name="deploy-slingshot-tomcat-exploded" 
+           depends="incremental-core, incremental-webscriptframework, incremental-webframework, incremental-slingshot">
+      <!-- remove the WAR, if necessary -->
+      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
+      
+      <!-- copy web source files i.e. JSPs, images etc. -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.slingshot.src.web}" />
+      </copy>
+
+      <!-- copy the class files and config from each project to the WEB-INF/classes folder -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.core.classes}" />
+         <fileset dir="${dir.project.webscriptframework.classes}" />
+         <fileset dir="${dir.project.webframework.classes}" />
+         <fileset dir="${dir.project.slingshot.classes}" />
+         
+         <fileset dir="${dir.project.core.src.java}" 
+                  includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.slingshot.config}" 
+                  excludes="**/extension/**" />
+      </copy>
+
+      <!-- copy required 3rd party libs -->
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot/WEB-INF/lib" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
+                  includes="${includes.webscriptframework.libs.abdera}" />
+      </copy>
    </target>
 
    <target name="start-tomcat" 
