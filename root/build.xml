@@ -189,7 +189,7 @@
    <target name="clean" 
            description="Cleans everything" 
            depends="clean-core,
-	                clean-jlan, 
+	                 clean-jlan, 
                     clean-mbeans,
                     clean-deployment, 
                     clean-repository, 
@@ -198,6 +198,8 @@
                     clean-catalinavirtual, 
                     clean-linkvalidation, 
                     clean-webscriptframework,
+                    clean-webframework,
+                    clean-slingshot,
                     clean-webclient, 
                     clean-rm,
                     clean-blog,

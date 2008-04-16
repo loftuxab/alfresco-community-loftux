@@ -29,8 +29,8 @@ import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
+import org.alfresco.connector.remote.ScriptRemote;
 import org.alfresco.web.scripts.PresentationContainer;
-import org.alfresco.web.scripts.ScriptRemote;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

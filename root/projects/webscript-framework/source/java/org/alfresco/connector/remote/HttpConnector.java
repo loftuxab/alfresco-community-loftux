@@ -27,6 +27,7 @@ package org.alfresco.connector.remote;
 import java.io.IOException;
 import java.util.Map;
 
+import org.alfresco.web.scripts.Status;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 
 /**

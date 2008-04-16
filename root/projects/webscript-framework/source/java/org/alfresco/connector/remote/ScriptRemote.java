@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.scripts;
+package org.alfresco.connector.remote;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,6 +35,7 @@ import java.net.URL;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.util.Base64;
+import org.alfresco.web.scripts.Status;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -244,46 +245,6 @@ public class ScriptRemote
          status.setMessage(ioErr.getMessage());
          
          throw ioErr;
-      }
-   }
-   
-   
-   /**
-    * Representation of the response from a remote HTTP API call.
-    * 
-    * @author Kevin Roast
-    */
-   public static class Response
-   {
-      private String data;
-      private Status status;
-      
-      Response(String data, Status status)
-      {
-         this.data = data;
-         this.status = status;
-      }
-      
-      /**
-       * @return the data stream from the response object - will be null on error
-       */
-      public String getResponse()
-      {
-         return this.data;
-      }
-      
-      /**
-       * @return Status object representing the response status and any error information {@link Status}
-       */
-      public Status getStatus()
-      {
-         return this.status;
-      }
-
-      @Override
-      public String toString()
-      {
-         return this.data;
       }
    }
 }
