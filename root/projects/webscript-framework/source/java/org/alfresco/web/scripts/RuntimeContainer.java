@@ -34,13 +34,6 @@ import java.io.IOException;
  */
 public interface RuntimeContainer extends Container
 {
-	/**
-	 * Gets the name of the Container
-	 * 
-	 * @return  name
-	 */
-    public String getName();
-    
     /**
      * Execute the script in the context of the provided request and response
      * 

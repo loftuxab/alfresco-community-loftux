@@ -74,6 +74,12 @@ public abstract class AbstractWebScript implements WebScript
      */
     public void init(Container container, Description description)
     {
+    	// sanity check to ensure a web script is only registered with a single web script container
+    	if (this.container != null && (!this.container.equals(container)))
+    	{
+    		throw new WebScriptException("Web Script " + description.getId() + " already associated with the '" + this.container.getName() + "' container");
+    	}
+    	
         this.container = container;
         this.description = description;
         this.statusTemplateLock.writeLock().lock();
