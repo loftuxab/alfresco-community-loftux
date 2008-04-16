@@ -1702,6 +1702,11 @@
          <fileset dir="${dir.project.slingshot.dist}" 
                   includes="${file.name.jar.slingshot}" />
       </copy>
+      
+      <!-- unzip and add 3rd party javascript library -->
+      <unzip src="${file.zip.slingshot.yui}"
+             dest="${dir.project.slingshot.assemble}" />
+      
    </target>  
    
    <target name="test-slingshot" 
@@ -3125,9 +3130,9 @@
     
       <!-- Auto Expand EXTJS and YUI into the Assembly -->
       <!-- TOOD: Remove YUI -->
-      <unzip src="${dir.project.dynamicwebsite}/lib/ext-2.0.2.zip"
+      <unzip src="${file.zip.dynamicwebsite.ext}"
              dest="${dir.project.dynamicwebsite.assemble}" />
-      <unzip src="${dir.project.dynamicwebsite}/lib/yui_2.5.1.zip"
+      <unzip src="${file.zip.dynamicwebsite.yui}"
              dest="${dir.project.dynamicwebsite.assemble}" />      
 
 
