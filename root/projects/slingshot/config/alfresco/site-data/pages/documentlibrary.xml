@@ -3,6 +3,6 @@
    <id>documentlibrary</id>
    <title>Document Library: Test Page</title>
    <description>Test page for document library components</description>
-   <template>documentlibrary-full</template>
+   <template-instance>documentlibrary-full</template-instance>
    <authentication>none</authentication>
 </page>

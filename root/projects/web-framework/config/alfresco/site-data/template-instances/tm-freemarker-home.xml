@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<template>
+<template-instance>
 	<id>tm-freemarker-home</id>
 	<name>tm-freemarker-home</name>
 	<description>tm-freemarker-home</description>
@@ -10,4 +10,4 @@
 		<value>/web/sample/home</value>
 	</setting>
 
-</template>
+</template-instance>

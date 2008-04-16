@@ -107,11 +107,11 @@ public class PageInstance
          this.title = rootElement.elementTextTrim("title");
          this.description = rootElement.elementTextTrim("description");
 
-         Element templateElement = rootElement.element("template");
+         Element templateElement = rootElement.element("template-instance");
          if (templateElement == null && templateElement.getTextTrim() == null)
          {
             throw new AlfrescoRuntimeException(
-                  "No 'template' element found in page definition config: " + path);
+                  "No 'template-instance' element found in page definition config: " + path);
          }
          this.template = templateElement.getTextTrim();
          
