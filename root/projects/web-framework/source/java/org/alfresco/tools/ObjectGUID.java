@@ -133,6 +133,7 @@ public class ObjectGUID
     // truncate the string output to be a bit shorter
     public String toString()
     {
+        /*
         String raw = valueAfterMD5.toUpperCase();
         StringBuffer sb = new StringBuffer();
         sb.append(raw.substring(0, 8));
@@ -140,6 +141,12 @@ public class ObjectGUID
         sb.append(raw.substring(8, 12));
         sb.append("-");
         sb.append(raw.substring(20));
+        */
+        
+        String raw = valueAfterMD5.toLowerCase();
+        StringBuffer sb = new StringBuffer();
+        sb.append(raw.substring(0,6));
+        sb.append(raw.substring(8,12));
 
         return sb.toString();
     }

@@ -36,6 +36,11 @@ import org.alfresco.web.site.model.ModelObject;
  */
 public class RuntimeConfig
 {
+    protected RuntimeConfig()
+    {
+        this(null);
+    }
+    
     protected RuntimeConfig(ModelObject object)
     {
         this.object = object;

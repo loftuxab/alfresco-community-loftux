@@ -43,4 +43,8 @@ public interface Renderable
     public void setRenderer(String renderer);
 
     public String getRenderer();
+    
+    public String getRendererType();
+    
+    public void setRendererType(String rendererType);
 }

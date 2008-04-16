@@ -94,29 +94,38 @@ public abstract class AbstractModel
                 new Object[] { document });
         return siteObject;
     }
-
+    
+    /**
+     * This is an exhaustive method to find a model object type with a
+     * given id across the given model type paths.
+     * 
+     * @param id
+     * @return
+     */
     protected String convertIDToRelativeFilePath(String id)
     {
-        String prefix = id.substring(0, 3);
-
-        // TODO: Improve how this is done (use hashtable)
-        String[] ids = getConfiguration().getModelTypeIds();
-        for (int i = 0; i < ids.length; i++)
+        String[] modelTypeIds = getConfiguration().getModelTypeIds();
+        for(int i = 0; i < modelTypeIds.length; i++)
         {
-            String modelTypeId = (String) ids[i];
-
-            String modelPrefix = getConfiguration().getModelTypePrefix(
-                    modelTypeId);
-            if (modelPrefix != null && modelPrefix.equals(prefix))
+            String relativeFilePath = convertIDToRelativeFilePath(modelTypeIds[i], id);
+            IFile modelFile = getFileSystem().getFile(relativeFilePath);
+            if(modelFile != null)
             {
-                // match
-                String relativePath = getConfiguration().getModelTypePath(
-                        modelTypeId);
-                return relativePath + "/" + id + ".xml";
-            }
+                return relativeFilePath;
+            }            
         }
         return null;
     }
+    
+    protected String convertIDToRelativeFilePath(String typeId, String id)
+    {
+        String modelTypePath = getConfiguration().getModelTypePath(typeId);
+        if(modelTypePath != null)
+        {
+            return modelTypePath + "/" + id + ".xml";
+        }
+        return null;
+    }        
 
     protected String convertToID(IFile file)
     {
@@ -126,12 +135,6 @@ public abstract class AbstractModel
         return name;
     }
 
-    protected String convertToRelativeFilePath(IFile file)
-    {
-        String id = convertToID(file);
-        String path = convertIDToRelativeFilePath(id);
-        return path;
-    }
 
     protected ModelObject convertDocumentToModelObject(Document document,
             long modificationTime)

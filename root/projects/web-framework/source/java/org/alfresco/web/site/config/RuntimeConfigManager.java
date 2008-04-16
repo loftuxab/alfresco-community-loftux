@@ -36,6 +36,12 @@ import org.alfresco.web.site.model.Template;
  */
 public class RuntimeConfigManager
 {
+    public static RuntimeConfig newConfiguration(RequestContext context)
+    {
+        RuntimeConfig config = new RuntimeConfig();
+        return config;
+    }
+    
     public static RuntimeConfig loadConfiguration(RequestContext context,
             ModelObject obj)
     {

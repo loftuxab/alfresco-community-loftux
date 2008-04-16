@@ -69,10 +69,17 @@ public class WebScriptRenderer extends AbstractRenderer
         webScriptContext.modelObject = modelConfig.getObject();
         webScriptContext.Tokens = args;
 
+        // get the webscript container
+        String containerId = context.getConfig().getRendererProperty(getRendererType(), "container-bean");
+        if(containerId == null || "".equals(containerId))
+        {
+            containerId = "webscripts.container";
+        }
+
         // get the application context
         // get the web script runtime container
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-        RuntimeContainer webScriptContainer = (RuntimeContainer) appContext.getBean("webscripts.container");
+        RuntimeContainer webScriptContainer = (RuntimeContainer) appContext.getBean(containerId);
 
         // character encoding
         String encoding = request.getCharacterEncoding();

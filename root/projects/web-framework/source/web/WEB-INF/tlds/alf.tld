@@ -38,6 +38,10 @@
 		<bodycontent>tagdependent</bodycontent>
 		<info>Tags located inside the body of this tag will be placed into the HEAD</info> 
 		<attribute>
+			<name>name</name>
+			<required>false</required>
+		</attribute>		
+		<attribute>
 			<name>script</name>
 			<required>false</required>
 		</attribute>

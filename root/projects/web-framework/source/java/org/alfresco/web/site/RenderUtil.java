@@ -31,21 +31,22 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
 import org.alfresco.tools.WrappedHttpServletResponse;
 import org.alfresco.web.site.config.RuntimeConfig;
+import org.alfresco.web.site.config.RuntimeConfigManager;
 import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
 import org.alfresco.web.site.exception.PageRenderException;
 import org.alfresco.web.site.exception.RegionRenderException;
 import org.alfresco.web.site.exception.TemplateRenderException;
 import org.alfresco.web.site.model.Component;
+import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Template;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererFactory;
-import org.dom4j.Document;
-import org.dom4j.Element;
 
 /**
  * @author muzquiano
@@ -84,13 +85,15 @@ public class RenderUtil
             WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(
                     response);
 
+
             // do the include
             RequestUtil.include(wrappedRequest, wrappedResponse, dispatchPath);
 
             // generate the HEAD tag
-            String headTags = generateHeader(context);
+            String headTags = generateHeader(context, request, response);
 
             // Now do a replace on all of the stamp placeholders
+            //String responseBody = wrappedResponse.getOutput();
             String responseBody = wrappedResponse.getOutput();
             int i = -1;
             do
@@ -150,7 +153,7 @@ public class RenderUtil
             // have executed.  We must now stamp the <!--${head}-->
             // onto the output.  To do so, we must first generate
             // the stamp.        
-            String headTags = generateHeader(context);
+            String headTags = generateHeader(context, request, response);
 
             // Now do a replace on all of the stamp placeholders
             String responseBody = wrappedResponse.getOutput();
@@ -313,8 +316,7 @@ public class RenderUtil
             RuntimeConfig config = context.loadConfiguration(component);
             request.setAttribute("component-configuration", config);
 
-            // build a renderer for this component type
-            //ComponentType componentType = component.getComponentType(context);
+            // build a renderer for this component
             AbstractRenderer renderer = RendererFactory.newRenderer(context,
                     component);
             renderer.execute(context, request, response, config);
@@ -492,16 +494,15 @@ public class RenderUtil
     }
 
     // TODO: Introduce some caching for this
-    protected static String generateHeader(RequestContext context)
+    protected static String generateHeader(RequestContext context, HttpServletRequest request, HttpServletResponse response)
+        throws Exception
     {
         StringBuffer buffer = new StringBuffer();
         appendBuffer(buffer, "");
 
         String currentThemeId = ThemeUtil.getCurrentThemeId(context);
         
-
-// TODO: Make this load from dynamic source
-        
+/*        
         // CSS
         appendBuffer(buffer, renderLinkImport(context,
                 "/extjs/resources/css/ext-all.css"));
@@ -516,7 +517,7 @@ public class RenderUtil
                 "/ui/themes/builder/css/builder-" + currentThemeId + ".css",
                 "builder-theme-link"));
 
-        // ExtJS things
+        // ExtJS things 
         appendBuffer(buffer, renderScriptImport(context,
                 "/extjs/adapter/ext/ext-base.js"));
         appendBuffer(buffer, renderScriptImport(context, "/extjs/ext-all.js"));
@@ -540,8 +541,8 @@ public class RenderUtil
                 "/ui/builder/application.js"));
         appendBuffer(buffer, renderScriptImport(context,
                 "/ui/builder/builder.js"));
-// End TODO
-
+*/
+                
 /*        
         // Import the stuff that the global site requires
         Document doc = context.getSiteConfiguration().getDocument();
@@ -574,6 +575,29 @@ public class RenderUtil
         }
 */        
         
+        
+        /**
+         * This is a work in progress.  Still not sure what the best
+         * way is to define a "global" include.
+         * 
+         * With this approach, allow a global.head.renderer.xml file
+         * to live as a Configuration object.
+         * 
+         * If this file is available, it is automatically read
+         * and the renderer described therein is executed.
+         */
+        Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
+        if(config != null)
+        {
+            // renderer properties
+            String rendererType = config.getSetting("renderer-type");
+            String renderer = config.getSetting("renderer");
+            
+            // execute renderer
+            String tags = processRenderer(context, request, response, rendererType, renderer);
+            appendBuffer(buffer, tags);
+        }
+        
         // Now import the stuff that the components on the page needed us to import
         List tagsList = RenderUtil.getHeadTags(context);
         for (int i = 0; i < tagsList.size(); i++)
@@ -589,6 +613,26 @@ public class RenderUtil
             throws IOException
     {
         response.getWriter().print(str);
+    }
+    
+    protected static String processRenderer(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String rendererType, String renderer) throws Exception
+    {
+        // wrap the request and response
+        WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
+                request);
+        FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
+        
+        // build a configuration instance
+        RuntimeConfig config = RuntimeConfigManager.newConfiguration(context);
+
+        // build a renderer for this component
+        AbstractRenderer rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
+        rendererInstance.execute(context, wrappedRequest, fakeResponse, config);
+        
+        // return the result
+        return fakeResponse.getContentAsString();        
     }
 
     public static String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";

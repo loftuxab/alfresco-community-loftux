@@ -57,95 +57,95 @@ public class DefaultModel extends AbstractModel implements IModel
 
     public Component loadComponent(RequestContext context, String id)
     {
-        return (Component) loadObject(context, id);
+        return (Component) loadObject(context, Component.TYPE_NAME, id);
     }
 
     public ComponentType loadComponentType(RequestContext context, String id)
     {
-        return (ComponentType) loadObject(context, id);
+        return (ComponentType) loadObject(context, ComponentType.TYPE_NAME, id);
     }
 
     public Configuration loadConfiguration(RequestContext context, String id)
     {
-        return (Configuration) loadObject(context, id);
+        return (Configuration) loadObject(context, Configuration.TYPE_NAME, id);
     }
 
     public ContentAssociation loadContentAssociation(RequestContext context,
             String id)
     {
-        return (ContentAssociation) loadObject(context, id);
+        return (ContentAssociation) loadObject(context, ContentAssociation.TYPE_NAME, id);
     }
 
     public Endpoint loadEndpoint(RequestContext context, String id)
     {
-        return (Endpoint) loadObject(context, id);
+        return (Endpoint) loadObject(context, Endpoint.TYPE_NAME, id);
     }
 
     public Page loadPage(RequestContext context, String id)
     {
-        return (Page) loadObject(context, id);
+        return (Page) loadObject(context, Page.TYPE_NAME, id);
     }
 
     public PageAssociation loadPageAssociation(RequestContext context, String id)
     {
-        return (PageAssociation) loadObject(context, id);
+        return (PageAssociation) loadObject(context, PageAssociation.TYPE_NAME, id);
     }
 
     public Template loadTemplate(RequestContext context, String id)
     {
-        return (Template) loadObject(context, id);
+        return (Template) loadObject(context, Template.TYPE_NAME, id);
     }
 
     public TemplateType loadTemplateType(RequestContext context, String id)
     {
-        return (TemplateType) loadObject(context, id);
+        return (TemplateType) loadObject(context, TemplateType.TYPE_NAME, id);
     }
 
     // instantiation
 
     public Component newComponent(RequestContext context)
     {
-        return (Component) newObject(context, "component");
+        return (Component) newObject(context, Component.TYPE_NAME);
     }
 
     public ComponentType newComponentType(RequestContext context)
     {
-        return (ComponentType) newObject(context, "component-type");
+        return (ComponentType) newObject(context, ComponentType.TYPE_NAME);
     }
 
     public Configuration newConfiguration(RequestContext context)
     {
-        return (Configuration) newObject(context, "configuration");
+        return (Configuration) newObject(context, Configuration.TYPE_NAME);
     }
 
     public ContentAssociation newContentAssociation(RequestContext context)
     {
-        return (ContentAssociation) newObject(context, "content-association");
+        return (ContentAssociation) newObject(context, ContentAssociation.TYPE_NAME);
     }
 
     public Endpoint newEndpoint(RequestContext context)
     {
-        return (Endpoint) newObject(context, "endpoint");
+        return (Endpoint) newObject(context, Endpoint.TYPE_NAME);
     }
 
     public Page newPage(RequestContext context)
     {
-        return (Page) newObject(context, "page");
+        return (Page) newObject(context, Page.TYPE_NAME);
     }
 
     public PageAssociation newPageAssociation(RequestContext context)
     {
-        return (PageAssociation) newObject(context, "page-association");
+        return (PageAssociation) newObject(context, PageAssociation.TYPE_NAME);
     }
 
     public Template newTemplate(RequestContext context)
     {
-        return (Template) newObject(context, "template");
+        return (Template) newObject(context, Template.TYPE_NAME);
     }
 
     public TemplateType newTemplateType(RequestContext context)
     {
-        return (TemplateType) newObject(context, "template-type");
+        return (TemplateType) newObject(context, TemplateType.TYPE_NAME);
     }
 
     // generics
@@ -157,7 +157,7 @@ public class DefaultModel extends AbstractModel implements IModel
         {
             String modelRelativePath = obj.getRelativePath();
             String modelFileName = obj.getFileName();
-
+            
             // write the document to the model's file system
             ModelUtil.writeDocument(getFileSystem(), modelRelativePath,
                     modelFileName, xmlDocument);
@@ -168,13 +168,29 @@ public class DefaultModel extends AbstractModel implements IModel
         }
     }
 
+    public ModelObject loadObject(RequestContext context, IFile file)
+    {
+        String modelRelativeFilePath = file.getPath();
+        return _loadObject(context, modelRelativeFilePath);
+    }
+    
+    public ModelObject loadObject(RequestContext context, String typeId, String id)
+    {
+        String modelRelativeFilePath = this.convertIDToRelativeFilePath(typeId, id);
+        return _loadObject(context, modelRelativeFilePath);
+    }
+    
     public ModelObject loadObject(RequestContext context, String id)
     {
-        if (id == null)
-            return null;
-
+        String modelRelativeFilePath = this.convertIDToRelativeFilePath(id);
+        return _loadObject(context, modelRelativeFilePath);
+        
+    }
+        
+    protected ModelObject _loadObject(RequestContext context, String modelRelativeFilePath)
+    {
         // check the cache to see if we already have it
-        ModelObject obj = cacheGetById(context, id);
+        ModelObject obj = cacheGetByPath(context, modelRelativeFilePath);
         if (obj != null)
         {
             return obj;
@@ -182,8 +198,6 @@ public class DefaultModel extends AbstractModel implements IModel
 
         try
         {
-            String modelRelativeFilePath = convertIDToRelativeFilePath(id);
-
             // Read the document from the model's file system
             IFile file = getFileSystem().getFile(modelRelativeFilePath);
             if (file != null)
@@ -213,10 +227,7 @@ public class DefaultModel extends AbstractModel implements IModel
         return (ModelObject) obj;
     }
 
-    public ModelObject loadObject(RequestContext context, IFile file)
-    {
-        return loadObject(context, convertToID(file));
-    }
+    
 
     public void removeObject(RequestContext context, ModelObject obj)
     {
@@ -273,7 +284,7 @@ public class DefaultModel extends AbstractModel implements IModel
 
         String modelRelativeDirectoryPath = context.getConfig().getModelTypePath(
                 typeName);
-
+        
         // read files from the model's file system
         IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);
         if (files != null)
@@ -288,6 +299,9 @@ public class DefaultModel extends AbstractModel implements IModel
         return array;
     }
 
+    
+    
+    
     // Internal Cache for Objects
     protected HashMap cacheMap = null;
 
@@ -331,11 +345,4 @@ public class DefaultModel extends AbstractModel implements IModel
         ModelObject obj = (ModelObject) getCache(context).get(relativePath);
         return obj;
     }
-
-    protected ModelObject cacheGetById(RequestContext context, String id)
-    {
-        String relativePath = convertIDToRelativeFilePath(id);
-        return cacheGetByPath(context, relativePath);
-    }
-
 }

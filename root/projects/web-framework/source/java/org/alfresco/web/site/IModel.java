@@ -60,6 +60,8 @@ public interface IModel
     // generic
     public void saveObject(RequestContext context, ModelObject obj);
 
+    public ModelObject loadObject(RequestContext context, String typeId, String id);
+    
     public ModelObject loadObject(RequestContext context, String id);
 
     public ModelObject loadObject(RequestContext context, IFile file);

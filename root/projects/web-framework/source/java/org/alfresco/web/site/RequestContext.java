@@ -119,6 +119,15 @@ public abstract class RequestContext
     {
         this.currentPage = page;
     }
+    
+    public String getCurrentPageId()
+    {
+        if(getCurrentPage() != null)
+        {
+            return getCurrentPage().getId();
+        }
+        return null;
+    }
 
     public Page getRootPage()
     {
@@ -127,8 +136,32 @@ public abstract class RequestContext
 
     public Template getCurrentTemplate()
     {
-        return getCurrentPage().getTemplate(this);
+        if(getCurrentPage() != null)
+        {
+            return getCurrentPage().getTemplate(this);
+        }
+        return null;
     }
+    
+    public String getCurrentTemplateId()
+    {
+        if(getCurrentTemplate() != null)
+        {
+            return getCurrentTemplate().getId();
+        }
+        return null;
+    }
+    
+    /*
+    public Object getCurrentObject()
+    {
+        return null;
+    }
+    
+    public void setCurrentObject(Object o)
+    {        
+    }
+    */
 
     public String getCurrentObjectId()
     {

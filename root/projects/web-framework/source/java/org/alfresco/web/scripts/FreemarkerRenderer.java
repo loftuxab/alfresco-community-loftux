@@ -62,9 +62,14 @@ public class FreemarkerRenderer extends AbstractRenderer
         Page page = context.getCurrentPage();
         
         // get the template processor
+        String processorId = context.getConfig().getRendererProperty(getRendererType(), "processor-bean");
+        if(processorId == null || "".equals(processorId))
+        {
+            processorId = "webscripts.web.templateprocessor";
+        }
         ServletContext servletContext = request.getSession().getServletContext();
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        TemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean("webscripts.web.templateprocessor");
+        TemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(processorId);
 
         // build the model
         Map<String, Object> model = new HashMap<String, Object>(8);
@@ -74,6 +79,8 @@ public class FreemarkerRenderer extends AbstractRenderer
         model.put("title", page.getName());
         //model.put("theme", page.getTheme());
 
+        
+        // TODO: This should walk all tags and make all available
         // add the custom 'region' directive implementation - one instance per model as we pass in template/page 
         model.put("region", new FreemarkerRegionDirective(context));
         model.put("head", new FreemarkerHeadDirective(context));
