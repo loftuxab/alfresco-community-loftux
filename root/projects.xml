@@ -1553,7 +1553,7 @@
 
    <target name="package-webframework-war" 
            description="Packages the WAR file for the webframework project" 
-           depends="package-webscriptframework-war, assemble-webframework-war">
+           depends="assemble-webframework-war">
       <war warfile="${dir.project.webframework.dist}/${file.name.war.webframework}" 
            webxml="${dir.project.webframework.src.webinf}/web.xml">
          <fileset dir="${dir.project.webframework.assemble}" />
@@ -1561,7 +1561,7 @@
    </target>
 
    <target name="assemble-webframework-war" 
-           depends="package-webframework">
+           depends="package-webscriptframework-war,package-webframework">
       <mkdir dir="${dir.project.webframework.assemble}" />
       
       <!-- Copy in base WAR file from the "webscript-framework" package -->
@@ -1673,7 +1673,8 @@
       </war>
    </target>
 
-   <target name="assemble-slingshot-war" depends="package-slingshot">
+   <target name="assemble-slingshot-war"
+           depends="package-webframework-war,package-slingshot">
       <mkdir dir="${dir.project.slingshot.assemble}" />
       
       <!-- Copy in base WAR file from the "webscript-framework" package -->
