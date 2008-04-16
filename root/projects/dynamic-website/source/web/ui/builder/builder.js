@@ -2382,6 +2382,7 @@ function showRegionPageEditorOverlay(event, overlay)
 		// Tell the region overlay to load in region information
 		//
 		var url = "/ui/misc/regionPageOverlay.jsp?regionId=" + id + "&regionScopeId=" + el.dom.getAttribute("regionScopeId") + "&regionSourceId=" + el.dom.getAttribute("regionSourceId");
+		url = toBrowser(url);
 		if(el.dom.getAttribute("componentId")  != null)
 			url += "&componentId=" + el.dom.getAttribute("componentId");
 		win.load(url);
@@ -2963,6 +2964,7 @@ function setupRegionLayoutEditorOverlay(regionId)
 		// Tell the region overlay to load in region information
 		//
 		//var url = "/ui/misc/regionLayoutOverlay.jsp?regionId=" + regionId + "&regionScopeId=" + el.dom.getAttribute("regionScopeId") + "&layoutId=" + el.dom.getAttribute("layoutId") + "&regionSourceId=" + el.dom.getAttribute("regionSourceId");
+		//url = toBrowser(url);
 		//win.load(url);
 		
 		

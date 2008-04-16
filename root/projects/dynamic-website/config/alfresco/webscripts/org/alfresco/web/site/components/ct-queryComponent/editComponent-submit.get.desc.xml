@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Query Component - Submit</shortname>
+  <description>Edit Query Component - Submit</description>
+  <url>/components/ct-queryComponent/edit/_submit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

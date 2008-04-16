@@ -196,10 +196,11 @@ function getInContextMenuXOffset()
 
 function getInContextWebScriptURL(webScript, dmMode)
 {
-	var url = getHttpHostPort() + getServiceUri() + webScript;
+	var url = getServiceUri() + webScript;
+	url = getHttpHostPort() + toBrowser(url);
+
 	if(dmMode == null)
 	{
-		//url = url + "/" + getStoreId() + "/ROOT";
 		url = url + "?avmStoreId=" + getStoreId();
 	}
 	var proxiedURL = buildProxiedUrl(url);

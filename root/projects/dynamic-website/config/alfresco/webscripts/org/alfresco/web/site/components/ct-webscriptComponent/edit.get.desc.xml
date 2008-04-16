@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Webscript Component</shortname>
+  <description>Edit Webscript Component</description>
+  <url>/component/ct-webscriptComponent/edit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

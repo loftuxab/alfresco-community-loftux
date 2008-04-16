@@ -25,7 +25,6 @@
 			<div onClick="showWelcomeWindow();">
 			<b>Click here to Get Started!</b>
 			</div>
-			</a>
 			<br/>
 			<br/>
 			<br/>

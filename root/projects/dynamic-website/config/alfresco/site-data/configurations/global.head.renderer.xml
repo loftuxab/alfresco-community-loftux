@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+  <id>global.head.renderer</id>
+  <name>Global Header Renderer</name>
+  <description></description>
+  <setting>
+    <name>renderer-type</name>
+    <value>jsp</value>
+  </setting>
+  <setting>
+    <name>renderer</name>
+    <value>/ui/misc/global-header.jsp</value>
+  </setting>
+</configuration>

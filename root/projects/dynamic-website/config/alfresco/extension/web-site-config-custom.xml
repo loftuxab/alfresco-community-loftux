@@ -1,0 +1,158 @@
+<alfresco-config>
+
+	<config evaluator="string-compare" condition="WebFramework">
+	
+		<!-- Make the AVM Request Context Factory available -->
+		<!-- TODO: Is this needed anymore? -->
+		<request-context>
+			<definitions>
+				<definition>
+					<id>avm</id>
+					<name>AVMRequestContextFactory</name>
+					<description>AVMRequestContextFactory</description>
+					<class>org.alfresco.web.site.AVMRequestContextFactory</class>
+				</definition>
+			</definitions>
+		</request-context>
+		
+		<!-- Add in other Link Builders -->
+		<!-- TODO -->
+		<link-builder>
+			<definitions>
+				<definition>
+					<id>direct</id>
+					<name>Direct Link Builder</name>
+					<description>Direct Link Builder</description>
+					<class>org.alfresco.web.site.DirectLinkBuilder</class>
+				</definition>
+				<definition>
+					<id>static</id>
+					<name>Static Link Builder</name>
+					<description>Static Link Builder</description>
+					<class>org.alfresco.web.site.StaticLinkBuilder</class>
+				</definition>
+			</definitions>
+		</link-builder>
+		
+
+		<!-- Add support for the AVM file system (via avmRemote) -->		
+		<file-system>
+			<definitions>
+				<definition>
+					<id>avm</id>
+					<name>AVM File System</name>
+					<description>AVM File System</description>
+					<class>org.alfresco.web.site.filesystem.AVMFileSystem</class>
+					<usecache>true</usecache>
+				</definition>
+			</definitions>
+		</file-system>
+		
+
+		<!-- InContext Settings -->
+		<incontext>
+			<enabled>true</enabled>
+			<elements>
+				<element>
+					<id>content_editor</id>
+					<name>Content Editor</name>
+					<type>editor</type>
+					<defaults>
+						<enabled>true</enabled>
+						<state>{x:32,y:32}</state>
+					</defaults>
+				</element>
+				<element>
+					<id>page_editor</id>
+					<name>Page Editor</name>
+					<type>editor</type>
+					<defaults>
+						<enabled>true</enabled>
+					</defaults>
+				</element>
+				<element>
+					<id>layout_editor</id>
+					<name>Layout Editor</name>
+					<type>editor</type>
+					<defaults>
+						<enabled>true</enabled>
+					</defaults>
+				</element>
+				<element>
+					<id>web_content_window</id>
+					<name>Web Content</name>
+					<type>window</type>
+					<defaults>
+						<enabled>true</enabled>
+					</defaults>
+				</element>
+				<element>
+					<id>search_window</id>
+					<name>Search</name>
+					<type>window</type>
+					<defaults>
+						<enabled>false</enabled>
+					</defaults>
+				</element>
+				<element>
+					<id>navigation_window</id>
+					<name>Navigation</name>
+					<type>window</type>
+					<defaults>
+						<enabled>false</enabled>
+					</defaults>
+				</element>
+				<element>
+					<id>web_components_window</id>
+					<name>Web Components</name>
+					<type>window</type>
+					<defaults>
+						<enabled>false</enabled>
+					</defaults>
+				</element>
+				<element>
+					<id>spaces_window</id>
+					<name>Collaboration Spaces</name>
+					<type>window</type>
+					<defaults>
+						<enabled>false</enabled>
+					</defaults>
+				</element>
+			</elements>
+		</incontext>	
+		
+		
+	
+		<!-- Include the ADW Tag Library -->
+		<tags>
+			<libraries>
+				<library>
+					<id>adw</id>
+					<uri>/WEB-INF/tlds/adw.tld</uri>
+					<namespace>http://www.alfresco.org/taglib/adw</namespace>				
+				</library>				
+			</libraries>
+		</tags>
+		
+		<!-- Change the welcome page to our getting started one -->
+		<page>
+			<default>
+				<uri>/ui/misc/getting-started.jsp</uri>
+			</default>
+		</page>
+		
+		
+		
+		<!-- Add in the HTML renderer -->
+		<renderers>
+			<renderer>
+				<id>html</id>
+				<name>HTML Renderer</name>
+				<description>HTML Renderer</description>
+				<class>org.alfresco.web.site.renderer.HTMLRenderer</class>
+			</renderer>
+		</renderers>
+		
+	</config>
+
+</alfresco-config>
