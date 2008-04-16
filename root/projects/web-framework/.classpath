@@ -5,10 +5,10 @@
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/json.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-httpclient-3.0.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/devenv/jsp.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.12.jar" sourcepath="/3rd Party/src/freemarker-2.3.12.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/rhino-js-1.6R7.jar" sourcepath="/3rd Party/src/rhino-js-1.6R7-src.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-fileupload-1.1.1.jar"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-httpclient-3.0.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

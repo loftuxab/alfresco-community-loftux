@@ -1509,8 +1509,8 @@
    
    <target name="incremental-webframework" 
            description="Performs an incremental build of the web framework project"
-           depends="package-webframework" />
-      
+           depends="package-webscriptframework,package-webframework" />
+   
    <target name="build-webframework" 
            description="Performs a clean build of the web framework project"
            depends="clean-webframework, 
