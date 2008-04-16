@@ -3,7 +3,7 @@
    <head> 
       <title>${title}</title> 
       <link rel="stylesheet" href="${url.context}/css/base.css" type="text/css"/>
-      <!--${head}-->
+      ${head}
    </head>
    <body>
       <div>
@@ -11,13 +11,17 @@
             Default region content (only see this if component cannot be resolved!)
          </@region>
       </div>
-      A header component is above this plain text.
-      <br/>
-      Now a nav component appears...
+      <p>
+         A header component is above this plain text.
+         <br/>
+         Now a nav component appears...
+      </p>
       <div>
          <@region id="nav" scope="global" protected=true />
       </div>
-      Some plain text, and another component...
+      <p>
+         Some plain text, and another component...
+      </p>
       <div>
          <@region id="content" scope="page" />
       </div>

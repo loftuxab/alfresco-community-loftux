@@ -3,7 +3,7 @@
    <head> 
       <title>${title}</title> 
       <link rel="stylesheet" href="${url.context}/css/base.css" type="text/css"/>
-      <!--${head}-->
+      ${head}
    </head>
    <body>
       <div>
@@ -11,17 +11,23 @@
             Default region content (only see this if component cannot be resolved!)
          </@region>
       </div>
-      A header component is above this plain text.
-      <br/>
-      Now a nav component appears...
+      <p>
+         A header component is above this plain text.
+         <br/>
+         Now a nav component appears...
+      </p>
       <div>
          <@region id="nav" scope="global" protected=true />
       </div>
-      Additional plain text, and another component...
+      <p>
+         Additional plain text, and another component...
+      </p>
       <div>
          <@region id="main" scope="page" protected=true />
       </div>
-      More plain text, and another component...
+      <p>
+         More plain text, and another component...
+      </p>
       <div>
          <#--Example of how you might configure a template with template config -->
          <#if columns[0].enabled>
