@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<id>ct-navComponent</id>
+	<name>Navigation Component</name>
+	<description>Navigation Component Description</description>
+	<rendererType>jsp</rendererType>
+	<renderer>/ui/components/navComponent/component.jsp</renderer>
+</component-type>

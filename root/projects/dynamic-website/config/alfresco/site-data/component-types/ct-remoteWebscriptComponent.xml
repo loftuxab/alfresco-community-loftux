@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<id>ct-remoteWebscriptComponent</id>
+	<name>Remote Webscript Component</name>
+	<description>Remote Webscript Component</description>
+	<renderer-type>jsp</renderer-type>		
+	<renderer>/ui/components/remoteWebscriptComponent/component.jsp</renderer>
+</component-type>

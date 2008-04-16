@@ -152,7 +152,7 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
 }
 .maintoolbar-icon-learn-about-alfresco
 {
-    background-image:url(/ui/images/logos/AlfrescoLogo32.gif);
+    background-image:url(../../../images/logos/AlfrescoLogo32.gif);
 }
 .maintoolbar-icon-configure-web-site
 {
@@ -208,7 +208,7 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
 }
 .maintoolbar-icon-left
 {
-    background-image:url(/ui/images/logos/AlfrescoLogo32.gif) !important;
+    background-image:url(../../../images/logos/AlfrescoLogo32.gif) !important;
 }
 
 

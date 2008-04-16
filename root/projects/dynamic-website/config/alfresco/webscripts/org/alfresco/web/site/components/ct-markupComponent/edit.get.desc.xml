@@ -1,0 +1,8 @@
+<webscript kind="wizard">
+  <shortname>Edit Markup Component</shortname>
+  <description>Edit Markup Component</description>
+  <url>/component/ct-markupComponent/edit</url>
+  <format default="json">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>
