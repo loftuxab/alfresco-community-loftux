@@ -2,15 +2,14 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
-   <display-name>Alfresco Web Framework</display-name>
+   <display-name>Alfresco Web Script Framework</display-name>
     
-   <description>Alfresco Web Framework and SPK application</description>
+   <description>Alfresco Web Script Framework test application</description>
    
    <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
-         classpath:alfresco/pagerenderer-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>
@@ -18,16 +17,6 @@
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
-   
-   <servlet>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
-   </servlet>
-   
-   <servlet>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
-   </servlet>
    
    <servlet>
       <servlet-name>apiServlet</servlet-name>
@@ -42,21 +31,6 @@
       <servlet-name>proxyServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
    </servlet>
-
-   <servlet-mapping>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <url-pattern>/page/*</url-pattern>
-   </servlet-mapping>
-
-   <servlet-mapping>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <url-pattern>/p/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <url-pattern>/auth/*</url-pattern>
-   </servlet-mapping>
 
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>
