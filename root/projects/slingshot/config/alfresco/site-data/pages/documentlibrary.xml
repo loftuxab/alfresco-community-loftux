@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>documentlibrary</id>
+   <title>Document Library: Test Page</title>
+   <description>Test page for document library components</description>
+   <template>documentlibrary-full</template>
+   <authentication>none</authentication>
+</page>

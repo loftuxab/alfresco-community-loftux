@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template>
+   <id>documentlibrary-full</id>
+   <template-type>documentlibrary</template-type>
+   <properties>
+      <hasBreadcrumb>true</hasBreadcrumb>
+      <hasTreeview>true</hasTreeview>
+      <hasPackager>true</hasPackager>
+   </properties>
+</template>

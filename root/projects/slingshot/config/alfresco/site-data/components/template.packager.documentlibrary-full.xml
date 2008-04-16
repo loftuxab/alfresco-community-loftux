@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>packager</region-id>
+   <source-id>documentlibrary-full</source-id>
+   <url>/components/documentlibrary/packager</url>
+   <chrome>
+      <frame>div</frame>      <!-- none | div (default) | iframe -->
+   </chrome>
+   <properties></properties>
+</component>
