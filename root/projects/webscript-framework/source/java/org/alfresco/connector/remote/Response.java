@@ -24,40 +24,43 @@
  */
 package org.alfresco.connector.remote;
 
+import org.alfresco.web.scripts.Status;
+
 /**
- * @author muzquiano
+ * Representation of the response from a remote HTTP API call.
+ * 
+ * @author Kevin Roast
  */
 public class Response
 {
-    private String data;
-    private Status status;
+   private String data;
+   private Status status;
+   
+   Response(String data, Status status)
+   {
+      this.data = data;
+      this.status = status;
+   }
+   
+   /**
+    * @return the data stream from the response object - will be null on error
+    */
+   public String getResponse()
+   {
+      return this.data;
+   }
+   
+   /**
+    * @return Status object representing the response status and any error information {@link Status}
+    */
+   public Status getStatus()
+   {
+      return this.status;
+   }
 
-    public Response(String data, Status status)
-    {
-        this.data = data;
-        this.status = status;
-    }
-
-    /**
-     * @return the data stream from the response object - will be null on error
-     */
-    public String getResponse()
-    {
-        return this.data;
-    }
-
-    /**
-     * @return Status object representing the response status and any error
-     *         information
-     */
-    public Status getStatus()
-    {
-        return this.status;
-    }
-
-    @Override
-    public String toString()
-    {
-        return this.data;
-    }
+   @Override
+   public String toString()
+   {
+      return this.data;
+   }
 }

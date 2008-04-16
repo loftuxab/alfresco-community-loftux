@@ -1416,7 +1416,7 @@
    
    <target name="compile-webscriptframework" 
            description="Compiles the web script framework project" 
-           depends="init">
+           depends="package-core">
       <compile-java projectdir="${dir.project.webscriptframework}" />
    </target>
    
@@ -1509,7 +1509,7 @@
    
    <target name="incremental-webframework" 
            description="Performs an incremental build of the web framework project"
-           depends="package-webscriptframework,package-webframework" />
+           depends="package-webframework" />
    
    <target name="build-webframework" 
            description="Performs a clean build of the web framework project"
@@ -1524,13 +1524,13 @@
    
    <target name="compile-webframework" 
            description="Compiles the web framework project" 
-           depends="init">
+           depends="package-webscriptframework">
       <compile-java projectdir="${dir.project.webframework}" />
    </target>
    
    <target name="package-webframework"
            description="Packages the web framework project"
-           depends="compile-webframework">
+           depends="package-core,compile-webframework">
       <mkdir dir="${dir.project.webframework.dist}" />
       <jar jarfile="${dir.project.webframework.dist}/${file.name.jar.webframework}" 
            basedir="${dir.project.webframework.classes}" />
@@ -1623,7 +1623,7 @@
    <target name="incremental-slingshot" 
            description="Performs an incremental build of the slingshot project"
            depends="package-slingshot" />
-      
+   
    <target name="build-slingshot" 
            description="Performs a clean build of the slingshot project"
            depends="clean-slingshot, 
@@ -1637,7 +1637,7 @@
    
    <target name="compile-slingshot" 
            description="Compiles the slingshot project" 
-           depends="init">
+           depends="package-webframework">
       <compile-java projectdir="${dir.project.slingshot}" />
    </target>
    

@@ -35,6 +35,7 @@ import java.net.URL;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.util.Base64;
+import org.alfresco.web.scripts.Status;
 
 public class WebClient extends AbstractClient
 {

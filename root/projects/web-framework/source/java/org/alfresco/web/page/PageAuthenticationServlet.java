@@ -34,10 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
+import org.alfresco.connector.remote.Response;
+import org.alfresco.connector.remote.ScriptRemote;
 import org.alfresco.util.URLEncoder;
-import org.alfresco.web.scripts.ScriptRemote;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
-import org.alfresco.web.scripts.ScriptRemote.Response;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 

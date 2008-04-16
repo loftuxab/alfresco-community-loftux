@@ -28,9 +28,10 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.connector.remote.Response;
+import org.alfresco.connector.remote.ScriptRemote;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
-import org.alfresco.web.scripts.ScriptRemote.Response;
 import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.RequestContext;
