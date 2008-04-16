@@ -23,7 +23,8 @@
  * http://www.alfresco.com/legal/licensing"
 --%>
 <%@ page buffer="16kb" contentType="text/html;charset=UTF-8" %>
-<%@ page isELIgnored="false" %>
+<%@ page isELIgnored="false" %>
+
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -32,17 +33,17 @@
 <title>Login</title>
 </head>
 
-<body bgcolor="#ffffff">
+<body>
 
    <form accept-charset="UTF-8" id="login" action="<%=request.getContextPath()%>/auth/login" method="post">
    
-   <table width="100%" height="96%" align="center">
-      <tr width="100%" align="center">
-         <td valign="middle" align="center" width="100%">
+   <table width="100%">
+      <tr align="center">
+         <td valign="middle" align="center">
             
             Username: <input type="text" id="username" name="username" maxlength="256" style="width:150px" />
 
-            Password: <input type="secret" id="password" name="password" maxlength="256" style="width:150px" />
+            Password: <input type="password" id="password" name="password" maxlength="256" style="width:150px" />
             
             <input type="hidden" id="returl" name="returl" value="<%=request.getParameter("returl")%>" />
             
@@ -51,19 +52,13 @@
             <div id="no-cookies" style="display:none">
                <table cellpadding="0" cellspacing="0" border="0" style="padding-top:16px;">
                   <tr>
-                     <td>
-                        <table cellpadding="0" cellspacing="0" border="0">
-                           <tr>
-                              <td class="mainSubText">
-                                 Cookies are disabled in your browser. Please enable cookies to use this application.
-                              </td>
-                           </tr>
-                        </table>
+                     <td class="mainSubText">
+                        Cookies are disabled in your browser. Please enable cookies to use this application.
                      </td>
                   </tr>
                </table>
             </div>
-            <script>
+            <script type="text/javascript">
                document.cookie="_alfTest=_alfTest"
                var cookieEnabled = (document.cookie.indexOf("_alfTest") != -1);
                if (cookieEnabled == false)
@@ -76,6 +71,8 @@
       </tr>
       
    </table>
+   
+   </form>
       
 </body>
 

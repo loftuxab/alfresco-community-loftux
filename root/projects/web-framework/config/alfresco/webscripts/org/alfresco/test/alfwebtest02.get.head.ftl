@@ -1,1 +1,1 @@
-This was output into the HEAD tag for the alfwebtest02 component.
+<!-- This was output into the HEAD tag for the alfwebtest02 component. -->
