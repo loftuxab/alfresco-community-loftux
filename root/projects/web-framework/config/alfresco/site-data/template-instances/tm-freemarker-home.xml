@@ -7,7 +7,7 @@
 
 	<setting>
 		<name>uri</name>
-		<value>/web/templates/home</value>
+		<value>/web/sample/home</value>
 	</setting>
 
 </template>

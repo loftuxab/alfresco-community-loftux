@@ -31,13 +31,7 @@
 					<name>HttpRequestContextFactory</name>
 					<description>HttpRequestContextFactory</description>
 					<class>org.alfresco.web.site.HttpRequestContextFactory</class>
-					<store>adw--admin</store>
-				</definition>
-				<definition>
-					<id>avm</id>
-					<name>AVMRequestContextFactory</name>
-					<description>AVMRequestContextFactory</description>
-					<class>org.alfresco.web.site.AVMRequestContextFactory</class>
+					<store></store>
 				</definition>
 			</definitions>
 			<filesystem>
@@ -68,18 +62,6 @@
 					<description>Default Link Builder</description>
 					<class>org.alfresco.web.site.DefaultLinkBuilder</class>
 				</definition>
-				<definition>
-					<id>direct</id>
-					<name>Direct Link Builder</name>
-					<description>Direct Link Builder</description>
-					<class>org.alfresco.web.site.DirectLinkBuilder</class>
-				</definition>
-				<definition>
-					<id>static</id>
-					<name>Static Link Builder</name>
-					<description>Static Link Builder</description>
-					<class>org.alfresco.web.site.StaticLinkBuilder</class>
-				</definition>
 			</definitions>
 		</link-builder>
 		
@@ -87,13 +69,6 @@
 		<!-- File Systems -->		
 		<file-system>
 			<definitions>
-				<definition>
-					<id>avm</id>
-					<name>AVM File System</name>
-					<description>AVM File System</description>
-					<class>org.alfresco.web.site.filesystem.AVMFileSystem</class>
-					<usecache>true</usecache>
-				</definition>
 				<definition>
 					<id>local</id>
 					<name>Local File System</name>
@@ -133,80 +108,6 @@
 		</formats>
 		
 		
-		<!-- InContext Settings -->
-
-		<incontext>
-			<enabled>true</enabled>
-			<elements>
-				<element>
-					<id>content_editor</id>
-					<name>Content Editor</name>
-					<type>editor</type>
-					<defaults>
-						<enabled>true</enabled>
-						<state>{x:32,y:32}</state>
-					</defaults>
-				</element>
-				<element>
-					<id>page_editor</id>
-					<name>Page Editor</name>
-					<type>editor</type>
-					<defaults>
-						<enabled>true</enabled>
-					</defaults>
-				</element>
-				<element>
-					<id>layout_editor</id>
-					<name>Layout Editor</name>
-					<type>editor</type>
-					<defaults>
-						<enabled>true</enabled>
-					</defaults>
-				</element>
-				<element>
-					<id>web_content_window</id>
-					<name>Web Content</name>
-					<type>window</type>
-					<defaults>
-						<enabled>true</enabled>
-					</defaults>
-				</element>
-				<element>
-					<id>search_window</id>
-					<name>Search</name>
-					<type>window</type>
-					<defaults>
-						<enabled>false</enabled>
-					</defaults>
-				</element>
-				<element>
-					<id>navigation_window</id>
-					<name>Navigation</name>
-					<type>window</type>
-					<defaults>
-						<enabled>false</enabled>
-					</defaults>
-				</element>
-				<element>
-					<id>web_components_window</id>
-					<name>Web Components</name>
-					<type>window</type>
-					<defaults>
-						<enabled>false</enabled>
-					</defaults>
-				</element>
-				<element>
-					<id>spaces_window</id>
-					<name>Collaboration Spaces</name>
-					<type>window</type>
-					<defaults>
-						<enabled>false</enabled>
-					</defaults>
-				</element>
-			</elements>
-		</incontext>	
-		
-
 		<!--  url settings -->	
 		<servlet>
 			<dispatcher>
@@ -243,7 +144,7 @@
 					<tagname>component</tagname>
 					<class>org.alfresco.web.site.model.Component</class>
 					<path>/site-data/components</path>
-					<prefix></prefix>
+					<prefix>cm-</prefix>
 				</type>
 				<type>
 					<id>component-type</id>
@@ -253,7 +154,7 @@
 					<tagname>component-type</tagname>
 					<class>org.alfresco.web.site.model.ComponentType</class>
 					<path>/site-data/component-types</path>
-					<prefix></prefix>
+					<prefix>ct-</prefix>
 				</type>
 				<type>
 					<id>configuration</id>
@@ -263,7 +164,7 @@
 					<tagname>configuration</tagname>
 					<class>org.alfresco.web.site.model.Configuration</class>
 					<path>/site-data/configurations</path>
-					<prefix></prefix>
+					<prefix>co-</prefix>
 				</type>
 				<type>
 					<id>content-association</id>
@@ -273,7 +174,7 @@
 					<tagname>content-association</tagname>
 					<class>org.alfresco.web.site.model.ContentAssociation</class>
 					<path>/site-data/content-associations</path>
-					<prefix></prefix>
+					<prefix>ca-</prefix>
 				</type>
 				<type>
 					<id>endpoint</id>
@@ -283,7 +184,7 @@
 					<tagname>endpoint</tagname>
 					<class>org.alfresco.web.site.model.Endpoint</class>
 					<path>/site-data/endpoints</path>
-					<prefix></prefix>
+					<prefix>ep-</prefix>
 				</type>
 				<type>
 					<id>page</id>
@@ -293,7 +194,7 @@
 					<tagname>page</tagname>
 					<class>org.alfresco.web.site.model.Page</class>
 					<path>/site-data/pages</path>
-					<prefix></prefix>
+					<prefix>pg-</prefix>
 				</type>
 				<type>
 					<id>page-association</id>
@@ -303,7 +204,7 @@
 					<tagname>page-association</tagname>
 					<class>org.alfresco.web.site.model.PageAssociation</class>
 					<path>/site-data/page-associations</path>
-					<prefix></prefix>
+					<prefix>pa-</prefix>
 				</type>
 				<type>
 					<id>template</id>
@@ -313,7 +214,7 @@
 					<tagname>template</tagname>
 					<class>org.alfresco.web.site.model.Template</class>
 					<path>/site-data/template-instances</path>
-					<prefix></prefix>
+					<prefix>tm-</prefix>
 				</type>
 				<type>
 					<id>template-type</id>
@@ -323,7 +224,7 @@
 					<tagname>template-type</tagname>
 					<class>org.alfresco.web.site.model.TemplateType</class>
 					<path>/site-data/template-types</path>
-					<prefix></prefix>
+					<prefix>tt-</prefix>
 				</type>
 			</types>
 		</model>
@@ -359,6 +260,8 @@
 				</factory>
 			</factories>
 		</user>
+		
+		
 		
 		<!-- remote connectors and authenticators -->
 		<remote>
@@ -398,6 +301,8 @@
 			</authenticators>
 		</remote>
 		
+		
+		
 		<!-- renderers -->
 		<renderers>
 			<renderer>
@@ -407,28 +312,28 @@
 				<class>org.alfresco.web.site.renderer.JSPRenderer</class>
 			</renderer>
 			<renderer>
-				<id>html</id>
-				<name>HTML Renderer</name>
-				<description>HTML Renderer</description>
-				<class>org.alfresco.web.site.renderer.HTMLRenderer</class>
-			</renderer>
-			<renderer>
 				<id>java</id>
 				<name>Java Class Renderer</name>
 				<description>Java Class Renderer</description>
 				<class>org.alfresco.web.site.renderer.JavaClassRenderer</class>
 			</renderer>
+			
+			<!-- Use WebScriptFramework WebScript Container -->
 			<renderer>
 				<id>webscript</id>
 				<name>Web Script Renderer</name>
 				<description>Web Script Renderer</description>
 				<class>org.alfresco.web.scripts.WebScriptRenderer</class>
+				<container-bean>webscripts.container</container-bean>
 			</renderer>
+			
+			<!-- Use our own Template Processor -->
 			<renderer>
 				<id>freemarker</id>
 				<name>Freemarker Renderer</name>
 				<description>Freemarker Renderer</description>
 				<class>org.alfresco.web.scripts.FreemarkerRenderer</class>
+				<processor-bean>site.templateprocessor</processor-bean>
 			</renderer>
 		</renderers>
 		

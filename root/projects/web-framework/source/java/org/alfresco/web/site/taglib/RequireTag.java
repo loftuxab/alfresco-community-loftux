@@ -35,6 +35,17 @@ public class RequireTag extends TagBase
 {
     protected String script;
     protected String link;
+    protected String name;
+    
+    public void setName(String name)
+    {
+        this.name = name;
+    }
+    
+    public String getName()
+    {
+        return this.name;
+    }
 
     public void setScript(String script)
     {
@@ -85,8 +96,15 @@ public class RequireTag extends TagBase
         // is there a link tag?  if so, include it
         if (getLink() != null)
         {
-            String linkImport = RenderUtil.renderLinkImport(
-                    getRequestContext(), getLink());
+            String linkImport = null;
+            if(this.getName() != null)
+            {
+                linkImport = RenderUtil.renderLinkImport(getRequestContext(), getLink(), getName());
+            }
+            else
+            {
+                linkImport = RenderUtil.renderLinkImport(getRequestContext(), getLink());
+            }
             RenderUtil.appendHeadTags(getRequestContext(), linkImport);
         }
 

@@ -61,6 +61,17 @@ public abstract class AbstractRenderable implements Renderable
     {
         return this.renderer;
     }
+    
+    public void setRendererType(String rendererType)
+    {
+        this.rendererType = rendererType;
+    }
+    
+    public String getRendererType()
+    {
+        return this.rendererType;
+    }
 
+    protected String rendererType;
     protected String renderer;
 }

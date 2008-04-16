@@ -30,7 +30,6 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererNotFoundException;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
-import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.TemplateType;
 
 /**
@@ -48,8 +47,7 @@ public class RendererFactory
         {
             ComponentType componentType = context.getModel().loadComponentType(
                     context, "ct-webscriptComponent");
-            return _newRenderer(context, componentType,
-                    componentType.getRendererType(),
+            return _newRenderer(context, componentType.getRendererType(),
                     componentType.getRenderer());
         }
         
@@ -62,8 +60,7 @@ public class RendererFactory
             // lets assume web script...
             ComponentType componentType = context.getModel().loadComponentType(
                     context, "ct-webscriptComponent");
-            return _newRenderer(context, componentType,
-                    componentType.getRendererType(),
+            return _newRenderer(context, componentType.getRendererType(),
                     componentType.getRenderer());            
         }
 
@@ -75,19 +72,23 @@ public class RendererFactory
     public static AbstractRenderer newRenderer(RequestContext context,
             ComponentType componentType) throws RendererNotFoundException
     {
-        return _newRenderer(context, componentType,
-                componentType.getRendererType(), componentType.getRenderer());
+        return _newRenderer(context, componentType.getRendererType(), componentType.getRenderer());
     }
 
     public static AbstractRenderer newRenderer(RequestContext context,
             TemplateType templateType) throws RendererNotFoundException
     {
-        return _newRenderer(context, templateType,
-                templateType.getRendererType(), templateType.getRenderer());
+        return _newRenderer(context, templateType.getRendererType(), templateType.getRenderer());
+    }
+    
+    public static AbstractRenderer newRenderer(RequestContext context, String rendererType, String renderer)
+        throws RendererNotFoundException
+    {
+        return _newRenderer(context, rendererType, renderer);
     }
 
     protected static AbstractRenderer _newRenderer(RequestContext context,
-            ModelObject siteObject, String rendererType, String renderer)
+            String rendererType, String renderer)
             throws RendererNotFoundException
     {
         // JSP is the default case
@@ -123,6 +124,7 @@ public class RendererFactory
 
                 r = (AbstractRenderer) Class.forName(className).newInstance();
                 r.setRenderer(renderer);
+                r.setRendererType(rendererType);
                 renderers.put(cacheKey, r);
             }
             catch (Exception ex)
