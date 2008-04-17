@@ -454,14 +454,14 @@
       <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
       
       <!-- copy web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.slingshot.src.web}" />
       </copy>
 
       <!-- copy the class files and config from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot/WEB-INF/classes" verbose="${copy.verbose}" overwrite="yes">
          <fileset dir="${dir.project.core.classes}" />
          <fileset dir="${dir.project.webscriptframework.classes}" />
          <fileset dir="${dir.project.webframework.classes}" />
