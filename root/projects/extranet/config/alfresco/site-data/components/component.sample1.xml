@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+  <id>component.sample1</id>  
+  <name>Sample Component</name>  
+  <url>/sample1</url>
+  
+  <!-- Binding --> 
+  <scope>template</scope>
+  <source-id>template.home</source-id>
+  <region-id>content</region-id>
+  
+</component>
