@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+    <id>collaboration-dashboard</id>
+    <template-type>collaboration-dashboard</template-type>
+    <properties>
+        <regions>9</regions>
+        <horizontalGap>20</horizontalGap>
+        <verticalGap>20</verticalGap>
+        <widthLeft>250</widthLeft>
+        <widthRight>250</widthRight>
+    </properties>
+</template-instance>         

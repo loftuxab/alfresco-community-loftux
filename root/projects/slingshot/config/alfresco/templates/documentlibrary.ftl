@@ -23,7 +23,8 @@
    <div id="doc3">
       <div id="hd">
          <@region id="header" scope="global" protected=true />
-         <@region id="nav" scope="global" protected=true />
+         <@region id="title" scope="page" protected=true />
+         <@region id="navigation" scope="page" protected=true />
       </div>
       <div id="bd">
          <div class="yui-t1" id="divDoclibWrapper">
@@ -40,8 +41,9 @@
          </div>
       </div>
       <div id="ft">
-         Footer Component
+         <@region id="footer" scope="global" protected=true />
       </div>
+      <@region id="file-upload" scope="page"/>      
    </div>
 </body>
 </html>

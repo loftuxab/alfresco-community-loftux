@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>page</scope>
+   <region-id>component-8</region-id>
+   <source-id>collaboration-dashboard</source-id>
+   <url>/components/dashlets/doclist</url>
+</component>

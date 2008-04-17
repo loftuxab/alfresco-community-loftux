@@ -1,0 +1,25 @@
+/* Footer css */
+
+div.site-footer{
+   padding: 2px 8px 2px 8px;
+   border-top: 1px solid #dedede;
+}
+
+span.footer-menu-item {
+    vertical-align: middle;
+    padding: 0px 10px 0px 10px;
+    margin: 0px;
+    text-valign: middle;
+    white-space: nowrap;
+}
+
+div.support-menu {
+    float: left;
+    margin: 0px 0px 0px 10px;
+}
+div.copyright-label {
+    float: none;
+    text-align: center;
+    margin: 5px 0px 0px 0px;
+}
+
