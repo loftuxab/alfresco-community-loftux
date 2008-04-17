@@ -1,11 +1,13 @@
 body
 {
-   margin: 4px;
    font-family: Trebuchet MS, Arial, sans-serif;
    font-size: 12px;
    color: #515D6B;
 }
 
+.hiddenComponents {
+   display: none;
+}
 
 div, .text, .header
 {

@@ -2,7 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <title>${title}</title>
-        <#include "include/head.ftl"/>
         ${head}
         <#include "util/3-column-head.ftl"/>
    </head>

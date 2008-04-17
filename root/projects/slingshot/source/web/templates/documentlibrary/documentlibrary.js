@@ -1,6 +1,3 @@
-/* Ensure Alfresco object exists */
-var Alfresco = (typeof Alfresco == "undefined" || !Alfresco ? {} : Alfresco);
-
 /*
  *** Alfresco.DocumentLibrary
 */
@@ -31,13 +28,24 @@ Alfresco.DocumentLibrary = function()
          });
 
          /* Resizer listener event */
-         horizResize.addListener('resize', function(ev)
+         horizResize.addListener('resize', function(eventTarget)
          {
-            this.doclibResize(ev.width);
+            this.doclibResize(eventTarget.width);
          }, this, true);
 
          /* Initial size */
          horizResize.resize(null, null, this.DEFAULT_MinFilterPanelWidth, 0, 0, true);
+         
+         /*
+         if (typeof Alfresco.DocumentList != "undefined")
+         {
+            alert("I have a document list");
+         }
+         if (typeof Alfresco.FileUpload != "undefined")
+         {
+            alert("I can upload files");
+         }
+         */
       },
    
       doclibResize: function(width)
