@@ -11,7 +11,6 @@
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
          classpath:alfresco/pagerenderer-application-context.xml
-         classpath:alfresco/web-site-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>
@@ -20,7 +19,7 @@
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
    
-   <!-- This filter will bootstrap the Web Script Framework Spring Context -->
+   <!-- This filter will bootstrap the Web Script Framework Spring Context
    <filter>
       <filter-name>Web Script Framework Filter</filter-name>
       <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>
@@ -29,7 +28,7 @@
    <filter-mapping>
       <filter-name>Web Script Framework Filter</filter-name>
       <url-pattern>/*</url-pattern>
-   </filter-mapping>
+   </filter-mapping> -->
          
    <servlet>
       <servlet-name>apiServlet</servlet-name>

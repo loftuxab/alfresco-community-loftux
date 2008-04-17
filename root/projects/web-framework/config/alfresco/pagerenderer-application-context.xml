@@ -26,19 +26,48 @@
    </bean>
    
    
+   <!-- Page Renderer UI component webscript store and search paths -->
+   <bean id="pagerenderer.webscripts.store" parent="webscripts.classpathstore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/site-webscripts</value></property>
+   </bean>
+
+   <bean id="pagerenderer.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="pagerenderer.webscripts.store" />
+            <ref bean="webscripts.store" />
+         </list>
+      </property>
+   </bean>
+   
+   
+   <bean id="pagerenderer.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+   </bean>
+
+   <bean id="pagerenderer.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+   </bean>
+   
+   
    <!-- Page Renderer WebScript container -->
+   <bean id="pagerenderer.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />
+   
    <bean id="pagerenderer.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.page.PageRendererRuntimeContainer">
       <property name="name"><value>PageRenderer</value></property>
       <property name="registry" ref="pagerenderer.registry" />
-      <property name="templateProcessor" ref="webscripts.web.templateprocessor" />
-      <property name="scriptProcessor" ref="webscripts.web.scriptprocessor" />
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+      <property name="templateProcessor" ref="pagerenderer.webscripts.templateprocessor" />
+      <property name="scriptProcessor" ref="pagerenderer.webscripts.scriptprocessor" />
       <property name="configService" ref="pagerenderer.config" />
    </bean>
    
    <bean id="pagerenderer.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
       <property name="container" ref="pagerenderer.container" />
-      <property name="uriIndex" ref="webscripts.index" />
-      <property name="searchPath" ref="webscripts.searchpath" />
+      <property name="uriIndex" ref="pagerenderer.index" />
+      <property name="searchPath" ref="pagerenderer.searchpath" />
       <property name="defaultWebScript"><value>webscript.default</value></property>
    </bean>
    
