@@ -139,6 +139,12 @@
 			<default>
 				<uri>/ui/misc/getting-started.jsp</uri>
 			</default>
+			<unconfigured>
+				<uri>/ui/misc/unconfigured-nav-node.jsp</uri>
+			</unconfigured>
+			<region-container>
+				<uri>/ui/misc/region.jsp</uri>
+			</region-container>
 		</page>
 		
 		
