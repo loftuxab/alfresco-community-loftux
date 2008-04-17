@@ -35,12 +35,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
+import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.scripts.WebScriptException;
 import org.alfresco.web.scripts.WebScriptRequest;
-import org.alfresco.web.scripts.Status;
-import org.alfresco.web.scripts.SearchPath;
-import org.alfresco.web.scripts.Store;
 
 
 /**
@@ -50,14 +49,6 @@ import org.alfresco.web.scripts.Store;
  */
 public class ServiceDump extends DeclarativeWebScript
 {
-    private SearchPath searchPath;
-    
-    
-    public void setSearchPath(SearchPath searchPath)
-    {
-        this.searchPath = searchPath;
-    }
-    
 
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
@@ -85,7 +76,7 @@ public class ServiceDump extends DeclarativeWebScript
         model.put("stores", modelStores);
 
         // locate web script stores
-        Collection<Store> stores = searchPath.getStores();
+        Collection<Store> stores = getContainer().getSearchPath().getStores();
         for (Store store : stores)
         {
             ScriptStore modelStore = new ScriptStore();

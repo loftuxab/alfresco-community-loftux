@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Registry;
-import org.alfresco.web.scripts.SearchPath;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.WebScript;
@@ -48,8 +47,6 @@ import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.servlet.FormData;
 import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 import org.alfresco.web.scripts.servlet.FormData.FormField;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.FileUploadException;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
@@ -64,14 +61,6 @@ import org.dom4j.io.SAXReader;
  */
 public class ServiceInstall extends DeclarativeWebScript
 {
-    private SearchPath searchPath;
-    
-    
-    public void setSearchPath(SearchPath searchPath)
-    {
-        this.searchPath = searchPath;
-    }
-    
 
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
@@ -198,7 +187,7 @@ public class ServiceInstall extends DeclarativeWebScript
     private void installFile(String storePath, String file, String content)
     {
         // retrieve appropriate web script store
-        Store store = searchPath.getStore(storePath);
+        Store store = getContainer().getSearchPath().getStore(storePath);
         if (store == null)
         {
             throw new WebScriptException(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Store path " + storePath + " refers to a store that does not exist");
