@@ -211,7 +211,7 @@ public class PageAuthenticationServlet extends HttpServlet
    
    public static String getLoginPage(ConfigService configService)
    {
-      Config config = configService.getConfig("PageRenderer");
+      Config config = configService.getConfig(PageRendererServlet.CONFIG_ELEMENT);
       if (config == null)
       {
          throw new IllegalStateException("PageRenderer config section cannot be found.");

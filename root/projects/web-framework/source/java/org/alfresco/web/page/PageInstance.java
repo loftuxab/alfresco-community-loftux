@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -70,8 +71,8 @@ public class PageInstance
    /** Authentication type required to view this page */
    private RequiredAuthentication authentication;
    
-   /** the map of components resolved for the regions on this page */
-   private Map<String, PageComponent> components = new HashMap<String, PageComponent>();
+   /** the ordered map of components resolved for the regions on this page */
+   private Map<String, PageComponent> components = new LinkedHashMap<String, PageComponent>();
    
    
    /**

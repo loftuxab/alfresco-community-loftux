@@ -26,9 +26,11 @@ package org.alfresco.web.page;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -37,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.page.PageAuthenticationServlet.AuthenticationResult;
@@ -72,9 +75,12 @@ public class PageRendererServlet extends WebScriptServlet
 {
    private static Log logger = LogFactory.getLog(PageRendererServlet.class);
    
-   private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
+   public static final String CONFIG_ELEMENT = "PageRenderer";
+   
    static final String PARAM_COMPONENT_ID  = "_alfId";
    static final String PARAM_COMPONENT_URL = "_alfUrl";
+   
+   private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
    
    private PresentationTemplateProcessor templateProcessor;
    private PresentationTemplateProcessor webScriptsTemplateProcessor;
@@ -84,6 +90,8 @@ public class PageRendererServlet extends WebScriptServlet
    private Store templateStore;
    private Store templateConfigStore;
    private Store componentStore;
+   
+   private List<UrlMapper> urlMappers;
    
    private Map<String, CacheValue<PageComponent>> componentCache =
       Collections.synchronizedMap(new HashMap<String, CacheValue<PageComponent>>());
@@ -97,7 +105,7 @@ public class PageRendererServlet extends WebScriptServlet
       // init required beans - template processor and template loaders
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
       
-      webscriptsRegistry = (Registry)context.getBean("webscripts.registry");
+      webscriptsRegistry = (Registry)context.getBean("pagerenderer.registry");
       pageStore = (Store)context.getBean("pagerenderer.pagestore");
       pageStore.init();
       componentStore = (Store)context.getBean("pagerenderer.componentstore");
@@ -107,14 +115,17 @@ public class PageRendererServlet extends WebScriptServlet
       templateConfigStore = (Store)context.getBean("pagerenderer.templateconfigstore");
       templateConfigStore.init();
       templateProcessor = (PresentationTemplateProcessor)context.getBean("pagerenderer.templateprocessor");
-      webScriptsTemplateProcessor = (PresentationTemplateProcessor)context.getBean("webscripts.web.templateprocessor");
-      scriptProcessor = (PresentationScriptProcessor)context.getBean("webscripts.web.scriptprocessor");
+      webScriptsTemplateProcessor = (PresentationTemplateProcessor)context.getBean("pagerenderer.webscripts.templateprocessor");
+      scriptProcessor = (PresentationScriptProcessor)context.getBean("pagerenderer.webscripts.scriptprocessor");
       
       // we use a specific config service instance
       configService = (ConfigService)context.getBean("pagerenderer.config");
       
       // we use a specific webscript container instance
       container = (RuntimeContainer)context.getBean("pagerenderer.container");
+      
+      // get the list of url mappers for the page renderer
+      initUrlMappers();
    }
 
    @Override
@@ -161,31 +172,38 @@ public class PageRendererServlet extends WebScriptServlet
          args.put(name, req.getParameter(name));
       }
       
-      // resolve app url object to process this resource
+      // resolve a Url mapper object to process this resource
       if (logger.isDebugEnabled())
          logger.debug("Matching resource URL: " + resource + " args: " + args.toString());
-      ApplicationUrl appUrl = matchAppUrl(resource, args);
-      if (appUrl == null)
+      UrlMapper mapper = matchAppUrl(resource);
+      if (mapper == null)
       {
-         logger.warn("No Application URL mapping found for resource: " + resource);
+         logger.warn("No valid URL mapper found for resource: " + resource);
          res.setStatus(HttpServletResponse.SC_NOT_FOUND);
          return;
       }
       
+      // retrieve the page instance as per the url mapper resource from the page store - will
+      // return null if the page fails to retrieve from the given page store
+      PageInstance page = findPageInstance(this.pageStore, mapper, resource);
+      if (page == null)
+      {
+         logger.warn("Unable to locate page instance in page store for resource: " + resource);
+         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+         return;
+      }
+      
+      if (logger.isDebugEnabled())
+         logger.debug("PageInstance: " + page.toString());
+      
       // TODO: what caching here...?
       setNoCacheHeaders(res);
       
+      // set response content type and charset
+      res.setContentType(MIMETYPE_HTML);
+      
       try
       {
-         // retrieve the page instance via the application url - will throw a runtime exception if
-         // the page cannot be found or fails to retrieve from the local store or repository
-         PageInstance page = appUrl.getPageInstance();
-         if (logger.isDebugEnabled())
-            logger.debug("PageInstance: " + page.toString());
-         
-         // set response content type and charset
-         res.setContentType(MIMETYPE_HTML);
-         
          // authenticate - or redirect to login page
          AuthenticationResult auth = PageAuthenticationServlet.authenticate(req, page.getAuthentication());
          if (auth.Success)
@@ -250,19 +268,43 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    /**
-    * Match the specified resource url against an app url object, which in turn is responsible
-    * for locating the correct Page. 
-    *  
-    * @param resource   
-    * @param args       
+    * Match the specified resource url against the available Url Mappers - return a mapper if
+    * successfully mapped - false otherwise.
+    * 
+    * @param resource to match
+    * 
+    * @return a UrlMapper matching the resource if found or null if no match found
     */
-   private ApplicationUrl matchAppUrl(String resource, Map<String, String> args)
+   private UrlMapper matchAppUrl(String resource)
    {
-      // TODO: match against app urls loaded from app registry?
-      // TODO: page dispatcher framework plugs in here?
-      ApplicationUrl testUrl = new ApplicationUrl(this.pageStore);
-      testUrl.match(resource);
-      return testUrl;
+      UrlMapper result = null;
+      for (UrlMapper mapper : this.urlMappers)
+      {
+         if (mapper.match(resource) == true)
+         {
+            result = mapper;
+            break;
+         }
+      }
+      return result;
+   }
+   
+   /**
+    * Find a PageInstance using the specified Url mapper and resource from the given store
+    * 
+    * @return the PageInstance if found or null otherwise
+    */
+   private static PageInstance findPageInstance(Store store, UrlMapper mapper, String resource)
+   {
+      String pagePath = mapper.buildResourcePath(resource);
+      if (store.hasDocument(pagePath))
+      {
+         return new PageInstance(store, pagePath);
+      }
+      else
+      {
+         return null;
+      }
    }
    
    /**
@@ -433,7 +475,52 @@ public class PageRendererServlet extends WebScriptServlet
     */
    private Config getConfig()
    {
-      return this.configService.getConfig("PageRenderer");
+      Config config = this.configService.getConfig(CONFIG_ELEMENT);
+      if (config == null)
+      {
+         throw new AlfrescoRuntimeException("Cannot find required config element 'PageRenderer'.");
+      }
+      return config;
+   }
+   
+   /**
+    * Initialise the list of URL Mapper objects for the PageRenderer
+    */
+   private void initUrlMappers()
+   {
+      Config config = getConfig();
+      ConfigElement urlMappersElement = config.getConfigElement("url-mappers");
+      if (urlMappersElement == null)
+      {
+         throw new AlfrescoRuntimeException("Missing required config element 'url-mappers' under 'PageRenderer'.");
+      }
+      List<ConfigElement> mappers = urlMappersElement.getChildren("url-mapper");
+      if (mappers == null || mappers.size() == 0)
+      {
+         throw new AlfrescoRuntimeException("Empty config element 'url-mappers' under 'PageRenderer'." +
+               " Was expecting one or more 'url-mappers' child elements.");
+      }
+      
+      this.urlMappers = new ArrayList<UrlMapper>(mappers.size());
+      
+      for (ConfigElement e : mappers)
+      {
+         String className = e.getValue();
+         if (className == null || className.length() == 0)
+         {
+            throw new AlfrescoRuntimeException("Empty 'url-mapper' config element." +
+                  " Was expecting fully qualified class name value.");
+         }
+         try
+         {
+            this.urlMappers.add(UrlMapperFactory.createMapper(className));
+         }
+         catch (AlfrescoRuntimeException err)
+         {
+            throw new AlfrescoRuntimeException("Unable to create class from 'url-mapper' config element value: " +
+                  err.getMessage(), err);
+         }
+      }
    }
    
    /**

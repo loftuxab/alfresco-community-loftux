@@ -1,7 +1,13 @@
 <alfresco-config>
    
    <config evaluator="string-compare" condition="PageRenderer">
+      <!-- login page JSP -->
       <login-page>/login.jsp</login-page>
+      
+      <!-- order list of URL mapper classes implementing org.alfresco.web.page.UrlMapper -->
+      <url-mappers>
+         <url-mapper>org.alfresco.web.page.DefaultPageUrlMapper</url-mapper>
+      </url-mappers>
    </config>
    
    <config evaluator="string-compare" condition="Remote">

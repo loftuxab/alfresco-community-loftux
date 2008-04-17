@@ -383,8 +383,17 @@ public class ClassPathStore implements Store
         String prefix = (prefixIdx != -1) ? storeResourcePath.substring(prefixIdx) : "";
         return resource.createRelative(prefix + "/" + path);
     }
-
     
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return this.storeResourcePath;
+    }
+
+
     /**
      * Class path based script loader
      * 
