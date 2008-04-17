@@ -30,6 +30,7 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererNotFoundException;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
+import org.alfresco.web.site.model.Template;
 import org.alfresco.web.site.model.TemplateType;
 
 /**
@@ -40,30 +41,60 @@ public class RendererFactory
     public static AbstractRenderer newRenderer(RequestContext context,
             Component component) throws RendererNotFoundException
     {
-        // Special case for URIs
-        // If the component has a URI property, then lets assume it is a local
-        // web script
-        if (component.getSetting("uri") != null && component.getSetting("uri").length() > 0)
+        /**
+         * Special Case for Web Scripts as default
+         * 
+         * If there is a URI specified on the component, then assume
+         * that this URI is the path to a web script.  This is basically
+         * a short-hand way to express web script components.
+         */
+        String uri = component.getURL();
+        if(uri == null)
         {
+            uri = component.getProperty("uri");
+        }
+        if(uri == null)
+        {
+            uri = component.getProperty("url");
+        }
+        if(uri == null)
+        {
+            uri = component.getSetting("uri");
+        }
+        if(uri == null)
+        {
+            uri = component.getSetting("url");
+        }
+        if(uri != null && !"".equals(uri))
+        {
+            // execute as a web script
+            // use a web script component
             ComponentType componentType = context.getModel().loadComponentType(
-                    context, "ct-webscriptComponent");
-            return _newRenderer(context, componentType.getRendererType(),
-                    componentType.getRenderer());
+                    context, "webscript");
+            return _newRenderer(context, componentType.getRendererType(), uri);
         }
         
-        // Another special case - if the component type id starts
-        // with / then it is a URI - a web script
+        /**
+         * Another special case for Web Scripts as default
+         * 
+         * If there is a component-type specified, check to see if the
+         * component-type exists.  If it doesn't, then assume that the
+         * value is the name/path to a web script.
+         */
         String componentTypeId = component.getComponentTypeId();
-        if(componentTypeId != null && componentTypeId.startsWith("/"))
+        if(componentTypeId != null)
         {
-            // this is either a web script or a freemarker template
-            // lets assume web script...
-            ComponentType componentType = context.getModel().loadComponentType(
-                    context, "ct-webscriptComponent");
-            return _newRenderer(context, componentType.getRendererType(),
-                    componentType.getRenderer());            
+            ComponentType testComponentType = context.getModel().loadComponentType(context, componentTypeId);
+            if(testComponentType == null)
+            {
+                // use a web script component
+                ComponentType componentType = context.getModel().loadComponentType(
+                        context, "webscript");
+                return _newRenderer(context, componentType.getRendererType(),
+                        componentTypeId);                
+            }
         }
-
+        
         // Otherwise, proceed as before
         ComponentType componentType = component.getComponentType(context);
         return newRenderer(context, componentType);
@@ -76,8 +107,36 @@ public class RendererFactory
     }
 
     public static AbstractRenderer newRenderer(RequestContext context,
+            Template template) throws RendererNotFoundException
+    {                
+        /**
+         * Special case for Web Scripts as default
+         * 
+         * If there is a component-type specified, check to see if the
+         * component-type exists.  If it doesn't, then assume that the
+         * value is the name/path to a web script.
+         */
+        String templateTypeId = template.getTemplateType();
+        if(templateTypeId != null)
+        {
+            TemplateType testTemplateType = context.getModel().loadTemplateType(context, templateTypeId);
+            if(testTemplateType == null)
+            {
+                // execute as a freemarker template type
+                TemplateType templateType = context.getModel().loadTemplateType(context, "freemarker");
+                return _newRenderer(context, templateType.getRendererType(),
+                        templateTypeId);                
+            }
+        }
+        
+        // Otherwise, proceed as before
+        TemplateType templateType = template.getTemplateType(context);
+        return newRenderer(context, templateType);
+    }
+    
+    public static AbstractRenderer newRenderer(RequestContext context,
             TemplateType templateType) throws RendererNotFoundException
-    {
+    {        
         return _newRenderer(context, templateType.getRendererType(), templateType.getRenderer());
     }
     
@@ -118,10 +177,6 @@ public class RendererFactory
         {
             try
             {
-                System.out.println("Instantiating renderer: " + className);
-                if(renderer != null)
-                    System.out.println(" -> renderer: " + renderer);
-
                 r = (AbstractRenderer) Class.forName(className).newInstance();
                 r.setRenderer(renderer);
                 r.setRendererType(rendererType);

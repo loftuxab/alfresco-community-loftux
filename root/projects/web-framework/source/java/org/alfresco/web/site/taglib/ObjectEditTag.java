@@ -33,7 +33,7 @@ import org.alfresco.web.site.URLUtil;
 /**
  * @author muzquiano
  */
-public class ContentEditTag extends ContentTagBase
+public class ObjectEditTag extends AbstractObjectTag
 {
     private String endpointId = null;
     private String target = null;
@@ -71,38 +71,41 @@ public class ContentEditTag extends ContentTagBase
 
     public int doStartTag() throws JspException
     {
-        if (Framework.getConfig().isInContextEnabled())
+        if(isContentId())
         {
-            RequestContext context = getRequestContext();
-
-            // get the url
-            String url = URLUtil.getContentEditURL(context, getEndpoint(),
-                    getId());
-
-            // icon uri
-            String newIconUri = "/ui/images/icons/incontext/edit_content.gif";
-            if (iconUri != null)
-                newIconUri = iconUri;
-            newIconUri = URLUtil.browser(context, newIconUri);
-
-            // target
-            String newTargetString = " target='_blank' ";
-            if (target != null)
+            if (Framework.getConfig().isInContextEnabled())
             {
-                if ("".equals(target))
-                    newTargetString = " ";
-                else
-                    newTargetString = " target='" + target + "' ";
+                RequestContext context = getRequestContext();
+    
+                // get the url
+                String url = URLUtil.getContentEditURL(context, getEndpoint(),
+                        getId());
+    
+                // icon uri
+                String newIconUri = "/ui/images/icons/incontext/edit_content.gif";
+                if (iconUri != null)
+                    newIconUri = iconUri;
+                newIconUri = URLUtil.browser(context, newIconUri);
+    
+                // target
+                String newTargetString = " target='_blank' ";
+                if (target != null)
+                {
+                    if ("".equals(target))
+                        newTargetString = " ";
+                    else
+                        newTargetString = " target='" + target + "' ";
+                }
+    
+                // render
+                StringBuffer buffer = new StringBuffer();
+                buffer.append("<div id='ipe-" + context.getModel().newGUID() + "'>");
+                buffer.append("<a href='" + url + "' " + newTargetString + ">");
+                buffer.append("<img border='0' src='" + newIconUri + "'/>");
+                buffer.append("</a>");
+                buffer.append("</div>");
+                print(buffer.toString());
             }
-
-            // render
-            StringBuffer buffer = new StringBuffer();
-            buffer.append("<div id='ipe-" + context.getModel().newGUID() + "'>");
-            buffer.append("<a href='" + url + "' " + newTargetString + ">");
-            buffer.append("<img border='0' src='" + newIconUri + "'/>");
-            buffer.append("</a>");
-            buffer.append("</div>");
-            print(buffer.toString());
         }
         return EVAL_BODY_INCLUDE;
     }

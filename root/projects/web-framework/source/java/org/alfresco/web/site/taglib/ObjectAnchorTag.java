@@ -31,7 +31,7 @@ import org.alfresco.web.site.RequestContext;
 /**
  * @author muzquiano
  */
-public class ContentAnchorTag extends ContentTagBase
+public class ObjectAnchorTag extends AbstractObjectTag
 {
     private String formatId = null;
     private String target = null;
@@ -60,8 +60,9 @@ public class ContentAnchorTag extends ContentTagBase
     {
         RequestContext context = getRequestContext();
 
-        String url = context.getLinkBuilder().content(context, this.getId(),
-                this.getFormat());
+        // generate the URL
+        String url = render(context, this.getId(), this.getFormat());
+
         try
         {
             this.getOut().write("<A href=\"" + url + "\"");
@@ -71,11 +72,9 @@ public class ContentAnchorTag extends ContentTagBase
         }
         catch (Exception ex)
         {
-            print("Unable to render this component - an error occurred: ");
-            print(ex.getMessage());
-            ex.printStackTrace();
+            throw new JspException(ex);
         }
-        return EVAL_BODY_INCLUDE;
+        return this.EVAL_BODY_INCLUDE;
     }
 
     public int doEndTag() throws JspException
@@ -86,9 +85,8 @@ public class ContentAnchorTag extends ContentTagBase
         }
         catch (Exception ex)
         {
-            print("Unable to render this component - an error occurred: ");
-            print(ex.getMessage());
             ex.printStackTrace();
+            throw new JspException(ex);
         }
         return EVAL_PAGE;
     }

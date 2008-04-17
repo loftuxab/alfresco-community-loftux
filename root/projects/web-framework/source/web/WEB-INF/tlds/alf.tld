@@ -59,12 +59,12 @@
 	
 	
 	
-	
+	<!-- Object Handling Tags / Links -->
 	<tag> 
-		<name>url</name> 
-		<tagclass>org.alfresco.web.site.taglib.URLTag</tagclass>
-		<bodycontent>empty</bodycontent>
-		<info>Generic dispatch URL for a node or a content item</info> 
+		<name>link</name> 
+		<tagclass>org.alfresco.web.site.taglib.ObjectLinkTag</tagclass>
+		<bodycontent>jsp</bodycontent>
+		<info>Renders a URL for a given page or object</info> 
 		<attribute>
 			<name>id</name>
 			<required>false</required>
@@ -76,9 +76,9 @@
 	</tag> 
 	<tag> 
 		<name>anchor</name> 
-		<tagclass>org.alfresco.web.site.taglib.ContentAnchorTag</tagclass>
-		<bodycontent>empty</bodycontent>
-		<info>Links to a content or navigation object</info> 
+		<tagclass>org.alfresco.web.site.taglib.ObjectAnchorTag</tagclass>
+		<bodycontent>jsp</bodycontent>
+		<info>Renders an HTML Anchor to a given page or object</info> 
 		<attribute>
 			<name>id</name>
 			<required>false</required>
@@ -94,9 +94,9 @@
 	</tag> 
 	<tag> 
 		<name>edit</name> 
-		<tagclass>org.alfresco.web.site.taglib.ContentEditTag</tagclass>
-		<bodycontent>empty</bodycontent>
-		<info>Links to a content or navigation object</info> 
+		<tagclass>org.alfresco.web.site.taglib.ObjectEditTag</tagclass>
+		<bodycontent>jsp</bodycontent>
+		<info>Renders an HTML Anchor to an editor for the given content object</info> 
 		<attribute>
 			<name>id</name>
 			<required>false</required>
@@ -116,9 +116,9 @@
 	</tag> 
 	<tag> 
 		<name>print</name> 
-		<tagclass>org.alfresco.web.site.taglib.ContentPrintTag</tagclass>
-		<bodycontent>empty</bodycontent>
-		<info>Links to a 'print' format for content</info> 
+		<tagclass>org.alfresco.web.site.taglib.ObjectPrintTag</tagclass>
+		<bodycontent>jsp</bodycontent>
+		<info>Renders an HTML Anchor to a printable view for a given piece of content</info> 
 		<attribute>
 			<name>id</name>
 			<required>false</required>

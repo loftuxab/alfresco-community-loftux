@@ -113,6 +113,10 @@ public abstract class AbstractConfig
 
     public abstract String getDefaultPageUri();
 
+    public abstract String getUnconfiguredPageUri();
+    
+    public abstract String getRegionContainerUri();
+
     //////////////////////////////////////////////////////////////////
     // File Systems
     //////////////////////////////////////////////////////////////////

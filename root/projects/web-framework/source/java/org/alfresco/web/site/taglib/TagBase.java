@@ -39,7 +39,6 @@ import org.alfresco.web.site.RequestUtil;
 /**
  * @author muzquiano
  */
-//public abstract class TagBase implements Tag, Serializable
 public abstract class TagBase extends BodyTagSupport implements Serializable
 {
     private PageContext pageContext = null;

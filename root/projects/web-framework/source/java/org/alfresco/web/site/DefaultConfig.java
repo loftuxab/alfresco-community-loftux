@@ -168,7 +168,8 @@ public class DefaultConfig extends AbstractConfig
         String key = "pagemapper.definition." + id + ".class";
         return get(key);
     }
-
+    
+    
     //////////////////////////////////////////////////////////////////
     // Link Builder
     //////////////////////////////////////////////////////////////////
@@ -318,6 +319,23 @@ public class DefaultConfig extends AbstractConfig
             value = "/ui/core/page-default.jsp";
         return value;
     }
+    
+    public String getUnconfiguredPageUri()
+    {
+        String value = get("page.unconfigured.uri");
+        if (value == null)
+            value = "/ui/core/page-unconfigured.jsp";
+        return value;        
+    }
+    
+    public String getRegionContainerUri()
+    {
+        String value = get("page.region-container.uri");
+        if (value == null)
+            value = "/ui/core/region.jsp";
+        return value;        
+    }
+    
 
     //////////////////////////////////////////////////////////////////
     // File Systems

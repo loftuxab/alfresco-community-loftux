@@ -50,10 +50,10 @@ public class WebScriptRenderer extends AbstractRenderer
             HttpServletResponse response, RuntimeConfig modelConfig)
             throws RendererExecutionException
     {
-        // pull values from the config
-        // these are values that are stored on the component instance
-        // or on the template instance
-        String requestUri = (String) modelConfig.get("uri"); // i.e. /test/component1
+        // get the webscript destination property
+        String requestUri = this.getRenderer();
+
+        // request path
         String requestPath = (String) modelConfig.get("requestPath"); // i.e. /test/component1
         if (requestPath == null)
             requestPath = "/service";
@@ -68,6 +68,8 @@ public class WebScriptRenderer extends AbstractRenderer
         webScriptContext.modelConfig = modelConfig;
         webScriptContext.modelObject = modelConfig.getObject();
         webScriptContext.Tokens = args;
+        webScriptContext.scriptUrl = requestPath + requestUri;
+        webScriptContext.requestContext = context;
 
         // get the webscript container
         String containerId = context.getConfig().getRendererProperty(getRendererType(), "container-bean");
@@ -79,7 +81,7 @@ public class WebScriptRenderer extends AbstractRenderer
         // get the application context
         // get the web script runtime container
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-        RuntimeContainer webScriptContainer = (RuntimeContainer) appContext.getBean(containerId);
+        LocalWebScriptRuntimeContainer webScriptContainer = (LocalWebScriptRuntimeContainer) appContext.getBean(containerId);
 
         // character encoding
         String encoding = request.getCharacterEncoding();
@@ -98,9 +100,20 @@ public class WebScriptRenderer extends AbstractRenderer
         // build the runtime
         LocalWebScriptRuntime runtime = new LocalWebScriptRuntime(
                 webScriptContainer, webScriptContext, encoding);
+        
+        // bind the request context with a threadlocal variable
+        webScriptContainer.bindRequestContext(context);
+        
+        // Note:  The model is created later on and will use
+        // getScriptParameters and getTemplateParameters
+        // from the Container.  The container looks up the
+        // thread local variable and does its thing.
 
         // execute the script
         runtime.executeScript();
+        
+        // unbind the request context
+        webScriptContainer.unbindRequestContext();
 
         // read back the results
         Reader reader = (Reader) runtime.getResponseReader();

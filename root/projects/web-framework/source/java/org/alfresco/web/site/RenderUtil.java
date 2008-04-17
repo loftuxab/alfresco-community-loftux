@@ -209,8 +209,7 @@ public class RenderUtil
             request.setAttribute("template-configuration", config);
 
             // get the renderer and execute it
-            AbstractRenderer renderer = RendererFactory.newRenderer(context,
-                    template.getTemplateType(context));
+            AbstractRenderer renderer = RendererFactory.newRenderer(context, template);
             renderer.execute(context, request, response, config);
         }
         catch (Exception ex)
@@ -256,11 +255,20 @@ public class RenderUtil
             String sourceId = getSourceId(context, regionScopeId);
             config.put("region-source-id", sourceId);
 
-            // determine the renderer
-            // this can be overridden by a setting on either the layout
-            // or the layout type instances
-            // TODO: Do we want to keep this?
-            String renderer = "/ui/core/region.jsp";
+            // determine the region renderer
+            // this is set in the configuration
+            String renderer = context.getConfig().getRegionContainerUri();
+            if(renderer == null || "".equals(renderer))
+            {
+                renderer = "/ui/core/region.jsp";
+            }
+            // Allow this to be overridden by the template
+            // store the setting "region-regionName-renderer" with value "/my/jsppage.jsp"
+            String rendererOverride = template.getSetting("region-" + regionId + "-renderer");
+            if(rendererOverride != null && !"".equals(rendererOverride))
+            {
+                renderer = rendererOverride;
+            }
 
             // if there is already a component associated for this region,
             // we must let the region know      
@@ -500,82 +508,6 @@ public class RenderUtil
         StringBuffer buffer = new StringBuffer();
         appendBuffer(buffer, "");
 
-        String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-        
-/*        
-        // CSS
-        appendBuffer(buffer, renderLinkImport(context,
-                "/extjs/resources/css/ext-all.css"));
-        appendBuffer(buffer, renderLinkImport(context,
-                "/ui/themes/builder/css/builder-default.css"));
-
-        // Theme CSS
-        appendBuffer(buffer, renderLinkImport(context,
-                "/ui/themes/extjs/css/xtheme-" + currentThemeId + ".css",
-                "extjs-theme-link"));
-        appendBuffer(buffer, renderLinkImport(context,
-                "/ui/themes/builder/css/builder-" + currentThemeId + ".css",
-                "builder-theme-link"));
-
-        // ExtJS things 
-        appendBuffer(buffer, renderScriptImport(context,
-                "/extjs/adapter/ext/ext-base.js"));
-        appendBuffer(buffer, renderScriptImport(context, "/extjs/ext-all.js"));
-
-        // Custom JS things
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/utils/miframe-min.js"));
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/utils/json.js"));
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/dynamic.js.jsp"));
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/incontext.js.jsp"));
-
-        // Web Components (in progress)
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/wizard-core.js"));
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/wizard-adapter-extjs.js"));
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/application.js"));
-        appendBuffer(buffer, renderScriptImport(context,
-                "/ui/builder/builder.js"));
-*/
-                
-/*        
-        // Import the stuff that the global site requires
-        Document doc = context.getSiteConfiguration().getDocument();
-        if(doc != null)
-        {
-            Element headElement = doc.getRootElement().element("head");
-            if(headElement != null)
-            {
-                List requireList = headElement.elements("require");
-                for(int z = 0; z < requireList.size(); z++)
-                {
-                    Element requireElement = (Element) requireList.get(z);
-                    
-
-                    String link = requireElement.attributeValue("link");
-                    if(link != null && !"".equals(link))
-                    {
-                        String id = requireElement.attributeValue("id");
-                        
-                        appendBuffer(buffer, renderLinkImport(context, link, id));
-                    }
-
-                    String script = requireElement.attributeValue("script");
-                    if(script != null && !"".equals(script))
-                    {
-                        appendBuffer(buffer, renderScriptImport(context, script));
-                    }
-                }
-            }
-        }
-*/        
-        
-        
         /**
          * This is a work in progress.  Still not sure what the best
          * way is to define a "global" include.

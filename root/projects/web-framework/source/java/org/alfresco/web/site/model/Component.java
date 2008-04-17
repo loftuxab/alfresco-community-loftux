@@ -38,6 +38,7 @@ public class Component extends ModelObject
     public static String PROP_SCOPE = "scope";
     public static String PROP_COMPONENT_TYPE_ID = "component-type-id";
     public static String PROP_FRAME_TYPE = "frame-type";
+    public static String PROP_URL = "url";
 
     public Component(Document document)
     {
@@ -92,6 +93,16 @@ public class Component extends ModelObject
     public void setFrameType(String frameType)
     {
         setProperty(PROP_FRAME_TYPE, frameType);
+    }
+    
+    public String getURL()
+    {
+        return getProperty(PROP_URL);
+    }
+    
+    public void setURL(String url)
+    {
+        setProperty(PROP_URL, url);
     }
 
     // Helpers

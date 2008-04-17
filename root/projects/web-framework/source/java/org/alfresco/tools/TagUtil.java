@@ -2,6 +2,8 @@ package org.alfresco.tools;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.tagext.BodyContent;
+import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
 
 /**
@@ -14,12 +16,23 @@ public class TagUtil
 {
     public static String execute(Tag tag, HttpServletRequest request)
     {
+        return execute(tag, request, null);
+    }
+
+    public static String execute(Tag tag, HttpServletRequest request, String bodyContentString)
+    {
         ServletContext context = request.getSession().getServletContext();
-        return execute(tag, context, request);
+        return execute(tag, context, request, bodyContentString);
     }
 
     public static String execute(Tag tag, ServletContext context,
             HttpServletRequest request)
+    {
+        return execute(tag, context, request, null);
+    }
+    
+    public static String execute(Tag tag, ServletContext context,
+            HttpServletRequest request, String bodyContentString)
     {
         // wrap the request
         WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
@@ -38,10 +51,31 @@ public class TagUtil
             FakeJspPageContext fakePageContext = new FakeJspPageContext(
                     context, wrappedRequest, fakeResponse, fakeJspWriter);
 
-            // process the tag
+            // begin executing the tag
             tag.setPageContext(fakePageContext);
-            tag.doStartTag();
+            int startTagReturn = tag.doStartTag();
+            if(tag instanceof BodyTagSupport)
+            {
+                if(startTagReturn == tag.EVAL_BODY_INCLUDE)
+                {   
+                    BodyTagSupport support = ((BodyTagSupport)tag);
+                    
+                    BodyContent bc = fakePageContext.pushBody();
+                    support.setBodyContent(bc);
+                    
+                    support.doInitBody();
+                    support.doAfterBody();
+                    
+                    fakePageContext.popBody();
+                }
+            }
+            
+            if(bodyContentString != null)
+            {
+                fakeJspWriter.print(bodyContentString);
+            }
             tag.doEndTag();
+            tag.release();
 
             // render the output
             //jspWriter.flush();

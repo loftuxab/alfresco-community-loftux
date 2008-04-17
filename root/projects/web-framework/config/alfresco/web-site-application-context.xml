@@ -41,9 +41,36 @@
 
 
 	<!--                               -->
+	<!-- WebScript Container           -->
+	<!--                               -->
+	<bean id="site.store.webscripts"
+		class="org.alfresco.web.scripts.ClassPathStore">
+		<property name="mustExist">
+			<value>true</value>
+		</property>
+		<property name="classPath">
+			<value>alfresco/webscripts</value>
+		</property>
+	</bean>	
+	<bean id="site.webscripts.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.scripts.LocalWebScriptRuntimeContainer">
+		<property name="name"><value>WebFramework</value></property>
+		<property name="registry" ref="site.webscripts.registry" />
+		<property name="templateProcessor" ref="webscripts.web.templateprocessor" />
+		<property name="scriptProcessor" ref="webscripts.web.scriptprocessor" />
+		<property name="configService" ref="site.config" />
+	</bean>
+	<bean id="site.webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
+		<property name="container" ref="site.webscripts.container" />
+		<property name="uriIndex" ref="webscripts.index" />
+		<property name="searchPath" ref="webscripts.searchpath" />
+		<property name="defaultWebScript"><value>webscript.default</value></property>
+	</bean>
+	
+
+	<!--                               -->
 	<!-- FreeMarker Template Processor -->
 	<!--                               -->
-	<bean id="site.store.templatestore"
+	<bean id="site.store.templates"
 		class="org.alfresco.web.scripts.ClassPathStore">
 		<property name="mustExist">
 			<value>true</value>
@@ -55,7 +82,8 @@
    <bean id="site.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-            <ref bean="site.store.templatestore" />
+            <ref bean="site.store.templates" />
+            <ref bean="site.store.webscripts" />
          </list>
       </property>
    </bean>	

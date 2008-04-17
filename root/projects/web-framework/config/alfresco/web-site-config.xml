@@ -324,7 +324,7 @@
 				<name>Web Script Renderer</name>
 				<description>Web Script Renderer</description>
 				<class>org.alfresco.web.scripts.WebScriptRenderer</class>
-				<container-bean>webscripts.container</container-bean>
+				<container-bean>site.webscripts.container</container-bean>
 			</renderer>
 			
 			<!-- Use our own Template Processor -->
