@@ -273,23 +273,19 @@
    <!--  Index -->
    <bean id="webscript.org.alfresco.index.get" class="org.alfresco.web.scripts.bean.Index" parent="webscript" singleton="false"/>
    <alias name="webscript.org.alfresco.index.get" alias="webscript.org.alfresco.indexall.get"/>
-   <bean id="webscript.org.alfresco.indexuri.get" class="org.alfresco.web.scripts.bean.IndexURI" parent="webscript" />
-   <bean id="webscript.org.alfresco.indexpackage.get" class="org.alfresco.web.scripts.bean.IndexPackage" parent="webscript" />
-   <bean id="webscript.org.alfresco.index.post" class="org.alfresco.web.scripts.bean.IndexUpdate" parent="webscript" >
+   <bean id="webscript.org.alfresco.indexuri.get" class="org.alfresco.web.scripts.bean.IndexURI" parent="webscript" singleton="false" />
+   <bean id="webscript.org.alfresco.indexpackage.get" class="org.alfresco.web.scripts.bean.IndexPackage" parent="webscript" singleton="false" />
+   <bean id="webscript.org.alfresco.index.post" class="org.alfresco.web.scripts.bean.IndexUpdate" parent="webscript" singleton="false" >
       <property name="facebookService" ref="facebook.service"/>
    </bean>
 
    <!--  Get Description Document -->
-   <bean id="webscript.org.alfresco.scriptdescription.get" class="org.alfresco.web.scripts.bean.ServiceDescription" parent="webscript" />
+   <bean id="webscript.org.alfresco.scriptdescription.get" class="org.alfresco.web.scripts.bean.ServiceDescription" parent="webscript" singleton="false" />
 
    <!--  Get Web Script -->
-   <bean id="webscript.org.alfresco.scriptdump.get" class="org.alfresco.web.scripts.bean.ServiceDump" parent="webscript" >
-      <property name="searchPath" ref="webscripts.searchpath"/>
-   </bean>
+   <bean id="webscript.org.alfresco.scriptdump.get" class="org.alfresco.web.scripts.bean.ServiceDump" parent="webscript" singleton="false" />
 
    <!--  Install -->
-   <bean id="webscript.org.alfresco.scriptinstall.post" class="org.alfresco.web.scripts.bean.ServiceInstall" parent="webscript" >
-      <property name="searchPath" ref="webscripts.searchpath"/>
-   </bean>
+   <bean id="webscript.org.alfresco.scriptinstall.post" class="org.alfresco.web.scripts.bean.ServiceInstall" parent="webscript" singleton="false" />
    
 </beans>
