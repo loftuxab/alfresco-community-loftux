@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template>
+  <id>template.home</id>
+  <name>Home Page Template</name>
+  <template-type>homepage</template-type>
+  
+  <!-- Example Settings -->
+  <setting>
+  	<name>width</name>
+  	<value>100</value>
+  </setting>
+  <setting>
+  	<name>height</name>
+  	<value>200</value>
+  </setting>
+  
+</template>

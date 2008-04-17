@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <id>page.home</id>
+  <name>Home Page</name>
+  <template-id>template.home</template-id>
+  <root-page>true</root-page>
+</page>
