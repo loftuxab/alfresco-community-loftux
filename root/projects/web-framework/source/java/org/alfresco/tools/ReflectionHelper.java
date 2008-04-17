@@ -26,6 +26,7 @@ package org.alfresco.tools;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 /**
  * Static Helper methods for instantiating objects from reflection.
@@ -98,5 +99,33 @@ public class ReflectionHelper
             ite.printStackTrace();
         }
         return o;
+    }
+    
+    public static Object invoke(Object obj, String method, Class[] argTypes, Object[] args)
+    {
+        if(obj == null || method == null)
+        {
+            return null;
+        }
+        
+        // get the method
+        try
+        {
+            Method m = obj.getClass().getMethod(method, argTypes);
+            if(m != null)
+            {
+                return m.invoke(obj, args);
+            }
+        }
+        catch(NoSuchMethodException nsme)
+        {
+        }
+        catch(IllegalAccessException iae)
+        {
+        }
+        catch(InvocationTargetException ite)
+        {
+        }
+        return null;
     }
 }

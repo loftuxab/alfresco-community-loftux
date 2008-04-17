@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,52 +20,48 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing
+ * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.scripts;
+package org.alfresco.web.site.taglib;
 
-import java.io.IOException;
-import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.taglib.HeadTag;
-
-import freemarker.core.Environment;
-import freemarker.template.TemplateDirectiveBody;
-import freemarker.template.TemplateException;
-import freemarker.template.TemplateModel;
 
 /**
- * Custom @imports FreeMarker directive.
- * This places the imports into the page
- * 
- * @author Michael Uzquiano
+ * @author muzquiano
  */
-public class FreemarkerHeadDirective extends FreemarkerTagSupportDirective
+public class ObjectLinkTag extends AbstractObjectTag
 {
-    public FreemarkerHeadDirective(RequestContext context)
+    private String formatId = null;
+
+    public void setFormat(String formatId)
     {
-        super(context);
+        this.formatId = formatId;
     }
 
-    public void execute(Environment env, Map params, TemplateModel[] loopVars,
-            TemplateDirectiveBody body) throws TemplateException, IOException
+    public String getFormat()
     {
-        // the tag we want to execute
-        HeadTag tag = new HeadTag();
+        return this.formatId;
+    }
 
-        // execute the tag
-        String output = executeTag(tag);
+    public int doStartTag() throws JspException
+    {
+        HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();
+        HttpServletResponse response = (HttpServletResponse) getPageContext().getResponse();
+        RequestContext context = getRequestContext();
 
-        // commit the output
         try
         {
-            env.getOut().write(output);
-            env.getOut().flush();
+            render(context, request, response, getId(), getFormat());
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
+            throw new JspException(ex);
         }
+        return SKIP_BODY;
     }
 }

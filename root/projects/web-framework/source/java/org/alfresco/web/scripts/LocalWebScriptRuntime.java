@@ -51,7 +51,7 @@ public class LocalWebScriptRuntime
 		super(container);
 
 		this.context = context;
-		this.encoding = encoding;
+		this.encoding = encoding;        
 	}
 
 	/*
@@ -75,7 +75,8 @@ public class LocalWebScriptRuntime
 	{
 		// this includes all elements of the xml
 		Map properties = context.modelObject.getProperties();
-		String scriptUrl = context.RequestURI;
+		String scriptUrl = context.scriptUrl;
+        
 		return new LocalWebScriptRequest(this, scriptUrl, match, properties);
 	}
 

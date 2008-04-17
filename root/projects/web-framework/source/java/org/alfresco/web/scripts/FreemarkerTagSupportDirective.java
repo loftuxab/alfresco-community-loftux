@@ -25,12 +25,12 @@
 package org.alfresco.web.scripts;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.jsp.tagext.Tag;
 
 import org.alfresco.tools.TagUtil;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.taglib.TagBase;
 
 import freemarker.template.TemplateDirectiveModel;
 
@@ -55,7 +55,12 @@ public abstract class FreemarkerTagSupportDirective implements
         this.context = context;
     }
 
-    public String executeTag(TagBase tag)
+    public String executeTag(Tag tag)
+    {
+        return executeTag(tag, null);
+    }
+    
+    public String executeTag(Tag tag, String bodyContent)
     {
         // render the component into dummy objects
         // currently, we can only do this for HttpRequestContext instances
@@ -64,7 +69,7 @@ public abstract class FreemarkerTagSupportDirective implements
             HttpServletRequest response = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
 
             // execute the tag
-            String output = TagUtil.execute(tag, response);
+            String output = TagUtil.execute(tag, response, bodyContent);
             return output;
         }
         return null;

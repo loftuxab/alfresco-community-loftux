@@ -157,8 +157,12 @@ public class DispatcherServlet extends BaseServlet
         }
         else
         {
-            // no template, so dispatch to a "starter" page
-            String dispatchPage = "/ui/misc/unconfigured-nav-node.jsp";
+            // go to unconfigured page display
+            String dispatchPage = context.getConfig().getUnconfiguredPageUri();
+            if (dispatchPage == null || "".equals(dispatchPage))
+                dispatchPage = "/ui/core/page-unconfigured.jsp";
+
+            // dispatch
             PresentationUtil.renderJspPage(context, request, response,
                     dispatchPage);
         }

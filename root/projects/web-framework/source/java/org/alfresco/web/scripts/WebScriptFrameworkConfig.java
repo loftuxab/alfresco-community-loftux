@@ -387,6 +387,35 @@ public class WebScriptFrameworkConfig extends AbstractConfig
         }
         return "/ui/core/page-default.jsp";
     }
+    
+    public String getUnconfiguredPageUri()
+    {
+        try
+        {
+            return config.getConfigElement("page").getChild("unconfigured").getChildValue(
+                    "uri");
+        }
+        catch (Exception ex)
+        {
+        }
+        return "/ui/core/page-unconfigured.jsp";
+    }
+
+    public String getRegionContainerUri()
+    {
+        try
+        {
+            return config.getConfigElement("page").getChild("region-container").getChildValue(
+                    "uri");
+        }
+        catch (Exception ex)
+        {
+        }
+        return "/ui/core/region.jsp";
+    }
+    
+    
+    
 
     //////////////////////////////////////////////////////////////////
     // File Systems

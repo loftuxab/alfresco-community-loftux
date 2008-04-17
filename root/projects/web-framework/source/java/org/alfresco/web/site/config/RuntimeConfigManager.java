@@ -72,8 +72,7 @@ public class RuntimeConfigManager
         config.putAll(templateSettings);
 
         config.put("template-id", template.getId());
-        config.put("template-type-id",
-                template.getTemplateType(context).getId());
+        config.put("template-type-id", template.getTemplateType());
     }
 
     protected static void populateConfiguration(RequestContext context,
@@ -84,8 +83,7 @@ public class RuntimeConfigManager
         config.putAll(componentSettings);
 
         config.put("component-id", component.getId());
-        config.put("component-type-id",
-                component.getComponentType(context).getId());
+        config.put("component-type-id", component.getComponentTypeId());
         config.put("component-region-id", component.getRegionId());
         config.put("component-source-id", component.getSourceId());
         config.put("component-scope-id", component.getScope());

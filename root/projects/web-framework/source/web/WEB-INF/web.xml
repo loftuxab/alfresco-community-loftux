@@ -20,10 +20,11 @@
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
 
-	<!--
-	DYNAMIC WEBSITE FILTERS
-	 -->
-   <!-- This filter will bootstrap the Web Script Framework Spring Context -->
+   <!-- 
+   		This filter will bootstrap the Web Script Framework
+   		It will execute the configured RequestContextFactory and bind
+   		the RequestContext instance to the request
+   -->
    <filter>
       <filter-name>Web Script Framework Filter</filter-name>
       <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>

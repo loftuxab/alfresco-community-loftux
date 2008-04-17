@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<id>webscript</id>
+	<name>Webscript Component Type</name>
+	<description>A component type that invokes the webscript engine</description>
+	<renderer-type>webscript</renderer-type>
+</component-type>

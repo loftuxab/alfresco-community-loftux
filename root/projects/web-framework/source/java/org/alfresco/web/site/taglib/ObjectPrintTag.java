@@ -31,7 +31,7 @@ import org.alfresco.web.site.URLUtil;
 /**
  * @author muzquiano
  */
-public class ContentPrintTag extends ContentAnchorTag
+public class ObjectPrintTag extends ObjectAnchorTag
 {
     private String iconUri = null;
 
@@ -47,28 +47,30 @@ public class ContentPrintTag extends ContentAnchorTag
 
     public int doStartTag() throws JspException
     {
-        String format = getFormat();
-        if (format == null)
-            setFormat("print");
-
-        int ret = super.doStartTag();
-
-        String theIconUri = getIconUri();
-        if (theIconUri == null)
-            theIconUri = "/ui/images/icons/incontext/print_content.gif";
-        theIconUri = URLUtil.browser(getRequestContext(), theIconUri);
-
-        try
+        if(isContentId())
         {
-            this.getOut().write("<img src='" + theIconUri + "' border='0'/>");
+            String format = getFormat();
+            if (format == null)
+                setFormat("print");
+    
+            int ret = super.doStartTag();
+    
+            String theIconUri = getIconUri();
+            if (theIconUri == null)
+                theIconUri = "/ui/images/icons/incontext/print_content.gif";
+            theIconUri = URLUtil.browser(getRequestContext(), theIconUri);
+    
+            try
+            {
+                this.getOut().write("<img src='" + theIconUri + "' border='0'/>");
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+                throw new JspException(ex);
+            }
+            return ret;
         }
-        catch (Exception ex)
-        {
-            print("Unable to render this component - an error occurred: ");
-            print(ex.getMessage());
-            ex.printStackTrace();
-        }
-
-        return ret;
+        return EVAL_BODY_INCLUDE;
     }
 }
