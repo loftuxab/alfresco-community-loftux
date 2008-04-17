@@ -2,8 +2,6 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
    <head> 
       <title>${title}</title> 
-      <#include "util/site-css-head.ftl"/>
-      <#include "util/site-js-head.ftl"/>
       ${head}
    </head>
    <body class="yui-skin-sam">

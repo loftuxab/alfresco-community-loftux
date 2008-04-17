@@ -2,10 +2,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head> 
    <title>${title}</title> 
-   <!-- Site-wide Assets -->
-   <link rel="stylesheet" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" type="text/css" />
-   <link rel="stylesheet" href="${url.context}/themes/default/base.css" type="text/css" />
-   <script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
+   <!-- Common Assets -->
+   ${head}
 
    <!-- Document Library YUI Assets -->
    <link rel="stylesheet" href="${url.context}/yui/resize/assets/skins/sam/resize.css" type="text/css" />
@@ -14,9 +12,6 @@
    <!-- Document Library Assets -->
    <link rel="stylesheet" href="${url.context}/templates/documentlibrary/documentlibrary.css" type="text/css" />
    <script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></script>
-
-   <!-- Component Assets -->
-   ${head}
 
 </head>  
 <body class="yui-skin-sam">
@@ -43,7 +38,9 @@
       <div id="ft">
          <@region id="footer" scope="global" protected=true />
       </div>
-      <@region id="file-upload" scope="page"/>      
+      <div class="hiddenComponents">
+         <@region id="file-upload" scope="template" protected=true />
+      </div>
    </div>
 </body>
 </html>
