@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>My Sites Component</shortname>
+   <description>Component used to list sites a user belongs to</description>
+   <url>/components/dashlets/my-sites</url>
+</webscript>

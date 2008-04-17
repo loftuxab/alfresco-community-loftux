@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>user-dashboard</id>
+   <title>User Dashboard</title>
+   <description>Users dashboard page</description>
+   <template-instance>user-dashboard</template-instance>
+   <authentication>none</authentication>
+</page>

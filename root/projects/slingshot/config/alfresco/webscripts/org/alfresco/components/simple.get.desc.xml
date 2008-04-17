@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>A Component</shortname>
+  <description>
+     A component that takes some real estate of the screen for testing.
+     Remove this when we have a few more components for the dashboards.
+  </description>
+  <url>/components/simple</url>
+</webscript>

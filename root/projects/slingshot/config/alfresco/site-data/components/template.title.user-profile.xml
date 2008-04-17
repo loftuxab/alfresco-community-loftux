@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>template</scope>
+   <region-id>title</region-id>
+   <source-id>user-profile</source-id>
+   <url>/components/title/profile-title</url>
+   <chrome>
+      <frame>none</frame>
+   </chrome>
+</component>
