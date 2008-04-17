@@ -3182,5 +3182,110 @@
                          windowtitle="Alfresco Web Framework" 
                          projectdir="${dir.project.dynamicwebsite}"/>
    </target>
+   
+   
+   
+   
+   <!-- ******************************* -->
+   <!-- ** Alfresco Extranet Project ** -->
+   <!-- ******************************* -->
+   
+   <target name="incremental-extranet" 
+           description="Performs an incremental build of the extranet project"
+           depends="package-extranet" />
+      
+   <target name="build-extranet" 
+           description="Performs a clean build of the extranet project"
+           depends="clean-extranet, 
+                    incremental-extranet" />
+   
+   <target name="clean-extranet" 
+           description="Cleans the extranet project" 
+           depends="init">
+      <clean projectdir="${dir.project.extranet}" />
+   </target>
+   
+   <target name="compile-extranet" 
+           description="Compiles the extranet project" 
+           depends="init">
+      <compile-java projectdir="${dir.project.extranet}" />
+   </target>
+   
+   <target name="package-extranet"
+           description="Packages the extranet project"
+           depends="compile-extranet">
+      <mkdir dir="${dir.project.extranet.dist}" />
+      <jar jarfile="${dir.project.extranet.dist}/${file.name.jar.extranet}" 
+           basedir="${dir.project.extranet.classes}" />
+   </target>
+   
+   <target name="incremental-extranet-war" 
+           description="Performs an incremental build of the extranet WAR file"
+           depends="package-extranet-war" />
+      
+   <target name="build-extranet-war" 
+           description="Performs a clean build of the extranet project"
+           depends="clean-extranet-war, 
+                    incremental-extranet-war" />
+   
+   <target name="clean-extranet-war" 
+           description="Cleans the extranet WAR assemble folder" 
+           depends="init">
+      <delete dir="${dir.project.extranet.assemble}" />
+   </target>
+
+   <target name="package-extranet-war" 
+           description="Packages the WAR file for the extranet project" 
+           depends="assemble-extranet-war">
+      <war warfile="${dir.project.extranet.dist}/${file.name.war.extranet}" 
+           webxml="${dir.project.extranet.src.webinf}/web.xml">
+         <fileset dir="${dir.project.extranet.assemble}" />
+      </war>
+   </target>
+
+   <target name="assemble-extranet-war" depends="package-extranet">
+      <mkdir dir="${dir.project.extranet.assemble}" />
+      
+      <!-- Copy in base WAR file from the "web-framework" package -->
+      <copy todir="${dir.project.extranet.assemble}">
+         <fileset dir="${dir.project.webframework.assemble}" />
+      </copy>
+      <!-- End of Copy -->
+
+      <copy todir="${dir.project.extranet.assemble}" overwrite="yes">
+         <fileset dir="${dir.project.extranet.src.web}" 
+                  excludes="WEB-INF/**" />
+      </copy>
+
+      <copy todir="${dir.project.extranet.assemble}/WEB-INF" overwrite="yes">
+         <fileset dir="${dir.project.extranet.src.webinf}" 
+                  excludes="web.xml" />
+      </copy>
+
+      <!-- add config files to WEB-INF/classes -->
+      <copy todir="${dir.project.extranet.assemble}/WEB-INF/classes" overwrite="true">
+         <fileset dir="${dir.project.extranet.config}" />
+      </copy>
+
+      <copy todir="${dir.project.extranet.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.extranet.dist}" 
+                  includes="${file.name.jar.extranet}" />
+      </copy>
+   </target>  
+   
+   <target name="test-extranet" 
+           description="Runs the tests for the extranet project" 
+           depends="compile-extranet">
+      <run-tests projectdir="${dir.project.extranet}" />
+   </target>
+   
+   <target name="generate-javadocs-extranet" 
+           description="Generates the JavaDocs for the extranet project"
+           depends="init">
+      <generate-javadocs documenttitle="Alfresco Extranet" 
+                         windowtitle="Alfresco Extranet" 
+                         projectdir="${dir.project.extranet}"/>
+   </target>
+   
 
 </project>
