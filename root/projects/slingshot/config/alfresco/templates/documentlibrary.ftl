@@ -5,12 +5,8 @@
    <!-- Common Assets -->
    ${head}
 
-   <!-- Document Library YUI Assets -->
-   <link rel="stylesheet" href="${url.context}/yui/resize/assets/skins/sam/resize.css" type="text/css" />
-   <script type="text/javascript" src="${url.context}/yui/resize/resize-beta-min.js"></script>
-
    <!-- Document Library Assets -->
-   <link rel="stylesheet" href="${url.context}/templates/documentlibrary/documentlibrary.css" type="text/css" />
+   <link rel="stylesheet" type="text/css" href="${url.context}/templates/documentlibrary/documentlibrary.css" />
    <script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></script>
 
 </head>  
