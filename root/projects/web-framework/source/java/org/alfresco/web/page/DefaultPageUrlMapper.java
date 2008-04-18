@@ -34,6 +34,15 @@ package org.alfresco.web.page;
 public class DefaultPageUrlMapper implements UrlMapper
 {
    /**
+    * @see org.alfresco.web.page.UrlMapper#match(java.lang.String)
+    */
+   public boolean match(String url)
+   {
+      // we map all urls directly to file paths - so can match anything
+      return true;
+   }
+   
+   /**
     * @see org.alfresco.web.page.UrlMapper#buildResourcePath(java.lang.String)
     */
    public String buildResourcePath(String url)
@@ -47,15 +56,6 @@ public class DefaultPageUrlMapper implements UrlMapper
       url = trimUrl(url);
       
       return url + ".xml";
-   }
-
-   /**
-    * @see org.alfresco.web.page.UrlMapper#match(java.lang.String)
-    */
-   public boolean match(String url)
-   {
-      // we map all urls directly to file paths - so can match anything
-      return true;
    }
    
    /**

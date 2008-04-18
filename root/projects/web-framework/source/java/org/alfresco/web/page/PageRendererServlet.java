@@ -82,17 +82,22 @@ public class PageRendererServlet extends WebScriptServlet
    
    private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
    
+   /** bean references */
    private PresentationTemplateProcessor templateProcessor;
-   private PresentationTemplateProcessor webScriptsTemplateProcessor;
+   private PresentationTemplateProcessor componentTemplateProcessor;
    private PresentationScriptProcessor scriptProcessor;
    private Registry webscriptsRegistry;
+   
+   /** stores */
    private Store pageStore;
    private Store templateStore;
    private Store templateConfigStore;
    private Store componentStore;
    
+   /** list of register UrlMapper instances */
    private List<UrlMapper> urlMappers;
    
+   /** thread-safe cache of page level components */
    private Map<String, CacheValue<PageComponent>> componentCache =
       Collections.synchronizedMap(new HashMap<String, CacheValue<PageComponent>>());
    
@@ -102,7 +107,7 @@ public class PageRendererServlet extends WebScriptServlet
    {
       super.init();
       
-      // init required beans - template processor and template loaders
+      // init required beans - webscript beans, stores, template and script processors
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
       
       webscriptsRegistry = (Registry)context.getBean("pagerenderer.registry");
@@ -115,16 +120,16 @@ public class PageRendererServlet extends WebScriptServlet
       templateConfigStore = (Store)context.getBean("pagerenderer.templateconfigstore");
       templateConfigStore.init();
       templateProcessor = (PresentationTemplateProcessor)context.getBean("pagerenderer.templateprocessor");
-      webScriptsTemplateProcessor = (PresentationTemplateProcessor)context.getBean("pagerenderer.webscripts.templateprocessor");
+      componentTemplateProcessor = (PresentationTemplateProcessor)context.getBean("pagerenderer.webscripts.templateprocessor");
       scriptProcessor = (PresentationScriptProcessor)context.getBean("pagerenderer.webscripts.scriptprocessor");
       
       // we use a specific config service instance
       configService = (ConfigService)context.getBean("pagerenderer.config");
       
-      // we use a specific webscript container instance
+      // we use a specific webscript container instance - override the one from the super
       container = (RuntimeContainer)context.getBean("pagerenderer.container");
       
-      // get the list of url mappers for the page renderer
+      // init the list of url mappers for the page renderer
       initUrlMappers();
    }
 
@@ -204,6 +209,7 @@ public class PageRendererServlet extends WebScriptServlet
       
       try
       {
+         // TODO: reimplement using the new connector abstraction package
          // authenticate - or redirect to login page
          AuthenticationResult auth = PageAuthenticationServlet.authenticate(req, page.getAuthentication());
          if (auth.Success)
@@ -211,15 +217,14 @@ public class PageRendererServlet extends WebScriptServlet
             // apply the ticket to the WebScript runtime container for the current thread
             ((PageRendererRuntimeContainer)container).setTicket(auth.Ticket);
             
-            // Setup the PageRenderer context for the webscript runtime to use when processing
-            // the page components
+            // Setup the PageRenderer context for the webscript runtime to use when processing page components
             PageRendererContext context = new PageRendererContext();
             context.RuntimeContainer = container;
             context.RequestURI = uri;
             context.RequestPath = req.getContextPath();
             context.PageInstance = page;
             context.Tokens = args;
-            context.PageModel = buildPageModel(page, req);
+            context.PageComponentModel = buildPageComponentModel(page, req);
             
             // handle a clicked UI component link - look for id+url
             // TODO: keep further state of page? i.e. multiple webscripts can be hosted and clicked
@@ -434,6 +439,15 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    /**
+    * Build the model for page template execution. Responsible for added the special 'region' directive
+    * to the model. The region directive executes in one of two modes, active and passive. See the docs
+    * for the RegionDirective class for more information.
+    * 
+    * @param context    PageRendererContext for this thread
+    * @param page       the page object
+    * @param req        Request (for source url)
+    * @param active     True for 'active' region directive processing mode, false for 'passive' mode.
+    * 
     * @return model to use for UI Component template page execution
     */
    private Map<String, Object> buildTemplateModel(
@@ -446,7 +460,7 @@ public class PageRendererServlet extends WebScriptServlet
       model.put("description", page.getDescription());
       model.put("title", page.getTitle());
       model.put("theme", page.getTheme());
-      model.put("head", page.getHeaderRenderer(webscriptsRegistry, webScriptsTemplateProcessor, urlHelper));
+      model.put("head", page.getHeaderRenderer(webscriptsRegistry, componentTemplateProcessor, urlHelper));
       
       // add the custom 'region' directive implementation - one instance per model as we pass in template/page 
       model.put("region", new RegionDirective(context, componentStore, componentCache, page, active));
@@ -455,9 +469,11 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    /**
-    * @return model to use for UI Component execution on a page
+    * Build the model available to each component to represent the current page meta. 
+    * 
+    * @return model to use for UI Component execution against a page.
     */
-   private Map<String, Object> buildPageModel(
+   private Map<String, Object> buildPageComponentModel(
          PageInstance page, HttpServletRequest req)
    {
       Map<String, Object> model = new HashMap<String, Object>(4);
@@ -465,6 +481,7 @@ public class PageRendererServlet extends WebScriptServlet
       URLHelper urlHelper = new URLHelper(req);
       pageModel.put("url", urlHelper);
       pageModel.put("theme", page.getTheme());
+      // TODO: add page url arguments as Map model "page.args"
       model.put("page", pageModel);
       
       return model;
@@ -488,8 +505,7 @@ public class PageRendererServlet extends WebScriptServlet
     */
    private void initUrlMappers()
    {
-      Config config = getConfig();
-      ConfigElement urlMappersElement = config.getConfigElement("url-mappers");
+      ConfigElement urlMappersElement = getConfig().getConfigElement("url-mappers");
       if (urlMappersElement == null)
       {
          throw new AlfrescoRuntimeException("Missing required config element 'url-mappers' under 'PageRenderer'.");
@@ -602,23 +618,28 @@ public class PageRendererServlet extends WebScriptServlet
       String ComponentId;
       String ComponentUrl;
       Map<String, String> Tokens;
-      Map<String, Object> PageModel;
+      Map<String, Object> PageComponentModel;
    }
    
    
    /**
-    * Helper to return context path for generating urls
+    * Helper to return component parts of the URL and to generate page url
     */
    public static class URLHelper
    {
       String context;
-      String url;
+      String pageContext;
+      String uri;
       String args;
+      
 
       public URLHelper(HttpServletRequest req)
       {
          this.context = req.getContextPath();
-         this.url = req.getRequestURI();
+         this.uri = req.getRequestURI();
+         String uriNoContext = req.getRequestURI().substring(this.context.length());
+         StringTokenizer t = new StringTokenizer(uriNoContext, "/");
+         this.pageContext = this.context + "/" + t.nextToken();
          this.args = (req.getQueryString() != null ? req.getQueryString() : "");
       }
 
@@ -627,9 +648,19 @@ public class PageRendererServlet extends WebScriptServlet
          return context;
       }
       
-      public String getFull()
+      public String getServletContext()
       {
-         return url;
+         return pageContext;
+      }
+      
+      public String getUri()
+      {
+         return uri;
+      }
+      
+      public String getUrl()
+      {
+         return uri + (this.args.length() != 0 ? ("?" + this.args) : "");
       }
       
       public String getArgs()
