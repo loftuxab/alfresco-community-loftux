@@ -41,7 +41,7 @@ public interface UrlMapper
    /**
     * Build path to a resource mapped for the given url
     * 
-    * @param resource
+    * @param url     Of the resource to build path to
     * 
     * @return path to a resource for the given url
     */

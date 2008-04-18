@@ -125,7 +125,7 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
    @Override
    public Map<String, Object> getScriptParameters()
    {
-      return context.PageModel;
+      return context.PageComponentModel;
    }
 
    /* (non-Javadoc)
@@ -134,7 +134,7 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
    @Override
    public Map<String, Object> getTemplateParameters()
    {
-      return context.PageModel;
+      return context.PageComponentModel;
    }
 
    @Override

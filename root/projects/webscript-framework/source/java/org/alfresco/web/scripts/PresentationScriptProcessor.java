@@ -103,8 +103,6 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
     {
         // TODO: script caching (compiled version)
         
-        // TODO: script imports (as RhinoScriptProcessor does)
-        
         // read script content from location
         try
         {   
