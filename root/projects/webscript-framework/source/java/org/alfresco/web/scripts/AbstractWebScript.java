@@ -26,7 +26,6 @@ package org.alfresco.web.scripts;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
@@ -224,11 +223,7 @@ public abstract class AbstractWebScript implements WebScript
         String[] names = req.getParameterNames();
         for (String name : names)
         {
-            try
-            {
-                args.put(name, new String(req.getParameter(name).getBytes(), "UTF-8"));
-            }
-            catch (UnsupportedEncodingException err) {}
+            args.put(name, req.getParameter(name));
         }
         return args;
     }
@@ -245,20 +240,7 @@ public abstract class AbstractWebScript implements WebScript
         String[] names = req.getParameterNames();
         for (String name : names)
         {
-            String[] unconvertedValues = req.getParameterValues(name);
-            String[] convertedValues = new String[unconvertedValues.length];
-            for (int i = 0; i < unconvertedValues.length; i++)
-            {
-                String unconvertedValue = unconvertedValues[i];
-                String convertedValue = unconvertedValue;
-                try
-                {
-                    convertedValue = new String(unconvertedValue.getBytes(), "UTF-8");
-                }
-                catch (UnsupportedEncodingException err) {}
-                convertedValues[i] = convertedValue;
-            }
-            args.put(name, convertedValues);
+            args.put(name, req.getParameterValues(name));
         }
         return args;
     }
