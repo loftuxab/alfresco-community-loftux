@@ -1,20 +1,14 @@
 <!-- Site-wide YUI Assets -->
-<link rel="stylesheet" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" type="text/css" />
-<link rel="stylesheet" href="${url.context}/themes/default/base.css" type="text/css" />
-<script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
+<link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
+<link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/sam/skin.css" />
+<script type="text/javascript" src="${url.context}/yui/yui-all.js"></script>
 
 <!-- Site-wide Common Assets -->
+<link rel="stylesheet" type="text/css" href="${url.context}/themes/default/base.css" />
 <script type="text/javascript">//<![CDATA[
   /* Ensure Alfresco root object exists */
   var Alfresco = (typeof Alfresco == "undefined" || !Alfresco ? {} : Alfresco);
 //]]></script>
-
-<!-- Header YUI Assets -->
-<link rel="stylesheet" type="text/css" href="${url.context}/yui/button/assets/skins/sam/button.css" />
-<link rel="stylesheet" type="text/css" href="${url.context}/yui/menu/assets/skins/sam/menu.css" />
-<script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
-<script type="text/javascript" src="${url.context}/yui/menu/menu-min.js"></script>
-<script type="text/javascript" src="${url.context}/yui/button/button-min.js"></script>
 
 <!-- Header Assets -->
 <link rel="stylesheet" type="text/css" href="${url.context}/components/header/header.css" />

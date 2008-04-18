@@ -1,12 +1,5 @@
-<!-- File upload YUI Assets -->
-<link rel="stylesheet" type="text/css" href="${url.context}/yui/container/assets/skins/sam/container.css">
-<script type="text/javascript" src="${url.context}/yui/yahoo-dom-event/yahoo-dom-event.js"></script>
-<script type="text/javascript" src="${url.context}/yui/animation/animation-min.js"></script>
-<script type="text/javascript" src="${url.context}/yui/dragdrop/dragdrop-min.js"></script>
-<script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
-
 <!-- File upload Assets -->
-<link rel="stylesheet" type="text/css" href="${url.context}/components/documentlibrary/file-upload.css"/>
+<link rel="stylesheet" type="text/css" href="${url.context}/components/documentlibrary/file-upload.css" />
 <script type="text/javascript" src="${url.context}/js/flash/AC_OETags.js"></script>
 
 <script type="text/javascript" src="${url.context}/components/documentlibrary/mootools-core.js"></script>

@@ -43,7 +43,7 @@
 					</div>
 
 					<ul class="photoupload-queue" id="photoupload-queue">
-						<li style="display: none" />
+						<li style="display: none">&nbsp;</li>
 					</ul>
 				</fieldset>
 			</div>
