@@ -24,71 +24,13 @@
  */
 package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.alfresco.web.site.model.Configuration;
-import org.alfresco.web.site.model.Page;
-
 /**
  * @author muzquiano
  */
-public class ExtranetPageMapper extends PageMapper
+public class ExtranetPageMapper extends DefaultPageMapper
 {
     protected ExtranetPageMapper()
     {
         super();
-    }
-
-    public void execute(RequestContext context, HttpServletRequest request)
-    {
-        // init
-        // requests come in the form
-        // ?f=formatId&n=nodeId
-        // ?f=formatId&n=nodeId&o=objectId
-        // ?n=nodeId
-        // ?n=nodeId&o=objectId
-        // ? (node id assumed to be site root node)
-
-        // format id
-        String formatId = (String) request.getParameter("f");
-        if (formatId == null || "".equals(formatId))
-            formatId = context.getConfig().getDefaultFormatId();
-        if (formatId != null)
-            context.setCurrentFormatId(formatId);
-
-        // page id
-        String pageId = (String) request.getParameter("p");
-        if (pageId == null || "".equals(pageId))
-        {
-            // no page was provided, so load the root page
-            Page rootPage = ModelUtil.getRootPage(context);
-            if (rootPage != null)
-                pageId = rootPage.getId();
-        }
-        if (pageId != null)
-        {
-            Page _page = context.getModel().loadPage(context, pageId);
-            if (_page != null)
-                context.setCurrentPage(_page);
-        }
-
-        // object id
-        String objectId = (String) request.getParameter("o");
-        if (objectId != null && !"".equals(objectId))
-        {
-            context.setCurrentObjectId(objectId);
-        }
-
-        // check to make sure we have a site configuration
-        Configuration siteConfiguration = ModelUtil.getSiteConfiguration(context);
-        if (siteConfiguration == null)
-        {
-            // if we don't, then lets null everything
-            // this forces the framework to "restart"
-            context.setCurrentPage(null);
-            context.setCurrentObjectId(null);
-            context.setCurrentFormatId(null);
-        }
-
     }
 }

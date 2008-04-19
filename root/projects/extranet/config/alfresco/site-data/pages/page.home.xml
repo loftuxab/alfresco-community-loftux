@@ -3,6 +3,6 @@
 <page>
   <id>page.home</id>
   <name>Home Page</name>
-  <template-id>template.home</template-id>
-  <root-page>true</root-page>
+  <template-instance>template.home</template-instance>
+  <authentication>none</authentication>  
 </page>

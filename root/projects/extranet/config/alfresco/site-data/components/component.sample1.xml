@@ -2,7 +2,7 @@
 
 <component> 
   <id>component.sample1</id>  
-  <name>Sample Component</name>  
+  <title>Sample Component</title>  
   <url>/sample1</url>
   
   <!-- Binding --> 

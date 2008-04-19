@@ -27,60 +27,10 @@ package org.alfresco.web.site;
 /**
  * @author muzquiano
  */
-public class ExtranetLinkBuilder extends LinkBuilder
+public class ExtranetLinkBuilder extends DefaultLinkBuilder
 {
     protected ExtranetLinkBuilder()
     {
         super();
     }
-
-    public String page(RequestContext context, String pageId)
-    {
-        String formatId = context.getConfig().getDefaultFormatId();
-        return page(context, pageId, formatId);
-    }
-
-    public String page(RequestContext context, String pageId, String formatId)
-    {
-        if (pageId == null)
-            return null;
-        if (formatId == null)
-            formatId = context.getConfig().getDefaultFormatId();
-
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("?f=" + formatId);
-        buffer.append("&p=" + pageId);
-
-        return buffer.toString();
-    }
-
-    public String content(RequestContext context, String objectId)
-    {
-        String formatId = context.getConfig().getDefaultFormatId();
-        return content(context, objectId, formatId);
-    }
-
-    public String content(RequestContext context, String objectId,
-            String formatId)
-    {
-        return content(context, objectId, null, formatId);
-    }
-
-    public String content(RequestContext context, String objectId,
-            String pageId, String formatId)
-    {
-        if (objectId == null)
-            return null;
-        if (formatId == null)
-            formatId = context.getConfig().getDefaultFormatId();
-
-        StringBuffer buffer = new StringBuffer();
-        buffer.append("?f=" + formatId);
-        if (pageId != null && !"".equals(pageId))
-            buffer.append("&p=" + pageId);
-        buffer.append("&o=" + objectId);
-
-        return buffer.toString();
-    }
-
 }

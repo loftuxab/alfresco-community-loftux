@@ -24,42 +24,12 @@
  */
 package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.alfresco.connector.remote.Connector;
-import org.alfresco.connector.remote.Response;
-import org.alfresco.web.site.model.Endpoint;
-import org.alfresco.web.site.remote.ConnectorFactory;
-
 /**
  * This factory loads users from Alfresco, fetching their properties
  * and so forth.
  * 
  * @author muzquiano
  */
-public class ExtranetUserFactory extends UserFactory
+public class ExtranetUserFactory extends DefaultUserFactory
 {
-    protected User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws Exception
-    {
-        // TODO: Somehow get the endpoint id...
-        String endpointId = "";
-
-        // Load the endpoint
-        Endpoint endpoint = ModelUtil.getEndpoint(context, endpointId);
-
-        // Webscript to use
-        String webscriptUri = "/service/user";
-
-        // Use the remote
-        Connector conn = ConnectorFactory.newInstance(context, endpoint);
-        Response response = conn.call(webscriptUri);
-        String responseString = response.getResponse();
-
-        // This is a JSON response...
-        // TODO: Load into JSON parser and work with it
-        User user = new User(user_id);
-
-        return user;
-    }
 }
