@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site.model;
 
+import java.util.Map;
+
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 
@@ -39,11 +41,13 @@ public class Component extends ModelObject
     public static String PROP_COMPONENT_TYPE_ID = "component-type-id";
     public static String PROP_FRAME_TYPE = "frame-type";
     public static String PROP_URL = "url";
+    
+    protected static Map modelPropertyKeys;
 
     public Component(Document document)
     {
         super(document);
-    }
+    }    
 
     public String getRegionId()
     {

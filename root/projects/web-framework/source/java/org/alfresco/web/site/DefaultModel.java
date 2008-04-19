@@ -26,7 +26,6 @@ package org.alfresco.web.site;
 
 import java.util.HashMap;
 
-import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.site.cache.CacheFactory;
 import org.alfresco.web.site.cache.IContentCache;
 import org.alfresco.web.site.filesystem.IFile;
@@ -36,12 +35,12 @@ import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Endpoint;
+import org.alfresco.web.site.model.ModelHelper;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
-import org.dom4j.Document;
 
 /**
  * @author muzquiano
@@ -91,9 +90,9 @@ public class DefaultModel extends AbstractModel implements IModel
         return (PageAssociation) loadObject(context, PageAssociation.TYPE_NAME, id);
     }
 
-    public Template loadTemplate(RequestContext context, String id)
+    public TemplateInstance loadTemplate(RequestContext context, String id)
     {
-        return (Template) loadObject(context, Template.TYPE_NAME, id);
+        return (TemplateInstance) loadObject(context, TemplateInstance.TYPE_NAME, id);
     }
 
     public TemplateType loadTemplateType(RequestContext context, String id)
@@ -138,9 +137,9 @@ public class DefaultModel extends AbstractModel implements IModel
         return (PageAssociation) newObject(context, PageAssociation.TYPE_NAME);
     }
 
-    public Template newTemplate(RequestContext context)
+    public TemplateInstance newTemplate(RequestContext context)
     {
-        return (Template) newObject(context, Template.TYPE_NAME);
+        return (TemplateInstance) newObject(context, TemplateInstance.TYPE_NAME);
     }
 
     public TemplateType newTemplateType(RequestContext context)
@@ -152,17 +151,10 @@ public class DefaultModel extends AbstractModel implements IModel
 
     public void saveObject(RequestContext context, ModelObject obj)
     {
-        Document xmlDocument = obj.getDocument();
-        if (xmlDocument != null)
+        boolean b = ModelHelper.saveObject(getFileSystem(), obj);
+        if(b)
         {
-            String modelRelativePath = obj.getRelativePath();
-            String modelFileName = obj.getFileName();
-            
-            // write the document to the model's file system
-            ModelUtil.writeDocument(getFileSystem(), modelRelativePath,
-                    modelFileName, xmlDocument);
-
-            // make sure that the cache is in sync
+            // update cache
             obj.touch();
             cachePut(context, obj);
         }
@@ -179,7 +171,7 @@ public class DefaultModel extends AbstractModel implements IModel
         String modelRelativeFilePath = this.convertIDToRelativeFilePath(typeId, id);
         return _loadObject(context, modelRelativeFilePath);
     }
-    
+        
     public ModelObject loadObject(RequestContext context, String id)
     {
         String modelRelativeFilePath = this.convertIDToRelativeFilePath(id);
@@ -196,50 +188,21 @@ public class DefaultModel extends AbstractModel implements IModel
             return obj;
         }
 
-        try
+        obj = ModelHelper.loadObject(getFileSystem(), modelRelativeFilePath);
+        if(obj != null)
         {
-            // Read the document from the model's file system
-            IFile file = getFileSystem().getFile(modelRelativeFilePath);
-            if (file != null)
-            {
-                Document document = ModelUtil.readDocument(file);
-                obj = convertDocumentToModelObject(document,
-                        file.getModificationDate());
-
-                // get the relative path for this type
-                int u = modelRelativeFilePath.lastIndexOf("/");
-                String relativePath = modelRelativeFilePath.substring(0, u);
-
-                obj.setRelativePath(relativePath);
-
-                // make sure that the cache is in sync
-                cachePut(context, obj);
-            }
-            else
-            {
-                // we didn't find the file, we'll return null
-            }
+            obj.touch();
+            cachePut(context, obj);
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-        return (ModelObject) obj;
+
+        return obj;
     }
-
-    
 
     public void removeObject(RequestContext context, ModelObject obj)
     {
-        Document xmlDocument = obj.getDocument();
-        if (xmlDocument != null)
+        boolean b = ModelHelper.removeObject(getFileSystem(), obj);
+        if(b)
         {
-            String modelRelativePath = obj.getRelativePath();
-            String modelFileName = obj.getFileName();
-
-            // delete the file from the model's file system
-            getFileSystem().deleteFile(modelRelativePath, modelFileName);
-
             // make sure that the cache is in sync
             cacheRemove(context, obj);
         }
@@ -247,34 +210,13 @@ public class DefaultModel extends AbstractModel implements IModel
 
     public ModelObject newObject(RequestContext context, String typeName)
     {
-        // construct the xml
-        String xml = "<" + typeName + "></" + typeName + ">";
-
-        // constructs a new GUID (with prefix if available)
-        String id = newGUID(typeName);
-
-        // build the object
-        ModelObject obj = null;
-        try
+        ModelObject obj = ModelHelper.newObject(typeName);
+        if(obj != null)
         {
-            Document d = XMLUtil.parse(xml);
-            XMLUtil.addChildValue(d.getRootElement(), "id", id);
-            XMLUtil.addChildValue(d.getRootElement(), "name", id);
-            XMLUtil.addChildValue(d.getRootElement(), "description", id);
-
-            obj = (ModelObject) convertDocumentToModelObject(d,
-                    System.currentTimeMillis());
-
-            // get the relative path for this type
-            String modelRelativePath = getConfiguration().getModelTypePath(
-                    typeName);
-            obj.setRelativePath(modelRelativePath);
-
+            // make sure that the cache is in sync
+            cachePut(context, obj);
         }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+        
         return obj;
     }
 
@@ -286,13 +228,28 @@ public class DefaultModel extends AbstractModel implements IModel
                 typeName);
         
         // read files from the model's file system
-        IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);
+        IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);        
         if (files != null)
         {
-            array = new ModelObject[files.length];
+            // extra step - make sure we only get back files
+            int realFilesCount = 0;
+            for(int z = 0; z < files.length; z++)
+            {
+                if(files[z].isFile())
+                {
+                    realFilesCount++;
+                }            
+            }
+            
+            int count = 0;
+            array = new ModelObject[realFilesCount];
             for (int i = 0; i < files.length; i++)
             {
-                array[i] = loadObject(context, files[i]);
+                if(files[i].isFile())
+                {
+                    array[count] = loadObject(context, files[i]);
+                    count++;
+                }
             }
         }
 

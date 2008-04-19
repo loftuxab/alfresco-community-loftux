@@ -30,12 +30,12 @@ import org.dom4j.Document;
 /**
  * @author muzquiano
  */
-public class Template extends ModelObject
+public class TemplateInstance extends ModelObject
 {
-    public static String TYPE_NAME = "template";
+    public static String TYPE_NAME = "template-instance";
     public static String PROP_TEMPLATE_TYPE = "template-type";
     
-    public Template(Document document)
+    public TemplateInstance(Document document)
     {
         super(document);
     }

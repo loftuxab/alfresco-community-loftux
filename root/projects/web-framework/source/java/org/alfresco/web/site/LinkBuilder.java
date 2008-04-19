@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import java.util.Map;
+
 /**
  * @author muzquiano
  */
@@ -33,16 +35,58 @@ public abstract class LinkBuilder
     {
     }
 
+    /**
+     * Constructs a link to a given page.
+     * This will automatically use the default format.
+     */
     public abstract String page(RequestContext context, String pageId);
 
-    public abstract String page(RequestContext context, String pageId,
+    /**
+     * Constructs a link to a given page for a given format.
+     */    
+    public abstract String page(RequestContext context, String pageId, 
             String formatId);
 
+    /**
+     * Constructs a link to a given page for a given format.
+     * The provided object is passed in as context.
+     */    
+    public abstract String page(RequestContext context, String pageId, 
+            String formatId, String objectId);    
+
+    /**
+     * Constructs a link to a given page for a given format.
+     * The provided object is passed in as context.
+     * The provided parameters are appended to the URL.
+     */    
+    public abstract String page(RequestContext context, String pageId, 
+            String formatId, String objectId, Map<String, String> params);
+    
+    /**
+     * Constructs a link to a given content item.
+     * This will automatically use the default format.
+     * 
+     * This method allows the dispatcher servlet to perform a late
+     * lookup of the appropriate page to render for the given item.
+     */    
     public abstract String content(RequestContext context, String objectId);
 
+    /**
+     * Constructs a link to a given content item for a given format.
+     * 
+     * This method allows the dispatcher servlet to perform a late
+     * lookup of the appropriate page to render for the given item.
+     */    
     public abstract String content(RequestContext context, String objectId,
             String formatId);
 
+    /**
+     * Constructs a link to a given content item for a given format.
+     * The provided parameters are appended to the generated URL.
+     * 
+     * This method allows the dispatcher servlet to perform a late
+     * lookup of the appropriate page to render for the given item.
+     */    
     public abstract String content(RequestContext context, String objectId,
-            String pageId, String formatId);
+            String formatId, Map<String, String> params);
 }

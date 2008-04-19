@@ -30,14 +30,19 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
+import org.alfresco.web.site.Timer;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * @author muzquiano
@@ -47,28 +52,56 @@ public class DispatcherServlet extends BaseServlet
     public void init() throws ServletException
     {
         super.init();
+        
+        // make sure the default framework is loaded
+        ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        FrameworkHelper.initFramework(getServletContext(), context);
     }
-
+    
     protected void service(HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException
     {
+        // bind a timer for reporting of dispatches
+        Timer.bindTimer(request);
+        Timer.start(request, "service");
+        
         setNoCacheHeaders(response);
-
-        // get the request context
-        RequestContext context = RequestUtil.getRequestContext(request);
-
+        
+        // initialize the request context
+        RequestContext context = null;
+        try
+        {
+            Timer.start(request, "initRequestContext");
+            FrameworkHelper.initRequestContext(request);
+            context = RequestUtil.getRequestContext(request);
+            Timer.stop(request, "initRequestContext");
+        }
+        catch (Exception ex)
+        {
+            throw new ServletException(ex);
+        }
+        
         // stamp any theme information onto the request
         ThemeUtil.applyTheme(context, request);
 
         // dispatch
         try
         {
+            Timer.start(request, "dispatch");
             dispatch(context, request, response);
+            Timer.stop(request, "dispatch");
         }
         catch (Exception e)
         {
             throw new ServletException(e);
         }
+        
+        // stop the service timer
+        Timer.stop(request, "service");
+        
+        // print out any timing information (if enabled)
+        Timer.reportAll(request);
+        Timer.unbindTimer(request);
     }
 
     protected void dispatch(RequestContext context, HttpServletRequest request,
@@ -79,29 +112,58 @@ public class DispatcherServlet extends BaseServlet
         //
         String currentFormatId = context.getCurrentFormatId();
         String currentObjectId = context.getCurrentObjectId();
+        String currentPageId = context.getCurrentPageId();
         Page currentPage = context.getCurrentPage();
+        
+        Framework.getLogger().debug("Current Page ID: " + currentPageId);
+        Framework.getLogger().debug("Current Format ID: " + currentFormatId);
+        Framework.getLogger().debug("Current Object ID: " + currentObjectId);
 
-        // initial state - what if nothing is set up
+        // if we have absolutely nothing to dispatch to, then check to
+        // see if there is a root-page declared to which we can go
         if (currentPage == null && currentObjectId == null)
         {
-            // go to default page
-            String defaultPageUri = context.getConfig().getDefaultPageUri();
-            if (defaultPageUri == null || "".equals(defaultPageUri))
-                defaultPageUri = "/ui/core/page-default.jsp";
-            dispatchJsp(context, request, response, defaultPageUri);
+            // check if a root page exists to which we can forward
+            Page rootPage = ModelUtil.getRootPage(context);
+            if (rootPage != null)
+            {
+                context.setCurrentPage(rootPage);
+            }            
+        }
+        
+        // if at this point there really is nothing to view...
+        if (currentPage == null && currentObjectId == null)
+        {
+            Framework.getLogger().debug("No Page or Object determined");
+            
+            // go to getting started page
+            String gettingStartedPageUri = context.getConfig().getGettingStartedPageUri();
+            Framework.getLogger().debug("Dispatching to Getting Started: " + gettingStartedPageUri);
+            dispatchJsp(context, request, response, gettingStartedPageUri);
         }
         else
         {
-            // are we dispatching to a content object
-            if (currentObjectId != null)
+            // we know we're dispatching to something...
+            
+            // if we have a page specified, then we'll go there
+            if(currentPageId != null)
             {
-                dispatchContent(context, request, response, currentObjectId,
-                        currentFormatId);
+                Framework.getLogger().debug("Dispatching to Page: " + currentPageId);
+                
+                // if there happens to be a content item specified as well, it will just become part of the context
+                // in other words, the content item doesn't determine the
+                // destination page if the destination page is specified
+                
+                // we're dispatching to the current page
+                dispatchCurrentPage(context, request, response, currentFormatId);                
             }
             else
             {
-                // we're dispatching to the current page
-                dispatchCurrentPage(context, request, response, currentFormatId);
+                // otherwise, a page wasn't specified and a content item was
+                Framework.getLogger().debug("Dispatching to Content Object: " + currentObjectId);
+                
+                dispatchContent(context, request, response, currentObjectId,
+                        currentFormatId);
             }
         }
     }
@@ -118,18 +180,23 @@ public class DispatcherServlet extends BaseServlet
             String contentId, String formatId)
     {
         // TODO
-        // figure out the content type
-        /*
-         String relativeFilePath = contentId;
-         Document doc = XMLHelper.getDocumentXML(context, relativeFilePath);
-         String tagName = doc.getDocumentElement().getTagName();
-         int i = tagName.indexOf(":");
-         if(i > 0)
-         tagName = tagName.substring(i+1, tagName.length());
-         */
+        // Load the Content Item into a Content wrapper
+        // This should go through a ContentFactory pattern
+        // Objects that are XML serialized on disk are trivial
+        // Objects that must be remoted should go through a caching layer
+        // and then be present in the wrapped object
+        //
+        // An example - loading an object: workspace://SpacesStore/ABCDEF
+        // content.getId();
+        // content.getSource();
+        // content.getMetadata();
+        //
 
         // TODO
         String sourceId = "content type id";
+        Framework.getLogger().debug("Content - Object Source Id: " + sourceId); 
+
+        // Once we determine the "sourceId", we can do the following
 
         // get the content-template association
         ContentAssociation[] associations = ModelUtil.findContentAssociations(
@@ -139,6 +206,9 @@ public class DispatcherServlet extends BaseServlet
             Page page = associations[0].getPage(context);
             if (page != null)
             {
+                Framework.getLogger().debug("Content - Dispatching to Page: " + page.getId());
+                
+                // dispatch to content page
                 context.setCurrentPage(page);
                 dispatchCurrentPage(context, request, response, formatId);
             }
@@ -150,19 +220,24 @@ public class DispatcherServlet extends BaseServlet
             String formatId)
     {
         Page page = context.getCurrentPage();
-        Template currentTemplate = page.getTemplate(context);
+        Framework.getLogger().debug("Template ID: " +page.getTemplateId()); 
+        TemplateInstance currentTemplate = page.getTemplate(context);
         if (currentTemplate != null)
         {
+            Framework.getLogger().debug("Rendering Page with template: " + currentTemplate.getId()); 
             PresentationUtil.renderPage(context, request, response);
         }
         else
         {
+            Framework.getLogger().debug("Unable to render Page - template was not found");
+            
             // go to unconfigured page display
             String dispatchPage = context.getConfig().getUnconfiguredPageUri();
             if (dispatchPage == null || "".equals(dispatchPage))
                 dispatchPage = "/ui/core/page-unconfigured.jsp";
 
             // dispatch
+            Framework.getLogger().debug("Rendering Unconfigured Page: " + dispatchPage);
             PresentationUtil.renderJspPage(context, request, response,
                     dispatchPage);
         }

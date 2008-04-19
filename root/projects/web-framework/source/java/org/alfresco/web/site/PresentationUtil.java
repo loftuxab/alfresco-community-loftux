@@ -160,7 +160,7 @@ public class PresentationUtil
             request.setAttribute("error", t);
             request.setAttribute("error-pageId", pageId);
 
-            String dispatchPath = "/ui/core/page-error.jsp";
+            String dispatchPath = context.getConfig().getPageErrorUri();
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)
@@ -184,7 +184,7 @@ public class PresentationUtil
             request.setAttribute("error", t);
             request.setAttribute("error-templateId", templateId);
 
-            String dispatchPath = "/ui/core/template-error.jsp";
+            String dispatchPath = context.getConfig().getTemplateErrorUri();
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)
@@ -213,7 +213,7 @@ public class PresentationUtil
             request.setAttribute("error-regionId", regionId);
             request.setAttribute("error-regionScopeId", regionScopeId);
 
-            String dispatchPath = "/ui/core/region-error.jsp";
+            String dispatchPath = context.getConfig().getRegionErrorUri();
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)
@@ -237,7 +237,7 @@ public class PresentationUtil
             request.setAttribute("error", t);
             request.setAttribute("error-componentId", componentId);
 
-            String dispatchPath = "/ui/core/component-error.jsp";
+            String dispatchPath = context.getConfig().getComponentErrorUri();
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)

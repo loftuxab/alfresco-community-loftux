@@ -47,30 +47,21 @@ public class ObjectPrintTag extends ObjectAnchorTag
 
     public int doStartTag() throws JspException
     {
-        if(isContentId())
-        {
-            String format = getFormat();
-            if (format == null)
-                setFormat("print");
+        String format = getFormat();
+        if (format == null)
+            setFormat("print");
+
+        int ret = super.doStartTag();
     
-            int ret = super.doStartTag();
+        String theIconUri = getIconUri();
+        if (theIconUri == null)
+            theIconUri = "/ui/images/icons/incontext/print_content.gif";
+        theIconUri = URLUtil.browser(getRequestContext(), theIconUri);
     
-            String theIconUri = getIconUri();
-            if (theIconUri == null)
-                theIconUri = "/ui/images/icons/incontext/print_content.gif";
-            theIconUri = URLUtil.browser(getRequestContext(), theIconUri);
-    
-            try
-            {
-                this.getOut().write("<img src='" + theIconUri + "' border='0'/>");
-            }
-            catch (Exception ex)
-            {
-                ex.printStackTrace();
-                throw new JspException(ex);
-            }
-            return ret;
-        }
+        String markup = "<img src='" + theIconUri + "' border='0'/>";
+        
+        print(markup);
+
         return EVAL_BODY_INCLUDE;
     }
 }

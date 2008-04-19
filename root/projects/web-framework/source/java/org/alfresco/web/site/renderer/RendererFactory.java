@@ -30,7 +30,7 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererNotFoundException;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
 
 /**
@@ -107,7 +107,7 @@ public class RendererFactory
     }
 
     public static AbstractRenderer newRenderer(RequestContext context,
-            Template template) throws RendererNotFoundException
+            TemplateInstance template) throws RendererNotFoundException
     {                
         /**
          * Special case for Web Scripts as default

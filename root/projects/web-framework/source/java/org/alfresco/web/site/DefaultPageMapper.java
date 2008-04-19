@@ -34,7 +34,7 @@ import org.alfresco.web.site.model.Page;
  */
 public class DefaultPageMapper extends PageMapper
 {
-    protected DefaultPageMapper()
+    public DefaultPageMapper()
     {
         super();
     }
@@ -58,14 +58,7 @@ public class DefaultPageMapper extends PageMapper
 
         // page id
         String pageId = (String) request.getParameter("p");
-        if (pageId == null || "".equals(pageId))
-        {
-            // no page was provided, so load the root page
-            Page rootPage = ModelUtil.getRootPage(context);
-            if (rootPage != null)
-                pageId = rootPage.getId();
-        }
-        if (pageId != null)
+        if(pageId != null && !"".equals(pageId))
         {
             Page _page = context.getModel().loadPage(context, pageId);
             if (_page != null)
@@ -89,6 +82,5 @@ public class DefaultPageMapper extends PageMapper
             context.setCurrentObjectId(null);
             context.setCurrentFormatId(null);
         }
-
     }
 }

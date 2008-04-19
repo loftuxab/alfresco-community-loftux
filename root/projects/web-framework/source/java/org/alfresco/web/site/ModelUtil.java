@@ -41,7 +41,7 @@ import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
 import org.dom4j.Document;
 
@@ -302,28 +302,28 @@ public class ModelUtil
     }
 
     // helpers (for non associations)
-    public static Template[] findTemplates(RequestContext context)
+    public static TemplateInstance[] findTemplates(RequestContext context)
     {
         return findTemplates(context, null);
     }
 
-    public static Template[] findTemplates(RequestContext context,
+    public static TemplateInstance[] findTemplates(RequestContext context,
             String templateType)
     {
         // build property map
         HashMap propertyConstraintMap = new HashMap();
         addPropertyConstraint(propertyConstraintMap,
-                Template.PROP_TEMPLATE_TYPE, templateType);
+                TemplateInstance.PROP_TEMPLATE_TYPE, templateType);
 
         // do the lookup
-        ModelObject[] objects = findObjects(context, Template.TYPE_NAME,
+        ModelObject[] objects = findObjects(context, TemplateInstance.TYPE_NAME,
                 propertyConstraintMap);
 
         // convert to return type
-        Template[] array = new Template[objects.length];
+        TemplateInstance[] array = new TemplateInstance[objects.length];
         for (int i = 0; i < objects.length; i++)
         {
-            array[i] = (Template) objects[i];
+            array[i] = (TemplateInstance) objects[i];
         }
         return array;
     }
@@ -395,7 +395,7 @@ public class ModelUtil
     {
         // build property map
         HashMap propertyConstraintMap = new HashMap();
-        addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_ID,
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_ROOT_PAGE,
                 rootPage);
@@ -479,18 +479,38 @@ public class ModelUtil
 
     public static Page getRootPage(RequestContext context)
     {
+        // first check the site configuration
+        Configuration siteConfiguration = context.getSiteConfiguration();
+        if(siteConfiguration != null)
+        {
+            String rootPageId = siteConfiguration.getSetting("root-page");
+            if(rootPageId != null)
+            {
+                Page page = context.getModel().loadPage(context, rootPageId);
+                if(page != null)
+                {
+                    return page;
+                }
+            }
+        }
+        
+        // Otherwise, do an exhaustive query for pages with the root-page property
         Page[] rootPages = ModelUtil.findPages(context, null, "true");
         if (rootPages != null && rootPages.length > 0)
+        {
             return rootPages[0];
+        }
         return null;
     }
 
     public static Configuration getSiteConfiguration(RequestContext context)
     {
         Configuration[] configurations = ModelUtil.findConfigurations(context,
-                "site");
+                Configuration.VALUE_SOURCE_ID_SITE);
         if (configurations != null && configurations.length > 0)
+        {
             return configurations[0];
+        }
         return null;
     }
 
@@ -627,13 +647,16 @@ public class ModelUtil
     public static Document readDocument(IFile file)
     {
         Document doc = null;
-        try
+        if(file.isFile())
         {
-            doc = XMLUtil.parse(file.getInputStream());
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            try
+            {
+                doc = XMLUtil.parse(file.getInputStream());
+            }
+            catch (Exception ex)
+            {
+                ex.printStackTrace();
+            }
         }
         return doc;
     }

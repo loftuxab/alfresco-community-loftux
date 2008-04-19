@@ -24,46 +24,33 @@
  */
 package org.alfresco.web.site;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.tools.ReflectionHelper;
+import org.alfresco.web.site.exception.UserFactoryException;
 
-/**
- * @author muzquiano
- */
-public class Framework
+public abstract class UserFactoryBuilder
 {
-    public static boolean isInitialized()
+    protected UserFactoryBuilder()
     {
-        return (getConfig() != null && getModel() != null);
     }
 
-    public static AbstractConfig getConfig()
+    public static UserFactory newFactory()
+        throws UserFactoryException
     {
-        return Framework.config;
-    }
+        // default that we will use
+        String className = "org.alfresco.web.site.DefaultUserFactory";
+        
+        // check the config
+        String _defaultId = Framework.getConfig().getDefaultUserFactoryId();
+        String _className = Framework.getConfig().getUserFactoryClass(_defaultId);
+        if (_className != null)
+            className = _className;
 
-    public static void setConfig(AbstractConfig config)
-    {
-        Framework.config = config;
+        UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
+        if(factory == null)
+        {
+            throw new UserFactoryException("Unable to create user factory for class name: " + className);
+        }
+        factory.setId(_defaultId);
+        return factory;
     }
-
-    public static IModel getModel()
-    {
-        return Framework.model;
-    }
-
-    public static void setModel(IModel model)
-    {
-        Framework.model = model;
-    }
-    
-    public static Log getLogger()
-    {
-        return logger;
-    }
-
-    protected static AbstractConfig config = null;
-    protected static IModel model = null;
-    
-    protected static Log logger = LogFactory.getLog(Framework.class);
 }

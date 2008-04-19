@@ -24,46 +24,24 @@
  */
 package org.alfresco.web.site;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import javax.servlet.http.HttpServletRequest;
+
+import org.alfresco.connector.remote.Connector;
+import org.alfresco.connector.remote.Response;
+import org.alfresco.web.site.model.Endpoint;
+import org.alfresco.web.site.remote.ConnectorFactory;
 
 /**
+ * The world's simplest user factory.
+ * This just returns guest users.  NOP users, essentially.
+ * 
  * @author muzquiano
  */
-public class Framework
+public class DefaultUserFactory extends UserFactory
 {
-    public static boolean isInitialized()
+    public User loadUser(RequestContext context, HttpServletRequest request,
+            String user_id) throws Exception
     {
-        return (getConfig() != null && getModel() != null);
+        return this.getGuestUser(context, request);
     }
-
-    public static AbstractConfig getConfig()
-    {
-        return Framework.config;
-    }
-
-    public static void setConfig(AbstractConfig config)
-    {
-        Framework.config = config;
-    }
-
-    public static IModel getModel()
-    {
-        return Framework.model;
-    }
-
-    public static void setModel(IModel model)
-    {
-        Framework.model = model;
-    }
-    
-    public static Log getLogger()
-    {
-        return logger;
-    }
-
-    protected static AbstractConfig config = null;
-    protected static IModel model = null;
-    
-    protected static Log logger = LogFactory.getLog(Framework.class);
 }

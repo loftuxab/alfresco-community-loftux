@@ -10,10 +10,8 @@
          <element-reader element-name="incontext" class="org.alfresco.web.config.WebSiteElementReader"/>
          <element-reader element-name="servlet" class="org.alfresco.web.config.WebSiteElementReader"/>
          <element-reader element-name="alfresco" class="org.alfresco.web.config.WebSiteElementReader"/>
-         <element-reader element-name="model" class="org.alfresco.web.config.WebSiteElementReader"/>
 		 <element-reader element-name="tags" class="org.alfresco.web.config.WebSiteElementReader"/>
 		 <element-reader element-name="user" class="org.alfresco.web.config.WebSiteElementReader"/>
-		 <element-reader element-name="remote" class="org.alfresco.web.config.WebSiteElementReader"/>
 		 <element-reader element-name="renderers" class="org.alfresco.web.config.WebSiteElementReader"/>
 		 <element-reader element-name="defaults" class="org.alfresco.web.config.WebSiteElementReader"/>		 
       </element-readers>
@@ -129,106 +127,8 @@
 				<webscript-service-uri>/alfresco/service</webscript-service-uri>
 			</authoring>
 		</alfresco>
-		
-		
-		
-		<!--  Model  -->
-		<model>
-			<rootpath>/WEB-INF/classes/alfresco</rootpath>
-			<types>
-				<type>
-					<id>component</id>
-					<name>Component</name>
-					<description>Component</description>
-					<namespace></namespace>
-					<tagname>component</tagname>
-					<class>org.alfresco.web.site.model.Component</class>
-					<path>/site-data/components</path>
-					<prefix>cm-</prefix>
-				</type>
-				<type>
-					<id>component-type</id>
-					<name>Component Type</name>
-					<description>Component Type</description>
-					<namespace></namespace>
-					<tagname>component-type</tagname>
-					<class>org.alfresco.web.site.model.ComponentType</class>
-					<path>/site-data/component-types</path>
-					<prefix>ct-</prefix>
-				</type>
-				<type>
-					<id>configuration</id>
-					<name>Configuration</name>
-					<description>Configuration</description>
-					<namespace></namespace>
-					<tagname>configuration</tagname>
-					<class>org.alfresco.web.site.model.Configuration</class>
-					<path>/site-data/configurations</path>
-					<prefix>co-</prefix>
-				</type>
-				<type>
-					<id>content-association</id>
-					<name>Content Association</name>
-					<description>Content Association</description>
-					<namespace></namespace>
-					<tagname>content-association</tagname>
-					<class>org.alfresco.web.site.model.ContentAssociation</class>
-					<path>/site-data/content-associations</path>
-					<prefix>ca-</prefix>
-				</type>
-				<type>
-					<id>endpoint</id>
-					<name>Endpoint</name>
-					<description>Endpoint</description>
-					<namespace></namespace>
-					<tagname>endpoint</tagname>
-					<class>org.alfresco.web.site.model.Endpoint</class>
-					<path>/site-data/endpoints</path>
-					<prefix>ep-</prefix>
-				</type>
-				<type>
-					<id>page</id>
-					<name>Page</name>
-					<description>Page</description>
-					<namespace></namespace>
-					<tagname>page</tagname>
-					<class>org.alfresco.web.site.model.Page</class>
-					<path>/site-data/pages</path>
-					<prefix>pg-</prefix>
-				</type>
-				<type>
-					<id>page-association</id>
-					<name>Page Association</name>
-					<description>Page Association</description>
-					<namespace></namespace>
-					<tagname>page-association</tagname>
-					<class>org.alfresco.web.site.model.PageAssociation</class>
-					<path>/site-data/page-associations</path>
-					<prefix>pa-</prefix>
-				</type>
-				<type>
-					<id>template</id>
-					<name>Template</name>
-					<description>Template</description>
-					<namespace></namespace>
-					<tagname>template</tagname>
-					<class>org.alfresco.web.site.model.Template</class>
-					<path>/site-data/template-instances</path>
-					<prefix>tm-</prefix>
-				</type>
-				<type>
-					<id>template-type</id>
-					<name>Template Type</name>
-					<description>Template Type</description>
-					<namespace></namespace>
-					<tagname>template-type</tagname>
-					<class>org.alfresco.web.site.model.TemplateType</class>
-					<path>/site-data/template-types</path>
-					<prefix>tt-</prefix>
-				</type>
-			</types>
-		</model>
-		
+
+
 		
 		<!-- tag libraries -->
 		<tags>
@@ -247,10 +147,10 @@
 		<user>
 			<factories>
 				<factory>
-					<id>guest</id>
-					<name>Guest User Factory</name>
-					<description>Produces Anonymous Users</description>
-					<class>org.alfresco.web.site.GuestUserFactory</class>
+					<id>default</id>
+					<name>Default User Factory</name>
+					<description>Produces Default Users</description>
+					<class>org.alfresco.web.site.DefaultUserFactory</class>
 				</factory>
 				<factory>
 					<id>alfresco</id>
@@ -261,45 +161,6 @@
 			</factories>
 		</user>
 		
-		
-		
-		<!-- remote connectors and authenticators -->
-		<remote>
-			<connectors>
-				<connector>
-					<id>http</id>
-					<name>Http Connector</name>
-					<description>HTTP Client Connector</description>
-					<class>org.alfresco.connector.remote.HttpConnector</class>
-				</connector>
-				<connector>
-					<id>web</id>
-					<name>Web Connector</name>
-					<description>Web Connector</description>
-					<class>org.alfresco.connector.remote.WebConnector</class>
-				</connector>
-				<connector>
-					<id>alfresco</id>
-					<name>Alfresco Connector</name>
-					<description>Alfresco Connector</description>
-					<class>org.alfresco.web.site.remote.AlfrescoConnector</class>
-				</connector>
-			</connectors>
-			<authenticators>
-				<authenticator>
-					<id>basic</id>
-					<name>HTTP Basic Authenticator</name>
-					<description>HTTP Basic Authenticator</description>
-					<class>org.alfresco.connector.HTTPBasicAuthenticator</class>
-				</authenticator>
-				<authenticator>
-					<id>alf_ticket</id>
-					<name>Alfresco Ticket Authenticator</name>
-					<description>Alfresco Ticket Authenticator</description>
-					<class>org.alfresco.web.site.remote.AlfrescoAuthenticator</class>
-				</authenticator>
-			</authenticators>
-		</remote>
 		
 		
 		
@@ -337,15 +198,52 @@
 			</renderer>
 		</renderers>
 		
+		
+		<!-- Define system pages -->
+		<page>
+			<getting-started>
+				<uri>/core/page-gettingstarted.jsp</uri>
+			</getting-started>
+			<unconfigured>
+				<uri>/core/page-unconfigured.jsp</uri>
+			</unconfigured>
+			<region-container>
+				<uri>/core/region.jsp</uri>
+			</region-container>
+			<region-nocomponent>
+				<uri>/core/region-nocomponent.jsp</uri>
+			</region-nocomponent>
+			<component-error>
+				<uri>/core/component-error.jsp</uri>
+			</component-error>
+			<page-error>
+				<uri>/core/page-error.jsp</uri>
+			</page-error>
+			<region-error>
+				<uri>/core/region-error.jsp</uri>
+			</region-error>
+			<template-error>
+				<uri>/core/template-error.jsp</uri>
+			</template-error>
+		</page>
+		
+		
+		<!-- debug tools -->
+		<debug>
+			<timer>
+				<enabled>true</enabled>
+			</timer>
+		</debug>
+		
 
 		<!-- defaults -->
 		<defaults>
 			<request-context>http</request-context>
+			<file-system>local</file-system>
+			<format>default</format>
 			<page-mapper>default</page-mapper>
 			<link-builder>default</link-builder>			
-			<file-system>local</file-system>
-			<format>default</format>			
-			<user-factory>guest</user-factory>
+			<user-factory>default</user-factory>			
 		</defaults>
 		
 	</config>

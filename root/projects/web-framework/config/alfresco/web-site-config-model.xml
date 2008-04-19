@@ -1,0 +1,109 @@
+<alfresco-config>
+
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="model" class="org.alfresco.web.config.WebSiteElementReader"/>
+      </element-readers>
+   </plug-ins>
+
+	<config evaluator="string-compare" condition="WebFramework">
+	
+		<model>
+			<rootpath>/WEB-INF/classes/alfresco</rootpath>
+			<types>
+				<type>
+					<id>component</id>
+					<name>Component</name>
+					<description>Component</description>
+					<namespace></namespace>
+					<tagname>component</tagname>
+					<class>org.alfresco.web.site.model.Component</class>
+					<path>/site-data/components</path>
+					<prefix>cm-</prefix>
+				</type>
+				<type>
+					<id>component-type</id>
+					<name>Component Type</name>
+					<description>Component Type</description>
+					<namespace></namespace>
+					<tagname>component-type</tagname>
+					<class>org.alfresco.web.site.model.ComponentType</class>
+					<path>/site-data/component-types</path>
+					<prefix>ct-</prefix>
+				</type>
+				<type>
+					<id>configuration</id>
+					<name>Configuration</name>
+					<description>Configuration</description>
+					<namespace></namespace>
+					<tagname>configuration</tagname>
+					<class>org.alfresco.web.site.model.Configuration</class>
+					<path>/site-data/configurations</path>
+					<prefix>co-</prefix>
+				</type>
+				<type>
+					<id>content-association</id>
+					<name>Content Association</name>
+					<description>Content Association</description>
+					<namespace></namespace>
+					<tagname>content-association</tagname>
+					<class>org.alfresco.web.site.model.ContentAssociation</class>
+					<path>/site-data/content-associations</path>
+					<prefix>ca-</prefix>
+				</type>
+				<type>
+					<id>endpoint</id>
+					<name>Endpoint</name>
+					<description>Endpoint</description>
+					<namespace></namespace>
+					<tagname>endpoint</tagname>
+					<class>org.alfresco.web.site.model.Endpoint</class>
+					<path>/site-data/endpoints</path>
+					<prefix>ep-</prefix>
+				</type>
+				<type>
+					<id>page</id>
+					<name>Page</name>
+					<description>Page</description>
+					<namespace></namespace>
+					<tagname>page</tagname>
+					<class>org.alfresco.web.site.model.Page</class>
+					<path>/site-data/pages</path>
+					<prefix>pg-</prefix>
+				</type>
+				<type>
+					<id>page-association</id>
+					<name>Page Association</name>
+					<description>Page Association</description>
+					<namespace></namespace>
+					<tagname>page-association</tagname>
+					<class>org.alfresco.web.site.model.PageAssociation</class>
+					<path>/site-data/page-associations</path>
+					<prefix>pa-</prefix>
+				</type>
+				<type>
+					<id>template-instance</id>
+					<name>Template Instance</name>
+					<description>Template Instance</description>
+					<namespace></namespace>
+					<tagname>template-instance</tagname>
+					<class>org.alfresco.web.site.model.TemplateInstance</class>
+					<path>/site-data/template-instances</path>
+					<prefix>tm-</prefix>
+				</type>
+				<type>
+					<id>template-type</id>
+					<name>Template Type</name>
+					<description>Template Type</description>
+					<namespace></namespace>
+					<tagname>template-type</tagname>
+					<class>org.alfresco.web.site.model.TemplateType</class>
+					<path>/site-data/template-types</path>
+					<prefix>tt-</prefix>
+				</type>
+			</types>
+		</model>
+		
+	</config>
+
+</alfresco-config>

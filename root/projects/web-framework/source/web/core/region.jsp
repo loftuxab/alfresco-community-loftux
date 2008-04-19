@@ -12,21 +12,9 @@
 	// properties from configuration	
 	String regionId = (String) configuration.get("region-id");
 	String componentId = (String) configuration.get("component-id");	
-
-	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-	String unconfiguredImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
 %>
 <div width="100%" id="<%=regionId%>">
 <%
-	if(componentId != null)
-	{
-		PresentationUtil.renderComponent(context, request, response, componentId);
-	}
-	else
-	{
-%>
-	<img src="<%=unconfiguredImageUrl%>" border="0" width="64px" height="64px"/>
-<%
-	}
+	PresentationUtil.renderComponent(context, request, response, componentId);
 %>
 </div>

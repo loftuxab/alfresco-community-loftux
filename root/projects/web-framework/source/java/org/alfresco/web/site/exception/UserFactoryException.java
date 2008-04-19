@@ -22,48 +22,20 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+package org.alfresco.web.site.exception;
 
 /**
  * @author muzquiano
  */
-public class Framework
+public class UserFactoryException extends Exception
 {
-    public static boolean isInitialized()
+    public UserFactoryException(String message)
     {
-        return (getConfig() != null && getModel() != null);
+        super(message);
     }
 
-    public static AbstractConfig getConfig()
+    public UserFactoryException(String message, Exception ex)
     {
-        return Framework.config;
+        super(message, ex);
     }
-
-    public static void setConfig(AbstractConfig config)
-    {
-        Framework.config = config;
-    }
-
-    public static IModel getModel()
-    {
-        return Framework.model;
-    }
-
-    public static void setModel(IModel model)
-    {
-        Framework.model = model;
-    }
-    
-    public static Log getLogger()
-    {
-        return logger;
-    }
-
-    protected static AbstractConfig config = null;
-    protected static IModel model = null;
-    
-    protected static Log logger = LogFactory.getLog(Framework.class);
 }

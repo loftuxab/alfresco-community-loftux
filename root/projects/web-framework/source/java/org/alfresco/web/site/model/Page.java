@@ -40,9 +40,10 @@ import org.dom4j.Element;
 public class Page extends ModelObject
 {
     public static String TYPE_NAME = "page";
-    public static String PROP_TEMPLATE_ID = "template-id";
+    public static String PROP_TEMPLATE_INSTANCE = "template-instance";
     public static String ATTR_FORMAT_ID = "format-id";
     public static String PROP_ROOT_PAGE = "root-page";
+    public static String PROP_AUTHENTICATION = "authentication";
     
     public Page(Document document)
     {
@@ -76,7 +77,7 @@ public class Page extends ModelObject
         }
         
         List templateElements = getDocument().getRootElement().elements(
-                PROP_TEMPLATE_ID);
+                PROP_TEMPLATE_INSTANCE);
         for (int i = 0; i < templateElements.size(); i++)
         {
             Element templateElement = (Element) templateElements.get(i);
@@ -115,7 +116,7 @@ public class Page extends ModelObject
         if (templateElement == null)
         {
             templateElement = getDocument().getRootElement().addElement(
-                    PROP_TEMPLATE_ID);
+                    PROP_TEMPLATE_INSTANCE);
             if (formatId != null)
                 templateElement.addAttribute(ATTR_FORMAT_ID, formatId);
         }
@@ -134,12 +135,12 @@ public class Page extends ModelObject
             templateElement.getParent().remove(templateElement);
     }
 
-    public Map<String, Template> getTemplates(RequestContext context)
+    public Map<String, TemplateInstance> getTemplates(RequestContext context)
     {
         Map map = new HashMap();
 
         List templateElements = getDocument().getRootElement().elements(
-                PROP_TEMPLATE_ID);
+                PROP_TEMPLATE_INSTANCE);
         for (int i = 0; i < templateElements.size(); i++)
         {
             Element templateElement = (Element) templateElements.get(i);
@@ -150,7 +151,7 @@ public class Page extends ModelObject
             String templateId = templateElement.getStringValue();
             if (templateId != null)
             {
-                Template template = (Template) context.getModel().loadTemplate(
+                TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(
                         context, templateId);
                 map.put(formatId, template);
             }
@@ -169,12 +170,12 @@ public class Page extends ModelObject
         this.setProperty(PROP_ROOT_PAGE, (b ? "true" : "false"));
     }
 
-    public Template getTemplate(RequestContext context)
+    public TemplateInstance getTemplate(RequestContext context)
     {
         return getTemplate(context, null);
     }
 
-    public Template getTemplate(RequestContext context, String formatId)
+    public TemplateInstance getTemplate(RequestContext context, String formatId)
     {
         String templateId = getTemplateId(formatId);
         if (templateId != null)

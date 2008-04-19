@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +32,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
@@ -53,34 +55,61 @@ public class FreemarkerRenderer extends AbstractRenderer
         // the current format
         String format = context.getCurrentFormatId();
         
-        // The current template and page
-        //Page page = context.getCurrentPage();
-        
         // get the template processor
         String processorId = context.getConfig().getRendererProperty(getRendererType(), "processor-bean");
         if(processorId == null || "".equals(processorId))
         {
-            processorId = "webscripts.web.templateprocessor";
+            processorId = "site.webscripts.templateprocessor";
         }
         ServletContext servletContext = request.getSession().getServletContext();
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        TemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(processorId);
-
-        // build the model
-        Map<String, Object> model = new HashMap<String, Object>(8);
-        ModelHelper.populateTemplateModel(context, model);
-
-        // path to the template (switches on format)
-        String templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".ftl") : ".ftl");
+        PresentationTemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(processorId);
         
-        // execute
+        /**
+         * Attempt to execute the script's .head. file, if it has one
+         * This output is trapped and placed into the aggregated HEAD capture
+         */
+        String templateName = null;
         try
         {
+            // build the model
+            Map<String, Object> model = new HashMap<String, Object>(8);
+            ModelHelper.populateTemplateModel(context, model);
+            
+            // path to the template (switches on format)
+            templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");
+            
+            if(templateProcessor.hasTemplate(templateName))
+            {
+                StringWriter out = new StringWriter();
+                templateProcessor.process(templateName, model, out);
+                
+                String tags = out.toString();
+                RenderUtil.appendHeadTags(context, tags);
+            }
+        }
+        catch(Exception ex) 
+        {   
+            throw new RendererExecutionException(ex, "FreemarkerRenderer failed to process template: " + templateName);
+        }
+        
+
+        /**
+         * Now execute the real template
+         */
+        try
+        {
+            // build the model
+            Map<String, Object> model = new HashMap<String, Object>(8);
+            ModelHelper.populateTemplateModel(context, model);
+
+            // path to the template (switches on format)
+            templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".ftl") : ".ftl");        
             templateProcessor.process(templateName, model, response.getWriter());
         }
         catch(Exception ex)
         {
-            ex.printStackTrace();
+            throw new RendererExecutionException(ex, "FreemarkerRenderer failed to process template: " + templateName);
         }
     }
 }
