@@ -36,7 +36,7 @@
 	if(queryString == null)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-		String unconfiguredImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+		String unconfiguredImageUrl = URLUtil.browser(context, "/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
 		String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Query Component'/>";	
 		out.println(renderString);
 		return;

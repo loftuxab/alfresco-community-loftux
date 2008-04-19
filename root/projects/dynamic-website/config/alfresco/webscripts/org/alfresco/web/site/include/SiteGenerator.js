@@ -10,7 +10,7 @@ function clearCurrentSite()
 	// note: we do not remove TemplateTypes or ComponentTypes
 	// since those are reusable
 	removeObjects(site.getComponents());
-	removeObjects(site.getConfigurations());
+	//removeObjects(site.getConfigurations()); // don't delete these
 	removeObjects(site.getContentAssociations());
 	removeObjects(site.getEndpoints());
 	removeObjects(site.getPages());
@@ -64,9 +64,7 @@ function buildBasicPublicWebsite()
 	var t4 = newTemplate("Print Template", "tt-basic-print-template");
 	
 	// freemarker sample template
-	var t5 = newTemplate("Freemarker Sample Template", "tt-freemarker-template");
-	t5.setSetting("uri", "/web/sample/home");
-	t5.save();
+	var t5 = newFreemarkerTemplate("Freemarker Sample Template", "/web/sample/home");
 
 	// associate templates
 	associateTemplate(rootPage, t1, "default");
@@ -116,8 +114,7 @@ function buildBasicPublicWebsite()
 	var c31 = newWebScriptComponent("WebScript Sample 1", "/web/components/sample1");
 	var c32 = newWebScriptComponent("WebScript Sample 2", "/web/components/sample2");
 	associatePageComponent(c31, nd3, "content");
-	associateTemplateComponent(c32, t5, nd3, "leftNav");		
-	
+	associateTemplateComponent(c32, t5, nd3, "leftNav");			
 	
 	// set up the content template (for item views)
 	var c91 = newItemComponent("Item Viewer", "current", null, "templateTitle", "article-full", "alfresco-webuser");

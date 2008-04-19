@@ -89,7 +89,7 @@
 	}
 	
 	// Stylesheet
-	String stylesheetUri = "/ui/components/navComponent/renderers/horizontalNav1/default/menu.css";
+	String stylesheetUri = "/components/navComponent/renderers/horizontalNav1/default/menu.css";
 	stylesheetUri = URLUtil.browser(context, stylesheetUri);
 %>
 	<link rel="stylesheet" type="text/css" href="<%=stylesheetUri%>"/>

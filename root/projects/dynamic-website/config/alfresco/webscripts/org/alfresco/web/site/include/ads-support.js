@@ -34,9 +34,9 @@ function assertSiteConfiguration(websiteName, websiteDescription)
 	var siteConfiguration = site.findConfiguration("site");
 	if(siteConfiguration == null)
 		siteConfiguration = site.newConfiguration();
+	siteConfiguration.setTitle(websiteName);
+	siteConfiguration.setDescription(websiteDescription);
 	siteConfiguration.setProperty("source-id", "site");
-	siteConfiguration.setProperty("name", websiteName);
-	siteConfiguration.setProperty("description", websiteDescription);
 	siteConfiguration.save();
 
 	// ensure that we have a root page
@@ -44,8 +44,8 @@ function assertSiteConfiguration(websiteName, websiteDescription)
 	if(rootPage == null)
 	{
 		rootPage = site.newPage();
+		rootPage.setName("Home");
 		rootPage.setProperty("root-page", "true");
-		rootPage.setProperty("name", "Home");
 	}
 	rootPage.setProperty("description", "Home Page for '" + websiteName + "'");
 	rootPage.save();
@@ -57,8 +57,8 @@ function assertPage(pageId, pageName, pageDescription)
 	var page = site.getObject(pageId);
 	if(page != null)
 	{
-		page.setProperty("name", pageName);
-		page.setProperty("description", pageDescription);
+		page.setName(pageName);
+		page.setDescription(pageDescription);
 		page.save();
 	}
 }
@@ -67,8 +67,8 @@ function assertPage(pageId, pageName, pageDescription)
 function addChildPage(parentPageId, pageName, pageDescription)
 {
 	var childPage = site.newPage();
-	childPage.setProperty("name", pageName);
-	childPage.setProperty("description", pageDescription);
+	childPage.setName(pageName);
+	childPage.setDescription(pageDescription);
 	childPage.save();
 	
 	// associate to parent with child relationship
@@ -93,7 +93,7 @@ function findEndpoint(endpointId)
 function newPage(name, parentPage)
 {
 	var page = site.newPage();
-	page.setProperty("name", name);
+	page.setName(name);
 	page.save();	
 	if(parentPage != null)
 		site.associatePage(parentPage.getId(), page.getId());		
@@ -108,10 +108,21 @@ function newTemplate(name, templateTypeId)
 	if(templateType != null)
 	{
 		var template = site.newTemplate();
-		template.setProperty("template-type", templateTypeId);
-		template.setProperty("name", name);
+		template.setName(name);
+		template.setProperty("template-type", templateTypeId);		
 		template.save();
 	}
+	return template;
+}
+
+function newFreemarkerTemplate(name, uri)
+{
+	var template = site.newTemplate();
+	template.setName(name);
+	template.setProperty("template-type", "freemarker");
+	template.setProperty("uri", uri);
+	save(template);
+	
 	return template;
 }
 
@@ -133,7 +144,7 @@ function associateContentType(contentTypeId, pageId, formatId)
 function newComponent(name, componentTypeId)
 {
 	var c = site.newComponent();
-	c.setProperty("name", name);
+	c.setName(name);
 	c.setProperty("component-type-id", componentTypeId);
 	c.save();
 	return c;
@@ -141,17 +152,22 @@ function newComponent(name, componentTypeId)
 
 function associateSiteComponent(component, regionId)
 {
-	site.associateComponent(component.getProperty("id"), "site", "site", regionId);
+	associateGlobalComponent(component, regionId);
+}
+
+function associateGlobalComponent(component, regionId)
+{
+	site.associateComponent(component.getId(), "global", "global", regionId);
 }
 
 function associateTemplateComponent(component, template, regionId)
 {
-	site.associateComponent(component.getProperty("id"), "template", template.getId(), regionId);
+	site.associateComponent(component.getId(), "template", template.getId(), regionId);
 }
 
 function associatePageComponent(component, page, regionId)
 {	
-	site.associateComponent(component.getProperty("id"), "page", page.getId(), regionId);
+	site.associateComponent(component.getId(), "page", page.getId(), regionId);
 }
 
 function setConfig(o, propertyName, propertyValue)
@@ -208,8 +224,8 @@ function newItemComponent(name, itemType, itemPath, howToRender, renderData, end
 
 function newWebScriptComponent(name, uri)
 {
-	var c = newComponent(name, "ct-webscriptComponent");		
-	c.setSetting("uri", uri);
+	var c = newComponent(name, "webscript");		
+	c.setProperty("uri", uri);
 	save(c);
 
 	return c;

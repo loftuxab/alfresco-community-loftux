@@ -85,7 +85,7 @@
 	}
 	
 	// Stylesheet
-	String stylesheetUri = "/ui/components/navComponent/renderers/verticalNav1/default/menu.css";
+	String stylesheetUri = "/components/navComponent/renderers/verticalNav1/default/menu.css";
 	stylesheetUri = URLUtil.browser(context, stylesheetUri);
 	
 %>
