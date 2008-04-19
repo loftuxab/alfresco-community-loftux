@@ -231,7 +231,7 @@
 		<!-- debug tools -->
 		<debug>
 			<timer>
-				<enabled>true</enabled>
+				<enabled>false</enabled>
 			</timer>
 		</debug>
 		

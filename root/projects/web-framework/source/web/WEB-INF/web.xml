@@ -10,8 +10,8 @@
       <param-name>contextConfigLocation</param-name>
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
-         classpath:alfresco/pagerenderer-application-context.xml
          classpath:alfresco/web-site-application-context.xml
+         classpath:alfresco/pagerenderer-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>
