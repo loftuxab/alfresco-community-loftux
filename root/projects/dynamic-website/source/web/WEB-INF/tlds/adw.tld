@@ -14,4 +14,29 @@
 		<bodycontent>empty</bodycontent>
 		<info>Places the floating in-context menu into the page.  This is generally placed at the bottom of the HTML tag block.</info> 
 	</tag> 
+	
+	<!-- InContext Edit -->
+	<tag> 
+		<name>edit</name> 
+		<tagclass>org.alfresco.web.site.taglib.ObjectEditTag</tagclass>
+		<bodycontent>jsp</bodycontent>
+		<info>Renders an HTML Anchor to an editor for the given content object</info> 
+		<attribute>
+			<name>id</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>endpoint</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>target</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>iconUri</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	
 </taglib>

@@ -136,9 +136,9 @@
 		
 		<!-- Change the welcome page to our getting started one -->
 		<page>
-			<default>
+			<getting-started>
 				<uri>/ui/misc/getting-started.jsp</uri>
-			</default>
+			</getting-started>
 			<unconfigured>
 				<uri>/ui/misc/unconfigured-nav-node.jsp</uri>
 			</unconfigured>
