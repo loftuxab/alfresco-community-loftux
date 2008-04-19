@@ -3118,7 +3118,7 @@
    </target>
 
    <target name="assemble-dynamicwebsite-war" 
-           depends="package-dynamicwebsite">
+           depends="package-webframework-war,package-dynamicwebsite">
       <mkdir dir="${dir.project.dynamicwebsite.assemble}" />
       
       <!-- Copy in base WAR file from the "web-framework" package -->
@@ -3242,7 +3242,7 @@
       </war>
    </target>
 
-   <target name="assemble-extranet-war" depends="package-extranet">
+   <target name="assemble-extranet-war" depends="package-webframework-war,package-extranet">
       <mkdir dir="${dir.project.extranet.assemble}" />
       
       <!-- Copy in base WAR file from the "web-framework" package -->
