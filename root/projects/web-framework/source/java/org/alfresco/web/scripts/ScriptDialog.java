@@ -28,6 +28,8 @@ import org.alfresco.web.site.RequestContext;
 import org.json.JSONObject;
 
 /**
+ * NOT IMPLEMENTED YET
+ * 
  * @author muzquiano
  */
 public final class ScriptDialog extends ScriptBase
