@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+
 /**
  * @author muzquiano
  */
@@ -111,22 +112,27 @@ public abstract class AbstractConfig
 
     public abstract String getDynamicWebsiteServletUri();
 
-    public abstract String getGettingStartedPageUri();
 
-    public abstract String getUnconfiguredPageUri();
+    //////////////////////////////////////////////////////////////////
+    // Presentation
+    //////////////////////////////////////////////////////////////////
     
-    public abstract String getRegionContainerUri();
+    public abstract String[] getPresentationContainerIds();
     
-    public abstract String getRegionNoComponentUri();
-    
-    public abstract String getComponentErrorUri();
-    
-    public abstract String getPageErrorUri();
-    
-    public abstract String getRegionErrorUri();
-    
-    public abstract String getTemplateErrorUri();
+    public abstract String getPresentationContainerTitle(String id);
 
+    public abstract String getPresentationContainerURI(String id);
+    
+    public abstract String getPresentationContainerProperty(String id, String propertyId);
+    
+    public abstract String[] getPresentationPageIds();
+    
+    public abstract String getPresentationPageTitle(String id);
+
+    public abstract String getPresentationPageURI(String id);
+    
+    public abstract String getPresentationPageProperty(String id, String propertyId);
+    
     //////////////////////////////////////////////////////////////////
     // File Systems
     //////////////////////////////////////////////////////////////////
@@ -249,5 +255,8 @@ public abstract class AbstractConfig
     //////////////////////////////////////////////////////////////////
     
     public abstract boolean getDebugTimerEnabled();
+    
+    
+    
     
 }

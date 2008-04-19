@@ -153,14 +153,17 @@ public class PresentationUtil
         // log the error
         context.getLogger().error("A Page Rendering problem was handled");
         context.getLogger().error("Page Id: " + pageId);
-        context.getLogger().error(t);
-        context.getLogger().trace(t);
+        context.getLogger().error("Trace", t);
         try
         {
             request.setAttribute("error", t);
             request.setAttribute("error-pageId", pageId);
 
-            String dispatchPath = context.getConfig().getPageErrorUri();
+            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_RENDER_ERROR);
+            if(dispatchPath == null)
+            {
+                dispatchPath = WebFrameworkConstants.DEFAULT_PAGE_URI_RENDER_ERROR;
+            }
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)
@@ -184,7 +187,11 @@ public class PresentationUtil
             request.setAttribute("error", t);
             request.setAttribute("error-templateId", templateId);
 
-            String dispatchPath = context.getConfig().getTemplateErrorUri();
+            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_CONTAINER_TEMPLATE_RENDER_ERROR);
+            if(dispatchPath == null)
+            {
+                dispatchPath = WebFrameworkConstants.DEFAULT_CONTAINER_URI_TEMPLATE_RENDER_ERROR;
+            }
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)
@@ -213,7 +220,11 @@ public class PresentationUtil
             request.setAttribute("error-regionId", regionId);
             request.setAttribute("error-regionScopeId", regionScopeId);
 
-            String dispatchPath = context.getConfig().getRegionErrorUri();
+            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION_RENDER_ERROR);
+            if(dispatchPath == null)
+            {
+                dispatchPath = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION_RENDER_ERROR;
+            }
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)
@@ -237,7 +248,11 @@ public class PresentationUtil
             request.setAttribute("error", t);
             request.setAttribute("error-componentId", componentId);
 
-            String dispatchPath = context.getConfig().getComponentErrorUri();
+            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_CONTAINER_COMPONENT_RENDER_ERROR);
+            if(dispatchPath == null)
+            {
+                dispatchPath = WebFrameworkConstants.DEFAULT_CONTAINER_URI_COMPONENT_RENDER_ERROR;
+            }
             RequestUtil.include(request, response, dispatchPath);
         }
         catch (Exception ex)

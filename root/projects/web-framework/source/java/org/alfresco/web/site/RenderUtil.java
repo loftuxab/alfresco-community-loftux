@@ -298,10 +298,10 @@ public class RenderUtil
 
             // determine the region renderer
             // this is set in the configuration
-            String renderer = context.getConfig().getRegionContainerUri();
+            String renderer = context.getConfig().getPresentationContainerURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION);
             if(renderer == null || "".equals(renderer))
             {
-                renderer = "/ui/core/region.jsp";
+                renderer = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION;
             }
             // Allow this to be overridden by the template
             // store the setting "region-regionName-renderer" with value "/my/jsppage.jsp"
@@ -330,7 +330,11 @@ public class RenderUtil
             {
                 // if we couldn't find a component, then redirect to a
                 // region "no-component" page
-                renderer = context.getConfig().getRegionNoComponentUri();
+                renderer = context.getConfig().getPresentationContainerURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION_NO_COMPONENT);
+                if(renderer == null)
+                {
+                    renderer = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION_NO_COMPONENT;
+                }
             }
 
             // do the render
@@ -585,8 +589,8 @@ public class RenderUtil
         if(config != null)
         {
             // renderer properties
-            String rendererType = config.getSetting("renderer-type");
-            String renderer = config.getSetting("renderer");
+            String rendererType = config.getProperty("renderer-type");
+            String renderer = config.getProperty("renderer");
             
             // execute renderer
             String tags = processRenderer(context, request, response, rendererType, renderer);

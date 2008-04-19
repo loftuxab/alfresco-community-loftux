@@ -29,7 +29,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.web.page.PageRendererServlet.URLHelper;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
@@ -60,13 +59,20 @@ public class ModelHelper
         }
     
         // page attributes
-        model.put("description", context.getCurrentPage().getDescription());
-        model.put("title", context.getCurrentPage().getName());
+        if(context.getCurrentPage() != null)
+        {
+            model.put("description", context.getCurrentPage().getDescription());
+            model.put("title", context.getCurrentPage().getName());
+        }
+        
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
         
         // add in the web framework script objects
         model.put("site", new ScriptSite(context));
-        model.put("user", new ScriptUser(context, context.getUser()));
+        if(context.getUser() != null)
+        {
+            model.put("user", new ScriptUser(context, context.getUser()));
+        }
     }
 
     public static void populateTemplateModel(RequestContext context, Map<String, Object> model)
@@ -91,16 +97,25 @@ public class ModelHelper
         }
     
         // fixed page attributes
-        model.put("title", context.getCurrentPage().getTitle());
-        model.put("description", context.getCurrentPage().getDescription());
+        if(context.getCurrentPage() != null)
+        {
+            model.put("title", context.getCurrentPage().getTitle());
+            model.put("description", context.getCurrentPage().getDescription());
+        }
         
-        // copy in custom properties from the page        
-        Map<String, Object> pageProperties = context.getCurrentTemplate().getCustomProperties();
-        copyToModel(model, pageProperties);
+        // copy in custom properties from the page
+        if(context.getCurrentPage() != null)
+        {
+            Map<String, Object> pageProperties = context.getCurrentPage().getCustomProperties();
+            copyToModel(model, pageProperties);
+        }
         
         // copy in custom properties from the template
-        Map<String, Object> templateProperties = context.getCurrentTemplate().getCustomProperties();
-        copyToModel(model, templateProperties);
+        if(context.getCurrentTemplate() != null)
+        {
+            Map<String, Object> templateProperties = context.getCurrentTemplate().getCustomProperties();
+            copyToModel(model, templateProperties);
+        }
         
         // copy in custom properties from the passed in model object
         // this is usually a component
@@ -143,7 +158,10 @@ public class ModelHelper
         
         // add in the web framework script objects
         model.put("site", new ScriptSite(context));
-        model.put("user", new ScriptUser(context, context.getUser()));
+        if(context.getUser() != null)
+        {
+            model.put("user", new ScriptUser(context, context.getUser()));
+        }
     }    
     
     protected static void copyToModel(Map<String, Object> model, Map<String, Object> properties)

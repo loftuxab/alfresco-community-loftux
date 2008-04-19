@@ -77,7 +77,7 @@ public abstract class AbstractObjectTag extends TagBase
                 this.id = newId;
             }
         }
-        return this.id;
+        return this.objectId;
     }
             
     protected String link(RequestContext context, String formatId)

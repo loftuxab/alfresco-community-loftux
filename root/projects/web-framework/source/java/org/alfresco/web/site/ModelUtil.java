@@ -483,7 +483,7 @@ public class ModelUtil
         Configuration siteConfiguration = context.getSiteConfiguration();
         if(siteConfiguration != null)
         {
-            String rootPageId = siteConfiguration.getSetting("root-page");
+            String rootPageId = siteConfiguration.getProperty("root-page");
             if(rootPageId != null)
             {
                 Page page = context.getModel().loadPage(context, rootPageId);
