@@ -1,1 +1,1 @@
-wizard.setDialogURL("/ui/misc/welcome-splash.jsp");
+wizard.setDialogURL("/app/welcome-splash.jsp");

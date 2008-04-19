@@ -26,6 +26,7 @@ package org.alfresco.web.site.taglib;
 
 import javax.servlet.jsp.JspException;
 
+import org.alfresco.web.site.ADWUtil;
 import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.URLUtil;
@@ -76,11 +77,11 @@ public class ObjectEditTag extends AbstractObjectTag
             RequestContext context = getRequestContext();
 
             // get the url
-            String url = URLUtil.getContentEditURL(context, getEndpoint(),
+            String url = ADWUtil.getContentEditURL(context, getEndpoint(),
                     getId());
 
             // icon uri
-            String newIconUri = "/ui/images/icons/incontext/edit_content.gif";
+            String newIconUri = "/ui/themes/builder/images/default/icons/incontext/edit_content.gif";
             if (iconUri != null)
                 newIconUri = iconUri;
             newIconUri = URLUtil.browser(context, newIconUri);

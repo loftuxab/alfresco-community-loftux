@@ -2,14 +2,10 @@
 
 <configuration>
   <id>global.head.renderer</id>
-  <name>Global Header Renderer</name>
+  <title>Global Header Renderer</title>
   <description></description>
-  <setting>
-    <name>renderer-type</name>
-    <value>jsp</value>
-  </setting>
-  <setting>
-    <name>renderer</name>
-    <value>/ui/misc/global-header.jsp</value>
-  </setting>
+  <properties>
+    <renderer-type>jsp</renderer-type>
+    <renderer>/app/global-header.jsp</renderer>
+  </properties>
 </configuration>

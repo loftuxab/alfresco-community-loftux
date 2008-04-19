@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-type>
 	<id>ct-itemComponent</id>
-	<name>Item Component</name>
+	<title>Item Component</title>
 	<description>Item Component</description>
 	<renderer-type>jsp</renderer-type>		
-	<renderer>/ui/components/itemComponent/component.jsp</renderer>
-
+	<renderer>/components/itemComponent/component.jsp</renderer>
 </component-type>

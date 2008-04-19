@@ -2,8 +2,6 @@
 
 	<config evaluator="string-compare" condition="WebFramework">
 	
-		<!-- Make the AVM Request Context Factory available -->
-		<!-- TODO: Is this needed anymore? -->
 		<request-context>
 			<definitions>
 				<definition>
@@ -15,8 +13,6 @@
 			</definitions>
 		</request-context>
 		
-		<!-- Add in other Link Builders -->
-		<!-- TODO -->
 		<link-builder>
 			<definitions>
 				<definition>
@@ -34,8 +30,6 @@
 			</definitions>
 		</link-builder>
 		
-
-		<!-- Add support for the AVM file system (via avmRemote) -->		
 		<file-system>
 			<definitions>
 				<definition>
@@ -134,21 +128,6 @@
 			</libraries>
 		</tags>
 		
-		<!-- Change the welcome page to our getting started one -->
-		<page>
-			<getting-started>
-				<uri>/ui/misc/getting-started.jsp</uri>
-			</getting-started>
-			<unconfigured>
-				<uri>/ui/misc/unconfigured-nav-node.jsp</uri>
-			</unconfigured>
-			<region-container>
-				<uri>/ui/misc/region.jsp</uri>
-			</region-container>
-		</page>
-		
-		
-		
 		<!-- Add in the HTML renderer -->
 		<renderers>
 			<renderer>
@@ -158,6 +137,36 @@
 				<class>org.alfresco.web.site.renderer.HTMLRenderer</class>
 			</renderer>
 		</renderers>
+		
+	</config>
+
+	<config evaluator="string-compare" condition="WebFramework" replace="true">
+	
+		<!-- Updates to Presentation Pages -->
+		<presentation>
+			<pages>
+				<page>
+					<id>getting-started</id>
+					<title>Getting Started</title>
+					<uri>/app/getting-started.jsp</uri>
+				</page>
+				<page>
+					<id>page-unconfigured</id>
+					<title>Unconfigured Page</title>
+					<uri>/app/unconfigured-nav-node.jsp</uri>
+				</page>
+			</pages>
+			<containers>
+				<container>
+					<id>region-container</id>
+					<uri>/app/region.jsp</uri>
+				</container>
+				<container>
+					<id>in-context</id>
+					<uri>/app/in-context.jsp</uri>
+				</container>
+			</containers>
+		</presentation>
 		
 	</config>
 
