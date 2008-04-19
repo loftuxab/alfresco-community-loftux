@@ -10,6 +10,7 @@
       <param-name>contextConfigLocation</param-name>
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
+         classpath:alfresco/web-site-application-context.xml
          classpath:alfresco/pagerenderer-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
@@ -18,18 +19,7 @@
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
-   
-   <!-- This filter will bootstrap the Web Script Framework Spring Context
-   <filter>
-      <filter-name>Web Script Framework Filter</filter-name>
-      <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>
-   </filter>
-    
-   <filter-mapping>
-      <filter-name>Web Script Framework Filter</filter-name>
-      <url-pattern>/*</url-pattern>
-   </filter-mapping> -->
-         
+            
    <servlet>
       <servlet-name>apiServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
@@ -41,14 +31,27 @@
    </servlet>
 
    <servlet>
+      <servlet-name>pageAuthenticationServlet</servlet-name>
+      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
+   </servlet>
+
+
+   <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
    </servlet>
    
+
+   <!-- To use the Web Framework Dispatcher Servlet -->
+   <!--   Uncomment this block and comment out the pageRendererServlet above -->
+   <!--
    <servlet>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
-   </servlet>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>  
+   -->
+   
 
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>
