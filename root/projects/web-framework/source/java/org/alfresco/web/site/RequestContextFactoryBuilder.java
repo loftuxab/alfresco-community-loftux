@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import org.alfresco.tools.ReflectionHelper;
+
 /**
  * @author muzquiano
  */
@@ -43,18 +45,8 @@ public class RequestContextFactoryBuilder
         if (_className != null)
             className = _className;
 
-        RequestContextFactory factory = null;
-        try
-        {
-            Class clazz = Class.forName(className);
-            factory = (RequestContextFactory) clazz.newInstance();
-            factory.setId(_defaultId);
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-
+        RequestContextFactory factory = (RequestContextFactory) ReflectionHelper.newObject(className);
+        factory.setId(_defaultId);
         return factory;
     }
 }

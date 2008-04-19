@@ -1,11 +1,10 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
-<%@ taglib uri="/WEB-INF/tlds/adw.tld" prefix="adw" %>
 <%
 	RequestContext context = RequestUtil.getRequestContext(request);
-	String bgImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/logos/AlfrescoFadedBG.png");
-	String logoImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/logos/AlfrescoLogo200.png");
+	String bgImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/images/logo/AlfrescoFadedBG.png");
+	String logoImageUrl = org.alfresco.web.site.URLUtil.browser(context, "/images/logo/AlfrescoLogo200.png");
 %>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>

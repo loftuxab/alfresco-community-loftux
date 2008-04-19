@@ -31,7 +31,7 @@ import javax.servlet.http.HttpServletRequest;
  */
 public abstract class PageMapper
 {
-    protected PageMapper()
+    public PageMapper()
     {
     }
 

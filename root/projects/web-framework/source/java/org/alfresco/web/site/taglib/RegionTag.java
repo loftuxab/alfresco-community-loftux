@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.site.PresentationUtil;
+import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -58,7 +59,7 @@ public class RegionTag extends TagBase
     public String getScope()
     {
         if (this.scope == null)
-            this.scope = "site";
+            this.scope = RenderUtil.REGION_SCOPE_GLOBAL;
         return this.scope;
     }
 

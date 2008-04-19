@@ -38,37 +38,88 @@ import org.dom4j.Element;
  */
 public abstract class ModelObject implements IModelObject
 {
+    public static String PROP_ID = "id";
+    public static String PROP_TITLE = "title";
+    public static String PROP_DESCRIPTION = "description";
+    
+    public static String CONTAINER_PROPERTIES = "properties";
+    
+    protected Document document;
+    protected String relativePath;
+    protected String fileName;
+    protected boolean isSaved;
+    protected long modificationTime;
+    
     public ModelObject(Document document)
     {
         this.document = document;
     }
 
-    // common properties
+    ///////////////////////////////////////////////////////////////
+    // common model properties
+    ///////////////////////////////////////////////////////////////
 
+    protected String id;
+    
     public String getId()
     {
-        return getProperty("id");
-    }
+        /*
+        // the id field SHOULD be on the object
+        String id = getProperty(PROP_ID);
+        if(id == null)
+        {
+            // if it is NOT on the object, then we can assume the file name
+            String fileName = this.getFileName();
 
-    public String getName()
-    {
-        return getProperty("name");
-    }
+            // strip off the extension
+            int i = fileName.lastIndexOf(".");
+            if(i > -1)
+            {
+                id = fileName.substring(0,i);
+            }
+        }
+        */
+        
+        // assume from filename
+        if(this.id == null)
+        {
+            // if it is NOT on the object, then we can assume the file name
+            String fileName = this.getFileName();
 
-    public void setName(String value)
+            // strip off the extension
+            int i = fileName.lastIndexOf(".");
+            if(i > -1)
+            {
+                this.id = fileName.substring(0,i);
+            }            
+        }
+        return this.id;
+    }
+    
+    public String getTitle()
     {
-        setProperty("name", value);
+        return getProperty(PROP_TITLE);
+    }
+    
+    public void setTitle(String title)
+    {
+        setProperty(PROP_TITLE, title);
     }
 
     public String getDescription()
     {
-        return getProperty("description");
+        return getProperty(PROP_DESCRIPTION);
     }
 
     public void setDescription(String value)
     {
-        setProperty("description", value);
+        setProperty(PROP_DESCRIPTION, value);
     }
+    
+    
+    ///////////////////////////////////////////////////////////////
+    // persistence methods
+    ///////////////////////////////////////////////////////////////    
 
     public void save(RequestContext context)
     {
@@ -84,6 +135,16 @@ public abstract class ModelObject implements IModelObject
     {
         context.getModel().removeObject(context, this);
     }
+    
+    public boolean isSaved()
+    {
+        return this.isSaved;
+    }
+    
+    
+    ///////////////////////////////////////////////////////////////
+    // xml methods
+    ///////////////////////////////////////////////////////////////    
 
     public Document getDocument()
     {
@@ -94,6 +155,11 @@ public abstract class ModelObject implements IModelObject
     {
         return XMLUtil.toXML(document, true);
     }
+    
+    
+    ///////////////////////////////////////////////////////////////
+    // generic property accessors
+    ///////////////////////////////////////////////////////////////
 
     public boolean getBooleanProperty(String propertyName)
     {
@@ -107,16 +173,109 @@ public abstract class ModelObject implements IModelObject
     {
         if (propertyName == null)
             return null;
-
-        return (String) getDocument().getRootElement().elementTextTrim(
-                propertyName);
+        
+        if(isModelProperty(propertyName))
+        {
+            return getModelProperty(propertyName);
+        }
+        else
+        {
+            return getCustomProperty(propertyName);
+        }
     }
 
     public void setProperty(String propertyName, String propertyValue)
     {
         if (propertyName == null)
             return;
+        
+        if(isModelProperty(propertyName))
+        {
+            setModelProperty(propertyName, propertyValue);
+        }
+        else
+        {
+            setCustomProperty(propertyName, propertyValue);
+        }
+    }
 
+    public void removeProperty(String propertyName)
+    {
+        if (propertyName == null)
+            return;
+        
+        if(isModelProperty(propertyName))
+        {
+            removeModelProperty(propertyName);
+        }
+        else
+        {
+            removeCustomProperty(propertyName);
+        }
+    }
+    
+    
+    /**
+     * Uses reflection to determine whether the given property name
+     * is a custom property.  A custom property is a non-model-specific
+     * property.  Custom properties are written under the <properties/>
+     * container element in the XML.
+     * 
+     * @param propertyName
+     * @return
+     */
+    protected boolean isCustomProperty(String propertyName)
+    {
+        return (!isModelProperty(propertyName));        
+    }
+    
+    /**
+     * Uses reflection to determine whether the given property name
+     * is a model property.  Model properties are written directly
+     * under the root element of the XML document.
+     * 
+     * @param propertyName
+     * @return
+     */
+    protected boolean isModelProperty(String propertyName)
+    {
+        if(propertyName == null)
+        {
+            return false;
+        }
+
+        return ModelHelper.isModelProperty(this, propertyName);
+    }
+    
+    
+
+    ////////////////////////////////////////////////////////////
+    // Model Properties
+    ////////////////////////////////////////////////////////////
+
+    public String getModelProperty(String propertyName)
+    {
+        if (propertyName == null)
+            return null;
+        
+        // do the get
+        return (String) getDocument().getRootElement().elementTextTrim(
+                propertyName);
+    }
+
+    public void setModelProperty(String propertyName, String propertyValue)
+    {
+        if (propertyName == null)
+            return;
+        
+        // if the propertyValue is null, remove the property
+        if(propertyValue == null)
+        {
+            removeModelProperty(propertyName);
+            return;
+        }
+
+        // do the set
         Element el = getDocument().getRootElement().element(propertyName);
         if (el == null)
         {
@@ -127,17 +286,212 @@ public abstract class ModelObject implements IModelObject
         el.setText(propertyValue);
     }
 
-    public void removeProperty(String propertyName)
+    public void removeModelProperty(String propertyName)
     {
         if (propertyName == null)
             return;
 
+        // do the remove
         Element el = getDocument().getRootElement().element(propertyName);
         if (el != null)
+        {
             getDocument().getRootElement().remove(el);
+        }
     }
 
-    // support for name value pairs
+    
+    
+    
+    ////////////////////////////////////////////////////////////
+    // Custom Properties
+    ////////////////////////////////////////////////////////////
+    
+    public String getCustomProperty(String propertyName)
+    {
+        if (propertyName == null)
+            return null;
+        
+        // do the get
+        Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
+        if(properties != null)
+        {
+            return (String) properties.elementTextTrim(propertyName);
+        }
+        
+        return null;
+    }
+
+    public void setCustomProperty(String propertyName, String propertyValue)
+    {
+        if (propertyName == null)
+            return;
+        
+        // if the propertyValue is null, remove the property
+        if(propertyValue == null)
+        {
+            removeCustomProperty(propertyName);
+            return;
+        }
+        
+        // do the set
+        Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
+        if(properties == null)
+        {
+            properties = getDocument().getRootElement().addElement(CONTAINER_PROPERTIES);
+        }
+        
+        Element el = properties.element(propertyName);
+        if (el == null)
+        {
+            el = properties.addElement(propertyName);
+        }
+
+        // put value
+        el.setText(propertyValue);
+    }
+
+    public void removeCustomProperty(String propertyName)
+    {
+        if (propertyName == null)
+            return;
+        
+        // do the remove
+        Element properties = getDocument().getRootElement().element("properties");
+        if(properties != null)
+        {
+            Element el = properties.element(propertyName);
+            if (el != null)
+                properties.remove(el);
+        }
+    }
+
+    
+    
+    public Map<String, Object> getProperties()
+    {
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.putAll(getModelProperties());
+        properties.putAll(getCustomProperties());
+        return properties;        
+    }
+    
+    public Map<String, Object> getModelProperties()
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        List elements = getDocument().getRootElement().elements();
+        for (int i = 0; i < elements.size(); i++)
+        {
+            Element el = (Element) elements.get(i);
+            String elementName = el.getName();
+            if(elementName != null)
+            {
+                if(!CONTAINER_PROPERTIES.equals(elementName))
+                {
+                    String elementValue = el.getStringValue();
+                    map.put(elementName, elementValue);
+                }
+            }
+        }
+        return map;
+    }
+
+    public Map<String, Object> getCustomProperties()
+    {
+        Map<String, Object> map = new HashMap<String, Object>();
+        
+        Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
+        if(properties != null)
+        {
+            List elements = properties.elements();
+            for (int i = 0; i < elements.size(); i++)
+            {
+                Element el = (Element) elements.get(i);
+                String elementName = el.getName();
+                String elementValue = el.getTextTrim();
+                map.put(elementName, elementValue);
+            }
+        }
+        return map;
+    }
+    
+
+
+    public long getModificationTime()
+    {
+        return this.modificationTime;
+    }
+
+    public void setModificationTime(long modificationTime)
+    {
+        this.modificationTime = modificationTime;
+    }
+
+    public void touch()
+    {
+        setModificationTime(System.currentTimeMillis());
+    }
+    
+    public String getRelativePath()
+    {
+        return relativePath;
+    }
+    
+    public String getFileName()
+    {
+        return this.fileName;
+    }
+    
+    public String getRelativeFilePath()
+    {
+        return getRelativePath() + "/" + getFileName();
+    }
+
+    public abstract String getTypeName();
+    
+    
+    
+    
+    
+    ////////////////////////////////////////////////////////
+    //
+    // Protected Internal Methods
+    //
+    ////////////////////////////////////////////////////////
+
+    public void setRelativePath(String relativePath)
+    {
+        this.relativePath = relativePath;
+    }
+    
+    protected void setFileName(String fileName)
+    {
+        this.fileName = fileName;
+    }
+    
+    protected void setSaved(boolean b)
+    {
+        this.isSaved = b;
+    }
+    
+
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    //TODO
+    /////////////////////////////////////////////////////////////////
+    // backward compatibility for dynamic website project
+    // this will be removed shortly
+    /////////////////////////////////////////////////////////////////
+
 
     public String getSetting(String settingName)
     {
@@ -178,7 +532,6 @@ public abstract class ModelObject implements IModelObject
                 getDocument().getRootElement().remove(el);
         }
     }
-
     public Map getSettings()
     {
         Map map = new HashMap();
@@ -193,67 +546,16 @@ public abstract class ModelObject implements IModelObject
         }
         return map;
     }
-
-    public Map getProperties()
+    
+    public String getName()
     {
-        Map map = new HashMap();
-
-        List elements = getDocument().getRootElement().elements();
-        for (int i = 0; i < elements.size(); i++)
-        {
-            Element el = (Element) elements.get(i);
-            String elementName = el.getName();
-            if (elementName != null && elementName.equalsIgnoreCase("setting"))
-            {
-                String propertyValue = el.getStringValue();
-                map.put(elementName, propertyValue);
-            }
-        }
-        return map;
+        return getTitle();
     }
 
-    protected Document document;
-    long modificationTime;
-
-    public long getModificationTime()
+    public void setName(String value)
     {
-        return this.modificationTime;
+        setTitle(value);
     }
-
-    public void setModificationTime(long modificationTime)
-    {
-        this.modificationTime = modificationTime;
-    }
-
-    public void touch()
-    {
-        setModificationTime(System.currentTimeMillis());
-    }
-
-    //
-
-    protected String relativePath;
-
-    public String getRelativePath()
-    {
-        return relativePath;
-    }
-
-    public void setRelativePath(String relativePath)
-    {
-        this.relativePath = relativePath;
-    }
-
-    public String getFileName()
-    {
-        return this.getId() + ".xml";
-    }
-
-    public String getRelativeFilePath()
-    {
-        return getRelativePath() + "/" + getFileName();
-    }
-
-    public abstract String getTypeName();
+    
 
 }

@@ -37,8 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class RequestUtil
 {
-
-    public static RequestContext getRequestContext(HttpServletRequest request)
+    public static RequestContext getRequestContext(ServletRequest request)
     {
         RequestContext context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT);
         return context;

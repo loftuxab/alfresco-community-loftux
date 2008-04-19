@@ -61,7 +61,7 @@ public class ObjectAnchorTag extends AbstractObjectTag
         RequestContext context = getRequestContext();
 
         // generate the URL
-        String url = render(context, this.getId(), this.getFormat());
+        String url = link(context, getPage(), getObject(), getFormat());
 
         try
         {

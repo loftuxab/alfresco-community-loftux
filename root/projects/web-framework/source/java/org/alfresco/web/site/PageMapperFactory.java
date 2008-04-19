@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.site;
 
+import org.alfresco.tools.ReflectionHelper;
+import org.alfresco.web.site.exception.PageMapperException;
+
 /**
  * @author muzquiano
  */
@@ -35,6 +38,7 @@ public class PageMapperFactory
     }
 
     public static PageMapper newInstance(RequestContext context)
+        throws PageMapperException
     {
         // default that we will use
         String className = "org.alfresco.web.site.DefaultPageMapper";
@@ -49,16 +53,12 @@ public class PageMapperFactory
                 className = _className;
         }
 
-        // construct a link builder
+        // construct a page mapper
         // TODO: Pool these
-        PageMapper pageMapper = null;
-        try
+        PageMapper pageMapper = (PageMapper) ReflectionHelper.newObject(className);
+        if(pageMapper == null)
         {
-            Class clazz = Class.forName(className);
-            pageMapper = (PageMapper) clazz.newInstance();
-        }
-        catch (Exception ex)
-        {
+            throw new PageMapperException("Unable to create page mapper for class name: " + className);
         }
 
         return pageMapper;

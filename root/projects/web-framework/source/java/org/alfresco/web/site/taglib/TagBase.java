@@ -77,6 +77,7 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
     }
 
     protected void print(String str)
+        throws JspException
     {
         try
         {
@@ -84,6 +85,8 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
         }
         catch (Exception ex)
         {
+            ex.printStackTrace();
+            throw new JspException(ex);
         }
     }
 }

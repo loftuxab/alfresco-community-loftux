@@ -44,7 +44,7 @@ import org.alfresco.web.site.exception.TemplateRenderException;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererFactory;
 
@@ -77,6 +77,9 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String dispatchPath) throws JspRenderException
     {
+        // start a timer
+        Timer.start(request, "RenderJspPage-" + dispatchPath);
+        
         try
         {
             // wrap the request and response
@@ -84,7 +87,6 @@ public class RenderUtil
                     request);
             WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(
                     response);
-
 
             // do the include
             RequestUtil.include(wrappedRequest, wrappedResponse, dispatchPath);
@@ -115,6 +117,10 @@ public class RenderUtil
         {
             throw new JspRenderException("Unable to render JSP page", ex);
         }
+        finally
+        {
+            Timer.stop(request, "RenderJspPage-" + dispatchPath);
+        }
     }
 
     /**
@@ -130,13 +136,35 @@ public class RenderUtil
             throw new PageRenderException(
                     "Unable to locate current page in request context");
         }
-        Template currentTemplate = page.getTemplate(context);
+        
+        renderPage(context, request, response, page.getId());
+    }
+    
+    /**
+     * Renders a given page instance
+     */
+    public static void renderPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String pageId) throws PageRenderException
+    {
+        // start a timer
+        Timer.start(request, "RenderPage-" + pageId);
+        
+        // look up the page
+        Page page = (Page) context.getModel().loadPage(context, pageId);
+        if (page == null)
+            throw new PageRenderException(
+                    "Unable to locate page: " + pageId);
+
+        // look up the page template
+        TemplateInstance currentTemplate = page.getTemplate(context);
         if (currentTemplate == null)
         {
             throw new PageRenderException(
-                    "Unable to locate template for page: " + page.getId());
+                    "Unable to locate template for page: " + pageId);
         }
 
+        // do our thing
         try
         {
             // Wrap the Request and Response
@@ -179,6 +207,10 @@ public class RenderUtil
                     "An exception occurred while rendering page: " + page.getId(),
                     ex);
         }
+        finally
+        {
+            Timer.stop(request, "RenderPage-" + page.getId());
+        }
     }
 
     /**
@@ -196,12 +228,14 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String templateId) throws TemplateRenderException
     {
-        Template template = (Template) context.getModel().loadTemplate(context,
+        // start a timer
+        Timer.start(request, "RenderTemplate-" + templateId);
+
+        TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
                 templateId);
         if (template == null)
             throw new TemplateRenderException(
                     "Unable to locate template: " + templateId);
-
         try
         {
             // get the configuration for the template
@@ -217,6 +251,10 @@ public class RenderUtil
             throw new TemplateRenderException(
                     "An exception occurred while rendering template: " + templateId,
                     ex);
+        }
+        finally
+        {
+            Timer.stop(request, "RenderTemplate-" + templateId);            
         }
     }
 
@@ -236,8 +274,11 @@ public class RenderUtil
             String templateId, String regionId, String regionScopeId)
             throws RegionRenderException
     {
+        // start a timer
+        Timer.start(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
+        
         // get the template
-        Template template = (Template) context.getModel().loadTemplate(context,
+        TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
                 templateId);
         if (template == null)
             throw new RegionRenderException(
@@ -285,6 +326,12 @@ public class RenderUtil
                 // merge in the template data
                 config.merge(componentConfig);
             }
+            else
+            {
+                // if we couldn't find a component, then redirect to a
+                // region "no-component" page
+                renderer = context.getConfig().getRegionNoComponentUri();
+            }
 
             // do the render
             request.setAttribute("region-configuration", config);
@@ -294,6 +341,10 @@ public class RenderUtil
         {
             throw new RegionRenderException(
                     "Unable to render region: " + regionId, ex);
+        }
+        finally
+        {
+            Timer.stop(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
         }
     }
 
@@ -312,6 +363,9 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String componentId) throws ComponentRenderException
     {
+        // start a timer
+        Timer.start(request, "RenderComponent-" + componentId);
+        
         Component component = context.getModel().loadComponent(context,
                 componentId);
         if (component == null)
@@ -336,6 +390,10 @@ public class RenderUtil
                     ex);
 
         }
+        finally
+        {
+            Timer.stop(request, "RenderComponent-" + componentId);
+        }
     }
 
     /**
@@ -347,7 +405,7 @@ public class RenderUtil
      * @param formatId
      */
     public static void page(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, String pageId, String formatId)
+            HttpServletResponse response, String pageId, String formatId, String objectId)
     {
         String url = context.getLinkBuilder().page(context, pageId, formatId);
         if (url != null)
@@ -481,19 +539,24 @@ public class RenderUtil
     {
         // rendering objects
         Page page = context.getCurrentPage();
-        Template template = context.getCurrentTemplate();
+        TemplateInstance template = context.getCurrentTemplate();
 
         // get the component association in that scope
         String sourceId = null;
-        if ("site".equalsIgnoreCase(scopeId))
-            sourceId = "site";
-        if ("template".equalsIgnoreCase(scopeId))
+        if (REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+            sourceId = REGION_SCOPE_GLOBAL;
+        if (REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
             sourceId = template.getId();
-        if ("page".equalsIgnoreCase(scopeId))
+        if (REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
             sourceId = page.getId();
 
         return sourceId;
     }
+    
+    public static final String REGION_SCOPE_GLOBAL   = "global";
+    public static final String REGION_SCOPE_TEMPLATE = "template";
+    public static final String REGION_SCOPE_PAGE     = "page";
+ 
 
     protected static void appendBuffer(StringBuffer buffer, String toAppend)
     {

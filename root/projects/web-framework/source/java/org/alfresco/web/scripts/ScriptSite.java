@@ -42,10 +42,17 @@ import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.mozilla.javascript.Scriptable;
 
 /**
+ * The "site" object represents the starting point for working with
+ * the web framework.
+ * 
+ * From this object, you can access the site model,
+ * perform read and write updates to components, pages and model
+ * configurations.
+ * 
  * @author muzquiano
  */
 public final class ScriptSite extends ScriptBase
@@ -308,13 +315,13 @@ public final class ScriptSite extends ScriptBase
 
     public ScriptModelObject newTemplate()
     {
-        Template template = (Template) Framework.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) Framework.getModel().newTemplate(context);
         return toScriptModelObject(context, template);
     }
 
     public ScriptModelObject newTemplate(String templateType)
     {
-        Template template = (Template) Framework.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) Framework.getModel().newTemplate(context);
         template.setTemplateType(templateType);
         return toScriptModelObject(context, template);
     }
@@ -322,7 +329,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject newTemplate(String templateType, String name,
             String description)
     {
-        Template template = (Template) Framework.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) Framework.getModel().newTemplate(context);
         template.setTemplateType(templateType);
         template.setName(name);
         template.setDescription(description);
@@ -389,14 +396,14 @@ public final class ScriptSite extends ScriptBase
 		Page page = context.getModel().loadPage(context, pageId);
 		if(page != null)
 		{
-			Map<String, Template> templatesMap = page.getTemplates(context);
+			Map<String, TemplateInstance> templatesMap = page.getTemplates(context);
 			
 			ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
 			Iterator it = templatesMap.keySet().iterator();
 			while(it.hasNext())
 			{
 				String formatId = (String) it.next();
-				Template template = templatesMap.get(formatId);
+				TemplateInstance template = templatesMap.get(formatId);
 				
 				ScriptModelObject scriptModelObject = toScriptModelObject(context, template);
 				map.put(formatId, scriptModelObject);
@@ -425,7 +432,7 @@ public final class ScriptSite extends ScriptBase
         Page page = (Page) context.getModel().loadPage(context, pageId);
         if (page != null)
         {
-            Template t = page.getTemplate(context, formatId);
+            TemplateInstance t = page.getTemplate(context, formatId);
             if (t != null)
                 return this.toScriptModelObject(context, t);
         }

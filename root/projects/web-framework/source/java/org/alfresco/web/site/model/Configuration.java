@@ -34,6 +34,8 @@ public class Configuration extends ModelObject
     public static String TYPE_NAME = "configuration";
     public static String PROP_SOURCE_ID = "source-id";
     
+    public static String VALUE_SOURCE_ID_SITE = "site";
+    
     public Configuration(Document document)
     {
         super(document);

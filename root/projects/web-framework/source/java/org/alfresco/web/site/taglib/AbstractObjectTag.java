@@ -46,16 +46,27 @@ import org.alfresco.web.site.model.Page;
  */
 public abstract class AbstractObjectTag extends TagBase
 {
-    private String id = null;
+    private String pageId = null;
+    private String objectId = null;
 
-    public void setId(String id)
+    public void setPage(String pageId)
     {
-        this.id = id;
+        this.pageId = pageId;
     }
 
-    public String getId()
+    public String getPage()
     {
-        if (this.id == null)
+        return this.pageId;
+    }
+    
+    public void setObject(String objectId)
+    {
+        this.objectId = objectId;
+    }
+    
+    public String getObject()
+    {
+        if (this.objectId == null)
         {
             PageContext pc = (PageContext) getPageContext();
 
@@ -68,53 +79,27 @@ public abstract class AbstractObjectTag extends TagBase
         }
         return this.id;
     }
-    
-    /**
-     * TODO: I consider this a pretty weak way to do this
-     */
-    protected boolean isPageId()
+            
+    protected String link(RequestContext context, String formatId)
     {
-        if(this.id == null)
-            return false;
-        
-        // TODO: This can be expensive if not in cache
-        Page page = getRequestContext().getModel().loadPage(getRequestContext(), getId());
-        return(page != null);
+        return link(context, getPage(), getObject(), formatId);
     }
     
-    protected boolean isContentId()
+    protected String link(RequestContext context, String pageId, String objectId, String formatId)
     {
-        if(this.id == null)
-            return false;
-        
-        return(!isPageId());
+        if(pageId != null && objectId == null)
+        {
+            return context.getLinkBuilder().page(context, pageId, formatId);
+        }
+        else if(pageId == null && objectId != null)
+        {
+            return context.getLinkBuilder().content(context, objectId, formatId);
+            
+        }
+        else if(pageId != null && objectId != null)
+        {
+            return context.getLinkBuilder().page(context, pageId, formatId, objectId);
+        }
+        return null;
     }
-    
-    protected String render(RequestContext context, String id, String format)
-    {
-        boolean isContent = isContentId();
-        if(isContent)
-        {
-            return context.getLinkBuilder().content(context, id, format);
-        }
-        else
-        {
-            return context.getLinkBuilder().page(context, id, format);
-        }
-    }
-    
-    protected void render(RequestContext context, HttpServletRequest request, HttpServletResponse response, String id, String format)
-    {
-        boolean isContent = isContentId();
-        if(isContent)
-        {
-            RenderUtil.content(context, request, response, id, format);
-        }
-        else
-        {
-            RenderUtil.page(context, request, response, id, format);
-        }
-    }
-    
-    
 }

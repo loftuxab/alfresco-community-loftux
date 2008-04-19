@@ -88,4 +88,17 @@ public abstract class UserFactory
 
     protected abstract User loadUser(RequestContext context,
             HttpServletRequest request, String user_id) throws Exception;
+    
+    public void setId(String id)
+    {
+        this.id = id;
+    }
+
+    public String getId()
+    {
+        return this.id;
+    }
+
+    protected String id;
+    
 }

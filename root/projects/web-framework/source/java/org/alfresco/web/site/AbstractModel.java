@@ -24,12 +24,10 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.tools.ObjectGUID;
-import org.alfresco.tools.ReflectionHelper;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
+import org.alfresco.web.site.model.ModelHelper;
 import org.alfresco.web.site.model.ModelObject;
-import org.dom4j.Document;
 
 /**
  * @author muzquiano
@@ -48,52 +46,24 @@ public abstract class AbstractModel
         return this.fileSystem;
     }
 
-    // guids
+    // configuration
 
     public String newGUID()
     {
-        ObjectGUID guid = new ObjectGUID();
-        return guid.toString();
+        return ModelHelper.newGUID();
     }
 
     public String newGUID(String typeName)
     {
-        // TODO: Is this necessary?
-        int i = typeName.indexOf(":");
-        if (i > -1)
-            typeName = typeName.substring(i + 1, typeName.length());
-
-        String prefix = this.getConfiguration().getModelTypePrefix(typeName);
-        if (prefix != null && !"".equals(prefix))
-            return prefix + newGUID();
-        return newGUID();
+        return ModelHelper.newGUID(typeName);
     }
-
-    // configuration
-
+    
     public AbstractConfig getConfiguration()
     {
         return Framework.getConfig();
     }
 
     // helper methods
-    protected ModelObject convertDocumentToModelObject(Document document)
-    {
-        if (document == null)
-            return null;
-
-        String tagName = document.getRootElement().getName();
-        int i = tagName.indexOf(":");
-        if (i > -1)
-            tagName = tagName.substring(i + 1, tagName.length());
-
-        String implClassName = this.getConfiguration().getModelTypeClass(
-                tagName);
-        ModelObject siteObject = (ModelObject) ReflectionHelper.newObject(
-                implClassName, new Class[] { Document.class },
-                new Object[] { document });
-        return siteObject;
-    }
     
     /**
      * This is an exhaustive method to find a model object type with a
@@ -133,15 +103,6 @@ public abstract class AbstractModel
         if (name.endsWith(".xml"))
             name = name.substring(0, name.length() - 4);
         return name;
-    }
-
-
-    protected ModelObject convertDocumentToModelObject(Document document,
-            long modificationTime)
-    {
-        ModelObject obj = convertDocumentToModelObject(document);
-        obj.setModificationTime(modificationTime);
-        return obj;
     }
 
     protected String getRelativePath(ModelObject object)

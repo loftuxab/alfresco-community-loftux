@@ -10,7 +10,7 @@ import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
 
 public interface IModel
@@ -34,7 +34,7 @@ public interface IModel
 
     public PageAssociation loadPageAssociation(RequestContext context, String id);
 
-    public Template loadTemplate(RequestContext context, String id);
+    public TemplateInstance loadTemplate(RequestContext context, String id);
 
     public TemplateType loadTemplateType(RequestContext context, String id);
 
@@ -53,7 +53,7 @@ public interface IModel
 
     public PageAssociation newPageAssociation(RequestContext context);
 
-    public Template newTemplate(RequestContext context);
+    public TemplateInstance newTemplate(RequestContext context);
 
     public TemplateType newTemplateType(RequestContext context);
 

@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default user profile object.
@@ -51,10 +52,9 @@ public class User
     public static String PROP_STATE = "state";
     public static String PROP_ZIP_CODE = "zip_code";
     
+    protected Map<String, Object> map = null;
     
-    protected HashMap<String, Object> map = null;
-    
-    protected User(String id)
+    public User(String id)
     {
         map = new HashMap<String,Object>();
         setId(id);
@@ -214,6 +214,10 @@ public class User
     public void setProperty(String key, Object value)
     {
         map.put(key, value);
+    }
+    public Map<String, Object> getProperties()
+    {
+        return map;
     }
     
 }

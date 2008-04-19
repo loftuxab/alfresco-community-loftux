@@ -9,7 +9,7 @@
    </head>
    <body>
       <div>
-         <@region id="header" scope="site" access="protected">
+         <@region id="header" scope="global" access="protected">
             Default region content (only see this if component cannot be resolved!)
          </@region>
       </div>

@@ -29,7 +29,7 @@ import java.util.Map;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ModelObject;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 
 /**
  * @author muzquiano
@@ -60,12 +60,12 @@ public class RuntimeConfigManager
             populateConfiguration(context, (Component) obj, config);
         if (obj instanceof Component)
             populateConfiguration(context, (Component) obj, config);
-        if (obj instanceof Template)
-            populateConfiguration(context, (Template) obj, config);
+        if (obj instanceof TemplateInstance)
+            populateConfiguration(context, (TemplateInstance) obj, config);
     }
 
     protected static void populateConfiguration(RequestContext context,
-            Template template, RuntimeConfig config)
+            TemplateInstance template, RuntimeConfig config)
     {
         // populate with template settings
         Map templateSettings = template.getSettings();

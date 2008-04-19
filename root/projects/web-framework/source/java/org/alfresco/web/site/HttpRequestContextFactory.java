@@ -51,13 +51,18 @@ public class HttpRequestContextFactory extends RequestContextFactory
             throws Exception
     {
         HttpRequestContext context = new HttpRequestContext(request);
+        Framework.getLogger().debug("Built HttpRequestContext instance");
 
         // load the user onto the context
-        // TODO: Make User Factory pluggable
-        UserFactory userFactory = new AlfrescoUserFactory();
-        User user = userFactory.getUser(context, request);
-        context.setUser(user);
+        UserFactory userFactory = UserFactoryBuilder.newFactory();
+        if(userFactory != null)
+        {
+            User user = userFactory.getUser(context, request);
+            context.setUser(user);
+            Framework.getLogger().debug("Loaded user onto RequestContext");
+        }
 
+        // TODO: Rethink if this is needed
         // load properties from the request context properties block
         // the store to run against (standalone mode)
         initStoreId(context, request);
@@ -65,10 +70,12 @@ public class HttpRequestContextFactory extends RequestContextFactory
         // initialize the file system
         String rootPath = context.getConfig().getFileSystemRootPath("local");
         initFileSystem(context, request, rootPath);
+        Framework.getLogger().debug("Local FileSystem connector initialized");
 
         // populate the request context
         PageMapper pageMapper = PageMapperFactory.newInstance(context);
         pageMapper.execute(context, request);
+        Framework.getLogger().debug("Page Mapper executed: " + pageMapper.getClass().getName());
 
         return context;
     }

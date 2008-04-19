@@ -33,53 +33,62 @@ import org.alfresco.web.site.RequestContext;
  */
 public interface IModelObject
 {
+    // common properties
     public String getId();
-
+    public String getTitle();
+    public void setTitle(String value);
+    public String getDescription();
+    public void setDescription(String value);
+    
+    // persistence methods
     public void save(RequestContext context);
-
     public void reload(RequestContext context);
-
     public void remove(RequestContext context);
+    public boolean isSaved();
 
+    // xml methods
     public String toXML();
 
-    public String getName();
-
-    public void setName(String value);
-
-    public String getDescription();
-
-    public void setDescription(String value);
-
+    // generic properties
     public boolean getBooleanProperty(String propertyName);
-
     public String getProperty(String propertyName);
-
     public void setProperty(String propertyName, String propertyValue);
-
     public void removeProperty(String propertyName);
+    public Map<String, Object> getProperties();
 
-    public String getSetting(String settingName);
-
-    public void setSetting(String settingName, String settingValue);
-
-    public void removeSetting(String settingName);
-
+    // model properties
+    public String getModelProperty(String propertyName);
+    public void setModelProperty(String propertyName, String propertyValue);
+    public void removeModelProperty(String propertyName);
+    public Map<String, Object> getModelProperties();
+    
+    // custom properties
+    public String getCustomProperty(String propertyName);
+    public void setCustomProperty(String propertyName, String propertyValue);
+    public void removeCustomProperty(String propertyName);
+    public Map<String, Object> getCustomProperties();
+    
+    // modification stamps
     public long getModificationTime();
-
-    public void setModificationTime(long modificationTime);
-
+    //public void setModificationTime(long modificationTime);
     public void touch();
 
+    // model object management
     public String getRelativePath();
-
     public String getFileName();
-
     public String getRelativeFilePath();
-
-    public Map getSettings();
-
-    public Map getProperties();
-
     public String getTypeName();
+
+    
+
+    
+    
+    // TODO: legacy methods
+    // TODO: remove these methods
+    public String getName();
+    public void setName(String value);
+    public Map getSettings();
+    public String getSetting(String settingName);
+    public void setSetting(String settingName, String settingValue);
+    public void removeSetting(String settingName);
 }

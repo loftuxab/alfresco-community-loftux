@@ -24,8 +24,6 @@
  */
 package org.alfresco.web.site.taglib;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.site.RequestContext;
@@ -49,19 +47,12 @@ public class ObjectLinkTag extends AbstractObjectTag
 
     public int doStartTag() throws JspException
     {
-        HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();
-        HttpServletResponse response = (HttpServletResponse) getPageContext().getResponse();
         RequestContext context = getRequestContext();
 
-        try
-        {
-            render(context, request, response, getId(), getFormat());
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-            throw new JspException(ex);
-        }
+        // generate the URL
+        String url = link(context, getPage(), getObject(), getFormat());
+        print(url);
+        
         return SKIP_BODY;
     }
 }

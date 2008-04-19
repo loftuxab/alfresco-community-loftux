@@ -26,16 +26,15 @@ package org.alfresco.web.scripts;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Iterator;
 import java.util.Map;
 
 import javax.servlet.jsp.tagext.BodyTagSupport;
-import javax.servlet.jsp.tagext.Tag;
 
-import org.alfresco.tools.ReflectionHelper;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.taglib.RegionTag;
 
 import freemarker.core.Environment;
+import freemarker.template.TemplateBooleanModel;
 import freemarker.template.TemplateDirectiveBody;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateModel;
@@ -47,75 +46,58 @@ import freemarker.template.TemplateScalarModel;
  * 
  * @author muzquiano
  */
-public class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
+public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
 {
-    public GenericFreemarkerTagDirective(RequestContext context, String tagName, String tagClassName)
-    {
-        this(context);
-        setTagName(tagName);
-        setTagClassName(tagClassName);
-    }
-
-    public GenericFreemarkerTagDirective(RequestContext context)
+    public RegionFreemarkerTagDirective(RequestContext context)
     {
         super(context);
     }
-    
-    protected String tagName;
-    protected String tagClassName;
-    
-    public void setTagClassName(String tagClassName)
-    {
-        this.tagClassName = tagClassName;
-    }
-    
-    public String getTagClassName()
-    {
-        return this.tagClassName;
-    }
-    
-    public void setTagName(String tagName)
-    {
-        this.tagName = tagName;
-    }
-    
-    public String getTagName()
-    {
-        return this.tagName;
-    }
-    
+
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException
     {
         // instantiate the tag class
-        Tag tag = (Tag) ReflectionHelper.newObject(getTagClassName());
-        
-        if(tag != null)
-        {
-            // set directive parameters onto the tag
-            Iterator it = params.keySet().iterator();
-            while(it.hasNext())
-            {
-                String name = (String) it.next();
-                TemplateModel value = (TemplateModel) params.get(name);
+        RegionTag tag = new RegionTag();
 
-                // If the value is a scalar, we can do the set
-                // However, we can only do Strings (at the moment)
-                if(value instanceof TemplateScalarModel)
-                {
-                    // TODO: Totally improve how this is done
-                    String method = "set" + name.substring(0,1).toUpperCase() + name.substring(1, name.length());
-                    Class[] argTypes = new Class[] { String.class };
-                    String v = ((TemplateScalarModel)value).getAsString();
-                    String[] args = new String[] { v };
-                    ReflectionHelper.invoke(tag, method, argTypes, args);
-                }
-                else
-                {
-                    throw new TemplateModelException("The '"+name+"' parameter to the '" + getTagName() + "' directive must be a string.");                    
-                }
-            }
+        
+        
+        // REGION NAME
+        TemplateModel idValue = (TemplateModel)params.get("id");
+        if (idValue instanceof TemplateScalarModel == false)
+        {
+           throw new TemplateModelException("The 'id' parameter to a region directive must be a string.");
         }
+        String regionId = ((TemplateScalarModel)idValue).getAsString();
+        tag.setName(regionId);
+        
+        
+        // REGION SCOPE
+        TemplateModel scopeValue = (TemplateModel)params.get("scope");
+        if (scopeValue instanceof TemplateScalarModel == false)
+        {
+           throw new TemplateModelException("The 'scope' parameter to a region directive must be a string.");
+        }
+        String scope = ((TemplateScalarModel)scopeValue).getAsString();
+        tag.setScope(scope);
+        
+        
+        // PROTECTED ACCESS
+        boolean protectedRegion = false;
+        TemplateModel protValue = (TemplateModel)params.get("protected");
+        if (protValue != null)
+        {
+           if (protValue instanceof TemplateBooleanModel == false)
+           {
+              throw new TemplateModelException("The 'protected' parameter to a region directive must be a boolean.");
+           }
+           protectedRegion = ((TemplateBooleanModel)protValue).getAsBoolean();
+           if(protectedRegion)
+           {
+               tag.setAccess("protected");
+           }
+        }
+
+        
         
         // copy in body content (if there is any)
         String bodyContentString = null;

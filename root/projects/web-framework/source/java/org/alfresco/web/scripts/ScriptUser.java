@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,48 +22,44 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.web.scripts;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import java.io.Serializable;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.User;
 
 /**
+ * Represents the user of the site who is currently executing the
+ * given template or component.
+ * 
  * @author muzquiano
  */
-public class Framework
+public final class ScriptUser extends ScriptBase
 {
-    public static boolean isInitialized()
+    protected User user;
+    
+    public ScriptUser(RequestContext context, User user)
     {
-        return (getConfig() != null && getModel() != null);
-    }
-
-    public static AbstractConfig getConfig()
-    {
-        return Framework.config;
-    }
-
-    public static void setConfig(AbstractConfig config)
-    {
-        Framework.config = config;
-    }
-
-    public static IModel getModel()
-    {
-        return Framework.model;
-    }
-
-    public static void setModel(IModel model)
-    {
-        Framework.model = model;
+        super(context);
+        this.user = user;
     }
     
-    public static Log getLogger()
+    public ScriptableMap getProperties()
     {
-        return logger;
+        Map<String, Object> userProperties = user.getProperties();
+        
+        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
+        for(Entry<String, Object> entry : userProperties.entrySet())
+        {
+            String key = (String) entry.getKey();
+            Object value = entry.getValue();
+            map.put(key, value);            
+        }
+        return map;
     }
 
-    protected static AbstractConfig config = null;
-    protected static IModel model = null;
     
-    protected static Log logger = LogFactory.getLog(Framework.class);
 }

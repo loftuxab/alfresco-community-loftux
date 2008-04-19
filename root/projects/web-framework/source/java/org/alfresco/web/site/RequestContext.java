@@ -34,20 +34,30 @@ import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.Template;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
  * @author muzquiano
  */
 public abstract class RequestContext
 {
-    private static Log logger = LogFactory.getLog(RequestContext.class);
-
+    protected static int requestCount = 0;
+    
     protected RequestContext()
     {
         this.map = new HashMap();
+        
+        synchronized(RequestContext.class)
+        {
+            requestCount++;
+            this.id = "" + requestCount;            
+        }
+    }
+
+    public String getId()
+    {
+        return this.id;
     }
     
     public Configuration getSiteConfiguration()
@@ -134,7 +144,7 @@ public abstract class RequestContext
         return ModelUtil.getRootPage(this);
     }
 
-    public Template getCurrentTemplate()
+    public TemplateInstance getCurrentTemplate()
     {
         if(getCurrentPage() != null)
         {
@@ -220,8 +230,8 @@ public abstract class RequestContext
     }
 
     public Log getLogger()
-    {
-        return logger;
+    { 
+        return Framework.getLogger();
     }
 
     public void setUser(User user)
@@ -241,6 +251,7 @@ public abstract class RequestContext
     protected IFileSystem fileSystem;
     protected String storeId;
     protected User user;
+    protected String id;
 
     public static String VALUE_HEAD_TAGS = "headTags";
     public static String VALUE_CREDENTIAL_VAULT = "credential_vault";

@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import java.util.Map;
+
 /**
  * @author muzquiano
  */
@@ -40,47 +42,89 @@ public class DefaultLinkBuilder extends LinkBuilder
         return page(context, pageId, formatId);
     }
 
-    public String page(RequestContext context, String pageId, String formatId)
+    public String page(RequestContext context, String pageId, 
+            String formatId)
+    {
+        return page(context, pageId, formatId, null);
+    }
+
+    public String page(RequestContext context, String pageId, 
+            String formatId, String objectId)
+    {
+        return page(context, pageId, formatId, objectId, null);
+    }
+    
+
+    public String page(RequestContext context, String pageId, 
+            String formatId, String objectId, Map<String, String> params)
     {
         if (pageId == null)
+        {
             return null;
+        }
         if (formatId == null)
+        {
             formatId = context.getConfig().getDefaultFormatId();
+        }
 
         StringBuffer buffer = new StringBuffer();
         buffer.append("?f=" + formatId);
         buffer.append("&p=" + pageId);
+        if (objectId != null && !"".equals(objectId))
+        {
+              buffer.append("&o=" + objectId);
+        }
+        if(params != null)
+        {
+            for (Map.Entry<String, String> entry : params.entrySet())
+            {
+                String key = entry.getKey();
+                String value = entry.getValue();                
+                buffer.append("&" + key + "=" + value);
+            }
+        }
 
         return buffer.toString();
     }
-
+    
     public String content(RequestContext context, String objectId)
     {
         String formatId = context.getConfig().getDefaultFormatId();
         return content(context, objectId, formatId);
     }
-
+    
     public String content(RequestContext context, String objectId,
             String formatId)
     {
-        return content(context, objectId, null, formatId);
+        return content(context, objectId, formatId, null);
     }
 
     public String content(RequestContext context, String objectId,
-            String pageId, String formatId)
+            String formatId, Map<String, String> params)
     {
-        if (objectId == null)
+        if(objectId == null)
+        {
             return null;
+        }
         if (formatId == null)
+        {
             formatId = context.getConfig().getDefaultFormatId();
+        }
 
         StringBuffer buffer = new StringBuffer();
         buffer.append("?f=" + formatId);
-        if (pageId != null && !"".equals(pageId))
-            buffer.append("&p=" + pageId);
         buffer.append("&o=" + objectId);
+      
+        if(params != null)
+        {
+            for (Map.Entry<String, String> entry : params.entrySet())
+            {
+                String key = entry.getKey();
+                String value = entry.getValue();                
+                buffer.append("&" + key + "=" + value);
+            }
+        }
 
         return buffer.toString();
     }
-
 }

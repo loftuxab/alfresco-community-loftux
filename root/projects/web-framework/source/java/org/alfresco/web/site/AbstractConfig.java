@@ -111,11 +111,21 @@ public abstract class AbstractConfig
 
     public abstract String getDynamicWebsiteServletUri();
 
-    public abstract String getDefaultPageUri();
+    public abstract String getGettingStartedPageUri();
 
     public abstract String getUnconfiguredPageUri();
     
     public abstract String getRegionContainerUri();
+    
+    public abstract String getRegionNoComponentUri();
+    
+    public abstract String getComponentErrorUri();
+    
+    public abstract String getPageErrorUri();
+    
+    public abstract String getRegionErrorUri();
+    
+    public abstract String getTemplateErrorUri();
 
     //////////////////////////////////////////////////////////////////
     // File Systems
@@ -234,4 +244,10 @@ public abstract class AbstractConfig
 
     public abstract String getRendererProperty(String id, String property);
 
+    //////////////////////////////////////////////////////////////////
+    // Debug
+    //////////////////////////////////////////////////////////////////
+    
+    public abstract boolean getDebugTimerEnabled();
+    
 }
