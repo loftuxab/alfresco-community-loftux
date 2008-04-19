@@ -81,7 +81,7 @@ public class ObjectEditTag extends AbstractObjectTag
                     getId());
 
             // icon uri
-            String newIconUri = "/ui/themes/builder/images/default/icons/incontext/edit_content.gif";
+            String newIconUri = "/themes/builder/images/default/icons/incontext/edit_content.gif";
             if (iconUri != null)
                 newIconUri = iconUri;
             newIconUri = URLUtil.browser(context, newIconUri);

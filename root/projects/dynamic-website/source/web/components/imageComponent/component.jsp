@@ -34,7 +34,7 @@
 	if(renderString == null)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
-		String unconfiguredImageUrl = URLUtil.browser(context, "/ui/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
+		String unconfiguredImageUrl = URLUtil.browser(context, "/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
 		renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component'/>";
 	}
 %>
