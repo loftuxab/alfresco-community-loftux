@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<template>
+<template-instance>
   <id>template.home</id>
   <title>Home Page Template</title>
   <template-type>homepage</template-type>
@@ -10,4 +10,4 @@
     <height>200</height>
   </properties>
   
-</template>
+</template-instance>

@@ -2,7 +2,6 @@
 
 	<config evaluator="string-compare" condition="WebFramework">
 
-
 		<!-- Extranet may want to define its links a specific way -->
 		<link-builder>
 			<definitions>
@@ -43,20 +42,29 @@
 		
 
 		<!-- Change the welcome page to our getting started one -->
-		<page>
-			<default>
-				<uri>/app/getting-started.jsp</uri>
-			</default>
-		</page>
+		<presentation>
+			<pages>
+				<page>
+					<id>getting-started</id>
+					<title>Getting Started</title>
+					<uri>/app/getting-started.jsp</uri>
+				</page>
+			</pages>
+		</presentation>
 		
+	</config>	
+	
+	<config evaluator="string-compare" condition="WebFramework" replace="true">		
 
 		<!-- Override defaults for the dispatcher -->
 		<defaults>
-			<link-builder>extranet</link-builder>
+			<request-context>http</request-context>
+			<file-system>local</file-system>
+			<format>default</format>
 			<page-mapper>extranet</page-mapper>
-			<user-factory>extranet</user-factory>
+			<link-builder>extranet</link-builder>			
+			<user-factory>extranet</user-factory>			
 		</defaults>
-		
 
 	</config>
 

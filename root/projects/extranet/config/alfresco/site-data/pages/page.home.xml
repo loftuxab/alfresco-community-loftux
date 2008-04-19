@@ -2,7 +2,7 @@
 
 <page>
   <id>page.home</id>
-  <name>Home Page</name>
+  <title>Home Page</title>
   <template-instance>template.home</template-instance>
   <authentication>none</authentication>  
 </page>

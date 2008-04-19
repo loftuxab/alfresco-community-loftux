@@ -4,11 +4,14 @@
       <title>${title}</title> 
       <link rel="stylesheet" href="${url.context}/css/basic.css" type="text/css"/>      
 
-      <@head />
+      ${head}
 
    </head>
    <body>
    
+   	<img src="${url.context}/images/logo/AlfrescoLogo200.png" border="0"/>
+   	<br/>
+   	
       This is the top of the page
 
       <br/>
@@ -33,21 +36,21 @@
       <br/>
       
       Here is a 
-      <@anchor id="page.home">
+      <@anchor page="page.home">
        link back to this page
       </@anchor>
 
       <br/>
       
       Here is a       
-      <@anchor id="home" target="_blank">
+      <@anchor page="page.home" target="_blank">
        link back to this page (new window)
       </@anchor>
       
       <br/>
       
       Here is a
-      <@anchor id="workspace://SpacesStore/1234567890">
+      <@anchor object="workspace://SpacesStore/1234567890">
       	link to an imaginary project
       </@anchor>      
       
