@@ -13,8 +13,8 @@
 
 <!-- allows the error to be expanded and viewed -->
 <%
-	String collapsedImage = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/misc/collapsed.gif");
-	String expandedImage = org.alfresco.web.site.URLUtil.browser(context, "/ui/images/misc/expanded.gif");
+	String collapsedImage = org.alfresco.web.site.URLUtil.browser(context, "/images/misc/collapsed.gif");
+	String expandedImage = org.alfresco.web.site.URLUtil.browser(context, "/images/misc/expanded.gif");
 %>	
 <script language="Javascript">
 var display = false;
