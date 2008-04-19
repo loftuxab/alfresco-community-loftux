@@ -1695,8 +1695,7 @@
 
       <!-- add config files to WEB-INF/classes -->
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes" overwrite="yes">
-         <fileset dir="${dir.project.slingshot.config}" 
-                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.slingshot.config}" />
       </copy>
 
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/lib">
