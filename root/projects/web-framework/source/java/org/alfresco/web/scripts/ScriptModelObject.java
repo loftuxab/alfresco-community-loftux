@@ -120,24 +120,9 @@ public final class ScriptModelObject implements Serializable
         modelObject.removeProperty(propertyName);
     }
 
-    public String getSetting(String settingName)
-    {
-        ParameterCheck.mandatory("settingName", settingName);
-        return modelObject.getSetting(settingName);
-    }
-
-    public void setSetting(String settingName, String settingValue)
-    {
-        ParameterCheck.mandatory("settingName", settingName);
-        ParameterCheck.mandatory("settingValue", settingValue);
-        modelObject.setSetting(settingName, settingValue);
-    }
-
-    public void removeSetting(String settingName)
-    {
-        ParameterCheck.mandatory("settingName", settingName);
-        modelObject.removeSetting(settingName);
-    }
+    
+    
+    
 
     public long getModificationTime()
     {
@@ -170,22 +155,6 @@ public final class ScriptModelObject implements Serializable
         return modelObject.getRelativeFilePath();
     }
 
-    public Map getSettings()
-    {
-        ScriptableMap map = new ScriptableMap();
-
-        Map settings = modelObject.getSettings();
-        Iterator it = settings.keySet().iterator();
-        while (it.hasNext())
-        {
-            String key = (String) it.next();
-            String value = (String) settings.get(key);
-            map.put(key, value);
-        }
-
-        return map;
-    }
-
     public Map getProperties()
     {
         ScriptableMap map = new ScriptableMap();
@@ -201,4 +170,48 @@ public final class ScriptModelObject implements Serializable
 
         return map;
     }
+    
+    
+    
+    /////////////////////////////////////////////////////////
+    //
+    // These are legacy methods that will be done away with
+    // They just call through to custom properties
+    //
+    /////////////////////////////////////////////////////////
+    public String getSetting(String settingName)
+    {
+        ParameterCheck.mandatory("settingName", settingName);
+        return modelObject.getSetting(settingName);
+    }
+
+    public void setSetting(String settingName, String settingValue)
+    {
+        ParameterCheck.mandatory("settingName", settingName);
+        ParameterCheck.mandatory("settingValue", settingValue);
+        modelObject.setSetting(settingName, settingValue);
+    }
+
+    public void removeSetting(String settingName)
+    {
+        ParameterCheck.mandatory("settingName", settingName);
+        modelObject.removeSetting(settingName);
+    }
+    
+    public Map getSettings()
+    {
+        ScriptableMap map = new ScriptableMap();
+
+        Map settings = modelObject.getSettings();
+        Iterator it = settings.keySet().iterator();
+        while (it.hasNext())
+        {
+            String key = (String) it.next();
+            String value = (String) settings.get(key);
+            map.put(key, value);
+        }
+
+        return map;
+    }
+    
 }

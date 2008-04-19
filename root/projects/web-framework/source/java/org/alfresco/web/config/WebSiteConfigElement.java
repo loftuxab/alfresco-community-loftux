@@ -134,7 +134,7 @@ public class WebSiteConfigElement extends GenericConfigElement
         return combined;
     }
 
-    protected static String[] mergeChildNames = new String[] { "definitions", "elements", "types", "libraries", "factories", "connectors", "authenticators" };
+    protected static String[] mergeChildNames = new String[] { "definitions", "elements", "types", "libraries", "factories", "connectors", "authenticators", "pages", "containers" };
 
     protected boolean isMergeChildElement(String name)
     {

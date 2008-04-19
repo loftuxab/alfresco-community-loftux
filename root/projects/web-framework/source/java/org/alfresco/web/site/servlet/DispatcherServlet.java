@@ -38,6 +38,7 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.Timer;
+import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
@@ -115,9 +116,9 @@ public class DispatcherServlet extends BaseServlet
         String currentPageId = context.getCurrentPageId();
         Page currentPage = context.getCurrentPage();
         
-        Framework.getLogger().debug("Current Page ID: " + currentPageId);
-        Framework.getLogger().debug("Current Format ID: " + currentFormatId);
-        Framework.getLogger().debug("Current Object ID: " + currentObjectId);
+        debug(context, "Current Page ID: " + currentPageId);
+        debug(context, "Current Format ID: " + currentFormatId);
+        debug(context, "Current Object ID: " + currentObjectId);
 
         // if we have absolutely nothing to dispatch to, then check to
         // see if there is a root-page declared to which we can go
@@ -127,6 +128,9 @@ public class DispatcherServlet extends BaseServlet
             Page rootPage = ModelUtil.getRootPage(context);
             if (rootPage != null)
             {
+                debug(context, "Set root page as current page");
+                currentPage = rootPage;
+                currentPageId = currentPage.getId();
                 context.setCurrentPage(rootPage);
             }            
         }
@@ -134,11 +138,11 @@ public class DispatcherServlet extends BaseServlet
         // if at this point there really is nothing to view...
         if (currentPage == null && currentObjectId == null)
         {
-            Framework.getLogger().debug("No Page or Object determined");
+            debug(context, "No Page or Object determined");
             
             // go to getting started page
-            String gettingStartedPageUri = context.getConfig().getGettingStartedPageUri();
-            Framework.getLogger().debug("Dispatching to Getting Started: " + gettingStartedPageUri);
+            String gettingStartedPageUri = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_GETTING_STARTED);
+            debug(context, "Dispatching to Getting Started: " + gettingStartedPageUri);
             dispatchJsp(context, request, response, gettingStartedPageUri);
         }
         else
@@ -148,7 +152,7 @@ public class DispatcherServlet extends BaseServlet
             // if we have a page specified, then we'll go there
             if(currentPageId != null)
             {
-                Framework.getLogger().debug("Dispatching to Page: " + currentPageId);
+                debug(context, "Dispatching to Page: " + currentPageId);
                 
                 // if there happens to be a content item specified as well, it will just become part of the context
                 // in other words, the content item doesn't determine the
@@ -160,7 +164,7 @@ public class DispatcherServlet extends BaseServlet
             else
             {
                 // otherwise, a page wasn't specified and a content item was
-                Framework.getLogger().debug("Dispatching to Content Object: " + currentObjectId);
+                debug(context, "Dispatching to Content Object: " + currentObjectId);
                 
                 dispatchContent(context, request, response, currentObjectId,
                         currentFormatId);
@@ -194,7 +198,7 @@ public class DispatcherServlet extends BaseServlet
 
         // TODO
         String sourceId = "content type id";
-        Framework.getLogger().debug("Content - Object Source Id: " + sourceId); 
+        debug(context, "Content - Object Source Id: " + sourceId); 
 
         // Once we determine the "sourceId", we can do the following
 
@@ -206,7 +210,7 @@ public class DispatcherServlet extends BaseServlet
             Page page = associations[0].getPage(context);
             if (page != null)
             {
-                Framework.getLogger().debug("Content - Dispatching to Page: " + page.getId());
+                debug(context, "Content - Dispatching to Page: " + page.getId());
                 
                 // dispatch to content page
                 context.setCurrentPage(page);
@@ -220,26 +224,31 @@ public class DispatcherServlet extends BaseServlet
             String formatId)
     {
         Page page = context.getCurrentPage();
-        Framework.getLogger().debug("Template ID: " +page.getTemplateId()); 
+        debug(context, "Template ID: " +page.getTemplateId()); 
         TemplateInstance currentTemplate = page.getTemplate(context);
         if (currentTemplate != null)
         {
-            Framework.getLogger().debug("Rendering Page with template: " + currentTemplate.getId()); 
+            debug(context, "Rendering Page with template: " + currentTemplate.getId()); 
             PresentationUtil.renderPage(context, request, response);
         }
         else
         {
-            Framework.getLogger().debug("Unable to render Page - template was not found");
+            debug(context, "Unable to render Page - template was not found");
             
             // go to unconfigured page display
-            String dispatchPage = context.getConfig().getUnconfiguredPageUri();
+            String dispatchPage = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_UNCONFIGURED);
             if (dispatchPage == null || "".equals(dispatchPage))
                 dispatchPage = "/ui/core/page-unconfigured.jsp";
 
             // dispatch
-            Framework.getLogger().debug("Rendering Unconfigured Page: " + dispatchPage);
+            debug(context, "Rendering Unconfigured Page: " + dispatchPage);
             PresentationUtil.renderJspPage(context, request, response,
                     dispatchPage);
         }
+    }
+    
+    protected static void debug(RequestContext context, String value)
+    {
+        Framework.getLogger().debug("[" + context.getId() + "] " + value);
     }
 }

@@ -13,6 +13,7 @@
 		 <element-reader element-name="tags" class="org.alfresco.web.config.WebSiteElementReader"/>
 		 <element-reader element-name="user" class="org.alfresco.web.config.WebSiteElementReader"/>
 		 <element-reader element-name="renderers" class="org.alfresco.web.config.WebSiteElementReader"/>
+		 <element-reader element-name="presentation" class="org.alfresco.web.config.WebSiteElementReader"/>		 
 		 <element-reader element-name="defaults" class="org.alfresco.web.config.WebSiteElementReader"/>		 
       </element-readers>
    </plug-ins>
@@ -199,33 +200,48 @@
 		</renderers>
 		
 		
-		<!-- Define system pages -->
-		<page>
-			<getting-started>
-				<uri>/core/page-gettingstarted.jsp</uri>
-			</getting-started>
-			<unconfigured>
-				<uri>/core/page-unconfigured.jsp</uri>
-			</unconfigured>
-			<region-container>
-				<uri>/core/region.jsp</uri>
-			</region-container>
-			<region-nocomponent>
-				<uri>/core/region-nocomponent.jsp</uri>
-			</region-nocomponent>
-			<component-error>
-				<uri>/core/component-error.jsp</uri>
-			</component-error>
-			<page-error>
-				<uri>/core/page-error.jsp</uri>
-			</page-error>
-			<region-error>
-				<uri>/core/region-error.jsp</uri>
-			</region-error>
-			<template-error>
-				<uri>/core/template-error.jsp</uri>
-			</template-error>
-		</page>
+		<!-- Define presentation pages -->
+		<presentation>
+			<pages>
+				<page>
+					<id>getting-started</id>
+					<title>Getting Started</title>
+					<uri>/core/page-gettingstarted.jsp</uri>
+				</page>
+				<page>
+					<id>page-unconfigured</id>
+					<title>Unconfigured Page</title>
+					<uri>/core/page-unconfigured.jsp</uri>
+				</page>
+				<page>
+					<id>page-error</id>
+					<title>An error has occurred</title>
+					<uri>/core/page-error.jsp</uri>
+				</page>
+			</pages>
+			<containers>
+				<container>
+					<id>region-container</id>
+					<uri>/core/region.jsp</uri>
+				</container>
+				<container>
+					<id>region-nocomponent</id>
+					<uri>/core/region-nocomponent.jsp</uri>
+				</container>		
+				<container>
+					<id>component-error</id>
+					<uri>/core/component-error.jsp</uri>
+				</container>
+				<container>
+					<id>region-error</id>
+					<uri>/core/region-error.jsp</uri>
+				</container>
+				<container>
+					<id>template-error</id>
+					<uri>/core/template-error.jsp</uri>
+				</container>
+			</containers>
+		</presentation>
 		
 		
 		<!-- debug tools -->

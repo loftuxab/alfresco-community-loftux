@@ -98,15 +98,11 @@ public final class ScriptSite extends ScriptBase
         }
 
         StringBuffer ep = new StringBuffer();
-        ep.append(endpoint.getSetting("protocol"));
-        ep.append("://");
-        ep.append(endpoint.getSetting("host"));
-        ep.append(":");
-        ep.append(endpoint.getSetting("port"));
+        ep.append(endpoint.getEndpointURL());
 
         String endpointString = ep.toString();
-        String user = endpoint.getSetting("username");
-        String pass = endpoint.getSetting("password");
+        String user = endpoint.getUsername();
+        String pass = endpoint.getPassword();
 
         return callRemote(endpointString, user, pass, uri);
     }

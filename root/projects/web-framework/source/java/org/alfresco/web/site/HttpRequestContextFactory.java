@@ -51,7 +51,6 @@ public class HttpRequestContextFactory extends RequestContextFactory
             throws Exception
     {
         HttpRequestContext context = new HttpRequestContext(request);
-        Framework.getLogger().debug("Built HttpRequestContext instance");
 
         // load the user onto the context
         UserFactory userFactory = UserFactoryBuilder.newFactory();
@@ -59,7 +58,6 @@ public class HttpRequestContextFactory extends RequestContextFactory
         {
             User user = userFactory.getUser(context, request);
             context.setUser(user);
-            Framework.getLogger().debug("Loaded user onto RequestContext");
         }
 
         // TODO: Rethink if this is needed
@@ -70,12 +68,10 @@ public class HttpRequestContextFactory extends RequestContextFactory
         // initialize the file system
         String rootPath = context.getConfig().getFileSystemRootPath("local");
         initFileSystem(context, request, rootPath);
-        Framework.getLogger().debug("Local FileSystem connector initialized");
 
         // populate the request context
         PageMapper pageMapper = PageMapperFactory.newInstance(context);
         pageMapper.execute(context, request);
-        Framework.getLogger().debug("Page Mapper executed: " + pageMapper.getClass().getName());
 
         return context;
     }

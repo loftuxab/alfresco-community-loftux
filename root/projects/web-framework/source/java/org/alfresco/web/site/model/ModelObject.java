@@ -497,6 +497,9 @@ public abstract class ModelObject implements IModelObject
     {
         if (settingName == null)
             return null;
+        
+        return getCustomProperty(settingName);
+/*        
 
         List elements = getDocument().getRootElement().elements("setting");
         for (int i = 0; i < elements.size(); i++)
@@ -506,11 +509,16 @@ public abstract class ModelObject implements IModelObject
             if (_settingName.equals(settingName))
                 return (String) el.elementTextTrim("value");
         }
+        
         return null;
+*/        
     }
 
     public void setSetting(String settingName, String settingValue)
     {
+        setCustomProperty(settingName, settingValue);
+        
+        /*
         removeSetting(settingName);
 
         // create a new setting
@@ -519,10 +527,14 @@ public abstract class ModelObject implements IModelObject
         nameElement.setText(settingName);
         Element valueElement = el.addElement("value");
         valueElement.setText(settingValue);
+        */
     }
 
     public void removeSetting(String settingName)
     {
+        removeCustomProperty(settingName);
+        
+        /*
         List elements = getDocument().getRootElement().elements("setting");
         for (int i = 0; i < elements.size(); i++)
         {
@@ -531,9 +543,12 @@ public abstract class ModelObject implements IModelObject
             if (_settingName.equals(settingName))
                 getDocument().getRootElement().remove(el);
         }
+        */
     }
     public Map getSettings()
     {
+        return getCustomProperties();
+        /*
         Map map = new HashMap();
 
         List elements = getDocument().getRootElement().elements("setting");
@@ -545,6 +560,7 @@ public abstract class ModelObject implements IModelObject
             map.put(settingName, settingValue);
         }
         return map;
+        */
     }
     
     public String getName()
