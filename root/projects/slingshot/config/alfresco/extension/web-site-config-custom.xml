@@ -1,0 +1,61 @@
+<alfresco-config>
+
+	<!-- Mix in additional dispatcher pieces -->
+	<config evaluator="string-compare" condition="WebFramework">
+
+		<!-- Slingshot Link Builder -->	
+		<link-builder>
+			<definitions>
+				<definition>
+					<id>slingshot</id>
+					<name>Slingshot Link Builder</name>
+					<description>Slingshot Link Builder</description>
+					<class>org.alfresco.web.site.SlingshotLinkBuilder</class>
+				</definition>
+			</definitions>
+		</link-builder>
+
+		<!-- Slingshot Page Mapper -->
+		<page-mapper>
+			<definitions>
+				<definition>
+					<id>slingshot</id>
+					<name>Slingshot Page Mapper</name>
+					<description>Slingshot Page Mapper</description>
+					<class>org.alfresco.web.site.SlingshotPageMapper</class>
+				</definition>
+			</definitions>
+		</page-mapper>
+		
+		<!-- User Factory that loads User objects from Alfresco user source -->
+		<user>
+			<factories>
+				<factory>
+					<id>slingshot</id>
+					<name>Slingshot User Factory</name>
+					<description>Produces Users loaded from Slingshot (Alfresco) Repository</description>
+					<class>org.alfresco.web.site.SlingshotUserFactory</class>
+				</factory>
+			</factories>
+		</user>	
+		
+	</config>
+	
+	
+	<!-- Override defaults so that we use our pieces -->
+	<config evaluator="string-compare" condition="WebFramework" replace="true">
+
+		<defaults>
+			<request-context>http</request-context>
+			<file-system>local</file-system>
+			<format>default</format>
+			
+			<!-- Slingshot Specific -->
+			<link-builder>slingshot</link-builder>
+			<page-mapper>slingshot</page-mapper>
+			<user-factory>slingshot</user-factory>
+		</defaults>
+		
+	</config>
+
+</alfresco-config>
