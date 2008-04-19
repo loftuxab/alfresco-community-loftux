@@ -2,17 +2,12 @@
 
 <template>
   <id>template.home</id>
-  <name>Home Page Template</name>
+  <title>Home Page Template</title>
   <template-type>homepage</template-type>
   
-  <!-- Example Settings -->
-  <setting>
-  	<name>width</name>
-  	<value>100</value>
-  </setting>
-  <setting>
-  	<name>height</name>
-  	<value>200</value>
-  </setting>
+  <properties>
+    <width>100</width>
+    <height>200</height>
+  </properties>
   
 </template>

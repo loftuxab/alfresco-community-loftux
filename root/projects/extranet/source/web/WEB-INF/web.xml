@@ -18,27 +18,12 @@
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
-
-   <!-- 
-   		This filter will bootstrap the Web Script Framework
-   		It will execute the configured RequestContextFactory and bind
-   		the RequestContext instance to the request
-   -->
-   <filter>
-      <filter-name>Web Script Framework Filter</filter-name>
-      <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>
-   </filter>
    
    <filter>
       <filter-name>UrlRewriteFilter</filter-name>
       <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
    </filter>
-      
-   <filter-mapping>
-      <filter-name>Web Script Framework Filter</filter-name>
-      <url-pattern>/*</url-pattern>
-   </filter-mapping>
-   
+         
    <filter-mapping>
       <filter-name>UrlRewriteFilter</filter-name>
       <url-pattern>/alfresco/*</url-pattern>
