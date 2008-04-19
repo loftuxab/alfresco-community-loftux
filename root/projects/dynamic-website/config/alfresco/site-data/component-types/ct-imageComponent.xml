@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-type>
 	<id>ct-imageComponent</id>
-	<name>Image Component</name>
+	<title>Image Component</title>
 	<description>Image Component</description>
 	<renderer-type>jsp</renderer-type>		
-	<renderer>/ui/components/imageComponent/component.jsp</renderer>
+	<renderer>/components/imageComponent/component.jsp</renderer>
 </component-type>

@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-type>
 	<id>ct-queryComponent</id>
-	<name>Query Component</name>
+	<title>Query Component</title>
 	<description>Query Component</description>
-	<renderer-type>jsp</renderer-type>		
-	<renderer>/ui/components/queryComponent/component.jsp</renderer>
+	<renderer>/components/queryComponent/component.jsp</renderer>
 </component-type>

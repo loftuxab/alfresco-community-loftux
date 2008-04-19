@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template-type>
 	<id>tt-basic-landing-template</id>
-	<name>basic-landing-template</name>
-	<description>basic-landing-template</description>
+	<name>Basic Landing Template</name>
+	<description>Basic Landing Template</description>
 	<renderer-type>html</renderer-type>
 	<renderer>/build/basic/basic-landing-template.html</renderer>
 </template-type>

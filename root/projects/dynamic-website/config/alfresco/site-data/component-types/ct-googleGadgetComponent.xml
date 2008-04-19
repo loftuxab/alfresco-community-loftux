@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component-type>
 	<id>ct-googleGadgetComponent</id>
-	<name>Google Gadget Component</name>
+	<title>Google Gadget Component</title>
 	<description>Google Gadget Component Description</description>
 	<renderer-type>jsp</renderer-type>	
-	<renderer>/ui/components/googleGadgetComponent/component.jsp</renderer>
+	<renderer>/components/googleGadgetComponent/component.jsp</renderer>
 </component-type>
