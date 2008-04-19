@@ -3,8 +3,8 @@
 
 <web-app>
 
-   <display-name>Alfresco Web Framework</display-name>    
-   <description>Alfresco Web Framework application</description>
+   <display-name>Web Framework</display-name>    
+   <description>Web Framework</description>
    
    <context-param>
       <param-name>contextConfigLocation</param-name>
@@ -19,45 +19,7 @@
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
-
-   <!-- 
-   		This filter will bootstrap the Web Script Framework
-   		It will execute the configured RequestContextFactory and bind
-   		the RequestContext instance to the request
-   -->
-   <filter>
-      <filter-name>Web Script Framework Filter</filter-name>
-      <filter-class>org.alfresco.web.scripts.WebScriptFrameworkFilter</filter-class>
-   </filter>
-   
-   <filter>
-      <filter-name>UrlRewriteFilter</filter-name>
-      <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
-   </filter>
-   
-   <!-- Include this filter to run standalone (without Spring) -->
-   <!--
-   <filter>
-      <filter-name>Default Filter</filter-name>
-      <filter-class>org.alfresco.web.site.filter.DefaultFilter</filter-class>
-   </filter>
-   
-   <filter-mapping>
-      <filter-name>Default Filter</filter-name>
-      <url-pattern>/*</url-pattern>
-   </filter-mapping>    
-   -->
-   
-   <filter-mapping>
-      <filter-name>Web Script Framework Filter</filter-name>
-      <url-pattern>/*</url-pattern>
-   </filter-mapping>
-   
-   <filter-mapping>
-      <filter-name>UrlRewriteFilter</filter-name>
-      <url-pattern>/alfresco/*</url-pattern>
-   </filter-mapping>
-
+            
    <servlet>
       <servlet-name>apiServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
@@ -69,57 +31,27 @@
    </servlet>
 
    <servlet>
-      <servlet-name>Dispatcher Servlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
-   </servlet> 
-          
-   <servlet>
-      <servlet-name>Region Dispatcher Servlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.RegionDispatcherServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
+      <servlet-name>pageAuthenticationServlet</servlet-name>
+      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
    </servlet>
-   
-   <servlet>
-      <servlet-name>Cache Control Servlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
-   </servlet>
-           
-   <servlet>
-      <servlet-name>Proxy Servlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.ProxyServlet</servlet-class>
-   </servlet>
-   
+
+
    <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
    </servlet>
    
+
+   <!-- To use the Web Framework Dispatcher Servlet -->
+   <!--   Uncomment this block and comment out the pageRendererServlet above -->
+   <!--
    <servlet>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
-   </servlet>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>  
+   -->
    
-   <servlet-mapping>
-      <servlet-name>Proxy Servlet</servlet-name>
-      <url-pattern>/proxy/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>Cache Control Servlet</servlet-name>
-      <url-pattern>/cache/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>Region Dispatcher Servlet</servlet-name>
-      <url-pattern>/region/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>Dispatcher Servlet</servlet-name>
-      <url-pattern>/adw/*</url-pattern>
-   </servlet-mapping>
 
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>
@@ -155,10 +87,10 @@
       <session-timeout>20</session-timeout>
    </session-config>
 
-   <!-- welcome file list precedence order is index.jsp, then index.html -->
-   <welcome-file-list>
-      <welcome-file>index.jsp</welcome-file>
-      <welcome-file>index.html</welcome-file>
-   </welcome-file-list>
+    <!-- welcome file list precedence order is index.jsp, then index.html -->
+    <welcome-file-list>
+        <welcome-file>index.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+    </welcome-file-list>
 
 </web-app>

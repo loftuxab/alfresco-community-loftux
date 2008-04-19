@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.Config;
@@ -70,16 +71,19 @@ public class FrameworkHelper
     }
     
     
-    public static void initRequestContext(HttpServletRequest request)
+    public static void initRequestContext(ServletRequest request)
         throws Exception
     {
         // get whatever factory builder we're configured to use
         RequestContextFactory factory = RequestContextFactoryBuilder.newFactory();
         if (factory instanceof HttpRequestContextFactory)
         {
-            // this is what we expect
-            HttpRequestContext context = ((HttpRequestContextFactory) factory).newInstance(request);
-            RequestUtil.setRequestContext(request, context);
+            if(request instanceof HttpServletRequest)
+            {
+                // this is what we expect
+                RequestContext context = ((HttpRequestContextFactory) factory).newInstance((HttpServletRequest)request);
+                RequestUtil.setRequestContext((HttpServletRequest)request, context);
+            }
         }
         else
         {

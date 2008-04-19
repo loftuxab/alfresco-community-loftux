@@ -40,6 +40,28 @@ public class RequestUtil
     public static RequestContext getRequestContext(ServletRequest request)
     {
         RequestContext context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT);
+        if(context != null)
+        {
+            return context;
+        }
+        
+        // block so only a single thread pays the price
+        synchronized(RequestContext.class)
+        {
+            context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT); 
+            if(context == null)
+            {
+                try
+                {
+                    FrameworkHelper.initRequestContext(request);
+                    context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT);
+                }
+                catch(Exception ex)
+                {
+                    ex.printStackTrace();
+                }
+            }
+        }
         return context;
     }
 

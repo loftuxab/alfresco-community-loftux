@@ -73,6 +73,7 @@ public class ModelHelper
         {
             model.put("user", new ScriptUser(context, context.getUser()));
         }
+        //model.put("wizard", new ScriptWizard(context));
     }
 
     public static void populateTemplateModel(RequestContext context, Map<String, Object> model)

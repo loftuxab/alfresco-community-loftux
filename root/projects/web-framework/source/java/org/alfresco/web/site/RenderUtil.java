@@ -312,9 +312,13 @@ public class RenderUtil
             }
 
             // if there is already a component associated for this region,
-            // we must let the region know      
+            // we must let the region know
+//            System.out.println("For region: " + regionId);
+//            System.out.println(" -> looking scopeId: " + regionScopeId);
+//            System.out.println(" -> looking sourceId: " + sourceId);
             Component[] components = ModelUtil.findComponents(context,
                     regionScopeId, sourceId, regionId, null);
+//            System.out.println("FOUND " + components.length);
             if (components.length > 0)
             {
                 Component component = components[0];

@@ -119,10 +119,21 @@ public class DispatcherServlet extends BaseServlet
         debug(context, "Current Page ID: " + currentPageId);
         debug(context, "Current Format ID: " + currentFormatId);
         debug(context, "Current Object ID: " + currentObjectId);
+        
+        // reset case - if the site config is not available, assume
+        // the entire site is not available
+        boolean siteReset = false;
+        if(context.getSiteConfiguration() == null)
+        {
+            currentPage = null;
+            currentPageId = null;
+            currentObjectId = null;
+            siteReset = true;
+        }
 
         // if we have absolutely nothing to dispatch to, then check to
         // see if there is a root-page declared to which we can go
-        if (currentPage == null && currentObjectId == null)
+        if (currentPage == null && currentObjectId == null && !siteReset)
         {
             // check if a root page exists to which we can forward
             Page rootPage = ModelUtil.getRootPage(context);

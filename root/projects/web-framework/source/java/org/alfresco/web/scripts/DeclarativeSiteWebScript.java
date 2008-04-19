@@ -82,27 +82,12 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
 
     protected RequestContext getRequestContext(WebScriptRequest req)
     {
-        // avm store id
-        String avmStoreId = req.getParameter("avmStoreId");
-
-        // make the request available
-        HttpServletRequest request = null;
+        RequestContext context = null;
         if (req instanceof org.alfresco.web.scripts.servlet.WebScriptServletRequest)
         {
-            request = ((org.alfresco.web.scripts.servlet.WebScriptServletRequest) req).getHttpServletRequest();
-
-            RequestContext context = RequestUtil.getRequestContext(request);
-            return context;
+            HttpServletRequest request = ((org.alfresco.web.scripts.servlet.WebScriptServletRequest) req).getHttpServletRequest();
+            context = RequestUtil.getRequestContext(request);
         }
-        return null;
-
-        /*
-        // construct a local request context
-        ScriptRequestContextFactory factory = new ScriptRequestContextFactory();
-        RequestContext context = factory.newInstance(getStore(), avmStoreId,
-                request);
         return context;
-        */
     }
-
 }

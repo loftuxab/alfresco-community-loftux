@@ -53,15 +53,25 @@ public final class ScriptModelObject implements Serializable
         return modelObject.getId();
     }
 
-    public String getName()
+    public String getTitle()
     {
-        return modelObject.getName();
+        return modelObject.getTitle();
     }
 
-    public void setName(String value)
+    public void setTitle(String value)
     {
         ParameterCheck.mandatory("value", value);
-        modelObject.setName(value);
+        modelObject.setTitle(value);
+    }
+    
+    public String getName()
+    {
+        return getTitle();
+    }
+    
+    public void setName(String name)
+    {
+        setTitle(name);
     }
 
     public String getDescription()
