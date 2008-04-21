@@ -1,33 +1,56 @@
 /*
  *** Alfresco.DocumentList
 */
-Alfresco.DocumentList = function()
+(function()
 {
-   /* Shortcuts */
-   var Dom = YAHOO.util.Dom,
-      Event = YAHOO.util.Event;
-
-   return {
-      ID: null,
+   Alfresco.DocumentList = function(htmlId)
+   {
+      this.name = "Alfresco.DocumentList";
+      this.id = htmlId;
       
+      /* Register this component */
+      Alfresco.util.ComponentManager.register(this);
+      
+      /* Load YUI Components */
+      new Alfresco.util.YUILoaderHelper().load(["button", "menu", "containercore"], this.componentsLoaded, this);
+      
+      return this;
+   }
+   
+   Alfresco.DocumentList.prototype =
+   {
+      fileUpload: null,
+      
+      componentsLoaded: function()
+      {
+         YAHOO.util.Event.onDOMReady(this.init, this, true);
+      },
+   
       init: function()
       {
-         Event.onDOMReady(this.start, this, true);
-      },
+         var Dom = YAHOO.util.Dom;
       
-      start: function()
-      {
          /* File Select Button */
-         var fsButton = Dom.getElementsByClassName("doclib-fileSelect-button", "input", this.ID)[0];
-         var fsMenu = Dom.getElementsByClassName("doclib-fileSelect-menu", "select", this.ID)[0];
+         var fsButton = Dom.getElementsByClassName("doclib-fileSelect-button", "input", this.id)[0];
+         var fsMenu = Dom.getElementsByClassName("doclib-fileSelect-menu", "select", this.id)[0];
          var fileSelectButton = new YAHOO.widget.Button(fsButton,
          {
             type: "menu", 
             menu: fsMenu
          });
          fileSelectButton.getMenu().subscribe("click", this.onFileSelectButtonClick, this, true);
+         
+         /* Show the Upload button if a FileUpload component has registered on the page */
+         var fileUploads = Alfresco.util.ComponentManager.find({name:"Alfresco.FileUpload"});
+         if (fileUploads.length > 0)
+         {
+            this.fileUpload = fileUploads[0];
+            var fuButton = Dom.getElementsByClassName("doclib-fileUpload-button", "span", this.id)[0];
+            Dom.removeClass(fuButton, "hiddenComponents");
+         }
+         
       },
-      
+   
       onFileSelectButtonClick: function(type, args)
       {
          if (type == "click")
@@ -37,7 +60,5 @@ Alfresco.DocumentList = function()
             alert(eventTarget.value);
          }
       }
-   }
-}();
-
-Alfresco.DocumentList.init();
+   };
+})();

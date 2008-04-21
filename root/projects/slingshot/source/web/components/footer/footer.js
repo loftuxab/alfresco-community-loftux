@@ -1,27 +1,31 @@
 /*
  *** Alfresco.Footer
 */
-
-Alfresco.Footer = function()
+(function()
 {
-    /* Shortcuts */
-    var Dom = YAHOO.util.Dom,
-            Event = YAHOO.util.Event;
+   Alfresco.Footer = function(htmlId)
+   {
+      this.name = "Alfresco.Footer";
+      this.id = htmlId;
+      
+      /* Register this component */
+      Alfresco.util.ComponentManager.register(this);
+      
+      /* Load YUI Components */
+      new Alfresco.util.YUILoaderHelper().load(["button", "menu", "containercore"], this.componentsLoaded, this);
 
-    return {
-        ID: null,
+      return this;
+   };
 
-        init: function()
-        {
-            Event.onDOMReady(this.start, this, true);
-        },
+   Alfresco.Footer.prototype =
+   {
+      componentsLoaded: function()
+      {
+         YAHOO.util.Event.onDOMReady(this.init, this, true);
+      },
 
-        start: function()
-        {
-
-        }
-
-    }
-}();
-
-Alfresco.Footer.init();
+      init: function()
+      {
+      }
+   };
+})();

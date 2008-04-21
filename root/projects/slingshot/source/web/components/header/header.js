@@ -1,44 +1,49 @@
 /*
  *** Alfresco.Header
 */
-
-Alfresco.Header = function()
+(function()
 {
-    /* Shortcuts */
-    var Dom = YAHOO.util.Dom,
-            Event = YAHOO.util.Event;
+   Alfresco.Header = function(htmlId)
+   {
+      this.name = "Alfresco.Header";
+      this.id = htmlId;
+      
+      /* Register this component */
+      Alfresco.util.ComponentManager.register(this);
+      
+      /* Load YUI Components */
+      new Alfresco.util.YUILoaderHelper().load(["button", "menu", "containercore"], this.componentsLoaded, this);
 
-    return {
-        ID: null,
+      return this;
+   };
 
-        init: function()
-        {
-            Event.onDOMReady(this.start, this, true);
-        },
+   Alfresco.Header.prototype =
+   {
+      componentsLoaded: function()
+      {
+         YAHOO.util.Event.onDOMReady(this.init, this, true);
+      },
 
-        start: function()
-        {
-            /* Splitbuttons */
+      init: function()
+      {
+         var Dom = YAHOO.util.Dom;
 
-            var ssButton = Dom.getElementsByClassName("header-sitesSelect-button", "input", this.ID)[0];
-            var ssMenu = Dom.getElementsByClassName("header-sitesSelect-menu", "select", this.ID)[0];
-            var sitesSelectButton = new YAHOO.widget.Button(ssButton,
-            {
-               type: "split",
-               menu: ssMenu
-            });
+         /* Splitbuttons */
+         var ssButton = Dom.getElementsByClassName("header-sitesSelect-button", "input", this.ID)[0];
+         var ssMenu = Dom.getElementsByClassName("header-sitesSelect-menu", "select", this.ID)[0];
+         var sitesSelectButton = new YAHOO.widget.Button(ssButton,
+         {
+            type: "split",
+            menu: ssMenu
+         });
 
-            var csButton = Dom.getElementsByClassName("header-colleaguesSelect-button", "input", this.ID)[0];
-            var csMenu = Dom.getElementsByClassName("header-colleaguesSelect-menu", "select", this.ID)[0];
-            var colleaguesSelectButton = new YAHOO.widget.Button(csButton,
-            {
-               type: "split",
-               menu: csMenu
-            });
-        }
-
-    }
-}();
-
-Alfresco.Header.init();
-
+         var csButton = Dom.getElementsByClassName("header-colleaguesSelect-button", "input", this.ID)[0];
+         var csMenu = Dom.getElementsByClassName("header-colleaguesSelect-menu", "select", this.ID)[0];
+         var colleaguesSelectButton = new YAHOO.widget.Button(csButton,
+         {
+            type: "split",
+            menu: csMenu
+         });
+      }
+   };
+})();

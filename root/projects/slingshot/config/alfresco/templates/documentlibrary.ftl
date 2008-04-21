@@ -35,7 +35,7 @@
          <@region id="footer" scope="global" protected=true />
       </div>
       <div class="hiddenComponents">
-         <@region id="file-upload" scope="template" protected=true />
+         <region id="file-upload" scope="template" protected=true />
       </div>
    </div>
 </body>
