@@ -39,7 +39,6 @@ public final class ScriptFileSystem extends ScriptBase
 
     public ScriptFileSystem(IFileSystem fileSystem)
     {
-        super();
         this.fileSystem = fileSystem;
     }
 

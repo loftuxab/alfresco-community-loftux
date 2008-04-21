@@ -137,7 +137,7 @@ public class SlingshotPageMapper extends PageMapper
                 context.setCurrentPage(_page);
             }
         }
-
+        
         
         /**
          * TODO:  At present, the Slingshot project doesn't seem to do
@@ -152,7 +152,6 @@ public class SlingshotPageMapper extends PageMapper
          */
         context.setCurrentFormatId(Framework.getConfig().getDefaultFormatId());
     	
-        
         
         /**
          * If we received a "currently viewed object", then lets set it

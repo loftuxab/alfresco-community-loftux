@@ -45,6 +45,8 @@ import org.alfresco.web.site.model.Endpoint;
  */
 public class ConnectorFactory
 {
+    protected static HashMap<String, Object> cache = null;
+    
     public static Connector newInstance(RequestContext context,
             Endpoint endpoint)
     {
@@ -52,7 +54,7 @@ public class ConnectorFactory
 
         // Does this endpoint have any authentication set up on it?
         String authenticatorId = endpoint.getAuthenticatorId();
-        if (authenticatorId == null || "".equalsIgnoreCase(authenticatorId))
+        if (authenticatorId == null || authenticatorId.length() == 0)
         {
             // Nope, so just return the connector
             return connector;
@@ -146,12 +148,16 @@ public class ConnectorFactory
         // build the final URL
         String url = endpointUrl;
         if (defaultUri != null)
+        {
             url = url + defaultUri;
+        }
 
         // get the connector id
         String connectorId = (String) endpoint.getConnectorId();
-        if (connectorId == null || "".equals(connectorId))
+        if (connectorId == null || connectorId.length() == 0)
+        {
             connectorId = "http";
+        }
 
         // instantiate this connector
         String className = Framework.getConfig().getRemoteConnectorClass(
@@ -170,7 +176,9 @@ public class ConnectorFactory
     protected static Connector _getConnector(String className, String url)
     {
         if (cache == null)
+        {
             cache = new HashMap();
+        }
 
         String cacheKey = className + "_" + url;
 
@@ -191,7 +199,9 @@ public class ConnectorFactory
     protected static Authenticator _getAuthenticator(String className)
     {
         if (cache == null)
+        {
             cache = new HashMap<String, Object>();
+        }
 
         String cacheKey = className;
 
@@ -205,6 +215,4 @@ public class ConnectorFactory
 
         return auth;
     }
-
-    protected static HashMap<String, Object> cache = null;
 }

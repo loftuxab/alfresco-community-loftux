@@ -46,9 +46,7 @@ public class SlingshotUserFactory extends UserFactory
 {
 	/**
 	 * For the moment, this just produces Slingshot Users that are
-	 * guests.  The user's name is set to Paul Holmes Higgin - a name
-	 * that a small subset of our future user base is expected
-	 * to have. 
+	 * guests. 
 	 * 
 	 * Ultimately, this method should call to Alfresco, JSON the data
 	 * for the user object and construct the Slingshot user.
@@ -69,8 +67,8 @@ public class SlingshotUserFactory extends UserFactory
 		if(this.guestUser == null)
 		{
 			this.guestUser = new SlingshotUser("guest");
-			this.guestUser.setFirstName("Paul");
-			this.guestUser.setLastName("Holmes Higgin");
+			this.guestUser.setFirstName("Guest");
+			this.guestUser.setLastName("User");
 		}
 		return this.guestUser;
     }

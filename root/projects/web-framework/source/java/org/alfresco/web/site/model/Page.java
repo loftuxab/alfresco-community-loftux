@@ -82,11 +82,13 @@ public class Page extends ModelObject
         {
             Element templateElement = (Element) templateElements.get(i);
             String _formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
-            if ("".equals(_formatId))
+            if (_formatId.length() == 0)
+            {
                 _formatId = null;
+            }
             if (formatId == null)
             {
-                if (_formatId == null || "".equals(_formatId))
+                if (_formatId == null || _formatId.length() == 0)
                 {
                     return templateElement;
                 }
@@ -145,8 +147,10 @@ public class Page extends ModelObject
         {
             Element templateElement = (Element) templateElements.get(i);
             String formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
-            if (formatId == null || "".equals(formatId))
+            if (formatId == null || formatId.length() == 0)
+            {
                 formatId = context.getConfig().getDefaultFormatId();
+            }
 
             String templateId = templateElement.getStringValue();
             if (templateId != null)

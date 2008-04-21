@@ -24,12 +24,19 @@
  */
 package org.alfresco.web.page;
 
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.alfresco.util.Content;
+import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Runtime;
 import org.alfresco.web.scripts.WebScriptRequestURLImpl;
+import org.alfresco.web.scripts.servlet.WebScriptServletRequest;
 
 /**
  * Simple implementation of a WebScript URL Request for a webscript component on the page.
@@ -40,12 +47,31 @@ import org.alfresco.web.scripts.WebScriptRequestURLImpl;
  */
 class WebScriptPageComponentRequest extends WebScriptRequestURLImpl
 {
+   /** request parameters */
    private Map<String, String> parameters;
-
-   WebScriptPageComponentRequest(Runtime runtime, String scriptUrl, Match match, Map<String, String> parameters)
+   
+   /** properties of the host server */
+   private ServerProperties serverProperties;
+   
+   /** servlet request for the containing page */
+   private HttpServletRequest servletRequest;
+   
+   
+   /**
+    * Construction
+    * 
+    * @param runtime        Page Component WebScript Runtime
+    * @param scriptUrl      Url to the script request to execute
+    * @param match          WebScript match for the request
+    * @param parameters     Request parameters
+    */
+   WebScriptPageComponentRequest(
+           PageComponentWebScriptRuntime runtime, String scriptUrl, Match match, Map<String, String> parameters)
    {
       super(runtime, scriptUrl, match);
       this.parameters = parameters;
+      this.serverProperties = runtime.getPageRendererContext().ServerProperties;
+      this.servletRequest = runtime.getPageRendererContext().ServletRequest;
    }
 
    /* (non-Javadoc)
@@ -72,33 +98,129 @@ class WebScriptPageComponentRequest extends WebScriptRequestURLImpl
       return this.parameters.values().toArray(new String[this.parameters.size()]);
    }
 
+   /* (non-Javadoc)
+    * @see org.alfresco.web.scripts.WebScriptRequest#getAgent()
+    */
    public String getAgent()
    {
-      return null;
+      return WebScriptServletRequest.resolveUserAgent(servletRequest.getHeader("user-agent"));
    }
 
+   /**
+    * @return the absolute server path
+    *         based on configured values or built from request if not configured 
+    */
    public String getServerPath()
    {
-      return null;
+      return getServerScheme() + "://" + getServerName() + ":" + getServerPort();
    }
 
+   /* (non-Javadoc)
+    * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderNames()
+    */
+   @SuppressWarnings("unchecked")
    public String[] getHeaderNames()
    {
-      return new String[] {};
+      List<String> headersList = new ArrayList<String>();
+      Enumeration<String> enumNames = servletRequest.getHeaderNames();
+      while(enumNames.hasMoreElements())
+      {
+         headersList.add(enumNames.nextElement());
+      }
+      String[] headers = new String[headersList.size()];
+      headersList.toArray(headers);
+      return headers;
    }
 
+   /* (non-Javadoc)
+    * @see org.alfresco.web.scripts.WebScriptRequest#getHeader(java.lang.String)
+    */
    public String getHeader(String name)
    {
-      return null;
+      return servletRequest.getHeader(name);
    }
 
+   /* (non-Javadoc)
+    * @see org.alfresco.web.scripts.WebScriptRequest#getHeaderValues(java.lang.String)
+    */
+   @SuppressWarnings("unchecked")
    public String[] getHeaderValues(String name)
    {
-      return null;
+      String[] values = null;
+      Enumeration<String> enumValues = servletRequest.getHeaders(name);
+      if (enumValues.hasMoreElements())
+      {
+         List<String> valuesList = new ArrayList<String>(2);
+         do
+         {
+            valuesList.add(enumValues.nextElement());
+         } 
+         while (enumValues.hasMoreElements());
+         values = new String[valuesList.size()];
+         valuesList.toArray(values);
+      }
+      return values;
    }
 
    public Content getContent()
    {
       return null;
+   }
+
+   /**
+    * Get Server Scheme
+    * 
+    * @return  server scheme
+    */
+   private String getServerScheme()
+   {
+      String scheme = null;
+      if (serverProperties != null)
+      {
+         scheme = serverProperties.getScheme();
+      }
+      if (scheme == null)
+      {
+         scheme = servletRequest.getScheme();
+      }
+      return scheme;
+   }
+
+   /**
+    * Get Server Name
+    * 
+    * @return  server name
+    */
+   private String getServerName()
+   {
+      String name = null;
+      if (serverProperties != null)
+      {
+         name = serverProperties.getHostName();
+      }
+      if (name == null)
+      {
+         name = servletRequest.getServerName();
+      }
+      return name;
+   }
+
+   /**
+    * Get Server Port
+    * 
+    * @return  server name
+    */
+   private int getServerPort()
+   {
+      Integer port = null;
+      if (serverProperties != null)
+      {
+         port = serverProperties.getPort();
+      }
+      if (port == null)
+      {
+         port = servletRequest.getServerPort();
+      }
+      return port;
    }
 }

@@ -42,6 +42,7 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.page.PageAuthenticationServlet.AuthenticationResult;
 import org.alfresco.web.scripts.PresentationScriptProcessor;
 import org.alfresco.web.scripts.PresentationTemplateProcessor;
@@ -49,6 +50,7 @@ import org.alfresco.web.scripts.Registry;
 import org.alfresco.web.scripts.RuntimeContainer;
 import org.alfresco.web.scripts.ScriptContent;
 import org.alfresco.web.scripts.Store;
+import org.alfresco.web.scripts.URLHelper;
 import org.alfresco.web.scripts.servlet.WebScriptServlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -153,7 +155,7 @@ public class PageRendererServlet extends WebScriptServlet
       t.nextToken();    // skip servlet name
       if (!t.hasMoreTokens())
       {
-         throw new IllegalArgumentException("Invalid URL to PageRendererServlet: " + uri);
+         throw new PageRendererException("Invalid URL to PageRendererServlet: " + uri);
       }
       
       // get the remaining elements of the url ready for AppUrl lookup 
@@ -219,6 +221,8 @@ public class PageRendererServlet extends WebScriptServlet
             
             // Setup the PageRenderer context for the webscript runtime to use when processing page components
             PageRendererContext context = new PageRendererContext();
+            context.ServletRequest = req;
+            context.ServerProperties = serverProperties;
             context.RuntimeContainer = container;
             context.RequestURI = uri;
             context.RequestPath = req.getContextPath();
@@ -267,7 +271,7 @@ public class PageRendererServlet extends WebScriptServlet
       }
       catch (Throwable err)
       {
-         throw new AlfrescoRuntimeException("Error occurred during page rendering.\nResource: " +
+         throw new PageRendererException("Error occurred during page rendering.\nResource: " +
                resource + "\nError: " + err.getMessage(), err);
       }
    }
@@ -434,7 +438,7 @@ public class PageRendererServlet extends WebScriptServlet
       }
       else
       {
-         throw new AlfrescoRuntimeException("Unable to find template config: " + templateConfig);
+         throw new PageRendererException("Unable to find template config: " + templateConfig);
       }
    }
    
@@ -495,7 +499,7 @@ public class PageRendererServlet extends WebScriptServlet
       Config config = this.configService.getConfig(CONFIG_ELEMENT);
       if (config == null)
       {
-         throw new AlfrescoRuntimeException("Cannot find required config element 'PageRenderer'.");
+         throw new PageRendererException("Cannot find required config element 'PageRenderer'.");
       }
       return config;
    }
@@ -508,12 +512,12 @@ public class PageRendererServlet extends WebScriptServlet
       ConfigElement urlMappersElement = getConfig().getConfigElement("url-mappers");
       if (urlMappersElement == null)
       {
-         throw new AlfrescoRuntimeException("Missing required config element 'url-mappers' under 'PageRenderer'.");
+         throw new PageRendererException("Missing required config element 'url-mappers' under 'PageRenderer'.");
       }
       List<ConfigElement> mappers = urlMappersElement.getChildren("url-mapper");
       if (mappers == null || mappers.size() == 0)
       {
-         throw new AlfrescoRuntimeException("Empty config element 'url-mappers' under 'PageRenderer'." +
+         throw new PageRendererException("Empty config element 'url-mappers' under 'PageRenderer'." +
                " Was expecting one or more 'url-mappers' child elements.");
       }
       
@@ -524,7 +528,7 @@ public class PageRendererServlet extends WebScriptServlet
          String className = e.getValue();
          if (className == null || className.length() == 0)
          {
-            throw new AlfrescoRuntimeException("Empty 'url-mapper' config element." +
+            throw new PageRendererException("Empty 'url-mapper' config element." +
                   " Was expecting fully qualified class name value.");
          }
          try
@@ -533,7 +537,7 @@ public class PageRendererServlet extends WebScriptServlet
          }
          catch (AlfrescoRuntimeException err)
          {
-            throw new AlfrescoRuntimeException("Unable to create class from 'url-mapper' config element value: " +
+            throw new PageRendererException("Unable to create class from 'url-mapper' config element value: " +
                   err.getMessage(), err);
          }
       }
@@ -611,6 +615,8 @@ public class PageRendererServlet extends WebScriptServlet
     */
    public static class PageRendererContext
    {
+      HttpServletRequest ServletRequest;
+      ServerProperties ServerProperties;
       RuntimeContainer RuntimeContainer;
       PageInstance PageInstance;
       String RequestURI;
@@ -619,53 +625,5 @@ public class PageRendererServlet extends WebScriptServlet
       String ComponentUrl;
       Map<String, String> Tokens;
       Map<String, Object> PageComponentModel;
-   }
-   
-   
-   /**
-    * Helper to return component parts of the URL and to generate page url
-    */
-   public static class URLHelper
-   {
-      String context;
-      String pageContext;
-      String uri;
-      String args;
-      
-
-      public URLHelper(HttpServletRequest req)
-      {
-         this.context = req.getContextPath();
-         this.uri = req.getRequestURI();
-         String uriNoContext = req.getRequestURI().substring(this.context.length());
-         StringTokenizer t = new StringTokenizer(uriNoContext, "/");
-         this.pageContext = this.context + "/" + t.nextToken();
-         this.args = (req.getQueryString() != null ? req.getQueryString() : "");
-      }
-
-      public String getContext()
-      {
-         return context;
-      }
-      
-      public String getServletContext()
-      {
-         return pageContext;
-      }
-      
-      public String getUri()
-      {
-         return uri;
-      }
-      
-      public String getUrl()
-      {
-         return uri + (this.args.length() != 0 ? ("?" + this.args) : "");
-      }
-      
-      public String getArgs()
-      {
-         return this.args;
-      }
    }
 }

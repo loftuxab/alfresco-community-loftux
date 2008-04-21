@@ -258,11 +258,13 @@ public class PersistentCache extends BasicCache
      */
     protected File getCacheFile(String pathID)
     {
-        if (pathID == null || "".equals(pathID))
+        if (pathID == null || pathID.length() == 0)
+        {
             return null;
+        }
 
         // build the literal file path
-        StringBuffer buffer = new StringBuffer(m_cacheLocation);
+        StringBuilder buffer = new StringBuilder(m_cacheLocation);
         buffer.append(pathID);
 
         // make sure the directory structure exists

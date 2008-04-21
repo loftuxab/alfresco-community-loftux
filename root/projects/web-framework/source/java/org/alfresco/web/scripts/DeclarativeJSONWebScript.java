@@ -49,7 +49,7 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     public DeclarativeJSONWebScript()
     {
     }
-
+    
     /*
      * (non-Javadoc)
      * 
@@ -110,10 +110,9 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
                         res, model);
                 // add return model allowing script to add items to template
                 // model
-                Map<String, Object> returnModel = new HashMap<String, Object>(
-                        8, 1.0f);
+                Map<String, Object> returnModel = new HashMap<String, Object>(8, 1.0f);
                 scriptModel.put("model", returnModel);
-                _executeScript(executeScript, scriptModel);
+                executeScript(executeScript, scriptModel);
                 mergeScriptModelIntoTemplateModel(returnModel, model);
             }
 
@@ -311,11 +310,5 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
 
             renderTemplate(templatePath, model, writer);
         }
-    }
-
-    protected void _executeScript(ScriptContent location,
-            Map<String, Object> model) throws Exception
-    {
-        super.executeScript(location, model);
     }
 }

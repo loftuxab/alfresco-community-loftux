@@ -248,8 +248,10 @@ public class DispatcherServlet extends BaseServlet
             
             // go to unconfigured page display
             String dispatchPage = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_UNCONFIGURED);
-            if (dispatchPage == null || "".equals(dispatchPage))
+            if (dispatchPage == null || dispatchPage.length() == 0)
+            {
                 dispatchPage = "/ui/core/page-unconfigured.jsp";
+            }
 
             // dispatch
             debug(context, "Rendering Unconfigured Page: " + dispatchPage);

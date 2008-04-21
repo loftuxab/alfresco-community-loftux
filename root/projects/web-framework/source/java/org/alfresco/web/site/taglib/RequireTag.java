@@ -76,10 +76,10 @@ public class RequireTag extends TagBase
     public int doEndTag() throws JspException
     {
         // get the body content and include if it is there
-        if (getBodyContent() != null && !"".equals(getBodyContent()))
+        if (getBodyContent() != null)
         {
             String tags = getBodyContent().getString();
-            if (tags != null && !"".equals(tags))
+            if (tags != null && tags.length() != 0)
             {
                 RenderUtil.appendHeadTags(getRequestContext(), tags);
             }

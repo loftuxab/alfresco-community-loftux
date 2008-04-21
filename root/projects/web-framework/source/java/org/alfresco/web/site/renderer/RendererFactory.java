@@ -65,7 +65,7 @@ public class RendererFactory
         {
             uri = component.getSetting("url");
         }
-        if(uri != null && !"".equals(uri))
+        if(uri != null && uri.length() != 0)
         {
             // execute as a web script
             // use a web script component
@@ -151,14 +151,14 @@ public class RendererFactory
             throws RendererNotFoundException
     {
         // JSP is the default case
-        if (rendererType == null || "".equals(rendererType))
+        if (rendererType == null || rendererType.length() == 0)
         {
             rendererType = "jsp";
         }
 
         // look up the class implementation
         String className = context.getConfig().getRendererClass(rendererType);
-        if (className == null || "".equals(className))
+        if (className == null || className.length() == 0)
         {
             // JSP is the default case
             className = "org.alfresco.web.site.renderer.JSPRenderer";

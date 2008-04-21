@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ import java.util.Map;
  * @author muzquiano
  */
 public class User
-    implements java.security.Principal
+    implements java.security.Principal, Serializable
 {
     public static String PROP_ID = "id";
     public static String PROP_ADDRESS1 = "address1";
@@ -52,11 +53,11 @@ public class User
     public static String PROP_STATE = "state";
     public static String PROP_ZIP_CODE = "zip_code";
     
-    protected Map<String, Object> map = null;
+    protected Map<String, Serializable> map = null;
     
     public User(String id)
     {
-        map = new HashMap<String,Object>();
+        map = new HashMap<String,Serializable>();
         setId(id);
     }
     
@@ -207,17 +208,19 @@ public class User
     {
         return (Object) map.get(key);
     }
+    
     public String getStringProperty(String key)
     {
         return (String) map.get(key);
     }
-    public void setProperty(String key, Object value)
+    
+    public void setProperty(String key, Serializable value)
     {
         map.put(key, value);
     }
-    public Map<String, Object> getProperties()
+    
+    public Map<String, Serializable> getProperties()
     {
         return map;
     }
-    
 }

@@ -132,7 +132,7 @@ public class WebScriptRenderer extends AbstractRenderer
         // get the web script runtime container
         String containerId = context.getConfig().getRendererProperty(
                 getRendererType(), "container-bean");
-        if (containerId == null || "".equals(containerId))
+        if (containerId == null || containerId.length() == 0)
         {
             containerId = "webscripts.container";
         }
@@ -170,7 +170,7 @@ public class WebScriptRenderer extends AbstractRenderer
         Reader reader = (Reader) runtime.getResponseReader();
         BufferedReader in = new BufferedReader(reader);
         char[] cbuf = new char[65536];
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         int read_this_time = 0;
         try
         {

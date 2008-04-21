@@ -40,12 +40,10 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
 
     public DeclarativeSiteWebScript()
     {
-        super();
     }
 
     public DeclarativeSiteWebScript(Store store)
     {
-        super();
         this.store = store;
     }
 

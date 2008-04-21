@@ -324,8 +324,10 @@ public final class ScriptWizard extends ScriptBase
         {
             // process type
             String type = currentPageElement.attributeValue("type");
-            if (type != null && !"".equals(type))
+            if (type != null && type.length() != 0)
+            {
                 this.setDialogType(type);
+            }
 
             // process data elements (put in scope)			
             Element dataEl = currentPageElement.element("data");

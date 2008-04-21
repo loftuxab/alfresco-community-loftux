@@ -250,20 +250,17 @@ public class ModelHelper
         // TODO: Is this necessary?
         int i = typeName.indexOf(":");
         if (i > -1)
+        {
             typeName = typeName.substring(i + 1, typeName.length());
+        }
 
         String prefix = Framework.getConfig().getModelTypePrefix(typeName);
-        if (prefix != null && !"".equals(prefix))
+        if (prefix != null && prefix.length() != 0)
+        {
             return prefix + newGUID();
+        }
         return newGUID();
     }
-    
-    
-    
-    
-    
-    
-    
     
     
     protected static ModelObject convertDocumentToModelObject(Document document)

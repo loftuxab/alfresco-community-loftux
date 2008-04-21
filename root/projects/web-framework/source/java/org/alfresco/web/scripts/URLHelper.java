@@ -4,49 +4,55 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * Class to represent the template model for a URL.
+ * 
+ * @author Kevin Roast
+ */
 public class URLHelper
 {
     String context;
     String pageContext;
     String uri;
     String args;
-    
 
+    /**
+     * Construction
+     * 
+     * @param req       Servlet request to build URL model helper from
+     */
     public URLHelper(HttpServletRequest req)
     {
-       this.context = req.getContextPath();
-       this.uri = req.getRequestURI();
-       String uriNoContext = req.getRequestURI().substring(this.context.length());
-       StringTokenizer t = new StringTokenizer(uriNoContext, "/");
-       if(t.hasMoreTokens())
-       {
-           this.pageContext = this.context + "/" + t.nextToken();
-       }
-       this.args = (req.getQueryString() != null ? req.getQueryString() : "");
+        this.context = req.getContextPath();
+        this.uri = req.getRequestURI();
+        String uriNoContext = req.getRequestURI().substring(this.context.length());
+        StringTokenizer t = new StringTokenizer(uriNoContext, "/");
+        this.pageContext = this.context + "/" + t.nextToken();
+        this.args = (req.getQueryString() != null ? req.getQueryString() : "");
     }
 
     public String getContext()
     {
-       return context;
+        return context;
     }
-    
+
     public String getServletContext()
     {
-       return pageContext;
+        return pageContext;
     }
-    
+
     public String getUri()
     {
-       return uri;
+        return uri;
     }
-    
+
     public String getUrl()
     {
-       return uri + (this.args.length() != 0 ? ("?" + this.args) : "");
+        return uri + (this.args.length() != 0 ? ("?" + this.args) : "");
     }
-    
+
     public String getArgs()
     {
-       return this.args;
+        return this.args;
     }
 }

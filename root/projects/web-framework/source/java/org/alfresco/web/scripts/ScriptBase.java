@@ -38,6 +38,10 @@ import org.mozilla.javascript.Scriptable;
  */
 public class ScriptBase implements Serializable
 {
+    protected RequestContext context;
+    protected Map<String, Object> model;
+    
+    
     public ScriptBase()
     {
     }
@@ -46,9 +50,6 @@ public class ScriptBase implements Serializable
     {
         this.context = context;
     }
-
-    protected RequestContext context;
-    protected Map<String, Object> model;
 
     public RequestContext getRequestContext()
     {
@@ -74,10 +75,8 @@ public class ScriptBase implements Serializable
 
         for (int i = 0; i < modelObjects.length; i++)
         {
-            ScriptModelObject scriptModelObject = toScriptModelObject(context,
-                    modelObjects[i]);
+            ScriptModelObject scriptModelObject = toScriptModelObject(context, modelObjects[i]);
             String id = modelObjects[i].getId();
-            System.out.println("toScriptableMap: adding " + id + " = " + scriptModelObject);
             map.put(id, scriptModelObject);
         }
 
@@ -89,7 +88,9 @@ public class ScriptBase implements Serializable
     {
         Object[] array = new Object[elements.length];
         for (int i = 0; i < elements.length; i++)
+        {
             array[i] = elements[i];
+        }
 
         return Context.getCurrentContext().newArray(scope, array);
     }
@@ -98,7 +99,9 @@ public class ScriptBase implements Serializable
             ModelObject modelObject)
     {
         if (modelObject != null)
+        {
             return new ScriptModelObject(context, modelObject);
+        }
         return null;
     }
 
@@ -110,8 +113,9 @@ public class ScriptBase implements Serializable
         {
             array = new Object[modelObjects.length];
             for (int i = 0; i < modelObjects.length; i++)
+            {
                 array[i] = toScriptModelObject(context, modelObjects[i]);
-            return array;
+            }
         }
         return array;
     }

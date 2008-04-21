@@ -299,14 +299,14 @@ public class RenderUtil
             // determine the region renderer
             // this is set in the configuration
             String renderer = context.getConfig().getPresentationContainerURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION);
-            if(renderer == null || "".equals(renderer))
+            if(renderer == null || renderer.length() == 0)
             {
                 renderer = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION;
             }
             // Allow this to be overridden by the template
             // store the setting "region-regionName-renderer" with value "/my/jsppage.jsp"
             String rendererOverride = template.getSetting("region-" + regionId + "-renderer");
-            if(rendererOverride != null && !"".equals(rendererOverride))
+            if(rendererOverride != null && rendererOverride.length() != 0)
             {
                 renderer = rendererOverride;
             }
@@ -566,7 +566,7 @@ public class RenderUtil
     public static final String REGION_SCOPE_PAGE     = "page";
  
 
-    protected static void appendBuffer(StringBuffer buffer, String toAppend)
+    protected static void appendBuffer(StringBuilder buffer, String toAppend)
     {
         buffer.append(toAppend);
         buffer.append("\r\n"); // cosmetic
@@ -576,7 +576,7 @@ public class RenderUtil
     protected static String generateHeader(RequestContext context, HttpServletRequest request, HttpServletResponse response)
         throws Exception
     {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         appendBuffer(buffer, "");
 
         /**

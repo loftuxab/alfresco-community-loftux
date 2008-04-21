@@ -137,15 +137,6 @@ public class SlingshotLinkBuilder extends LinkBuilder
         return URLUtil.browser(context, buffer.toString());
     }
     
-    
-    
-    
-    
-    
-    
-    
-    
-
     /**
      * Constructs a link to a given content item.
      * This will automatically use the default format.
