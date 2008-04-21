@@ -67,10 +67,10 @@ public class DefaultLinkBuilder extends LinkBuilder
             formatId = context.getConfig().getDefaultFormatId();
         }
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("?f=" + formatId);
         buffer.append("&p=" + pageId);
-        if (objectId != null && !"".equals(objectId))
+        if (objectId != null && objectId.length() != 0)
         {
               buffer.append("&o=" + objectId);
         }
@@ -111,7 +111,7 @@ public class DefaultLinkBuilder extends LinkBuilder
             formatId = context.getConfig().getDefaultFormatId();
         }
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append("?f=" + formatId);
         buffer.append("&o=" + objectId);
       

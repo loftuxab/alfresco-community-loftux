@@ -76,7 +76,7 @@ public class ObjectGUID
     private void getRandomGUID(boolean secure)
     {
         MessageDigest md5 = null;
-        StringBuffer sbValueBeforeMD5 = new StringBuffer();
+        StringBuilder sbValueBeforeMD5 = new StringBuilder();
 
         try
         {
@@ -101,7 +101,7 @@ public class ObjectGUID
                 rand = myRand.nextLong();
             }
 
-            // StringBuffer
+            // StringBuilder
             sbValueBeforeMD5.append(s_id);
             sbValueBeforeMD5.append(":");
             sbValueBeforeMD5.append(Long.toString(time));
@@ -112,7 +112,7 @@ public class ObjectGUID
             md5.update(valueBeforeMD5.getBytes());
 
             byte[] array = md5.digest();
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             for (int j = 0; j < array.length; ++j)
             {
                 int b = array[j] & 0xFF;
@@ -135,7 +135,7 @@ public class ObjectGUID
     {
         /*
         String raw = valueAfterMD5.toUpperCase();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(raw.substring(0, 8));
         sb.append("-");
         sb.append(raw.substring(8, 12));
@@ -144,7 +144,7 @@ public class ObjectGUID
         */
         
         String raw = valueAfterMD5.toLowerCase();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(raw.substring(0,6));
         sb.append(raw.substring(8,12));
 

@@ -97,7 +97,7 @@ public final class ScriptSite extends ScriptBase
             return null;
         }
 
-        StringBuffer ep = new StringBuffer();
+        StringBuilder ep = new StringBuilder();
         ep.append(endpoint.getEndpointURL());
 
         String endpointString = ep.toString();

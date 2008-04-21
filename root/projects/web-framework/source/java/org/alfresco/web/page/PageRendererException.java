@@ -20,44 +20,50 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing"
+ * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.scripts;
+package org.alfresco.web.page;
 
-import java.io.Serializable;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.User;
+import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
- * Represents the user of the site who is currently executing the
- * given template or component.
- * 
- * @author muzquiano
+ * @author Kevin Roast
  */
-public final class ScriptUser extends ScriptBase
+public class PageRendererException extends AlfrescoRuntimeException
 {
-    protected User user;
-    
-    public ScriptUser(RequestContext context, User user)
-    {
-        super(context);
-        this.user = user;
-    }
-    
-    public ScriptableMap getProperties()
-    {
-        Map<String, Serializable> userProperties = user.getProperties();
-        
-        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
-        for (Entry<String, Serializable> entry : userProperties.entrySet())
-        {
-            String key = (String) entry.getKey();
-            Serializable value = entry.getValue();
-            map.put(key, value);            
-        }
-        return map;
-    }
+   /**
+    * @param msgId
+    * @param msgParams
+    * @param cause
+    */
+   public PageRendererException(String msgId, Object[] msgParams, Throwable cause)
+   {
+      super(msgId, msgParams, cause);
+   }
+
+   /**
+    * @param msgId
+    * @param msgParams
+    */
+   public PageRendererException(String msgId, Object[] msgParams)
+   {
+      super(msgId, msgParams);
+   }
+
+   /**
+    * @param msgId
+    * @param cause
+    */
+   public PageRendererException(String msgId, Throwable cause)
+   {
+      super(msgId, cause);
+   }
+
+   /**
+    * @param msgId
+    */
+   public PageRendererException(String msgId)
+   {
+      super(msgId);
+   }
 }

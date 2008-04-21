@@ -57,7 +57,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         
         // get the template processor
         String processorId = context.getConfig().getRendererProperty(getRendererType(), "processor-bean");
-        if(processorId == null || "".equals(processorId))
+        if(processorId == null || processorId.length() == 0)
         {
             processorId = "site.webscripts.templateprocessor";
         }
@@ -77,11 +77,12 @@ public class FreemarkerRenderer extends AbstractRenderer
             ModelHelper.populateTemplateModel(context, model);
             
             // path to the template (switches on format)
-            templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");
+            templateName = uri + ((format != null && format.length() != 0 &&
+                    !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");
             
-            if(templateProcessor.hasTemplate(templateName))
+            if (templateProcessor.hasTemplate(templateName))
             {
-                StringWriter out = new StringWriter();
+                StringWriter out = new StringWriter(512);
                 templateProcessor.process(templateName, model, out);
                 
                 String tags = out.toString();

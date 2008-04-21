@@ -51,14 +51,14 @@ public class DefaultPageMapper extends PageMapper
 
         // format id
         String formatId = (String) request.getParameter("f");
-        if (formatId == null || "".equals(formatId))
+        if (formatId == null || formatId.length() == 0)
             formatId = context.getConfig().getDefaultFormatId();
         if (formatId != null)
             context.setCurrentFormatId(formatId);
 
         // page id
         String pageId = (String) request.getParameter("p");
-        if(pageId != null && !"".equals(pageId))
+        if(pageId != null && pageId.length() != 0)
         {
             Page _page = context.getModel().loadPage(context, pageId);
             if (_page != null)
@@ -67,7 +67,7 @@ public class DefaultPageMapper extends PageMapper
 
         // object id
         String objectId = (String) request.getParameter("o");
-        if (objectId != null && !"".equals(objectId))
+        if (objectId != null && objectId.length() != 0)
         {
             context.setCurrentObjectId(objectId);
         }

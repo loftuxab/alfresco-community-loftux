@@ -24,16 +24,23 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 import org.mozilla.javascript.Scriptable;
 
-public class ScriptableMap<K, V> extends HashMap implements Scriptable
+/**
+ * @author Kevin Roast
+ * 
+ * NOTE: sourced from @see org.alfresco.repo.jscript.ScriptableHashMap
+ */
+public class ScriptableMap<K,V> extends LinkedHashMap<K, V> implements Scriptable
 {
-    public ScriptableMap()
-    {
-    }
-
+    private static final long serialVersionUID = 3774167893214964123L;
+    
+    private Scriptable parentScope;
+    private Scriptable prototype;
+    
     /**
      * @see org.mozilla.javascript.Scriptable#getClassName()
      */
@@ -43,11 +50,11 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
     }
 
     /**
-     * @see org.mozilla.javascript.Scriptable#get(java.lang.String,
-     *      org.mozilla.javascript.Scriptable)
+     * @see org.mozilla.javascript.Scriptable#get(java.lang.String, org.mozilla.javascript.Scriptable)
      */
     public Object get(String name, Scriptable start)
     {
+        // get the property from the underlying QName map
         if ("length".equals(name))
         {
             return this.size();
@@ -59,47 +66,53 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
     }
 
     /**
-     * @see org.mozilla.javascript.Scriptable#get(int,
-     *      org.mozilla.javascript.Scriptable)
+     * @see org.mozilla.javascript.Scriptable#get(int, org.mozilla.javascript.Scriptable)
      */
     public Object get(int index, Scriptable start)
     {
-        return null;
+        Object value =  null;
+        int i=0;
+        Iterator itrValues = this.values().iterator();
+        while (i++ <= index && itrValues.hasNext())
+        {
+            value = itrValues.next();
+        }
+        return value;
     }
 
     /**
-     * @see org.mozilla.javascript.Scriptable#has(java.lang.String,
-     *      org.mozilla.javascript.Scriptable)
+     * @see org.mozilla.javascript.Scriptable#has(java.lang.String, org.mozilla.javascript.Scriptable)
      */
     public boolean has(String name, Scriptable start)
     {
+        // locate the property in the underlying map
         return containsKey(name);
     }
 
     /**
-     * @see org.mozilla.javascript.Scriptable#has(int,
-     *      org.mozilla.javascript.Scriptable)
+     * @see org.mozilla.javascript.Scriptable#has(int, org.mozilla.javascript.Scriptable)
      */
     public boolean has(int index, Scriptable start)
     {
-        return false;
+        return (index >= 0 && this.values().size() > index);
     }
 
     /**
-     * @see org.mozilla.javascript.Scriptable#put(java.lang.String,
-     *      org.mozilla.javascript.Scriptable, java.lang.Object)
+     * @see org.mozilla.javascript.Scriptable#put(java.lang.String, org.mozilla.javascript.Scriptable, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     public void put(String name, Scriptable start, Object value)
     {
-        put(name, value);
+        // add the property to the underlying QName map
+        put((K)name, (V)value);
     }
 
     /**
-     * @see org.mozilla.javascript.Scriptable#put(int,
-     *      org.mozilla.javascript.Scriptable, java.lang.Object)
+     * @see org.mozilla.javascript.Scriptable#put(int, org.mozilla.javascript.Scriptable, java.lang.Object)
      */
     public void put(int index, Scriptable start, Object value)
     {
+        // TODO: implement?
     }
 
     /**
@@ -107,6 +120,7 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
      */
     public void delete(String name)
     {
+        // remove the property from the underlying QName map
         remove(name);
     }
 
@@ -115,6 +129,17 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
      */
     public void delete(int index)
     {
+        int i=0;
+        Iterator itrKeys = this.keySet().iterator();
+        while (i <= index && itrKeys.hasNext())
+        {
+            Object key = itrKeys.next();
+            if (i == index)
+            {
+                remove(key);
+                break;
+            }
+        }
     }
 
     /**
@@ -122,7 +147,7 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
      */
     public Scriptable getPrototype()
     {
-        return null;
+        return this.prototype;
     }
 
     /**
@@ -130,6 +155,7 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
      */
     public void setPrototype(Scriptable prototype)
     {
+        this.prototype = prototype;
     }
 
     /**
@@ -137,7 +163,7 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
      */
     public Scriptable getParentScope()
     {
-        return null;
+        return this.parentScope;
     }
 
     /**
@@ -145,6 +171,7 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
      */
     public void setParentScope(Scriptable parent)
     {
+        this.parentScope = parent;
     }
 
     /**
@@ -171,3 +198,4 @@ public class ScriptableMap<K, V> extends HashMap implements Scriptable
         return instance instanceof ScriptableMap;
     }
 }
+

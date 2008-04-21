@@ -33,6 +33,8 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.web.site.filesystem.FileSystemManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.servlet.DispatcherServlet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -42,6 +44,8 @@ import org.springframework.context.ApplicationContext;
  */
 public class FrameworkHelper
 {
+    private static Log logger = LogFactory.getLog(FrameworkHelper.class);
+    
     public static void initFramework(ServletContext servletContext,
             ApplicationContext context)
     {
@@ -65,11 +69,10 @@ public class FrameworkHelper
                 IModel model = new DefaultModel(modelFileSystem);
                 Framework.setModel(model);
 
-                System.out.println("Successfully Initialized Web Framework");
+                logger.info("Successfully Initialized Web Framework");
             }
         }
     }
-    
     
     public static void initRequestContext(ServletRequest request)
         throws Exception
@@ -91,6 +94,4 @@ public class FrameworkHelper
                     "The configured request context factory does not extend from HttpRequestContextFactory");
         }        
     }
-    
-
 }

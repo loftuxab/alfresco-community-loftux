@@ -73,6 +73,11 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
          logger.debug("Constructing runtime for url: " + executeUrl);
    }
 
+   public PageRendererContext getPageRendererContext()
+   {
+      return this.context;
+   }
+   
    /* (non-Javadoc)
     * @see org.alfresco.web.scripts.Runtime#getName()
     */

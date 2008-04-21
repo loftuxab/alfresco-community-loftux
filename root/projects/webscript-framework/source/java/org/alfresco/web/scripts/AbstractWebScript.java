@@ -541,7 +541,7 @@ public abstract class AbstractWebScript implements WebScript
      * @param location  script location
      * @param model  model
      */
-    final protected void executeScript(ScriptContent location, Map<String, Object> model)
+    protected void executeScript(ScriptContent location, Map<String, Object> model)
     {
         long start = System.nanoTime();
         container.getScriptProcessor().executeScript(location, model);

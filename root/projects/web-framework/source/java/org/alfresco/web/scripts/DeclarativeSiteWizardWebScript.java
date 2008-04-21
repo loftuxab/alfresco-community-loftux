@@ -26,6 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -68,14 +69,22 @@ public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
      * Override this method so that we can automatically call the wizard
      * object's init and finalize methods
      */
-    protected void _executeScript(ScriptContent location,
-            Map<String, Object> model) throws Exception
+    @Override
+    protected void executeScript(ScriptContent location,
+            Map<String, Object> model)
     {
         // get the wizard object
         ScriptWizard wizard = (ScriptWizard) model.get("wizard");
 
         // call the wizard's init method
-        wizard.init();
+        try
+        {
+            wizard.init();
+        }
+        catch (Throwable err)
+        {
+            throw new AlfrescoRuntimeException("Error during wizard initialisation: " + err.getMessage(), err);
+        }
 
         // get the new script that we should execute
         String currentPageId = wizard.getCurrentPageId();
@@ -100,5 +109,4 @@ public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
         // System.out.println("GENERATED JSON: ");
         // System.out.println(wizard.getResponse());
     }
-
 }

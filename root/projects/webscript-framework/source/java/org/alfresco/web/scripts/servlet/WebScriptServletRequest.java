@@ -278,7 +278,14 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
      */
     public String getAgent()
     {
-        String userAgent = req.getHeader("user-agent");
+        return resolveUserAgent(req.getHeader("user-agent"));
+    }
+    
+    /**
+     * Helper to resolve common user agent strings from Http request header
+     */
+    public static String resolveUserAgent(String userAgent)
+    {
         if (userAgent != null)
         {
             if (userAgent.indexOf("Firefox/") != -1)

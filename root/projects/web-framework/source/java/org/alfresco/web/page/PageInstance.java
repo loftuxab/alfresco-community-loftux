@@ -34,11 +34,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.web.page.PageRendererServlet.URLHelper;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.Registry;
 import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.TemplateProcessor;
+import org.alfresco.web.scripts.URLHelper;
 import org.alfresco.web.scripts.WebScript;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.dom4j.Document;

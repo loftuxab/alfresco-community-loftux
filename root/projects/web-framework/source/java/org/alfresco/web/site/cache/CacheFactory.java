@@ -60,8 +60,10 @@ public class CacheFactory
     public static IContentCache createPersistentCache(String cacheId,
             long timeout, String cacheDir) throws Exception
     {
-        if (cacheDir == null || "".equals(cacheDir))
+        if (cacheDir == null || cacheDir.length() == 0)
+        {
             throw new Exception("Null cache directory!");
+        }
 
         // clean up and add in the bean ID
         cacheDir = cacheDir.replace('\\', File.separatorChar);
