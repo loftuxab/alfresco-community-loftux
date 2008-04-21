@@ -1616,6 +1616,23 @@
                          projectdir="${dir.project.webframework}"/>
    </target>
    
+   <target name="clean-webframework-samples"
+            description="Removes example components and templates from the web framework assemble folder"
+            depends="init">
+      <delete>
+         <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data">
+            <include name="components/*.xml" />
+            <include name="page-associations/*.xml" />
+            <include name="pages/*.xml" />
+            <include name="template-instances/*.xml" />
+         </fileset>
+      </delete>
+      <delete dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts/sample" />
+      <delete dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts/test" />
+      <delete dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates" />
+      <mkdir dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates" />
+   </target>
+   
    <!-- **************************************** -->
    <!-- ** Web Client 3.0 (Slingshot) Project ** -->
    <!-- **************************************** -->
@@ -1674,7 +1691,7 @@
    </target>
 
    <target name="assemble-slingshot-war"
-           depends="package-webframework-war,package-slingshot">
+           depends="package-webframework-war,clean-webframework-samples,package-slingshot">
       <mkdir dir="${dir.project.slingshot.assemble}" />
       
       <!-- Copy in base WAR file from the "webscript-framework" package -->
