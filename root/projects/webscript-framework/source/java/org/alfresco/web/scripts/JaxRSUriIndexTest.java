@@ -31,7 +31,6 @@ import java.util.TreeSet;
 import junit.framework.TestCase;
 
 import org.alfresco.web.scripts.JaxRSUriIndex.IndexEntry;
-import org.alfresco.web.scripts.JaxRSUriIndex.UriTemplate;
 
 
 /**
@@ -161,13 +160,13 @@ public class JaxRSUriIndexTest extends TestCase
         UriTemplate i1 = new UriTemplate("/");
         assertEquals("/", i1.getTemplate());
         assertEquals("/", i1.getRegex().pattern());
-        assertEquals(1, i1.getStaticCharacterCount());
+        assertEquals(1, i1.getStaticCharCount());
         assertEquals(0, i1.getVariableNames().length);
 
         UriTemplate i2 = new UriTemplate("/a/{a1}/b{b1}b/{c_c}");
         assertEquals("/a/{a1}/b{b1}b/{c_c}", i2.getTemplate());
         assertEquals("/a/(.*?)/b(.*?)b/(.*?)", i2.getRegex().pattern());
-        assertEquals(7, i2.getStaticCharacterCount());
+        assertEquals(7, i2.getStaticCharCount());
         assertEquals(3, i2.getVariableNames().length);
         assertEquals("a1", i2.getVariableNames()[0]);
         assertEquals("b1", i2.getVariableNames()[1]);
