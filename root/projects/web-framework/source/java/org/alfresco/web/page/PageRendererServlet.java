@@ -26,11 +26,9 @@ package org.alfresco.web.page;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -39,9 +37,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.page.PageAuthenticationServlet.AuthenticationResult;
 import org.alfresco.web.scripts.PresentationScriptProcessor;
@@ -64,12 +60,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * GET: /<context>/<servlet>/[resource]...
  *  resource - app url resource
  *  url args - passed to all webscript component urls for the page
- * 
- * Read from page renderer web-app config:
- *  serverurl - url to Alfresco host repo server (i.e. http://servername:8080/alfresco)
- * 
- * Read from object model for spk:site - pass to webscript urls as "well known tokens"
- *  theme - default theme for the site (can be override in user prefs?) 
  * 
  * @author Kevin Roast
  */
@@ -95,9 +85,6 @@ public class PageRendererServlet extends WebScriptServlet
    private Store templateStore;
    private Store templateConfigStore;
    private Store componentStore;
-   
-   /** list of register UrlMapper instances */
-   private List<UrlMapper> urlMappers;
    
    /** thread-safe cache of page level components */
    private Map<String, CacheValue<PageComponent>> componentCache =
@@ -130,9 +117,6 @@ public class PageRendererServlet extends WebScriptServlet
       
       // we use a specific webscript container instance - override the one from the super
       container = (RuntimeContainer)context.getBean("pagerenderer.container");
-      
-      // init the list of url mappers for the page renderer
-      initUrlMappers();
    }
 
    @Override
@@ -150,27 +134,19 @@ public class PageRendererServlet extends WebScriptServlet
          startTime = System.nanoTime();
       }
       
-      uri = uri.substring(req.getContextPath().length());   // skip server context path
+      // skip server context path and build the path to the resource we are looking for
+      uri = uri.substring(req.getContextPath().length());
+      
+      // validate and return the resource path - stripping the servlet context
       StringTokenizer t = new StringTokenizer(uri, "/");
-      t.nextToken();    // skip servlet name
+      String servletName = t.nextToken();
       if (!t.hasMoreTokens())
       {
-         throw new PageRendererException("Invalid URL to PageRendererServlet: " + uri);
+         throw new PageRendererException("Invalid URL: " + uri);
       }
+      String resource = uri = uri.substring(servletName.length() + 1);
       
-      // get the remaining elements of the url ready for AppUrl lookup 
-      StringBuilder buf = new StringBuilder(64);
-      while (t.hasMoreTokens())
-      {
-         buf.append(t.nextToken());
-         if (t.hasMoreTokens())
-         {
-            buf.append('/');
-         }
-      }
-      String resource = buf.toString();
-      
-      // get URL arguments as a map ready for AppUrl lookup
+      // get URL arguments as a map ready for building the page context
       Map<String, String> args = new HashMap<String, String>(req.getParameterMap().size(), 1.0f);
       Enumeration names = req.getParameterNames();
       while (names.hasMoreElements())
@@ -179,24 +155,16 @@ public class PageRendererServlet extends WebScriptServlet
          args.put(name, req.getParameter(name));
       }
       
-      // resolve a Url mapper object to process this resource
       if (logger.isDebugEnabled())
-         logger.debug("Matching resource URL: " + resource + " args: " + args.toString());
-      UrlMapper mapper = matchAppUrl(resource);
-      if (mapper == null)
-      {
-         logger.warn("No valid URL mapper found for resource: " + resource);
-         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-         return;
-      }
+         logger.debug("Page Renderer resource URL: " + resource + " args: " + args);
       
-      // retrieve the page instance as per the url mapper resource from the page store - will
+      // retrieve the page instance as per resource url - will
       // return null if the page fails to retrieve from the given page store
-      PageInstance page = findPageInstance(this.pageStore, mapper, resource);
+      PageInstance page = findPageInstance(this.pageStore, resource);
       if (page == null)
       {
          logger.warn("Unable to locate page instance in page store for resource: " + resource);
-         res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+         res.setStatus(HttpServletResponse.SC_NOT_FOUND, resource);
          return;
       }
       
@@ -220,15 +188,7 @@ public class PageRendererServlet extends WebScriptServlet
             ((PageRendererRuntimeContainer)container).setTicket(auth.Ticket);
             
             // Setup the PageRenderer context for the webscript runtime to use when processing page components
-            PageRendererContext context = new PageRendererContext();
-            context.ServletRequest = req;
-            context.ServerProperties = serverProperties;
-            context.RuntimeContainer = container;
-            context.RequestURI = uri;
-            context.RequestPath = req.getContextPath();
-            context.PageInstance = page;
-            context.Tokens = args;
-            context.PageComponentModel = buildPageComponentModel(page, req);
+            PageRendererContext context = createPageContext(req, uri, args, page);
             
             // handle a clicked UI component link - look for id+url
             // TODO: keep further state of page? i.e. multiple webscripts can be hosted and clicked
@@ -242,14 +202,12 @@ public class PageRendererServlet extends WebScriptServlet
                context.ComponentUrl = compUrl;
             }
             
-            // Process the page template using our custom loader - the loader will find and buffer
-            // individual included webscript output into the Writer out for the servlet page.
             if (logger.isDebugEnabled())
                logger.debug("Page template resolved as: " + page.getTemplate());
             
+            // execute the template to render the page - based on the current page definition
             try
             {
-               // execute the template to render the page - based on the current page definition
                processTemplatePage(context, page, req, res);
             }
             finally
@@ -275,37 +233,15 @@ public class PageRendererServlet extends WebScriptServlet
                resource + "\nError: " + err.getMessage(), err);
       }
    }
-   
+
    /**
-    * Match the specified resource url against the available Url Mappers - return a mapper if
-    * successfully mapped - false otherwise.
-    * 
-    * @param resource to match
-    * 
-    * @return a UrlMapper matching the resource if found or null if no match found
-    */
-   private UrlMapper matchAppUrl(String resource)
-   {
-      UrlMapper result = null;
-      for (UrlMapper mapper : this.urlMappers)
-      {
-         if (mapper.match(resource) == true)
-         {
-            result = mapper;
-            break;
-         }
-      }
-      return result;
-   }
-   
-   /**
-    * Find a PageInstance using the specified Url mapper and resource from the given store
+    * Find a PageInstance representing the resource from the given store
     * 
     * @return the PageInstance if found or null otherwise
     */
-   private static PageInstance findPageInstance(Store store, UrlMapper mapper, String resource)
+   private static PageInstance findPageInstance(Store store, String resource)
    {
-      String pagePath = mapper.buildResourcePath(resource);
+      String pagePath = resource + ".xml";
       if (store.hasDocument(pagePath))
       {
          return new PageInstance(store, pagePath);
@@ -314,6 +250,23 @@ public class PageRendererServlet extends WebScriptServlet
       {
          return null;
       }
+   }
+   
+   /**
+    * @return a PageRendererContext instance for this page render request.
+    */
+   private PageRendererContext createPageContext(HttpServletRequest req, String uri, Map<String, String> args, PageInstance page)
+   {
+      PageRendererContext context = new PageRendererContext();
+      context.ServletRequest = req;
+      context.ServerProperties = serverProperties;
+      context.RuntimeContainer = container;
+      context.RequestURI = uri;
+      context.RequestPath = req.getContextPath();
+      context.PageInstance = page;
+      context.Tokens = args;
+      context.PageComponentModel = buildPageComponentModel(page, req);
+      return context;
    }
    
    /**
@@ -505,45 +458,6 @@ public class PageRendererServlet extends WebScriptServlet
    }
    
    /**
-    * Initialise the list of URL Mapper objects for the PageRenderer
-    */
-   private void initUrlMappers()
-   {
-      ConfigElement urlMappersElement = getConfig().getConfigElement("url-mappers");
-      if (urlMappersElement == null)
-      {
-         throw new PageRendererException("Missing required config element 'url-mappers' under 'PageRenderer'.");
-      }
-      List<ConfigElement> mappers = urlMappersElement.getChildren("url-mapper");
-      if (mappers == null || mappers.size() == 0)
-      {
-         throw new PageRendererException("Empty config element 'url-mappers' under 'PageRenderer'." +
-               " Was expecting one or more 'url-mappers' child elements.");
-      }
-      
-      this.urlMappers = new ArrayList<UrlMapper>(mappers.size());
-      
-      for (ConfigElement e : mappers)
-      {
-         String className = e.getValue();
-         if (className == null || className.length() == 0)
-         {
-            throw new PageRendererException("Empty 'url-mapper' config element." +
-                  " Was expecting fully qualified class name value.");
-         }
-         try
-         {
-            this.urlMappers.add(UrlMapperFactory.createMapper(className));
-         }
-         catch (AlfrescoRuntimeException err)
-         {
-            throw new PageRendererException("Unable to create class from 'url-mapper' config element value: " +
-                  err.getMessage(), err);
-         }
-      }
-   }
-   
-   /**
     * Apply the headers required to disallow caching of the response in the browser
     */
    private static void setNoCacheHeaders(HttpServletResponse res)
@@ -551,64 +465,7 @@ public class PageRendererServlet extends WebScriptServlet
       res.setHeader("Cache-Control", "no-cache");
       res.setHeader("Pragma", "no-cache");
    }
-   
-   /**
-    * Helper to replace tokens in a string with values from a map of token->value.
-    * Token names in the string are delimited by '{' and '}' - the entire token name
-    * plus the delimiters are replaced by the value found in the supplied replacement map.
-    * If no replacement value is found for the token name, it is replaced by the empty string.
-    * 
-    * @param s       String to work on - cannot be null
-    * @param tokens  Map of token name -> token value for replacements
-    * 
-    * @return the replaced string or the original if no tokens found or a failure occurs
-    */
-   static String replaceContextTokens(String s, Map<String, String> tokens)
-   {
-      String result = s;
-      int preIndex = 0;
-      int delimIndex = s.indexOf('{');
-      if (delimIndex != -1)
-      {
-         StringBuilder buf = new StringBuilder(s.length() + 16);
-         do
-         {
-            // copy up to token delimiter start
-            buf.append(s.substring(preIndex, delimIndex));
-            
-            // extract token and replace
-            if (s.length() < delimIndex + 2)
-            {
-               if (logger.isWarnEnabled())
-                  logger.warn("Failed to replace context tokens - malformed input: " + s);
-               return s;
-            }
-            int endDelimIndex = s.indexOf('}', delimIndex + 2);
-            if (endDelimIndex == -1)
-            {
-               if (logger.isWarnEnabled())
-                  logger.warn("Failed to replace context tokens - malformed input: " + s);
-               return s;
-            }
-            String token = s.substring(delimIndex + 1, endDelimIndex);
-            String replacement = tokens.get(token);
-            buf.append(replacement != null ? replacement : "");
-            
-            // locate next delimiter and mark end of previous delimiter
-            preIndex = endDelimIndex + 1; 
-            delimIndex = s.indexOf('{', preIndex);
-            if (delimIndex == -1 && s.length() > preIndex)
-            {
-               // append suffix of original string after the last delimiter found
-               buf.append(s.substring(preIndex));
-            }
-         } while (delimIndex != -1);
-         
-         result = buf.toString();
-      }
-      return result;
-   }
-   
+
    
    /**
     * Simple structure class representing the current thread request context for a page.

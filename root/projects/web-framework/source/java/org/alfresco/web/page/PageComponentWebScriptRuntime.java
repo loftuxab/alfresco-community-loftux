@@ -103,9 +103,7 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
       // add/replace the "well known" context tokens in component properties
       for (String arg : component.getProperties().keySet())
       {
-         properties.put(
-               arg,
-               PageRendererServlet.replaceContextTokens(component.getProperties().get(arg), context.Tokens));
+         properties.put(arg, UriUtils.replaceUriTokens(component.getProperties().get(arg), context.Tokens));
       }
       
       // build the request to render this component

@@ -53,8 +53,8 @@ import freemarker.template.TemplateScalarModel;
  *  template - a template specific component, all pages sharing this template see this component
  *  page - a page specific component, visible on this page only
  * 
- * Optionally a boolean parameter 'protected' can be specified which declares a region as locked. Locked
- * regions are not editable at design time. The default if omitted is false.
+ * A boolean parameter 'protected' can be optionally specified which declares a region as locked. Locked
+ * regions are not editable at design time. The default is false if omitted.
  * 
  * Example:
  * <@region id="mycomponent" scope="template" protected=false>
@@ -254,7 +254,7 @@ public class RegionDirective implements TemplateDirectiveModel
    {
       // NOTE: UI component URIs in page instance config files should not include /service prefix
       // Replace context/well known tokens in the component url
-      String componentUrl = PageRendererServlet.replaceContextTokens(component.getUrl(), context.Tokens);
+      String componentUrl = UriUtils.replaceUriTokens(component.getUrl(), context.Tokens);
       String webscript = componentUrl;
       if (webscript.lastIndexOf('?') != -1)
       {
