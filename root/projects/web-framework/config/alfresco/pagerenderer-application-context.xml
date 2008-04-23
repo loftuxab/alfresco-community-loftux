@@ -3,7 +3,9 @@
 
 <beans>
    
-   <!-- Page Renderer Servlet configuration -->
+   <!--                             -->
+   <!-- Page Renderer config source -->
+   <!--                             -->
    <bean id="pagerenderer.configsource" class="org.alfresco.config.source.UrlConfigSource">
       <constructor-arg>
          <list>
@@ -26,53 +28,9 @@
    </bean>
    
    
-   <!-- Page Renderer UI component webscript store and search paths -->
-   <bean id="pagerenderer.webscripts.store" parent="webscripts.classpathstore">
-      <property name="mustExist"><value>true</value></property>
-      <property name="classPath"><value>alfresco/site-webscripts</value></property>
-   </bean>
-
-   <bean id="pagerenderer.searchpath" class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="pagerenderer.webscripts.store" />
-            <ref bean="webscripts.store" />
-         </list>
-      </property>
-   </bean>
-   
-   
-   <bean id="pagerenderer.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
-      <property name="searchPath" ref="pagerenderer.searchpath" />
-      <property name="defaultEncoding"><value>UTF-8</value></property>
-   </bean>
-
-   <bean id="pagerenderer.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
-      <property name="searchPath" ref="pagerenderer.searchpath" />
-   </bean>
-   
-   
-   <!-- Page Renderer WebScript container -->
-   <bean id="pagerenderer.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />
-   
-   <bean id="pagerenderer.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.page.PageRendererRuntimeContainer">
-      <property name="name"><value>PageRenderer</value></property>
-      <property name="registry" ref="pagerenderer.registry" />
-      <property name="searchPath" ref="pagerenderer.searchpath" />
-      <property name="templateProcessor" ref="pagerenderer.webscripts.templateprocessor" />
-      <property name="scriptProcessor" ref="pagerenderer.webscripts.scriptprocessor" />
-      <property name="configService" ref="pagerenderer.config" />
-   </bean>
-   
-   <bean id="pagerenderer.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
-      <property name="container" ref="pagerenderer.container" />
-      <property name="uriIndex" ref="pagerenderer.index" />
-      <property name="searchPath" ref="pagerenderer.searchpath" />
-      <property name="defaultWebScript"><value>webscript.default</value></property>
-   </bean>
-   
-   
+   <!--                                -->
    <!-- Resource Storage configuration -->
+   <!--                                -->
    <!-- TODO: replace with Remote store impl - load all resources via data WebScripts from remote repo -->
    <bean id="pagerenderer.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
 
@@ -108,12 +66,64 @@
          </list>
       </property>
    </bean>
+   
+   <bean id="pagerenderer.webscripts.store" parent="webscripts.classpathstore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/site-webscripts</value></property>
+   </bean>
 
-
-   <!--  Page Renderer Template Processor -->
+   <bean id="pagerenderer.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="pagerenderer.webscripts.store" />
+            <ref bean="webscripts.store" />
+         </list>
+      </property>
+   </bean>
+   
+   
+   <!--                                                        -->
+   <!-- Page Renderer webscript template and script processors -->
+   <!--                                                        -->
+   <!-- this template processor instance executes the webscript components -->
+   <bean id="pagerenderer.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+      <property name="updateDelay"><value>10</value></property>
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+   </bean>
+   
+   <!-- this template processor instance executes the page templates -->
    <bean id="pagerenderer.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
       <property name="searchPath" ref="pagerenderer.templates.searchpath" />
+      <property name="updateDelay"><value>10</value></property>
       <property name="defaultEncoding"><value>UTF-8</value></property>
+   </bean>
+   
+   <!-- the script processor executes the .js for both template pages and webscript components -->
+   <bean id="pagerenderer.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+   </bean>
+   
+   
+   <!--                                   -->
+   <!-- Page Renderer WebScript container -->
+   <!--                                   -->
+   <bean id="pagerenderer.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />
+   
+   <bean id="pagerenderer.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.page.PageRendererRuntimeContainer">
+      <property name="name"><value>PageRenderer</value></property>
+      <property name="registry" ref="pagerenderer.registry" />
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+      <property name="templateProcessor" ref="pagerenderer.webscripts.templateprocessor" />
+      <property name="scriptProcessor" ref="pagerenderer.webscripts.scriptprocessor" />
+      <property name="configService" ref="pagerenderer.config" />
+   </bean>
+   
+   <bean id="pagerenderer.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
+      <property name="container" ref="pagerenderer.container" />
+      <property name="uriIndex" ref="pagerenderer.index" />
+      <property name="searchPath" ref="pagerenderer.searchpath" />
+      <property name="defaultWebScript"><value>webscript.default</value></property>
    </bean>
    
 </beans>

@@ -59,11 +59,13 @@ public class PresentationTemplateProcessor
     private static final Log logger = LogFactory.getLog(PresentationTemplateProcessor.class);
 
     private ApplicationContext applicationContext;
-    protected SearchPath searchPath;
-    protected String defaultEncoding;
-    protected Configuration templateConfig;
-    protected Configuration stringConfig;
-    protected List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
+    private SearchPath searchPath;
+    private String defaultEncoding;
+    private Configuration templateConfig;
+    private Configuration stringConfig;
+    private List<TemplateLoader> loaders = new ArrayList<TemplateLoader>();
+    private int updateDelay = 0;
+    private int cacheSize = 256;
 
     /**
      * @param searchPath
@@ -87,6 +89,25 @@ public class PresentationTemplateProcessor
     public String getDefaultEncoding()
     {
         return this.defaultEncoding;
+    }
+    
+    /**
+     * @param updateDelay the time in seconds between checks on the modified date for cached templates
+     */
+    public void setUpdateDelay(int updateDelay)
+    {
+        this.updateDelay = updateDelay;
+    }
+    
+    /**
+     * @param cacheSize the size of the MRU template cache, default is 256
+     */
+    public void setCacheSize(int cacheSize)
+    {
+        if (cacheSize >= 0)
+        {
+            this.cacheSize = cacheSize;
+        }
     }
 
     /* (non-Javadoc)
@@ -228,8 +249,8 @@ public class PresentationTemplateProcessor
     {
         // construct template config
         templateConfig = new Configuration();
-        templateConfig.setCacheStorage(new MruCacheStorage(256, 512));
-        templateConfig.setTemplateUpdateDelay(0);
+        templateConfig.setCacheStorage(new MruCacheStorage(this.cacheSize, this.cacheSize << 1));
+        templateConfig.setTemplateUpdateDelay(updateDelay);
         templateConfig.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
         templateConfig.setLocalizedLookup(false);
         templateConfig.setOutputEncoding("UTF-8");
