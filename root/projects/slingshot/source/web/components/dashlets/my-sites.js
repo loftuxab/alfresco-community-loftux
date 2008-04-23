@@ -1,17 +1,22 @@
-/*
- *** Alfresco.Header
-*/
-
-Alfresco.MySites = function()
+(function()
 {
-   /* Shortcuts */
-   var Dom = YAHOO.util.Dom,
-         Event = YAHOO.util.Event;
+   Alfresco.MySites = function(htmlId)
+   {
+      this.name = "Alfresco.MySites";
+      this.id = htmlId;
 
-   return {
-      ID: null,
+      /* Register this component */
+      Alfresco.util.ComponentManager.register(this);
 
-      createPanel: null,
+      /* Load YUI Components */
+      new Alfresco.util.YUILoaderHelper().load(["button", "container"], this.componentsLoaded, this);
+
+      return this;
+   }
+
+   Alfresco.MySites.prototype =
+   {
+      createSitePanel: null,
       modalPanelConfig: {
          fixedcenter: true,
          close:false,
@@ -21,27 +26,32 @@ Alfresco.MySites = function()
          visible:true
       },
 
+      componentsLoaded: function()
+      {
+         YAHOO.util.Event.onDOMReady(this.init, this, true);
+      },
+
       init: function()
       {
-         Event.onDOMReady(this.start, this, true);
+         var Dom = YAHOO.util.Dom;
+
+         /* Create Site Button */
+         var csButton = Dom.getElementsByClassName("mysites-createSite-button", "span", this.id)[0];
+         var createSiteButton = new YAHOO.widget.Button(csButton,
+         {
+            type: "button"
+         });
+         createSiteButton.subscribe("click", this.onCreateSiteButtonClick, this, true);
+
+         var createSiteDiv = Dom.getElementsByClassName("mysites-createSite-panel", "div", this.id)[0];
+         this.createSitePanel = new YAHOO.widget.Panel(createSiteDiv, this.modalPanelConfig);
       },
 
-      start: function()
+      onCreateSiteButtonClick: function(event)
       {
-
-         /* Html Dialog */
-         var createDiv = Dom.getElementsByClassName("mysites-createdialog-panel", "div", this.ID)[0];
-         this.createPanel = new YAHOO.widget.Panel(createDiv, this.modalPanelConfig);
-      },
-
-      showCreateDialog: function()
-      {
-          this.createPanel.render(document.body);
-          this.createPanel.show();
+         this.createSitePanel.render(document.body);
+         this.createSitePanel.show();
       }
 
-   }
-}();
-
-Alfresco.MySites.init();
-
+   };
+})();

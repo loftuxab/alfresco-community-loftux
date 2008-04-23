@@ -5,6 +5,7 @@
 
 <!-- Site-wide Common Assets -->
 <link rel="stylesheet" type="text/css" href="${url.context}/themes/default/base.css" />
+<link rel="stylesheet" type="text/css" href="${url.context}/themes/default/controls.css" />
 <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
 <script type="text/javascript">//<![CDATA[
   Alfresco.constants.URL_CONTEXT = "${url.context}/";

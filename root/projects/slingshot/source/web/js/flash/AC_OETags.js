@@ -1,6 +1,7 @@
 // Flash Player Version Detection - Rev 1.5
 // Detect Client Browser type
 // Copyright(c) 2005-2006 Adobe Macromedia Software, LLC. All rights reserved.
+
 var isIE  = (navigator.appVersion.indexOf("MSIE") != -1) ? true : false;
 var isWin = (navigator.appVersion.toLowerCase().indexOf("win") != -1) ? true : false;
 var isOpera = (navigator.userAgent.indexOf("Opera") != -1) ? true : false;
@@ -10,6 +11,7 @@ function ControlVersion()
 	var version;
 	var axo;
 	var e;
+
 
 	// NOTE : new ActiveXObject(strFoo) throws an exception if strFoo isn't in the registry
 
@@ -265,5 +267,4 @@ function AC_GetArgs(args, ext, srcParamName, classid, mimeType){
   if (mimeType) ret.embedAttrs["type"] = mimeType;
   return ret;
 }
-
 
