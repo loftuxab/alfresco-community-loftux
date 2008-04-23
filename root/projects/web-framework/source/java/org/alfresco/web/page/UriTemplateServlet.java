@@ -125,9 +125,7 @@ public class UriTemplateServlet extends HttpServlet
          logger.debug("Resolved uri template to resource: " + resource);
       
       // rebuild page servlet URL to perform forward too
-      // TODO: get servlet name from config!
-      String url = "/page" + resource;
-      req.getRequestDispatcher(url).forward(req, res);
+      req.getRequestDispatcher(resource).forward(req, res);
    }
    
    /**
