@@ -284,6 +284,14 @@ public class PageInstance
             model.put("theme", theme);
             model.put("url", urlHelper);
             
+            // added by Uzi - 4/24 to make consistent with PageRendererServlet
+            Map<String, Object> pageModel = new HashMap<String, Object>(4);
+            pageModel.put("url", urlHelper);
+            pageModel.put("theme", theme);
+            // TODO: add page url arguments as Map model "page.args"
+            model.put("page", pageModel);
+            
+            
             // for each page component, find the optional .head.ftl template associated with
             // its webscript - execute each template in turn and return the completed set
             StringWriter writer = new StringWriter(512);
