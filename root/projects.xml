@@ -159,7 +159,7 @@
          </fileset>
          <fileset dir="${dir.project.3rdparty.lib}">
             <include name="spring-*.jar" />
-            <include name="jug.jar" />
+            <include name="jug-*.jar" />
          </fileset> 
          <fileset dir="${dir.project.3rdparty.lib}/commons">
             <filename name="commons-logging-*.jar" />
