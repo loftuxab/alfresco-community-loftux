@@ -272,7 +272,9 @@
                     clean-webframework,
                     clean-slingshot,
                     clean-webclient, 
-                    clean-webserviceclient" />
+                    clean-webserviceclient,
+                    clean-extranet,
+                    clean-dynamicwebsite" />
    
    <target name="clean-modules"
            description="Cleans all modules"
