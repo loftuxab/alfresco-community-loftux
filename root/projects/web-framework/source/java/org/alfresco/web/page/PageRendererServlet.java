@@ -438,7 +438,6 @@ public class PageRendererServlet extends WebScriptServlet
       URLHelper urlHelper = new URLHelper(req, args);
       pageModel.put("url", urlHelper);
       pageModel.put("theme", page.getTheme());
-      // TODO: add page url arguments as Map model "page.args"
       model.put("page", pageModel);
       
       return model;

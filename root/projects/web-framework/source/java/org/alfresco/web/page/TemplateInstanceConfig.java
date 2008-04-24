@@ -79,12 +79,9 @@ public class TemplateInstanceConfig
             throw new AlfrescoRuntimeException(
                   "Expected 'template-instance' root element in template instance config: " + path);
          }
-         if (rootElement.element("id") == null)
-         {
-             throw new AlfrescoRuntimeException(
-                  "Expected 'id' element on template element in template instance config: " + path);
-         }
-         this.templateId = rootElement.elementTextTrim("id");
+         
+         // template Id is implied by the unique path to it
+         this.templateId = path;
          
          Element templateElement = rootElement.element("template-type");
          if (templateElement == null && templateElement.getTextTrim() == null)
