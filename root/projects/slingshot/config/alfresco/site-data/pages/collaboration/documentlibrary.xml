@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <id>collaboration/documentlibrary</id>
+   <id>collaboration-documentlibrary</id>
    <title>Document Library for collaboration site</title>
    <description>Test page for document library components</description>
    <template-instance>documentlibrary-full</template-instance>

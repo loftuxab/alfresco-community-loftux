@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <id>collaboration/details</id>
+   <id>collaboration-details</id>
    <title>Collboration document details page</title>
    <description>Collaboration site's doclib page</description>
    <template-instance>collaboration-details</template-instance>
