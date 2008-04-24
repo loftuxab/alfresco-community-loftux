@@ -420,6 +420,8 @@
       <copy todir="${dir.continuous.assemble.tomcat}/webapps">
          <fileset dir="${dir.project.webclient.dist}" 
                   includes="${file.name.war.webclient}" />
+         <fileset dir="${dir.project.slingshot.dist}" 
+                  includes="${file.name.war.slingshot}" />
       </copy>
       <copy todir="${dir.continuous.assemble.tomcat}/shared/classes/alfresco/extension">
          <fileset dir="${dir.project.repository.config}/alfresco/extension" />
@@ -463,6 +465,8 @@
                      includes="README_mysql.txt" />
          <zipfileset dir="${dir.project.webclient.dist}"
                      includes="${file.name.war.webclient}" />
+         <zipfileset dir="${dir.project.slingshot.dist}"
+                     includes="${file.name.war.slingshot}" />
          <zipfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <zipfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -492,6 +496,8 @@
                      fullpath="README_mysql.txt" />
          <tarfileset dir="${dir.project.webclient.dist}"
                      includes="${file.name.war.webclient}" />
+         <tarfileset dir="${dir.project.slingshot.dist}"
+                     includes="${file.name.war.slingshot}" />
          <tarfileset dir="${dir.project.repository.config}/alfresco/extension"
                      prefix="extensions/extension" />
          <tarfileset dir="${dir.project.webclient.config}/alfresco/extension"
@@ -880,9 +886,9 @@
 	<target name="distribute-amps" 
 	        description="Creates the distribution AMP file for all extensions"
 	        depends="init,
-                         package-php-module, package-rm-extension, package-blog-extension,
+                         package-php-extension, package-rm-extension, package-blog-extension,
                          package-fb-doclib-extension, package-googlegadgets,
-                         package-avmcompare, package-truncatemalformedxml">
+                         package-avmcompare-extension, package-truncatemalformedxml-extension">
 		
 		<copy todir="${dir.continuous.dist}">
 			<fileset dir="${dir.module.php.dist}"                  includes="${file.name.amp.php}" />

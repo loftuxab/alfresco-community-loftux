@@ -100,31 +100,53 @@
 
    <target name="build" 
            description="Performs a clean build of all projects" 
-           depends="clean, 
-                    incremental" />
+           depends="clean, incremental" />
 
    <target name="incremental" 
            description="Performs an incremental build of all projects"
-           depends="-tomcat" />
+           depends="incremental-core,
+                    incremental-jlan,
+                    incremental-mbeans,
+                    incremental-deployment,
+                    incremental-repository,
+                    incremental-remoteapi,
+                    incremental-jndi, 
+                    incremental-catalinavirtual, 
+                    incremental-linkvalidation,
+                    incremental-webscriptframework,
+                    incremental-webclient,  
+                    incremental-webserviceclient,
+                    incremental-webframework,
+                    incremental-slingshot" />
+   
+   <target name="build-modules"
+           description="Performs a clean build of all modules"
+           depends="clean-modules, incremental-modules" />
+   
+   <target name="incremental-modules"
+           description="Performs an incremental build of all modules"
+           depends="incremental,
+                    package-avmcompare-extension,
+                    package-blog-extension,
+                    package-fb-doclib-extension,
+                    package-kb-extension,
+                    package-php-extension,
+                    package-rm-extension, 
+                    package-truncatemalformedxml-extension" />
+                    <!-- package-mediawiki-extension, -->
 
    <target name="build-tomcat" 
-           description="Performs a clean build for Tomcat and deploys the WAR file"
-           depends="clean, 
-                    incremental-tomcat" />
-                    
-   <target name="build-tomcat-exploded"
-           depends="clean, 
-                    clean-tomcat-deploy, 
-                    incremental-tomcat-exploded" />
+           description="Performs a clean build for Tomcat and deploys the Alfresco and application WAR files"
+           depends="clean, incremental-tomcat" />
 
    <target name="incremental-tomcat" 
-           description="Performs an incremental build for Tomcat and deploys the WAR file"
-           depends="-tomcat, 
-                    deploy-tomcat" />
+           description="Performs an incremental build for Tomcat and deploys the Alfresco and application WAR files"
+           depends="incremental-webclient-tomcat, incremental-slingshot-tomcat" />
    
-   <target name="incremental-tomcat-exploded" 
+   <target name="incremental-webclient-tomcat" 
+           description="Performs an incremental build and deployment of the Alfresco WAR"
            depends="incremental-core,
-	                incremental-jlan, 
+                    incremental-jlan, 
                     incremental-mbeans, 
                     incremental-deployment,
                     incremental-repository, 
@@ -132,15 +154,72 @@
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    incremental-webscriptframework,
+                    package-webscriptframework-jar,
+                    incremental-webclient,
+                    deploy-webclient-tomcat" />
+      
+   <target name="incremental-webclient-tomcat-exploded" 
+           depends="incremental-core,
+                    incremental-jlan, 
+                    incremental-mbeans, 
+                    incremental-deployment,
+                    incremental-repository, 
+                    incremental-remoteapi, 
+                    incremental-jndi,
+                    incremental-catalinavirtual, 
+                    incremental-linkvalidation,
+                    package-webscriptframework-jar,
                     package-webclient-jar,
-                    deploy-tomcat-exploded" />
+                    deploy-webclient-tomcat-exploded" />
    
-   <target name="incremental-webscriptframework-tomcat-exploded" 
+   <target name="incremental-webscriptframework-tomcat" 
            depends="incremental-core,
                     incremental-webscriptframework,
-                    deploy-webscriptframework-tomcat-exploded" />
+                    deploy-webscriptframework-tomcat" />
    
+   <target name="incremental-webframework-tomcat" 
+           depends="incremental-core,
+                    package-webscriptframework-jar,
+                    incremental-webframework,
+                    deploy-webframework-tomcat" />
+   
+   <target name="incremental-slingshot-tomcat" 
+           description="Performs an incremental build and deployment of the slingshot WAR"
+           depends="incremental-core, 
+                    package-webscriptframework-jar, 
+                    package-webframework-jar, 
+                    incremental-slingshot,
+                    deploy-slingshot-tomcat" />
+
+   <target name="incremental-slingshot-tomcat-exploded" 
+           depends="incremental-core, 
+                    package-webscriptframework-jar, 
+                    package-webframework-jar, 
+                    package-slingshot-jar,
+                    deploy-slingshot-tomcat-exploded" />
+   
+   <target name="incremental-dynamicwebsite-tomcat" 
+           description="Performs an incremental build and deployment of the dynamic website WAR"
+           depends="incremental-core, 
+                    incremental-jlan, 
+                    incremental-mbeans, 
+                    incremental-deployment,
+                    incremental-repository,
+                    incremental-jndi,
+                    package-webscriptframework-jar, 
+                    package-webframework-jar, 
+                    incremental-dynamicwebsite,
+                    deploy-dynamicwebsite-tomcat" />
+   
+   <target name="incremental-extranet-tomcat" 
+           description="Performs an incremental build and deployment of the extranet WAR"
+           depends="incremental-core, 
+                    package-webscriptframework-jar, 
+                    package-webframework-jar, 
+                    incremental-extranet,
+                    deploy-extranet-tomcat" />
+   
+   <!--
    <target name="build-jboss" 
            description="Performs a clean build for JBoss and deploys the WAR file"
            depends="clean, 
@@ -150,6 +229,7 @@
            description="Performs an incremental build for JBoss and deploys the WAR file"
            depends="package-webclient-war-jboss, 
                     deploy-jboss" />
+   -->
 
    <target name="generate-docs" 
            description="Compiles all documentation for all projects"
@@ -164,30 +244,21 @@
                     generate-javadocs-webclient, 
                     generate-taglibdocs-webclient, 
                     generate-javadocs-webserviceclient,
-				    generate-javadocs-jlan" />
-
-   <target name="-tomcat"
-           depends="incremental-core,
-                    incremental-jlan,
-                    incremental-mbeans,
-                    incremental-deployment,
-                    incremental-repository,
-                    incremental-remoteapi,
-                    incremental-jndi, 
-                    incremental-catalinavirtual, 
-                    incremental-linkvalidation,
-                    incremental-webscriptframework,
-                    incremental-webclient,  
-                    incremental-webserviceclient" />
-
-
+                    generate-javadocs-jlan,
+                    generate-javadocs-webscriptframework,
+                    generate-javadocs-webframework,
+                    generate-javadocs-slingshot" />
 
    <!-- ****************************************************** -->
    <!-- ****************** Cleaning targets ****************** -->
    <!-- ****************************************************** -->
 
    <target name="clean" 
-           description="Cleans everything" 
+           description="Cleans everything, all projects, modules and all tomcat deployments"
+           depends="clean-projects, clean-modules, clean-tomcat-deployments" />
+      
+   <target name="clean-projects" 
+           description="Cleans all projects" 
            depends="clean-core,
 	                 clean-jlan, 
                     clean-mbeans,
@@ -201,64 +272,83 @@
                     clean-webframework,
                     clean-slingshot,
                     clean-webclient, 
-                    clean-rm,
-                    clean-blog,
-                    clean-php,
-                    clean-fb-doclib, 
                     clean-webserviceclient" />
-
-   <target name="clean-tomcat-deploy" 
-           description="Cleans the Alfresco application from Tomcat" 
+   
+   <target name="clean-modules"
+           description="Cleans all modules"
+           depends="clean-avmcompare,
+                    clean-blog,
+                    clean-fb-doclib,
+                    clean-kb,
+                    clean-mediawiki,
+                    clean-php,
+                    clean-rm, 
+                    clean-truncatemalformedxml" />
+   
+   <target name ="clean-tomcat-deployments" 
+           description="Cleans all Tomcat server deployments"
+           depends="clean-webclient-tomcat-deploy,
+                    clean-application-tomcat-deploy,
+                    clean-virtual-tomcat-deploy" />
+   
+   <target name="clean-webclient-tomcat-deploy" 
+           description="Cleans the Alfresco WAR from the Tomcat server" 
            depends="init">
       <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
-      <delete dir="${dir.deploy.tomcat}/alfresco" 
+      <delete dir="${dir.deploy.tomcat.webclient}" 
               includeEmptyDirs="true" 
               quiet="yes" />
    </target>
    
-   <target name="clean-webscriptframework-tomcat-deploy" 
-              description="Cleans slingshot from the webscriptframework Tomcat" 
-              depends="init">
-         <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webscriptframework}" />
-         <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwsf" 
-                 includeEmptyDirs="true" quiet="yes" />
-         <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
-         <delete dir="${dir.deploy.tomcat.webscriptframework}/slingshot" 
-                 includeEmptyDirs="true" quiet="yes" />
-      </target>
+   <target name="clean-application-tomcat-deploy" 
+           description="Cleans all apps from the application Tomcat server" 
+           depends="init">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webscriptframework}" />
+      <delete dir="${dir.deploy.tomcat.application.webscriptframework}" 
+              includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframework}" />
+      <delete dir="${dir.deploy.tomcat.application.webframework}" 
+              includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
+      <delete dir="${dir.deploy.tomcat.application.slingshot}" 
+              includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.dynamicwebsite}" />
+      <delete dir="${dir.deploy.tomcat.application.dynamicwebsite}" 
+              includeEmptyDirs="true" quiet="yes" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.extranet}" />
+      <delete dir="${dir.deploy.tomcat.application.extranet}" 
+              includeEmptyDirs="true" quiet="yes" />
+   </target>
 
    <target name="clean-virtual-tomcat-deploy"
            description="Cleans the Virtual Tomcat deployment" 
            depends="init">
        <delete failonerror="no">
            <!-- Remove old spring jar files lingering in common/lib, if any -->
-           <fileset dir="${home.virtualtomcat}/common/lib" includes="spring*.jar"/>
+           <fileset dir="${home.tomcat.virtual}/common/lib" includes="spring*.jar"/>
 
            <!-- Get rid of old config files -->
-           <fileset dir="${home.virtualtomcat}/conf" includes="alfresco-*"/>
+           <fileset dir="${home.tomcat.virtual}/conf" includes="alfresco-*"/>
        </delete>
    </target>
    
+   <!--
    <target name="clean-jboss-deploy" 
            description="Cleans the Alfresco application from JBoss" 
            depends="init">
       <delete file="${dir.deploy.jboss}/${file.name.war.webclient}" />
    </target>
-
-   <target name="clean-war" 
-           description="Cleans just the WAR file" 
-           depends="init">
-      <delete file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
-      <delete quiet="yes" 
-              includeEmptyDirs="true" 
-              dir="${dir.project.webclient.assemble}" />
-   </target>
-
-
+   -->
 
    <!-- ****************************************************** -->
    <!-- **************** Deployment targets ****************** -->
    <!-- ****************************************************** -->
+   
+   <target name="deploy-virtual-tomcat" 
+           description="Deploys to Virtual Tomcat (the virtualization server)" 
+           depends="init, clean-virtual-tomcat-deploy">
+      <deploy-virtual-tomcat location="${home.tomcat.virtual}" />
+   </target>
    
    <target name="-deploy-tomcat-common" depends="init">
 
@@ -287,20 +377,23 @@
             file="${dir.project.installer}/wcm-bootstrap-context.xml" />
    </target>
    
-   <target name="deploy-tomcat" 
-           description="Deploys to Tomcat" 
-           depends="clean-tomcat-deploy, -deploy-tomcat-common, deploy-virtual-tomcat">
+   <target name="deploy-webclient-tomcat" 
+           description="Deploys the Alfresco WAR to Tomcat" 
+           depends="clean-webclient-tomcat-deploy, -deploy-tomcat-common, deploy-virtual-tomcat">
 
-      <!-- copy the webclient WAR file to Tomcat's deploy folder -->
+      <!-- copy the alfresco WAR file to Tomcat's deploy folder -->
       <copy todir="${dir.deploy.tomcat}" 
             file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="deploy-tomcat-exploded" 
+   <target name="deploy-webclient-tomcat-exploded" 
            depends="-deploy-tomcat-common">
       
+      <!-- remove the WAR, if necessary -->
+      <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
+      
       <!-- copy the class files from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/classes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}">
       
          <!-- copy class files -->
          <fileset dir="${dir.project.core.classes}" />
@@ -336,18 +429,18 @@
            up when the build is transformed into a single project.
       -->
       <copy file="${dir.project.linkvalidation.config}/alfresco/alfresco-link-validation-bootstrap-context.xml"
-            todir="${dir.deploy.tomcat}/alfresco/WEB-INF/classes/alfresco/extension"/>
+            todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes/alfresco/extension"/>
 
 
       <!-- copy webclient web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webclient.src.web}" 
                   excludes="WEB-INF/jboss*.xml, WEB-INF/portlet*.xml, 
                             WEB-INF/alfresco-object.xml" />
       </copy>
       
       <!-- copy required 3rd party libs -->
-      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF/lib" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty.lib}" includes="*.jar" 
                   excludes="${dir.name.devenv}/**" />
          <fileset dir="${dir.project.3rdparty.lib}/jibx" includes="*.jar" />
@@ -361,141 +454,107 @@
       </copy>
       
       <!-- copy webservices files -->
-      <copy todir="${dir.deploy.tomcat}/alfresco/WEB-INF" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF" verbose="${copy.verbose}">
          <fileset dir="${dir.project.remoteapi.src.webinf}"/>
       </copy>
-      <copy todir="${dir.deploy.tomcat}/alfresco/wsdl" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}/wsdl" verbose="${copy.verbose}">
          <fileset dir="${dir.project.remoteapi.src.wsdl}" />
       </copy>
    </target>
    
-   <target name="deploy-virtual-tomcat" 
-           description="Deploys to Virtual Tomcat (the virtualization server)" 
-           depends="init, clean-virtual-tomcat-deploy">
-      <deploy-virtual-tomcat location="${home.virtualtomcat}" />
-   </target>
-   
    <target name="deploy-webclient-changes" depends="init">
-      <copy todir="${dir.deploy.tomcat}/alfresco" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.webclient}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
       </copy>
    </target>
-
-   <target name="deploy-webscriptframework-tomcat" depends="init" description="Deploys Web Script Framework WAR to webscriptframework tomcat">
-      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webscriptframework}" />
-      <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwsf" 
-              includeEmptyDirs="true" 
-              quiet="yes" />
-      <!-- copy the webscriptframework WAR file to webscriptframework's Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}" 
+   
+   <target name="deploy-webscriptframework-tomcat" depends="init" 
+           description="Deploys the Web Script Framework WAR to the application Tomcat server">
+      <!-- copy the WebScript Framework WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" />
    </target>
 
-   <target name="deploy-webscriptframework-tomcat-exploded" depends="init">
-      <!-- copy webscriptframework web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webscriptframework.src.web}" />
-      </copy>
-
-      <!-- copy the class files from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webscriptframework.src.webinf}" 
-                  excludes="web.xml" />
-      </copy>
-
-      <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf/WEB-INF/classes" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.core.src.java}" 
-                  includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" 
-                  excludes="**/extension/**" />
-      </copy>
-
-      <!-- copy required 3rd party libs -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/alfwsf/WEB-INF/lib">
-         <fileset dir="${dir.project.core.dist}" 
-                  includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webscriptframework.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
-                  includes="${includes.webscriptframework.libs.abdera}" />
-      </copy>
-   </target>
-   
-   <target name="deploy-webframework-tomcat" 
-           depends="package-core, package-webframework-war" 
-           description="Deploys WebFramework WAR to webscriptframework tomcat">
-      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.webframework}" />
-      <delete dir="${dir.deploy.tomcat.webscriptframework}/alfwf" 
-              includeEmptyDirs="true" quiet="yes" />
-      <!-- copy the WebFramework WAR file to webscriptframework's Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}" 
+   <target name="deploy-webframework-tomcat" depends="init" 
+           description="Deploys the WebFramework WAR to the application Tomcat server">
+      <!-- copy the WebFramework WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
    </target>
    
-   <target name="deploy-slingshot-tomcat" 
-           depends="package-core, package-webscriptframework-war, package-webframework-war, package-slingshot-war" 
-           description="Deploys Slingshot WAR to webscriptframework tomcat">
-      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
-      <delete dir="${dir.deploy.tomcat.webscriptframework}/slingshot" 
-              includeEmptyDirs="true" quiet="yes" />
-      <!-- copy the slingshot WAR file to webscriptframework's Tomcat deploy folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}" 
+   <target name="deploy-slingshot-tomcat" depends="init" 
+           description="Deploys the slingshot WAR to the application Tomcat server">
+      <!-- copy the slingshot WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
    </target>
    
-   <target name="deploy-slingshot-tomcat-exploded" 
-           depends="incremental-core, incremental-webscriptframework, incremental-webframework, incremental-slingshot">
+   <target name="deploy-slingshot-tomcat-exploded" depends="init">
       <!-- remove the WAR, if necessary -->
-      <delete file="${dir.deploy.tomcat.webscriptframework}/${file.name.war.slingshot}" />
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
       
-      <!-- copy web source files i.e. JSPs, images etc. -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot" verbose="${copy.verbose}">
+      <!-- copy all required files from webscript and web framework projects -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
          <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
+      
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
+      </copy>
+      
+      <!-- overlay all source files from slingshot project -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}" overwrite="yes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.slingshot.src.web}" />
       </copy>
 
-      <!-- copy the class files and config from each project to the WEB-INF/classes folder -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot/WEB-INF/classes" verbose="${copy.verbose}">
+      <!-- overlay config files to WEB-INF/classes -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" overwrite="yes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.slingshot.config}" />
+         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
+      </copy>
+      
+      <!-- add all class files to WEB-INF/classes -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.core.classes}" />
          <fileset dir="${dir.project.webscriptframework.classes}" />
          <fileset dir="${dir.project.webframework.classes}" />
          <fileset dir="${dir.project.slingshot.classes}" />
-         
-         <fileset dir="${dir.project.core.src.java}" 
-                  includes="log4j.properties" />
-         <fileset dir="${dir.project.webscriptframework.config}" 
-                  excludes="**/extension/**" />
-         <fileset dir="${dir.project.webframework.config}" 
-                  excludes="**/extension/**" />
-         <fileset dir="${dir.project.slingshot.config}" 
-                  excludes="**/extension/**" />
       </copy>
-
-      <!-- copy required 3rd party libs -->
-      <copy todir="${dir.deploy.tomcat.webscriptframework}/slingshot/WEB-INF/lib" verbose="${copy.verbose}">
-         <fileset dir="${dir.project.webscriptframework.dist}" 
-                  includes="${file.name.jar.webscriptframework}" />
+      
+      <!-- add all JARs to WEB-INF/lib -->
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/lib" verbose="${copy.verbose}">
          <fileset dir="${dir.project.3rdparty.lib}" 
                   includes="${includes.webscriptframework.libs}" />
          <fileset dir="${dir.project.3rdparty.lib}/commons" 
                   includes="${includes.webscriptframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
                   includes="${includes.webscriptframework.libs.abdera}" />
       </copy>
 
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.slingshot.yui}"
-             dest="${dir.deploy.tomcat.webscriptframework}/slingshot" />
+             dest="${dir.deploy.tomcat.application.slingshot}" />
+   </target>
+   
+   <target name="deploy-dynamicwebsite-tomcat" depends="init" 
+           description="Deploys the dynamic website WAR to the application Tomcat server">
+      <!-- copy the dynamic website WAR file to application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
+            file="${dir.project.dynamicwebsite.dist}/${file.name.war.dynamicwebsite}" />
+   </target>
+   
+   <target name="deploy-extranet-tomcat" depends="init" 
+           description="Deploys the extranet WAR to the application Tomcat server">
+      <!-- copy the dynamic website WAR file to the application Tomcat deploy folder -->
+      <copy todir="${dir.deploy.tomcat.application}" 
+            file="${dir.project.extranet.dist}/${file.name.war.extranet}" />
    </target>
 
-   <target name="start-tomcat" 
-           description="Starts the Tomcat server on Windows" 
+   <target name="start-tomcat-webclient" 
+           description="Starts the Alfresco Tomcat server on Windows" 
            depends="init">
       <exec dir="${home.tomcat}/bin" 
             executable="cmd.exe" 
@@ -507,25 +566,25 @@
    <target name="start-tomcat-virtual" 
            description="Starts the virtual Tomcat server on Windows" 
            depends="init">
-      <exec dir="${home.virtualtomcat}/bin" 
+      <exec dir="${home.tomcat.virtual}/bin" 
             executable="cmd.exe" 
             spawn="true">
          <arg line="/k startup.bat" />
       </exec>
    </target>
 
-   <target name="start-tomcat-webscriptframework" 
-           description="Starts the webscriptframework Tomcat server on Windows" 
+   <target name="start-tomcat-application" 
+           description="Starts the application Tomcat server on Windows" 
            depends="init">
-      <exec dir="${home.tomcat.webscriptframework}/bin" 
+      <exec dir="${home.tomcat.application}/bin" 
             executable="cmd.exe" 
             spawn="true">
          <arg line="/k startup.bat" />
       </exec>
    </target>
 
-   <target name="start-tomcat-debug"
-           description="Starts the Tomcat server on Windows" 
+   <target name="start-tomcat-webclient-debug"
+           description="Starts the Alfresco Tomcat server on Windows in debug mode" 
            depends="init">
       <fail unless="env.JPDA_ADDRESS" 
             message="To run Tomcat in debug mode you need to setup the JPDA_ADDRESS enviornment variable"/>
@@ -539,10 +598,10 @@
       </exec>
    </target>
    
+   <!--
    <target name="deploy-jboss" 
            description="Deploys to JBoss" 
            depends="clean-jboss-deploy">
-      <!-- ensure mysql drivers and xalan files are present -->
       <copy todir="${dir.deploy.jboss}" 
             file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
       <delete>
@@ -554,7 +613,6 @@
       <copy todir="${home.jboss}/server/default/lib" 
             file="${dir.project.3rdparty.lib}/${dir.name.devenv}/${file.name.jar.mysql.connector}" />
 
-      <!-- copy the hotspot_compiler file to bin directory -->
       <copy todir="${home.jboss}/bin" 
             file="${file.hotspotcompiler}" />
    </target>
@@ -568,6 +626,7 @@
          <arg line="/k start run.bat" />
       </exec>
    </target>
+   -->
 
    <target name="deploy-amp" 
            description="Deploys an AMP file to the web client WAR file. Usage deploy-amp -Dampfile=[ampfile]" 
@@ -666,6 +725,8 @@
       <echo level="info">user.home = ${user.home}</echo>
       <echo level="info">ant.home = ${ant.home}</echo>
       <echo level="info">home.tomcat = ${home.tomcat}</echo>
+      <echo level="info">home.tomcat.application = ${home.tomcat.application}</echo>
+      <echo level="info">home.tomcat.virtual = ${home.tomcat.virtual}</echo>
       <echo level="info">home.jboss = ${home.jboss}</echo>
       <echo level="info">home.findbugs = ${home.findbugs}</echo>
    </target>

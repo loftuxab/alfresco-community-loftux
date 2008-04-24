@@ -1,6 +1,5 @@
 <project name="projects">
 
-
    <!-- ************************************************************************** -->
    <!-- ** This file contains the targets used to build the individual projects ** -->
    <!-- ************************************************************************** -->
@@ -10,28 +9,23 @@
    <!-- ****************** -->
    
    <target name="incremental-core" 
-           description="Performs an incremental build of the core project"
            depends="package-core" />
       
    <target name="build-core" 
-           description="Performs a clean build of the core project"
            depends="clean-core, 
                     incremental-core" />
    
    <target name="clean-core" 
-           description="Cleans the core project" 
            depends="init">
       <clean projectdir="${dir.project.core}" />
    </target>
    
    <target name="compile-core" 
-           description="Compiles the core project" 
            depends="init">
       <compile-java projectdir="${dir.project.core}" />
    </target>
    
    <target name="package-core"
-           description="Packages the core project"
            depends="compile-core">
       <mkdir dir="${dir.project.core.dist}" />
       <jar jarfile="${dir.project.core.dist}/${file.name.jar.core}" 
@@ -39,13 +33,11 @@
    </target>
    
    <target name="test-core" 
-           description="Runs the tests for the core project" 
            depends="compile-core">
       <run-tests projectdir="${dir.project.core}" />
    </target>
    
    <target name="generate-javadocs-core" 
-           description="Generates the JavaDocs for the core project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Core API Specification" 
                          windowtitle="Alfresco Core API" 
@@ -57,28 +49,23 @@
    <!-- ******************** -->
    
    <target name="incremental-mbeans" 
-           description="Performs an incremental build of the mbeans project" 
            depends="package-mbeans" />
       
    <target name="build-mbeans" 
-           description="Performs a clean build of the mbeans project" 
            depends="clean-mbeans, 
            incremental-mbeans" />
    
    <target name="clean-mbeans" 
-           description="Cleans the mbeans project" 
            depends="init">
       <clean projectdir="${dir.project.mbeans}" />
    </target>
    
    <target name="compile-mbeans" 
-           description="Compiles the mbeans project" 
            depends="init">
       <compile-java projectdir="${dir.project.mbeans}" />
    </target>
    
    <target name="package-mbeans"
-           description="Packages the mbeans project"
            depends="compile-mbeans">
       <mkdir dir="${dir.project.mbeans.dist}" />
       <jar jarfile="${dir.project.mbeans.dist}/${file.name.jar.mbeans}" 
@@ -86,52 +73,44 @@
    </target>
    
    <target name="test-mbeans" 
-           description="Runs the tests for the mbeans project" 
            depends="compile-mbeans">
       <run-tests projectdir="${dir.project.mbeans}" />
    </target>
    
    <target name="generate-javadocs-mbeans" 
-           description="Generates the JavaDocs for the mbeans project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Virtualization MBean" 
                          windowtitle="Alfresco Virtualization MBean" 
                          projectdir="${dir.project.mbeans}" />
    </target>
 
-   <!-- ******************** -->
+   <!-- ************************ -->
    <!-- ** Deployment Project ** -->
-   <!-- ******************** -->
+   <!-- ************************ -->
    
    <target name="incremental-deployment" 
-           description="Performs an incremental build of the deployment project" 
            depends="package-deployment" />
       
    <target name="build-deployment" 
-           description="Performs a clean build of the deployment project" 
            depends="clean-deployment, 
            incremental-deployment" />
    
    <target name="clean-deployment" 
-           description="Cleans the deployment project" 
            depends="init">
       <clean projectdir="${dir.project.deployment}" />
    </target>
    
    <target name="compile-deployment" 
-           description="Compiles the deployment project" 
            depends="init">
       <compile-java projectdir="${dir.project.deployment}" />
    </target>
    
    <target name="package-deployment"
-           description="Packages the deployment project"
            depends="package-deployment-jar,
                     package-deployment-zip">
    </target>
          
    <target name="package-deployment-jar"
-           description="Packages the JAR file for the deployment project"
            depends="compile-deployment">
       <mkdir dir="${dir.project.deployment.dist}" />
       <jar jarfile="${dir.project.deployment.dist}/${file.name.jar.deployment}" 
@@ -139,7 +118,6 @@
    </target>
    
    <target name="package-deployment-zip"
-           description="Packages zip file of the deployment project"
            depends="assemble-deployment">
       <mkdir dir="${dir.project.deployment.dist}" />
       <zip basedir="${dir.project.deployment.assemble}" compress="yes"
@@ -147,7 +125,6 @@
    </target>
    
    <target name="assemble-deployment" 
-           description="Assembles the files needed for the deployment project package"
            depends="package-deployment-jar">
       <mkdir dir="${dir.project.deployment.assemble}" />
       <copy todir="${dir.project.deployment.assemble}">
@@ -171,13 +148,11 @@
    </target>
    
    <target name="test-deployment" 
-           description="Runs the tests for the deployment project" 
            depends="compile-deployment">
       <run-tests projectdir="${dir.project.deployment}" />
    </target>
    
    <target name="generate-javadocs-deployment" 
-           description="Generates the JavaDocs for the deployment project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Deployment Receiver" 
                          windowtitle="Alfresco Deployment Receiver" 
@@ -189,33 +164,27 @@
    <!-- ************************ -->
       
    <target name="incremental-repository" 
-           description="Performs an incremental build of the repository project" 
            depends="package-repository" />
       
    <target name="build-repository" 
-           description="Performs a clean build of the repository project" 
            depends="clean-repository, 
                     incremental-repository" />
    
    <target name="clean-repository" 
-           description="Cleans the repository project" 
            depends="init">
       <clean projectdir="${dir.project.repository}" />
    </target>
    
    <target name="compile-repository" 
-           description="Compiles the repository project" 
            depends="compile-repository-java, 
                     compile-repository-jibx" />
    
    <target name="compile-repository-java" 
-           description="Compiles the Java source for repository project" 
            depends="init">
       <compile-java projectdir="${dir.project.repository}" />
    </target>
    
    <target name="compile-repository-jibx" 
-           description="Compiles the JIBX bindings for the repository project" 
            depends="init">
       <!-- load the JIBX task definition -->
       <taskdef name="bind" 
@@ -235,7 +204,6 @@
    </target>
    
    <target name="package-repository"
-           description="Packages the repository project" 
            depends="compile-repository">
       <mkdir dir="${dir.project.repository.dist}" />
       <jar jarfile="${dir.project.repository.dist}/${file.name.jar.repository}" 
@@ -243,13 +211,11 @@
    </target>
    
    <target name="test-repository" 
-           description="Runs the tests for the repository project" 
            depends="compile-repository">
       <run-tests projectdir="${dir.project.repository}" />
    </target>
    
    <target name="generate-javadocs-repository" 
-           description="Generates the JavaDocs for the repository project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Repository Specification" 
                          windowtitle="Alfresco Repository" 
@@ -257,7 +223,6 @@
    </target>
    
    <target name="build-single-jar" 
-           description="Builds a self-contained executable jar" 
            depends="package-repository">
 
       <!-- extract the one-jar file -->
@@ -303,28 +268,23 @@
    <!-- ***************************** -->
    
    <target name="incremental-linkvalidation" 
-           description="Performs an incremental build of the linkvalidation project" 
            depends="package-linkvalidation" />
       
    <target name="build-linkvalidation" 
-           description="Performs a clean build of the linkvalidation project" 
            depends="clean-linkvalidation, 
                     incremental-linkvalidation" />
    
    <target name="clean-linkvalidation" 
-           description="Cleans the linkvalidation project" 
            depends="init">
       <clean projectdir="${dir.project.linkvalidation}" />
    </target>
    
    <target name="compile-linkvalidation" 
-           description="Compiles the linkvalidation project" 
            depends="init">
       <compile-java projectdir="${dir.project.linkvalidation}" />
    </target>
    
    <target name="package-linkvalidation" 
-           description="Packages the linkvalidation project" 
            depends="compile-linkvalidation">
       <mkdir dir="${dir.project.linkvalidation.dist}" />
       <jar jarfile="${dir.project.linkvalidation.dist}/${file.name.jar.linkvalidation}" 
@@ -337,7 +297,6 @@
    </target>
 
    <target name="_test-linkvalidation" 
-           description="Runs the tests for the linkvalidation project" 
            depends="compile-linkvalidation">
       <run-tests projectdir="${dir.project.linkvalidation}" />
    </target>
@@ -418,7 +377,6 @@
    </target>
 
    <target name="generate-javadocs-linkvalidation" 
-           description="Generates the JavaDocs for the linkvalidation project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Core API Specification" 
                          windowtitle="Alfresco Core API" 
@@ -432,8 +390,7 @@
    <!-- ********************* -->
 
    <target name="build-tck" 
-           depends="package-repository"
-           description="Builds the JCR TCK WAR file">
+           depends="package-repository">
       <war warfile="${dir.project.repository.dist}/${file.name.war.jcr.tck}" 
            webxml="${dir.project.repository.src.webinf}\JCRTCK\web.xml">
          <fileset dir="${dir.project.repository.src.web}" 
@@ -487,16 +444,13 @@
    <!-- ************************ -->
 
    <target name="incremental-remoteapi" 
-           description="Performs an incremental build of the remote API project" 
            depends="package-remoteapi" />
       
    <target name="build-remoteapi" 
-           description="Performs a clean build of the remote API project" 
            depends="clean-remoteapi, 
                     incremental-remoteapi" />
    
    <target name="clean-remoteapi" 
-           description="Cleans the remote API project" 
            depends="init">
       <clean projectdir="${dir.project.remoteapi}" />
    </target>
@@ -509,13 +463,11 @@
    </target>
 
    <target name="compile-remoteapi" 
-           description="Compiles the remote API project" 
            depends="init">
       <compile-java-inc-generated projectdir="${dir.project.remoteapi}" />
    </target>
    
    <target name="package-remoteapi" 
-           description="Packages the remote API project" 
            depends="compile-remoteapi">
       <mkdir dir="${dir.project.remoteapi.dist}" />
       <jar jarfile="${dir.project.remoteapi.dist}/${file.name.jar.remoteapi}" 
@@ -525,13 +477,11 @@
    </target>
    
    <target name="test-remoteapi" 
-           description="Runs the tests for the remote API project" 
            depends="compile-remoteapi">
       <run-tests projectdir="${dir.project.remoteapi}" />
    </target>
    
    <target name="generate-javadocs-remoteapi" 
-           description="Generates the JavaDocs for the remote API project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Remote Services API Specification" 
                          windowtitle="Alfresco Remote Services API" 
@@ -757,28 +707,23 @@
    <!-- ****************** -->
 
    <target name="incremental-jndi"
-           description="Performs an incremental build of the JNDI project" 
            depends="package-jndi" />
       
    <target name="build-jndi" 
-           description="Performs a clean build of the JNDI project" 
            depends="clean-jndi, 
                     incremental-jndi" />
    
    <target name="clean-jndi" 
-           description="Cleans the JNDI project" 
            depends="init">
       <clean projectdir="${dir.project.jndi}" />
    </target>
    
    <target name="compile-jndi" 
-           description="Compiles the JNDI project" 
            depends="init">
       <compile-java projectdir="${dir.project.jndi}" />
    </target>
    
    <target name="package-jndi" 
-           description="Packages the JNDI project" 
            depends="compile-jndi">
       <mkdir dir="${dir.project.jndi.dist}" />
       <jar jarfile="${dir.project.jndi.dist}/${file.name.jar.jndi}" 
@@ -786,7 +731,6 @@
    </target>
    
    <target name="generate-javadocs-jndi" 
-           description="Generates the JavaDocs for the JNDI project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco JNDI (Java Naming and Directory Interface)" 
                          windowtitle="Alfresco JNDI" 
@@ -827,7 +771,6 @@
    <!-- **       (the real installer takes care of the chmod step).          -->
    <!-- ******************************************************************** -->
    <target name="tomcat-virtserver"
-           description="Builds the version of Tomcat used by the virt server"
            depends="init, incremental-catalinavirtual">
 
       <property name  ="dir.name.src.tomcatvirt.custom"
@@ -997,7 +940,6 @@
 
 
    <target name="mingw"
-           description="Builds a mingw cross compiler for windows"
            depends="init">
 
       <!-- 
@@ -1092,7 +1034,6 @@
 
    <!-- Build pthreads-w32 for mingw -->
    <target name="mingw-pthreads-w32"
-           description="Builds pthreads-w32 for mingw"
            depends="init">
 
      <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.pthreadsw32.src}"
@@ -1122,7 +1063,6 @@
 
    <!-- Build Zlib for mingw -->
    <target name="mingw-zlib"
-           description="Builds zlib for mingw"
            depends="init">
 
      <untar src="${dir.project.3rdparty.src}/${file.name.tar.bz2.zlib.src}"
@@ -1156,7 +1096,6 @@
 
    <!-- Build libiconv for mingw -->
    <target name="mingw-libiconv"
-           description="Builds libiconv for mingw"
            depends="init">
 
      <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.libiconv.src}"
@@ -1182,7 +1121,6 @@
 
    <!-- Build gettext for mingw -->
    <target name="mingw-gettext"
-           description="Builds gettext for mingw"
            depends="init">
 
      <untar src="${dir.project.3rdparty.src}/${file.name.tar.gz.gettext.src}"
@@ -1210,7 +1148,6 @@
 
    <!-- Build libgpg-error for mingw -->
    <target name="mingw-libgpg-error"
-           description="Builds libgpg-error for mingw"
            depends="init">
 
      <untar src="${dir.project.3rdparty.src}/${file.name.tar.bz2.libgpgerror.src}"
@@ -1244,7 +1181,6 @@
 
    <!-- Build libgcrypt for mingw -->
    <target name="mingw-libgcrypt"
-           description="Builds libgcrypt for mingw"
            depends="init">
 
      <untar src="${dir.project.3rdparty.src}/${file.name.tar.bz2.libgcrypt.src}"
@@ -1305,7 +1241,6 @@
    <!-- ********************************************************************* -->
 
    <target name="incremental-clt"
-           description="Builds the CLTs (runs on linux only for now)"
            depends="init,-incremental-clt-build-platform-check"
            if="build.platform.supports.mingw">
 
@@ -1338,7 +1273,6 @@
    </target>
 
    <target name="clean-clt"
-           description="Cleans the CLTs (runs on linux only for now)"
            depends="init">
 
            <exec dir="${dir.project.clt}/source/c" executable="make">
@@ -1352,28 +1286,23 @@
    <!-- **************************** -->
 
    <target name="incremental-catalinavirtual" 
-           description="Performs an incremental build of the virtual tomcat project" 
            depends="package-catalinavirtual" />
 
    <target name="build-catalinavirtual" 
-           description="Performs a clean build of the virtual tomcat project" 
            depends="clean-catalinavirtual, 
                     incremental-catalinavirtual" />
 
    <target name="clean-catalinavirtual" 
-           description="Cleans the virtual tomcat project" 
            depends="init">
       <clean projectdir="${dir.project.catalinavirtual}" />
    </target>
 
    <target name="compile-catalinavirtual" 
-           description="Compiles the virtual tomcat project" 
            depends="init">
       <compile-java projectdir="${dir.project.catalinavirtual}" />
    </target>
 
    <target name="package-catalinavirtual" 
-           description="Packages the virtual tomcat project" 
            depends="compile-catalinavirtual">
       <mkdir dir="${dir.project.catalinavirtual.dist}" />
       <jar jarfile="${dir.project.catalinavirtual.dist}/${file.name.jar.catalinavirtual}" 
@@ -1381,13 +1310,11 @@
    </target>
 
    <target name="test-catalinavirtual" 
-           description="Runs the tests for the virtual tomcat project" 
            depends="compile-catalinavirtual">
       <run-tests projectdir="${dir.project.catalinavirtual}" />
    </target>
 
    <target name="generate-javadocs-catalinavirtual" 
-           description="Generates the JavaDocs for the virtual tomcat project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Catalina Valve" 
                          windowtitle="Alfresco Catalina Valve" 
@@ -1400,51 +1327,33 @@
    <!-- ********************************** -->
    
    <target name="incremental-webscriptframework" 
-           description="Performs an incremental build of the web script framework project"
            depends="package-webscriptframework" />
       
    <target name="build-webscriptframework" 
-           description="Performs a clean build of the web script framework project"
            depends="clean-webscriptframework, 
                     incremental-webscriptframework" />
    
    <target name="clean-webscriptframework" 
-           description="Cleans the web script framework project" 
            depends="init">
       <clean projectdir="${dir.project.webscriptframework}" />
    </target>
    
    <target name="compile-webscriptframework" 
-           description="Compiles the web script framework project" 
-           depends="package-core">
+           depends="init">
       <compile-java projectdir="${dir.project.webscriptframework}" />
    </target>
    
    <target name="package-webscriptframework"
-           description="Packages the web script framework project"
+           depends="package-webscriptframework-war" />
+   
+   <target name="package-webscriptframework-jar"
            depends="compile-webscriptframework">
       <mkdir dir="${dir.project.webscriptframework.dist}" />
       <jar jarfile="${dir.project.webscriptframework.dist}/${file.name.jar.webscriptframework}" 
            basedir="${dir.project.webscriptframework.classes}" />
    </target>
-   
-   <target name="incremental-webscriptframework-war" 
-           description="Performs an incremental build of the web script framework WAR file"
-           depends="package-webscriptframework-war" />
-      
-   <target name="build-webscriptframework-war" 
-           description="Performs a clean build of the web script framework project"
-           depends="clean-webscriptframework-war, 
-                    incremental-webscriptframework-war" />
-   
-   <target name="clean-webscriptframework-war" 
-           description="Cleans the web script framework WAR assemble folder" 
-           depends="init">
-      <delete dir="${dir.project.webscriptframework.assemble}" />
-   </target>
 
    <target name="package-webscriptframework-war" 
-           description="Packages the WAR file for the webscriptframework project" 
            depends="assemble-webscriptframework-war">
       <war warfile="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" 
            webxml="${dir.project.webscriptframework.src.webinf}/web.xml">
@@ -1453,7 +1362,7 @@
    </target>
 
    <target name="assemble-webscriptframework-war" 
-           depends="package-webscriptframework">
+           depends="package-webscriptframework-jar">
       <mkdir dir="${dir.project.webscriptframework.assemble}" />
 
       <copy todir="${dir.project.webscriptframework.assemble}">
@@ -1489,16 +1398,14 @@
    </target>  
    
    <target name="test-webscriptframework" 
-           description="Runs the tests for the web script framework project" 
            depends="compile-webscriptframework">
       <run-tests projectdir="${dir.project.webscriptframework}" />
    </target>
    
    <target name="generate-javadocs-webscriptframework" 
-           description="Generates the JavaDocs for the web script framework project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Framework" 
-                         windowtitle="Alfresco Web Framework" 
+      <generate-javadocs documenttitle="Alfresco Web Script Framework" 
+                         windowtitle="Alfresco Web Script Framework" 
                          projectdir="${dir.project.webscriptframework}"/>
    </target>
 
@@ -1508,51 +1415,33 @@
    <!-- *************************** -->
    
    <target name="incremental-webframework" 
-           description="Performs an incremental build of the web framework project"
            depends="package-webframework" />
    
    <target name="build-webframework" 
-           description="Performs a clean build of the web framework project"
            depends="clean-webframework, 
                     incremental-webframework" />
    
    <target name="clean-webframework" 
-           description="Cleans the web framework project" 
            depends="init">
       <clean projectdir="${dir.project.webframework}" />
    </target>
    
    <target name="compile-webframework" 
-           description="Compiles the web framework project" 
-           depends="package-webscriptframework">
+           depends="init">
       <compile-java projectdir="${dir.project.webframework}" />
    </target>
    
-   <target name="package-webframework"
-           description="Packages the web framework project"
-           depends="package-core,compile-webframework">
+   <target name="package-webframework" 
+           depends="package-webframework-war" />
+   
+   <target name="package-webframework-jar"
+           depends="compile-webframework">
       <mkdir dir="${dir.project.webframework.dist}" />
       <jar jarfile="${dir.project.webframework.dist}/${file.name.jar.webframework}" 
            basedir="${dir.project.webframework.classes}" />
    </target>
-   
-   <target name="incremental-webframework-war" 
-           description="Performs an incremental build of the web framework WAR file"
-           depends="package-webframework-war" />
-      
-   <target name="build-webframework-war" 
-           description="Performs a clean build of the web framework project"
-           depends="clean-webframework-war, 
-                    incremental-webframework-war" />
-   
-   <target name="clean-webframework-war" 
-           description="Cleans the web framework WAR assemble folder" 
-           depends="init">
-      <delete dir="${dir.project.webframework.assemble}" />
-   </target>
 
    <target name="package-webframework-war" 
-           description="Packages the WAR file for the webframework project" 
            depends="assemble-webframework-war">
       <war warfile="${dir.project.webframework.dist}/${file.name.war.webframework}" 
            webxml="${dir.project.webframework.src.webinf}/web.xml">
@@ -1561,76 +1450,50 @@
    </target>
 
    <target name="assemble-webframework-war" 
-           depends="package-webscriptframework-war,package-webframework">
+           depends="package-webframework-jar">
       <mkdir dir="${dir.project.webframework.assemble}" />
       
-      <!-- Copy in base WAR file from the "webscript-framework" package -->
       <copy todir="${dir.project.webframework.assemble}">
-         <fileset dir="${dir.project.webscriptframework.assemble}" />
-      </copy>
-      <!-- End of Copy -->
-
-      <copy todir="${dir.project.webframework.assemble}">
-         <fileset dir="${dir.project.webframework.src.web}" 
-                  excludes="WEB-INF/**" />
-      </copy>
-
-      <copy todir="${dir.project.webframework.assemble}/WEB-INF">
-         <fileset dir="${dir.project.webframework.src.webinf}" 
-                  excludes="web.xml" />
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
 
       <!-- add config files to WEB-INF/classes -->
       <copy todir="${dir.project.webframework.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" 
+                  excludes="**/extension/**" />
          <fileset dir="${dir.project.webframework.config}" 
                   excludes="**/extension/**" />
       </copy>
 
       <copy todir="${dir.project.webframework.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
          <fileset dir="${dir.project.core.dist}" 
                   includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
          <fileset dir="${dir.project.webframework.dist}" 
                   includes="${file.name.jar.webframework}" />
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.webframework.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.webframework.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
-                  includes="${includes.webframework.libs.abdera}" />
       </copy>
    </target>  
    
    <target name="test-webframework" 
-           description="Runs the tests for the web framework project" 
            depends="compile-webframework">
       <run-tests projectdir="${dir.project.webframework}" />
    </target>
    
    <target name="generate-javadocs-webframework" 
-           description="Generates the JavaDocs for the web framework project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Web Framework" 
                          windowtitle="Alfresco Web Framework" 
                          projectdir="${dir.project.webframework}"/>
-   </target>
-   
-   <target name="clean-webframework-samples"
-            description="Removes example components and templates from the web framework assemble folder"
-            depends="init">
-      <delete>
-         <fileset dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-data">
-            <include name="components/*.xml" />
-            <include name="page-associations/*.xml" />
-            <include name="pages/*.xml" />
-            <include name="template-instances/*.xml" />
-         </fileset>
-      </delete>
-      <delete dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts/sample" />
-      <delete dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/site-webscripts/test" />
-      <delete dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates" />
-      <mkdir dir="${dir.project.webframework.assemble}/WEB-INF/classes/alfresco/templates" />
    </target>
    
    <!-- **************************************** -->
@@ -1638,51 +1501,33 @@
    <!-- **************************************** -->
    
    <target name="incremental-slingshot" 
-           description="Performs an incremental build of the slingshot project"
            depends="package-slingshot" />
    
    <target name="build-slingshot" 
-           description="Performs a clean build of the slingshot project"
            depends="clean-slingshot, 
                     incremental-slingshot" />
    
    <target name="clean-slingshot" 
-           description="Cleans the slingshot project" 
            depends="init">
       <clean projectdir="${dir.project.slingshot}" />
    </target>
    
    <target name="compile-slingshot" 
-           description="Compiles the slingshot project" 
-           depends="package-webframework">
+           depends="init">
       <compile-java projectdir="${dir.project.slingshot}" />
    </target>
    
    <target name="package-slingshot"
-           description="Packages the slingshot project"
-           depends="compile-slingshot">
+           depends="package-slingshot-war" />
+   
+   <target name="package-slingshot-jar"
+              depends="compile-slingshot">
       <mkdir dir="${dir.project.slingshot.dist}" />
       <jar jarfile="${dir.project.slingshot.dist}/${file.name.jar.slingshot}" 
            basedir="${dir.project.slingshot.classes}" />
    </target>
-   
-   <target name="incremental-slingshot-war" 
-           description="Performs an incremental build of the slingshot WAR file"
-           depends="package-slingshot-war" />
-      
-   <target name="build-slingshot-war" 
-           description="Performs a clean build of the slingshot project"
-           depends="clean-slingshot-war, 
-                    incremental-slingshot-war" />
-   
-   <target name="clean-slingshot-war" 
-           description="Cleans the slingshot WAR assemble folder" 
-           depends="init">
-      <delete dir="${dir.project.slingshot.assemble}" />
-   </target>
 
    <target name="package-slingshot-war" 
-           description="Packages the WAR file for the slingshot project" 
            depends="assemble-slingshot-war">
       <war warfile="${dir.project.slingshot.dist}/${file.name.war.slingshot}" 
            webxml="${dir.project.slingshot.src.webinf}/web.xml">
@@ -1690,50 +1535,63 @@
       </war>
    </target>
 
-   <target name="assemble-slingshot-war"
-           depends="package-webframework-war,clean-webframework-samples,package-slingshot">
+   <target name="assemble-slingshot-war" 
+           depends="package-slingshot-jar">
       <mkdir dir="${dir.project.slingshot.assemble}" />
       
-      <!-- Copy in base WAR file from the "webscript-framework" package -->
+      <!-- copy all required files from webscript and web framework projects -->
       <copy todir="${dir.project.slingshot.assemble}">
-         <fileset dir="${dir.project.webframework.assemble}" />
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
-      <!-- End of Copy -->
-
+      
+      <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
+      </copy>
+      
+      <!-- overlay all files from slingshot project -->
       <copy todir="${dir.project.slingshot.assemble}" overwrite="yes">
-         <fileset dir="${dir.project.slingshot.src.web}" 
-                  excludes="WEB-INF/**" />
+         <fileset dir="${dir.project.slingshot.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
 
-      <copy todir="${dir.project.slingshot.assemble}/WEB-INF" overwrite="yes">
-         <fileset dir="${dir.project.slingshot.src.webinf}" 
-                  excludes="web.xml" />
-      </copy>
-
-      <!-- add config files to WEB-INF/classes -->
+      <!-- overlay config files to WEB-INF/classes -->
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/classes" overwrite="yes">
          <fileset dir="${dir.project.slingshot.config}" />
+         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
       </copy>
 
+      <!-- add all JAR to WEB-INF/lib -->
       <copy todir="${dir.project.slingshot.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
          <fileset dir="${dir.project.slingshot.dist}" 
                   includes="${file.name.jar.slingshot}" />
       </copy>
       
       <!-- unzip and add 3rd party javascript library -->
-      <unzip src="${file.zip.slingshot.yui}"
+      <unzip src="${file.zip.slingshot.yui}" 
              dest="${dir.project.slingshot.assemble}" />
       
    </target>  
    
    <target name="test-slingshot" 
-           description="Runs the tests for the slingshot project" 
            depends="compile-slingshot">
       <run-tests projectdir="${dir.project.slingshot}" />
    </target>
    
    <target name="generate-javadocs-slingshot" 
-           description="Generates the JavaDocs for the slingshot project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Slingshot" 
                          windowtitle="Alfresco Slingshot" 
@@ -1745,16 +1603,13 @@
    <!-- ************************ -->
 
    <target name="incremental-webclient" 
-           description="Performs an incremental build of the webclient project" 
            depends="package-webclient" />
       
    <target name="build-webclient" 
-           description="Performs a clean build of the webclient project" 
            depends="clean-webclient, 
            incremental-webclient" />
    
    <target name="clean-webclient" 
-           description="Cleans the webclient project" 
            depends="init">
       <clean projectdir="${dir.project.webclient}" />
       <delete includeEmptyDirs="true" 
@@ -1763,19 +1618,15 @@
    </target>
    
    <target name="compile-webclient" 
-           description="Compiles the webclient project" 
            depends="init">
       <compile-java projectdir="${dir.project.webclient}" />
    </target>
    
-   
    <target name="package-webclient" 
-           description="Packages the webclient project" 
            depends="package-webclient-war, 
                     package-sample-website" />
 
    <target name="package-webclient-jar" 
-           description="Packages the JAR file for the webclient project" 
            depends="compile-webclient">
       <mkdir dir="${dir.project.webclient.dist}" />
       <jar jarfile="${dir.project.webclient.dist}/${file.name.jar.webclient}" 
@@ -1783,7 +1634,6 @@
    </target>
 
    <target name="package-webclient-war" 
-           description="Packages the WAR file for the webclient project" 
            depends="assemble-webclient-war">
       <mkdir dir="${dir.project.webclient.dist}" />
       <war warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" 
@@ -1910,6 +1760,7 @@
       </copy>
    </target>
 
+   <!--
    <target name="package-webclient-war-jboss" 
            depends="-tomcat">
       <copy todir="${dir.project.webclient.assemble}/WEB-INF" 
@@ -1932,6 +1783,7 @@
          <fileset dir="${dir.project.webclient.assemble}" />
       </war>
    </target>
+   -->
 
    <target name="package-sample-website" 
            description="Packages the sample website" 
@@ -1978,13 +1830,11 @@
    </target>
 
    <target name="test-webclient" 
-           description="Runs the tests for the webclient project" 
            depends="compile-webclient">
       <run-tests projectdir="${dir.project.webclient}" />
    </target>
 
    <target name="generate-javadocs-webclient" 
-           description="Generates the JavaDocs for the webclient project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Web Client API Specification" 
                          windowtitle="Alfresco Web Client API" 
@@ -1992,7 +1842,6 @@
    </target>
 
    <target name="generate-taglibdocs-webclient" 
-           description="Creates the tag library docs for the webclient project"
            depends="init">
 
       <mkdir dir="${dir.project.webclient.docs.taglib}" />
@@ -2014,31 +1863,25 @@
    <!-- ******************************** -->
 
    <target name="incremental-rm" 
-           description="Performs an incremental build of the records management project."
            depends="package-rm" />
 
    <target name="build-rm" 
-           description="Performs a clean build of the records management project."
            depends="clean-rm, incremental-rm" />
 
    <target name="clean-rm" 
-           description="Cleans the records management project" 
            depends="init">
       <clean projectdir="${dir.module.rm}" />
    </target>
 
    <target name="compile-rm" 
-           description="Compiles the records management project."
            depends="init">
       <compile-java projectdir="${dir.module.rm}" />
    </target>
 
    <target name="package-rm"
-           description="Packages the records management project."
-           depends="package-rm-war, deploy-tomcat" />
+           depends="package-rm-war, deploy-webclient-tomcat" />
 
    <target name="package-rm-jar"
-           description="Packages the JAR file for the records management project."
            depends="compile-rm">
       <mkdir dir="${dir.module.rm.dist}" />
       <jar jarfile="${dir.module.rm.dist}/${file.name.jar.rm}" 
@@ -2046,7 +1889,6 @@
    </target>
 
    <target name="package-rm-war"
-           description="Packages the WAR file for the records management project."
            depends="package-rm-extension">
       <echo>Installing records management into WAR...</echo>
       <install-amp ampfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
@@ -2054,7 +1896,6 @@
    </target>
 
    <target name="package-rm-extension"
-           description="Packages the records management extension."
            depends="package-rm-jar">
       <zip destfile="${dir.module.rm.dist}/${file.name.amp.rm}" 
            update="true">
@@ -2069,13 +1910,11 @@
    </target>
 
    <target name="test-rm" 
-           description="Runs the tests for the records management project."
            depends="compile-rm">
       <run-tests projectdir="${dir.module.rm}" />
    </target>
 
    <target name="generate-javadocs-rm"
-           description="Generates the JavaDocs for the records management project."
            depends="init">
       <generate-javadocs documenttitle="Alfresco Records Management Extension"
                          windowtitle="Records Management"
@@ -2093,27 +1932,22 @@
    <!-- ** avmCompare module                           ** -->
    <!-- ************************************************* -->
    <target name="incremental-avmcompare"
-           description="Performs an incremental build of the avmcompare module."
            depends="package-avmcompare" />
 
    <target name="build-avmcompare"
-           description="Performs a clean build of the avmcompare module."
            depends="clean-avmcompare, incremental-avmcompare" />
 
    <target name="clean-avmcompare"
-           description="Cleans the avmcompare module"
            depends="init">
       <clean projectdir="${dir.module.avmcompare}" />
    </target>
 
    <target name="compile-avmcompare"
-           description="Compiles the avmcompare module."
            depends="init">
       <compile-java projectdir="${dir.module.avmcompare}" />
    </target>
 
    <target name="package-avmcompare-jar"
-           description="Packages the avmcompare jar file."
            depends="compile-avmcompare">
       <mkdir dir="${dir.module.avmcompare.dist}" />
       <mkdir dir="${dir.module.avmcompare.lib}" />
@@ -2125,7 +1959,6 @@
    </target>
 
    <target name="package-avmcompare-extension"
-           description="Packages the avmcompare amp file."
            depends="package-avmcompare-jar">
         <zip destfile="${dir.module.avmcompare.dist}/${file.name.amp.avmcompare}" update="true">
             <zipfileset dir="${dir.module.avmcompare.lib}"     prefix="lib"  includes="*.jar"/>
@@ -2137,7 +1970,6 @@
    </target>
 
    <target name="package-avmcompare-war"
-           description="Packages the WAR file for the avmcompare integration project."
            depends="package-avmcompare-extension">
       <echo>Installing avmcompare into WAR...</echo>
       <install-amp ampfile="${dir.module.avmcompare.dist}/${file.name.amp.avmcompare}"
@@ -2145,11 +1977,9 @@
    </target>
 
    <target name="package-avmcompare"
-           description="Packages the avmcompare integration project."
-           depends="package-avmcompare-war, deploy-tomcat" />
+           depends="package-avmcompare-war, deploy-webclient-tomcat" />
 
    <target name="generate-javadocs-avmcompare"
-           description="Generates the JavaDocs for the avmcompare project."
            depends="init">
       <generate-javadocs documenttitle="Alfresco avmcompare webscript module"
                          windowtitle="avmcompare"
@@ -2163,27 +1993,22 @@
    <!-- ************************************************* -->
 
    <target name="incremental-truncatemalformedxml"
-           description="Performs an incremental build of the truncatemalformedxml module."
            depends="package-truncatemalformedxml" />
 
    <target name="build-truncatemalformedxml"
-           description="Performs a clean build of the truncatemalformedxml module."
            depends="clean-truncatemalformedxml, incremental-truncatemalformedxml" />
 
    <target name="clean-truncatemalformedxml"
-           description="Cleans the truncatemalformedxml module"
            depends="init">
       <clean projectdir="${dir.module.truncatemalformedxml}" />
    </target>
 
    <target name="compile-truncatemalformedxml"
-           description="Compiles the truncatemalformedxml module."
            depends="init">
       <compile-java projectdir="${dir.module.truncatemalformedxml}" />
    </target>
 
    <target name="package-truncatemalformedxml-jar"
-           description="Packages the truncatemalformedxml jar file."
            depends="compile-truncatemalformedxml">
       <mkdir dir="${dir.module.truncatemalformedxml.dist}" />
       <mkdir dir="${dir.module.truncatemalformedxml.lib}" />
@@ -2195,7 +2020,6 @@
    </target>
 
    <target name="package-truncatemalformedxml-extension"
-           description="Packages the truncatemalformedxml amp file."
            depends="package-truncatemalformedxml-jar">
         <zip destfile="${dir.module.truncatemalformedxml.dist}/${file.name.amp.truncatemalformedxml}" update="true">
             <zipfileset dir="${dir.module.truncatemalformedxml.lib}"     prefix="lib"  includes="*.jar"/>
@@ -2207,7 +2031,6 @@
    </target>
 
    <target name="package-truncatemalformedxml-war"
-           description="Packages the WAR file for the truncatemalformedxml integration project."
            depends="package-truncatemalformedxml-extension">
       <echo>Installing truncatemalformedxml into WAR...</echo>
       <install-amp ampfile="${dir.module.truncatemalformedxml.dist}/${file.name.amp.truncatemalformedxml}"
@@ -2215,11 +2038,9 @@
    </target>
 
    <target name="package-truncatemalformedxml"
-           description="Packages the truncatemalformedxml integration project."
-           depends="package-truncatemalformedxml-war, deploy-tomcat" />
+           depends="package-truncatemalformedxml-war, deploy-webclient-tomcat" />
 
    <target name="generate-javadocs-truncatemalformedxml"
-           description="Generates the JavaDocs for the truncatemalformedxml project."
            depends="init">
       <generate-javadocs documenttitle="Alfresco truncatemalformedxml webscript module"
                          windowtitle="truncatemalformedxml"
@@ -2234,31 +2055,25 @@
    <!-- ******************************** -->
 
    <target name="incremental-blog"
-           description="Performs an incremental build of the blog integration project."
            depends="package-blog" />
 
    <target name="build-blog"
-           description="Performs a clean build of the blog integration project."
            depends="clean-blog, incremental-blog" />
 
    <target name="clean-blog"
-           description="Cleans the blog integration project"
            depends="init">
       <clean projectdir="${dir.module.blog}" />
    </target>
 
    <target name="compile-blog"
-           description="Compiles the blog integration project."
            depends="init">
       <compile-java projectdir="${dir.module.blog}" />
    </target>
 
    <target name="package-blog"
-           description="Packages the blog integration project."
-           depends="package-blog-war, deploy-tomcat" />
+           depends="package-blog-war, deploy-webclient-tomcat" />
 
    <target name="package-blog-jar"
-           description="Packages the JAR file for the blog integration project."
            depends="compile-blog">
       <mkdir dir="${dir.module.blog.dist}" />
       <jar jarfile="${dir.module.blog.dist}/${file.name.jar.blog}"
@@ -2270,7 +2085,6 @@
    </target>
 
    <target name="package-blog-war"
-           description="Packages the WAR file for the blog integration project."
            depends="package-blog-extension">
       <echo>Installing blog integration into WAR...</echo>
       <install-amp ampfile="${dir.module.blog.dist}/${file.name.amp.blog}"
@@ -2278,7 +2092,6 @@
    </target>
 
    <target name="package-blog-extension"
-           description="Packages the blog integration extension."
            depends="package-blog-jar">
       <zip destfile="${dir.module.blog.dist}/${file.name.amp.blog}"
            update="true">
@@ -2295,13 +2108,11 @@
    </target>
 
    <target name="test-blog"
-           description="Runs the tests for the blog integration project."
            depends="compile-blog">
       <run-tests projectdir="${dir.module.blog}" />
    </target>
 
    <target name="generate-javadocs-blog"
-           description="Generates the JavaDocs for the blog integration project."
            depends="init">
       <generate-javadocs documenttitle="Alfresco Blog Integration Extension"
                          windowtitle="Blog Integration"
@@ -2313,31 +2124,25 @@
    <!-- ******************************** -->
 
    <target name="incremental-php" 
-           description="Performs an incremental build of the PHP SDK project"
            depends="package-php" />
 
    <target name="build-php" 
-           description="Performs a clean build of the PHP SDK project"
            depends="clean-php, incremental-php" />
 
    <target name="clean-php" 
-           description="Cleans the PHP SDK project" 
            depends="init">
       <clean projectdir="${dir.module.php}" />
    </target>
 
    <target name="compile-php" 
-           description="Compiles the PHP SDK project" 
            depends="init">
       <compile-java projectdir="${dir.module.php}" />
    </target>
 
    <target name="package-php" 
-           description="Packages the PHP SDK project"
-           depends="package-php-war, deploy-tomcat" />
+           depends="package-php-war, deploy-webclient-tomcat" />
            
    <target name="package-php-lib"
-           description="Package the PHP client library"
            depends="init">
       <echo>Packaging Alfresco PHP library</echo>
       <mkdir dir="${dir.module.php.dist}" />
@@ -2354,7 +2159,6 @@
    </target>
 
    <target name="package-php-jar" 
-           description="Packages the JAR file for the PHP SDK project"
            depends="compile-php">
       <mkdir dir="${dir.module.php.dist}" />
       <jar jarfile="${dir.module.php.dist}/${file.name.jar.php}" 
@@ -2362,15 +2166,13 @@
    </target>
 
    <target name="package-php-war" 
-           description="Packages the WAR file installing the PHP integration module"
-           depends="package-php-module">
+           depends="package-php-extension">
       <echo>Installing PHP Integration into WAR...</echo>
       <install-amp ampfile="${dir.module.php.dist}/${file.name.amp.php}" 
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="package-php-module" 
-           description="Packages the PHP Integration module into an AMP"
+   <target name="package-php-extension" 
            depends="package-php-jar">
       <zip destfile="${dir.module.php.dist}/${file.name.amp.php}" 
            update="true">
@@ -2391,25 +2193,15 @@
    </target>
 
    <target name="test-php" 
-           description="Runs the tests for the PHP SDK project"
            depends="compile-php">
       <run-tests projectdir="${dir.module.php}" />
    </target>
 
    <target name="generate-javadocs-php" 
-           description="Generates the JavaDocs for the records management project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Records Management Extension" 
                          windowtitle="Records Management" 
                          projectdir="${dir.module.php}"/>
-   </target>
-   
-   <target name="refresh-mediawiki" 
-   	     description="Refreshes the media wiki integration files" 
-   	     depends="init">
-   	<copy todir="${dir.mediawiki}/extensions">
-      	<fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
-      </copy>
    </target>
    
    <!-- ******************************** -->
@@ -2417,31 +2209,25 @@
    <!-- ******************************** -->
 
    <target name="incremental-mediawiki" 
-           description="Performs an incremental build of the mediawiki project"
            depends="package-mediawiki" />
 
    <target name="build-mediawiki"
-           description="Performs a clean build of the mediawiki project"
            depends="clean-mediawiki, incremental-mediawiki" />
 
    <target name="clean-mediawiki"
-           description="Cleans the mediawiki project"
            depends="init">
       <clean projectdir="${dir.module.mediawiki}" />
    </target>
 
    <target name="compile-mediawiki"
-           description="Compiles the mediawiki project"
            depends="init">
       <compile-java projectdir="${dir.module.mediawiki}" />
    </target>
 
    <target name="package-mediawiki"
-           description="Packages the mediawiki project"
-           depends="package-mediawiki-war, deploy-tomcat" />
+           depends="package-mediawiki-war, deploy-webclient-tomcat" />
 
    <!--<target name="package-php-lib"
-           description="Package the PHP client library"
            depends="init">
       <echo>Packaging Alfresco PHP library</echo>
       <mkdir dir="${dir.module.php.dist}" />
@@ -2458,7 +2244,6 @@
    </target>  -->
 
    <target name="package-mediawiki-jar"
-           description="Packages the JAR file for the mediawiki project"
            depends="compile-mediawiki">
       <mkdir dir="${dir.module.mediawiki.dist}" />
       <jar jarfile="${dir.module.mediawiki.dist}/${file.name.jar.mediawiki}"
@@ -2466,15 +2251,13 @@
    </target>
 
    <target name="package-mediawiki-war"
-           description="Packages the WAR file installing the mediawiki integration module"
-           depends="package-mediawiki-module">
+           depends="package-mediawiki-extension">
       <echo>Installing mediawiki integration into WAR...</echo>
       <install-amp ampfile="${dir.module.mediawiki.dist}/${file.name.amp.mediawiki}"
                    warfile="${dir.project.webclient.dist}/${file.name.war.webclient}" />
    </target>
 
-   <target name="package-mediawiki-module"
-           description="Packages the mediawiki Integration module into an AMP"
+   <target name="package-mediawiki-extension"
            depends="package-mediawiki-jar">
       <zip destfile="${dir.module.mediawiki.dist}/${file.name.amp.mediawiki}"
            update="true">
@@ -2486,7 +2269,7 @@
             <exclude name="**/module.properties"/>
          </zipfileset>
          <!-- Copy mediaWiki code into the AMP -->
-	 <zipfileset dir="${dir.module.mediawiki.web.php}/mediawiki"
+         <zipfileset dir="${dir.module.mediawiki.web.php}/mediawiki"
                      prefix="web/php/wiki"/>
          <!-- Copy the extension into the correct place -->
          <zipfileset dir="${dir.module.mediawiki.web.php}/alfresco-integration"
@@ -2500,57 +2283,48 @@
    </target>
 
    <target name="test-mediawiki"
-           description="Runs the tests for the mediawiki project"
            depends="compile-mediawiki">
       <run-tests projectdir="${dir.module.mediawiki}" />
    </target>
 
    <target name="generate-javadocs-mediawiki"
-           description="Generates the JavaDocs for the mediawiki project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco MediaWiki Extension"
                          windowtitle="MediaWiki Integration"
                          projectdir="${dir.module.mediawiki}"/>
    </target>
    
-   <!-- <target name="refresh-mediawiki"
-   	     description="Refreshes the media wiki integration files"
+   <target name="refresh-mediawiki"
    	     depends="init">
    	<copy todir="${dir.mediawiki}/extensions">
       	<fileset dir="${dir.module.php.source.remote}/Integration/MediaWiki" includes="*.php"/>
       </copy>
-   </target> -->
+   </target>
    
    <!-- ******************************** -->
    <!-- ** Knowledge Base Project ** -->
    <!-- ******************************** -->
 
    <target name="incremental-kb"
-           description="Performs an incremental build of the knowledge base project."
            depends="package-kb" />
 
    <target name="build-kb"
-           description="Performs a clean build of the knowledge base project."
            depends="clean-kb, incremental-kb" />
 
    <target name="clean-kb"
-           description="Cleans the knowledge base project"
            depends="init">
       <clean projectdir="${dir.module.kb}" />
    </target>
 
    <target name="compile-kb"
-           description="Compiles the knowledge base project."
            depends="init">
       <compile-java projectdir="${dir.module.kb}" />
    </target>
 
    <target name="package-kb"
-           description="Packages the knowledge base project."
-           depends="package-kb-war, deploy-tomcat" />
+           depends="package-kb-war, deploy-webclient-tomcat" />
 
    <target name="package-kb-jar"
-           description="Packages the JAR file for the knowledge base project."
            depends="compile-kb">
       <mkdir dir="${dir.module.kb.dist}" />
       <jar jarfile="${dir.module.kb.dist}/${file.name.jar.kb}"
@@ -2558,7 +2332,6 @@
    </target>
 
    <target name="package-kb-war"
-           description="Packages the WAR file for the knowledge base project."
            depends="package-kb-extension">
       <echo>Installing knowledge base into WAR...</echo>
       <install-amp ampfile="${dir.module.kb.dist}/${file.name.amp.kb}"
@@ -2566,7 +2339,6 @@
    </target>
 
    <target name="package-kb-extension"
-           description="Packages the knowledge base extension."
            depends="package-kb-jar">
       <zip destfile="${dir.module.kb.dist}/${file.name.amp.kb}"
            update="true">
@@ -2582,13 +2354,11 @@
    </target>
 
    <target name="test-kb"
-           description="Runs the tests for the knowledge base project."
            depends="compile-kb">
       <run-tests projectdir="${dir.module.kb}" />
    </target>
 
    <target name="generate-javadocs-kb"
-           description="Generates the JavaDocs for the knowledge base project."
            depends="init">
       <generate-javadocs documenttitle="Alfresco Knowledge Base Extension"
                          windowtitle="Knowledge Base"
@@ -2600,7 +2370,6 @@
    <!-- ******************************** -->
 
    <target name="clean-ace"
-           description="Cleans the current ACE application build"
            depends="init">
 
       <!-- Remove the contents of the bin directory -->
@@ -2611,7 +2380,6 @@
    </target>
 
    <target name="incremental-ace"
-           description="Incrementally builds the ACE application"
            depends="init">
 
       <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
@@ -2662,7 +2430,6 @@
    </target>
    
    <target name="wrapper-ace"
-           description="Generates HTML wrapper for ACE application"
            depends="init">
 
       <property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
@@ -2684,7 +2451,6 @@
    </target>
 
    <target name="build-ace"
-           description="Builds the ACE application"
            depends="clean-ace, incremental-ace, wrapper-ace"/>
 
    <!-- **************************************** -->
@@ -2692,31 +2458,25 @@
    <!-- **************************************** -->
 
    <target name="incremental-fb-doclib"
-           description="Performs an incremental build of the Facebook Doc Lib project."
            depends="package-fb-doclib" />
 
    <target name="build-fb-doclib"
-           description="Performs a clean build of the Facebook Doc Lib project."
            depends="clean-fb-doclib, incremental-fb-doclib" />
 
    <target name="clean-fb-doclib"
-           description="Cleans the Facebook Doc Lib project"
            depends="init">
       <clean projectdir="${dir.module.fb.doclib}" />
    </target>
 
    <target name="compile-fb-doclib"
-           description="Compiles the Facebook Doc Lib project."
            depends="init">
       <compile-java projectdir="${dir.module.fb.doclib}" />
    </target>
 
    <target name="package-fb-doclib"
-           description="Packages the Facebook Doc Lib project."
-           depends="package-fb-doclib-war, deploy-tomcat" />
+           depends="package-fb-doclib-war, deploy-webclient-tomcat" />
 
    <target name="package-fb-doclib-jar"
-           description="Packages the JAR file for the Facebook Doc Lib project."
            depends="compile-fb-doclib">
       <mkdir dir="${dir.module.fb.doclib.dist}" />
       <jar jarfile="${dir.module.fb.doclib.dist}/${file.name.jar.fb.doclib}"
@@ -2724,7 +2484,6 @@
    </target>
 
    <target name="package-fb-doclib-war"
-           description="Packages the WAR file for the Facebook Doc Lib project."
            depends="package-fb-doclib-extension">
       <echo>Installing Facebook Alfresco Document Library into WAR...</echo>
       <install-amp ampfile="${dir.module.fb.doclib.dist}/${file.name.amp.fb.doclib}"
@@ -2732,8 +2491,7 @@
    </target>
 
    <target name="package-fb-doclib-extension"
-           description="Packages the Facebook Doc Lib extension."
-	   depends="init">
+           depends="init">
 	   <mkdir dir="${dir.module.fb.doclib.dist}" />
       <zip destfile="${dir.module.fb.doclib.dist}/${file.name.amp.fb.doclib}"
            update="true">
@@ -2745,13 +2503,11 @@
    </target>
 
    <target name="test-fb-doclib"
-           description="Runs the tests for the Facebook Doc Lib project."
            depends="compile-fb-doclib">
       <run-tests projectdir="${dir.module.fb.doclib}" />
    </target>
 
    <target name="generate-javadocs-fb-doclib"
-           description="Generates the JavaDocs for the Facebook Doc Lib project."
            depends="init">
       <generate-javadocs documenttitle="Facebook Alfresco Document Library Extension"
                          windowtitle="Knowledge Base"
@@ -2763,16 +2519,13 @@
    <!-- ******************************** -->
 
    <target name="incremental-webserviceclient" 
-           description="Performs an incremental build of the web service client project" 
            depends="package-webserviceclient" />
 
    <target name="build-webserviceclient" 
-           description="Performs a clean build of the web service client project" 
            depends="clean-webserviceclient, 
                     incremental-webserviceclient" />
    
    <target name="clean-webserviceclient" 
-           description="Cleans the web service client project" 
            depends="init">
       <clean projectdir="${dir.project.webserviceclient}" />
    </target>
@@ -2785,13 +2538,11 @@
    </target>
 
    <target name="compile-webserviceclient" 
-           description="Compiles the web service client project" 
            depends="init">
       <compile-java-inc-generated projectdir="${dir.project.webserviceclient}" />
    </target>
    
    <target name="package-webserviceclient"
-           description="Packages the web service client project"
            depends="compile-webserviceclient">
       <mkdir dir="${dir.project.webserviceclient.dist}" />
       <copy todir="${dir.project.webserviceclient.classes}" 
@@ -2801,13 +2552,11 @@
    </target>
    
    <target name="test-webserviceclient" 
-           description="Runs the tests for the web service client project" 
            depends="compile-webserviceclient">
       <run-tests projectdir="${dir.project.webserviceclient}" />
    </target>
    
    <target name="generate-javadocs-webserviceclient" 
-           description="Generates the JavaDocs for the web service client project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Web Service Client Specification" 
                          windowtitle="Alfresco Web Service Client" 
@@ -2982,7 +2731,6 @@
    <!-- **************************** -->
 
    <target name="package-googlegadgets"
-           description="Packages the google gadgets module"
            depends="init">
       <mkdir dir="${dir.module.gg.dist}" />
       <zip zipfile="${dir.module.gg}/${file.name.zip.gg}">
@@ -3005,28 +2753,23 @@
    <!-- ************************** -->
 
    <target name="incremental-devenv" 
-           description="Performs an incremental build of the devenv tools project"
            depends="package-devenv" />
 
    <target name="build-devenv" 
-           description="Performs a clean build of the devenv tools project" 
            depends="clean-devenv, 
                     incremental-devenv" />
 
    <target name="clean-devenv" 
-           description="Cleans the devenv tools project" 
            depends="init">
       <clean projectdir="${dir.project.devenv}" />
    </target>
 
    <target name="compile-devenv" 
-           description="Compiles the devenv tools project" 
            depends="init">
       <compile-java projectdir="${dir.project.devenv}" />
    </target>
 
    <target name="package-devenv" 
-           description="Packages the devenv tools project" 
            depends="compile-devenv">
       <mkdir dir="${dir.project.devenv.dist}" />
       <jar jarfile="${dir.project.devenv.dist}/${file.name.jar.devenv}"
@@ -3040,28 +2783,23 @@
    <!-- *************************** -->
    
    <target name="incremental-jlan" 
-           description="Performs an incremental build of the JLAN project" 
            depends="package-jlan" />
       
    <target name="build-jlan" 
-           description="Performs a clean build of the jlan project" 
            depends="clean-jlan, 
                     incremental-jlan" />
    
    <target name="clean-jlan" 
-           description="Cleans the jlan project" 
            depends="init">
       <clean projectdir="${dir.project.jlan}" />
    </target>
    
    <target name="compile-jlan" 
-           description="Compiles the jlan project" 
            depends="init">
       <compile-java projectdir="${dir.project.jlan}" compileExcludes="org/alfresco/jlan/app/** org/alfresco/jlan/server/filesys/db/*/** org/alfresco/jlan/smb/util/** org/alfresco/jlan/util/db/** org/alfresco/config/*/**" />
    </target>
    
    <target name="package-jlan"
-           description="Packages the jlan project"
            depends="compile-jlan">
       <mkdir dir="${dir.project.jlan.dist}" />
       <jar jarfile="${dir.project.jlan.dist}/${file.name.jar.jlan}" 
@@ -3069,7 +2807,6 @@
    </target>
    
    <target name="generate-javadocs-jlan" 
-           description="Generates the JavaDocs for the JLAN project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco JLAN API Specification" 
                          windowtitle="Alfresco JLAN API" 
@@ -3082,51 +2819,33 @@
    <!-- ***************************** -->
    
    <target name="incremental-dynamicwebsite" 
-           description="Performs an incremental build of the web framework project"
            depends="package-dynamicwebsite" />
       
    <target name="build-dynamicwebsite" 
-           description="Performs a clean build of the web framework project"
            depends="clean-dynamicwebsite, 
                     incremental-dynamicwebsite" />
    
    <target name="clean-dynamicwebsite" 
-           description="Cleans the web framework project" 
            depends="init">
       <clean projectdir="${dir.project.dynamicwebsite}" />
    </target>
    
    <target name="compile-dynamicwebsite" 
-           description="Compiles the web framework project" 
            depends="init">
       <compile-java projectdir="${dir.project.dynamicwebsite}" />
    </target>
    
-   <target name="package-dynamicwebsite"
-           description="Packages the web framework project"
+   <target name="package-dynamicwebsite" 
+           depends="package-dynamicwebsite-war" />
+   
+   <target name="package-dynamicwebsite-jar"
            depends="compile-dynamicwebsite">
       <mkdir dir="${dir.project.dynamicwebsite.dist}" />
       <jar jarfile="${dir.project.dynamicwebsite.dist}/${file.name.jar.dynamicwebsite}" 
            basedir="${dir.project.dynamicwebsite.classes}" />
    </target>
-   
-   <target name="incremental-dynamicwebsite-war" 
-           description="Performs an incremental build of the web framework WAR file"
-           depends="package-dynamicwebsite-war" />
-      
-   <target name="build-dynamicwebsite-war" 
-           description="Performs a clean build of the web framework project"
-           depends="clean-dynamicwebsite-war, 
-                    incremental-dynamicwebsite-war" />
-   
-   <target name="clean-dynamicwebsite-war" 
-           description="Cleans the web framework WAR assemble folder" 
-           depends="init">
-      <delete dir="${dir.project.dynamicwebsite.assemble}" />
-   </target>
 
    <target name="package-dynamicwebsite-war" 
-           description="Packages the WAR file for the webframework project" 
            depends="assemble-dynamicwebsite-war">
       <war warfile="${dir.project.dynamicwebsite.dist}/${file.name.war.dynamicwebsite}" 
            webxml="${dir.project.dynamicwebsite.src.webinf}/web.xml">
@@ -3135,123 +2854,106 @@
    </target>
 
    <target name="assemble-dynamicwebsite-war" 
-           depends="package-webframework-war,package-dynamicwebsite">
+           depends="package-dynamicwebsite-jar">
       <mkdir dir="${dir.project.dynamicwebsite.assemble}" />
       
-      <!-- Copy in base WAR file from the "web-framework" package -->
+      <!-- copy all required files from webscript and web framework projects -->
       <copy todir="${dir.project.dynamicwebsite.assemble}">
-         <fileset dir="${dir.project.webframework.assemble}" />
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
-      <!-- End of Copy -->
+      
+      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
+      </copy>
+      
+      <!-- overlay all files from dynamic website project -->
+      <copy todir="${dir.project.dynamicwebsite.assemble}" overwrite="yes">
+         <fileset dir="${dir.project.dynamicwebsite.src.web}" excludes="WEB-INF/web.xml" />
+      </copy>
 
-    
+      <!-- overlay config files to WEB-INF/classes -->
+      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes" overwrite="yes">
+         <fileset dir="${dir.project.dynamicwebsite.config}" />
+         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
+      </copy>
+
+      <!-- add all JAR to WEB-INF/lib -->
+      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
+         <fileset dir="${dir.project.dynamicwebsite.dist}" 
+                  includes="${file.name.jar.dynamicwebsite}" />
+      </copy>
+      
       <!-- Auto Expand EXTJS and YUI into the Assembly -->
       <!-- TOOD: Remove YUI -->
       <unzip src="${file.zip.dynamicwebsite.ext}"
              dest="${dir.project.dynamicwebsite.assemble}" />
       <unzip src="${file.zip.dynamicwebsite.yui}"
-             dest="${dir.project.dynamicwebsite.assemble}" />      
-
-
-      <copy todir="${dir.project.dynamicwebsite.assemble}">
-         <fileset dir="${dir.project.dynamicwebsite.src.web}" 
-                  excludes="WEB-INF/**" />
-      </copy>
-
-      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF">
-         <fileset dir="${dir.project.dynamicwebsite.src.webinf}" 
-                  excludes="web.xml" />
-      </copy>
-
-      <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes" overwrite="true">
-         <fileset dir="${dir.project.core.src.java}" 
-                  includes="log4j.properties" />
-         <fileset dir="${dir.project.dynamicwebsite.config}" />
-      </copy>
-
-
-      <copy todir="${dir.project.dynamicwebsite.assemble}/WEB-INF/lib">
-         <fileset dir="${dir.project.core.dist}" 
-                  includes="${file.name.jar.core}" />
-         <fileset dir="${dir.project.dynamicwebsite.dist}" 
-                  includes="${file.name.jar.dynamicwebsite}" />
-         <fileset dir="${dir.project.3rdparty.lib}" 
-                  includes="${includes.dynamicwebsite.libs}" />
-         <fileset dir="${dir.project.3rdparty.lib}/commons" 
-                  includes="${includes.dynamicwebsite.libs.commons}" />
-         <fileset dir="${dir.project.3rdparty.lib}/abdera" 
-                  includes="${includes.dynamicwebsite.libs.abdera}" />
-      </copy>
+             dest="${dir.project.dynamicwebsite.assemble}" />
+      
+      <!-- placeholder site-webscripts and templates folders are required -->
+      <mkdir dir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes/alfresco/site-webscripts" />
+      <mkdir dir="${dir.project.dynamicwebsite.assemble}/WEB-INF/classes/alfresco/templates" />
    </target>  
    
    <target name="test-dynamicwebsite" 
-           description="Runs the tests for the web framework project" 
            depends="compile-dynamicwebsite">
       <run-tests projectdir="${dir.project.dynamicwebsite}" />
    </target>
    
    <target name="generate-javadocs-dynamicwebsite" 
-           description="Generates the JavaDocs for the web framework project"
            depends="init">
-      <generate-javadocs documenttitle="Alfresco Web Framework" 
-                         windowtitle="Alfresco Web Framework" 
+      <generate-javadocs documenttitle="Alfresco Dynamic Website" 
+                         windowtitle="Alfresco Dynamic Website" 
                          projectdir="${dir.project.dynamicwebsite}"/>
    </target>
-   
-   
-   
    
    <!-- ******************************* -->
    <!-- ** Alfresco Extranet Project ** -->
    <!-- ******************************* -->
    
    <target name="incremental-extranet" 
-           description="Performs an incremental build of the extranet project"
            depends="package-extranet" />
       
    <target name="build-extranet" 
-           description="Performs a clean build of the extranet project"
            depends="clean-extranet, 
                     incremental-extranet" />
    
    <target name="clean-extranet" 
-           description="Cleans the extranet project" 
            depends="init">
       <clean projectdir="${dir.project.extranet}" />
    </target>
    
    <target name="compile-extranet" 
-           description="Compiles the extranet project" 
            depends="init">
       <compile-java projectdir="${dir.project.extranet}" />
    </target>
    
-   <target name="package-extranet"
-           description="Packages the extranet project"
+   <target name="package-extranet" 
+           depends="package-extranet-war" />
+   
+   <target name="package-extranet-jar"
            depends="compile-extranet">
       <mkdir dir="${dir.project.extranet.dist}" />
       <jar jarfile="${dir.project.extranet.dist}/${file.name.jar.extranet}" 
            basedir="${dir.project.extranet.classes}" />
    </target>
-   
-   <target name="incremental-extranet-war" 
-           description="Performs an incremental build of the extranet WAR file"
-           depends="package-extranet-war" />
-      
-   <target name="build-extranet-war" 
-           description="Performs a clean build of the extranet project"
-           depends="clean-extranet-war, 
-                    incremental-extranet-war" />
-   
-   <target name="clean-extranet-war" 
-           description="Cleans the extranet WAR assemble folder" 
-           depends="init">
-      <delete dir="${dir.project.extranet.assemble}" />
-   </target>
 
    <target name="package-extranet-war" 
-           description="Packages the WAR file for the extranet project" 
            depends="assemble-extranet-war">
       <war warfile="${dir.project.extranet.dist}/${file.name.war.extranet}" 
            webxml="${dir.project.extranet.src.webinf}/web.xml">
@@ -3259,44 +2961,58 @@
       </war>
    </target>
 
-   <target name="assemble-extranet-war" depends="package-webframework-war,package-extranet">
+   <target name="assemble-extranet-war" 
+           depends="package-extranet-jar">
       <mkdir dir="${dir.project.extranet.assemble}" />
       
-      <!-- Copy in base WAR file from the "web-framework" package -->
+      <!-- copy all required files from webscript and web framework projects -->
       <copy todir="${dir.project.extranet.assemble}">
-         <fileset dir="${dir.project.webframework.assemble}" />
+         <fileset dir="${dir.project.webscriptframework.src.web}" excludes="WEB-INF/web.xml" />
+         <fileset dir="${dir.project.webframework.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
-      <!-- End of Copy -->
-
+      
+      <copy todir="${dir.project.extranet.assemble}/WEB-INF/classes">
+         <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
+         <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
+         <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
+      </copy>
+      
+      <!-- overlay all files from extranet project -->
       <copy todir="${dir.project.extranet.assemble}" overwrite="yes">
-         <fileset dir="${dir.project.extranet.src.web}" 
-                  excludes="WEB-INF/**" />
+         <fileset dir="${dir.project.extranet.src.web}" excludes="WEB-INF/web.xml" />
       </copy>
 
-      <copy todir="${dir.project.extranet.assemble}/WEB-INF" overwrite="yes">
-         <fileset dir="${dir.project.extranet.src.webinf}" 
-                  excludes="web.xml" />
-      </copy>
-
-      <!-- add config files to WEB-INF/classes -->
-      <copy todir="${dir.project.extranet.assemble}/WEB-INF/classes" overwrite="true">
+      <!-- overlay config files to WEB-INF/classes -->
+      <copy todir="${dir.project.extranet.assemble}/WEB-INF/classes" overwrite="yes">
          <fileset dir="${dir.project.extranet.config}" />
+         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
       </copy>
 
+      <!-- add all JAR to WEB-INF/lib -->
       <copy todir="${dir.project.extranet.assemble}/WEB-INF/lib">
+         <fileset dir="${dir.project.3rdparty.lib}" 
+                  includes="${includes.webscriptframework.libs}" />
+         <fileset dir="${dir.project.3rdparty.lib}/commons" 
+                  includes="${includes.webscriptframework.libs.commons}" />
+         <fileset dir="${dir.project.3rdparty.lib}/abdera"  
+                  includes="${includes.webscriptframework.libs.abdera}" />
+         <fileset dir="${dir.project.core.dist}" 
+                  includes="${file.name.jar.core}" />
+         <fileset dir="${dir.project.webscriptframework.dist}" 
+                  includes="${file.name.jar.webscriptframework}" />
+         <fileset dir="${dir.project.webframework.dist}" 
+                  includes="${file.name.jar.webframework}" />
          <fileset dir="${dir.project.extranet.dist}" 
                   includes="${file.name.jar.extranet}" />
       </copy>
    </target>  
    
    <target name="test-extranet" 
-           description="Runs the tests for the extranet project" 
            depends="compile-extranet">
       <run-tests projectdir="${dir.project.extranet}" />
    </target>
    
    <target name="generate-javadocs-extranet" 
-           description="Generates the JavaDocs for the extranet project"
            depends="init">
       <generate-javadocs documenttitle="Alfresco Extranet" 
                          windowtitle="Alfresco Extranet" 
