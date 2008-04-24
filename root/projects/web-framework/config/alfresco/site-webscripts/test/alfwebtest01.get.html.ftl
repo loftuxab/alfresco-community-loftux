@@ -7,5 +7,5 @@
 <li>page.url.servletContext: ${page.url.servletContext}</li>
 <li>page.url.uri: ${page.url.uri}</li>
 <li>page.url.url: ${page.url.url}</li>
-<li>page.url.args: ${page.url.args}</li>
+<li>page.url.queryString: ${page.url.queryString}</li>
 <ul>

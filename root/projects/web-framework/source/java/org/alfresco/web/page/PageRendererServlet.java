@@ -265,7 +265,7 @@ public class PageRendererServlet extends WebScriptServlet
       context.RequestPath = req.getContextPath();
       context.PageInstance = page;
       context.Tokens = args;
-      context.PageComponentModel = buildPageComponentModel(page, req);
+      context.PageComponentModel = buildPageComponentModel(page, req, args);
       return context;
    }
    
@@ -412,7 +412,7 @@ public class PageRendererServlet extends WebScriptServlet
    {
       Map<String, Object> model = new HashMap<String, Object>(8);
       
-      URLHelper urlHelper = new URLHelper(req);
+      URLHelper urlHelper = new URLHelper(req, context.Tokens);
       model.put("url", urlHelper);
       model.put("description", page.getDescription());
       model.put("title", page.getTitle());
@@ -431,11 +431,11 @@ public class PageRendererServlet extends WebScriptServlet
     * @return model to use for UI Component execution against a page.
     */
    private Map<String, Object> buildPageComponentModel(
-         PageInstance page, HttpServletRequest req)
+         PageInstance page, HttpServletRequest req, Map<String, String> args)
    {
       Map<String, Object> model = new HashMap<String, Object>(4);
       Map<String, Object> pageModel = new HashMap<String, Object>(4);
-      URLHelper urlHelper = new URLHelper(req);
+      URLHelper urlHelper = new URLHelper(req, args);
       pageModel.put("url", urlHelper);
       pageModel.put("theme", page.getTheme());
       // TODO: add page url arguments as Map model "page.args"

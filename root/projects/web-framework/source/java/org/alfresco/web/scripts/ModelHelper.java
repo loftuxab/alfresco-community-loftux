@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.scripts;
 
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -54,7 +56,15 @@ public class ModelHelper
         {
             HttpServletRequest request = ((HttpRequestContext)context).getRequest();
             
-            URLHelper urlHelper = new URLHelper(request);
+            Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
+            Enumeration names = request.getParameterNames();
+            while (names.hasMoreElements())
+            {
+                String name = (String)names.nextElement();
+                args.put(name, request.getParameter(name));
+            }
+            
+            URLHelper urlHelper = new URLHelper(request, args);
             model.put("url", urlHelper);
         }
     
@@ -93,7 +103,15 @@ public class ModelHelper
         {
             HttpServletRequest request = ((HttpRequestContext)context).getRequest();
             
-            URLHelper urlHelper = new URLHelper(request);
+            Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
+            Enumeration names = request.getParameterNames();
+            while (names.hasMoreElements())
+            {
+                String name = (String)names.nextElement();
+                args.put(name, request.getParameter(name));
+            }
+            
+            URLHelper urlHelper = new URLHelper(request, args);
             model.put("url", urlHelper);
         }
     
