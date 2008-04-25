@@ -63,7 +63,7 @@ public class InputStreamContent implements Content, Serializable
     public String getContent()
         throws IOException
     {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        ByteArrayOutputStream os = new ByteArrayOutputStream(1024);
         FileCopyUtils.copy(stream, os);  // both streams are closed
         byte[] bytes = os.toByteArray();
         // get the encoding for the string
