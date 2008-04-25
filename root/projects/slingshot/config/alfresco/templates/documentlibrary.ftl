@@ -1,15 +1,9 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-<head> 
-   <title>${title}</title> 
-   <!-- Common Assets -->
-   ${head}
-
-   <!-- Document Library Assets -->
+<#import "global/alfresco-template.ftl" as template />
+<@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/documentlibrary/documentlibrary.css" />
    <script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></script>
-
-</head>  
+</@>
+<@template.body>
 <body class="yui-skin-sam">
    <div id="doc3">
       <div id="hd">
@@ -39,4 +33,4 @@
       </div>
    </div>
 </body>
-</html>
+</@>

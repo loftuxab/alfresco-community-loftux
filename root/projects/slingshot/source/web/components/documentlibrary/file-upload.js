@@ -4,16 +4,19 @@
 
 (function()
 {
-   Alfresco.FileUpload = function(htmlId, swfUrl)
+   Alfresco.FileUpload = function(htmlId)
    {
-      
       this.name = "Alfresco.FileUpload";
       this.id = htmlId;
-      this.swf = swfUrl;
 
+      this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
+
+      /* Register this component */
       Alfresco.util.ComponentManager.register(this);
 
-      new Alfresco.util.YUILoaderHelper().load(["button", "container", "datatable", "datasource", "uploader"], this.componentsLoaded, this);
+      /* Load YUI Components */
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "uploader"], this.componentsLoaded, this);
+
       return this;
    }
 
@@ -40,7 +43,7 @@
       componentsLoaded: function()
       {
          YAHOO.widget.Uploader.SWFURL = this.swf;
-         YAHOO.util.Event.onDOMReady(this.init, this, true);
+         YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
       },
 
       init: function()
@@ -86,7 +89,7 @@
             this.uploader.subscribe("uploadError",this.onUploadError, this, true);
          }
 
-         var rButton = Dom.getElementsByClassName("fileupload-remove-button", "input", "fileupload-fileItemTemplate-div")[0];
+         var rButton = Dom.getElementsByClassName("fileupload-remove-button", "input", this.id)[0];
          var removeButton = new YAHOO.widget.Button(rButton, {type: "button"});
          //removeButton.subscribe("click", function(){ this.removeFile(flashId, oRecord.getId()); }, this, true);
 

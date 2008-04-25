@@ -9,7 +9,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      new Alfresco.util.YUILoaderHelper().load(["button", "container"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container"], this.componentsLoaded, this);
 
       return this;
    }
@@ -28,7 +28,7 @@
 
       componentsLoaded: function()
       {
-         YAHOO.util.Event.onDOMReady(this.init, this, true);
+         YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
       },
 
       init: function()
