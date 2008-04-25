@@ -32,6 +32,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.util.URLEncoder;
+
 
 /**
  * HTTP Proxy Servlet
@@ -66,7 +68,7 @@ public class HTTPProxyServlet extends HttpServlet
             throws ServletException, IOException
     {
         String endpoint = null;
-        String args = null;
+        StringBuilder args = new StringBuilder(32);
         
         Map<String, String[]> parameters = req.getParameterMap();
         for (Map.Entry<String, String[]> parameter : parameters.entrySet())
@@ -74,7 +76,7 @@ public class HTTPProxyServlet extends HttpServlet
             String[] values = parameter.getValue();
             int startIdx = 0;
             
-            if (parameter.getKey().equals("endpoint") && values.length > 0)
+            if (parameter.getKey().equals("endpoint") && values.length != 0)
             {
                 endpoint = values[0];
                 startIdx++;
@@ -82,17 +84,20 @@ public class HTTPProxyServlet extends HttpServlet
             
             for (int i = startIdx; i < values.length; i++)
             {
-                String arg = parameter.getKey() + "=" + values[i];
-                args = (args == null) ? arg : args + "&" + arg;
+                if (args.length() != 0)
+                {
+                    args.append("&");
+                }
+                args.append(parameter.getKey()).append('=').append(URLEncoder.encode(values[i]));
             }
         }
-
+        
         if (endpoint == null || endpoint.length() == 0)
         {
             throw new IllegalArgumentException("endpoint argument not specified");
         }
         
-        String url = endpoint + ((args == null) ? "" : "?" + args);
+        String url = endpoint + ((args.length() == 0) ? "" : "?" + args.toString());
         HTTPProxy proxy = new HTTPProxy(url, res);
         proxy.service();
     }
