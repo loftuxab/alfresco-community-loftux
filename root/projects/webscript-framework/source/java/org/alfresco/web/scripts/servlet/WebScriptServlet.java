@@ -71,8 +71,13 @@ public class WebScriptServlet extends HttpServlet
         super.init();
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
         configService = (ConfigService)context.getBean("web.config");
-        container = (RuntimeContainer)context.getBean("webscripts.container");
-
+        String containerName = getServletConfig().getInitParameter("container");
+        if (containerName == null)
+        {
+            containerName = "webscripts.container";
+        }
+        container = (RuntimeContainer)context.getBean(containerName);
+        
         // retrieve authenticator factory
         String authenticatorId = getInitParameter("authenticator");
         if (authenticatorId != null && authenticatorId.length() > 0)
@@ -88,10 +93,10 @@ public class WebScriptServlet extends HttpServlet
         // retrieve host server configuration 
         Config config = configService.getConfig("Server");
         serverProperties = (ServerConfigElement)config.getConfigElement(ServerConfigElement.CONFIG_ELEMENT_ID);
-
+        
         // servlet specific initialisation
         initServlet(context);
-
+        
         if (logger.isDebugEnabled())
             logger.debug("Initialised Web Script Servlet (authenticator='" + authenticatorId + "')");
     }

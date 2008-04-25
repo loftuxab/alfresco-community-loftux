@@ -114,9 +114,6 @@ public class PageRendererServlet extends WebScriptServlet
       
       // we use a specific config service instance
       configService = (ConfigService)context.getBean("pagerenderer.config");
-      
-      // we use a specific webscript container instance - override the one from the super
-      container = (RuntimeContainer)context.getBean("pagerenderer.container");
    }
 
    @Override
