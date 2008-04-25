@@ -27,6 +27,7 @@ package org.alfresco.web.scripts.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -67,7 +68,7 @@ public class HTTPProxy
     public void service()
         throws IOException
     {
-        URLConnection connection = url.openConnection();
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         initialiseResponse(connection);
         InputStream input = connection.getInputStream();
         OutputStream output = response.getOutputStream();
@@ -88,6 +89,8 @@ public class HTTPProxy
                     output.flush();
                     output.close();
                 }
+                // TODO: required?
+                connection.disconnect();
             }
             catch(IOException e)
             {
