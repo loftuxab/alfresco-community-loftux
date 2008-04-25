@@ -157,7 +157,10 @@
                     package-webscriptframework-jar,
                     incremental-webclient,
                     deploy-webclient-tomcat" />
-      
+   
+   <!-- temporary target for mac dev env to call for backwards compatibility -->
+   <target name="incremental-tomcat-exploded" depends="incremental-webclient-tomcat-exploded" />
+   
    <target name="incremental-webclient-tomcat-exploded" 
            depends="incremental-core,
                     incremental-jlan, 
@@ -382,7 +385,10 @@
    <target name="deploy-webclient-tomcat" 
            description="Deploys the Alfresco WAR to Tomcat" 
            depends="clean-webclient-tomcat-deploy, -deploy-tomcat-common, deploy-virtual-tomcat">
-
+      <delete file="${dir.deploy.tomcat}/${file.name.war.webclient}" />
+      <delete dir="${dir.deploy.tomcat.webclient}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
       <!-- copy the alfresco WAR file to Tomcat's deploy folder -->
       <copy todir="${dir.deploy.tomcat}" 
             file="${dir.project.webclient.dist}/${file.name.war.webclient}" />
@@ -472,6 +478,10 @@
    
    <target name="deploy-webscriptframework-tomcat" depends="init" 
            description="Deploys the Web Script Framework WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webscriptframework}" />
+      <delete dir="${dir.deploy.tomcat.application.webscriptframework}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
       <!-- copy the WebScript Framework WAR file to the application Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.webscriptframework.dist}/${file.name.war.webscriptframework}" />
@@ -479,6 +489,10 @@
 
    <target name="deploy-webframework-tomcat" depends="init" 
            description="Deploys the WebFramework WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.webframework}" />
+      <delete dir="${dir.deploy.tomcat.application.webframework}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
       <!-- copy the WebFramework WAR file to the application Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.webframework.dist}/${file.name.war.webframework}" />
@@ -486,6 +500,10 @@
    
    <target name="deploy-slingshot-tomcat" depends="init" 
            description="Deploys the slingshot WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.slingshot}" />
+      <delete dir="${dir.deploy.tomcat.application.slingshot}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
       <!-- copy the slingshot WAR file to the application Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.slingshot.dist}/${file.name.war.slingshot}" />
@@ -508,12 +526,12 @@
       </copy>
       
       <!-- overlay all source files from slingshot project -->
-      <copy todir="${dir.deploy.tomcat.application.slingshot}" overwrite="yes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.slingshot.src.web}" />
       </copy>
 
       <!-- overlay config files to WEB-INF/classes -->
-      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" overwrite="yes" verbose="${copy.verbose}">
+      <copy todir="${dir.deploy.tomcat.application.slingshot}/WEB-INF/classes" verbose="${copy.verbose}">
          <fileset dir="${dir.project.slingshot.config}" />
          <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
       </copy>
@@ -543,6 +561,10 @@
    
    <target name="deploy-dynamicwebsite-tomcat" depends="init" 
            description="Deploys the dynamic website WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.dynamicwebsite}" />
+      <delete dir="${dir.deploy.tomcat.application.dynamicwebsite}" 
+              includeEmptyDirs="true" quiet="yes" />
+
       <!-- copy the dynamic website WAR file to application Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.dynamicwebsite.dist}/${file.name.war.dynamicwebsite}" />
@@ -550,6 +572,10 @@
    
    <target name="deploy-extranet-tomcat" depends="init" 
            description="Deploys the extranet WAR to the application Tomcat server">
+      <delete file="${dir.deploy.tomcat.application}/${file.name.war.extranet}" />
+      <delete dir="${dir.deploy.tomcat.application.extranet}" 
+              includeEmptyDirs="true" quiet="yes" />
+      
       <!-- copy the dynamic website WAR file to the application Tomcat deploy folder -->
       <copy todir="${dir.deploy.tomcat.application}" 
             file="${dir.project.extranet.dist}/${file.name.war.extranet}" />
