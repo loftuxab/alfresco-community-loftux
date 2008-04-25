@@ -35,13 +35,16 @@
       <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
    </servlet>
 
-
    <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
    </servlet>
    
-
+   <servlet>
+      <servlet-name>uriTemplateServlet</servlet-name>
+      <servlet-class>org.alfresco.web.page.UriTemplateServlet</servlet-class>
+   </servlet>
+   
    <!-- To use the Web Framework Dispatcher Servlet -->
    <!--   Uncomment this block and comment out the pageRendererServlet above -->
    <!--
@@ -58,11 +61,6 @@
       <url-pattern>/service/*</url-pattern>
    </servlet-mapping>
    
-   <servlet-mapping>
-      <servlet-name>apiServlet</servlet-name>
-      <url-pattern>/s/*</url-pattern>
-   </servlet-mapping>
-
    <servlet-mapping>
       <servlet-name>proxyServlet</servlet-name>
       <url-pattern>/proxy</url-pattern>
@@ -81,6 +79,11 @@
    <servlet-mapping>
       <servlet-name>pageAuthenticationServlet</servlet-name>
       <url-pattern>/auth/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>uriTemplateServlet</servlet-name>
+      <url-pattern>/s/*</url-pattern>
    </servlet-mapping>
    
    <session-config>
