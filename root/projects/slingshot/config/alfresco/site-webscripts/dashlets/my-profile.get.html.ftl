@@ -3,8 +3,8 @@
 <div class="component">
   <div class="component-title">My Limited Profile</div>
   <div class="component-links">
-    <a href="javascript:alert('Not implemented');">Edit profile ></a>
-    <a href="javascript:alert('Not implemented');">View Full Profile ></a>
+    <a href="#" onclick="alert('Not implemented');">Edit profile ></a>
+    <a href="#" onclick="alert('Not implemented');">View Full Profile ></a>
   </div>
   <div class="component-body">
      <div class="header">${profile.name}, Welcome</div>

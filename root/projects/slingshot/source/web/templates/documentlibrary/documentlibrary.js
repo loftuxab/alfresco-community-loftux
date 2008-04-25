@@ -10,7 +10,7 @@
    Alfresco.DocumentLibrary = function()
    {
       /* Load YUI Components */
-      new Alfresco.util.YUILoaderHelper().load(["resize"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["resize"], this.componentsLoaded, this);
             
       return this;
    };

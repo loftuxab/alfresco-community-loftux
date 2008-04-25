@@ -16,8 +16,8 @@
          NOTE: You can select multiple files by using the CTRL or SHIFT key.
       </div>
       <div>
-         <input class="fileupload-clear-button" type="button" value="Clear">
-         <input class="fileupload-browse-button" type="button" value="Browse">
+         <input class="fileupload-clear-button" type="button" value="Clear" />
+         <input class="fileupload-browse-button" type="button" value="Browse" />
       </div>
       <div id="fileupload-flashuploader-button" style="width:0px;height:0px">
          Unable to load Flash content. You can download the latest version of Flash Player from the
@@ -25,8 +25,8 @@
       </div>
       <div class="fileupload-filelist-table"></div>
       <div>
-         <input class="fileupload-cancel-button" type="button" value="Cancel">
-         <input class="fileupload-upload-button" type="button" value="Upload">
+         <input class="fileupload-cancel-button" type="button" value="Cancel" />
+         <input class="fileupload-upload-button" type="button" value="Upload" />
       </div>
       <div class="list">
       </div>
@@ -35,10 +35,10 @@
          <div class="fileupload-fileItemTemplate-div">
             <div class="fileupload-leftcolumn-div">&nbsp;</div>
             <div class="fileupload-actions-div">
-               <form><input class="fileupload-remove-button" type="button" value="Remove"></form>
+               <input class="fileupload-remove-button" type="button" value="Remove" />
             </div>
             <div class="progressBar">
-               <span class="progressSuccess"></span>
+               <span class="progressSuccess">&nbsp;</span>
                <span class="progressInfo">[filename and size]</span>
                <span class="progressPercentage">[percentage]</span>
             </div>
