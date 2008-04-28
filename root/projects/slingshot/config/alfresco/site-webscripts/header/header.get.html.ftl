@@ -1,3 +1,6 @@
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.Header("${args.htmlid}");
+//]]></script>
 <div class="logo">
    <img src="${url.context}${args.logo}" alt="Alfresco" />
 </div>

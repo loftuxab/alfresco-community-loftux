@@ -1,3 +1,9 @@
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.DocumentList("${args.htmlid}").setOptions(
+   {
+      initialPath: "${page.url.args["path"]!""}"
+   });
+//]]></script>
 <div class="doclist-headerBar">
    <div class="yui-gb">
       <div class="yui-u first">

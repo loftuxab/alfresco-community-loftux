@@ -1,3 +1,6 @@
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.FileUpload("${args.htmlid}");   
+//]]></script>
 
 <!-- HTML Upload Panel -->
 <div class="fileupload-htmldialog-panel">
