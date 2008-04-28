@@ -1,3 +1,7 @@
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.MySites("${args.htmlid}");
+//]]></script>
+
 <div id="mysites_1">
 
 <div class="component">

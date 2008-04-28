@@ -1,10 +1,11 @@
 /* Ensure Alfresco root object exists */
-var Alfresco = {};
+if (typeof Alfresco == "undefined" || !Alfresco)
+{
+   var Alfresco = {};
+}
 
 /* Site-wide constants */
-Alfresco.constants = Alfresco.constants || {};
-
-Alfresco.constants =
+Alfresco.constants = Alfresco.constants ||
 {
    /* URL_CONTEXT set by header component using ${url.context} */
    URL_CONTEXT: "./",
@@ -14,7 +15,7 @@ Alfresco.constants =
    
    /* TODO: Remove ticket when AJAX/Proxy authentication in place */
    /* http://localhost:8080/alfresco/service/api/login?u={username}&pw={password} */
-   TICKET: "TICKET_6b23531441346ccde360c0666d879557103d0404"
+   TICKET: "TICKET_af8aff15781e674ae202803224d140d7c8dfcf4b"
 };
 
 
@@ -22,11 +23,10 @@ Alfresco.constants =
 Alfresco.util = Alfresco.util || {};
 
 /*
-   Alfresco.util.appendArray
-   
+   Alfresco.util.appendArrayToObject
    Appends an array onto an object
  */
-Alfresco.util.appendArray = function(obj, arr)
+Alfresco.util.appendArrayToObject = function(obj, arr)
 {
    if (arr)
    {
@@ -35,6 +35,23 @@ Alfresco.util.appendArray = function(obj, arr)
           obj[arr[i]] = true;
       }
    }
+};
+
+/*
+   Alfresco.util.arrayToObject
+   Converts an array into an object
+ */
+Alfresco.util.arrayToObject = function(arr)
+{
+   var obj = {};
+   if (arr)
+   {
+      for (var i = 0; i < arr.length; i++)
+      {
+          obj[arr[i]] = true;
+      }
+   }
+   return obj;
 };
 
 
@@ -48,16 +65,10 @@ Alfresco.util.appendArray = function(obj, arr)
  */
 Alfresco.util.YUILoaderHelper = function()
 {
-   var preloads = {};
    var yuiLoader = null;
    var callbacks = [];
    
    return {
-      preloaded: function(p_aComponents)
-      {
-         Alfresco.util.appendArray(preloads, p_aComponents);
-      },
-      
       require: function(p_aComponents, p_oCallback, p_oScope)
       {
          if (yuiLoader === null)
@@ -66,6 +77,7 @@ Alfresco.util.YUILoaderHelper = function()
             {
                loadOptional: false,
                filter: "",
+               skin: {},
                onSuccess: Alfresco.util.YUILoaderHelper.onLoaderComplete,
                scope: this
             });
@@ -73,17 +85,17 @@ Alfresco.util.YUILoaderHelper = function()
          
          if (p_aComponents.length > 0)
          {
-            /* Have we preloaded all the YUI components the caller requires? */
-            var isPreloaded = true;
+            /* Have all the YUI components the caller requires been registered? */
+            var isRegistered = true;
             for (var i = 0; i < p_aComponents.length; i++)
             {
-               if ((p_aComponents[i] != "") && !(p_aComponents[i] in preloads))
+               if (YAHOO.env.getVersion(p_aComponents[i]) === null)
                {
-                  isPreloaded = false;
+                  isRegistered = false;
                   break;
                }
             }
-            if (isPreloaded && (p_oCallback !== null))
+            if (isRegistered && (p_oCallback !== null))
             {
                p_oCallback.call(typeof p_oScope != "undefined" ? p_oScope : window);
             }
@@ -95,6 +107,7 @@ Alfresco.util.YUILoaderHelper = function()
                /* Store the callback function and scope for later */
                callbacks.push(
                {
+                  required: Alfresco.util.arrayToObject(p_aComponents),
                   fn: p_oCallback,
                   scope: (typeof p_oScope != "undefined" ? p_oScope : window)
                });

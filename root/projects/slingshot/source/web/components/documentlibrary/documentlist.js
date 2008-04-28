@@ -122,7 +122,7 @@
          var dlDataTable = Dom.getElementsByClassName("doclist-documents", "div", this.id)[0];
          this.myDataTable = new YAHOO.widget.DataTable(dlDataTable, myColumnDefs, this.myDataSource,
          {
-            initialRequest: "path=" + this.currentPath.replace(/\s/g, "%2520")
+            initialRequest: "path=" + encodeURIComponent(this.currentPath)
          });
          
       },
@@ -151,7 +151,7 @@
       {
          obj.options.showFolders = !obj.options.showFolders;
          this.set("label", (obj.options.showFolders ? "Hide Folders" : "Show Folders"));
-         obj.myDataSource.sendRequest("path=User%2520Homes/Mike%2520H" + (obj.options.showFolders ? "" : "&type=documents"),
+         obj.myDataSource.sendRequest("path=" + encodeURIComponent(obj.currentPath) + (obj.options.showFolders ? "" : "&type=documents"),
          {
                success: obj.myDataTable.onDataReturnReplaceRows,
                failure: null,

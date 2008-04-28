@@ -5,6 +5,6 @@
    <source-id>global</source-id>
    <url>/components/footer</url>
    <chrome>
-      <frame>none</frame>
+      <frame>div</frame>
    </chrome>
 </component>
