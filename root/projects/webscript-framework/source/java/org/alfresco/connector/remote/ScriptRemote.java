@@ -24,12 +24,14 @@
  */
 package org.alfresco.connector.remote;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.servlet.http.HttpServletResponse;
@@ -38,12 +40,15 @@ import org.alfresco.util.Base64;
 import org.alfresco.web.scripts.Status;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.util.FileCopyUtils;
 
 /**
- * Script root object for accessing data from remote webscripts.
+ * Script root object for accessing data from remote URLs.
  * 
- * Generally remote webscripts will be "data" webscripts (i.e. returning XML/JSON) and
- * will be housed within an Alfresco Repository server.
+ * Generally remote URLs will be "data" webscripts (i.e. returning XML/JSON) called from
+ * web-tier script objects and will be housed within an Alfresco Repository server.
+ * 
+ * Also supports POST of content data 
  * 
  * A 'Response' is returned containing the response data stream as a String and the Status
  * object representing the status code and error information if any.
@@ -61,7 +66,6 @@ public class ScriptRemote
    private String defaultEncoding;
    private String ticket;
    
-   // TODO: remove this - for testing only!
    private String username;
    private String password;
    
@@ -100,7 +104,12 @@ public class ScriptRemote
       this.ticket = ticket;
    }
    
-   // TODO: remove this - for testing only!
+   /**
+    * Basic HTTP auth
+    * 
+    * @param user
+    * @param pass
+    */
    public void setUsernamePassword(String user, String pass)
    {
       this.username = user;
@@ -111,72 +120,166 @@ public class ScriptRemote
     * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
     * as the prefix for the full WebScript url.
     * 
+    * This API is generally called from a script host.
+    * 
     * @param uri     WebScript URI - for example /test/myscript?arg=value
     * 
     * @return Response object from the call {@link Response}
     */
    public Response call(String uri)
    {
-      String result = null;
+      return call(uri, true, null);
+   }
+   
+   /**
+    * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
+    * as the prefix for the full WebScript url.
+    * 
+    * @param uri    WebScript URI - for example /test/myscript?arg=value
+    * @param buildResponseString   True to build a String result automatically based on the response
+    *                              encoding, false to instead return the InputStream in the Response.
+    * @param in     The optional InputStream to the call - if supplied a POST will be performed
+    * 
+    * @return Response object from the call {@link Response}
+    */
+   public Response call(String uri, boolean buildResponseString, InputStream in)
+   {
+      Response result;
       Status status = new Status();
       try
       {
-         URL url;
-         if (this.ticket == null)
-         {
-            url = new URL(endpoint + uri);
-         }
-         else
-         {
-            url = new URL(endpoint + uri +
-                          (uri.lastIndexOf('?') == -1 ? ("?alf_ticket="+ticket) : ("&alf_ticket="+ticket)));
-         }
          ByteArrayOutputStream bOut = new ByteArrayOutputStream(BUFFERSIZE);
-         String encoding = service(url, bOut, status);
-         if (encoding != null)
+         String encoding = service(buildURL(uri), in, bOut, status);
+         if (buildResponseString)
          {
-            result = bOut.toString(encoding);
+            String data;
+            if (encoding != null)
+            {
+               data = bOut.toString(encoding);
+            }
+            else
+            {
+               data = (defaultEncoding != null ? bOut.toString(defaultEncoding) : bOut.toString());
+            }
+            result = new Response(data, status);
          }
          else
          {
-            result = (defaultEncoding != null ? bOut.toString(defaultEncoding) : bOut.toString());
+            result = new Response(new ByteArrayInputStream(bOut.toByteArray()), status);
          }
+         result.setEncoding(encoding);
       }
       catch (IOException ioErr)
       {
+         if (logger.isDebugEnabled())
+            logger.debug("Error status " + status.getCode() + " " + status.getMessage());
+         
          // error information already applied to Status object during service() call
+         result = new Response(status);
       }
       
-      return new Response(result, status);
+      return result;
+   }
+   
+   /**
+    * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
+    * as the prefix for the full WebScript url.
+    * 
+    * @param uri    WebScript URI - for example /test/myscript?arg=value
+    * @param in     The optional InputStream to the call - if supplied a POST will be performed
+    * @param out    OutputStream to stream successful response to - will be closed automatically.
+    *               If call fails the OutputStream will not be modified.
+    * 
+    * @return Response object from the call {@link Response}
+    */
+   public Response call(String uri, InputStream in, OutputStream out)
+   {
+      Response result;
+      Status status = new Status();
+      try
+      {
+         String encoding = service(buildURL(uri), in, out, status);
+         result = new Response(status);
+         result.setEncoding(encoding);
+      }
+      catch (IOException ioErr)
+      {
+         if (logger.isDebugEnabled())
+            logger.debug("Error status " + status.getCode() + " " + status.getMessage());
+         
+         // error information already applied to Status object during service() call
+         result = new Response(status);
+      }
+      
+      return result;
+   }
+
+   /**
+    * Build the URL object based on the supplied uri and configured endpoint. Ticket
+    * will be appiled as an argument if available.
+    * 
+    * @param uri     URI to build URL against
+    * 
+    * @return the URL object representing the call.
+    * 
+    * @throws MalformedURLException
+    */
+   private URL buildURL(String uri) throws MalformedURLException
+   {
+      URL url;
+      if (this.ticket == null)
+      {
+         url = new URL(endpoint + uri);
+      }
+      else
+      {
+         url = new URL(endpoint + uri +
+                       (uri.lastIndexOf('?') == -1 ? ("?alf_ticket="+ticket) : ("&alf_ticket="+ticket)));
+      }
+      return url;
    }
 
    /**
     * Service a remote URL and write the the result into an output stream.
+    * If an InputStream is provided then a POST will be performed with the content
+    * pushed to the url. Otherwise a standard GET will be performed.
     * 
-    * @param url     The URL to open and retrieve data from
-    * @param out     The outputstream to write result to
-    * @param status  The status object to apply the response code too
+    * @param url    The URL to open and retrieve data from
+    * @param in     The optional InputStream - if set a POST will be performed
+    * @param out    The OutputStream to write result to
+    * @param status The status object to apply the response code too
     * 
     * @return encoding specified by the source URL - may be null
     * 
     * @throws IOException
     */
-   private String service(URL url, OutputStream out, Status status)
+   private String service(URL url, InputStream in, OutputStream out, Status status)
       throws IOException
    {
+      if (logger.isDebugEnabled())
+         logger.debug("Executing " + (in == null ? "(get)" : "(post)") + ' ' + url.toString());
+      
       HttpURLConnection connection = null;
       try
       {
          connection = (HttpURLConnection)url.openConnection();
          
-         // TODO: remove this once authentication has been added!
+         // HTTP basic auth support
          if (this.username != null && this.password != null)
          {
             String auth = this.username + ':' + this.password;
             connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
          }
          
-         // locate encoding from the response headers
+         // POST to the connection if input supplied
+         if (in != null)
+         {
+            connection.setDoOutput(true);
+            connection.setRequestMethod("POST");
+            FileCopyUtils.copy(in, connection.getOutputStream());
+         }
+         
+         // locate response encoding from the headers
          String encoding = null;
          String ct = connection.getContentType();
          if (ct != null)
@@ -188,7 +291,7 @@ public class ScriptRemote
             }
          }
          
-         // write the service result to the output stream
+         // write the connection result to the output stream
          InputStream input = connection.getInputStream();
          try
          {
