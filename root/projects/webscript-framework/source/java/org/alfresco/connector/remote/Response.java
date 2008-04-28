@@ -24,6 +24,10 @@
  */
 package org.alfresco.connector.remote;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+
 import org.alfresco.web.scripts.Status;
 
 /**
@@ -34,7 +38,14 @@ import org.alfresco.web.scripts.Status;
 public class Response
 {
    private String data;
+   private InputStream is;
    private Status status;
+   private String encoding = null;
+   
+   Response(Status status)
+   {
+      this.status = status;
+   }
    
    Response(String data, Status status)
    {
@@ -42,12 +53,39 @@ public class Response
       this.status = status;
    }
    
+   Response(InputStream is, Status status)
+   {
+      this.is = is;
+      this.status = status;
+   }
+   
+   /*package*/ void setEncoding(String encoding)
+   {
+      this.encoding = encoding;
+   }
+   
    /**
-    * @return the data stream from the response object - will be null on error
+    * @return the data stream from the response object - will be null on error or if the
+    *         response has already been streamed to an OutputStream.
     */
    public String getResponse()
    {
       return this.data;
+   }
+   
+   /**
+    * @return the response InputStream if set during construction, else will be null.
+    */
+   public InputStream getResponseStream()
+   {
+      try
+      {
+         return (this.is != null ? this.is : new ByteArrayInputStream(this.data.getBytes(encoding)));
+      }
+      catch (UnsupportedEncodingException e)
+      {
+         throw new RuntimeException("UnsupportedEncodingException: " + encoding);
+      }
    }
    
    /**
@@ -56,6 +94,14 @@ public class Response
    public Status getStatus()
    {
       return this.status;
+   }
+   
+   /**
+    * @return the response encoding
+    */
+   public String getEncoding()
+   {
+      return this.encoding;
    }
 
    @Override

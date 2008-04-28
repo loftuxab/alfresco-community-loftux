@@ -31,7 +31,34 @@
    <!--                                -->
    <!-- Resource Storage configuration -->
    <!--                                -->
-   <!-- TODO: replace with Remote store impl - load all resources via data WebScripts from remote repo -->
+   <!-- load site resources via data WebScripts from classpath/remote repo store -->
+   
+   <!-- uncomment this section to use the remote AVM store -->
+   <!-- see web-client bean id 'webscript.org.alfresco.repository.store.remoteavm.get' for store config -->
+   <!--
+   <bean id="pagerenderer.store" parent="webscripts.remotestore" abstract="true">
+      <property name="endpoint"><value>http://localhost:8080/alfresco/s/remotestore</value></property>
+   </bean>
+
+   <bean id="pagerenderer.pagestore" parent="pagerenderer.store">
+      <property name="path"><value>/site-data/pages</value></property>
+   </bean>
+
+   <bean id="pagerenderer.pageassocstore" parent="pagerenderer.store">
+      <property name="path"><value>/site-data/page-associations</value></property>
+   </bean>
+
+   <bean id="pagerenderer.templateconfigstore" parent="pagerenderer.store">
+      <property name="path"><value>/site-data/template-instances</value></property>
+   </bean>
+
+   <bean id="pagerenderer.componentstore" parent="pagerenderer.store">
+      <property name="path"><value>/site-data/components</value></property>
+   </bean>
+   -->
+   <!-- END of remote store section -->
+   
+   <!-- and also comment out this section -->
    <bean id="pagerenderer.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
 
    <bean id="pagerenderer.pagestore" parent="pagerenderer.classpathstore">
@@ -53,8 +80,9 @@
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/site-data/components</value></property>
    </bean>
-
-   <bean id="pagerenderer.templatestore" parent="pagerenderer.classpathstore">
+   <!-- END of classpath store section -->
+   
+   <bean id="pagerenderer.templatestore" parent="webscripts.classpathstore">
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/templates</value></property>
    </bean>

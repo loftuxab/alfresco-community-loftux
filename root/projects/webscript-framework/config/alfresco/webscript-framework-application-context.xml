@@ -158,6 +158,8 @@
 
    <bean id="webscripts.classpathstore" class="org.alfresco.web.scripts.ClassPathStore" abstract="true" />
 
+   <bean id="webscripts.remotestore" class="org.alfresco.web.scripts.RemoteStore" abstract="true" />
+
    <bean id="webscripts.store" parent="webscripts.classpathstore">
       <property name="mustExist"><value>true</value></property>
       <property name="classPath"><value>alfresco/webscripts</value></property>

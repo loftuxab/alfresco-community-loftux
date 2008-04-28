@@ -208,8 +208,6 @@ public class RegionDirective implements TemplateDirectiveModel
                   // TODO: style the chrome?
                   // write an ID into the div element - this can be used by the component writer
                   env.getOut().write("<div id='" + component.getId() + "'>");
-                  // inform the component writer of the element id via 'htmlid' component properties
-                  component.getProperties().put(PageComponent.PROP_HTMLID, component.getId());
                   break;
                case IFRAME:
                   // TODO: token context replacement on the URL here?
@@ -217,6 +215,9 @@ public class RegionDirective implements TemplateDirectiveModel
                   env.getOut().write("<iframe src='/service" + component.getUrl() + "'>"); 
                   break;
             }
+            
+            // inform the component writer of the element id via 'htmlid' component properties
+            component.getProperties().put(PageComponent.PROP_HTMLID, component.getId());
             
             renderComponent(env.getOut(), component);
             
