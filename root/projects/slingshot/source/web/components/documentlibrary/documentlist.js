@@ -140,7 +140,11 @@
       onFileUploadButtonClick: function(e, obj)
       {
          var fuComponent = Alfresco.util.ComponentManager.find({name:"Alfresco.FileUpload"})[0];
-         fuComponent.show();
+         // config for update new version of a single image
+         // fuComponent.show("Upload New Version of Alfresco Logo.rtf", [{description:"Images", extensions:"*.jpg"}], false, 1, true);
+
+         // config for multi upload of new documents
+         fuComponent.show("Upload Files", [{description:"Documents", extensions:"*.doc"}], true, 5, false);
       },
       
       onShowFoldersButtonClick: function(e, obj)
