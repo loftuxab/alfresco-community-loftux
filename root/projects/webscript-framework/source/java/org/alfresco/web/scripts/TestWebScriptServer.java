@@ -142,8 +142,8 @@ public class TestWebScriptServer
     {
         String[] CONFIG_LOCATIONS = new String[]
         {
-            "classpath:alfresco/web-framework-application-context.xml", 
-            "classpath:alfresco/web-framework-application-context-test.xml"
+            "classpath:alfresco/webscript-framework-application-context.xml", 
+            "classpath:alfresco/webscript-framework-application-context-test.xml"
         };
         ApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_LOCATIONS);
         TestWebScriptServer testServer = (TestWebScriptServer)context.getBean("webscripts.test");
