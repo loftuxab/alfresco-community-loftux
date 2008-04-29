@@ -38,7 +38,8 @@ public enum Format
     ATOM ("application/atom+xml"),
     ATOMFEED ("application/atom+xml;type=feed"),
     ATOMENTRY ("application/atom+xml;type=entry"),
-    FORMDATA ("multipart/form-data");
+    FORMDATA ("multipart/form-data"),
+    JSON ("application/json");
 
     private String mimetype;
 

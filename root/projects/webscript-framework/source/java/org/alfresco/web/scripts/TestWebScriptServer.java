@@ -178,13 +178,51 @@ public class TestWebScriptServer
      * @throws IOException
      */
     public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers)
+    throws IOException
+    {
+        return submitRequest(method, uri, headers, null, null);
+    }
+        
+    /**
+     * Submit a Web Script Request. 
+     * <p>
+     * Can specifiy content and content type
+     * 
+     * @param method        http method
+     * @param uri           web script (relative to /alfresco/service)
+     * @param headers       headers
+     * @param body          body of request content (can be null)
+     * @param contentType   content type (eg "multipart/form-data") (can be null)
+     * @return              response           
+     * @throws IOException
+     */
+    public MockHttpServletResponse submitRequest(String method, String uri, Map<String, String> headers, String body, String contentType)
         throws IOException
     {
         MockHttpServletRequest req = createRequest(method, uri);
-        for (Map.Entry<String, String> header: headers.entrySet())
+        
+        // Set the headers
+        if (headers != null)
         {
-            req.addHeader(header.getKey(), header.getValue());
+            for (Map.Entry<String, String> header: headers.entrySet())
+            {
+                req.addHeader(header.getKey(), header.getValue());
+            }
+        }        
+
+        // Set the body of the request
+        if (body != null && body.length() != 0)
+        {            
+            req.setContent(body.getBytes());
         }
+        
+        // Set the content type
+        if (contentType != null && contentType.length() != 0)
+        {
+            req.setContentType(contentType);
+            req.addHeader("Content-Type", contentType);
+        }
+        
         MockHttpServletResponse res = new MockHttpServletResponse();
         AbstractRuntime runtime = new WebScriptServletRuntime(container, authenticatorFactory, req, res, serverProperties);
         runtime.executeScript();
