@@ -67,6 +67,7 @@
       <property name="readers">
          <list>
            <bean class="org.alfresco.web.scripts.servlet.FormDataReader" />
+           <bean class="org.alfresco.web.scripts.json.JSONReader" />
            <bean class="org.alfresco.web.scripts.atom.AtomEntryReader">
               <property name="abderaService" ref="webscripts.abdera"/>
            </bean>
