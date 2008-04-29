@@ -6,7 +6,7 @@
 
    <plug-ins>
       <element-readers>
-         <element-reader element-name="opensearch" class="org.alfresco.web.config.OpenSearchElementReader"/>
+         <element-reader element-name="opensearch" class="org.alfresco.repo.web.scripts.config.OpenSearchElementReader"/>
       </element-readers>
    </plug-ins>
    

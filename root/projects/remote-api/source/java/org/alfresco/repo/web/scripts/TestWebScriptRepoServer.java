@@ -101,8 +101,7 @@ public class TestWebScriptRepoServer extends TestWebScriptServer
             "classpath:alfresco/application-context.xml",
             "classpath:alfresco/webscript-framework-application-context.xml",
             "classpath:alfresco/web-scripts-application-context.xml",
-            "classpath:alfresco/web-scripts-application-context-test.xml",
-            "classpath:alfresco/web-client-application-context.xml"
+            "classpath:alfresco/web-scripts-application-context-test.xml"
         };
         ApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_LOCATIONS);
         TestWebScriptServer testServer = (TestWebScriptRepoServer)context.getBean("webscripts.test");

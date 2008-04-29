@@ -443,7 +443,7 @@
    <!-- ** Remote API Project ** -->
    <!-- ************************ -->
 
-   <target name="incremental-remoteapi" 
+   <target name="incremental-remoteapi"
            depends="package-remoteapi" />
       
    <target name="build-remoteapi" 
@@ -1666,11 +1666,13 @@
       <copy todir="${dir.project.webclient.assemble}/WEB-INF/classes">
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
-         <fileset dir="${dir.project.repository.config}" 
+         <fileset dir="${dir.project.repository.config}"
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.webscriptframework.config}" 
+         <fileset dir="${dir.project.remoteapi.config}"
                   excludes="**/extension/**" />
-         <fileset dir="${dir.project.webclient.config}" 
+         <fileset dir="${dir.project.webscriptframework.config}"
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webclient.config}"
                   excludes="**/extension/**" />
          <!-- 
          Add dev-context.xml (if present) to WEB-INF/classes.
@@ -1781,7 +1783,7 @@
            description="Packages the sample website" 
            depends="compile-webclient" 
            if="enable.webclient.samplewebsite">
-      <delete includeEmptyDirs="true" 
+      <delete includeEmptyDirs="true"
               quiet="yes" 
               dir="${dir.project.webclient.samplewebsite}" />
       <mkdir dir="${dir.project.webclient.samplewebsite}/alfresco/classes"/>

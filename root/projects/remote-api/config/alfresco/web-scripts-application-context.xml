@@ -130,8 +130,7 @@
    <!--  Web Script Authenticators -->
    <!--                            -->
 
-   <!--  Alfresco Web Client Authenticator (Servlet based) -->
-   <bean id="webscripts.authenticator.webclient" class="org.alfresco.repo.web.scripts.servlet.WebClientAuthenticatorFactory" />
+   
    
    <!--  HTTP Basic Authenticator (Servlet based) -->
    <bean id="webscripts.authenticator.basic" class="org.alfresco.repo.web.scripts.servlet.BasicHttpAuthenticatorFactory">
@@ -141,11 +140,6 @@
    <!--  JSR-168 Authenticator (Portal based) -->
    <bean id="webscripts.authenticator.jsr168" class="org.alfresco.repo.web.scripts.portlet.JSR168PortletAuthenticatorFactory">
       <property name="unprotAuthenticationService" ref="authenticationService" />
-      <property name="transactionService" ref="TransactionService" />
-   </bean>
-   <bean id="webscripts.authenticator.jsr168.webclient" class="org.alfresco.repo.web.scripts.portlet.WebClientPortletAuthenticatorFactory">
-      <property name="repository" ref="webscripts.repo" />
-      <property name="authenticationService" ref="AuthenticationService" />
       <property name="transactionService" ref="TransactionService" />
    </bean>
 
