@@ -24,6 +24,7 @@
  */
 package org.alfresco.connector.remote;
 
+import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -136,6 +137,20 @@ public class ScriptRemote
     * as the prefix for the full WebScript url.
     * 
     * @param uri    WebScript URI - for example /test/myscript?arg=value
+    * @param in     The optional InputStream to the call - if supplied a POST will be performed
+    * 
+    * @return Response object from the call {@link Response}
+    */
+   public Response call(String uri, InputStream in)
+   {
+      return call(uri, true, in);
+   }
+   
+   /**
+    * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
+    * as the prefix for the full WebScript url.
+    * 
+    * @param uri    WebScript URI - for example /test/myscript?arg=value
     * @param buildResponseString   True to build a String result automatically based on the response
     *                              encoding, false to instead return the InputStream in the Response.
     * @param in     The optional InputStream to the call - if supplied a POST will be performed
@@ -186,9 +201,26 @@ public class ScriptRemote
     * as the prefix for the full WebScript url.
     * 
     * @param uri    WebScript URI - for example /test/myscript?arg=value
+    * @param out    OutputStream to stream successful response to - will be closed automatically.
+    *               A response data string will not therefore be available in the Response object.
+    *               If remote call fails the OutputStream will not be modified or closed.
+    * 
+    * @return Response object from the call {@link Response}
+    */
+   public Response call(String uri, OutputStream out)
+   {
+      return call(uri, null, out);
+   }
+   
+   /**
+    * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
+    * as the prefix for the full WebScript url.
+    * 
+    * @param uri    WebScript URI - for example /test/myscript?arg=value
     * @param in     The optional InputStream to the call - if supplied a POST will be performed
     * @param out    OutputStream to stream successful response to - will be closed automatically.
-    *               If call fails the OutputStream will not be modified.
+    *               A response data string will not therefore be available in the Response object.
+    *               If remote call fails the OutputStream will not be modified or closed.
     * 
     * @return Response object from the call {@link Response}
     */
@@ -274,21 +306,12 @@ public class ScriptRemote
          // POST to the connection if input supplied
          if (in != null)
          {
-            connection.setDoOutput(true);
             connection.setRequestMethod("POST");
-            FileCopyUtils.copy(in, connection.getOutputStream());
-         }
-         
-         // locate response encoding from the headers
-         String encoding = null;
-         String ct = connection.getContentType();
-         if (ct != null)
-         {
-            int csi = ct.indexOf(CHARSETEQUALS);
-            if (csi != -1)
-            {
-               encoding = ct.substring(csi + CHARSETEQUALS.length());
-            }
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+            connection.setUseCaches(false);
+            connection.setRequestProperty ("Content-Type", "application/octet-stream");
+            FileCopyUtils.copy(in, new BufferedOutputStream(connection.getOutputStream()));
          }
          
          // write the connection result to the output stream
@@ -323,6 +346,18 @@ public class ScriptRemote
             {
                if (logger.isWarnEnabled())
                   logger.warn("Exception during close() of HTTP API connection", e);
+            }
+         }
+         
+         // locate response encoding from the headers
+         String encoding = null;
+         String ct = connection.getContentType();
+         if (ct != null)
+         {
+            int csi = ct.indexOf(CHARSETEQUALS);
+            if (csi != -1)
+            {
+               encoding = ct.substring(csi + CHARSETEQUALS.length());
             }
          }
          

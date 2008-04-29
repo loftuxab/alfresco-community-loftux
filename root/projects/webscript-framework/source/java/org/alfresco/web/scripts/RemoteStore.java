@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.remote.Response;
 import org.alfresco.connector.remote.ScriptRemote;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLEncoder;
 
 import freemarker.cache.TemplateLoader;
@@ -164,7 +165,7 @@ public class RemoteStore implements Store
      */
     public String[] getAllDocumentPaths()
     {
-        return null;
+        throw new AlfrescoRuntimeException("getAllDocumentPaths() not supported by remote store.");
     }
     
     /* (non-Javadoc)
@@ -172,7 +173,7 @@ public class RemoteStore implements Store
      */
     public String[] getDescriptionDocumentPaths()
     {
-        return null;
+        throw new AlfrescoRuntimeException("getDescriptionDocumentPaths() not supported by remote store.");
     }
 
     /* (non-Javadoc)
@@ -180,7 +181,7 @@ public class RemoteStore implements Store
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
-        return null;
+        throw new AlfrescoRuntimeException("getScriptDocumentPaths() not supported by remote store.");
     }
 
     /* (non-Javadoc)
@@ -188,7 +189,7 @@ public class RemoteStore implements Store
      */
     public ScriptLoader getScriptLoader()
     {
-        return null;
+        throw new AlfrescoRuntimeException("getScriptLoader() not supported by remote store.");
     }
 
     /* (non-Javadoc)
@@ -196,7 +197,7 @@ public class RemoteStore implements Store
      */
     public TemplateLoader getTemplateLoader()
     {
-        return null;
+        throw new AlfrescoRuntimeException("getTemplateLoader() not supported by remote store.");
     }
 
     /* (non-Javadoc)

@@ -148,4 +148,10 @@ public class Status
     {
         return I18NUtil.getMessage("webscript.code." + code + ".description");
     }
+
+    @Override
+    public String toString()
+    {
+        return Integer.toString(code);
+    }
 }
