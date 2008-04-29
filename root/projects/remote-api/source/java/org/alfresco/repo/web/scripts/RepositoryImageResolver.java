@@ -28,7 +28,6 @@ import javax.servlet.ServletContext;
 
 import org.alfresco.service.cmr.repository.FileTypeImageSize;
 import org.alfresco.service.cmr.repository.TemplateImageResolver;
-import org.alfresco.web.ui.common.Utils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.context.ServletContextAware;
 
@@ -56,6 +55,7 @@ public class RepositoryImageResolver
     /* (non-Javadoc)
      * @see org.springframework.beans.factory.InitializingBean#afterPropertiesSet()
      */
+    @SuppressWarnings("serial")
     public void afterPropertiesSet()
         throws Exception
     {
@@ -63,7 +63,7 @@ public class RepositoryImageResolver
         {
             public String resolveImagePathForName(String filename, FileTypeImageSize size)
             {
-                return Utils.getFileTypeImage(servletContext, filename, size);
+                return FileTypeImageUtils.getFileTypeImage(servletContext, filename, size);
             }  
         };        
     }

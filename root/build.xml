@@ -105,20 +105,20 @@
    <target name="incremental" 
            description="Performs an incremental build of all projects"
            depends="incremental-core,
+                    incremental-webscriptframework,
                     incremental-jlan,
                     incremental-mbeans,
                     incremental-deployment,
                     incremental-repository,
                     incremental-remoteapi,
-                    incremental-jndi, 
+                    incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    incremental-webscriptframework,
                     incremental-webclient,  
                     incremental-webserviceclient,
                     incremental-webframework,
                     incremental-slingshot" />
-   
+
    <target name="build-modules"
            description="Performs a clean build of all modules"
            depends="clean-modules, incremental-modules" />
@@ -146,15 +146,15 @@
    <target name="incremental-webclient-tomcat" 
            description="Performs an incremental build and deployment of the Alfresco WAR"
            depends="incremental-core,
+                    package-webscriptframework-jar,
                     incremental-jlan, 
                     incremental-mbeans, 
                     incremental-deployment,
-                    incremental-repository, 
+                    incremental-repository,
                     incremental-remoteapi, 
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    package-webscriptframework-jar,
                     incremental-webclient,
                     deploy-webclient-tomcat" />
    
@@ -163,6 +163,7 @@
    
    <target name="incremental-webclient-tomcat-exploded" 
            depends="incremental-core,
+                    package-webscriptframework-jar,
                     incremental-jlan, 
                     incremental-mbeans, 
                     incremental-deployment,
@@ -171,7 +172,6 @@
                     incremental-jndi,
                     incremental-catalinavirtual, 
                     incremental-linkvalidation,
-                    package-webscriptframework-jar,
                     package-webclient-jar,
                     deploy-webclient-tomcat-exploded" />
    
@@ -203,13 +203,13 @@
    
    <target name="incremental-dynamicwebsite-tomcat" 
            description="Performs an incremental build and deployment of the dynamic website WAR"
-           depends="incremental-core, 
+           depends="incremental-core,
+                    package-webscriptframework-jar,
                     incremental-jlan, 
                     incremental-mbeans, 
                     incremental-deployment,
                     incremental-repository,
                     incremental-jndi,
-                    package-webscriptframework-jar, 
                     package-webframework-jar, 
                     incremental-dynamicwebsite,
                     deploy-dynamicwebsite-tomcat" />
@@ -421,6 +421,8 @@
          <fileset dir="${dir.project.core.src.java}" 
                   includes="log4j.properties" />
          <fileset dir="${dir.project.repository.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.remoteapi.config}"
                   excludes="**/extension/**" />
          <fileset dir="${dir.project.webclient.config}" 
                   excludes="**/extension/**" />

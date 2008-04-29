@@ -33,7 +33,7 @@ import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.repo.content.MimetypeMap;
-import org.alfresco.web.config.OpenSearchConfigElement;
+import org.alfresco.repo.web.scripts.config.OpenSearchConfigElement;
 import org.alfresco.web.scripts.DeclarativeWebScript;
 import org.alfresco.web.scripts.Status;
 import org.alfresco.web.scripts.WebScriptRequest;
@@ -79,6 +79,7 @@ public class SearchEngines extends DeclarativeWebScript
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.DeclarativeWebScript#executeImpl(org.alfresco.web.scripts.WebScriptRequest, org.alfresco.web.scripts.WebScriptResponse)
      */
+    @SuppressWarnings("deprecation")
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
     {
@@ -91,7 +92,7 @@ public class SearchEngines extends DeclarativeWebScript
         {
             urlType = URL_ARG_DESCRIPTION;
         }
-        
+                
         //
         // retrieve open search engines configuration
         //

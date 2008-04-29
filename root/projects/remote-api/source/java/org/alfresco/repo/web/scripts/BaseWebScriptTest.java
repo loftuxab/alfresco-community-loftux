@@ -25,6 +25,7 @@
 package org.alfresco.repo.web.scripts;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.alfresco.web.scripts.TestWebScriptServer;
 import org.springframework.mock.web.MockHttpServletResponse;
@@ -47,7 +48,7 @@ public abstract class BaseWebScriptTest extends TestCase
     /** Test web script server */
     private static TestWebScriptServer server = null;
     
-    protected TestWebScriptServer getServer()
+    protected static TestWebScriptServer getServer()
     {
         if (BaseWebScriptTest.server == null)
         {
@@ -95,7 +96,7 @@ public abstract class BaseWebScriptTest extends TestCase
     private MockHttpServletResponse sendRequest(String method, String url, int expectedStatus, String body, String contentType)
         throws IOException
     {
-        MockHttpServletResponse response = getServer().submitRequest(method, url, null, body, contentType);
+        MockHttpServletResponse response = BaseWebScriptTest.getServer().submitRequest(method, url, new HashMap<String, String>(), body, contentType);
         if (expectedStatus != response.getStatus())
         {
             if (response.getStatus() == 500)
