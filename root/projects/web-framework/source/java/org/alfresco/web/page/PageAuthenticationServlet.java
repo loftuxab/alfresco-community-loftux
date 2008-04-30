@@ -34,8 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.Response;
-import org.alfresco.connector.remote.ScriptRemote;
 import org.alfresco.util.URLEncoder;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.springframework.context.ApplicationContext;
@@ -69,7 +69,7 @@ public class PageAuthenticationServlet extends HttpServlet
          else
          {
             // make a direct call to login api to retrieve a ticket for the user credentials
-            ScriptRemote remote = new ScriptRemote(endpoint);
+            RemoteClient remote = new RemoteClient(endpoint);
             Response response = remote.call("/s/api/login?u=" + username + "&pw=" + password);
             if (response.getStatus().getCode() == HttpServletResponse.SC_OK)
             {

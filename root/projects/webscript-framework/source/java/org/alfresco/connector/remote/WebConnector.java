@@ -33,14 +33,14 @@ import org.alfresco.connector.Credentials;
  */
 public class WebConnector extends AbstractConnector
 {
-    public WebConnector(WebClient client)
+    public WebConnector(RemoteClient client)
     {
         super(client);
     }
 
     public WebConnector(String url)
     {
-        this(new WebClient(url));
+        this(new RemoteClient(url));
     }
 
     //
@@ -49,7 +49,7 @@ public class WebConnector extends AbstractConnector
 
     protected Response service(String uri, Map parameters, Map headers)
     {
-        WebClient remoteClient = ((WebClient) this.getClient());
+        RemoteClient remoteClient = ((RemoteClient)this.getClient());
 
         // stamp credentials onto the client
         credentials(remoteClient);
@@ -60,7 +60,7 @@ public class WebConnector extends AbstractConnector
 
     protected void credentials(Client client)
     {
-        WebClient webClient = (WebClient) client;
+        RemoteClient webClient = (RemoteClient) client;
 
         // set up authentication
         if (getCredentials() != null)
@@ -76,7 +76,6 @@ public class WebConnector extends AbstractConnector
         }
     }
 
-    protected WebClient client;
+    protected RemoteClient client;
     protected Credentials credentials;
-
 }

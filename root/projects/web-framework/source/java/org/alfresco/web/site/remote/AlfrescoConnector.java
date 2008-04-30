@@ -25,7 +25,7 @@
 package org.alfresco.web.site.remote;
 
 import org.alfresco.connector.remote.Client;
-import org.alfresco.connector.remote.WebClient;
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.WebConnector;
 
 /**
@@ -33,19 +33,19 @@ import org.alfresco.connector.remote.WebConnector;
  */
 public class AlfrescoConnector extends WebConnector
 {
-    protected AlfrescoConnector(WebClient client)
+    protected AlfrescoConnector(RemoteClient client)
     {
         super(client);
     }
 
     protected AlfrescoConnector(String url)
     {
-        this(new WebClient(url));
+        this(new RemoteClient(url));
     }
 
     protected void credentials(Client client)
     {
-        WebClient webClient = (WebClient) client;
+        RemoteClient webClient = (RemoteClient)client;
 
         // set up authentication
         if (getCredentials() != null)
@@ -58,5 +58,4 @@ public class AlfrescoConnector extends WebConnector
             }
         }
     }
-
 }

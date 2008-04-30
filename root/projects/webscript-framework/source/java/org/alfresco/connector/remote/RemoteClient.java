@@ -44,7 +44,9 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.util.FileCopyUtils;
 
 /**
- * Script root object for accessing data from remote URLs.
+ * Remote client for for accessing data from remote URLs.
+ * 
+ * Can be used as a Script root object for simple HTTP requests.
  * 
  * Generally remote URLs will be "data" webscripts (i.e. returning XML/JSON) called from
  * web-tier script objects and will be housed within an Alfresco Repository server.
@@ -56,14 +58,13 @@ import org.springframework.util.FileCopyUtils;
  * 
  * @author Kevin Roast
  */
-public class ScriptRemote
+public class RemoteClient extends AbstractClient
 {
-   private static Log logger = LogFactory.getLog(ScriptRemote.class);
+   private static Log logger = LogFactory.getLog(RemoteClient.class);
    
    private static final String CHARSETEQUALS = "charset=";
    private static final int BUFFERSIZE = 4096;
 
-   private String endpoint;
    private String defaultEncoding;
    private String ticket;
    
@@ -77,7 +78,7 @@ public class ScriptRemote
     * @param endpoint         HTTP API endpoint of remote Alfresco server webapp
     *                         For example http://servername:8080/alfresco
     */
-   public ScriptRemote(String endpoint)
+   public RemoteClient(String endpoint)
    {
       this(endpoint, null);
    }
@@ -89,9 +90,9 @@ public class ScriptRemote
     *                         For example http://servername:8080/alfresco
     * @param defaultEncoding  Encoding to use when converting responses that do not specify one
     */
-   public ScriptRemote(String endpoint, String defaultEncoding)
+   public RemoteClient(String endpoint, String defaultEncoding)
    {
-      this.endpoint = endpoint;
+      super(endpoint);
       this.defaultEncoding = defaultEncoding;
    }
    

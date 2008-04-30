@@ -24,16 +24,20 @@
  */
 package org.alfresco.connector.remote;
 
+import java.net.URL;
+
 /**
  * @author muzquiano
  */
 public interface Client
 {
+    /**
+     * @return the endpoint for this client i.e. http://server:8080/alfresco
+     */
     public String getEndpoint();
 
-    public String getHost();
-
-    public int getPort();
-
-    public String getProtocol();
+    /**
+     * @return the endpoint for this client as a URL object
+     */
+    public URL getURL();
 }

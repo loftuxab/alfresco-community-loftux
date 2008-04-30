@@ -136,10 +136,8 @@ public class Endpoint extends ModelObject
         setProperty(PROP_PASSWORD, password);
     }    
     
-    
     public String getTypeName() 
     {
         return TYPE_NAME;
     }
-    
 }

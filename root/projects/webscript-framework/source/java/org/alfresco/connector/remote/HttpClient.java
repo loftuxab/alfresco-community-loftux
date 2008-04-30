@@ -25,6 +25,7 @@
 package org.alfresco.connector.remote;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -72,27 +73,32 @@ public class HttpClient extends AbstractClient
             String key = (String) it.next();
             String value = (String) headers.get(key);
             if (value != null)
+            {
                 method.addRequestHeader(key, value);
+            }
         }
     }
-
-    // ///////////////
 
     public void init(Map params, Map headers, String uri)
     {
         String url = this.getEndpoint();
         if (uri != null)
+        {
             url = url + uri;
+        }
 
-        System.out.println("Calling init: " + url);
         this.client = new org.apache.commons.httpclient.HttpClient();
         this.method = new org.apache.commons.httpclient.methods.GetMethod(url);
 
         // stamp request parameters and headers onto the method
         if (params != null)
+        {
             stampParameters(method, params);
+        }
         if (headers != null)
+        {
             stampHeaders(method, headers);
+        }
     }
 
     public String execute() throws IOException
@@ -118,8 +124,9 @@ public class HttpClient extends AbstractClient
 
     protected void applyCredentials(Credentials credentials)
     {
+        URL url = getURL();
         this.client.getState().setCredentials(
-                new AuthScope(getHost(), getPort(), AuthScope.ANY_REALM),
+                new AuthScope(url.getHost(), url.getPort(), AuthScope.ANY_REALM),
                 credentials);
     }
 

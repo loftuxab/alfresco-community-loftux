@@ -50,5 +50,4 @@ public class HTTPBasicAuthenticator implements Authenticator
 
         return credentials;
     }
-
 }

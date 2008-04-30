@@ -29,9 +29,10 @@ import org.alfresco.connector.Credentials;
 import org.alfresco.connector.DefaultCredentials;
 import org.alfresco.connector.Identity;
 import org.alfresco.connector.remote.AbstractClient;
+import org.alfresco.connector.remote.Client;
 import org.alfresco.connector.remote.Connector;
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.Response;
-import org.alfresco.connector.remote.WebClient;
 import org.alfresco.connector.remote.WebConnector;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
@@ -43,18 +44,17 @@ public class AlfrescoAuthenticator implements Authenticator
 {
     public Credentials authenticate(Connector connector, Identity identity)
     {
-        AlfrescoConnector alfConnector = (AlfrescoConnector) connector;
-        AbstractClient alfClient = (AbstractClient) alfConnector.getClient();
-        String endpointUrl = alfClient.getEndpoint();
-
-        // the endpoint would be
+        Client client = connector.getClient();
+        String endpointUrl = client.getEndpoint();
+        
+        // the endpoint would be something like
         // http://localhost:8080/alfresco
-
+        
         // create a new web connector
         WebConnector webConnector = ConnectorFactory.newWebConnector(endpointUrl);
-
+        
         // plug identity onto the connector/client
-        WebClient webClient = (WebClient) webConnector.getClient();
+        RemoteClient webClient = (RemoteClient)webConnector.getClient();
         String username = (String) identity.get("USERNAME");
         String password = (String) identity.get("PASSWORD");
         webClient.setUsernamePassword(username, password);

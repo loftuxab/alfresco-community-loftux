@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
-import org.alfresco.connector.remote.ScriptRemote;
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.web.scripts.PresentationContainer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -71,7 +71,7 @@ public class PageRendererRuntimeContainer extends PresentationContainer
          else
          {
             // use appropriate webscript servlet here - one that supports TICKET param auth
-            ScriptRemote remote = new ScriptRemote(endpoint + "/s", "UTF-8");
+            RemoteClient remote = new RemoteClient(endpoint + "/s", "UTF-8");
             remote.setTicket(ticket.get());
 
             //

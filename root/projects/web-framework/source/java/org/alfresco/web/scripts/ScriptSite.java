@@ -28,8 +28,8 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.Response;
-import org.alfresco.connector.remote.ScriptRemote;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.site.Framework;
@@ -110,7 +110,7 @@ public final class ScriptSite extends ScriptBase
     public String callRemote(String endpointString, String user, String pass,
             String uri)
     {
-        ScriptRemote remote = new ScriptRemote(endpointString, null);
+        RemoteClient remote = new RemoteClient(endpointString, null);
         remote.setUsernamePassword(user, pass);
 
         Response r = remote.call(uri);

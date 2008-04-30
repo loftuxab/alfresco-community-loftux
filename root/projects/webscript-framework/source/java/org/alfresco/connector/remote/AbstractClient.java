@@ -27,6 +27,8 @@ package org.alfresco.connector.remote;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+
 /**
  * @author muzquiano
  */
@@ -35,49 +37,23 @@ public abstract class AbstractClient implements Client
     public AbstractClient(String endpoint)
     {
         this.endpoint = endpoint;
-
-        // parse out some things
     }
 
     public String getEndpoint()
     {
-        return endpoint;
-    }
-
-    public String getHost()
-    {
-        URL url = getURL();
-        if (url != null)
-            return url.getHost();
-        return null;
-    }
-
-    public int getPort()
-    {
-        URL url = getURL();
-        if (url != null)
-            return url.getPort();
-        return 80;
-    }
-
-    public String getProtocol()
-    {
-        URL url = getURL();
-        if (url != null)
-            return url.getProtocol();
-        return null;
+        return this.endpoint;
     }
 
     public URL getURL()
     {
         try
         {
-            return new URL(endpoint);
+            return new URL(this.endpoint);
         }
         catch (MalformedURLException me)
         {
+            throw new AlfrescoRuntimeException("Unable to parse endpoint as URL: " + this.endpoint);
         }
-        return null;
     }
 
     protected String endpoint;
