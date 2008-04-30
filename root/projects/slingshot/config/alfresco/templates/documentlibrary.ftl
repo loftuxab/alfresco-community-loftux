@@ -4,7 +4,6 @@
    <script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></script>
 </@>
 <@template.body>
-<body class="yui-skin-sam">
    <div id="doc3">
       <div id="hd">
          <@region id="header" scope="global" protected=true />
@@ -32,5 +31,4 @@
          <@region id="file-upload" scope="template" protected=true />
       </div>
    </div>
-</body>
 </@>

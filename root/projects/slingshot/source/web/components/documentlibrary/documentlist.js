@@ -50,8 +50,8 @@
          this.currentPath = this.options.initialPath;
       
          /* File Select Button */
-         var fsButton = Dom.getElementsByClassName("doclist-fileSelect-button", "input", this.id)[0];
-         var fsMenu = Dom.getElementsByClassName("doclist-fileSelect-menu", "select", this.id)[0];
+         var fsButton = Dom.get(this.id + "-fileSelect-button");
+         var fsMenu = Dom.get(this.id + "-fileSelect-menu");
          var fileSelectButton = new YAHOO.widget.Button(fsButton,
          {
             type: "menu", 
@@ -64,18 +64,18 @@
          if (fileUploads.length > 0)
          {
             this.fileUpload = fileUploads[0];
-            var fuButton = Dom.getElementsByClassName("doclist-fileUpload-button", "a", this.id)[0];
+            var fuButton = Dom.get(this.id + "-fileUpload-button");
             var fileUploadButton = new YAHOO.widget.Button(fuButton,
             {
                type: "button"
             });
             fileUploadButton.on("click", this.onFileUploadButtonClick, this);
-            var fuButtonWrap = Dom.getElementsByClassName("doclist-fileUpload-buttonWrap", "span", this.id)[0];
+            var fuButtonWrap = Dom.get(this.id + "-fileUpload-buttonWrap");
             Dom.removeClass(fuButtonWrap, "hiddenComponents");
          }
 
          /* Hide/Show Folders button */
-         var sfButton = Dom.getElementsByClassName("doclist-showFolders-button", "a", this.id)[0];
+         var sfButton = Dom.get(this.id + "-showFolders-button");
          var showFoldersButton = new YAHOO.widget.Button(sfButton,
          {
             type: "button"
@@ -119,7 +119,7 @@
              fields: ["nodeRef", "type", "icon16", "icon32", "name", "status", "description"]
          };
 
-         var dlDataTable = Dom.getElementsByClassName("doclist-documents", "div", this.id)[0];
+         var dlDataTable = Dom.get(this.id + "-documents");
          this.myDataTable = new YAHOO.widget.DataTable(dlDataTable, myColumnDefs, this.myDataSource,
          {
             initialRequest: "path=" + encodeURIComponent(this.currentPath)

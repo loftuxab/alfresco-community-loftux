@@ -39,16 +39,16 @@
                This new version has:
             </div>
             <div class="yui-u">
-                <div class="fileupload-versiongroup-div" class="yui-buttongroup">
-                    <input class="fileupload-minorChanges" type="radio" name="newVersion" value="1.1" checked>
-                    <input class="fileupload-majorChanges" type="radio" name="newVersion" value="2.0">
+                <div class="fileupload-versiongroup-div yui-buttongroup">
+                    <input class="fileupload-minorChanges" type="radio" name="newVersion" value="1.1" checked="checked" />
+                    <input class="fileupload-majorChanges" type="radio" name="newVersion" value="2.0" />
                 </div>
             </div>
             <div class="yui-u first">
                Comments:
             </div>
             <div class="yui-u">
-                <textarea></textarea>               
+                <textarea cols="80" rows="4"></textarea>
             </div>
          </div>
       </div>
