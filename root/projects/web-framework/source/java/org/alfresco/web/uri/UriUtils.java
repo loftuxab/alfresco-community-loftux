@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.page;
+package org.alfresco.web.uri;
 
 import java.util.Map;
 

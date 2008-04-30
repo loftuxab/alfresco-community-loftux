@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.page;
+package org.alfresco.web.uri;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -35,6 +35,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -83,12 +84,12 @@ public class UriTemplateServlet extends HttpServlet
       Config config = configService.getConfig(CONFIG_ELEMENT);
       if (config == null)
       {
-         throw new PageRendererException("Cannot find required config element 'PageRenderer'.");
+         throw new AlfrescoRuntimeException("Cannot find required config element 'UriTemplate'.");
       }
       ConfigElement uriConfig = config.getConfigElement("uri-mappings");
       if (uriConfig == null)
       {
-         throw new PageRendererException("Missing required config element 'uri-mappings' under 'PageRenderer'.");
+         throw new AlfrescoRuntimeException("Missing required config element 'uri-mappings' under 'UriTemplate'.");
       }
       this.uriTemplateIndex = new UriTemplateIndex(uriConfig);
    }
@@ -110,7 +111,7 @@ public class UriTemplateServlet extends HttpServlet
       String servletName = t.nextToken();
       if (!t.hasMoreTokens())
       {
-         throw new PageRendererException("Invalid URL: " + uri);
+         throw new AlfrescoRuntimeException("Invalid URL: " + uri);
       }
       
       // build the uri ready for URI Template match

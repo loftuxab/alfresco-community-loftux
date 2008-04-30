@@ -19,7 +19,7 @@
    <listener>
       <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
    </listener>
-            
+   
    <servlet>
       <servlet-name>apiServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
@@ -46,7 +46,7 @@
    
    <servlet>
       <servlet-name>uriTemplateServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.UriTemplateServlet</servlet-class>
+      <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
    </servlet>
    
    <!-- To use the Web Framework Dispatcher Servlet -->

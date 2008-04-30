@@ -34,6 +34,7 @@ import org.alfresco.web.scripts.Authenticator;
 import org.alfresco.web.scripts.Match;
 import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.WebScriptResponse;
+import org.alfresco.web.uri.UriUtils;
 
 /**
  * WebScript runtime for a Page Component included within the PageRenderer servlet context.

@@ -31,6 +31,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.page.PageRendererServlet.PageRendererContext;
 import org.alfresco.web.scripts.Store;
+import org.alfresco.web.uri.UriUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
