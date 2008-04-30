@@ -8,7 +8,7 @@
 	<!--                       -->
 
 	<bean id="site.configsource"
-		class="org.alfresco.config.source.UrlConfigSource">
+		   class="org.alfresco.config.source.UrlConfigSource">
 		<constructor-arg>
 			<list>
 				<value>classpath:alfresco/web-site-config.xml</value>
@@ -22,14 +22,11 @@
 	</bean>
 
 	<bean id="site.config"
-		class="org.alfresco.config.xml.XMLConfigService" init-method="init">
+		   class="org.alfresco.config.xml.XMLConfigService" init-method="init">
 		<constructor-arg>
 			<ref bean="site.configsource" />
 		</constructor-arg>
 	</bean>
-
-	
-
 
 
 	<!--                                                     -->
@@ -76,10 +73,6 @@
 	
 
 
-
-
-
-
 	<!--                                                    -->
 	<!-- Configuration of the FreeMarker Template Processor -->
 	<!--                                                    -->
@@ -111,7 +104,6 @@
 
 
 
-
 	<!--                                -->
 	<!-- Resource Storage Configuration -->
 	<!--                                -->
@@ -137,8 +129,6 @@
 		</property>
 	</bean>
 
-
-
 	<!--  Declarative Site Web Script -->
 	<bean id="webscript.site" parent="webscript"
 		class="org.alfresco.web.scripts.DeclarativeSiteWebScript"
@@ -156,6 +146,5 @@
 			<ref bean="site.store.modelobjects" />
 		</constructor-arg>
 	</bean>
-
 
 </beans>
