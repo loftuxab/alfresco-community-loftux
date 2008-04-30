@@ -33,7 +33,7 @@ import org.alfresco.connector.DefaultIdentity;
 import org.alfresco.connector.Identity;
 import org.alfresco.connector.IdentityVault;
 import org.alfresco.connector.remote.Connector;
-import org.alfresco.connector.remote.WebClient;
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.WebConnector;
 import org.alfresco.tools.ReflectionHelper;
 import org.alfresco.web.site.Framework;
@@ -47,8 +47,7 @@ public class ConnectorFactory
 {
     protected static HashMap<String, Object> cache = null;
     
-    public static Connector newInstance(RequestContext context,
-            Endpoint endpoint)
+    public static Connector newInstance(RequestContext context,Endpoint endpoint)
     {
         Connector connector = newInstance(endpoint);
 
@@ -66,8 +65,7 @@ public class ConnectorFactory
         CredentialsVault userCredentialVault = context.getUserCredentialVault();
         if (userCredentialVault != null)
         {
-            // check whether the user has cached authentication credentials (for
-            // this endpoint)
+            // check whether the user has cached authentication credentials (for this endpoint)
             Credentials credentials = userCredentialVault.getCredentials(endpoint.getId());
             if (credentials != null)
             {
@@ -107,13 +105,11 @@ public class ConnectorFactory
             }
         }
 
-        // Now, execute an authenticator to fetch the credentials that
-        // we need...
+        // Now, execute an authenticator to fetch the credentials that we need...
         Credentials credentials = null;
         if (authenticatorId != null)
         {
-            String authClassName = context.getConfig().getRemoteAuthenticatorClass(
-                    authenticatorId);
+            String authClassName = context.getConfig().getRemoteAuthenticatorClass(authenticatorId);
             Authenticator auth = (Authenticator) _getAuthenticator(authClassName);
             credentials = auth.authenticate(connector, identity);
         }
@@ -124,8 +120,7 @@ public class ConnectorFactory
             if (userCredentialVault != null)
             {
                 // Update the credentials in the user's vault
-                userCredentialVault.putCredentials(endpoint.getId(),
-                        credentials);
+                userCredentialVault.putCredentials(endpoint.getId(), credentials);
             }
 
             // Set the credentials onto the connector
@@ -160,8 +155,7 @@ public class ConnectorFactory
         }
 
         // instantiate this connector
-        String className = Framework.getConfig().getRemoteConnectorClass(
-                connectorId);
+        String className = Framework.getConfig().getRemoteConnectorClass(connectorId);
         Connector connector = _getConnector(className, url);
 
         return connector;
@@ -169,7 +163,7 @@ public class ConnectorFactory
 
     public static WebConnector newWebConnector(String endpointUrl)
     {
-        WebClient webClient = new WebClient(endpointUrl);
+        RemoteClient webClient = new RemoteClient(endpointUrl);
         return new WebConnector(webClient);
     }
 

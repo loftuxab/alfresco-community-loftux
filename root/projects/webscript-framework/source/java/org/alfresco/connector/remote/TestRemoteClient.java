@@ -29,24 +29,23 @@ import java.io.ByteArrayOutputStream;
 import java.util.Random;
 
 import junit.framework.TestCase;
-import junit.framework.TestResult;
 
 /**
- * JUnit test for Script Remote and Remote Store API.
+ * JUnit test for Remote HTTP client and Remote Store API.
  * 
  * Requires that an Alfresco repo is running on http://localhost:8080/alfresco
  * and that the default remote store (an AVM store called 'sitestore') exists.
  * 
  * @author Kevin Roast
  */
-public class TestScriptRemote extends TestCase
+public class TestRemoteClient extends TestCase
 {
    String TEST_CONTENT1 = "some test text";
    String TEST_CONTENT2 = "some text text - updated";
    
-   public void testScriptRemote()
+   public void testRemoteClient()
    {
-      ScriptRemote remote = new ScriptRemote("http://localhost:8080/alfresco/s");
+      RemoteClient remote = new RemoteClient("http://localhost:8080/alfresco/s");
       
       Response res = remote.call("/index");
       assertEquals(200, res.getStatus().getCode());
@@ -55,7 +54,7 @@ public class TestScriptRemote extends TestCase
    
    public void testRemoteStore()
    {
-      ScriptRemote remote = new ScriptRemote("http://localhost:8080/alfresco/s");
+      RemoteClient remote = new RemoteClient("http://localhost:8080/alfresco/s");
       
       // POST a new file
       String filename = Long.toString((new Random().nextLong())) + ".txt";

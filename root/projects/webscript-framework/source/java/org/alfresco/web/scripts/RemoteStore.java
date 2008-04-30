@@ -31,8 +31,8 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.Response;
-import org.alfresco.connector.remote.ScriptRemote;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLEncoder;
 
@@ -45,7 +45,7 @@ public class RemoteStore implements Store
 {
     private String path;
     private String endpoint;
-    private ScriptRemote remote;
+    private RemoteClient remote;
     
     /**
      * @param path      the relative path to set
@@ -69,7 +69,7 @@ public class RemoteStore implements Store
      */
     public void init()
     {
-        this.remote = new ScriptRemote(this.endpoint);
+        this.remote = new RemoteClient(this.endpoint);
     }
     
     /* (non-Javadoc)
