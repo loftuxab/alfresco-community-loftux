@@ -1,5 +1,4 @@
 <%@ page import="org.alfresco.web.site.*"%>
-<%@ page import="org.alfresco.web.site.config.*"%>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
@@ -7,8 +6,7 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// get the configuration and regionId
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("region-configuration");
-	String regionId = (String) configuration.get("region-id");
+	String regionId = (String) context.getRenderData().get("region-id");
 
 	// unconfigured component image
 	String unconfiguredImageUrl = URLUtil.browser(context, "/images/core/unconfigured_region_large.gif");

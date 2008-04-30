@@ -27,11 +27,8 @@ package org.alfresco.web.scripts;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.alfresco.web.site.HttpRequestContext;
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThemeUtil;
 
 /**
  * @author muzquiano
@@ -66,7 +63,8 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         RequestContext context = getRequestContext();
         if(context != null)
         {
-            ModelHelper.populateScriptModel(context, params);
+            RenderData renderData = context.getRenderData();
+            ProcessorModelHelper.populateScriptModel(context, renderData, params);
         }
 
         return params;
@@ -83,7 +81,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         RequestContext context = getRequestContext();
         if(context != null)
         {
-            ModelHelper.populateTemplateModel(context, params);
+            ProcessorModelHelper.populateTemplateModel(context, params);
         }
 
         return params;

@@ -130,7 +130,6 @@ public final class ScriptWizard extends ScriptBase
             o.put("schema", "adw10");
             o.put("windowId", "test-window-id");
             json = o.toString();
-            //System.out.println("Using debug json: " + json);
         }
         init(json);
     }
@@ -208,7 +207,6 @@ public final class ScriptWizard extends ScriptBase
             if (request.getBoolean("refreshSession"))
             {
                 this.sessionRemove(getId());
-                //System.out.println("Refreshing Wizard Session: " + getId());
             }
         }
         catch (Exception ex)
@@ -303,7 +301,6 @@ public final class ScriptWizard extends ScriptBase
                                 {
                                     String requestElementValue = (String) requestElement.get("value");
 
-                                    //System.out.println("Wizard Session[" + this.getId() + "] storing '" + requestElementName + "' = '" + requestElementValue + "'");
                                     this.sessionPut(requestElementName,
                                             requestElementValue);
                                 }
@@ -347,8 +344,6 @@ public final class ScriptWizard extends ScriptBase
                         String elValue = (String) sessionGet(elName,
                                 elDefaultValue);
                         getModel().put(elName, elValue);
-
-                        //System.out.println("Copied '" + elName + "' into model with value '" + elValue + "'");
                     }
                 }
             }

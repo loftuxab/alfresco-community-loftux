@@ -58,7 +58,7 @@ public class FrameworkHelper
                 Config config = configService.getConfig("WebFramework");
 
                 // set the config onto the framework
-                WebFrameworkConfig webFrameworkConfig = new WebFrameworkConfig(
+                DefaultFrameworkConfig webFrameworkConfig = new DefaultFrameworkConfig(
                         config);
                 Framework.setConfig(webFrameworkConfig);
 
@@ -78,7 +78,7 @@ public class FrameworkHelper
         throws Exception
     {
         // get whatever factory builder we're configured to use
-        RequestContextFactory factory = RequestContextFactoryBuilder.newFactory();
+        RequestContextFactory factory = RequestContextFactoryBuilder.sharedFactory();
         if (factory instanceof HttpRequestContextFactory)
         {
             if(request instanceof HttpServletRequest)

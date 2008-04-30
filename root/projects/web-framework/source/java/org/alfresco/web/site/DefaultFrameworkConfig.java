@@ -32,12 +32,12 @@ import org.alfresco.config.ConfigElement;
 /**
  * @author muzquiano
  */
-public class WebFrameworkConfig extends AbstractConfig
+public class DefaultFrameworkConfig implements FrameworkConfig
 {
     protected Config config = null;
     protected boolean isInitialized = false;
 
-    public WebFrameworkConfig(Config config)
+    public DefaultFrameworkConfig(Config config)
     {
         reset(config);
     }
@@ -63,13 +63,6 @@ public class WebFrameworkConfig extends AbstractConfig
     //////////////////////////////////////////////////////////////////
     // Formats
     //////////////////////////////////////////////////////////////////
-
-    public String getDefaultFormatId()
-    {
-        ConfigElement element = config.getConfigElement("defaults").getChild(
-                "format");
-        return element.getValue();
-    }
 
     public String[] getFormatIds()
     {
@@ -112,13 +105,6 @@ public class WebFrameworkConfig extends AbstractConfig
     //////////////////////////////////////////////////////////////////
     // Page Mapper
     //////////////////////////////////////////////////////////////////
-
-    public String getDefaultPageMapperId()
-    {
-        ConfigElement element = config.getConfigElement("defaults").getChild(
-                "page-mapper");
-        return element.getValue();
-    }
 
     public String[] getPageMapperIds()
     {
@@ -179,13 +165,6 @@ public class WebFrameworkConfig extends AbstractConfig
     // Link Builder
     //////////////////////////////////////////////////////////////////
 
-    public String getDefaultLinkBuilderId()
-    {
-        ConfigElement element = config.getConfigElement("defaults").getChild(
-                "link-builder");
-        return element.getValue();
-    }
-
     public String[] getLinkBuilderIds()
     {
         List elements = config.getConfigElement("link-builder").getChild(
@@ -244,13 +223,6 @@ public class WebFrameworkConfig extends AbstractConfig
     //////////////////////////////////////////////////////////////////
     // Request Context
     //////////////////////////////////////////////////////////////////
-
-    public String getDefaultRequestContextId()
-    {
-        ConfigElement element = config.getConfigElement("defaults").getChild(
-                "request-context");
-        return element.getValue();
-    }
 
     public String[] getRequestContextIds()
     {
@@ -329,33 +301,7 @@ public class WebFrameworkConfig extends AbstractConfig
         return null;
     }
 
-    //////////////////////////////////////////////////////////////////
-    // Alfresco Authoring Server
-    //////////////////////////////////////////////////////////////////
-
-    public String getAlfrescoAuthoringHost()
-    {
-        return config.getConfigElement("alfresco").getChild("authoring").getChildValue(
-                "host");
-    }
-
-    public String getAlfrescoAuthoringPort()
-    {
-        return config.getConfigElement("alfresco").getChild("authoring").getChildValue(
-                "port");
-    }
-
-    public String getAlfrescoAuthoringWebappUri()
-    {
-        return config.getConfigElement("alfresco").getChild("authoring").getChildValue(
-                "webapp-uri");
-    }
-
-    public String getAlfrescoAuthoringWebscriptServiceUri()
-    {
-        return config.getConfigElement("alfresco").getChild("authoring").getChildValue(
-                "webscript-service-uri");
-    }
+    
 
     //////////////////////////////////////////////////////////////////
     // Servlet and Dispatcher Information
@@ -373,14 +319,15 @@ public class WebFrameworkConfig extends AbstractConfig
                 "context");
     }
 
+
     //////////////////////////////////////////////////////////////////
-    // Presentation
+    // Dispatcher
     //////////////////////////////////////////////////////////////////
 
-    public String[] getPresentationContainerIds()
+    public String[] getDispatcherErrorHandlerIds()
     {
-        List elements = config.getConfigElement("presentation").getChild(
-                "containers").getChildren("container");
+        List elements = config.getConfigElement("dispatcher").getChild(
+                "error-handlers").getChildren("handler");
         String[] ids = new String[elements.size()];
         for (int i = 0; i < elements.size(); i++)
         {
@@ -390,34 +337,38 @@ public class WebFrameworkConfig extends AbstractConfig
         return ids;
     }
     
-    public String getPresentationContainerTitle(String id)
+    public String getDispatcherErrorHandlerRenderer(String id)
     {
-        return getPresentationContainerProperty(id, "title");        
+        return getDispatcherErrorHandlerProperty(id, "renderer");
     }
 
-    public String getPresentationContainerURI(String id)
+    public String getDispatcherErrorHandlerRendererType(String id)
     {
-        return getPresentationContainerProperty(id, "uri");
+        return getDispatcherErrorHandlerProperty(id, "renderer-type");
     }
     
-    public String getPresentationContainerProperty(String id, String propertyId)
+    public String getDispatcherErrorHandlerProperty(String id, String propertyId)
     {
-        List elements = config.getConfigElement("presentation").getChild(
-                "containers").getChildren("container");
-        for (int i = 0; i < elements.size(); i++)
+        try
         {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue(propertyId);
+            List elements = config.getConfigElement("dispatcher").getChild(
+                    "error-handlers").getChildren("handler");
+            for (int i = 0; i < elements.size(); i++)
+            {
+                ConfigElement configElement = (ConfigElement) elements.get(i);
+                String _id = configElement.getChildValue("id");
+                if (_id.equals(id))
+                    return configElement.getChildValue(propertyId);
+            }
         }
+        catch(Exception ex) { }
         return null;
     }
     
-    public String[] getPresentationPageIds()
+    public String[] getDispatcherSystemPageIds()
     {
-        List elements = config.getConfigElement("presentation").getChild(
-                "pages").getChildren("page");
+        List elements = config.getConfigElement("dispatcher").getChild(
+                "system-pages").getChildren("page");
         String[] ids = new String[elements.size()];
         for (int i = 0; i < elements.size(); i++)
         {
@@ -427,91 +378,35 @@ public class WebFrameworkConfig extends AbstractConfig
         return ids;
     }
     
-    public String getPresentationPageTitle(String id)
+    public String getDispatcherSystemPageRenderer(String id)
     {
-        return getPresentationPageProperty(id, "title");        
+        return getDispatcherSystemPageProperty(id, "renderer");
     }
 
-    public String getPresentationPageURI(String id)
+    public String getDispatcherSystemPageRendererType(String id)
     {
-        return getPresentationPageProperty(id, "uri");
+        return getDispatcherSystemPageProperty(id, "renderer-type");
     }
     
-    public String getPresentationPageProperty(String id, String propertyId)
+    public String getDispatcherSystemPageProperty(String id, String propertyId)
     {
-        List elements = config.getConfigElement("presentation").getChild(
-                "pages").getChildren("page");
-        for (int i = 0; i < elements.size(); i++)
+        try
         {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue(propertyId);
+            List elements = config.getConfigElement("dispatcher").getChild(
+                    "system-pages").getChildren("page");
+            for (int i = 0; i < elements.size(); i++)
+            {
+                ConfigElement configElement = (ConfigElement) elements.get(i);
+                String _id = configElement.getChildValue("id");
+                if (_id.equals(id))
+                    return configElement.getChildValue(propertyId);
+            }
         }
+        catch(Exception ex) { }
         return null;
     }
     
     
-
-    
-    
-
-    
-    public String getComponentErrorUri()
-    {
-        try
-        {
-            return config.getConfigElement("page").getChild("component-error").getChildValue(
-                    "uri");
-        }
-        catch (Exception ex)
-        {
-        }
-        return "/core/component-error.jsp";
-    }
-        
-    public String getPageErrorUri()
-    {
-        try
-        {
-            return config.getConfigElement("page").getChild("page-error").getChildValue(
-                    "uri");
-        }
-        catch (Exception ex)
-        {
-        }
-        return "/core/page-error.jsp";
-    }
-    
-    
-    public String getRegionErrorUri()
-    {
-        try
-        {
-            return config.getConfigElement("page").getChild("region-error").getChildValue(
-                    "uri");
-        }
-        catch (Exception ex)
-        {
-        }
-        return "/core/region-error.jsp";
-    }
-    
-    public String getTemplateErrorUri()
-    {
-        try
-        {
-            return config.getConfigElement("page").getChild("template-error").getChildValue(
-                    "uri");
-        }
-        catch (Exception ex)
-        {
-        }
-        return "/core/template-error.jsp";
-    }
-    
-    
-        
 
     //////////////////////////////////////////////////////////////////
     // File Systems
@@ -685,102 +580,56 @@ public class WebFrameworkConfig extends AbstractConfig
 
     public String getModelTypeName(String id)
     {
-        List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
-        for (int i = 0; i < elements.size(); i++)
-        {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue("name");
-        }
-        return null;
+        return getModelTypeProperty(id, "name");
     }
 
     public String getModelTypeDescription(String id)
     {
-        List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
-        for (int i = 0; i < elements.size(); i++)
-        {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue("description");
-        }
-        return null;
+        return getModelTypeProperty(id, "description");
     }
 
     public String getModelTypeNamespace(String id)
     {
-        List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
-        for (int i = 0; i < elements.size(); i++)
-        {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue("namespace");
-        }
-        return null;
+        return getModelTypeProperty(id, "namespace");
     }
     
     public String getModelTypeTagName(String id)
     {
-        List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
-        for (int i = 0; i < elements.size(); i++)
-        {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue("tagname");
-        }
-        return null;
+        return getModelTypeProperty(id, "tagname");
     }
 
     public String getModelTypeClass(String id)
     {
-        List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
-        for (int i = 0; i < elements.size(); i++)
-        {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue("class");
-        }
-        return null;
+        return getModelTypeProperty(id, "class");
     }
 
     public String getModelTypePath(String id)
     {
-        List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
-        for (int i = 0; i < elements.size(); i++)
-        {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue("id");
-            if (_id.equals(id))
-                return configElement.getChildValue("path");
-        }
-        return null;
-    }
+        return getModelTypeProperty(id, "path");    }
 
     public String getModelTypePrefix(String id)
     {
+        return getModelTypeProperty(id, "prefix");        
+    }
+    
+    public String getModelTypeVersion(String id)
+    {
+        return getModelTypeProperty(id, "version");    }
+
+    public String getModelTypeProperty(String id, String propertyName)
+    {
         List elements = config.getConfigElement("model").getChild("types").getChildren(
-                "type");
+            "type");
         for (int i = 0; i < elements.size(); i++)
         {
             ConfigElement configElement = (ConfigElement) elements.get(i);
             String _id = configElement.getChildValue("id");
             if (_id.equals(id))
-                return configElement.getChildValue("prefix");
+                return configElement.getChildValue(propertyName);
         }
-        return null;
+        return null;        
     }
-
+    
     public String getModelRootPath()
     {
         String rootPath = config.getConfigElement("model").getChildValue(
@@ -789,6 +638,8 @@ public class WebFrameworkConfig extends AbstractConfig
             rootPath = "/";
         return rootPath;
     }
+    
+    
 
     //////////////////////////////////////////////////////////////////
     // Tag Libraries
@@ -835,16 +686,11 @@ public class WebFrameworkConfig extends AbstractConfig
         return null;
     }
 
+    
+    
     //////////////////////////////////////////////////////////////////
     // User Factories
     //////////////////////////////////////////////////////////////////
-
-    public String getDefaultUserFactoryId()
-    {
-        ConfigElement element = config.getConfigElement("defaults").getChild(
-                "user-factory");
-        return element.getValue();
-    }
 
     public String[] getUserFactoryIds()
     {
@@ -991,7 +837,6 @@ public class WebFrameworkConfig extends AbstractConfig
             ids[i] = configElement.getChildValue("id");
         }
         return ids;
-
     }
 
     public String getRendererName(String id)
@@ -1036,5 +881,91 @@ public class WebFrameworkConfig extends AbstractConfig
                 "enabled");
         return("true".equalsIgnoreCase(val));
     }
+
+    
+    
+    //////////////////////////////////////////////////////////////////
+    // Application Default Settings
+    //////////////////////////////////////////////////////////////////
+        
+    public String getDefaultRegionChrome()
+    {
+        return config.getConfigElement("application").getChild("defaults").getChildValue("region-chrome");
+    }
+
+    public String getDefaultComponentChrome()
+    {
+        return config.getConfigElement("application").getChild("defaults").getChildValue("component-chrome");
+    }
+
+    public String[] getDefaultPageTypeIds()
+    {
+        List elements = config.getConfigElement("application").getChild(
+                "defaults").getChild("page-types").getChildren("page-type");
+        String[] ids = new String[elements.size()];
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            ids[i] = configElement.getChildValue("id");
+        }
+        return ids;
+    }
+
+    public String getDefaultPageTypeInstanceId(String id)
+    {
+        List elements = config.getConfigElement("application").getChild(
+                "page-types").getChildren("page-type");
+        for (int i = 0; i < elements.size(); i++)
+        {
+            ConfigElement configElement = (ConfigElement) elements.get(i);
+            String _id = configElement.getChildValue("id");
+            if (_id.equals(id))
+                return configElement.getChildValue("page-instance-id");
+        }
+        return null;
+    }
+    
+    
+    
+    //////////////////////////////////////////////////////////////////
+    // Defaults
+    //////////////////////////////////////////////////////////////////
+    
+    public String getDefaultFormatId()
+    {
+        return getDefaultProperty("format");
+    }
+    
+    public String getDefaultPageMapperId()
+    {
+        return getDefaultProperty("page-mapper");
+    }
+
+    public String getDefaultLinkBuilderId()
+    {
+        return getDefaultProperty("link-builder");
+    }
+    
+    public String getDefaultRequestContextId()
+    {
+        return getDefaultProperty("request-context");        
+    }
+
+    public String getDefaultUserFactoryId()
+    {
+        return getDefaultProperty("user-factory");        
+    }
+    
+    public String getDefaultTheme(String id)
+    {
+        return getDefaultProperty("theme");
+    }
+    
+    public String getDefaultProperty(String id)
+    {
+        ConfigElement element = config.getConfigElement("framework").getChild("defaults").getChild(id);
+        return element.getValue();
+    }
+    
     
 }

@@ -43,11 +43,20 @@ public class Page extends ModelObject
     public static String PROP_TEMPLATE_INSTANCE = "template-instance";
     public static String ATTR_FORMAT_ID = "format-id";
     public static String PROP_ROOT_PAGE = "root-page";
+    public static String PROP_PAGE_TYPE_ID = "page-type-id";
     public static String PROP_AUTHENTICATION = "authentication";
+    
+    public static String DEFAULT_PAGE_TYPE_ID = "generic";
     
     public Page(Document document)
     {
         super(document);
+        
+        // default page type
+        if(getPageTypeId() == null)
+        {
+            setPageTypeId(DEFAULT_PAGE_TYPE_ID);
+        }
     }
 
     @Override
@@ -82,7 +91,7 @@ public class Page extends ModelObject
         {
             Element templateElement = (Element) templateElements.get(i);
             String _formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
-            if (_formatId.length() == 0)
+            if (_formatId != null && _formatId.length() == 0)
             {
                 _formatId = null;
             }
@@ -200,9 +209,28 @@ public class Page extends ModelObject
         return pages;
     }
     
+    public String getPageTypeId()
+    {
+        return this.getProperty(PROP_PAGE_TYPE_ID);        
+    }
+    
+    public void setPageTypeId(String pageTypeId)
+    {
+        this.setProperty(PROP_PAGE_TYPE_ID, pageTypeId);        
+    }
+    
+    public PageType getPageType(RequestContext context)
+    {
+        String pageTypeId = getPageTypeId();
+        if(pageTypeId != null)
+        {
+            return context.getModel().loadPageType(context, pageTypeId);
+        }
+        return null;
+    }
+       
     public String getTypeName() 
     {
         return TYPE_NAME;
     }
-    
 }

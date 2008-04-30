@@ -29,8 +29,8 @@ import java.util.HashMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RenderableNotFoundException;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
@@ -40,7 +40,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 public class JavaClassRenderer extends AbstractRenderer
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
+            HttpServletResponse response, RenderData renderData)
             throws RendererExecutionException
     {
         String renderer = this.getRenderer();
@@ -70,7 +70,7 @@ public class JavaClassRenderer extends AbstractRenderer
         // execute
         try
         {
-            renderableImpl.execute(context, request, response, config);
+            renderableImpl.execute(context, request, response, renderData);
         }
         catch (Exception ex)
         {

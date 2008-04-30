@@ -26,8 +26,8 @@ package org.alfresco.web.scripts;
 
 import java.util.Map;
 
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.model.ModelObject;
 
 /**
@@ -35,11 +35,11 @@ import org.alfresco.web.site.model.ModelObject;
  */
 public class LocalWebScriptContext
 {
-    RuntimeConfig modelConfig;
+    RenderData renderData;
     String RequestURI;
     String RequestPath;
     String scriptUrl;
-    ModelObject modelObject;
+    ModelObject object;
     RequestContext requestContext;
     Map<String, String> Tokens;
 }

@@ -27,9 +27,9 @@ package org.alfresco.web.site.renderer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -38,7 +38,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 public class JSPRenderer extends AbstractRenderer
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
+            HttpServletResponse response, RenderData renderData)
             throws RendererExecutionException
     {
         String renderer = this.getRenderer();
@@ -48,12 +48,12 @@ public class JSPRenderer extends AbstractRenderer
         {
             // put the file URI into the config
             String dispatchPath = renderer;
-            config.put("component-file-uri", dispatchPath);
+            renderData.put("jsp-file-uri", dispatchPath);
 
             // put the folder URI into the config
             int x = dispatchPath.lastIndexOf("/");
             String pathUri = dispatchPath.substring(0, x);
-            config.put("component-path-uri", pathUri);
+            renderData.put("jsp-path-uri", pathUri);
 
             // do the include
             RequestUtil.include(request, response, dispatchPath);

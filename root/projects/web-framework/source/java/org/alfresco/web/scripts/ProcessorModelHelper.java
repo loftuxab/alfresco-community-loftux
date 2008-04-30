@@ -32,19 +32,20 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.site.HttpRequestContext;
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
+import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.model.ModelObject;
 
 /**
  * @author muzquiano
  */
-public class ModelHelper
+public class ProcessorModelHelper
 {
     public static final String PROP_HTMLID = "htmlid";
     
-    public static void populateScriptModel(RequestContext context, Map<String, Object> model)
+    public static void populateScriptModel(RequestContext context, RenderData renderData, Map<String, Object> model)
     {
         if(model == null || context == null)
         {
@@ -75,6 +76,44 @@ public class ModelHelper
             model.put("title", context.getCurrentPage().getName());
         }
         
+        // copy in custom properties from the page
+        if(context.getCurrentPage() != null)
+        {
+            Map<String, Object> pageProperties = context.getCurrentPage().getCustomProperties();
+            copyToModel(model, pageProperties, null);
+        }
+        
+        // copy in custom properties from the template
+        if(context.getCurrentTemplate() != null)
+        {
+            Map<String, Object> templateProperties = context.getCurrentTemplate().getCustomProperties();
+            copyToModel(model, templateProperties, null);
+        }
+        
+        // we are also given the "rendering configuration" for the current
+        // object.  usually, this is either a component or a template.
+        // in either case, the configuration is set up ahead of time
+        // our job here is to make sure that freemarker has everything
+        // it needs for the component or template to process
+        if(renderData != null)
+        {
+            ModelObject object = renderData.getObject();
+            if(object != null)
+            {
+                Map<String, Object> objectProperties = object.getCustomProperties();
+                copyToModel(model, objectProperties, null);
+            }
+            
+            String htmlBindingId = (String) renderData.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+            if(htmlBindingId != null && htmlBindingId.length() > 0)
+            {
+                model.put(PROP_HTMLID, htmlBindingId);
+            }
+            
+            // copy in render data settings
+            copyToModel(model, renderData.map(), null);
+        }
+                
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
         
         // add in the web framework script objects
@@ -83,7 +122,6 @@ public class ModelHelper
         {
             model.put("user", new ScriptUser(context, context.getUser()));
         }
-        //model.put("wizard", new ScriptWizard(context));
     }
 
     public static void populateTemplateModel(RequestContext context, Map<String, Object> model)
@@ -91,7 +129,7 @@ public class ModelHelper
         populateTemplateModel(context, null, model);
     }
     
-    public static void populateTemplateModel(RequestContext context, ModelObject object, Map<String, Object> model)
+    public static void populateTemplateModel(RequestContext context, RenderData renderData, Map<String, Object> model)
     {
         if(model == null || context == null)
         {
@@ -126,30 +164,44 @@ public class ModelHelper
         if(context.getCurrentPage() != null)
         {
             Map<String, Object> pageProperties = context.getCurrentPage().getCustomProperties();
-            copyToModel(model, pageProperties);
+            copyToModel(model, pageProperties, null);
         }
         
         // copy in custom properties from the template
         if(context.getCurrentTemplate() != null)
         {
             Map<String, Object> templateProperties = context.getCurrentTemplate().getCustomProperties();
-            copyToModel(model, templateProperties);
+            copyToModel(model, templateProperties, null);
         }
         
-        // copy in custom properties from the passed in model object
-        // this is usually a component
-        if(object != null)
+        // we are also given the "rendering configuration" for the current
+        // object.  usually, this is either a component or a template.
+        // in either case, the configuration is set up ahead of time
+        // our job here is to make sure that freemarker has everything
+        // it needs for the component or template to process
+        if(renderData != null)
         {
-            Map<String, Object> objectProperties = object.getCustomProperties();
-            copyToModel(model, objectProperties);
-            model.put(PROP_HTMLID, object.getId());
+            ModelObject object = renderData.getObject();
+            if(object != null)
+            {
+                Map<String, Object> objectProperties = object.getCustomProperties();
+                copyToModel(model, objectProperties, null);
+            }
+            
+            String htmlBindingId = (String) renderData.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+            if(htmlBindingId != null && htmlBindingId.length() > 0)
+            {
+                model.put(PROP_HTMLID, htmlBindingId);
+            }
+            
+            // copy in render data settings
+            copyToModel(model, renderData.map(), null);
         }
-        
         
 
         // other fixed elements
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
-        model.put("head", RenderUtil.PAGE_HEAD_DEPENDENCIES_STAMP);
+        model.put("head", WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
         
         // TODO: I would like this code to look at the tag libraries
         // registered with the configuration, parse the tag classes
@@ -160,8 +212,8 @@ public class ModelHelper
         // single, consistent approach
         
         model.put("region", new RegionFreemarkerTagDirective(context));
-        //addDirective(context, model, "region", "org.alfresco.web.site.taglib.RegionTag");
-        //addDirective(context, model, "head", "org.alfresco.web.site.taglib.HeadTag");
+        model.put("component", new ComponentFreemarkerTagDirective(context));
+        addDirective(context, model, "componentInclude", "org.alfresco.web.site.taglib.ComponentIncludeTag");
         addDirective(context, model, "pageTitle", "org.alfresco.web.site.taglib.PageTitleTag");
         addDirective(context, model, "require", "org.alfresco.web.site.taglib.RequireTag");
         
@@ -172,8 +224,7 @@ public class ModelHelper
         addDirective(context, model, "link", "org.alfresco.web.site.taglib.ObjectLinkTag");
         
         // temporary: add floating menu
-        addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");
-        
+        addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");        
         
         // add in the web framework script objects
         model.put("site", new ScriptSite(context));
@@ -183,13 +234,18 @@ public class ModelHelper
         }
     }    
     
-    protected static void copyToModel(Map<String, Object> model, Map<String, Object> properties)
+    protected static void copyToModel(Map<String, Object> model, Map<String, Object> properties, String prefix)
     {
         Iterator it = properties.keySet().iterator();
         while(it.hasNext())
         {
             String key = (String) it.next();
             Object value = properties.get(key);
+            
+            if(prefix != null)
+            {
+                key = prefix + key;
+            }
             
             model.put(key, value);
             

@@ -12,7 +12,19 @@
 			<rootpath>/WEB-INF/classes/alfresco</rootpath>
 			<types>
 				<type>
+					<id>chrome</id>
+					<version>1.0</version>					
+					<name>Chrome</name>
+					<description>Chrome</description>
+					<namespace></namespace>
+					<tagname>chrome</tagname>
+					<class>org.alfresco.web.site.model.Chrome</class>
+					<path>/site-data/chrome</path>
+					<prefix>ch-</prefix>
+				</type>
+				<type>
 					<id>component</id>
+					<version>1.0</version>					
 					<name>Component</name>
 					<description>Component</description>
 					<namespace></namespace>
@@ -23,6 +35,7 @@
 				</type>
 				<type>
 					<id>component-type</id>
+					<version>1.0</version>					
 					<name>Component Type</name>
 					<description>Component Type</description>
 					<namespace></namespace>
@@ -33,6 +46,7 @@
 				</type>
 				<type>
 					<id>configuration</id>
+					<version>1.0</version>
 					<name>Configuration</name>
 					<description>Configuration</description>
 					<namespace></namespace>
@@ -43,6 +57,7 @@
 				</type>
 				<type>
 					<id>content-association</id>
+					<version>1.0</version>
 					<name>Content Association</name>
 					<description>Content Association</description>
 					<namespace></namespace>
@@ -53,6 +68,7 @@
 				</type>
 				<type>
 					<id>endpoint</id>
+					<version>1.0</version>
 					<name>Endpoint</name>
 					<description>Endpoint</description>
 					<namespace></namespace>
@@ -63,6 +79,7 @@
 				</type>
 				<type>
 					<id>page</id>
+					<version>1.0</version>
 					<name>Page</name>
 					<description>Page</description>
 					<namespace></namespace>
@@ -72,7 +89,19 @@
 					<prefix>pg-</prefix>
 				</type>
 				<type>
+					<id>page-type</id>
+					<version>1.0</version>
+					<name>Page Type</name>
+					<description>Page Type</description>
+					<namespace></namespace>
+					<tagname>page-type</tagname>
+					<class>org.alfresco.web.site.model.PageType</class>
+					<path>/site-data/page-types</path>
+					<prefix>pt-</prefix>
+				</type>
+				<type>
 					<id>page-association</id>
+					<version>1.0</version>
 					<name>Page Association</name>
 					<description>Page Association</description>
 					<namespace></namespace>
@@ -83,6 +112,7 @@
 				</type>
 				<type>
 					<id>template-instance</id>
+					<version>1.0</version>
 					<name>Template Instance</name>
 					<description>Template Instance</description>
 					<namespace></namespace>
@@ -93,6 +123,7 @@
 				</type>
 				<type>
 					<id>template-type</id>
+					<version>1.0</version>
 					<name>Template Type</name>
 					<description>Template Type</description>
 					<namespace></namespace>
@@ -101,6 +132,17 @@
 					<path>/site-data/template-types</path>
 					<prefix>tt-</prefix>
 				</type>
+				<type>
+					<id>theme</id>
+					<version>1.0</version>					
+					<name>Theme</name>
+					<description>Theme</description>
+					<namespace></namespace>
+					<tagname>theme</tagname>
+					<class>org.alfresco.web.site.model.Theme</class>
+					<path>/site-data/themes</path>
+					<prefix>th-</prefix>
+				</type>								
 			</types>
 		</model>
 		

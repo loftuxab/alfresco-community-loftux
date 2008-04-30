@@ -58,7 +58,7 @@ public abstract class AbstractModel
         return ModelHelper.newGUID(typeName);
     }
     
-    public AbstractConfig getConfiguration()
+    public FrameworkConfig getConfiguration()
     {
         return Framework.getConfig();
     }

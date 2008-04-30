@@ -29,8 +29,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.site.PresentationUtil;
-import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.site.model.Chrome;
 
 /**
  * @author muzquiano
@@ -40,6 +41,8 @@ public class RegionTag extends TagBase
     private String name = null;
     private String scope = null;
     private String access = null;
+    private String chrome = null;
+    private boolean chromeless = false;
 
     public void setName(String name)
     {
@@ -59,7 +62,9 @@ public class RegionTag extends TagBase
     public String getScope()
     {
         if (this.scope == null)
-            this.scope = RenderUtil.REGION_SCOPE_GLOBAL;
+        {
+            this.scope = WebFrameworkConstants.REGION_SCOPE_GLOBAL;
+        }
         return this.scope;
     }
 
@@ -72,6 +77,27 @@ public class RegionTag extends TagBase
     {
         return this.access;
     }
+    
+    public void setChrome(String chrome)
+    {
+        this.chrome = chrome;
+    }
+
+    public String getChrome()
+    {
+        return this.chrome;
+    }
+    
+    public boolean isChromeless()
+    {
+        return chromeless;
+    }
+
+    public void setChromeless(boolean chromeless)
+    {
+        this.chromeless = chromeless;
+    }
+    
 
     public int doStartTag() throws JspException
     {
@@ -81,8 +107,15 @@ public class RegionTag extends TagBase
 
         try
         {
-            PresentationUtil.renderRegion(context, request, response,
-                    context.getCurrentTemplate().getId(), getName(), getScope());
+            String chromeId = getChrome();
+            if(!isChromeless())
+            {
+                PresentationUtil.renderRegion(context, request, response, context.getCurrentTemplate().getId(), getName(), getScope(), chromeId);
+            }
+            else
+            {
+                PresentationUtil.renderChromelessRegion(context, request, response, context.getCurrentTemplate().getId(), getName(), getScope());
+            }            
         }
         catch (Throwable t)
         {
@@ -91,4 +124,16 @@ public class RegionTag extends TagBase
         }
         return SKIP_BODY;
     }
+    
+    public void release()
+    {
+        this.name = null;
+        this.scope = null;
+        this.access = null;
+        this.chrome = null;
+        this.chromeless = false;
+        
+        super.release();
+    }
+    
 }

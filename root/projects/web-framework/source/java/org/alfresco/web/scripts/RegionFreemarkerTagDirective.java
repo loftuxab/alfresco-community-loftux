@@ -97,8 +97,6 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
            }
         }
 
-        
-        
         // copy in body content (if there is any)
         String bodyContentString = null;
         if(body != null)
@@ -111,10 +109,10 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
                 bodyContentString = bodyStringWriter.toString();
             }
         }
-
+        
         // execute the tag
         String output = executeTag(tag, bodyContentString);
-
+        
         // commit the output
         try
         {

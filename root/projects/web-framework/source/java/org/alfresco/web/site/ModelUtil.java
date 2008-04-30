@@ -33,6 +33,7 @@ import java.util.Map;
 import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
+import org.alfresco.web.site.model.Chrome;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
@@ -41,8 +42,10 @@ import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
+import org.alfresco.web.site.model.PageType;
 import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
+import org.alfresco.web.site.model.Theme;
 import org.dom4j.Document;
 
 /**
@@ -50,6 +53,34 @@ import org.dom4j.Document;
  */
 public class ModelUtil
 {
+    //////////////////////////
+    // chrome
+    public static Chrome[] findChrome(RequestContext context)
+    {
+        return findChrome(context, null);
+    }
+
+    public static Chrome[] findChrome(RequestContext context,
+            String chromeType)
+    {
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        addPropertyConstraint(propertyConstraintMap,
+                Chrome.PROP_CHROME_TYPE, chromeType);
+
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Chrome.TYPE_NAME,
+                propertyConstraintMap);
+        
+        // convert to return type
+        Chrome[] array = new Chrome[objects.length];
+        for (int i = 0; i < objects.length; i++)
+        {
+            array[i] = (Chrome) objects[i];
+        }
+        return array;
+    }
+
     //////////////////////////
     // configurations
     public static Configuration[] findConfigurations(RequestContext context)
@@ -68,7 +99,7 @@ public class ModelUtil
         // do the lookup
         ModelObject[] objects = findObjects(context, Configuration.TYPE_NAME,
                 propertyConstraintMap);
-
+        
         // convert to return type
         Configuration[] array = new Configuration[objects.length];
         for (int i = 0; i < objects.length; i++)
@@ -259,6 +290,7 @@ public class ModelUtil
         {
             array[i] = (Component) objects[i];
         }
+        
         return array;
     }
 
@@ -387,11 +419,11 @@ public class ModelUtil
 
     public static Page[] findPages(RequestContext context)
     {
-        return findPages(context, null, null);
+        return findPages(context, null, null, null);
     }
 
     public static Page[] findPages(RequestContext context, String templateId,
-            String rootPage)
+            String rootPage, String pageTypeId)
     {
         // build property map
         HashMap propertyConstraintMap = new HashMap();
@@ -399,6 +431,8 @@ public class ModelUtil
                 templateId);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_ROOT_PAGE,
                 rootPage);
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_PAGE_TYPE_ID,
+                pageTypeId);
 
         // do the lookup
         ModelObject[] objects = findObjects(context, Page.TYPE_NAME,
@@ -413,6 +447,62 @@ public class ModelUtil
         return array;
     }
 
+    public static PageType[] findPageTypes(RequestContext context)
+    {
+        return findPageTypes(context, null);
+    }
+
+    public static PageType[] findPageTypes(RequestContext context, String temp)
+    {
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        /*
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
+                templateId);
+        */
+
+        // do the lookup
+        ModelObject[] objects = findObjects(context, PageType.TYPE_NAME,
+                propertyConstraintMap);
+
+        // convert to return type
+        PageType[] array = new PageType[objects.length];
+        for (int i = 0; i < objects.length; i++)
+        {
+            array[i] = (PageType) objects[i];
+        }
+        return array;
+    }
+    
+    
+    public static Theme[] findThemes(RequestContext context)
+    {
+        return findThemes(context, null);
+    }
+
+    public static Theme[] findThemes(RequestContext context, String temp)
+    {
+        // build property map
+        HashMap propertyConstraintMap = new HashMap();
+        /*
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
+                templateId);
+        */
+
+        // do the lookup
+        ModelObject[] objects = findObjects(context, Theme.TYPE_NAME,
+                propertyConstraintMap);
+
+        // convert to return type
+        Theme[] array = new Theme[objects.length];
+        for (int i = 0; i < objects.length; i++)
+        {
+            array[i] = (Theme) objects[i];
+        }
+        return array;
+    }
+    
+    
     public static Endpoint[] findEndpoints(RequestContext context)
     {
         return findEndpoints(context, null);
@@ -495,7 +585,7 @@ public class ModelUtil
         }
         
         // Otherwise, do an exhaustive query for pages with the root-page property
-        Page[] rootPages = ModelUtil.findPages(context, null, "true");
+        Page[] rootPages = ModelUtil.findPages(context, null, "true", null);
         if (rootPages != null && rootPages.length > 0)
         {
             return rootPages[0];
@@ -513,6 +603,9 @@ public class ModelUtil
         }
         return null;
     }
+    
+    
+    
 
     // generic method
 

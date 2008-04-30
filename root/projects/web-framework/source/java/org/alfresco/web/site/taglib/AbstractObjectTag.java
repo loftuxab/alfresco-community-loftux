@@ -24,15 +24,9 @@
  */
 package org.alfresco.web.site.taglib;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspTagException;
 import javax.servlet.jsp.PageContext;
-import javax.servlet.jsp.tagext.BodyContent;
 
-import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.Page;
 
 /**
  * A tag that works specifically with bound objects, either explicitly
@@ -47,6 +41,7 @@ import org.alfresco.web.site.model.Page;
 public abstract class AbstractObjectTag extends TagBase
 {
     private String pageId = null;
+    private String pageTypeId = null;
     private String objectId = null;
 
     public void setPage(String pageId)
@@ -57,6 +52,16 @@ public abstract class AbstractObjectTag extends TagBase
     public String getPage()
     {
         return this.pageId;
+    }
+    
+    public void setPageType(String pageTypeId)
+    {
+        this.pageTypeId = pageTypeId;
+    }
+    
+    public String getPageType()
+    {
+        return this.pageTypeId;
     }
     
     public void setObject(String objectId)
@@ -82,24 +87,44 @@ public abstract class AbstractObjectTag extends TagBase
             
     protected String link(RequestContext context, String formatId)
     {
-        return link(context, getPage(), getObject(), formatId);
+        return link(context, getPageType(), getPage(), getObject(), formatId);
     }
     
-    protected String link(RequestContext context, String pageId, String objectId, String formatId)
+    protected String link(RequestContext context, String pageTypeId, String pageId, String objectId, String formatId)
     {
-        if(pageId != null && objectId == null)
+        // page types
+        if(pageTypeId != null)
         {
-            return context.getLinkBuilder().page(context, pageId, formatId);
+            if(objectId != null)
+            {
+                return context.getLinkBuilder().pageType(context, pageTypeId, formatId, objectId);
+            }
+            else
+            {
+                return context.getLinkBuilder().pageType(context, pageTypeId, formatId);
+            }
         }
-        else if(pageId == null && objectId != null)
+        
+        // pages
+        if(pageId != null)
         {
-            return context.getLinkBuilder().content(context, objectId, formatId);
-            
+            if(objectId != null)
+            {
+                return context.getLinkBuilder().page(context, pageId, formatId, objectId);
+            }
+            else
+            {
+                return context.getLinkBuilder().page(context, pageId, formatId);
+            }
         }
-        else if(pageId != null && objectId != null)
+        
+        // objects
+        if(objectId != null)
         {
-            return context.getLinkBuilder().page(context, pageId, formatId, objectId);
+            return context.getLinkBuilder().object(context, objectId, formatId);
         }
+        
         return null;
     }
+        
 }

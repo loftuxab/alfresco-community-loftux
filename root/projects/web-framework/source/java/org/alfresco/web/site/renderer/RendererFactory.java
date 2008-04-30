@@ -27,6 +27,7 @@ package org.alfresco.web.site.renderer;
 import java.util.HashMap;
 
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.RendererNotFoundException;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
@@ -153,7 +154,7 @@ public class RendererFactory
         // JSP is the default case
         if (rendererType == null || rendererType.length() == 0)
         {
-            rendererType = "jsp";
+            rendererType = WebFrameworkConstants.RENDERER_TYPE_JSP;
         }
 
         // look up the class implementation

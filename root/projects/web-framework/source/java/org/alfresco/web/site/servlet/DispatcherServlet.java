@@ -34,11 +34,13 @@ import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.PresentationUtil;
+import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.Timer;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
@@ -92,9 +94,44 @@ public class DispatcherServlet extends BaseServlet
             dispatch(context, request, response);
             Timer.stop(request, "dispatch");
         }
-        catch (Exception e)
+        catch (Throwable t)
         {
-            throw new ServletException(e);
+            /**
+             * The framework should naturally catch exceptions and handle
+             * them gracefully using the system pages defined in the
+             * configuration file.  For instance, if a component fails
+             * to render, it should resort to displaying itself with
+             * a friendly message.
+             * 
+             * On the other hand, it could be the case that something
+             * really nasty came this way - for instance an Error.
+             * 
+             * Or it may be the case that a system page was unavailable
+             * to handle the error.  In that case, the exception will fall
+             * back here as a RequestDispatchException.
+             * 
+             * It may also be the case that the system administrator
+             * wishes the errors to trickle back.  This would be the
+             * typical setup if the administrator wishes the servlet
+             * container to handle the error.
+             * 
+             * Finally, they may have opted to throw a Runtime Exception
+             * back.  We must handle that case as well.
+             */
+            
+            // Either way, print stuff out to log
+            Framework.getLogger().error(t);
+            
+            // If it is a runtime exception, we should handle
+            if(t instanceof RuntimeException)
+            {
+                // TODO: How?
+            }
+            else
+            {
+                // otherwise, we will throw back to servlet container
+                throw new ServletException(t);
+            }
         }
         
         // stop the service timer
@@ -106,7 +143,44 @@ public class DispatcherServlet extends BaseServlet
     }
 
     protected void dispatch(RequestContext context, HttpServletRequest request,
+            HttpServletResponse response) throws RequestDispatchException
+    {
+        // a quick test to ensure that the context is set up correctly
+        ensureDispatchState(context, request, response);
+        
+        // dispatch to page processing code
+        doDispatch(context, request, response);
+    }
+    
+    protected void ensureDispatchState(RequestContext context, HttpServletRequest request,
             HttpServletResponse response)
+    {
+        if(context.getSiteConfiguration() == null)
+        {
+            debug(context, "No site configuration - performing reset");
+            
+            // effectively, do a reset
+            context.setCurrentPage(null);
+            context.setCurrentObjectId(null);
+        }
+        
+        // if we have absolutely nothing to dispatch to, then check to
+        // see if there is a root-page declared to which we can go
+        if (context.getCurrentPage() == null && context.getCurrentObjectId() == null)
+        {
+            // check if a root page exists to which we can forward
+            Page rootPage = ModelUtil.getRootPage(context);
+            if (rootPage != null)
+            {
+                debug(context, "Set root page as current page");
+                context.setCurrentPage(rootPage);
+            }            
+        }
+        
+    }
+    
+    protected void doDispatch(RequestContext context, HttpServletRequest request,
+            HttpServletResponse response) throws RequestDispatchException
     {
         // we are either navigating to a NODE
         // or to a CONTENT OBJECT (xform object)
@@ -119,42 +193,16 @@ public class DispatcherServlet extends BaseServlet
         debug(context, "Current Page ID: " + currentPageId);
         debug(context, "Current Format ID: " + currentFormatId);
         debug(context, "Current Object ID: " + currentObjectId);
-        
-        // reset case - if the site config is not available, assume
-        // the entire site is not available
-        boolean siteReset = false;
-        if(context.getSiteConfiguration() == null)
-        {
-            currentPage = null;
-            currentPageId = null;
-            currentObjectId = null;
-            siteReset = true;
-        }
-
-        // if we have absolutely nothing to dispatch to, then check to
-        // see if there is a root-page declared to which we can go
-        if (currentPage == null && currentObjectId == null && !siteReset)
-        {
-            // check if a root page exists to which we can forward
-            Page rootPage = ModelUtil.getRootPage(context);
-            if (rootPage != null)
-            {
-                debug(context, "Set root page as current page");
-                currentPage = rootPage;
-                currentPageId = currentPage.getId();
-                context.setCurrentPage(rootPage);
-            }            
-        }
-        
+                
         // if at this point there really is nothing to view...
         if (currentPage == null && currentObjectId == null)
         {
             debug(context, "No Page or Object determined");
             
-            // go to getting started page
-            String gettingStartedPageUri = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_GETTING_STARTED);
-            debug(context, "Dispatching to Getting Started: " + gettingStartedPageUri);
-            dispatchJsp(context, request, response, gettingStartedPageUri);
+            // Go to the getting started page
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.SYSTEM_PAGE_GETTING_STARTED,
+                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_GETTING_STARTED);
         }
         else
         {
@@ -185,14 +233,14 @@ public class DispatcherServlet extends BaseServlet
 
     protected void dispatchJsp(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String dispatchPage)
+            String dispatchPage) throws RequestDispatchException
     {
         PresentationUtil.renderJspPage(context, request, response, dispatchPage);
     }
 
     protected void dispatchContent(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String contentId, String formatId)
+            String contentId, String formatId) throws RequestDispatchException
     {
         // TODO
         // Load the Content Item into a Content wrapper
@@ -232,7 +280,7 @@ public class DispatcherServlet extends BaseServlet
 
     protected void dispatchCurrentPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String formatId)
+            String formatId) throws RequestDispatchException
     {
         Page page = context.getCurrentPage();
         debug(context, "Template ID: " +page.getTemplateId()); 
@@ -244,19 +292,10 @@ public class DispatcherServlet extends BaseServlet
         }
         else
         {
-            debug(context, "Unable to render Page - template was not found");
-            
-            // go to unconfigured page display
-            String dispatchPage = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_UNCONFIGURED);
-            if (dispatchPage == null || dispatchPage.length() == 0)
-            {
-                dispatchPage = "/ui/core/page-unconfigured.jsp";
-            }
-
-            // dispatch
-            debug(context, "Rendering Unconfigured Page: " + dispatchPage);
-            PresentationUtil.renderJspPage(context, request, response,
-                    dispatchPage);
+            debug(context, "Unable to render Page - template was not found");            
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.SYSTEM_PAGE_UNCONFIGURED,
+                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_UNCONFIGURED);
         }
     }
     

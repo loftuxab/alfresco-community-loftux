@@ -78,7 +78,9 @@ public interface IModelObject
     public String getFileName();
     public String getRelativeFilePath();
     public String getTypeName();
-
+    
+    // version
+    public String getModelVersion();
     
 
     

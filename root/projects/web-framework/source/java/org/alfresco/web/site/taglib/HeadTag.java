@@ -26,7 +26,7 @@ package org.alfresco.web.site.taglib;
 
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
  * This tag is a bit unusual.  When executed, it simply emits a
@@ -37,7 +37,7 @@ public class HeadTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-        print(RenderUtil.PAGE_HEAD_DEPENDENCIES_STAMP);
+        print(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
         return SKIP_BODY;
     }
 

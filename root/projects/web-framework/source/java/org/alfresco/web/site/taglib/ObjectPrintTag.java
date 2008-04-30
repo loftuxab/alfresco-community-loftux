@@ -64,4 +64,12 @@ public class ObjectPrintTag extends ObjectAnchorTag
 
         return EVAL_BODY_INCLUDE;
     }
+    
+    public void release()
+    {
+        this.iconUri = null;
+        
+        super.release();
+    }
+    
 }

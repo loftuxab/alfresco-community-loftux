@@ -110,4 +110,14 @@ public class RequireTag extends TagBase
 
         return SKIP_BODY;
     }
+    
+    public void release()
+    {
+        this.script = null;
+        this.link = null;
+        this.name = null;
+        
+        super.release();
+    }
+    
 }

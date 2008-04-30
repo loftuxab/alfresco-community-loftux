@@ -24,9 +24,11 @@
  */
 package org.alfresco.web.site;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletRequest;
 
@@ -140,6 +142,12 @@ public class Timer
             Timer t = (Timer) request.getAttribute(TIMER_KEY);
             if(t != null)
             {
+                // check if this timer has not already been started
+                if(t.startTimes.get(blockId) == null)
+                {
+                    t.keys.add(blockId);
+                }
+                
                 Long l = new Long(System.nanoTime());
                 t.startTimes.put(blockId, l);
             }
@@ -226,9 +234,11 @@ public class Timer
             Timer t = (Timer) request.getAttribute(TIMER_KEY);
             if(t != null)
             {
-                for(Entry entry: t.totalTimes.entrySet())
+                // report timing blocks in order they were received
+                Iterator it = t.keys.iterator();
+                while(it.hasNext())
                 {
-                    String blockId = (String) entry.getKey();
+                    String blockId = (String) it.next();
                     report(request, blockId);
                 }
             }
@@ -239,9 +249,11 @@ public class Timer
     {
         this.totalTimes = new HashMap<String, Long>();
         this.startTimes = new HashMap<String, Long>();
+        this.keys = new ArrayList<String>();
     }
     
     protected Map<String, Long> totalTimes;
     protected Map<String, Long> startTimes;
+    protected List<String> keys;
 
 }

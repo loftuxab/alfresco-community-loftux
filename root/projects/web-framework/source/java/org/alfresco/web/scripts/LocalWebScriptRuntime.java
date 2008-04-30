@@ -35,6 +35,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.uri.UriUtils;
 
 /**
  * @author muzquiano
@@ -74,8 +76,24 @@ public class LocalWebScriptRuntime
 	protected WebScriptRequest createRequest(Match match)
 	{
 		// this includes all elements of the xml
-		Map properties = context.modelObject.getProperties();
+		Map properties = context.object.getProperties();
 		String scriptUrl = context.scriptUrl;
+
+        // component ID is always available to the component
+        properties.put("id", context.object.getId());
+
+        // add/replace the "well known" context tokens in component properties
+        for (String arg : context.object.getCustomProperties().keySet())
+        {
+           properties.put(arg, UriUtils.replaceUriTokens((String)context.object.getCustomProperties().get(arg), context.Tokens));
+        }
+        
+        // add the html binding id
+        String htmlBindingId = (String) context.renderData.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+        if(htmlBindingId != null)
+        {
+            properties.put(ProcessorModelHelper.PROP_HTMLID, htmlBindingId);
+        }
         
 		return new LocalWebScriptRequest(this, scriptUrl, match, properties);
 	}

@@ -30,6 +30,7 @@ import org.alfresco.web.site.cache.CacheFactory;
 import org.alfresco.web.site.cache.IContentCache;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
+import org.alfresco.web.site.model.Chrome;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
@@ -39,8 +40,10 @@ import org.alfresco.web.site.model.ModelHelper;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
+import org.alfresco.web.site.model.PageType;
 import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
+import org.alfresco.web.site.model.Theme;
 
 /**
  * @author muzquiano
@@ -54,6 +57,11 @@ public class DefaultModel extends AbstractModel implements IModel
 
     // load
 
+    public Chrome loadChrome(RequestContext context, String id)
+    {
+        return (Chrome) loadObject(context, Chrome.TYPE_NAME, id);
+    }
+    
     public Component loadComponent(RequestContext context, String id)
     {
         return (Component) loadObject(context, Component.TYPE_NAME, id);
@@ -84,6 +92,11 @@ public class DefaultModel extends AbstractModel implements IModel
     {
         return (Page) loadObject(context, Page.TYPE_NAME, id);
     }
+    
+    public PageType loadPageType(RequestContext context, String id)
+    {
+        return (PageType) loadObject(context, PageType.TYPE_NAME, id);
+    }
 
     public PageAssociation loadPageAssociation(RequestContext context, String id)
     {
@@ -100,8 +113,18 @@ public class DefaultModel extends AbstractModel implements IModel
         return (TemplateType) loadObject(context, TemplateType.TYPE_NAME, id);
     }
 
+    public Theme loadTheme(RequestContext context, String id)
+    {
+        return (Theme) loadObject(context, Theme.TYPE_NAME, id);
+    }
+    
     // instantiation
 
+    public Chrome newChrome(RequestContext context)
+    {
+        return (Chrome) newObject(context, Chrome.TYPE_NAME);
+    }
+    
     public Component newComponent(RequestContext context)
     {
         return (Component) newObject(context, Component.TYPE_NAME);
@@ -131,6 +154,11 @@ public class DefaultModel extends AbstractModel implements IModel
     {
         return (Page) newObject(context, Page.TYPE_NAME);
     }
+    
+    public PageType newPageType(RequestContext context)
+    {
+        return (PageType) newObject(context, PageType.TYPE_NAME);
+    }
 
     public PageAssociation newPageAssociation(RequestContext context)
     {
@@ -147,6 +175,11 @@ public class DefaultModel extends AbstractModel implements IModel
         return (TemplateType) newObject(context, TemplateType.TYPE_NAME);
     }
 
+    public Theme newTheme(RequestContext context)
+    {
+        return (Theme) newObject(context, Theme.TYPE_NAME);
+    }
+    
     // generics
 
     public void saveObject(RequestContext context, ModelObject obj)
@@ -228,7 +261,7 @@ public class DefaultModel extends AbstractModel implements IModel
                 typeName);
         
         // read files from the model's file system
-        IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);        
+        IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);
         if (files != null)
         {
             // extra step - make sure we only get back files

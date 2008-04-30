@@ -129,7 +129,7 @@ public class TemplateInstanceConfig
    /**
     * @return the map of name/value pair custom properties from the template instance config
     */
-   public Map<String, String> getPropetries()
+   public Map<String, String> getProperties()
    {
       return this.properties;
    }

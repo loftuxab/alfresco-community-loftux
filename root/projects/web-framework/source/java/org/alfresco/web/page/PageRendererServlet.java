@@ -39,7 +39,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.web.config.ServerProperties;
-import org.alfresco.web.page.PageAuthenticationServlet.AuthenticationResult;
 import org.alfresco.web.scripts.PresentationScriptProcessor;
 import org.alfresco.web.scripts.PresentationTemplateProcessor;
 import org.alfresco.web.scripts.Registry;
@@ -48,6 +47,8 @@ import org.alfresco.web.scripts.ScriptContent;
 import org.alfresco.web.scripts.Store;
 import org.alfresco.web.scripts.URLHelper;
 import org.alfresco.web.scripts.servlet.WebScriptServlet;
+import org.alfresco.web.site.servlet.WebScriptAuthenticationServlet;
+import org.alfresco.web.site.servlet.WebScriptAuthenticationServlet.AuthenticationResult;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -181,7 +182,7 @@ public class PageRendererServlet extends WebScriptServlet
       {
          // TODO: reimplement using the new connector abstraction package
          // authenticate - or redirect to login page
-         AuthenticationResult auth = PageAuthenticationServlet.authenticate(req, page.getAuthentication());
+         AuthenticationResult auth = WebScriptAuthenticationServlet.authenticate(req, page.getAuthentication());
          if (auth.Success)
          {
             // apply the ticket to the WebScript runtime container for the current thread
@@ -219,7 +220,7 @@ public class PageRendererServlet extends WebScriptServlet
          }
          else
          {
-            PageAuthenticationServlet.redirectToLoginPage(req, res, configService);
+            WebScriptAuthenticationServlet.redirectToLoginPage(req, res, configService);
          }
          if (logger.isDebugEnabled())
          {
@@ -313,7 +314,7 @@ public class PageRendererServlet extends WebScriptServlet
          
          // add the template config values directly to the template root model - this is useful for
          // templates that do not require additional processing in JavaScript, they just need the values
-         templateModel.putAll(templateInstance.getPropetries());
+         templateModel.putAll(templateInstance.getProperties());
          
          // execute any attached javascript behaviour for this template
          // the behaviour plus the config is responsible for specialising the template
@@ -323,7 +324,7 @@ public class PageRendererServlet extends WebScriptServlet
          {
             Map<String, Object> scriptModel = new HashMap<String, Object>(8, 1.0f);
             // add the template config properties to the script model
-            scriptModel.putAll(templateInstance.getPropetries());
+            scriptModel.putAll(templateInstance.getProperties());
             // results from the script should be placed into the root 'model' object
             scriptModel.put("model", resultModel);
             
@@ -369,7 +370,7 @@ public class PageRendererServlet extends WebScriptServlet
          
          // construct template model for 2nd pass
          templateModel = buildTemplateModel(context, page, req, true);
-         templateModel.putAll(templateInstance.getPropetries());
+         templateModel.putAll(templateInstance.getProperties());
          if (script != null)
          {
             // script already executed - so just merge script return model into the template model

@@ -32,9 +32,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.springframework.context.ApplicationContext;
@@ -46,9 +46,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class FreemarkerRenderer extends AbstractRenderer
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig modelConfig)
+            HttpServletResponse response, RenderData renderData)
             throws RendererExecutionException
     {
+        ServletContext servletContext = request.getSession().getServletContext();
+        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+
         // get the renderer destination property
         String uri = this.getRenderer();
         
@@ -56,14 +59,24 @@ public class FreemarkerRenderer extends AbstractRenderer
         String format = context.getCurrentFormatId();
         
         // get the template processor
-        String processorId = context.getConfig().getRendererProperty(getRendererType(), "processor-bean");
-        if(processorId == null || processorId.length() == 0)
+        String templateProcessorId = context.getConfig().getRendererProperty(getRendererType(), "template-processor-bean");
+        if(templateProcessorId == null || templateProcessorId.length() == 0)
         {
-            processorId = "site.webscripts.templateprocessor";
+            templateProcessorId = "site.templateprocessor";
         }
-        ServletContext servletContext = request.getSession().getServletContext();
-        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
-        PresentationTemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(processorId);
+        PresentationTemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(templateProcessorId);
+        
+        // get the script processor
+        String scriptProcessorId = context.getConfig().getRendererProperty(getRendererType(), "script-processor-bean");
+        if(scriptProcessorId == null || scriptProcessorId.length() == 0)
+        {
+            scriptProcessorId = "site.scriptprocessor";
+        }
+        PresentationScriptProcessor scriptProcessor = (PresentationScriptProcessor)appContext.getBean(scriptProcessorId);
+
+        // template store
+        Store templateStore = (Store)appContext.getBean("site.store.templates");
+        templateStore.init();
         
         /**
          * Attempt to execute the script's .head. file, if it has one
@@ -74,7 +87,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         {
             // build the model
             Map<String, Object> model = new HashMap<String, Object>(8);
-            ModelHelper.populateTemplateModel(context, model);
+            ProcessorModelHelper.populateTemplateModel(context, renderData, model);
             
             // path to the template (switches on format)
             templateName = uri + ((format != null && format.length() != 0 &&
@@ -93,6 +106,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         {   
             throw new RendererExecutionException(ex, "FreemarkerRenderer failed to process template: " + templateName);
         }
+
         
 
         /**
@@ -100,13 +114,51 @@ public class FreemarkerRenderer extends AbstractRenderer
          */
         try
         {
-            // build the model
-            Map<String, Object> model = new HashMap<String, Object>(8);
-            ModelHelper.populateTemplateModel(context, model);
+            // the result model
+            Map<String, Object> resultModel = new HashMap<String, Object>(8, 1.0f);
+            
+            /**
+             * Attempt to execute a .js file for this template
+             */
+            String scriptPath = uri + ".js";
+            ScriptContent script = templateStore.getScriptLoader().getScript(scriptPath);
+            if (script != null)
+            {
+                // build the model
+                Map<String, Object> scriptModel = new HashMap<String, Object>(8);
+                ProcessorModelHelper.populateScriptModel(context, renderData, scriptModel);
 
+                // add in the model object
+                scriptModel.put("model", resultModel);
+
+                // execute the script
+                scriptProcessor.executeScript(script, scriptModel);
+            }
+            
+            
+            
+            
+            /**
+             * Execute the template file itself
+             */
+            Map<String, Object> templateModel = new HashMap<String, Object>(8);
+            ProcessorModelHelper.populateTemplateModel(context, renderData, templateModel);
+            
+            // merge script results model into the template model
+            // these may not exist if a .js file was not found
+            for (Map.Entry<String, Object> entry : resultModel.entrySet())
+            {
+                // retrieve script model value and unwrap each java object from script object
+                Object value = entry.getValue();
+                Object templateValue = scriptProcessor.unwrapValue(value);
+                templateModel.put(entry.getKey(), templateValue);
+            }
+            
             // path to the template (switches on format)
-            templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".ftl") : ".ftl");        
-            templateProcessor.process(templateName, model, response.getWriter());
+            templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".ftl") : ".ftl");
+            
+            // process the template
+            templateProcessor.process(templateName, templateModel, response.getWriter());
         }
         catch(Exception ex)
         {

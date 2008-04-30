@@ -26,27 +26,40 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
+import org.alfresco.web.site.model.Theme;
 
 /**
  * @author muzquiano
  */
-public class DefaultPageMapper extends PageMapper
+public class DefaultPageMapper extends AbstractPageMapper
 {
     public DefaultPageMapper()
     {
         super();
+    }
+    
+    protected String getDefaultPageId(RequestContext context, String pageTypeId)
+    {
+        if(pageTypeId == null)
+        {
+            return null;
+        }
+        
+        return context.getConfig().getDefaultPageTypeInstanceId(pageTypeId);
     }
 
     public void execute(RequestContext context, HttpServletRequest request)
     {
         // init
         // requests come in the form
-        // ?f=formatId&n=nodeId
-        // ?f=formatId&n=nodeId&o=objectId
-        // ?n=nodeId
-        // ?n=nodeId&o=objectId
+        // ?f=formatId&p=pageId
+        // ?f=formatId&p=pageId&o=objectId
+        // ?p=pageId
+        // ?p=pageId&o=objectId
+        // ?pt=pageTypeId
+        // ?pt=pageTypeId&f=formatId
+        // ?pt=pageTypeId&f=formatId&o=objectId
         // ? (node id assumed to be site root node)
 
         // format id
@@ -56,15 +69,6 @@ public class DefaultPageMapper extends PageMapper
         if (formatId != null)
             context.setCurrentFormatId(formatId);
 
-        // page id
-        String pageId = (String) request.getParameter("p");
-        if(pageId != null && pageId.length() != 0)
-        {
-            Page _page = context.getModel().loadPage(context, pageId);
-            if (_page != null)
-                context.setCurrentPage(_page);
-        }
-
         // object id
         String objectId = (String) request.getParameter("o");
         if (objectId != null && objectId.length() != 0)
@@ -72,15 +76,54 @@ public class DefaultPageMapper extends PageMapper
             context.setCurrentObjectId(objectId);
         }
 
-        // check to make sure we have a site configuration
-        Configuration siteConfiguration = ModelUtil.getSiteConfiguration(context);
-        if (siteConfiguration == null)
+        // page type id
+        String pageTypeId = (String) request.getParameter("pt");
+        if(pageTypeId != null && pageTypeId.length() != 0)
         {
-            // if we don't, then lets null everything
-            // this forces the framework to "restart"
-            context.setCurrentPage(null);
-            context.setCurrentObjectId(null);
-            context.setCurrentFormatId(null);
+            // the page id to which we will resolve
+            String pageId = null;
+            
+            // see if the current theme has defined an "override"
+            String themeId = (String) context.getThemeId();
+            Theme theme = context.getModel().loadTheme(context, themeId);
+            if(theme != null)
+            {
+                pageId = theme.getDefaultPageId(pageTypeId);
+            }
+            
+            // otherwise, look up the system default
+            if(pageId == null)
+            {
+                pageId = (String) getDefaultPageId(context, pageTypeId);
+            }
+            
+            // if we still couldn't resolve, we can use a generic page            
+            if(pageId == null)
+            {
+                pageId = (String) getDefaultPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
+            }
+            
+            // load page into context (if we can)
+            if(pageId != null)
+            {
+                Page page = context.getModel().loadPage(context, pageId);
+                if(page != null)
+                {
+                    context.setCurrentPage(page);
+                }
+            }
+        }
+        
+        
+        // page id
+        String pageId = (String) request.getParameter("p");
+        if(pageId != null && pageId.length() != 0)
+        {
+            Page page = context.getModel().loadPage(context, pageId);
+            if (page != null)
+            {
+                context.setCurrentPage(page);
+            }
         }
     }
 }
