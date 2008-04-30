@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.page;
+package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
 
@@ -44,7 +44,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * @author Kevin Roast
  */
-public class PageAuthenticationServlet extends HttpServlet
+public class WebScriptAuthenticationServlet extends HttpServlet
 {
    private String loginPage = null;
    private ConfigService configService = null;
@@ -211,15 +211,15 @@ public class PageAuthenticationServlet extends HttpServlet
    
    public static String getLoginPage(ConfigService configService)
    {
-      Config config = configService.getConfig(PageRendererServlet.CONFIG_ELEMENT);
+      Config config = configService.getConfig("Authentication");
       if (config == null)
       {
-         throw new IllegalStateException("PageRenderer config section cannot be found.");
+         throw new IllegalStateException("Authentication config section cannot be found.");
       }
       ConfigElement loginElement = config.getConfigElement("login-page");
       if (loginElement == null)
       {
-         throw new IllegalStateException("PageRenderer login-page config element cannot be found.");
+         throw new IllegalStateException("Authentication login-page config element cannot be found.");
       }
       return loginElement.getValue().trim();
    }

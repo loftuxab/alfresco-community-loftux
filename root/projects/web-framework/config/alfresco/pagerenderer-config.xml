@@ -39,7 +39,7 @@
       </uri-mappings>      
    </config>
    
-   <config evaluator="string-compare" condition="PageRenderer">
+   <config evaluator="string-compare" condition="Authentication">
       <!-- login page JSP -->
       <login-page>/login.jsp</login-page>
    </config>
