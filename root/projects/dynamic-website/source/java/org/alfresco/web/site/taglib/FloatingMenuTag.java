@@ -44,7 +44,7 @@ public class FloatingMenuTag extends TagBase
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 
-            String uri = Framework.getConfig().getPresentationContainerURI("in-context");
+            String uri = Framework.getConfig().getDispatcherErrorHandlerRenderer("in-context");
             if(uri == null)
             {
             	uri = "/app/in-context.jsp";

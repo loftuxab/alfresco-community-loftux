@@ -1,25 +1,24 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
-	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");
-	
 	// config values
-	String imageLocation = (String) configuration.get("imageLocation");
-	String width = (String) configuration.get("width");
-	String height = (String) configuration.get("height");
-	String alt = (String) configuration.get("alt");
+	String imageLocation = (String) context.getRenderData().get("imageLocation");
+	String width = (String) context.getRenderData().get("width");
+	String height = (String) context.getRenderData().get("height");
+	String alt = (String) context.getRenderData().get("alt");
 	
 	String renderString = null;
 	if(imageLocation != null && !"".equals(imageLocation))
 	{
-		imageLocation = URLUtil.browser(context, imageLocation);
+		if(imageLocation.startsWith("/"))
+		{
+			imageLocation = URLUtil.browser(context, imageLocation);
+		}
 		renderString = "<img src=\"" + imageLocation + "\" ";
 		if(width != null)
 			renderString += " width=\"" + width + "\"";
@@ -35,7 +34,7 @@
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
 		String unconfiguredImageUrl = URLUtil.browser(context, "/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
-		renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component'/>";
+		renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component' width='64px' height='64px'/>";
 	}
 %>
 <%=renderString%>

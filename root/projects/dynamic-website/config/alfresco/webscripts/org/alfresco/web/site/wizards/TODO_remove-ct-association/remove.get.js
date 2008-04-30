@@ -22,13 +22,13 @@ if(associationId != null)
 	var association = site.getObject(associationId);
 
 	// default values
-	var templateId = association.getProperty("templateId");
-	var formatId = association.getProperty("formatId");
-	var xformId = association.getProperty("sourceId");
+	var templateId = association.getProperty("template-instance");
+	var formatId = association.getProperty("format-id");
+	var xformId = association.getProperty("source-id");
 	
 	var template = site.getObject(templateId);
-	var templateName = template.getProperty("name");
-	var templateDescription = template.getProperty("description");
+	var templateName = template.getTitle();
+	var templateDescription = template.getDescription();
 	
 	setResponseTitle("Remove Association for " + xformId + " (" + formatId + ")");
 

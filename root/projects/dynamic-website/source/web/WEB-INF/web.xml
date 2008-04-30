@@ -56,6 +56,16 @@
       <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
    </servlet>
+
+   <servlet>
+      <servlet-name>themeServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.ThemeServlet</servlet-class>
+   </servlet>
+
+   <servlet>
+      <servlet-name>incontextServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.InContextServlet</servlet-class>
+   </servlet>
            
    <servlet>
       <servlet-name>Proxy Servlet</servlet-name>
@@ -75,6 +85,16 @@
    <servlet-mapping>
       <servlet-name>regionDispatcherServlet</servlet-name>
       <url-pattern>/region/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>themeServlet</servlet-name>
+      <url-pattern>/theme/*</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>incontextServlet</servlet-name>
+      <url-pattern>/incontext/*</url-pattern>
    </servlet-mapping>
    
    <servlet-mapping>

@@ -1,7 +1,6 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
 <%@ page import="org.alfresco.web.site.remote.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="org.alfresco.tools.*" %>
@@ -12,15 +11,12 @@
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
-	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");	
-
 	// settings	
-	String theItemType = (String) configuration.get("itemType");
-	String theItemPath = (String) configuration.get("itemPath");	
-	String howToRender = (String) configuration.get("howToRender");
-	String renderData = (String) configuration.get("renderData");
-	String endpointId = (String) configuration.get("endpointId");
+	String theItemType = (String) context.getRenderData().get("itemType");
+	String theItemPath = (String) context.getRenderData().get("itemPath");	
+	String howToRender = (String) context.getRenderData().get("howToRender");
+	String renderData = (String) context.getRenderData().get("renderData");
+	String endpointId = (String) context.getRenderData().get("endpointId");
 	
 
 	// find this endpoint

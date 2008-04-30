@@ -33,7 +33,7 @@ save(component);
 //
 // associate the component to the region
 //
-var componentId = component.getProperty("id");
+var componentId = component.getId();
 site.associateComponent(componentId, regionScopeId, regionSourceId, regionId);
 
 

@@ -142,32 +142,78 @@
 
 	<config evaluator="string-compare" condition="WebFramework" replace="true">
 	
-		<!-- Updates to Presentation Pages -->
-		<presentation>
-			<pages>
+		<!-- Define dispatcher settings -->
+		<dispatcher>
+			<error-handlers>
+				<handler>
+					<id>page-error</id>
+					<renderer>/core/page-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+				<handler>
+					<id>component-error</id>
+					<renderer>/core/component-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+				<handler>
+					<id>region-error</id>
+					<renderer>/core/region-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+				<handler>
+					<id>region-nocomponent</id>
+					<renderer>/app/region-nocomponent.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>						
+				<handler>
+					<id>template-error</id>
+					<renderer>/core/template-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+			</error-handlers>
+			<system-pages>
 				<page>
-					<id>getting-started</id>
-					<title>Getting Started</title>
-					<uri>/app/getting-started.jsp</uri>
+					<id>page-getting-started</id>
+					<renderer>/app/getting-started.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
 				</page>
 				<page>
 					<id>page-unconfigured</id>
-					<title>Unconfigured Page</title>
-					<uri>/app/unconfigured-nav-node.jsp</uri>
+					<renderer>/app/unconfigured-nav-node.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
 				</page>
-			</pages>
-			<containers>
-				<container>
-					<id>region-container</id>
-					<uri>/app/region.jsp</uri>
-				</container>
-				<container>
+				<page>
 					<id>in-context</id>
-					<uri>/app/in-context.jsp</uri>
-				</container>
-			</containers>
-		</presentation>
+					<renderer>/app/in-context.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</page>
+			</system-pages>
+		</dispatcher>
 		
 	</config>
+	
+
+	<!-- Add in additional Dynamic Website elements -->
+	<config evaluator="string-compare" condition="WebFramework" replace="true">
+	
+		<application>
+			<defaults>
+				<region-chrome>dynamic-region-chrome</region-chrome>
+				<component-chrome>dynamic-component-chrome</component-chrome>
+				<page-types>
+					<page-type>
+						<id>login</id>
+						<page-instance-id></page-instance-id>
+					</page-type>
+					<page-type>
+						<id>logout</id>
+						<page-instance-id></page-instance-id>
+					</page-type>
+				</page-types>
+			</defaults>
+		</application>
+	
+	</config>
+	
 
 </alfresco-config>

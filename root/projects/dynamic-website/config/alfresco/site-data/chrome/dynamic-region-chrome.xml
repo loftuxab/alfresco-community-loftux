@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chrome>
+	<title>Dynamic Website Region Chrome</title>
+	<renderer>/app/region.jsp</renderer>
+	<renderer-type>jsp</renderer-type>
+</chrome>

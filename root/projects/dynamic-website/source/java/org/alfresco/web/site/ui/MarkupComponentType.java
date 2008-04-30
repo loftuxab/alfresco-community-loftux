@@ -29,10 +29,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.web.site.AbstractRenderable;
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.URLUtil;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -41,11 +41,11 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 public class MarkupComponentType extends AbstractRenderable
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
+            HttpServletResponse response, RenderData renderData)
             throws RendererExecutionException
     {
         // config values
-        String markupData = (String) config.get("markupData");
+        String markupData = (String) renderData.get("markupData");
 
         // shimmy the data a bit
         if (markupData != null)

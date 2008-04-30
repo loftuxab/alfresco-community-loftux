@@ -18,7 +18,7 @@ if(endpointId != null)
 		var defaultUri = wizard.getSafeProperty(endpoint, "default-uri");
 
 		// add the endpoint object id
-		wizard.addHiddenElement("endpointObjectId", endpoint.getProperty("id"));
+		wizard.addHiddenElement("endpointObjectId", endpoint.getId());
 
 		// set up form elements
 		wizard.addElement("endpointId", endpointId);

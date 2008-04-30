@@ -7,7 +7,7 @@
 		</buttons>
 		<data>
 			<element id="mediaType" type="String" defaultValue="" />
-			<element id="url" type="String" defaultValue="" />
+			<element id="mediaUrl" type="String" defaultValue="" />
 			<element id="unsupportedText" type="String" defaultValue="" />
 			<element id="width" type="String" defaultValue="" />
 			<element id="height" type="String" defaultValue="" />
@@ -16,7 +16,7 @@
 	<page id="submit" end="true" type="form">
 		<data>
 			<element id="mediaType" type="String" />
-			<element id="url" type="String" />
+			<element id="mediaUrl" type="String" />
 			<element id="unsupportedText" type="String" />
 			<element id="width" type="String" />
 			<element id="height" type="String" />

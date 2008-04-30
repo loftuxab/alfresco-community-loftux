@@ -12,7 +12,7 @@ var siteConfiguration = site.getSiteConfiguration();
 var newComponent = site.newComponent();
 
 newComponent.setProperty("name", "TEST NAME");
-var p1 = newComponent.getProperty("name");
+var p1 = newComponent.getTitle();
 
 newComponent.setSetting("testSetting", "TEST VALUE");
 var s1 = newComponent.getSetting("testSetting");
@@ -34,27 +34,27 @@ l1.setProperty("layoutTypeId", "lt-test");
 l1.save();
 
 var t1 = site.newTemplate();
-t1.setProperty("layoutId", l1.getProperty("id"));
+t1.setProperty("layoutId", l1.getId());
 t1.save();
 
 var ca1 = site.newComponentAssociation();
 ca1.setProperty("scope", "template");
-ca1.setProperty("sourceId", t1.getProperty("id"));
+ca1.setProperty("sourceId", t1.getId());
 ca1.setProperty("regionId", "header");
-ca1.setProperty("componentId", c1.getProperty("id"));
+ca1.setProperty("componentId", c1.getId());
 ca1.save();
 
 
 // verify: 1
-var as1 = site.findComponentAssociations(null, null, t1.getProperty("id"), null);
+var as1 = site.findComponentAssociations(null, null, t1.getId(), null);
 logger.log("ASSOCIATION SIZE: " + as1.length);
 
 
 // do an unassociate
-site.unassociateComponent(c1.getProperty("id"), "template", t1.getProperty("id"), "header" );
+site.unassociateComponent(c1.getProperty("id"), "template", t1.getId(), "header" );
 
 // verify: 0
-var as2 = site.findComponentAssociations(null, null, t1.getProperty("id"), null);
+var as2 = site.findComponentAssociations(null, null, t1.getId(), null);
 logger.log("ASSOCIATION SIZE: " + as2.length);
 
 

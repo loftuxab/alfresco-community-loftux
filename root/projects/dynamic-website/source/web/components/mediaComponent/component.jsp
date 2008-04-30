@@ -1,33 +1,29 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
-<%@ taglib uri="/WEB-INF/tlds/adw.tld" prefix="adw" %>
+<%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%@ page isELIgnored="false" %>
+<alf:require script="/components/mediaComponent/uxmedia.js"/>
+<alf:require script="/components/mediaComponent/uxflash.js"/>
 <%
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
-	
-	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");
 
-	String componentPathUri = (String) config.get("component-path-uri");
-	
 	// config values
-	String componentId = (String) configuration.get("component-id");
+	String componentId = (String) context.getRenderData().get("component-id");
 
-	String mediaType = (String) configuration.get("mediaType");
-	String url = (String) configuration.get("url");
+	String mediaType = (String) context.getRenderData().get("mediaType");
+	String mediaUrl = (String) context.getRenderData().get("mediaUrl");
 
-	String unsupportedText = (String) configuration.get("unsupportedText");
+	String unsupportedText = (String) context.getRenderData().get("unsupportedText");
 	if(unsupportedText == null || "".equals(unsupportedText))
 		unsupportedText = "The viewer is not installed.";
 
-	String width = (String) configuration.get("width");
+	String width = (String) context.getRenderData().get("width");
 	if(width == null || "".equals(width))
 		width = "320";
 
-	String height = (String) configuration.get("height");
+	String height = (String) context.getRenderData().get("height");
 	if(height == null || "".equals(height))
 		height = "240";
 
@@ -35,43 +31,38 @@
 	
 	if(mediaType == null || "".equals(mediaType))
 		configured = false;
-	if(url == null || "".equals(url))
+	if(mediaUrl == null || "".equals(mediaUrl))
 		configured = false;
 		
 	if(!configured)
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
 		String unconfiguredImageUrl = URLUtil.browser(context, "/themes/builder/images/" + currentThemeId + "/icons/unconfigured_component_large.gif");
-		String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component'/>";
+		String renderString = "<img src='" + unconfiguredImageUrl + "' border='0' alt='Unconfigured Image Component' width='64px' height='64px' />";
 		out.println(renderString);
 		return;
 	}
 	
 	String divId = "div-" + componentId;
 %>
-<adw:require>
-	<script type="text/javascript" src="<%=componentPathUri%>/mediapanel.js"></script>
-</adw:require>
 <div>
 <br/>
 <br/>
 <div id="<%=divId%>"></div>
-</div>
+
 <%
-	if(url.startsWith("/"))
-		url = "http://" + request.getServerName() + ":" + request.getServerPort() + url;
+	if(mediaUrl.startsWith("/"))
+		mediaUrl = "http://" + request.getServerName() + ":" + request.getServerPort() + mediaUrl;
 
 	String extension = null;
-	int x = url.lastIndexOf(".");
+	int x = mediaUrl.lastIndexOf(".");
 	if(x > -1)
-		extension = url.substring(x+1, url.length());
+		extension = mediaUrl.substring(x+1, mediaUrl.length());
 	if(extension != null)
 		extension = extension.toLowerCase();
 %>	
 <script language="Javascript">
 
-//var width = Ext.get("<%=divId%>").parent().getWidth();
-//var height = Ext.get("<%=divId%>").parent().getHeight();
 var width=320;
 var height=240;
 
@@ -80,11 +71,17 @@ var isWindows = Ext.isWindows;
 var isLinux = Ext.isLinux;
 var isMac = Ext.isMac;
 
+// base config
 var config = {
-       url         :'<%=url%>'
-       ,unsupportedText : '<%=unsupportedText%>'
-       ,start	: true
-}
+       			url		: '<%=mediaUrl%>',
+       			id		: '<%=componentId%>',
+       			start		: true,
+       			loop		: true,
+       			controls	: true,
+       			autoSize	: true
+};
+
+
 
 if("video" == "<%=mediaType%>")
 {
@@ -93,7 +90,6 @@ if("video" == "<%=mediaType%>")
 		if(isWindows)
 		{
 			config["mediaType"] = "WMV";
-			config["params"] = { };
 		}
 	}
 	
@@ -102,23 +98,19 @@ if("video" == "<%=mediaType%>")
 		if(isMac || isLinux)
 		{
 			config["mediaType"] = "MOV";
-			config["params"] = { };
 		}
 		if(isWindows)
 		{
 			config["mediaType"] = "WMV";
-			config["params"] = { };
 		}
 	}
 	if("swf" == extension)
 	{
 		config["mediaType"] = "SWF";
-		config["params"] = { };
 	}
 	if("rv" == extension)
 	{
 		config["mediaType"] = "REAL";
-		config["params"] = { };
 	}
 }
 
@@ -127,51 +119,48 @@ if("audio" == "<%=mediaType%>")
 	if(isWindows)
 	{
 		config["mediaType"] = "WMV";
-		config["params"] = { };			
 	}
 	else
 	{	
 		if("mp3" == extension)
 		{
 			config["mediaType"] = "QTMP3";
-			config["params"] = { };
 		}
 		if("mid" == extension)
 		{
 			config["mediaType"] = "QTMIDI";
-			config["params"] = { };
 		}
 		if("wav" == extension)
 		{
 			config["mediaType"] = "QTWAV";
-			config["params"] = { };
 		}
 	}
 }
 
 if("flash" == "<%=mediaType%>")
 {
-	config["mediaType"] = "flashpanel";
-	config["params"] = { };
+	config["mediaType"] = "SWF";
 }
 
 if("pdf" == "<%=mediaType%>")
 {
 	config["mediaType"] = "PDF";
-	config["params"] = { };
 }
 
-var p = new Ext.ux.MediaPanel({
-        id:'<%=componentId%>',
-        renderTo: '<%=divId%>',
-        height: height,
-        width : width,
-        mediaCfg: config
-});
 
-//p.show();
+
+	var p = new Ext.ux.MediaPanel({
+		id		: 'win<%=componentId%>',
+		renderTo	: '<%=divId%>',
+		height		: <%=height%>,
+		width		: <%=width%>,
+		mediaCfg	: config
+	});
+	p.show();
 
 </script>
+
 <br/>
 <br/>
 <br/>
+</div>

@@ -59,7 +59,7 @@ wizard.addElementFormatKeyPair("templateId", "title", "Templates");
 var templates = site.getTemplates();
 for(var i = 0; i < templates.length; i++)
 {
-	var templateId = templates[i].getProperty("id");
-	var templateName = templates[i].getProperty("name");
+	var templateId = templates[i].getId();
+	var templateName = templates[i].getTitle();
 	wizard.addElementSelectionValue("templateId", templateId, templateName);
 }

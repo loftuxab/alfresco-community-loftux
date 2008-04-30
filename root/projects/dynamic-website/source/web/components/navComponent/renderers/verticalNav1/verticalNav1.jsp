@@ -1,6 +1,5 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%!
@@ -69,10 +68,7 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");
-
-	// get the configuration
-	String style = (String) configuration.get("style");
+	String style = (String) context.getRenderData().get("style");
 	if(style == null || "".equals(style))
 		style="0";
 	

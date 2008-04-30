@@ -158,6 +158,7 @@ function getInContextURL(toggle, elementId, value)
 
 	
 	var url = "/incontext/" + queryString;
+	url = toBrowser(url);
 <%
 	if(jSessionId != null)
 	{

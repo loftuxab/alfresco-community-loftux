@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chrome>
+	<title>Dynamic Website Component Chrome</title>
+	<renderer>/app/component.jsp</renderer>
+	<renderer-type>jsp</renderer-type>
+</chrome>

@@ -36,7 +36,9 @@ public class ADWUtil
     {
         // use default endpoint id if none specified
         if (endpointId == null)
-            endpointId = RenderUtil.DEFAULT_ALFRESCO_ENDPOINT_ID;
+        {
+            endpointId = WebFrameworkConstants.DEFAULT_ALFRESCO_ENDPOINT_ID;
+        }
 
         // get the endpoint
         Endpoint endpoint = context.getModel().loadEndpoint(context, endpointId);

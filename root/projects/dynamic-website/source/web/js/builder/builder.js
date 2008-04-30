@@ -10,10 +10,10 @@ var BUILDER_TEMPLATE_SCOPE_OVERLAY_COLOR1_HIGH = "#AA6666";
 var BUILDER_TEMPLATE_SCOPE_OVERLAY_COLOR1 = "#220000";
 var BUILDER_TEMPLATE_SCOPE_OVERLAY_COLOR1_LOW = "#995555";
 
-// Site Scope Colors
-var BUILDER_SITE_SCOPE_OVERLAY_COLOR1_HIGH = "#66AA66";
-var BUILDER_SITE_SCOPE_OVERLAY_COLOR1 = "#002200";
-var BUILDER_SITE_SCOPE_OVERLAY_COLOR1_LOW = "#559955";
+// Global Scope Colors
+var BUILDER_GLOBAL_SCOPE_OVERLAY_COLOR1_HIGH = "#66AA66";
+var BUILDER_GLOBAL_SCOPE_OVERLAY_COLOR1 = "#002200";
+var BUILDER_GLOBAL_SCOPE_OVERLAY_COLOR1_LOW = "#559955";
 
 
 var buttonHandler = applicationButtonHandler;
@@ -1225,14 +1225,15 @@ function dropOntoRegion(region, nodeData, source, e, data)
 		}
 
 		// they dropped a webscript component
+		// this is when they've selected a WEB UI component
 		if("webscriptComponent" == alfType)
 		{
 			var uri = data.node.attributes["uri"];
 			
 			// create a webscript component params
 			var params = { };
-			params["componentType"] = "ct-webscriptComponent";
-			params["_uri"] = uri;
+			params["componentType"] = "webscript";
+			params["_url"] = uri;
 
 			// bounce component into place
 			plugComponentIntoRegion(region, params);
@@ -1273,7 +1274,7 @@ function dropOntoRegion(region, nodeData, source, e, data)
 
 				// bounce component into place
 				var params = { };
-				params["componentType"] = "ct-webscriptComponent";
+				params["componentType"] = "ct-remoteWebscriptComponent";
 				params["_endpointId"] = "alfresco";
 				params["_webscript"] = "/collaboration/projectSpace?nodeRef=workspace://SpacesStore/" + spaceRef;
 				params["_container"] = "iframe";
@@ -1290,7 +1291,7 @@ function dropOntoRegion(region, nodeData, source, e, data)
 
 					// bounce component into place
 					var params = { };
-					params["componentType"] = "ct-webscriptComponent";
+					params["componentType"] = "ct-remoteWebscriptComponent";
 					params["_endpointId"] = "alfresco";
 					params["_webscript"] = "/collaboration/gallery/view/workspace://SpacesStore/" + spaceRef;
 					params["_container"] = "iframe";
@@ -1303,7 +1304,7 @@ function dropOntoRegion(region, nodeData, source, e, data)
 
 					// bounce component into place
 					var params = { };
-					params["componentType"] = "ct-webscriptComponent";
+					params["componentType"] = "ct-remoteWebscriptComponent";
 					params["_endpointId"] = "alfresco";
 					params["_webscript"] = "/collaboration/docLibrary?nodeRef=workspace://SpacesStore/" + spaceRef;
 					params["_container"] = "iframe";
@@ -1319,7 +1320,7 @@ function dropOntoRegion(region, nodeData, source, e, data)
 
 					// bounce component into place
 					var params = { };
-					params["componentType"] = "ct-webscriptComponent";
+					params["componentType"] = "ct-remoteWebscriptComponent";
 					params["_endpointId"] = "alfresco";
 					params["_webscript"] = "/collaboration/forumSummary?nodeRef=workspace://SpacesStore/" + spaceRef;
 					params["_container"] = "iframe";
@@ -1334,7 +1335,7 @@ function dropOntoRegion(region, nodeData, source, e, data)
 				
 				// bounce component into place
 				var params = { };
-				params["componentType"] = "ct-webscriptComponent";
+				params["componentType"] = "ct-remoteWebscriptComponent";
 				params["_endpointId"] = "alfresco";
 				params["_webscript"] = "/collaboration/calendar?nodeRef=workspace://SpacesStore/" + spaceRef;
 				params["_container"] = "iframe";
@@ -1361,7 +1362,7 @@ function plugComponentIntoRegion(region, params)
 
 	// select the source id
 	var regionScopeId = region.regionScopeId;
-	var sourceId = "site";
+	var sourceId = "global";
 	if("template" == regionScopeId)
 		sourceId = currentTemplateId;
 	if("page" == regionScopeId)
@@ -1395,31 +1396,26 @@ function RefreshPageRegion(responseObject)
 	var regionId = data.regionId;
 	var regionScopeId = data.regionScopeId;
 	
-	// get the region div
-	//var divEl = Ext.get(regionId);
-	
-	// update to the region div
-	//bindComponentToRegion(regionId, componentAssociationId, componentId, componentTypeId);	
-		
-	// tell it to reload from the region renderer
-	//var host = getLocalProtocolHostPort();
-	//var url = host + "/region/?" + getQueryString() + "&regionId="+regionId+"&regionScopeId="+regionScopeId;
-	//directRenderURL(url, divEl.dom.id);	
 	faultRegion(regionId, regionScopeId);
 }
 
 function faultRegion(regionId, regionScopeId)
 {
 	var host = getLocalProtocolHostPort();
-	var url = host + "/region/?" + getQueryString() + "&regionId="+regionId+"&regionScopeId="+regionScopeId;
+	var url = "/region/?regionId="+regionId+"&regionScopeId="+regionScopeId;
+	if(getQueryString() != null && getQueryString().length > 0)
+	{
+		url = url + "&" + getQueryString();
+	}
+	url = toBrowser(url);
 
 	Ext.Ajax.request({
 			url: url,
 			disableCaching: true,
 			method: 'GET',
 			params: {
-				'regionId' : regionId,
-				'regionScopeId' : regionScopeId
+				regionId: regionId,
+				regionScopeId: regionScopeId
 			},
 			success: faultRegionSuccess			
 	});
@@ -1429,10 +1425,10 @@ function faultRegionSuccess(responseObject, options)
 {
 	var regionId = options["params"]["regionId"];
 	var regionScopeId = options["params"]["regionScopeId"];
-	
+
 	// load in the html
 	var html = responseObject.responseText;
-	
+
 	// get the parent of the region
 	var el = Ext.get(regionId);
 	var parent = el.parent();
@@ -1444,7 +1440,6 @@ function faultRegionSuccess(responseObject, options)
 	el.remove();
 	
 	// append the html into the right place
-	//var _el = Ext.DomHelper.append(parent, html, true);	
 	var _el = Ext.DomHelper.insertBefore(dummy, html, true);
 	
 	// remove the dummy
@@ -1482,12 +1477,18 @@ function bindComponentToRegion(regionId, componentId, componentTypeId)
 
 function switchTheme(themeId)
 {
-	Ext.util.CSS.swapStyleSheet('extjs-theme-link', '/themes/extjs/css/xtheme-'+themeId+'.css');
-	Ext.util.CSS.swapStyleSheet('builder-theme-link', '/themes/builder/css/builder-'+themeId+'.css');
+	var newExtTheme = toBrowser('/themes/extjs/css/xtheme-'+themeId+'.css');
+	var newBuilderTheme = toBrowser('/themes/builder/css/builder-'+themeId+'.css');
+	
+	Ext.util.CSS.swapStyleSheet('extjs-theme-link', newExtTheme);
+	Ext.util.CSS.swapStyleSheet('builder-theme-link', newBuilderTheme);
+	
+	var url = "/theme/?themeId=" + themeId;
+	url = toBrowser(url);
 	
 	// post ajax update
 	Ext.Ajax.request({
-		url: "/theme/?themeId=" + themeId,
+		url: url,
 		method: 'GET',
 		scriptTag: true
 	});
@@ -1754,7 +1755,9 @@ function makeSpacesTreePanel(panelId)
 
 function spacesTreeNodeDoubleClickHandler(node, e)
 {
-	var url = getHttpHostPort() + node.attributes.url	
+	//var url = getHttpHostPort() + node.attributes.url	
+	var url = node.attributes.url;
+	url = toBrowser(url);
 	window.open(url);
 }
 
@@ -2023,8 +2026,9 @@ function navTreeNodeDoubleClickHandler(node, e)
 {
 	// TODO: hit the layout dispatcher and fault in a new layout via ajax
 	// for now, redirect
-	var nodeId = node.attributes.nodeId;
-	window.location.href = "/?f=default&n="+nodeId;
+	var pageId = node.attributes.pageId;
+	var url = "/?f=default&p="+pageId;
+	window.location.href = toBrowser(url);
 }
 
 function updateNavTreeButtons(node)
@@ -2775,11 +2779,11 @@ function formatColorOverlay(regionElement, overlayElement)
 		colorLow = BUILDER_TEMPLATE_SCOPE_OVERLAY_COLOR1_LOW;
 		color = BUILDER_TEMPLATE_SCOPE_OVERLAY_COLOR1;
 	}
-	if("site" == regionScopeId)
+	if("global" == regionScopeId)
 	{
-		colorHigh = BUILDER_SITE_SCOPE_OVERLAY_COLOR1_HIGH;
-		colorLow = BUILDER_SITE_SCOPE_OVERLAY_COLOR1_LOW;
-		color = BUILDER_SITE_SCOPE_OVERLAY_COLOR1;
+		colorHigh = BUILDER_GLOBAL_SCOPE_OVERLAY_COLOR1_HIGH;
+		colorLow = BUILDER_GLOBAL_SCOPE_OVERLAY_COLOR1_LOW;
+		color = BUILDER_GLOBAL_SCOPE_OVERLAY_COLOR1;
 	}
 
 	// determine the total window width and height

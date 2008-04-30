@@ -27,13 +27,13 @@ var templates = site.getTemplates();
 for(var i = 0; i < templates.length; i++)
 {
 	var array = new Array();
-	array[0] = templates[i].getProperty("name");
-	array[1] = templates[i].getProperty("id");
+	array[0] = templates[i].getTitle();
+	array[1] = templates[i].getId();
 	array[2] = "";
 	
 	var templateType = site.getObject(templates[i].getProperty("template-type-id"));
 	if(templateType != null)
-		array[2] = templateType.getName();
+		array[2] = templateType.getTitle();
 		
 	wizard.addGridData(array);
 }

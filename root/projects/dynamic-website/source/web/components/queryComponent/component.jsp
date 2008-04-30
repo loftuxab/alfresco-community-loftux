@@ -7,26 +7,22 @@
 <%@ page import="org.w3c.dom.*" %>
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
-	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");	
-
 	// settings	
-	String queryString = (String) configuration.get("queryString");
-	String queryType = (String) configuration.get("queryType");
-	String howToRender = (String) configuration.get("howToRender");
-	String renderData = (String) configuration.get("renderData");
-	String endpointId = (String) configuration.get("endpointId");
+	String queryString = (String) context.getRenderData().get("queryString");
+	String queryType = (String) context.getRenderData().get("queryType");
+	String howToRender = (String) context.getRenderData().get("howToRender");
+	String renderData = (String) context.getRenderData().get("renderData");
+	String endpointId = (String) context.getRenderData().get("endpointId");
 	
 
 	// find this endpoint
-	Endpoint endpoint = context.getManager().getEndpoint(context, endpointId);
+	Endpoint endpoint = ModelUtil.getEndpoint(context, endpointId);
 	if(endpoint == null)
 	{
 		out.println("No endpoint specified");

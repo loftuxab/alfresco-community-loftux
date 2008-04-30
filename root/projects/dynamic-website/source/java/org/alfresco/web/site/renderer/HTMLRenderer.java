@@ -28,8 +28,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.HTMLUtil;
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -38,7 +38,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 public class HTMLRenderer extends AbstractRenderer
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
+            HttpServletResponse response, RenderData renderData)
             throws RendererExecutionException
     {
         String renderer = this.getRenderer();
