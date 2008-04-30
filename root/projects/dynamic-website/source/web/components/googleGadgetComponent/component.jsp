@@ -1,18 +1,14 @@
 <%@ page import="org.alfresco.tools.*" %>
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
-	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");
-	
         // config values
-        String markupData = (String) configuration.get("markupData");
+        String markupData = (String) context.getRenderData().get("markupData");
 
         // shimmy the data a bit
         if (markupData != null)

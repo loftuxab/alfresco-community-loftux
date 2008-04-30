@@ -1,6 +1,5 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.web.site.model.*" %>
-<%@ page import="org.alfresco.web.site.config.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%!
@@ -68,15 +67,12 @@
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
-	// get the configuration
-	RuntimeConfig configuration = (RuntimeConfig) request.getAttribute("component-configuration");
-	
 	// config values
-	String componentId = (String) configuration.get("component-id");
-	String altText = (String) configuration.get("alt");
+	String componentId = (String) context.getRenderData().get("component-id");
+	String altText = (String) context.getRenderData().get("alt");
 	if(altText == null)
 		altText = "Navigation";		
-	String orientation = (String) configuration.get("orientation");
+	String orientation = (String) context.getRenderData().get("orientation");
 	if(orientation == null || "".equals(orientation))
 		orientation = "horizontal";
 	

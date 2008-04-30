@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <template-type>
 	<id>tt-basic-print-template</id>
-	<name>Basic Print Template</name>
+	<title>Basic Print Template</title>
 	<description>Basic Print Template</description>
 	<renderer-type>html</renderer-type>
 	<renderer>/build/basic/basic-print-template.html</renderer>

@@ -39,8 +39,8 @@ wizard.addElementSelectionValue("formatId", "wap", "Wireless (WAP)");
 wizard.addElementFormatKeyPair("templateTypeId", "title", "Template Types");
 for(var i = 0; i < templateTypes.length; i++)
 {
-	var templateTypeId = templateTypes[i].getProperty("id");
-	var templateTypeName = templateTypes[i].getProperty("name");
+	var templateTypeId = templateTypes[i].getId();
+	var templateTypeName = templateTypes[i].getTitle();
 	wizard.addElementSelectionValue("templateTypeId", templateTypeId, templateTypeName);
 }
 //if(templateTypes.length > 0)

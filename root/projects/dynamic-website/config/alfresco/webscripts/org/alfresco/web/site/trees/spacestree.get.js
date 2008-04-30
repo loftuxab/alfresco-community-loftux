@@ -38,7 +38,7 @@ if(responseString != null)
 		if(node.hasChildren)
 			json[i]["leaf"] = false;
 
-		json[i]["url"] = "/alfresco" + node.url;
+		json[i]["url"] = "./alfresco" + node.url;
 		json[i]["nodeId"] = node.id;
 		json[i]["nodeRef"] = node.nodeRef;
 
@@ -49,11 +49,11 @@ if(responseString != null)
 		var icon = node.properties["{http://www.alfresco.org/model/application/1.0}icon"];
 		if(icon != null)
 		{
-			json[i]["icon"] = "/alfresco/images/icons/" + icon + ".gif";
+			json[i]["icon"] = "./alfresco/images/icons/" + icon + ".gif";
 		}
 		else
 		{
-			json[i]["icon"] = "/alfresco" + node.icon16;
+			json[i]["icon"] = "./alfresco" + node.icon16;
 		}
 	}
 }

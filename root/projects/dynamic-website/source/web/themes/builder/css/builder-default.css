@@ -278,7 +278,7 @@ A.floatingMenuOptions:active { color: #000000; text-decoration: none; }
 
 
 
-.region-window-body-configured-site-region .x-window-body 
+.region-window-body-configured-global-region .x-window-body 
 {
     background-color: #4C7D7E;
     filter:alpha(opacity=95);

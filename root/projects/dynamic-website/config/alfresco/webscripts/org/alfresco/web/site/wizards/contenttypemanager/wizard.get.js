@@ -27,17 +27,17 @@ wizard.addGridNoDataMessage("There are no associations currently defined.");
 var associations = site.findContentAssociations(null, null, null, null);
 for(var i = 0; i < associations.length; i++)
 {
-	var sourceId = associations[i].getProperty("sourceId");
+	var sourceId = associations[i].getProperty("source-id");
 	if(sourceId != null)
 	{
-		var associationId = associations[i].getProperty("id");
-		var formatId = associations[i].getProperty("formatId");
+		var associationId = associations[i].getId();;
+		var formatId = associations[i].getProperty("format-id");
 
-		var destId = associations[i].getProperty("destId");
+		var destId = associations[i].getProperty("dest-id");
 		var pageName = "NOT FOUND";
 		var page = site.getObject(destId);
 		if(page != null)
-			pageName = page.getProperty("name");
+			pageName = page.getTitle();
 
 		var array = new Array();
 		array[0] = associationId;

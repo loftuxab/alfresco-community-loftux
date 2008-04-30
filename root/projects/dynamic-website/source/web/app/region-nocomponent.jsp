@@ -13,39 +13,13 @@
 	String regionId = (String) context.getRenderData().get("region-id");
 	String regionScopeId = (String) context.getRenderData().get("region-scope-id");
 	String regionSourceId = (String) context.getRenderData().get("region-source-id");
-	String componentId = (String) context.getRenderData().get("component-id");	
-	String componentTypeId = (String) context.getRenderData().get("component-type-id");
 
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
 	String unconfiguredImageUrl = URLUtil.browser(context, "/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");
 %>
-<!-- Start Dynamic Website Region Chrome -->
 <div width="100%" id="<%=regionId%>">
-<%
-	if(componentId != null)
-	{
-		PresentationUtil.renderComponent(context, request, response, componentId);
-	}
-	else
-	{
-%>
 	<img src="<%=unconfiguredImageUrl%>" border="0" width="64px" height="64px"/>
-<%
-	}
-%>
 </div>
 <script language="Javascript">
 	configureRegion("<%=regionId%>", "<%=regionScopeId%>", <%=(regionSourceId == null ? "null" : "\"" + regionSourceId + "\"")%>);
 </script>
-<%
-	// component bindings	
-	if(componentId != null && !"".equals(componentId))
-	{
-%>
-<script language="Javascript">
-	bindComponentToRegion("<%=regionId%>", "<%=componentId%>", "<%=componentTypeId%>");
-</script>
-<%
-	}
-%>
-<!-- End Dynamic Website Region Chrome -->

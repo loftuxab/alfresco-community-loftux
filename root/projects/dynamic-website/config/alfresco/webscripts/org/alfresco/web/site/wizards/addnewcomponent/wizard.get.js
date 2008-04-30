@@ -20,8 +20,8 @@ wizard.addElementFormatKeyPair("componentTypeId", "title", "Component Types");
 var componentTypes = site.getComponentTypes();
 for(var i = 0; i < componentTypes.length; i++)
 {
-	var _componentTypeId = componentTypes[i].getProperty("id");
-	var _componentTypeName = componentTypes[i].getProperty("name");
+	var _componentTypeId = componentTypes[i].getId();
+	var _componentTypeName = componentTypes[i].getTitle();
 	wizard.addElementSelectionValue("componentTypeId", _componentTypeId, _componentTypeName);
 }
 

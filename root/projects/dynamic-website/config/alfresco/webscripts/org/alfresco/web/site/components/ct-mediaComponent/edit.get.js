@@ -9,20 +9,20 @@ var component = site.getObject(componentId);
 if(component != null)
 {
 	var mediaType = wizard.getSafeSetting(component, "mediaType");
-	var url = wizard.getSafeSetting(component, "url");
+	var mediaUrl = wizard.getSafeSetting(component, "mediaUrl");
 	var unsupportedText = wizard.getSafeSetting(component, "unsupportedText");
 	var width = wizard.getSafeSetting(component, "width");
 	var height = wizard.getSafeSetting(component, "height");
 	
 	// the controls
 	wizard.addElement("mediaType", mediaType);
-	wizard.addElement("url", url);
+	wizard.addElement("mediaUrl", mediaUrl);
 	wizard.addElement("unsupportedText", unsupportedText);
 	wizard.addElement("width", width);
 	wizard.addElement("height", height);
 	
 	wizard.addElementFormat("mediaType", "Media Type", "combo", 290);
-	wizard.addElementFormat("url", "URL", "textfield", 290);
+	wizard.addElementFormat("mediaUrl", "URL", "textfield", 290);
 	wizard.addElementFormat("unsupportedText", "Unsupported Text", "textarea", 290);
 	wizard.addElementFormat("width", "Width", "textfield", 290);	
 	wizard.addElementFormat("height", "Height", "textfield", 290);	

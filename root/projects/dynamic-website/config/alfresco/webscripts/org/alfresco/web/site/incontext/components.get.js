@@ -71,7 +71,7 @@ if(proceed)
 		save(component);
 	
 		// assign component id onto json return
-		componentId = component.getProperty("id");
+		componentId = component.getId();
 		json["componentId"] = componentId;
 		json["componentTypeId"] = componentTypeId;
 

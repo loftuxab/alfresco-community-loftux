@@ -11,10 +11,10 @@ if(templateId != null)
 	var template = site.getObject(templateId);
 
 	// default values
-	var templateName = template.getProperty("name");
+	var templateName = template.getTitle();
 	if(templateName == null)
 		templateName = "";
-	var templateDescription = template.getProperty("description");
+	var templateDescription = template.getDescription();
 	if(templateDescription == null)
 		templateDescription = "";
 	

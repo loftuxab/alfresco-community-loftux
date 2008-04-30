@@ -81,7 +81,7 @@ public class AVMRequestContextFactory extends HttpRequestContextFactory
         if (pageId == null || "".equals(pageId))
         {
             // no page was provided, so load the root page
-            Page[] rootPages = ModelUtil.findPages(context, null, "true");
+            Page[] rootPages = ModelUtil.findPages(context, null, "true", null);
             if (rootPages != null && rootPages.length > 0)
                 pageId = rootPages[0].getId();
         }

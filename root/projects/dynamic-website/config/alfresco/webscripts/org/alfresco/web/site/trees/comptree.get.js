@@ -39,8 +39,8 @@ if(nodeId != null)
 			
 			json[ctr] = { };
 			json[ctr]["draggable"] = true;
-			json[ctr]["nodeId"] = componentType.getProperty("id");
-			json[ctr]["text"] = componentType.getProperty("name");
+			json[ctr]["nodeId"] = componentType.getId();
+			json[ctr]["text"] = componentType.getTitle();
 			json[ctr]["leaf"] = true;
 			json[ctr]["iconCls"] = "tree-icon-componenttree-componenttype";
 			json[ctr]["alfType"] = "componentType";
@@ -50,34 +50,44 @@ if(nodeId != null)
 
 	if("web-script-components" == nodeId)
 	{
-		var files = site.getModelFileSystem().getFiles("/webscripts/web/components");
-		if(files != null)
+		var dirs = site.getModelFileSystem().getFiles("/site-webscripts");
+		if(dirs != null)
 		{
-			for(var i = 0; i < files.length; i++)
+			for(var x = 0; x < dirs.length; x++)
 			{
-				var file = files[i];
-				var fileName = file.getName();
-				if(fileName.endsWith("desc.xml"))
+				if(dirs[x].isDirectory())
 				{
-					var filePath = file.getPath();
-					
-					// get the contents of the file (using e4x)
-					var xmlString = file.readContents();
-					var xml = new XML(xmlString);
-					
-					var shortName = xml.shortname.toString();
-					var uri = xml.url.toString();
-					
-					json[ctr] = { };
-					json[ctr]["draggable"] = true;
-					json[ctr]["nodeId"] = filePath;
-					json[ctr]["text"] = shortName;
-					json[ctr]["leaf"] = false;
-					json[ctr]["iconCls"] = "tree-icon-componenttree-component";
-					json[ctr]["alfType"] = "webscriptComponent";
-					
-					json[ctr]["uri"] = uri;
-					ctr++;
+					var files = site.getModelFileSystem().getFiles("/site-webscripts/" + dirs[x].getName());
+					if(files != null)
+					{
+						for(var i = 0; i < files.length; i++)
+						{
+							var file = files[i];
+							var fileName = file.getName();
+							if(fileName.endsWith("desc.xml"))
+							{
+								var filePath = file.getPath();
+
+								// get the contents of the file (using e4x)
+								var xmlString = file.readContents();
+								var xml = new XML(xmlString);
+
+								var shortName = xml.shortname.toString();
+								var uri = xml.url.toString();
+
+								json[ctr] = { };
+								json[ctr]["draggable"] = true;
+								json[ctr]["nodeId"] = filePath;
+								json[ctr]["text"] = shortName;
+								json[ctr]["leaf"] = false;
+								json[ctr]["iconCls"] = "tree-icon-componenttree-component";
+								json[ctr]["alfType"] = "webscriptComponent";
+
+								json[ctr]["uri"] = uri;
+								ctr++;
+							}
+						}
+					}
 				}
 			}
 		}
