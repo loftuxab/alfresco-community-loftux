@@ -7,19 +7,23 @@ if (typeof Alfresco == "undefined" || !Alfresco)
 /* Site-wide constants */
 Alfresco.constants = Alfresco.constants ||
 {
-   /* URL_CONTEXT set by header component using ${url.context} */
-   URL_CONTEXT: "./",
-   
    /* AJAX Proxy URI stem */
    PROXY_URI: window.location.protocol + "//" + window.location.host + "/slingshot/proxy?endpoint=",
    
+   /* THEME set by template header using ${theme} */
+   THEME: "./",
+   
    /* TODO: Remove ticket when AJAX/Proxy authentication in place */
    /* http://localhost:8080/alfresco/service/api/login?u={username}&pw={password} */
-   TICKET: "TICKET_af8aff15781e674ae202803224d140d7c8dfcf4b"
+   TICKET: "TICKET_58dbd003f5e7c0713811641eae6d3cf0c1e58dae",
+
+   /* URL_CONTEXT set by template header using ${url.context} */
+   URL_CONTEXT: "./"
 };
 
 
-/* Ensure Alfresco.util object exists */
+/* Ensure top-level Alfresco namespaces exist */
+Alfresco.ui = Alfresco.ui || {};
 Alfresco.util = Alfresco.util || {};
 
 /*
@@ -121,10 +125,13 @@ Alfresco.util.YUILoaderHelper = function()
       
       loadComponents: function()
       {
-         yuiLoader.insert(
+         if (yuiLoader !== null)
          {
-            base: Alfresco.constants.URL_CONTEXT + "yui/"
-         });
+            yuiLoader.insert(
+            {
+               base: Alfresco.constants.URL_CONTEXT + "yui/"
+            });
+         }
       },
 
       onLoaderComplete: function()
