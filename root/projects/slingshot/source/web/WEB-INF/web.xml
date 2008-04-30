@@ -35,8 +35,8 @@
    </servlet>
 
    <servlet>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
+      <servlet-name>webscriptAuthenticationServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.WebScriptAuthenticationServlet</servlet-class>
    </servlet>
 
    <servlet>
@@ -81,7 +81,7 @@
    </servlet-mapping>
    
    <servlet-mapping>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
+      <servlet-name>webscriptAuthenticationServlet</servlet-name>
       <url-pattern>/auth/*</url-pattern>
    </servlet-mapping>
    
