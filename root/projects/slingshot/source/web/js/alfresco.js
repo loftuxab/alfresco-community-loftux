@@ -79,9 +79,18 @@ Alfresco.util.YUILoaderHelper = function()
          {
             yuiLoader = new YAHOO.util.YUILoader(
             {
+               base: Alfresco.constants.URL_CONTEXT + "yui/",
                loadOptional: false,
-               filter: "",
-               skin: {},
+               skin:
+               {
+                  defaultSkin: Alfresco.constants.THEME,
+                  /* TODO: Remove these once bug fixed from YUI 2.5.1 */
+                  /* See: http://sourceforge.net/tracker/index.php?func=detail&aid=1954935&group_id=165715&atid=836478 */
+                  base: 'assets/skins/',
+                  path: 'skin.css',
+                  after: ['reset', 'fonts', 'grids', 'base'],
+                  rollup: 3
+               },
                onSuccess: Alfresco.util.YUILoaderHelper.onLoaderComplete,
                scope: this
             });
@@ -127,10 +136,7 @@ Alfresco.util.YUILoaderHelper = function()
       {
          if (yuiLoader !== null)
          {
-            yuiLoader.insert(
-            {
-               base: Alfresco.constants.URL_CONTEXT + "yui/"
-            });
+            yuiLoader.insert();
          }
       },
 
