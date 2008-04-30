@@ -185,8 +185,8 @@ public class ModelHelper
         {
             Document d = XMLUtil.parse(xml);
             XMLUtil.addChildValue(d.getRootElement(), "id", id);
+            XMLUtil.addChildValue(d.getRootElement(), "version", Framework.getConfig().getModelTypeVersion(typeName));
             XMLUtil.addChildValue(d.getRootElement(), "name", id);
-            XMLUtil.addChildValue(d.getRootElement(), "description", id);
 
             obj = (ModelObject) convertDocumentToModelObject(d,
                     System.currentTimeMillis());

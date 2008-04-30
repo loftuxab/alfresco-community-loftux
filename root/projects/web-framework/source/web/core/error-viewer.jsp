@@ -1,11 +1,10 @@
 <%@ page import="org.alfresco.web.site.*" %>
-<%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
 	RequestContext context = RequestUtil.getRequestContext(request);
-	String pageId = (String) request.getAttribute("error-pageId");
+	String objectId = (String) request.getAttribute("error-objectId");
 	Throwable t = (Throwable) request.getAttribute("error");
 	if(t != null)
 	{
@@ -37,17 +36,36 @@ function toggle(id)
 	}
 }
 </script>
-<img id="i-<%=pageId%>" src="<%=collapsedImage%>" onclick="toggle('<%=pageId%>');"/>
+<img id="i-<%=objectId%>" src="<%=collapsedImage%>" onclick="toggle('<%=objectId%>');"/>
 <font face="Verdana" size="-1">Details...</font>
 <br/>
-<div id="e-<%=pageId%>" style="display: none">
-<font face="Verdana" size="-1">
+<div id="e-<%=objectId%>" style="display: none">
+<table width="100%">
+<tr>
+<td width="100%" align="left">
+<pre>
+<font face="Courier" size="-2">
 <%
 	
 	PrintWriter pw = new PrintWriter(out);
-	t.printStackTrace(pw);
+	
+	Throwable ex = t;
+	ex.fillInStackTrace();
+	while(ex != null)
+	{
+		ex.printStackTrace(pw);
+		ex = ex.getCause();
+		if(ex != null)
+		{
+			pw.print("\r\nCaused By...\r\n");
+		}
+	}
 %>
 </font>
+</pre>
+</td>
+</tr>
+</table>
 </div>
 <!-- end of error viewer -->
 

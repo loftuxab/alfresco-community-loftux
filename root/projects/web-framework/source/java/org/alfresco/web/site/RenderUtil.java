@@ -34,18 +34,20 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
 import org.alfresco.tools.WrappedHttpServletResponse;
-import org.alfresco.web.site.config.RuntimeConfig;
-import org.alfresco.web.site.config.RuntimeConfigManager;
+import org.alfresco.web.site.exception.ComponentChromeRenderException;
 import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
 import org.alfresco.web.site.exception.PageRenderException;
 import org.alfresco.web.site.exception.RegionRenderException;
+import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.exception.TemplateRenderException;
+import org.alfresco.web.site.model.Chrome;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.AbstractRenderer;
+import org.alfresco.web.site.renderer.RendererDescriptor;
 import org.alfresco.web.site.renderer.RendererFactory;
 
 /**
@@ -82,36 +84,10 @@ public class RenderUtil
         
         try
         {
-            // wrap the request and response
-            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
-                    request);
-            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(
-                    response);
-
-            // do the include
-            RequestUtil.include(wrappedRequest, wrappedResponse, dispatchPath);
-
-            // generate the HEAD tag
-            String headTags = generateHeader(context, request, response);
-
-            // Now do a replace on all of the stamp placeholders
-            //String responseBody = wrappedResponse.getOutput();
-            String responseBody = wrappedResponse.getOutput();
-            int i = -1;
-            do
-            {
-                i = responseBody.indexOf(PAGE_HEAD_DEPENDENCIES_STAMP);
-                if (i > -1)
-                {
-                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
-                            i + PAGE_HEAD_DEPENDENCIES_STAMP.length(),
-                            responseBody.length());
-                }
-            }
-            while (i > -1);
-
-            // Finally, commit the entire thing to the output stream
-            response.getWriter().print(responseBody);
+            String renderer = dispatchPath;
+            String rendererType = WebFrameworkConstants.RENDERER_TYPE_JSP;
+            
+            executePageRenderer(context, request, response, rendererType, renderer);
         }
         catch (Exception ex)
         {
@@ -125,6 +101,7 @@ public class RenderUtil
 
     /**
      * Renders the current page instance.
+
      */
     public static void renderPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response)
@@ -153,8 +130,9 @@ public class RenderUtil
         // look up the page
         Page page = (Page) context.getModel().loadPage(context, pageId);
         if (page == null)
-            throw new PageRenderException(
-                    "Unable to locate page: " + pageId);
+        {
+            throw new PageRenderException("Unable to locate page: " + pageId);
+        }
 
         // look up the page template
         TemplateInstance currentTemplate = page.getTemplate(context);
@@ -163,10 +141,13 @@ public class RenderUtil
             throw new PageRenderException(
                     "Unable to locate template for page: " + pageId);
         }
-
-        // do our thing
+        
+        // render the template
         try
         {
+            // bind the rendering to this page
+            RenderDataHelper.bind(context, page);
+            
             // Wrap the Request and Response
             WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
                     request);
@@ -188,11 +169,11 @@ public class RenderUtil
             int i = -1;
             do
             {
-                i = responseBody.indexOf(PAGE_HEAD_DEPENDENCIES_STAMP);
+                i = responseBody.indexOf(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
                 if (i > -1)
                 {
                     responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
-                            i + PAGE_HEAD_DEPENDENCIES_STAMP.length(),
+                            i + WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP.length(),
                             responseBody.length());
                 }
             }
@@ -209,6 +190,9 @@ public class RenderUtil
         }
         finally
         {
+            // unbind the rendering context
+            RenderDataHelper.unbind(context);
+
             Timer.stop(request, "RenderPage-" + page.getId());
         }
     }
@@ -234,17 +218,19 @@ public class RenderUtil
         TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
                 templateId);
         if (template == null)
+        {
             throw new TemplateRenderException(
                     "Unable to locate template: " + templateId);
+        }
+        
         try
         {
-            // get the configuration for the template
-            RuntimeConfig config = context.loadConfiguration(template);
-            request.setAttribute("template-configuration", config);
-
+            // bind the rendering to this template
+            RenderData renderData = RenderDataHelper.bind(context, template);
+            
             // get the renderer and execute it
             AbstractRenderer renderer = RendererFactory.newRenderer(context, template);
-            renderer.execute(context, request, response, config);
+            renderer.execute(context, request, response, renderData);
         }
         catch (Exception ex)
         {
@@ -254,8 +240,30 @@ public class RenderUtil
         }
         finally
         {
+            // unbind the rendering context
+            RenderDataHelper.unbind(context);
+            
             Timer.stop(request, "RenderTemplate-" + templateId);            
         }
+    }
+
+    /**
+     * Renders a region for a given template.
+     *  
+     * @param context
+     * @param request
+     * @param response
+     * @param templateId
+     * @param regionId
+     * @param regionScopeId
+     * @throws Exception
+     */    
+    public static void renderRegion(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String templateId, String regionId, String regionScopeId)
+            throws RegionRenderException
+    {
+        renderRegion(context, request, response, templateId, regionId, regionScopeId, null);
     }
 
     /**
@@ -271,7 +279,8 @@ public class RenderUtil
      */
     public static void renderRegion(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String templateId, String regionId, String regionScopeId)
+            String templateId, String regionId, String regionScopeId,
+            String overrideChromeId)
             throws RegionRenderException
     {
         // start a timer
@@ -281,69 +290,48 @@ public class RenderUtil
         TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
                 templateId);
         if (template == null)
+        {
             throw new RegionRenderException(
                     "Unable to locate template: " + templateId);
+        }
 
         try
         {
-            // load the baseline configuration for this template
-            RuntimeConfig config = context.loadConfiguration(template);
-            request.setAttribute("template-configuration", config);
-
-            // build the configuration for this region
-            config.put("region-id", regionId);
-            config.put("region-scope-id", regionScopeId);
-            String sourceId = getSourceId(context, regionScopeId);
-            config.put("region-source-id", sourceId);
+            // bind the rendering to this template
+            RenderData renderData = RenderDataHelper.bind(context, template);
+            
+            // regions have to set by hand (not auto populated)
+            String regionSourceId = getSourceId(context, regionScopeId);
+            renderData.put(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
+            renderData.put(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID, regionScopeId);
+            renderData.put(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID, regionSourceId);
 
             // determine the region renderer
-            // this is set in the configuration
-            String renderer = context.getConfig().getPresentationContainerURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION);
-            if(renderer == null || renderer.length() == 0)
-            {
-                renderer = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION;
-            }
-            // Allow this to be overridden by the template
-            // store the setting "region-regionName-renderer" with value "/my/jsppage.jsp"
-            String rendererOverride = template.getSetting("region-" + regionId + "-renderer");
-            if(rendererOverride != null && rendererOverride.length() != 0)
-            {
-                renderer = rendererOverride;
-            }
-
-            // if there is already a component associated for this region,
-            // we must let the region know
-//            System.out.println("For region: " + regionId);
-//            System.out.println(" -> looking scopeId: " + regionScopeId);
-//            System.out.println(" -> looking sourceId: " + sourceId);
+            RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);            
+            
+            // render in either one of two ways
+            // if there is a component bound, then continue processing downstream
+            // if not, then render a "no component" screen
             Component[] components = ModelUtil.findComponents(context,
-                    regionScopeId, sourceId, regionId, null);
-//            System.out.println("FOUND " + components.length);
+                    regionScopeId, regionSourceId, regionId, null);
             if (components.length > 0)
             {
-                Component component = components[0];
-
-                // load config for this component
-                RuntimeConfig componentConfig = context.loadConfiguration(component);
-                request.setAttribute("component-configuration", componentConfig);
-
-                // merge in the template data
-                config.merge(componentConfig);
+                // merge in component to render data
+                RenderData compRenderData = RenderDataHelper.generate(context, components[0]);
+                renderData.putAll(compRenderData);
+                
+                // execute renderer
+                RenderUtil.executeRenderer(context, request, response, descriptor);
             }
             else
             {
                 // if we couldn't find a component, then redirect to a
-                // region "no-component" page
-                renderer = context.getConfig().getPresentationContainerURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION_NO_COMPONENT);
-                if(renderer == null)
-                {
-                    renderer = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION_NO_COMPONENT;
-                }
+                // region "no-component" renderer
+                RenderUtil.renderErrorHandlerPage(context, request, 
+                        response, 
+                        WebFrameworkConstants.DISPATCHER_HANDLER_REGION_NO_COMPONENT,
+                        WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_REGION_NO_COMPONENT  );
             }
-
-            // do the render
-            request.setAttribute("region-configuration", config);
-            RequestUtil.include(request, response, renderer);
         }
         catch (Exception ex)
         {
@@ -352,10 +340,85 @@ public class RenderUtil
         }
         finally
         {
+            // unbind the rendering context
+            RenderDataHelper.unbind(context);
+            
             Timer.stop(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
         }
     }
 
+    /**
+     * Renders a given component with default chrome.
+     * 
+     * If you would like to render a component without chrome, then
+     * see the renderRawComponent method.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param componentId
+     * @throws Exception
+     */
+    public static void renderComponent(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String componentId) throws ComponentRenderException, ComponentChromeRenderException
+    {
+        renderComponent(context, request, response, componentId, null);
+    }
+
+    /**
+     * Renders a given component with the given chrome.
+     * 
+     * If you would like to render a component without chrome, then
+     * see the renderRawComponent method.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param componentId
+     * @throws Exception
+     */    
+    public static void renderComponent(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String componentId, String overrideChromeId) throws ComponentChromeRenderException
+    {
+        // start a timer
+        Timer.start(request, "RenderComponent-" + componentId);
+        
+        Component component = context.getModel().loadComponent(context,
+                componentId);
+        if (component == null)
+        {
+            throw new ComponentChromeRenderException(
+                    "Unable to locate component: " + componentId);
+        }
+
+        try
+        {
+            // bind the rendering to this component
+            RenderDataHelper.bind(context, component);
+            
+            // determine the component renderer
+            RendererDescriptor descriptor = getComponentRendererDescriptor(context, component, overrideChromeId);
+            
+            // execute
+            RenderUtil.executeRenderer(context, request, response, descriptor);
+        }
+        catch (Exception ex)
+        {
+            throw new ComponentChromeRenderException(
+                    "Unable to render component chrome: " + overrideChromeId + " with component: " + componentId, ex);
+        }
+        finally
+        {
+            // unbind the rendering context
+            RenderDataHelper.unbind(context);
+            
+            Timer.stop(request, "RenderComponent-" + componentId);
+        }
+            
+    }
+    
     /**
      * Renders a given component instance.  This fetches the abstract renderer
      * instance for the given component's type and then binds configuration data
@@ -367,29 +430,30 @@ public class RenderUtil
      * @param componentId
      * @throws Exception
      */
-    public static void renderComponent(RequestContext context,
+    public static void renderRawComponent(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String componentId) throws ComponentRenderException
     {
         // start a timer
-        Timer.start(request, "RenderComponent-" + componentId);
+        Timer.start(request, "RenderRawComponent-" + componentId);
         
         Component component = context.getModel().loadComponent(context,
                 componentId);
         if (component == null)
+        {
             throw new ComponentRenderException(
                     "Unable to locate component: " + componentId);
+        }
 
         try
         {
-            // get the configuration for the component
-            RuntimeConfig config = context.loadConfiguration(component);
-            request.setAttribute("component-configuration", config);
-
+            // bind the rendering to this component
+            RenderData renderData = RenderDataHelper.bind(context, component);
+            
             // build a renderer for this component
             AbstractRenderer renderer = RendererFactory.newRenderer(context,
                     component);
-            renderer.execute(context, request, response, config);
+            renderer.execute(context, request, response, renderData);
         }
         catch (Exception ex)
         {
@@ -400,7 +464,10 @@ public class RenderUtil
         }
         finally
         {
-            Timer.stop(request, "RenderComponent-" + componentId);
+            // unbind the rendering context
+            RenderDataHelper.unbind(context);
+            
+            Timer.stop(request, "RenderRawComponent-" + componentId);
         }
     }
 
@@ -551,20 +618,15 @@ public class RenderUtil
 
         // get the component association in that scope
         String sourceId = null;
-        if (REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
-            sourceId = REGION_SCOPE_GLOBAL;
-        if (REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
+        if (WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+            sourceId = WebFrameworkConstants.REGION_SCOPE_GLOBAL;
+        if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
             sourceId = template.getId();
-        if (REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
+        if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
             sourceId = page.getId();
 
         return sourceId;
     }
-    
-    public static final String REGION_SCOPE_GLOBAL   = "global";
-    public static final String REGION_SCOPE_TEMPLATE = "template";
-    public static final String REGION_SCOPE_PAGE     = "page";
- 
 
     protected static void appendBuffer(StringBuilder buffer, String toAppend)
     {
@@ -577,7 +639,9 @@ public class RenderUtil
         throws Exception
     {
         StringBuilder buffer = new StringBuilder();
-        appendBuffer(buffer, "");
+        appendBuffer(buffer, "\r\n");
+        appendBuffer(buffer, WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
+        appendBuffer(buffer, "\r\n");
 
         /**
          * This is a work in progress.  Still not sure what the best
@@ -617,8 +681,15 @@ public class RenderUtil
     {
         response.getWriter().print(str);
     }
+        
+    public static String processRenderer(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            RendererDescriptor descriptor) throws Exception
+    {
+        return processRenderer(context, request, response, descriptor.getRendererType(), descriptor.getRenderer());
+    }
     
-    protected static String processRenderer(RequestContext context,
+    public static String processRenderer(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String rendererType, String renderer) throws Exception
     {
@@ -627,17 +698,239 @@ public class RenderUtil
                 request);
         FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
         
-        // build a configuration instance
-        RuntimeConfig config = RuntimeConfigManager.newConfiguration(context);
-
-        // build a renderer for this component
-        AbstractRenderer rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
-        rendererInstance.execute(context, wrappedRequest, fakeResponse, config);
-        
+        // execute
+        executeRenderer(context, wrappedRequest, fakeResponse, rendererType, renderer);
+                
         // return the result
         return fakeResponse.getContentAsString();        
     }
 
-    public static String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";
-    public static String PAGE_HEAD_DEPENDENCIES_STAMP = "<!--${head}-->";
+    public static void executeRenderer(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            RendererDescriptor descriptor) throws Exception
+    {
+        executeRenderer(context, request, response, descriptor.getRendererType(), descriptor.getRenderer());
+    }
+    
+    public static void executeRenderer(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String rendererType, String renderer) throws Exception
+    {
+        // grab the renderer config
+        RenderData renderData = RenderDataHelper.current(context);
+                
+        // build a renderer for this descriptor
+        AbstractRenderer rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
+        rendererInstance.execute(context, request, response, renderData);
+    }
+    
+    public static void executePageRenderer(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String rendererType, String renderer) throws Exception
+    {
+        // this executes against buffer objects and returns a buffer
+        String responseBody = RenderUtil.processRenderer(context, request, response, rendererType, renderer);
+
+        // generate the HEAD tag
+        String headTags = generateHeader(context, request, response);
+
+        // Now do a replace on all of the stamp placeholders
+        //String responseBody = wrappedResponse.getOutput();
+        int i = -1;
+        do
+        {
+            i = responseBody.indexOf(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+            if (i > -1)
+            {
+                responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
+                        i + WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP.length(),
+                        responseBody.length());
+            }
+        }
+        while (i > -1);
+
+        // Finally, commit the entire thing to the output stream
+        response.getWriter().print(responseBody);
+    }
+    
+    
+    /**
+     * Renders a system page
+     * 
+     * A system page is a "special page" designed to handle one of a few
+     * exception cases such as when an error occurs or a page has not
+     * yet been configured.  We want to show something rather than
+     * have an exception purely occur.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param systemPageId
+     */
+    public static void renderErrorHandlerPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String errorHandlerPageId, String defaultErrorHandlerPageRenderer) throws RequestDispatchException
+    {
+        String renderer = null;
+        String rendererType = null;
+        try
+        {
+            // go to unconfigured page display
+            renderer = context.getConfig().getDispatcherErrorHandlerRenderer(errorHandlerPageId);
+            rendererType = context.getConfig().getDispatcherErrorHandlerRendererType(errorHandlerPageId);
+            if(rendererType == null || rendererType.length() == 0)
+            {
+                rendererType = WebFrameworkConstants.DEFAULT_RENDERER_TYPE;
+                if(defaultErrorHandlerPageRenderer != null)
+                {
+                    renderer = defaultErrorHandlerPageRenderer;
+                }
+            }
+
+            RenderUtil.executeRenderer(context, request, response, rendererType, renderer);
+        }
+        catch (Exception ex)
+        {
+            throw new RequestDispatchException("Failed to render the error handler page '" + errorHandlerPageId + "' for renderer: " + renderer + " of type: " + rendererType, ex);
+        }
+    }
+
+    /**
+     * Renders a system container
+     * 
+     * A system container is a page fragment that is rendered
+     * as a container of other elements like components.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param systemContainerId
+     */
+    public static void renderSystemPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String systemPageId, String defaultSystemPageRenderer) throws RequestDispatchException
+    {
+        String renderer = null;
+        String rendererType = null;
+        try
+        {
+            // go to unconfigured page display
+            renderer = context.getConfig().getDispatcherSystemPageRenderer(systemPageId);
+            rendererType = context.getConfig().getDispatcherSystemPageRendererType(systemPageId); 
+            if(rendererType == null || rendererType.length() == 0)
+            {
+                rendererType = WebFrameworkConstants.DEFAULT_RENDERER_TYPE;
+                if(defaultSystemPageRenderer != null)
+                {
+                    renderer = defaultSystemPageRenderer;
+                }
+            }
+
+            RenderUtil.executePageRenderer(context, request, response, rendererType, renderer);
+        }
+        catch (Exception ex)
+        {
+            throw new RequestDispatchException("Failed to render the system page '" + systemPageId + "' for renderer: " + renderer + " of type: " + rendererType, ex);
+        }
+    }
+    
+
+    
+    
+    // logic that I want to move somewhere else
+
+    /**
+     * Returns the renderer to use to render the given region
+     * 
+     * Currently, this just resorts to using the system default but
+     * the idea is that it could be overridden at various levels.
+     * 
+     * For example, the Theme could change the default chrome for a region.
+     * 
+     * Or, a specific region might be "forced" to another chrome.
+     * 
+     */
+    protected static RendererDescriptor getRegionRendererDescriptor(RequestContext context, TemplateInstance template, String regionId, String chromeId)
+    {
+        // if the chrome id is empty, see if there is an override
+        // this allows the template to "override" the chrome on a
+        // per-region basis
+        if(chromeId == null)
+        {
+            chromeId = template.getSetting("region-" + regionId + "-chrome-id");
+        }
+        
+        // see if a default chrome was specified
+        if(chromeId == null)
+        {
+            chromeId = context.getConfig().getDefaultRegionChrome();
+        }
+        
+        // if there still isn't a chrome, then pick the system default
+        if(chromeId == null)
+        {
+            chromeId = WebFrameworkConstants.DEFAULT_REGION_CHROME_ID;
+        }
+        
+        // load the chrome
+        Chrome chrome = context.getModel().loadChrome(context, chromeId);
+        if(chrome != null)
+        {
+            // return the renderer for this chrome
+            return new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
+        }
+
+        // assume it is a freemarker chrome        
+        return new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
+    }
+
+    /**
+     * Returns the renderer to use to render the given component chrome
+     * 
+     * Currently, this just resorts to using the system default but
+     * the idea is that it could be overridden at various levels.
+     * 
+     * For example, the Theme could change the default chrome for
+     * all components in the site.
+     * 
+     * Or a specific component might override its settings.
+     */
+    protected static RendererDescriptor getComponentRendererDescriptor(RequestContext context, Component component, String chromeId)
+    {
+        // if the chrome id is empty, see if there is an override
+        // this allows the component to "override" the chrome on a
+        // per-component basis
+        if(chromeId == null)
+        {
+            chromeId = component.getSetting("chrome");
+            if(chromeId == null)
+            {
+                chromeId = component.getSetting("chrome-id");
+            }
+        }
+        
+        // see if a default chrome was specified
+        if(chromeId == null)
+        {
+            chromeId = context.getConfig().getDefaultComponentChrome();
+        }        
+        
+        // if there still isn't a chrome, then pick the default
+        if(chromeId == null)
+        {
+            chromeId = WebFrameworkConstants.DEFAULT_COMPONENT_CHROME_ID;
+        }
+        
+        // load the chrome
+        Chrome chrome = context.getModel().loadChrome(context, chromeId);
+        if(chrome != null)
+        {
+            // return the renderer for this chrome
+            return new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
+        }
+
+        // assume it is a freemarker chrome
+        return new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
+    }
+
 }

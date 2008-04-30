@@ -29,26 +29,71 @@ package org.alfresco.web.site;
  */
 public class WebFrameworkConstants
 {
-    public final static String PRESENTATION_PAGE_GETTING_STARTED = "getting-started";
-    public final static String PRESENTATION_PAGE_UNCONFIGURED = "page-unconfigured";
-    public final static String PRESENTATION_PAGE_RENDER_ERROR = "page-error";
+    // System Pages
+    public static final String SYSTEM_PAGE_GETTING_STARTED = "page-getting-started";
+    public static final String SYSTEM_PAGE_UNCONFIGURED = "page-unconfigured";
+    public static final String DEFAULT_SYSTEM_PAGE_GETTING_STARTED = "/core/page-gettingstarted.jsp";
+    public static final String DEFAULT_SYSTEM_PAGE_UNCONFIGURED = "/core/page-unconfigured.jsp";
 
-    public final static String PRESENTATION_CONTAINER_REGION = "region-container";
-    public final static String PRESENTATION_CONTAINER_REGION_NO_COMPONENT = "region-nocomponent";
-    public final static String PRESENTATION_CONTAINER_COMPONENT_RENDER_ERROR = "component-error";
-    public final static String PRESENTATION_CONTAINER_TEMPLATE_RENDER_ERROR = "template-error";
-    public final static String PRESENTATION_CONTAINER_REGION_RENDER_ERROR = "region-error";
+    // Dispatcher Handlers
+    public static final String DISPATCHER_HANDLER_PAGE_ERROR = "page-error";
+    public static final String DISPATCHER_HANDLER_COMPONENT_ERROR = "component-error";
+    public static final String DISPATCHER_HANDLER_TEMPLATE_ERROR = "template-error";
+    public static final String DISPATCHER_HANDLER_REGION_ERROR = "region-error";
+    public static final String DISPATCHER_HANDLER_REGION_NO_COMPONENT = "region-nocomponent";
+    public static final String DEFAULT_DISPATCHER_HANDLER_PAGE_ERROR = "/core/page-error.jsp";
+    public static final String DEFAULT_DISPATCHER_HANDLER_COMPONENT_ERROR = "/core/component-error.jsp";
+    public static final String DEFAULT_DISPATCHER_HANDLER_TEMPLATE_ERROR = "/core/template-error.jsp";
+    public static final String DEFAULT_DISPATCHER_HANDLER_REGION_ERROR = "/core/region-error.jsp";
+    public static final String DEFAULT_DISPATCHER_HANDLER_REGION_NO_COMPONENT = "/core/region-nocomponent.jsp";
     
-    // defaults
+    // Region Scopes
+    public static final String REGION_SCOPE_GLOBAL   = "global";
+    public static final String REGION_SCOPE_TEMPLATE = "template";
+    public static final String REGION_SCOPE_PAGE     = "page";
     
-    public final static String DEFAULT_PAGE_URI_GETTING_STARTED = "/core/page-gettingstarted.jsp";
-    public final static String DEFAULT_PAGE_URI_UNCONFIGURED = "/core/page-unconfigured.jsp";
-    public final static String DEFAULT_PAGE_URI_RENDER_ERROR = "/core/page-error";
-    public final static String DEFAULT_CONTAINER_URI_REGION = "/core/region.jsp";
-    public final static String DEFAULT_CONTAINER_URI_REGION_NO_COMPONENT = "/core/region-nocomponent.jsp";
-    public final static String DEFAULT_CONTAINER_URI_REGION_RENDER_ERROR = "/core/region-error.jsp";
-    public final static String DEFAULT_CONTAINER_URI_COMPONENT_RENDER_ERROR = "/core/component-error.jsp";
-    public final static String DEFAULT_CONTAINER_URI_TEMPLATE_RENDER_ERROR = "/core/template-error.jsp";
+    // Renderer Types
+    public static final String RENDERER_TYPE_JSP = "jsp";
+    public static final String RENDERER_TYPE_FREEMARKER = "freemarker";
+    public static final String RENDERER_TYPE_WEBSCRIPT = "webscript";
+    public static final String RENDERER_TYPE_JAVA = "java";
+    public static final String DEFAULT_RENDERER_TYPE = "jsp";
     
+    // Chromes
+    public static final String DEFAULT_REGION_CHROME_ID = "default-region-chrome";
+    public static final String DEFAULT_COMPONENT_CHROME_ID = "default-component-chrome";
+    public static final String CHROMELESS_REGION_CHROME_ID = "chromeless-region-chrome";
+    public static final String CHROMELESS_COMPONENT_CHROME_ID = "chromeless-component-chrome";
+    public static final String DEBUG_COMPONENT_CHROME_ID = "debug-component-chrome";
+    //public static final String NO_CHROME = "NO_CHROME";
+    
+    // Misc
+    public static final String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";
+    public static final String PAGE_HEAD_DEPENDENCIES_STAMP = "<!--${head}-->";
 
+    // Renderer Context Parameters (Page)
+    public static final String RENDER_DATA_PAGE_ID = "page-id";
+    public static final String RENDER_DATA_PAGE_TYPE_ID = "page-type-id";
+    public static final String RENDER_DATA_TEMPLATE_ID = "template-id";
+    public static final String RENDER_DATA_TEMPLATE_TYPE_ID = "template-type-id";
+    public static final String RENDER_DATA_COMPONENT_ID = "component-id";
+    public static final String RENDER_DATA_COMPONENT_TYPE_ID = "component-type-id";
+    public static final String RENDER_DATA_COMPONENT_REGION_ID = "component-region-id";
+    public static final String RENDER_DATA_COMPONENT_SOURCE_ID = "component-source-id";
+    public static final String RENDER_DATA_COMPONENT_SCOPE_ID = "component-scope-id";
+    public static final String RENDER_DATA_REGION_ID = "region-id";
+    public static final String RENDER_DATA_REGION_SCOPE_ID = "region-scope-id";
+    public static final String RENDER_DATA_REGION_SOURCE_ID = "region-source-id";
+    
+    public static final String RENDER_DATA_HTML_BINDING_ID = "html-binding-id";
+    public static final String RENDER_DATA_REQUEST_CONTEXT_STACK_KEY = "configuration-stack";
+    
+    // Web Framework Signature
+    public static final String WEB_FRAMEWORK_SIGNATURE = "<!-- Generated by Alfresco Web Framework -->";
+    
+    // Theme
+    public static final String DEFAULT_THEME_ID = "default";
+    
+    // Page Types
+    public static final String GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID = "generic";
 }

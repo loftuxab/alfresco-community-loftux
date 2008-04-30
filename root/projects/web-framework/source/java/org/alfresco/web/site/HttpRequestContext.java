@@ -37,10 +37,45 @@ public class HttpRequestContext extends RequestContext
         this.request = request;
     }
 
+    /**
+     * Returns the HTTP Servlet Request bound to this request
+     * 
+     * @return
+     */
     public HttpServletRequest getRequest()
     {
         return request;
     }
+    
+    /**
+     * Returns the debug mode of the current request
+     * If not in debug mode, this will return null
+     */
+    public String getDebugMode()
+    {
+        if(getRequest() != null)
+        {
+            String debug = getRequest().getParameter("debug");
+            if(debug != null && debug.length() > 0)
+            {
+                return debug;
+            }
+        }
+        return null;
+    }
+    
+    public String getThemeId()
+    {
+        if(getRequest() != null)
+        {
+            return ThemeUtil.getCurrentThemeId(getRequest());
+        }
+        
+        return super.getThemeId();
+    }
+    
+    
+
 
     protected HttpServletRequest request;
 }

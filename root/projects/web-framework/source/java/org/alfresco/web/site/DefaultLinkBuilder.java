@@ -29,32 +29,14 @@ import java.util.Map;
 /**
  * @author muzquiano
  */
-public class DefaultLinkBuilder extends LinkBuilder
+public class DefaultLinkBuilder extends AbstractLinkBuilder
 {
     protected DefaultLinkBuilder()
     {
         super();
     }
 
-    public String page(RequestContext context, String pageId)
-    {
-        String formatId = context.getConfig().getDefaultFormatId();
-        return page(context, pageId, formatId);
-    }
-
-    public String page(RequestContext context, String pageId, 
-            String formatId)
-    {
-        return page(context, pageId, formatId, null);
-    }
-
-    public String page(RequestContext context, String pageId, 
-            String formatId, String objectId)
-    {
-        return page(context, pageId, formatId, objectId, null);
-    }
     
-
     public String page(RequestContext context, String pageId, 
             String formatId, String objectId, Map<String, String> params)
     {
@@ -66,7 +48,7 @@ public class DefaultLinkBuilder extends LinkBuilder
         {
             formatId = context.getConfig().getDefaultFormatId();
         }
-
+        
         StringBuilder buffer = new StringBuilder();
         buffer.append("?f=" + formatId);
         buffer.append("&p=" + pageId);
@@ -87,19 +69,39 @@ public class DefaultLinkBuilder extends LinkBuilder
         return buffer.toString();
     }
     
-    public String content(RequestContext context, String objectId)
+    public String pageType(RequestContext context, String pageTypeId, 
+            String formatId, String objectId, Map<String, String> params)
     {
-        String formatId = context.getConfig().getDefaultFormatId();
-        return content(context, objectId, formatId);
-    }
-    
-    public String content(RequestContext context, String objectId,
-            String formatId)
-    {
-        return content(context, objectId, formatId, null);
-    }
+        if (pageTypeId == null)
+        {
+            return null;
+        }
+        if (formatId == null)
+        {
+            formatId = context.getConfig().getDefaultFormatId();
+        }
 
-    public String content(RequestContext context, String objectId,
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("?f=" + formatId);
+        buffer.append("&pt=" + pageTypeId);
+        if (objectId != null && objectId.length() != 0)
+        {
+              buffer.append("&o=" + objectId);
+        }
+        if(params != null)
+        {
+            for (Map.Entry<String, String> entry : params.entrySet())
+            {
+                String key = entry.getKey();
+                String value = entry.getValue();                
+                buffer.append("&" + key + "=" + value);
+            }
+        }
+
+        return buffer.toString();
+    }    
+
+    public String object(RequestContext context, String objectId,
             String formatId, Map<String, String> params)
     {
         if(objectId == null)

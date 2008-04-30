@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.tools.XMLUtil;
+import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -53,6 +54,24 @@ public abstract class ModelObject implements IModelObject
     public ModelObject(Document document)
     {
         this.document = document;
+        
+        // model version
+        String modelVersion = getProperty("model-version");
+        if(modelVersion == null)
+        {
+            // use the declared version if none available
+            modelVersion = Framework.getConfig().getModelTypeVersion(this.getTypeName());
+            if(modelVersion == null)
+            {
+                modelVersion = "unknown";
+            }
+        }
+        
+    }
+    
+    public String getModelVersion()
+    {
+        return getProperty("model-version");
     }
 
     ///////////////////////////////////////////////////////////////

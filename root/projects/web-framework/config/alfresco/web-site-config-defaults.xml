@@ -1,0 +1,25 @@
+<alfresco-config>
+
+	<!-- Set up Web Framework defaults -->
+	<config evaluator="string-compare" condition="WebFramework">
+	
+		<application>
+			<defaults>
+				<region-chrome>default-region-chrome</region-chrome>
+				<component-chrome>default-component-chrome</component-chrome>
+				<page-types>
+					<page-type>
+						<id>login</id>
+						<page-instance-id></page-instance-id>
+					</page-type>
+					<page-type>
+						<id>logout</id>
+						<page-instance-id></page-instance-id>
+					</page-type>
+				</page-types>
+			</defaults>
+		</application>
+	
+	</config>
+	
+</alfresco-config>

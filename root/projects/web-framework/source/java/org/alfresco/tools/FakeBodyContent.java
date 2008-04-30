@@ -82,7 +82,7 @@ public class FakeBodyContent extends BodyContent
         }
         else
         {
-            if (s.length() == 0)
+            if (s != null && s.length() == 0)
             {
                 return;
             }

@@ -37,12 +37,12 @@ public class Framework
         return (getConfig() != null && getModel() != null);
     }
 
-    public static AbstractConfig getConfig()
+    public static FrameworkConfig getConfig()
     {
         return Framework.config;
     }
 
-    public static void setConfig(AbstractConfig config)
+    public static void setConfig(FrameworkConfig config)
     {
         Framework.config = config;
     }
@@ -62,7 +62,7 @@ public class Framework
         return logger;
     }
 
-    protected static AbstractConfig config = null;
+    protected static FrameworkConfig config = null;
     protected static IModel model = null;
     
     protected static Log logger = LogFactory.getLog(Framework.class);

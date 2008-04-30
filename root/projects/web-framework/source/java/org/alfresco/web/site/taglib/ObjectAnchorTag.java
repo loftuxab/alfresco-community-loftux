@@ -61,7 +61,7 @@ public class ObjectAnchorTag extends AbstractObjectTag
         RequestContext context = getRequestContext();
 
         // generate the URL
-        String url = link(context, getPage(), getObject(), getFormat());
+        String url = link(context, getPageType(), getPage(), getObject(), getFormat());
 
         try
         {
@@ -90,4 +90,13 @@ public class ObjectAnchorTag extends AbstractObjectTag
         }
         return EVAL_PAGE;
     }
+    
+    public void release()
+    {
+        this.formatId = null;
+        this.target = null;
+        
+        super.release();
+    }
+    
 }

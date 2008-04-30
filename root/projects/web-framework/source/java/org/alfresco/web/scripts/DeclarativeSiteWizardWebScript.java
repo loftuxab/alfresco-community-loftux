@@ -105,8 +105,5 @@ public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
 
         // automatically call the wizard's finalize method
         wizard.finalize();
-
-        // System.out.println("GENERATED JSON: ");
-        // System.out.println(wizard.getResponse());
     }
 }

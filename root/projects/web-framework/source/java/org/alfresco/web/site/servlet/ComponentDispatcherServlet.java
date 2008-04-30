@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.exception.RequestDispatchException;
 
 /**
  * @author muzquiano
@@ -42,8 +43,8 @@ public class ComponentDispatcherServlet extends DispatcherServlet
     }
 
     // this servlet just dispatches components
-    protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response)
+    protected void doDispatch(RequestContext context, HttpServletRequest request,
+            HttpServletResponse response) throws RequestDispatchException
     {
         setNoCacheHeaders(response);
 

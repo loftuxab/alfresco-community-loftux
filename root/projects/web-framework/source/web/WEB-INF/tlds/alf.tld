@@ -25,6 +25,38 @@
 			<name>protect</name>
 			<required>false</required>
 		</attribute>
+		<attribute>
+			<name>chrome</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>chromeless</name>
+			<required>false</required>
+		</attribute>		
+	</tag> 
+	<tag> 
+		<name>component</name> 
+		<tagclass>org.alfresco.web.site.taglib.ComponentTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Renders a component</info> 
+		<attribute>
+			<name>component</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>chrome</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<name>chromeless</name>
+			<required>false</required>
+		</attribute>
+	</tag> 
+	<tag> 
+		<name>component-include</name> 
+		<tagclass>org.alfresco.web.site.taglib.ComponentIncludeTag</tagclass>
+		<bodycontent>empty</bodycontent>
+		<info>Includes a component into a component chrome</info> 
 	</tag> 
 	<tag>
 		<name>head</name> 
@@ -70,6 +102,10 @@
 			<required>false</required>
 		</attribute>
 		<attribute>
+			<name>page-type</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
 			<name>object</name>
 			<required>false</required>
 		</attribute>
@@ -87,6 +123,10 @@
 			<name>page</name>
 			<required>false</required>
 		</attribute>
+		<attribute>
+			<name>page-type</name>
+			<required>false</required>
+		</attribute>		
 		<attribute>
 			<name>object</name>
 			<required>false</required>
@@ -109,6 +149,10 @@
 			<name>page</name>
 			<required>false</required>
 		</attribute>
+		<attribute>
+			<name>page-type</name>
+			<required>false</required>
+		</attribute>		
 		<attribute>
 			<name>object</name>
 			<required>false</required>

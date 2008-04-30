@@ -47,6 +47,27 @@ public class RequestContextFactoryBuilder
 
         RequestContextFactory factory = (RequestContextFactory) ReflectionHelper.newObject(className);
         factory.setId(_defaultId);
+        
+        // log
+        Framework.getLogger().debug("New request context factory: " + className);
+
         return factory;
     }
+    
+    public static RequestContextFactory sharedFactory()
+    {
+        if(factory == null)
+        {
+            synchronized(RequestContextFactoryBuilder.class)
+            {
+                if(factory == null)
+                {
+                    factory = newFactory();
+                }
+            }
+        }
+        return factory;
+    }
+    
+    protected static RequestContextFactory factory = null;
 }

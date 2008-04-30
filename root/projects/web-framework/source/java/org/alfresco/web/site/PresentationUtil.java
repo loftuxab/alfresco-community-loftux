@@ -27,10 +27,12 @@ package org.alfresco.web.site;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.exception.ComponentChromeRenderException;
 import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
 import org.alfresco.web.site.exception.PageRenderException;
 import org.alfresco.web.site.exception.RegionRenderException;
+import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.exception.TemplateRenderException;
 
 /**
@@ -57,7 +59,7 @@ public class PresentationUtil
      */
     public static void renderJspPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String dispatchPath)
+            String dispatchPath) throws RequestDispatchException
     {
         try
         {
@@ -78,7 +80,8 @@ public class PresentationUtil
      * @param response
      */
     public static void renderPage(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response)
+            HttpServletRequest request, HttpServletResponse response) 
+            throws RequestDispatchException
     {
         try
         {
@@ -101,7 +104,7 @@ public class PresentationUtil
      */
     public static void renderTemplate(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String templateId)
+            String templateId) throws RequestDispatchException
     {
         try
         {
@@ -113,14 +116,31 @@ public class PresentationUtil
         }
     }
 
+    public static void renderChromelessRegion(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String templateId, String regionId, String regionScopeId) 
+            throws RequestDispatchException 
+    {
+        renderRegion(context, request, response, templateId, regionId, regionScopeId, WebFrameworkConstants.CHROMELESS_REGION_CHROME_ID);
+    }
+
     public static void renderRegion(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String templateId, String regionId, String regionScopeId)
+            String templateId, String regionId, String regionScopeId) 
+            throws RequestDispatchException 
+    {
+        renderRegion(context, request, response, templateId, regionId, regionScopeId, null);
+    }
+    
+    public static void renderRegion(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String templateId, String regionId, String regionScopeId, String overrideChromeId) 
+            throws RequestDispatchException 
     {
         try
         {
             RenderUtil.renderRegion(context, request, response, templateId,
-                    regionId, regionScopeId);
+                    regionId, regionScopeId, overrideChromeId);
         }
         catch (RegionRenderException ex)
         {
@@ -129,26 +149,40 @@ public class PresentationUtil
         }
     }
 
+    public static void renderChromelessComponent(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String componentId) throws RequestDispatchException
+    {
+        renderComponent(context, request, response, componentId, WebFrameworkConstants.CHROMELESS_COMPONENT_CHROME_ID);
+    }
+    
     public static void renderComponent(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            String componentId)
+            String componentId) throws RequestDispatchException
+    {
+        renderComponent(context, request, response, componentId, null);
+    }
+
+    public static void renderComponent(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            String componentId, String chromeId) throws RequestDispatchException
     {
         try
         {
-            RenderUtil.renderComponent(context, request, response, componentId);
+            RenderUtil.renderComponent(context, request, response, componentId, chromeId);
         }
-        catch (ComponentRenderException ex)
+        catch (ComponentChromeRenderException ex)
         {
             handleComponentRenderProblem(context, request, response, ex,
                     componentId);
         }
     }
-
+    
     // pretty methods
 
     protected static void handlePageRenderProblem(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            Throwable t, String pageId)
+            Throwable t, String pageId) throws RequestDispatchException
     {
         // log the error
         context.getLogger().error("A Page Rendering problem was handled");
@@ -158,25 +192,22 @@ public class PresentationUtil
         {
             request.setAttribute("error", t);
             request.setAttribute("error-pageId", pageId);
+            request.setAttribute("error-objectId", pageId);
 
-            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_PAGE_RENDER_ERROR);
-            if(dispatchPath == null)
-            {
-                dispatchPath = WebFrameworkConstants.DEFAULT_PAGE_URI_RENDER_ERROR;
-            }
-            RequestUtil.include(request, response, dispatchPath);
+            // allow the framework to handle things gracefully
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.DISPATCHER_HANDLER_PAGE_ERROR,
+                    WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_PAGE_ERROR);
         }
         catch (Exception ex)
         {
-            context.getLogger().error(
-                    "Unable to include presentation for page error");
-            context.getLogger().error(ex);
+            throw new RequestDispatchException("A page rendering problem was not able to be handled by the framework", ex);
         }
     }
 
     protected static void handleTemplateRenderProblem(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            Throwable t, String templateId)
+            Throwable t, String templateId) throws RequestDispatchException
     {
         // log the error
         context.getLogger().error("A Template Rendering problem was handled");
@@ -186,26 +217,23 @@ public class PresentationUtil
         {
             request.setAttribute("error", t);
             request.setAttribute("error-templateId", templateId);
+            request.setAttribute("error-objectId", templateId);
 
-            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_CONTAINER_TEMPLATE_RENDER_ERROR);
-            if(dispatchPath == null)
-            {
-                dispatchPath = WebFrameworkConstants.DEFAULT_CONTAINER_URI_TEMPLATE_RENDER_ERROR;
-            }
-            RequestUtil.include(request, response, dispatchPath);
+            // allow the framework to handle things gracefully
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.DISPATCHER_HANDLER_TEMPLATE_ERROR,
+                    WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_TEMPLATE_ERROR);
         }
         catch (Exception ex)
         {
-            context.getLogger().error(
-                    "Unable to include presentation for template error");
-            context.getLogger().error(ex);
+            throw new RequestDispatchException("A template rendering problem was not able to be handled by the framework", ex);
         }
     }
 
     protected static void handleRegionRenderProblem(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             Throwable t, String templateId, String regionId,
-            String regionScopeId)
+            String regionScopeId) throws RequestDispatchException
     {
         // log the error
         context.getLogger().error("A Region Rendering problem was handled");
@@ -219,25 +247,22 @@ public class PresentationUtil
             request.setAttribute("error-templateId", templateId);
             request.setAttribute("error-regionId", regionId);
             request.setAttribute("error-regionScopeId", regionScopeId);
+            request.setAttribute("error-objectId", regionId);
 
-            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_CONTAINER_REGION_RENDER_ERROR);
-            if(dispatchPath == null)
-            {
-                dispatchPath = WebFrameworkConstants.DEFAULT_CONTAINER_URI_REGION_RENDER_ERROR;
-            }
-            RequestUtil.include(request, response, dispatchPath);
+            // allow the framework to handle things gracefully
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.DISPATCHER_HANDLER_REGION_ERROR,
+                    WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_REGION_ERROR);
         }
         catch (Exception ex)
         {
-            context.getLogger().error(
-                    "Unable to include presentation for region error");
-            context.getLogger().error(ex);
+            throw new RequestDispatchException("A region rendering problem was not able to be handled by the framework", ex);
         }
     }
 
     protected static void handleComponentRenderProblem(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
-            Throwable t, String componentId)
+            Throwable t, String componentId) throws RequestDispatchException
     {
         // log the error
         context.getLogger().error("A Component Rendering problem was handled");
@@ -247,20 +272,16 @@ public class PresentationUtil
         {
             request.setAttribute("error", t);
             request.setAttribute("error-componentId", componentId);
+            request.setAttribute("error-objectId", componentId);
 
-            String dispatchPath = context.getConfig().getPresentationPageURI(WebFrameworkConstants.PRESENTATION_CONTAINER_COMPONENT_RENDER_ERROR);
-            if(dispatchPath == null)
-            {
-                dispatchPath = WebFrameworkConstants.DEFAULT_CONTAINER_URI_COMPONENT_RENDER_ERROR;
-            }
-            RequestUtil.include(request, response, dispatchPath);
+            // allow the framework to handle things gracefully
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.DISPATCHER_HANDLER_COMPONENT_ERROR,
+                    WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_COMPONENT_ERROR);
         }
         catch (Exception ex)
         {
-            context.getLogger().error(
-                    "Unable to include presentation for region error");
-            context.getLogger().error(ex);
+            throw new RequestDispatchException("A component rendering problem was not able to be handled by the framework", ex);
         }
     }
-
 }

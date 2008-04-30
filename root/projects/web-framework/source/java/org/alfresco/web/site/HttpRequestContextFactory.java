@@ -53,7 +53,7 @@ public class HttpRequestContextFactory extends RequestContextFactory
         HttpRequestContext context = new HttpRequestContext(request);
 
         // load the user onto the context
-        UserFactory userFactory = UserFactoryBuilder.newFactory();
+        UserFactory userFactory = UserFactoryBuilder.sharedFactory();
         if(userFactory != null)
         {
             User user = userFactory.getUser(context, request);
@@ -72,7 +72,7 @@ public class HttpRequestContextFactory extends RequestContextFactory
         // populate the request context
         PageMapper pageMapper = PageMapperFactory.newInstance(context);
         pageMapper.execute(context, request);
-
+        
         return context;
     }
 
@@ -81,16 +81,6 @@ public class HttpRequestContextFactory extends RequestContextFactory
     {
         ServletContext servletContext = request.getSession().getServletContext();
         String realPath = servletContext.getRealPath(rootPath);
-
-        // System.out.println("INITFILESYSTEM rootPath: " + rootPath);        
-        // System.out.println("INITFILESYSTEM: " + realPath);
-
-        //System.out.println("GETFILESYSTEM.realPath = " + realPath);
-        // D:\tomcat-test\webapps\green
-
-        //System.out.println("LocalFileSystem");
-        //System.out.println(" -> rootPath: " + rootPath);
-        //System.out.println(" -> realPath: " + realPath);
 
         // the file system manager takes care to make sure that if this
         // file system has already been loaded, it will be reused

@@ -35,9 +35,9 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.renderer.AbstractRenderer;
@@ -50,7 +50,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class WebScriptRenderer extends AbstractRenderer
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig modelConfig)
+            HttpServletResponse response, RenderData renderData)
             throws RendererExecutionException
     {
         // get the application context and context objects
@@ -65,9 +65,9 @@ public class WebScriptRenderer extends AbstractRenderer
         // for the execution of .head templates.
         //
         //
-        if (modelConfig.getObject() instanceof Component)
+        if (renderData.getObject() instanceof Component)
         {
-            Component component = (Component) modelConfig.getObject();
+            Component component = (Component) renderData.getObject();
             String url = component.getURL();
             if (url.lastIndexOf('?') != -1)
             {
@@ -83,8 +83,8 @@ public class WebScriptRenderer extends AbstractRenderer
                     String path = webScript.getDescription().getId() + ".head.ftl";
 
                     Map<String, Object> model = new HashMap<String, Object>(8);
-                    ModelHelper.populateTemplateModel(context, modelConfig.getObject(), model);
-
+                    ProcessorModelHelper.populateTemplateModel(context, renderData, model);
+                    
                     // get the template processor
                     if (templateProcessor.hasTemplate(path))
                     {
@@ -107,7 +107,7 @@ public class WebScriptRenderer extends AbstractRenderer
         String requestUri = this.getRenderer();
 
         // request path
-        String requestPath = (String) modelConfig.get("requestPath"); // i.e.
+        String requestPath = (String) renderData.get("requestPath"); // i.e.
         // /test/component1
         if (requestPath == null)
             requestPath = "/service";
@@ -142,8 +142,8 @@ public class WebScriptRenderer extends AbstractRenderer
         LocalWebScriptContext webScriptContext = new LocalWebScriptContext();
         webScriptContext.RequestURI = requestUri;
         webScriptContext.RequestPath = requestPath;
-        webScriptContext.modelConfig = modelConfig;
-        webScriptContext.modelObject = modelConfig.getObject();
+        webScriptContext.renderData = renderData;
+        webScriptContext.object = renderData.getObject();
         webScriptContext.Tokens = args;
         webScriptContext.scriptUrl = requestPath + requestUri;
         webScriptContext.requestContext = context;

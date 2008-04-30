@@ -14,6 +14,9 @@
 				<value>classpath:alfresco/web-site-config.xml</value>
 				<value>classpath:alfresco/web-site-config-model.xml</value>
 				<value>classpath:alfresco/web-site-config-remote.xml</value>								
+				<value>classpath:alfresco/web-site-config-debug.xml</value>
+				<value>classpath:alfresco/web-site-config-defaults.xml</value>				
+				<value>classpath:alfresco/web-site-config-application.xml</value>
 
 				<value>classpath:alfresco/extension/web-site-config-custom.xml</value>
 				<value>jar:*!/META-INF/web-site-config-custom.xml</value>
@@ -50,6 +53,7 @@
 	</bean>
 	<bean id="site.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
 		<property name="searchPath" ref="site.searchpath" />
+		<property name="updateDelay"><value>10</value></property>
 		<property name="defaultEncoding"><value>UTF-8</value></property>
 	</bean>
 	<bean id="site.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
@@ -85,9 +89,19 @@
 			<value>alfresco/templates</value>
 		</property>
 	</bean>
+	<bean id="site.store.system-templates"
+		class="org.alfresco.web.scripts.ClassPathStore">
+		<property name="mustExist">
+			<value>true</value>
+		</property>
+		<property name="classPath">
+			<value>alfresco/system-templates</value>
+		</property>
+	</bean>
    <bean id="site.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
+            <ref bean="site.store.system-templates" />
             <ref bean="site.store.templates" />
             <ref bean="site.store.webscripts" />
          </list>
@@ -100,6 +114,11 @@
 		<property name="defaultEncoding">
 			<value>UTF-8</value>
 		</property>
+	</bean>
+	<bean id="site.scriptprocessor"
+		class="org.alfresco.web.scripts.PresentationScriptProcessor">
+		<property name="searchPath"
+			ref="site.templates.searchpath" />
 	</bean>
 
 

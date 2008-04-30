@@ -1,5 +1,3 @@
-<%@ page import="java.util.*" %>
-<%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%

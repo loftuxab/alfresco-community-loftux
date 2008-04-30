@@ -26,6 +26,8 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.model.Theme;
+
 /**
  * @author muzquiano
  */
@@ -33,46 +35,45 @@ public class ThemeUtil
 {
     public static String getCurrentThemeId(RequestContext context)
     {
-        String themeId = (String) context.getValue("currentThemeId");
-        if (themeId == null)
-            themeId = "default";
-        return themeId;
+        return context.getThemeId();
     }
 
+    public static Theme getCurrentTheme(RequestContext context)
+    {
+        String themeId = getCurrentThemeId(context);
+        if(themeId != null)
+        {
+            return (Theme) context.getModel().loadTheme(context, themeId);
+        }
+        return null;
+    }
+    
     public static String getCurrentThemeId(HttpServletRequest request)
     {
-        String themeId = (String) request.getSession().getAttribute(
-                "currentThemeId");
-        if (themeId == null)
-            themeId = "default";
-        return themeId;
+        return (String) request.getSession().getAttribute("currentThemeId");
     }
 
     public static void setCurrentThemeId(HttpServletRequest request,
             String themeId)
     {
-        if (themeId == null)
-            themeId = "default";
-        request.getSession().setAttribute("currentThemeId", themeId);
+        if (themeId != null)
+        {
+            request.getSession().setAttribute("currentThemeId", themeId);
+        }
     }
 
     public static void applyTheme(RequestContext context,
             HttpServletRequest request)
     {
         String themeId = getCurrentThemeId(request);
-        context.setValue("currentThemeId", themeId);
+        if(themeId == null)
+        {
+            themeId = WebFrameworkConstants.DEFAULT_THEME_ID;
+            setCurrentThemeId(request, themeId);
+        }
+        if(themeId != null)
+        {
+            context.setThemeId(themeId);
+        }
     }
-
-    public static String[] getThemeIds()
-    {
-        return new String[] { "default", "black", "indigo" };
-    }
-
-    public static String getThemeName(String themeId)
-    {
-        if ("default".equalsIgnoreCase(themeId))
-            return "Default";
-        return themeId;
-    }
-
 }

@@ -27,8 +27,8 @@ package org.alfresco.web.site.renderer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.config.RuntimeConfig;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -37,7 +37,7 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 public interface Renderable
 {
     public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RuntimeConfig config)
+            HttpServletResponse response, RenderData data)
             throws RendererExecutionException;
 
     public void setRenderer(String renderer);
@@ -46,5 +46,5 @@ public interface Renderable
     
     public String getRendererType();
     
-    public void setRendererType(String rendererType);
+    public void setRendererType(String rendererType);    
 }

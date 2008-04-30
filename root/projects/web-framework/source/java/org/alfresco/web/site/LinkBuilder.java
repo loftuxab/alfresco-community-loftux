@@ -29,64 +29,128 @@ import java.util.Map;
 /**
  * @author muzquiano
  */
-public abstract class LinkBuilder
+public interface LinkBuilder
 {
-    protected LinkBuilder()
-    {
-    }
-
     /**
-     * Constructs a link to a given page.
+     * Constructs a link to a given page instance.
      * This will automatically use the default format.
+     * 
+     * @param context The Request Context instance
+     * @param pageId The id of the page instance
      */
-    public abstract String page(RequestContext context, String pageId);
+    public String page(RequestContext context, String pageId);
 
     /**
      * Constructs a link to a given page for a given format.
-     */    
-    public abstract String page(RequestContext context, String pageId, 
+     * 
+     * @param context The Request Context instance
+     * @param pageId The id of the page instance
+     * @param formatId The id of the format to render
+     */
+    public String page(RequestContext context, String pageId, 
             String formatId);
 
     /**
      * Constructs a link to a given page for a given format.
      * The provided object is passed in as context.
-     */    
-    public abstract String page(RequestContext context, String pageId, 
+     * 
+     * @param context The Request Context instance
+     * @param pageId The id of the page instance
+     * @param formatId The id of the format to render
+     * @param objectId The id of the object
+     */
+    public String page(RequestContext context, String pageId, 
             String formatId, String objectId);    
 
     /**
      * Constructs a link to a given page for a given format.
      * The provided object is passed in as context.
      * The provided parameters are appended to the URL.
-     */    
-    public abstract String page(RequestContext context, String pageId, 
+     * 
+     * @param context The Request Context instance
+     * @param pageId The id of the page instance
+     * @param formatId The id of the format to render
+     * @param objectId The id of the object
+     * @param params A map of name/value pairs to be appended to the URL
+     */
+    public String page(RequestContext context, String pageId, 
             String formatId, String objectId, Map<String, String> params);
-    
+        
     /**
-     * Constructs a link to a given content item.
+     * Constructs a link to a given page type.
      * This will automatically use the default format.
      * 
-     * This method allows the dispatcher servlet to perform a late
-     * lookup of the appropriate page to render for the given item.
-     */    
-    public abstract String content(RequestContext context, String objectId);
+     * @param context The Request Context instance
+     * @param pageTypeId The type of the page
+     */
+    public String pageType(RequestContext context, String pageTypeId);
 
     /**
-     * Constructs a link to a given content item for a given format.
+     * Constructs a link to a given page type for a given format.
      * 
-     * This method allows the dispatcher servlet to perform a late
-     * lookup of the appropriate page to render for the given item.
+     * @param context The Request Context instance
+     * @param pageTypeId The type of the page
+     * @param formatId The id of the format to render
      */    
-    public abstract String content(RequestContext context, String objectId,
+    public String pageType(RequestContext context, String pageTypeId, 
             String formatId);
 
     /**
-     * Constructs a link to a given content item for a given format.
-     * The provided parameters are appended to the generated URL.
+     * Constructs a link to a given page type for a given format.
+     * The provided object is passed in as context.
      * 
-     * This method allows the dispatcher servlet to perform a late
-     * lookup of the appropriate page to render for the given item.
+     * @param context The Request Context instance
+     * @param pageTypeId The type of the page
+     * @param formatId The id of the format to render
+     * @param objectId The id of the object
      */    
-    public abstract String content(RequestContext context, String objectId,
+    public String pageType(RequestContext context, String pageTypeId, 
+            String formatId, String objectId);    
+
+    /**
+     * Constructs a link to a given page type for a given format.
+     * The provided object is passed in as context.
+     * The provided parameters are appended to the URL.
+     * 
+     * @param context The Request Context instance
+     * @param pageTypeId The type of the page
+     * @param formatId The id of the format to render
+     * @param objectId The id of the object
+     * @param params A map of name/value pairs to be appended to the URL
+     */
+    public String pageType(RequestContext context, String pageTypeId, 
+            String formatId, String objectId, Map<String, String> params);
+    
+    /**
+     * Constructs a link to a given object.
+     * This will automatically use the default format.
+     * 
+     * @param context The Request Context instance
+     * @param objectId The id of the object
+     */    
+    public String object(RequestContext context, String objectId);
+
+    /**
+     * Constructs a link to a given object.
+     * This will automatically use the default format.
+     * 
+     * @param context The Request Context instance
+     * @param objectId The id of the object
+     * @param formatId The id of the format to render
+     */        
+    public String object(RequestContext context, String objectId,
+            String formatId);
+
+    /**
+     * Constructs a link to a given object.
+     * The provided object is passed in as context.
+     * The provided parameters are appended to the URL.
+     * 
+     * @param context The Request Context instance
+     * @param objectId The id of the object
+     * @param formatId The id of the format to render
+     * @param params A map of name/value pairs to be appended to the URL
+     */    
+    public String object(RequestContext context, String objectId,
             String formatId, Map<String, String> params);
 }

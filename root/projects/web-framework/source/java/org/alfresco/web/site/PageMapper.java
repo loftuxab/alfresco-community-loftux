@@ -29,12 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author muzquiano
  */
-public abstract class PageMapper
+public interface PageMapper
 {
-    public PageMapper()
-    {
-    }
-
-    public abstract void execute(RequestContext context,
-            HttpServletRequest request);
+    public void execute(RequestContext context, HttpServletRequest request);
 }

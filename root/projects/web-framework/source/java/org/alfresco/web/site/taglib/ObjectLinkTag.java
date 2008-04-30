@@ -50,9 +50,17 @@ public class ObjectLinkTag extends AbstractObjectTag
         RequestContext context = getRequestContext();
 
         // generate the URL
-        String url = link(context, getPage(), getObject(), getFormat());
+        String url = link(context, getPageType(), getPageType(), getObject(), getFormat());
         print(url);
         
         return SKIP_BODY;
     }
+    
+    public void release()
+    {
+        this.formatId = null;
+        
+        super.release();
+    }
+    
 }

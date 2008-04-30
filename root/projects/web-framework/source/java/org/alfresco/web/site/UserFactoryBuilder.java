@@ -51,6 +51,30 @@ public abstract class UserFactoryBuilder
             throw new UserFactoryException("Unable to create user factory for class name: " + className);
         }
         factory.setId(_defaultId);
+        
+        // log
+        Framework.getLogger().debug("New User Factory: " + className);
+
         return factory;
     }
+    
+    public static UserFactory sharedFactory()
+        throws UserFactoryException
+    {
+        if(factory == null)
+        {
+            synchronized(UserFactory.class)
+            {
+                if(factory == null)
+                {
+                    factory = newFactory();
+                }
+            }
+            
+        }
+        
+        return factory;    
+    }
+
+    protected static UserFactory factory = null;
 }

@@ -9,15 +9,14 @@
          <element-reader element-name="formats" class="org.alfresco.web.config.WebSiteElementReader"/>
          <element-reader element-name="incontext" class="org.alfresco.web.config.WebSiteElementReader"/>
          <element-reader element-name="servlet" class="org.alfresco.web.config.WebSiteElementReader"/>
-         <element-reader element-name="alfresco" class="org.alfresco.web.config.WebSiteElementReader"/>
-		 <element-reader element-name="tags" class="org.alfresco.web.config.WebSiteElementReader"/>
-		 <element-reader element-name="user" class="org.alfresco.web.config.WebSiteElementReader"/>
-		 <element-reader element-name="renderers" class="org.alfresco.web.config.WebSiteElementReader"/>
-		 <element-reader element-name="presentation" class="org.alfresco.web.config.WebSiteElementReader"/>		 
-		 <element-reader element-name="defaults" class="org.alfresco.web.config.WebSiteElementReader"/>		 
-      </element-readers>
+         <element-reader element-name="tags" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="user" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="renderers" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="dispatcher" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="framework" class="org.alfresco.web.config.WebSiteElementReader"/>
+         <element-reader element-name="application" class="org.alfresco.web.config.WebSiteElementReader"/>
+	  </element-readers>
    </plug-ins>
-
 
 
 	<config evaluator="string-compare" condition="WebFramework">
@@ -118,18 +117,6 @@
 		</servlet>
 
 
-		<!--  TODO: This may not be necessary -->
-		<!-- location of alfresco -->
-		<alfresco>
-			<authoring>
-				<host>localhost</host>
-				<port>8080</port>
-				<webapp-uri>/alfresco</webapp-uri>
-				<webscript-service-uri>/alfresco/service</webscript-service-uri>
-			</authoring>
-		</alfresco>
-
-
 		
 		<!-- tag libraries -->
 		<tags>
@@ -195,72 +182,66 @@
 				<name>Freemarker Renderer</name>
 				<description>Freemarker Renderer</description>
 				<class>org.alfresco.web.scripts.FreemarkerRenderer</class>
-				<processor-bean>site.templateprocessor</processor-bean>
+				<template-processor-bean>site.templateprocessor</template-processor-bean>
+				<script-processor-bean>site.scriptprocessor</script-processor-bean>
 			</renderer>
 		</renderers>
 		
 		
-		<!-- Define presentation pages -->
-		<presentation>
-			<pages>
+		<!-- Define dispatcher settings -->
+		<dispatcher>
+			<error-handlers>
+				<handler>
+					<id>page-error</id>
+					<renderer>/core/page-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+				<handler>
+					<id>component-error</id>
+					<renderer>/core/component-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+				<handler>
+					<id>region-error</id>
+					<renderer>/core/region-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+				<handler>
+					<id>region-nocomponent</id>
+					<renderer>/core/region-nocomponent.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>						
+				<handler>
+					<id>template-error</id>
+					<renderer>/core/template-error.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
+				</handler>
+			</error-handlers>
+			<system-pages>
 				<page>
-					<id>getting-started</id>
-					<title>Getting Started</title>
-					<uri>/core/page-gettingstarted.jsp</uri>
+					<id>page-getting-started</id>
+					<renderer>/core/page-gettingstarted.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
 				</page>
 				<page>
 					<id>page-unconfigured</id>
-					<title>Unconfigured Page</title>
-					<uri>/core/page-unconfigured.jsp</uri>
+					<renderer>/core/page-unconfigured.jsp</renderer>
+					<renderer-type>jsp</renderer-type>
 				</page>
-				<page>
-					<id>page-error</id>
-					<title>An error has occurred</title>
-					<uri>/core/page-error.jsp</uri>
-				</page>
-			</pages>
-			<containers>
-				<container>
-					<id>region-container</id>
-					<uri>/core/region.jsp</uri>
-				</container>
-				<container>
-					<id>region-nocomponent</id>
-					<uri>/core/region-nocomponent.jsp</uri>
-				</container>		
-				<container>
-					<id>component-error</id>
-					<uri>/core/component-error.jsp</uri>
-				</container>
-				<container>
-					<id>region-error</id>
-					<uri>/core/region-error.jsp</uri>
-				</container>
-				<container>
-					<id>template-error</id>
-					<uri>/core/template-error.jsp</uri>
-				</container>
-			</containers>
-		</presentation>
-		
-		
-		<!-- debug tools -->
-		<debug>
-			<timer>
-				<enabled>false</enabled>
-			</timer>
-		</debug>
-		
-
-		<!-- defaults -->
-		<defaults>
-			<request-context>http</request-context>
-			<file-system>local</file-system>
-			<format>default</format>
-			<page-mapper>default</page-mapper>
-			<link-builder>default</link-builder>			
-			<user-factory>default</user-factory>			
-		</defaults>
+			</system-pages>
+		</dispatcher>
+				
+		<!-- framework defaults -->
+		<framework>
+			<defaults>
+				<request-context>http</request-context>
+				<file-system>local</file-system>
+				<format>default</format>
+				<page-mapper>default</page-mapper>
+				<link-builder>default</link-builder>			
+				<user-factory>default</user-factory>			
+			</defaults>
+		</framework>
 		
 	</config>
 

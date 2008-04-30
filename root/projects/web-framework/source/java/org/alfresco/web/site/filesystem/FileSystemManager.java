@@ -119,7 +119,9 @@ public class FileSystemManager
             // flip on caching?
             if ("true".equals(Framework.getConfig().getFileSystemUseCache(
                     "local")))
+            {
                 fileSystem = new CachedFileSystem(fileSystem);
+            }
 
             putFileSystem(cacheKey, fileSystem);
         }

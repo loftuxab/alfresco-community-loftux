@@ -1,0 +1,14 @@
+<alfresco-config>
+
+	<config evaluator="string-compare" condition="WebFramework">
+	
+		<!-- debug tools -->
+		<debug>
+			<timer>
+				<enabled>false</enabled>
+			</timer>
+		</debug>
+		
+	</config>
+
+</alfresco-config>

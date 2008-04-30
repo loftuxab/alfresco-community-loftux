@@ -30,7 +30,14 @@ public class URLHelper
         this.uri = req.getRequestURI();
         String uriNoContext = req.getRequestURI().substring(this.context.length());
         StringTokenizer t = new StringTokenizer(uriNoContext, "/");
-        this.pageContext = this.context + "/" + t.nextToken();
+        if(t.hasMoreTokens())
+        {
+            this.pageContext = this.context + "/" + t.nextToken();
+        }
+        else
+        {
+            this.pageContext = this.context;
+        }
         this.queryString = (req.getQueryString() != null ? req.getQueryString() : "");
         this.args = new HashMap<String, String>(reqArgs.size());
         this.args.putAll(reqArgs);
@@ -63,6 +70,27 @@ public class URLHelper
     
     public Map<String, String> getArgs()
     {
+        URLModel a;
         return this.args;
     }
+    
+    /**
+     * Added these methods in to mak ethin
+     */
+    
+    public String getServiceContext()
+    {
+        return this.context;
+    }
+    
+    public String getService()
+    {
+        return "";
+    }
+    
+    public String getFull()
+    {
+        return this.uri;
+    }
+    
 }

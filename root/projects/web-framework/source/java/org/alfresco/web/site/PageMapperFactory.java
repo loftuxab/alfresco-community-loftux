@@ -60,7 +60,29 @@ public class PageMapperFactory
         {
             throw new PageMapperException("Unable to create page mapper for class name: " + className);
         }
+        
+        // log
+        Framework.getLogger().debug("New page mapper: " + className);
 
         return pageMapper;
     }
+    
+    public static PageMapper sharedInstance(RequestContext context)
+        throws PageMapperException
+    {
+        if(mapper == null)
+        {
+            synchronized(PageMapperFactory.class)
+            {
+                if(mapper == null)
+                {
+                    mapper = newInstance(context);
+                }
+            }
+        }
+    
+        return mapper;
+    }
+    
+    protected static PageMapper mapper = null;
 }

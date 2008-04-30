@@ -54,12 +54,6 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
         return EVAL_PAGE;
     }
 
-    public void release()
-    {
-        this.pageContext = null;
-        super.release();
-    }
-
     protected PageContext getPageContext()
     {
         return this.pageContext;
@@ -89,4 +83,11 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
             throw new JspException(ex);
         }
     }
+    
+    public void release()
+    {
+        this.pageContext = null;
+        super.release();
+    }
+    
 }
