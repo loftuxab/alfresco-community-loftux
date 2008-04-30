@@ -47,7 +47,7 @@ import java.util.Map;
  * 
  * @author muzquiano
  */
-public class SlingshotLinkBuilder extends LinkBuilder
+public class SlingshotLinkBuilder extends AbstractLinkBuilder
 {
     public SlingshotLinkBuilder()
     {
@@ -55,38 +55,15 @@ public class SlingshotLinkBuilder extends LinkBuilder
     }
 
     /**
-     * Constructs a link to a given page.
-     * This will automatically use the default format.
-     */
-    public String page(RequestContext context, String pageId)
-    {
-        String formatId = context.getConfig().getDefaultFormatId();
-        return page(context, pageId, formatId);
-    }
-
-    /**
-     * Constructs a link to a given page for a given format.
-     */
-    public String page(RequestContext context, String pageId, 
-            String formatId)
-    {
-        return page(context, pageId, formatId, null);
-    }
-
-    /**
-     * Constructs a link to a given page for a given format.
-     * The provided object is passed in as context.
-     */
-    public String page(RequestContext context, String pageId, 
-            String formatId, String objectId)
-    {
-        return page(context, pageId, formatId, objectId, null);
-    }
-
-    /**
      * Constructs a link to a given page for a given format.
      * The provided object is passed in as context.
      * The provided parameters are appended to the URL.
+     * 
+     * @param context The Request Context instance
+     * @param pageId The id of the page instance
+     * @param formatId The id of the format to render
+     * @param objectId The id of the object
+     * @param params A map of name/value pairs to be appended to the URL
      */
     public String page(RequestContext context, String pageId, 
             String formatId, String objectId, Map<String, String> params)
@@ -138,38 +115,60 @@ public class SlingshotLinkBuilder extends LinkBuilder
     }
     
     /**
-     * Constructs a link to a given content item.
-     * This will automatically use the default format.
+     * Constructs a link to a given page type for a given format.
+     * The provided object is passed in as context.
+     * The provided parameters are appended to the URL.
      * 
-     * This method allows the dispatcher servlet to perform a late
-     * lookup of the appropriate page to render for the given item.
+     * @param context The Request Context instance
+     * @param pageTypeId The type of the page
+     * @param formatId The id of the format to render
+     * @param objectId The id of the object
+     * @param params A map of name/value pairs to be appended to the URL
      */
-    public String content(RequestContext context, String objectId)
+    public String pageType(RequestContext context, String pageTypeId, 
+            String formatId, String objectId, Map<String, String> params)
     {
-        String formatId = context.getConfig().getDefaultFormatId();
-        return content(context, objectId, formatId);
-    }
+        if (pageTypeId == null)
+        {
+            return null;
+        }
+        if (formatId == null)
+        {
+            formatId = context.getConfig().getDefaultFormatId();
+        }
 
-    /**
-     * Constructs a link to a given content item for a given format.
-     * 
-     * This method allows the dispatcher servlet to perform a late
-     * lookup of the appropriate page to render for the given item.
-     */
-    public String content(RequestContext context, String objectId,
-            String formatId)
-    {
-        return content(context, objectId, formatId, null);
-    }
+        StringBuilder buffer = new StringBuilder();
+        buffer.append("?f=" + formatId);
+        buffer.append("&pt=" + pageTypeId);
+        if (objectId != null && objectId.length() != 0)
+        {
+              buffer.append("&o=" + objectId);
+        }
+        if(params != null)
+        {
+            for (Map.Entry<String, String> entry : params.entrySet())
+            {
+                String key = entry.getKey();
+                String value = entry.getValue();                
+                buffer.append("&" + key + "=" + value);
+            }
+        }
 
+        return buffer.toString();
+    }    
+    
+    
     /**
-     * Constructs a link to a given content item for a given format.
-     * The provided parameters are appended to the generated URL.
+     * Constructs a link to a given object.
+     * The provided object is passed in as context.
+     * The provided parameters are appended to the URL.
      * 
-     * This method allows the dispatcher servlet to perform a late
-     * lookup of the appropriate page to render for the given item.
-     */
-    public String content(RequestContext context, String objectId,
+     * @param context The Request Context instance
+     * @param objectId The id of the object
+     * @param formatId The id of the format to render
+     * @param params A map of name/value pairs to be appended to the URL
+     */    
+    public String object(RequestContext context, String objectId,
             String formatId, Map<String, String> params)
     {
         if(objectId == null)

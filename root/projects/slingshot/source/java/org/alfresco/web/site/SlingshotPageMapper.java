@@ -57,7 +57,7 @@ import org.alfresco.web.site.model.Page;
  * 
  * @author muzquiano
  */
-public class SlingshotPageMapper extends PageMapper
+public class SlingshotPageMapper extends AbstractPageMapper
 {
     public SlingshotPageMapper()
     {
@@ -72,9 +72,6 @@ public class SlingshotPageMapper extends PageMapper
      *
      * This is a pretty quick and dirty way to implement the
      * interpretation
-     */
-    /**
-     * 
      */
     public void execute(RequestContext context, HttpServletRequest request)
     {
