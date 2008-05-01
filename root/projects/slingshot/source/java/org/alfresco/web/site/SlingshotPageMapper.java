@@ -26,8 +26,10 @@ package org.alfresco.web.site;
 
 import java.util.StringTokenizer;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.model.Page;
 
 /**
@@ -73,13 +75,19 @@ public class SlingshotPageMapper extends AbstractPageMapper
      * This is a pretty quick and dirty way to implement the
      * interpretation
      */
-    public void execute(RequestContext context, HttpServletRequest request)
+    public void execute(RequestContext context, ServletRequest request)
+    	throws PageMapperException
     {
+    	if(!(request instanceof HttpServletRequest))
+    	{
+    		throw new PageMapperException("The slingshot page mapper must be given an HttpServletRequest to execute against");
+    	}
+    	
     	/**
     	 * The request URI string.  This comes in as something like:
     	 * 		/slingshot/page/user-profile
     	 */
-    	String requestURI = request.getRequestURI();
+    	String requestURI = ((HttpServletRequest)request).getRequestURI();
     	
     	/**
     	 * Tokenizer and walk the string to figure out what kinds of

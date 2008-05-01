@@ -26,6 +26,8 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.exception.UserFactoryException;
+
 /**
  * This factory is responsible for loading user objects from a user
  * repository and making them available to the framework.
@@ -56,13 +58,13 @@ public class SlingshotUserFactory extends UserFactory
 	 * User object faulting should only occur once.
 	 */
     public User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws Exception
+            String user_id) throws UserFactoryException
     {
     	return getGuestUser(context, request);
     }
     
     protected User getGuestUser(RequestContext context,
-            HttpServletRequest request) throws Exception
+            HttpServletRequest request) throws UserFactoryException
     {
 		if(this.guestUser == null)
 		{
