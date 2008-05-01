@@ -25,6 +25,8 @@
 package org.alfresco.web.site.cache;
 
 /**
+ * The Interface IContentCache.
+ * 
  * @author muzquiano
  */
 public interface IContentCache
@@ -34,10 +36,22 @@ public interface IContentCache
      *  that the timeout for the object hasn't expired.  If the timeout has expired, the
      *  object is cleaned up and null is returned.
      */
+    /**
+     * Gets the.
+     * 
+     * @param key the key
+     * 
+     * @return the object
+     */
     public Object get(String key);
 
     /*
      *  Removes the content object from the cache.
+     */
+    /**
+     * Removes the.
+     * 
+     * @param key the key
      */
     public void remove(String key);
 
@@ -45,13 +59,39 @@ public interface IContentCache
      *  Adds the given content object to the cache, keyed from the given path.
      *  If a content item exists at the given path, it is replaced.
      */
+    /**
+     * Put.
+     * 
+     * @param key the key
+     * @param obj the obj
+     * @param timeout the timeout
+     */
     public void put(String key, Object obj, long timeout);
 
+    /**
+     * Put.
+     * 
+     * @param key the key
+     * @param obj the obj
+     */
     public void put(String key, Object obj);
 
+    /**
+     * Invalidate all.
+     */
     public void invalidateAll();
 
+    /**
+     * Sets the reporting.
+     * 
+     * @param b the new reporting
+     */
     public void setReporting(boolean b);
 
+    /**
+     * Checks if is reporting.
+     * 
+     * @return true, if is reporting
+     */
     public boolean isReporting();
 }

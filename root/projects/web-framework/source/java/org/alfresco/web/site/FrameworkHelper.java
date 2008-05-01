@@ -26,13 +26,12 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
-import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.web.site.exception.RequestContextException;
 import org.alfresco.web.site.filesystem.FileSystemManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
-import org.alfresco.web.site.servlet.DispatcherServlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -46,51 +45,101 @@ public class FrameworkHelper
 {
     private static Log logger = LogFactory.getLog(FrameworkHelper.class);
     
-    public static void initFramework(ServletContext servletContext,
+    /**
+     * Initializes the Web Framework.  This method must be called once
+     * in order to instruct the framework to walk through its appropriate
+     * startup steps.  This involves locating the configuration service,
+     * connecting the appropriate model stores and the like.
+     * 
+     * This should be very quick to do.  The objects loaded here are
+     * classloader scoped and should then be available to all future
+     * requests.
+     * 
+     * @param servletContext
+     * @param context
+     */
+    public synchronized static void initFramework(ServletContext servletContext,
             ApplicationContext context)
     {
-        synchronized (DispatcherServlet.class)
+        if (!Framework.isInitialized())
         {
-            if (!Framework.isInitialized())
-            {
-                // get the config service
-                ConfigService configService = (ConfigService) context.getBean("site.config");
-                Config config = configService.getConfig("WebFramework");
+            /**
+             * Retrieve the configuration service
+             */
+            ConfigService configService = (ConfigService) context.getBean("site.config");
+            Config config = configService.getConfig("WebFramework");
 
-                // set the config onto the framework
-                DefaultFrameworkConfig webFrameworkConfig = new DefaultFrameworkConfig(config);
-                Framework.setConfig(webFrameworkConfig);
+            /**
+             * Set up the DefaultFrameworkConfig instance
+             * 
+             * This provides helper methods for working with the configuration
+             * service XML.  It serves to help things be a bit faster in
+             * that it caches values on the instance so as to avoid having to
+             * go to the XML each time.
+             */
+            DefaultFrameworkConfig webFrameworkConfig = new DefaultFrameworkConfig(config);
+            Framework.setConfig(webFrameworkConfig);
 
-                // set the model onto the framework
-                String modelRootPath = webFrameworkConfig.getModelRootPath();
-                IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(
-                        servletContext, modelRootPath);
-                IModel model = new DefaultModel(modelFileSystem);
-                Framework.setModel(model);
+            /**
+             * Loads the model implementation onto the framework.
+             * 
+             * A model implementation is the persister layer between the
+             * model objects and the XML on disk.
+             * 
+             * TODO:  At present, this mounts against a FileSystem
+             * implementation which is pointed at the model root directory.
+             * We would like to change this to use the Store abstraction
+             * (which is underway but not yet complete).
+             */
+            String modelRootPath = webFrameworkConfig.getModelRootPath();
+            IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(
+                    servletContext, modelRootPath);
+            IModel model = new DefaultModel(modelFileSystem);
+            Framework.setModel(model);
 
-                logger.info("Successfully Initialized Web Framework");
-            }
+            logger.info("Successfully Initialized Web Framework");
         }
     }
     
-    public static void initRequestContext(ServletRequest request)
-        throws Exception
+    /**
+     * Creates and initializes a single request context instance.
+     * 
+     * This method is called once at the top of the request processing chain.
+     * It routes through the configured RequestContextFactory implementation
+     * so as to create a RequestContext implementation.
+     * 
+     * @param request
+     * @throws RequestContextException
+     */
+    public static RequestContext initRequestContext(ServletRequest request)
+        throws RequestContextException
     {
-        // get whatever factory builder we're configured to use
+        /**
+         * Retrieve the configured RequestContextFactory implementation.
+         * If one has already been retrieved, it will be reused.
+         * If not, then a new one will be instantiated.
+         */
         RequestContextFactory factory = RequestContextFactoryBuilder.sharedFactory();
-        if (factory instanceof HttpRequestContextFactory)
+        if(factory == null)
         {
-            if(request instanceof HttpServletRequest)
-            {
-                // this is what we expect
-                RequestContext context = ((HttpRequestContextFactory)factory).newInstance((HttpServletRequest)request);
-                RequestUtil.setRequestContext((HttpServletRequest)request, context);
-            }
+            throw new RequestContextException("Unable to load RequestContextFactory");
         }
-        else
+        
+        /**
+         * Using the factory, produce a new RequestContext instance for the
+         * given request.
+         */
+        RequestContext context = factory.newInstance(request);
+        if(context == null)
         {
-            throw new Exception(
-                    "The configured request context factory does not extend from HttpRequestContextFactory");
-        }        
+            throw new RequestContextException("A request context was not manufactured");
+        }
+        
+        /**
+         * Bind the new request context instance to the request.
+         */
+        RequestUtil.setRequestContext(request, context);
+        
+        return context;
     }
 }

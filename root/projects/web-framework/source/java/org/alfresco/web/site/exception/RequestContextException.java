@@ -22,31 +22,20 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
-
-import javax.servlet.ServletRequest;
-
-import org.alfresco.web.site.exception.RequestContextException;
+package org.alfresco.web.site.exception;
 
 /**
- * Interface for a RequestContext factory.
- * 
- * A request context factory is invoked by the framework at the start of the
- * request chain.  It is responsible for producing a RequestContext object
- * which is bound to the request.  The RequestContext object is a single
- * object instance with which all downstream framework elements can consult.
- * 
- * The RequestContext object is scoped to the request.
- * 
  * @author muzquiano
  */
-public interface RequestContextFactory
+public class RequestContextException extends Exception
 {
-    /**
-     * Produces a new RequestContext instance for a given request
-     * 
-     * @return The RequestContext instance
-     * @throws RequestContextException
-     */
-    public RequestContext newInstance(ServletRequest request) throws RequestContextException;
+    public RequestContextException(String message)
+    {
+        super(message);
+    }
+
+    public RequestContextException(String message, Exception ex)
+    {
+        super(message, ex);
+    }
 }

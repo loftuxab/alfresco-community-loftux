@@ -67,18 +67,12 @@ public class PageMapperFactory
         return pageMapper;
     }
     
-    public static PageMapper sharedInstance(RequestContext context)
+    public synchronized static PageMapper sharedInstance(RequestContext context)
         throws PageMapperException
     {
         if(mapper == null)
         {
-            synchronized(PageMapperFactory.class)
-            {
-                if(mapper == null)
-                {
-                    mapper = newInstance(context);
-                }
-            }
+            mapper = newInstance(context);
         }
     
         return mapper;

@@ -34,22 +34,30 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.BodyContent;
 
 /**
- * Implementation of the JSP BodyContent abstract class.  BodyContent 
- * extends JspWriter to allow access to the underlying buffer.
+ * Implementation of the JSP BodyContent class. BodyContent extends
+ * JspWriter to allow access to the underlying buffer.
  * 
- * The buffer can be cleared, converted to a string, 
- * or read through a Reader.  It also has the notion of an enclosed
- * writer, which is in essence a parent BodyContent.
+ * The buffer can be cleared, converted to a string, or read through a Reader.
+ * It also has the notion of an enclosed writer, which is in essence a parent
+ * BodyContent.
  * 
- * Finally, it has a writeOut method which allows for efficiently 
- * writing its contents to its parent (or another writer).
+ * Finally, it has a writeOut method which allows for efficiently writing its
+ * contents to its parent (or another writer).
  * 
  * @author muzquiano
  */
 public class FakeBodyContent extends BodyContent
 {
+    
+    /** The DEFAUL t_ buffe r_ size. */
     static int DEFAULT_BUFFER_SIZE = 1024;
 
+    /**
+     * Instantiates a new fake body content.
+     * 
+     * @param encl
+     *            the encl
+     */
     public FakeBodyContent(JspWriter encl)
     {
         super(encl);
@@ -66,7 +74,13 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Write the String s to the buffer
+     * Write the String s to the buffer.
+     * 
+     * @param s
+     *            the s
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void write(String s) throws IOException
     {
@@ -100,7 +114,13 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Write the character represented by the integer i to the buffer
+     * Write the character represented by the integer i to the buffer.
+     * 
+     * @param i
+     *            the i
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void write(int i) throws IOException
     {
@@ -123,7 +143,17 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Write an array of characters to the buffer
+     * Write an array of characters to the buffer.
+     * 
+     * @param c
+     *            the c
+     * @param off
+     *            the off
+     * @param len
+     *            the len
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void write(char c[], int off, int len) throws IOException
     {
@@ -158,6 +188,9 @@ public class FakeBodyContent extends BodyContent
 
     /**
      * Ensure that at least minLength bytes are available in the buffer total.
+     * 
+     * @param minLength
+     *            the min length
      */
     private void growBuffer(int minLength)
     {
@@ -169,104 +202,161 @@ public class FakeBodyContent extends BodyContent
         bufferSize = newBuf.length;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(char)
+     */
     public void print(char c) throws IOException
     {
         write((int) c);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(double)
+     */
     public void print(double d) throws IOException
     {
         write(Double.toString(d));
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(boolean)
+     */
     public void print(boolean b) throws IOException
     {
         write(new Boolean(b).toString());
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(long)
+     */
     public void print(long l) throws IOException
     {
         write(Long.toString(l));
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(float)
+     */
     public void print(float f) throws IOException
     {
         write(Float.toString(f));
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(int)
+     */
     public void print(int i) throws IOException
     {
         write(Integer.toString(i));
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(java.lang.Object)
+     */
     public void print(Object o) throws IOException
     {
         write(o.toString());
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(char[])
+     */
     public void print(char c[]) throws IOException
     {
         write(c, 0, c.length);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#print(java.lang.String)
+     */
     public void print(String s) throws IOException
     {
         write(s);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println()
+     */
     public void println() throws IOException
     {
         newLine();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(java.lang.String)
+     */
     public void println(String s) throws IOException
     {
         print(s);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(char)
+     */
     public void println(char c) throws IOException
     {
         print(c);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(char[])
+     */
     public void println(char c[]) throws IOException
     {
         print(c);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(long)
+     */
     public void println(long l) throws IOException
     {
         print(l);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(int)
+     */
     public void println(int i) throws IOException
     {
         print(i);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(double)
+     */
     public void println(double d) throws IOException
     {
         print(d);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(float)
+     */
     public void println(float f) throws IOException
     {
         print(f);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(boolean)
+     */
     public void println(boolean b) throws IOException
     {
         print(b);
         println();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspWriter#println(java.lang.Object)
+     */
     public void println(Object o) throws IOException
     {
         print(o);
@@ -274,22 +364,31 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Close is a no-op in BodyContent
+     * Close is a no-op in BodyContent.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void close() throws IOException
     {
     }
 
     /**
-     * Flush is a no-op in BodyContent, since you have to explicitly write its contents to the enclosing writer.
+     * Flush is a no-op in BodyContent, since you have to explicitly write its
+     * contents to the enclosing writer.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void flush() throws IOException
     {
     }
 
     /**
-     * Return remaining size in the buffer.  This shouldn't be a concern, since this implementation always
-     * grows the buffer.
+     * Return remaining size in the buffer. This shouldn't be a concern, since
+     * this implementation always grows the buffer.
+     * 
+     * @return the remaining
      */
     public int getRemaining()
     {
@@ -297,7 +396,10 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Clear the contents of the buffer, unless it was flushed
+     * Clear the contents of the buffer, unless it was flushed.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void clear() throws IOException
     {
@@ -307,7 +409,10 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Clear the contents of the buffer
+     * Clear the contents of the buffer.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void clearBuffer() throws IOException
     {
@@ -316,10 +421,14 @@ public class FakeBodyContent extends BodyContent
         index = 0;
     }
 
+    /** The line separator. */
     static String lineSeparator = System.getProperty("line.separator");
 
     /**
-     * Add a newline to the buffer
+     * Add a newline to the buffer.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void newLine() throws IOException
     {
@@ -327,11 +436,10 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Return the value of this BodyContent as a Reader.
-     * Note: this is after evaluation!!  There are no scriptlets,
-     * etc in this stream.
-     *
-     * @returns the value of this BodyContent as a Reader
+     * Return the value of this BodyContent as a Reader. Note: this is after
+     * evaluation!! There are no scriptlets, etc in this stream.
+     * 
+     * @return the value of this BodyContent as a Reader
      */
     public Reader getReader()
     {
@@ -342,11 +450,10 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Return the value of the BodyContent as a String.
-     * Note: this is after evaluation!!  There are no scriptlets,
-     * etc in this stream.
-     *
-     * @returns the value of the BodyContent as a String
+     * Return the value of the BodyContent as a String. Note: this is after
+     * evaluation!! There are no scriptlets, etc in this stream.
+     * 
+     * @return the value of the BodyContent as a String
      */
     public String getString()
     {
@@ -357,12 +464,16 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Write the contents of this BodyContent into a Writer.
-     * Subclasses are likely to do interesting things with the
-     * implementation so some things are extra efficient.
-     *
-     * @param out The writer into which to place the contents of
-     * this body evaluation
+     * Write the contents of this BodyContent into a Writer. Subclasses are
+     * likely to do interesting things with the implementation so some things
+     * are extra efficient.
+     * 
+     * @param out
+     *            The writer into which to place the contents of this body
+     *            evaluation
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
      */
     public void writeOut(Writer out) throws IOException
     {
@@ -373,28 +484,42 @@ public class FakeBodyContent extends BodyContent
     }
 
     /**
-     * Get the enclosing JspWriter
-     *
-     * @returns the enclosing JspWriter passed at construction time
+     * Get the enclosing JspWriter.
+     * 
+     * @return the enclosing JspWriter passed at construction time
      */
     public JspWriter getEnclosingWriter()
     {
         return enclosingWriter;
     }
 
+    /**
+     * Sets the enclosing writer.
+     * 
+     * @param encl
+     *            the new enclosing writer
+     */
     protected void setEnclosingWriter(JspWriter encl)
     {
         this.enclosingWriter = encl;
     }
 
-    /**
-     * private fields
-     */
+    /** private fields. */
 
     private JspWriter enclosingWriter;
+    
+    /** The out. */
     private PrintWriter out;
+    
+    /** The buffer. */
     private char buffer[];
+    
+    /** The index. */
     private int index;
+    
+    /** The flushed. */
     private boolean flushed = false;
+    
+    /** The unbounded. */
     public boolean unbounded = false;
 }

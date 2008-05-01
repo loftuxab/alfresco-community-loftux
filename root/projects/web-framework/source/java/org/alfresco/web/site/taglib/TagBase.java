@@ -35,6 +35,7 @@ import javax.servlet.jsp.tagext.TagSupport;
 
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * @author muzquiano
@@ -60,9 +61,21 @@ public abstract class TagBase extends BodyTagSupport implements Serializable
     }
 
     protected RequestContext getRequestContext()
+        throws JspException
     {
+        RequestContext context = null;
+    
         HttpServletRequest request = (HttpServletRequest) getPageContext().getRequest();
-        return RequestUtil.getRequestContext(request);
+        try 
+        {
+            context = RequestUtil.getRequestContext(request);
+        }
+        catch(RequestContextException rce)
+        {
+            throw new JspException("Unable to retrieve request context from request", rce);
+        }
+        
+        return context;
     }
 
     protected JspWriter getOut()

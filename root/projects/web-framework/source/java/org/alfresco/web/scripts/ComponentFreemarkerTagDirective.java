@@ -20,7 +20,7 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing
+ * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.scripts;
 
@@ -39,26 +39,37 @@ import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateScalarModel;
 
 /**
- * A generic Freemarker Directive wrapper around the Java Tag classes
+ * A generic Freemarker Directive wrapper around the Java Tag classes.
  * 
  * @author muzquiano
  */
 public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirective
 {
+    
+    /**
+     * Instantiates a new component freemarker tag directive.
+     * 
+     * @param context the context
+     */
     public ComponentFreemarkerTagDirective(RequestContext context)
     {
         super(context);
     }
 
+    /* (non-Javadoc)
+     * @see freemarker.template.TemplateDirectiveModel#execute(freemarker.core.Environment, java.util.Map, freemarker.template.TemplateModel[], freemarker.template.TemplateDirectiveBody)
+     */
     public void execute(Environment env, Map params, TemplateModel[] loopVars,
             TemplateDirectiveBody body) throws TemplateException, IOException
     {
-        // instantiate the tag class
+        /**
+         * Instantiate the tag object that we will render
+         */
         ComponentTag tag = new ComponentTag();
-
         
-        
-        // Component ID
+        /**
+         * Receive the "componentId" parameter and set it onto the tag
+         */
         TemplateModel idValue = (TemplateModel)params.get("componentId");
         if(idValue != null)
         {
@@ -70,8 +81,9 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
             tag.setComponent(componentId);
         }
         
-        
-        // Chrome ID
+        /**
+         * Receive the "chrome" parameter and set it onto the tag
+         */
         TemplateModel chromeValue = (TemplateModel)params.get("chrome");
         if(chromeValue != null)
         {        
@@ -83,8 +95,9 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
             tag.setChrome(chrome);
         }
         
-        
-        // Chromeless attribute        
+        /**
+         * Receive the "chromeless" parameter and set it onto the tag
+         */
         boolean chromeless = false;
         TemplateModel chromelessValue = (TemplateModel)params.get("chromeless");
         if (chromelessValue != null)
@@ -98,18 +111,18 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
         }
 
 
-        // execute the tag
-        String output = executeTag(tag);
-
-        // commit the output
+        /**
+         * Execute the tag
+         */
         try
         {
+            String output = executeTag(tag);
             env.getOut().write(output);
             env.getOut().flush();
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-            ex.printStackTrace();
+            throw new TemplateException("Unable to process tag and commit output", ex, env);
         }
     }
 }

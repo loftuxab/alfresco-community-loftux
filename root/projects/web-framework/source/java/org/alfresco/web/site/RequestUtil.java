@@ -32,12 +32,34 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.exception.RequestContextException;
+
 /**
  * @author muzquiano
  */
 public class RequestUtil
 {
+    /**
+     * A lightweight method for returning the request context that is bound
+     * to the current request.
+     * 
+     * If the request context is found, it is returned.  This is very quick
+     * and pays no performance penalty due to synchronized handling.
+     * 
+     * If the request context is not found, then the method calls into
+     * the protected _getRequestContext which is synchronized and pays the
+     * penalty of constructing the actual request context and binding it to
+     * the request context.
+     * 
+     * Thus, subsequent requests are isolated from this penalty and only the
+     * first player pays the penalty.
+     * 
+     * @param request
+     * @return
+     * @throws RequestContextException
+     */
     public static RequestContext getRequestContext(ServletRequest request)
+        throws RequestContextException
     {
         RequestContext context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT);
         if(context != null)
@@ -45,32 +67,66 @@ public class RequestUtil
             return context;
         }
         
-        // block so only a single thread pays the price
-        synchronized(RequestContext.class)
+        return _getRequestContext(request, false);
+    }
+    
+    /**
+     * Synchronized method that checks to see if a request context already
+     * exists as bound to the current request.  If not, one is created.
+     * 
+     * @param request
+     * @param forceNew
+     * @return
+     * @throws RequestContextException
+     */
+    protected static synchronized RequestContext _getRequestContext(ServletRequest request, boolean forceNew)
+        throws RequestContextException
+    {
+        /**
+         * If we already have a request context on the request, then we
+         * will simply return that.
+         */
+        RequestContext context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT); 
+        if(context != null)
         {
-            context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT); 
-            if(context == null)
-            {
-                try
-                {
-                    FrameworkHelper.initRequestContext(request);
-                    context = (RequestContext) request.getAttribute(ATTR_REQUEST_CONTEXT);
-                }
-                catch(Exception ex)
-                {
-                    ex.printStackTrace();
-                }
-            }
+            return context;
         }
+        
+        /**
+         * Create a new request context
+         * 
+         * This will be bound to the current request by the initRequestContext
+         * method.  Thus, we can just hand it back.
+         */
+        context = FrameworkHelper.initRequestContext(request);
+
         return context;
     }
 
-    public static void setRequestContext(HttpServletRequest request,
+    /**
+     * Binds the given request context to the given servlet request.
+     * 
+     * @param request
+     * @param context
+     */
+    public static void setRequestContext(ServletRequest request,
             RequestContext context)
     {
         request.setAttribute(ATTR_REQUEST_CONTEXT, context);
     }
 
+    /**
+     * Performs a servlet include.  This is the principal means
+     * for handling any kind of JSP include that occurs within the framework.
+     * 
+     * With this method, all dispatch path referencing is relative 
+     * to the request.
+     * 
+     * @param request
+     * @param response
+     * @param dispatchPath
+     * @throws ServletException
+     */
     public static void include(HttpServletRequest request,
             HttpServletResponse response, String dispatchPath)
             throws ServletException
@@ -85,6 +141,18 @@ public class RequestUtil
         }
     }
 
+    /**
+     * Performs a servlet include.  This is the principal means
+     * for handling any kind of JSP include that occurs within the framework.
+     * 
+     * With this method, all dispatch path referencing is relative 
+     * to the servlet context.
+     * 
+     * @param request
+     * @param response
+     * @param dispatchPath
+     * @throws ServletException
+     */    
     public static void include(ServletContext context, ServletRequest request,
             ServletResponse response, String dispatchPath)
             throws ServletException
@@ -100,6 +168,18 @@ public class RequestUtil
         }
     }
 
+    /**
+     * Performs a servlet forward.  This is the principal means
+     * for handling any kind of JSP include that occurs within the framework.
+     * 
+     * With this method, all dispatch path referencing is relative 
+     * to the request.
+     * 
+     * @param request
+     * @param response
+     * @param dispatchPath
+     * @throws ServletException
+     */    
     public static void forward(HttpServletRequest request,
             HttpServletResponse response, String dispatchPath)
             throws ServletException
@@ -114,6 +194,18 @@ public class RequestUtil
         }
     }
 
+    /**
+     * Performs a servlet forward.  This is the principal means
+     * for handling any kind of JSP include that occurs within the framework.
+     * 
+     * With this method, all dispatch path referencing is relative 
+     * to the servlet context.
+     * 
+     * @param request
+     * @param response
+     * @param dispatchPath
+     * @throws ServletException
+     */    
     public static void forward(ServletContext context, ServletRequest request,
             ServletResponse response, String dispatchPath)
             throws ServletException
@@ -129,5 +221,5 @@ public class RequestUtil
         }
     }
 
-    public static String ATTR_REQUEST_CONTEXT = "requestContext";
+    public static final String ATTR_REQUEST_CONTEXT = "requestContext";
 }

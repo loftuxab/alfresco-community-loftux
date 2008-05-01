@@ -24,12 +24,32 @@
  */
 package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
+
+import org.alfresco.web.site.exception.PageMapperException;
 
 /**
+ * Interface for custom PageMapper implementations.
+ * 
+ * A PageMapper is utilized by the request context instantiation process to map
+ * from page parameters (on the URL) into the current request context.
+ * 
+ * Classes implementing this interface are responsible for populating context
+ * onto a given request context instance.
+ * 
  * @author muzquiano
  */
 public interface PageMapper
 {
-    public void execute(RequestContext context, HttpServletRequest request);
+    
+    /**
+     * Execute the page mapper against the given request and populate into the
+     * provided request context instance.
+     * 
+     * @param context
+     *            the context
+     * @param request
+     *            the request
+     */
+    public void execute(RequestContext context, ServletRequest request) throws PageMapperException;
 }

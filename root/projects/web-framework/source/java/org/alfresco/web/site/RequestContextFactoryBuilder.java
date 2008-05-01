@@ -27,47 +27,64 @@ package org.alfresco.web.site;
 import org.alfresco.tools.ReflectionHelper;
 
 /**
+ * Manages the construction of RequestContextFactory objects.
+ * 
+ * The Web Framework configuration could specify one or more
+ * RequestContextFactory implementations.
+ * 
  * @author muzquiano
  */
 public class RequestContextFactoryBuilder
 {
+    
+    /**
+     * Instantiates a new request context factory builder.
+     */
     protected RequestContextFactoryBuilder()
     {
     }
 
+    /**
+     * Produces the default RequestContextFactory as identified by the
+     * Web Framework configuration
+     * 
+     * @return the request context factory
+     */
     public static RequestContextFactory newFactory()
     {
-        // default that we will use
+        // the default class name that we will use
         String className = "org.alfresco.web.site.HttpRequestContextFactory";
 
-        String _defaultId = Framework.getConfig().getDefaultRequestContextId();
+        // see if another class name was configured
         String _className = Framework.getConfig().getRequestContextFactoryClass();
         if (_className != null)
             className = _className;
 
+        // instantiate the object
         RequestContextFactory factory = (RequestContextFactory) ReflectionHelper.newObject(className);
-        factory.setId(_defaultId);
         
-        // log
+        // log the creation
         Framework.getLogger().debug("New request context factory: " + className);
 
         return factory;
     }
     
-    public static RequestContextFactory sharedFactory()
+    /**
+     * Produces the default RequestContextFactory instance and stores it
+     * locally so that it need not be created again.  This, in effect,
+     * creates a shared RequestContextFactory instance.
+     * 
+     * @return the request context factory
+     */
+    public synchronized static RequestContextFactory sharedFactory()
     {
-        if(factory == null)
+        if(sharedFactory == null)
         {
-            synchronized(RequestContextFactoryBuilder.class)
-            {
-                if(factory == null)
-                {
-                    factory = newFactory();
-                }
-            }
+            sharedFactory = newFactory();
         }
-        return factory;
+        return sharedFactory;
     }
     
-    protected static RequestContextFactory factory = null;
+    /** The shared factory. */
+    protected static RequestContextFactory sharedFactory = null;
 }

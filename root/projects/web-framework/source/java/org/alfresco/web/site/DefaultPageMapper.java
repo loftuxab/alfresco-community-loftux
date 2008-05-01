@@ -24,45 +24,79 @@
  */
 package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
 
+import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Theme;
 
 /**
+ * The default page mapper instance.
+ * 
+ * An out-of-the-box page mapper instance which can either be used straight
+ * away or can be looked upon as a reference for how to build your own.
+ * 
+ * This provides a very simple, request parameter based way of identifying
+ * pages, looking them up and mapping them into the request context.
+ * 
  * @author muzquiano
  */
 public class DefaultPageMapper extends AbstractPageMapper
 {
+    /**
+     * Instantiates a new default page mapper.
+     */
     public DefaultPageMapper()
     {
         super();
     }
     
-    protected String getDefaultPageId(RequestContext context, String pageTypeId)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractPageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
+     */
+    public void execute(RequestContext context, ServletRequest request)
+        throws PageMapperException
     {
-        if(pageTypeId == null)
-        {
-            return null;
-        }
-        
-        return context.getConfig().getDefaultPageTypeInstanceId(pageTypeId);
-    }
+        /**
+         * For this default instance, we assume that requests arrive
+         * via servlet invocation and that all elements to be mapped into
+         * the request context are described by request parameters.
+         * 
+         * The following request parameter keys are defined:
+         * 
+         * f    The format id
+         * p    The page id
+         * o    The object id
+         * pt   The page type id
+         * 
+         * Thus, requests may arrive in the following example patterns:
+         * 
+         * A simple request for a page:
+         *      ?p=<pageId>
+         * 
+         * A request for a page in a given format:
+         *      ?p=<pageId>&f=<formatId>
+         *      
+         * A request for an object:
+         *      ?o=<objectId>
+         * 
+         * A request for a page with an object bound into context:
+         *      ?p=<pageId>&o=<objectId>
+         *      
+         * A request for a page of a specific type:
+         *      ?pt=<pageTypeId>
+         *      
+         * A request for a page of a specific type, with format and object binding:
+         *      ?pt=<pageTypeId>&f=<formatId>&o=<objectId>
+         *      
+         * For an empty request, a best effort is made to determine the root
+         * page for the site.
+         * 
+         */
 
-    public void execute(RequestContext context, HttpServletRequest request)
-    {
-        // init
-        // requests come in the form
-        // ?f=formatId&p=pageId
-        // ?f=formatId&p=pageId&o=objectId
-        // ?p=pageId
-        // ?p=pageId&o=objectId
-        // ?pt=pageTypeId
-        // ?pt=pageTypeId&f=formatId
-        // ?pt=pageTypeId&f=formatId&o=objectId
-        // ? (node id assumed to be site root node)
-
-        // format id
+        /**
+         * Extract the format id and set onto the request context
+         */
         String formatId = (String) request.getParameter("f");
         if (formatId == null || formatId.length() == 0)
         {
@@ -73,21 +107,36 @@ public class DefaultPageMapper extends AbstractPageMapper
             context.setCurrentFormatId(formatId);
         }
 
-        // object id
+        /**
+         * Extract the object id and set onto the request context
+         */
         String objectId = (String) request.getParameter("o");
         if (objectId != null && objectId.length() != 0)
         {
             context.setCurrentObjectId(objectId);
         }
 
-        // page type id
+        /**
+         * Extract the page type id and determine which page to bind
+         * into the request context.
+         * 
+         * This checks to see if a theme is defined and whether said theme
+         * describes an override for this page type.
+         * 
+         * Otherwise, a check is made to see if a system default page has
+         * been specified for this page type.
+         * 
+         * Finally, if nothing can be determined, a generic page is
+         * bound into the request context.
+         */
         String pageTypeId = (String) request.getParameter("pt");
         if(pageTypeId != null && pageTypeId.length() != 0)
         {
-            // the page id to which we will resolve
             String pageId = null;
-            
-            // see if the current theme has defined an "override"
+
+            /**
+             * Consider the theme
+             */
             String themeId = (String) context.getThemeId();
             Theme theme = context.getModel().loadTheme(context, themeId);
             if(theme != null)
@@ -95,19 +144,25 @@ public class DefaultPageMapper extends AbstractPageMapper
                 pageId = theme.getDefaultPageId(pageTypeId);
             }
             
-            // otherwise, look up the system default
+            /**
+             * Consider whether a system default has been set up
+             */
             if(pageId == null)
             {
                 pageId = (String) getDefaultPageId(context, pageTypeId);
             }
             
-            // if we still couldn't resolve, we can use a generic page            
+            /**
+             * Worst case, pick a generic page
+             */           
             if(pageId == null)
             {
                 pageId = (String) getDefaultPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
             }
             
-            // load page into context (if we can)
+            /**
+             * Bind the page into the context
+             */
             if(pageId != null)
             {
                 Page page = context.getModel().loadPage(context, pageId);
@@ -118,7 +173,9 @@ public class DefaultPageMapper extends AbstractPageMapper
             }
         }
         
-        // page id
+        /**
+         * Extract the page id and set it onto the context
+         */
         String pageId = (String) request.getParameter("p");
         if(pageId != null && pageId.length() != 0)
         {

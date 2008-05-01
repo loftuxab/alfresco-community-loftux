@@ -32,6 +32,7 @@ import java.util.Map;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -199,14 +200,21 @@ public class Timer
                     label = "ms";
                 }
 
-                RequestContext context = RequestUtil.getRequestContext(request);
-                if(context == null)
+                try
                 {
-                    print("[" + blockId + "] took " + value + " " + label);
+                    RequestContext context = RequestUtil.getRequestContext(request);
+                    if(context == null)
+                    {
+                        print("[" + blockId + "] took " + value + " " + label);
+                    }
+                    else
+                    {
+                        print("[" + context.getId() + ":" + blockId + "] took " + value + " " + label);
+                    }
                 }
-                else
+                catch(RequestContextException rce)
                 {
-                    print("[" + context.getId() + ":" + blockId + "] took " + value + " " + label);
+                    logger.debug("Unable to generate report line - RequestContextException", rce);
                 }
             }
         }

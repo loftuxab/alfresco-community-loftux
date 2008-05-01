@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -41,24 +41,35 @@ import org.alfresco.config.element.GenericConfigElement;
  * 
  * Thus, this class allows for these container elements to be merged
  * and makes it possible for the framework to support loading of
- * configuration from multiple web-site-config.xml and 
+ * configuration from multiple web-site-config.xml and
  * web-site-config-*.xml files.
  * 
  * @author muzquiano
  */
 public class WebSiteConfigElement extends GenericConfigElement
 {
+    
+    /**
+     * Instantiates a new web site config element.
+     * 
+     * @param name the name
+     */
     public WebSiteConfigElement(String name)
     {
         super(name);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.config.element.GenericConfigElement#combine(org.alfresco.config.ConfigElement)
+     */
     public ConfigElement combine(ConfigElement configElement)
     {
         WebSiteConfigElement combined = new WebSiteConfigElement(this.name);
         combined.setValue(configElement.getValue());
 
-        // add the existing attributes to the new instance
+        /**
+         * Add the existing attributes to the new instance
+         */
         if (this.attributes != null)
         {
             Iterator<String> attrs = this.getAttributes().keySet().iterator();
@@ -70,7 +81,9 @@ public class WebSiteConfigElement extends GenericConfigElement
             }
         }
 
-        // add/combine the attributes from the given instance
+        /**
+         * Add/combine the attributes from the given instance
+         */
         if (configElement.getAttributes() != null)
         {
             Iterator<String> attrs = configElement.getAttributes().keySet().iterator();
@@ -82,7 +95,9 @@ public class WebSiteConfigElement extends GenericConfigElement
             }
         }
 
-        // add the existing children to the new instance
+        /**
+         * Add the existing children to the new instance
+         */
         List<ConfigElement> kids = this.getChildren();
         if (kids != null)
         {
@@ -93,7 +108,9 @@ public class WebSiteConfigElement extends GenericConfigElement
             }
         }
 
-        // add the children from the given instance
+        /**
+         * Add the children from the given instance
+         */
         kids = configElement.getChildren();
         if (kids != null)
         {
@@ -101,10 +118,15 @@ public class WebSiteConfigElement extends GenericConfigElement
             {
                 ConfigElement ce = kids.get(x);
                 
-                // "container" node
+                /**
+                 * If this is one of our defined "merge" nodes,
+                 * then allow the children to be merged together
+                 */
                 if(isMergeChildElement(ce.getName()))
                 {
-                	// find the existing child on the combined object
+                    /**
+                     * Find the existing child on the combined object
+                     */
                 	int combinedIndex = -1;
                 	ConfigElement combinedChild = null;
                 	for(int c = 0; c < combined.children.size(); c++)
@@ -117,10 +139,15 @@ public class WebSiteConfigElement extends GenericConfigElement
                 		}
                 	}
                 	
-                	// get all of the "libraries" children and place them into the combinedChild children
+                    /**
+                     * get all of the "merge-node" children and place them into 
+                     * the combinedChild children
+                     */
                 	ConfigElement newCombinedChild = combinedChild.combine(ce);
                 	
-                	// replace the combined child with the new one
+                    /**
+                     * Replace the combined child with the new one
+                     */
                 	combined.children.remove(combinedIndex);
                 	combined.children.add(combinedIndex, newCombinedChild);
                 }
@@ -134,8 +161,16 @@ public class WebSiteConfigElement extends GenericConfigElement
         return combined;
     }
 
+    /** The merge child names. */
     protected static String[] mergeChildNames = new String[] { "definitions", "elements", "types", "libraries", "factories", "connectors", "authenticators", "pages", "containers" };
 
+    /**
+     * Checks if is merge child element.
+     * 
+     * @param name the name
+     * 
+     * @return true, if is merge child element
+     */
     protected boolean isMergeChildElement(String name)
     {
         for (int i = 0; i < mergeChildNames.length; i++)
@@ -147,12 +182,10 @@ public class WebSiteConfigElement extends GenericConfigElement
     }
 
     /**
-     * Adds the attribute with the given name and value
+     * Adds the attribute with the given name and value.
      * 
-     * @param name
-     *            Name of the attribute
-     * @param value
-     *            Value of the attribute
+     * @param name Name of the attribute
+     * @param value Value of the attribute
      */
     public void addAttribute(String name, String value)
     {
@@ -160,10 +193,9 @@ public class WebSiteConfigElement extends GenericConfigElement
     }
 
     /**
-     * Adds the given config element as a child of this element
+     * Adds the given config element as a child of this element.
      * 
-     * @param configElement
-     *            The child config element
+     * @param configElement The child config element
      */
     public void addChild(ConfigElement configElement)
     {

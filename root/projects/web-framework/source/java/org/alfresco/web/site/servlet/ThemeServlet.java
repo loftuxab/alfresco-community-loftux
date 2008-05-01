@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
+import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * Listens for AJAX calls to update the theme for the current user
@@ -50,7 +51,15 @@ public class ThemeServlet extends BaseServlet
             HttpServletResponse response) throws ServletException, IOException
     {
         // get the request context
-        RequestContext context = RequestUtil.getRequestContext(request);
+        RequestContext context = null;
+        try
+        {
+            context = RequestUtil.getRequestContext(request);
+        }
+        catch(RequestContextException rce)
+        {
+            throw new ServletException("Unable to retrieve request context from request", rce);
+        }
 
         // the new theme
         String themeId = (String) request.getParameter("themeId");

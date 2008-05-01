@@ -29,16 +29,26 @@ import java.io.File;
 import org.alfresco.web.site.filesystem.IFileSystem;
 
 /**
+ * The Class CacheFactory.
+ * 
  * @author muzquiano
  */
 public class CacheFactory
 {
+    
+    /**
+     * Instantiates a new cache factory.
+     */
     private CacheFactory()
     {
     }
 
     /**
-     *  Creates a basic in-memory cache
+     * Creates a basic in-memory cache.
+     * 
+     * @param timeout the timeout
+     * 
+     * @return the i content cache
      */
     public static IContentCache createBasicCache(long timeout)
     {
@@ -46,7 +56,12 @@ public class CacheFactory
     }
 
     /**
-     *  Creates an ADS Object cache
+     * Creates an ADS Object cache.
+     * 
+     * @param fileSystem the file system
+     * @param timeout the timeout
+     * 
+     * @return the i content cache
      */
     public static IContentCache createADSCache(IFileSystem fileSystem,
             long timeout)
@@ -55,7 +70,15 @@ public class CacheFactory
     }
 
     /**
-     *  Creates a persistent disk-memory cache
+     * Creates a persistent disk-memory cache.
+     * 
+     * @param cacheId the cache id
+     * @param timeout the timeout
+     * @param cacheDir the cache dir
+     * 
+     * @return the i content cache
+     * 
+     * @throws Exception the exception
      */
     public static IContentCache createPersistentCache(String cacheId,
             long timeout, String cacheDir) throws Exception
@@ -88,9 +111,16 @@ public class CacheFactory
     }
 
     /**
-     *  Creates a persistent disk-memory cache from the default properties settings.
-     *  If no cache directory is available, then the assumption is that persisted
-     *  caching is disabled and an exception is thrown.
+     * Creates a persistent disk-memory cache from the default properties settings.
+     * If no cache directory is available, then the assumption is that persisted
+     * caching is disabled and an exception is thrown.
+     * 
+     * @param cacheId the cache id
+     * @param timeout the timeout
+     * 
+     * @return the i content cache
+     * 
+     * @throws Exception the exception
      */
     public static IContentCache createPersistentCache(String cacheId,
             long timeout) throws Exception
@@ -106,7 +136,9 @@ public class CacheFactory
     }
 
     /**
-     *  Returns whether persistent caching is enabled
+     * Returns whether persistent caching is enabled.
+     * 
+     * @return true, if checks if is persistent cache
      */
     public static boolean isPersistentCache()
     {
@@ -114,8 +146,10 @@ public class CacheFactory
     }
 
     /**
-     *  Returns the cache location as in the properties.txt file.
-     *  If the location is invalid, doesn't exist or empty, then NULL is returned.
+     * Returns the cache location as in the properties.txt file.
+     * If the location is invalid, doesn't exist or empty, then NULL is returned.
+     * 
+     * @return the properties cache location
      */
     private static String getPropertiesCacheLocation()
     {
@@ -145,10 +179,13 @@ public class CacheFactory
         return propertiesCacheLocation;
     }
 
+    /** The properties cache location. */
     private static String propertiesCacheLocation;
 
     /**
-     *  Returns whether reporting is enabled for the cache in the properties file
+     * Returns whether reporting is enabled for the cache in the properties file.
+     * 
+     * @return true, if checks if is reporting enabled
      */
     private static boolean isReportingEnabled()
     {

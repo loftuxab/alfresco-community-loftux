@@ -24,17 +24,50 @@
  */
 package org.alfresco.web.site;
 
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.ServletRequest;
+
+import org.alfresco.web.site.exception.PageMapperException;
 
 /**
+ * Abstract class for use in building custom page mappers.
+ * 
+ * This abstract class intends to make things a little easier for application
+ * developers.  It also provides helper methods that may be useful in writing
+ * your own page mapper instances.
+ * 
  * @author muzquiano
  */
 public abstract class AbstractPageMapper implements PageMapper
 {
+    /**
+     * Instantiates a new abstract page mapper.
+     */
     public AbstractPageMapper()
     {
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.PageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
+     */
     public abstract void execute(RequestContext context,
-            HttpServletRequest request);
+            ServletRequest request) throws PageMapperException;
+    
+    /**
+     * Gets the default page id.
+     * 
+     * @param context the context
+     * @param pageTypeId the page type id
+     * 
+     * @return the default page id
+     */
+    protected String getDefaultPageId(RequestContext context, String pageTypeId)
+    {
+        if(pageTypeId == null)
+        {
+            return null;
+        }
+        
+        return context.getConfig().getDefaultPageTypeInstanceId(pageTypeId);
+    }
+    
 }
