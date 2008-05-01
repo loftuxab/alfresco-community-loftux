@@ -49,21 +49,17 @@ import java.util.Map;
  */
 public class SlingshotLinkBuilder extends AbstractLinkBuilder
 {
+    
+    /**
+     * Instantiates a new slingshot link builder.
+     */
     public SlingshotLinkBuilder()
     {
         super();
     }
 
-    /**
-     * Constructs a link to a given page for a given format.
-     * The provided object is passed in as context.
-     * The provided parameters are appended to the URL.
-     * 
-     * @param context The Request Context instance
-     * @param pageId The id of the page instance
-     * @param formatId The id of the format to render
-     * @param objectId The id of the object
-     * @param params A map of name/value pairs to be appended to the URL
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractLinkBuilder#page(org.alfresco.web.site.RequestContext, java.lang.String, java.lang.String, java.lang.String, java.util.Map)
      */
     public String page(RequestContext context, String pageId, 
             String formatId, String objectId, Map<String, String> params)
@@ -80,7 +76,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         // TODO: how should we handle the format?
 
         // construct the url
-        StringBuffer buffer = new StringBuffer();
+        StringBuffer buffer = new StringBuffer(128);
         buffer.append("/page/" + pageId);
         
         boolean first = true;        
@@ -114,16 +110,8 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         return URLUtil.browser(context, buffer.toString());
     }
     
-    /**
-     * Constructs a link to a given page type for a given format.
-     * The provided object is passed in as context.
-     * The provided parameters are appended to the URL.
-     * 
-     * @param context The Request Context instance
-     * @param pageTypeId The type of the page
-     * @param formatId The id of the format to render
-     * @param objectId The id of the object
-     * @param params A map of name/value pairs to be appended to the URL
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractLinkBuilder#pageType(org.alfresco.web.site.RequestContext, java.lang.String, java.lang.String, java.lang.String, java.util.Map)
      */
     public String pageType(RequestContext context, String pageTypeId, 
             String formatId, String objectId, Map<String, String> params)
@@ -137,7 +125,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
             formatId = context.getConfig().getDefaultFormatId();
         }
 
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(128);
         buffer.append("?f=" + formatId);
         buffer.append("&pt=" + pageTypeId);
         if (objectId != null && objectId.length() != 0)
@@ -156,18 +144,10 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
 
         return buffer.toString();
     }    
-    
-    
-    /**
-     * Constructs a link to a given object.
-     * The provided object is passed in as context.
-     * The provided parameters are appended to the URL.
-     * 
-     * @param context The Request Context instance
-     * @param objectId The id of the object
-     * @param formatId The id of the format to render
-     * @param params A map of name/value pairs to be appended to the URL
-     */    
+        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractLinkBuilder#object(org.alfresco.web.site.RequestContext, java.lang.String, java.lang.String, java.util.Map)
+     */
     public String object(RequestContext context, String objectId,
             String formatId, Map<String, String> params)
     {
@@ -180,7 +160,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
             formatId = context.getConfig().getDefaultFormatId();
         }
 
-        StringBuffer buffer = new StringBuffer();
+        StringBuffer buffer = new StringBuffer(128);
         buffer.append("?f=" + formatId);
         buffer.append("&o=" + objectId);
       
