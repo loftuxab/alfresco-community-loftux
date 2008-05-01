@@ -1550,8 +1550,7 @@
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.slingshot.config}" />
-         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
+         <fileset dir="${dir.project.slingshot.config}" excludes="**/extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
@@ -2862,8 +2861,7 @@
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.dynamicwebsite.config}" />
-         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
+         <fileset dir="${dir.project.dynamicwebsite.config}" excludes="**/extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
@@ -2962,8 +2960,7 @@
          <fileset dir="${dir.project.core.src.java}" includes="log4j.properties" />
          <fileset dir="${dir.project.webscriptframework.config}" excludes="**/extension/**" />
          <fileset dir="${dir.project.webframework.config}" excludes="${excludes.webframework.config}" />
-         <fileset dir="${dir.project.extranet.config}" />
-         <!-- excludes="**/extension/**"  should be present in fileset above, TODO: fixit -->
+         <fileset dir="${dir.project.extranet.config}" excludes="**/extension/**" />
       </copy>
 
       <!-- add all JAR to WEB-INF/lib -->
