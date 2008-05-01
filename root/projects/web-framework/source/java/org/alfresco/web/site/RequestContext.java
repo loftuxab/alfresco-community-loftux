@@ -476,6 +476,4 @@ public abstract class RequestContext
     public static final String VALUE_IDENTITY_VAULT = "identity_vault";
     
     public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
-    
-
 }

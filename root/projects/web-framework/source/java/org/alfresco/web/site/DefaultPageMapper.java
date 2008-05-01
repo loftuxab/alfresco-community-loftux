@@ -65,9 +65,13 @@ public class DefaultPageMapper extends AbstractPageMapper
         // format id
         String formatId = (String) request.getParameter("f");
         if (formatId == null || formatId.length() == 0)
+        {
             formatId = context.getConfig().getDefaultFormatId();
+        }
         if (formatId != null)
+        {
             context.setCurrentFormatId(formatId);
+        }
 
         // object id
         String objectId = (String) request.getParameter("o");
@@ -113,7 +117,6 @@ public class DefaultPageMapper extends AbstractPageMapper
                 }
             }
         }
-        
         
         // page id
         String pageId = (String) request.getParameter("p");

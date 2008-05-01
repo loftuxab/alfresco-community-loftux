@@ -127,16 +127,16 @@ public class RenderDataHelper
         {
             newData = generate(context, (Component) object);
         }
-        if (object instanceof Page)
+        else if (object instanceof Page)
         {
             newData = generate(context, (Page) object);
         }
-        if (object instanceof TemplateInstance)
+        else if (object instanceof TemplateInstance)
         {
             newData = generate(context, (TemplateInstance) object);
         }
         
-        if(newData != null)
+        if (newData != null)
         {
             // populate with custom properties settings
             Map<String, Object> properties = object.getCustomProperties();

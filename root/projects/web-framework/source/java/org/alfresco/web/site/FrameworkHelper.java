@@ -58,8 +58,7 @@ public class FrameworkHelper
                 Config config = configService.getConfig("WebFramework");
 
                 // set the config onto the framework
-                DefaultFrameworkConfig webFrameworkConfig = new DefaultFrameworkConfig(
-                        config);
+                DefaultFrameworkConfig webFrameworkConfig = new DefaultFrameworkConfig(config);
                 Framework.setConfig(webFrameworkConfig);
 
                 // set the model onto the framework
@@ -84,7 +83,7 @@ public class FrameworkHelper
             if(request instanceof HttpServletRequest)
             {
                 // this is what we expect
-                RequestContext context = ((HttpRequestContextFactory) factory).newInstance((HttpServletRequest)request);
+                RequestContext context = ((HttpRequestContextFactory)factory).newInstance((HttpServletRequest)request);
                 RequestUtil.setRequestContext((HttpServletRequest)request, context);
             }
         }

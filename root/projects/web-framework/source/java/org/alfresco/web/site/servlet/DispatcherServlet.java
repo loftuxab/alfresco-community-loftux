@@ -65,8 +65,11 @@ public class DispatcherServlet extends BaseServlet
             HttpServletResponse response) throws ServletException, IOException
     {
         // bind a timer for reporting of dispatches
-        Timer.bindTimer(request);
-        Timer.start(request, "service");
+        if (Timer.isTimerEnabled())
+        {
+            Timer.bindTimer(request);
+            Timer.start(request, "service");
+        }
         
         setNoCacheHeaders(response);
         
@@ -74,10 +77,14 @@ public class DispatcherServlet extends BaseServlet
         RequestContext context = null;
         try
         {
-            Timer.start(request, "initRequestContext");
+            if (Timer.isTimerEnabled())
+                Timer.start(request, "initRequestContext");
+            
             FrameworkHelper.initRequestContext(request);
             context = RequestUtil.getRequestContext(request);
-            Timer.stop(request, "initRequestContext");
+            
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "initRequestContext");
         }
         catch (Exception ex)
         {
@@ -90,9 +97,13 @@ public class DispatcherServlet extends BaseServlet
         // dispatch
         try
         {
-            Timer.start(request, "dispatch");
+            if (Timer.isTimerEnabled())
+                Timer.start(request, "dispatch");
+            
             dispatch(context, request, response);
-            Timer.stop(request, "dispatch");
+            
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "dispatch");
         }
         catch (Throwable t)
         {
@@ -123,7 +134,7 @@ public class DispatcherServlet extends BaseServlet
             Framework.getLogger().error(t);
             
             // If it is a runtime exception, we should handle
-            if(t instanceof RuntimeException)
+            if (t instanceof RuntimeException)
             {
                 // TODO: How?
             }
@@ -134,12 +145,13 @@ public class DispatcherServlet extends BaseServlet
             }
         }
         
-        // stop the service timer
-        Timer.stop(request, "service");
-        
-        // print out any timing information (if enabled)
-        Timer.reportAll(request);
-        Timer.unbindTimer(request);
+        // stop the service timer and print out any timing information (if enabled)
+        if (Timer.isTimerEnabled())
+        {
+            Timer.stop(request, "service");
+            Timer.reportAll(request);
+            Timer.unbindTimer(request);
+        }
     }
 
     protected void dispatch(RequestContext context, HttpServletRequest request,
@@ -155,9 +167,10 @@ public class DispatcherServlet extends BaseServlet
     protected void ensureDispatchState(RequestContext context, HttpServletRequest request,
             HttpServletResponse response)
     {
-        if(context.getSiteConfiguration() == null)
+        if (context.getSiteConfiguration() == null)
         {
-            debug(context, "No site configuration - performing reset");
+            if (isDebugEnabled())
+                debug(context, "No site configuration - performing reset");
             
             // effectively, do a reset
             context.setCurrentPage(null);
@@ -172,7 +185,9 @@ public class DispatcherServlet extends BaseServlet
             Page rootPage = ModelUtil.getRootPage(context);
             if (rootPage != null)
             {
-                debug(context, "Set root page as current page");
+                if (isDebugEnabled())
+                    debug(context, "Set root page as current page");
+                
                 context.setCurrentPage(rootPage);
             }            
         }
@@ -184,20 +199,23 @@ public class DispatcherServlet extends BaseServlet
     {
         // we are either navigating to a NODE
         // or to a CONTENT OBJECT (xform object)
-        //
         String currentFormatId = context.getCurrentFormatId();
         String currentObjectId = context.getCurrentObjectId();
         String currentPageId = context.getCurrentPageId();
         Page currentPage = context.getCurrentPage();
         
-        debug(context, "Current Page ID: " + currentPageId);
-        debug(context, "Current Format ID: " + currentFormatId);
-        debug(context, "Current Object ID: " + currentObjectId);
+        if (isDebugEnabled())
+        {
+            debug(context, "Current Page ID: " + currentPageId);
+            debug(context, "Current Format ID: " + currentFormatId);
+            debug(context, "Current Object ID: " + currentObjectId);
+        }
                 
         // if at this point there really is nothing to view...
         if (currentPage == null && currentObjectId == null)
         {
-            debug(context, "No Page or Object determined");
+            if (isDebugEnabled())
+                debug(context, "No Page or Object determined");
             
             // Go to the getting started page
             RenderUtil.renderSystemPage(context, request, response, 
@@ -211,7 +229,8 @@ public class DispatcherServlet extends BaseServlet
             // if we have a page specified, then we'll go there
             if(currentPageId != null)
             {
-                debug(context, "Dispatching to Page: " + currentPageId);
+                if (isDebugEnabled())
+                    debug(context, "Dispatching to Page: " + currentPageId);
                 
                 // if there happens to be a content item specified as well, it will just become part of the context
                 // in other words, the content item doesn't determine the
@@ -223,7 +242,8 @@ public class DispatcherServlet extends BaseServlet
             else
             {
                 // otherwise, a page wasn't specified and a content item was
-                debug(context, "Dispatching to Content Object: " + currentObjectId);
+                if (isDebugEnabled())
+                    debug(context, "Dispatching to Content Object: " + currentObjectId);
                 
                 dispatchContent(context, request, response, currentObjectId,
                         currentFormatId);
@@ -257,7 +277,8 @@ public class DispatcherServlet extends BaseServlet
 
         // TODO
         String sourceId = "content type id";
-        debug(context, "Content - Object Source Id: " + sourceId); 
+        if (isDebugEnabled())
+            debug(context, "Content - Object Source Id: " + sourceId); 
 
         // Once we determine the "sourceId", we can do the following
 
@@ -269,7 +290,8 @@ public class DispatcherServlet extends BaseServlet
             Page page = associations[0].getPage(context);
             if (page != null)
             {
-                debug(context, "Content - Dispatching to Page: " + page.getId());
+                if (isDebugEnabled())
+                    debug(context, "Content - Dispatching to Page: " + page.getId());
                 
                 // dispatch to content page
                 context.setCurrentPage(page);
@@ -283,20 +305,28 @@ public class DispatcherServlet extends BaseServlet
             String formatId) throws RequestDispatchException
     {
         Page page = context.getCurrentPage();
-        debug(context, "Template ID: " +page.getTemplateId()); 
+        if (isDebugEnabled())
+            debug(context, "Template ID: " +page.getTemplateId()); 
         TemplateInstance currentTemplate = page.getTemplate(context);
         if (currentTemplate != null)
         {
-            debug(context, "Rendering Page with template: " + currentTemplate.getId()); 
+            if (isDebugEnabled())
+                debug(context, "Rendering Page with template: " + currentTemplate.getId()); 
             PresentationUtil.renderPage(context, request, response);
         }
         else
         {
-            debug(context, "Unable to render Page - template was not found");            
+            if (isDebugEnabled())
+                debug(context, "Unable to render Page - template was not found");            
             RenderUtil.renderSystemPage(context, request, response, 
                     WebFrameworkConstants.SYSTEM_PAGE_UNCONFIGURED,
                     WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_UNCONFIGURED);
         }
+    }
+    
+    protected static boolean isDebugEnabled()
+    {
+        return Framework.getLogger().isDebugEnabled();
     }
     
     protected static void debug(RequestContext context, String value)

@@ -56,7 +56,7 @@ public class Timer
      */
     protected static void print(String value)
     {
-        if(logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
             logger.debug(value);
         }
@@ -72,7 +72,7 @@ public class Timer
      * 
      * @return Whether the timer functionality is enabled or not
      */
-    protected static boolean isTimerEnabled()
+    public static boolean isTimerEnabled()
     {
         return Framework.getConfig().getDebugTimerEnabled();
     }
@@ -98,14 +98,11 @@ public class Timer
     
     public static void bindTimer(ServletRequest request, boolean forceNew)
     {
-        if(isTimerEnabled())
+        Timer t = (Timer) request.getAttribute(TIMER_KEY);
+        if(t == null || forceNew)
         {
-            Timer t = (Timer) request.getAttribute(TIMER_KEY);
-            if(t == null || forceNew)
-            {
-                t = new Timer();
-                request.setAttribute(TIMER_KEY, t);
-            }
+            t = new Timer();
+            request.setAttribute(TIMER_KEY, t);
         }
     }
     
@@ -117,10 +114,7 @@ public class Timer
      */
     public static void unbindTimer(ServletRequest request)
     {
-        if(isTimerEnabled())
-        {
-            request.removeAttribute(TIMER_KEY);
-        }
+        request.removeAttribute(TIMER_KEY);
     }
     
     /**
@@ -132,58 +126,52 @@ public class Timer
      */
     public static void start(ServletRequest request, String blockId)
     {
-        if(isTimerEnabled())
+        if(blockId == null)
         {
-            if(blockId == null)
+            return;
+        }
+        
+        Timer t = (Timer) request.getAttribute(TIMER_KEY);
+        if(t != null)
+        {
+            // check if this timer has not already been started
+            if(t.startTimes.get(blockId) == null)
             {
-                return;
+                t.keys.add(blockId);
             }
             
-            Timer t = (Timer) request.getAttribute(TIMER_KEY);
-            if(t != null)
-            {
-                // check if this timer has not already been started
-                if(t.startTimes.get(blockId) == null)
-                {
-                    t.keys.add(blockId);
-                }
-                
-                Long l = new Long(System.nanoTime());
-                t.startTimes.put(blockId, l);
-            }
+            Long l = new Long(System.nanoTime());
+            t.startTimes.put(blockId, l);
         }
     }
     
     public static void stop(ServletRequest request, String blockId)
     {
-        if(isTimerEnabled())
-        {
-            long endTime = System.nanoTime();
+        long endTime = System.nanoTime();
 
-            Timer t = (Timer) request.getAttribute(TIMER_KEY);
-            if(t != null)
+        Timer t = (Timer) request.getAttribute(TIMER_KEY);
+        if(t != null)
+        {
+            // start time
+            Long startTime = (Long) t.startTimes.get(blockId);
+            if(startTime != null)
             {
-                // start time
-                Long startTime = (Long) t.startTimes.get(blockId);
-                if(startTime != null)
+                // execution time
+                long executionTime = endTime - startTime.longValue();
+                
+                // add to total time
+                Long totalTime = (Long) t.totalTimes.get(blockId);
+                if(totalTime == null)
                 {
-                    // execution time
-                    long executionTime = endTime - startTime.longValue();
-                    
-                    // add to total time
-                    Long totalTime = (Long) t.totalTimes.get(blockId);
-                    if(totalTime == null)
-                    {
-                        totalTime = new Long(executionTime);
-                    }
-                    else
-                    {
-                        totalTime = new Long(totalTime.longValue() + executionTime);
-                    }
-                    
-                    // store back
-                    t.totalTimes.put(blockId, totalTime);
+                    totalTime = new Long(executionTime);
                 }
+                else
+                {
+                    totalTime = new Long(totalTime.longValue() + executionTime);
+                }
+                
+                // store back
+                t.totalTimes.put(blockId, totalTime);
             }
         }
     }
@@ -196,51 +184,45 @@ public class Timer
      */
     public static void report(ServletRequest request, String blockId)
     {
-        if(isTimerEnabled())
+        Timer t = (Timer) request.getAttribute(TIMER_KEY);
+        if(t != null)
         {
-            Timer t = (Timer) request.getAttribute(TIMER_KEY);
-            if(t != null)
+            Long l = (Long) t.totalTimes.get(blockId);
+            if(l != null)
             {
-                Long l = (Long) t.totalTimes.get(blockId);
-                if(l != null)
+                long value = (long) l.longValue();
+                String label = "ns";
+                
+                if(Timer.showMilliseconds())
                 {
-                    long value = (long) l.longValue();
-                    String label = "ns";
-                    
-                    if(Timer.showMilliseconds())
-                    {
-                        value = (long)(value / 1000000);
-                        label = "ms";
-                    }
+                    value = (long)(value / 1000000);
+                    label = "ms";
+                }
 
-                    RequestContext context = RequestUtil.getRequestContext(request);
-                    if(context == null)
-                    {
-                        print("[" + blockId + "] took " + value + " " + label);
-                    }
-                    else
-                    {
-                        print("[" + context.getId() + ":" + blockId + "] took " + value + " " + label);
-                    }
+                RequestContext context = RequestUtil.getRequestContext(request);
+                if(context == null)
+                {
+                    print("[" + blockId + "] took " + value + " " + label);
+                }
+                else
+                {
+                    print("[" + context.getId() + ":" + blockId + "] took " + value + " " + label);
                 }
             }
-        }        
+        }
     }
     
     public static void reportAll(ServletRequest request)
     {
-        if(isTimerEnabled())
+        Timer t = (Timer) request.getAttribute(TIMER_KEY);
+        if(t != null)
         {
-            Timer t = (Timer) request.getAttribute(TIMER_KEY);
-            if(t != null)
+            // report timing blocks in order they were received
+            Iterator it = t.keys.iterator();
+            while(it.hasNext())
             {
-                // report timing blocks in order they were received
-                Iterator it = t.keys.iterator();
-                while(it.hasNext())
-                {
-                    String blockId = (String) it.next();
-                    report(request, blockId);
-                }
+                String blockId = (String) it.next();
+                report(request, blockId);
             }
         }
     }
@@ -255,5 +237,4 @@ public class Timer
     protected Map<String, Long> totalTimes;
     protected Map<String, Long> startTimes;
     protected List<String> keys;
-
 }
