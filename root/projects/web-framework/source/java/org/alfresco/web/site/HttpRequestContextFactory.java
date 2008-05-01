@@ -104,9 +104,7 @@ public class HttpRequestContextFactory extends RequestContextFactory
     public void initStoreId(RequestContext context, HttpServletRequest request)
     {
         String defId = context.getConfig().getDefaultRequestContextId();
-        String storeId = context.getConfig().getRequestContextSetting(defId,
-                "store");
+        String storeId = context.getConfig().getRequestContextSetting(defId, "store");
         context.setStoreId(storeId);
     }
-
 }

@@ -80,7 +80,8 @@ public class RenderUtil
             String dispatchPath) throws JspRenderException
     {
         // start a timer
-        Timer.start(request, "RenderJspPage-" + dispatchPath);
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderJspPage-" + dispatchPath);
         
         try
         {
@@ -95,7 +96,8 @@ public class RenderUtil
         }
         finally
         {
-            Timer.stop(request, "RenderJspPage-" + dispatchPath);
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderJspPage-" + dispatchPath);
         }
     }
 
@@ -125,7 +127,8 @@ public class RenderUtil
             String pageId) throws PageRenderException
     {
         // start a timer
-        Timer.start(request, "RenderPage-" + pageId);
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderPage-" + pageId);
         
         // look up the page
         Page page = (Page) context.getModel().loadPage(context, pageId);
@@ -149,14 +152,11 @@ public class RenderUtil
             RenderDataHelper.bind(context, page);
             
             // Wrap the Request and Response
-            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
-                    request);
-            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(
-                    response);
+            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
+            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(response);
 
             // Execute the template        
-            RenderUtil.renderTemplate(context, wrappedRequest, wrappedResponse,
-                    currentTemplate.getId());
+            RenderUtil.renderTemplate(context, wrappedRequest, wrappedResponse, currentTemplate.getId());
 
             // At this point, the template and all of the components
             // have executed.  We must now stamp the <!--${head}-->
@@ -193,7 +193,8 @@ public class RenderUtil
             // unbind the rendering context
             RenderDataHelper.unbind(context);
 
-            Timer.stop(request, "RenderPage-" + page.getId());
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderPage-" + page.getId());
         }
     }
 
@@ -213,7 +214,8 @@ public class RenderUtil
             String templateId) throws TemplateRenderException
     {
         // start a timer
-        Timer.start(request, "RenderTemplate-" + templateId);
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderTemplate-" + templateId);
 
         TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
                 templateId);
@@ -243,7 +245,8 @@ public class RenderUtil
             // unbind the rendering context
             RenderDataHelper.unbind(context);
             
-            Timer.stop(request, "RenderTemplate-" + templateId);            
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderTemplate-" + templateId);            
         }
     }
 
@@ -284,7 +287,8 @@ public class RenderUtil
             throws RegionRenderException
     {
         // start a timer
-        Timer.start(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
         
         // get the template
         TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
@@ -343,7 +347,8 @@ public class RenderUtil
             // unbind the rendering context
             RenderDataHelper.unbind(context);
             
-            Timer.stop(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
         }
     }
 
@@ -383,7 +388,8 @@ public class RenderUtil
             String componentId, String overrideChromeId) throws ComponentChromeRenderException
     {
         // start a timer
-        Timer.start(request, "RenderComponent-" + componentId);
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderComponent-" + componentId);
         
         Component component = context.getModel().loadComponent(context,
                 componentId);
@@ -414,9 +420,9 @@ public class RenderUtil
             // unbind the rendering context
             RenderDataHelper.unbind(context);
             
-            Timer.stop(request, "RenderComponent-" + componentId);
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderComponent-" + componentId);
         }
-            
     }
     
     /**
@@ -435,7 +441,8 @@ public class RenderUtil
             String componentId) throws ComponentRenderException
     {
         // start a timer
-        Timer.start(request, "RenderRawComponent-" + componentId);
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderRawComponent-" + componentId);
         
         Component component = context.getModel().loadComponent(context,
                 componentId);
@@ -467,7 +474,8 @@ public class RenderUtil
             // unbind the rendering context
             RenderDataHelper.unbind(context);
             
-            Timer.stop(request, "RenderRawComponent-" + componentId);
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderRawComponent-" + componentId);
         }
     }
 
@@ -619,29 +627,29 @@ public class RenderUtil
         // get the component association in that scope
         String sourceId = null;
         if (WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+        {
             sourceId = WebFrameworkConstants.REGION_SCOPE_GLOBAL;
+        }
         if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
+        {
             sourceId = template.getId();
+        }
         if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
+        {
             sourceId = page.getId();
+        }
 
         return sourceId;
-    }
-
-    protected static void appendBuffer(StringBuilder buffer, String toAppend)
-    {
-        buffer.append(toAppend);
-        buffer.append("\r\n"); // cosmetic
     }
 
     // TODO: Introduce some caching for this
     protected static String generateHeader(RequestContext context, HttpServletRequest request, HttpServletResponse response)
         throws Exception
     {
-        StringBuilder buffer = new StringBuilder();
-        appendBuffer(buffer, "\r\n");
-        appendBuffer(buffer, WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
-        appendBuffer(buffer, "\r\n");
+        StringBuilder buffer = new StringBuilder(256);
+        buffer.append("\r\n");
+        buffer.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
+        buffer.append("\r\n");
 
         /**
          * This is a work in progress.  Still not sure what the best
@@ -662,7 +670,7 @@ public class RenderUtil
             
             // execute renderer
             String tags = processRenderer(context, request, response, rendererType, renderer);
-            appendBuffer(buffer, tags);
+            buffer.append(tags);
         }
         
         // Now import the stuff that the components on the page needed us to import
@@ -670,7 +678,7 @@ public class RenderUtil
         for (int i = 0; i < tagsList.size(); i++)
         {
             String tags = (String) tagsList.get(i);
-            appendBuffer(buffer, tags);
+            buffer.append(tags);
         }
 
         return buffer.toString();
@@ -835,8 +843,6 @@ public class RenderUtil
     }
     
 
-    
-    
     // logic that I want to move somewhere else
 
     /**
