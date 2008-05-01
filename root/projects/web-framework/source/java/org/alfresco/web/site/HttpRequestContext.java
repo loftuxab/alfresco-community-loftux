@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * @author muzquiano
  */
-public class HttpRequestContext extends RequestContext
+public class HttpRequestContext extends AbstractRequestContext
 {
     public HttpRequestContext(HttpServletRequest request)
     {

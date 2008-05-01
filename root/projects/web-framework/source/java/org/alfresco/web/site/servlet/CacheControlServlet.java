@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.web.site.CacheUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
+import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * A servlet that can be used to invalidate the cache
@@ -50,7 +51,15 @@ public class CacheControlServlet extends BaseServlet
             HttpServletResponse response) throws ServletException, IOException
     {
         // get the request context
-        RequestContext context = RequestUtil.getRequestContext(request);
+        RequestContext context = null;
+        try 
+        {
+            context = RequestUtil.getRequestContext(request);
+        }
+        catch(RequestContextException rce)
+        {
+            throw new ServletException("Unable to retrieve request context from request", rce);
+        }
 
         // the command
         String command = (String) request.getParameter("command");

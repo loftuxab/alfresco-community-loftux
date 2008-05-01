@@ -28,7 +28,7 @@ import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.ModelObject;
 
-/** 
+/**
  * This is an enhancement on the basic cache that performs an additional
  * check to the source file within the AVM to see if timestamps have
  * changed.  This is not a persistent cache.  If objects are removed
@@ -38,14 +38,25 @@ import org.alfresco.web.site.model.ModelObject;
  */
 public class ModelObjectCache extends BasicCache
 {
+    
+    /**
+     * Instantiates a new model object cache.
+     * 
+     * @param fileSystem the file system
+     * @param default_timeout the default_timeout
+     */
     protected ModelObjectCache(IFileSystem fileSystem, long default_timeout)
     {
         super(default_timeout);
         this.fileSystem = fileSystem;
     }
 
+    /** The file system. */
     protected IFileSystem fileSystem = null;
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.BasicCache#get(java.lang.String)
+     */
     public synchronized Object get(String key)
     {
         ModelObject obj = (ModelObject) super.get(key);

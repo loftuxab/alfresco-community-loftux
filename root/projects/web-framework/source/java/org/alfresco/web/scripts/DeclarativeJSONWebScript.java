@@ -1,25 +1,25 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have recieved a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.scripts;
@@ -35,17 +35,29 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
+ * An implementation of a declarative web script base class automatically
+ * handles the JSON return type.  If the web script is of type "json", web
+ * scripts of this kind will process a json-specific template that hands
+ * back the serialized object.
+ * 
  * @author muzquiano
  */
 public class DeclarativeJSONWebScript extends AbstractWebScript
 {
     // Logger
+    /** The Constant logger. */
     protected static final Log logger = LogFactory.getLog(DeclarativeJSONWebScript.class);
 
     // Script Context
+    /** The base path. */
     protected String basePath;
+    
+    /** The execute script. */
     protected ScriptContent executeScript;
 
+    /**
+     * Instantiates a new declarative json web script.
+     */
     public DeclarativeJSONWebScript()
     {
     }
@@ -210,12 +222,10 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     }
 
     /**
-     * Merge script generated model into template-ready model
+     * Merge script generated model into template-ready model.
      * 
-     * @param scriptModel
-     *            script model
-     * @param templateModel
-     *            template model
+     * @param scriptModel script model
+     * @param templateModel template model
      */
     protected void mergeScriptModelIntoTemplateModel(
             Map<String, Object> scriptModel, Map<String, Object> templateModel)
@@ -231,13 +241,13 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     }
 
     /**
-     * Execute custom Java logic
+     * Execute custom Java logic.
      * 
-     * @param req
-     *            Web Script request
-     * @param status
-     *            Web Script status
+     * @param req Web Script request
+     * @param status Web Script status
+     * 
      * @return custom service model
+     * 
      * @deprecated
      */
     protected Map<String, Object> executeImpl(WebScriptRequest req,
@@ -247,13 +257,13 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     }
 
     /**
-     * Execute custom Java logic
+     * Execute custom Java logic.
      * 
-     * @param req
-     *            Web Script request
-     * @param status
-     *            Web Script status
+     * @param req Web Script request
+     * @param status Web Script status
+     * 
      * @return custom service model
+     * 
      * @deprecated
      */
     protected Map<String, Object> executeImpl(WebScriptRequest req,
@@ -263,14 +273,12 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     }
 
     /**
-     * Execute custom Java logic
+     * Execute custom Java logic.
      * 
-     * @param req
-     *            Web Script request
-     * @param status
-     *            Web Script status
-     * @param cache
-     *            Web Script cache
+     * @param req Web Script request
+     * @param status Web Script status
+     * @param cache Web Script cache
+     * 
      * @return custom service model
      */
     protected Map<String, Object> executeImpl(WebScriptRequest req,
@@ -282,26 +290,28 @@ public class DeclarativeJSONWebScript extends AbstractWebScript
     }
 
     /**
-     * Render a template (of given format) to the Web Script Response
+     * Render a template (of given format) to the Web Script Response.
      * 
-     * @param format
-     *            template format (null, default format)
-     * @param model
-     *            data model to render
-     * @param writer
-     *            where to output
+     * @param format template format (null, default format)
+     * @param model data model to render
+     * @param writer where to output
      */
     protected void renderFormatTemplate(String format,
             Map<String, Object> model, Writer writer)
     {
-        if ("json".equals(format) || format == null)
+        /**
+         * Handle the special JSON format case
+         */
+        if ("json".equals(format) || org.alfresco.web.scripts.Format.JSON.equals(format) || format == null)
         {
-            // the JSON case (default behavior)
             String template = "<#if json?exists>${json}</#if>";
             this.renderString(template, model, writer);
         }
         else
         {
+            /**
+             * Otherwise, process as before
+             */
             format = (format == null) ? "" : format;
             String templatePath = basePath + "." + format + ".ftl";
 

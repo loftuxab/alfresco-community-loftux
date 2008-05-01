@@ -130,18 +130,18 @@ public class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
             }
         }
 
-        // execute the tag
-        String output = executeTag(tag, bodyContentString);
-
-        // commit the output
+        /**
+         * Execute the tag
+         */
         try
         {
+            String output = executeTag(tag, bodyContentString);
             env.getOut().write(output);
             env.getOut().flush();
         }
-        catch (Exception ex)
+        catch(Exception ex)
         {
-            ex.printStackTrace();
-        }
+            throw new TemplateException("Unable to process tag and commit output", ex, env);
+        }        
     }
 }

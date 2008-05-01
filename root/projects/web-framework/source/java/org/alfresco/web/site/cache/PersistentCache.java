@@ -30,7 +30,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-/** 
+/**
  * This is a more advanced version of a cache that passivates objects to
  * disk.  If objects are cleaned out of the WeakHashMap, they are still
  * retained on disk and can be reloaded from disk.
@@ -42,6 +42,13 @@ import java.io.ObjectOutputStream;
  */
 public class PersistentCache extends BasicCache
 {
+    
+    /**
+     * Instantiates a new persistent cache.
+     * 
+     * @param default_timeout the default_timeout
+     * @param cacheDir the cache dir
+     */
     protected PersistentCache(long default_timeout, String cacheDir)
     {
         super(default_timeout);
@@ -53,6 +60,9 @@ public class PersistentCache extends BasicCache
      *  persistent cache.  If the object isn't in memory, it is reloaded from disk, if it
      *  exists.  The object is checked for expiration, lazily.  The object is cleaned up
      *  and null is returned if the timeout has expired.
+     */
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.BasicCache#get(java.lang.String)
      */
     public synchronized Object get(String key)
     {
@@ -132,6 +142,9 @@ public class PersistentCache extends BasicCache
     /*
      *  Removes the content object from the cache (both disk and memory)
      */
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.BasicCache#remove(java.lang.String)
+     */
     public synchronized void remove(String key)
     {
         if (key == null)
@@ -151,6 +164,9 @@ public class PersistentCache extends BasicCache
     /*
      *  Adds the given content object to the cache, keyed from the given path.
      *  If a content item exists at the given path, it is replaced.
+     */
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.BasicCache#put(java.lang.String, java.lang.Object, long)
      */
     public synchronized void put(String key, Object obj, long timeout)
     {
@@ -175,7 +191,11 @@ public class PersistentCache extends BasicCache
     }
 
     /**
-     *  Returns whether the disk-cached object for the given pathID exists.
+     * Returns whether the disk-cached object for the given pathID exists.
+     * 
+     * @param pathID the path id
+     * 
+     * @return true, if exists on disk
      */
     protected boolean existsOnDisk(String pathID)
     {
@@ -186,9 +206,13 @@ public class PersistentCache extends BasicCache
     }
 
     /**
-     *  Loads a content item from disk if it exists.
-     *  Returns null if the item doesn't exist on disk.
-     *  If the file on disk is corrupt, the file is cleaned up.
+     * Loads a content item from disk if it exists.
+     * Returns null if the item doesn't exist on disk.
+     * If the file on disk is corrupt, the file is cleaned up.
+     * 
+     * @param pathID the path id
+     * 
+     * @return the cache item
      */
     protected CacheItem loadFromDisk(String pathID)
     {
@@ -213,7 +237,12 @@ public class PersistentCache extends BasicCache
     }
 
     /**
-     *  Serializes the given content item to disk for the given path string.
+     * Serializes the given content item to disk for the given path string.
+     * 
+     * @param pathID the path id
+     * @param item the item
+     * 
+     * @return true, if write to disk
      */
     protected synchronized boolean writeToDisk(String pathID, CacheItem item)
     {
@@ -242,7 +271,9 @@ public class PersistentCache extends BasicCache
     }
 
     /**
-     *  Removes a content item cached file from disk for the given path id.
+     * Removes a content item cached file from disk for the given path id.
+     * 
+     * @param pathID the path id
      */
     protected void removeFromDisk(String pathID)
     {
@@ -254,7 +285,11 @@ public class PersistentCache extends BasicCache
     }
 
     /**
-     *  Returns the literal java.io.File path for the given path ID.
+     * Returns the literal java.io.File path for the given path ID.
+     * 
+     * @param pathID the path id
+     * 
+     * @return the cache file
      */
     protected File getCacheFile(String pathID)
     {
@@ -275,5 +310,6 @@ public class PersistentCache extends BasicCache
         return file;
     }
 
+    /** The m_cache location. */
     private String m_cacheLocation;
 }

@@ -26,21 +26,29 @@ package org.alfresco.web.site.cache;
 
 import java.util.WeakHashMap;
 
-/** 
+/**
  * This is an implementation of a purely in-memory cache that uses a
  * WeakHashMap to provide a basic form of caching.
  * 
- * @author muzquiano 
+ * @author muzquiano
  */
-
 public class BasicCache implements IContentCache
 {
+    
+    /**
+     * Instantiates a new basic cache.
+     * 
+     * @param default_timeout the default_timeout
+     */
     protected BasicCache(long default_timeout)
     {
         m_default_timeout = default_timeout;
         m_cache = new WeakHashMap(256);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#get(java.lang.String)
+     */
     public synchronized Object get(String key)
     {
         // get the content item from the cache
@@ -69,6 +77,9 @@ public class BasicCache implements IContentCache
         }
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#remove(java.lang.String)
+     */
     public synchronized void remove(String key)
     {
         if (key == null)
@@ -76,11 +87,17 @@ public class BasicCache implements IContentCache
         m_cache.remove(key);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#put(java.lang.String, java.lang.Object)
+     */
     public synchronized void put(String key, Object obj)
     {
         put(key, obj, m_default_timeout);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#put(java.lang.String, java.lang.Object, long)
+     */
     public synchronized void put(String key, Object obj, long timeout)
     {
         // create the cache item
@@ -91,33 +108,56 @@ public class BasicCache implements IContentCache
         debugLog("Cached '" + key + "' with timeout of " + timeout);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#invalidateAll()
+     */
     public void invalidateAll()
     {
         m_cache.clear();
     }
 
+    /** The m_cache. */
     protected WeakHashMap m_cache;
+    
+    /** The m_default_timeout. */
     protected long m_default_timeout;
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#isReporting()
+     */
     public boolean isReporting()
     {
         return m_bReporting;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.cache.IContentCache#setReporting(boolean)
+     */
     public void setReporting(boolean b)
     {
         m_bReporting = b;
     }
 
+    /**
+     * Gets the report title.
+     * 
+     * @return the report title
+     */
     protected String getReportTitle()
     {
         return "[Cache Thread " + Thread.currentThread().getName() + "]";
     }
 
+    /**
+     * Debug log.
+     * 
+     * @param str the str
+     */
     protected void debugLog(String str)
     {
         //System.out.println(str);
     }
 
+    /** The m_b reporting. */
     private boolean m_bReporting;
 }

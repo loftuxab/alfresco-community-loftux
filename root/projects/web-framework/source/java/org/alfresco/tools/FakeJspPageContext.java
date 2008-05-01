@@ -49,20 +49,40 @@ import javax.servlet.jsp.el.VariableResolver;
 import org.alfresco.web.site.RequestUtil;
 
 /**
- * Fake Jsp PageContext implementation which wraps predescribed HTTP objects
- *
+ * Fake Jsp PageContext implementation which wraps predescribed HTTP objects.
+ * 
  * @author muzquiano
  */
 public class FakeJspPageContext
 	extends PageContext
 {
+    
+    /** The exception. */
     protected Exception exception;
+	
+	/** The values. */
 	protected Map<String, Object> values;
+	
+	/** The context. */
 	protected ServletContext context;
+	
+	/** The request. */
 	protected HttpServletRequest request;
+	
+	/** The response. */
 	protected HttpServletResponse response;
+	
+	/** The out. */
 	protected JspWriter out;
 	
+    /**
+     * Instantiates a new fake jsp page context
+     * 
+     * @param context The ServletContext to wrap
+     * @param request The HttpServletRequest instance to wrap
+     * @param response The HttpServletResponse instance to wrap
+     * @param out The JspWriter to wrap
+     */
     public FakeJspPageContext(ServletContext context, HttpServletRequest request, HttpServletResponse response, JspWriter out)
     {
     	this.context = context;
@@ -71,36 +91,57 @@ public class FakeJspPageContext
     	this.out = out;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getRequest()
+     */
     public ServletRequest getRequest()
     {
     	return this.request;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getResponse()
+     */
     public ServletResponse getResponse()
     {
     	return this.response;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getServletContext()
+     */
     public ServletContext getServletContext()
     {
     	return this.context;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getServletConfig()
+     */
     public ServletConfig getServletConfig()
     {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getOut()
+     */
     public JspWriter getOut()
     {
         return this.out;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getSession()
+     */
     public HttpSession getSession()
     {
     	return this.request.getSession();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#findAttribute(java.lang.String)
+     */
     public Object findAttribute(String name)
     {
         Object ret = getAttribute(name, PAGE_SCOPE);
@@ -118,11 +159,17 @@ public class FakeJspPageContext
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getAttribute(java.lang.String)
+     */
     public Object getAttribute(String name)
     {
     	return findAttribute(name);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getAttribute(java.lang.String, int)
+     */
     public Object getAttribute(String name, int scope)
     {
         switch (scope)
@@ -145,11 +192,17 @@ public class FakeJspPageContext
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#setAttribute(java.lang.String, java.lang.Object)
+     */
     public void setAttribute(String name, Object obj)
     {
     	setValue(name, obj);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#setAttribute(java.lang.String, java.lang.Object, int)
+     */
     public void setAttribute(String name, Object obj, int scope)
     {
         switch (scope)
@@ -170,11 +223,17 @@ public class FakeJspPageContext
         }
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#removeAttribute(java.lang.String)
+     */
     public void removeAttribute(String name)
     {
         removeValue(name);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#removeAttribute(java.lang.String, int)
+     */
     public void removeAttribute(String name, int scope)
     {
         switch (scope)
@@ -195,6 +254,9 @@ public class FakeJspPageContext
         }
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getAttributeNamesInScope(int)
+     */
     public Enumeration getAttributeNamesInScope(int scope)
     {
         switch (scope)
@@ -211,6 +273,9 @@ public class FakeJspPageContext
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getAttributesScope(java.lang.String)
+     */
     public int getAttributesScope(String name)
     {
         if (getValue(name) != null)
@@ -229,16 +294,25 @@ public class FakeJspPageContext
         return 0;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#forward(java.lang.String)
+     */
     public void forward(String url) throws ServletException, IOException
     {
     	RequestUtil.forward(getServletContext(), getRequest(), getResponse(), url);    	
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#include(java.lang.String)
+     */
     public void include(String url) throws ServletException, IOException
     {
     	include(url, true);
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#include(java.lang.String, boolean)
+     */
     public void include(String url, boolean b) throws ServletException,
             IOException
     {
@@ -248,47 +322,77 @@ public class FakeJspPageContext
         flushOut();
     }
 
+    /**
+     * Flush out.
+     * 
+     * @throws IOException
+     *             Signals that an I/O exception has occurred.
+     */
     public void flushOut() throws java.io.IOException
     {
     	out.flush();
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#release()
+     */
     public void release()
     {
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getExpressionEvaluator()
+     */
     public ExpressionEvaluator getExpressionEvaluator()
     {
         return null;
 
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.JspContext#getVariableResolver()
+     */
     public VariableResolver getVariableResolver()
     {
         return null;
 
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#handlePageException(java.lang.Throwable)
+     */
     public void handlePageException(Throwable t)
     {
     	// TODO?
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#handlePageException(java.lang.Exception)
+     */
     public void handlePageException(Exception e)
     {
         exception = e;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getException()
+     */
     public Exception getException()
     {
     	return exception;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#getPage()
+     */
     public Object getPage()
     {
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see javax.servlet.jsp.PageContext#initialize(javax.servlet.Servlet, javax.servlet.ServletRequest, javax.servlet.ServletResponse, java.lang.String, boolean, int, boolean)
+     */
     public void initialize(Servlet srv, ServletRequest req,
             ServletResponse res, String s1, boolean b1, int i1, boolean b2)
     {
@@ -297,6 +401,14 @@ public class FakeJspPageContext
     
     // local page context helper methods
     
+    /**
+     * Gets the value.
+     * 
+     * @param key
+     *            the key
+     * 
+     * @return the value
+     */
     protected Object getValue(String key)
     {
     	if(values == null)
@@ -304,6 +416,14 @@ public class FakeJspPageContext
     	return values.get(key);
     }
     
+    /**
+     * Sets the value.
+     * 
+     * @param key
+     *            the key
+     * @param value
+     *            the value
+     */
     protected void setValue(String key, Object value)
     {
     	if(values == null)
@@ -311,6 +431,12 @@ public class FakeJspPageContext
     	values.put(key, value);
     }
     
+    /**
+     * Removes the value.
+     * 
+     * @param key
+     *            the key
+     */
     protected void removeValue(String key)
     {
     	if(values == null)
@@ -318,6 +444,11 @@ public class FakeJspPageContext
     	values.remove(key);
     }
     
+    /**
+     * Gets the value names.
+     * 
+     * @return the value names
+     */
     protected Enumeration getValueNames()
     {
     	ArrayList<Object> array = new ArrayList<Object>();

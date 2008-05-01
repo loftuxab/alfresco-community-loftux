@@ -26,6 +26,8 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.exception.UserFactoryException;
+
 public abstract class UserFactory
 {
     public static String SESSION_ATTRIBUTE_KEY_USER_OBJECT = "USER_OBJECT";
@@ -34,7 +36,7 @@ public abstract class UserFactory
     protected User guestUser = null;
 
     protected User getGuestUser(RequestContext context,
-            HttpServletRequest request) throws Exception
+            HttpServletRequest request) throws UserFactoryException
     {
         if (this.guestUser == null)
         {
@@ -47,7 +49,7 @@ public abstract class UserFactory
     }
 
     public User getUser(RequestContext context, HttpServletRequest request)
-            throws Exception
+        throws UserFactoryException
     {
         // check whether there is a "USER_ID" file in the session
         String userId = (String) request.getSession().getAttribute(
@@ -87,7 +89,7 @@ public abstract class UserFactory
     }
 
     protected abstract User loadUser(RequestContext context,
-            HttpServletRequest request, String user_id) throws Exception;
+            HttpServletRequest request, String user_id) throws UserFactoryException;
     
     public void setId(String id)
     {

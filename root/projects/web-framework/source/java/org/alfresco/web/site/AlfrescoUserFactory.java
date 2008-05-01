@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.remote.Connector;
 import org.alfresco.connector.remote.Response;
+import org.alfresco.web.site.exception.UserFactoryException;
 import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.remote.ConnectorFactory;
 
@@ -40,7 +41,7 @@ import org.alfresco.web.site.remote.ConnectorFactory;
 public class AlfrescoUserFactory extends UserFactory
 {
     protected User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws Exception
+            String user_id) throws UserFactoryException
     {
         // TODO: Somehow get the endpoint id...
         String endpointId = "";

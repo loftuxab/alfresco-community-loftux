@@ -26,10 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.connector.remote.Connector;
-import org.alfresco.connector.remote.Response;
-import org.alfresco.web.site.model.Endpoint;
-import org.alfresco.web.site.remote.ConnectorFactory;
+import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
  * The world's simplest user factory.
@@ -40,7 +37,7 @@ import org.alfresco.web.site.remote.ConnectorFactory;
 public class DefaultUserFactory extends UserFactory
 {
     public User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws Exception
+            String user_id) throws UserFactoryException
     {
         return this.getGuestUser(context, request);
     }

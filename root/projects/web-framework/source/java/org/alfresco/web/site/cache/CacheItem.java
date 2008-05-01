@@ -27,12 +27,23 @@ package org.alfresco.web.site.cache;
 import java.io.IOException;
 
 /**
+ * The Class CacheItem.
+ * 
  * @author muzquiano
  */
 public class CacheItem implements java.io.Serializable
 {
+    
+    /** The Constant serialVersionUID. */
     private static final long serialVersionUID = 4526472295622776147L;
 
+    /**
+     * Instantiates a new cache item.
+     * 
+     * @param key the key
+     * @param obj the obj
+     * @param timeout the timeout
+     */
     public CacheItem(String key, Object obj, long timeout)
     {
         m_timeout = timeout;
@@ -41,11 +52,23 @@ public class CacheItem implements java.io.Serializable
         m_stamp = System.currentTimeMillis();
     }
 
+    /** The m_key. */
     protected String m_key;
+    
+    /** The m_object. */
     protected Object m_object;
+    
+    /** The m_timeout. */
     protected long m_timeout;
+    
+    /** The m_stamp. */
     protected long m_stamp;
 
+    /**
+     * Checks if is expired.
+     * 
+     * @return true, if is expired
+     */
     public boolean isExpired()
     {
         // never timeout for -1
@@ -55,6 +78,13 @@ public class CacheItem implements java.io.Serializable
         return (m_timeout < (System.currentTimeMillis() - m_stamp));
     }
 
+    /**
+     * Write object.
+     * 
+     * @param out the out
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     */
     public void writeObject(java.io.ObjectOutputStream out) throws IOException
     {
         out.writeObject(this.m_key);
@@ -63,6 +93,14 @@ public class CacheItem implements java.io.Serializable
         out.writeObject(this.m_object);
     }
 
+    /**
+     * Read object.
+     * 
+     * @param in the in
+     * 
+     * @throws IOException Signals that an I/O exception has occurred.
+     * @throws ClassNotFoundException the class not found exception
+     */
     public void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException
     {

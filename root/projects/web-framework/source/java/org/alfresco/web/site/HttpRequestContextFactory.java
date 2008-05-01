@@ -27,55 +27,99 @@ package org.alfresco.web.site;
 import java.io.File;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.exception.PageMapperException;
+import org.alfresco.web.site.exception.RequestContextException;
+import org.alfresco.web.site.exception.UserFactoryException;
 import org.alfresco.web.site.filesystem.FileSystemManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
 
 /**
- * Produces HttpRequestContext objects that have access to the servlet context
- * file system.  These use the standard &f=formatId&o=objectId object linking
- * behavior that is out of the box with ADS.
+ * Produces HttpRequestContext instances for HttpServletRequest request
+ * inputs.  The HttpRequestContext type has an additional convenience
+ * accessor method.
  *  
  * @author muzquiano
  */
-public class HttpRequestContextFactory extends RequestContextFactory
+public class HttpRequestContextFactory implements RequestContextFactory
 {
-    public RequestContext newInstance() throws Exception
+    /**
+     * Produces a new RequestContext instance for a given request
+     * 
+     * @return The RequestContext instance
+     * @throws RequestContextException
+     */    
+    public RequestContext newInstance(ServletRequest request)
+        throws RequestContextException
     {
-        throw new Exception(
-                "Unable to instantiate HttpRequestContext without request");
-    }
-
-    public HttpRequestContext newInstance(HttpServletRequest request)
-            throws Exception
-    {
-        HttpRequestContext context = new HttpRequestContext(request);
-
-        // load the user onto the context
-        UserFactory userFactory = UserFactoryBuilder.sharedFactory();
-        if(userFactory != null)
+        if(!(request instanceof HttpServletRequest))
         {
-            User user = userFactory.getUser(context, request);
-            context.setUser(user);
+            throw new RequestContextException("HttpRequestContextFactory can only produce HttpRequestContext instances for HttpServletRequest requests");
         }
 
-        // TODO: Rethink if this is needed
-        // load properties from the request context properties block
-        // the store to run against (standalone mode)
-        initStoreId(context, request);
+        HttpRequestContext context = null;
+        
+        /**
+         * Load the user and place the user onto the RequestContext
+         */
+        try
+        {
+            /**
+             * Construct the HttpRequestContext instance
+             */
+            context = new HttpRequestContext((HttpServletRequest)request);
 
-        // initialize the file system
-        String rootPath = context.getConfig().getFileSystemRootPath("local");
-        initFileSystem(context, request, rootPath);
-
-        // populate the request context
-        PageMapper pageMapper = PageMapperFactory.newInstance(context);
-        pageMapper.execute(context, request);
+            /**
+             * Construct/load the user and place them onto the instance
+             */
+            UserFactory userFactory = UserFactoryBuilder.sharedFactory();
+            if(userFactory != null)
+            {
+                User user = userFactory.getUser(context, (HttpServletRequest)request);
+                context.setUser(user);
+            }
+            
+            /**
+             * Determine the store id and set it onto the request context
+             */
+            initStoreId(context);
+            
+            /**
+             * Initialize the file system
+             */
+            String rootPath = context.getConfig().getFileSystemRootPath("local");
+            initFileSystem(context, (HttpServletRequest)request, rootPath);
+            
+            /**
+             * Execute the configured page mapper
+             * 
+             * This will populate request context with information about
+             * how to render, based on the incoming URL
+             */
+            PageMapper pageMapper = PageMapperFactory.newInstance(context);
+            pageMapper.execute(context, (HttpServletRequest)request);
+        }
+        catch(UserFactoryException ufe)
+        {
+            throw new RequestContextException("Exception running UserFactory in HttpRequestContextFactory", ufe);
+        }
+        catch(PageMapperException pme)
+        {
+            throw new RequestContextException("Exception running PageMapper in HttpRequestContextFactory", pme);
+        }
         
         return context;
     }
 
+    /**
+     * Creates a FileSystem that points to the local web application root.
+     * 
+     * @param context
+     * @param request
+     * @param rootPath
+     */
     public void initFileSystem(RequestContext context,
             HttpServletRequest request, String rootPath)
     {
@@ -90,18 +134,15 @@ public class HttpRequestContextFactory extends RequestContextFactory
     }
 
     /**
-     * When using the HttpRequestContext servlet, we're going directly against
-     * the disk and there is NO virtual server / no virtualization.
+     * Sets the AVM store id onto the request.
      * 
-     * Thus, we have to be explicitly told ahead of time which store we're
-     * acting against.
+     * This method purely copies the default value as described in the
+     * configuration into the request context.
      * 
-     * This is configured via the properties bundle.
-     * 
-     * @param context
+     * @param context The request context instance
      * @param request
      */
-    public void initStoreId(RequestContext context, HttpServletRequest request)
+    public void initStoreId(RequestContext context)
     {
         String defId = context.getConfig().getDefaultRequestContextId();
         String storeId = context.getConfig().getRequestContextSetting(defId, "store");

@@ -22,31 +22,35 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
-
-import javax.servlet.ServletRequest;
-
-import org.alfresco.web.site.exception.RequestContextException;
+package org.alfresco.web.site.exception;
 
 /**
- * Interface for a RequestContext factory.
- * 
- * A request context factory is invoked by the framework at the start of the
- * request chain.  It is responsible for producing a RequestContext object
- * which is bound to the request.  The RequestContext object is a single
- * object instance with which all downstream framework elements can consult.
- * 
- * The RequestContext object is scoped to the request.
+ * Class that describes an exception which has occurred while processing
+ * tags in a tag executor.
  * 
  * @author muzquiano
  */
-public interface RequestContextFactory
+public class TagExecutionException extends Exception
 {
+    
     /**
-     * Produces a new RequestContext instance for a given request
+     * Instantiates a new tag execution exception.
      * 
-     * @return The RequestContext instance
-     * @throws RequestContextException
+     * @param message the message
      */
-    public RequestContext newInstance(ServletRequest request) throws RequestContextException;
+    public TagExecutionException(String message)
+    {
+        super(message);
+    }
+
+    /**
+     * Instantiates a new tag execution exception.
+     * 
+     * @param message the message
+     * @param ex the ex
+     */
+    public TagExecutionException(String message, Exception ex)
+    {
+        super(message, ex);
+    }
 }

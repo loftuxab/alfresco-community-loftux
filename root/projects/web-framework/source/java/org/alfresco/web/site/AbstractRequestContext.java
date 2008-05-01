@@ -24,6 +24,9 @@
  */
 package org.alfresco.web.site;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.alfresco.connector.CredentialsVault;
 import org.alfresco.connector.IdentityVault;
 import org.alfresco.web.site.filesystem.IFileSystem;
@@ -46,19 +49,46 @@ import org.apache.commons.logging.Log;
  * 
  * @author muzquiano
  */
-public interface RequestContext
+public abstract class AbstractRequestContext implements RequestContext
 {
+    /*
+     * Increments every time a request context is manufactured
+     */
+    protected static int requestCount = 0;
+    
+    /**
+     * Constructs a new Request Context.  In general, you should not
+     * have to construct these by hand.  They are constructed by
+     * the framework via a RequestContextFactory.
+     */
+    protected AbstractRequestContext()
+    {
+        this.map = new HashMap();
+        
+        synchronized(AbstractRequestContext.class)
+        {
+            requestCount++;
+            this.id = "" + requestCount;            
+        }
+    }
+
     /**
      * Each request context instance is stamped with a unique id
      * @return The id of the request context
      */
-    public String getId();
+    public String getId()
+    {
+        return this.id;
+    }
     
     /**
      * If the site has a configuration XML, then this will return it
      * @return Configuration instance for the site
      */
-    public Configuration getSiteConfiguration();
+    public Configuration getSiteConfiguration()
+    {
+        return ModelUtil.getSiteConfiguration(this);
+    }
 
     /**
      * Returns the title of the web site.  This is drawn from the
@@ -66,7 +96,17 @@ public interface RequestContext
      * 
      * @return
      */
-    public String getWebsiteTitle();
+    public String getWebsiteTitle()
+    {
+        String title = "Web Application";
+        
+        if(getSiteConfiguration() != null)
+        {
+            title = getSiteConfiguration().getName();
+        }
+        
+        return title;
+    }
 
     /**
      * Returns the title of the current page.  This is drawn from
@@ -74,7 +114,17 @@ public interface RequestContext
      * 
      * @return The title of the current page.
      */
-    public String getPageTitle();
+    public String getPageTitle()
+    {
+        String title = "Default Page";
+        
+        if (getCurrentPage() != null)
+        {
+            title = getCurrentPage().getName();
+        }
+        
+        return title;
+    }
 
     /**
      * Sets a custom value onto the request context
@@ -82,7 +132,13 @@ public interface RequestContext
      * @param key
      * @param value
      */
-    public void setValue(String key, Object value);
+    public void setValue(String key, Object value)
+    {
+        if (key != null && value != null)
+        {
+            map.put(key, value);
+        }
+    }
 
     /**
      * Retrieves a custom value from the request context
@@ -90,14 +146,23 @@ public interface RequestContext
      * @param key
      * @return
      */
-    public Object getValue(String key);
+    public Object getValue(String key)
+    {
+        return map.get(key);
+    }
 
     /**
      * Removes a custom value from the request context
      * 
      * @param key
      */
-    public void removeValue(String key);
+    public void removeValue(String key)
+    {
+        if (map.containsKey(key))
+        {
+            map.remove(key);
+        }
+    }
 
 
     /**
@@ -106,14 +171,20 @@ public interface RequestContext
      * 
      * @return The current page
      */
-    public Page getCurrentPage();
+    public Page getCurrentPage()
+    {
+        return this.currentPage;
+    }
 
     /**
      * Sets the currently executing page.
      * 
      * @param page
      */
-    public void setCurrentPage(Page page);
+    public void setCurrentPage(Page page)
+    {
+        this.currentPage = page;
+    }
     
     /**
      * Returns the id of the currently executing page.  If a currently
@@ -121,7 +192,14 @@ public interface RequestContext
      * 
      * @return The current page id (or null)
      */
-    public String getCurrentPageId();
+    public String getCurrentPageId()
+    {
+        if(getCurrentPage() != null)
+        {
+            return getCurrentPage().getId();
+        }
+        return null;
+    }
 
     /**
      * Returns the LinkBuilder to be used for the currently executing
@@ -130,7 +208,10 @@ public interface RequestContext
      * 
      * @return
      */
-    public LinkBuilder getLinkBuilder();
+    public LinkBuilder getLinkBuilder()
+    {
+        return LinkBuilderFactory.newInstance(this);
+    }
     
     /**
      * Returns the root page for a site.  A root page is designated
@@ -139,14 +220,24 @@ public interface RequestContext
      * 
      * @return The root page of the application
      */
-    public Page getRootPage();
+    public Page getRootPage()
+    {
+        return ModelUtil.getRootPage(this);
+    }
 
     /**
      * Returns the current executing template.
      * 
      * @return
      */
-    public TemplateInstance getCurrentTemplate();
+    public TemplateInstance getCurrentTemplate()
+    {
+        if(getCurrentPage() != null)
+        {
+            return getCurrentPage().getTemplate(this);
+        }
+        return null;
+    }
     
     /**
      * Returns the id of the currently executing template.
@@ -154,7 +245,14 @@ public interface RequestContext
      * 
      * @return The current template id or null
      */
-    public String getCurrentTemplateId();
+    public String getCurrentTemplateId()
+    {
+        if(getCurrentTemplate() != null)
+        {
+            return getCurrentTemplate().getId();
+        }
+        return null;
+    }
     
     /**
      * Returns the id of the current object
@@ -162,28 +260,40 @@ public interface RequestContext
      * 
      * @return The id of the current object
      */
-    public String getCurrentObjectId();
+    public String getCurrentObjectId()
+    {
+        return this.currentObjectId;
+    }
 
     /**
      * Sets the id of the current object
      * 
      * @param objectId
      */
-    public void setCurrentObjectId(String objectId);
+    public void setCurrentObjectId(String objectId)
+    {
+        this.currentObjectId = objectId;
+    }
 
     /**
      * Returns the current format id
      * 
      * @return
      */
-    public String getCurrentFormatId();
+    public String getCurrentFormatId()
+    {
+        return this.currentFormatId;
+    }
 
     /**
      * Sets the current format id
      * 
      * @param formatId
      */
-    public void setCurrentFormatId(String formatId);
+    public void setCurrentFormatId(String formatId)
+    {
+        this.currentFormatId = formatId;
+    }
 
     /**
      * Returns the File System implementation which points to the
@@ -193,7 +303,10 @@ public interface RequestContext
      *  
      * @return The file system implementation
      */
-    public IFileSystem getFileSystem();
+    public IFileSystem getFileSystem()
+    {
+        return this.fileSystem;
+    }
 
     /**
      * Sets the File System implementation to serve as the "root" of
@@ -201,7 +314,10 @@ public interface RequestContext
      * 
      * @param fileSystem
      */
-    public void setFileSystem(IFileSystem fileSystem);
+    public void setFileSystem(IFileSystem fileSystem)
+    {
+        this.fileSystem = fileSystem;
+    }
 
     /**
      * Returns the current AVM store ID.
@@ -213,14 +329,25 @@ public interface RequestContext
      * 
      * @return
      */
-    public String getStoreId();
+    public String getStoreId()
+    {
+        if (this.storeId == null)
+        {
+            this.storeId = "";
+        }
+        return this.storeId;
+    }
 
     /**
      * Sets the current AVM store ID.
      * 
      * @param storeId
      */
-    public void setStoreId(String storeId);
+    public void setStoreId(String storeId)
+    {
+        this.storeId = storeId;
+    }
+
 
     /**
      * Returns the model.  The model allows object model manipulation
@@ -229,48 +356,69 @@ public interface RequestContext
      * 
      * @return
      */
-    public IModel getModel();
+    public IModel getModel()
+    {
+        return Framework.getModel();
+    }
 
     /**
      * Returns the configuration for the framework.
      * 
      * @return
      */
-    public FrameworkConfig getConfig();
+    public FrameworkConfig getConfig()
+    {
+        return Framework.getConfig();
+    }
 
     /**
      * Returns the logger for the framework
      * 
      * @return
      */
-    public Log getLogger();
+    public Log getLogger()
+    { 
+        return Framework.getLogger();
+    }
 
     /**
      * Sets the current user for this request
      * @param user
      */
-    public void setUser(User user);
+    public void setUser(User user)
+    {
+        this.user = user;
+    }
 
     /**
      * Returns the current user
      * 
      * @return
      */
-    public User getUser();
+    public User getUser()
+    {
+        return user;
+    }
 
     /**
      * Returns the credential vault for the current user
      * 
      * @return
      */
-    public CredentialsVault getUserCredentialVault();
+    public CredentialsVault getUserCredentialVault()
+    {
+        return (CredentialsVault) getValue(VALUE_CREDENTIAL_VAULT);
+    }
 
     /**
      * Returns the identity vault for the current user
      * 
      * @return
      */
-    public IdentityVault getUserIdentityVault();
+    public IdentityVault getUserIdentityVault()
+    {
+        return (IdentityVault) getValue(VALUE_IDENTITY_VAULT);
+    }
 
     /**
      * Returns the render data context for the currently rendering
@@ -279,24 +427,50 @@ public interface RequestContext
      * 
      * @return The Render Data instance
      */
-    public RenderData getRenderData();
+    public RenderData getRenderData()
+    {
+        return RenderDataHelper.current(this);
+    }
     
     /**
      * Returns the debug mode of the current request
      * If not in debug mode, this will return null
      */
-    public String getDebugMode();
+    public String getDebugMode()
+    {
+        return null;
+    }
     
     /**
      * Returns the current theme id
      */
-    public String getThemeId();
+    public String getThemeId()
+    {
+        return themeId;
+    }
     
     /**
      * Sets the current theme id
      */
-    public void setThemeId(String themeId);
-        
+    public void setThemeId(String themeId)
+    {
+        this.themeId = themeId;
+    }
+    
+    // variables
+    
+    protected Map map;
+    protected Page currentPage;
+    protected String currentObjectId;
+    protected String currentFormatId;
+    protected IFileSystem fileSystem;
+    protected String storeId;
+    protected User user;
+    protected String id;
+    protected String themeId;
+
+    // constants
+    
     public static final String VALUE_HEAD_TAGS = "headTags";
     public static final String VALUE_CREDENTIAL_VAULT = "credential_vault";
     public static final String VALUE_IDENTITY_VAULT = "identity_vault";

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -32,11 +32,21 @@ import org.dom4j.Attribute;
 import org.dom4j.Element;
 
 /**
+ * Responsible for reading WebSiteConfigElement objects from the configuration
+ * XML and into the framework.
+ * 
  * @author muzquiano
  */
 public class WebSiteElementReader implements ConfigElementReader
 {   
+   
    /**
+    * Parses the.
+    * 
+    * @param element the element
+    * 
+    * @return the config element
+    * 
     * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
     */
    public ConfigElement parse(Element element)
@@ -56,10 +66,10 @@ public class WebSiteElementReader implements ConfigElementReader
 
    /**
     * Recursively processes the children creating the required config element
-    * objects as it goes
+    * objects as it goes.
     * 
-    * @param element
-    * @param parentConfig
+    * @param element the element
+    * @param parentConfig the parent config
     */
    @SuppressWarnings("unchecked")
    private void processChildren(Element element, WebSiteConfigElement parentConfig)
@@ -81,6 +91,7 @@ public class WebSiteElementReader implements ConfigElementReader
     * Creates a ConfigElementImpl object from the given element.
     * 
     * @param element The element to parse
+    * 
     * @return The GenericConfigElement representation of the given element
     */
    @SuppressWarnings("unchecked")

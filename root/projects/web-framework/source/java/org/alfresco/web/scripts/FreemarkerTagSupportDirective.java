@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -20,7 +20,7 @@
  * and Open Source Software ("FLOSS") applications as described in Alfresco's 
  * FLOSS exception.  You should have recieved a copy of the text describing 
  * the FLOSS exception, and it is also available here: 
- * http://www.alfresco.com/legal/licensing
+ * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.scripts;
 
@@ -30,48 +30,83 @@ import javax.servlet.jsp.tagext.Tag;
 import org.alfresco.tools.TagUtil;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.exception.TagExecutionException;
 import org.alfresco.web.site.model.Page;
 
 import freemarker.template.TemplateDirectiveModel;
 
 /**
- * Custom @imports FreeMarker directive.
- * This places the imports into the page
+ * Abstract class that defines a Freemarker directive which can process
+ * JSP tags.
+ * 
+ * This class exists so that freemarker directive implementations can be
+ * constructing using a single piece of code - a tag.  The directives then
+ * provide another entry point into the same tag logic.
  * 
  * @author Michael Uzquiano
  */
 public abstract class FreemarkerTagSupportDirective implements
         TemplateDirectiveModel
 {
+    
+    /** The context. */
     private RequestContext context;
 
+    /**
+     * Instantiates a new freemarker tag support directive.
+     * 
+     * @param context the context
+     */
     public FreemarkerTagSupportDirective(RequestContext context)
     {
         this(context, context.getCurrentPage());
     }
 
+    /**
+     * Instantiates a new freemarker tag support directive.
+     * 
+     * @param context the context
+     * @param page the page
+     */
     public FreemarkerTagSupportDirective(RequestContext context, Page page)
     {
         this.context = context;
     }
 
+    /**
+     * Execute a tag and return the String output
+     * 
+     * @param tag the tag
+     * 
+     * @return the string
+     */
     public String executeTag(Tag tag)
+        throws TagExecutionException
     {
         return executeTag(tag, null);
     }
     
+    /**
+     * Execute tag.
+     * 
+     * @param tag the tag
+     * @param bodyContent the body content
+     * 
+     * @return the string
+     */
     public String executeTag(Tag tag, String bodyContent)
+        throws TagExecutionException
     {
         // render the component into dummy objects
         // currently, we can only do this for HttpRequestContext instances
+        String output = null;
         if (context instanceof HttpRequestContext)
         {
             HttpServletRequest response = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
 
             // execute the tag
-            String output = TagUtil.execute(tag, response, bodyContent);
-            return output;
+            output = TagUtil.execute(tag, response, bodyContent);
         }
-        return null;
+        return output;
     }
 }
