@@ -1,25 +1,25 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have recieved a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.site.filesystem;
@@ -37,12 +37,21 @@ import org.alfresco.tools.DataUtil;
 import org.springframework.util.FileCopyUtils;
 
 /**
+ * The Class AVMFileSystem.
+ * 
  * @author muzquiano
  */
 public class AVMFileSystem implements IFileSystem
 {
     // avmStoreId = ads--admin
     // avmWebappPath = /www/avm_webapps/ROOT
+    /**
+     * Instantiates a new aVM file system.
+     * 
+     * @param avmRemote the avm remote
+     * @param avmStoreId the avm store id
+     * @param avmWebappPath the avm webapp path
+     */
     public AVMFileSystem(AVMRemote avmRemote, String avmStoreId,
             String avmWebappPath)
     {
@@ -51,25 +60,46 @@ public class AVMFileSystem implements IFileSystem
         setAVMWebappPath(avmWebappPath);
     }
 
+    /**
+     * Instantiates a new aVM file system.
+     */
     public AVMFileSystem()
     {
     }
 
+    /**
+     * Sets the aVM remote.
+     * 
+     * @param avmRemote the new aVM remote
+     */
     protected void setAVMRemote(AVMRemote avmRemote)
     {
         this.avmRemote = avmRemote;
     }
 
+    /**
+     * Sets the aVM store id.
+     * 
+     * @param avmStoreId the new aVM store id
+     */
     protected void setAVMStoreId(String avmStoreId)
     {
         this.avmStoreId = avmStoreId;
     }
 
+    /**
+     * Sets the aVM webapp path.
+     * 
+     * @param avmWebappPath the new aVM webapp path
+     */
     protected void setAVMWebappPath(String avmWebappPath)
     {
         this.avmWebappPath = avmWebappPath;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getRoot()
+     */
     public IDirectory getRoot()
     {
         IFile file = getFile("/");
@@ -78,23 +108,35 @@ public class AVMFileSystem implements IFileSystem
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getAbsolutePath(org.alfresco.web.site.filesystem.IFile)
+     */
     public String getAbsolutePath(IFile file)
     {
         return getAVMPath(file.getPath());
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getInputStream(org.alfresco.web.site.filesystem.IFile)
+     */
     public InputStream getInputStream(IFile file) throws Exception
     {
         String avmPath = getAVMPath(file.getPath());
         return this.avmRemote.getFileInputStream(-1, avmPath);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getOutputStream(org.alfresco.web.site.filesystem.IFile)
+     */
     public OutputStream getOutputStream(IFile file) throws Exception
     {
         String avmPath = getAVMPath(file.getPath());
         return this.avmRemote.getFileOutputStream(avmPath);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getFile(java.lang.String)
+     */
     public IFile getFile(String path)
     {
         IFile file = null;
@@ -112,11 +154,17 @@ public class AVMFileSystem implements IFileSystem
         return file;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getFile(java.lang.String, java.lang.String)
+     */
     public IFile getFile(String path, String name)
     {
         return getFile(path + "/" + name);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getFiles(java.lang.String)
+     */
     public IFile[] getFiles(String path)
     {
         String avmPath = getAVMPath(path);
@@ -135,6 +183,9 @@ public class AVMFileSystem implements IFileSystem
         return array;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#getParent(java.lang.String)
+     */
     public IDirectory getParent(String path)
     {
         if (path == null)
@@ -149,6 +200,9 @@ public class AVMFileSystem implements IFileSystem
         return null;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#createFile(java.lang.String)
+     */
     public IFile createFile(String path)
     {
         int i = path.lastIndexOf("/");
@@ -157,6 +211,9 @@ public class AVMFileSystem implements IFileSystem
         return createFile(parentPath, fileName);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#createFile(java.lang.String, java.lang.String)
+     */
     public IFile createFile(String directoryPath, String fileName)
     {
         String avmDirectoryPath = getAVMPath(directoryPath);
@@ -189,6 +246,9 @@ public class AVMFileSystem implements IFileSystem
         return this.getFile(directoryPath, fileName);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#deleteFile(java.lang.String)
+     */
     public boolean deleteFile(String path)
     {
         int i = path.lastIndexOf("/");
@@ -197,6 +257,9 @@ public class AVMFileSystem implements IFileSystem
         return deleteFile(parentPath, fileName);
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.filesystem.IFileSystem#deleteFile(java.lang.String, java.lang.String)
+     */
     public boolean deleteFile(String directoryPath, String fileName)
     {
         String avmDirectoryPath = getAVMPath(directoryPath);
@@ -204,6 +267,13 @@ public class AVMFileSystem implements IFileSystem
         return true;
     }
 
+    /**
+     * Gets the descriptor.
+     * 
+     * @param avmPath the avm path
+     * 
+     * @return the descriptor
+     */
     protected AVMNodeDescriptor getDescriptor(String avmPath)
     {
         try
@@ -218,6 +288,13 @@ public class AVMFileSystem implements IFileSystem
         return null;
     }
 
+    /**
+     * Gets the descriptors.
+     * 
+     * @param avmPath the avm path
+     * 
+     * @return the descriptors
+     */
     protected AVMNodeDescriptor[] getDescriptors(String avmPath)
     {
         SortedMap<String, AVMNodeDescriptor> map = this.avmRemote.getDirectoryListing(
@@ -236,9 +313,16 @@ public class AVMFileSystem implements IFileSystem
         return descriptors;
     }
 
+    /** The avm remote. */
     protected AVMRemote avmRemote;
+    
+    /** The avm store id. */
     protected String avmStoreId;
+    
+    /** The avm webapp path. */
     protected String avmWebappPath;
+    
+    /** The servlet context. */
     protected ServletContext servletContext;
 
     /*
@@ -262,21 +346,43 @@ public class AVMFileSystem implements IFileSystem
      * ads--admin:/www/avm_webapps/ROOT/data/site/site-configuration.xml
      */
 
+    /**
+     * Gets the aVM path.
+     * 
+     * @param relativePath the relative path
+     * 
+     * @return the aVM path
+     */
     public String getAVMPath(String relativePath)
     {
         return this.avmStoreId + ":" + this.avmWebappPath + "/" + relativePath;
     }
 
+    /**
+     * Gets the aVM remote.
+     * 
+     * @return the aVM remote
+     */
     public AVMRemote getAVMRemote()
     {
         return this.avmRemote;
     }
 
+    /**
+     * Gets the aVM store id.
+     * 
+     * @return the aVM store id
+     */
     public String getAVMStoreId()
     {
         return this.avmStoreId;
     }
 
+    /**
+     * Gets the aVM webapp path.
+     * 
+     * @return the aVM webapp path
+     */
     public String getAVMWebappPath()
     {
         return this.avmWebappPath;
