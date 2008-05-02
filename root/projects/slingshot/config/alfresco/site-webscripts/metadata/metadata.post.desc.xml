@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Metadata</shortname>
+  <description>Metadata UI component, shows a node's properties and associations</description>
+  <url>/components/metadata</url>
+</webscript>

@@ -1,0 +1,86 @@
+<html>
+   <head>
+      <title>Metadata Example</title>
+      
+      <!-- load required libraries -->
+      <!--<script type="text/javascript" src="../../build/assemble/yui/utilities/utilities.js"></script>-->
+      
+      <script type="text/javascript" src="../../build/assemble/yui/yahoo/yahoo-debug.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/event/event-debug.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/dom/dom-debug.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/element/element-beta-debug.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/get/get-debug.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/yuiloader/yuiloader-beta-debug.js"></script>
+      
+      <script type="text/javascript" src="../../build/assemble/yui/button/button-min.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/container/container_core-min.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/yahoo/menu-min.js"></script>
+      <script type="text/javascript" src="../web/js/alfresco.js"></script>
+      <script type="text/javascript" src="../web/js/forms-runtime.js"></script>
+   </head>
+   
+   <body>
+      <h3>Metadata Example</h3>
+      
+      <form id="regform" class="alfForm" action="http://localhost:8081/slingshot/service/components/metadata" 
+            method="post" enctype="multipart/form-data" accept-charset="utf-8">
+         <fieldset>
+            <legend>Login details</legend>
+            <label for="username" class="alfFormLabel">Username:</label>
+            <input id="username" name="username" type="text" size="40" />
+            <br />
+      
+            <label for="pwd" class="alfFormLabel">Password:</label>
+            <input id="pwd" name="pwd" type="password" size="40" />
+            <br />
+      
+            <label for="email" class="alfFormLabel">Email Address:</label>
+            <input id="email" name="email" type="text" size="40" />
+         </fieldset>
+         
+         <br/>
+         
+         <fieldset>
+            <legend>Personal information</legend>
+            <label for="name" class="alfFormLabel">Name:</label>
+            <input id="name" name="name" type="text" size="40" />
+            <br />
+      
+            <label for="age" class="alfFormLabel">Age:</label>
+            <input id="age" name="age" type="text" size="5" />
+            <br />
+      
+            <label for="gender" class="alfFormLabel">Gender:</label>
+            <input id="gender" name="gender" type="radio" value="male" /><label>Male</label>
+            <input id="gender" name="gender" type="radio" value="female" /><label>Female</label>
+            <br />
+      
+            <label for="country" class="alfFormLabel">Country:</label>
+            <select id="country" name="country">
+               <option value="">Please select...</option>
+               <option value="france">France</option>
+               <option value="germany">Germany</option>
+               <option value="spain">Spain</option>
+               <option value="uk">United Kingdom</option>
+               <option value="us">United States</option>
+            </select>
+            <br />
+      
+            <label for="interests" class="alfFormLabel">Interests:</label>
+            <input id="interests" name="interests" type="text" size="40" />
+         </fieldset>
+      
+         <br/>
+         
+         <input id="submit" type="submit" value="Submit" />
+         <input value="Clear" type="reset" />
+      </form>
+      
+      <script type="text/javascript">
+         var regform = new Alfresco.forms.Form('regform');
+         regform.addValidation('username', Alfresco.forms.validation.length, {min: 3}, "blur");
+      </script>
+      
+   </body>
+</html>
+
