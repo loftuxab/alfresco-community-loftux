@@ -25,6 +25,7 @@ Alfresco.constants = Alfresco.constants ||
 /* Ensure top-level Alfresco namespaces exist */
 Alfresco.ui = Alfresco.ui || {};
 Alfresco.util = Alfresco.util || {};
+Alfresco.logger = Alfresco.logger || {};
 
 /*
    Alfresco.util.appendArrayToObject
@@ -57,7 +58,6 @@ Alfresco.util.arrayToObject = function(arr)
    }
    return obj;
 };
-
 
 /*
    Alfresco.util.YUILoaderHelper
@@ -193,3 +193,37 @@ Alfresco.util.ComponentManager = function()
       }
    };
 }();
+
+Alfresco.logger.isDebugEnabled = function()
+{
+   // TODO: make this switchable
+   
+   return false;
+}
+
+Alfresco.logger.debug = function(p1, p2)
+{
+   var msg;
+   
+   if (typeof p1 == "string" && p2 != null)
+   {
+      msg = p1 + " " + YAHOO.lang.dump(p2);
+   }
+   else
+   {
+      msg = YAHOO.lang.dump(p1);
+   }
+   
+   // TODO: use an inline div first, then support the YUI logger and
+   //       log to that if possible.
+   
+   // if console.log is available use it otherwise use alert for now
+   if (window.console)
+   {
+      window.console.log(msg);
+   }
+   else
+   {
+      alert(msg);
+   }
+}
