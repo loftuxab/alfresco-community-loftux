@@ -213,7 +213,7 @@ function getFormDescription(formName)
 function getQueryString()
 {
 <%
-	HashMap mapz = WebUtil.getQueryStringMap(request);
+	Map mapz = WebUtil.getQueryStringMap(request);
 	String qsz = WebUtil.getQueryStringForMap(mapz);
 	if(qsz == null) {
 		%>return "?a=1";<%

@@ -124,7 +124,7 @@ function flipInContextElementEnabled(elementId)
 function getInContextURL(toggle, elementId, value)
 {
 <%
-	HashMap map = WebUtil.getQueryStringMap(request);
+	Map map = WebUtil.getQueryStringMap(request);
 	map.remove(InContextUtil.INCONTEXT_TOGGLE_REQUEST_PARAM);
 	map.remove(InContextUtil.INCONTEXT_ELEMENT_REQUEST_PARAM);
 	map.remove(InContextUtil.INCONTEXT_VALUE_REQUEST_PARAM);

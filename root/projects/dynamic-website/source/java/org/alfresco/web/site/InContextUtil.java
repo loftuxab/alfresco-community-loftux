@@ -31,18 +31,32 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 /**
- * Convenience methods for working with in-context state
+ * Convenience methods for working with in-context state.
  * 
  * @author muzquiano
  */
 public class InContextUtil
 {
+    
+    /** The INCONTEX t_ elemen t_ id. */
     public static String INCONTEXT_ELEMENT_ID = "incontext";
 
+    /** The INCONTEX t_ toggl e_ reques t_ param. */
     public static String INCONTEXT_TOGGLE_REQUEST_PARAM = "toggle";
+    
+    /** The INCONTEX t_ elemen t_ reques t_ param. */
     public static String INCONTEXT_ELEMENT_REQUEST_PARAM = "element";
+    
+    /** The INCONTEX t_ valu e_ reques t_ param. */
     public static String INCONTEXT_VALUE_REQUEST_PARAM = "value";
 
+    /**
+     * Gets the in context map.
+     * 
+     * @param session the session
+     * 
+     * @return the in context map
+     */
     protected static Map getInContextMap(HttpSession session)
     {
         Map map = (Map) session.getAttribute("incontext.map");
@@ -73,17 +87,40 @@ public class InContextUtil
         return map;
     }
 
+    /**
+     * Checks if is enabled.
+     * 
+     * @param session the session
+     * 
+     * @return true, if is enabled
+     */
     public static boolean isEnabled(HttpSession session)
     {
         return isElementEnabled(session, INCONTEXT_ELEMENT_ID);
     }
 
+    /**
+     * Checks if is element enabled.
+     * 
+     * @param session the session
+     * @param elementId the element id
+     * 
+     * @return true, if is element enabled
+     */
     public static boolean isElementEnabled(HttpSession session, String elementId)
     {
         return getBoolean(session, elementId + ".enabled");
 
     }
 
+    /**
+     * Gets the element state.
+     * 
+     * @param session the session
+     * @param elementId the element id
+     * 
+     * @return the element state
+     */
     public static String getElementState(HttpSession session, String elementId)
     {
         return get(session, elementId + ".state");
@@ -92,9 +129,9 @@ public class InContextUtil
     /**
      * Handles the enable/disable of in-context elements
      * Also handles updates of in-context element states
-     * This is primarily utilized by the InContextServlet
-     * @param context
-     * @param request
+     * This is primarily utilized by the InContextServlet.
+     * 
+     * @param request the request
      */
     public static void processRequest(HttpServletRequest request)
     {
@@ -131,6 +168,13 @@ public class InContextUtil
         }
     }
 
+    /**
+     * Sets the in context element enabled.
+     * 
+     * @param session the session
+     * @param elementId the element id
+     * @param value the value
+     */
     public static void setInContextElementEnabled(HttpSession session,
             String elementId, boolean value)
     {
@@ -140,12 +184,26 @@ public class InContextUtil
             toggleInContext(session, elementId + ".enabled", "false");
     }
 
+    /**
+     * Sets the in context element state.
+     * 
+     * @param session the session
+     * @param elementId the element id
+     * @param value the value
+     */
     public static void setInContextElementState(HttpSession session,
             String elementId, String value)
     {
         toggleInContext(session, elementId + ".state", value);
     }
 
+    /**
+     * Toggle in context.
+     * 
+     * @param session the session
+     * @param key the key
+     * @param value the value
+     */
     protected static void toggleInContext(HttpSession session, String key,
             String value)
     {
@@ -155,11 +213,27 @@ public class InContextUtil
         }
     }
 
+    /**
+     * Gets the.
+     * 
+     * @param session the session
+     * @param key the key
+     * 
+     * @return the string
+     */
     protected static String get(HttpSession session, String key)
     {
         return (String) getInContextMap(session).get(key);
     }
 
+    /**
+     * Gets the boolean.
+     * 
+     * @param session the session
+     * @param key the key
+     * 
+     * @return the boolean
+     */
     protected static boolean getBoolean(HttpSession session, String key)
     {
         String value = get(session, key);
@@ -168,27 +242,60 @@ public class InContextUtil
         return false;
     }
 
+    /**
+     * Gets the in context element ids.
+     * 
+     * @return the in context element ids
+     */
     public static String[] getInContextElementIds()
     {
         return Framework.getConfig().getInContextElementIds();
     }
 
+    /**
+     * Gets the in context element default enabled.
+     * 
+     * @param elementId the element id
+     * 
+     * @return the in context element default enabled
+     */
     public static String getInContextElementDefaultEnabled(String elementId)
     {
         return Framework.getConfig().getInContextElementDefaultEnabled(
                 elementId);
     }
 
+    /**
+     * Gets the in context element default state.
+     * 
+     * @param elementId the element id
+     * 
+     * @return the in context element default state
+     */
     public static String getInContextElementDefaultState(String elementId)
     {
         return Framework.getConfig().getInContextElementDefaultState(elementId);
     }
 
+    /**
+     * Gets the in context element name.
+     * 
+     * @param elementId the element id
+     * 
+     * @return the in context element name
+     */
     public static String getInContextElementName(String elementId)
     {
         return Framework.getConfig().getInContextElementName(elementId);
     }
 
+    /**
+     * Gets the in context element type.
+     * 
+     * @param elementId the element id
+     * 
+     * @return the in context element type
+     */
     public static String getInContextElementType(String elementId)
     {
         return Framework.getConfig().getInContextElementType(elementId);
