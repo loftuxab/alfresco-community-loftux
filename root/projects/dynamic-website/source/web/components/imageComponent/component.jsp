@@ -7,10 +7,10 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// config values
-	String imageLocation = (String) context.getRenderData().get("imageLocation");
-	String width = (String) context.getRenderData().get("width");
-	String height = (String) context.getRenderData().get("height");
-	String alt = (String) context.getRenderData().get("alt");
+	String imageLocation = (String) context.getRenderContext().get("imageLocation");
+	String width = (String) context.getRenderContext().get("width");
+	String height = (String) context.getRenderContext().get("height");
+	String alt = (String) context.getRenderContext().get("alt");
 	
 	String renderString = null;
 	if(imageLocation != null && !"".equals(imageLocation))

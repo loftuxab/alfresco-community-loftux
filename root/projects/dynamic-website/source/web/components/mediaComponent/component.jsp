@@ -10,20 +10,20 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 
 	// config values
-	String componentId = (String) context.getRenderData().get("component-id");
+	String componentId = (String) context.getRenderContext().get("component-id");
 
-	String mediaType = (String) context.getRenderData().get("mediaType");
-	String mediaUrl = (String) context.getRenderData().get("mediaUrl");
+	String mediaType = (String) context.getRenderContext().get("mediaType");
+	String mediaUrl = (String) context.getRenderContext().get("mediaUrl");
 
-	String unsupportedText = (String) context.getRenderData().get("unsupportedText");
+	String unsupportedText = (String) context.getRenderContext().get("unsupportedText");
 	if(unsupportedText == null || "".equals(unsupportedText))
 		unsupportedText = "The viewer is not installed.";
 
-	String width = (String) context.getRenderData().get("width");
+	String width = (String) context.getRenderContext().get("width");
 	if(width == null || "".equals(width))
 		width = "320";
 
-	String height = (String) context.getRenderData().get("height");
+	String height = (String) context.getRenderContext().get("height");
 	if(height == null || "".equals(height))
 		height = "240";
 

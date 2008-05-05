@@ -7,10 +7,10 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// config values
-	String componentId = (String) context.getRenderData().get("component-id");
-	String endpointId = (String) context.getRenderData().get("endpointId");
-	String webscript = (String) context.getRenderData().get("webscript");
-	String container = (String) context.getRenderData().get("container");
+	String componentId = (String) context.getRenderContext().get("component-id");
+	String endpointId = (String) context.getRenderContext().get("endpointId");
+	String webscript = (String) context.getRenderContext().get("webscript");
+	String container = (String) context.getRenderContext().get("container");
 	
 	// find the endpoint object
 	Endpoint[] array = ModelUtil.findEndpoints(context, endpointId);

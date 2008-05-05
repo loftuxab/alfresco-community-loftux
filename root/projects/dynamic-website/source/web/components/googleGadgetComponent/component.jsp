@@ -8,7 +8,7 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
         // config values
-        String markupData = (String) context.getRenderData().get("markupData");
+        String markupData = (String) context.getRenderContext().get("markupData");
 
         // shimmy the data a bit
         if (markupData != null)

@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.HTMLUtil;
-import org.alfresco.web.site.RenderData;
-import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -37,10 +35,12 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  */
 public class HTMLRenderer extends AbstractRenderer
 {
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RenderData renderData)
+    public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
+    	HttpServletRequest request = rendererContext.getRequest();
+    	HttpServletResponse response = rendererContext.getResponse();
+    	
         String renderer = this.getRenderer();
 
         // execute
@@ -51,8 +51,7 @@ public class HTMLRenderer extends AbstractRenderer
         }
         catch (Exception ex)
         {
-            throw new RendererExecutionException(ex,
-                    "Unable to include HTML: " + renderer);
+            throw new RendererExecutionException("Unable to include HTML: " + renderer, ex);
         }
     }
 }

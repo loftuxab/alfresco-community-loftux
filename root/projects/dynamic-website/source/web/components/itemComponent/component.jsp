@@ -12,11 +12,11 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// settings	
-	String theItemType = (String) context.getRenderData().get("itemType");
-	String theItemPath = (String) context.getRenderData().get("itemPath");	
-	String howToRender = (String) context.getRenderData().get("howToRender");
-	String renderData = (String) context.getRenderData().get("renderData");
-	String endpointId = (String) context.getRenderData().get("endpointId");
+	String theItemType = (String) context.getRenderContext().get("itemType");
+	String theItemPath = (String) context.getRenderContext().get("itemPath");	
+	String howToRender = (String) context.getRenderContext().get("howToRender");
+	String renderData = (String) context.getRenderContext().get("renderData");
+	String endpointId = (String) context.getRenderContext().get("endpointId");
 	
 
 	// find this endpoint

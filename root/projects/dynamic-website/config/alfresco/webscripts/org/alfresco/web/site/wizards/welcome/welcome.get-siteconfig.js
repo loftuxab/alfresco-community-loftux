@@ -8,7 +8,7 @@
 var siteConfiguration = site.findConfiguration("site");
 if(siteConfiguration != null)
 {
-	websiteName = wizard.getSafeProperty(siteConfiguration, "name");
+	websiteName = wizard.getSafeProperty(siteConfiguration, "title");
 	websiteDescription = wizard.getSafeProperty(siteConfiguration, "description");
 }
 
