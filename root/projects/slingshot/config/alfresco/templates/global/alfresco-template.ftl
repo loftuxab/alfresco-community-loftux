@@ -17,7 +17,7 @@
 <!-- Common YUI components -->
    <script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
    <script type="text/javascript" src="${url.context}/yui/button/button-min.js"></script>
-   <script type="text/javascript" src="${url.context}/yui/container/container_core-min.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/menu/menu-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/json/json-min.js"></script>
    <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>

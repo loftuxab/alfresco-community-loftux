@@ -204,14 +204,63 @@ Alfresco.util.PopupManager = function()
 
    return {
 
-      displayMessage: function(message, delay)
+      displayMessage: function(text, autoHide, delay, effectDuration)
       {
-         alert(message);
+         autoHide = autoHide ? autoHide : true;
+         delay = delay ? delay : 2.5;
+         effectDuration = effectDuration ? effectDuration : 0.5;
+         var popup = new YAHOO.widget.Dialog("message",
+            {
+               visible: false,
+               effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration: effectDuration},
+               close: false,
+               modal:true,
+               draggable:false               
+            }
+         );
+         popup.setBody(text);
+         popup.render(document.body);
+         popup.center();
+         if(autoHide)
+         {
+            popup.subscribe("show", this._delayPopupHide, {popup: popup, delay: (delay * 1000)}, true);
+         }
+         popup.show();
       },
 
-      displayPrompt: function()
+      _delayPopupHide: function()
+      {         
+         YAHOO.lang.later(this.delay, this, function()
+         {
+            this.popup.hide();
+         });
+      },
+
+      displayPrompt: function(text, buttons, icon, title, effectDuration)
       {
-         alert("Not implemented");
+         effectDuration = effectDuration ? effectDuration : 0.5;
+         var prompt = new YAHOO.widget.SimpleDialog("prompt", {
+            visible:false,
+            effect:{effect: YAHOO.widget.ContainerEffect.FADE, duration: effectDuration},
+            close: false,
+            modal:true,
+            draggable:false
+         });
+         if(title)
+         {
+            prompt.setHeader(title);
+         }
+         prompt.setBody(text);
+         if(icon)
+         {
+            prompt.cfg.setProperty("icon", icon); // YAHOO.widget.SimpleDialog.ICON_WARN
+         }
+         // todo: Hmm how shall the OK label be localized?
+         buttons = buttons ? buttons : [ { text:"OK", handler: function(){ prompt.hide(); }, isDefault:true } ];
+         prompt.cfg.queueProperty("buttons", buttons);
+         prompt.render(document.body);
+         prompt.center();
+         prompt.show();
       },
 
       displayDialog: function()
