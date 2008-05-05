@@ -33,6 +33,8 @@ import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
+import org.alfresco.web.site.renderer.RendererContext;
+import org.alfresco.web.site.renderer.RendererContextHelper;
 import org.apache.commons.logging.Log;
 
 /**
@@ -63,7 +65,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     protected AbstractRequestContext()
     {
-        this.map = new HashMap();
+        this.map = new HashMap(16, 1.0f);
         
         synchronized(AbstractRequestContext.class)
         {
@@ -421,15 +423,15 @@ public abstract class AbstractRequestContext implements RequestContext
     }
 
     /**
-     * Returns the render data context for the currently rendering
-     * object.  The render data context is scoped to the currently
+     * Returns the render context for the currently rendering
+     * object.  The render context is scoped to the currently
      * rendering object.
      * 
      * @return The Render Data instance
      */
-    public RenderData getRenderData()
+    public RendererContext getRenderContext()
     {
-        return RenderDataHelper.current(this);
+        return RendererContextHelper.current(this);
     }
     
     /**

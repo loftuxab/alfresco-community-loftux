@@ -85,7 +85,6 @@ public class ObjectAnchorTag extends AbstractObjectTag
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
             throw new JspException(ex);
         }
         return EVAL_PAGE;

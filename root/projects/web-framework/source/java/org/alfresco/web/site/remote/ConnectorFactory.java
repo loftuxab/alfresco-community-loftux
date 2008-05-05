@@ -171,7 +171,7 @@ public class ConnectorFactory
     {
         if (cache == null)
         {
-            cache = new HashMap();
+            cache = new HashMap(16, 1.0f);
         }
 
         String cacheKey = className + "_" + url;

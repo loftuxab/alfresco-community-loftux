@@ -652,10 +652,10 @@ public class FakeHttpServletResponse implements HttpServletResponse
     private Locale locale = Locale.getDefault();
     
     /** The cookies. */
-    private final List cookies = new ArrayList();
+    private final List cookies = new ArrayList(24);
     
     /** The headers. */
-    private final Map headers = new HashMap();
+    private final Map headers = new HashMap(24, 1.0f);
     
     /** The status. */
     private int status = HttpServletResponse.SC_OK;

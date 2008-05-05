@@ -49,7 +49,9 @@ public class FileSystemManager
             String cacheKey)
     {
         if (fileSystems == null)
-            fileSystems = new HashMap();
+        {
+            fileSystems = new HashMap(16, 1.0f);
+        }
 
         IFileSystem fileSystem = (IFileSystem) fileSystems.get(cacheKey);
         if (fileSystem == null)
@@ -62,7 +64,7 @@ public class FileSystemManager
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                Framework.getLogger().error(ex);
             }
         }
         return fileSystem;
@@ -72,7 +74,7 @@ public class FileSystemManager
     {
         if (fileSystems == null)
         {
-            fileSystems = new HashMap();
+            fileSystems = new HashMap(16, 1.0f);
         }
         fileSystems.put(cacheKey, fileSystem);
     }
@@ -81,7 +83,7 @@ public class FileSystemManager
     {
         if (fileSystems == null)
         {
-            fileSystems = new HashMap();
+            fileSystems = new HashMap(16, 1.0f);
         }
 
         return (IFileSystem) fileSystems.get(cacheKey);

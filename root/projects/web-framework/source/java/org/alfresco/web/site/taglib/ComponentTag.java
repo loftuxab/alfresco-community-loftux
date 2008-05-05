@@ -31,7 +31,6 @@ import javax.servlet.jsp.JspException;
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.site.model.Chrome;
 
 /**
  * @author muzquiano
@@ -86,7 +85,7 @@ public class ComponentTag extends TagBase
         // this will apply if we're rendering in a region
         if(componentId == null)
         {
-            componentId = (String) context.getRenderData().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
+            componentId = (String) context.getRenderContext().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
         }
         
         // now render the component
@@ -113,7 +112,6 @@ public class ComponentTag extends TagBase
         }
         catch (Throwable t)
         {
-            t.printStackTrace();
             throw new JspException(t);
         }
         return SKIP_BODY;

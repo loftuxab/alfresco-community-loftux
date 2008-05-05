@@ -27,29 +27,33 @@ package org.alfresco.web.scripts;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.web.site.RenderData;
-import org.alfresco.web.site.RequestContext;
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.connector.remote.RemoteClient;
+import org.alfresco.web.site.renderer.RendererContext;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * @author muzquiano
  */
 public class LocalWebScriptRuntimeContainer extends PresentationContainer
 {
-    private ThreadLocal<RequestContext> requestContext = new ThreadLocal<RequestContext>();
+    private ThreadLocal<RendererContext> rendererContext = new ThreadLocal<RendererContext>();
 
-    protected void bindRequestContext(RequestContext context)
+    protected void bindRendererContext(RendererContext context)
     {
-        requestContext.set(context);
+        rendererContext.set(context);
     }
 
-    protected void unbindRequestContext()
+    protected void unbindRendererContext()
     {
-        requestContext.remove();
+        rendererContext.remove();
     }
 
-    protected RequestContext getRequestContext()
+    protected RendererContext getRendererContext()
     {
-        return requestContext.get();
+        return rendererContext.get();
     }
 
     @Override
@@ -60,13 +64,35 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         params.putAll(super.getScriptParameters());
         
         // Bind in Web Script Model elements
-        RequestContext context = getRequestContext();
-        if(context != null)
-        {
-            RenderData renderData = context.getRenderData();
-            ProcessorModelHelper.populateScriptModel(context, renderData, params);
-        }
+        RendererContext rendererContext = getRendererContext();
 
+        // populate the root script properties
+        ProcessorModelHelper.populateScriptModel(rendererContext, params);
+        
+        // TODO: We need to refactor the "remote" object
+        // Does this make sense here?
+        // retrieve remote server configuration 
+        Config config = getConfigService().getConfig("Remote");
+        if (config != null)
+        {
+           ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
+           if(remoteConfig != null)
+           {
+               String endpoint = remoteConfig.getChildValue("endpoint");
+               if (endpoint == null || endpoint.length() == 0)
+               {
+                   logger.warn("No 'endpoint' configured for ScriptRemote HTTP API access - remote object not available!");
+               }
+               else
+               {
+                   // use appropriate webscript servlet here - one that supports TICKET param auth
+                   RemoteClient remote = new RemoteClient(endpoint + "/s", "UTF-8");
+                   remote.setTicket(ticket.get());
+                   params.put("remote", remote);
+               }
+           }
+        }
+        
         return params;
     }
 
@@ -78,12 +104,26 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         params.putAll(super.getTemplateParameters());
         
         // Bind in Template Model elements
-        RequestContext context = getRequestContext();
-        if(context != null)
-        {
-            ProcessorModelHelper.populateTemplateModel(context, params);
-        }
+        RendererContext rendererContext = getRendererContext();
+
+        // populate the root template properties
+        ProcessorModelHelper.populateTemplateModel(rendererContext, params);
+
 
         return params;
     }
+    
+    /**
+     * This is included from the PageRendererRuntimeContainer
+     * TODO: This should be removed
+     * Tickets should be loaded from the credential store
+     */
+    private ThreadLocal<String> ticket = new ThreadLocal<String>();
+    
+    void setTicket(String ticket)
+    {
+       this.ticket.set(ticket);
+    }
+    
+    private static Log logger = LogFactory.getLog(PresentationContainer.class);
 }

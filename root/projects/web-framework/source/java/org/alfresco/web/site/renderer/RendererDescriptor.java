@@ -34,32 +34,61 @@ package org.alfresco.web.site.renderer;
  */
 public class RendererDescriptor
 {
+    /**
+     * Instantiates a new renderer descriptor.
+     * 
+     * @param renderer the renderer
+     * @param rendererType the renderer type
+     */
     public RendererDescriptor(String renderer, String rendererType)
     {
         this.renderer = renderer;
         this.rendererType = rendererType;
     }
     
+    /**
+     * Sets the renderer.
+     * 
+     * @param renderer the new renderer
+     */
     public void setRenderer(String renderer)
     {
         this.renderer = renderer;
     }
     
+    /**
+     * Gets the renderer.
+     * 
+     * @return the renderer
+     */
     public String getRenderer()
     {
         return this.renderer;
     }
     
+    /**
+     * Sets the renderer string.
+     * 
+     * @param rendererType the new renderer string
+     */
     public void setRendererString(String rendererType)
     {
         this.rendererType = rendererType;
     }
     
+    /**
+     * Gets the renderer type.
+     * 
+     * @return the renderer type
+     */
     public String getRendererType()
     {
         return this.rendererType;
     }
     
+    /** The renderer. */
     protected String renderer;
+    
+    /** The renderer type. */
     protected String rendererType;
 }

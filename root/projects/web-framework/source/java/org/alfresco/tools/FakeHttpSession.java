@@ -187,7 +187,7 @@ public class FakeHttpSession implements HttpSession
     }
 
     /** The attributes. */
-    private Map attributes = new HashMap();
+    private Map attributes = new HashMap(24, 1.0f);
 
     /** The creation time. */
     private long creationTime;

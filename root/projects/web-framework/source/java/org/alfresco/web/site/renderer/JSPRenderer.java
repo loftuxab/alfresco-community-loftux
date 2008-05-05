@@ -24,44 +24,67 @@
  */
 package org.alfresco.web.site.renderer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.alfresco.web.site.RenderData;
-import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
+ * The JSP renderer is a delegating renderer in that it allows you to
+ * pass control of object rendering to a specific JSP page.  Thus, folks
+ * can dynamically add and remove JSP renderers to their heart's content.
+ * 
+ * To use the JSP renderer, the renderer type should be set to "jsp" and
+ * the renderer property should be set to the path to your JSP file.
+ * 
  * @author muzquiano
  */
 public class JSPRenderer extends AbstractRenderer
 {
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RenderData renderData)
+    
+    private static final String JSP_FILE_URI = "jsp-file-uri";
+    private static final String JSP_PATH_URI = "jsp-path-uri";
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#execute(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.site.RenderData)
+     */
+    public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
+        /**
+         * Get the JSP file to be included
+         */
         String renderer = this.getRenderer();
-
-        // execute
         try
         {
-            // put the file URI into the config
-            String dispatchPath = renderer;
-            renderData.put("jsp-file-uri", dispatchPath);
+            /**
+             * Place the JSP file path onto the render data.
+             * This allows it to be retrieved within the JSP page.
+             */
+            rendererContext.put(JSP_FILE_URI, renderer);
 
-            // put the folder URI into the config
-            int x = dispatchPath.lastIndexOf("/");
-            String pathUri = dispatchPath.substring(0, x);
-            renderData.put("jsp-path-uri", pathUri);
+            /**
+             * Place the JSP file's parent folder path onto the render data.
+             * This allows it to be retrieved within the JSP page.
+             */
+            int x = renderer.lastIndexOf("/");
+            if(x > -1)
+            {
+                String pathUri = renderer.substring(0, x);
+                rendererContext.put(JSP_PATH_URI, pathUri);
+            }
+            else
+            {
+                rendererContext.put(JSP_PATH_URI, "/");
+            }
 
-            // do the include
-            RequestUtil.include(request, response, dispatchPath);
+            /**
+             * Do the include via the request dispatcher
+             */
+            RequestUtil.include(rendererContext.getRequest(), 
+                    rendererContext.getResponse(), renderer);
         }
         catch (Exception ex)
         {
-            throw new RendererExecutionException(ex,
-                    "Unable to execute JSP include: " + renderer);
+            throw new RendererExecutionException("Unable to execute JSP include: " + renderer, ex);
         }
     }
 }

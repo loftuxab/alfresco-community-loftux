@@ -29,15 +29,22 @@ package org.alfresco.web.site.exception;
  */
 public class RendererExecutionException extends Exception
 {
+    public RendererExecutionException(String message)
+    {
+        super(message);
+        setMessage(message);
+    }
+    
+    public RendererExecutionException(String message, Exception ex)
+    {
+        super(message, ex);
+        setMessage(message);
+    }
+
     public RendererExecutionException(Exception ex)
     {
         super(ex);
-    }
-
-    public RendererExecutionException(Exception ex, String myMessage)
-    {
-        super(ex);
-        setMessage(myMessage);
+        setMessage(ex.getLocalizedMessage());
     }
 
     public String getMessage()

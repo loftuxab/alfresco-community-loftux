@@ -48,7 +48,7 @@ public class WebUtil
      */
     public static Map getQueryStringMap(HttpServletRequest request)
     {
-        HashMap map = new HashMap();
+        HashMap map = new HashMap(24, 1.0f);
         String queryString = request.getQueryString();
         if (queryString != null)
         {

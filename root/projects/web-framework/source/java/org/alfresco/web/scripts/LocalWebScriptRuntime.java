@@ -89,7 +89,7 @@ public class LocalWebScriptRuntime
         }
         
         // add the html binding id
-        String htmlBindingId = (String) context.renderData.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+        String htmlBindingId = (String) context.rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
         if(htmlBindingId != null)
         {
             properties.put(ProcessorModelHelper.PROP_HTMLID, htmlBindingId);

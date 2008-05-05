@@ -1,25 +1,25 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have recieved a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.site.model;
@@ -35,9 +35,11 @@ import org.dom4j.Document;
 import org.dom4j.Element;
 
 /**
+ * Page model object
+ * 
  * @author muzquiano
  */
-public class Page extends ModelObject
+public class Page extends AbstractModelObject
 {
     public static String TYPE_NAME = "page";
     public static String PROP_TEMPLATE_INSTANCE = "template-instance";
@@ -45,9 +47,13 @@ public class Page extends ModelObject
     public static String PROP_ROOT_PAGE = "root-page";
     public static String PROP_PAGE_TYPE_ID = "page-type-id";
     public static String PROP_AUTHENTICATION = "authentication";
-    
     public static String DEFAULT_PAGE_TYPE_ID = "generic";
     
+    /**
+     * Instantiates a new page for a given XML document
+     * 
+     * @param document the document
+     */
     public Page(Document document)
     {
         super(document);
@@ -59,17 +65,32 @@ public class Page extends ModelObject
         }
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString()
     {
         return "Page Instance: " + getId() + ", " + toXML();
     }
 
+    /**
+     * Gets the template id.
+     * 
+     * @return the template id
+     */
     public String getTemplateId()
     {
         return getTemplateId(null);
     }
 
+    /**
+     * Gets the template id.
+     * 
+     * @param formatId the format id
+     * 
+     * @return the template id
+     */
     public String getTemplateId(String formatId)
     {
         Element templateElement = getTemplateElement(formatId);
@@ -78,6 +99,13 @@ public class Page extends ModelObject
         return null;
     }
 
+    /**
+     * Gets the template element.
+     * 
+     * @param formatId the format id
+     * 
+     * @return the template element
+     */
     protected Element getTemplateElement(String formatId)
     {
         if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
@@ -111,11 +139,22 @@ public class Page extends ModelObject
         return null;
     }
 
+    /**
+     * Sets the template id.
+     * 
+     * @param templateId the new template id
+     */
     public void setTemplateId(String templateId)
     {
         setTemplateId(templateId, null);
     }
 
+    /**
+     * Sets the template id.
+     * 
+     * @param templateId the template id
+     * @param formatId the format id
+     */
     public void setTemplateId(String templateId, String formatId)
     {
         if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
@@ -134,6 +173,11 @@ public class Page extends ModelObject
         templateElement.setText(templateId);
     }
 
+    /**
+     * Removes the template id.
+     * 
+     * @param formatId the format id
+     */
     public void removeTemplateId(String formatId)
     {
         if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
@@ -146,9 +190,16 @@ public class Page extends ModelObject
             templateElement.getParent().remove(templateElement);
     }
 
+    /**
+     * Gets the templates.
+     * 
+     * @param context the context
+     * 
+     * @return the templates
+     */
     public Map<String, TemplateInstance> getTemplates(RequestContext context)
     {
-        Map map = new HashMap();
+        Map map = new HashMap(8, 1.0f);
 
         List templateElements = getDocument().getRootElement().elements(
                 PROP_TEMPLATE_INSTANCE);
@@ -173,21 +224,46 @@ public class Page extends ModelObject
         return map;
     }
 
+    /**
+     * Gets the root page.
+     * 
+     * @return the root page
+     */
     public boolean getRootPage()
     {
         return getBooleanProperty(PROP_ROOT_PAGE);
     }
 
+    /**
+     * Sets the root page.
+     * 
+     * @param b the new root page
+     */
     public void setRootPage(boolean b)
     {
         this.setProperty(PROP_ROOT_PAGE, (b ? "true" : "false"));
     }
 
+    /**
+     * Gets the template.
+     * 
+     * @param context the context
+     * 
+     * @return the template
+     */
     public TemplateInstance getTemplate(RequestContext context)
     {
         return getTemplate(context, null);
     }
 
+    /**
+     * Gets the template.
+     * 
+     * @param context the context
+     * @param formatId the format id
+     * 
+     * @return the template
+     */
     public TemplateInstance getTemplate(RequestContext context, String formatId)
     {
         String templateId = getTemplateId(formatId);
@@ -196,6 +272,13 @@ public class Page extends ModelObject
         return null;
     }
 
+    /**
+     * Gets the child pages.
+     * 
+     * @param context the context
+     * 
+     * @return the child pages
+     */
     public Page[] getChildPages(RequestContext context)
     {
         PageAssociation[] associations = ModelUtil.findPageAssociations(
@@ -209,16 +292,33 @@ public class Page extends ModelObject
         return pages;
     }
     
+    /**
+     * Gets the page type id.
+     * 
+     * @return the page type id
+     */
     public String getPageTypeId()
     {
         return this.getProperty(PROP_PAGE_TYPE_ID);        
     }
     
+    /**
+     * Sets the page type id.
+     * 
+     * @param pageTypeId the new page type id
+     */
     public void setPageTypeId(String pageTypeId)
     {
         this.setProperty(PROP_PAGE_TYPE_ID, pageTypeId);        
     }
     
+    /**
+     * Gets the page type.
+     * 
+     * @param context the context
+     * 
+     * @return the page type
+     */
     public PageType getPageType(RequestContext context)
     {
         String pageTypeId = getPageTypeId();
@@ -229,6 +329,9 @@ public class Page extends ModelObject
         return null;
     }
        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.model.AbstractModelObject#getTypeName()
+     */
     public String getTypeName() 
     {
         return TYPE_NAME;

@@ -181,15 +181,19 @@ public class DispatcherServlet extends BaseServlet
         // see if there is a root-page declared to which we can go
         if (context.getCurrentPage() == null && context.getCurrentObjectId() == null)
         {
-            // check if a root page exists to which we can forward
-            Page rootPage = ModelUtil.getRootPage(context);
-            if (rootPage != null)
+            // if the site configuration exists...
+            if (context.getSiteConfiguration() != null)
             {
-                if (isDebugEnabled())
-                    debug(context, "Set root page as current page");
-                
-                context.setCurrentPage(rootPage);
-            }            
+                // check if a root page exists to which we can forward
+                Page rootPage = ModelUtil.getRootPage(context);
+                if (rootPage != null)
+                {
+                    if (isDebugEnabled())
+                        debug(context, "Set root page as current page");
+                    
+                    context.setCurrentPage(rootPage);
+                }            
+            }
         }
         
     }

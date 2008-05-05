@@ -24,12 +24,15 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
+
 import org.alfresco.connector.CredentialsVault;
 import org.alfresco.connector.IdentityVault;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
+import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
 
 /**
@@ -46,7 +49,7 @@ import org.apache.commons.logging.Log;
  * 
  * @author muzquiano
  */
-public interface RequestContext
+public interface RequestContext extends Serializable
 {
     /**
      * Each request context instance is stamped with a unique id
@@ -273,13 +276,13 @@ public interface RequestContext
     public IdentityVault getUserIdentityVault();
 
     /**
-     * Returns the render data context for the currently rendering
-     * object.  The render data context is scoped to the currently
-     * rendering object.
+     * Returns the render context for the currently rendering
+     * object.  The render context is scoped to the currently
+     * rendering object
      * 
-     * @return The Render Data instance
+     * @return The Render Context instance
      */
-    public RenderData getRenderData();
+    public RendererContext getRenderContext();
     
     /**
      * Returns the debug mode of the current request

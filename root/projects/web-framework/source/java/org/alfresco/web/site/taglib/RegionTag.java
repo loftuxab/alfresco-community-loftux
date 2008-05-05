@@ -119,7 +119,6 @@ public class RegionTag extends TagBase
         }
         catch (Throwable t)
         {
-            t.printStackTrace();
             throw new JspException(t);
         }
         return SKIP_BODY;

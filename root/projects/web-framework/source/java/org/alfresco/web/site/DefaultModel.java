@@ -298,13 +298,17 @@ public class DefaultModel extends AbstractModel implements IModel
     public void cacheInvalidateAll(RequestContext context)
     {
         if (cacheMap != null)
+        {
             cacheMap.clear();
+        }
     }
 
     protected IContentCache getCache(RequestContext context)
     {
         if (cacheMap == null)
-            cacheMap = new HashMap();
+        {
+            cacheMap = new HashMap(4096, 1.0f);
+        }
 
         String cacheMapKey = context.getStoreId();
         IContentCache cache = (IContentCache) cacheMap.get(cacheMapKey);
@@ -332,7 +336,6 @@ public class DefaultModel extends AbstractModel implements IModel
     protected ModelObject cacheGetByPath(RequestContext context,
             String relativePath)
     {
-        ModelObject obj = (ModelObject) getCache(context).get(relativePath);
-        return obj;
+        return (ModelObject) getCache(context).get(relativePath);
     }
 }

@@ -1,25 +1,25 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have recieved a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.site.renderer;
@@ -35,11 +35,27 @@ import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
 
 /**
+ * Produces the appropriate renderer implementations for a given
+ * model object.  The methods provided here look at the model and walk the
+ * object tree to determine its type and type of renderer to use.
+ * 
+ * In general, renderers are instantiated for Components and Templates.
+ * 
  * @author muzquiano
  */
 public class RendererFactory
 {
-    public static AbstractRenderer newRenderer(RequestContext context,
+    /**
+     * Constructs a renderer for a given component instance.
+     * 
+     * @param context the context
+     * @param component the components
+     * 
+     * @return the render instance
+     * 
+     * @throws RendererNotFoundException 
+     */
+    public static Renderable newRenderer(RequestContext context,
             Component component) throws RendererNotFoundException
     {
         /**
@@ -68,8 +84,10 @@ public class RendererFactory
         }
         if(uri != null && uri.length() != 0)
         {
-            // execute as a web script
-            // use a web script component
+            /**
+             * If it had a URI property, then we're assuming it is a
+             * webscript component type.
+             */
             ComponentType componentType = context.getModel().loadComponentType(
                     context, "webscript");
             return _newRenderer(context, componentType.getRendererType(), uri);
@@ -95,19 +113,42 @@ public class RendererFactory
                         componentTypeId);                
             }
         }
-        
-        // Otherwise, proceed as before
+
+        /**
+         * Otherwise, just look at the component type and instantiate
+         * a renderer for that component type
+         */
         ComponentType componentType = component.getComponentType(context);
         return newRenderer(context, componentType);
     }
 
-    public static AbstractRenderer newRenderer(RequestContext context,
+    /**
+     * Constructs a renderer for a given component type
+     * 
+     * @param context the context
+     * @param componentType the component type
+     * 
+     * @return the renderer instance
+     * 
+     * @throws RendererNotFoundException
+     */
+    public static Renderable newRenderer(RequestContext context,
             ComponentType componentType) throws RendererNotFoundException
     {
         return _newRenderer(context, componentType.getRendererType(), componentType.getRenderer());
     }
 
-    public static AbstractRenderer newRenderer(RequestContext context,
+    /**
+     * Constructs a renderer for a given template instance
+     * 
+     * @param context the context
+     * @param template the template
+     * 
+     * @return the renderer instance
+     * 
+     * @throws RendererNotFoundException
+     */
+    public static Renderable newRenderer(RequestContext context,
             TemplateInstance template) throws RendererNotFoundException
     {                
         /**
@@ -135,64 +176,109 @@ public class RendererFactory
         return newRenderer(context, templateType);
     }
     
-    public static AbstractRenderer newRenderer(RequestContext context,
+    /**
+     * Constructs a renderer for a given template type.
+     * 
+     * @param context the context
+     * @param templateType the template type
+     * 
+     * @return the renderer isntance
+     * 
+     * @throws RendererNotFoundException
+     */
+    public static Renderable newRenderer(RequestContext context,
             TemplateType templateType) throws RendererNotFoundException
     {        
         return _newRenderer(context, templateType.getRendererType(), templateType.getRenderer());
     }
     
-    public static AbstractRenderer newRenderer(RequestContext context, String rendererType, String renderer)
+    /**
+     * Constructs a renderer for a given renderer path and type
+     * 
+     * @param context the context
+     * @param rendererType the renderer type
+     * @param renderer the renderer
+     * 
+     * @return the renderer instance
+     * 
+     * @throws RendererNotFoundException
+     */
+    public static Renderable newRenderer(RequestContext context, String rendererType, String renderer)
         throws RendererNotFoundException
     {
         return _newRenderer(context, rendererType, renderer);
     }
 
-    protected static AbstractRenderer _newRenderer(RequestContext context,
+    /**
+     * Internal workhorse method for building renderers
+     * 
+     * @param context the context
+     * @param rendererType the renderer type
+     * @param renderer the renderer
+     * 
+     * @return the renderer instance
+     * 
+     * @throws RendererNotFoundException
+     */
+    protected static Renderable _newRenderer(RequestContext context,
             String rendererType, String renderer)
             throws RendererNotFoundException
     {
-        // JSP is the default case
+        /**
+         * If a renderer type is not specified, assume JSP.
+         */
         if (rendererType == null || rendererType.length() == 0)
         {
             rendererType = WebFrameworkConstants.RENDERER_TYPE_JSP;
         }
 
-        // look up the class implementation
+        /**
+         * Look up the implementation class name for this renderer type
+         * If not found, assume the JSP renderer
+         */
         String className = context.getConfig().getRendererClass(rendererType);
         if (className == null || className.length() == 0)
         {
-            // JSP is the default case
             className = "org.alfresco.web.site.renderer.JSPRenderer";
         }
 
-        // cache the renderers for performance
+        /**
+         * We only want to instantiate renderers once, so make sure
+         * that renderer cache is instantiated
+         */
         if (renderers == null)
         {
-            renderers = new HashMap<String, AbstractRenderer>();
+            renderers = new HashMap<String, Renderable>();
         }
 
-        // look up
+        /**
+         * Check the cache to see if this renderer has already been
+         * instantiated.  If not, then create a new one
+         */
         String cacheKey = className + "_" + renderer;
-        AbstractRenderer r = (AbstractRenderer) renderers.get(cacheKey);
+        Renderable r = (Renderable) renderers.get(cacheKey);
         if (r == null)
         {
             try
             {
-                r = (AbstractRenderer) Class.forName(className).newInstance();
+                r = (Renderable) Class.forName(className).newInstance();
                 r.setRenderer(renderer);
                 r.setRendererType(rendererType);
                 renderers.put(cacheKey, r);
             }
             catch (Exception ex)
             {
-                // unable to find the renderer implementation class
-                ex.printStackTrace();
+                /**
+                 * If for whatever reason we could not instantiate, throw
+                 * back with the RendererNotFoundException
+                 */
                 throw new RendererNotFoundException(ex);
             }
         }
         return r;
     }
 
-    protected static HashMap<String, AbstractRenderer> renderers = null;
+    /** The renderers. */
+    protected static HashMap<String, Renderable> renderers = null;
 
 }

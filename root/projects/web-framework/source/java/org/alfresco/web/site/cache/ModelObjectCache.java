@@ -89,10 +89,6 @@ public class ModelObjectCache extends BasicCache
                     long currentModificationTime = file.getModificationDate();
                     if (currentModificationTime > cachedModificationTime)
                     {
-                        debugLog("Cache Item '" + obj.getId() + "' changed on disk, marking invalid in cache.");
-                        debugLog(" -> cachedModificationTime:  " + cachedModificationTime);
-                        debugLog(" -> currentModificationTime: " + currentModificationTime);
-
                         remove(key);
                         obj = null;
                     }

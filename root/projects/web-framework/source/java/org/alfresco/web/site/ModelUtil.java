@@ -64,7 +64,7 @@ public class ModelUtil
             String chromeType)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 Chrome.PROP_CHROME_TYPE, chromeType);
 
@@ -92,7 +92,7 @@ public class ModelUtil
             String sourceId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 Configuration.PROP_SOURCE_ID, sourceId);
 
@@ -121,7 +121,7 @@ public class ModelUtil
             String associationType)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 PageAssociation.PROP_SOURCE_ID, sourceId);
         addPropertyConstraint(propertyConstraintMap,
@@ -200,7 +200,7 @@ public class ModelUtil
             String assocType, String formatId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 ContentAssociation.PROP_SOURCE_ID, sourceId);
         addPropertyConstraint(propertyConstraintMap,
@@ -270,7 +270,7 @@ public class ModelUtil
             String componentTypeId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE,
                 scope);
         addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID,
@@ -343,7 +343,7 @@ public class ModelUtil
             String templateType)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 TemplateInstance.PROP_TEMPLATE_TYPE, templateType);
 
@@ -369,7 +369,7 @@ public class ModelUtil
             String uri)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap, TemplateType.PROP_URI, uri);
 
         // do the lookup
@@ -400,7 +400,7 @@ public class ModelUtil
             String uri)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap, ComponentType.PROP_URI,
                 uri);
 
@@ -426,7 +426,7 @@ public class ModelUtil
             String rootPage, String pageTypeId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_ROOT_PAGE,
@@ -455,7 +455,7 @@ public class ModelUtil
     public static PageType[] findPageTypes(RequestContext context, String temp)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         /*
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
@@ -483,7 +483,7 @@ public class ModelUtil
     public static Theme[] findThemes(RequestContext context, String temp)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         /*
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
@@ -512,7 +512,7 @@ public class ModelUtil
             String endpointId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap();
+        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
         addPropertyConstraint(propertyConstraintMap, Endpoint.PROP_ENDPOINT_ID,
                 endpointId);
 
@@ -619,7 +619,9 @@ public class ModelUtil
                     typeName);
             if (objects != null && objects.length > 0)
             {
-                List arrayList = new ArrayList();
+                // TODO: What should the default size be for this array list?
+                // Using a high value here for the time being
+                List arrayList = new ArrayList(512);
                 for (int i = 0; i < objects.length; i++)
                 {
                     ModelObject object = (ModelObject) objects[i];
@@ -657,17 +659,21 @@ public class ModelUtil
                     }
 
                     if (success)
+                    {
                         arrayList.add(object);
+                    }
                 }
 
                 array = new ModelObject[arrayList.size()];
                 for (int j = 0; j < arrayList.size(); j++)
+                {
                     array[j] = (ModelObject) arrayList.get(j);
+                }
             }
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            Framework.getLogger().fatal(ex);
         }
         return array;
     }
@@ -748,7 +754,7 @@ public class ModelUtil
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                Framework.getLogger().error(ex);
             }
         }
         return doc;

@@ -25,30 +25,49 @@
 package org.alfresco.web.site.renderer;
 
 /**
+ * An abstract implementation of the Renderable interface that can be
+ * extended by application developers for quick implementation.
+ * 
  * @author muzquiano
  */
 public abstract class AbstractRenderer implements Renderable
 {
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#setRenderer(java.lang.String)
+     */
     public void setRenderer(String renderer)
     {
         this.renderer = renderer;
     }
 
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#getRenderer()
+     */
     public String getRenderer()
     {
         return this.renderer;
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#setRendererType(java.lang.String)
+     */
     public void setRendererType(String rendererType)
     {
         this.rendererType = rendererType;
     }
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#getRendererType()
+     */
     public String getRendererType()
     {
         return this.rendererType;
     }
 
+    /** The renderer. */
     protected String renderer;
+    
+    /** The renderer type. */
     protected String rendererType;
 }

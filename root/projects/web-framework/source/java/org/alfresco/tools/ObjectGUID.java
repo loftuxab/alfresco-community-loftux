@@ -31,6 +31,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
+import org.alfresco.web.page.PageRendererServlet;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /*
  * Useful for generating non-typed GUIDs.
  * 
@@ -41,6 +45,8 @@ import java.util.Random;
  */
 public class ObjectGUID
 {
+    private static Log logger = LogFactory.getLog(ObjectGUID.class);
+    
     /** The value before m d5. */
     public String valueBeforeMD5 = "";
     
@@ -67,7 +73,7 @@ public class ObjectGUID
         }
         catch (UnknownHostException e)
         {
-            e.printStackTrace();
+            logger.fatal(e);
         }
 
     }
@@ -110,7 +116,7 @@ public class ObjectGUID
         }
         catch (NoSuchAlgorithmException e)
         {
-            System.out.println("Error: " + e);
+            logger.fatal(e);
         }
 
         try
@@ -152,7 +158,7 @@ public class ObjectGUID
         }
         catch (Exception e)
         {
-            System.out.println("Error:" + e);
+            logger.error(e);
         }
     }
 

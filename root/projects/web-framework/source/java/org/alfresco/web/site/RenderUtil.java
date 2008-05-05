@@ -46,7 +46,9 @@ import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
-import org.alfresco.web.site.renderer.AbstractRenderer;
+import org.alfresco.web.site.renderer.Renderable;
+import org.alfresco.web.site.renderer.RendererContext;
+import org.alfresco.web.site.renderer.RendererContextHelper;
 import org.alfresco.web.site.renderer.RendererDescriptor;
 import org.alfresco.web.site.renderer.RendererFactory;
 
@@ -83,6 +85,9 @@ public class RenderUtil
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderJspPage-" + dispatchPath);
         
+        // bind the rendering to this page
+        RendererContextHelper.bind(context, request, response);
+        
         try
         {
             String renderer = dispatchPath;
@@ -96,6 +101,9 @@ public class RenderUtil
         }
         finally
         {
+            // unbind the rendering context
+            RendererContextHelper.unbind(context);
+            
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderJspPage-" + dispatchPath);
         }
@@ -149,7 +157,7 @@ public class RenderUtil
         try
         {
             // bind the rendering to this page
-            RenderDataHelper.bind(context, page);
+            RendererContextHelper.bind(context, page, request, response);
             
             // Wrap the Request and Response
             WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
@@ -191,7 +199,7 @@ public class RenderUtil
         finally
         {
             // unbind the rendering context
-            RenderDataHelper.unbind(context);
+            RendererContextHelper.unbind(context);
 
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderPage-" + page.getId());
@@ -228,11 +236,11 @@ public class RenderUtil
         try
         {
             // bind the rendering to this template
-            RenderData renderData = RenderDataHelper.bind(context, template);
+            RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
             
             // get the renderer and execute it
-            AbstractRenderer renderer = RendererFactory.newRenderer(context, template);
-            renderer.execute(context, request, response, renderData);
+            Renderable renderer = RendererFactory.newRenderer(context, template);
+            renderer.execute(rendererContext);
         }
         catch (Exception ex)
         {
@@ -243,7 +251,7 @@ public class RenderUtil
         finally
         {
             // unbind the rendering context
-            RenderDataHelper.unbind(context);
+            RendererContextHelper.unbind(context);
             
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderTemplate-" + templateId);            
@@ -302,13 +310,13 @@ public class RenderUtil
         try
         {
             // bind the rendering to this template
-            RenderData renderData = RenderDataHelper.bind(context, template);
+            RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
             
             // regions have to set by hand (not auto populated)
             String regionSourceId = getSourceId(context, regionScopeId);
-            renderData.put(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
-            renderData.put(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID, regionScopeId);
-            renderData.put(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID, regionSourceId);
+            rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
+            rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_SCOPE_ID, regionScopeId);
+            rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID, regionSourceId);
 
             // determine the region renderer
             RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);            
@@ -321,8 +329,8 @@ public class RenderUtil
             if (components.length > 0)
             {
                 // merge in component to render data
-                RenderData compRenderData = RenderDataHelper.generate(context, components[0]);
-                renderData.putAll(compRenderData);
+                RendererContext compRenderData = RendererContextHelper.generate(context, components[0]);
+                rendererContext.putAll(compRenderData);
                 
                 // execute renderer
                 RenderUtil.executeRenderer(context, request, response, descriptor);
@@ -345,7 +353,7 @@ public class RenderUtil
         finally
         {
             // unbind the rendering context
-            RenderDataHelper.unbind(context);
+            RendererContextHelper.unbind(context);
             
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
@@ -402,7 +410,7 @@ public class RenderUtil
         try
         {
             // bind the rendering to this component
-            RenderDataHelper.bind(context, component);
+            RendererContextHelper.bind(context, component, request, response);
             
             // determine the component renderer
             RendererDescriptor descriptor = getComponentRendererDescriptor(context, component, overrideChromeId);
@@ -418,7 +426,7 @@ public class RenderUtil
         finally
         {
             // unbind the rendering context
-            RenderDataHelper.unbind(context);
+            RendererContextHelper.unbind(context);
             
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderComponent-" + componentId);
@@ -455,12 +463,12 @@ public class RenderUtil
         try
         {
             // bind the rendering to this component
-            RenderData renderData = RenderDataHelper.bind(context, component);
+            RendererContext rendererContext = RendererContextHelper.bind(context, component, request, response);
             
             // build a renderer for this component
-            AbstractRenderer renderer = RendererFactory.newRenderer(context,
+            Renderable renderer = RendererFactory.newRenderer(context,
                     component);
-            renderer.execute(context, request, response, renderData);
+            renderer.execute(rendererContext);
         }
         catch (Exception ex)
         {
@@ -472,7 +480,7 @@ public class RenderUtil
         finally
         {
             // unbind the rendering context
-            RenderDataHelper.unbind(context);
+            RendererContextHelper.unbind(context);
             
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderRawComponent-" + componentId);
@@ -499,7 +507,7 @@ public class RenderUtil
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                Framework.getLogger().error(ex);
             }
         }
     }
@@ -518,7 +526,7 @@ public class RenderUtil
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                Framework.getLogger().error(ex);
             }
         }
     }
@@ -533,7 +541,7 @@ public class RenderUtil
         List list = (List) context.getValue(RequestContext.VALUE_HEAD_TAGS);
         if (list == null)
         {
-            list = new ArrayList();
+            list = new ArrayList(64);
             context.setValue(RequestContext.VALUE_HEAD_TAGS, list);
         }
         return list;
@@ -725,11 +733,11 @@ public class RenderUtil
             String rendererType, String renderer) throws Exception
     {
         // grab the renderer config
-        RenderData renderData = RenderDataHelper.current(context);
+        RendererContext rendererContext = RendererContextHelper.current(context);
                 
         // build a renderer for this descriptor
-        AbstractRenderer rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
-        rendererInstance.execute(context, request, response, renderData);
+        Renderable rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
+        rendererInstance.execute(rendererContext);
     }
     
     public static void executePageRenderer(RequestContext context,
@@ -818,6 +826,13 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String systemPageId, String defaultSystemPageRenderer) throws RequestDispatchException
     {
+        // start a timer
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderSystemPage-" + systemPageId);
+        
+        // bind the rendering to this page
+        RendererContextHelper.bind(context, request, response);
+        
         String renderer = null;
         String rendererType = null;
         try
@@ -839,6 +854,14 @@ public class RenderUtil
         catch (Exception ex)
         {
             throw new RequestDispatchException("Failed to render the system page '" + systemPageId + "' for renderer: " + renderer + " of type: " + rendererType, ex);
+        }
+        finally
+        {
+            // unbind the rendering context
+            RendererContextHelper.unbind(context);
+            
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderSystemPage-" + systemPageId);
         }
     }
     

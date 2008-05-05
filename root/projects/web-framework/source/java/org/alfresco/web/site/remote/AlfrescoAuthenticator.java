@@ -28,12 +28,11 @@ import org.alfresco.connector.Authenticator;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.DefaultCredentials;
 import org.alfresco.connector.Identity;
-import org.alfresco.connector.remote.AbstractClient;
 import org.alfresco.connector.remote.Client;
 import org.alfresco.connector.remote.Connector;
-import org.alfresco.connector.remote.RemoteClient;
 import org.alfresco.connector.remote.Response;
 import org.alfresco.connector.remote.WebConnector;
+import org.alfresco.web.site.Framework;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 
@@ -54,10 +53,9 @@ public class AlfrescoAuthenticator implements Authenticator
         WebConnector webConnector = ConnectorFactory.newWebConnector(endpointUrl);
         
         // plug identity onto the connector/client
-        RemoteClient webClient = (RemoteClient)webConnector.getClient();
+        Client webClient = (Client)webConnector.getClient();
         String username = (String) identity.get("USERNAME");
         String password = (String) identity.get("PASSWORD");
-        webClient.setUsernamePassword(username, password);
 
         // call and get the ticket
         Response r = webConnector.call("/service/ticket");
@@ -77,7 +75,7 @@ public class AlfrescoAuthenticator implements Authenticator
         }
         catch (DocumentException de)
         {
-            de.printStackTrace();
+            Framework.getLogger().error(de);
         }
         return null;
     }

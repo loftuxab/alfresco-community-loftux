@@ -257,6 +257,7 @@ public class RegionDirective implements TemplateDirectiveModel
       // NOTE: UI component URIs in page instance config files should not include /service prefix
       // Replace context/well known tokens in the component url
       String componentUrl = UriUtils.replaceUriTokens(component.getUrl(), context.Tokens);
+      
       String webscript = componentUrl;
       if (webscript.lastIndexOf('?') != -1)
       {

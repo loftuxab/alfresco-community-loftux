@@ -29,15 +29,38 @@ import javax.servlet.http.HttpServletRequest;
 import org.alfresco.web.site.model.Theme;
 
 /**
+ * A helper class for working with themes.
+ * 
+ * This basically assists in synchronizing the current theme between
+ * the request and the session.
+ * 
+ * It is useful for determining the current theme id during the execution
+ * of a JSP component, for example, or within a custom Java bean.
+ * 
  * @author muzquiano
  */
 public class ThemeUtil
 {
+    
+    /**
+     * Gets the current theme id.
+     * 
+     * @param context the context
+     * 
+     * @return the current theme id
+     */
     public static String getCurrentThemeId(RequestContext context)
     {
         return context.getThemeId();
     }
 
+    /**
+     * Gets the current theme.
+     * 
+     * @param context the context
+     * 
+     * @return the current theme
+     */
     public static Theme getCurrentTheme(RequestContext context)
     {
         String themeId = getCurrentThemeId(context);
@@ -48,11 +71,24 @@ public class ThemeUtil
         return null;
     }
     
+    /**
+     * Gets the current theme id.
+     * 
+     * @param request the request
+     * 
+     * @return the current theme id
+     */
     public static String getCurrentThemeId(HttpServletRequest request)
     {
         return (String) request.getSession().getAttribute("currentThemeId");
     }
 
+    /**
+     * Sets the current theme id.
+     * 
+     * @param request the request
+     * @param themeId the theme id
+     */
     public static void setCurrentThemeId(HttpServletRequest request,
             String themeId)
     {
@@ -62,6 +98,13 @@ public class ThemeUtil
         }
     }
 
+    /**
+     * This method is called by the dispatcher servlet to "push" the
+     * current theme from the session into the request-scoped RequestContext
+     * 
+     * @param context the context
+     * @param request the request
+     */
     public static void applyTheme(RequestContext context,
             HttpServletRequest request)
     {
