@@ -68,11 +68,11 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// config values
-	String componentId = (String) context.getRenderData().get("component-id");
-	String altText = (String) context.getRenderData().get("alt");
+	String componentId = (String) context.getRenderContext().get("component-id");
+	String altText = (String) context.getRenderContext().get("alt");
 	if(altText == null)
 		altText = "Navigation";		
-	String orientation = (String) context.getRenderData().get("orientation");
+	String orientation = (String) context.getRenderContext().get("orientation");
 	if(orientation == null || "".equals(orientation))
 		orientation = "horizontal";
 	

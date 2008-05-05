@@ -68,7 +68,7 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// get the configuration
-	String style = (String) context.getRenderData().get("style");
+	String style = (String) context.getRenderContext().get("style");
 	if(style == null || "".equals(style))
 		style="0";
 	

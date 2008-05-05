@@ -11,7 +11,7 @@
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
-	String orientation = (String) context.getRenderData().get("orientation");
+	String orientation = (String) context.getRenderContext().get("orientation");
 	if(orientation == null || "".equals(orientation))
 	{
 		String currentThemeId = ThemeUtil.getCurrentThemeId(context);
@@ -22,7 +22,7 @@
 	}
 	
 	// determine the renderer to use
-	String renderer = (String) context.getRenderData().get("renderer");
+	String renderer = (String) context.getRenderContext().get("renderer");
 	if(renderer == null)
 	{
 		renderer = "renderers/horizontalNav1/horizontalNav1.jsp";

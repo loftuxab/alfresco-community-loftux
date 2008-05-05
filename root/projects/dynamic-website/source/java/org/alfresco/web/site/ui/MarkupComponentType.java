@@ -24,28 +24,29 @@
  */
 package org.alfresco.web.site.ui;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.web.site.AbstractRenderable;
-import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.URLUtil;
 import org.alfresco.web.site.exception.RendererExecutionException;
+import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
  */
 public class MarkupComponentType extends AbstractRenderable
 {
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RenderData renderData)
+    public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
+    	RequestContext context = rendererContext.getRequestContext();
+    	HttpServletResponse response = rendererContext.getResponse();
+    	
         // config values
-        String markupData = (String) renderData.get("markupData");
+        String markupData = (String) rendererContext.get("markupData");
 
         // shimmy the data a bit
         if (markupData != null)

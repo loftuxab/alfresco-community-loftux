@@ -10,11 +10,11 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// properties from configuration	
-	String regionId = (String) context.getRenderData().get("region-id");
-	String regionScopeId = (String) context.getRenderData().get("region-scope-id");
-	String regionSourceId = (String) context.getRenderData().get("region-source-id");
-	String componentId = (String) context.getRenderData().get("component-id");	
-	String componentTypeId = (String) context.getRenderData().get("component-type-id");
+	String regionId = (String) context.getRenderContext().get("region-id");
+	String regionScopeId = (String) context.getRenderContext().get("region-scope-id");
+	String regionSourceId = (String) context.getRenderContext().get("region-source-id");
+	String componentId = (String) context.getRenderContext().get("component-id");	
+	String componentTypeId = (String) context.getRenderContext().get("component-type-id");
 
 	String currentThemeId = ThemeUtil.getCurrentThemeId(context);
 	String unconfiguredImageUrl = URLUtil.browser(context, "/themes/builder/images/" + currentThemeId + "/icons/unconfigured_region_large.gif");

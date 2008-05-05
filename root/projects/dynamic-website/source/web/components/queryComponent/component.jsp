@@ -14,11 +14,11 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 	
 	// settings	
-	String queryString = (String) context.getRenderData().get("queryString");
-	String queryType = (String) context.getRenderData().get("queryType");
-	String howToRender = (String) context.getRenderData().get("howToRender");
-	String renderData = (String) context.getRenderData().get("renderData");
-	String endpointId = (String) context.getRenderData().get("endpointId");
+	String queryString = (String) context.getRenderContext().get("queryString");
+	String queryType = (String) context.getRenderContext().get("queryType");
+	String howToRender = (String) context.getRenderContext().get("howToRender");
+	String renderData = (String) context.getRenderContext().get("renderData");
+	String endpointId = (String) context.getRenderContext().get("endpointId");
 	
 
 	// find this endpoint
