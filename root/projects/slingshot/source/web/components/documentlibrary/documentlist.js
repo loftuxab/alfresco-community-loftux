@@ -12,7 +12,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "containercore", "datasource", "datatable"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["datasource", "datatable"], this.componentsLoaded, this);
       
       return this;
    }
@@ -141,10 +141,10 @@
       {
          var fuComponent = Alfresco.util.ComponentManager.find({name:"Alfresco.FileUpload"})[0];
          // config for update new version of a single image
-         // fuComponent.show("Upload New Version of Alfresco Logo.rtf", [{description:"Images", extensions:"*.jpg"}], false, 1, true);
+         fuComponent.show("Upload New Version of Alfresco Logo.rtf", [{description:"Documents", extensions:"*.doc"}], false, 1, true);
 
          // config for multi upload of new documents
-         fuComponent.show("Upload Files", [{description:"Documents", extensions:"*.doc"}], true, 5, false);
+         //fuComponent.show("Upload Files", [{description:"Images", extensions:"*.jpg"}], true, 5, false);
       },
       
       onShowFoldersButtonClick: function(e, obj)

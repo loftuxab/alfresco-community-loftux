@@ -12,7 +12,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "containercore"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require([], this.componentsLoaded, this);
 
       return this;
    };

@@ -15,7 +15,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "uploader"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["datatable", "datasource", "uploader"], this.componentsLoaded, this);
 
       return this;
    }
@@ -39,6 +39,7 @@
       versionSection: null,
       multiSelectText:null,
       fileItemTemplate: null,      
+      addedFiles: {},
 
       modalPanelConfig: {
          width: "600px",
@@ -161,12 +162,13 @@
          }
       },
 
-      browse: function() {
-         this.clear(); // since the swf clears its file list when a new browser window opens....
+      browse: function()
+      {
          this.uploader.browse(this.multiSelect, this.filter);
       },
 
-      createEmptyDataTable: function() {
+      createEmptyDataTable: function()
+      {
 
          var Dom = YAHOO.util.Dom;
 
@@ -187,16 +189,32 @@
                   height: "200px"
                }
          );
+         this.dataTable.subscribe("rowAddEvent", this.rememberAddedFiles, this, true);
       },
 
-      addFilesToDataTable: function(entries){
+      rememberAddedFiles: function(oArgs)
+      {
+         var uniqueFileToken = this.getUniqeFileToken(oArgs.record.getData());
+         this.addedFiles[uniqueFileToken] = oArgs.record.getId();
+      },
+
+      getUniqeFileToken: function(data)
+      {
+         return data.name + ":" + data.size + ":" + data.cDate + ":" + data.mDate
+      },
+
+      addFilesToDataTable: function(entries)
+      {
          for(var i in entries) {
             var data = YAHOO.widget.DataTable._cloneObject(entries[i]);
-            this.dataTable.addRow(data, 0);
+            if(!this.addedFiles[this.getUniqeFileToken(data)]){
+               this.dataTable.addRow(data, 0);
+            }
          }
       },
 
-      onFileSelect: function(event) {
+      onFileSelect: function(event)
+      {
          this.addFilesToDataTable(event.fileList);
       },
 
@@ -251,6 +269,7 @@
       clear: function() {
          var length = this.dataTable.getRecordSet().getLength();
          this.uploader.clearFileList();
+         this.addedFiles = {};
          this.dataTable.deleteRows(0, length);
       },
 

@@ -35,10 +35,10 @@
 
       onOkButtonClick: function(type, args)
       {
-         //var data = '{"shortName":"erik10", "sitePreset":"sitePresetName", "title":"title", "description":"description", "isPublic":true, "url":"/services/api/sites/erik"}';
-         Alfresco.util.Request.doJsonForm(this.id + "-createSite-form", null, 
+         Alfresco.util.Request.doJsonForm(this.id + "-createSite-form", null,
            {successMessage: "Site created", failureMessage: "Could not create site"}
          );
+          
       }
 
    };
