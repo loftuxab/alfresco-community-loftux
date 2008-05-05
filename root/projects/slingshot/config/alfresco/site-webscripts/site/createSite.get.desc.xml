@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Create Site Component</shortname>
+   <description>Component to create a site</description>
+   <url>/components/site/createSite</url>
+</webscript>

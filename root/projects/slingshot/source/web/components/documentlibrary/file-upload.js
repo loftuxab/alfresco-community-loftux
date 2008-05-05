@@ -61,43 +61,45 @@
 
          var Dom = YAHOO.util.Dom;
 
-         var htmlDiv = Dom.getElementsByClassName("fileupload-htmldialog-panel", "div", this.id)[0];
+         var htmlDiv = Dom.get(this.id + "-htmldialog-panel");
          this.htmlPanel = new YAHOO.widget.Panel(htmlDiv, this.modalPanelConfig);
 
-         this.fileItemTemplate = Dom.getElementsByClassName("fileupload-fileItemTemplate-div", "div", this.id)[0];
+         this.fileItemTemplate = Dom.get(this.id + "-fileItemTemplate-div");
+
          this.createEmptyDataTable();
 
-         this.titleText = Dom.getElementsByClassName("fileupload-title-text", "span", this.id)[0];
+         this.titleText = Dom.get(this.id + "-title-span");
 
-         var flashDiv = Dom.getElementsByClassName("fileupload-flashdialog-panel", "div", this.id)[0];
+         var flashDiv = Dom.get(this.id + "-flashdialog-panel");
          this.flashPanel = new YAHOO.widget.Panel(flashDiv, this.modalPanelConfig);
 
 
-         var clButton = Dom.getElementsByClassName("fileupload-clear-button", "input", this.id)[0];
+         var clButton = Dom.get(this.id + "-clear-button");
          var clearButton = new YAHOO.widget.Button(clButton, {type: "button"});
          clearButton.subscribe("click", this.clear, this, true);
 
-         var bButton = Dom.getElementsByClassName("fileupload-browse-button", "input", this.id)[0];
+         var bButton = Dom.get(this.id + "-browse-button");
          var browseButton = new YAHOO.widget.Button(bButton, {type: "button"});
          browseButton.subscribe("click", this.browse, this, true);
 
-         this.versionSection = Dom.getElementsByClassName("fileupload-versionSection-div", "div", this.id)[0];
-         this.multiSelectText = Dom.getElementsByClassName("fileupload-multiSelect-text", "span", this.id)[0];
+         this.versionSection = Dom.get(this.id + "-versionSection-div");
+         this.multiSelectText = Dom.get(this.id + "-multiSelect-span");
 
-         var vGroup = Dom.getElementsByClassName("fileupload-versiongroup-div", "div", this.id)[0];
+         var vGroup = Dom.get(this.id + "-version-buttongroup");
          var oButtonGroup1 = new YAHOO.widget.ButtonGroup(vGroup); 
 
-         var uButton = Dom.getElementsByClassName("fileupload-upload-button", "input", this.id)[0];
+         var uButton = Dom.get(this.id + "-upload-button");
          var uploadButton = new YAHOO.widget.Button(uButton, {type: "button"});
          uploadButton.subscribe("click", this.upload, this, true);
 
-         var caButton = Dom.getElementsByClassName("fileupload-cancel-button", "input", this.id)[0];
+         var caButton = Dom.get(this.id + "-cancel-button");
          var cancelButton = new YAHOO.widget.Button(caButton, {type: "button"});
          cancelButton.subscribe("click", this.hide, this, true);
 
          this.hasRequestedVersion = DetectFlashVer(9, 0, 45); // majorVersion, minorVersions, revisionVersion
-         if(this.hasRequestedVersion){
-            this.uploader = new YAHOO.widget.Uploader("fileupload-flashuploader-div");
+         if(this.hasRequestedVersion)
+         {
+            this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
             this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
             this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
             this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
@@ -106,9 +108,6 @@
             this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
             this.uploader.subscribe("uploadError",this.onUploadError, this, true);
          }
-
-
-
       },
 
       /**
@@ -127,15 +126,19 @@
          this.versionInput = versionInput;
 
          this.titleText["innerHTML"] = title;
-         if(this.versionInput){
-            if(this.multiSelect){
+         if(this.versionInput)
+         {
+            if(this.multiSelect)
+            {
                alert("Cannot show version input fields for multiple files");
             }
-            else{
+            else
+            {
                Dom.setStyle(this.versionSection, "display", "true");
             }
          }
-         else{
+         else
+         {
             Dom.setStyle(this.versionSection, "display", "none");
          }
          Dom.setStyle(this.multiSelectText, "display", (this.multiSelect ? "true" : "none"));
@@ -177,7 +180,7 @@
             fields: ["id","name","created","modified","type", "size", "progress"]
          };
 
-         var dataTableDiv = Dom.getElementsByClassName("fileupload-filelist-table", "div", this.id)[0];
+         var dataTableDiv = Dom.get(this.id + "-filelist-table");
          this.dataTable = new YAHOO.widget.DataTable
                (dataTableDiv, myColumnDefs, myDataSource, {
                   scrollable: true,
@@ -220,7 +223,7 @@
          var Dom = YAHOO.util.Dom;
 
          // Set percentage
-         var templateInstance = Dom.get("fileupload-fileItemTemplate-div-" + flashId);
+         var templateInstance = Dom.get(this.id + "-fileItemTemplate-div-" + flashId);
          var uploaded = bytesLoaded / bytesTotal;
          Dom.getElementsByClassName("progressPercentage", "span", templateInstance)[0]["innerHTML"] = (uploaded * 100) + "%";
 
@@ -259,17 +262,16 @@
 
       formatCell:function(el, oRecord) {
          var Dom = YAHOO.util.Dom;
-         
+
          var flashId = oRecord.getData()["id"];
          var cell = new YAHOO.util.Element(el);
-
-         var template = this.fileItemTemplate;
-         var templateInstance = template.cloneNode(true);
-         templateInstance.setAttribute("id", "fileupload-fileItemTemplate-div-" + flashId);
-
          var fileInfoStr = oRecord.getData()["name"] + "(" + oRecord.getData()["size"] + "b)";
+
+         var templateInstance = this.fileItemTemplate.cloneNode(true);
+         templateInstance.setAttribute("id", this.id + "-fileItemTemplate-div-" + flashId);
          Dom.getElementsByClassName("progressInfo", "span", templateInstance)[0]["innerHTML"] = fileInfoStr;
          Dom.getElementsByClassName("progressPercentage", "span", templateInstance)[0]["innerHTML"] = "0%";
+
          // Set id so it can be referenced later (the class name can't be used since it will change if a failure occurs)
          var progress = Dom.getElementsByClassName("progressSuccess", "span", templateInstance)[0];
          progress.setAttribute("id", "progress-" + flashId);
