@@ -514,5 +514,5 @@ public class FakeHttpServletRequest implements HttpServletRequest
     private String characterEncoding = null;
     
     /** The attributes. */
-    private Map attributes = new HashMap();
+    private Map attributes = new HashMap(24, 1.0f);
 }

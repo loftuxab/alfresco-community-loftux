@@ -31,6 +31,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.ScriptConfigModel;
+import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
@@ -78,7 +79,7 @@ public final class ScriptWizard extends ScriptBase
         }
         catch (JSONException je)
         {
-            je.printStackTrace();
+            Framework.getLogger().error(je);
         }
     }
 
@@ -90,7 +91,7 @@ public final class ScriptWizard extends ScriptBase
         }
         catch (JSONException je)
         {
-            je.printStackTrace();
+            Framework.getLogger().error(je);
         }
     }
 
@@ -102,7 +103,7 @@ public final class ScriptWizard extends ScriptBase
         }
         catch (JSONException je)
         {
-            je.printStackTrace();
+            Framework.getLogger().error(je);
         }
     }
 
@@ -809,7 +810,7 @@ public final class ScriptWizard extends ScriptBase
                     "scriptWizard-state-" + getId());
             if (map == null)
             {
-                map = new HashMap();
+                map = new HashMap(32, 1.0f);
                 r.getSession().setAttribute("scriptWizard-state-" + getId(),
                         map);
             }

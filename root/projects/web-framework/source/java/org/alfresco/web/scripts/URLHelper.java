@@ -70,27 +70,6 @@ public class URLHelper
     
     public Map<String, String> getArgs()
     {
-        URLModel a;
         return this.args;
     }
-    
-    /**
-     * Added these methods in to mak ethin
-     */
-    
-    public String getServiceContext()
-    {
-        return this.context;
-    }
-    
-    public String getService()
-    {
-        return "";
-    }
-    
-    public String getFull()
-    {
-        return this.uri;
-    }
-    
 }

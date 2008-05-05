@@ -113,7 +113,7 @@ public class ModelHelper
             }
             catch(IllegalAccessException iae)
             {
-                iae.printStackTrace();
+                Framework.getLogger().error(iae);
             }
         }
         
@@ -156,16 +156,13 @@ public class ModelHelper
             // splice this off the front and that's our filename
             String fileName = modelRelativeFilePath.substring(relativePath.length() + 1, modelRelativeFilePath.length());
             
-            // get the relative path for this type
-            /*
-            int u = modelRelativeFilePath.lastIndexOf("/");
-            String relativePath = modelRelativeFilePath.substring(0, u);
-            String fileName = modelRelativeFilePath.substring(u+1, modelRelativeFilePath.length());
-            */
-
             // set onto object
-            obj.setRelativePath(relativePath);
-            obj.setFileName(fileName);
+            // TODO: To be refactored with shift to AVM store
+            if(obj instanceof AbstractModelObject)
+            {
+                ((AbstractModelObject)obj).setRelativePath(relativePath);
+                ((AbstractModelObject)obj).setFileName(fileName);
+            }
         }
         
         return obj;
@@ -194,12 +191,16 @@ public class ModelHelper
             // get the relative path for this type
             String modelRelativePath = Framework.getConfig().getModelTypePath(
                     typeName);
-            obj.setRelativePath(modelRelativePath);
-            obj.setFileName(id + ".xml");
+            // TODO: Refactor with shift to AVM store
+            if(obj instanceof AbstractModelObject)
+            {
+                ((AbstractModelObject)obj).setRelativePath(modelRelativePath);
+                ((AbstractModelObject)obj).setFileName(id + ".xml");
+            }
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            Framework.getLogger().error(ex);
         }
         return obj;        
     }

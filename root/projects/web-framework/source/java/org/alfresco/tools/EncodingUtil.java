@@ -37,7 +37,7 @@ public class EncodingUtil
 {
     
     /** The DEFAULT encoding. */
-    public static String DEFAULT_ENCODING = "utf-8";
+    public static final String DEFAULT_ENCODING = "utf-8";
 
     /**
      * Encodes the given String into the default encoding. The default encoding

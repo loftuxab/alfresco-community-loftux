@@ -32,11 +32,12 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.site.HttpRequestContext;
-import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.model.ModelObject;
+import org.alfresco.web.site.model.TemplateInstance;
+import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
@@ -44,76 +45,63 @@ import org.alfresco.web.site.model.ModelObject;
 public class ProcessorModelHelper
 {
     public static final String PROP_HTMLID = "htmlid";
-    
-    public static void populateScriptModel(RequestContext context, RenderData renderData, Map<String, Object> model)
+
+    /**
+     * Populates the model with common things for all processors
+     * 
+     * @param rendererContext
+     * @param model
+     */
+    public static void populateModel(RendererContext rendererContext, Map<String, Object> model)
     {
-        if(model == null || context == null)
+        if(model == null)
         {
             return;
         }
         
-        // populate url
-        if(context instanceof HttpRequestContext)
+        RequestContext context = rendererContext.getRequestContext();
+        if(context == null)
         {
-            HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-            
-            Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
-            Enumeration names = request.getParameterNames();
-            while (names.hasMoreElements())
-            {
-                String name = (String)names.nextElement();
-                args.put(name, request.getParameter(name));
-            }
-            
-            URLHelper urlHelper = new URLHelper(request, args);
-            model.put("url", urlHelper);
+            return;
         }
-    
-        // page attributes
+
+        // things about the current page being rendererd
         if(context.getCurrentPage() != null)
         {
             model.put("description", context.getCurrentPage().getDescription());
             model.put("title", context.getCurrentPage().getName());
-        }
-        
-        // copy in custom properties from the page
-        if(context.getCurrentPage() != null)
-        {
+
+            // custom page properties
             Map<String, Object> pageProperties = context.getCurrentPage().getCustomProperties();
             copyToModel(model, pageProperties, null);
+            
+            // "page" object
+            Map<String, Object> pageModel = new HashMap<String, Object>(4);
+            if(context instanceof HttpRequestContext)
+            {
+                HttpServletRequest request = ((HttpRequestContext)context).getRequest();
+                
+                Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
+                Enumeration names = request.getParameterNames();
+                while (names.hasMoreElements())
+                {
+                    String name = (String)names.nextElement();
+                    args.put(name, request.getParameter(name));
+                }
+                URLHelper urlHelper = new URLHelper(request, args);
+                pageModel.put("url", urlHelper);
+            }
+            pageModel.put("theme", ThemeUtil.getCurrentThemeId(context));
+            model.put("page", pageModel);
         }
         
-        // copy in custom properties from the template
+        // things from the current template
         if(context.getCurrentTemplate() != null)
         {
             Map<String, Object> templateProperties = context.getCurrentTemplate().getCustomProperties();
             copyToModel(model, templateProperties, null);
         }
-        
-        // we are also given the "rendering configuration" for the current
-        // object.  usually, this is either a component or a template.
-        // in either case, the configuration is set up ahead of time
-        // our job here is to make sure that freemarker has everything
-        // it needs for the component or template to process
-        if(renderData != null)
-        {
-            ModelObject object = renderData.getObject();
-            if(object != null)
-            {
-                Map<String, Object> objectProperties = object.getCustomProperties();
-                copyToModel(model, objectProperties, null);
-            }
-            
-            String htmlBindingId = (String) renderData.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
-            if(htmlBindingId != null && htmlBindingId.length() > 0)
-            {
-                model.put(PROP_HTMLID, htmlBindingId);
-            }
-            
-            // copy in render data settings
-            copyToModel(model, renderData.map(), null);
-        }
-                
+
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
         
         // add in the web framework script objects
@@ -121,87 +109,108 @@ public class ProcessorModelHelper
         if(context.getUser() != null)
         {
             model.put("user", new ScriptUser(context, context.getUser()));
-        }
-    }
+        }        
 
-    public static void populateTemplateModel(RequestContext context, Map<String, Object> model)
-    {
-        populateTemplateModel(context, null, model);
-    }
-    
-    public static void populateTemplateModel(RequestContext context, RenderData renderData, Map<String, Object> model)
-    {
-        if(model == null || context == null)
-        {
-            return;
-        }
-
-        // populate url
-        if(context instanceof HttpRequestContext)
-        {
-            HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-            
-            Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
-            Enumeration names = request.getParameterNames();
-            while (names.hasMoreElements())
-            {
-                String name = (String)names.nextElement();
-                args.put(name, request.getParameter(name));
-            }
-            
-            URLHelper urlHelper = new URLHelper(request, args);
-            model.put("url", urlHelper);
-        }
-    
-        // fixed page attributes
-        if(context.getCurrentPage() != null)
-        {
-            model.put("title", context.getCurrentPage().getTitle());
-            model.put("description", context.getCurrentPage().getDescription());
-        }
-        
-        // copy in custom properties from the page
-        if(context.getCurrentPage() != null)
-        {
-            Map<String, Object> pageProperties = context.getCurrentPage().getCustomProperties();
-            copyToModel(model, pageProperties, null);
-        }
-        
-        // copy in custom properties from the template
-        if(context.getCurrentTemplate() != null)
-        {
-            Map<String, Object> templateProperties = context.getCurrentTemplate().getCustomProperties();
-            copyToModel(model, templateProperties, null);
-        }
-        
         // we are also given the "rendering configuration" for the current
         // object.  usually, this is either a component or a template.
         // in either case, the configuration is set up ahead of time
         // our job here is to make sure that freemarker has everything
         // it needs for the component or template to process
-        if(renderData != null)
+        if(rendererContext != null)
         {
-            ModelObject object = renderData.getObject();
+            ModelObject object = rendererContext.getObject();
             if(object != null)
             {
                 Map<String, Object> objectProperties = object.getCustomProperties();
                 copyToModel(model, objectProperties, null);
             }
             
-            String htmlBindingId = (String) renderData.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+            String htmlBindingId = (String) rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
             if(htmlBindingId != null && htmlBindingId.length() > 0)
             {
                 model.put(PROP_HTMLID, htmlBindingId);
             }
             
             // copy in render data settings
-            copyToModel(model, renderData.map(), null);
+            copyToModel(model, rendererContext.map(), null);
+        }        
+    }
+    
+    public static void populateScriptModel(RendererContext rendererContext, Map<String, Object> model)
+    {
+        if(model == null)
+        {
+            return;
         }
         
+        RequestContext context = rendererContext.getRequestContext();
+        if(context == null)
+        {
+            return;
+        }
+        
+        // common population
+        populateModel(rendererContext, model);
 
-        // other fixed elements
-        model.put("theme", ThemeUtil.getCurrentThemeId(context));
-        model.put("head", WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+        // script specific
+        // none... at the moment
+    }
+    
+    public static void populateTemplateModel(RendererContext rendererContext, Map<String, Object> model)
+    {
+        if(model == null)
+        {
+            return;
+        }
+        
+        RequestContext context = rendererContext.getRequestContext();
+        if(context == null)
+        {
+            return;
+        }
+
+        // common population
+        populateModel(rendererContext, model);
+
+        /**
+         * We add in the "url" object if we're processing against
+         * a TemplateInstance
+         * 
+         * If we're processing against a Web Script, it will already be there
+         */
+        if(rendererContext.getObject() instanceof TemplateInstance)
+        {
+            if(context instanceof HttpRequestContext)
+            {
+                HttpServletRequest request = ((HttpRequestContext)context).getRequest();
+                
+                Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
+                Enumeration names = request.getParameterNames();
+                while (names.hasMoreElements())
+                {
+                    String name = (String)names.nextElement();
+                    args.put(name, request.getParameter(name));
+                }
+    
+                /**
+                 * The template processor could be called standalone or as a
+                 * processor for a web script.  Some variables might have
+                 * already been provided by the web script engine, such as the
+                 * "url" variable here.  Thus, if one already exists, we can
+                 * just use that one.
+                 */
+                URLHelper urlHelper = new URLHelper(request, args);
+                model.put("url", urlHelper);
+            }
+            
+            // add in the ${head} tag
+            model.put("head", WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+        }
+
+
+        /**
+         * TAGS
+         */
         
         // TODO: I would like this code to look at the tag libraries
         // registered with the configuration, parse the tag classes
@@ -225,15 +234,8 @@ public class ProcessorModelHelper
         
         // temporary: add floating menu
         addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");        
-        
-        // add in the web framework script objects
-        model.put("site", new ScriptSite(context));
-        if(context.getUser() != null)
-        {
-            model.put("user", new ScriptUser(context, context.getUser()));
-        }
     }    
-    
+       
     protected static void copyToModel(Map<String, Object> model, Map<String, Object> properties, String prefix)
     {
         Iterator it = properties.keySet().iterator();
@@ -245,22 +247,31 @@ public class ProcessorModelHelper
             if(prefix != null)
             {
                 key = prefix + key;
-            }
-            
+            }            
             model.put(key, value);
             
-            // NOTE: Fix this
-            // why do i have to do this?
-            // Freemarker TemplateProcessor ObjectWrapper thinks of all values as non numerical...
-            // Thus, have to force numerical... very strange.
-            // Kevin's approach seems not to have to do this
-            // Not sure why the disparity exists
-            try {
-                Integer a = Integer.valueOf((String)value);
-                model.put(key, a);
-            }catch(Exception ex) { }
+            /**
+             * This is an additional step to see if we can convert the
+             * values to Integers.
+             * 
+             * Note that the original PageRendererServlet did not do this
+             * and that this incurs additional overhead.  Thus, we may want
+             * to do away with it.
+             */
+            try 
+            {
+                //Integer a = Integer.valueOf((String)value);
+                //model.put(key, a);
+            }
+            catch(Exception ex) 
+            {
+                /**
+                 * This just means that we were unable to convert this to
+                 * an integer.  For whatever reason.  It really doesn't
+                 * matter why, so we let it go
+                 */                
+            }
         }
-        //model.putAll(customProperties);        
     }
     
     protected static void addDirective(RequestContext context, Map<String, Object> model, String name, String className)

@@ -95,12 +95,6 @@ public class PersistentCache extends BasicCache
             // it's not valid, throw it away
             remove(key);
 
-            if (isReporting())
-            {
-                debugLog(getReportTitle() + " get " + key);
-                debugLog(getReportTitle() + " -> Expired in cache.");
-            }
-
             return null;
         }
 
@@ -111,12 +105,6 @@ public class PersistentCache extends BasicCache
             {
                 remove(key);
 
-                if (isReporting())
-                {
-                    debugLog(getReportTitle() + " get " + key);
-                    debugLog(getReportTitle() + " -> Data found in memory, but not on disk.  Item will be removed.");
-                }
-
                 return null;
             }
         }
@@ -124,16 +112,6 @@ public class PersistentCache extends BasicCache
         // if it was reloaded, make sure its stored in memory
         if (bReloadedFromDisk)
             m_cache.put(key, item);
-
-        // reporting
-        if (isReporting())
-        {
-            debugLog(getReportTitle() + " get " + key);
-            if (bGottenFromMemory)
-                debugLog(getReportTitle() + " -> Found in memory.");
-            if (bReloadedFromDisk)
-                debugLog(getReportTitle() + " -> Loaded back into memory from disk.");
-        }
 
         // return this
         return item.m_object;
@@ -152,13 +130,6 @@ public class PersistentCache extends BasicCache
 
         m_cache.remove(key);
         removeFromDisk(key);
-
-        // reporting
-        if (isReporting())
-        {
-            debugLog(getReportTitle() + " remove " + key);
-            debugLog(getReportTitle() + " -> Removed from memory and disk");
-        }
     }
 
     /*
@@ -178,15 +149,6 @@ public class PersistentCache extends BasicCache
         if (writeToDisk(key, item))
         {
             m_cache.put(key, item);
-
-            // reporting
-            if (isReporting())
-            {
-                debugLog(getReportTitle() + " put " + key);
-                debugLog(getReportTitle() + " -> Cached to memory and disk");
-                debugLog(getReportTitle() + " -> Timeout is " + timeout);
-            }
-
         }
     }
 
@@ -249,7 +211,6 @@ public class PersistentCache extends BasicCache
         File file = getCacheFile(pathID);
         if (file == null)
         {
-            debugLog("Write to disk failed:  Null file path!");
             return false;
         }
 
@@ -263,7 +224,6 @@ public class PersistentCache extends BasicCache
         }
         catch (Exception e)
         {
-            debugLog("Write to disk failed: " + e.getMessage());
             return false;
         }
 

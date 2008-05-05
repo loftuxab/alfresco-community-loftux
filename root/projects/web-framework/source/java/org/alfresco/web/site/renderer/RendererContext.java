@@ -22,12 +22,18 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.web.site.renderer;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.User;
 import org.alfresco.web.site.model.ModelObject;
 
 /**
@@ -37,22 +43,31 @@ import org.alfresco.web.site.model.ModelObject;
  * 
  * @author muzquiano
  */
-public class RenderData
+public class RendererContext implements Serializable
 {
     protected Map<String, Object> map;
     protected ModelObject object;
     protected RequestContext context;
+    protected HttpServletRequest request;
+    protected HttpServletResponse response;
 
-    protected RenderData()
+    public RendererContext()
     {
         this.map = new HashMap<String, Object>();
     }
 
-    protected RenderData(RequestContext context, ModelObject object)
+    public RendererContext(RequestContext context, ModelObject object)
     {
         this();
         this.context = context;
         this.object = object;
+    }
+    
+    public RendererContext(RequestContext context, ModelObject object, HttpServletRequest request, HttpServletResponse response)
+    {
+        this(context, object);
+        this.request = request;
+        this.response = response;
     }
     
     public RequestContext getRequestContext()
@@ -60,9 +75,29 @@ public class RenderData
         return this.context;        
     }
     
-    protected void setRequestContext(RequestContext context)
+    public void setRequestContext(RequestContext context)
     {
         this.context = context;        
+    }
+    
+    public HttpServletRequest getRequest()
+    {
+        return this.request;
+    }
+    
+    public void setRequest(HttpServletRequest request)
+    {
+        this.request = request;
+    }
+    
+    public HttpServletResponse getResponse()
+    {
+        return this.response;
+    }
+    
+    public void setResponse(HttpServletResponse response)
+    {
+        this.response = response;
     }
     
     public ModelObject getObject()
@@ -70,7 +105,7 @@ public class RenderData
         return this.object;
     }
     
-    protected void setObject(ModelObject object)
+    public void setObject(ModelObject object)
     {
         this.object = object;
     }
@@ -106,9 +141,9 @@ public class RenderData
     
     // Helper Methods
     
-    public RenderData clone()
+    public RendererContext clone()
     {
-        RenderData c = new RenderData();
+        RendererContext c = new RendererContext();
         c.setObject(this.getObject());
         c.setRequestContext(this.getRequestContext());
         c.putAll(this);
@@ -124,11 +159,11 @@ public class RenderData
         }
     }
 
-    public void putAll(RenderData renderData)
+    public void putAll(RendererContext rendererContext)
     {
-        if(renderData != null)
+        if(rendererContext != null)
         {
-            putAll(renderData.map);
+            putAll(rendererContext.map);
         }
     }
     

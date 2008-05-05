@@ -43,14 +43,13 @@ public class ComponentIncludeTag extends TagBase
         HttpServletResponse response = (HttpServletResponse) getPageContext().getResponse();
         RequestContext context = getRequestContext();
 
-        String componentId = (String) context.getRenderData().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);        
+        String componentId = (String) context.getRenderContext().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);        
         try
         {
             RenderUtil.renderRawComponent(context, request, response, componentId);
         }
         catch (Throwable t)
         {
-            t.printStackTrace();
             throw new JspException(t);
         }
         return SKIP_BODY;

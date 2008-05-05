@@ -34,7 +34,6 @@ import java.util.WeakHashMap;
  */
 public class BasicCache implements IContentCache
 {
-    
     /**
      * Instantiates a new basic cache.
      * 
@@ -53,24 +52,21 @@ public class BasicCache implements IContentCache
     {
         // get the content item from the cache
         CacheItem item = (CacheItem) m_cache.get(key);
-        debugLog("Cache lookup of '" + key + "' returns: " + item);
 
         // if the cache item is null, return right away
         if (item == null)
+        {
             return null;
+        }
         else
         {
             // ask the cache item if it's still valid
             if (item.isExpired())
             {
-                debugLog("Cache item '" + key + "' expired.");
-
                 // it's not valid, throw it away
                 remove(key);
                 return null;
             }
-            else
-                debugLog("Cache item '" + key + "' returned from cache.");
 
             // return this
             return item.m_object;
@@ -83,7 +79,9 @@ public class BasicCache implements IContentCache
     public synchronized void remove(String key)
     {
         if (key == null)
+        {
             return;
+        }
         m_cache.remove(key);
     }
 
@@ -103,9 +101,6 @@ public class BasicCache implements IContentCache
         // create the cache item
         CacheItem item = new CacheItem(key, obj, timeout);
         m_cache.put(key, item);
-
-        // debug feature
-        debugLog("Cached '" + key + "' with timeout of " + timeout);
     }
 
     /* (non-Javadoc)
@@ -146,16 +141,6 @@ public class BasicCache implements IContentCache
     protected String getReportTitle()
     {
         return "[Cache Thread " + Thread.currentThread().getName() + "]";
-    }
-
-    /**
-     * Debug log.
-     * 
-     * @param str the str
-     */
-    protected void debugLog(String str)
-    {
-        //System.out.println(str);
     }
 
     /** The m_b reporting. */

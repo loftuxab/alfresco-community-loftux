@@ -41,7 +41,6 @@ public class ScriptBase implements Serializable
     protected RequestContext context;
     protected Map<String, Object> model;
     
-    
     public ScriptBase()
     {
     }

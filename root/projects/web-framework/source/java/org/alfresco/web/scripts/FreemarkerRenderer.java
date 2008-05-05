@@ -29,28 +29,36 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.RenderData;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.AbstractRenderer;
+import org.alfresco.web.site.renderer.RendererContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
+ * Implementation of a renderer that executes a Freemarker template.
+ * 
  * @author muzquiano
  */
 public class FreemarkerRenderer extends AbstractRenderer
 {
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RenderData renderData)
+    
+    /**
+     * Execute.
+     * 
+     * @param rendererContext the renderer context
+     * 
+     * @throws RendererExecutionException the renderer execution exception
+     */
+    public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
-        ServletContext servletContext = request.getSession().getServletContext();
+        ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        RequestContext context = rendererContext.getRequestContext();
 
         // get the renderer destination property
         String uri = this.getRenderer();
@@ -85,16 +93,16 @@ public class FreemarkerRenderer extends AbstractRenderer
         String templateName = null;
         try
         {
-            // build the model
-            Map<String, Object> model = new HashMap<String, Object>(8);
-            ProcessorModelHelper.populateTemplateModel(context, renderData, model);
-            
             // path to the template (switches on format)
             templateName = uri + ((format != null && format.length() != 0 &&
                     !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");
             
             if (templateProcessor.hasTemplate(templateName))
             {
+                // build the model
+                Map<String, Object> model = new HashMap<String, Object>(8);
+                ProcessorModelHelper.populateTemplateModel(rendererContext, model);
+                
                 StringWriter out = new StringWriter(512);
                 templateProcessor.process(templateName, model, out);
                 
@@ -104,7 +112,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         }
         catch(Exception ex) 
         {   
-            throw new RendererExecutionException(ex, "FreemarkerRenderer failed to process template: " + templateName);
+            throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
         }
 
         
@@ -112,6 +120,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         /**
          * Now execute the real template
          */
+        templateName = null;
         try
         {
             // the result model
@@ -126,7 +135,7 @@ public class FreemarkerRenderer extends AbstractRenderer
             {
                 // build the model
                 Map<String, Object> scriptModel = new HashMap<String, Object>(8);
-                ProcessorModelHelper.populateScriptModel(context, renderData, scriptModel);
+                ProcessorModelHelper.populateScriptModel(rendererContext, scriptModel);
 
                 // add in the model object
                 scriptModel.put("model", resultModel);
@@ -135,14 +144,11 @@ public class FreemarkerRenderer extends AbstractRenderer
                 scriptProcessor.executeScript(script, scriptModel);
             }
             
-            
-            
-            
             /**
              * Execute the template file itself
              */
             Map<String, Object> templateModel = new HashMap<String, Object>(8);
-            ProcessorModelHelper.populateTemplateModel(context, renderData, templateModel);
+            ProcessorModelHelper.populateTemplateModel(rendererContext, templateModel);
             
             // merge script results model into the template model
             // these may not exist if a .js file was not found
@@ -158,11 +164,11 @@ public class FreemarkerRenderer extends AbstractRenderer
             templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".ftl") : ".ftl");
             
             // process the template
-            templateProcessor.process(templateName, templateModel, response.getWriter());
+            templateProcessor.process(templateName, templateModel, rendererContext.getResponse().getWriter());
         }
         catch(Exception ex)
         {
-            throw new RendererExecutionException(ex, "FreemarkerRenderer failed to process template: " + templateName);
+            throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
         }
     }
 }

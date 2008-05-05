@@ -26,20 +26,26 @@ package org.alfresco.web.scripts;
 
 import java.util.Map;
 
-import org.alfresco.web.site.RenderData;
+import javax.servlet.http.HttpServletRequest;
+
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.ModelObject;
+import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
  */
 public class LocalWebScriptContext
 {
-    RenderData renderData;
+    HttpServletRequest ServletRequest;
+    RuntimeContainer RuntimeContainer;
     String RequestURI;
     String RequestPath;
+    Map<String, String> Tokens;
     String scriptUrl;
+    
+    // Web Framework Elements
+    RendererContext rendererContext;
     ModelObject object;
     RequestContext requestContext;
-    Map<String, String> Tokens;
 }

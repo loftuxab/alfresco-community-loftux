@@ -39,7 +39,8 @@ public class CacheUtil
         {
             CachedFileSystem cachedFileSystem = (CachedFileSystem) fileSystem;
             cachedFileSystem.refresh();
-            System.out.println("Invalidated File System Cache");
+            
+            Framework.getLogger().info("Invalidated File System Cache");
         }
     }
 
@@ -49,7 +50,8 @@ public class CacheUtil
         if (model instanceof DefaultModel)
         {
             ((DefaultModel) model).cacheInvalidateAll(context);
-            System.out.println("Invalidated Object Cache");
+            
+            Framework.getLogger().info("Invalidated Object Cache");
         }
     }
 

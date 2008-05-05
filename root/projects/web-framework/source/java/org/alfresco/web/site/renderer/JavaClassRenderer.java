@@ -26,35 +26,57 @@ package org.alfresco.web.site.renderer;
 
 import java.util.HashMap;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.alfresco.web.site.RenderData;
-import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RenderableNotFoundException;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
+ * The Java Class renderer is a delegating renderer that allows application
+ * developers to wrap the execution of their custom Java beans.
+ * 
+ * To use the renderer, the renderer type should be set to "javaclass" 
+ * and the renderer property should be set to the fully qualified class name
+ * of the Java bean to execute.
+ * 
+ * The Java bean to be executed must also implement the Renderable interface.
+ * 
+ * You are also free to register your Java bean directly.  The advantage of
+ * routing through the JavaClassRenderer as a proxy is basically to
+ * take advantage of Exception trapping.
+ * 
  * @author muzquiano
  */
 public class JavaClassRenderer extends AbstractRenderer
 {
-    public void execute(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response, RenderData renderData)
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#execute(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.site.RenderData)
+     */
+    public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
+        /**
+         * The fully qualified java class name to execute
+         */
         String renderer = this.getRenderer();
 
-        // go to cache for performance
+        /**
+         * Make sure that we only construct beans for a given class name
+         * once by using a cache
+         */
         if (instances == null)
-            instances = new HashMap();
+        {
+            instances = new HashMap(16, 1.0f);
+        }
 
+        /**
+         * See if an instance for this class has already been constructed
+         * If not, construct it and place it into the cache
+         */
         Renderable renderableImpl = (Renderable) instances.get(renderer);
         if (renderableImpl == null)
         {
             try
             {
-                // instantiate the java class
                 renderableImpl = (Renderable) Class.forName(renderer).newInstance();
                 renderableImpl.setRenderer(renderer);
                 instances.put(renderer, renderableImpl);
@@ -67,10 +89,12 @@ public class JavaClassRenderer extends AbstractRenderer
             }
         }
 
-        // execute
+        /**
+         * Now execute the bean
+         */
         try
         {
-            renderableImpl.execute(context, request, response, renderData);
+            renderableImpl.execute(rendererContext);
         }
         catch (Exception ex)
         {
@@ -78,5 +102,6 @@ public class JavaClassRenderer extends AbstractRenderer
         }
     }
 
+    /** The instances. */
     protected static HashMap instances = null;
 }

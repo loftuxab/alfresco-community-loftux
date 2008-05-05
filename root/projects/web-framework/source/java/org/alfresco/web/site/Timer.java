@@ -61,10 +61,6 @@ public class Timer
         {
             logger.debug(value);
         }
-        else
-        {
-            System.out.println(value);
-        }
     }
     
     /**
