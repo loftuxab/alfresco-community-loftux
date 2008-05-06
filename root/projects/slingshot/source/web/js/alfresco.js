@@ -8,22 +8,23 @@ if (typeof Alfresco == "undefined" || !Alfresco)
 Alfresco.constants = Alfresco.constants ||
 {
    /* AJAX Proxy URI stem */
-   PROXY_URI: window.location.protocol + "//" + window.location.host + "/slingshot/proxy?endpoint=",
+   PROXY_URI: "",
    
    /* THEME set by template header using ${theme} */
    THEME: "./",
    
    /* TODO: Remove ticket when AJAX/Proxy authentication in place */
    /* http://localhost:8080/alfresco/service/api/login?u={username}&pw={password} */
-   TICKET: "TICKET_5afa7148ab77870ae0fb3997e5b569ef59da0319",
+   TICKET: "TICKET_f6cf06f37ce0f2cfc217a7e0c61f7ea186668bd6",
 
-   /* URL_CONTEXT set by template header using ${url.context} */
-   URL_CONTEXT: "./"
+   /* URL_CONTEXT and URL_SERVICECONTEXT set by template header using ${url.context} */
+   URL_CONTEXT: "./",
+   URL_SERVICECONTEXT: "./service/"
 };
 
 
 /* Ensure top-level Alfresco namespaces exist */
-Alfresco.ui = Alfresco.ui || {};
+Alfresco.module = Alfresco.module || {};
 Alfresco.util = Alfresco.util || {};
 Alfresco.logger = Alfresco.logger || {};
 
@@ -71,6 +72,7 @@ Alfresco.util.YUILoaderHelper = function()
 {
    var yuiLoader = null;
    var callbacks = [];
+   var initialLoaderComplete = false;
    
    return {
       require: function(p_aComponents, p_oCallback, p_oScope)
@@ -146,6 +148,8 @@ Alfresco.util.YUILoaderHelper = function()
          {
             callbacks[i].fn.call(callbacks[i].scope);
          }
+         callbacks = [];
+         initialLoaderComplete = true;
       }
    };
 }();

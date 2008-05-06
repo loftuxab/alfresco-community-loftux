@@ -49,8 +49,9 @@
 
       onCreateSiteButtonClick: function(event)
       {
-         this.createSitePanel.render(document.body);
-         this.createSitePanel.show();
+         // this.createSitePanel.render(document.body);
+         // this.createSitePanel.show();
+         new Alfresco.module.CreateSite(this.id + "-createSite").show();
       }
 
    };
