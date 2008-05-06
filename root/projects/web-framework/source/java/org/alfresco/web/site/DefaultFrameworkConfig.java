@@ -1220,6 +1220,4 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         ConfigElement element = config.getConfigElement(CONFIG_FRAMEWORK).getChild(CONFIG_DEFAULTS).getChild(id);
         return element.getValue();
     }
-    
-    
 }

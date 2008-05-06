@@ -32,49 +32,44 @@ import org.alfresco.web.site.exception.PageMapperException;
  */
 public class PageMapperFactory
 {
-    public static PageMapper newPageMapper()
-    {
-        return new DefaultPageMapper();
-    }
-
     public static PageMapper newInstance(RequestContext context)
         throws PageMapperException
     {
-        // default that we will use
-        String className = "org.alfresco.web.site.DefaultPageMapper";
-
+        PageMapper pageMapper;
+        
         // check if there is a configured link builder id
         String pageMapperId = Framework.getConfig().getDefaultPageMapperId();
-        if (pageMapperId != null)
+        if (pageMapperId == null)
         {
-            String _className = Framework.getConfig().getPageMapperClass(
-                    pageMapperId);
-            if (_className != null)
-                className = _className;
+            // default that we will use
+            pageMapper = new DefaultPageMapper();
         }
-
-        // construct a page mapper
-        // TODO: Pool these
-        PageMapper pageMapper = (PageMapper) ReflectionHelper.newObject(className);
-        if(pageMapper == null)
+        else
         {
-            throw new PageMapperException("Unable to create page mapper for class name: " + className);
+            // construct a page mapper
+            // TODO: Pool these?
+            String className = Framework.getConfig().getPageMapperClass(pageMapperId);
+            pageMapper = (PageMapper) ReflectionHelper.newObject(className);
+            if (pageMapper == null)
+            {
+                throw new PageMapperException("Unable to create page mapper for class name: " + className);
+            }
         }
         
-        // log
-        Framework.getLogger().debug("New page mapper: " + className);
-
+        Framework.getLogger().isDebugEnabled();
+            Framework.getLogger().debug("New page mapper: " + pageMapper.getClass().toString());
+        
         return pageMapper;
     }
     
     public synchronized static PageMapper sharedInstance(RequestContext context)
         throws PageMapperException
     {
-        if(mapper == null)
+        if (mapper == null)
         {
             mapper = newInstance(context);
         }
-    
+        
         return mapper;
     }
     

@@ -35,10 +35,12 @@
       <servlet-class>org.alfresco.web.site.servlet.WebScriptAuthenticationServlet</servlet-class>
    </servlet>
    
+   <!--
    <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
    </servlet>
+   -->
    
    <servlet>
       <servlet-name>uriTemplateServlet</servlet-name>
@@ -47,13 +49,11 @@
 
    <!-- To use the Web Framework Dispatcher Servlet -->
    <!--   Uncomment this block and comment out the pageRendererServlet above -->
-   <!--
    <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
    </servlet>  
-   -->
    
 
    <servlet-mapping>

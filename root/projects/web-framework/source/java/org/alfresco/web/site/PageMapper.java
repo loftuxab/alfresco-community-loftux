@@ -41,7 +41,6 @@ import org.alfresco.web.site.exception.PageMapperException;
  */
 public interface PageMapper
 {
-    
     /**
      * Execute the page mapper against the given request and populate into the
      * provided request context instance.
