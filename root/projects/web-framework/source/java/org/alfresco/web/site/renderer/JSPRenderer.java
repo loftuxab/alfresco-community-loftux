@@ -24,6 +24,14 @@
  */
 package org.alfresco.web.site.renderer;
 
+import java.net.URL;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
@@ -39,10 +47,52 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  */
 public class JSPRenderer extends AbstractRenderer
 {
-    
     private static final String JSP_FILE_URI = "jsp-file-uri";
     private static final String JSP_PATH_URI = "jsp-path-uri";
 
+    public String head(RendererContext rendererContext)
+        throws RendererExecutionException
+    {
+        String head = super.head(rendererContext);
+        
+        String headRenderer = this.getRenderer();
+        try
+        {
+            if(headRenderer != null)
+            {
+                int x = headRenderer.lastIndexOf(".");
+                if(x > -1)
+                {
+                    headRenderer = headRenderer.substring(0,x) + ".head." + renderer.substring(x+1, renderer.length());
+                }
+    
+                /**
+                 * Check whether the file exists
+                 */
+                ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
+                URL resource = servletContext.getResource(headRenderer);
+    
+                /**
+                 * If the resource exists, process it...
+                 */
+                if(resource != null)
+                {
+                    RequestContext context = rendererContext.getRequestContext();
+                    HttpServletRequest request = rendererContext.getRequest();
+                    HttpServletResponse response = rendererContext.getResponse();
+                    
+                    head = head + RenderUtil.processRenderer(context, request, response, getRendererType(), headRenderer);                    
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new RendererExecutionException("Unable to execute head renderer for renderer: " + renderer, ex);
+        }
+        
+        return head;
+    }
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.site.renderer.Renderable#execute(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.site.RenderData)
      */

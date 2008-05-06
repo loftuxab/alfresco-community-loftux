@@ -32,9 +32,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.site.HttpRequestContext;
+import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.RendererContext;
@@ -157,6 +159,7 @@ public class ProcessorModelHelper
     }
     
     public static void populateTemplateModel(RendererContext rendererContext, Map<String, Object> model)
+        throws RendererExecutionException
     {
         if(model == null)
         {
@@ -204,7 +207,11 @@ public class ProcessorModelHelper
             }
             
             // add in the ${head} tag
-            model.put("head", WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+            if(rendererContext.getObject() instanceof TemplateInstance)
+            {               
+                StringBuilder builder = RenderUtil.processHeader(rendererContext);
+                model.put("head", builder.toString());
+            }
         }
 
 

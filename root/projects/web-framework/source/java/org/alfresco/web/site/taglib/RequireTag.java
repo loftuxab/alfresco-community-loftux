@@ -75,22 +75,13 @@ public class RequireTag extends TagBase
 
     public int doEndTag() throws JspException
     {
-        // get the body content and include if it is there
-        if (getBodyContent() != null)
-        {
-            String tags = getBodyContent().getString();
-            if (tags != null && tags.length() != 0)
-            {
-                RenderUtil.appendHeadTags(getRequestContext(), tags);
-            }
-        }
-
-        // is there a script tag?  if so, include it
-        if (getScript() != null)
+        // is there a script tag?
+        if(getScript() != null)
         {
             String scriptImport = RenderUtil.renderScriptImport(
                     getRequestContext(), getScript());
-            RenderUtil.appendHeadTags(getRequestContext(), scriptImport);
+            print(scriptImport);
+            print("\r\n");
         }
 
         // is there a link tag?  if so, include it
@@ -105,7 +96,19 @@ public class RequireTag extends TagBase
             {
                 linkImport = RenderUtil.renderLinkImport(getRequestContext(), getLink());
             }
-            RenderUtil.appendHeadTags(getRequestContext(), linkImport);
+            print(linkImport);
+            print("\r\n");
+        }
+        
+        // get the body content and include if it is there
+        if (getBodyContent() != null)
+        {
+            String tags = getBodyContent().getString();
+            if (tags != null && tags.length() != 0)
+            {
+                print(tags);
+                print("\r\n");
+            }
         }
 
         return SKIP_BODY;

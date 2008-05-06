@@ -26,18 +26,34 @@ package org.alfresco.web.site.taglib;
 
 import javax.servlet.jsp.JspException;
 
-import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.site.RenderUtil;
+import org.alfresco.web.site.exception.RendererExecutionException;
+import org.alfresco.web.site.renderer.RendererContext;
 
 /**
- * This tag is a bit unusual.  When executed, it simply emits a
- * <!--${head$}--> token to the output stream.
+ * This tag is meant to be used during the processing of Template Instances.
+ * 
+ * The tag will look for components bound to this template and produce their
+ * .head markup.  It will then print this to the output stream.
+ * 
  * @author muzquiano
  */
 public class HeadTag extends TagBase
 {
     public int doStartTag() throws JspException
     {
-        print(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+        RendererContext rendererContext = this.getRequestContext().getRenderContext();
+
+        try
+        {
+            StringBuilder builder = RenderUtil.processHeader(rendererContext);
+            print(builder.toString());
+        }
+        catch(RendererExecutionException ree)
+        {
+            throw new JspException("Unable to process downstream component head files", ree);
+        }
+        
         return SKIP_BODY;
     }
 

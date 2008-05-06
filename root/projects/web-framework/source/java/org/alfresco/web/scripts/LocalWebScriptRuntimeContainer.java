@@ -30,6 +30,7 @@ import java.util.Map;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.connector.remote.RemoteClient;
+import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -107,7 +108,15 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         RendererContext rendererContext = getRendererContext();
 
         // populate the root template properties
-        ProcessorModelHelper.populateTemplateModel(rendererContext, params);
+        try
+        {
+            ProcessorModelHelper.populateTemplateModel(rendererContext, params);
+        }
+        catch(RendererExecutionException ree)
+        {
+            // This exception is only thrown when processing
+            // template objects, thus it shouldn't occur for web scripts
+        }
 
 
         return params;
