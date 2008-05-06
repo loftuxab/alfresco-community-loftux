@@ -24,10 +24,6 @@
  */
 package org.alfresco.web.site.renderer;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
 /**
@@ -42,6 +38,19 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  */
 public interface Renderable
 {
+    /**
+     * Allows the renderer to provide text that should be placed into the
+     * header portion of the returned markup.
+     * 
+     * If null is returned, no markup is placed into the markup header.
+     * 
+     * @param rendererContext
+     * @return
+     * @throws RendererExecutionException
+     */
+    public String head(RendererContext rendererContext)
+        throws RendererExecutionException;
+    
     /**
      * Executes the renderer.  The renderer, while running in the context
      * of this method, has full access to the original request context,

@@ -36,7 +36,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.tools.EncodingUtil;
-import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.model.Component;
@@ -51,9 +50,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * a rendering engine that the Web Framework can use to execute a web script.
  * 
  * A WebScriptRenderer can be used to execute a web script for any purpose
- * so long as an appropriate RenderData instance is passed to it.
+ * so long as an appropriate RendererContext instance is passed to it.
  * 
- * Most commonly, the RenderData passed in will describe a Component.
+ * Most commonly, the RendererContext passed in will describe a Component.
  * 
  * The WebScriptRenderer uses a buffering pattern internally as this is the
  * nature of web scripts.  The buffer is managed by the Web Script engine
@@ -64,18 +63,30 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WebScriptRenderer extends AbstractRenderer
 {
+    protected Map<String, String> getArgs(HttpServletRequest request)
+    {
+        Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
+        Enumeration names = request.getParameterNames();
+        while (names.hasMoreElements())
+        {
+           String name = (String)names.nextElement();
+           args.put(name, request.getParameter(name));
+        }
+        return args;        
+    }
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.Renderable#execute(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.site.RenderData)
+     * @see org.alfresco.web.site.renderer.AbstractRenderer#head(org.alfresco.web.site.renderer.RendererContext)
      */
-    public void execute(RendererContext rendererContext)
-            throws RendererExecutionException
+    public String head(RendererContext rendererContext)
+        throws RendererExecutionException
     {
+        String head = null;
+        
         /**
          * Pull a few necessary things from the renderer context
          */
         HttpServletRequest request = rendererContext.getRequest();
-        RequestContext context = (RequestContext) rendererContext.getRequestContext();
 
         /**
          * Get the application context and relevant context objects
@@ -88,13 +99,7 @@ public class WebScriptRenderer extends AbstractRenderer
          * Copy in request parameters into a HashMap
          * This is so as to be compatible with UriUtils (and Token substitution)
          */
-        Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
-        Enumeration names = request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-           String name = (String)names.nextElement();
-           args.put(name, request.getParameter(name));
-        }
+        Map<String, String> args = getArgs(request);
 
         /**
          * If the ModelObject being rendered is a component, then we will
@@ -105,7 +110,6 @@ public class WebScriptRenderer extends AbstractRenderer
          * that is then committed into the completed output stream
          * at the end.
          * 
-         * TODO:  This behavior is scheduled to change quite soon.
          */
         if (rendererContext.getObject() instanceof Component)
         {
@@ -167,11 +171,42 @@ public class WebScriptRenderer extends AbstractRenderer
 
                         StringWriter out = new StringWriter();
                         templateProcessor.process(path, model, out);
-                        RenderUtil.appendHeadTags(context, out.toString());
+                        
+                        String result = out.toString();
+                        if(result != null && result.length() > 0)
+                        {
+                            head = super.head(rendererContext) + out.toString();
+                        }
                     }
                 }
             }
         }
+        
+        return head;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#execute(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse, org.alfresco.web.site.RenderData)
+     */
+    public void execute(RendererContext rendererContext)
+            throws RendererExecutionException
+    {
+        /**
+         * Pull a few necessary things from the renderer context
+         */
+        HttpServletRequest request = rendererContext.getRequest();
+        RequestContext context = (RequestContext) rendererContext.getRequestContext();
+
+        /**
+         * Get the application context and relevant context objects
+         */
+        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
+
+        /**
+         * Copy in request parameters into a HashMap
+         * This is so as to be compatible with UriUtils (and Token substitution)
+         */
+        Map<String, String> args = getArgs(request);
 
         /**
          * Begin to process the actual web script.

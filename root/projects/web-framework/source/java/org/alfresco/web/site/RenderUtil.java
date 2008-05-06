@@ -25,20 +25,19 @@
 package org.alfresco.web.site;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
-import org.alfresco.tools.WrappedHttpServletResponse;
 import org.alfresco.web.site.exception.ComponentChromeRenderException;
 import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
 import org.alfresco.web.site.exception.PageRenderException;
 import org.alfresco.web.site.exception.RegionRenderException;
+import org.alfresco.web.site.exception.RendererExecutionException;
+import org.alfresco.web.site.exception.RendererNotFoundException;
 import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.exception.TemplateRenderException;
 import org.alfresco.web.site.model.Chrome;
@@ -60,16 +59,8 @@ public class RenderUtil
     /**
      * Renders a given JSP page.
      * 
-     * This wraps the JSP rendering in servlet wrappers and will
-     * do variable substitution on HEAD tags.
-     * 
-     * This method should really only be used for top-level page
-     * elements (i.e. the first dispatch to a JSP page).
-     * 
-     * If you use it for downstream JSP includes, it will work fine,
-     * but it will be less efficient.  For each call to this method,
-     * there exists some extra overhead for the wrapping/unwrapping
-     * of servlet objects and substitution within response text.
+     * This renders the JSP page directly and does not perform
+     * any wrapping of the servlet objects.
      * 
      * @param context
      * @param request
@@ -90,10 +81,7 @@ public class RenderUtil
         
         try
         {
-            String renderer = dispatchPath;
-            String rendererType = WebFrameworkConstants.RENDERER_TYPE_JSP;
-            
-            executePageRenderer(context, request, response, rendererType, renderer);
+            executeRenderer(context, request, response, WebFrameworkConstants.RENDERER_TYPE_JSP, dispatchPath);
         }
         catch (Exception ex)
         {
@@ -110,8 +98,12 @@ public class RenderUtil
     }
 
     /**
-     * Renders the current page instance.
-
+     * Renders the current page as provided by the request context.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @throws PageRenderException
      */
     public static void renderPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response)
@@ -126,9 +118,16 @@ public class RenderUtil
         
         renderPage(context, request, response, page.getId());
     }
-    
+
     /**
-     * Renders a given page instance
+     * Renders a given page.  This will determine the active template
+     * and then delegate to the template renderer.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param pageId
+     * @throws PageRenderException
      */
     public static void renderPage(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
@@ -159,36 +158,8 @@ public class RenderUtil
             // bind the rendering to this page
             RendererContextHelper.bind(context, page, request, response);
             
-            // Wrap the Request and Response
-            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
-            WrappedHttpServletResponse wrappedResponse = new WrappedHttpServletResponse(response);
-
             // Execute the template        
-            RenderUtil.renderTemplate(context, wrappedRequest, wrappedResponse, currentTemplate.getId());
-
-            // At this point, the template and all of the components
-            // have executed.  We must now stamp the <!--${head}-->
-            // onto the output.  To do so, we must first generate
-            // the stamp.        
-            String headTags = generateHeader(context, request, response);
-
-            // Now do a replace on all of the stamp placeholders
-            String responseBody = wrappedResponse.getOutput();
-            int i = -1;
-            do
-            {
-                i = responseBody.indexOf(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
-                if (i > -1)
-                {
-                    responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
-                            i + WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP.length(),
-                            responseBody.length());
-                }
-            }
-            while (i > -1);
-
-            // Finally, commit the entire thing to the output stream
-            response.getWriter().print(responseBody);
+            RenderUtil.renderTemplate(context, request, response, currentTemplate.getId());
         }
         catch (Exception ex)
         {
@@ -488,7 +459,8 @@ public class RenderUtil
     }
 
     /**
-     * Renders the fully formed URL string fo
+     * Renders the fully formed URL string for a link to a given page
+     * 
      * @param context
      * @param request
      * @param response
@@ -512,6 +484,16 @@ public class RenderUtil
         }
     }
 
+    /**
+    /**
+     * Renders the fully formed URL string for a link to a given content object
+     *  
+     * @param context
+     * @param request
+     * @param response
+     * @param objectId
+     * @param formatId
+     */
     public static void content(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String objectId, String formatId)
@@ -531,22 +513,32 @@ public class RenderUtil
         }
     }
 
-    public static void appendHeadTags(RequestContext context, String tags)
+    /**
+     * Renders the fully formed URL string for a link to a given page type
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param objectId
+     * @param formatId
+     */
+    public static void pageType(RequestContext context, HttpServletRequest request,
+            HttpServletResponse response, String pageTypeId, String formatId, String objectId)
     {
-        getHeadTags(context).add(tags);
-    }
-
-    public static List getHeadTags(RequestContext context)
-    {
-        List list = (List) context.getValue(RequestContext.VALUE_HEAD_TAGS);
-        if (list == null)
+        String url = context.getLinkBuilder().pageType(context, pageTypeId, formatId, objectId);
+        if (url != null)
         {
-            list = new ArrayList(64);
-            context.setValue(RequestContext.VALUE_HEAD_TAGS, list);
+            try
+            {
+                response.getWriter().write(url);
+            }
+            catch (Exception ex)
+            {
+                Framework.getLogger().error(ex);
+            }
         }
-        return list;
     }
-
+    
     public static String renderScriptImport(RequestContext context, String src)
     {
         if (context instanceof HttpRequestContext)
@@ -626,7 +618,7 @@ public class RenderUtil
         return value;
     }
 
-    protected static String getSourceId(RequestContext context, String scopeId)
+    public static String getSourceId(RequestContext context, String scopeId)
     {
         // rendering objects
         Page page = context.getCurrentPage();
@@ -650,61 +642,46 @@ public class RenderUtil
         return sourceId;
     }
 
-    // TODO: Introduce some caching for this
-    protected static String generateHeader(RequestContext context, HttpServletRequest request, HttpServletResponse response)
-        throws Exception
-    {
-        StringBuilder buffer = new StringBuilder(256);
-        buffer.append("\r\n");
-        buffer.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
-        buffer.append("\r\n");
-
-        /**
-         * This is a work in progress.  Still not sure what the best
-         * way is to define a "global" include.
-         * 
-         * With this approach, allow a global.head.renderer.xml file
-         * to live as a Configuration object.
-         * 
-         * If this file is available, it is automatically read
-         * and the renderer described therein is executed.
-         */
-        Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
-        if(config != null)
-        {
-            // renderer properties
-            String rendererType = config.getProperty("renderer-type");
-            String renderer = config.getProperty("renderer");
-            
-            // execute renderer
-            String tags = processRenderer(context, request, response, rendererType, renderer);
-            buffer.append(tags);
-        }
-        
-        // Now import the stuff that the components on the page needed us to import
-        List tagsList = RenderUtil.getHeadTags(context);
-        for (int i = 0; i < tagsList.size(); i++)
-        {
-            String tags = (String) tagsList.get(i);
-            buffer.append(tags);
-        }
-
-        return buffer.toString();
-    }
-
-    protected static void print(HttpServletResponse response, String str)
+    public static void print(HttpServletResponse response, String str)
             throws IOException
     {
         response.getWriter().print(str);
     }
-        
+       
+    /**
+     * Executes a renderer inside of a wrapped context so that the
+     * output stream is trapped and returned as a string.  The provided
+     * servlet context objects are wrapped and used to help build
+     * the output string.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param descriptor
+     * @return
+     * @throws Exception
+     */
     public static String processRenderer(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             RendererDescriptor descriptor) throws Exception
     {
         return processRenderer(context, request, response, descriptor.getRendererType(), descriptor.getRenderer());
     }
-    
+
+    /**
+     * Executes a renderer inside of a wrapped context so that the
+     * output stream is trapped and returned as a string.  The provided
+     * servlet context objects are wrapped and used to help build
+     * the output string.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param rendererType
+     * @param renderer
+     * @return
+     * @throws Exception
+     */
     public static String processRenderer(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String rendererType, String renderer) throws Exception
@@ -721,6 +698,16 @@ public class RenderUtil
         return fakeResponse.getContentAsString();        
     }
 
+    /**
+     * Executes a renderer against the given context and request.
+     * The outputstream is committed directly to the given servlet objects.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param descriptor
+     * @throws Exception
+     */
     public static void executeRenderer(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             RendererDescriptor descriptor) throws Exception
@@ -728,6 +715,17 @@ public class RenderUtil
         executeRenderer(context, request, response, descriptor.getRendererType(), descriptor.getRenderer());
     }
     
+    /**
+     * Executes a renderer against the given context and request.
+     * The outputstream is committed directly to the given servlet objects.
+     *  
+     * @param context
+     * @param request
+     * @param response
+     * @param rendererType
+     * @param renderer
+     * @throws Exception
+     */
     public static void executeRenderer(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String rendererType, String renderer) throws Exception
@@ -739,36 +737,6 @@ public class RenderUtil
         Renderable rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
         rendererInstance.execute(rendererContext);
     }
-    
-    public static void executePageRenderer(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
-            String rendererType, String renderer) throws Exception
-    {
-        // this executes against buffer objects and returns a buffer
-        String responseBody = RenderUtil.processRenderer(context, request, response, rendererType, renderer);
-
-        // generate the HEAD tag
-        String headTags = generateHeader(context, request, response);
-
-        // Now do a replace on all of the stamp placeholders
-        //String responseBody = wrappedResponse.getOutput();
-        int i = -1;
-        do
-        {
-            i = responseBody.indexOf(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
-            if (i > -1)
-            {
-                responseBody = responseBody.substring(0, i) + headTags + responseBody.substring(
-                        i + WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP.length(),
-                        responseBody.length());
-            }
-        }
-        while (i > -1);
-
-        // Finally, commit the entire thing to the output stream
-        response.getWriter().print(responseBody);
-    }
-    
     
     /**
      * Renders a system page
@@ -849,7 +817,7 @@ public class RenderUtil
                 }
             }
 
-            RenderUtil.executePageRenderer(context, request, response, rendererType, renderer);
+            RenderUtil.executeRenderer(context, request, response, rendererType, renderer);
         }
         catch (Exception ex)
         {
@@ -879,7 +847,7 @@ public class RenderUtil
      * Or, a specific region might be "forced" to another chrome.
      * 
      */
-    protected static RendererDescriptor getRegionRendererDescriptor(RequestContext context, TemplateInstance template, String regionId, String chromeId)
+    public static RendererDescriptor getRegionRendererDescriptor(RequestContext context, TemplateInstance template, String regionId, String chromeId)
     {
         // if the chrome id is empty, see if there is an override
         // this allows the template to "override" the chrome on a
@@ -924,7 +892,7 @@ public class RenderUtil
      * 
      * Or a specific component might override its settings.
      */
-    protected static RendererDescriptor getComponentRendererDescriptor(RequestContext context, Component component, String chromeId)
+    public static RendererDescriptor getComponentRendererDescriptor(RequestContext context, Component component, String chromeId)
     {
         // if the chrome id is empty, see if there is an override
         // this allows the component to "override" the chrome on a
@@ -961,5 +929,151 @@ public class RenderUtil
         // assume it is a freemarker chrome
         return new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
     }
+    
+    /**
+     * Generates text to be inserted into template markup head for a given
+     * renderer context.  The renderer context must describe a template.
+     * 
+     * @param rendererContext
+     * @return
+     */
+    public static StringBuilder processHeader(RendererContext rendererContext)
+        throws RendererExecutionException
+    {
+        RequestContext context = rendererContext.getRequestContext();
+        StringBuilder builder = new StringBuilder(1024);
+        
+        /**
+         * Allow for the head tags to be generated once per request
+         * If they're sought a second time, we can just throw down what
+         * we already generated the first time.
+         */
+        StringBuilder headTags = (StringBuilder) context.getValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+        if(headTags == null)
+        {
+            /**
+             * Bind into request context
+             */
+            headTags = new StringBuilder(4096);
+            context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);
+            
+            /**
+             * This is a work in progress.  Still not sure what the best
+             * way is to define a "global" include.
+             * 
+             * With this approach, allow a global.head.renderer.xml file
+             * to live as a Configuration object.
+             * 
+             * If this file is available, it is automatically read
+             * and the renderer described therein is executed.
+             */
+            String rendererType = null;
+            String renderer = null;
+            try
+            {            
+                Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
+                if(config != null)
+                {
+                    // renderer properties
+                    rendererType = config.getProperty("renderer-type");
+                    renderer = config.getProperty("renderer");
+                    
+                    // execute renderer
+                    String tags = RenderUtil.processRenderer(context, rendererContext.getRequest(), rendererContext.getResponse(), rendererType, renderer);
+                    headTags.append(tags);
+                    headTags.append("\r\n");
+                }
+            }
+            catch(Exception ex)
+            {
+                throw new RendererExecutionException("Unable to render global include for renderer: " + renderer + " of type: " + rendererType, ex);
+            }
+                
+            
+            /**
+             * If the current renderer is rendering a TemplateInstance,
+             * then we should additionally process downstream components
+             */
+            if(rendererContext.getObject() instanceof TemplateInstance)
+            {
+                Component component = null;
+                try
+                {
+                    Component[] components = RenderUtil.getCurrentComponentBindings(context);
+                    for(int i = 0; i < components.length; i++)
+                    {
+                        component = components[i];
+                        
+                        // bind the component into context
+                        RendererContext componentRendererContext = RendererContextHelper.bind(context, component, rendererContext.getRequest(), rendererContext.getResponse());
+    
+                        Renderable renderable = RendererFactory.newRenderer(context, component);
+                        String head = renderable.head(componentRendererContext);
+                        if(head != null)
+                        {
+                            headTags.append(head);
+                            headTags.append("\r\n");
+                        }
+                        
+                        // unbind the component
+                        RendererContextHelper.unbind(context);
+                    }
+                }
+                catch(RendererNotFoundException rnfe)
+                {
+                    RendererContextHelper.unbind(context);
+                    throw new RendererExecutionException("HEAD Renderer not found for component: " + component.getId(), rnfe);
+                }
+                catch(RendererExecutionException ree)
+                {
+                    RendererContextHelper.unbind(context);
+                    throw new RendererExecutionException("HEAD Renderer failed to execute for component: " + component.getId(), ree);
+                }
+            }
+        }
 
+        /**
+         * Hand back the full head string
+         */
+        builder.append("\r\n");
+        builder.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
+        builder.append("\r\n");        
+        builder.append(headTags.toString());
+        
+        return builder;
+    }
+    
+    /**
+     * Retrieves all of the component bindings that are present on the
+     * current view (global + template + page)
+     * 
+     * @param context
+     * @return
+     */
+    protected static Component[] getCurrentComponentBindings(RequestContext context)
+    {
+        Component[] globalComponents = ModelUtil.findComponents(context, null, WebFrameworkConstants.REGION_SCOPE_GLOBAL, null, null);
+        Component[] templateComponents = ModelUtil.findComponents(context, null, context.getCurrentTemplateId(), null, null);
+        Component[] pageComponents = ModelUtil.findComponents(context, null, context.getCurrentPageId(), null, null);
+        
+        Component[] array = new Component[globalComponents.length + templateComponents.length + pageComponents.length];
+        int z = 0;
+        for(int i = 0; i < globalComponents.length; i++)
+        {
+            array[z] = globalComponents[i];
+            z++;
+        }
+        for(int i = 0; i < templateComponents.length; i++)
+        {
+            array[z] = templateComponents[i];
+            z++;
+        }
+        for(int i = 0; i < pageComponents.length; i++)
+        {
+            array[z] = pageComponents[i];
+            z++;
+        }
+        
+        return array;
+    }
 }

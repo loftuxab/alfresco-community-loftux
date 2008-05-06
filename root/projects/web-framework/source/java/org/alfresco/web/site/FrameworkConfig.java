@@ -36,8 +36,6 @@ package org.alfresco.web.site;
  */
 public interface FrameworkConfig
 {
-    public void reset(RequestContext context);
-
     public boolean isInitialized();
 
     

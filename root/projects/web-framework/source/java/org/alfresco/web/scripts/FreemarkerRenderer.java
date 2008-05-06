@@ -30,7 +30,6 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.AbstractRenderer;
@@ -46,6 +45,65 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class FreemarkerRenderer extends AbstractRenderer
 {
     
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.AbstractRenderer#head(org.alfresco.web.site.renderer.RendererContext)
+     */
+    public String head(RendererContext rendererContext)
+        throws RendererExecutionException
+    {
+        ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
+        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        RequestContext context = rendererContext.getRequestContext();
+
+        // get the renderer destination property
+        String uri = this.getRenderer();
+        
+        // the current format
+        String format = context.getCurrentFormatId();
+        
+        // get the template processor
+        String templateProcessorId = context.getConfig().getRendererProperty(getRendererType(), "template-processor-bean");
+        if(templateProcessorId == null || templateProcessorId.length() == 0)
+        {
+            templateProcessorId = "site.templateprocessor";
+        }
+        PresentationTemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(templateProcessorId);
+        
+        // template store
+        Store templateStore = (Store)appContext.getBean("site.store.templates");
+        templateStore.init();
+        
+        /**
+         * Attempt to execute the script's .head. file, if it has one
+         * This output is trapped and placed into the aggregated HEAD capture
+         */
+        String head = super.head(rendererContext);
+        String templateName = null;
+        try
+        {
+            // path to the template (switches on format)
+            templateName = uri + ((format != null && format.length() != 0 &&
+                    !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");
+            
+            if (templateProcessor.hasTemplate(templateName))
+            {
+                // build the model
+                Map<String, Object> model = new HashMap<String, Object>(8);
+                ProcessorModelHelper.populateTemplateModel(rendererContext, model);
+                
+                StringWriter out = new StringWriter(512);
+                templateProcessor.process(templateName, model, out);
+                
+                head = head + out.toString();
+            }
+        }
+        catch(Exception ex) 
+        {   
+            throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
+        }
+        return head;
+    }
+ 
     /**
      * Execute.
      * 
@@ -87,40 +145,9 @@ public class FreemarkerRenderer extends AbstractRenderer
         templateStore.init();
         
         /**
-         * Attempt to execute the script's .head. file, if it has one
-         * This output is trapped and placed into the aggregated HEAD capture
-         */
-        String templateName = null;
-        try
-        {
-            // path to the template (switches on format)
-            templateName = uri + ((format != null && format.length() != 0 &&
-                    !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".head.ftl") : ".head.ftl");
-            
-            if (templateProcessor.hasTemplate(templateName))
-            {
-                // build the model
-                Map<String, Object> model = new HashMap<String, Object>(8);
-                ProcessorModelHelper.populateTemplateModel(rendererContext, model);
-                
-                StringWriter out = new StringWriter(512);
-                templateProcessor.process(templateName, model, out);
-                
-                String tags = out.toString();
-                RenderUtil.appendHeadTags(context, tags);
-            }
-        }
-        catch(Exception ex) 
-        {   
-            throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
-        }
-
-        
-
-        /**
          * Now execute the real template
          */
-        templateName = null;
+        String templateName = null;
         try
         {
             // the result model

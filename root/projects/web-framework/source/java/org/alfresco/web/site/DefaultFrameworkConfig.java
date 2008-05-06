@@ -38,188 +38,82 @@ import org.alfresco.config.ConfigElement;
  */
 public class DefaultFrameworkConfig implements FrameworkConfig
 {
-    /** The Constant CONFIG_URI. */
+    /**
+     * Statics of keys that comprise XML elements in the 
+     * configuration file
+     */
     private static final String CONFIG_URI = "uri";
-    
-    /** The Constant CONFIG_USECACHE. */
     private static final String CONFIG_USECACHE = "usecache";
-    
-    /** The Constant CONFIG_FORMAT. */
     private static final String CONFIG_FORMAT = "format";
-    
-    /** The Constant CONFIG_FORMATS. */
     private static final String CONFIG_FORMATS = "formats";
-    
-    /** The Constant CONFIG_PAGE_MAPPER. */
     private static final String CONFIG_PAGE_MAPPER = "page-mapper";
-    
-    /** The Constant CONFIG_LINK_BUILDER. */
     private static final String CONFIG_LINK_BUILDER = "link-builder";
-    
-    /** The Constant CONFIG_REQUEST_CONTEXT. */
     private static final String CONFIG_REQUEST_CONTEXT = "request-context";
-    
-    /** The Constant CONFIG_CONTEXT. */
     private static final String CONFIG_CONTEXT = "context";
-    
-    /** The Constant CONFIG_DEFAULT. */
     private static final String CONFIG_DEFAULT = "default";
-    
-    /** The Constant CONFIG_SERVLET. */
     private static final String CONFIG_SERVLET = "servlet";
-    
-    /** The Constant CONFIG_HANDLER. */
     private static final String CONFIG_HANDLER = "handler";
-    
-    /** The Constant CONFIG_ERROR_HANDLERS. */
     private static final String CONFIG_ERROR_HANDLERS = "error-handlers";
-    
-    /** The Constant CONFIG_RENDERER_TYPE. */
     private static final String CONFIG_RENDERER_TYPE = "renderer-type";
-    
-    /** The Constant CONFIG_PAGE. */
     private static final String CONFIG_PAGE = "page";
-    
-    /** The Constant CONFIG_SYSTEM_PAGES. */
     private static final String CONFIG_SYSTEM_PAGES = "system-pages";
-    
-    /** The Constant CONFIG_DISPATCHER. */
     private static final String CONFIG_DISPATCHER = "dispatcher";
-    
-    /** The Constant CONFIG_DEFINITION. */
     private static final String CONFIG_DEFINITION = "definition";
-    
-    /** The Constant CONFIG_DEFINITIONS. */
     private static final String CONFIG_DEFINITIONS = "definitions";
-    
-    /** The Constant CONFIG_FILE_SYSTEM. */
     private static final String CONFIG_FILE_SYSTEM = "file-system";
-    
-    /** The Constant CONFIG_STATE. */
     private static final String CONFIG_STATE = "state";
-    
-    /** The Constant CONFIG_ELEMENT. */
     private static final String CONFIG_ELEMENT = "element";
-    
-    /** The Constant CONFIG_ELEMENTS. */
     private static final String CONFIG_ELEMENTS = "elements";
-    
-    /** The Constant CONFIG_INCONTEXT. */
     private static final String CONFIG_INCONTEXT = "incontext";
-    
-    /** The Constant CONFIG_TAGNAME. */
     private static final String CONFIG_TAGNAME = "tagname";
-    
-    /** The Constant CONFIG_PATH. */
     private static final String CONFIG_PATH = "path";
-    
-    /** The Constant CONFIG_PREFIX. */
     private static final String CONFIG_PREFIX = "prefix";
-    
-    /** The Constant CONFIG_VERSION. */
     private static final String CONFIG_VERSION = "version";
-    
-    /** The Constant CONFIG_TYPE. */
     private static final String CONFIG_TYPE = "type";
-    
-    /** The Constant CONFIG_TYPES. */
     private static final String CONFIG_TYPES = "types";
-    
-    /** The Constant CONFIG_ROOTPATH. */
     private static final String CONFIG_ROOTPATH = "rootpath";
-    
-    /** The Constant CONFIG_MODEL. */
     private static final String CONFIG_MODEL = "model";
-    
-    /** The Constant CONFIG_NAMESPACE. */
     private static final String CONFIG_NAMESPACE = "namespace";
-    
-    /** The Constant CONFIG_LIBRARY. */
     private static final String CONFIG_LIBRARY = "library";
-    
-    /** The Constant CONFIG_LIBRARIES. */
     private static final String CONFIG_LIBRARIES = "libraries";
-    
-    /** The Constant CONFIG_TAGS. */
     private static final String CONFIG_TAGS = "tags";
-    
-    /** The Constant CONFIG_FACTORY. */
     private static final String CONFIG_FACTORY = "factory";
-    
-    /** The Constant CONFIG_FACTORIES. */
     private static final String CONFIG_FACTORIES = "factories";
-    
-    /** The Constant CONFIG_USER. */
     private static final String CONFIG_USER = "user";
-    
-    /** The Constant CONFIG_CONNECTOR. */
     private static final String CONFIG_CONNECTOR = "connector";
-    
-    /** The Constant CONFIG_CONNECTORS. */
     private static final String CONFIG_CONNECTORS = "connectors";
-    
-    /** The Constant CONFIG_CLASS. */
     private static final String CONFIG_CLASS = "class";
-    
-    /** The Constant CONFIG_DESCRIPTION. */
     private static final String CONFIG_DESCRIPTION = "description";
-    
-    /** The Constant CONFIG_NAME. */
     private static final String CONFIG_NAME = "name";
-    
-    /** The Constant CONFIG_AUTHENTICATOR. */
     private static final String CONFIG_AUTHENTICATOR = "authenticator";
-    
-    /** The Constant CONFIG_AUTHENTICATORS. */
     private static final String CONFIG_AUTHENTICATORS = "authenticators";
-    
-    /** The Constant CONFIG_REMOTE. */
     private static final String CONFIG_REMOTE = "remote";
-    
-    /** The Constant CONFIG_RENDERER. */
     private static final String CONFIG_RENDERER = "renderer";
-    
-    /** The Constant CONFIG_RENDERERS. */
     private static final String CONFIG_RENDERERS = "renderers";
-    
-    /** The Constant CONFIG_PAGE_INSTANCE_ID. */
     private static final String CONFIG_PAGE_INSTANCE_ID = "page-instance-id";
-    
-    /** The Constant CONFIG_FRAMEWORK. */
     private static final String CONFIG_FRAMEWORK = "framework";
-    
-    /** The Constant CONFIG_PAGE_TYPES. */
     private static final String CONFIG_PAGE_TYPES = "page-types";
-    
-    /** The Constant CONFIG_PAGE_TYPE. */
     private static final String CONFIG_PAGE_TYPE = "page-type";
-    
-    /** The Constant CONFIG_ID. */
     private static final String CONFIG_ID = "id";
-    
-    /** The Constant CONFIG_DEFAULTS. */
     private static final String CONFIG_DEFAULTS = "defaults";
-    
-    /** The Constant CONFIG_APPLICATION. */
     private static final String CONFIG_APPLICATION = "application";
-    
-    /** The Constant CONFIG_ENABLED. */
     private static final String CONFIG_ENABLED = "enabled";
-    
-    /** The Constant CONFIG_TIMER. */
     private static final String CONFIG_TIMER = "timer";
-    
-    /** The Constant CONFIG_DEBUG. */
     private static final String CONFIG_DEBUG = "debug";
     
-    /** The config. */
+    /** The config object. */
     protected Config config = null;
-    
-    /** The is initialized. */
+
+    /**
+     * Storage variables to prevent re-fetch into XML
+     */
     protected boolean isInitialized = false;
-    
-    /** The is timer enabled. */
     protected Boolean isTimerEnabled = null;
+    protected String defaultFormatId = null;
+    protected String defaultPageMapperId = null;
+    protected String defaultLinkBuilderId = null;
+    protected String defaultRequestContextId = null;
+    protected String defaultUserFactoryId = null;    
 
     
     /**
@@ -229,30 +123,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public DefaultFrameworkConfig(Config config)
     {
-        reset(config);
-    }
-
-    /**
-     * Reset.
-     * 
-     * @param config the config
-     */
-    public void reset(Config config)
-    {
         this.config = config;
-        this.isInitialized = true;
-        this.isTimerEnabled = null;
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.FrameworkConfig#reset(org.alfresco.web.site.RequestContext)
-     */
-    public void reset(RequestContext context)
-    {
-        // not much that can really be done here...
-        this.isInitialized = false;
-        this.config = null;
-        this.isTimerEnabled = null;
     }
 
     /* (non-Javadoc)
@@ -1272,13 +1143,17 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     //////////////////////////////////////////////////////////////////
     // Defaults
     //////////////////////////////////////////////////////////////////
-    
+        
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultFormatId()
      */
     public String getDefaultFormatId()
     {
-        return getDefaultProperty(CONFIG_FORMAT);
+        if(defaultFormatId == null)
+        {
+            defaultFormatId = getDefaultProperty(CONFIG_FORMAT);
+        }
+        return defaultFormatId;
     }
     
     /* (non-Javadoc)
@@ -1286,7 +1161,11 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public String getDefaultPageMapperId()
     {
-        return getDefaultProperty(CONFIG_PAGE_MAPPER);
+        if(defaultPageMapperId == null)
+        {
+            defaultPageMapperId = getDefaultProperty(CONFIG_PAGE_MAPPER);
+        }
+        return defaultPageMapperId;
     }
 
     /* (non-Javadoc)
@@ -1294,7 +1173,11 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public String getDefaultLinkBuilderId()
     {
-        return getDefaultProperty(CONFIG_LINK_BUILDER);
+        if(defaultLinkBuilderId == null)
+        {
+            defaultLinkBuilderId = getDefaultProperty(CONFIG_LINK_BUILDER);
+        }
+        return defaultLinkBuilderId;
     }
     
     /* (non-Javadoc)
@@ -1302,7 +1185,11 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public String getDefaultRequestContextId()
     {
-        return getDefaultProperty(CONFIG_REQUEST_CONTEXT);        
+        if(defaultRequestContextId == null)
+        {
+            defaultRequestContextId = getDefaultProperty(CONFIG_REQUEST_CONTEXT);
+        }
+        return defaultRequestContextId;
     }
 
     /* (non-Javadoc)
@@ -1310,7 +1197,11 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public String getDefaultUserFactoryId()
     {
-        return getDefaultProperty("user-factory");        
+        if(defaultUserFactoryId == null)
+        {
+            defaultUserFactoryId = getDefaultProperty("user-factory");
+        }
+        return defaultUserFactoryId;
     }
     
     /* (non-Javadoc)
