@@ -61,12 +61,14 @@ public class AVMRequestContextFactory extends HttpRequestContextFactory
         initFileSystem(context, request); // this requires the store id to be
                                             // set
 
+        /*
         // bootstrap the ADS Configuration object to this filesystem
         if (!context.getConfig().isInitialized())
         {
             System.out.println("- Initializing ADSConfiguration to AVM FileSystem");
             context.getConfig().reset(context);
         }
+        */
 
         // init
         // requests come in the form
