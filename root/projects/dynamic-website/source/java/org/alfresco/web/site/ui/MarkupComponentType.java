@@ -27,19 +27,30 @@ package org.alfresco.web.site.ui;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.EncodingUtil;
-import org.alfresco.web.site.AbstractRenderable;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.URLUtil;
 import org.alfresco.web.site.exception.RendererExecutionException;
+import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
  */
-public class MarkupComponentType extends AbstractRenderable
+public class MarkupComponentType extends AbstractRenderer
 {
-    public void execute(RendererContext rendererContext)
+    public String head(RendererContext rendererContext)
+    	throws RendererExecutionException
+	{
+        /**
+         * Append one or more tags that we would like to appear in the
+         * HEAD region of the page.  This is done just to show an
+         * example.
+         */
+    	return "<!-- Appended to HEAD by MarkupComponentType -->\r\n";	
+	}
+
+	public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
     	RequestContext context = rendererContext.getRequestContext();
@@ -51,13 +62,6 @@ public class MarkupComponentType extends AbstractRenderable
         // shimmy the data a bit
         if (markupData != null)
         {
-            /**
-             * Append one or more tags that we would like to appear in the
-             * HEAD region of the page.  This is done just to show an
-             * example.
-             */
-            this.appendHeadTags(context, "<!-- Appended to HEAD by MarkupComponentType -->");
-
             // clean up the data
             String data = EncodingUtil.decode(markupData);
 
