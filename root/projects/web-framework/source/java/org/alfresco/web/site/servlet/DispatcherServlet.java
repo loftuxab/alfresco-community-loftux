@@ -80,8 +80,7 @@ public class DispatcherServlet extends BaseServlet
             if (Timer.isTimerEnabled())
                 Timer.start(request, "initRequestContext");
             
-            FrameworkHelper.initRequestContext(request);
-            context = RequestUtil.getRequestContext(request);
+            context = FrameworkHelper.initRequestContext(request);
             
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "initRequestContext");

@@ -39,14 +39,14 @@ public final class ScriptModelObject implements Serializable
 {
     private static final long serialVersionUID = -3378946227712939601L;
 
+    protected RequestContext context;
+    protected ModelObject modelObject;
+    
     public ScriptModelObject(RequestContext context, ModelObject modelObject)
     {
         this.context = context;
         this.modelObject = modelObject;
     }
-
-    protected RequestContext context;
-    protected ModelObject modelObject;
 
     public String getId()
     {
@@ -130,10 +130,6 @@ public final class ScriptModelObject implements Serializable
         modelObject.removeProperty(propertyName);
     }
 
-    
-    
-    
-
     public long getModificationTime()
     {
         return modelObject.getModificationTime();
@@ -182,13 +178,13 @@ public final class ScriptModelObject implements Serializable
     }
     
     
-    
     /////////////////////////////////////////////////////////
     //
     // These are legacy methods that will be done away with
     // They just call through to custom properties
     //
     /////////////////////////////////////////////////////////
+    
     public String getSetting(String settingName)
     {
         ParameterCheck.mandatory("settingName", settingName);
@@ -223,5 +219,4 @@ public final class ScriptModelObject implements Serializable
 
         return map;
     }
-    
 }

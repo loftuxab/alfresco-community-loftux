@@ -47,7 +47,7 @@ public class ConnectorFactory
 {
     protected static HashMap<String, Object> cache = null;
     
-    public static Connector newInstance(RequestContext context,Endpoint endpoint)
+    public static Connector newInstance(RequestContext context, Endpoint endpoint)
     {
         Connector connector = newInstance(endpoint);
 

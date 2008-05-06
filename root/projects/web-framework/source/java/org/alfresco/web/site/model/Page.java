@@ -95,7 +95,9 @@ public class Page extends AbstractModelObject
     {
         Element templateElement = getTemplateElement(formatId);
         if (templateElement != null)
+        {
             return templateElement.getStringValue();
+        }
         return null;
     }
 
@@ -108,16 +110,17 @@ public class Page extends AbstractModelObject
      */
     protected Element getTemplateElement(String formatId)
     {
-        if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        if (formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
         {
             formatId = null;
         }
         
-        List templateElements = getDocument().getRootElement().elements(
-                PROP_TEMPLATE_INSTANCE);
+        Element result = null;
+        
+        List<Element> templateElements = getDocument().getRootElement().elements(PROP_TEMPLATE_INSTANCE);
         for (int i = 0; i < templateElements.size(); i++)
         {
-            Element templateElement = (Element) templateElements.get(i);
+            Element templateElement = templateElements.get(i);
             String _formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
             if (_formatId != null && _formatId.length() == 0)
             {
@@ -127,16 +130,20 @@ public class Page extends AbstractModelObject
             {
                 if (_formatId == null || _formatId.length() == 0)
                 {
-                    return templateElement;
+                    result = templateElement;
+                    break;
                 }
             }
             else
             {
                 if (formatId.equals(_formatId))
-                    return templateElement;
+                {
+                    result = templateElement;
+                    break;
+                }
             }
         }
-        return null;
+        return result;
     }
 
     /**
