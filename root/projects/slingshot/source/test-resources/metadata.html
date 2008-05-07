@@ -60,6 +60,7 @@
                <option value="">Please select...</option>
                <option value="france">France</option>
                <option value="germany">Germany</option>
+               <option value="">Separator...</option>
                <option value="spain">Spain</option>
                <option value="uk">United Kingdom</option>
                <option value="us">United States</option>
@@ -77,8 +78,15 @@
       </form>
       
       <script type="text/javascript">
-         var regform = new Alfresco.forms.Form('regform');
-         regform.addValidation('username', Alfresco.forms.validation.length, {min: 3}, "blur");
+         var regform = new Alfresco.forms.Form("regform");
+         regform.addValidation("username", Alfresco.forms.validation.length, {min: 3, max: 10}, "blur");
+         regform.addValidation("age", Alfresco.forms.validation.mandatory);
+         //regform.addValidation("age", Alfresco.forms.validation.number, null, "blur");
+         regform.addValidation("age", Alfresco.forms.validation.numberRange, {min: 18}, "blur");
+         regform.addValidation("country", Alfresco.forms.validation.mandatory);
+         regform.addValidation("gender", Alfresco.forms.validation.mandatory);
+         regform.addValidation("email", Alfresco.forms.validation.regexMatch, {pattern: /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/}, "blur");
+         regform.init();
       </script>
       
    </body>
