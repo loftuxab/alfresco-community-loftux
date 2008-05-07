@@ -46,6 +46,12 @@ import org.alfresco.web.site.exception.UserFactoryException;
  */
 public class SlingshotUserFactory extends UserFactory
 {
+    public boolean authenticate(HttpServletRequest request,
+    		String username, String password)
+    {
+    	return false;
+    }
+	
 	/**
 	 * For the moment, this just produces Slingshot Users that are
 	 * guests. 
