@@ -275,7 +275,7 @@ public interface FrameworkConfig
 
     public String getDefaultUserFactoryId();
     
-    public String getDefaultTheme(String id);
+    public String getDefaultThemeId();
     
     public String getDefaultProperty(String id);
     

@@ -111,11 +111,15 @@ public class ThemeUtil
         String themeId = getCurrentThemeId(request);
         if(themeId == null)
         {
+        	themeId = Framework.getConfig().getDefaultThemeId();
+        }
+        if(themeId == null)
+        {
             themeId = WebFrameworkConstants.DEFAULT_THEME_ID;
-            setCurrentThemeId(request, themeId);
         }
         if(themeId != null)
         {
+        	setCurrentThemeId(request, themeId);
             context.setThemeId(themeId);
         }
     }

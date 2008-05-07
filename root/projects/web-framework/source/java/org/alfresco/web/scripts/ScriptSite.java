@@ -28,16 +28,19 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.connector.remote.RemoteClient;
+import org.alfresco.connector.remote.Response;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Endpoint;
+import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
 import org.alfresco.web.site.model.TemplateInstance;
@@ -74,16 +77,20 @@ public final class ScriptSite extends ScriptBase
     public ScriptFileSystem getFileSystem()
     {
         if (rootFileSystem == null)
+        {
             rootFileSystem = new ScriptFileSystem(
                     getRequestContext().getFileSystem());
+        }
         return rootFileSystem;
     }
 
     public ScriptFileSystem getModelFileSystem()
     {
         if (modelFileSystem == null)
+        {
             modelFileSystem = new ScriptFileSystem(
                     getRequestContext().getModel().getFileSystem());
+        }
         return modelFileSystem;
     }
 
@@ -108,16 +115,11 @@ public final class ScriptSite extends ScriptBase
     public String callRemote(String endpointString, String user, String pass,
             String uri)
     {
-/*        
         RemoteClient remote = new RemoteClient(endpointString, null);
         remote.setUsernamePassword(user, pass);
 
         Response r = remote.call(uri);
         return r.getResponse();
-*/
-        //TODO: This is being worked on right now
-        
-        return "";
     }
 
     public RequestContext getRequestContext()
@@ -553,4 +555,12 @@ public final class ScriptSite extends ScriptBase
     {
         return EncodingUtil.decode(input, encoding);
     }
+   
+    // methods that are still in progress
+    
+    public void logout()
+    {
+    	AuthenticationUtil.logout(context);
+    }
+    
 }

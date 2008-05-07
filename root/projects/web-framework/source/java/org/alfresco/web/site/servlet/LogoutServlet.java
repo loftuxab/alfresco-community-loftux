@@ -22,39 +22,33 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.web.site.servlet;
 
-import org.alfresco.tools.ReflectionHelper;
-import org.alfresco.web.site.exception.UserFactoryException;
+import java.io.IOException;
 
-public abstract class UserFactoryBuilder
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.alfresco.web.site.UserFactory;
+
+/**
+ * List for call from the web client to log the user out
+ * from the current session.
+ * 
+ * @author muzquiano
+ */
+public class LogoutServlet extends BaseServlet
 {
-    protected UserFactoryBuilder()
+    public void init() throws ServletException
     {
+        super.init();
     }
 
-    public static UserFactory newFactory()
-        throws UserFactoryException
+    protected void service(HttpServletRequest request,
+            HttpServletResponse response) throws ServletException, IOException
     {
-        // default that we will use
-        String className = "org.alfresco.web.site.DefaultUserFactory";
-        
-        // check the config
-        String _defaultId = Framework.getConfig().getDefaultUserFactoryId();
-        String _className = Framework.getConfig().getUserFactoryClass(_defaultId);
-        if (_className != null)
-            className = _className;
-
-        UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
-        if(factory == null)
-        {
-            throw new UserFactoryException("Unable to create user factory for class name: " + className);
-        }
-        factory.setId(_defaultId);
-        
-        // log
-        Framework.getLogger().debug("New User Factory: " + className);
-
-        return factory;
-    }    
+    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+    }
 }

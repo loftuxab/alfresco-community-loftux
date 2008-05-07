@@ -119,7 +119,7 @@ public class FrameworkHelper
          * If one has already been retrieved, it will be reused.
          * If not, then a new one will be instantiated.
          */
-        RequestContextFactory factory = RequestContextFactoryBuilder.sharedFactory();
+        RequestContextFactory factory = RequestContextFactoryBuilder.newFactory();
         if(factory == null)
         {
             throw new RequestContextException("Unable to load RequestContextFactory");

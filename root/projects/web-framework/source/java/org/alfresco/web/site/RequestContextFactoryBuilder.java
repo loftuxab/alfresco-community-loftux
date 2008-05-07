@@ -67,24 +67,5 @@ public class RequestContextFactoryBuilder
         Framework.getLogger().debug("New request context factory: " + className);
 
         return factory;
-    }
-    
-    /**
-     * Produces the default RequestContextFactory instance and stores it
-     * locally so that it need not be created again.  This, in effect,
-     * creates a shared RequestContextFactory instance.
-     * 
-     * @return the request context factory
-     */
-    public synchronized static RequestContextFactory sharedFactory()
-    {
-        if(sharedFactory == null)
-        {
-            sharedFactory = newFactory();
-        }
-        return sharedFactory;
-    }
-    
-    /** The shared factory. */
-    protected static RequestContextFactory sharedFactory = null;
+    }    
 }
