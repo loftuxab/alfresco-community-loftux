@@ -44,7 +44,7 @@ import org.alfresco.web.site.model.Theme;
 public class DefaultPageMapper extends AbstractPageMapper
 {
     /**
-     * Instantiates a new default page mapper.
+     * Empty constructor - for instantiation via reflection 
      */
     public DefaultPageMapper()
     {

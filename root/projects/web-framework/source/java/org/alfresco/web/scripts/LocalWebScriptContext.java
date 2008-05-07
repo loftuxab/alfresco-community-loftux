@@ -42,10 +42,10 @@ public class LocalWebScriptContext
     String RequestURI;
     String RequestPath;
     Map<String, String> Tokens;
-    String scriptUrl;
+    String ScriptUrl;
     
     // Web Framework Elements
     RendererContext rendererContext;
-    ModelObject object;
-    RequestContext requestContext;
+    ModelObject Object;
+    RequestContext RequestContext;
 }

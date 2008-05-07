@@ -278,7 +278,6 @@ public class RendererFactory
         return r;
     }
 
-    /** The renderers. */
+    /** The renderers */
     protected static HashMap<String, Renderable> renderers = null;
-
 }

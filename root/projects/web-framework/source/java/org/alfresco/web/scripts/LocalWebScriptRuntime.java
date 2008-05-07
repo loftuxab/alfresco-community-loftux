@@ -24,127 +24,87 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.Map;
 
-import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.uri.UriUtils;
 
 /**
+ * @author kevinr
  * @author muzquiano
  */
-public class LocalWebScriptRuntime
-	extends AbstractRuntime
+public class LocalWebScriptRuntime extends AbstractRuntime
 {
-	private LocalWebScriptContext context;
-	private String encoding;
-	private ByteArrayOutputStream baOut;
+    private LocalWebScriptContext context;
+    private Writer out;
 
-    public LocalWebScriptRuntime(RuntimeContainer container, LocalWebScriptContext context, String encoding) 
-	{
-		super(container);
+    public LocalWebScriptRuntime(
+            Writer out, RuntimeContainer container, LocalWebScriptContext context) 
+    {
+        super(container);
+        
+        this.out = out;
+        this.context = context;
+    }
 
-		this.context = context;
-		this.encoding = encoding;        
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.web.scripts.Runtime#getName()
+     */
+    public String getName()
+    {
+        return "Web Framework Runtime";
+    }
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.alfresco.web.scripts.Runtime#getName()
-	 */
-	public String getName()
-	{
-		return "Web Script Runtime";
-	}
+    @Override
+    protected String getScriptUrl()
+    {
+        return context.RequestURI;
+    }
 
-	@Override
-	protected String getScriptUrl()
-	{
-		return context.RequestURI;
-	}
-
-	@Override
-	protected WebScriptRequest createRequest(Match match)
-	{
-		// this includes all elements of the xml
-		Map properties = context.object.getProperties();
-		String scriptUrl = context.scriptUrl;
+    @Override
+    protected WebScriptRequest createRequest(Match match)
+    {
+        // this includes all elements of the xml
+        Map properties = context.Object.getProperties();
+        String scriptUrl = context.ScriptUrl;
 
         // component ID is always available to the component
-        properties.put("id", context.object.getId());
+        properties.put("id", context.Object.getId());
 
         // add/replace the "well known" context tokens in component properties
-        for (String arg : context.object.getCustomProperties().keySet())
+        for (String arg : context.Object.getCustomProperties().keySet())
         {
-           properties.put(arg, UriUtils.replaceUriTokens((String)context.object.getCustomProperties().get(arg), context.Tokens));
+            properties.put(arg, UriUtils.replaceUriTokens((String)context.Object.getCustomProperties().get(arg), context.Tokens));
         }
-        
+
         // add the html binding id
-        String htmlBindingId = (String) context.rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
-        if(htmlBindingId != null)
+        String htmlBindingId = (String)context.rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+        if (htmlBindingId != null)
         {
             properties.put(ProcessorModelHelper.PROP_HTMLID, htmlBindingId);
         }
-        
-		return new LocalWebScriptRequest(this, scriptUrl, match, properties);
-	}
 
-	@Override
-	protected LocalWebScriptResponse createResponse()
-	{
-		try
-		{
-			baOut = new ByteArrayOutputStream(4096);
-			BufferedWriter wrOut = new BufferedWriter(
-					encoding == null ? new OutputStreamWriter(baOut) : new OutputStreamWriter(baOut, encoding));
-			
-			return new LocalWebScriptResponse(this, context, wrOut, baOut);
-		}
-		catch (UnsupportedEncodingException err)
-		{
-			throw new AlfrescoRuntimeException("Unsupported encoding.", err);
-		}
-	}
+        return new LocalWebScriptRequest(this, scriptUrl, match, properties);
+    }
 
-	@Override
-	protected String getScriptMethod()
-	{
-		return "GET";
-	}
+    @Override
+    protected LocalWebScriptResponse createResponse()
+    {
+        return new LocalWebScriptResponse(this, context, out);
+    }
 
-	public Reader getResponseReader()
-	{
-		try
-		{
-			if (baOut == null)
-			{
-				return null;
-			}
-			else
-			{
-				return new BufferedReader(new InputStreamReader(
-						encoding == null ? new ByteArrayInputStream(baOut.toByteArray()) :
-							new ByteArrayInputStream(baOut.toByteArray()), encoding));
-			}
-		}
-		catch (UnsupportedEncodingException err)
-		{
-			throw new AlfrescoRuntimeException("Unsupported encoding.", err);
-		}
-	}
+    @Override
+    protected String getScriptMethod()
+    {
+        return "GET";
+    }
 
-	@Override
-	protected Authenticator createAuthenticator()
-	{
-		return null;
-	}
+    @Override
+    protected Authenticator createAuthenticator()
+    {
+        return null;
+    }
 }

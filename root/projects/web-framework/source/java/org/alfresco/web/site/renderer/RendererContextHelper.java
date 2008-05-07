@@ -65,7 +65,6 @@ import org.alfresco.web.site.model.TemplateInstance;
  */
 public class RendererContextHelper
 {
-    
     /**
      * Push.
      * 
@@ -87,10 +86,8 @@ public class RendererContextHelper
      */
     public static RendererContext pop(RequestContext requestContext)
     {
-        Stack stack = getStack(requestContext);
-        RendererContext rendererContext = (RendererContext) stack.pop();
-
-        return rendererContext;
+        Stack<RendererContext> stack = getStack(requestContext);
+        return stack.pop();
     }
     
     /**
@@ -117,8 +114,8 @@ public class RendererContextHelper
      */
     protected static Stack<RendererContext> getStack(RequestContext requestContext)
     {
-        Stack stack = (Stack) requestContext.getValue(WebFrameworkConstants.RENDER_DATA_REQUEST_CONTEXT_STACK_KEY);
-        if(stack == null)
+        Stack<RendererContext> stack = (Stack)requestContext.getValue(WebFrameworkConstants.RENDER_DATA_REQUEST_CONTEXT_STACK_KEY);
+        if (stack == null)
         {
             stack = new Stack<RendererContext>();
             
@@ -153,7 +150,7 @@ public class RendererContextHelper
         
         // create a new context
         RendererContext newRendererContext = null;
-        if(currentRendererContext != null)
+        if (currentRendererContext != null)
         {
             // clone the current render data
             newRendererContext = currentRendererContext.clone();
@@ -168,7 +165,7 @@ public class RendererContextHelper
         newRendererContext.setResponse(response);
         
         // call generate function to populate from object, if available
-        if(object != null)
+        if (object != null)
         {
             newRendererContext.setObject(object);
             RendererContext generatedRenderData = generate(context, object);
@@ -311,7 +308,10 @@ public class RendererContextHelper
 
         // properties about the html binding id
         String htmlBindingId = component.getScope() + "." + component.getRegionId();
-        htmlBindingId += (component.getScope().equalsIgnoreCase(WebFrameworkConstants.REGION_SCOPE_GLOBAL) ? "" : ("." + component.getSourceId()));
+        if (!component.getScope().equalsIgnoreCase(WebFrameworkConstants.REGION_SCOPE_GLOBAL))
+        {
+            htmlBindingId += "." + component.getSourceId();
+        }
         rendererContext.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
         
         return rendererContext;

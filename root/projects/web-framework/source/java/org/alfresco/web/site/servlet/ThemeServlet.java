@@ -63,7 +63,7 @@ public class ThemeServlet extends BaseServlet
 
         // the new theme
         String themeId = (String) request.getParameter("themeId");
-        if(themeId == null)
+        if (themeId == null)
         {
             themeId = (String) request.getParameter("theme");
         }

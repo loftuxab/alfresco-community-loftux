@@ -40,7 +40,7 @@ import org.alfresco.web.site.exception.PageMapperException;
 public abstract class AbstractPageMapper implements PageMapper
 {
     /**
-     * Instantiates a new abstract page mapper.
+     * Empty constructor - for instantiation via reflection 
      */
     public AbstractPageMapper()
     {

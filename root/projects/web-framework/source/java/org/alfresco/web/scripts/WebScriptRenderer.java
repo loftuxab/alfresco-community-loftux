@@ -24,9 +24,8 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
@@ -60,6 +59,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * the WebScriptRenderer's execution.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class WebScriptRenderer extends AbstractRenderer
 {
@@ -83,22 +83,16 @@ public class WebScriptRenderer extends AbstractRenderer
     {
         String head = null;
         
-        /**
-         * Pull a few necessary things from the renderer context
-         */
+        // Pull a few necessary things from the renderer context
         HttpServletRequest request = rendererContext.getRequest();
 
-        /**
-         * Get the application context and relevant context objects
-         */
+        // Get the application context and relevant context objects
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
         TemplateProcessor templateProcessor = (TemplateProcessor) appContext.getBean("site.templateprocessor");
         Registry registry = (Registry) appContext.getBean("site.webscripts.registry");
 
-        /**
-         * Copy in request parameters into a HashMap
-         * This is so as to be compatible with UriUtils (and Token substitution)
-         */
+        // Copy in request parameters into a HashMap
+        // This is so as to be compatible with UriUtils (and Token substitution)
         Map<String, String> args = getArgs(request);
 
         /**
@@ -109,14 +103,11 @@ public class WebScriptRenderer extends AbstractRenderer
          * .head template files are committed to a wrapped output stream
          * that is then committed into the completed output stream
          * at the end.
-         * 
          */
         if (rendererContext.getObject() instanceof Component)
         {
-            /**
-             * Get the component and its URL.  Do a token replacement
-             * on the URL right away and remove the query string
-             */
+            // Get the component and its URL.  Do a token replacement
+            // on the URL right away and remove the query string
             Component component = (Component) rendererContext.getObject();
             String url = component.getURL();
             url = UriUtils.replaceUriTokens(url, args);
@@ -125,18 +116,14 @@ public class WebScriptRenderer extends AbstractRenderer
                 url = url.substring(0, url.lastIndexOf('?'));
             }
             
-            /**
-             * Find the web script
-             */
+            // Find the web script
             Match match = registry.findWebScript("GET", url);
             if (match != null)
             {
                 WebScript webScript = match.getWebScript();
                 if (webScript != null)
                 {
-                    /**
-                     * Twiddle with the path so as to resolve the .head.ftl file
-                     */
+                    // Modify the path to resolve the .head.ftl file
                     String path = webScript.getDescription().getId() + ".head.ftl";
 
                     /**
@@ -160,7 +147,7 @@ public class WebScriptRenderer extends AbstractRenderer
                          * At any rate, we can add this in for the time being.
                          */
                         Map pageModel = (Map) model.get("page");
-                        if(pageModel != null && model.get("url") == null)
+                        if (pageModel != null && model.get("url") == null)
                         {
                             URLHelper helper = (URLHelper) pageModel.get("url");
                             if(helper != null)
@@ -173,7 +160,7 @@ public class WebScriptRenderer extends AbstractRenderer
                         templateProcessor.process(path, model, out);
                         
                         String result = out.toString();
-                        if(result != null && result.length() > 0)
+                        if (result != null && result.length() > 0)
                         {
                             head = super.head(rendererContext) + out.toString();
                         }
@@ -191,35 +178,25 @@ public class WebScriptRenderer extends AbstractRenderer
     public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
-        /**
-         * Pull a few necessary things from the renderer context
-         */
+        // Pull a few necessary things from the renderer context
         HttpServletRequest request = rendererContext.getRequest();
         RequestContext context = (RequestContext) rendererContext.getRequestContext();
 
-        /**
-         * Get the application context and relevant context objects
-         */
+        // Get the application context and relevant context objects
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
 
-        /**
-         * Copy in request parameters into a HashMap
-         * This is so as to be compatible with UriUtils (and Token substitution)
-         */
+        // Copy in request parameters into a HashMap
+        // This is so as to be compatible with UriUtils (and Token substitution)
         Map<String, String> args = getArgs(request);
 
-        /**
-         * Begin to process the actual web script.
-         * 
-         * Construct a "context" object that the Web Script Engine will use
-         * to figure out what we want it to do.
-         */
+        // Begin to process the actual web script.
+        // 
+        // Construct a "context" object that the Web Script Engine will use
+        // to figure out what we want it to do.
         LocalWebScriptContext webScriptContext = new LocalWebScriptContext();
         
-        /**
-         * Get the web script url, do token substitution and lop off query string
-         * Set onto the context
-         */
+        // Get the web script url, do token substitution and lop off query string
+        // Set onto the context
         String url = this.getRenderer();
         url = UriUtils.replaceUriTokens(url, args);
         if (url.lastIndexOf('?') != -1)
@@ -228,23 +205,17 @@ public class WebScriptRenderer extends AbstractRenderer
         }
         webScriptContext.RequestURI = url;
 
-        /**
-         * Set up the request path.
-         * If none is supplied, assume the servlet path.
-         */
-        String requestPath = (String) rendererContext.get("requestPath"); // i.e.
+        // Set up the request path.
+        // If none is supplied, assume the servlet path.
+        String requestPath = (String) rendererContext.get("requestPath");
         if (requestPath == null)
         {
             requestPath = request.getContextPath();
-            //requestPath = "/service";
         }
         webScriptContext.RequestPath = requestPath;
-        webScriptContext.scriptUrl = requestPath + webScriptContext.RequestURI;
+        webScriptContext.ScriptUrl = requestPath + webScriptContext.RequestURI;
 
-        /**
-         * Set up character encoding.  If none, set the default.
-         */
-        // character encoding
+        // Set up character encoding.  If none, set the default.
         String encoding = request.getCharacterEncoding();
         if (encoding == null)
         {
@@ -259,12 +230,9 @@ public class WebScriptRenderer extends AbstractRenderer
             }
         }
 
-        /**
-         * Figure out which web script runtime container to use.
-         * Most of the time, this will be the default one.
-         */
-        String containerId = context.getConfig().getRendererProperty(
-                getRendererType(), "container-bean");
+        // Figure out which web script runtime container to use.
+        // Most of the time, this will be the default one.
+        String containerId = context.getConfig().getRendererProperty(getRendererType(), "container-bean");
         if (containerId == null || containerId.length() == 0)
         {
             containerId = "site.webscripts.container";
@@ -276,77 +244,42 @@ public class WebScriptRenderer extends AbstractRenderer
         }
         webScriptContext.RuntimeContainer = webScriptContainer;
         
-        /**
-         * Set up additional state onto the web script context
-         */
+        // Set up additional state onto the web script context
         webScriptContext.rendererContext = rendererContext;
-        webScriptContext.object = rendererContext.getObject();
+        webScriptContext.Object = rendererContext.getObject();
         webScriptContext.Tokens = args;
-        webScriptContext.requestContext = context;
+        webScriptContext.RequestContext = context;
 
-        /**
-         * Construct the Web Script Runtime
-         * This bundles the container, the context and the encoding
-         */
-        LocalWebScriptRuntime runtime = new LocalWebScriptRuntime(
-                webScriptContainer, webScriptContext, encoding);
-
-        /**
-         * Bind the RequestContext to the Web Script Container using a
-         * thread local variable.  The Web Script Container methods for
-         * setting model properties are not request scoped, so this is the
-         * only way to do this (it seems)
-         * 
-         * Note: The models for script and template processing are created
-         * later on and will use getScriptParameters and
-         * getTemplateParameters from the container.  The container looks up
-         * the thread local variable and does its thing. 
-         */
-        webScriptContainer.bindRendererContext(rendererContext);
-
-        /**
-         * Execute the script
-         */
-        runtime.executeScript();
-
-        /**
-         * Be sure to unbind the request context thread local variable
-         */
-        webScriptContainer.unbindRendererContext();
-
-        /**
-         * Pull back the results from the runtime buffer
-         */
-        Reader reader = (Reader) runtime.getResponseReader();
-        BufferedReader in = new BufferedReader(reader);
-        char[] cbuf = new char[65536];
-        StringBuilder buffer = new StringBuilder();
-        int read_this_time = 0;
         try
         {
-            do
-            {
-                read_this_time = in.read(cbuf, 0, 65536);
-                if (read_this_time > 0)
-                    buffer.append(cbuf, 0, read_this_time);
-            }
-            while (read_this_time > 0);
+            // Construct the Web Script Runtime
+            // This bundles the container, the context and the encoding
+            LocalWebScriptRuntime runtime = new LocalWebScriptRuntime(
+                    new BufferedWriter(rendererContext.getResponse().getWriter(), 4096),
+                    webScriptContainer, webScriptContext);
+            
+            /**
+             * Bind the RequestContext to the Web Script Container using a
+             * thread local variable.  The Web Script Container methods for
+             * setting model properties are not request scoped, so this is the
+             * only way to do this (it seems)
+             * 
+             * Note: The models for script and template processing are created
+             * later on and will use getScriptParameters and
+             * getTemplateParameters from the container.  The container looks up
+             * the thread local variable and does its thing. 
+             */
+            webScriptContainer.bindRendererContext(rendererContext);
+    
+            // Execute the script
+            runtime.executeScript();
+    
+            // Be sure to unbind the request context thread local variable
+            webScriptContainer.unbindRendererContext();
         }
         catch (IOException exc)
         {
             throw new RendererExecutionException("Unable to read back response from Web Script Runtime buffer", exc);
-        }
-
-        /**
-         * Commit the buffer back to the output stream
-         */
-        try
-        {
-            rendererContext.getResponse().getWriter().write(buffer.toString());
-        }
-        catch (IOException ioe)
-        {
-            throw new RendererExecutionException("Unable to commit Web Script results buffer to output stream", ioe);
         }
     }
 }

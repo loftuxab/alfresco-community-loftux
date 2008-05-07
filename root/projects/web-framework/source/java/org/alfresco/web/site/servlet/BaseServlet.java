@@ -39,8 +39,6 @@ public abstract class BaseServlet extends HttpServlet
     /** forcing guess access is available on most servlets */
     private static final String ARG_GUEST = "guest";
 
-    //private static Log logger = LogFactory.getLog(BaseServlet.class);
-
     /**
      * Apply the headers required to disallow caching of the response in the browser
      */

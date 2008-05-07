@@ -29,24 +29,21 @@ import java.io.OutputStream;
 import java.io.Writer;
 
 /**
+ * @author kevinr
  * @author muzquiano
  */
 public class LocalWebScriptResponse extends WebScriptResponseImpl
 {
-    private Writer outWriter;
-    private OutputStream outStream;
+    private Writer out;
     private Runtime runtime;
     private LocalWebScriptContext context;
 
-    public LocalWebScriptResponse(Runtime runtime,
-            LocalWebScriptContext context, Writer outWriter,
-            OutputStream outStream)
+    public LocalWebScriptResponse(Runtime runtime,LocalWebScriptContext context, Writer out)
     {
         super(runtime);
         this.context = context;
         this.runtime = runtime;
-        this.outWriter = outWriter;
-        this.outStream = outStream;
+        this.out = out;
     }
 
     public String encodeScriptUrl(String url)
@@ -70,12 +67,13 @@ public class LocalWebScriptResponse extends WebScriptResponseImpl
 
     public OutputStream getOutputStream() throws IOException
     {
-        return this.outStream;
+        // NOTE: not support by locale WebScript runtime 
+        return null;
     }
 
     public Writer getWriter() throws IOException
     {
-        return this.outWriter;
+        return this.out;
     }
 
     public void reset()

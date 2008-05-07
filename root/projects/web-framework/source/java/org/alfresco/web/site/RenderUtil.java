@@ -56,6 +56,8 @@ import org.alfresco.web.site.renderer.RendererFactory;
  */
 public class RenderUtil
 {
+    private static final String NEWLINE = "\r\n";
+
     /**
      * Renders a given JSP page.
      * 
@@ -935,27 +937,25 @@ public class RenderUtil
      * renderer context.  The renderer context must describe a template.
      * 
      * @param rendererContext
-     * @return
+     * 
+     * @return head tags render output
      */
-    public static StringBuilder processHeader(RendererContext rendererContext)
+    public static String processHeader(RendererContext rendererContext)
         throws RendererExecutionException
     {
         RequestContext context = rendererContext.getRequestContext();
-        StringBuilder builder = new StringBuilder(1024);
         
         /**
          * Allow for the head tags to be generated once per request
          * If they're sought a second time, we can just throw down what
          * we already generated the first time.
          */
-        StringBuilder headTags = (StringBuilder) context.getValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
-        if(headTags == null)
+        String headTags = (String)context.getValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
+        if (headTags == null)
         {
-            /**
-             * Bind into request context
-             */
-            headTags = new StringBuilder(4096);
-            context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);
+            StringBuilder buf = new StringBuilder(4096);
+            buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
+            buf.append(NEWLINE); 
             
             /**
              * This is a work in progress.  Still not sure what the best
@@ -972,7 +972,7 @@ public class RenderUtil
             try
             {            
                 Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
-                if(config != null)
+                if (config != null)
                 {
                     // renderer properties
                     rendererType = config.getProperty("renderer-type");
@@ -980,67 +980,60 @@ public class RenderUtil
                     
                     // execute renderer
                     String tags = RenderUtil.processRenderer(context, rendererContext.getRequest(), rendererContext.getResponse(), rendererType, renderer);
-                    headTags.append(tags);
-                    headTags.append("\r\n");
+                    buf.append(tags);
+                    buf.append(NEWLINE);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new RendererExecutionException("Unable to render global include for renderer: " + renderer + " of type: " + rendererType, ex);
             }
-                
             
-            /**
-             * If the current renderer is rendering a TemplateInstance,
-             * then we should additionally process downstream components
-             */
-            if(rendererContext.getObject() instanceof TemplateInstance)
+            // If the current renderer is rendering a TemplateInstance,
+            // then we should additionally process downstream components
+            if (rendererContext.getObject() instanceof TemplateInstance)
             {
                 Component component = null;
                 try
                 {
                     Component[] components = RenderUtil.getCurrentComponentBindings(context);
-                    for(int i = 0; i < components.length; i++)
+                    for (int i = 0; i < components.length; i++)
                     {
                         component = components[i];
                         
                         // bind the component into context
                         RendererContext componentRendererContext = RendererContextHelper.bind(context, component, rendererContext.getRequest(), rendererContext.getResponse());
-    
+                        
                         Renderable renderable = RendererFactory.newRenderer(context, component);
                         String head = renderable.head(componentRendererContext);
-                        if(head != null)
+                        if (head != null)
                         {
-                            headTags.append(head);
-                            headTags.append("\r\n");
+                            buf.append(head);
+                            buf.append(NEWLINE);
                         }
                         
                         // unbind the component
                         RendererContextHelper.unbind(context);
                     }
                 }
-                catch(RendererNotFoundException rnfe)
+                catch (RendererNotFoundException rnfe)
                 {
                     RendererContextHelper.unbind(context);
                     throw new RendererExecutionException("HEAD Renderer not found for component: " + component.getId(), rnfe);
                 }
-                catch(RendererExecutionException ree)
+                catch (RendererExecutionException ree)
                 {
                     RendererContextHelper.unbind(context);
                     throw new RendererExecutionException("HEAD Renderer failed to execute for component: " + component.getId(), ree);
                 }
             }
+            
+            // bind result into request context
+            headTags = buf.toString();
+            context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);
         }
-
-        /**
-         * Hand back the full head string
-         */
-        builder.append("\r\n");
-        builder.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
-        builder.append("\r\n");        
-        builder.append(headTags.toString());
         
-        return builder;
+        return headTags;
     }
     
     /**
