@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<template-instance>
+
+  <title>Extranet Logout Template</title>
+  <template-type>extranet-logout</template-type>
+  
+  <properties>
+    <width>100</width>
+    <height>200</height>
+  </properties>
+  
+</template-instance>

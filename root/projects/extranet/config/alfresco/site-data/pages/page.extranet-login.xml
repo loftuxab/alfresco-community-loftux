@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <id>page.extranet-login</id>
+  <page-type>login</page-type>
+  <title>Extranet Login Page</title>
+  <template-instance>template.extranet-login</template-instance>
+  <authentication>none</authentication>  
+</page>

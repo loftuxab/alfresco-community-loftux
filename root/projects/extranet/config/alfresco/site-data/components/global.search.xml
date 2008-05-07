@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+  <title>Search</title>  
+  <url>/components/search</url>
+  
+  <!-- Binding --> 
+  <scope>global</scope>
+  <source-id>global</source-id>
+  <region-id>search</region-id>
+  
+</component>

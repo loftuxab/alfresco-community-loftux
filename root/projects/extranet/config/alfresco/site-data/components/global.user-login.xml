@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+  <title>User Login</title>  
+  <url>/components/user-login</url>
+  
+  <!-- Binding --> 
+  <scope>global</scope>
+  <source-id>global</source-id>
+  <region-id>user-login</region-id>
+  
+</component>

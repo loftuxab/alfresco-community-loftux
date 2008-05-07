@@ -73,7 +73,7 @@
 			<system-pages>
 				<page>
 					<id>page-getting-started</id>
-					<renderer>/app/page-gettingstarted.jsp</renderer>
+					<renderer>/app/getting-started.jsp</renderer>
 					<renderer-type>jsp</renderer-type>
 				</page>
 				<page>
@@ -99,7 +99,25 @@
 				<user-factory>extranet</user-factory>
 			</defaults>
 		</framework>
-		
+			
+		<application>
+			<defaults>
+				<theme>extranet</theme>
+				<region-chrome>default-region-chrome</region-chrome>
+				<component-chrome>default-component-chrome</component-chrome>
+				<page-types>
+					<page-type>
+						<id>login</id>
+						<page-instance-id></page-instance-id>
+					</page-type>
+					<page-type>
+						<id>logout</id>
+						<page-instance-id></page-instance-id>
+					</page-type>
+				</page-types>
+			</defaults>
+		</application>
+	
 	</config>
 
 </alfresco-config>

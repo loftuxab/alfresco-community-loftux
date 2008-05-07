@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page-association>
+  <title>JIRA</title>
+  <source-id>page.home</source-id>
+  <dest-id>page.jira</dest-id>
+  <assoc-type>child</assoc-type>
+</page-association>

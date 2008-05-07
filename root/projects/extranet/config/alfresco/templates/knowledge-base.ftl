@@ -45,44 +45,14 @@
 
 	</div>
 
-	
-	<!-- LEFT COLUMN -->
-	<div class="left">
-	
-		<h3 style="text-align: left;"><img style="width: 27px; height: 27px;" alt="hiker" src="./images/hiker_green.jpg"> Trails:
-		</h3>
 
-		<div class="left_articles">
-			<@region id="trails" scope="global"/>
-		</div>
-
-		<div class="left_articles">
-			<@region id="top-extensions" scope="global"/>
-		</div>
-
-		<div class="left_articles">
-			<@region id="popular-content" scope="global"/>
-		</div>
-	</div>
-
-	
-	<!-- MIDDLE COLUMN -->
-	<div class="middle">
-	
-		<@region id="home-welcome" scope="global"/>
-		
-		<@region id="home-resources" scope="global"/>
-		
-		<@region id="product-news" scope="global"/>
-		
-	</div>
-
-
-	<!-- RIGHT COLUMN -->
-	<div class="right">
-	
-		<@region id="get-alfresco" scope="global"/>
-		<@region id="community-news" scope="global"/>		
+	<div align="center">
+		<br/>
+		<br/>
+		TODO:  The knowledge base integration!
+		<br/>
+		<br/>
+		<br/>
 	</div>
 
 	<!-- FOOTER -->
