@@ -199,12 +199,13 @@ public class WebScriptRenderer extends AbstractRenderer
         // Set onto the context
         String url = this.getRenderer();
         url = UriUtils.replaceUriTokens(url, args);
-        if (url.lastIndexOf('?') != -1)
+        String requestUri = url;
+        if (requestUri.lastIndexOf('?') != -1)
         {
-            url = url.substring(0, url.lastIndexOf('?'));
+            requestUri = requestUri.substring(0, requestUri.lastIndexOf('?'));
         }
-        webScriptContext.RequestURI = url;
-
+        webScriptContext.RequestURI = requestUri;
+        
         // Set up the request path.
         // If none is supplied, assume the servlet path.
         String requestPath = (String) rendererContext.get("requestPath");
@@ -213,8 +214,8 @@ public class WebScriptRenderer extends AbstractRenderer
             requestPath = request.getContextPath();
         }
         webScriptContext.RequestPath = requestPath;
-        webScriptContext.ScriptUrl = requestPath + webScriptContext.RequestURI;
-
+        webScriptContext.ScriptUrl = requestPath + url;
+        
         // Set up character encoding.  If none, set the default.
         String encoding = request.getCharacterEncoding();
         if (encoding == null)
