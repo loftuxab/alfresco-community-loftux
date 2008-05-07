@@ -74,14 +74,6 @@ public class RendererFactory
         {
             uri = component.getProperty("url");
         }
-        if(uri == null)
-        {
-            uri = component.getSetting("uri");
-        }
-        if(uri == null)
-        {
-            uri = component.getSetting("url");
-        }
         if(uri != null && uri.length() != 0)
         {
             /**

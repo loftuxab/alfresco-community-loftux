@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * As a special exception to the terms and conditions of version 2.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's
+ * FLOSS exception.  You should have recieved a copy of the text describing
+ * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.site;
@@ -31,15 +31,15 @@ import org.alfresco.config.ConfigElement;
 
 /**
  * A default implementation of the FrameworkConfig interface.
- * 
+ *
  * This implementation works directly against the Config Service
- * 
+ *
  * @author muzquiano
  */
 public class DefaultFrameworkConfig implements FrameworkConfig
 {
     /**
-     * Statics of keys that comprise XML elements in the 
+     * Statics of keys that comprise XML elements in the
      * configuration file
      */
     private static final String CONFIG_URI = "uri";
@@ -100,7 +100,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     private static final String CONFIG_ENABLED = "enabled";
     private static final String CONFIG_TIMER = "timer";
     private static final String CONFIG_DEBUG = "debug";
-    
+
     /** The config object. */
     protected Config config = null;
 
@@ -113,12 +113,12 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     protected String defaultPageMapperId = null;
     protected String defaultLinkBuilderId = null;
     protected String defaultRequestContextId = null;
-    protected String defaultUserFactoryId = null;    
+    protected String defaultUserFactoryId = null;
 
-    
+
     /**
      * Instantiates a new default framework config.
-     * 
+     *
      * @param config the config
      */
     public DefaultFrameworkConfig(Config config)
@@ -134,18 +134,18 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         return isInitialized;
     }
 
-    
+
     //////////////////////////////////////////////////////////////////
     // Helpers
     //////////////////////////////////////////////////////////////////
 
     /**
      * Gets the element child value by id.
-     * 
+     *
      * @param elements the elements
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the element child value by id
      */
     private static String getElementChildValueById(List<ConfigElement> elements, String id, String childId)
@@ -160,12 +160,12 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return null;
     }
-    
+
     /**
      * Gets the element ids.
-     * 
+     *
      * @param elements the elements
-     * 
+     *
      * @return the element ids
      */
     private static String[] getElementIds(List<ConfigElement> elements)
@@ -178,8 +178,8 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return ids;
     }
-    
-    
+
+
     //////////////////////////////////////////////////////////////////
     // Formats
     //////////////////////////////////////////////////////////////////
@@ -208,13 +208,13 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getFormatChildElement(id, CONFIG_DESCRIPTION);
     }
-    
+
     /**
      * Gets the format child element.
-     * 
+     *
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the format child element
      */
     private String getFormatChildElement(String id, String childId)
@@ -261,13 +261,13 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getPageMapperChildElement(id, CONFIG_CLASS);
     }
-    
+
     /**
      * Gets the page mapper child element.
-     * 
+     *
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the page mapper child element
      */
     private String getPageMapperChildElement(String id, String childId)
@@ -277,7 +277,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         return getElementChildValueById(elements, id, childId);
     }
 
-    
+
     //////////////////////////////////////////////////////////////////
     // Link Builder
     //////////////////////////////////////////////////////////////////
@@ -315,13 +315,13 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getLinkBuilderChildElement(id, CONFIG_CLASS);
     }
-    
+
     /**
      * Gets the link builder child element.
-     * 
+     *
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the link builder child element
      */
     private String getLinkBuilderChildElement(String id, String childId)
@@ -330,8 +330,8 @@ public class DefaultFrameworkConfig implements FrameworkConfig
                 CONFIG_DEFINITIONS).getChildren(CONFIG_DEFINITION);
         return getElementChildValueById(elements, id, childId);
     }
-    
-    
+
+
 
     //////////////////////////////////////////////////////////////////
     // Request Context
@@ -391,13 +391,13 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getRequestContextElement(id, settingKey);
     }
-    
+
     /**
      * Gets the request context element.
-     * 
+     *
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the request context element
      */
     private String getRequestContextElement(String id, String childId)
@@ -407,11 +407,11 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         return getElementChildValueById(elements, id, childId);
     }
 
-    
+
     //////////////////////////////////////////////////////////////////
     // Servlet and Dispatcher Information
     //////////////////////////////////////////////////////////////////
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultServletUri()
      */
@@ -444,7 +444,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
                 CONFIG_ERROR_HANDLERS).getChildren(CONFIG_HANDLER);
         return getElementIds(elements);
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDispatcherErrorHandlerRenderer(java.lang.String)
      */
@@ -460,7 +460,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getDispatcherErrorHandlerProperty(id, CONFIG_RENDERER_TYPE);
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDispatcherErrorHandlerProperty(java.lang.String, java.lang.String)
      */
@@ -482,7 +482,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         catch(Exception ex) { }
         return null;
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDispatcherSystemPageIds()
      */
@@ -492,7 +492,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
                 CONFIG_SYSTEM_PAGES).getChildren(CONFIG_PAGE);
         return getElementIds(elements);
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDispatcherSystemPageRenderer(java.lang.String)
      */
@@ -508,7 +508,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getDispatcherSystemPageProperty(id, CONFIG_RENDERER_TYPE);
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDispatcherSystemPageProperty(java.lang.String, java.lang.String)
      */
@@ -529,8 +529,8 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         catch(Exception ex) { }
         return null;
     }
-    
-    
+
+
 
     //////////////////////////////////////////////////////////////////
     // File Systems
@@ -580,10 +580,10 @@ public class DefaultFrameworkConfig implements FrameworkConfig
 
     /**
      * Gets the file system element.
-     * 
+     *
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the file system element
      */
     private String getFileSystemElement(String id, String childId)
@@ -668,13 +668,13 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return null;
     }
-    
+
     /**
      * Gets the in context element.
-     * 
+     *
      * @param id the id
      * @param childId the child id
-     * 
+     *
      * @return the in context element
      */
     private String getInContextElement(String id, String childId)
@@ -683,7 +683,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
                 CONFIG_ELEMENTS).getChildren(CONFIG_ELEMENT);
         return getElementChildValueById(elements, id, childId);
     }
-    
+
 
     //////////////////////////////////////////////////////////////////
     // Model Types
@@ -722,7 +722,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
     {
         return getModelTypeProperty(id, CONFIG_NAMESPACE);
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getModelTypeTagName(java.lang.String)
      */
@@ -751,9 +751,9 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public String getModelTypePrefix(String id)
     {
-        return getModelTypeProperty(id, CONFIG_PREFIX);        
+        return getModelTypeProperty(id, CONFIG_PREFIX);
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getModelTypeVersion(java.lang.String)
      */
@@ -776,9 +776,9 @@ public class DefaultFrameworkConfig implements FrameworkConfig
                 return configElement.getChildValue(propertyName);
             }
         }
-        return null;        
+        return null;
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getModelRootPath()
      */
@@ -791,8 +791,8 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return rootPath;
     }
-    
-    
+
+
 
     //////////////////////////////////////////////////////////////////
     // Tag Libraries
@@ -842,8 +842,8 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         return null;
     }
 
-    
-    
+
+
     //////////////////////////////////////////////////////////////////
     // User Factories
     //////////////////////////////////////////////////////////////////
@@ -900,7 +900,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         return null;
     }
 
- 
+
     //////////////////////////////////////////////////////////////////
     // Remote
     //////////////////////////////////////////////////////////////////
@@ -1064,31 +1064,31 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         return null;
     }
 
-    
-    
+
+
     //////////////////////////////////////////////////////////////////
     // Debug
     //////////////////////////////////////////////////////////////////
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDebugTimerEnabled()
      */
     public boolean getDebugTimerEnabled()
     {
         if (isTimerEnabled == null)
-        {   
+        {
             String val = config.getConfigElement(CONFIG_DEBUG).getChild(CONFIG_TIMER).getChildValue(CONFIG_ENABLED);
             isTimerEnabled = Boolean.valueOf(val);
         }
         return isTimerEnabled.booleanValue();
     }
 
-    
-    
+
+
     //////////////////////////////////////////////////////////////////
     // Application Default Settings
     //////////////////////////////////////////////////////////////////
-        
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultRegionChrome()
      */
@@ -1126,24 +1126,32 @@ public class DefaultFrameworkConfig implements FrameworkConfig
      */
     public String getDefaultPageTypeInstanceId(String id)
     {
-        List elements = config.getConfigElement(CONFIG_APPLICATION).getChild(
-                CONFIG_PAGE_TYPES).getChildren(CONFIG_PAGE_TYPE);
-        for (int i = 0; i < elements.size(); i++)
+        ConfigElement pageTypes = config.getConfigElement(CONFIG_APPLICATION).getChild(
+                CONFIG_PAGE_TYPES);
+
+        if(pageTypes != null)
         {
-            ConfigElement configElement = (ConfigElement) elements.get(i);
-            String _id = configElement.getChildValue(CONFIG_ID);
-            if (_id.equals(id))
-                return configElement.getChildValue(CONFIG_PAGE_INSTANCE_ID);
+        	List elements = pageTypes.getChildren(CONFIG_PAGE_TYPE);
+	        for (int i = 0; i < elements.size(); i++)
+	        {
+	            ConfigElement configElement = (ConfigElement) elements.get(i);
+	            String _id = configElement.getChildValue(CONFIG_ID);
+	            if (_id.equals(id))
+	            {
+	                return configElement.getChildValue(CONFIG_PAGE_INSTANCE_ID);
+				}
+	        }
         }
-        return null;
+
+	    return null;
     }
-    
-    
-    
+
+
+
     //////////////////////////////////////////////////////////////////
     // Defaults
     //////////////////////////////////////////////////////////////////
-        
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultFormatId()
      */
@@ -1155,7 +1163,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return defaultFormatId;
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultPageMapperId()
      */
@@ -1179,7 +1187,7 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return defaultLinkBuilderId;
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultRequestContextId()
      */
@@ -1203,15 +1211,15 @@ public class DefaultFrameworkConfig implements FrameworkConfig
         }
         return defaultUserFactoryId;
     }
-    
+
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.FrameworkConfig#getDefaultTheme(java.lang.String)
+     * @see org.alfresco.web.site.FrameworkConfig#getDefaultThemeId(java.lang.String)
      */
-    public String getDefaultTheme(String id)
+    public String getDefaultThemeId()
     {
-        return getDefaultProperty("theme");
+    	return config.getConfigElement(CONFIG_APPLICATION).getChild(CONFIG_DEFAULTS).getChildValue("theme");
     }
-    
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.FrameworkConfig#getDefaultProperty(java.lang.String)
      */

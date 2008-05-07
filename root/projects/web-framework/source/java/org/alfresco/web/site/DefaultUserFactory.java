@@ -36,6 +36,19 @@ import org.alfresco.web.site.exception.UserFactoryException;
  */
 public class DefaultUserFactory extends UserFactory
 {
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.UserFactory#authenticate(javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
+     */
+    public boolean authenticate(HttpServletRequest request,
+    		String username, String password)
+    {
+    	return false;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
+     */
     public User loadUser(RequestContext context, HttpServletRequest request,
             String user_id) throws UserFactoryException
     {

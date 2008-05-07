@@ -28,10 +28,24 @@ import org.alfresco.web.site.filesystem.CachedFileSystem;
 import org.alfresco.web.site.filesystem.IFileSystem;
 
 /**
+ * Utility class that allows for easy invalidation of the cache.
+ * 
+ * This is used primarly by the CacheServlet which receives calls
+ * from the outside world to "refresh" the cache.
+ * 
+ * It is also invoked from within the scripting layer to force
+ * cache refreshes when objects have been changed through scripting.
+ * 
  * @author muzquiano
  */
 public class CacheUtil
 {
+    
+    /**
+     * Invalidate file system cache.
+     * 
+     * @param context the context
+     */
     public static void invalidateFileSystemCache(RequestContext context)
     {
         IFileSystem fileSystem = context.getFileSystem();
@@ -44,6 +58,11 @@ public class CacheUtil
         }
     }
 
+    /**
+     * Invalidate ads object cache.
+     * 
+     * @param context the context
+     */
     public static void invalidateADSObjectCache(RequestContext context)
     {
         IModel model = context.getModel();
@@ -55,6 +74,13 @@ public class CacheUtil
         }
     }
 
+    /**
+     * Checks if is file system cache enabled.
+     * 
+     * @param context the context
+     * 
+     * @return true, if is file system cache enabled
+     */
     public static boolean isFileSystemCacheEnabled(RequestContext context)
     {
         IFileSystem fileSystem = context.getFileSystem();

@@ -65,22 +65,26 @@ public abstract class UserFactory
             // check whether there is a user object loaded already
             User user = (User) request.getSession().getAttribute(
                     SESSION_ATTRIBUTE_KEY_USER_OBJECT);
-            if (user == null)
+            if(user != null)
             {
-                // load the user from whatever store...
-                user = loadUser(context, request, userId);
+            	return user;
+            }
 
-                // if we got the user, set onto session
-                if (user != null)
-                {
-                    request.getSession().setAttribute(
-                            SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
-                    return user;
-                }
-                else
-                {
-                    // unable to load the user
-                }
+            // load the user from whatever store...
+            user = loadUser(context, request, userId);
+
+            // if we got the user, set onto session
+            if (user != null)
+            {
+                request.getSession().setAttribute(
+                        SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
+                return user;
+            }
+            else
+            {
+                // unable to load the user
+                request.getSession().removeAttribute(
+                        SESSION_ATTRIBUTE_KEY_USER_OBJECT);                	
             }
         }
 
@@ -88,8 +92,11 @@ public abstract class UserFactory
         return getGuestUser(context, request);
     }
 
-    protected abstract User loadUser(RequestContext context,
+    public abstract User loadUser(RequestContext context,
             HttpServletRequest request, String user_id) throws UserFactoryException;
+
+    public abstract boolean authenticate(HttpServletRequest request,
+    		String username, String password);
     
     public void setId(String id)
     {

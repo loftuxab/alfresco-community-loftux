@@ -24,37 +24,21 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.tools.ReflectionHelper;
-import org.alfresco.web.site.exception.UserFactoryException;
+import javax.servlet.http.HttpServletRequest;
 
-public abstract class UserFactoryBuilder
+/**
+ * @author muzquiano
+ */
+public class AuthenticationUtil
 {
-    protected UserFactoryBuilder()
-    {
-    }
-
-    public static UserFactory newFactory()
-        throws UserFactoryException
-    {
-        // default that we will use
-        String className = "org.alfresco.web.site.DefaultUserFactory";
-        
-        // check the config
-        String _defaultId = Framework.getConfig().getDefaultUserFactoryId();
-        String _className = Framework.getConfig().getUserFactoryClass(_defaultId);
-        if (_className != null)
-            className = _className;
-
-        UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
-        if(factory == null)
-        {
-            throw new UserFactoryException("Unable to create user factory for class name: " + className);
-        }
-        factory.setId(_defaultId);
-        
-        // log
-        Framework.getLogger().debug("New User Factory: " + className);
-
-        return factory;
-    }    
+	public static void logout(RequestContext context)
+	{
+		if(context instanceof HttpRequestContext)
+		{
+			HttpServletRequest request = ((HttpRequestContext)context).getRequest();
+		
+	    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+	    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+		}
+	}
 }

@@ -60,18 +60,5 @@ public class PageMapperFactory
             Framework.getLogger().debug("New page mapper: " + pageMapper.getClass().toString());
         
         return pageMapper;
-    }
-    
-    public synchronized static PageMapper sharedInstance(RequestContext context)
-        throws PageMapperException
-    {
-        if (mapper == null)
-        {
-            mapper = newInstance(context);
-        }
-        
-        return mapper;
-    }
-    
-    protected static PageMapper mapper = null;
+    }    
 }
