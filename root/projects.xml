@@ -2980,6 +2980,11 @@
          <fileset dir="${dir.project.extranet.dist}" 
                   includes="${file.name.jar.extranet}" />
       </copy>
+
+      <!-- unzip and add 3rd party javascript library -->
+      <unzip src="${file.zip.slingshot.yui}" 
+             dest="${dir.project.extranet.assemble}" />
+
    </target>  
    
    <target name="test-extranet" 
