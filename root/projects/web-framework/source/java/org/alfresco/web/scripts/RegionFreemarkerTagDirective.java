@@ -59,9 +59,7 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
         // instantiate the tag class
         RegionTag tag = new RegionTag();
 
-        
-        
-        // REGION NAME
+        // Region name
         TemplateModel idValue = (TemplateModel)params.get("id");
         if (idValue instanceof TemplateScalarModel == false)
         {
@@ -70,8 +68,7 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
         String regionId = ((TemplateScalarModel)idValue).getAsString();
         tag.setName(regionId);
         
-        
-        // REGION SCOPE
+        // Region Scope
         TemplateModel scopeValue = (TemplateModel)params.get("scope");
         if (scopeValue instanceof TemplateScalarModel == false)
         {
@@ -80,8 +77,7 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
         String scope = ((TemplateScalarModel)scopeValue).getAsString();
         tag.setScope(scope);
         
-        
-        // PROTECTED ACCESS
+        // Region Access
         boolean protectedRegion = false;
         TemplateModel protValue = (TemplateModel)params.get("protected");
         if (protValue != null)
@@ -91,7 +87,7 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
               throw new TemplateModelException("The 'protected' parameter to a region directive must be a boolean.");
            }
            protectedRegion = ((TemplateBooleanModel)protValue).getAsBoolean();
-           if(protectedRegion)
+           if (protectedRegion)
            {
                tag.setAccess("protected");
            }
@@ -99,9 +95,9 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
 
         // copy in body content (if there is any)
         String bodyContentString = null;
-        if(body != null)
+        if (body != null)
         {
-            if(tag instanceof BodyTagSupport)
+            if (tag instanceof BodyTagSupport)
             {
                 // dump out the Freemarker body content
                 StringWriter bodyStringWriter = new StringWriter();
@@ -119,7 +115,7 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
             env.getOut().write(output);
             env.getOut().flush();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new TemplateException("Unable to process tag and commit output", ex, env);
         }        

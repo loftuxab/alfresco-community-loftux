@@ -176,4 +176,10 @@ public class RendererContext implements Serializable
     {
         return this.map;        
     }
+
+    @Override
+    public String toString()
+    {
+        return this.map.toString();
+    }
 }

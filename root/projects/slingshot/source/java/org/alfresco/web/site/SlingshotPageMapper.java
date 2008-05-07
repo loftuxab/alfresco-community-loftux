@@ -61,6 +61,9 @@ import org.alfresco.web.site.model.Page;
  */
 public class SlingshotPageMapper extends AbstractPageMapper
 {
+    /**
+     * Empty constructor - for instantiation via reflection 
+     */
     public SlingshotPageMapper()
     {
         super();

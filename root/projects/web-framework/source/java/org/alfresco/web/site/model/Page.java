@@ -273,10 +273,13 @@ public class Page extends AbstractModelObject
      */
     public TemplateInstance getTemplate(RequestContext context, String formatId)
     {
+        TemplateInstance instance = null;
         String templateId = getTemplateId(formatId);
         if (templateId != null)
-            return context.getModel().loadTemplate(context, templateId);
-        return null;
+        {
+            instance = context.getModel().loadTemplate(context, templateId);
+        }
+        return instance;
     }
 
     /**

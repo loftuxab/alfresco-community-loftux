@@ -46,8 +46,7 @@ public class HeadTag extends TagBase
 
         try
         {
-            StringBuilder builder = RenderUtil.processHeader(rendererContext);
-            print(builder.toString());
+            print(RenderUtil.processHeader(rendererContext));
         }
         catch(RendererExecutionException ree)
         {
@@ -56,5 +55,4 @@ public class HeadTag extends TagBase
         
         return SKIP_BODY;
     }
-
 }

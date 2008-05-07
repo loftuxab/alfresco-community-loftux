@@ -77,7 +77,7 @@ public class FreemarkerRenderer extends AbstractRenderer
          * Attempt to execute the script's .head. file, if it has one
          * This output is trapped and placed into the aggregated HEAD capture
          */
-        String head = super.head(rendererContext);
+        String head = null;
         String templateName = null;
         try
         {
@@ -94,13 +94,18 @@ public class FreemarkerRenderer extends AbstractRenderer
                 StringWriter out = new StringWriter(512);
                 templateProcessor.process(templateName, model, out);
                 
-                head = head + out.toString();
+                head = out.toString();
+            }
+            else
+            {
+                head = super.head(rendererContext);
             }
         }
-        catch(Exception ex) 
+        catch (Exception ex) 
         {   
             throw new RendererExecutionException("FreemarkerRenderer failed to process template: " + templateName, ex);
         }
+        
         return head;
     }
  

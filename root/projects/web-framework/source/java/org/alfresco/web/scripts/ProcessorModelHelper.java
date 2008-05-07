@@ -207,10 +207,9 @@ public class ProcessorModelHelper
             }
             
             // add in the ${head} tag
-            if(rendererContext.getObject() instanceof TemplateInstance)
+            if (rendererContext.getObject() instanceof TemplateInstance)
             {               
-                StringBuilder builder = RenderUtil.processHeader(rendererContext);
-                model.put("head", builder.toString());
+                model.put("head", RenderUtil.processHeader(rendererContext));
             }
         }
 
@@ -256,28 +255,6 @@ public class ProcessorModelHelper
                 key = prefix + key;
             }            
             model.put(key, value);
-            
-            /**
-             * This is an additional step to see if we can convert the
-             * values to Integers.
-             * 
-             * Note that the original PageRendererServlet did not do this
-             * and that this incurs additional overhead.  Thus, we may want
-             * to do away with it.
-             */
-            try 
-            {
-                //Integer a = Integer.valueOf((String)value);
-                //model.put(key, a);
-            }
-            catch(Exception ex) 
-            {
-                /**
-                 * This just means that we were unable to convert this to
-                 * an integer.  For whatever reason.  It really doesn't
-                 * matter why, so we let it go
-                 */                
-            }
         }
     }
     
