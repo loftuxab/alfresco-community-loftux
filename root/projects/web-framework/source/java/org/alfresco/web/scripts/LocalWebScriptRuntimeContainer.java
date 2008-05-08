@@ -41,8 +41,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class LocalWebScriptRuntimeContainer extends PresentationContainer
 {
+    private static Log logger = LogFactory.getLog(PresentationContainer.class);
+    
     private ThreadLocal<RendererContext> rendererContext = new ThreadLocal<RendererContext>();
-
+    
+    
     protected void bindRendererContext(RendererContext context)
     {
         rendererContext.set(context);
@@ -107,7 +110,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         
         // Bind in Template Model elements
         RendererContext rendererContext = getRendererContext();
-
+        
         // populate the root template properties
         try
         {
@@ -118,8 +121,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
             // This exception is only thrown when processing
             // template objects, thus it shouldn't occur for web scripts
         }
-
-
+        
         return params;
     }
     
@@ -134,6 +136,4 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
     {
        this.ticket.set(ticket);
     }
-    
-    private static Log logger = LogFactory.getLog(PresentationContainer.class);
 }

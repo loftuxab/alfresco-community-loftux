@@ -67,6 +67,7 @@ public class RemoteClient extends AbstractClient
 
    private String defaultEncoding;
    private String ticket;
+   private String requestContentType;
    
    private String username;
    private String password;
@@ -117,7 +118,15 @@ public class RemoteClient extends AbstractClient
       this.username = user;
       this.password = pass;
    }
-   
+
+   /**
+    * @param requestContentType     the POST request "Content-Type" header value to set
+    */
+   public void setRequestContentType(String contentType)
+   {
+       this.requestContentType = contentType;
+   }
+
    /**
     * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
     * as the prefix for the full WebScript url.
@@ -311,7 +320,8 @@ public class RemoteClient extends AbstractClient
             connection.setDoOutput(true);
             connection.setDoInput(true);
             connection.setUseCaches(false);
-            connection.setRequestProperty ("Content-Type", "application/octet-stream");
+            connection.setRequestProperty ("Content-Type",
+                    (this.requestContentType != null ? this.requestContentType : "application/octet-stream"));
             FileCopyUtils.copy(in, new BufferedOutputStream(connection.getOutputStream()));
          }
          

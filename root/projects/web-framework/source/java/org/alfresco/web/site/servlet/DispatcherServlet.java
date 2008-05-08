@@ -177,14 +177,16 @@ public class DispatcherServlet extends BaseServlet
     protected void ensureDispatchState(RequestContext context, HttpServletRequest request,
             HttpServletResponse response)
     {
-        if (context.getSiteConfiguration() == null)
+        if (isDebugEnabled())
         {
-            if (isDebugEnabled())
+            if (context.getSiteConfiguration() == null)
+            {
                 debug(context, "No site configuration - performing reset");
-            
-            // effectively, do a reset
-            context.setCurrentPage(null);
-            context.setCurrentObjectId(null);
+                
+                // effectively, do a reset
+                context.setCurrentPage(null);
+                context.setCurrentObjectId(null);
+            }
         }
         
         // if we have absolutely nothing to dispatch to, then check to
@@ -205,7 +207,6 @@ public class DispatcherServlet extends BaseServlet
                 }            
             }
         }
-        
     }
     
     protected void doDispatch(RequestContext context, HttpServletRequest request,
