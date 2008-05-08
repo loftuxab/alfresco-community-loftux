@@ -29,7 +29,7 @@
       <@recursestack exception=exception.cause/>
    </#if>
    <#if exception.cause?exists == false>
-      ,"${exception}",
+      ,"${exception}"
       <#list exception.stackTrace as element>
       ,"${element}"
       </#list>  
