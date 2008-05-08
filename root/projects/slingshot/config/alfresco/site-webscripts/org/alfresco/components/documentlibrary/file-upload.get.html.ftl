@@ -40,7 +40,7 @@
             </div>
             <div class="yui-u">
                 <div id="${args.htmlid}-version-buttongroup" class="yui-buttongroup">
-                    <input id="${args.htmlid}-minorChanges" type="radio" name="newVersion" value="1.1" checked="true"/>
+                    <input id="${args.htmlid}-minorChanges" type="radio" name="newVersion" value="1.1" checked="checked"/>
                     <input id="${args.htmlid}-majorChanges" type="radio" name="newVersion" value="2.0"/>
                 </div>
             </div>
