@@ -38,7 +38,14 @@ import org.alfresco.web.site.exception.RendererExecutionException;
  * @author muzquiano
  */
 public abstract class AbstractRenderer implements Renderable
-{   
+{
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.Renderable#init(org.alfresco.web.site.renderer.RendererContext)
+     */
+    public void init(RendererContext rendererContext)
+    {
+    }
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.renderer.Renderable#head(org.alfresco.web.site.renderer.RendererContext)
      */
