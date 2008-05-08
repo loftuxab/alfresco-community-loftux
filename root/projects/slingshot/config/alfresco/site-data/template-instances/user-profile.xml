@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
-   <template-type>user-profile</template-type>
+   <template-type>org/alfresco/user-profile</template-type>
 </template-instance>

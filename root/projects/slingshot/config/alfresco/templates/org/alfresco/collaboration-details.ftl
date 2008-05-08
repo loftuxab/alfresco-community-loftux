@@ -1,0 +1,22 @@
+<#import "global/alfresco-template.ftl" as template />
+<@template.header />
+
+<@template.body>
+<div id="doc3">
+   <div id="hd">
+      <@region id="header" scope="global" protected=true/>
+      <@region id="title" scope="template" protected=true />
+      <@region id="navigation" scope="template" protected=true />
+   </div>
+   <div id="bd">
+      <div class="site-content">
+         <@region id="details" scope="page">
+           TODO: Bind details components
+         </@region>
+      </div>
+   </div>
+   <div id="ft">
+      <@region id="footer" scope="global" protected=true />
+   </div>
+</div>
+</@>
