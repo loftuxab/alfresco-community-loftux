@@ -253,9 +253,13 @@ public class RendererFactory
         {
             try
             {
-                r = (Renderable) Class.forName(className).newInstance();
+                r = (Renderable)Class.forName(className).newInstance();
+                
+                // setup and single time initialisation
                 r.setRenderer(renderer);
                 r.setRendererType(rendererType);
+                r.init(context.getRenderContext());
+                
                 renderers.put(cacheKey, r);
             }
             catch (Exception ex)

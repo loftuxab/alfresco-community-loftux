@@ -32,8 +32,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
@@ -63,6 +65,35 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WebScriptRenderer extends AbstractRenderer
 {
+    private TemplateProcessor templateProcessor;
+    private LocalWebScriptRuntimeContainer webScriptContainer;
+    private Registry registry;
+    
+    
+    public void init(RendererContext rendererContext)
+    {
+        // Get the application context and relevant context objects
+        ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
+        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
+        RequestContext context = (RequestContext) rendererContext.getRequestContext();
+        
+        templateProcessor = (TemplateProcessor)appContext.getBean("site.templateprocessor");
+        registry = (Registry) appContext.getBean("site.webscripts.registry");
+        
+        // Figure out which web script runtime container to use.
+        // Most of the time, this will be the default one.
+        String containerId = context.getConfig().getRendererProperty(getRendererType(), "container-bean");
+        if (containerId == null || containerId.length() == 0)
+        {
+            containerId = "site.webscripts.container";
+        }
+        webScriptContainer = (LocalWebScriptRuntimeContainer)appContext.getBean(containerId);
+        if (webScriptContainer == null)
+        {
+            throw new AlfrescoRuntimeException("Unable to find web script container: " + containerId); 
+        }
+    }
+    
     protected Map<String, String> getArgs(HttpServletRequest request)
     {
         Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
@@ -85,12 +116,7 @@ public class WebScriptRenderer extends AbstractRenderer
         
         // Pull a few necessary things from the renderer context
         HttpServletRequest request = rendererContext.getRequest();
-
-        // Get the application context and relevant context objects
-        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-        TemplateProcessor templateProcessor = (TemplateProcessor) appContext.getBean("site.templateprocessor");
-        Registry registry = (Registry) appContext.getBean("site.webscripts.registry");
-
+        
         // Copy in request parameters into a HashMap
         // This is so as to be compatible with UriUtils (and Token substitution)
         Map<String, String> args = getArgs(request);
@@ -182,9 +208,6 @@ public class WebScriptRenderer extends AbstractRenderer
         HttpServletRequest request = rendererContext.getRequest();
         RequestContext context = (RequestContext) rendererContext.getRequestContext();
 
-        // Get the application context and relevant context objects
-        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
-
         // Copy in request parameters into a HashMap
         // This is so as to be compatible with UriUtils (and Token substitution)
         Map<String, String> args = getArgs(request);
@@ -230,27 +253,14 @@ public class WebScriptRenderer extends AbstractRenderer
                 throw new RendererExecutionException("Unable to set encoding to default: " + EncodingUtil.DEFAULT_ENCODING, uee);
             }
         }
-
-        // Figure out which web script runtime container to use.
-        // Most of the time, this will be the default one.
-        String containerId = context.getConfig().getRendererProperty(getRendererType(), "container-bean");
-        if (containerId == null || containerId.length() == 0)
-        {
-            containerId = "site.webscripts.container";
-        }
-        LocalWebScriptRuntimeContainer webScriptContainer = (LocalWebScriptRuntimeContainer) appContext.getBean(containerId);
-        if(webScriptContainer == null)
-        {
-            throw new RendererExecutionException("Unable to find web script container: " + containerId); 
-        }
-        webScriptContext.RuntimeContainer = webScriptContainer;
         
-        // Set up additional state onto the web script context
+        // Set up state onto the web script context
+        webScriptContext.RuntimeContainer = webScriptContainer;
         webScriptContext.rendererContext = rendererContext;
         webScriptContext.Object = rendererContext.getObject();
         webScriptContext.Tokens = args;
         webScriptContext.RequestContext = context;
-
+        
         try
         {
             // Construct the Web Script Runtime
