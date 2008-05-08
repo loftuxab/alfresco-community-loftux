@@ -40,7 +40,9 @@ import java.util.Map;
 import org.alfresco.web.config.ServerProperties;
 import org.alfresco.web.scripts.servlet.ServletAuthenticatorFactory;
 import org.alfresco.web.scripts.servlet.WebScriptServletRuntime;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.MessageSource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -53,8 +55,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
  * 
  * @author davidc
  */
-public class TestWebScriptServer
+public class TestWebScriptServer implements ApplicationContextAware
 {
+    /** The application context */
+    protected ApplicationContext applicationContext;
+    
     // dependencies
     protected RuntimeContainer container;
     protected ServletAuthenticatorFactory authenticatorFactory;
@@ -107,6 +112,28 @@ public class TestWebScriptServer
     {
         this.m_messages = messages;
     }
+    
+    /**
+     * Sets the application context 
+     * 
+     * @param applicationContext    the application context
+     * @throws BeansException
+     */
+    public void setApplicationContext(ApplicationContext applicationContext)
+            throws BeansException
+    {
+        this.applicationContext = applicationContext;
+    }
+    
+    /**
+     * Gets the application context
+     * 
+     * @return  ApplicationContext  the application context
+     */
+    public ApplicationContext getApplicationContext()
+    {
+        return this.applicationContext;
+    }
 
     
     /**
@@ -147,6 +174,7 @@ public class TestWebScriptServer
         };
         ApplicationContext context = new ClassPathXmlApplicationContext(CONFIG_LOCATIONS);
         TestWebScriptServer testServer = (TestWebScriptServer)context.getBean("webscripts.test");
+        
         return testServer;
     }
     
