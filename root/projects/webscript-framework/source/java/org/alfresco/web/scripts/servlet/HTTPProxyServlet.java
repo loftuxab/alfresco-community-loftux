@@ -60,7 +60,10 @@ import org.alfresco.util.URLEncoder;
 public class HTTPProxyServlet extends HttpServlet
 {
     private static final long serialVersionUID = -576405943603122206L;
-
+    
+    private static final String PARAM_ENDPOINT = "endpoint";
+    
+    
     /**
      * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
@@ -76,7 +79,7 @@ public class HTTPProxyServlet extends HttpServlet
             String[] values = parameter.getValue();
             int startIdx = 0;
             
-            if (parameter.getKey().equals("endpoint") && values.length != 0)
+            if (parameter.getKey().equals(PARAM_ENDPOINT) && values.length != 0)
             {
                 endpoint = values[0];
                 startIdx++;
@@ -105,7 +108,7 @@ public class HTTPProxyServlet extends HttpServlet
     /**
      * Construct a "proxied" URL
      * 
-     * Note: the "proxied" URL is a relative url 
+     * Note: the "proxied" URL is a relative url - it is assumed that the servlet path is /proxy
      * 
      * @param url  the URL to proxy
      * @return  the "proxied" url
