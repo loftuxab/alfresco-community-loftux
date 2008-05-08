@@ -24,11 +24,7 @@
       </div>
    </div>
    <p>&nbsp;</p>
-   <div class="yui-g">
-      <div class="yui-u first">
-         <div id="${args.htmlid}-documents" class="doclist-documents"></div>
-      </div>
-   </div>
+   <div id="${args.htmlid}-documents" class="doclist-documents"></div>
 </div>
 
 <div id="${args.htmlid}-createSite"></div>
