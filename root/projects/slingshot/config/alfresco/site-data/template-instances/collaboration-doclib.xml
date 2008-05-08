@@ -1,4 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
-   <template-type>collaboration-doclib</template-type>
+   <template-type>org/alfresco/collaboration-doclib</template-type>
 </template-instance>         

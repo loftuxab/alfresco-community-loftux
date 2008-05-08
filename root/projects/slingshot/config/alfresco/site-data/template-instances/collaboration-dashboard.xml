@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
-    <template-type>collaboration-dashboard</template-type>
+    <template-type>org/alfresco/collaboration-dashboard</template-type>
     <properties>
         <regions>9</regions>
         <horizontalGap>20</horizontalGap>
