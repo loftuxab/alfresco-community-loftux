@@ -39,6 +39,15 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 public interface Renderable
 {
     /**
+     * Initialisation hook point. Guarenteed to be call once only and on the
+     * first creation of this renderer class. The RendererContext is provided
+     * to allow access to say ServletContext and config etc.
+     * 
+     * @param rendererContext
+     */
+    public void init(RendererContext rendererContext);
+    
+    /**
      * Allows the renderer to provide text that should be placed into the
      * header portion of the returned markup.
      * 

@@ -32,7 +32,6 @@ import javax.servlet.ServletContext;
 
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererContext;
@@ -46,21 +45,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class FreemarkerRenderer extends AbstractRenderer
 {
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.renderer.AbstractRenderer#head(org.alfresco.web.site.renderer.RendererContext)
-     */
-    public String head(RendererContext rendererContext)
-        throws RendererExecutionException
+    private PresentationTemplateProcessor templateProcessor;
+    private PresentationScriptProcessor scriptProcessor;
+    private Store templateStore;
+    
+    
+    public void init(RendererContext rendererContext)
     {
         ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         RequestContext context = rendererContext.getRequestContext();
-
-        // get the renderer destination property
-        String uri = this.getRenderer();
-        
-        // the current format
-        String format = context.getCurrentFormatId();
         
         // get the template processor
         String templateProcessorId = context.getConfig().getRendererProperty(getRendererType(), "template-processor-bean");
@@ -68,11 +62,34 @@ public class FreemarkerRenderer extends AbstractRenderer
         {
             templateProcessorId = "site.templateprocessor";
         }
-        PresentationTemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(templateProcessorId);
+        templateProcessor = (PresentationTemplateProcessor)appContext.getBean(templateProcessorId);
         
-        // template store
-        Store templateStore = (Store)appContext.getBean("site.store.templates");
+        // get the script processor
+        String scriptProcessorId = context.getConfig().getRendererProperty(getRendererType(), "script-processor-bean");
+        if(scriptProcessorId == null || scriptProcessorId.length() == 0)
+        {
+            scriptProcessorId = "site.scriptprocessor";
+        }
+        scriptProcessor = (PresentationScriptProcessor)appContext.getBean(scriptProcessorId);
+        
+        // get and init template store
+        templateStore = (Store)appContext.getBean("site.store.templates");
         templateStore.init();
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.renderer.AbstractRenderer#head(org.alfresco.web.site.renderer.RendererContext)
+     */
+    public String head(RendererContext rendererContext)
+        throws RendererExecutionException
+    {
+        RequestContext context = rendererContext.getRequestContext();
+        
+        // get the renderer destination property
+        String uri = this.getRenderer();
+        
+        // the current format
+        String format = context.getCurrentFormatId();
         
         /**
          * Attempt to execute the script's .head. file, if it has one
@@ -120,35 +137,13 @@ public class FreemarkerRenderer extends AbstractRenderer
     public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
-        ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
-        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         RequestContext context = rendererContext.getRequestContext();
-
+        
         // get the renderer destination property
         String uri = this.getRenderer();
         
         // the current format
         String format = context.getCurrentFormatId();
-        
-        // get the template processor
-        String templateProcessorId = context.getConfig().getRendererProperty(getRendererType(), "template-processor-bean");
-        if(templateProcessorId == null || templateProcessorId.length() == 0)
-        {
-            templateProcessorId = "site.templateprocessor";
-        }
-        PresentationTemplateProcessor templateProcessor = (PresentationTemplateProcessor)appContext.getBean(templateProcessorId);
-        
-        // get the script processor
-        String scriptProcessorId = context.getConfig().getRendererProperty(getRendererType(), "script-processor-bean");
-        if(scriptProcessorId == null || scriptProcessorId.length() == 0)
-        {
-            scriptProcessorId = "site.scriptprocessor";
-        }
-        PresentationScriptProcessor scriptProcessor = (PresentationScriptProcessor)appContext.getBean(scriptProcessorId);
-
-        // template store
-        Store templateStore = (Store)appContext.getBean("site.store.templates");
-        templateStore.init();
         
         // Now execute the real template
         String templateName = null;
