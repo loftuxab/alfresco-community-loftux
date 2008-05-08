@@ -52,6 +52,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class DispatcherServlet extends BaseServlet
 {
+    private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
+    
     public void init() throws ServletException
     {
         super.init();
@@ -72,6 +74,9 @@ public class DispatcherServlet extends BaseServlet
         }
         
         setNoCacheHeaders(response);
+        
+        // set response content type and charset
+        response.setContentType(MIMETYPE_HTML);
         
         // initialize the request context
         RequestContext context = null;
@@ -143,13 +148,19 @@ public class DispatcherServlet extends BaseServlet
                 throw new ServletException(t);
             }
         }
-        
-        // stop the service timer and print out any timing information (if enabled)
-        if (Timer.isTimerEnabled())
+        finally
         {
-            Timer.stop(request, "service");
-            Timer.reportAll(request);
-            Timer.unbindTimer(request);
+            // clean up
+            response.getWriter().flush();
+            response.getWriter().close();
+            
+            // stop the service timer and print out any timing information (if enabled)
+            if (Timer.isTimerEnabled())
+            {
+                Timer.stop(request, "service");
+                Timer.reportAll(request);
+                Timer.unbindTimer(request);
+            }
         }
     }
 
@@ -228,7 +239,6 @@ public class DispatcherServlet extends BaseServlet
         else
         {
             // we know we're dispatching to something...
-            
             // if we have a page specified, then we'll go there
             if(currentPageId != null)
             {

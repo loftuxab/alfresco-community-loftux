@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site.model;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -399,20 +400,24 @@ public abstract class AbstractModelObject implements ModelObject
 
     public Map<String, Object> getCustomProperties()
     {
-        Map<String, Object> map = new HashMap<String, Object>();
+        Map<String, Object> map = null;
         
         Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
-        if(properties != null)
+        if (properties != null)
         {
-            List elements = properties.elements();
+            List<Element> elements = properties.elements();
+            map = new HashMap<String, Object>(elements.size());
             for (int i = 0; i < elements.size(); i++)
             {
-                Element el = (Element) elements.get(i);
-                String elementName = el.getName();
-                String elementValue = el.getTextTrim();
-                map.put(elementName, elementValue);
+                Element el = elements.get(i);
+                map.put(el.getName(), el.getTextTrim());
             }
         }
+        else
+        {
+            map = Collections.<String, Object>emptyMap();
+        }
+        
         return map;
     }
     
@@ -525,6 +530,11 @@ public abstract class AbstractModelObject implements ModelObject
     {
         setTitle(value);
     }
-    
 
+    
+    @Override
+    public String toString()
+    {
+        return this.document.toString();
+    }
 }

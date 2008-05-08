@@ -58,7 +58,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class FakeHttpServletResponse implements HttpServletResponse
 {
-    
     /* (non-Javadoc)
      * @see javax.servlet.ServletResponse#setCharacterEncoding(java.lang.String)
      */
@@ -93,10 +92,10 @@ public class FakeHttpServletResponse implements HttpServletResponse
             Writer targetWriter = (characterEncoding != null ? new OutputStreamWriter(
                     content, characterEncoding) : new OutputStreamWriter(
                     content));
-
+            
             writer = new PrintWriter(targetWriter, true);
         }
-
+        
         return writer;
     }
 
@@ -624,7 +623,7 @@ public class FakeHttpServletResponse implements HttpServletResponse
     private static final String CHARSET_PREFIX = "charset=";
     
     /** The character encoding. */
-    private String characterEncoding = "ISO-8859-1";
+    private String characterEncoding = "UTF-8";
 
     /** The content. */
     private final ByteArrayOutputStream content = new ByteArrayOutputStream();
