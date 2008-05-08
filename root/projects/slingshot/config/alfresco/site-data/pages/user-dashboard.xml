@@ -4,5 +4,5 @@
    <title>User Dashboard</title>
    <description>Users dashboard page</description>
    <template-instance>user-dashboard</template-instance>
-   <authentication>none</authentication>
+   <authentication>user</authentication>
 </page>

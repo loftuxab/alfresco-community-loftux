@@ -36,47 +36,48 @@
             scope: this
          }
 
-         YAHOO.util.Connect.asyncRequest("GET", Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite", callback);
+         YAHOO.util.Connect.asyncRequest("GET", Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite?htmlid=" + this.id, callback);
       },
       
       templateLoaded: function(response)
       {
-         YAHOO.util.Dom.get(this.id).innerHTML = response.responseText;
+         var Dom = YAHOO.util.Dom;
 
-         var handleSubmit = function()
-         {
-            this.submit();
-         }
-
-         var handleCancel = function()
-         {
-            this.cancel();
-         }
-
+         Dom.get(this.id).innerHTML = response.responseText;
          this.dialog = new YAHOO.widget.Dialog(this.id,
          {
-            width: "30em",
             fixedcenter: true,
-            visible: false,
-            constraintoviewport: true,
-            buttons:
-            [
-               {
-                  text: "Create", handler: handleSubmit, isDefault: true
-               },
-               {
-                  text: "Cancel", handler: handleCancel
-               }
-            ]
+            visible: false
          });
+
+         var clButton = Dom.get(this.id + "-ok-button");
+         var clearButton = new YAHOO.widget.Button(clButton, {type: "button"});
+         clearButton.subscribe("click", this.onOkButtonClick, this, true);
+
          this.dialog.render();
          this.dialog.show();
       },
-      
-      templateFailed: function()
+
+
+      onOkButtonClick: function(type, args)
       {
-         YAHOO.util.Dom.get(this.id).innerHTML = "<b>Couldn't get template</b>";
+         Alfresco.util.Request.doJsonForm(this.id + "-createSite-form", null,
+            {failureMessage: "Could not create site"}
+               , this.onCreateSiteSucces
+         );
+
+      },
+
+      onCreateSiteSucces: function(response)
+      {
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration/dashboard?site=" + response.json.shortName;
+      },
+
+      templateFailed: function(o)
+      {
+         Alfresco.util.PopupManager.displayPrompt({ text: "Could not load create site template"});
       }
+      
    };
 })();
 

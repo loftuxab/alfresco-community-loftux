@@ -15,7 +15,7 @@ Alfresco.constants = Alfresco.constants ||
    
    /* TODO: Remove ticket when AJAX/Proxy authentication in place */
    /* http://localhost:8080/alfresco/service/api/login?u={username}&pw={password} */
-   TICKET: "TICKET_f6cf06f37ce0f2cfc217a7e0c61f7ea186668bd6",
+   TICKET: "TICKET_18342ad25cf99716bec6437ba6fd6375f91419c3",
 
    /* URL_CONTEXT and URL_SERVICECONTEXT set by template header using ${url.context} */
    URL_CONTEXT: "./",
@@ -208,60 +208,84 @@ Alfresco.util.PopupManager = function()
 
    return {
 
-      displayMessage: function(text, autoHide, delay, effectDuration)
+      zIndex: 5,
+
+      displayMessageConfig: {
+         text: null,
+         autoHide: true,
+         effect: YAHOO.widget.ContainerEffect.FADE,
+         effectDuration: 0.5,
+         displayTime: 2.5,
+         modal: false
+      },
+
+      displayMessage: function(userConfig)
       {
-         autoHide = autoHide ? autoHide : true;
-         delay = delay ? delay : 2.5;
-         effectDuration = effectDuration ? effectDuration : 0.5;
-         var popup = new YAHOO.widget.Dialog("message",
+         var c = YAHOO.lang.merge(this.displayMessageConfig, userConfig);
+         var message = new YAHOO.widget.Dialog("message",
             {
                visible: false,
-               effect:{effect:YAHOO.widget.ContainerEffect.FADE, duration: effectDuration},
                close: false,
-               modal:true,
-               draggable:false               
+               draggable:false,
+               effect:{effect: c.effect, duration: c.effectDuration},
+               modal: c.modal,
+               zIndex: this.zIndex++
             }
          );
-         popup.setBody(text);
-         popup.render(document.body);
-         popup.center();
-         if(autoHide)
+         message.setBody(c.text);
+         message.render(document.body);
+         message.center();
+         if(c.autoHide)
          {
-            popup.subscribe("show", this._delayPopupHide, {popup: popup, delay: (delay * 1000)}, true);
+            message.subscribe("show", this._delayPopupHide, {popup: message, displayTime: (c.displayTime * 1000)}, true);
          }
-         popup.show();
+         message.show();
       },
 
       _delayPopupHide: function()
       {         
-         YAHOO.lang.later(this.delay, this, function()
+         YAHOO.lang.later(this.displayTime, this, function()
          {
             this.popup.hide();
          });
       },
 
-      displayPrompt: function(text, buttons, icon, title, effectDuration)
+      displayPromptConfig: {
+         title: null,
+         text: null,
+         icon: null,
+         autoHide: true,
+         effect: null,
+         effectDuration: 0.5,
+         modal: false,
+         close: false,
+         buttons: [{ text:"OK", handler: function(){ this.hide(); }, isDefault: true }]
+      },
+
+      displayPrompt: function(userConfig)
       {
-         effectDuration = effectDuration ? effectDuration : 0.5;
+         var c = YAHOO.lang.merge(this.displayPromptConfig, userConfig);
          var prompt = new YAHOO.widget.SimpleDialog("prompt", {
             visible:false,
-            effect:{effect: YAHOO.widget.ContainerEffect.FADE, duration: effectDuration},
-            close: false,
-            modal:true,
-            draggable:false
+            draggable:false,
+            effect: c.effect,
+            modal: c.modal,
+            close: c.close,
+            zIndex: this.zIndex++
          });
-         if(title)
+         if(c.title)
          {
-            prompt.setHeader(title);
+            prompt.setHeader(c.title);
          }
-         prompt.setBody(text);
-         if(icon)
+         prompt.setBody(c.text);
+         if(c.icon)
          {
-            prompt.cfg.setProperty("icon", icon); // YAHOO.widget.SimpleDialog.ICON_WARN
+            prompt.cfg.setProperty("icon", c.icon);
          }
          // todo: Hmm how shall the OK label be localized?
-         buttons = buttons ? buttons : [ { text:"OK", handler: function(){ prompt.hide(); }, isDefault:true } ];
-         prompt.cfg.queueProperty("buttons", buttons);
+         if(c.buttons){
+            prompt.cfg.queueProperty("buttons", c.buttons);
+         }
          prompt.render(document.body);
          prompt.center();
          prompt.show();
@@ -422,16 +446,24 @@ Alfresco.util.Request = function()
        * @param successHandler A custom handler if Alfresco.util.Request.defaultSuccessHandler shouldn't be used.
        * @param failurehandler A custom handler if Alfresco.util.Request.defaultFailureHandler shouldn't be used.
        */
-      request: function(method, url, postData, contentType, reqInfo, successHandler, failurehandler)
+      request: function(method, url, postData, contentType, userReqInfo, userSuccessHandler, userFailureHandler)
       {
          if(contentType){
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", contentType);
          }
+         // todo: When the functions above have changed to take just a 1 object as parameter instead of 4 or 5
+         // pass in that object as argument below....
          var callback = {
-            success: (successHandler ? successHandler : this.defaultSuccessHandler),
-            failure: (failurehandler ? failurehandler: this.defaultFailureHandler),
-            argument: reqInfo ? [reqInfo] : null
+            success: this.successHandler,
+            failure: this.failureHandler,
+            argument:
+            {
+               successHandler: userSuccessHandler,
+               failureHandler: userFailureHandler,
+               reqInfo: userReqInfo || {},
+               contentType: contentType
+            }
          };
          YAHOO.util.Connect.asyncRequest (method, url, callback, postData);
       },
@@ -441,11 +473,20 @@ Alfresco.util.Request = function()
        * The successMessage will be present if a reqInfo object with failureMessage was provided for the request.
        * @param serverResponse
        */
-      defaultSuccessHandler: function(serverResponse)
+      successHandler: function(serverResponse)
       {
-         if(serverResponse.argument && serverResponse.argument[0] && serverResponse.argument[0].successMessage)
+         var argument = serverResponse.argument;
+         if(argument.successHandler)
          {
-            Alfresco.util.PopupManager.displayMessage(serverResponse.argument[0].successMessage);
+            var json = null;
+            if(argument.contentType === "application/json"){
+               json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+            }
+            argument.successHandler({reqInfo: argument.reqInfo, json: json});
+         }
+         else if(argument.reqInfo.successMessage)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: argument.reqInfo.successMessage});
          }
       },
 
@@ -455,19 +496,39 @@ Alfresco.util.Request = function()
        * Otherwise the server error from serverResponse.statusText will be displayed.
        * @param serverResponse
        */
-      defaultFailureHandler: function(serverResponse)
+      failureHandler: function(serverResponse)
       {
-         if(serverResponse.argument && serverResponse.argument[0] && serverResponse.argument[0].failureMessage)
+         var argument = serverResponse.argument;
+         if(argument.failureHandler)
          {
-            Alfresco.util.PopupManager.displayMessage(serverResponse.argument[0].failureMessage);
+            var json = null;
+            if(argument.contentType === "application/json"){
+               // Exception stack trace currently makes the json string incorrect
+               //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+            }
+            argument.failureHandler({reqInfo: argument.reqInfo, json: json});
          }
-         else if(serverResponse.statusText)
+         else if(argument.reqInfo.failureMessage)
          {
-            Alfresco.util.PopupManager.displayMessage(serverResponse.statusText);
+            Alfresco.util.PopupManager.displayPrompt({text: argument.reqInfo.failureMessage});
          }
          else
          {
-            Alfresco.util.PopupManager.displayMessage("Error sending data to server.");
+            if(argument.contentType === "application/json"){
+               var json = null;
+               // Exception stack trace currently makes the json string incorrect
+               // json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+               // Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
+               Alfresco.util.PopupManager.displayPrompt({title: serverResponse.statusText});
+            }
+            else if(serverResponse.statusText)
+            {
+               Alfresco.util.PopupManager.displayPrompt({title: serverResponse.statusText});
+            }
+            else
+            {
+               Alfresco.util.PopupManager.displayPrompt({text: "Error sending data to server."});
+            }
          }
       }
 
