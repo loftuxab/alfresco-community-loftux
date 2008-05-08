@@ -2,7 +2,7 @@
 <component>
    <scope>global</scope>
    <region-id>nav</region-id>
-   <source-id>dashboard</source-id>
+   <source-id>global</source-id>
    <url>/test/alfwebtest02</url>
    <properties>
       <location>myhome</location>

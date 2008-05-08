@@ -59,6 +59,7 @@ public class FilterUtil
     {        
         WrappedHttpServletRequest req = new WrappedHttpServletRequest(request);
         FakeHttpServletResponse resp = new FakeHttpServletResponse();
+        resp.setContentType(response.getContentType());
         
         // Create the filter context
         FilterContext filterContext = new FilterContext(req, resp,

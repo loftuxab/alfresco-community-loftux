@@ -272,12 +272,10 @@ public class RenderUtil
             Timer.start(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
         
         // get the template
-        TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
-                templateId);
+        TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context, templateId);
         if (template == null)
         {
-            throw new RegionRenderException(
-                    "Unable to locate template: " + templateId);
+            throw new RegionRenderException("Unable to locate template: " + templateId);
         }
 
         try
@@ -297,9 +295,8 @@ public class RenderUtil
             // render in either one of two ways
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
-            Component[] components = ModelUtil.findComponents(context,
-                    regionScopeId, regionSourceId, regionId, null);
-            if (components.length > 0)
+            Component[] components = ModelUtil.findComponents(context, regionScopeId, regionSourceId, regionId, null);
+            if (components.length != 0)
             {
                 // merge in component to render data
                 RendererContext compRenderData = RendererContextHelper.generate(context, components[0]);
@@ -320,8 +317,7 @@ public class RenderUtil
         }
         catch (Exception ex)
         {
-            throw new RegionRenderException(
-                    "Unable to render region: " + regionId, ex);
+            throw new RegionRenderException("Unable to render region: " + regionId, ex);
         }
         finally
         {
@@ -372,8 +368,7 @@ public class RenderUtil
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderComponent-" + componentId);
         
-        Component component = context.getModel().loadComponent(context,
-                componentId);
+        Component component = context.getModel().loadComponent(context, componentId);
         if (component == null)
         {
             throw new ComponentChromeRenderException(
@@ -439,8 +434,7 @@ public class RenderUtil
             RendererContext rendererContext = RendererContextHelper.bind(context, component, request, response);
             
             // build a renderer for this component
-            Renderable renderer = RendererFactory.newRenderer(context,
-                    component);
+            Renderable renderer = RendererFactory.newRenderer(context, component);
             renderer.execute(rendererContext);
         }
         catch (Exception ex)
@@ -689,9 +683,9 @@ public class RenderUtil
             String rendererType, String renderer) throws Exception
     {
         // wrap the request and response
-        WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(
-                request);
+        WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
         FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
+        fakeResponse.setContentType(response.getContentType());
         
         // execute
         executeRenderer(context, wrappedRequest, fakeResponse, rendererType, renderer);

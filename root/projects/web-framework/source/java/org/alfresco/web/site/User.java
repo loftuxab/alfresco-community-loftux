@@ -223,4 +223,10 @@ public class User
     {
         return map;
     }
+
+    @Override
+    public String toString()
+    {
+        return map.toString();
+    }
 }

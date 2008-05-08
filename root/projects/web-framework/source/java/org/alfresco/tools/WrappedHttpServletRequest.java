@@ -34,7 +34,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public class WrappedHttpServletRequest extends HttpServletRequestWrapper
 {
-    
     /**
      * Instantiates a new wrapped http servlet request.
      * 
@@ -44,5 +43,4 @@ public class WrappedHttpServletRequest extends HttpServletRequestWrapper
     {
         super(request);
     }
-
 }

@@ -75,7 +75,5 @@ public class HttpRequestContext extends AbstractRequestContext
     }
     
     
-
-
     protected HttpServletRequest request;
 }

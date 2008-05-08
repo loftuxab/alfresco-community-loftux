@@ -102,10 +102,10 @@ public abstract class FreemarkerTagSupportDirective implements
         String output = null;
         if (context instanceof HttpRequestContext)
         {
-            HttpServletRequest response = (HttpServletRequest) ((HttpRequestContext) context).getRequest();
-
+            HttpServletRequest request = (HttpServletRequest)((HttpRequestContext)context).getRequest();
+            
             // execute the tag
-            output = TagUtil.execute(tag, response, bodyContent);
+            output = TagUtil.execute(tag, request, bodyContent);
         }
         return output;
     }

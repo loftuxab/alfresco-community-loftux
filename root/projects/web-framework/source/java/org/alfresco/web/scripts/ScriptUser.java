@@ -60,4 +60,10 @@ public final class ScriptUser extends ScriptBase
         }
         return map;
     }
+    
+    @Override
+    public String toString()
+    {
+        return user.getProperties().toString();
+    }
 }

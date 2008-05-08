@@ -32,6 +32,8 @@ import javax.servlet.ServletContext;
 
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
+import org.alfresco.web.site.model.Page;
+import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.springframework.context.ApplicationContext;
@@ -44,7 +46,6 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class FreemarkerRenderer extends AbstractRenderer
 {
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.site.renderer.AbstractRenderer#head(org.alfresco.web.site.renderer.RendererContext)
      */
@@ -149,37 +150,34 @@ public class FreemarkerRenderer extends AbstractRenderer
         Store templateStore = (Store)appContext.getBean("site.store.templates");
         templateStore.init();
         
-        /**
-         * Now execute the real template
-         */
+        // Now execute the real template
         String templateName = null;
         try
         {
             // the result model
             Map<String, Object> resultModel = new HashMap<String, Object>(8, 1.0f);
             
-            /**
-             * Attempt to execute a .js file for this template
-             */
-            String scriptPath = uri + ".js";
-            ScriptContent script = templateStore.getScriptLoader().getScript(scriptPath);
-            if (script != null)
+            if (rendererContext.getObject() instanceof TemplateInstance)
             {
-                // build the model
-                Map<String, Object> scriptModel = new HashMap<String, Object>(8);
-                ProcessorModelHelper.populateScriptModel(rendererContext, scriptModel);
-
-                // add in the model object
-                scriptModel.put("model", resultModel);
-
-                // execute the script
-                scriptProcessor.executeScript(script, scriptModel);
+                // Attempt to execute a .js file for this page template
+                String scriptPath = uri + ".js";
+                ScriptContent script = templateStore.getScriptLoader().getScript(scriptPath);
+                if (script != null)
+                {
+                    // build the model
+                    Map<String, Object> scriptModel = new HashMap<String, Object>(8);
+                    ProcessorModelHelper.populateScriptModel(rendererContext, scriptModel);
+                    
+                    // add in the model object
+                    scriptModel.put("model", resultModel);
+                    
+                    // execute the script
+                    scriptProcessor.executeScript(script, scriptModel);
+                }
             }
             
-            /**
-             * Execute the template file itself
-             */
-            Map<String, Object> templateModel = new HashMap<String, Object>(8);
+            // Execute the template file itself
+            Map<String, Object> templateModel = new HashMap<String, Object>(32);
             ProcessorModelHelper.populateTemplateModel(rendererContext, templateModel);
             
             // merge script results model into the template model
@@ -193,7 +191,11 @@ public class FreemarkerRenderer extends AbstractRenderer
             }
             
             // path to the template (switches on format)
-            templateName = uri + ((format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format)) ? ("." + format + ".ftl") : ".ftl");
+            templateName = uri + ".ftl";
+            if (format != null && format.length() != 0 && !context.getConfig().getDefaultFormatId().equals(format))
+            {
+                templateName = uri + "." + format + ".ftl";
+            }
             
             // process the template
             templateProcessor.process(templateName, templateModel, rendererContext.getResponse().getWriter());

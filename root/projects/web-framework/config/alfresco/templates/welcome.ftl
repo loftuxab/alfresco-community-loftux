@@ -8,7 +8,7 @@
    <body>
       <div>
          <@region id="header" scope="global" protected=true>
-            Default region content (only see this if component cannot be resolved!)
+            Default region content
          </@region>
       </div>
       <p>

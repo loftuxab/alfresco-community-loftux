@@ -73,10 +73,8 @@ public class TagUtil
     public static String execute(Tag tag, HttpServletRequest request, String bodyContentString)
         throws TagExecutionException
     {
-        /**
-         * Extract the servlet context from the request (session)
-         * Then proceed into the workhorse method
-         */
+        // Extract the servlet context from the request (session)
+        // Then proceed into the workhorse method
         ServletContext context = request.getSession().getServletContext();
         return execute(tag, context, request, bodyContentString);
     }
@@ -91,8 +89,7 @@ public class TagUtil
      * 
      * @return the string
      */
-    public static String execute(Tag tag, ServletContext context,
-            HttpServletRequest request)
+    public static String execute(Tag tag, ServletContext context, HttpServletRequest request)
         throws TagExecutionException
     {
         return execute(tag, context, request, null);
@@ -123,42 +120,28 @@ public class TagUtil
             HttpServletRequest request, String bodyContentString)
         throws TagExecutionException
     {
-        /**
-         * Manufacture a request implementation within which the tag will run
-         */
-        WrappedHttpServletRequest tagRequest = new WrappedHttpServletRequest(
-                request);
-
-        /**
-         * Manufacture a response implementation within which the tag will run
-         */
+        // Manufacture a request implementation within which the tag will run
+        WrappedHttpServletRequest tagRequest = new WrappedHttpServletRequest(request);
+        
+        // Manufacture a response implementation within which the tag will run
         FakeHttpServletResponse tagResponse = new FakeHttpServletResponse();
-
-        /**
-         * Execute the tag.  This proceeds by "running" the tag as per the
-         * JSP tag mechanism.
-         */
+        
+        // Execute the tag.  This proceeds by "running" the tag as per the JSP tag mechanism.
         String response = null;
         try
         {
-            /**
-             * Manufacture a jsp writer against which the tag will run
-             */
+            // Manufacture a jsp writer against which the tag will run
             FakeJspWriter tagJspWriter = new FakeJspWriter(
                     tagResponse.getWriter());
-
-            /**
-             * Manufacture a jsp page context against which the tag will run
-             */
+            
+            // Manufacture a jsp page context against which the tag will run
             FakeJspPageContext tagJspPageContext = new FakeJspPageContext(
                     context, tagRequest, tagResponse, tagJspWriter);
-
-            /**
-             * Start the tag runner
-             */
+            
+            // Start the tag runner
             tag.setPageContext(tagJspPageContext);
             int startTagReturn = tag.doStartTag();
-            if(tag instanceof BodyTagSupport)
+            if (tag instanceof BodyTagSupport)
             {
                 if(startTagReturn == tag.EVAL_BODY_INCLUDE)
                 {   
@@ -174,19 +157,15 @@ public class TagUtil
                 }
             }
             
-            /**
-             * If we have body content, copy it into the output stream
-             */
-            if(bodyContentString != null)
+            // If we have body content, copy it into the output stream
+            if (bodyContentString != null)
             {
                 tagJspWriter.print(bodyContentString);
             }
             tag.doEndTag();
             tag.release();
 
-            /**
-             * Pick off the output and return it
-             */
+            // Pick off the output and return it
             response = tagResponse.getContentAsString();
         }
         catch (Exception ex)

@@ -113,7 +113,6 @@ public class RegionFreemarkerTagDirective extends FreemarkerTagSupportDirective
         {
             String output = executeTag(tag, bodyContentString);
             env.getOut().write(output);
-            env.getOut().flush();
         }
         catch (Exception ex)
         {
