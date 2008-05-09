@@ -15,6 +15,7 @@
       <script type="text/javascript" src="../../build/assemble/yui/button/button-min.js"></script>
       <script type="text/javascript" src="../../build/assemble/yui/container/container_core-min.js"></script>
       <script type="text/javascript" src="../../build/assemble/yui/yahoo/menu-min.js"></script>
+      <script type="text/javascript" src="../../build/assemble/yui/selector/selector-beta-min.js"></script>
       <script type="text/javascript" src="../web/js/alfresco.js"></script>
       <script type="text/javascript" src="../web/js/forms-runtime.js"></script>
    </head>
@@ -81,11 +82,12 @@
          var regform = new Alfresco.forms.Form("regform");
          regform.addValidation("username", Alfresco.forms.validation.length, {min: 3, max: 10}, "blur");
          regform.addValidation("age", Alfresco.forms.validation.mandatory);
-         //regform.addValidation("age", Alfresco.forms.validation.number, null, "blur");
          regform.addValidation("age", Alfresco.forms.validation.numberRange, {min: 18}, "blur");
          regform.addValidation("country", Alfresco.forms.validation.mandatory);
          regform.addValidation("gender", Alfresco.forms.validation.mandatory);
          regform.addValidation("email", Alfresco.forms.validation.regexMatch, {pattern: /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/}, "blur");
+         //regform.setValidateOnSubmit(false);
+         //regform.setShowSubmitStateDynamically(true);
          regform.init();
       </script>
       
