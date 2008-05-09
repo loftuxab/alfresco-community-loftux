@@ -5,19 +5,18 @@
     <a href="#" onclick="alert('Not implemented');">Find</a> <input type="text" />
   </div>
   <div class="component-list">
-<#list persons as person>
-      <div>
-        <div class="header">
-        ${person.name}<br />
-        <#if person.role == "CONTRIBUTOR">
-        Contributor  
-        </#if>
+
+     <#if (memberships?size > 0) >
+        <#list memberships as m>
+           <div>
+              <h1>${m.person.firstName} ${m.person.lastName}</h1>
+              <h1>${m.role}</h1>
+           </div>
+        </#list>
+     <#else>
+        <div>
+           <h1>No members in this site yet</h1>
         </div>
-        <div class="text">
-           Logged in at ${person.loggedIn}<br />
-           Last activity at ${person.lastActivity}
-        </div>
-      </div>
-</#list>
+     </#if>
   </div>
 </div>

@@ -4,5 +4,5 @@
    <title>Collboration Site Dashboard</title>
    <description>Collaboration site's dashboard page</description>
    <template-instance>collaboration-dashboard</template-instance>
-   <authentication>none</authentication>
+   <authentication>user</authentication>
 </page>

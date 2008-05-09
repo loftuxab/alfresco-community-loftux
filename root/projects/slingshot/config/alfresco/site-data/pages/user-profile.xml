@@ -4,5 +4,5 @@
    <title>User Profile</title>
    <description>User profile page</description>
    <template-instance>user-profile</template-instance>
-   <authentication>none</authentication>
+   <authentication>user</authentication>
 </page>
