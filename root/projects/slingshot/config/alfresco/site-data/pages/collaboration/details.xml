@@ -4,5 +4,5 @@
    <title>Collboration document details page</title>
    <description>Collaboration site's doclib page</description>
    <template-instance>collaboration-details</template-instance>
-   <authentication>none</authentication>
+   <authentication>user</authentication>
 </page>

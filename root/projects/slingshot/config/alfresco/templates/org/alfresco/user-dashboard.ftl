@@ -1,8 +1,6 @@
 <#import "global/alfresco-template.ftl" as template />
-<@template.header>
-   <#include "util/3-column-head.ftl"/>
-</@>
-
+<#import "global/alfresco-layout.ftl" as layout />
+<@template.header/>
 <@template.body>
 <div id="doc3">
    <div id="hd">
@@ -12,7 +10,7 @@
    </div>
    <div id="bd">
       <div class="site-content">
-         <#include "util/3-column-html.ftl"/>
+         <@layout.grid 3 "fluid" 9 "component-"/>
       </div>
    </div>
    <div id="ft">

@@ -4,5 +4,5 @@
    <title>Document Library for collaboration site</title>
    <description>Test page for document library components</description>
    <template-instance>documentlibrary-full</template-instance>
-   <authentication>none</authentication>
+   <authentication>user</authentication>
 </page>
