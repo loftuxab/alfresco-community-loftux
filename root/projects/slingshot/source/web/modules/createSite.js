@@ -29,21 +29,22 @@
       
       show: function()
       {
-         var callback =
+         Alfresco.util.Ajax.serviceRequest(
          {
+            url: "modules/createSite",
+            dataObj: {htmlid: this.id},
             success: this.templateLoaded,
-            failure: this.templateFailed,
+            failureMessage: "Could not load create site template",
             scope: this
-         }
-
-         YAHOO.util.Connect.asyncRequest("GET", Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite?htmlid=" + this.id, callback);
+         });
+         //YAHOO.util.Connect.asyncRequest("GET", Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite?htmlid=" + this.id, callback);
       },
       
       templateLoaded: function(response)
       {
          var Dom = YAHOO.util.Dom;
 
-         Dom.get(this.id).innerHTML = response.responseText;
+         Dom.get(this.id).innerHTML = response.serverResponse.responseText;
          this.dialog = new YAHOO.widget.Dialog(this.id,
          {
             fixedcenter: true,
@@ -61,23 +62,25 @@
 
       onOkButtonClick: function(type, args)
       {
-         Alfresco.util.Request.doJsonForm(this.id + "-createSite-form", null,
-            {failureMessage: "Could not create site"}
-               , this.onCreateSiteSucces
-         );
 
+         // The getFormInfo call will be replaced by Gav's forms runtime
+         // ...and perhaps its that runtime that will make the proxyRequest call instead?
+         // To do that it will need to take in success, failure, successMessage and failureMessage
+         var formInfo = Alfresco.util.Ajax.getFormInfo(this.id + "-createSite-form");
+         Alfresco.util.Ajax.jsonProxyRequest(
+         {
+            url: formInfo.action,
+            dataObj: formInfo.data,
+            success: this.onCreateSiteSucces,
+            failureMessage: "Could not create site"
+         });
       },
 
       onCreateSiteSucces: function(response)
       {
          document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration/dashboard?site=" + response.json.shortName;
-      },
-
-      templateFailed: function(o)
-      {
-         Alfresco.util.PopupManager.displayPrompt({ text: "Could not load create site template"});
       }
-      
+
    };
 })();
 
