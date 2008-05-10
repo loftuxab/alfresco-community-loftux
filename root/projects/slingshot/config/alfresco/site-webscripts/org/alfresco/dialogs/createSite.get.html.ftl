@@ -1,6 +1,6 @@
 <div class="hd">Create site</div>
 <div class="bd">
-   <form id="${args.htmlid}-createSite-form" action="/alfresco/service/api/sites" method="POST">
+   <form id="${args.htmlid}-createSite-form" action="api/sites" method="POST">
       <input type="hidden" name="isPublic" value="true"/>
       <div class="yui-t1">
          <div class="yui-g">

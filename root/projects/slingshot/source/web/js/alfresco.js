@@ -15,7 +15,7 @@ Alfresco.constants = Alfresco.constants ||
    
    /* TODO: Remove ticket when AJAX/Proxy authentication in place */
    /* http://localhost:8080/alfresco/service/api/login?u={username}&pw={password} */
-   TICKET: "TICKET_18342ad25cf99716bec6437ba6fd6375f91419c3",
+   TICKET: "TICKET_256b684b9fd9f261e848b8eda638c06067bb65b6",
 
    /* URL_CONTEXT and URL_SERVICECONTEXT set by template header using ${url.context} */
    URL_CONTEXT: "./",
@@ -58,6 +58,19 @@ Alfresco.util.arrayToObject = function(arr)
       }
    }
    return obj;
+};
+
+/*
+   Alfresco.util.assert
+   Asserts param contains a proper value
+   Didn't want to use the YAHOO.util.Assert methods since it would mean yet another of a new yui package ("yuitest")
+ */
+Alfresco.util.assertNotEmpty = function(param, message)
+{
+   if(typeof param == "undefined" || !param || param === "")
+   {
+      throw new Error(message);
+   }
 };
 
 /*
@@ -302,109 +315,18 @@ Alfresco.util.PopupManager = function()
 
 
 /*
-   Alfresco.util.Request
-
-   Helper functions for sending GET and POST using parameters and/or json.
-   Will send everything through the proxy as soon possible.
+   Alfresco.util.Ajax
  */
 
-Alfresco.util.Request = function()
+Alfresco.util.Ajax = function()
 {
 
    return {
 
-      /**
-       *
-       * @param url
-       * @param getDataObj An object literal that should be sent as a get-parameter-string in the url
-       * @param reqInfo
-       * @param successHandler
-       * @param failurehandler
-       */
-      doGet: function(url, getDataObj, reqInfo, successHandler, failurehandler)
-      {
-         // todo: transform getDataObj to a get-parameter-string and append it to the url
-         var getParameterString = "";
-         url += getParameterString;
-         this.request("GET", url, null, null, reqInfo, successHandler, failurehandler);
-      },
 
-      /**
-       *
-       * @param url
-       * @param postDataObj An object literal that should be sent as a post-parameter-string in the post body
-       * @param reqInfo
-       * @param successHandler
-       * @param failurehandler
-       */
-      doPost: function(url, postDataObj, reqInfo, successHandler, failurehandler)
-      {
-         // todo: transform postDataObj to a post-parameter-string
-         var postParameterString = "";
-         this.request("POST", url, postParameterString, null, reqInfo, successHandler, failurehandler);
-      },
-
-      /**
-       *
-       * @param url
-       * @param postDataObj An object literal that should be sent as a json-data in the post body
-       * @param reqInfo
-       * @param successHandler
-       * @param failurehandler
-       */
-      doJsonPost: function(url, postDataObj, reqInfo, successHandler, failurehandler)
-      {
-         var jsonString = YAHOO.lang.JSON.stringify(postDataObj);
-         this.request("POST", url, jsonString, "application/json", reqInfo, successHandler, failurehandler);
-      },
-
-      /**
-       * Takes a form and submits it as an ajax post.
-       *
-       * @param formId The form that should be submitted
-       * @param whiteList The fields in the form that should be submitted, if null all fields will be submitted.
-       * @param reqInfo
-       * @param successHandler
-       * @param failureHandler
-       */
-      doForm: function(formId, whiteList, reqInfo, successHandler, failureHandler){
-         var formInfo = this.getFormInfo(formId, whiteList);
-         if(formInfo.method == "POST")
-         {
-            this.doPost(formInfo.action, formInfo.data, reqInfo, successHandler, failureHandler);
-         }
-         else
-         {
-            // assume method is "GET"
-            this.doGet(formInfo.action, formInfo.data, reqInfo, successHandler, failureHandler);
-         }
-      },
-
-      /**
-       * Takes a form and submits it as a json post.
-       *
-       * @param formId The form that should be submitted
-       * @param whiteList The fields in the form that should be submitted, if null all fields will be submitted.
-       * @param reqInfo
-       * @param successHandler
-       * @param failureHandler
-       */
-      doJsonForm: function(formId, whiteList, reqInfo, successHandler, failureHandler){
-         var formInfo = this.getFormInfo(formId, whiteList);
-         if(formInfo.method != "POST")
-         {
-            throw new Error("Form " + formId + " must have method POST to use doJsonForm()");
-         }
-         this.doJsonPost(formInfo.action, formInfo.data, reqInfo, successHandler, failureHandler);
-      },
-
-      /**
-       * Helper method for getting information about a form, collects the url, method and data that should be sent
-       *
-       * @param formId The id of the HtmlElement of type form
-       * @param whiteList A list of the fields that should be submitted, if null all fields are used.
-       *                  NOTE: not used at the moment!
-       */
+      JSON: "application/json",
+      
+      /* STOP: REPLACE WITH GAVS FORM RUNTIMES!!! */
       getFormInfo: function(formId, whiteList)
       {
          var form = document.getElementById(formId);
@@ -413,7 +335,8 @@ Alfresco.util.Request = function()
          if(form != null && (form.tagName == "FORM" || form.tagName == "form"))
          {
             var formInfo = {};
-            formInfo.action = form.action;
+            //formInfo.action = form.action; This returns baseURI + action
+            formInfo.action = form.attributes.action.nodeValue; // don't use form.action since it returns baseURI + action
             formInfo.method = form.method ? form.method.toUpperCase() : "";
             formInfo.data = {};
             var length = form.elements.length;
@@ -435,88 +358,209 @@ Alfresco.util.Request = function()
          }
       },
 
-      /**
-       * Helper method for sending the actual request
+      /* STOP: REPLACE WITH GAVS FORM RUNTIMES!!! */
+
+      requestConfig:
+      {
+         method: "GET",        // GET, POST and hopefully PUT or DELETE if ot works...
+         context: null,        // Default will be Alfresco.constants.URL_CONTEXT but it's not set during declaration
+         url: null,            // Must be set by user and should be relative to context
+         scope: this,          // The scope in which the success and failure handlers will be called.
+         dataObj: null,        // Will be encoded to parameters (key1=value1&key2=value2)
+                               // or a json string if contentType is set to JSON
+         dataStr: null,        // Will be used in the request body, could be a already created parameter or json string
+                               // Will be overriden by the encoding result from dataObj ir dataObj is provided
+         contentType: null,    // Set to JSON if json should be used
+         success: null,        // Will be called in the scop of scope with a response object literal described below
+         successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
+         failure: null,        // Will be called in the scop of scope with a response object literal described below
+         failureMessage: null  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
+      },
+
+      jsonServiceRequest: function(config)
+      {
+         config.method = "POST";
+         config.contentType = this.JSON;
+         this.serviceRequest(config);
+      },
+
+      serviceRequest: function(config)
+      {
+         config.context = Alfresco.constants.URL_SERVICECONTEXT;
+         this.request(config);
+      },
+
+      jsonProxyRequest: function(config)
+      {
+         config.method = "POST";
+         config.contentType = this.JSON;
+         this.proxyRequest(config);
+      },
+
+      proxyRequest: function(config)
+      {
+         /*
+          todo: Make sure to use the proxy as soon as possible, somehing like this...
+          config.context = Alfresco.constants.PROXY_URI + "http://localhost:8080/alfresco/service/api/sites&alf_method=POST&alf_ticket=" + Alfresco.constants.TICKET + "&";
+          But for now go directly to the repo:
+         */
+         config.context = "/alfresco/service/";
+         this.request(config);
+      },
+
+      /*
+       * Wraps a YAHOO.util.Connect.asyncRequest call and provides some default behaviour.
        *
-       * @param method Request method, ie POST or GET
-       * @param url The url to the server resource that will handle the request
-       * @param postData The data that should be put in the body if method is POST
-       * @param contentType Set to application/json if json should be sent, default is ___________
-       * @param reqInfo An object that will be available to the success/failure handlers, through argument.
-       * @param successHandler A custom handler if Alfresco.util.Request.defaultSuccessHandler shouldn't be used.
-       * @param failurehandler A custom handler if Alfresco.util.Request.defaultFailureHandler shouldn't be used.
+       * If json is used it encodes config.dataObj to json (if provided)
+       * and decodes the server response to the response.json provided to the callback.
+       * If a json string already has been created it should be sent in as the config.dataStr.
+       *
+       * If normal parameters are used it can create them from config.dataObj handles enconding and decoding.
+       * If a parameter string already has been created it should have been added to the
+       * config.url for GET:s or config.dataStr for other methods.
+       *
+       * If request succeeds it calls the success handler (if provided),
+       * if not displays the successMessage (if provided),
+       * otherwise it does nothing.
+       *
+       * If request fails it calls the failure handler (if provided),
+       * if not displays the failureMessage (if provided),
+       * otherwise displays the best error message it can from the server response.
+       *
+       * The success or failure handler can expect a response object that looks like this and to be run int the scope
+       * defined by config.scope:
+       * {
+       *   config: config,                  // The config object passed in to the request,
+       *                                    // use config to add application specific attributes that the application
+       *                                    // needs when handling the reponse or the give a certain id to the request
+       *   serverResponse: serverResponse,  // The response provided by YIU
+       *   json: json                       // If json was used this is the parsed result of serverResponse.responseText
+       * }
+       *
+       * Should be called from the helper functions above to simplify the request calls and "hide" the paths to the
+       * proxies, services etc.
+       *
+       * @method request
+       * @param config {Object literal} Overridings of requestConfig, url is mandatory.
+       *                                Use config to add application specific attributes that the application
+       *                                needs when handling the reponse or the give a certain id to the request.
        */
-      request: function(method, url, postData, contentType, userReqInfo, userSuccessHandler, userFailureHandler)
+      request: function(config)
       {
-         if(contentType){
+         var c = YAHOO.lang.merge(this.requestConfig, config);
+         Alfresco.util.assertNotEmpty(c.url, "Parameter 'url' can NOT be null");
+         Alfresco.util.assertNotEmpty(c.method, "Parameter 'method' can NOT be null");
+         if(!c.context)
+         {
+            /* Since URL_CONTEXT can't be set during declaration of requestConfig */
+            c.context = Alfresco.constants.URL_CONTEXT;
+         }
+         if(c.contentType){
             YAHOO.util.Connect.setDefaultPostHeader(false);
-            YAHOO.util.Connect.initHeader("Content-Type", contentType);
+            YAHOO.util.Connect.initHeader("Content-Type", c.contentType);
          }
-         // todo: When the functions above have changed to take just a 1 object as parameter instead of 4 or 5
-         // pass in that object as argument below....
-         var callback = {
-            success: this.successHandler,
-            failure: this.failureHandler,
-            argument:
+         if(c.contentType === this.JSON)
+         {
+            if(c.method.toUpperCase() === "GET")
             {
-               successHandler: userSuccessHandler,
-               failureHandler: userFailureHandler,
-               reqInfo: userReqInfo || {},
-               contentType: contentType
+               throw new Error("Parameter' method' can not be 'GET' when using contentType '" + c.contentType + "'");
             }
-         };
-         YAHOO.util.Connect.asyncRequest (method, url, callback, postData);
-      },
-
-      /**
-       * Will do a PopupManager.displayMessage() of serverResponse.argument.successMessage if present.
-       * The successMessage will be present if a reqInfo object with failureMessage was provided for the request.
-       * @param serverResponse
-       */
-      successHandler: function(serverResponse)
-      {
-         var argument = serverResponse.argument;
-         if(argument.successHandler)
-         {
-            var json = null;
-            if(argument.contentType === "application/json"){
-               json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+            else
+            {
+               if(c.dataObj)
+               {
+                  c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj);
+               }
             }
-            argument.successHandler({reqInfo: argument.reqInfo, json: json});
-         }
-         else if(argument.reqInfo.successMessage)
-         {
-            Alfresco.util.PopupManager.displayMessage({text: argument.reqInfo.successMessage});
-         }
-      },
-
-      /**
-       * Will do a PopupManager.displayMessage() with serverResponse.argument.failureMessage if present.
-       * The failureMessage will be present if a reqInfo object with failureMessage was provided for the request.
-       * Otherwise the server error from serverResponse.statusText will be displayed.
-       * @param serverResponse
-       */
-      failureHandler: function(serverResponse)
-      {
-         var argument = serverResponse.argument;
-         if(argument.failureHandler)
-         {
-            var json = null;
-            if(argument.contentType === "application/json"){
-               // Exception stack trace currently makes the json string incorrect
-               //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
-            }
-            argument.failureHandler({reqInfo: argument.reqInfo, json: json});
-         }
-         else if(argument.reqInfo.failureMessage)
-         {
-            Alfresco.util.PopupManager.displayPrompt({text: argument.reqInfo.failureMessage});
          }
          else
          {
-            if(argument.contentType === "application/json"){
+            if(c.method.toUpperCase() === "GET")
+            {
+               c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
+            }
+            else
+            {
+               if(c.dataObj)
+               {
+                  c.dataStr = this._toParamString(c.dataObj);
+               }
+            }
+         }
+         var callback = {
+            success: this._successHandler,
+            failure: this._failureHandler,
+            argument:
+            {
+               config: config
+            }
+         };
+         YAHOO.util.Connect.asyncRequest (c.method, c.context + c.url, callback, c.dataStr);
+      },
+
+      _toParamString: function(obj)
+      {
+         var params = "";
+         var first = true;
+         for (attr in obj)
+         {
+            if(first)
+            {
+               first = false;
+            }
+            else
+            {
+               params += "&";
+            }
+            /* todo: decode any url reserved characters */
+            params += attr + "=" + obj[attr];
+         }
+         return params;
+      },
+
+      _successHandler: function(serverResponse)
+      {
+         var config = serverResponse.argument.config;
+         if(config.success)
+         {
+            /* User provided a custom successHandler */
+            var json = null;
+            if(config.contentType === "application/json"){
+               json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+            }
+            YAHOO.lang.later(1, (config.scope ? config.scope : this), config.success, {config: config, json: json, serverResponse: serverResponse});
+         }
+         else if(config.successMessage)
+         {
+            /* User did not provide a custom successHandler but a custom successMessage */
+            Alfresco.util.PopupManager.displayMessage({text: config.successMessage});
+         }
+      },
+
+      _failureHandler: function(serverResponse)
+      {
+         var config = serverResponse.argument.config;
+         if(config.failure)
+         {
+            /* User provided a custom failureHandler */
+            var json = null;
+            if(config.contentType === "application/json"){
+               /* todo: When error response is in valid json format */
+               //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+            }
+            YAHOO.lang.later(1, (config.scope ? config.scope : this), config.failure, {config: config, json: json, serverResponse: serverResponse});
+         }
+         else if(argument.failureMessage)
+         {
+            /* User did not provide a custom failureHandler but a custom failureMessage */
+            Alfresco.util.PopupManager.displayPrompt({text: config.failureMessage});
+         }
+         else
+         {
+            // User did not provide any failure info, display as good info as possible from the server response instead                        
+            if(config.contentType === "application/json"){
                var json = null;
-               // Exception stack trace currently makes the json string incorrect
+               /* todo: When error response is in valid json format */
                // json = YAHOO.lang.JSON.parse(serverResponse.responseText);
                // Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
                Alfresco.util.PopupManager.displayPrompt({title: serverResponse.statusText});
