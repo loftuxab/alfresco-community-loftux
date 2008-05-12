@@ -79,7 +79,7 @@ public class PageRendererRuntimeContainer extends PresentationContainer
          }
          
          // use appropriate webscript servlet here - one that supports TICKET param auth
-         RemoteClient remote = new RemoteClient(endpoint + "/s", "UTF-8");
+         RemoteClient remote = new RemoteClient(endpoint, "UTF-8");
          remote.setTicket(ticket.get());
 
          params.put("remote", remote);

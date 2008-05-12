@@ -130,6 +130,8 @@ public interface Connector
      */
     public void setCredentials(Credentials credentials);
     
+    public Credentials getCredentials();
+    
     /**
      * Sets the endpoint.
      * 

@@ -48,7 +48,7 @@ public class AlfrescoAuthenticator implements Authenticator
     		// call the login web script
 	    	String user = (String) credentials.getProperty(Credentials.CREDENTIAL_USERNAME);
 	    	String pass = (String) credentials.getProperty(Credentials.CREDENTIAL_PASSWORD);
-	    	Response response = remoteClient.call("/service/api/login?u="+user+"&pw="+pass);
+	    	Response response = remoteClient.call("/api/login?u="+user+"&pw="+pass);
 	    	
 	    	// read back the ticket
 	    	if(response.getStatus().getCode() == 200)

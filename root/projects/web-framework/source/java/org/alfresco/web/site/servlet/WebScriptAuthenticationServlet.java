@@ -85,7 +85,7 @@ public class WebScriptAuthenticationServlet extends HttpServlet
         	 
         	 // make a direct call to login api to retrieve a ticket for the user credentials
         	 RemoteClient remote = new RemoteClient(endpointUrl);
-        	 Response response = remote.call("/s/api/login?u=" + username + "&pw=" + password);
+        	 Response response = remote.call("/api/login?u=" + username + "&pw=" + password);
         	 if (response.getStatus().getCode() == HttpServletResponse.SC_OK)
              {
                boolean gotTicket = false;

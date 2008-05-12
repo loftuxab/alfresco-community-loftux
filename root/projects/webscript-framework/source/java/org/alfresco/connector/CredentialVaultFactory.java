@@ -123,24 +123,24 @@ public class CredentialVaultFactory
 	public synchronized CredentialVault vault(String vaultId)
 		throws RemoteConfigException	
 	{
-		if(cache == null)
+		if( cache == null)
 		{
-			cache = new HashMap<String, CredentialVault>(10, 1.0f);
+			cache = new HashMap<String, CredentialVault>(16, 1.0f);
 		}
 		
 		CredentialVault vault = (CredentialVault) cache.get(vaultId);
-		if(vault == null)
+		if (vault == null)
 		{
 			// get the remote configuration block
 			RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig("Remote").getConfigElement("remote");
-			if(remoteConfig == null)
+			if (remoteConfig == null)
 			{
 				throw new RemoteConfigException("The 'Remote' configuration was not found, unable to lookup the vault definition.");
 			}
 			
 			// load the vault
 			CredentialVaultDescriptor descriptor = remoteConfig.getCredentialVaultDescriptor(vaultId);
-			if(descriptor == null)
+			if (descriptor == null)
 			{
 				throw new RemoteConfigException("Unable to find credential vault definition for id: " + vaultId);
 			}
@@ -150,7 +150,7 @@ public class CredentialVaultFactory
 			vault = (CredentialVault) newObject(vaultClass);
 			
 			// place into cache
-			if(vault != null)
+			if (vault != null)
 			{
 				cache.put(vaultId, vault);
 			}

@@ -183,11 +183,10 @@ public class ConnectorFactory
 		String url = endpointDescriptor.getEndpointUrl();
 		
 		// build the connector
-		String connectorClass = connectorDescriptor.getImplementationClass();
-        Connector connector = _getConnector(connectorClass, connectorDescriptor, url);
+        Connector connector = buildConnector(connectorDescriptor, url);
         if (connector == null)
         {
-        	throw new RemoteConfigException("Unable to construct Connector for class: " + connectorClass + ", connector id: " + connectorId);
+        	throw new RemoteConfigException("Unable to construct Connector for class: " + connectorDescriptor.getImplementationClass() + ", connector id: " + connectorId);
         }
 		
 		// load the authenticator onto the connector
@@ -248,6 +247,7 @@ public class ConnectorFactory
     				credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);									
     			}
     			connector.setCredentials(credentials);
+                break;
             }
             
             case USER:
@@ -298,44 +298,28 @@ public class ConnectorFactory
 	{
 	    if (cache == null)
 	    {
-	        cache = new HashMap<String, Object>(10, 1.0f);
+	        cache = new HashMap<String, Object>(8);
 	    }
-	
+	    
 	    String cacheKey = className;
-	
+	    
 	    Authenticator auth = (Authenticator) cache.get(className);
 	    if (auth == null)
 	    {
 	        auth = (Authenticator) newObject(className);
-	
+	        
 	        cache.put(cacheKey, auth);
 	    }
-	
+	    
 	    return auth;
 	}
 	
     
-    protected static synchronized Connector _getConnector(String className, ConnectorDescriptor descriptor, String url)
+    protected static Connector buildConnector(ConnectorDescriptor descriptor, String url)
     {
-        if (cache == null)
-        {
-            cache = new HashMap(16, 1.0f);
-        }
-
-        String cacheKey = className + "_" + url;
-
-        Connector connector = (Connector) cache.get(cacheKey);
-        if (connector == null)
-        {
-            Class[] argTypes = new Class[] { descriptor.getClass(), url.getClass() };
-            Object[] args = new Object[] { descriptor, url };
-            connector = (Connector) newObject(className,
-                    argTypes, args);
-
-            cache.put(cacheKey, connector);
-        }
-
-        return connector;
+        Class[] argTypes = new Class[] { descriptor.getClass(), url.getClass() };
+        Object[] args = new Object[] { descriptor, url };
+        return (Connector)newObject(descriptor.getImplementationClass(), argTypes, args);
     }
     
     protected static Object newObject(String className)
