@@ -69,13 +69,9 @@ public class PageRendererRuntimeContainer extends PresentationContainer
          // assume the default endpoint for now
          String endpointId = remoteConfig.getDefaultEndpointId();
          EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
-         if(descriptor != null)
+         if (descriptor != null)
          {
-        	 endpoint = descriptor.getEndpointUrl();
-        	 if(descriptor.getDefaultUri() != null)
-        	 {
-        		 endpoint += descriptor.getDefaultUri();
-        	 }
+        	endpoint = descriptor.getEndpointUrl();
          }
          else
          {
@@ -86,17 +82,7 @@ public class PageRendererRuntimeContainer extends PresentationContainer
          RemoteClient remote = new RemoteClient(endpoint + "/s", "UTF-8");
          remote.setTicket(ticket.get());
 
-		//
-		// TODO: remove this block - for testing only!
-		//
-		/*if (remoteConfig.getChild("username") != null && remoteConfig.getChild("password") != null)
-		{
-		   remote.setUsernamePassword(
-		         remoteConfig.getChildValue("username"),
-		         remoteConfig.getChildValue("password"));
-		}*/
-
-        params.put("remote", remote);
+         params.put("remote", remote);
       }
 
       return params;

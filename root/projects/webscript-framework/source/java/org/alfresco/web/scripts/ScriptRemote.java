@@ -49,9 +49,9 @@ import org.apache.commons.logging.LogFactory;
 public class ScriptRemote
 {
     private static final Log logger = LogFactory.getLog(ScriptRemote.class);
-    
+
     private ConfigService configService;
-    
+
     /**
      * Instantiates a new script remote.
      * 
@@ -59,9 +59,9 @@ public class ScriptRemote
      */
     protected ScriptRemote(ConfigService configService)
     {
-    	this.configService = configService;
+        this.configService = configService;
     }
-        
+
     /**
      * Constructs a RemoteClient to a default endpoint (if configured)
      * If a default endpoint is not configured, null will be returned.
@@ -70,21 +70,21 @@ public class ScriptRemote
      */
     public Connector connect()
     {
-    	Connector connector = null;
-    	
-    	// Check whether a remote configuration has been provided
-    	RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
+        Connector connector = null;
+
+        // Check whether a remote configuration has been provided
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
         if(remoteConfig != null)
         {
-        	// See if we have a default endpoint id
-        	String defaultEndpointId = remoteConfig.getDefaultEndpointId();
-        	if(defaultEndpointId != null)
-        	{
-        		// Construct for this endpoint id
-        		connector = connect(defaultEndpointId);
-        	}
+            // See if we have a default endpoint id
+            String defaultEndpointId = remoteConfig.getDefaultEndpointId();
+            if(defaultEndpointId != null)
+            {
+                // Construct for this endpoint id
+                connector = connect(defaultEndpointId);
+            }
         }
-        
+
         return connector;
     }
 
@@ -98,53 +98,53 @@ public class ScriptRemote
      */
     public Connector connect(String endpointId)
     {
-    	Connector connector = null;
-    	
-    	// Check whether a remote configuration has been provided    	
-    	RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
+        Connector connector = null;
+
+        // Check whether a remote configuration has been provided    	
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
         if(remoteConfig != null)
         {        	
-        	// check whether we have a descriptor for this endpoint
-    		EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
-    		if(descriptor == null)
-    		{
-    			logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
-    		}
-    		else
-    		{
-    			// construct a connector to this endpoint
-    			try
-    			{
-    				// TODO:  Load current user credentials from the vault
-    				// At present, this does not seem possible to do since
-    				// the web script framework does not maintain any
-    				// notion of the current user
-    				//
-    				// The best we can do is construct anonymous connections
-    				// or connections to endpoints that have "specific" user
-    				// settings (which is to say, forced usernames and
-    				// passwords within the configuration file)
-    				//
-    				connector = ConnectorFactory.newInstance(configService).connector(endpointId);
-    			}
-    			catch(RemoteConfigException rce)
-    			{
-    				logger.error("Unable to open connection to endpoint: " + endpointId, rce);
-    			}
-    		}
+            // check whether we have a descriptor for this endpoint
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
+            if(descriptor == null)
+            {
+                logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
+            }
+            else
+            {
+                // construct a connector to this endpoint
+                try
+                {
+                    // TODO:  Load current user credentials from the vault
+                    // At present, this does not seem possible to do since
+                    // the web script framework does not maintain any
+                    // notion of the current user
+                    //
+                    // The best we can do is construct anonymous connections
+                    // or connections to endpoints that have "declared" user
+                    // settings (which is to say, forced usernames and
+                    // passwords within the configuration file)
+                    //
+                    connector = ConnectorFactory.newInstance(configService).connector(endpointId);
+                }
+                catch(RemoteConfigException rce)
+                {
+                    logger.error("Unable to open connection to endpoint: " + endpointId, rce);
+                }
+            }
         }
-        
-        return connector;    	
+
+        return connector;
     }
-    
-    
+
+
     ////////////////////////////////////////////////////////////////
     //
     // Connector pass-thru methods to work with default Connector
     //
     ////////////////////////////////////////////////////////////////
 
-    
+
     /**
      * Invoke a specific URI on the default endpoint
      * 
@@ -154,7 +154,7 @@ public class ScriptRemote
      */
     public Response call(String uri)
     {
-    	return this.connect().call(uri);
+        return this.connect().call(uri);
     }
 
     /**
@@ -167,7 +167,7 @@ public class ScriptRemote
      */
     public Response call(String uri, Map parameters)
     {
-    	return this.connect().call(uri, parameters);
+        return this.connect().call(uri, parameters);
     }
 
     /**
@@ -182,55 +182,55 @@ public class ScriptRemote
      */
     public Response call(String uri, Map parameters, Map headers)
     {
-    	return this.connect().call(uri, parameters, headers);
+        return this.connect().call(uri, parameters, headers);
     }
-    
-    
+
+
     // query and interrogation
-    
+
     public String[] getEndpointIds()
     {
-    	RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-    	if(remoteConfig == null)
-    	{
-    		return new String[] { };
-    	}
-    	
-    	return remoteConfig.getEndpointIds();
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
+        if(remoteConfig == null)
+        {
+            return new String[] { };
+        }
+
+        return remoteConfig.getEndpointIds();
     }
-    
+
     public String getEndpointName(String id)
     {
-    	RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-    	if(remoteConfig == null)
-    	{
-    		return null;
-    	}
-    	
-    	EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-    	if(descriptor == null)
-    	{
-    		return null;
-    	}
-    	
-    	return descriptor.getName();    	
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
+        if(remoteConfig == null)
+        {
+            return null;
+        }
+
+        EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+        if(descriptor == null)
+        {
+            return null;
+        }
+
+        return descriptor.getName();    	
     }
 
     public String getEndpointDescription(String id)
     {
-    	RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-    	if(remoteConfig == null)
-    	{
-    		return null;
-    	}
-    	
-    	EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-    	if(descriptor == null)
-    	{
-    		return null;
-    	}
-    	
-    	return descriptor.getDescription();    	
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
+        if(remoteConfig == null)
+        {
+            return null;
+        }
+
+        EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+        if(descriptor == null)
+        {
+            return null;
+        }
+
+        return descriptor.getDescription();    	
     }
-    
+
 }

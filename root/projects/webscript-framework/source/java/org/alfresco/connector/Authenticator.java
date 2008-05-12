@@ -49,6 +49,13 @@ import org.alfresco.connector.exception.AuthenticationException;
  */
 public interface Authenticator
 {
+    /**
+     * Authenticate against the given Client with the supplied Credentials
+     * 
+     * @return true on success, false otherwise
+     * 
+     * @throws AuthenticationException on error
+     */
     public boolean authenticate(Client client, Credentials credentials)
 		throws AuthenticationException;
 }

@@ -30,6 +30,7 @@
 				<description>Simple HTTP Connector</description>
 				<class>org.alfresco.connector.HttpConnector</class>
 			</connector>
+			
 			<connector>
 				<id>alfresco</id>
 				<name>Alfresco Connector</name>
@@ -47,24 +48,33 @@
 			</authenticator>
 			
 			<!-- Endpoints -->
+			<!--
 			<endpoint>
 				<id>alfresco-system</id>
 				<name>Alfresco - System access</name>
 				<description>System account access to Alfresco</description>
 				<connector-id>http</connector-id>
 				<endpoint-url>http://localhost:8080</endpoint-url>
-				<default-uri>/alfresco</default-uri>
-				<identity>specific</identity>
+				<identity>declared</identity>
 				<username>admin</username>
 				<password>admin</password>
 			</endpoint>
+			-->
+			<endpoint>
+				<id>alfresco</id>
+				<name>Alfresco - unauthenticated access</name>
+				<description>Unauthenticated access to Alfresco Repository WebScripts</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
+				<identity>none</identity>
+			</endpoint>
+			
 			<endpoint>
 				<id>alfresco.com</id>
 				<name>The alfresco.com website</name>
 				<description>The alfresco.com website</description>
 				<connector-id>http</connector-id>
 				<endpoint-url>http://www.alfresco.com</endpoint-url>
-				<default-uri>/</default-uri>
 			</endpoint>
 			
 			<!-- Credential Vaults -->
@@ -76,7 +86,7 @@
 			</credential-vault>
 			
 			<!-- The default endpoint -->
-			<default-endpoint-id>alfresco-system</default-endpoint-id>
+			<default-endpoint-id>alfresco</default-endpoint-id>
 			
 			<!-- The default credential vault -->
 			<default-credential-vault-id>default</default-credential-vault-id>

@@ -34,6 +34,7 @@ import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.alfresco.web.config.RemoteConfigElement.IdentityType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -154,52 +155,48 @@ public class ConnectorFactory
 	{
 		// get the remote configuration block
 		RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig("Remote").getConfigElement("remote");
-		if(remoteConfig == null)
+		if (remoteConfig == null)
 		{
 			throw new RemoteConfigException("The 'Remote' configuration was not found, unable to lookup the endpoint definition.");
 		}
 		
 		// load the endpoint
 		EndpointDescriptor endpointDescriptor = remoteConfig.getEndpointDescriptor(endpointId);
-		if(endpointDescriptor == null)
+		if (endpointDescriptor == null)
 		{
 			throw new RemoteConfigException("Unable to find endpoint definition for endpoint id: " + endpointId);
 		}
 		
 		// load the connector
 		String connectorId = (String) endpointDescriptor.getConnectorId();
-		if(connectorId == null)
+		if (connectorId == null)
 		{
 			throw new RemoteConfigException("The connector id property on the endpoint definition '" + endpointId + "' was empty");
 		}
 		ConnectorDescriptor connectorDescriptor = remoteConfig.getConnectorDescriptor(connectorId);
-		if(connectorDescriptor == null)
+		if (connectorDescriptor == null)
 		{
 			throw new RemoteConfigException("Unable to find connector definition for connector id: " + connectorId + " on endpoint id: " + endpointId);
 		}
 		
-		// build the url
+		// get the endpoint url
 		String url = endpointDescriptor.getEndpointUrl();
-		if(endpointDescriptor.getDefaultUri() != null)
-		{
-			url += endpointDescriptor.getDefaultUri();
-		}		
 		
 		// build the connector
 		String connectorClass = connectorDescriptor.getImplementationClass();
         Connector connector = _getConnector(connectorClass, connectorDescriptor, url);
-        if(connector == null)
+        if (connector == null)
         {
         	throw new RemoteConfigException("Unable to construct Connector for class: " + connectorClass + ", connector id: " + connectorId);
         }
 		
 		// load the authenticator onto the connector
-		// should we use the default authenticator?
-		if(authId == null)
+		// TODO: should we use the default authenticator?
+		if (authId == null)
 		{
 			authId = connectorDescriptor.getDefaultAuthId();
 		}
-		if(authId != null)
+		if (authId != null)
 		{
 			AuthenticatorDescriptor authDescriptor = remoteConfig.getAuthenticatorDescriptor(authId);
 			if(authDescriptor == null)
@@ -218,56 +215,60 @@ public class ConnectorFactory
 		}
 		
 		// set credentials onto the connector
-		// credentials are either "specific", "current", or "none"
-		//   "specific" indicates that fixed user credentials are to be used
-		//   "current"  indicates that the current user's credentials should
+		// credentials are either "declared", "user", or "none":
+		//   "declared" indicates that pre-set fixed declarative user credentials are to be used
+		//   "user"     indicates that the current user's credentials should
 		//              be drawn from the vault and used
 		//   "none"     means that we don't include any credentials
-		String identity = endpointDescriptor.getIdentity();
-		if("specific".equalsIgnoreCase(identity))
-		{
-			String username = (String) endpointDescriptor.getUsername();
-			String password = (String) endpointDescriptor.getPassword();
-			String bindingKey = endpointId + "_" + username;
-			Credentials credentials = null;
-
-			if(credentialVault != null)
-			{				
-				credentials = (Credentials) credentialVault.retrieve(bindingKey);
-				if(credentials == null)
-				{
-					credentials = new SimpleCredentials(bindingKey);
-					credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
-					credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);					
-					credentialVault.store(bindingKey, credentials);
-				}
-			}
-			else
-			{
-				credentials = new SimpleCredentials(bindingKey);
-				credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
-				credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);									
-			}
-			connector.setCredentials(credentials);
-		}
-		if("current".equalsIgnoreCase(identity))
-		{
-			String bindingKey = endpointId + "_" + credentialId;
-			
-			Credentials credentials = null;
-			if(credentialVault != null)
-			{
-				credentials = credentialVault.retrieve(bindingKey);
-			}
-			
-			if(credentials != null)
-			{
-				connector.setCredentials(credentials);
-			}
-			else
-			{
-				logger.warn("Unable to find credentials for binding key: " + bindingKey);
-			}
+		IdentityType identity = endpointDescriptor.getIdentity();
+        switch (identity)
+        {
+            case DECLARED:
+            {
+    			String username = (String) endpointDescriptor.getUsername();
+    			String password = (String) endpointDescriptor.getPassword();
+    			String bindingKey = endpointId + "_" + username;
+    			Credentials credentials = null;
+    			
+    			if (credentialVault != null)
+    			{				
+    				credentials = (Credentials) credentialVault.retrieve(bindingKey);
+    				if(credentials == null)
+    				{
+    					credentials = new SimpleCredentials(bindingKey);
+    					credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
+    					credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);					
+    					credentialVault.store(bindingKey, credentials);
+    				}
+    			}
+    			else
+    			{
+    				credentials = new SimpleCredentials(bindingKey);
+    				credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
+    				credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);									
+    			}
+    			connector.setCredentials(credentials);
+            }
+            
+            case USER:
+            {
+    			String bindingKey = endpointId + "_" + credentialId;
+    			
+    			Credentials credentials = null;
+    			if (credentialVault != null)
+    			{
+    				credentials = credentialVault.retrieve(bindingKey);
+    			}
+    			
+    			if (credentials != null)
+    			{
+    				connector.setCredentials(credentials);
+    			}
+    			else
+    			{
+    				logger.warn("Unable to find credentials for binding key: " + bindingKey);
+    			}
+            }
 		}
 		
 		return connector;
@@ -277,13 +278,13 @@ public class ConnectorFactory
 		throws RemoteConfigException
 	{
 		RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig("Remote").getConfigElement("remote");
-		if(remoteConfig == null)
+		if (remoteConfig == null)
 		{
 			throw new RemoteConfigException("Unable to find remote configuration, cannot load authenticator settings");
 		}
 		
 		AuthenticatorDescriptor descriptor = remoteConfig.getAuthenticatorDescriptor(id);
-		if(descriptor == null)
+		if (descriptor == null)
 		{
 			throw new RemoteConfigException("Unable to find authenticator for id: " + id);
 		}
@@ -291,7 +292,6 @@ public class ConnectorFactory
 		String className = descriptor.getImplementationClass();
 		return _getAuthenticator(className);		
 	}
-	
 	
 	
 	protected static synchronized Authenticator _getAuthenticator(String className)
@@ -362,7 +362,6 @@ public class ConnectorFactory
         return o;
     }
     
-    
     protected static Object newObject(String className, Class[] argTypes,
             Object[] args)
     {
@@ -402,7 +401,4 @@ public class ConnectorFactory
         }
         return o;
     }
-    
-    
-    
 }

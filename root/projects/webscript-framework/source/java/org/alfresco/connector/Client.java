@@ -45,6 +45,13 @@ import java.net.URL;
  */
 public interface Client
 {
+    /**
+     * @return the Endpoint for this Client e.g. http://localhost:8080/alfresco/service
+     */
     public String getEndpoint();
+    
+    /**
+     * @return the Endpoint for the Client as a URL object
+     */
     public URL getURL();
 }

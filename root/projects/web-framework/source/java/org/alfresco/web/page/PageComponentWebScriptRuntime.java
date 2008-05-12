@@ -47,7 +47,6 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
    private PageComponent component;
    private String webScript;
    private String scriptUrl;
-   private String encoding;
    private Writer out;
 
    /**
@@ -69,7 +68,6 @@ class PageComponentWebScriptRuntime extends AbstractRuntime
       this.context = context;
       this.webScript = webScript;
       this.scriptUrl = executeUrl;
-      this.encoding = encoding;
       if (logger.isDebugEnabled())
          logger.debug("Constructing runtime for url: " + executeUrl);
    }
