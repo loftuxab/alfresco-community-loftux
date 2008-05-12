@@ -12,7 +12,6 @@ function clearCurrentSite()
 	removeObjects(site.getComponents());
 	//removeObjects(site.getConfigurations()); // don't delete these
 	removeObjects(site.getContentAssociations());
-	removeObjects(site.getEndpoints());
 	removeObjects(site.getPages());
 	removeObjects(site.getPageAssociations());
 	removeObjects(site.getTemplates());

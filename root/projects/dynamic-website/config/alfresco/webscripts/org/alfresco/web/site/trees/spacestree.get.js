@@ -10,7 +10,8 @@ path = path.replace(/ /g, "%20");
 
 // remote call
 var json = new Array();
-var responseString = site.callRemote("http://localhost:8080", "admin", "admin", "/alfresco/service/content/query?path="+path);
+//var responseString = site.callRemote("http://localhost:8080", "admin", "admin", "/alfresco/service/content/query?path="+path);
+var responseString = site.callRemote("http://localhost:8080", "admin", "admin", "/alfresco/service/webframework/content/metadata?path="+path);
 if(responseString != null)
 {
 	// this is done to convert the string to a javascript literal

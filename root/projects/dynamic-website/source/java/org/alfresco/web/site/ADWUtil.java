@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.web.site.model.Endpoint;
+import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 
 /**
  * @author muzquiano
@@ -41,9 +41,7 @@ public class ADWUtil
         }
 
         // get the endpoint
-        Endpoint endpoint = context.getModel().loadEndpoint(context, endpointId);
-
-        // if the endpoint isn't found, just exit
+        EndpointDescriptor endpoint = FrameworkHelper.getEndpoint(endpointId);
         if (endpoint == null)
         {
             context.getLogger().debug("RenderUtil.getContentEditURL failed");
@@ -52,7 +50,7 @@ public class ADWUtil
         }
 
         // endpoint settings
-        String endpointURL = endpoint.getEndpointURL();
+        String endpointURL = endpoint.getEndpointUrl();
         String sandbox = context.getStoreId();
         String uri = "/alfresco/service/adw/redirect/incontext/" + sandbox + "/";
 

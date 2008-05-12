@@ -37,17 +37,9 @@ import javax.servlet.http.HttpSession;
  */
 public class InContextUtil
 {
-    
-    /** The INCONTEX t_ elemen t_ id. */
     public static String INCONTEXT_ELEMENT_ID = "incontext";
-
-    /** The INCONTEX t_ toggl e_ reques t_ param. */
     public static String INCONTEXT_TOGGLE_REQUEST_PARAM = "toggle";
-    
-    /** The INCONTEX t_ elemen t_ reques t_ param. */
     public static String INCONTEXT_ELEMENT_REQUEST_PARAM = "element";
-    
-    /** The INCONTEX t_ valu e_ reques t_ param. */
     public static String INCONTEXT_VALUE_REQUEST_PARAM = "value";
 
     /**
@@ -249,7 +241,7 @@ public class InContextUtil
      */
     public static String[] getInContextElementIds()
     {
-        return Framework.getConfig().getInContextElementIds();
+        return DynamicWebsite.getConfig().getInContextElementIds();
     }
 
     /**
@@ -261,8 +253,7 @@ public class InContextUtil
      */
     public static String getInContextElementDefaultEnabled(String elementId)
     {
-        return Framework.getConfig().getInContextElementDefaultEnabled(
-                elementId);
+        return DynamicWebsite.getConfig().getInContextElementDescriptor(elementId).getDefaultEnabled();
     }
 
     /**
@@ -274,7 +265,7 @@ public class InContextUtil
      */
     public static String getInContextElementDefaultState(String elementId)
     {
-        return Framework.getConfig().getInContextElementDefaultState(elementId);
+        return DynamicWebsite.getConfig().getInContextElementDescriptor(elementId).getDefaultState();
     }
 
     /**
@@ -286,7 +277,7 @@ public class InContextUtil
      */
     public static String getInContextElementName(String elementId)
     {
-        return Framework.getConfig().getInContextElementName(elementId);
+        return DynamicWebsite.getConfig().getInContextElementDescriptor(elementId).getName();
     }
 
     /**
@@ -298,6 +289,6 @@ public class InContextUtil
      */
     public static String getInContextElementType(String elementId)
     {
-        return Framework.getConfig().getInContextElementType(elementId);
+        return DynamicWebsite.getConfig().getInContextElementDescriptor(elementId).getType();
     }
 }

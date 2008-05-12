@@ -22,36 +22,38 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site.filesystem;
+package org.alfresco.web.config;
 
-import org.alfresco.service.cmr.avm.AVMNodeDescriptor;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.dom4j.Element;
 
 /**
- * The Class AVMDirectory.
+ * Responsible for loading Web Framework configuration settings from
+ * the web-site-config*.xml files that are loaded via the configuration
+ * service.
  * 
  * @author muzquiano
  */
-public class AVMDirectory extends AVMFile implements IDirectory
-{
-    
-    /**
-     * Instantiates a new aVM directory.
-     * 
-     * @param fileSystem the file system
-     * @param avmNodeDescriptor the avm node descriptor
-     * @param path the path
-     */
-    public AVMDirectory(AVMFileSystem fileSystem,
-            AVMNodeDescriptor avmNodeDescriptor, String path)
-    {
-        super(fileSystem, avmNodeDescriptor, path);
-    }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.filesystem.AbstractFileDirectory#isFile()
-     */
-    public boolean isFile()
-    {
-        return false;
-    }
+public class DynamicWebsiteConfigElementReader implements ConfigElementReader
+{   
+   /**
+    * Called from the configuration service to handle the loading of the
+    * Web Framework configuration XML.
+    * 
+    * @param element the element
+    * 
+    * @return the config element
+    * 
+    * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
+    */
+   public ConfigElement parse(Element elem)
+   {
+	   ConfigElement configElement = null;
+	   if(elem != null)
+	   {
+		   configElement = DynamicWebsiteConfigElement.newInstance(elem);
+	   }
+	   return configElement;
+   }
 }

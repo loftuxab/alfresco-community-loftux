@@ -84,11 +84,12 @@ function removeChildPage(parentPageId, childPageId, recurse)
 	site.unassociatePage(parentPageId, childPageId);
 }
 
-
+/*
 function findEndpoint(endpointId)
 {
 	return site.findEndpoint(endpointId);
 }
+*/
 
 function newPage(name, parentPage)
 {
@@ -233,6 +234,7 @@ function newWebScriptComponent(name, uri)
 
 function newEndpoint(endpointId, connectorId, authId, endpointUrl, defaultUri, identity, username, password)
 {
+/*
 	var endpoint = site.newEndpoint();
 	endpoint.setProperty("endpoint-id", endpointId);
 
@@ -250,6 +252,8 @@ function newEndpoint(endpointId, connectorId, authId, endpointUrl, defaultUri, i
 	save(endpoint);
 
 	return endpoint;
+*/
+	return null;	
 }
 
 

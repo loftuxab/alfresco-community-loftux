@@ -27,7 +27,7 @@ package org.alfresco.web.site.taglib;
 import javax.servlet.jsp.JspException;
 
 import org.alfresco.web.site.ADWUtil;
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.DynamicWebsite;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.URLUtil;
 
@@ -72,7 +72,7 @@ public class ObjectEditTag extends AbstractObjectTag
 
     public int doStartTag() throws JspException
     {
-        if (Framework.getConfig().isInContextEnabled())
+        if (DynamicWebsite.getConfig().isInContextEnabled())
         {
             RequestContext context = getRequestContext();
 
