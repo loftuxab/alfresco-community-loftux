@@ -3,8 +3,10 @@
    <plug-ins>
       <element-readers>
          <element-reader element-name="server" class="org.alfresco.web.config.ServerElementReader"/>
+		 <element-reader element-name="remote" class="org.alfresco.web.config.RemoteConfigElementReader"/>
       </element-readers>
    </plug-ins>
+   
    
    <config evaluator="string-compare" condition="Server">
       <server>
@@ -16,5 +18,70 @@
          -->
       </server>
    </config>
+   
+   
+   <config evaluator="string-compare" condition="Remote">
+		<remote>
+		
+			<!-- Connector Implementations -->
+			<connector>
+				<id>http</id>
+				<name>Simple Http Connector</name>
+				<description>Simple HTTP Connector</description>
+				<class>org.alfresco.connector.HttpConnector</class>
+			</connector>
+			<connector>
+				<id>alfresco</id>
+				<name>Alfresco Connector</name>
+				<description>Connects to an Alfresco instance using ticket-based authentication</description>
+				<class>org.alfresco.connector.AlfrescoConnector</class>
+				<default-auth-id>alfresco-ticket</default-auth-id>				
+			</connector>
+			
+			<!-- Authenticator Implementations -->
+			<authenticator>
+				<id>alfresco-ticket</id>
+				<name>Alfresco Authenticator</name>
+				<description>Alfresco Authenticator</description>
+				<class>org.alfresco.connector.AlfrescoAuthenticator</class>
+			</authenticator>
+			
+			<!-- Endpoints -->
+			<endpoint>
+				<id>alfresco-system</id>
+				<name>Alfresco - System access</name>
+				<description>System account access to Alfresco</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://localhost:8080</endpoint-url>
+				<default-uri>/alfresco</default-uri>
+				<identity>specific</identity>
+				<username>admin</username>
+				<password>admin</password>
+			</endpoint>
+			<endpoint>
+				<id>alfresco.com</id>
+				<name>The alfresco.com website</name>
+				<description>The alfresco.com website</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://www.alfresco.com</endpoint-url>
+				<default-uri>/</default-uri>
+			</endpoint>
+			
+			<!-- Credential Vaults -->
+			<credential-vault>
+				<id>default</id>
+				<name>Default Credential Vault</name>
+				<description>Implementation of simple, non-persistent credential vault</description>
+				<class>org.alfresco.connector.SimpleCredentialVault</class>
+			</credential-vault>
+			
+			<!-- The default endpoint -->
+			<default-endpoint-id>alfresco-system</default-endpoint-id>
+			
+			<!-- The default credential vault -->
+			<default-credential-vault-id>default</default-credential-vault-id>
+
+		</remote>
+	</config>   
 
 </alfresco-config>

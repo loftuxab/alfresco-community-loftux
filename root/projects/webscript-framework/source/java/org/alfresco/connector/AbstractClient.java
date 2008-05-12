@@ -24,33 +24,52 @@
  */
 package org.alfresco.connector;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import org.alfresco.error.AlfrescoRuntimeException;
 
 /**
+ * Abstract base class for use by developers who wish to provide
+ * additional custom client implementations.
+ * 
+ * A general purpose but very useful RemoteClient implementation 
+ * is provided that should handle most HTTP related matters.
+ * 
+ * Client objects manage state between the web script layer and the
+ * remote endpoint.  They are "dumb" objects in the sense that they
+ * need to be set up and then fired off.
+ * 
+ * Connector objects tell the Client objects what to do and when.
+ * They orchestrate the sequence of handshakes and so forth so that
+ * the end user or web script developer doesn't need to worry about the
+ * underlying mechanics of speaking to the endpoint.
+ * 
  * @author muzquiano
  */
-public class DefaultCredentials implements Credentials
+public abstract class AbstractClient implements Client
 {
-    public void put(String key, Object value)
+    public AbstractClient(String endpoint)
     {
-        if (map == null)
-        {
-            map = new HashMap();
-        }
-
-        map.put(key, value);
+        this.endpoint = endpoint;
     }
 
-    public Object get(String key)
+    public String getEndpoint()
     {
-        if (map == null)
-        {
-            map = new HashMap();
-        }
-
-        return map.get(key);
+        return this.endpoint;
     }
 
-    protected Map map;
+    public URL getURL()
+    {
+        try
+        {
+            return new URL(this.endpoint);
+        }
+        catch (MalformedURLException me)
+        {
+            throw new AlfrescoRuntimeException("Unable to parse endpoint as URL: " + this.endpoint);
+        }
+    }
+
+    protected String endpoint;
 }

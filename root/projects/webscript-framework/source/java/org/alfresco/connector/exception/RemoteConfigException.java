@@ -22,48 +22,20 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.connector;
+package org.alfresco.connector.exception;
 
 /**
- * Interface that describes the credentials for a given
- * service or user.
- * 
  * @author muzquiano
  */
-public interface Credentials
+public class RemoteConfigException extends Exception
 {
-	public final static String CREDENTIAL_USERNAME = "username";
-	public final static String CREDENTIAL_PASSWORD = "password";
-	public final static String CREDENTIAL_ALF_TICKET = "alfTicket";
-	
-	/**
-	 * Gets the id.
-	 * 
-	 * @return the id
-	 */
-	public String getId();
-	
-	/**
-	 * Gets the description.
-	 * 
-	 * @return the description
-	 */
-	public String getDescription();
-	
-	/**
-	 * Gets a given property
-	 * 
-	 * @param key the key
-	 * 
-	 * @return the property
-	 */
-	public Object getProperty(String key);
-	
-	/**
-	 * Sets a given property
-	 * 
-	 * @param key the key
-	 * @param value the value
-	 */
-	public void setProperty(String key, Object value);
+    public RemoteConfigException(String message)
+    {
+        super(message);
+    }
+
+    public RemoteConfigException(String message, Exception ex)
+    {
+        super(message, ex);
+    }
 }
