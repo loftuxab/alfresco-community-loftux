@@ -1,0 +1,36 @@
+<alfresco-config>
+
+	<!-- Add in additional Slingshot elements -->
+	<config evaluator="string-compare" condition="WebFramework">
+			
+		<link-builder>
+			<id>slingshot</id>
+			<name>Slingshot Link Builder</name>
+			<description>Slingshot Link Builder</description>
+			<class>org.alfresco.web.site.SlingshotLinkBuilder</class>
+		</link-builder>
+
+		<page-mapper>
+			<id>slingshot</id>
+			<name>Slingshot Page Mapper</name>
+			<description>Slingshot Page Mapper</description>
+			<class>org.alfresco.web.site.SlingshotPageMapper</class>
+		</page-mapper>
+		
+		<user-factory>
+			<id>slingshot</id>
+			<name>Slingshot User Factory</name>
+			<description>Produces Users loaded from Slingshot (Alfresco) Repository</description>
+			<class>org.alfresco.web.site.SlingshotUserFactory</class>
+		</user-factory>
+
+		<!-- Overrides -->
+		<framework-defaults>
+			<page-mapper>slingshot</page-mapper>
+			<link-builder>slingshot</link-builder>			
+			<user-factory>slingshot</user-factory>			
+		</framework-defaults>
+
+	</config>
+	
+</alfresco-config>

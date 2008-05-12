@@ -158,7 +158,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
          * Note that if we didn't set it, it would still automatically
          * pick up the default format.
          */
-        context.setCurrentFormatId(Framework.getConfig().getDefaultFormatId());
+        context.setCurrentFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
     	
         
         /**
