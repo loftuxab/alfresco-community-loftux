@@ -293,6 +293,44 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       },
       
       /**
+       * Retrieves the label text for a field
+       * 
+       * @method getFieldLabel
+       * @param fieldId {string | object} The id of a field or the HTML element representing the field
+       * @return {string} The label for the field or the fieldId if a label could not be found
+       */
+      getFieldLabel: function(fieldId)
+      {
+         var label = null;
+         
+         // lookup the label using the "for" attribute (use the first if multiple found)
+         //var nodes = YAHOO.util.Selector.query('label[for="' + fieldId + '"]');
+         var nodes = YAHOO.util.Selector.query('label');
+         // NOTE: there seems to be a bug in getting label using 'for' or 'htmlFor'
+         //       for now get all labels and find the one we want
+         if (nodes.length > 0)
+         {
+            for (var x = 0; x < nodes.length; x++)
+            {
+               var elem = nodes[x];
+               if (elem["htmlFor"] == fieldId)
+               {
+                  // get the text for the label
+                  label = elem.firstChild.nodeValue;
+               }
+            }
+         }
+         
+         // default to the field id if the label element was not found
+         if (label == null)
+         {
+            label = fieldId;
+         }
+         
+         return label;
+      },
+      
+      /**
        * Event handler called when a validation event is fired by any registered field.
        * 
        * @method _validationEventFired
@@ -366,6 +404,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                {
                   if (Alfresco.logger.isDebugEnabled())
                      Alfresco.logger.debug("Validation failed, ignoring any remaining rules");
+                  
+                  // if silent is false set the focus on the field that failed.
+                  if (!silent)
+                  {
+                     field.focus();
+                  }
                   
                   valid = false;
                   break;
@@ -457,7 +501,7 @@ Alfresco.forms.validation.mandatory = function mandatory(field, args, form, sile
    
    if (!valid && !silent && form !== null)
    {
-      form.addError(field.id + " is mandatory.", field, true);
+      form.addError(form.getFieldLabel(field.id) + " is mandatory.", field, true);
    }
    
    return valid; 
@@ -515,7 +559,7 @@ Alfresco.forms.validation.length = function length(field, args, form, silent)
    
    if (!valid && !silent && form !== null)
    {
-      form.addError(field.id + " is not the correct length.", field, true);
+      form.addError(form.getFieldLabel(field.id) + " is not the correct length.", field, true);
    }
    
    return valid;
@@ -540,7 +584,7 @@ Alfresco.forms.validation.number = function number(field, args, form, silent)
    
    if (!valid && !silent && form !== null)
    {
-      form.addError(field.id + " is not a number.", field, true);
+      form.addError(form.getFieldLabel(field.id) + " is not a number.", field, true);
    }
    
    return valid;
@@ -578,7 +622,7 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, form, 
          
          if (!silent && form !== null)
          {
-            form.addError(field.id + " is not a number.", field, true);
+            form.addError(form.getFieldLabel(field.id) + " is not a number.", field, true);
          }
       }
       else
@@ -608,7 +652,7 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, form, 
          
          if (!valid && !silent && form !== null)
          {
-            form.addError(field.id + " is not within the allowable range.", field, true);
+            form.addError(form.getFieldLabel(field.id) + " is not within the allowable range.", field, true);
          }
       }
    }
@@ -646,7 +690,7 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, form, si
       
       if (!valid && !silent && form !== null)
       {
-         form.addError(field.id + " is invalid.", field, true);
+         form.addError(form.getFieldLabel(field.id) + " is invalid.", field, true);
       }
    }
    
