@@ -26,8 +26,9 @@ package org.alfresco.web.site;
 
 import java.io.Serializable;
 
-import org.alfresco.connector.CredentialsVault;
-import org.alfresco.connector.IdentityVault;
+import org.alfresco.connector.CredentialVault;
+import org.alfresco.web.config.RemoteConfigElement;
+import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
@@ -232,15 +233,22 @@ public interface RequestContext extends Serializable
      * 
      * @return
      */
-    public IModel getModel();
+    public Model getModel();
 
     /**
      * Returns the configuration for the framework.
      * 
      * @return
      */
-    public FrameworkConfig getConfig();
+    public WebFrameworkConfigElement getConfig();
 
+    /**
+     * Returns the configuration for the remote.
+     * 
+     * @return
+     */
+    public RemoteConfigElement getRemoteConfig();
+    
     /**
      * Returns the logger for the framework
      * 
@@ -262,18 +270,11 @@ public interface RequestContext extends Serializable
     public User getUser();
 
     /**
-     * Returns the credential vault for the current user
+     * Returns the credential vault
      * 
      * @return
      */
-    public CredentialsVault getUserCredentialVault();
-
-    /**
-     * Returns the identity vault for the current user
-     * 
-     * @return
-     */
-    public IdentityVault getUserIdentityVault();
+    public CredentialVault getCredentialVault();
 
     /**
      * Returns the render context for the currently rendering

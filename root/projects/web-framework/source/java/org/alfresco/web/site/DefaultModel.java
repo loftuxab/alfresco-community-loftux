@@ -35,7 +35,6 @@ import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
-import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelHelper;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
@@ -48,7 +47,7 @@ import org.alfresco.web.site.model.Theme;
 /**
  * @author muzquiano
  */
-public class DefaultModel extends AbstractModel implements IModel
+public class DefaultModel extends AbstractModel implements Model
 {
     public DefaultModel(IFileSystem fileSystem)
     {
@@ -81,11 +80,6 @@ public class DefaultModel extends AbstractModel implements IModel
             String id)
     {
         return (ContentAssociation) loadObject(context, ContentAssociation.TYPE_NAME, id);
-    }
-
-    public Endpoint loadEndpoint(RequestContext context, String id)
-    {
-        return (Endpoint) loadObject(context, Endpoint.TYPE_NAME, id);
     }
 
     public Page loadPage(RequestContext context, String id)
@@ -143,11 +137,6 @@ public class DefaultModel extends AbstractModel implements IModel
     public ContentAssociation newContentAssociation(RequestContext context)
     {
         return (ContentAssociation) newObject(context, ContentAssociation.TYPE_NAME);
-    }
-
-    public Endpoint newEndpoint(RequestContext context)
-    {
-        return (Endpoint) newObject(context, Endpoint.TYPE_NAME);
     }
 
     public Page newPage(RequestContext context)
@@ -257,8 +246,7 @@ public class DefaultModel extends AbstractModel implements IModel
     {
         ModelObject[] array = new ModelObject[] {};
 
-        String modelRelativeDirectoryPath = context.getConfig().getModelTypePath(
-                typeName);
+        String modelRelativeDirectoryPath = context.getConfig().getTypeDescriptor(typeName).getPath();
         
         // read files from the model's file system
         IFile[] files = getFileSystem().getFiles(modelRelativeDirectoryPath);

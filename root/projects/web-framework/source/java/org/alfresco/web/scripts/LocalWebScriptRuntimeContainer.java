@@ -27,9 +27,7 @@ package org.alfresco.web.scripts;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.config.Config;
-import org.alfresco.config.ConfigElement;
-import org.alfresco.connector.remote.RemoteClient;
+import org.alfresco.connector.RemoteClient;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
@@ -73,31 +71,23 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
 
         // populate the root script properties
         ProcessorModelHelper.populateScriptModel(rendererContext, params);
-        
-        // TODO: We need to refactor the "remote" object
-        // Does this make sense here?
-        // retrieve remote server configuration 
-        Config config = getConfigService().getConfig("Remote");
-        if (config != null)
-        {
-           ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
-           if(remoteConfig != null)
-           {
-               String endpoint = remoteConfig.getChildValue("endpoint");
-               if (endpoint == null || endpoint.length() == 0)
-               {
-                   logger.warn("No 'endpoint' configured for ScriptRemote HTTP API access - remote object not available!");
-               }
-               else
-               {
-                   // use appropriate webscript servlet here - one that supports TICKET param auth
-                   RemoteClient remote = new RemoteClient(endpoint + "/s", "UTF-8");
-                   remote.setTicket(ticket.get());
-                   params.put("remote", remote);
-               }
-           }
-        }
-        
+
+        /**
+         * Override the "remote" object with a slightly better 
+         * implementation that takes into account the credential
+         * vault which is under management by the web framework
+         * 
+         * This allows script developers to make calls like:
+         * 
+         * var myRemote = remote.connect("alfresco");
+         * var json = myRemote.call("/content/get?nodeRef=abc");
+         * 
+         * All while in the context of the current user
+         * 
+         */
+        WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(rendererContext.getRequestContext());
+        params.put("remote", remote);
+            
         return params;
     }
 

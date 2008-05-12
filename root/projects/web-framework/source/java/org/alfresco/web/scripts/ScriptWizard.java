@@ -31,7 +31,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.config.ScriptConfigModel;
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
@@ -79,7 +79,7 @@ public final class ScriptWizard extends ScriptBase
         }
         catch (JSONException je)
         {
-            Framework.getLogger().error(je);
+        	FrameworkHelper.getLogger().error(je);
         }
     }
 
@@ -91,7 +91,7 @@ public final class ScriptWizard extends ScriptBase
         }
         catch (JSONException je)
         {
-            Framework.getLogger().error(je);
+        	FrameworkHelper.getLogger().error(je);
         }
     }
 
@@ -103,7 +103,7 @@ public final class ScriptWizard extends ScriptBase
         }
         catch (JSONException je)
         {
-            Framework.getLogger().error(je);
+        	FrameworkHelper.getLogger().error(je);
         }
     }
 

@@ -55,16 +55,21 @@ public class RequestContextFactoryBuilder
         // the default class name that we will use
         String className = "org.alfresco.web.site.HttpRequestContextFactory";
 
-        // see if another class name was configured
-        String _className = Framework.getConfig().getRequestContextFactoryClass();
-        if (_className != null)
-            className = _className;
+        // default request context id
+        String requestContextId = FrameworkHelper.getConfig().getDefaultRequestContextId();
+        if(requestContextId != null)
+        {
+	        // see if another class name was configured
+	        String _className = FrameworkHelper.getConfig().getRequestContextDescriptor(requestContextId).getImplementationClass();
+	        if (_className != null)
+	            className = _className;
+        }
 
         // instantiate the object
         RequestContextFactory factory = (RequestContextFactory) ReflectionHelper.newObject(className);
         
         // log the creation
-        Framework.getLogger().debug("New request context factory: " + className);
+        FrameworkHelper.getLogger().debug("New request context factory: " + className);
 
         return factory;
     }    

@@ -111,7 +111,7 @@ public class ThemeUtil
         String themeId = getCurrentThemeId(request);
         if(themeId == null)
         {
-        	themeId = Framework.getConfig().getDefaultThemeId();
+        	themeId = FrameworkHelper.getConfig().getDefaultThemeId();
         }
         if(themeId == null)
         {

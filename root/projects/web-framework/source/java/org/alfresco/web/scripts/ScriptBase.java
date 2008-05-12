@@ -27,7 +27,7 @@ package org.alfresco.web.scripts;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.ModelObject;
 import org.mozilla.javascript.Context;
@@ -123,7 +123,7 @@ public class ScriptBase implements Serializable
 
     public ScriptModelObject getObject(String id)
     {
-        ModelObject modelObject = Framework.getModel().loadObject(context, id);
+        ModelObject modelObject = FrameworkHelper.getModel().loadObject(context, id);
         if (modelObject != null)
             return new ScriptModelObject(context, modelObject);
         return null;

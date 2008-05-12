@@ -30,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.alfresco.tools.XMLUtil;
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 import org.dom4j.Element;
@@ -61,7 +61,7 @@ public abstract class AbstractModelObject implements ModelObject
         if(modelVersion == null)
         {
             // use the declared version if none available
-            modelVersion = Framework.getConfig().getModelTypeVersion(this.getTypeName());
+            modelVersion = FrameworkHelper.getConfig().getTypeDescriptor(this.getTypeName()).getVersion();
             if(modelVersion == null)
             {
                 modelVersion = "unknown";

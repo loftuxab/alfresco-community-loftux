@@ -28,7 +28,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.exception.ComponentChromeRenderException;
-import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
 import org.alfresco.web.site.exception.PageRenderException;
 import org.alfresco.web.site.exception.RegionRenderException;
@@ -195,7 +194,7 @@ public class PresentationUtil
             request.setAttribute("error-objectId", pageId);
 
             // allow the framework to handle things gracefully
-            RenderUtil.renderSystemPage(context, request, response, 
+            RenderUtil.renderErrorHandlerPage(context, request, response, 
                     WebFrameworkConstants.DISPATCHER_HANDLER_PAGE_ERROR,
                     WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_PAGE_ERROR);
         }
@@ -220,7 +219,7 @@ public class PresentationUtil
             request.setAttribute("error-objectId", templateId);
 
             // allow the framework to handle things gracefully
-            RenderUtil.renderSystemPage(context, request, response, 
+            RenderUtil.renderErrorHandlerPage(context, request, response, 
                     WebFrameworkConstants.DISPATCHER_HANDLER_TEMPLATE_ERROR,
                     WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_TEMPLATE_ERROR);
         }
@@ -250,7 +249,7 @@ public class PresentationUtil
             request.setAttribute("error-objectId", regionId);
 
             // allow the framework to handle things gracefully
-            RenderUtil.renderSystemPage(context, request, response, 
+            RenderUtil.renderErrorHandlerPage(context, request, response, 
                     WebFrameworkConstants.DISPATCHER_HANDLER_REGION_ERROR,
                     WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_REGION_ERROR);
         }
@@ -275,7 +274,7 @@ public class PresentationUtil
             request.setAttribute("error-objectId", componentId);
 
             // allow the framework to handle things gracefully
-            RenderUtil.renderSystemPage(context, request, response, 
+            RenderUtil.renderErrorHandlerPage(context, request, response, 
                     WebFrameworkConstants.DISPATCHER_HANDLER_COMPONENT_ERROR,
                     WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_COMPONENT_ERROR);
         }

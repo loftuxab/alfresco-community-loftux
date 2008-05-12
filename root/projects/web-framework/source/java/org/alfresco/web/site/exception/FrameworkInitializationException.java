@@ -22,42 +22,20 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.web.site.exception;
 
-import org.alfresco.tools.ReflectionHelper;
-import org.alfresco.web.site.exception.UserFactoryException;
-
-public abstract class UserFactoryBuilder
+/**
+ * @author muzquiano
+ */
+public class FrameworkInitializationException extends Exception
 {
-    protected UserFactoryBuilder()
+    public FrameworkInitializationException(String message)
     {
+        super(message);
     }
 
-    public static UserFactory newFactory()
-        throws UserFactoryException
+    public FrameworkInitializationException(String message, Exception ex)
     {
-        // default that we will use
-        String className = "org.alfresco.web.site.DefaultUserFactory";
-        
-        // check the config
-        String _defaultId = FrameworkHelper.getConfig().getDefaultUserFactoryId();
-        if(_defaultId != null)
-        {
-	        String _className = FrameworkHelper.getConfig().getUserFactoryDescriptor(_defaultId).getImplementationClass();
-	        if (_className != null)
-	            className = _className;
-        }
-
-        UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
-        if(factory == null)
-        {
-            throw new UserFactoryException("Unable to create user factory for class name: " + className);
-        }
-        factory.setId(_defaultId);
-        
-        // log
-        FrameworkHelper.getLogger().debug("New User Factory: " + className);
-
-        return factory;
-    }    
+        super(message, ex);
+    }
 }

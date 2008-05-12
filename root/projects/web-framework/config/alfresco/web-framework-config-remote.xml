@@ -1,0 +1,47 @@
+<alfresco-config>
+
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="remote" class="org.alfresco.web.config.RemoteConfigElementReader"/>
+	  </element-readers>
+   </plug-ins>
+
+	<config evaluator="string-compare" condition="Remote">
+
+		<remote>
+			
+			<!-- Endpoints -->
+			<endpoint>
+				<id>alfresco</id>
+				<name>Alfresco</name>
+				<description>Admin account access to Alfresco</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://localhost:8080</endpoint-url>
+				<default-uri>/alfresco</default-uri>
+				<identity>specific</identity>
+				<username>admin</username>
+				<password>admin</password>
+			</endpoint>
+			<endpoint>
+				<id>alfresco-user</id>
+				<name>Alfresco User</name>
+				<description>User account access to Alfresco</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://localhost:8080</endpoint-url>
+				<default-uri>/alfresco</default-uri>
+				<identity>current</identity>
+			</endpoint>
+			<endpoint>
+				<id>alfresco.com</id>
+				<name>alfresco.com website</name>
+				<description>alfresco.com website</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://www.alfresco.com</endpoint-url>
+				<default-uri>/</default-uri>
+			</endpoint>
+						
+		</remote>
+				
+	</config>
+
+</alfresco-config>

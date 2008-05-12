@@ -48,8 +48,7 @@ public class FreemarkerRenderer extends AbstractRenderer
     private PresentationTemplateProcessor templateProcessor;
     private PresentationScriptProcessor scriptProcessor;
     private Store templateStore;
-    
-    
+        
     public void init(RendererContext rendererContext)
     {
         ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
@@ -57,23 +56,23 @@ public class FreemarkerRenderer extends AbstractRenderer
         RequestContext context = rendererContext.getRequestContext();
         
         // get the template processor
-        String templateProcessorId = context.getConfig().getRendererProperty(getRendererType(), "template-processor-bean");
+        String templateProcessorId = context.getConfig().getRendererDescriptor(getRendererType()).getStringProperty("template-processor-bean");
         if(templateProcessorId == null || templateProcessorId.length() == 0)
         {
-            templateProcessorId = "site.templateprocessor";
+            templateProcessorId = "webframework.templateprocessor";
         }
         templateProcessor = (PresentationTemplateProcessor)appContext.getBean(templateProcessorId);
         
         // get the script processor
-        String scriptProcessorId = context.getConfig().getRendererProperty(getRendererType(), "script-processor-bean");
+        String scriptProcessorId = context.getConfig().getRendererDescriptor(getRendererType()).getStringProperty("script-processor-bean");
         if(scriptProcessorId == null || scriptProcessorId.length() == 0)
         {
-            scriptProcessorId = "site.scriptprocessor";
+            scriptProcessorId = "webframework.scriptprocessor";
         }
         scriptProcessor = (PresentationScriptProcessor)appContext.getBean(scriptProcessorId);
         
         // get and init template store
-        templateStore = (Store)appContext.getBean("site.store.templates");
+        templateStore = (Store)appContext.getBean("webframework.store.templates");
         templateStore.init();
     }
     

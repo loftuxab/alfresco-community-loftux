@@ -475,7 +475,7 @@ public class RenderUtil
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+                FrameworkHelper.getLogger().error(ex);
             }
         }
     }
@@ -504,7 +504,7 @@ public class RenderUtil
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+                FrameworkHelper.getLogger().error(ex);
             }
         }
     }
@@ -530,7 +530,7 @@ public class RenderUtil
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+                FrameworkHelper.getLogger().error(ex);
             }
         }
     }
@@ -751,13 +751,20 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String errorHandlerPageId, String defaultErrorHandlerPageRenderer) throws RequestDispatchException
     {
+        // start a timer
+        if (Timer.isTimerEnabled())
+            Timer.start(request, "RenderErrorHandlerPage-" + errorHandlerPageId);
+        
+        // bind the rendering to this page
+        RendererContextHelper.bind(context, request, response);
+    	
         String renderer = null;
         String rendererType = null;
         try
         {
             // go to unconfigured page display
-            renderer = context.getConfig().getDispatcherErrorHandlerRenderer(errorHandlerPageId);
-            rendererType = context.getConfig().getDispatcherErrorHandlerRendererType(errorHandlerPageId);
+            renderer = context.getConfig().getErrorHandlerDescriptor(errorHandlerPageId).getRenderer();
+            rendererType = context.getConfig().getErrorHandlerDescriptor(errorHandlerPageId).getRendererType();
             if(rendererType == null || rendererType.length() == 0)
             {
                 rendererType = WebFrameworkConstants.DEFAULT_RENDERER_TYPE;
@@ -773,6 +780,14 @@ public class RenderUtil
         {
             throw new RequestDispatchException("Failed to render the error handler page '" + errorHandlerPageId + "' for renderer: " + renderer + " of type: " + rendererType, ex);
         }
+        finally
+        {
+            // unbind the rendering context
+            RendererContextHelper.unbind(context);
+            
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "RenderErrorHandlerPage-" + errorHandlerPageId);
+        }        
     }
 
     /**
@@ -802,8 +817,8 @@ public class RenderUtil
         try
         {
             // go to unconfigured page display
-            renderer = context.getConfig().getDispatcherSystemPageRenderer(systemPageId);
-            rendererType = context.getConfig().getDispatcherSystemPageRendererType(systemPageId); 
+        	renderer = context.getConfig().getSystemPageDescriptor(systemPageId).getRenderer();
+        	rendererType = context.getConfig().getSystemPageDescriptor(systemPageId).getRendererType();
             if(rendererType == null || rendererType.length() == 0)
             {
                 rendererType = WebFrameworkConstants.DEFAULT_RENDERER_TYPE;

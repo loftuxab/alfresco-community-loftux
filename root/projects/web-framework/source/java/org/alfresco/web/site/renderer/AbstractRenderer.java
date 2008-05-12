@@ -28,6 +28,7 @@ import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.exception.RendererExecutionException;
 
@@ -44,6 +45,10 @@ public abstract class AbstractRenderer implements Renderable
      */
     public void init(RendererContext rendererContext)
     {
+    	if(FrameworkHelper.getLogger().isDebugEnabled())
+    	{
+    		FrameworkHelper.getLogger().debug("Renderer [" + this.getClass().getName() + "] init");
+    	}
     }
 
     /* (non-Javadoc)

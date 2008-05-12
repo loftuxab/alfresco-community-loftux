@@ -38,7 +38,7 @@ public class PageMapperFactory
         PageMapper pageMapper;
         
         // check if there is a configured link builder id
-        String pageMapperId = Framework.getConfig().getDefaultPageMapperId();
+        String pageMapperId = FrameworkHelper.getConfig().getDefaultPageMapperId();
         if (pageMapperId == null)
         {
             // default that we will use
@@ -48,7 +48,7 @@ public class PageMapperFactory
         {
             // construct a page mapper
             // TODO: Pool these?
-            String className = Framework.getConfig().getPageMapperClass(pageMapperId);
+            String className = FrameworkHelper.getConfig().getPageMapperDescriptor(pageMapperId).getImplementationClass();
             pageMapper = (PageMapper) ReflectionHelper.newObject(className);
             if (pageMapper == null)
             {
@@ -56,8 +56,10 @@ public class PageMapperFactory
             }
         }
         
-        Framework.getLogger().isDebugEnabled();
-            Framework.getLogger().debug("New page mapper: " + pageMapper.getClass().toString());
+        if(FrameworkHelper.getLogger().isDebugEnabled())
+        {
+            FrameworkHelper.getLogger().debug("New page mapper: " + pageMapper.getClass().toString());
+        }
         
         return pageMapper;
     }    

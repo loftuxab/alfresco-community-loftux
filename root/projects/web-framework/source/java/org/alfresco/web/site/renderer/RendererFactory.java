@@ -219,19 +219,18 @@ public class RendererFactory
         /**
          * If a renderer type is not specified, assume JSP.
          */
+    	String className = null;
         if (rendererType == null || rendererType.length() == 0)
         {
             rendererType = WebFrameworkConstants.RENDERER_TYPE_JSP;
-        }
-
-        /**
-         * Look up the implementation class name for this renderer type
-         * If not found, assume the JSP renderer
-         */
-        String className = context.getConfig().getRendererClass(rendererType);
-        if (className == null || className.length() == 0)
-        {
             className = "org.alfresco.web.site.renderer.JSPRenderer";
+        }
+        else
+        {
+	        /**
+	         * Look up the implementation class name for this renderer type
+	         */
+        	className = context.getConfig().getRendererDescriptor(rendererType).getImplementationClass();
         }
 
         /**

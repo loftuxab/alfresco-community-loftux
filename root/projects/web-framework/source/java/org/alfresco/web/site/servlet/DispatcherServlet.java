@@ -30,16 +30,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.Framework;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.Timer;
 import org.alfresco.web.site.WebFrameworkConstants;
+import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Page;
@@ -48,6 +47,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
+ * Central dispatching servlet for the Web Framework page rendering
+ * processor.
+ * 
+ * The role of this servlet is to serve back fully renditioned pages
+ * including all downstream templates and components, renderered
+ * in their entirety and in the proper markup.
+ * 
+ * @author kroast
  * @author muzquiano
  */
 public class DispatcherServlet extends BaseServlet
@@ -58,9 +65,16 @@ public class DispatcherServlet extends BaseServlet
     {
         super.init();
         
-        // make sure the default framework is loaded
+        // make sure the web framework is loaded        
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-        FrameworkHelper.initFramework(getServletContext(), context);
+        try
+        {
+        	FrameworkHelper.initFramework(getServletContext(), context);
+        }
+        catch(FrameworkInitializationException fie)
+        {
+        	throw new ServletException("Unable to initialize the Web Framework: " + fie);
+        }
     }
     
     protected void service(HttpServletRequest request,
@@ -135,7 +149,7 @@ public class DispatcherServlet extends BaseServlet
              */
             
             // Either way, print stuff out to log
-            Framework.getLogger().error(t);
+            FrameworkHelper.getLogger().error(t);
             
             // If it is a runtime exception, we should handle
             if (t instanceof RuntimeException)
@@ -340,11 +354,11 @@ public class DispatcherServlet extends BaseServlet
     
     protected static boolean isDebugEnabled()
     {
-        return Framework.getLogger().isDebugEnabled();
+        return FrameworkHelper.getLogger().isDebugEnabled();
     }
     
     protected static void debug(RequestContext context, String value)
     {
-        Framework.getLogger().debug("[" + context.getId() + "] " + value);
+        FrameworkHelper.getLogger().debug("[" + context.getId() + "] " + value);
     }
 }

@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.ModelHelper;
@@ -58,9 +59,9 @@ public abstract class AbstractModel
         return ModelHelper.newGUID(typeName);
     }
     
-    public FrameworkConfig getConfiguration()
+    public WebFrameworkConfigElement getConfiguration()
     {
-        return Framework.getConfig();
+        return FrameworkHelper.getConfig();
     }
 
     // helper methods
@@ -74,7 +75,7 @@ public abstract class AbstractModel
      */
     protected String convertIDToRelativeFilePath(String id)
     {
-        String[] modelTypeIds = getConfiguration().getModelTypeIds();
+        String[] modelTypeIds = getConfiguration().getTypeIds();
         for(int i = 0; i < modelTypeIds.length; i++)
         {
             String relativeFilePath = convertIDToRelativeFilePath(modelTypeIds[i], id);
@@ -89,7 +90,7 @@ public abstract class AbstractModel
     
     protected String convertIDToRelativeFilePath(String typeId, String id)
     {
-        String modelTypePath = getConfiguration().getModelTypePath(typeId);
+        String modelTypePath = getConfiguration().getTypeDescriptor(typeId).getPath();
         if(modelTypePath != null)
         {
             return modelTypePath + "/" + id + ".xml";

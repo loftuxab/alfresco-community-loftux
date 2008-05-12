@@ -71,7 +71,7 @@ public class Timer
      */
     public static boolean isTimerEnabled()
     {
-        return Framework.getConfig().getDebugTimerEnabled();
+        return FrameworkHelper.getConfig().isTimerEnabled();
     }
     
     /**

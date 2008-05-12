@@ -31,7 +31,7 @@ import java.util.Map;
 import org.alfresco.tools.ObjectGUID;
 import org.alfresco.tools.ReflectionHelper;
 import org.alfresco.tools.XMLUtil;
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
@@ -113,7 +113,7 @@ public class ModelHelper
             }
             catch(IllegalAccessException iae)
             {
-                Framework.getLogger().error(iae);
+            	FrameworkHelper.getLogger().error(iae);
             }
         }
         
@@ -151,7 +151,7 @@ public class ModelHelper
             String typeName = obj.getTypeName();
             
             // look up the relativePath for this bad boy
-            String relativePath = Framework.getConfig().getModelTypePath(typeName);
+            String relativePath = FrameworkHelper.getConfig().getTypeDescriptor(typeName).getPath();
             
             // splice this off the front and that's our filename
             String fileName = modelRelativeFilePath.substring(relativePath.length() + 1, modelRelativeFilePath.length());
@@ -182,15 +182,15 @@ public class ModelHelper
         {
             Document d = XMLUtil.parse(xml);
             XMLUtil.addChildValue(d.getRootElement(), "id", id);
-            XMLUtil.addChildValue(d.getRootElement(), "version", Framework.getConfig().getModelTypeVersion(typeName));
+            XMLUtil.addChildValue(d.getRootElement(), "version", FrameworkHelper.getConfig().getTypeDescriptor(typeName).getVersion());
             XMLUtil.addChildValue(d.getRootElement(), "name", id);
 
             obj = (ModelObject) convertDocumentToModelObject(d,
                     System.currentTimeMillis());
 
             // get the relative path for this type
-            String modelRelativePath = Framework.getConfig().getModelTypePath(
-                    typeName);
+            String modelRelativePath = FrameworkHelper.getConfig().getTypeDescriptor(typeName).getPath();
+
             // TODO: Refactor with shift to AVM store
             if(obj instanceof AbstractModelObject)
             {
@@ -200,7 +200,7 @@ public class ModelHelper
         }
         catch (Exception ex)
         {
-            Framework.getLogger().error(ex);
+        	FrameworkHelper.getLogger().error(ex);
         }
         return obj;        
     }
@@ -255,7 +255,7 @@ public class ModelHelper
             typeName = typeName.substring(i + 1, typeName.length());
         }
 
-        String prefix = Framework.getConfig().getModelTypePrefix(typeName);
+        String prefix = FrameworkHelper.getConfig().getTypeDescriptor(typeName).getPrefix();
         if (prefix != null && prefix.length() != 0)
         {
             return prefix + newGUID();
@@ -274,8 +274,7 @@ public class ModelHelper
         if (i > -1)
             tagName = tagName.substring(i + 1, tagName.length());
 
-        String implClassName = Framework.getConfig().getModelTypeClass(
-                tagName);
+        String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(tagName).getImplementationClass();
         ModelObject siteObject = (ModelObject) ReflectionHelper.newObject(
                 implClassName, new Class[] { Document.class },
                 new Object[] { document });
