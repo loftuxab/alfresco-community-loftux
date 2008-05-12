@@ -25,45 +25,36 @@
 package org.alfresco.connector;
 
 /**
- * Interface that describes the credentials for a given
- * service or user.
+ * The Interface CredentialVault.
  * 
  * @author muzquiano
  */
-public interface Credentials
+public interface CredentialVault
 {
-	public final static String CREDENTIAL_USERNAME = "username";
-	public final static String CREDENTIAL_PASSWORD = "password";
-	public final static String CREDENTIAL_ALF_TICKET = "alfTicket";
-	
 	/**
-	 * Gets the id.
+	 * Stores a given credential into the vault
 	 * 
-	 * @return the id
+	 * @param key the key
+	 * @param credentials the credentials
 	 */
-	public String getId();
+	public void store(String key, Credentials credentials);
 	
 	/**
-	 * Gets the description.
-	 * 
-	 * @return the description
-	 */
-	public String getDescription();
-	
-	/**
-	 * Gets a given property
+	 * Retrieves a credential from the vault
 	 * 
 	 * @param key the key
 	 * 
-	 * @return the property
+	 * @return the credentials
 	 */
-	public Object getProperty(String key);
+	public Credentials retrieve(String key);
 	
 	/**
-	 * Sets a given property
-	 * 
-	 * @param key the key
-	 * @param value the value
+	 * Tells the Credential Vault to load state from persisted store
 	 */
-	public void setProperty(String key, Object value);
+	public void load();
+	
+	/**
+	 * Tells the Credential Vault to write state to persisted store
+	 */
+	public void save();
 }

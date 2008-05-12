@@ -152,6 +152,9 @@ public abstract class AbstractWebScript implements WebScript
         
         // add configuration
         params.put("config", new ScriptConfigModel(this.container.getConfigService(), this.xmlConfig));
+        
+        // add remote object
+        params.put("remote", new ScriptRemote(this.container.getConfigService()));
  
         // add custom parameters
         if (customParams != null)

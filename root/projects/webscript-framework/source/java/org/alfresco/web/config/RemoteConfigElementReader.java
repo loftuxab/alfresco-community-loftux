@@ -22,48 +22,28 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.connector;
+package org.alfresco.web.config;
+
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.dom4j.Element;
 
 /**
- * Interface that describes the credentials for a given
- * service or user.
+ * Responsible for loading Web Framework configuration settings from
+ * the web-site-config*.xml files that are loaded via the configuration
+ * service.
  * 
  * @author muzquiano
  */
-public interface Credentials
-{
-	public final static String CREDENTIAL_USERNAME = "username";
-	public final static String CREDENTIAL_PASSWORD = "password";
-	public final static String CREDENTIAL_ALF_TICKET = "alfTicket";
-	
-	/**
-	 * Gets the id.
-	 * 
-	 * @return the id
-	 */
-	public String getId();
-	
-	/**
-	 * Gets the description.
-	 * 
-	 * @return the description
-	 */
-	public String getDescription();
-	
-	/**
-	 * Gets a given property
-	 * 
-	 * @param key the key
-	 * 
-	 * @return the property
-	 */
-	public Object getProperty(String key);
-	
-	/**
-	 * Sets a given property
-	 * 
-	 * @param key the key
-	 * @param value the value
-	 */
-	public void setProperty(String key, Object value);
+public class RemoteConfigElementReader implements ConfigElementReader
+{   
+   public ConfigElement parse(Element elem)
+   {
+	   ConfigElement configElement = null;
+	   if(elem != null)
+	   {
+		   configElement = RemoteConfigElement.newInstance(elem);
+	   }
+	   return configElement;
+   }
 }

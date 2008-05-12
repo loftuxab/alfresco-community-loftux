@@ -31,8 +31,8 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.connector.remote.RemoteClient;
-import org.alfresco.connector.remote.Response;
+import org.alfresco.connector.RemoteClient;
+import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLEncoder;
 

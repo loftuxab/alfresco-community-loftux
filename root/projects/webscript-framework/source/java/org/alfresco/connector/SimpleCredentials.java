@@ -24,46 +24,88 @@
  */
 package org.alfresco.connector;
 
+import java.util.HashMap;
+
 /**
- * Interface that describes the credentials for a given
- * service or user.
+ * Credentials for a given user.  This stores credentials that are
+ * to be passed to a back-end service in order to authenticate.  Once
+ * these credentials are used to authenticate, they may no longer be
+ * necessary as the service may hand back "endpoint credentials" which
+ * are to be used on subsequent calls.
+ * 
+ * An example of a user credential might be username/password.
+ * 
+ * An example of an endpoint credential might be an Alfresco ticket.
  * 
  * @author muzquiano
  */
-public interface Credentials
+public class SimpleCredentials implements Credentials
 {
-	public final static String CREDENTIAL_USERNAME = "username";
-	public final static String CREDENTIAL_PASSWORD = "password";
-	public final static String CREDENTIAL_ALF_TICKET = "alfTicket";
+	protected String id;
+	protected String description;
+	protected HashMap<String, Object> properties;
 	
 	/**
-	 * Gets the id.
+	 * Instantiates a new user credential.
 	 * 
-	 * @return the id
+	 * @param id the id
 	 */
-	public String getId();
+	public SimpleCredentials(String id)
+	{
+		this(id, null);		
+	}
+	
+	/**
+	 * Instantiates a new user credential.
+	 * 
+	 * @param id the id
+	 * @param description the description
+	 */
+	public SimpleCredentials(String id, String description)
+	{
+		this.id = id;
+		this.description = description;
+		this.properties = new HashMap<String, Object>();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.alfresco.connector.Credential#getId()
+	 */
+	public String getId()
+	{
+		return this.id;
+	}
 	
 	/**
 	 * Gets the description.
 	 * 
 	 * @return the description
 	 */
-	public String getDescription();
+	public String getDescription()
+	{
+		return this.description;
+	}
 	
 	/**
-	 * Gets a given property
+	 * Gets a given property.
 	 * 
 	 * @param key the key
 	 * 
 	 * @return the property
 	 */
-	public Object getProperty(String key);
+	public Object getProperty(String key)
+	{
+		return this.properties.get(key);
+	}
 	
 	/**
-	 * Sets a given property
+	 * Sets a given property.
 	 * 
 	 * @param key the key
 	 * @param value the value
 	 */
-	public void setProperty(String key, Object value);
+	public void setProperty(String key, Object value)
+	{
+		this.properties.put(key, value);
+	}
 }

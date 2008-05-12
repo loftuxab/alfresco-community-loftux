@@ -22,48 +22,35 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.connector;
+package org.alfresco.web.config;
+
+import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
+import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
+import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
+import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 
 /**
- * Interface that describes the credentials for a given
- * service or user.
- * 
  * @author muzquiano
  */
-public interface Credentials
+public interface RemoteConfigProperties
 {
-	public final static String CREDENTIAL_USERNAME = "username";
-	public final static String CREDENTIAL_PASSWORD = "password";
-	public final static String CREDENTIAL_ALF_TICKET = "alfTicket";
-	
-	/**
-	 * Gets the id.
-	 * 
-	 * @return the id
-	 */
-	public String getId();
-	
-	/**
-	 * Gets the description.
-	 * 
-	 * @return the description
-	 */
-	public String getDescription();
-	
-	/**
-	 * Gets a given property
-	 * 
-	 * @param key the key
-	 * 
-	 * @return the property
-	 */
-	public Object getProperty(String key);
-	
-	/**
-	 * Sets a given property
-	 * 
-	 * @param key the key
-	 * @param value the value
-	 */
-	public void setProperty(String key, Object value);
+    // remote connectors
+    public String[] getConnectorIds();
+    public ConnectorDescriptor getConnectorDescriptor(String id);
+
+    // remote authenticators
+    public String[] getAuthenticatorIds();
+    public AuthenticatorDescriptor getAuthenticatorDescriptor(String id);
+
+    // remote endpoints
+    public String[] getEndpointIds();
+    public EndpointDescriptor getEndpointDescriptor(String id);
+    
+    // credential vaults
+    public String[] getCredentialVaultIds();
+    public CredentialVaultDescriptor getCredentialVaultDescriptor(String id);
+    
+    // defaults
+    public String getDefaultEndpointId();
+    public String getDefaultCredentialVaultId();
 }

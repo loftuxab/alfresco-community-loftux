@@ -22,7 +22,7 @@
  * exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.connector.remote;
+package org.alfresco.connector;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

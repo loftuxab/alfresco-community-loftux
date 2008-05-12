@@ -31,7 +31,12 @@
       <servlet-name>proxyServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
    </servlet>
-
+   
+   <servlet>
+      <servlet-name>endpointServlet</servlet-name>
+      <servlet-class>org.alfresco.web.scripts.servlet.EndPointProxyServlet</servlet-class>
+   </servlet>
+   
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>
       <url-pattern>/service/*</url-pattern>
@@ -45,6 +50,11 @@
    <servlet-mapping>
       <servlet-name>proxyServlet</servlet-name>
       <url-pattern>/proxy</url-pattern>
+   </servlet-mapping>
+
+   <servlet-mapping>
+      <servlet-name>endpointServlet</servlet-name>
+      <url-pattern>/endpoint</url-pattern>
    </servlet-mapping>
    
    <session-config>
