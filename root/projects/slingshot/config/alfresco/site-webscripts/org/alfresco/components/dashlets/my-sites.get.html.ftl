@@ -16,4 +16,3 @@
   </div>
 </div>
 
-<div id="${args.htmlid}-createSite"></div>

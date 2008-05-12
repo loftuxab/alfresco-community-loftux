@@ -4,12 +4,8 @@
        <a href="#" onclick="alert('Not implemented');">Edit profile ></a>
     </div>
     <div class="component-body">
-       <div class="header">${profile.name} Collaboration Site, Welcome</div>
-       <div class="text">${profile.description}</div>
-       <div class="text">Tags: ${profile.tags}</div>
-       <div class="text">
-         Site admin<br />
-         ${profile.admin}
-       </div>
+       <h1>${profile.title}</h1>
+       <h2>${profile.sitePreset}</h2>
+       ${profile.description}
     </div>
 </div>
