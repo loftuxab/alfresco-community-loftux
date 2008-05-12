@@ -37,25 +37,25 @@
             failureMessage: "Could not load create site template",
             scope: this
          });
-         //YAHOO.util.Connect.asyncRequest("GET", Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite?htmlid=" + this.id, callback);
       },
       
       templateLoaded: function(response)
       {
          var Dom = YAHOO.util.Dom;
 
-         Dom.get(this.id).innerHTML = response.serverResponse.responseText;
-         this.dialog = new YAHOO.widget.Dialog(this.id,
+         var div = document.createElement("div");
+         div.innerHTML = response.serverResponse.responseText;
+         this.dialog = new YAHOO.widget.Dialog(div,
          {
             fixedcenter: true,
             visible: false
          });
+         this.dialog.render(document.body);
 
          var clButton = Dom.get(this.id + "-ok-button");
          var clearButton = new YAHOO.widget.Button(clButton, {type: "button"});
          clearButton.subscribe("click", this.onOkButtonClick, this, true);
 
-         this.dialog.render();
          this.dialog.show();
       },
 
