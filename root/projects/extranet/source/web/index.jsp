@@ -1,1 +1,1 @@
-<%	String path = org.alfresco.web.site.Framework.getConfig().getDynamicWebsiteServletUri();	request.getRequestDispatcher(path).include(request, response);%>
+<%	request.getRequestDispatcher("/page").include(request, response);%>
