@@ -48,25 +48,25 @@
 			</authenticator>
 			
 			<!-- Endpoints -->
-			<!--
+			<!-- TODO: remove this as an endpoint! -->
 			<endpoint>
 				<id>alfresco-system</id>
 				<name>Alfresco - System access</name>
 				<description>System account access to Alfresco</description>
-				<connector-id>http</connector-id>
-				<endpoint-url>http://localhost:8080</endpoint-url>
+				<connector-id>alfresco</connector-id>
+				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
 				<identity>declared</identity>
 				<username>admin</username>
 				<password>admin</password>
 			</endpoint>
-			-->
+			
 			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - unauthenticated access</name>
 				<description>Unauthenticated access to Alfresco Repository WebScripts</description>
-				<connector-id>http</connector-id>
+				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
-				<identity>none</identity>
+				<identity>user</identity>
 			</endpoint>
 			
 			<endpoint>
@@ -86,7 +86,7 @@
 			</credential-vault>
 			
 			<!-- The default endpoint -->
-			<default-endpoint-id>alfresco</default-endpoint-id>
+			<default-endpoint-id>alfresco-system</default-endpoint-id>
 			
 			<!-- The default credential vault -->
 			<default-credential-vault-id>default</default-credential-vault-id>

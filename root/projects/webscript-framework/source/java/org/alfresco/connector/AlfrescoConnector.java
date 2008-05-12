@@ -50,8 +50,7 @@ public class AlfrescoConnector extends HttpConnector
     {
     	// if we don't have any credentials, we'll just call the super class
     	// method since that will implement unauthenticated HTTP
-    	// that's really the best we can do
-    	if(getCredentials() == null)
+    	if (getCredentials() == null)
     	{
     		return super.call(uri, parameters, headers);
     	}
@@ -65,7 +64,7 @@ public class AlfrescoConnector extends HttpConnector
         // if we have a ticket, we assume it is valid
         // it may, however, be possible that the ticket is invalid
         // if it is invalid, we will have to fetch another ticket
-        if(alfTicket != null)
+        if (alfTicket != null)
         {
         	remoteClient.setTicket(alfTicket);
         	Response response = remoteClient.call(uri);
@@ -84,7 +83,7 @@ public class AlfrescoConnector extends HttpConnector
         {
         	authenticated = authenticate();
         }
-    	catch(AuthenticationException ae)
+    	catch (AuthenticationException ae)
     	{
     		Status status = new Status();
     		status.setCode(401);
@@ -94,18 +93,16 @@ public class AlfrescoConnector extends HttpConnector
     	}
     	
     	// did we successfully authenticate?
-    	if(authenticated)
+    	if (authenticated)
     	{
 	    	// now we have a valid ticket
 	    	// this ticket has been placed back onto the Credentials object
     		// we retrieve it here
-	    	alfTicket = (String) getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
+	    	alfTicket = (String)getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
 	    	remoteClient.setTicket(alfTicket);
 	    	response = remoteClient.call(uri);
     	}
     	
     	return response;
     }
-	
-
 }

@@ -263,14 +263,17 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         {
             return getStringProperty(CLAZZ);
         }
+        
         public String getDescription() 
         {
             return getStringProperty(DESCRIPTION);
         }
+        
         public String getName() 
         {
             return getStringProperty(NAME);
         } 
+        
         public String getDefaultAuthId()
         {
             return getStringProperty(DEFAULT_AUTH_ID);

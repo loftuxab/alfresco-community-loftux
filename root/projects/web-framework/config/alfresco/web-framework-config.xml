@@ -311,15 +311,16 @@
 				<theme>default</theme>
 				<region-chrome>default-region-chrome</region-chrome>
 				<component-chrome>default-component-chrome</component-chrome>
+				<!-- example page-type config
 				<page-type>
 					<id>login</id>
-					<page-instance-id></page-instance-id>
+					<page-instance-id>page.login</page-instance-id>
 				</page-type>
 				<page-type>
 					<id>logout</id>
-					<page-instance-id></page-instance-id>
-				</page-type>
-			</application-defaults>		
+					<page-instance-id>page.logout</page-instance-id>
+				</page-type> -->
+			</application-defaults>
 			
 			<!-- Debug -->
 			<debug>
@@ -329,8 +330,6 @@
 			</debug>					
 			
 		</web-framework>
-		
-		
 		
 	</config>
 

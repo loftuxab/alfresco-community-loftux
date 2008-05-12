@@ -34,7 +34,13 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorFactory;
+import org.alfresco.connector.CredentialVault;
+import org.alfresco.connector.CredentialVaultFactory;
+import org.alfresco.connector.Credentials;
 import org.alfresco.connector.RemoteClient;
+import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.ServerConfigElement;
@@ -73,8 +79,9 @@ public class EndPointProxyServlet extends HttpServlet
 {
     private static final long serialVersionUID = -176412355613122789L;
 
-    protected ConfigService configService;
-    protected RemoteConfigElement remoteConfigElement;
+    protected RemoteConfigElement config;
+    protected ConnectorFactory connectorFactory;
+    protected CredentialVault vault;
 
 
     @Override
@@ -82,18 +89,27 @@ public class EndPointProxyServlet extends HttpServlet
     {
         super.init();
         ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-        configService = (ConfigService)context.getBean("web.config");
-
+        ConfigService configService = (ConfigService)context.getBean("web.config");
+        
         // retrieve the remote configuration
-        remoteConfigElement = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
+        this.config = (RemoteConfigElement)configService.getConfig("Remote").getConfigElement("remote");
+        this.connectorFactory = ConnectorFactory.newInstance(configService);
+        try
+        {
+            this.vault = CredentialVaultFactory.newInstance(configService).vault();
+        }
+        catch (RemoteConfigException err)
+        {
+            throw new AlfrescoRuntimeException("Error retrieving CredentialVault: " + err.getMessage(), err);
+        }
     }
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse res)
-    throws ServletException, IOException
+        throws ServletException, IOException
     {
         String uri = req.getRequestURI().substring(req.getContextPath().length());
-
+        
         // validate and return the endpoint id from the URI path - stripping the servlet context
         StringTokenizer t = new StringTokenizer(uri, "/");
         String servletName = t.nextToken();
@@ -102,7 +118,7 @@ public class EndPointProxyServlet extends HttpServlet
             throw new IllegalArgumentException("Proxy URL did not specify endpoint id.");
         }
         String endpointId = t.nextToken();
-
+        
         // rebuild rest of the URL for the proxy request
         if (!t.hasMoreTokens())
         {
@@ -114,30 +130,37 @@ public class EndPointProxyServlet extends HttpServlet
             buf.append('/');
             buf.append(t.nextToken());
         } while (t.hasMoreTokens());
-
+        
         try
         {
-            // lookup endpoint from Model
-            // TODO: throw an exception if endpoint ID is invalid 
-            String endpointUrl = "http://localhost:8080/alfresco/service";
-
             // retrieve the endpoint descriptor
-            EndpointDescriptor descriptor = remoteConfigElement.getEndpointDescriptor(endpointId);
-            if (descriptor != null)
+            EndpointDescriptor descriptor = this.config.getEndpointDescriptor(endpointId);
+            if (descriptor == null)
             {
-                endpointUrl = descriptor.getEndpointUrl();
+                // throw an exception if endpoint ID is invalid 
+                throw new AlfrescoRuntimeException("Cannot find configuration for EndPoint Id: " + endpointId);
             }
-
-            // build proxy URL to the endpoint
+            
+            // userid from session
+            // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?
+            String userId = (String)req.getSession().getAttribute("USER_ID");
+            
+            // retrieve the connector for this user and endpoint - get user credentials from the supplied vault
+            Connector connector = this.connectorFactory.connector(endpointId, userId, this.vault);
+            
+            // build proxy URL referencing the endpoint
             String q = req.getQueryString();
             String url = buf.toString() + (q != null && q.length() != 0 ? q : "");
-
-            // TODO: auto append TICKET - get from the EndPoint credentials for the current User..?
-
+            
             // TODO: copy headers for proxy request
-
+            
             // execute proxy URL via remote client
-            RemoteClient client = new RemoteClient(endpointUrl);
+            RemoteClient client = ((RemoteClient)connector.getClient());
+            
+            // check to see if we have a ticket from the credentials on the connector
+            String alfTicket = (String)connector.getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
+            client.setTicket(alfTicket);
+            
             String method = req.getMethod();
             if (method.equalsIgnoreCase("GET"))
             {

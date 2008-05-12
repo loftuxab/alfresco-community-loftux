@@ -62,7 +62,7 @@ public class AlfrescoUserFactory extends UserFactory
 			Connector connector = remote.connect(endpointId);
 		
 			// call the authentication ticket provider
-			String uri = "/service/api/login?u=" + username + "&pw=" + password;
+			String uri = "/api/login?u=" + username + "&pw=" + password;
 			Response response = connector.call(uri);
 						
 			// parse out the ticket
@@ -97,8 +97,7 @@ public class AlfrescoUserFactory extends UserFactory
 			Connector connector = remote.connect(endpointId);
 		
 			// call the authentication ticket provider
-			//String uri = "/service/content/query?user=" + user_id;
-			String uri = "/service/webframework/content/metadata?user=" + user_id;
+			String uri = "/webframework/content/metadata?user=" + user_id;
 			Response response = connector.call(uri);
 			
 			String responseString = response.getResponse();

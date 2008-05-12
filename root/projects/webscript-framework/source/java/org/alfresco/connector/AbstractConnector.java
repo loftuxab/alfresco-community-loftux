@@ -95,7 +95,7 @@ public abstract class AbstractConnector implements Connector
      * 
      * @return the credentials
      */
-    protected Credentials getCredentials()
+    public Credentials getCredentials()
     {
     	return credentials;
     }
