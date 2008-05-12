@@ -72,15 +72,11 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 public class EndPointProxyServlet extends HttpServlet
 {
     private static final long serialVersionUID = -176412355613122789L;
-    
-    private static final String PARAM_ENDPOINTID = "eid";
-    
+
     protected ConfigService configService;
     protected RemoteConfigElement remoteConfigElement;
-    
-    /* (non-Javadoc)
-     * @see javax.servlet.GenericServlet#init()
-     */
+
+
     @Override
     public void init() throws ServletException
     {
@@ -91,16 +87,13 @@ public class EndPointProxyServlet extends HttpServlet
         // retrieve the remote configuration
         remoteConfigElement = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
     }
-    
-    /* (non-Javadoc)
-     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-     */
+
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse res)
-        throws ServletException, IOException
+    throws ServletException, IOException
     {
         String uri = req.getRequestURI().substring(req.getContextPath().length());
-        
+
         // validate and return the endpoint id from the URI path - stripping the servlet context
         StringTokenizer t = new StringTokenizer(uri, "/");
         String servletName = t.nextToken();
@@ -109,7 +102,7 @@ public class EndPointProxyServlet extends HttpServlet
             throw new IllegalArgumentException("Proxy URL did not specify endpoint id.");
         }
         String endpointId = t.nextToken();
-        
+
         // rebuild rest of the URL for the proxy request
         if (!t.hasMoreTokens())
         {
@@ -121,28 +114,28 @@ public class EndPointProxyServlet extends HttpServlet
             buf.append('/');
             buf.append(t.nextToken());
         } while (t.hasMoreTokens());
-        
+
         try
         {
             // lookup endpoint from Model
             // TODO: throw an exception if endpoint ID is invalid 
-            String endpointUrl = "http://localhost:8080/alfresco/service";;
-            
+            String endpointUrl = "http://localhost:8080/alfresco/service";
+
             // retrieve the endpoint descriptor
             EndpointDescriptor descriptor = remoteConfigElement.getEndpointDescriptor(endpointId);
-            if(descriptor != null)
+            if (descriptor != null)
             {
-            	endpointUrl = descriptor.getEndpointUrl() + descriptor.getDefaultUri();
+                endpointUrl = descriptor.getEndpointUrl();
             }
-            
+
             // build proxy URL to the endpoint
             String q = req.getQueryString();
             String url = buf.toString() + (q != null && q.length() != 0 ? q : "");
-            
+
             // TODO: auto append TICKET - get from the EndPoint credentials for the current User..?
-            
+
             // TODO: copy headers for proxy request
-            
+
             // execute proxy URL via remote client
             RemoteClient client = new RemoteClient(endpointUrl);
             String method = req.getMethod();

@@ -80,12 +80,8 @@ public class WebScriptAuthenticationServlet extends HttpServlet
         		 throw new ServletException("Unable to find endpoint for endpoint id: " + endpointId);
         	 }
         	 
-        	 // build the endpoint url
+        	 // get the endpoint url
         	 String endpointUrl = descriptor.getEndpointUrl();
-        	 if(descriptor.getDefaultUri() != null)
-        	 {
-        		 endpointUrl += descriptor.getDefaultUri();
-        	 }
         	 
         	 // make a direct call to login api to retrieve a ticket for the user credentials
         	 RemoteClient remote = new RemoteClient(endpointUrl);

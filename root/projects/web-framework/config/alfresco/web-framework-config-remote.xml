@@ -11,33 +11,35 @@
 		<remote>
 			
 			<!-- Endpoints -->
+			<!--
 			<endpoint>
-				<id>alfresco</id>
+				<id>alfresco-admin</id>
 				<name>Alfresco</name>
 				<description>Admin account access to Alfresco</description>
 				<connector-id>http</connector-id>
-				<endpoint-url>http://localhost:8080</endpoint-url>
-				<default-uri>/alfresco</default-uri>
-				<identity>specific</identity>
+				<endpoint-url>http://localhost:8080/alfresco</endpoint-url>
+				<identity>declared</identity>
 				<username>admin</username>
 				<password>admin</password>
 			</endpoint>
+			-->
+			
 			<endpoint>
 				<id>alfresco-user</id>
 				<name>Alfresco User</name>
 				<description>User account access to Alfresco</description>
 				<connector-id>http</connector-id>
-				<endpoint-url>http://localhost:8080</endpoint-url>
-				<default-uri>/alfresco</default-uri>
-				<identity>current</identity>
+				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
+				<identity>user</identity>
 			</endpoint>
+			
 			<endpoint>
 				<id>alfresco.com</id>
 				<name>alfresco.com website</name>
 				<description>alfresco.com website</description>
 				<connector-id>http</connector-id>
 				<endpoint-url>http://www.alfresco.com</endpoint-url>
-				<default-uri>/</default-uri>
+				<identity>none</identity>
 			</endpoint>
 						
 		</remote>
