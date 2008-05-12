@@ -7,5 +7,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Jndi-Client"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Repository"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Web Framework"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

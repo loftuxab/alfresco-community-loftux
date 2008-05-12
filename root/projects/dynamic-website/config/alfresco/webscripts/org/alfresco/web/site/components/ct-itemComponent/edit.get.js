@@ -38,11 +38,12 @@ if(componentAssociation != null)
 		addElement("endpointId", endpointId);
 		addElementFormat("endpointId", "Endpoint ID", "combo", 220);
 		addElementSelectionValue("endpointId", "none", "None");
-		var endpoints = site.getAllEndpoints();
+		var endpoints = remote.getEndpointIds();
 		for(var z = 0; z < endpoints.length; z++)
 		{
-			var _endpointId = endpoints[z].getProperty("endpointId");
-			var _endpointDescription = _endpointId;			
+			var _endpointId = endpoints[z];
+			var _endpointName = remote.getEndpointName(_endpointId);
+			var _endpointDescription = remote.getEndpointDescription(_endpointId);
 			addElementSelectionValue("endpointId", _endpointId, _endpointDescription);
 		}
 		updateElement("endpointId", endpointId);

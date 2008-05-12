@@ -1,0 +1,155 @@
+<alfresco-config>
+
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="dynamic-website" class="org.alfresco.web.config.DynamicWebsiteConfigElementReader"/>
+	  </element-readers>
+   </plug-ins>
+
+	<config evaluator="string-compare" condition="WebFramework">
+	
+		<web-framework>
+		
+			<link-builder>
+				<id>direct</id>
+				<name>Direct Link Builder</name>
+				<description>Direct Link Builder</description>
+				<class>org.alfresco.web.site.DirectLinkBuilder</class>
+			</link-builder>
+			<link-builder>
+				<id>static</id>
+				<name>Static Link Builder</name>
+				<description>Static Link Builder</description>
+				<class>org.alfresco.web.site.StaticLinkBuilder</class>
+			</link-builder>
+			
+			<tag-library>
+				<id>adw</id>
+				<uri>/WEB-INF/tlds/adw.tld</uri>
+				<namespace>http://www.alfresco.org/taglib/adw</namespace>				
+			</tag-library>
+			
+			<renderer>
+				<id>html</id>
+				<name>HTML Renderer</name>
+				<description>HTML Renderer</description>
+				<class>org.alfresco.web.site.renderer.HTMLRenderer</class>
+			</renderer>
+			
+			<!-- Override -->
+			<error-handler>
+				<id>region-nocomponent</id>
+				<renderer>/app/region-nocomponent.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</error-handler>						
+			
+			<!-- Override -->
+			<system-page>
+				<id>page-getting-started</id>
+				<renderer>/app/getting-started.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
+			<system-page>
+				<id>page-unconfigured</id>
+				<renderer>/app/unconfigured-nav-node.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
+			<system-page>
+				<id>in-context</id>
+				<renderer>/app/in-context.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
+			
+			<!-- Override -->
+			<defaults>
+				<request-context>http</request-context>
+				<file-system>local</file-system>
+				<format>default</format>
+				<page-mapper>default</page-mapper>
+				<link-builder>default</link-builder>			
+				<user-factory>default</user-factory>			
+			</defaults>
+			
+			<!-- Override -->
+			<application-defaults>
+				<region-chrome>dynamic-region-chrome</region-chrome>
+				<component-chrome>dynamic-component-chrome</component-chrome>
+			</application-defaults>		
+
+		</web-framework>
+		
+		<dynamic-website>
+		
+			<incontext-enabled>true</incontext-enabled>
+			<incontext-element>
+				<id>content_editor</id>
+				<name>Content Editor</name>
+				<type>editor</type>
+				<defaults>
+					<enabled>true</enabled>
+					<state>{x:32,y:32}</state>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>page_editor</id>
+				<name>Page Editor</name>
+				<type>editor</type>
+				<defaults>
+					<enabled>true</enabled>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>layout_editor</id>
+				<name>Layout Editor</name>
+				<type>editor</type>
+				<defaults>
+					<enabled>true</enabled>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>web_content_window</id>
+				<name>Web Content</name>
+				<type>window</type>
+				<defaults>
+					<enabled>true</enabled>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>search_window</id>
+				<name>Search</name>
+				<type>window</type>
+				<defaults>
+					<enabled>false</enabled>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>navigation_window</id>
+				<name>Navigation</name>
+				<type>window</type>
+				<defaults>
+					<enabled>false</enabled>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>web_components_window</id>
+				<name>Web Components</name>
+				<type>window</type>
+				<defaults>
+					<enabled>false</enabled>
+				</defaults>
+			</incontext-element>
+			<incontext-element>
+				<id>spaces_window</id>
+				<name>Collaboration Spaces</name>
+				<type>window</type>
+				<defaults>
+					<enabled>false</enabled>
+				</defaults>
+			</incontext-element>
+			
+		</dynamic-website>
+		
+
+	</config>
+
+</alfresco-config>

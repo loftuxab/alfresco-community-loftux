@@ -113,7 +113,9 @@ public class FilterUtil
     public static TagletParser getTagletParser(RequestContext context)
     {
         if (defaultTagletParser != null)
+        {
             return defaultTagletParser;
+        }
 
         // tld documents to load
         // and tld url mappings
@@ -121,13 +123,12 @@ public class FilterUtil
         Map<String, String> tldUrlMap = new HashMap<String, String>();
 
         // walk the configuration
-        String tldIds[] = Framework.getConfig().getTagLibraryIds();
+        String tldIds[] = FrameworkHelper.getConfig().getTagLibraryIds();
         for (int i = 0; i < tldIds.length; i++)
         {
-            String uri = Framework.getConfig().getTagLibraryUri(tldIds[i]);
-            String namespace = Framework.getConfig().getTagLibraryNamespace(
-                    tldIds[i]);
-
+            String uri = FrameworkHelper.getConfig().getTagLibraryDescriptor(tldIds[i]).getUri();
+            String namespace = FrameworkHelper.getConfig().getTagLibraryDescriptor(tldIds[i]).getNamespace();
+            
             // the id is the prefix
             String prefix = tldIds[i];
             tldMap.put(prefix, uri);
@@ -139,7 +140,9 @@ public class FilterUtil
 
         TagletParser parser = getTagletParser(context, tldMap, tldUrlMap);
         if (parser != null)
+        {
             defaultTagletParser = parser;
+        }
         return parser;
     }
 

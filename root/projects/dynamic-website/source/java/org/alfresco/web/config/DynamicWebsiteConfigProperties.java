@@ -22,45 +22,16 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site.taglib;
+package org.alfresco.web.config;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.PageContext;
-
-import org.alfresco.web.site.DynamicWebsite;
-import org.alfresco.web.site.FrameworkHelper;
+import org.alfresco.web.config.DynamicWebsiteConfigElement.InContextElementDescriptor;
 
 /**
  * @author muzquiano
  */
-public class FloatingMenuTag extends TagBase
+public interface DynamicWebsiteConfigProperties
 {
-    public int doStartTag() throws JspException
-    {
-        if (DynamicWebsite.getConfig().isInContextEnabled())
-        {
-            PageContext pageContext = this.getPageContext();
-            HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
-            HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
-
-            String uri = FrameworkHelper.getConfig().getErrorHandlerDescriptor("in-context").getRenderer();
-            if(uri == null)
-            {
-            	uri = "/app/in-context.jsp";
-            }
-
-            try
-            {
-                request.getRequestDispatcher(uri).include(request, response);
-            }
-            catch (Exception ex)
-            {
-                throw new JspException(ex);
-            }
-        }
-
-        return SKIP_BODY;
-    }
+    public boolean isInContextEnabled();
+    public String[] getInContextElementIds();
+    public InContextElementDescriptor getInContextElementDescriptor(String id);
 }

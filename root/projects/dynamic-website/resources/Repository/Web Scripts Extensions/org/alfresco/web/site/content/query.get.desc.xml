@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Content Query</shortname>
-  <description>Content Query</description>
-  <url>/content/query</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
