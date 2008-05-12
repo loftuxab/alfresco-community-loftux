@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
@@ -110,7 +110,7 @@ public class Page extends AbstractModelObject
      */
     protected Element getTemplateElement(String formatId)
     {
-        if (formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        if (formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
         {
             formatId = null;
         }
@@ -164,7 +164,7 @@ public class Page extends AbstractModelObject
      */
     public void setTemplateId(String templateId, String formatId)
     {
-        if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        if(formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
         {
             formatId = null;
         }
@@ -187,7 +187,7 @@ public class Page extends AbstractModelObject
      */
     public void removeTemplateId(String formatId)
     {
-        if(formatId != null && formatId.equals(Framework.getConfig().getDefaultFormatId()))
+        if(formatId != null && formatId.equals(FrameworkHelper.getConfig().getDefaultFormatId()))
         {
             formatId = null;
         }

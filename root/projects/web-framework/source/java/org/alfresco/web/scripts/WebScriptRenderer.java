@@ -77,15 +77,15 @@ public class WebScriptRenderer extends AbstractRenderer
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         RequestContext context = (RequestContext) rendererContext.getRequestContext();
         
-        templateProcessor = (TemplateProcessor)appContext.getBean("site.templateprocessor");
-        registry = (Registry) appContext.getBean("site.webscripts.registry");
+        templateProcessor = (TemplateProcessor)appContext.getBean("webframework.templateprocessor");
+        registry = (Registry) appContext.getBean("webframework.webscripts.registry");
         
         // Figure out which web script runtime container to use.
         // Most of the time, this will be the default one.
-        String containerId = context.getConfig().getRendererProperty(getRendererType(), "container-bean");
+        String containerId = context.getConfig().getRendererDescriptor(getRendererType()).getStringProperty("container-bean");
         if (containerId == null || containerId.length() == 0)
         {
-            containerId = "site.webscripts.container";
+            containerId = "webframework.webscripts.container";
         }
         webScriptContainer = (LocalWebScriptRuntimeContainer)appContext.getBean(containerId);
         if (webScriptContainer == null)

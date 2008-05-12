@@ -22,48 +22,38 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.web.config;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.alfresco.config.ConfigElement;
+import org.alfresco.config.xml.elementreader.ConfigElementReader;
+import org.dom4j.Element;
 
 /**
+ * Responsible for loading Web Framework configuration settings from
+ * the web-site-config*.xml files that are loaded via the configuration
+ * service.
+ * 
  * @author muzquiano
  */
-public class Framework
-{
-    public static boolean isInitialized()
-    {
-        return (getConfig() != null && getModel() != null);
-    }
-
-    public static FrameworkConfig getConfig()
-    {
-        return Framework.config;
-    }
-
-    public static void setConfig(FrameworkConfig config)
-    {
-        Framework.config = config;
-    }
-
-    public static IModel getModel()
-    {
-        return Framework.model;
-    }
-
-    public static void setModel(IModel model)
-    {
-        Framework.model = model;
-    }
-    
-    public static Log getLogger()
-    {
-        return logger;
-    }
-
-    protected static FrameworkConfig config = null;
-    protected static IModel model = null;
-    
-    protected static Log logger = LogFactory.getLog(Framework.class);
+public class WebFrameworkConfigElementReader implements ConfigElementReader
+{   
+   /**
+    * Called from the configuration service to handle the loading of the
+    * Web Framework configuration XML.
+    * 
+    * @param element the element
+    * 
+    * @return the config element
+    * 
+    * @see org.alfresco.config.xml.elementreader.ConfigElementReader#parse(org.dom4j.Element)
+    */
+   public ConfigElement parse(Element elem)
+   {
+	   ConfigElement configElement = null;
+	   if(elem != null)
+	   {
+		   configElement = WebFrameworkConfigElement.newInstance(elem);
+	   }
+	   return configElement;
+   }
 }

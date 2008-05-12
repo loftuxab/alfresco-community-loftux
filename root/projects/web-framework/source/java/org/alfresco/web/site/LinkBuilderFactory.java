@@ -40,11 +40,10 @@ public class LinkBuilderFactory
         String className = "org.alfresco.web.site.link.DefaultLinkBuilder";
 
         // check if there is a configured link builder id
-        String linkBuilderId = Framework.getConfig().getDefaultLinkBuilderId();
+        String linkBuilderId = FrameworkHelper.getConfig().getDefaultLinkBuilderId();
         if (linkBuilderId != null)
         {
-            String _className = Framework.getConfig().getLinkBuilderClass(
-                    linkBuilderId);
+            String _className = FrameworkHelper.getConfig().getLinkBuilderDescriptor(linkBuilderId).getImplementationClass();
             if (_className != null)
                 className = _className;
         }

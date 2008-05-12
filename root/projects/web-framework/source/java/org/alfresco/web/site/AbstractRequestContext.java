@@ -27,8 +27,9 @@ package org.alfresco.web.site;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.connector.CredentialsVault;
-import org.alfresco.connector.IdentityVault;
+import org.alfresco.connector.CredentialVault;
+import org.alfresco.web.config.RemoteConfigElement;
+import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
@@ -358,19 +359,29 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return
      */
-    public IModel getModel()
+    public Model getModel()
     {
-        return Framework.getModel();
+        return FrameworkHelper.getModel();
     }
 
     /**
      * Returns the configuration for the framework.
      * 
      * @return
-     */
-    public FrameworkConfig getConfig()
+     */    
+    public WebFrameworkConfigElement getConfig()
     {
-        return Framework.getConfig();
+    	return FrameworkHelper.getConfig();
+    }
+
+    /**
+     * Returns the configuration for the remote.
+     * 
+     * @return
+     */
+    public RemoteConfigElement getRemoteConfig()
+    {
+    	return FrameworkHelper.getRemoteConfig();
     }
 
     /**
@@ -380,7 +391,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Log getLogger()
     { 
-        return Framework.getLogger();
+        return FrameworkHelper.getLogger();
     }
 
     /**
@@ -407,19 +418,9 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return
      */
-    public CredentialsVault getUserCredentialVault()
+    public CredentialVault getCredentialVault()
     {
-        return (CredentialsVault) getValue(VALUE_CREDENTIAL_VAULT);
-    }
-
-    /**
-     * Returns the identity vault for the current user
-     * 
-     * @return
-     */
-    public IdentityVault getUserIdentityVault()
-    {
-        return (IdentityVault) getValue(VALUE_IDENTITY_VAULT);
+    	return FrameworkHelper.getCredentialVault();
     }
 
     /**
@@ -473,9 +474,6 @@ public abstract class AbstractRequestContext implements RequestContext
 
     // constants
     
-    public static final String VALUE_HEAD_TAGS = "headTags";
-    public static final String VALUE_CREDENTIAL_VAULT = "credential_vault";
-    public static final String VALUE_IDENTITY_VAULT = "identity_vault";
-    
+    public static final String VALUE_HEAD_TAGS = "headTags";    
     public static final String DEBUG_MODE_VALUE_COMPONENTS = "components";
 }

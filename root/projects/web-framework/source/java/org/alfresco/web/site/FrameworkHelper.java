@@ -29,6 +29,14 @@ import javax.servlet.ServletRequest;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.connector.ConnectorFactory;
+import org.alfresco.connector.CredentialVault;
+import org.alfresco.connector.CredentialVaultFactory;
+import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.web.config.RemoteConfigElement;
+import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.alfresco.web.site.filesystem.FileSystemManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
@@ -60,26 +68,15 @@ public class FrameworkHelper
      */
     public synchronized static void initFramework(ServletContext servletContext,
             ApplicationContext context)
+    	throws FrameworkInitializationException
     {
-        if (!Framework.isInitialized())
+        if (!isInitialized())
         {
-            /**
-             * Retrieve the configuration service
-             */
-            ConfigService configService = (ConfigService) context.getBean("site.config");
-            Config config = configService.getConfig("WebFramework");
-
-            /**
-             * Set up the DefaultFrameworkConfig instance
-             * 
-             * This provides helper methods for working with the configuration
-             * service XML.  It serves to help things be a bit faster in
-             * that it caches values on the instance so as to avoid having to
-             * go to the XML each time.
-             */
-            DefaultFrameworkConfig webFrameworkConfig = new DefaultFrameworkConfig(config);
-            Framework.setConfig(webFrameworkConfig);
-
+        	/**
+        	 * Store the application context
+        	 */
+        	applicationContext = context;
+        	
             /**
              * Loads the model implementation onto the framework.
              * 
@@ -91,11 +88,26 @@ public class FrameworkHelper
              * We would like to change this to use the Store abstraction
              * (which is underway but not yet complete).
              */
-            String modelRootPath = webFrameworkConfig.getModelRootPath();
+            String modelRootPath = getConfig().getRootPath();
             IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(
                     servletContext, modelRootPath);
-            IModel model = new DefaultModel(modelFileSystem);
-            Framework.setModel(model);
+            Model model = new DefaultModel(modelFileSystem);
+            setModel(model);
+            
+            
+            /**
+             * Fetches the credential vault and makes it available
+             */
+            CredentialVaultFactory vaultFactory = CredentialVaultFactory.newInstance(getConfigService());
+            try 
+            {
+            	// grab the default vault
+            	credentialVault = (CredentialVault) vaultFactory.vault();
+            }
+            catch(RemoteConfigException rce)
+            {
+            	throw new FrameworkInitializationException("Unable to load the default credential vault", rce);
+            }
 
             logger.info("Successfully Initialized Web Framework");
         }
@@ -142,4 +154,65 @@ public class FrameworkHelper
         
         return context;
     }
+    
+    public static boolean isInitialized()
+    {
+        return (getModel() != null);
+    }
+    
+    public static Model getModel()
+    {
+        return model;
+    }
+
+    public static void setModel(Model model)
+    {
+        FrameworkHelper.model = model;
+    }
+    
+    public static Log getLogger()
+    {
+        return logger;
+    }
+    
+    public static RemoteConfigElement getRemoteConfig()
+    {
+    	Config config = getConfigService().getConfig("Remote");
+    	return (RemoteConfigElement) config.getConfigElement("remote");
+    }
+    
+    public static WebFrameworkConfigElement getConfig()
+    {
+    	Config config = getConfigService().getConfig("WebFramework");
+    	return (WebFrameworkConfigElement) config.getConfigElement("web-framework");
+    }
+    
+    public static ConfigService getConfigService()
+    {
+    	return (ConfigService) applicationContext.getBean("webframework.config");
+    }
+    
+    public static ApplicationContext getApplicationContext()
+    {
+    	return applicationContext;
+    }
+    
+    public static CredentialVault getCredentialVault()
+    {
+    	return credentialVault;
+    }
+    
+    public static ConnectorFactory getConnectorFactory()
+    {
+    	return ConnectorFactory.newInstance(getConfigService());
+    }
+    
+    public static EndpointDescriptor getEndpoint(String endpointId)
+    {
+    	return getRemoteConfig().getEndpointDescriptor(endpointId);
+    }
+    
+    protected static Model model = null;
+    protected static ApplicationContext applicationContext = null;
+    protected static CredentialVault credentialVault = null;
 }

@@ -38,7 +38,6 @@ import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
-import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
@@ -502,42 +501,6 @@ public class ModelUtil
         return array;
     }
     
-    
-    public static Endpoint[] findEndpoints(RequestContext context)
-    {
-        return findEndpoints(context, null);
-    }
-
-    public static Endpoint[] findEndpoints(RequestContext context,
-            String endpointId)
-    {
-        // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
-        addPropertyConstraint(propertyConstraintMap, Endpoint.PROP_ENDPOINT_ID,
-                endpointId);
-
-        // do the lookup
-        ModelObject[] objects = findObjects(context, Endpoint.TYPE_NAME,
-                propertyConstraintMap);
-
-        // convert to return type
-        Endpoint[] array = new Endpoint[objects.length];
-        for (int i = 0; i < objects.length; i++)
-        {
-            array[i] = (Endpoint) objects[i];
-        }
-        return array;
-    }
-
-    public static Endpoint getEndpoint(RequestContext context, String endpointId)
-    {
-        Endpoint endpoint = null;
-        Endpoint[] endpoints = findEndpoints(context, endpointId);
-        if (endpoints != null && endpoints.length > 0)
-            endpoint = endpoints[0];
-        return endpoint;
-    }
-
     public static void associateTemplate(RequestContext context,
             String templateId, String pageId)
     {
@@ -673,7 +636,7 @@ public class ModelUtil
         }
         catch (Exception ex)
         {
-            Framework.getLogger().fatal(ex);
+            FrameworkHelper.getLogger().fatal(ex);
         }
         return array;
     }
@@ -754,7 +717,7 @@ public class ModelUtil
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+                FrameworkHelper.getLogger().error(ex);
             }
         }
         return doc;

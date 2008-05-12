@@ -30,7 +30,8 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.config.WebFrameworkConfigElement.FileSystemDescriptor;
+import org.alfresco.web.site.FrameworkHelper;
 
 /**
  * @author muzquiano
@@ -56,15 +57,15 @@ public class FileSystemManager
         IFileSystem fileSystem = (IFileSystem) fileSystems.get(cacheKey);
         if (fileSystem == null)
         {
-            String className = Framework.getConfig().getFileSystemClass(
-                    fileSystemId);
+        	FileSystemDescriptor d = FrameworkHelper.getConfig().getFileSystemDescriptor(fileSystemId);
+            String className = d.getImplementationClass();
             try
             {
                 fileSystem = (IFileSystem) Class.forName(className).newInstance();
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+            	FrameworkHelper.getLogger().error(ex);
             }
         }
         return fileSystem;
@@ -119,8 +120,8 @@ public class FileSystemManager
             localFileSystem.setRootDirectory(rootDirectory);
 
             // flip on caching?
-            if ("true".equals(Framework.getConfig().getFileSystemUseCache(
-                    "local")))
+            String useCache = FrameworkHelper.getConfig().getFileSystemDescriptor("local").getUseCache(); 
+            if("true".equals(useCache))
             {
                 fileSystem = new CachedFileSystem(fileSystem);
             }

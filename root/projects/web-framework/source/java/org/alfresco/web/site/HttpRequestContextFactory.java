@@ -89,7 +89,7 @@ public class HttpRequestContextFactory implements RequestContextFactory
             /**
              * Initialize the file system
              */
-            String rootPath = context.getConfig().getFileSystemRootPath("local");
+            String rootPath = context.getConfig().getFileSystemDescriptor("local").getRootPath();
             initFileSystem(context, (HttpServletRequest)request, rootPath);
             
             /**
@@ -144,8 +144,8 @@ public class HttpRequestContextFactory implements RequestContextFactory
      */
     public void initStoreId(RequestContext context)
     {
-        String defId = context.getConfig().getDefaultRequestContextId();
-        String storeId = context.getConfig().getRequestContextSetting(defId, "store");
+        String defId = context.getConfig().getDefaultFileSystemId();
+        String storeId = context.getConfig().getFileSystemDescriptor(defId).getStore();
         context.setStoreId(storeId);
     }
 }

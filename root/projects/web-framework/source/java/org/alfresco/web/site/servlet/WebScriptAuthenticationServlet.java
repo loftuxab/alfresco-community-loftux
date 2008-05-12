@@ -34,9 +34,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigElement;
 import org.alfresco.config.ConfigService;
-import org.alfresco.connector.remote.RemoteClient;
-import org.alfresco.connector.remote.Response;
+import org.alfresco.connector.RemoteClient;
+import org.alfresco.connector.Response;
 import org.alfresco.util.URLEncoder;
+import org.alfresco.web.config.RemoteConfigElement;
+import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -60,19 +62,36 @@ public class WebScriptAuthenticationServlet extends HttpServlet
       Config config = getConfigService().getConfig("Remote");
       if (config != null)
       {
-         ConfigElement remoteConfig = (ConfigElement)config.getConfigElement("remote");
-         String endpoint = remoteConfig.getChildValue("endpoint");
-         if (endpoint == null || endpoint.length() == 0)
+         RemoteConfigElement remoteConfig = (RemoteConfigElement)config.getConfigElement("remote");
+         
+         // TODO: currently assuming the default endpoint but we would
+         // probably like this to be configurable
+         String endpointId = remoteConfig.getDefaultEndpointId();
+         if (endpointId == null || endpointId.length() == 0)
          {
             throw new IllegalStateException("No endpoint configured for remote authentication.");
          }
          else
          {
-            // make a direct call to login api to retrieve a ticket for the user credentials
-            RemoteClient remote = new RemoteClient(endpoint);
-            Response response = remote.call("/s/api/login?u=" + username + "&pw=" + password);
-            if (response.getStatus().getCode() == HttpServletResponse.SC_OK)
-            {
+        	 // retrieve the endpoint details
+        	 EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
+        	 if(descriptor == null)
+        	 {
+        		 throw new ServletException("Unable to find endpoint for endpoint id: " + endpointId);
+        	 }
+        	 
+        	 // build the endpoint url
+        	 String endpointUrl = descriptor.getEndpointUrl();
+        	 if(descriptor.getDefaultUri() != null)
+        	 {
+        		 endpointUrl += descriptor.getDefaultUri();
+        	 }
+        	 
+        	 // make a direct call to login api to retrieve a ticket for the user credentials
+        	 RemoteClient remote = new RemoteClient(endpointUrl);
+        	 Response response = remote.call("/s/api/login?u=" + username + "&pw=" + password);
+        	 if (response.getStatus().getCode() == HttpServletResponse.SC_OK)
+             {
                boolean gotTicket = false;
                String ticketXML = response.getResponse();
                if (ticketXML != null && ticketXML.length() != 0)

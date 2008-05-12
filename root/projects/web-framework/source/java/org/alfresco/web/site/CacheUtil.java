@@ -54,7 +54,7 @@ public class CacheUtil
             CachedFileSystem cachedFileSystem = (CachedFileSystem) fileSystem;
             cachedFileSystem.refresh();
             
-            Framework.getLogger().info("Invalidated File System Cache");
+            FrameworkHelper.getLogger().info("Invalidated File System Cache");
         }
     }
 
@@ -65,12 +65,12 @@ public class CacheUtil
      */
     public static void invalidateADSObjectCache(RequestContext context)
     {
-        IModel model = context.getModel();
+        Model model = context.getModel();
         if (model instanceof DefaultModel)
         {
             ((DefaultModel) model).cacheInvalidateAll(context);
             
-            Framework.getLogger().info("Invalidated Object Cache");
+            FrameworkHelper.getLogger().info("Invalidated Object Cache");
         }
     }
 

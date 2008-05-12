@@ -30,7 +30,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.alfresco.tools.DataUtil;
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 
 /**
  * @author muzquiano
@@ -102,7 +102,7 @@ public abstract class AbstractFileDirectory implements IFile
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+            	FrameworkHelper.getLogger().error(ex);
             }
         }
         return array;
@@ -120,7 +120,7 @@ public abstract class AbstractFileDirectory implements IFile
             }
             catch (Exception ex)
             {
-                Framework.getLogger().error(ex);
+            	FrameworkHelper.getLogger().error(ex);
             }
         }
     }

@@ -27,7 +27,7 @@ package org.alfresco.web.site.filesystem;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.cache.CacheFactory;
 import org.alfresco.web.site.cache.IContentCache;
 
@@ -45,7 +45,7 @@ public class CachedFileSystem implements IFileSystem
         this.childrenCache = CacheFactory.createBasicCache(30 * 60 * 60);
         this.parentCache = CacheFactory.createBasicCache(30 * 60 * 60);
 
-        Framework.getLogger().info("CachedFileSystem started");
+        FrameworkHelper.getLogger().info("CachedFileSystem started");
     }
 
     // RETURN FROM CACHE

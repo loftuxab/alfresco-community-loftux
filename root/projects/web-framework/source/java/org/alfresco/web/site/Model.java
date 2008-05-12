@@ -1,5 +1,6 @@
 package org.alfresco.web.site;
 
+import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.alfresco.web.site.model.Chrome;
@@ -7,7 +8,6 @@ import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.ComponentType;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
-import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
@@ -16,7 +16,7 @@ import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.model.TemplateType;
 import org.alfresco.web.site.model.Theme;
 
-public interface IModel
+public interface Model
 {
     // returns the file system impl used for storing/retrieving model objects
     public IFileSystem getFileSystem();
@@ -33,8 +33,6 @@ public interface IModel
 
     public ContentAssociation loadContentAssociation(RequestContext context,
             String id);
-
-    public Endpoint loadEndpoint(RequestContext context, String id);
 
     public Page loadPage(RequestContext context, String id);
     
@@ -59,8 +57,6 @@ public interface IModel
     public Configuration newConfiguration(RequestContext context);
 
     public ContentAssociation newContentAssociation(RequestContext context);
-
-    public Endpoint newEndpoint(RequestContext context);
 
     public Page newPage(RequestContext context);
     
@@ -95,5 +91,5 @@ public interface IModel
     public String newGUID(String typeName);
 
     // configuration
-    public FrameworkConfig getConfiguration();
+    public WebFrameworkConfigElement getConfiguration();
 }

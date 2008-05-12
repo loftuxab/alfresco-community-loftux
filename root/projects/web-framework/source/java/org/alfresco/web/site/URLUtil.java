@@ -2,8 +2,6 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.web.site.model.Endpoint;
-
 public class URLUtil
 {
     /**

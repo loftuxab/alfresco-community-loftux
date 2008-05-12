@@ -28,18 +28,15 @@ import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.alfresco.connector.remote.RemoteClient;
-import org.alfresco.connector.remote.Response;
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.site.AuthenticationUtil;
-import org.alfresco.web.site.Framework;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.ContentAssociation;
-import org.alfresco.web.site.model.Endpoint;
 import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.PageAssociation;
@@ -94,34 +91,6 @@ public final class ScriptSite extends ScriptBase
         return modelFileSystem;
     }
 
-    public String callEndpoint(String endpointId, String uri)
-    {
-        Endpoint endpoint = ModelUtil.getEndpoint(context, endpointId);
-        if (endpoint == null)
-        {
-            return null;
-        }
-
-        StringBuilder ep = new StringBuilder();
-        ep.append(endpoint.getEndpointURL());
-
-        String endpointString = ep.toString();
-        String user = endpoint.getUsername();
-        String pass = endpoint.getPassword();
-
-        return callRemote(endpointString, user, pass, uri);
-    }
-
-    public String callRemote(String endpointString, String user, String pass,
-            String uri)
-    {
-        RemoteClient remote = new RemoteClient(endpointString, null);
-        remote.setUsernamePassword(user, pass);
-
-        Response r = remote.call(uri);
-        return r.getResponse();
-    }
-
     public RequestContext getRequestContext()
     {
         return context;
@@ -153,12 +122,6 @@ public final class ScriptSite extends ScriptBase
     {
         return toScriptModelObjectArray(context,
                 ModelUtil.findContentAssociations(context));
-    }
-
-    public Object[] getEndpoints()
-    {
-        return toScriptModelObjectArray(context,
-                ModelUtil.findEndpoints(context));
     }
 
     public Object[] getPages()
@@ -209,11 +172,6 @@ public final class ScriptSite extends ScriptBase
                 ModelUtil.findContentAssociations(context));
     }
 
-    public Scriptable getEndpointsMap()
-    {
-        return toScriptableMap(context, ModelUtil.findEndpoints(context));
-    }
-
     public Scriptable getPagesMap()
     {
         return toScriptableMap(context, ModelUtil.findPages(context));
@@ -240,7 +198,7 @@ public final class ScriptSite extends ScriptBase
 
     public ScriptModelObject newComponent()
     {
-        Component component = (Component) Framework.getModel().newComponent(
+        Component component = (Component) FrameworkHelper.getModel().newComponent(
                 context);
         return toScriptModelObject(context, component);
     }
@@ -249,7 +207,7 @@ public final class ScriptSite extends ScriptBase
     {
         ParameterCheck.mandatory("componentTypeId", componentTypeId);
 
-        Component component = (Component) Framework.getModel().newComponent(
+        Component component = (Component) FrameworkHelper.getModel().newComponent(
                 context);
         component.setComponentTypeId(componentTypeId);
         return toScriptModelObject(context, component);
@@ -262,7 +220,7 @@ public final class ScriptSite extends ScriptBase
         ParameterCheck.mandatory("name", name);
         ParameterCheck.mandatory("description", description);
 
-        Component component = (Component) Framework.getModel().newComponent(
+        Component component = (Component) FrameworkHelper.getModel().newComponent(
                 context);
         component.setComponentTypeId(componentTypeId);
         component.setName(name);
@@ -272,13 +230,13 @@ public final class ScriptSite extends ScriptBase
 
     public ScriptModelObject newComponentType()
     {
-        ModelObject modelObject = Framework.getModel().newComponentType(context);
+        ModelObject modelObject = FrameworkHelper.getModel().newComponentType(context);
         return toScriptModelObject(context, modelObject);
     }
 
     public ScriptModelObject newConfiguration()
     {
-        Configuration configuration = (Configuration) Framework.getModel().newConfiguration(
+        Configuration configuration = (Configuration) FrameworkHelper.getModel().newConfiguration(
                 context);
         return toScriptModelObject(context, configuration);
     }
@@ -287,21 +245,15 @@ public final class ScriptSite extends ScriptBase
     {
         ParameterCheck.mandatory("sourceId", sourceId);
 
-        Configuration configuration = (Configuration) Framework.getModel().newConfiguration(
+        Configuration configuration = (Configuration) FrameworkHelper.getModel().newConfiguration(
                 context);
         configuration.setSourceId(sourceId);
         return toScriptModelObject(context, configuration);
     }
 
-    public ScriptModelObject newEndpoint()
-    {
-        ModelObject modelObject = Framework.getModel().newEndpoint(context);
-        return toScriptModelObject(context, modelObject);
-    }
-
     public ScriptModelObject newPage()
     {
-        Page page = (Page) Framework.getModel().newPage(context);
+        Page page = (Page) FrameworkHelper.getModel().newPage(context);
         return toScriptModelObject(context, page);
     }
 
@@ -310,19 +262,19 @@ public final class ScriptSite extends ScriptBase
         ParameterCheck.mandatory("name", name);
         ParameterCheck.mandatory("description", description);
 
-        Page page = (Page) Framework.getModel().newPage(context);
+        Page page = (Page) FrameworkHelper.getModel().newPage(context);
         return toScriptModelObject(context, page);
     }
 
     public ScriptModelObject newTemplate()
     {
-        TemplateInstance template = (TemplateInstance) Framework.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
         return toScriptModelObject(context, template);
     }
 
     public ScriptModelObject newTemplate(String templateType)
     {
-        TemplateInstance template = (TemplateInstance) Framework.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
         template.setTemplateType(templateType);
         return toScriptModelObject(context, template);
     }
@@ -330,7 +282,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject newTemplate(String templateType, String name,
             String description)
     {
-        TemplateInstance template = (TemplateInstance) Framework.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
         template.setTemplateType(templateType);
         template.setName(name);
         template.setDescription(description);
@@ -521,18 +473,6 @@ public final class ScriptSite extends ScriptBase
     {
         ModelUtil.unassociateContent(context, contentTypeId, pageId,
                 "content-type", formatId);
-    }
-
-    // extra
-
-    public ScriptModelObject findEndpoint(String endpointId)
-    {
-        Endpoint[] endpoints = ModelUtil.findEndpoints(context, endpointId);
-        if (endpoints != null && endpoints.length > 0)
-        {
-            return toScriptModelObject(context, endpoints[0]);
-        }
-        return null;
     }
 
     // helper methods

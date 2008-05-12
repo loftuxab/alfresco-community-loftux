@@ -1,0 +1,337 @@
+<alfresco-config>
+
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="web-framework" class="org.alfresco.web.config.WebFrameworkConfigElementReader"/>
+	  </element-readers>
+   </plug-ins>
+
+	<config evaluator="string-compare" condition="WebFramework">
+	
+		<!--  Web Framework Core Settings  -->
+		<web-framework>
+		
+			<!-- Request Context Factory Implementations -->
+			<request-context>
+				<id>http</id>
+				<name>HttpRequestContextFactory</name>
+				<description>HttpRequestContextFactory</description>
+				<class>org.alfresco.web.site.HttpRequestContextFactory</class>
+				<store></store>
+			</request-context>
+			
+			<!-- Page Mapper Implementation -->
+			<page-mapper>
+				<id>default</id>
+				<name>Default Page Mapper</name>
+				<description>Default Page Mapper</description>
+				<class>org.alfresco.web.site.DefaultPageMapper</class>
+			</page-mapper>
+			
+			<!-- Link Builder Implementation -->
+			<link-builder>
+				<id>default</id>
+				<name>Default Link Builder</name>
+				<description>Default Link Builder</description>
+				<class>org.alfresco.web.site.DefaultLinkBuilder</class>
+			</link-builder>
+			
+			<!-- File System Implementation (LOCAL) -->
+			<file-system>
+				<id>local</id>
+				<name>Local File System</name>
+				<description>Local File System</description>
+				<class>org.alfresco.web.site.filesystem.LocalFileSystem</class>
+				<use-cache>false</use-cache>
+				<root-path>/</root-path>
+			</file-system>
+			
+			<!-- File System Implementation (STORE) -->
+			<file-system>
+				<id>store</id>
+				<name>Web Script Store File System</name>
+				<description>Web Script Store File System</description>
+				<class>org.alfresco.web.site.filesystem.StoreFileSystem</class>
+				<use-cache>false</use-cache>
+			</file-system>
+			
+			<!-- Formats -->
+			<format>
+				<id>default</id>
+				<name>Default</name>
+				<description>Default Format</description>
+			</format>
+			<format>
+				<id>print</id>
+				<name>Print</name>
+				<description>Print Format</description>
+			</format>
+			<format>
+				<id>wap</id>
+				<name>Wireless</name>
+				<description>Wireless Format</description>
+			</format>
+			
+			<!-- object model -->
+			<model-root-path>/WEB-INF/classes/alfresco</model-root-path>
+			<model-type>
+				<id>chrome</id>
+				<version>1.0</version>					
+				<name>Chrome</name>
+				<description>Chrome</description>
+				<namespace></namespace>
+				<tagname>chrome</tagname>
+				<class>org.alfresco.web.site.model.Chrome</class>
+				<path>/site-data/chrome</path>
+				<prefix>ch-</prefix>
+			</model-type>
+			<model-type>
+				<id>component</id>
+				<version>1.0</version>					
+				<name>Component</name>
+				<description>Component</description>
+				<namespace></namespace>
+				<tagname>component</tagname>
+				<class>org.alfresco.web.site.model.Component</class>
+				<path>/site-data/components</path>
+				<prefix>cm-</prefix>
+			</model-type>
+			<model-type>
+				<id>component-type</id>
+				<version>1.0</version>					
+				<name>Component Type</name>
+				<description>Component Type</description>
+				<namespace></namespace>
+				<tagname>component-type</tagname>
+				<class>org.alfresco.web.site.model.ComponentType</class>
+				<path>/site-data/component-types</path>
+				<prefix>ct-</prefix>
+			</model-type>
+			<model-type>
+				<id>configuration</id>
+				<version>1.0</version>
+				<name>Configuration</name>
+				<description>Configuration</description>
+				<namespace></namespace>
+				<tagname>configuration</tagname>
+				<class>org.alfresco.web.site.model.Configuration</class>
+				<path>/site-data/configurations</path>
+				<prefix>co-</prefix>
+			</model-type>
+			<model-type>
+				<id>content-association</id>
+				<version>1.0</version>
+				<name>Content Association</name>
+				<description>Content Association</description>
+				<namespace></namespace>
+				<tagname>content-association</tagname>
+				<class>org.alfresco.web.site.model.ContentAssociation</class>
+				<path>/site-data/content-associations</path>
+				<prefix>ca-</prefix>
+			</model-type>
+			<model-type>
+				<id>endpoint</id>
+				<version>1.0</version>
+				<name>Endpoint</name>
+				<description>Endpoint</description>
+				<namespace></namespace>
+				<tagname>endpoint</tagname>
+				<class>org.alfresco.web.site.model.Endpoint</class>
+				<path>/site-data/endpoints</path>
+				<prefix>ep-</prefix>
+			</model-type>
+			<model-type>
+				<id>page</id>
+				<version>1.0</version>
+				<name>Page</name>
+				<description>Page</description>
+				<namespace></namespace>
+				<tagname>page</tagname>
+				<class>org.alfresco.web.site.model.Page</class>
+				<path>/site-data/pages</path>
+				<prefix>pg-</prefix>
+			</model-type>
+			<model-type>
+				<id>page-type</id>
+				<version>1.0</version>
+				<name>Page Type</name>
+				<description>Page Type</description>
+				<namespace></namespace>
+				<tagname>page-type</tagname>
+				<class>org.alfresco.web.site.model.PageType</class>
+				<path>/site-data/page-types</path>
+				<prefix>pt-</prefix>
+			</model-type>
+			<model-type>
+				<id>page-association</id>
+				<version>1.0</version>
+				<name>Page Association</name>
+				<description>Page Association</description>
+				<namespace></namespace>
+				<tagname>page-association</tagname>
+				<class>org.alfresco.web.site.model.PageAssociation</class>
+				<path>/site-data/page-associations</path>
+				<prefix>pa-</prefix>
+			</model-type>
+			<model-type>
+				<id>template-instance</id>
+				<version>1.0</version>
+				<name>Template Instance</name>
+				<description>Template Instance</description>
+				<namespace></namespace>
+				<tagname>template-instance</tagname>
+				<class>org.alfresco.web.site.model.TemplateInstance</class>
+				<path>/site-data/template-instances</path>
+				<prefix>tm-</prefix>
+			</model-type>
+			<model-type>
+				<id>template-type</id>
+				<version>1.0</version>
+				<name>Template Type</name>
+				<description>Template Type</description>
+				<namespace></namespace>
+				<tagname>template-type</tagname>
+				<class>org.alfresco.web.site.model.TemplateType</class>
+				<path>/site-data/template-types</path>
+				<prefix>tt-</prefix>
+			</model-type>
+			<model-type>
+				<id>theme</id>
+				<version>1.0</version>					
+				<name>Theme</name>
+				<description>Theme</description>
+				<namespace></namespace>
+				<tagname>theme</tagname>
+				<class>org.alfresco.web.site.model.Theme</class>
+				<path>/site-data/themes</path>
+				<prefix>th-</prefix>
+			</model-type>										
+
+			<!-- Add in the ALF tag library -->
+			<tag-library>
+				<id>alf</id>
+				<uri>/WEB-INF/tlds/alf.tld</uri>
+				<namespace>http://www.alfresco.org/taglib/alf</namespace>				
+			</tag-library>
+
+			<!-- User Factory Implementation -->
+			<user-factory>
+				<id>default</id>
+				<name>Default User Factory</name>
+				<description>Produces Default Users</description>
+				<class>org.alfresco.web.site.DefaultUserFactory</class>
+			</user-factory>
+			<user-factory>
+				<id>alfresco</id>
+				<name>Alfresco User Factory</name>
+				<description>Produces Users loaded from Alfresco Repository</description>
+				<class>org.alfresco.web.site.AlfrescoUserFactory</class>
+			</user-factory>
+
+			<!-- Default Renderers (JSP, Java, WebScript, Freemarker) -->		
+			<renderer>
+				<id>jsp</id>
+				<name>JSP Renderer</name>
+				<description>JSP Renderer</description>
+				<class>org.alfresco.web.site.renderer.JSPRenderer</class>
+			</renderer>
+			<renderer>
+				<id>java</id>
+				<name>Java Class Renderer</name>
+				<description>Java Class Renderer</description>
+				<class>org.alfresco.web.site.renderer.JavaClassRenderer</class>
+			</renderer>
+			<renderer>
+				<id>webscript</id>
+				<name>Web Script Renderer</name>
+				<description>Web Script Renderer</description>
+				<class>org.alfresco.web.scripts.WebScriptRenderer</class>
+				<container-bean>webframework.webscripts.container</container-bean>
+			</renderer>
+			<renderer>
+				<id>freemarker</id>
+				<name>Freemarker Renderer</name>
+				<description>Freemarker Renderer</description>
+				<class>org.alfresco.web.scripts.FreemarkerRenderer</class>
+				<template-processor-bean>webframework.templateprocessor</template-processor-bean>
+				<script-processor-bean>webframework.scriptprocessor</script-processor-bean>
+			</renderer>
+			
+			<!-- Error Handler Pages -->
+			<error-handler>
+				<id>page-error</id>
+				<renderer>/core/page-error.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</error-handler>
+			<error-handler>
+				<id>component-error</id>
+				<renderer>/core/component-error.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</error-handler>
+			<error-handler>
+				<id>region-error</id>
+				<renderer>/core/region-error.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</error-handler>
+			<error-handler>
+				<id>region-nocomponent</id>
+				<renderer>/core/region-nocomponent.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</error-handler>
+			<error-handler>
+				<id>template-error</id>
+				<renderer>/core/template-error.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</error-handler>
+			
+			<!-- System Pages -->
+			<system-page>
+				<id>page-getting-started</id>
+				<renderer>/core/page-gettingstarted.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
+			<system-page>
+				<id>page-unconfigured</id>
+				<renderer>/core/page-unconfigured.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
+			
+			<!-- Defaults -->
+			<framework-defaults>
+				<request-context>http</request-context>
+				<file-system>local</file-system>
+				<format>default</format>
+				<page-mapper>default</page-mapper>
+				<link-builder>default</link-builder>			
+				<user-factory>default</user-factory>			
+			</framework-defaults>
+			
+			<!-- Application Defaults -->
+			<application-defaults>
+				<theme>default</theme>
+				<region-chrome>default-region-chrome</region-chrome>
+				<component-chrome>default-component-chrome</component-chrome>
+				<page-type>
+					<id>login</id>
+					<page-instance-id></page-instance-id>
+				</page-type>
+				<page-type>
+					<id>logout</id>
+					<page-instance-id></page-instance-id>
+				</page-type>
+			</application-defaults>		
+			
+			<!-- Debug -->
+			<debug>
+				<timer>
+					<enabled>false</enabled>
+				</timer>
+			</debug>					
+			
+		</web-framework>
+		
+		
+		
+	</config>
+
+</alfresco-config>
