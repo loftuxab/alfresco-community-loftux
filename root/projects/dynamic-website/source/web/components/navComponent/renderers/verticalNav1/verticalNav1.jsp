@@ -22,7 +22,7 @@
 			buffer.append("<a class='yuimenuitemlabel' href='" + href + "'>");
 			if(selected)
 				buffer.append("<B>");
-			buffer.append(page.getName());
+			buffer.append(page.getTitle());
 			if(selected)
 				buffer.append("</B>");
 			buffer.append("</a>");
@@ -33,7 +33,7 @@
 			buffer.append("<a class='yuimenuitemlabel' href='" + href + "'>");
 			if(selected)
 				buffer.append("<B>");
-			buffer.append(page.getName());
+			buffer.append(page.getTitle());
 			if(selected)
 				buffer.append("</B>");
 			buffer.append("</a>");
@@ -43,7 +43,7 @@
 		
 		if(doChildren)
 		{
-			Page[] childPages = page.getChildNodes(context);
+			Page[] childPages = page.getChildPages(context);
 			if(childPages.length > 0)
 			{
 				String id2 = context.getModel().newGUID();
@@ -178,7 +178,7 @@ if("0".equals(style))
 {
 	makeMenu(context, buffer, rootPage, 0, 0, false, true);
 
-	Page[] children = rootPage.getChildNodes(context);
+	Page[] children = rootPage.getChildPages(context);
 	for(int i = 0; i < children.length; i++)
 	{
 		makeMenu(context, buffer, children[i], i+1, 0, true, true);

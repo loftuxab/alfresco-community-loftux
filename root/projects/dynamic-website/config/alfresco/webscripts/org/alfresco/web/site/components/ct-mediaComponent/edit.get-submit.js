@@ -5,11 +5,11 @@ var componentId = wizard.request("componentId");
 var component = site.getObject(componentId);
 if(component != null)
 {
-	component.setSetting("mediaType", mediaType);
-	component.setSetting("mediaUrl", mediaUrl);
-	component.setSetting("unsupportedText", unsupportedText);
-	component.setSetting("width", width);
-	component.setSetting("height", height);
+	component.setProperty("mediaType", mediaType);
+	component.setProperty("mediaUrl", mediaUrl);
+	component.setProperty("unsupportedText", unsupportedText);
+	component.setProperty("width", width);
+	component.setProperty("height", height);
 	save(component);
 }
 

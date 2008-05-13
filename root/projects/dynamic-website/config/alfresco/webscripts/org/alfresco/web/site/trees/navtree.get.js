@@ -35,7 +35,7 @@ for(var i = 0; i < associations.length; i++)
 			json[ctr]["associationId"] = association.getId();
 			json[ctr]["parentId"] = pageId;
 	
-			json[ctr]["text"] = childNode.getName();
+			json[ctr]["text"] = childNode.getTitle();
 		
 			// does this have children?
 			var childAssociations = site.findChildPageAssociations(destId, null);

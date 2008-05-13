@@ -5,7 +5,7 @@ var componentId = wizard.request("componentId");
 var component = site.getObject(componentId);
 if(component != null)
 {
-	component.setSetting("uri", uri);
+	component.setProperty("uri", uri);
 	save(component);
 }
 

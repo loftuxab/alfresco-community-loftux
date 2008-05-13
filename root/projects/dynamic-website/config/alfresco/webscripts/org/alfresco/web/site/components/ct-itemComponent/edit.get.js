@@ -32,7 +32,7 @@ if(componentAssociation != null)
 		addElementFormat("itemPath", "Path", "textfield", 220);
 		
 		// ENDPOINT
-		var endpointId = component.getSetting("endpointId");
+		var endpointId = component.getProperty("endpointId");
 		if(endpointId == null)
 			endpointId = "alfresco-webuser";
 		addElement("endpointId", endpointId);

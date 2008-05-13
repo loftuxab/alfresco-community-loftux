@@ -44,7 +44,7 @@ function assertSiteConfiguration(websiteName, websiteDescription)
 	if(rootPage == null)
 	{
 		rootPage = site.newPage();
-		rootPage.setName("Home");
+		rootPage.setTitle("Home");
 		rootPage.setProperty("root-page", "true");
 	}
 	rootPage.setProperty("description", "Home Page for '" + websiteName + "'");
@@ -57,7 +57,7 @@ function assertPage(pageId, pageName, pageDescription)
 	var page = site.getObject(pageId);
 	if(page != null)
 	{
-		page.setName(pageName);
+		page.setTitle(pageName);
 		page.setDescription(pageDescription);
 		page.save();
 	}
@@ -67,7 +67,7 @@ function assertPage(pageId, pageName, pageDescription)
 function addChildPage(parentPageId, pageName, pageDescription)
 {
 	var childPage = site.newPage();
-	childPage.setName(pageName);
+	childPage.setTitle(pageName);
 	childPage.setDescription(pageDescription);
 	childPage.save();
 	
@@ -94,7 +94,7 @@ function findEndpoint(endpointId)
 function newPage(name, parentPage)
 {
 	var page = site.newPage();
-	page.setName(name);
+	page.setTitle(name);
 	page.save();	
 	if(parentPage != null)
 		site.associatePage(parentPage.getId(), page.getId());		
@@ -109,7 +109,7 @@ function newTemplate(name, templateTypeId)
 	if(templateType != null)
 	{
 		var template = site.newTemplate();
-		template.setName(name);
+		template.setTitle(name);
 		template.setProperty("template-type", templateTypeId);		
 		template.save();
 	}
@@ -119,7 +119,7 @@ function newTemplate(name, templateTypeId)
 function newFreemarkerTemplate(name, uri)
 {
 	var template = site.newTemplate();
-	template.setName(name);
+	template.setTitle(name);
 	template.setProperty("template-type", "freemarker");
 	template.setProperty("uri", uri);
 	save(template);
@@ -145,7 +145,7 @@ function associateContentType(contentTypeId, pageId, formatId)
 function newComponent(name, componentTypeId)
 {
 	var c = site.newComponent();
-	c.setName(name);
+	c.setTitle(name);
 	c.setProperty("component-type-id", componentTypeId);
 	c.save();
 	return c;
@@ -173,7 +173,7 @@ function associatePageComponent(component, page, regionId)
 
 function setConfig(o, propertyName, propertyValue)
 {
-	o.setSetting(propertyName, propertyValue);
+	o.setProperty(propertyName, propertyValue);
 }
 
 function newImageComponent(name, imageUrl)
@@ -212,11 +212,11 @@ function newItemComponent(name, itemType, itemPath, howToRender, renderData, end
 	if(endpointId == null)
 		endpointId = "alfresco-webuser";
 		
-	c.setSetting("itemType", itemType);
-	c.setSetting("itemPath", itemPath);
-	c.setSetting("howToRender", howToRender);
-	c.setSetting("renderData", renderData);
-	c.setSetting("endpoint-id", endpointId);
+	c.setProperty("itemType", itemType);
+	c.setProperty("itemPath", itemPath);
+	c.setProperty("howToRender", howToRender);
+	c.setProperty("renderData", renderData);
+	c.setProperty("endpoint-id", endpointId);
 	save(c);
 
 	return c;

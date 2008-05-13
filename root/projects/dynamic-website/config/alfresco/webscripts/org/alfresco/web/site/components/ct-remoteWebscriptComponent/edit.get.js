@@ -8,9 +8,9 @@ var component = site.getObject(componentId);
 // process
 if(component != null)
 {
-	var endpointId = wizard.getSafeSetting(component, "endpointId");
-	var webscript = wizard.getSafeSetting(component, "webscript");
-	var container = wizard.getSafeSetting(component, "container");
+	var endpointId = wizard.getSafeProperty(component, "endpointId");
+	var webscript = wizard.getSafeProperty(component, "webscript");
+	var container = wizard.getSafeProperty(component, "container");
 
 	// endpoint selector combo
 	wizard.addElement("endpointId", endpointId);

@@ -532,7 +532,8 @@ function initializeMainToolbarButtons()
 				id: 'configure_endpoints',
 				text: 'Configure Endpoints...',
 				iconCls: 'maintoolbar-icon-configure-endpoints',
-				handler: buttonHandler
+				handler: buttonHandler,
+				disabled: true
 			}
 			,
 			'-'

@@ -5,9 +5,9 @@ var componentId = wizard.request("componentId");
 var component = site.getObject(componentId);
 if(component != null)
 {
-	component.setSetting("endpointId", endpointId);
-	component.setSetting("webscript", webscript);
-	component.setSetting("container", container);
+	component.setProperty("endpointId", endpointId);
+	component.setProperty("webscript", webscript);
+	component.setProperty("container", container);
 	component.save();
 }
 

@@ -11,7 +11,7 @@ function pushComponentSettings(component)
 			var settingName = argName.substring(1, argName.length);			
 			var argValue = args[argName];
 			if(argValue != null)
-				component.setSetting(settingName, argValue);
+				component.setProperty(settingName, argValue);
 		}
 	}
 }

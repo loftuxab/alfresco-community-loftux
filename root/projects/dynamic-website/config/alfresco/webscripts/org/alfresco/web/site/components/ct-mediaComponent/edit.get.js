@@ -8,11 +8,11 @@ var component = site.getObject(componentId);
 // process
 if(component != null)
 {
-	var mediaType = wizard.getSafeSetting(component, "mediaType");
-	var mediaUrl = wizard.getSafeSetting(component, "mediaUrl");
-	var unsupportedText = wizard.getSafeSetting(component, "unsupportedText");
-	var width = wizard.getSafeSetting(component, "width");
-	var height = wizard.getSafeSetting(component, "height");
+	var mediaType = wizard.getSafeProperty(component, "mediaType");
+	var mediaUrl = wizard.getSafeProperty(component, "mediaUrl");
+	var unsupportedText = wizard.getSafeProperty(component, "unsupportedText");
+	var width = wizard.getSafeProperty(component, "width");
+	var height = wizard.getSafeProperty(component, "height");
 	
 	// the controls
 	wizard.addElement("mediaType", mediaType);

@@ -15,7 +15,7 @@ var templatesMap = site.findTemplatesMap(pageId);
 var template = templatesMap[formatId];
 if(template != null)
 {
-	var templateName = template.getName();
+	var templateName = template.getTitle();
 	var templateDescription = template.getDescription();
 
 	wizard.setResponseTitle("Remove Association to " + templateName + " for '" + formatId + "'");

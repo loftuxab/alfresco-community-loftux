@@ -6,8 +6,8 @@ var componentId = wizard.request("componentId");
 var component = site.getObject(componentId);
 if(component != null)
 {
-	var orientation = wizard.getSafeSetting(component, "orientation");
-	var style = wizard.getSafeSetting(component, "style");
+	var orientation = wizard.getSafeProperty(component, "orientation");
+	var style = wizard.getSafeProperty(component, "style");
 
 	// set up form elements
 	wizard.addElement("orientation", "");

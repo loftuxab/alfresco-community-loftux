@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.PageContext;
 
+import org.alfresco.web.config.WebFrameworkConfigElement.SystemPageDescriptor;
 import org.alfresco.web.site.DynamicWebsite;
 import org.alfresco.web.site.FrameworkHelper;
 
@@ -45,10 +46,11 @@ public class FloatingMenuTag extends TagBase
             HttpServletRequest request = (HttpServletRequest) pageContext.getRequest();
             HttpServletResponse response = (HttpServletResponse) pageContext.getResponse();
 
-            String uri = FrameworkHelper.getConfig().getErrorHandlerDescriptor("in-context").getRenderer();
-            if(uri == null)
+            String uri = "/app/in-context.jsp";
+            SystemPageDescriptor descriptor = FrameworkHelper.getConfig().getSystemPageDescriptor("in-context");
+            if(descriptor != null)
             {
-            	uri = "/app/in-context.jsp";
+            	uri = descriptor.getRenderer();
             }
 
             try

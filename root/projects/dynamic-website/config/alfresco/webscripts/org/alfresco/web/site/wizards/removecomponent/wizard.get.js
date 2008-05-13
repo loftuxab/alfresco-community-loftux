@@ -9,7 +9,7 @@ if(componentId != null)
 	if(component != null)
 	{	
 		// get the component name
-		var componentName = component.getName();
+		var componentName = component.getTitle();
 
 		var html = "Are you sure that you would like to unassociate the following component:";
 		html += "<br/><br/>";

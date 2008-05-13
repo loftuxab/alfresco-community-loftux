@@ -8,7 +8,7 @@ var component = site.getObject(componentId);
 // process
 if(component != null)
 {
-	var uri = component.getSetting("uri");
+	var uri = component.getProperty("uri");
 	if(uri == null)
 		uri = "";			
 

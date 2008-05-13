@@ -1,8 +1,0 @@
-<webscript>
-  <shortname>Dynamic Site Script Test</shortname>
-  <description>Dynamic Site Script Test</description>
-  <url>/ads/test/{storeid}/{path}</url>
-  <format default="html">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>
