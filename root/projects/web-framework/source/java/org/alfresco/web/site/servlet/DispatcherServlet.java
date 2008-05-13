@@ -112,7 +112,7 @@ public class DispatcherServlet extends BaseServlet
         // stamp any theme information onto the request
         ThemeUtil.applyTheme(context, request);
 
-        // dispatch
+        // dispatch to render the page
         try
         {
             if (Timer.isTimerEnabled())

@@ -13,10 +13,6 @@ Alfresco.constants = Alfresco.constants ||
    /* THEME set by template header using ${theme} */
    THEME: "./",
    
-   /* TODO: Remove ticket when AJAX/Proxy authentication in place */
-   /* http://localhost:8080/alfresco/service/api/login?u={username}&pw={password} */
-   TICKET: "TICKET_256b684b9fd9f261e848b8eda638c06067bb65b6",
-
    /* URL_CONTEXT and URL_SERVICECONTEXT set by template header using ${url.context} */
    URL_CONTEXT: "./",
    URL_SERVICECONTEXT: "./service/"
@@ -399,12 +395,7 @@ Alfresco.util.Ajax = function()
 
       proxyRequest: function(config)
       {
-         /*
-          todo: Make sure to use the proxy as soon as possible, somehing like this...
-          config.context = Alfresco.constants.PROXY_URI + "http://localhost:8080/alfresco/service/api/sites&alf_method=POST&alf_ticket=" + Alfresco.constants.TICKET + "&";
-          But for now go directly to the repo:
-         */
-         config.context = "/alfresco/service/";
+         config.context = Alfresco.constants.PROXY_URI;
          this.request(config);
       },
 

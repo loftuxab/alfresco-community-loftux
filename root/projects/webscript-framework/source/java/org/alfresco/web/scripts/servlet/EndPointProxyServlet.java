@@ -150,14 +150,27 @@ public class EndPointProxyServlet extends HttpServlet
             
             // build proxy URL referencing the endpoint
             String q = req.getQueryString();
-            String url = buf.toString() + (q != null && q.length() != 0 ? q : "");
+            String url = buf.toString() + (q != null && q.length() != 0 ? "?" + q : "");
             
             // execute proxy URL via remote client
             RemoteClient client = ((RemoteClient)connector.getClient());
             
             // check to see if we have a ticket from the credentials on the connector
-            String alfTicket = (String)connector.getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
-            client.setTicket(alfTicket);
+            Credentials credentials = connector.getCredentials();
+            if (credentials != null)
+            {
+                String alfTicket = (String)credentials.getProperty(Credentials.CREDENTIAL_ALF_TICKET);
+                client.setTicket(alfTicket);
+            }
+            
+            //
+            // TODO: TEMP! until dispatcher code path is active and have a working login page for slingshot!
+            //
+            else
+            {
+                String alfTicket = (String)req.getSession().getAttribute("_alfticket");
+                client.setTicket(alfTicket);
+            }
             
             // TODO: copy headers for proxy request
             String method = req.getMethod();
@@ -165,11 +178,11 @@ public class EndPointProxyServlet extends HttpServlet
             client.setRequestMethod(method);
             if (method.equalsIgnoreCase("POST"))
             {
-                client.call(uri, req.getInputStream(), res.getOutputStream());
+                client.call(url, req.getInputStream(), res.getOutputStream());
             }
             else
             {
-                client.call(uri, res.getOutputStream());
+                client.call(url, res.getOutputStream());
             }
         }
         catch (Throwable err)

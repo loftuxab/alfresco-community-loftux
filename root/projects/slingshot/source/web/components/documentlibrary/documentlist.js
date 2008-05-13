@@ -109,7 +109,7 @@
             }
          ];
 
-         var uriDoclist = Alfresco.constants.PROXY_URI + "http://localhost:8080/alfresco/service/slingshot/doclib/doclist&alf_ticket=" + Alfresco.constants.TICKET + "&";
+         var uriDoclist = Alfresco.constants.PROXY_URI + "slingshot/doclib/doclist?";
          this.myDataSource = new YAHOO.util.DataSource(uriDoclist);
          this.myDataSource.responseType = YAHOO.util.DataSource.TYPE_JSON;
          this.myDataSource.connXhrMode = "queueRequests";
