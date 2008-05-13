@@ -27,7 +27,7 @@
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/controls.css" />
    <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript">//<![CDATA[
-      Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "/${url.context}/proxy?endpoint=",
+      Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/",
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
