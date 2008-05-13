@@ -51,19 +51,32 @@ public class ConnectorFactory
 {
 	protected static Log logger = LogFactory.getLog(ConnectorFactory.class);
 	
+    // well known connectors
 	public final static String CONNECTOR_ALFRESCO = "alfresco";
 	public final static String CONNECTOR_HTTP = "http";
 
-	protected CredentialVault userVault;
-	protected CredentialVault endpointVault;
-	protected ConfigService configService;
+    private static ConnectorFactory factory = null;
+    
+	private CredentialVault userVault;
+	private CredentialVault endpointVault;
+	private ConfigService configService;
+	private static HashMap<String, Object> cache = new HashMap<String, Object>(8);
+    
 	
-	protected static HashMap<String, Object> cache = null;
-	
-	public static ConnectorFactory newInstance(ConfigService configService)
+    /**
+     * Get factory instance.
+     * 
+     * @param configService the config service
+     * 
+     * @return the Connector factory
+     */
+	public synchronized static ConnectorFactory getInstance(ConfigService configService)
 	{
-		ConnectorFactory factory = new ConnectorFactory();
-		factory.setConfigService(configService);
+        if (factory == null)
+        {
+            factory = new ConnectorFactory();
+            factory.setConfigService(configService);
+        }
 		return factory;
 	}
 	
@@ -190,10 +203,9 @@ public class ConnectorFactory
         }
 		
 		// load the authenticator onto the connector
-		// TODO: should we use the default authenticator?
 		if (authId == null)
 		{
-			authId = connectorDescriptor.getDefaultAuthId();
+			authId = connectorDescriptor.getAuthenticatorId();
 		}
 		if (authId != null)
 		{
@@ -296,11 +308,6 @@ public class ConnectorFactory
 	
 	protected static synchronized Authenticator _getAuthenticator(String className)
 	{
-	    if (cache == null)
-	    {
-	        cache = new HashMap<String, Object>(8);
-	    }
-	    
 	    String cacheKey = className;
 	    
 	    Authenticator auth = (Authenticator) cache.get(className);

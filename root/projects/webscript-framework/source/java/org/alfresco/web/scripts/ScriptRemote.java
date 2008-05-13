@@ -124,10 +124,9 @@ public class ScriptRemote
                     // or connections to endpoints that have "declared" user
                     // settings (which is to say, forced usernames and
                     // passwords within the configuration file)
-                    //
-                    connector = ConnectorFactory.newInstance(configService).connector(endpointId);
+                    connector = ConnectorFactory.getInstance(configService).connector(endpointId);
                 }
-                catch(RemoteConfigException rce)
+                catch (RemoteConfigException rce)
                 {
                     logger.error("Unable to open connection to endpoint: " + endpointId, rce);
                 }

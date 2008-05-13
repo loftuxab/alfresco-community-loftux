@@ -27,7 +27,6 @@ package org.alfresco.web.scripts;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.connector.RemoteClient;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
@@ -83,11 +82,10 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
          * var json = myRemote.call("/content/get?nodeRef=abc");
          * 
          * All while in the context of the current user
-         * 
          */
         WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(rendererContext.getRequestContext());
         params.put("remote", remote);
-            
+        
         return params;
     }
 
@@ -113,17 +111,5 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
         }
         
         return params;
-    }
-    
-    /**
-     * This is included from the PageRendererRuntimeContainer
-     * TODO: This should be removed
-     * Tickets should be loaded from the credential store
-     */
-    private ThreadLocal<String> ticket = new ThreadLocal<String>();
-    
-    void setTicket(String ticket)
-    {
-       this.ticket.set(ticket);
     }
 }

@@ -43,7 +43,6 @@ import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
  */
 public abstract class AbstractConnector implements Connector
 {    
-    
     /**
      * Instantiates a new abstract connector.
      * 

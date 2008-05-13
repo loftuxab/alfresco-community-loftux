@@ -138,7 +138,10 @@ public abstract class AbstractWebScript implements WebScript
         params.put("headersM", createHeadersM(req));
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
-
+        
+        // add remote object
+        params.put("remote", new ScriptRemote(this.container.getConfigService()));
+        
         // add request mimetype parameters
         FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
         if (reader != null)
@@ -153,9 +156,6 @@ public abstract class AbstractWebScript implements WebScript
         // add configuration
         params.put("config", new ScriptConfigModel(this.container.getConfigService(), this.xmlConfig));
         
-        // add remote object
-        params.put("remote", new ScriptRemote(this.container.getConfigService()));
- 
         // add custom parameters
         if (customParams != null)
         {

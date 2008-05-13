@@ -72,11 +72,18 @@ public class FrameworkHelper
     {
         if (!isInitialized())
         {
-        	/**
-        	 * Store the application context
-        	 */
+        	// Store the application context
         	applicationContext = context;
         	
+            
+            // init config cache
+            ConfigService configService = (ConfigService) applicationContext.getBean("web.config");
+            Config config = configService.getConfig("Remote");
+            remoteConfig = (RemoteConfigElement)config.getConfigElement("remote");
+            config = getConfigService().getConfig("WebFramework");
+            webFrameworkConfig = (WebFrameworkConfigElement)config.getConfigElement("web-framework");
+            
+            
             /**
              * Loads the model implementation onto the framework.
              * 
@@ -95,10 +102,8 @@ public class FrameworkHelper
             setModel(model);
             
             
-            /**
-             * Fetches the credential vault and makes it available
-             */
-            CredentialVaultFactory vaultFactory = CredentialVaultFactory.newInstance(getConfigService());
+            // Fetches the credential vault and makes it available
+            CredentialVaultFactory vaultFactory = CredentialVaultFactory.getInstance(getConfigService());
             try 
             {
             	// grab the default vault
@@ -108,7 +113,8 @@ public class FrameworkHelper
             {
             	throw new FrameworkInitializationException("Unable to load the default credential vault", rce);
             }
-
+            
+            
             logger.info("Successfully Initialized Web Framework");
         }
     }
@@ -177,19 +183,17 @@ public class FrameworkHelper
     
     public static RemoteConfigElement getRemoteConfig()
     {
-    	Config config = getConfigService().getConfig("Remote");
-    	return (RemoteConfigElement) config.getConfigElement("remote");
+    	return remoteConfig;
     }
     
     public static WebFrameworkConfigElement getConfig()
     {
-    	Config config = getConfigService().getConfig("WebFramework");
-    	return (WebFrameworkConfigElement) config.getConfigElement("web-framework");
+    	return webFrameworkConfig;
     }
     
     public static ConfigService getConfigService()
     {
-    	return (ConfigService) applicationContext.getBean("webframework.config");
+    	return (ConfigService)applicationContext.getBean("web.config");
     }
     
     public static ApplicationContext getApplicationContext()
@@ -204,7 +208,7 @@ public class FrameworkHelper
     
     public static ConnectorFactory getConnectorFactory()
     {
-    	return ConnectorFactory.newInstance(getConfigService());
+    	return ConnectorFactory.getInstance(getConfigService());
     }
     
     public static EndpointDescriptor getEndpoint(String endpointId)
@@ -212,7 +216,9 @@ public class FrameworkHelper
     	return getRemoteConfig().getEndpointDescriptor(endpointId);
     }
     
-    protected static Model model = null;
-    protected static ApplicationContext applicationContext = null;
-    protected static CredentialVault credentialVault = null;
+    private static Model model = null;
+    private static ApplicationContext applicationContext = null;
+    private static CredentialVault credentialVault = null;
+    private static RemoteConfigElement remoteConfig = null;
+    private static WebFrameworkConfigElement webFrameworkConfig = null;
 }

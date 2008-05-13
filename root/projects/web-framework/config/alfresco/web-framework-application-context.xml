@@ -33,7 +33,8 @@
 		</constructor-arg>
 	</bean>
 
-	<bean id="webframework.config"
+   <!-- override the web config bean -->
+	<bean id="web.config"
 		   class="org.alfresco.config.xml.XMLConfigService" init-method="init">
 		<constructor-arg>
 			<ref bean="webframework.configsource" />
@@ -75,7 +76,7 @@
 		<property name="searchPath" ref="webframework.searchpath" />		
 		<property name="templateProcessor" ref="webframework.webscripts.templateprocessor" />
 		<property name="scriptProcessor" ref="webframework.webscripts.scriptprocessor" />
-		<property name="configService" ref="webframework.config" />
+		<property name="configService" ref="web.config" />
 	</bean>
 	<bean id="webframework.webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
 		<property name="container" ref="webframework.webscripts.container" />

@@ -68,6 +68,7 @@ public class RemoteClient extends AbstractClient
    private String defaultEncoding;
    private String ticket;
    private String requestContentType;
+   private String requestMethod;
    
    private String username;
    private String password;
@@ -125,6 +126,16 @@ public class RemoteClient extends AbstractClient
    public void setRequestContentType(String contentType)
    {
        this.requestContentType = contentType;
+   }
+
+   /**
+    * @param requestMethod  the request Method to set i.e. one of GET/POST/PUT/DELETE etc.
+    *        if not set, GET will be assumed unless an InputStream is supplied during call()
+    *        in which case POST will always be used.
+    */
+   public void setRequestMethod(String requestMethod)
+   {
+       this.requestMethod = requestMethod;
    }
 
    /**
@@ -299,7 +310,9 @@ public class RemoteClient extends AbstractClient
       throws IOException
    {
       if (logger.isDebugEnabled())
-         logger.debug("Executing " + (in == null ? "(get)" : "(post)") + ' ' + url.toString());
+         logger.debug("Executing " + (in == null ?
+                          "(" + (requestMethod != null ? requestMethod : "GET") + ")" :
+                          "(POST)") + ' ' + url.toString());
       
       HttpURLConnection connection = null;
       try
@@ -313,7 +326,7 @@ public class RemoteClient extends AbstractClient
             connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
          }
          
-         // POST to the connection if input supplied
+         // always perform a POST to the connection if input supplied
          if (in != null)
          {
             connection.setRequestMethod("POST");
@@ -322,7 +335,13 @@ public class RemoteClient extends AbstractClient
             connection.setUseCaches(false);
             connection.setRequestProperty ("Content-Type",
                     (this.requestContentType != null ? this.requestContentType : "application/octet-stream"));
+            
             FileCopyUtils.copy(in, new BufferedOutputStream(connection.getOutputStream()));
+         }
+         // set the request method - if not supplied then the default of GET will be used anyway
+         else if (this.requestMethod != null)
+         {
+             connection.setRequestMethod(this.requestMethod);
          }
          
          // write the connection result to the output stream
