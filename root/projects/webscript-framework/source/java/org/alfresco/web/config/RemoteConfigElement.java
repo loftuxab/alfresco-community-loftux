@@ -247,7 +247,7 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         private static final String CLAZZ = "class";
         private static final String DESCRIPTION = "description";
         private static final String NAME = "name";
-        private static final String DEFAULT_AUTH_ID = "default-auth-id";
+        private static final String AUTHENTICATOR_ID = "authenticator-id";
 
         /**
          * Instantiates a new remote connector descriptor.
@@ -274,9 +274,9 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
             return getStringProperty(NAME);
         } 
         
-        public String getDefaultAuthId()
+        public String getAuthenticatorId()
         {
-            return getStringProperty(DEFAULT_AUTH_ID);
+            return getStringProperty(AUTHENTICATOR_ID);
         }	    
     }
 

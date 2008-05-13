@@ -69,7 +69,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * E.g.
  * 
- * /proxy/0/api/sites?name=mysite&desc=description
+ * /proxy/alf1/api/sites?name=mysite&desc=description
  * 
  * The proxy currently supports HTTP methods of GET and POST.
  * 
@@ -81,7 +81,7 @@ public class EndPointProxyServlet extends HttpServlet
 
     protected RemoteConfigElement config;
     protected ConnectorFactory connectorFactory;
-    protected CredentialVault vault;
+    protected CredentialVault credentialsVault;
 
 
     @Override
@@ -93,10 +93,10 @@ public class EndPointProxyServlet extends HttpServlet
         
         // retrieve the remote configuration
         this.config = (RemoteConfigElement)configService.getConfig("Remote").getConfigElement("remote");
-        this.connectorFactory = ConnectorFactory.newInstance(configService);
+        this.connectorFactory = ConnectorFactory.getInstance(configService);
         try
         {
-            this.vault = CredentialVaultFactory.newInstance(configService).vault();
+            this.credentialsVault = CredentialVaultFactory.getInstance(configService).vault();
         }
         catch (RemoteConfigException err)
         {
@@ -146,13 +146,11 @@ public class EndPointProxyServlet extends HttpServlet
             String userId = (String)req.getSession().getAttribute("USER_ID");
             
             // retrieve the connector for this user and endpoint - get user credentials from the supplied vault
-            Connector connector = this.connectorFactory.connector(endpointId, userId, this.vault);
+            Connector connector = this.connectorFactory.connector(endpointId, userId, this.credentialsVault);
             
             // build proxy URL referencing the endpoint
             String q = req.getQueryString();
             String url = buf.toString() + (q != null && q.length() != 0 ? q : "");
-            
-            // TODO: copy headers for proxy request
             
             // execute proxy URL via remote client
             RemoteClient client = ((RemoteClient)connector.getClient());
@@ -161,15 +159,17 @@ public class EndPointProxyServlet extends HttpServlet
             String alfTicket = (String)connector.getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
             client.setTicket(alfTicket);
             
+            // TODO: copy headers for proxy request
             String method = req.getMethod();
-            if (method.equalsIgnoreCase("GET"))
+            client.setRequestContentType(req.getContentType());
+            client.setRequestMethod(method);
+            if (method.equalsIgnoreCase("POST"))
+            {
+                client.call(uri, req.getInputStream(), res.getOutputStream());
+            }
+            else
             {
                 client.call(uri, res.getOutputStream());
-            }
-            else if (method.equalsIgnoreCase("POST"))
-            {
-                client.setRequestContentType(req.getContentType());
-                client.call(uri, req.getInputStream(), res.getOutputStream());
             }
         }
         catch (Throwable err)

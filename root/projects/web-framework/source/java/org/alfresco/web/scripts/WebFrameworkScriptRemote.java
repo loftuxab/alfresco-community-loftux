@@ -116,11 +116,11 @@ public class WebFrameworkScriptRemote
     	
     	// Check whether a remote configuration has been provided    	
     	RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
-        if(remoteConfig != null)
+        if (remoteConfig != null)
         {        	
         	// check whether we have a descriptor for this endpoint
     		EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
-    		if(descriptor == null)
+    		if (descriptor == null)
     		{
     			logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
     		}
@@ -137,18 +137,18 @@ public class WebFrameworkScriptRemote
     				
     				// check whether we have a current user
     				User user = getRequestContext().getUser();
-    				if(user == null)
+    				if (user == null)
     				{
         				// return the non-credential'ed connector to this endpoint
-    					connector = ConnectorFactory.newInstance(configService).connector(endpointId);
+    					connector = ConnectorFactory.getInstance(configService).connector(endpointId);
     				}
     				else
     				{
     					// return the credential'ed connector to this endpoint
-    					connector = ConnectorFactory.newInstance(configService).connector(endpointId, user.getId(), vault);
+    					connector = ConnectorFactory.getInstance(configService).connector(endpointId, user.getId(), vault);
     				}
     			}
-    			catch(RemoteConfigException rce)
+    			catch (RemoteConfigException rce)
     			{
     				logger.error("Unable to open connection to endpoint: " + endpointId, rce);
     			}

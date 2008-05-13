@@ -43,22 +43,27 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CredentialVaultFactory
 {
-	protected static Log logger = LogFactory.getLog(CredentialVaultFactory.class);
-	protected ConfigService configService = null;
-
-	protected static HashMap<String, CredentialVault> cache = null;
-	
+	private static Log logger = LogFactory.getLog(CredentialVaultFactory.class);
+    
+	private ConfigService configService = null;
+	private static HashMap<String, CredentialVault> cache = new HashMap<String, CredentialVault>(16, 1.0f);
+    private static CredentialVaultFactory factory = null;
+    
+    
 	/**
-	 * New instance.
+	 * Get factory instance.
 	 * 
 	 * @param configService the config service
 	 * 
-	 * @return the credential vault factory
+	 * @return the CredentialVault factory
 	 */
-	public static CredentialVaultFactory newInstance(ConfigService configService)
+	public synchronized static CredentialVaultFactory getInstance(ConfigService configService)
 	{
-		CredentialVaultFactory factory = new CredentialVaultFactory();
-		factory.setConfigService(configService);
+        if (factory == null)
+        {
+            factory = new CredentialVaultFactory();
+            factory.setConfigService(configService);
+        }
 		return factory;
 	}
 	
@@ -123,11 +128,6 @@ public class CredentialVaultFactory
 	public synchronized CredentialVault vault(String vaultId)
 		throws RemoteConfigException	
 	{
-		if( cache == null)
-		{
-			cache = new HashMap<String, CredentialVault>(16, 1.0f);
-		}
-		
 		CredentialVault vault = (CredentialVault) cache.get(vaultId);
 		if (vault == null)
 		{
