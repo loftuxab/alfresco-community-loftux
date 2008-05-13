@@ -213,17 +213,17 @@ public final class ScriptSite extends ScriptBase
         return toScriptModelObject(context, component);
     }
 
-    public ScriptModelObject newComponent(String componentTypeId, String name,
+    public ScriptModelObject newComponent(String componentTypeId, String title,
             String description)
     {
         ParameterCheck.mandatory("componentTypeId", componentTypeId);
-        ParameterCheck.mandatory("name", name);
+        ParameterCheck.mandatory("title", title);
         ParameterCheck.mandatory("description", description);
 
         Component component = (Component) FrameworkHelper.getModel().newComponent(
                 context);
         component.setComponentTypeId(componentTypeId);
-        component.setName(name);
+        component.setTitle(title);
         component.setDescription(description);
         return toScriptModelObject(context, component);
     }
@@ -279,12 +279,12 @@ public final class ScriptSite extends ScriptBase
         return toScriptModelObject(context, template);
     }
 
-    public ScriptModelObject newTemplate(String templateType, String name,
+    public ScriptModelObject newTemplate(String templateType, String title,
             String description)
     {
         TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
         template.setTemplateType(templateType);
-        template.setName(name);
+        template.setTitle(title);
         template.setDescription(description);
         return toScriptModelObject(context, template);
     }

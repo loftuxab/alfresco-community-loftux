@@ -64,16 +64,6 @@ public final class ScriptModelObject implements Serializable
         modelObject.setTitle(value);
     }
     
-    public String getName()
-    {
-        return getTitle();
-    }
-    
-    public void setName(String name)
-    {
-        setTitle(name);
-    }
-
     public String getDescription()
     {
         return modelObject.getDescription();
@@ -177,43 +167,16 @@ public final class ScriptModelObject implements Serializable
         return map;
     }
     
-    
-    /////////////////////////////////////////////////////////
-    //
-    // These are legacy methods that will be done away with
-    // They just call through to custom properties
-    //
-    /////////////////////////////////////////////////////////
-    
-    public String getSetting(String settingName)
+    public Map getCustomProperties()
     {
-        ParameterCheck.mandatory("settingName", settingName);
-        return modelObject.getSetting(settingName);
-    }
-
-    public void setSetting(String settingName, String settingValue)
-    {
-        ParameterCheck.mandatory("settingName", settingName);
-        ParameterCheck.mandatory("settingValue", settingValue);
-        modelObject.setSetting(settingName, settingValue);
-    }
-
-    public void removeSetting(String settingName)
-    {
-        ParameterCheck.mandatory("settingName", settingName);
-        modelObject.removeSetting(settingName);
-    }
-    
-    public Map getSettings()
-    {
-        ScriptableMap map = new ScriptableMap();
-
-        Map settings = modelObject.getSettings();
-        Iterator it = settings.keySet().iterator();
+    	ScriptableMap map = new ScriptableMap();
+    	
+        Map properties = modelObject.getCustomProperties();
+        Iterator it = properties.keySet().iterator();
         while (it.hasNext())
         {
             String key = (String) it.next();
-            String value = (String) settings.get(key);
+            String value = (String) properties.get(key);
             map.put(key, value);
         }
 

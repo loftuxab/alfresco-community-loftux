@@ -35,23 +35,84 @@ import org.dom4j.Document;
  */
 public interface ModelObject extends Serializable
 {
-    // common properties
+	/**
+	 * Returns the id of the model object.  This is either explicitly
+	 * declared by the object or it is assumed from the file name
+	 * of the serialized XML.
+	 * 
+	 * @return The id
+	 */
     public String getId();
+    
+    /**
+     * Returns the title property of the model object.
+     * 
+     * @return The title
+     */
     public String getTitle();
+    
+    /**
+     * Sets the title property of the model object
+     * 
+     * @param The new title
+     */
     public void setTitle(String value);
+    
+    /**
+     * Returns the description property of the model object
+     * 
+     * @return The description
+     */
     public String getDescription();
+    
+    /**
+     * Sets the description property of the model object
+     * 
+     * @param The description
+     */
     public void setDescription(String value);
     
-    // persistence methods
+    /**
+     * Saves the model object to its storage location.  The storage
+     * location is a Store implementation (either local or remote).
+     * 
+     * @param context
+     */ 
     public void save(RequestContext context);
+    
+    /**
+     * Reloads the object from its Store
+     * 
+     * @param context
+     */
     public void reload(RequestContext context);
+    
+    /**
+     * Removes the object from its Store
+     * 
+     * @param context
+     */
     public void remove(RequestContext context);
+    
+    /**
+     * Indicates whether the object is currently persisted (saved)
+     * or not.  A new object will have this flag set to false prior
+     * to a save and true once the save operation has completed.
+     * 
+     * @return Whether the object is currently saved
+     */
     public boolean isSaved();
 
-    // xml methods
+    /**
+     * Serializes the object to XML.  By default, this uses a 
+     * pretty XML renderer so that the resulting XML is
+     * human readable.
+     * 
+     * @return The XML string
+     */
     public String toXML();
 
-    // generic properties
+    // general property accessors
     public boolean getBooleanProperty(String propertyName);
     public String getProperty(String propertyName);
     public void setProperty(String propertyName, String propertyValue);
@@ -85,17 +146,5 @@ public interface ModelObject extends Serializable
     public String getModelVersion();
     
     // allow xml retrieval via document
-    public Document getDocument();
-    
-
-    
-    
-    // TODO: legacy methods
-    // TODO: remove these methods
-    public String getName();
-    public void setName(String value);
-    public Map getSettings();
-    public String getSetting(String settingName);
-    public void setSetting(String settingName, String settingValue);
-    public void removeSetting(String settingName);
+    public Document getDocument();    
 }

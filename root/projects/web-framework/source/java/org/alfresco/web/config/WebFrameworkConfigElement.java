@@ -643,11 +643,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             super(el);
         }
 
-        public String getId()
-        {
-            return getUri();
-        }
-
         public String getUri()
         {
             return getStringProperty(URI);

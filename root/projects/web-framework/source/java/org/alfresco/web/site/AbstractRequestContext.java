@@ -105,7 +105,7 @@ public abstract class AbstractRequestContext implements RequestContext
         
         if(getSiteConfiguration() != null)
         {
-            title = getSiteConfiguration().getName();
+            title = getSiteConfiguration().getTitle();
         }
         
         return title;
@@ -123,7 +123,7 @@ public abstract class AbstractRequestContext implements RequestContext
         
         if (getCurrentPage() != null)
         {
-            title = getCurrentPage().getName();
+            title = getCurrentPage().getTitle();
         }
         
         return title;

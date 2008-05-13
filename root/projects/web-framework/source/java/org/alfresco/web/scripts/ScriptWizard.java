@@ -879,18 +879,5 @@ public final class ScriptWizard extends ScriptBase
         if (value == null)
             value = "";
         return value;
-    }
-    
-    //////////////////////////
-    // To be removed
-    //////////////////////////
-    public String getSafeSetting(ScriptModelObject obj, String settingName)
-    {
-        String value = obj.getSetting(settingName);
-        if (value == null)
-            value = "";
-        return value;
-    }
-    
-
+    }    
 }
