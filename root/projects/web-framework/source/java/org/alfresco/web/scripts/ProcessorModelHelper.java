@@ -70,7 +70,7 @@ public class ProcessorModelHelper
         if (context.getCurrentPage() != null)
         {
             model.put("description", context.getCurrentPage().getDescription());
-            model.put("title", context.getCurrentPage().getName());
+            model.put("title", context.getCurrentPage().getTitle());
             
             // custom page properties - add to model
             model.putAll(context.getCurrentPage().getCustomProperties());

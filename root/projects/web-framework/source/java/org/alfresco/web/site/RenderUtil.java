@@ -865,7 +865,7 @@ public class RenderUtil
         // per-region basis
         if(chromeId == null)
         {
-            chromeId = template.getSetting("region-" + regionId + "-chrome-id");
+            chromeId = template.getCustomProperty("region-" + regionId + "-chrome-id");
         }
         
         // see if a default chrome was specified
@@ -910,10 +910,10 @@ public class RenderUtil
         // per-component basis
         if(chromeId == null)
         {
-            chromeId = component.getSetting("chrome");
+            chromeId = component.getCustomProperty("chrome");
             if(chromeId == null)
             {
-                chromeId = component.getSetting("chrome-id");
+                chromeId = component.getCustomProperty("chrome-id");
             }
         }
         
