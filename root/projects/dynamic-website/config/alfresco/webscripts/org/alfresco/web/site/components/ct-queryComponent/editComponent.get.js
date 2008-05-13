@@ -29,7 +29,7 @@ if(componentAssociation != null)
 	var component = site.getObject(componentId);
 	if(component != null)
 	{
-		var queryType = component.getSetting("queryType");
+		var queryType = component.getProperty("queryType");
 		if(queryType == null)
 			queryType = "";
 
@@ -43,7 +43,7 @@ if(componentAssociation != null)
 			updateElement("queryType", queryType);
 
 		// QUERY STRING
-		var queryString = component.getSetting("queryString");
+		var queryString = component.getProperty("queryString");
 		if(queryString == null)
 			queryString = "";
 		queryString = escape(queryString);
@@ -51,7 +51,7 @@ if(componentAssociation != null)
 		addElementFormat("queryString", "String", "textarea", 340);
 		
 		// ENDPOINT
-		var endpointId = component.getSetting("endpointId");
+		var endpointId = component.getProperty("endpointId");
 		if(endpointId == null)
 			endpointId = "alfresco-webuser";
 		// endpoint selector combo

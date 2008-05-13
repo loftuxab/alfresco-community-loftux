@@ -8,7 +8,7 @@ var component = site.getObject(componentId);
 // process
 if(component != null)
 {
-	var markupData = wizard.getSafeSetting(component, "markupData");
+	var markupData = wizard.getSafeProperty(component, "markupData");
 
 	// the controls
 	markupData = site.decode(markupData);

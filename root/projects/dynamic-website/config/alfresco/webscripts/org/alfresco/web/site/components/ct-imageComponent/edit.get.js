@@ -8,16 +8,16 @@ var component = site.getObject(componentId);
 // process
 if(component != null)
 {
-	var imageLocation = component.getSetting("imageLocation");
+	var imageLocation = component.getProperty("imageLocation");
 	if(imageLocation == null)
 		imageLocation = "";			
-	var width = component.getSetting("width");
+	var width = component.getProperty("width");
 	if(width == null)
 		width = "";
-	var height = component.getSetting("height");
+	var height = component.getProperty("height");
 	if(height == null)
 		height = "";			
-	var alt = component.getSetting("alt");
+	var alt = component.getProperty("alt");
 	if(alt == null)
 		alt = "";
 

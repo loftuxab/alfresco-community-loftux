@@ -6,8 +6,8 @@ var componentId = wizard.request("componentId");
 var component = site.getObject(componentId);
 if(component != null)
 {
-	component.setSetting("orientation", orientation);
-	component.setSetting("style", style);
+	component.setProperty("orientation", orientation);
+	component.setProperty("style", style);
 	save(component);
 }
 

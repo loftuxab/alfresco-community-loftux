@@ -5,10 +5,10 @@ var componentId = wizard.request("componentId");
 var component = site.getObject(componentId);
 if(component != null)
 {
-	component.setSetting("imageLocation", imageURL);
-	component.setSetting("width", imageWidth);
-	component.setSetting("height", imageHeight);
-	component.setSetting("alt", imageAlt);
+	component.setProperty("imageLocation", imageURL);
+	component.setProperty("width", imageWidth);
+	component.setProperty("height", imageHeight);
+	component.setProperty("alt", imageAlt);
 	save(component);
 }
 

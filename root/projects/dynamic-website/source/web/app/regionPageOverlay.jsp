@@ -61,9 +61,9 @@
 %>
 		<p valign="top">
 			<img align="left" src="<%=componentImageLargeUrl%>"/>
-			<font size="2"><b><%=component.getName()%></b></font>
+			<font size="2"><b><%=component.getTitle()%></b></font>
 			<br/>
-			<font size="1"><%=componentType.getName()%></font>
+			<font size="1"><%=componentType.getTitle()%></font>
 		</p>
 		<br/>	
 <%

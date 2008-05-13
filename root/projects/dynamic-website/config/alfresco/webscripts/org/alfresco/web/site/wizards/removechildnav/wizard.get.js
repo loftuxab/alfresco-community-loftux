@@ -12,7 +12,7 @@ var page = site.getObject(pageId);
 
 var html = "Are you sure that you would like to remove the following page:";
 html += "<br/><br/>";
-html += "<B>" + page.getName() + "</B>";
+html += "<B>" + page.getTitle() + "</B>";
 html += "<br/><br/>";
 html += "This <u>will not delete</u> child pages for this page.";
 

@@ -6,7 +6,7 @@ var component = site.getObject(componentId);
 if(component != null)
 {
 	markupData = site.encode(markupData);
-	component.setSetting("markupData", markupData);
+	component.setProperty("markupData", markupData);
 	save(component);
 }
 

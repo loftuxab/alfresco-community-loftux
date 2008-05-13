@@ -32,7 +32,7 @@ for(formatId in templates)
 	
 		var array = new Array();
 		array[0] = formatId;
-		array[1] = template.getName();
+		array[1] = template.getTitle();
 		array[2] = templateId;
 		array[3] = pageId;
 		

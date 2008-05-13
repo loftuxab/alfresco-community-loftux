@@ -16,11 +16,11 @@ if(componentAssociation != null)
 	var component = site.getObject(componentId);
 	if(component != null)
 	{
-		component.setSetting("itemType", itemType);
-		component.setSetting("itemPath", itemPath);
-		component.setSetting("howToRender", howToRender);
-		component.setSetting("renderData", renderData);
-		component.setSetting("endpointId", endpointId);
+		component.setProperty("itemType", itemType);
+		component.setProperty("itemPath", itemPath);
+		component.setProperty("howToRender", howToRender);
+		component.setProperty("renderData", renderData);
+		component.setProperty("endpointId", endpointId);
 		save(component);
 	}
 }

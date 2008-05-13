@@ -45,7 +45,7 @@ if(componentAssociation != null)
 	if(component != null)
 	{
 		// RENDITION TYPE			
-		var howToRender = component.getSetting("howToRender");
+		var howToRender = component.getProperty("howToRender");
 		if(howToRender == null)
 			howToRender = ""
 		addElement("howToRender", howToRender);
@@ -56,7 +56,7 @@ if(componentAssociation != null)
 
 
 		// RENDER DATA
-		var renderData = component.getSetting("renderData");
+		var renderData = component.getProperty("renderData");
 		if(renderData == null)
 			renderData = "";
 		addElement("renderData", renderData);

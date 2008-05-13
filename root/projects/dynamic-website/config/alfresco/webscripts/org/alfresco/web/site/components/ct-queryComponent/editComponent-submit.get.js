@@ -29,11 +29,11 @@ if(componentAssociation != null)
 	var component = site.getObject(componentId);
 	if(component != null)
 	{
-		component.setSetting("queryType", queryType);
-		component.setSetting("queryString", queryString);
-		component.setSetting("howToRender", howToRender);
-		component.setSetting("renderData", renderData);
-		component.setSetting("endpointId", endpointId);
+		component.setProperty("queryType", queryType);
+		component.setProperty("queryString", queryString);
+		component.setProperty("howToRender", howToRender);
+		component.setProperty("renderData", renderData);
+		component.setProperty("endpointId", endpointId);
 		save(component);
 	}
 }

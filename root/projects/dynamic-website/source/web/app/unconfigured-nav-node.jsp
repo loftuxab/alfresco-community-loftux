@@ -12,7 +12,7 @@
 	RequestContext context = RequestUtil.getRequestContext(request);
 
 	Page currentPage = context.getCurrentPage();
-	String pageName = currentPage.getName();
+	String pageName = currentPage.getTitle();
 	
 	String backgroundImageUrl = "/images/logo/AlfrescoFadedBG.png";
 	backgroundImageUrl = URLUtil.browser(context, backgroundImageUrl);

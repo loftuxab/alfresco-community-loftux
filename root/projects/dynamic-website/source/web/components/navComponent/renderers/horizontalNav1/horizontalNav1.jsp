@@ -22,7 +22,7 @@
 			buffer.append("<a class='yuimenubaritemlabel yuimenubaritemlabel-hassubmenu' href='" + href + "' onmouseover=\"this.style.cursor='hand'\">");
 			if(selected)
 				buffer.append("<B>");
-			buffer.append(page.getName());
+			buffer.append(page.getTitle());
 			if(selected)
 				buffer.append("</B>");
 			buffer.append("</a>");
@@ -33,7 +33,7 @@
 			buffer.append("<a class='yuimenuitemlabel' href='"+href+"' onmouseover=\"this.style.cursor='hand'\">");
 			if(selected)
 				buffer.append("<B>");
-			buffer.append(page.getName());
+			buffer.append(page.getTitle());
 			if(selected)
 				buffer.append("</B>");
 			buffer.append("</a>");
