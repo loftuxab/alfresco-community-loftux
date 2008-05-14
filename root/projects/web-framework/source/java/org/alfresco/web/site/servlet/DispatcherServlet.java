@@ -30,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.connector.User;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.PresentationUtil;
@@ -37,12 +38,15 @@ import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.Timer;
+import org.alfresco.web.site.UserFactory;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.model.ContentAssociation;
 import org.alfresco.web.site.model.Page;
+import org.alfresco.web.site.model.PageType;
 import org.alfresco.web.site.model.TemplateInstance;
+import org.alfresco.web.site.model.Theme;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -54,8 +58,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * including all downstream templates and components, renderered
  * in their entirety and in the proper markup.
  * 
- * @author kroast
  * @author muzquiano
+ * @author kroast
  */
 public class DispatcherServlet extends BaseServlet
 {
@@ -96,13 +100,7 @@ public class DispatcherServlet extends BaseServlet
         RequestContext context = null;
         try
         {
-            if (Timer.isTimerEnabled())
-                Timer.start(request, "initRequestContext");
-            
             context = FrameworkHelper.initRequestContext(request);
-            
-            if (Timer.isTimerEnabled())
-                Timer.stop(request, "initRequestContext");
         }
         catch (Exception ex)
         {
@@ -226,12 +224,60 @@ public class DispatcherServlet extends BaseServlet
     protected void doDispatch(RequestContext context, HttpServletRequest request,
             HttpServletResponse response) throws RequestDispatchException
     {
-        // we are either navigating to a NODE
-        // or to a CONTENT OBJECT (xform object)
         String currentFormatId = context.getCurrentFormatId();
         String currentObjectId = context.getCurrentObjectId();
         String currentPageId = context.getCurrentPageId();
         Page currentPage = context.getCurrentPage();
+        
+        // do we need to redirect to a login page type?
+        switch (currentPage.getAuthentication())
+        {
+            case user:
+                User user = context.getUser();
+                if ((user == null || user.getId().equals(UserFactory.USER_GUEST)) ||
+                    (user != null && context.getCredentialVault().hasCredentials(user) == false))
+                {
+                    // no valid user found - login required
+                    String loginPageId = null;
+                    
+                    // Consider the theme first - which can override common page types
+                    String themeId = (String) context.getThemeId();
+                    Theme theme = context.getModel().loadTheme(context, themeId);
+                    if (theme != null)
+                    {
+                        loginPageId = theme.getPageId(PageType.PAGETYPE_LOGIN);
+                    }
+                    
+                    // Consider whether a system default has been set up
+                    if (loginPageId == null)
+                    {
+                        loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
+                    }
+                    
+                    Page page = null;
+                    if (loginPageId != null)
+                    {
+                        page = context.getModel().loadPage(context, loginPageId);
+                        if (page != null)
+                        {
+                            String redirectUrl = context.getLinkBuilder().page(
+                                    context, currentPageId, currentFormatId, currentObjectId);
+                            // set redirect url for use on login page template
+                            page.setCustomProperty("alfRedirectUrl", redirectUrl);
+                            dispatchPage(context, request, response, page, currentFormatId);
+                            return;
+                        }
+                    }
+                    
+                    if (loginPageId == null || page == null)
+                    {
+                        FrameworkHelper.getLogger().warn("No 'login' page type found - but page auth required it.");
+                    }
+                }
+                break;
+            
+            // TODO: support admin/guest required auth cases
+        }
         
         if (isDebugEnabled())
         {
@@ -260,8 +306,9 @@ public class DispatcherServlet extends BaseServlet
                 if (isDebugEnabled())
                     debug(context, "Dispatching to Page: " + currentPageId);
                 
-                // if there happens to be a content item specified as well, it will just become part of the context
-                // in other words, the content item doesn't determine the
+                // if there happens to be a content item specified as well,
+                // it will just become part of the context
+                // i.e. if the content item doesn't determine the
                 // destination page if the destination page is specified
                 
                 // we're dispatching to the current page
@@ -273,8 +320,7 @@ public class DispatcherServlet extends BaseServlet
                 if (isDebugEnabled())
                     debug(context, "Dispatching to Content Object: " + currentObjectId);
                 
-                dispatchContent(context, request, response, currentObjectId,
-                        currentFormatId);
+                dispatchContent(context, request, response, currentObjectId, currentFormatId);
             }
         }
     }
@@ -333,19 +379,29 @@ public class DispatcherServlet extends BaseServlet
             String formatId) throws RequestDispatchException
     {
         Page page = context.getCurrentPage();
+        dispatchPage(context, request, response, page, formatId);
+    }
+    
+    protected void dispatchPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response,
+            Page page, String formatId) throws RequestDispatchException
+    {
         if (isDebugEnabled())
-            debug(context, "Template ID: " +page.getTemplateId()); 
+            debug(context, "Template ID: " + page.getTemplateId());
+        
         TemplateInstance currentTemplate = page.getTemplate(context);
         if (currentTemplate != null)
         {
             if (isDebugEnabled())
-                debug(context, "Rendering Page with template: " + currentTemplate.getId()); 
-            PresentationUtil.renderPage(context, request, response);
+                debug(context, "Rendering Page with template: " + currentTemplate.getId());
+            
+            PresentationUtil.renderPage(context, request, response, page.getId());
         }
         else
         {
             if (isDebugEnabled())
-                debug(context, "Unable to render Page - template was not found");            
+                debug(context, "Unable to render Page - template was not found");
+            
             RenderUtil.renderSystemPage(context, request, response, 
                     WebFrameworkConstants.SYSTEM_PAGE_UNCONFIGURED,
                     WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_UNCONFIGURED);

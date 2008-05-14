@@ -32,7 +32,7 @@ import java.util.Map;
 import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
 
-import org.alfresco.tools.ReflectionHelper;
+import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.site.RequestContext;
 
 import freemarker.core.Environment;

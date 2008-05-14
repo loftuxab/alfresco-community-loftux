@@ -31,12 +31,12 @@ import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorFactory;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Response;
+import org.alfresco.connector.User;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.User;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -155,7 +155,7 @@ public class WebFrameworkScriptRemote
     		}
         }
         
-        return connector;    	
+        return connector;
     }
     
     

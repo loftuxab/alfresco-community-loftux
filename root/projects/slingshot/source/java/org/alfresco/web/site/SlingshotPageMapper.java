@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.model.Page;
+import org.alfresco.web.site.model.Theme;
 
 /**
  * This is a Page Mapper class which serves to interpret URLs at dispatch
@@ -58,6 +59,7 @@ import org.alfresco.web.site.model.Page;
  * all rendering components and templates.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class SlingshotPageMapper extends AbstractPageMapper
 {
@@ -81,91 +83,110 @@ public class SlingshotPageMapper extends AbstractPageMapper
     public void execute(RequestContext context, ServletRequest request)
     	throws PageMapperException
     {
-    	if(!(request instanceof HttpServletRequest))
+    	if (request instanceof HttpServletRequest == false)
     	{
-    		throw new PageMapperException("The slingshot page mapper must be given an HttpServletRequest to execute against");
+    		throw new PageMapperException("The slingshot page mapper must be given an HttpServletRequest to execute.");
     	}
     	
-    	/**
-    	 * The request URI string.  This comes in as something like:
-    	 * 		/slingshot/page/user-profile
-    	 */
-    	String requestURI = ((HttpServletRequest)request).getRequestURI();
+    	// The request URI string.  This comes in as something like:
+    	//    /slingshot/page/collaboration/user-profile
+        // Strip off the webapp name (if any - may be ROOT i.e. "/")
+        HttpServletRequest req = ((HttpServletRequest)request);
+    	String requestURI = req.getRequestURI().substring(req.getContextPath().length());
     	
-    	/**
-    	 * Tokenizer and walk the string to figure out what kinds of
-    	 * inputs we were given in the straight up URI
-    	 */
-    	String webappId = null;
-    	String servletId = null;
+    	// Tokenizer and walk the string to figure out what kinds of
+    	// inputs we were given in the straight up URI
     	String pageId = null;
-    	StringTokenizer tokenizer = new StringTokenizer(requestURI, "/");
-    	if(tokenizer.hasMoreTokens())
-    	{
-    		webappId = (String) tokenizer.nextToken();
-    		if(tokenizer.hasMoreTokens())
-    		{
-    			servletId = (String) tokenizer.nextToken();
-    			if(tokenizer.hasMoreTokens())
-    			{
-    				// ride out the rest to build the pageId
-    				pageId = "";
-    				do {
-    					pageId += (String) tokenizer.nextToken();
-    					if(tokenizer.hasMoreTokens())
-    					{
-    						pageId += "/";
-    					}
-    				}while(tokenizer.hasMoreTokens());
-    			}
-    		}
-    	}
+    	StringTokenizer t = new StringTokenizer(requestURI, "/");
+		t.nextToken();        // skip servlet name
+		if (t.hasMoreTokens())
+		{
+			// ride out the rest to build the pageId
+            StringBuilder buf = new StringBuilder(64);
+            do
+            {
+                buf.append(t.nextToken());
+                if (t.hasMoreTokens())
+                {
+                    buf.append('/');
+                }
+            } while (t.hasMoreTokens());
+            pageId = buf.toString();
+		}
     	
-    	/**
-    	 * Did we receive an "object" request parameter
-    	 */
-    	String objectId = (String) request.getParameter("doc");
-    	if("".equals(objectId))
+    	// Did we receive an "object" request parameter
+    	String objectId = (String)request.getParameter("doc");
+    	if (objectId != null && objectId.length() == 0)
     	{
     		objectId = null;
     	}
     	
-    	
-    	/**
-    	 * Place everything into the request context
-    	 */
-    	if (pageId != null && !"".equals(pageId))
-    	{
-    		/**
-    		 * We have a page Id.  We must resolve it to a page.
-    		 */
-            Page _page = context.getModel().loadPage(context, pageId);
-            if (_page != null)
+        /**
+         * Extract the page type id and determine which page to bind
+         * into the request context.
+         * 
+         * This checks to see if a theme is defined and whether said theme
+         * describes an override for this page type.
+         * 
+         * Otherwise, a check is made to see if a system default page has
+         * been specified for this page type.
+         * 
+         * Finally, if nothing can be determined, a generic page is
+         * bound into the request context.
+         */
+        String pageTypeId = (String) request.getParameter("pt");
+        if (pageTypeId != null && pageTypeId.length() != 0)
+        {
+            // page type overrides anything else on the uri
+            pageId = null;
+            
+            // Consider the theme
+            String themeId = (String) context.getThemeId();
+            Theme theme = context.getModel().loadTheme(context, themeId);
+            if (theme != null)
             {
-                context.setCurrentPage(_page);
+                pageId = theme.getPageId(pageTypeId);
+            }
+            
+            // Consider whether a system default has been set up
+            if (pageId == null)
+            {
+                pageId = getPageId(context, pageTypeId);
+            }
+            
+            // Worst case, pick a generic page
+            if (pageId == null)
+            {
+                pageId = getPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
             }
         }
         
+    	// Place everything into the request context
+    	if (pageId != null)
+    	{
+    		// We have a page Id.  We must resolve it to a page.
+            Page page = context.getModel().loadPage(context, pageId);
+            if (page != null)
+            {
+                context.setCurrentPage(page);
+            }
+        }
         
         /**
          * TODO:  At present, the Slingshot project doesn't seem to do
          * much with formats, though this may change.  As such, we ignore
-         * formats though the RequestContext is capable of supporting
-         * them.  
-         * 
-         * Just for fun, we'll set the default format.
+         * formats though the RequestContext is capable of supporting them.  
          * 
          * Note that if we didn't set it, it would still automatically
          * pick up the default format.
          */
         context.setCurrentFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
     	
-        
         /**
          * If we received a "currently viewed object", then lets set it
          * onto the request as well.
          */
-    	if(objectId != null)
+    	if (objectId != null)
     	{
     		context.setCurrentObjectId(objectId);    		
     	}    	

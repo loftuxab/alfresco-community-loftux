@@ -24,12 +24,11 @@
  */
 package org.alfresco.connector;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
@@ -308,14 +307,12 @@ public class ConnectorFactory
 	
 	protected static synchronized Authenticator _getAuthenticator(String className)
 	{
-	    String cacheKey = className;
-	    
-	    Authenticator auth = (Authenticator) cache.get(className);
+	    Authenticator auth = (Authenticator)cache.get(className);
 	    if (auth == null)
 	    {
-	        auth = (Authenticator) newObject(className);
+	        auth = (Authenticator)ReflectionHelper.newObject(className);
 	        
-	        cache.put(cacheKey, auth);
+	        cache.put(className, auth);
 	    }
 	    
 	    return auth;
@@ -326,70 +323,6 @@ public class ConnectorFactory
     {
         Class[] argTypes = new Class[] { descriptor.getClass(), url.getClass() };
         Object[] args = new Object[] { descriptor, url };
-        return (Connector)newObject(descriptor.getImplementationClass(), argTypes, args);
-    }
-    
-    protected static Object newObject(String className)
-    {
-        Object o = null;
-
-        try
-        {
-            Class clazz = Class.forName(className);
-            o = clazz.newInstance();
-        }
-        catch (ClassNotFoundException cnfe)
-        {
-            logger.debug(cnfe);
-        }
-        catch (InstantiationException ie)
-        {
-            logger.debug(ie);
-        }
-        catch (IllegalAccessException iae)
-        {
-            logger.debug(iae);
-        }
-        return o;
-    }
-    
-    protected static Object newObject(String className, Class[] argTypes,
-            Object[] args)
-    {
-        if (args == null || args.length == 0)
-        {
-            return null;
-        }
-
-        Object o = null;
-        try
-        {
-            // base class
-            Class clazz = Class.forName(className);
-
-            Constructor c = clazz.getDeclaredConstructor(argTypes);
-            o = c.newInstance(args);
-        }
-        catch (ClassNotFoundException cnfe)
-        {
-            logger.debug(cnfe);
-        }
-        catch (InstantiationException ie)
-        {
-            logger.debug(ie);
-        }
-        catch (IllegalAccessException iae)
-        {
-            logger.debug(iae);
-        }
-        catch (NoSuchMethodException nsme)
-        {
-            logger.debug(nsme);
-        }
-        catch (InvocationTargetException ite)
-        {
-            logger.debug(ite);
-        }
-        return o;
+        return (Connector)ReflectionHelper.newObject(descriptor.getImplementationClass(), argTypes, args);
     }
 }

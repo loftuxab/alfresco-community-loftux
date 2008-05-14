@@ -26,6 +26,8 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.Credentials;
+import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
@@ -36,14 +38,13 @@ import org.alfresco.web.site.exception.UserFactoryException;
  */
 public class DefaultUserFactory extends UserFactory
 {
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.site.UserFactory#authenticate(javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
      */
-    public boolean authenticate(HttpServletRequest request,
+    public Credentials authenticate(HttpServletRequest request,
     		String username, String password)
     {
-    	return false;
+    	return null;
     }
 
     /* (non-Javadoc)

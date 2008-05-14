@@ -47,6 +47,11 @@ public interface CredentialVault
 	 * @return the credentials
 	 */
 	public Credentials retrieve(String key);
+    
+    /**
+     * @return true if any credentials are stored for this user
+     */
+    public boolean hasCredentials(User user);
 	
 	/**
 	 * Tells the Credential Vault to load state from persisted store

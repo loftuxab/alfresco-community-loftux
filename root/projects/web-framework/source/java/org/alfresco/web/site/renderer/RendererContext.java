@@ -32,8 +32,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.connector.User;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.User;
 import org.alfresco.web.site.model.ModelObject;
 
 /**

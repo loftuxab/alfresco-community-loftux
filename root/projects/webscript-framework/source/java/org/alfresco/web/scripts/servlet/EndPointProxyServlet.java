@@ -32,7 +32,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorFactory;
@@ -43,7 +42,6 @@ import org.alfresco.connector.RemoteClient;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.RemoteConfigElement;
-import org.alfresco.web.config.ServerConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
@@ -133,12 +131,12 @@ public class EndPointProxyServlet extends HttpServlet
         
         try
         {
-            // retrieve the endpoint descriptor
+            // retrieve the endpoint descriptor - do not allow proxy access to unsecure endpoints
             EndpointDescriptor descriptor = this.config.getEndpointDescriptor(endpointId);
-            if (descriptor == null)
+            if (descriptor == null || descriptor.getUnsecure())
             {
-                // throw an exception if endpoint ID is invalid 
-                throw new AlfrescoRuntimeException("Cannot find configuration for EndPoint Id: " + endpointId);
+                // throw an exception if endpoint ID is does not exist or invalid
+                throw new AlfrescoRuntimeException("Invalid EndPoint Id: " + endpointId);
             }
             
             // userid from session
@@ -163,16 +161,7 @@ public class EndPointProxyServlet extends HttpServlet
                 client.setTicket(alfTicket);
             }
             
-            //
-            // TODO: TEMP! until dispatcher code path is active and have a working login page for slingshot!
-            //
-            else
-            {
-                String alfTicket = (String)req.getSession().getAttribute("_alfticket");
-                client.setTicket(alfTicket);
-            }
-            
-            // TODO: copy headers for proxy request
+            // TODO: copy request headers for proxy call
             String method = req.getMethod();
             client.setRequestContentType(req.getContentType());
             client.setRequestMethod(method);

@@ -48,7 +48,6 @@
 			</authenticator>
 			
 			<!-- Endpoints -->
-			<!-- Example endpoint with declared auth
 			<endpoint>
 				<id>alfresco-system</id>
 				<name>Alfresco - System access</name>
@@ -58,7 +57,8 @@
 				<identity>declared</identity>
 				<username>admin</username>
 				<password>admin</password>
-			</endpoint>-->
+				<unsecure>true</unsecure>
+			</endpoint>
 			
 			<endpoint>
 				<id>alfresco</id>

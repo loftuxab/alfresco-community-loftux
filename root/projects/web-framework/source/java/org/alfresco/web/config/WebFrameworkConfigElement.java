@@ -323,6 +323,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultRegionChrome;
     }
+    
     public String getDefaultComponentChrome()
     {
         if(this.defaultComponentChrome == null)
@@ -331,14 +332,17 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultComponentChrome;
     }
+    
     public String[] getDefaultPageTypeIds()
     {
         return (String[]) this.pageTypes.keySet().toArray();
     }
+    
     public String getDefaultPageTypeInstanceId(String id)
     {
         return (String) this.pageTypes.get(id);
     }
+    
     public String getDefaultThemeId()
     {
         if(this.defaultTheme == null)
@@ -357,6 +361,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultFormatId;
     }
+    
     public String getDefaultPageMapperId()
     {
         if(this.defaultPageMapperId == null)
@@ -365,6 +370,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultPageMapperId;
     }
+    
     public String getDefaultLinkBuilderId()
     {
         if(this.defaultLinkBuilderId == null)
@@ -373,6 +379,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultLinkBuilderId;
     }
+    
     public String getDefaultRequestContextId()
     {
         if(this.defaultRequestContextId == null)
@@ -381,6 +388,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultRequestContextId;
     }
+    
     public String getDefaultUserFactoryId()
     {
         if(this.defaultUserFactoryId == null)
@@ -389,6 +397,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return this.defaultUserFactoryId;
     }
+    
     public String getDefaultFileSystemId()
     {
         if(this.defaultFileSystemId == null)
@@ -399,9 +408,10 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     }
 
 
-
-
-
+    /**
+     * Base for all Descriptor classes. Defines a basic get/put property bag
+     * of descriptor info. Sub classes should provide typed and named getter/setters.
+     */
     public static class Descriptor
     {
         private static final String ID = "id";
@@ -923,10 +933,10 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         Element debugElement = elem.element("debug");
         if(debugElement != null)
         {
-            String _isTimerEnabled = elem.elementTextTrim("timer");
+            String _isTimerEnabled = debugElement.elementTextTrim("timer");
             if(_isTimerEnabled != null)
             {
-                configElement.isTimerEnabled = ("true".equalsIgnoreCase(_isTimerEnabled));
+                configElement.isTimerEnabled = Boolean.parseBoolean(_isTimerEnabled);
             }
         }    	
 

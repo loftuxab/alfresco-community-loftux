@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.connector;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -53,12 +53,20 @@ public class User
     public static String PROP_STATE = "state";
     public static String PROP_ZIP_CODE = "zip_code";
     
+    protected boolean isAdmin = false;
+     
     protected Map<String, Serializable> map = null;
     
     public User(String id)
     {
-        map = new HashMap<String,Serializable>();
+        this.map = new HashMap<String,Serializable>();
         setId(id);
+    }
+    
+    public User(String id, boolean isAdmin)
+    {
+        this(id);
+        this.isAdmin = isAdmin;
     }
     
     public String getName()
@@ -75,7 +83,7 @@ public class User
         return getStringProperty(PROP_ADDRESS1);
     }
     
-    protected void setAddress1(String value)
+    public void setAddress1(String value)
     {
         setProperty(PROP_ADDRESS1, value);
     }
@@ -85,7 +93,7 @@ public class User
         return getStringProperty(PROP_ADDRESS2);
     }
     
-    protected void setAddress2(String value)
+    public void setAddress2(String value)
     {
         setProperty(PROP_ADDRESS2, value);
     }
@@ -95,7 +103,7 @@ public class User
         return getStringProperty(PROP_CITY);      
     }
     
-    protected void setCity(String value)
+    public void setCity(String value)
     {
         setProperty(PROP_CITY, value);
     }
@@ -105,7 +113,7 @@ public class User
         return getStringProperty(PROP_COUNTRY);
     }
     
-    protected void setCountry(String value)
+    public void setCountry(String value)
     {
         setProperty(PROP_COUNTRY, value);
     }
@@ -115,7 +123,7 @@ public class User
         return getStringProperty(PROP_FIRST_NAME);
     }
     
-    protected void setFirstName(String value)
+    public void setFirstName(String value)
     {
         setProperty(PROP_FIRST_NAME, value);
     }
@@ -125,7 +133,7 @@ public class User
         return getStringProperty(PROP_HOME_PHONE);
     }
 
-    protected void setHomePhone(String value)
+    public void setHomePhone(String value)
     {
         setProperty(PROP_HOME_PHONE, value);
     }
@@ -135,7 +143,7 @@ public class User
         return getStringProperty(PROP_ID);
     }
     
-    protected void setId(String value)
+    public void setId(String value)
     {
         setProperty(PROP_ID, value);
     }
@@ -145,7 +153,7 @@ public class User
         return getStringProperty(PROP_LAST_NAME);
     }
     
-    protected void setLastName(String value)
+    public void setLastName(String value)
     {
         setProperty(PROP_LAST_NAME, value);
     }
@@ -155,7 +163,7 @@ public class User
         return getStringProperty(PROP_MIDDLE_NAME);
     }
     
-    protected void setMiddleName(String value)
+    public void setMiddleName(String value)
     {
         setProperty(PROP_MIDDLE_NAME, value);
     }
@@ -165,7 +173,7 @@ public class User
         return getStringProperty(PROP_MOBILE_PHONE);
     }
     
-    protected void setMobilePhone(String value)
+    public void setMobilePhone(String value)
     {
         setProperty(PROP_MOBILE_PHONE, value);
     }
@@ -175,7 +183,7 @@ public class User
         return getStringProperty(PROP_STATE);
     }
     
-    protected void setState(String value)
+    public void setState(String value)
     {
         setProperty(PROP_STATE, value);
     }
@@ -185,7 +193,7 @@ public class User
         return (String) map.get(PROP_WORK_PHONE);
     }
     
-    protected void setWorkPhone(String value)
+    public void setWorkPhone(String value)
     {
         setProperty(PROP_WORK_PHONE, value);
     }
@@ -195,7 +203,7 @@ public class User
         return getStringProperty(PROP_ZIP_CODE);
     }
     
-    protected void setZipCode(String value)
+    public void setZipCode(String value)
     {
         setProperty(PROP_ZIP_CODE, value);
     }
@@ -222,6 +230,14 @@ public class User
     public Map<String, Serializable> getProperties()
     {
         return map;
+    }
+    
+    /**
+     * @return the isAdmin
+     */
+    public boolean isAdmin()
+    {
+        return this.isAdmin;
     }
 
     @Override

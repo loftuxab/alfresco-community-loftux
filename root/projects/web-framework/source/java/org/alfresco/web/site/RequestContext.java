@@ -27,6 +27,7 @@ package org.alfresco.web.site;
 import java.io.Serializable;
 
 import org.alfresco.connector.CredentialVault;
+import org.alfresco.connector.User;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.site.filesystem.IFileSystem;

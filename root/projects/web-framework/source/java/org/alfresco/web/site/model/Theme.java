@@ -65,16 +65,15 @@ public class Theme extends AbstractModelObject
         return TYPE_NAME;
     }
     
-    //
-    
     /**
-     * Gets the default page id.
+     * Gets the page id given the specified page type. If the theme supplies a
+     * specific page for a given page type it will be returned, if not null.
      * 
      * @param pageTypeId the page type id
      * 
-     * @return the default page id
+     * @return the page id
      */
-    public String getDefaultPageId(String pageTypeId)
+    public String getPageId(String pageTypeId)
     {
         Element pageTypesEl = document.getRootElement().element("page-types");
         if(pageTypesEl != null)
@@ -96,7 +95,7 @@ public class Theme extends AbstractModelObject
     }
     
     /**
-     * Sets the default page id.
+     * Sets the page id for a page type.
      * 
      * @param pageTypeId the page type id
      * @param pageId the page id

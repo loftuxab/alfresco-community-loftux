@@ -520,10 +520,10 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public Map<String, Object> getCustomProperties()
     {
-    	if(this.customProperties == null)
+    	if (this.customProperties == null)
     	{
-    		this.customProperties = new HashMap<String, Object>(16);
-
+    		this.customProperties = new HashMap<String, Object>(8);
+    		
     		Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
 	        if (properties != null)
 	        {
@@ -533,11 +533,7 @@ public abstract class AbstractModelObject implements ModelObject
 	                Element el = elements.get(i);
 	                this.customProperties.put(el.getName(), el.getTextTrim());
 	            }
-	        }
-	        else
-	        {
-	        	this.customProperties = Collections.<String, Object>emptyMap();
-	        }        
+	        }     
     	}
     	return this.customProperties;
     }
@@ -596,8 +592,6 @@ public abstract class AbstractModelObject implements ModelObject
      * @see org.alfresco.web.site.model.ModelObject#getTypeName()
      */
     public abstract String getTypeName();
-    
-    
     
     
     

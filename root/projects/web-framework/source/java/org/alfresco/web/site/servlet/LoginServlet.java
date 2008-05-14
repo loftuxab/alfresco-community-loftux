@@ -30,8 +30,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.connector.Credentials;
+import org.alfresco.web.site.FrameworkHelper;
+import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.UserFactory;
-import org.alfresco.web.site.UserFactoryBuilder;
 import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
@@ -42,7 +45,6 @@ import org.alfresco.web.site.exception.UserFactoryException;
  */
 public class LoginServlet extends BaseServlet
 {
-    
     /* (non-Javadoc)
      * @see javax.servlet.GenericServlet#init()
      */
@@ -63,46 +65,39 @@ public class LoginServlet extends BaseServlet
     	String successPage = (String) request.getParameter("success");
     	String failurePage = (String) request.getParameter("failure");
     	
-    	/**
-    	 * See if we can load the user with this identity
-    	 */
-    	boolean authenticated = true;
+    	// See if we can load the user with this identity
+    	Credentials credentials = null;
     	try
     	{
-	    	UserFactory userFactory = UserFactoryBuilder.newFactory();
-	    	if(userFactory != null)
+	    	UserFactory userFactory = FrameworkHelper.getUserFactory();
+	    	if (userFactory != null)
 	    	{
-	    		authenticated = userFactory.authenticate(request, username, password);
+                // authenticate and load the user details if successful
+	    	    credentials = userFactory.authenticate(request, username, password);
+	    	    if (credentials != null)
+	    	    {
+	    	        // set this onto the session
+	    	        request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
+	    	        
+	    	        // apply credentials to the default credentials vault
+	    	        FrameworkHelper.getCredentialVault().store(credentials.getId(), credentials);
+                    
+                    // this applies the User object to the Session
+                    RequestContext context = RequestUtil.getRequestContext(request);
+                    userFactory.getUser(context, request);
+	    	    }
 	    	}
     	}
-    	catch(UserFactoryException ufe)
+    	catch (Throwable err)
     	{
-    		throw new ServletException(ufe);
+    		throw new ServletException(err);
     	}
     	
-    	
-    	/**
-    	 * If they authenticated, "log in" to the framework
-    	 */
-    	boolean loggedIn = false;
-    	if(authenticated)
-    	{
-    		String userId = username;
-    	
-    		// set this onto the session
-    		request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
-    	
-    		loggedIn = true;
-    	}
-        
-        
-        /**
-         * If they succeeded in logging in, redirect to the success page
-         * Otherwise, redirect to the failure page
-         */
-        if(loggedIn)
+        // If they succeeded in logging in, redirect to the success page
+        // Otherwise, redirect to the failure page
+        if (credentials != null)
         {
-        	if(successPage != null)
+        	if (successPage != null)
         	{
         		response.sendRedirect(successPage);
         	}
@@ -113,7 +108,7 @@ public class LoginServlet extends BaseServlet
         }
         else
         {
-        	if(failurePage != null)
+        	if (failurePage != null)
         	{
         		response.sendRedirect(failurePage);
         	}

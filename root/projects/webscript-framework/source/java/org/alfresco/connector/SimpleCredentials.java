@@ -108,4 +108,10 @@ public class SimpleCredentials implements Credentials
 	{
 		this.properties.put(key, value);
 	}
+
+    @Override
+    public String toString()
+    {
+        return this.properties.toString();
+    }
 }

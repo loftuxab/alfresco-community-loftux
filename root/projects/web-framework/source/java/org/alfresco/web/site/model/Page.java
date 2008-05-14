@@ -28,6 +28,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.RequestContext;
@@ -322,6 +324,37 @@ public class Page extends AbstractModelObject
         this.setProperty(PROP_PAGE_TYPE_ID, pageTypeId);        
     }
     
+    /**
+     * @return the Authentication required for this page
+     */
+    public RequiredAuthentication getAuthentication()
+    {
+        RequiredAuthentication authentication = RequiredAuthentication.none;
+        
+        String auth = this.getProperty(PROP_AUTHENTICATION);
+        if (auth != null)
+        {
+            try
+            {
+               authentication = RequiredAuthentication.valueOf(auth.toLowerCase());
+            }
+            catch (IllegalArgumentException enumErr)
+            {
+               throw new AlfrescoRuntimeException(
+                     "Invalid page <authentication> element value: " + auth);
+            }
+        }
+        return authentication;
+    }
+
+    /**
+     * @param authentication    the authentication level to set
+     */
+    public void setAuthentication(String authentication)
+    {
+        this.setProperty(PROP_AUTHENTICATION, authentication);
+    }
+
     /**
      * Gets the page type.
      * 

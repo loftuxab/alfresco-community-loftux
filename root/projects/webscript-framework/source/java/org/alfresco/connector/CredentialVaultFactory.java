@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
 import org.apache.commons.logging.Log;
@@ -147,7 +148,7 @@ public class CredentialVaultFactory
 			
 			// build the vault
 			String vaultClass = descriptor.getImplementationClass();
-			vault = (CredentialVault) newObject(vaultClass);
+			vault = (CredentialVault)ReflectionHelper.newObject(vaultClass);
 			
 			// place into cache
 			if (vault != null)
@@ -158,32 +159,4 @@ public class CredentialVaultFactory
 		
 		return vault;
 	}
-
-	// reflection helper
-	protected static Object newObject(String className)
-    {
-        Object o = null;
-
-        try
-        {
-            Class clazz = Class.forName(className);
-            o = clazz.newInstance();
-        }
-        catch (ClassNotFoundException cnfe)
-        {
-        	cnfe.printStackTrace();
-            logger.debug(cnfe);
-        }
-        catch (InstantiationException ie)
-        {
-        	ie.printStackTrace();
-            logger.debug(ie);
-        }
-        catch (IllegalAccessException iae)
-        {
-        	iae.printStackTrace();
-            logger.debug(iae);
-        }
-        return o;
-    }
 }

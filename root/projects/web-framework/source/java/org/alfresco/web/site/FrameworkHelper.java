@@ -33,11 +33,13 @@ import org.alfresco.connector.ConnectorFactory;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.CredentialVaultFactory;
 import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestContextException;
+import org.alfresco.web.site.exception.UserFactoryException;
 import org.alfresco.web.site.filesystem.FileSystemManager;
 import org.alfresco.web.site.filesystem.IFileSystem;
 import org.apache.commons.logging.Log;
@@ -216,9 +218,45 @@ public class FrameworkHelper
     	return getRemoteConfig().getEndpointDescriptor(endpointId);
     }
     
+    public static synchronized UserFactory getUserFactory()
+        throws UserFactoryException
+    {
+        if (userFactory == null)
+        {
+            // default that we will use
+            String className = "org.alfresco.web.site.DefaultUserFactory";
+            
+            // check the config for an override
+            String defaultId = FrameworkHelper.getConfig().getDefaultUserFactoryId();
+            if(defaultId != null)
+            {
+                String _className = FrameworkHelper.getConfig().getUserFactoryDescriptor(defaultId).getImplementationClass();
+                if (_className != null)
+                {
+                    className = _className;
+                }
+            }
+            
+            UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
+            if(factory == null)
+            {
+                throw new UserFactoryException("Unable to create user factory for class name: " + className);
+            }
+            factory.setId(defaultId);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Created User Factory: " + className);
+            
+            userFactory = factory;
+        }
+        
+        return userFactory;
+    }
+    
     private static Model model = null;
     private static ApplicationContext applicationContext = null;
     private static CredentialVault credentialVault = null;
     private static RemoteConfigElement remoteConfig = null;
     private static WebFrameworkConfigElement webFrameworkConfig = null;
+    private static UserFactory userFactory = null;
 }

@@ -27,7 +27,10 @@ package org.alfresco.web.site;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.Connector;
+import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
+import org.alfresco.connector.SimpleCredentials;
+import org.alfresco.connector.User;
 import org.alfresco.web.scripts.WebFrameworkScriptRemote;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.dom4j.Document;
@@ -38,20 +41,20 @@ import org.json.JSONObject;
  * and so forth.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class AlfrescoUserFactory extends UserFactory
 {
-    public static final String ALFRESCO_SYSTEM_ENDPOINT_ID = "alfresco-system";
-    public static final String ALFRESCO_USER_ENDPOINT_ID = "alfresco-user";
+    private static final String ALFRESCO_ENDPOINT_ID = "alfresco";
+    private static final String ALFRESCO_SYSTEM_ENDPOINT_ID = "alfresco-system";
+
 
 	/* (non-Javadoc)
 	 * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
 	 */
-	public boolean authenticate(HttpServletRequest request, String username, String password)
+	public Credentials authenticate(HttpServletRequest request, String username, String password)
     {
-		String endpointId = ALFRESCO_SYSTEM_ENDPOINT_ID;
-		
-		String ticket = null;
+		Credentials credentials = null;
 		try
 		{
 			// request context
@@ -59,71 +62,64 @@ public class AlfrescoUserFactory extends UserFactory
 			
 			// create a connector for the current user
 			WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-			Connector connector = remote.connect(endpointId);
-		
+			Connector connector = remote.connect(ALFRESCO_ENDPOINT_ID);
+			
 			// call the authentication ticket provider
 			String uri = "/api/login?u=" + username + "&pw=" + password;
 			Response response = connector.call(uri);
-						
+			
 			// parse out the ticket
-	        String responseString = response.getResponse();
-        
-        	Document document = org.dom4j.DocumentHelper.parseText(responseString);
-        	ticket = document.getRootElement().getText();
+        	Document document = org.dom4j.DocumentHelper.parseText(response.getResponse());
+        	String ticket = document.getRootElement().getText();
+            
+            // build the credentials to represent the successful login
+            String id = ALFRESCO_ENDPOINT_ID + "_" + username;
+            credentials = new SimpleCredentials(id);
+            credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
+            credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
+            credentials.setProperty(Credentials.CREDENTIAL_ALF_TICKET, ticket);
         }
-        catch(Exception ex) 
+        catch (Throwable ex) 
         {
         	// many things might have happened
         	// an invalid ticket or perhaps a connectivity issue
         	// at any rate, we cannot authenticate
         }
         
-        return(ticket != null);
+        return credentials;
     }
 	
     /* (non-Javadoc)
      * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
      */
-    public User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws UserFactoryException
+    public User loadUser(RequestContext context, HttpServletRequest request, String userId)
+        throws UserFactoryException
     {
-        String endpointId = ALFRESCO_SYSTEM_ENDPOINT_ID;
         User user = null;
-        
 		try
 		{
 			// create a connector for the current user
 			WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-			Connector connector = remote.connect(endpointId);
-		
+			Connector connector = remote.connect(ALFRESCO_SYSTEM_ENDPOINT_ID);
+			
 			// call the authentication ticket provider
-			String uri = "/webframework/content/metadata?user=" + user_id;
+			String uri = "/webframework/content/metadata?user=" + userId;
 			Response response = connector.call(uri);
 			
 			String responseString = response.getResponse();
-						
+					
 	        // Load the user from the JSON parser
 	        JSONObject jsonObject = new JSONObject(responseString);
-	        	
+	        
         	JSONObject properties = jsonObject.getJSONObject("properties");
         	
-        	user = new User(user_id);
+        	user = new User(userId);
             user.setFirstName(properties.getString("{http://www.alfresco.org/model/content/1.0}firstName"));
-            //user.setMiddleName(value);
             user.setLastName(properties.getString("{http://www.alfresco.org/model/content/1.0}lastName"));
             
-            //user.setHomePhone(value);
-            //user.setMobilePhone(value);
-            //user.setWorkPhone(value);
-            
-            //user.setAddress1(value);
-            //user.setAddress2();        
-            //user.setCity(value);
-            //user.setState(value);
-            //user.setZipCode(value);
-            //user.setCountry(value);        	
+            // TODO: apply other user properties
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
         	// unable to read back the user json object
         	throw new UserFactoryException("Unable to retrieve user from repository", ex);

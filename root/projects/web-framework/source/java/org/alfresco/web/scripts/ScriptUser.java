@@ -28,8 +28,8 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.alfresco.connector.User;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.User;
 
 /**
  * Represents the user of the site who is currently executing the

@@ -45,6 +45,13 @@
 					<page-instance-id>page.slingshot-logout</page-instance-id>
 				</page-type>
 			</application-defaults>
+			
+			<!-- Error Handler Pages -->
+			<error-handler>
+				<id>region-nocomponent</id>
+				<renderer>org.alfresco.web.site.EmptyRegionRenderer</renderer>
+				<renderer-type>java</renderer-type>
+			</error-handler>
    		
       </web-framework>
 
