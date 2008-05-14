@@ -178,22 +178,48 @@ public class ClassPathStore implements Store
         
         return paths;
     }
-
+    
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
+     * @see org.alfresco.web.scripts.Store#getDocumentPaths(java.lang.String, boolean, java.lang.String)
      */
-    public String[] getDescriptionDocumentPaths()
+    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
     {
         String[] paths;
-
+        
+        if ((path == null) || (path.length() == 0))
+        {
+            path = "/";
+        }
+        
+        if (! path.startsWith("/"))
+        {
+            path = "/" + path;
+        }
+        
+        if (! path.endsWith("/"))
+        {
+            path = path + "/";
+        }
+        
+        if ((documentPattern == null) || (documentPattern.length() == 0))
+        {
+            documentPattern = "*";
+        }
+        
+        StringBuffer pattern = new StringBuffer();
+        pattern.append("classpath*:").append(classPath)
+               .append(path)
+               .append((includeSubPaths ? "**/" : ""))
+               .append(documentPattern);
+        
         try
         {
-            List<String> documentPaths = getPaths("classpath*:" + classPath + "/**/*.desc.xml");
+            List<String> documentPaths = getPaths(pattern.toString());
             paths = documentPaths.toArray(new String[documentPaths.size()]);
         }
         catch (IOException e)
         {
-            // Note: Ignore: no service description documents found
+            // Note: Ignore: no documents found
             paths = new String[0];
         }
         
@@ -201,25 +227,20 @@ public class ClassPathStore implements Store
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
+     */
+    public String[] getDescriptionDocumentPaths()
+    {
+        return getDocumentPaths("/", true, "*.desc.xml");
+    }
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getScriptDocumentPaths(org.alfresco.web.scripts.WebScript)
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
-        String[] paths;
-
-        try
-        {
-            String scriptPaths = script.getDescription().getId() + ".*";
-            List<String> documentPaths = getPaths("classpath*:" + classPath + "/" + scriptPaths);
-            paths = documentPaths.toArray(new String[documentPaths.size()]);
-        }
-        catch (IOException e)
-        {
-            // Note: Ignore: no script documents found
-            paths = new String[0];
-        }
-        
-        return paths;
+        String scriptPaths = script.getDescription().getId() + ".*";
+        return getDocumentPaths("/", false, scriptPaths);
     }
     
     /**

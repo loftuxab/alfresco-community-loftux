@@ -57,6 +57,16 @@ public interface Store
     public String getBasePath();
     
     /**
+     * Gets the paths of given document pattern within given path/sub-paths in this store
+     * 
+     * @param path             start path
+     * @param includeSubPaths  if true, include sub-paths
+     * @param documentPattern  document name, allows wildcards, eg. *.ftl or my*.ftl
+     * @return  array of document paths
+     */
+    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern);
+    
+    /**
      * Gets the paths of all Web Script description documents in this store
      * 
      * @return array of description document paths

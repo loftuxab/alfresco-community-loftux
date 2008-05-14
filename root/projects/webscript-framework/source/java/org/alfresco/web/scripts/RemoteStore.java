@@ -169,6 +169,14 @@ public class RemoteStore implements Store
     }
     
     /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#getDocumentPaths(java.lang.String, boolean, java.lang.String)
+     */
+    public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
+    {
+        throw new AlfrescoRuntimeException("getDocumentPaths() not supported by remote store.");
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getDescriptionDocumentPaths()
      */
     public String[] getDescriptionDocumentPaths()
