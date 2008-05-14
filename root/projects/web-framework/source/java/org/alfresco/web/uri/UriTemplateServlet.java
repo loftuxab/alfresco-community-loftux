@@ -72,7 +72,7 @@ public class UriTemplateServlet extends HttpServlet
       
       // init required beans
       ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-      ConfigService configService = (ConfigService)context.getBean("pagerenderer.config");
+      ConfigService configService = (ConfigService)context.getBean("web.config");
       initUriIndex(configService);
    }
    

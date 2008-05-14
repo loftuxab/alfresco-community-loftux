@@ -39,15 +39,6 @@
       <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
    </servlet>
 
-   <!--
-   <servlet>
-      <servlet-name>pageRendererServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageRendererServlet</servlet-class>
-   </servlet>
-   -->
-   
-   <!-- To use the Web Framework Dispatcher Servlet -->
-   <!--   Uncomment this block and comment out the pageRendererServlet above -->
    <servlet>
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
