@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site;
 
+import org.alfresco.connector.User;
+
 /**
  * Slingshot User object
  * 

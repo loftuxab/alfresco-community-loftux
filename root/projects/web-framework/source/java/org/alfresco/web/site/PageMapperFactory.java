@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.tools.ReflectionHelper;
+import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.site.exception.PageMapperException;
 
 /**
@@ -56,9 +56,9 @@ public class PageMapperFactory
             }
         }
         
-        if(FrameworkHelper.getLogger().isDebugEnabled())
+        if (FrameworkHelper.getLogger().isDebugEnabled())
         {
-            FrameworkHelper.getLogger().debug("New page mapper: " + pageMapper.getClass().toString());
+            FrameworkHelper.getLogger().debug("Constructed page mapper: " + pageMapper.getClass().toString());
         }
         
         return pageMapper;

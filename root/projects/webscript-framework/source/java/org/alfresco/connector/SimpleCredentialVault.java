@@ -43,58 +43,72 @@ import java.util.Map;
  */
 public class SimpleCredentialVault implements CredentialVault
 {
-    public static Map<String, Credentials> credentials = null;
-    
+    public static Map<String, Credentials> credentials = new HashMap<String, Credentials>(16, 1.0f);
+
     public SimpleCredentialVault()
     {
-    	this.credentials = new HashMap<String, Credentials>(128, 1.0f);
     }
-    
-	/**
-	 * Stores a given credential into the vault
-	 * 
-	 * @param key the key
-	 * @param credentials the credentials
-	 */
-	public void store(String key, Credentials credentials)
-	{
-		if(this.credentials != null)
-		{
-			this.credentials.put(key, credentials);
-		}
-	}
-	
-	/**
-	 * Retrieves a credential from the vault
-	 * 
-	 * @param key the key
-	 * 
-	 * @return the credentials
-	 */
-	public Credentials retrieve(String key)
-	{
-		Credentials cred = null;
-		
-		if(this.credentials != null)
-		{
-			cred = (Credentials) this.credentials.get(key);
-		}
-		
-		return cred;
-	}
-	
-	/**
-	 * Tells the Credential Vault to load state from persisted store
-	 */
-	public void load()
-	{
-	}
-	
-	/**
-	 * Tells the Credential Vault to write state to persisted store
-	 */
-	public void save()
-	{
-	}
-    
+
+    /**
+     * Stores a given credential into the vault
+     * 
+     * @param key the key
+     * @param credentials the credentials
+     */
+    public void store(String key, Credentials credentials)
+    {
+        this.credentials.put(key, credentials);
+    }
+
+    /**
+     * Retrieves a credential from the vault
+     * 
+     * @param key the key
+     * 
+     * @return the credentials
+     */
+    public Credentials retrieve(String key)
+    {
+        return (Credentials) this.credentials.get(key);
+    }
+
+    /**
+     * @return true if any credentials are stored for this user
+     */
+    public boolean hasCredentials(User user)
+    {
+        boolean found = false;
+        
+        String lookup = "_" + user.getId();
+        for (String key : this.credentials.keySet())
+        {
+            if (key.endsWith(lookup))
+            {
+                found = true;
+                break;
+            }
+        }
+        
+        return found;
+    }
+
+    /**
+     * Tells the Credential Vault to load state from persisted store
+     */
+    public void load()
+    {
+    }
+
+    /**
+     * Tells the Credential Vault to write state to persisted store
+     */
+    public void save()
+    {
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.credentials.toString();
+    }
 }

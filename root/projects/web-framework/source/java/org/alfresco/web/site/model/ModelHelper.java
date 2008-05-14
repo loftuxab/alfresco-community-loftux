@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.tools.ObjectGUID;
-import org.alfresco.tools.ReflectionHelper;
 import org.alfresco.tools.XMLUtil;
+import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.filesystem.IFile;

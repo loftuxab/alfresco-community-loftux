@@ -29,10 +29,10 @@
       <servlet-name>proxyServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
    </servlet>
-
+   
    <servlet>
-      <servlet-name>webscriptAuthenticationServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.WebScriptAuthenticationServlet</servlet-class>
+      <servlet-name>uriTemplateServlet</servlet-name>
+      <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
    </servlet>
    
    <!--
@@ -42,11 +42,6 @@
    </servlet>
    -->
    
-   <servlet>
-      <servlet-name>uriTemplateServlet</servlet-name>
-      <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
-   </servlet>
-
    <!-- To use the Web Framework Dispatcher Servlet -->
    <!--   Uncomment this block and comment out the pageRendererServlet above -->
    <servlet>
@@ -74,11 +69,6 @@
    <servlet-mapping>
       <servlet-name>pageRendererServlet</servlet-name>
       <url-pattern>/p/*</url-pattern>
-   </servlet-mapping>
-   
-   <servlet-mapping>
-      <servlet-name>webscriptAuthenticationServlet</servlet-name>
-      <url-pattern>/auth/*</url-pattern>
    </servlet-mapping>
    
    <servlet-mapping>

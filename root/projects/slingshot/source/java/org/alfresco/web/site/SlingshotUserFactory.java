@@ -26,6 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
@@ -44,42 +45,22 @@ import org.alfresco.web.site.exception.UserFactoryException;
  * 
  * @author muzquiano
  */
-public class SlingshotUserFactory extends UserFactory
+public class SlingshotUserFactory extends AlfrescoUserFactory
 {
-    public boolean authenticate(HttpServletRequest request,
-    		String username, String password)
-    {
-    	return false;
-    }
-	
 	/**
-	 * For the moment, this just produces Slingshot Users that are
-	 * guests. 
-	 * 
-	 * Ultimately, this method should call to Alfresco, JSON the data
+	 * This method should call to Alfresco, JSON the data
 	 * for the user object and construct the Slingshot user.
 	 * 
 	 * The returned User object is then placed onto the session.  This
 	 * is done automatically by the UserFactory class.  Thus, the
 	 * User object faulting should only occur once.
 	 */
-    public User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws UserFactoryException
+    public User loadUser(RequestContext context, HttpServletRequest request, String userId)
+        throws UserFactoryException
     {
-    	return getGuestUser(context, request);
+    	SlingshotUser user = new SlingshotUser(userId);
+        user.setFirstName(userId);
+        user.setLastName(userId);
+        return user;
     }
-    
-    protected User getGuestUser(RequestContext context,
-            HttpServletRequest request) throws UserFactoryException
-    {
-		if(this.guestUser == null)
-		{
-			this.guestUser = new SlingshotUser("guest");
-			this.guestUser.setFirstName("Guest");
-			this.guestUser.setLastName("User");
-		}
-		return this.guestUser;
-    }
-	
-	protected SlingshotUser guestUser;
 }

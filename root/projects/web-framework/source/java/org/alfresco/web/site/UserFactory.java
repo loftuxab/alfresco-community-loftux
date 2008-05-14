@@ -26,23 +26,35 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.Credentials;
+import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.UserFactoryException;
 
+/**
+ * Factory class for producing and loading User objects. Generally this is
+ * overriden on a per-application bases to build specific User instances.
+ * 
+ * @author muzquiano
+ * @author Kevin Roast
+ */
 public abstract class UserFactory
 {
+    public static final String USER_GUEST = "guest";
     public static String SESSION_ATTRIBUTE_KEY_USER_OBJECT = "USER_OBJECT";
     public static String SESSION_ATTRIBUTE_KEY_USER_ID = "USER_ID";
 
     protected User guestUser = null;
-
+    protected String id;
+    
+    
     protected User getGuestUser(RequestContext context,
             HttpServletRequest request) throws UserFactoryException
     {
         if (this.guestUser == null)
         {
-            User user = new User("guest");
+            User user = new User(USER_GUEST);
             user.setFirstName("Guest");
-
+            
             this.guestUser = user;
         }
         return this.guestUser;
@@ -51,52 +63,48 @@ public abstract class UserFactory
     public User getUser(RequestContext context, HttpServletRequest request)
         throws UserFactoryException
     {
-        // check whether there is a "USER_ID" file in the session
-        String userId = (String) request.getSession().getAttribute(
-                SESSION_ATTRIBUTE_KEY_USER_ID);
-        if (userId == null)
-        {
-            // there is no user
-        }
-
-        // we have a user
+        User user = null;
+        
+        // check whether there is a "USER_ID" marker in the session
+        String userId = (String) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_ID);
         if (userId != null)
         {
             // check whether there is a user object loaded already
-            User user = (User) request.getSession().getAttribute(
-                    SESSION_ATTRIBUTE_KEY_USER_OBJECT);
-            if(user != null)
+            user = (User) request.getSession().getAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+            if (user == null)
             {
-            	return user;
-            }
-
-            // load the user from whatever store...
-            user = loadUser(context, request, userId);
-
-            // if we got the user, set onto session
-            if (user != null)
-            {
-                request.getSession().setAttribute(
-                        SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
-                return user;
-            }
-            else
-            {
-                // unable to load the user
-                request.getSession().removeAttribute(
-                        SESSION_ATTRIBUTE_KEY_USER_OBJECT);                	
+                // load the user from whatever store...
+                user = loadUser(context, request, userId);
+    
+                // if we got the user, set onto session
+                if (user != null)
+                {
+                    request.getSession().setAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT, user);
+                }
+                else
+                {
+                    // unable to load the user
+                    request.getSession().removeAttribute(SESSION_ATTRIBUTE_KEY_USER_OBJECT);                	
+                }
             }
         }
-
+        
+        // TODO: should we do this?
         // return the guest user
-        return getGuestUser(context, request);
+        if (user == null)
+        {
+            user = getGuestUser(context, request);
+        }
+        
+        return user;
     }
 
-    public abstract User loadUser(RequestContext context,
-            HttpServletRequest request, String user_id) throws UserFactoryException;
+    public abstract User loadUser(
+            RequestContext context, HttpServletRequest request, String user_id)
+        throws UserFactoryException;
 
-    public abstract boolean authenticate(HttpServletRequest request,
-    		String username, String password);
+    public abstract Credentials authenticate(
+            HttpServletRequest request, String username, String password);
     
     public void setId(String id)
     {
@@ -107,7 +115,4 @@ public abstract class UserFactory
     {
         return this.id;
     }
-
-    protected String id;
-    
 }

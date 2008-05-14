@@ -141,7 +141,7 @@ public class DefaultPageMapper extends AbstractPageMapper
             Theme theme = context.getModel().loadTheme(context, themeId);
             if(theme != null)
             {
-                pageId = theme.getDefaultPageId(pageTypeId);
+                pageId = theme.getPageId(pageTypeId);
             }
             
             /**
@@ -149,7 +149,7 @@ public class DefaultPageMapper extends AbstractPageMapper
              */
             if(pageId == null)
             {
-                pageId = (String) getDefaultPageId(context, pageTypeId);
+                pageId = (String) getPageId(context, pageTypeId);
             }
             
             /**
@@ -157,7 +157,7 @@ public class DefaultPageMapper extends AbstractPageMapper
              */           
             if(pageId == null)
             {
-                pageId = (String) getDefaultPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
+                pageId = (String) getPageId(context, WebFrameworkConstants.GENERIC_PAGE_TYPE_DEFAULT_PAGE_ID);
             }
             
             /**

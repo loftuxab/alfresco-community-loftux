@@ -35,6 +35,11 @@ public class PageType extends AbstractModelObject
 {
     public static String TYPE_NAME = "page-type";
     
+    // well known system page type IDs
+    public static String PAGETYPE_LOGIN = "login";
+    public static String PAGETYPE_LOGOUT = "logout";
+    
+    
     /**
      * Instantiates a new page type for a given XML document
      * 

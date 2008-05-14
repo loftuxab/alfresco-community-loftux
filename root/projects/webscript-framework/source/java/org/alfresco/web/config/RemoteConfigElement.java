@@ -326,6 +326,7 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         private static final String CONNECTOR_ID = "connector-id";
         private static final String DESCRIPTION = "description";
         private static final String NAME = "name";
+        private static final String UNSECURE = "unsecure";
 
         /**
          * Instantiates a new remote endpoint descriptor.
@@ -381,6 +382,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
         public String getPassword()
         {
             return getStringProperty(PASSWORD);
+        }
+        
+        public boolean getUnsecure()
+        {
+            return Boolean.parseBoolean(getStringProperty(UNSECURE));
         }
     }
 

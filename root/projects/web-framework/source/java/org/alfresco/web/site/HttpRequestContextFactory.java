@@ -30,6 +30,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.alfresco.web.site.exception.UserFactoryException;
@@ -61,34 +62,26 @@ public class HttpRequestContextFactory implements RequestContextFactory
 
         HttpRequestContext context = null;
         
-        /**
-         * Load the user and place the user onto the RequestContext
-         */
+        // Load the user and place the user onto the RequestContext
         try
         {
-            /**
-             * Construct the HttpRequestContext instance
-             */
+            // Construct the HttpRequestContext instance
             context = new HttpRequestContext((HttpServletRequest)request);
 
-            /**
-             * Construct/load the user and place them onto the instance
-             */
-            UserFactory userFactory = UserFactoryBuilder.newFactory();
-            if(userFactory != null)
+            // Construct/load the user and place them onto the instance
+            // TODO: move this to login servlet...
+            UserFactory userFactory = FrameworkHelper.getUserFactory();
+            if (userFactory != null)
             {
                 User user = userFactory.getUser(context, (HttpServletRequest)request);
                 context.setUser(user);
             }
             
-            /**
-             * Determine the store id and set it onto the request context
-             */
+            // Determine the store id and set it onto the request context
             initStoreId(context);
             
-            /**
-             * Initialize the file system
-             */
+            // Initialize the file system
+            // TODO: remove this - replace with Store abstraction
             String rootPath = context.getConfig().getFileSystemDescriptor("local").getRootPath();
             initFileSystem(context, (HttpServletRequest)request, rootPath);
             
@@ -101,11 +94,11 @@ public class HttpRequestContextFactory implements RequestContextFactory
             PageMapper pageMapper = PageMapperFactory.newInstance(context);
             pageMapper.execute(context, (HttpServletRequest)request);
         }
-        catch(UserFactoryException ufe)
+        catch (UserFactoryException ufe)
         {
             throw new RequestContextException("Exception running UserFactory in HttpRequestContextFactory", ufe);
         }
-        catch(PageMapperException pme)
+        catch (PageMapperException pme)
         {
             throw new RequestContextException("Exception running PageMapper in HttpRequestContextFactory", pme);
         }

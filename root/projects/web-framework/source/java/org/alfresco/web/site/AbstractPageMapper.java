@@ -53,16 +53,16 @@ public abstract class AbstractPageMapper implements PageMapper
             ServletRequest request) throws PageMapperException;
     
     /**
-     * Gets the default page id.
+     * Gets the page id for a given page type.
      * 
      * @param context the context
      * @param pageTypeId the page type id
      * 
-     * @return the default page id
+     * @return the page id
      */
-    protected String getDefaultPageId(RequestContext context, String pageTypeId)
+    protected String getPageId(RequestContext context, String pageTypeId)
     {
-        if(pageTypeId == null)
+        if (pageTypeId == null)
         {
             return null;
         }

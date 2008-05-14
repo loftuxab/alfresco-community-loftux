@@ -42,7 +42,7 @@
 				<name>Local File System</name>
 				<description>Local File System</description>
 				<class>org.alfresco.web.site.filesystem.LocalFileSystem</class>
-				<use-cache>false</use-cache>
+				<use-cache>true</use-cache>
 				<root-path>/</root-path>
 			</file-system>
 			
@@ -52,7 +52,7 @@
 				<name>Web Script Store File System</name>
 				<description>Web Script Store File System</description>
 				<class>org.alfresco.web.site.filesystem.StoreFileSystem</class>
-				<use-cache>false</use-cache>
+				<use-cache>true</use-cache>
 			</file-system>
 			
 			<!-- Formats -->
@@ -324,10 +324,8 @@
 			
 			<!-- Debug -->
 			<debug>
-				<timer>
-					<enabled>false</enabled>
-				</timer>
-			</debug>					
+				<timer>false</timer>
+			</debug>				
 			
 		</web-framework>
 		

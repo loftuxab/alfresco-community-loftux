@@ -47,7 +47,6 @@ import org.alfresco.web.site.exception.TemplateRenderException;
  */
 public class PresentationUtil
 {
-
     /**
      * Renders a JSP page
      * 
@@ -71,6 +70,29 @@ public class PresentationUtil
         }
     }
 
+    /**
+     * Renders the given page
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * @param pageId
+     */
+    public static void renderPage(RequestContext context,
+            HttpServletRequest request, HttpServletResponse response, String pageId) 
+            throws RequestDispatchException
+    {
+        try
+        {
+            RenderUtil.renderPage(context, request, response, pageId);
+        }
+        catch (PageRenderException ex)
+        {
+            handlePageRenderProblem(context, request, response, ex,
+                    context.getCurrentPage().getId());
+        }
+    }
+    
     /**
      * Renders the current page
      * 

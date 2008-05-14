@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.site;
 
-import org.alfresco.tools.ReflectionHelper;
+import org.alfresco.util.ReflectionHelper;
 
 /**
  * Manages the construction of RequestContextFactory objects.
