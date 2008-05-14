@@ -70,23 +70,21 @@ public class LoginServlet extends BaseServlet
     	try
     	{
 	    	UserFactory userFactory = FrameworkHelper.getUserFactory();
-	    	if (userFactory != null)
-	    	{
-                // authenticate and load the user details if successful
-	    	    credentials = userFactory.authenticate(request, username, password);
-	    	    if (credentials != null)
-	    	    {
-	    	        // set this onto the session
-	    	        request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
-	    	        
-	    	        // apply credentials to the default credentials vault
-	    	        FrameworkHelper.getCredentialVault().store(credentials.getId(), credentials);
-                    
-                    // this applies the User object to the Session
-                    RequestContext context = RequestUtil.getRequestContext(request);
-                    userFactory.getUser(context, request);
-	    	    }
-	    	}
+            
+            // authenticate and load the user details if successful
+    	    credentials = userFactory.authenticate(request, username, password);
+    	    if (credentials != null)
+    	    {
+    	        // set this onto the session
+    	        request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
+    	        
+    	        // apply credentials to the default credentials vault
+    	        FrameworkHelper.getCredentialVault().store(credentials.getId(), credentials);
+                
+                // this applies the User object to the Session
+                RequestContext context = RequestUtil.getRequestContext(request);
+                userFactory.getUser(context, request);
+    	    }
     	}
     	catch (Throwable err)
     	{

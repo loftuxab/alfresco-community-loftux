@@ -229,54 +229,57 @@ public class DispatcherServlet extends BaseServlet
         String currentPageId = context.getCurrentPageId();
         Page currentPage = context.getCurrentPage();
         
-        // do we need to redirect to a login page type?
-        switch (currentPage.getAuthentication())
+        if (currentPage != null)
         {
-            case user:
-                User user = context.getUser();
-                if ((user == null || user.getId().equals(UserFactory.USER_GUEST)) ||
-                    (user != null && context.getCredentialVault().hasCredentials(user) == false))
-                {
-                    // no valid user found - login required
-                    String loginPageId = null;
-                    
-                    // Consider the theme first - which can override common page types
-                    String themeId = (String) context.getThemeId();
-                    Theme theme = context.getModel().loadTheme(context, themeId);
-                    if (theme != null)
+            // do we need to redirect to a login page type?
+            switch (currentPage.getAuthentication())
+            {
+                case user:
+                    User user = context.getUser();
+                    if ((user == null || user.getId().equals(UserFactory.USER_GUEST)) ||
+                        (user != null && context.getCredentialVault().hasCredentials(user) == false))
                     {
-                        loginPageId = theme.getPageId(PageType.PAGETYPE_LOGIN);
-                    }
-                    
-                    // Consider whether a system default has been set up
-                    if (loginPageId == null)
-                    {
-                        loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
-                    }
-                    
-                    Page page = null;
-                    if (loginPageId != null)
-                    {
-                        page = context.getModel().loadPage(context, loginPageId);
-                        if (page != null)
+                        // no valid user found - login required
+                        String loginPageId = null;
+                        
+                        // Consider the theme first - which can override common page types
+                        String themeId = (String) context.getThemeId();
+                        Theme theme = context.getModel().loadTheme(context, themeId);
+                        if (theme != null)
                         {
-                            String redirectUrl = context.getLinkBuilder().page(
-                                    context, currentPageId, currentFormatId, currentObjectId);
-                            // set redirect url for use on login page template
-                            page.setCustomProperty("alfRedirectUrl", redirectUrl);
-                            dispatchPage(context, request, response, page, currentFormatId);
-                            return;
+                            loginPageId = theme.getPageId(PageType.PAGETYPE_LOGIN);
+                        }
+                        
+                        // Consider whether a system default has been set up
+                        if (loginPageId == null)
+                        {
+                            loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
+                        }
+                        
+                        Page page = null;
+                        if (loginPageId != null)
+                        {
+                            page = context.getModel().loadPage(context, loginPageId);
+                            if (page != null)
+                            {
+                                String redirectUrl = context.getLinkBuilder().page(
+                                        context, currentPageId, currentFormatId, currentObjectId);
+                                // set redirect url for use on login page template
+                                page.setCustomProperty("alfRedirectUrl", redirectUrl);
+                                dispatchPage(context, request, response, page, currentFormatId);
+                                return;
+                            }
+                        }
+                        
+                        if (loginPageId == null || page == null)
+                        {
+                            FrameworkHelper.getLogger().warn("No 'login' page type found - but page auth required it.");
                         }
                     }
-                    
-                    if (loginPageId == null || page == null)
-                    {
-                        FrameworkHelper.getLogger().warn("No 'login' page type found - but page auth required it.");
-                    }
-                }
-                break;
-            
-            // TODO: support admin/guest required auth cases
+                    break;
+                
+                // TODO: support admin/guest required auth cases
+            }
         }
         
         if (isDebugEnabled())
@@ -285,7 +288,7 @@ public class DispatcherServlet extends BaseServlet
             debug(context, "Current Format ID: " + currentFormatId);
             debug(context, "Current Object ID: " + currentObjectId);
         }
-                
+        
         // if at this point there really is nothing to view...
         if (currentPage == null && currentObjectId == null)
         {
