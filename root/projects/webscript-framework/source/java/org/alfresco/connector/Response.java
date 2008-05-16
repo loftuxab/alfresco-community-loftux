@@ -37,76 +37,115 @@ import org.alfresco.web.scripts.Status;
  */
 public class Response
 {
-   private String data;
-   private InputStream is;
-   private Status status;
-   private String encoding = null;
-   
-   Response(Status status)
-   {
-      this.status = status;
-   }
-   
-   Response(String data, Status status)
-   {
-      this.data = data;
-      this.status = status;
-   }
-   
-   Response(InputStream is, Status status)
-   {
-      this.is = is;
-      this.status = status;
-   }
-   
-   /*package*/ void setEncoding(String encoding)
-   {
-      this.encoding = encoding;
-   }
-   
-   /**
-    * @return the data stream from the response object - will be null on error or if the
-    *         response has already been streamed to an OutputStream.
-    */
-   public String getResponse()
-   {
-      return this.data;
-   }
-   
-   /**
-    * @return the response InputStream if set during construction, else will be null.
-    */
-   public InputStream getResponseStream()
-   {
-      try
-      {
-         return (this.is != null ? this.is : new ByteArrayInputStream(this.data.getBytes(encoding)));
-      }
-      catch (UnsupportedEncodingException e)
-      {
-         throw new RuntimeException("UnsupportedEncodingException: " + encoding);
-      }
-   }
-   
-   /**
-    * @return Status object representing the response status and any error information {@link Status}
-    */
-   public Status getStatus()
-   {
-      return this.status;
-   }
-   
-   /**
-    * @return the response encoding
-    */
-   public String getEncoding()
-   {
-      return this.encoding;
-   }
+    private String data;
+    private InputStream is;
+    private Status status;
+    private String encoding = null;
 
-   @Override
-   public String toString()
-   {
-      return this.data;
-   }
+    /**
+     * Instantiates a new response.
+     * 
+     * @param status the status
+     */
+    Response(Status status)
+    {
+        this.status = status;
+    }
+
+    /**
+     * Instantiates a new response.
+     * 
+     * @param data the data
+     * @param status the status
+     */
+    Response(String data, Status status)
+    {
+        this.data = data;
+        this.status = status;
+    }
+
+    /**
+     * Instantiates a new response.
+     * 
+     * @param is the is
+     * @param status the status
+     */
+    Response(InputStream is, Status status)
+    {
+        this.is = is;
+        this.status = status;
+    }
+
+    /* package *//**
+                 * Sets the encoding.
+                 * 
+                 * @param encoding the new encoding
+                 */
+    void setEncoding(String encoding)
+    {
+        this.encoding = encoding;
+    }
+
+    /**
+     * Gets the response.
+     * 
+     * @return the data stream from the response object - will be null on error
+     *         or if the response has already been streamed to an OutputStream.
+     */
+    public String getResponse()
+    {
+        return this.data;
+    }
+
+    /**
+     * Gets the response stream.
+     * 
+     * @return the response InputStream if set during construction, else will be
+     *         null.
+     */
+    public InputStream getResponseStream()
+    {
+        try
+        {
+            return (this.is != null ? this.is : new ByteArrayInputStream(
+                    this.data.getBytes(encoding)));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new RuntimeException(
+                    "UnsupportedEncodingException: " + encoding);
+        }
+    }
+
+    /**
+     * Gets the status.
+     * 
+     * @return Status object representing the response status and any error
+     *         information {@link Status}
+     */
+    public Status getStatus()
+    {
+        return this.status;
+    }
+
+    /**
+     * Gets the encoding.
+     * 
+     * @return the response encoding
+     */
+    public String getEncoding()
+    {
+        return this.encoding;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return this.data;
+    }
 }

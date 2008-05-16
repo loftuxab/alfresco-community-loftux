@@ -29,52 +29,68 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 
 /**
+ * An authentication while will perform an Alfresco ticket
+ * handshake.
+ * 
+ * The credentials for performing the handshake are supplied
+ * using a Credentials object.  The acquired ticket is then
+ * placed onto the Credentials object.
+ * 
  * @author muzquiano
  */
 public class AlfrescoAuthenticator implements Authenticator
 {
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.alfresco.connector.Authenticator#authenticate(org.alfresco.connector.Client,
+     *      org.alfresco.connector.Credentials)
+     */
     public boolean authenticate(Client client, Credentials credentials)
-    	throws AuthenticationException
+            throws AuthenticationException
     {
-    	boolean authenticated = false;
-    	
-    	if(client instanceof RemoteClient)
-    	{
-    		// set up the remote client
-    		RemoteClient remoteClient = (RemoteClient) client;
-    		remoteClient.setTicket(null);
-    		remoteClient.setUsernamePassword(null, null);
-    		
-    		// call the login web script
-	    	String user = (String) credentials.getProperty(Credentials.CREDENTIAL_USERNAME);
-	    	String pass = (String) credentials.getProperty(Credentials.CREDENTIAL_PASSWORD);
-	    	Response response = remoteClient.call("/api/login?u="+user+"&pw="+pass);
-	    	
-	    	// read back the ticket
-	    	if(response.getStatus().getCode() == 200)
-	    	{
-	    		String responseText = response.getResponse();
-	    		
-	    		// read out the ticket id
-	    		String ticket = null;
-	    		try
-	    		{
-	    			ticket = DocumentHelper.parseText(responseText).getRootElement().getTextTrim();
-	    		}
-	    		catch(DocumentException de)
-	    		{
-	    			// the ticket that came back was unparseable or invalid
-	    			// this will cause the entire handshake to fail
-	    			throw new AuthenticationException("Unable to retrieve ticket from Alfresco", de);
-	    		}
-	    		
-	    		// place the ticket back onto the Credentials object
-	    		credentials.setProperty(Credentials.CREDENTIAL_ALF_TICKET, ticket);
-	    		
-	    		authenticated = true;
-	    	}
-    	}
-    	
-    	return authenticated;
+        boolean authenticated = false;
+
+        if (client instanceof RemoteClient)
+        {
+            // set up the remote client
+            RemoteClient remoteClient = (RemoteClient) client;
+            remoteClient.setTicket(null);
+            remoteClient.setUsernamePassword(null, null);
+
+            // call the login web script
+            String user = (String) credentials.getProperty(Credentials.CREDENTIAL_USERNAME);
+            String pass = (String) credentials.getProperty(Credentials.CREDENTIAL_PASSWORD);
+            Response response = remoteClient.call("/api/login?u=" + user + "&pw=" + pass);
+
+            // read back the ticket
+            if (response.getStatus().getCode() == 200)
+            {
+                String responseText = response.getResponse();
+
+                // read out the ticket id
+                String ticket = null;
+                try
+                {
+                    ticket = DocumentHelper.parseText(responseText).getRootElement().getTextTrim();
+                }
+                catch (DocumentException de)
+                {
+                    // the ticket that came back was unparseable or invalid
+                    // this will cause the entire handshake to fail
+                    throw new AuthenticationException(
+                            "Unable to retrieve ticket from Alfresco", de);
+                }
+
+                // place the ticket back onto the Credentials object
+                credentials.setProperty(Credentials.CREDENTIAL_ALF_TICKET,
+                        ticket);
+
+                authenticated = true;
+            }
+        }
+
+        return authenticated;
     }
 }

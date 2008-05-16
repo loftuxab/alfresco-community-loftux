@@ -29,27 +29,28 @@ import java.net.URL;
 /**
  * Interface for Client implementations
  * 
- * This interface is pretty lightweight at the moment.  The Client
- * implementation requirements are deliberately so since we're still
- * feeling out what kind of custom Clients might be written in the future.
+ * This interface is pretty lightweight at the moment. The Client implementation
+ * requirements are deliberately so since we're still feeling out what kind of
+ * custom Clients might be written in the future.
  * 
  * At present, it seems that most things are solved by the root RemoteClient
  * object.
  * 
  * This interface is therefore subject to change in the future.
  * 
- * Developers seeking to write their own Clients are encouraged to extend
- * the AbstractClient base class.
+ * Developers seeking to write their own Clients are encouraged to extend the
+ * AbstractClient base class.
  * 
  * @author muzquiano
  */
 public interface Client
 {
     /**
-     * @return the Endpoint for this Client e.g. http://localhost:8080/alfresco/service
+     * @return the Endpoint for this Client e.g.
+     *         http://localhost:8080/alfresco/service
      */
     public String getEndpoint();
-    
+
     /**
      * @return the Endpoint for the Client as a URL object
      */

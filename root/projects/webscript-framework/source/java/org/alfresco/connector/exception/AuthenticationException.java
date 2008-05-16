@@ -25,6 +25,11 @@
 package org.alfresco.connector.exception;
 
 /**
+ * Thrown when a connector was unable to properly authenticate
+ * the user's request against a given endpoint.  This exception
+ * is thrown after the connector has made its best total effort
+ * and cannot properly hand back a valid response.
+ * 
  * @author muzquiano
  */
 public class AuthenticationException extends Exception

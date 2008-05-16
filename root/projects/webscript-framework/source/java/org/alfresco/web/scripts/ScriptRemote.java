@@ -1,25 +1,25 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * 
+ * This program is free software; you can redistribute it and/or modify it under
+ * the terms of the GNU General Public License as published by the Free Software
+ * Foundation; either version 2 of the License, or (at your option) any later
+ * version.
+ * 
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ * 
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * 
+ * As a special exception to the terms and conditions of version 2.0 of the GPL,
+ * you may redistribute this Program in connection with Free/Libre and Open
+ * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
+ * exception. You should have recieved a copy of the text describing the FLOSS
+ * exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.scripts;
@@ -37,12 +37,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Root-scope class that provides useful functions for working with
- * endpoints, connectors and credentials.
+ * Root-scope class that provides useful functions for working with endpoints,
+ * connectors and credentials.
  * 
- * This class also implements methods from the Connector interface
- * so as to allow application developers to use it straight away
- * against the configured default endpoint.
+ * This class also implements methods from the Connector interface so as to
+ * allow application developers to use it straight away against the configured
+ * default endpoint.
  * 
  * @author muzquiano
  */
@@ -63,8 +63,8 @@ public class ScriptRemote
     }
 
     /**
-     * Constructs a RemoteClient to a default endpoint (if configured)
-     * If a default endpoint is not configured, null will be returned.
+     * Constructs a RemoteClient to a default endpoint (if configured) If a
+     * default endpoint is not configured, null will be returned.
      * 
      * @return the remote client
      */
@@ -73,12 +73,13 @@ public class ScriptRemote
         Connector connector = null;
 
         // Check whether a remote configuration has been provided
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-        if(remoteConfig != null)
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
+                "Remote").getConfigElement("remote");
+        if (remoteConfig != null)
         {
             // See if we have a default endpoint id
             String defaultEndpointId = remoteConfig.getDefaultEndpointId();
-            if(defaultEndpointId != null)
+            if (defaultEndpointId != null)
             {
                 // Construct for this endpoint id
                 connector = connect(defaultEndpointId);
@@ -89,8 +90,8 @@ public class ScriptRemote
     }
 
     /**
-     * Constructs a RemoteClient to a specific endpoint.
-     * If the endpoint does not exist, null is returned.
+     * Constructs a RemoteClient to a specific endpoint. If the endpoint does
+     * not exist, null is returned.
      * 
      * @param endpointId the endpoint id
      * 
@@ -100,13 +101,14 @@ public class ScriptRemote
     {
         Connector connector = null;
 
-        // Check whether a remote configuration has been provided    	
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-        if(remoteConfig != null)
-        {        	
+        // Check whether a remote configuration has been provided
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
+                "Remote").getConfigElement("remote");
+        if (remoteConfig != null)
+        {
             // check whether we have a descriptor for this endpoint
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(endpointId);
-            if(descriptor == null)
+            if (descriptor == null)
             {
                 logger.error("No endpoint descriptor found for endpoint id: " + endpointId);
             }
@@ -115,7 +117,7 @@ public class ScriptRemote
                 // construct a connector to this endpoint
                 try
                 {
-                    // TODO:  Load current user credentials from the vault
+                    // TODO: Load current user credentials from the vault
                     // At present, this does not seem possible to do since
                     // the web script framework does not maintain any
                     // notion of the current user
@@ -124,11 +126,14 @@ public class ScriptRemote
                     // or connections to endpoints that have "declared" user
                     // settings (which is to say, forced usernames and
                     // passwords within the configuration file)
-                    connector = ConnectorFactory.getInstance(configService).connector(endpointId);
+                    connector = ConnectorFactory.getInstance(configService).connector(
+                            endpointId);
                 }
                 catch (RemoteConfigException rce)
                 {
-                    logger.error("Unable to open connection to endpoint: " + endpointId, rce);
+                    logger.error(
+                            "Unable to open connection to endpoint: " + endpointId,
+                            rce);
                 }
             }
         }
@@ -136,13 +141,11 @@ public class ScriptRemote
         return connector;
     }
 
-
-    ////////////////////////////////////////////////////////////////
+    // //////////////////////////////////////////////////////////////
     //
     // Connector pass-thru methods to work with default Connector
     //
-    ////////////////////////////////////////////////////////////////
-
+    // //////////////////////////////////////////////////////////////
 
     /**
      * Invoke a specific URI on the default endpoint
@@ -157,8 +160,8 @@ public class ScriptRemote
     }
 
     /**
-     * Invoke a specific URI on the default endpoint
-     * Pass in the given parameters
+     * Invoke a specific URI on the default endpoint Pass in the given
+     * parameters
      * 
      * @param uri
      * @param parameters
@@ -170,9 +173,8 @@ public class ScriptRemote
     }
 
     /**
-     * Invoke a specific URI on the default endpoint
-     * Pass in the given parameters
-     * Apply the provided headers
+     * Invoke a specific URI on the default endpoint Pass in the given
+     * parameters Apply the provided headers
      * 
      * @param uri
      * @param parameters
@@ -184,52 +186,72 @@ public class ScriptRemote
         return this.connect().call(uri, parameters, headers);
     }
 
-
-    // query and interrogation
-
+    /**
+     * Useful in a script should you wish to list the ids of available
+     * endpoints.
+     * 
+     * @return
+     */
     public String[] getEndpointIds()
     {
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-        if(remoteConfig == null)
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
+                "Remote").getConfigElement("remote");
+        if (remoteConfig == null)
         {
-            return new String[] { };
+            return new String[] {};
         }
 
         return remoteConfig.getEndpointIds();
     }
 
+    /**
+     * Useful in a script to retrieve the formal display name of a given
+     * endpoint.
+     * 
+     * @param id
+     * @return
+     */
     public String getEndpointName(String id)
     {
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-        if(remoteConfig == null)
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
+                "Remote").getConfigElement("remote");
+        if (remoteConfig == null)
         {
             return null;
         }
 
         EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-        if(descriptor == null)
+        if (descriptor == null)
         {
             return null;
         }
 
-        return descriptor.getName();    	
+        return descriptor.getName();
     }
 
+    /**
+     * Useful in a script to retrieve the formal description of a given
+     * endpoint.
+     * 
+     * @param id
+     * @return
+     */
     public String getEndpointDescription(String id)
     {
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig("Remote").getConfigElement("remote");
-        if(remoteConfig == null)
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
+                "Remote").getConfigElement("remote");
+        if (remoteConfig == null)
         {
             return null;
         }
 
         EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-        if(descriptor == null)
+        if (descriptor == null)
         {
             return null;
         }
 
-        return descriptor.getDescription();    	
+        return descriptor.getDescription();
     }
 
 }
