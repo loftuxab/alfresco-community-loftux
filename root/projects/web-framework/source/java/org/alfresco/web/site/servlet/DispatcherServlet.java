@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
+import org.alfresco.web.site.Content;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.PresentationUtil;
@@ -200,7 +201,7 @@ public class DispatcherServlet extends BaseServlet
                 
                 // effectively, do a reset
                 context.setCurrentPage(null);
-                context.setCurrentObjectId(null);
+                context.setCurrentObject(null);
             }
         }
         
@@ -352,41 +353,59 @@ public class DispatcherServlet extends BaseServlet
             HttpServletRequest request, HttpServletResponse response,
             String contentId, String formatId) throws RequestDispatchException
     {
-        // TODO
-        // Load the Content Item into a Content wrapper
-        // This should go through a ContentFactory pattern
-        // Objects that are XML serialized on disk are trivial
-        // Objects that must be remoted should go through a caching layer
-        // and then be present in the wrapped object
-        //
-        // An example - loading an object: workspace://SpacesStore/ABCDEF
-        // content.getId();
-        // content.getSource();
-        // content.getMetadata();
-        //
-
-        // TODO
-        String sourceId = "content type id";
-        if (isDebugEnabled())
-            debug(context, "Content - Object Source Id: " + sourceId); 
-
-        // Once we determine the "sourceId", we can do the following
-
-        // get the content-template association
-        ContentAssociation[] associations = ModelUtil.findContentAssociations(
-                context, sourceId, null, null, formatId);
-        if (associations != null && associations.length > 0)
-        {
-            Page page = associations[0].getPage(context);
-            if (page != null)
-            {
-                if (isDebugEnabled())
-                    debug(context, "Content - Dispatching to Page: " + page.getId());
-                
-                // dispatch to content page
-                context.setCurrentPage(page);
-                dispatchCurrentPage(context, request, response, formatId);
-            }
+    	// get the current object
+    	Content object = context.getCurrentObject();
+    	if(object == null)
+    	{
+    		throw new RequestDispatchException("Unable to dispatch to content page with null current object");
+    	}
+    	
+    	// if the current object is not loaded, we should dispatch to a
+    	// generic system page handler
+    	if(!object.isLoaded())
+    	{
+    		// something wiped out while trying to load the content
+    		// we want to display a friendly page to communicate this
+            RenderUtil.renderSystemPage(context, request, response, 
+                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_NOT_LOADED,
+                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_CONTENT_NOT_LOADED);
+    	}
+    	else
+    	{    	
+    		// otherwise, we dispatch to the associated content page
+	    	String sourceId = object.getTypeId();
+	    	if (isDebugEnabled())
+	            debug(context, "Content - Object Source Id: " + sourceId);
+	    	
+	    	// Look up which page to use to display this contnet
+	    	// this must also take into account the current format
+	        ContentAssociation[] associations = ModelUtil.findContentAssociations(
+	                context, sourceId, null, null, null);
+	        if (associations != null && associations.length > 0)
+	        {
+	        	Page page = associations[0].getPage(context);
+	            if (page != null)
+	            {
+	                if (isDebugEnabled())
+	                    debug(context, "Content - Dispatching to Page: " + page.getId());
+	
+	                // dispatch to content page
+	                context.setCurrentPage(page);
+	                dispatchCurrentPage(context, request, response, formatId);
+	            }
+	        }
+	        else
+	        {
+	        	// we couldn't find a content association page
+	        	// we should dispatch to a generic system page
+	        	
+	            // Render a friendly page to show that we could not find
+	        	// a content association to a page
+	            RenderUtil.renderSystemPage(context, request, response, 
+	                    WebFrameworkConstants.SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING,
+	                    WebFrameworkConstants.DEFAULT_SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING);
+	        	
+	        }
         }
     }
 

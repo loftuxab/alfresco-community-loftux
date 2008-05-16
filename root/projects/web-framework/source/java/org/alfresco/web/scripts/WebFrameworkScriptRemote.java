@@ -135,15 +135,24 @@ public class WebFrameworkScriptRemote
     				// the vault
     				CredentialVault vault = getRequestContext().getCredentialVault();
     				
+    				if(logger.isDebugEnabled())
+    					logger.debug("Found credential vault: " + vault);
+
     				// check whether we have a current user
     				User user = getRequestContext().getUser();
     				if (user == null)
     				{
-        				// return the non-credential'ed connector to this endpoint
+    					if(logger.isDebugEnabled())
+    						logger.debug("No user was found, creating unauthenticated connector");
+
+    					// return the non-credential'ed connector to this endpoint
     					connector = ConnectorFactory.getInstance(configService).connector(endpointId);
     				}
     				else
     				{
+    					if(logger.isDebugEnabled())
+    						logger.debug("User '" + user.getId() + "' was found, creating authenticated connector");
+
     					// return the credential'ed connector to this endpoint
     					connector = ConnectorFactory.getInstance(configService).connector(endpointId, user.getId(), vault);
     				}

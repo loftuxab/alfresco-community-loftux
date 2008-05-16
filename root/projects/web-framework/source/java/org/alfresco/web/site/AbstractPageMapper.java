@@ -26,6 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
 
 /**
@@ -68,6 +69,20 @@ public abstract class AbstractPageMapper implements PageMapper
         }
         
         return context.getConfig().getDefaultPageTypeInstanceId(pageTypeId);
+    }
+    
+    /**
+     * Loads content from the remote content store and returns a Content 
+     * object that contains the data.
+     * 
+     * @param context
+     * @param objectId
+     * @return
+     */
+    protected Content loadContent(RequestContext context, String objectId)
+    	throws ContentLoaderException
+    {
+    	return ContentLoaderUtil.loadContent(context, objectId);
     }
     
 }

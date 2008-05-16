@@ -170,11 +170,19 @@ public interface RequestContext extends Serializable
     public String getCurrentObjectId();
 
     /**
+     * Returns the current object
+     * If no object has been set, then null is returned
+     * 
+     * @return The current object
+     */
+    public Content getCurrentObject();
+    
+    /**
      * Sets the id of the current object
      * 
      * @param objectId
      */
-    public void setCurrentObjectId(String objectId);
+    public void setCurrentObject(Content content);
 
     /**
      * Returns the current format id
@@ -270,6 +278,13 @@ public interface RequestContext extends Serializable
      */
     public User getUser();
 
+    /**
+     * Returns the current user id
+     * 
+     * @return
+     */
+    public String getUserId();
+    
     /**
      * Returns the credential vault
      * 

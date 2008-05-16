@@ -296,6 +296,15 @@
 				<script-processor-bean>webframework.scriptprocessor</script-processor-bean>
 			</renderer>
 			
+			<!-- Content Loaders -->
+			<content-loader>
+				<id>alfresco</id>
+				<name>Alfresco Content Loader</name>
+				<description>Loads content from an Alfresco repository</description>
+				<class>org.alfresco.web.site.AlfrescoContentLoader</class>
+				<endpoint>alfresco</endpoint>
+			</content-loader>			
+			
 			<!-- Error Handler Pages -->
 			<error-handler>
 				<id>page-error</id>
@@ -334,6 +343,16 @@
 				<renderer>/core/page-unconfigured.jsp</renderer>
 				<renderer-type>jsp</renderer-type>
 			</system-page>
+			<system-page>
+				<id>page-content-not-loaded</id>
+				<renderer>/core/content-not-loaded.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
+			<system-page>
+				<id>page-content-association-missing</id>
+				<renderer>/core/content-association-missing.jsp</renderer>
+				<renderer-type>jsp</renderer-type>
+			</system-page>
 			
 			<!-- Defaults -->
 			<framework-defaults>
@@ -350,7 +369,9 @@
 				<theme>default</theme>
 				<region-chrome>default-region-chrome</region-chrome>
 				<component-chrome>default-component-chrome</component-chrome>
-				<!-- example page-type config
+
+				<!-- example page-type config-->
+				<!--
 				<page-type>
 					<id>login</id>
 					<page-instance-id>page.login</page-instance-id>
@@ -358,13 +379,14 @@
 				<page-type>
 					<id>logout</id>
 					<page-instance-id>page.logout</page-instance-id>
-				</page-type> -->
+				</page-type>
+				-->
 			</application-defaults>
 			
 			<!-- Debug -->
 			<debug>
 				<timer>false</timer>
-			</debug>				
+			</debug>	
 			
 		</web-framework>
 		

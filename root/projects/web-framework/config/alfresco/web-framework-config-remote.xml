@@ -9,21 +9,17 @@
 	<config evaluator="string-compare" condition="Remote">
 
 		<remote>
-			
-			<!-- Endpoints -->
-			<!-- override the alfresco endpoint (defined in webscript-framework-config.xml)
-			     to use the 'alfresco' connector which supplies Ticket based auth -->
+
+			<!-- Include out-of-the-box unauthenticated endpoints -->
+
 			<endpoint>
-				<id>alfresco</id>
-				<name>Alfresco User</name>
-				<description>User account access to Alfresco</description>
-				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
-				<identity>user</identity>
-			</endpoint>
-			
-			<!-- The default endpoint -->
-			<default-endpoint-id>alfresco</default-endpoint-id>
+				<id>alfresco.com</id>
+				<name>alfresco.com website</name>
+				<description>The alfresco.com website</description>
+				<connector-id>http</connector-id>
+				<endpoint-url>http://www.alfresco.com</endpoint-url>
+				<identity>none</identity>
+			</endpoint>			
 		   
 		</remote>
 				

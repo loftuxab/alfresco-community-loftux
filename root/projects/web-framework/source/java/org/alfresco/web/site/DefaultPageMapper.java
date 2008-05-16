@@ -26,6 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Theme;
@@ -113,7 +114,22 @@ public class DefaultPageMapper extends AbstractPageMapper
         String objectId = (String) request.getParameter("o");
         if (objectId != null && objectId.length() != 0)
         {
-            context.setCurrentObjectId(objectId);
+        	Content content = null;
+        	try
+        	{
+        		content = loadContent(context, objectId);
+	        	if(content != null)
+	        	{
+	        		context.setCurrentObject(content);
+	        	}
+        	}
+    		catch(ContentLoaderException cle)
+    		{
+    			// if this gets thrown, then something pretty nasty happened
+    			// perhaps a content loader wasn't able to be instantiated
+    			// at any rate, we want to throw this back (at this point)
+    			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
+    		}
         }
 
         /**

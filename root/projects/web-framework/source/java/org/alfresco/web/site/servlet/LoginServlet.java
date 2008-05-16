@@ -35,7 +35,6 @@ import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.UserFactory;
-import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
  * Responds to Login POSTs to allow the user to authenticate to the
