@@ -34,6 +34,8 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -266,6 +268,40 @@ public class RemoteClient extends AbstractClient
       
       return result;
    }
+   
+   /**
+    * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
+    * as the prefix for the full WebScript url.
+    * 
+    * @param uri    WebScript URI - for example /test/myscript?arg=value
+    * @param in     The optional InputStream to the call - if supplied a POST will be performed
+    * @param out    OutputStream to stream successful response to - will be closed automatically.
+    *               A response data string will not therefore be available in the Response object.
+    *               If remote call fails the OutputStream will not be modified or closed.
+    * 
+    * @return Response object from the call {@link Response}
+    */
+   public Response call(String uri, InputStream in, HttpServletResponse res)
+   {
+      Response result;
+      Status status = new Status();
+      try
+      {
+         String encoding = service(buildURL(uri), in, res.getOutputStream(), res, status);
+         result = new Response(status);
+         result.setEncoding(encoding);
+      }
+      catch (IOException ioErr)
+      {
+         if (logger.isDebugEnabled())
+            logger.debug("Error status " + status.getCode() + " " + status.getMessage());
+         
+         // error information already applied to Status object during service() call
+         result = new Response(status);
+      }
+      
+      return result;
+   }
 
    /**
     * Build the URL object based on the supplied uri and configured endpoint. Ticket
@@ -309,6 +345,27 @@ public class RemoteClient extends AbstractClient
    private String service(URL url, InputStream in, OutputStream out, Status status)
       throws IOException
    {
+       return service(url, in, out, null, status);
+   }
+   
+   /**
+    * Service a remote URL and write the the result into an output stream.
+    * If an InputStream is provided then a POST will be performed with the content
+    * pushed to the url. Otherwise a standard GET will be performed.
+    * 
+    * @param url    The URL to open and retrieve data from
+    * @param in     The optional InputStream - if set a POST will be performed
+    * @param out    The OutputStream to write result to
+    * @param res    Optional HttpServletResponse - to which response headers will be copied - i.e. proxied
+    * @param status The status object to apply the response code too
+    * 
+    * @return encoding specified by the source URL - may be null
+    * 
+    * @throws IOException
+    */
+   private String service(URL url, InputStream in, OutputStream out, HttpServletResponse res, Status status)
+      throws IOException
+   {
       if (logger.isDebugEnabled())
          logger.debug("Executing " + (in == null ?
                           "(" + (requestMethod != null ? requestMethod : "GET") + ")" :
@@ -344,8 +401,24 @@ public class RemoteClient extends AbstractClient
              connection.setRequestMethod(this.requestMethod);
          }
          
-         // write the connection result to the output stream
+         // prepare to write the connection result to the output stream
          InputStream input = connection.getInputStream();
+         
+         // proxy over any headers we find after getting the input stream
+         if (res != null)
+         {
+             Map<String, List<String>> headers = connection.getHeaderFields();
+             for (String key : headers.keySet())
+             {
+                 // it's strange, but the key can be null...!
+                 if (key != null)
+                 {
+                     res.setHeader(key, connection.getHeaderField(key));
+                 }
+             }
+         }
+         
+         // perform the write to the output
          try
          {
             byte[] buffer = new byte[BUFFERSIZE];
