@@ -411,7 +411,7 @@ public class RemoteClient extends AbstractClient
              for (String key : headers.keySet())
              {
                  // it's strange, but the key can be null...!
-                 if (key != null)
+                 if (key != null && key.equals("Server") == false && key.equals("Transfer-Encoding") == false)
                  {
                      res.setHeader(key, connection.getHeaderField(key));
                  }
