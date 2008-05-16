@@ -91,6 +91,8 @@ public class ProcessorModelHelper
                 URLHelper urlHelper = new URLHelper(request, args);
                 pageModel.put("url", urlHelper);
             }
+            pageModel.put("id", context.getCurrentPage().getId());
+            pageModel.put("title", context.getCurrentPage().getTitle());
             pageModel.put("theme", ThemeUtil.getCurrentThemeId(context));
             model.put("page", pageModel);
         }

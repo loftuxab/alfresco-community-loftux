@@ -50,6 +50,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected HashMap<String, RendererDescriptor> renderers = null;
     protected HashMap<String, String> pageTypes = null;
     protected HashMap<String, TypeDescriptor> types = null;
+    protected HashMap<String, ContentLoaderDescriptor> contentLoaders = null;
 
     protected boolean isTimerEnabled = false;
     protected String defaultFormatId = null;
@@ -82,9 +83,9 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         tagLibraries = new HashMap<String, TagLibraryDescriptor>();
         userFactories = new HashMap<String, UserFactoryDescriptor>();
         renderers = new HashMap<String, RendererDescriptor>();
-
         pageTypes = new HashMap<String, String>();
         types = new HashMap<String, TypeDescriptor>();
+        contentLoaders = new HashMap<String, ContentLoaderDescriptor>();
 
         isTimerEnabled = false;
     }
@@ -111,6 +112,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.userFactories.putAll(this.userFactories);
         combinedElement.renderers.putAll(this.renderers);
         combinedElement.types.putAll(this.types);
+        combinedElement.contentLoaders.putAll(this.contentLoaders);
 
         // override with things from the merging object
         combinedElement.formats.putAll(configElement.formats);
@@ -124,6 +126,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.userFactories.putAll(configElement.userFactories);
         combinedElement.renderers.putAll(configElement.renderers);
         combinedElement.types.putAll(configElement.types);
+        combinedElement.contentLoaders.putAll(configElement.contentLoaders);
 
         // other properties
         combinedElement.isTimerEnabled = this.isTimerEnabled;
@@ -287,7 +290,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         return (RendererDescriptor) this.renderers.get(id);
     }
 
-
     // types (model files)
     public String[] getTypeIds()
     {
@@ -307,6 +309,18 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         }
         return rootPath;
     }
+    
+    // content loaders
+    public String[] getContentLoaderIds()
+    {
+    	return this.contentLoaders.keySet().toArray(new String[this.contentLoaders.size()]);
+    }
+    
+    public ContentLoaderDescriptor getContentLoaderDescriptor(String id)
+    {
+    	return (ContentLoaderDescriptor) this.contentLoaders.get(id);    	
+    }
+    
 
     // debug
     public boolean isTimerEnabled()
@@ -335,7 +349,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     
     public String[] getDefaultPageTypeIds()
     {
-        return (String[]) this.pageTypes.keySet().toArray();
+    	return this.pageTypes.keySet().toArray(new String[this.pageTypes.size()]);
     }
     
     public String getDefaultPageTypeInstanceId(String id)
@@ -763,6 +777,37 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             return getStringProperty(VERSION);
         }
     }
+    
+    public static class ContentLoaderDescriptor extends Descriptor
+    {
+        private static final String CLAZZ = "class";
+        private static final String DESCRIPTION = "description";
+        private static final String NAME = "name";
+        private static final String ENDPOINT = "endpoint";
+
+        ContentLoaderDescriptor(Element el)
+        {
+            super(el);
+        }
+
+        public String getImplementationClass() 
+        {
+            return getStringProperty(CLAZZ);
+        }
+        public String getDescription() 
+        {
+            return getStringProperty(DESCRIPTION);
+        }
+        public String getName() 
+        {
+            return getStringProperty(NAME);
+        }
+        public String getEndpoint() 
+        {
+            return getStringProperty(ENDPOINT);
+        }
+    }
+    
 
 
     protected static WebFrameworkConfigElement newInstance(Element elem)
@@ -944,10 +989,10 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         // Type Specific Things
         //////////////////////////////////////////////////////
 
-        List types = elem.elements("model-type");
-        for(int i = 0; i < types.size(); i++)
+        List modelTypes = elem.elements("model-type");
+        for(int i = 0; i < modelTypes.size(); i++)
         {
-            Element el = (Element) types.get(i);
+            Element el = (Element) modelTypes.get(i);
             TypeDescriptor descriptor = new TypeDescriptor(el);
             configElement.types.put(descriptor.getId(), descriptor);
         }
@@ -958,6 +1003,19 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             configElement.rootPath = _rootPath;
         }
 
+        
+        //////////////////////////////////////////////////////
+        // Content Loaders
+        //////////////////////////////////////////////////////
+
+        List loaders = elem.elements("content-loader");
+        for(int i = 0; i < loaders.size(); i++)
+        {
+            Element el = (Element) loaders.get(i);
+            ContentLoaderDescriptor descriptor = new ContentLoaderDescriptor(el);
+            configElement.contentLoaders.put(descriptor.getId(), descriptor);
+        }
+        
         return configElement;
     }
 }

@@ -32,8 +32,12 @@ public class WebFrameworkConstants
     // System Pages
     public static final String SYSTEM_PAGE_GETTING_STARTED = "page-getting-started";
     public static final String SYSTEM_PAGE_UNCONFIGURED = "page-unconfigured";
+    public static final String SYSTEM_PAGE_CONTENT_NOT_LOADED = "page-content-not-loaded";
+    public static final String SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING = "page-content-association-missing";
     public static final String DEFAULT_SYSTEM_PAGE_GETTING_STARTED = "/core/page-gettingstarted.jsp";
     public static final String DEFAULT_SYSTEM_PAGE_UNCONFIGURED = "/core/page-unconfigured.jsp";
+    public static final String DEFAULT_SYSTEM_PAGE_CONTENT_NOT_LOADED = "/core/content-not-loaded.jsp";
+    public static final String DEFAULT_SYSTEM_PAGE_CONTENT_ASSOCIATION_MISSING = "/core/content-association-missing.jsp";
 
     // Dispatcher Handlers
     public static final String DISPATCHER_HANDLER_PAGE_ERROR = "page-error";

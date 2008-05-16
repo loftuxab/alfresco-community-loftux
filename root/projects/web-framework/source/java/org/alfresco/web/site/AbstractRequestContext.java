@@ -266,17 +266,30 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public String getCurrentObjectId()
     {
-        return this.currentObjectId;
+    	String id = null;    	
+    	if(getCurrentObject() != null)
+    	{
+    		id = getCurrentObject().getId();
+    	}
+        return id;
     }
 
     /**
-     * Sets the id of the current object
+     * Sets the current object
      * 
-     * @param objectId
+     * @param content
      */
-    public void setCurrentObjectId(String objectId)
+    public void setCurrentObject(Content content)
     {
-        this.currentObjectId = objectId;
+        this.currentObject = content;
+    }
+    
+    /**
+     * Returns the current object
+     */
+    public Content getCurrentObject()
+    {
+    	return this.currentObject;
     }
 
     /**
@@ -413,6 +426,21 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         return user;
     }
+    
+    /**
+     * Returns the user id
+     * 
+     * @return
+     */
+    public String getUserId()
+    {
+    	String userId = null;
+    	if(getUser() != null)
+    	{
+    		userId = getUser().getId();
+    	}
+    	return userId;
+    }
 
     /**
      * Returns the credential vault for the current user
@@ -465,7 +493,7 @@ public abstract class AbstractRequestContext implements RequestContext
     
     protected Map map;
     protected Page currentPage;
-    protected String currentObjectId;
+    protected Content currentObject;
     protected String currentFormatId;
     protected IFileSystem fileSystem;
     protected String storeId;

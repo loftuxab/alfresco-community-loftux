@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.config;
 
+import org.alfresco.web.config.WebFrameworkConfigElement.ContentLoaderDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.ErrorHandlerDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.FileSystemDescriptor;
 import org.alfresco.web.config.WebFrameworkConfigElement.FormatDescriptor;
@@ -103,6 +104,10 @@ public interface WebFrameworkConfigProperties
     public String[] getTypeIds();
     public TypeDescriptor getTypeDescriptor(String id);
     public String getRootPath();
+    
+    // content loaders
+    public String[] getContentLoaderIds();
+    public ContentLoaderDescriptor getContentLoaderDescriptor(String id);
     
 
 /*
