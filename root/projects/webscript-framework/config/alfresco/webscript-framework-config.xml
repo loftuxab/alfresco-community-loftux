@@ -62,21 +62,13 @@
 			
 			<endpoint>
 				<id>alfresco</id>
-				<name>Alfresco - unauthenticated access</name>
-				<description>Unauthenticated access to Alfresco Repository WebScripts</description>
-				<connector-id>http</connector-id>
+				<name>Alfresco - user or unauthenticated access</name>
+				<description>User or unnauthenticated access to Alfresco Repository WebScripts</description>
+				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
+				<identity>user</identity>				
 			</endpoint>
-			
-			<endpoint>
-				<id>alfresco.com</id>
-				<name>alfresco.com website</name>
-				<description>The alfresco.com website</description>
-				<connector-id>http</connector-id>
-				<endpoint-url>http://www.alfresco.com</endpoint-url>
-				<identity>none</identity>
-			</endpoint>
-			
+									
 			<!-- Credential Vaults -->
 			<credential-vault>
 				<id>default</id>

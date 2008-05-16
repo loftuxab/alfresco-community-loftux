@@ -25,6 +25,17 @@
 package org.alfresco.connector.exception;
 
 /**
+ * Thrown by the Web Script Framework when an issue occurs reading
+ * or working with objects described by the Remote Config block 
+ * of the Web Script Framework configuration file.
+ * 
+ * The Remote Config block lets you specify Connectors,
+ * Authenticators and Endpoints.
+ * 
+ * If a problem occurs in reading or instantiating implementation
+ * objects for these elements, a RemoteConfigException may be
+ * thrown.
+ * 
  * @author muzquiano
  */
 public class RemoteConfigException extends Exception

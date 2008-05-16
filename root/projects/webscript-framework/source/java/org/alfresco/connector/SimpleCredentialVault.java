@@ -28,16 +28,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A simple implementation of a credential vault that does not
- * persist anything to disk or database.
+ * A simple implementation of a credential vault that does not persist anything
+ * to disk or database.
  * 
- * Credentials can be stored and retrieved from this vault but 
- * they will perish into lands unknown when the server is restarted.
- *
- * That said, this implementation will likely be very useable for
- * any situations where you wish to explicitly challenge the end
- * user but only challenge them once.  If the vault is loaded as a
- * Spring bean, it will remain active across user sessions.
+ * Credentials can be stored and retrieved from this vault but they will perish
+ * into lands unknown when the server is restarted.
+ * 
+ * That said, this implementation will likely be very useable for any situations
+ * where you wish to explicitly challenge the end user but only challenge them
+ * once. If the vault is loaded as a Spring bean, it will remain active across
+ * user sessions.
  * 
  * @author muzquiano
  */
@@ -78,7 +78,7 @@ public class SimpleCredentialVault implements CredentialVault
     public boolean hasCredentials(User user)
     {
         boolean found = false;
-        
+
         String lookup = "_" + user.getId();
         for (String key : this.credentials.keySet())
         {
@@ -88,7 +88,7 @@ public class SimpleCredentialVault implements CredentialVault
                 break;
             }
         }
-        
+
         return found;
     }
 
