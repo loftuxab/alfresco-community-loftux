@@ -25,6 +25,9 @@
 package org.alfresco.web.site.servlet;
 
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -262,8 +265,18 @@ public class DispatcherServlet extends BaseServlet
                             page = context.getModel().loadPage(context, loginPageId);
                             if (page != null)
                             {
+                                // get URL arguments as a map ready for rebuilding the request params
+                                Map<String, String> args = new HashMap<String, String>(
+                                        request.getParameterMap().size(), 1.0f);
+                                Enumeration names = request.getParameterNames();
+                                while (names.hasMoreElements())
+                                {
+                                    String name = (String)names.nextElement();
+                                    args.put(name, request.getParameter(name));
+                                }
+                                // construct redirection url
                                 String redirectUrl = context.getLinkBuilder().page(
-                                        context, currentPageId, currentFormatId, currentObjectId);
+                                        context, currentPageId, currentFormatId, currentObjectId, args);
                                 // set redirect url for use on login page template
                                 page.setCustomProperty("alfRedirectUrl", redirectUrl);
                                 dispatchPage(context, request, response, page, currentFormatId);
