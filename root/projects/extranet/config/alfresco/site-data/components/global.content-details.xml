@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+  <title>Content Details</title>  
+  <url>/components/content-details</url>
+  
+  <!-- Binding --> 
+  <scope>global</scope>
+  <source-id>global</source-id>
+  <region-id>content-details</region-id>
+  
+</component>

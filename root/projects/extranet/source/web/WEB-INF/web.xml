@@ -29,6 +29,9 @@
       <url-pattern>/alfresco/*</url-pattern>
    </filter-mapping>
 
+
+
+
    <servlet>
       <servlet-name>apiServlet</servlet-name>
       <servlet-class>org.alfresco.web.scripts.servlet.WebScriptServlet</servlet-class>
@@ -36,24 +39,18 @@
 
    <servlet>
       <servlet-name>proxyServlet</servlet-name>
-      <servlet-class>org.alfresco.web.scripts.servlet.HTTPProxyServlet</servlet-class>
+      <servlet-class>org.alfresco.web.scripts.servlet.EndPointProxyServlet</servlet-class>
+   </servlet>
+   
+   <servlet>
+      <servlet-name>uriTemplateServlet</servlet-name>
+      <servlet-class>org.alfresco.web.uri.UriTemplateServlet</servlet-class>
    </servlet>
 
    <servlet>
-      <servlet-name>Dispatcher Servlet</servlet-name>
+      <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
-   </servlet> 
-          
-   <servlet>
-      <servlet-name>Cache Control Servlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
-      <load-on-startup>1</load-on-startup>
-   </servlet>
-                
-   <servlet>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <servlet-class>org.alfresco.web.page.PageAuthenticationServlet</servlet-class>
    </servlet>
    
    <servlet>
@@ -65,7 +62,16 @@
       <servlet-name>logoutServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.LogoutServlet</servlet-class>
    </servlet> 
-
+   
+   <servlet>
+      <servlet-name>cacheControlServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
+      <load-on-startup>1</load-on-startup>
+   </servlet>
+              
+              
+              
+                   
    <servlet-mapping>
       <servlet-name>logoutServlet</servlet-name>
       <url-pattern>/logout/*</url-pattern>
@@ -76,37 +82,36 @@
       <url-pattern>/login/*</url-pattern>
    </servlet-mapping>
    
-   
    <servlet-mapping>
-      <servlet-name>Cache Control Servlet</servlet-name>
+      <servlet-name>cacheControlServlet</servlet-name>
       <url-pattern>/cache/*</url-pattern>
    </servlet-mapping>
    
-   <servlet-mapping>
-      <servlet-name>Dispatcher Servlet</servlet-name>
-      <url-pattern>/page/*</url-pattern>
-   </servlet-mapping>
-
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>
       <url-pattern>/service/*</url-pattern>
    </servlet-mapping>
    
    <servlet-mapping>
-      <servlet-name>apiServlet</servlet-name>
-      <url-pattern>/s/*</url-pattern>
+      <servlet-name>proxyServlet</servlet-name>
+      <url-pattern>/proxy/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <url-pattern>/page/*</url-pattern>
    </servlet-mapping>
 
    <servlet-mapping>
-      <servlet-name>proxyServlet</servlet-name>
-      <url-pattern>/proxy</url-pattern>
-   </servlet-mapping>
-      
-   <servlet-mapping>
-      <servlet-name>pageAuthenticationServlet</servlet-name>
-      <url-pattern>/auth/*</url-pattern>
+      <servlet-name>pageRendererServlet</servlet-name>
+      <url-pattern>/p/*</url-pattern>
    </servlet-mapping>
    
+   <servlet-mapping>
+      <servlet-name>uriTemplateServlet</servlet-name>
+      <url-pattern>/s/*</url-pattern>
+   </servlet-mapping>
+      
    <session-config>
       <session-timeout>20</session-timeout>
    </session-config>

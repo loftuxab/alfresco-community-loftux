@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<content-association>
+  <title>details: cm_content</title>
+  <source-id>{http://www.alfresco.org/model/content/1.0}content</source-id>
+  <dest-id>page.content.details</dest-id>
+  <assoc-type>page</assoc-type>
+</content-association>
