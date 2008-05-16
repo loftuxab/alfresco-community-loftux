@@ -167,11 +167,11 @@ public class EndPointProxyServlet extends HttpServlet
             client.setRequestMethod(method);
             if (method.equalsIgnoreCase("POST"))
             {
-                client.call(url, req.getInputStream(), res.getOutputStream());
+                client.call(url, req.getInputStream(), res);
             }
             else
             {
-                client.call(url, res.getOutputStream());
+                client.call(url, null, res);
             }
         }
         catch (Throwable err)
