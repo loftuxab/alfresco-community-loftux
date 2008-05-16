@@ -29,6 +29,7 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.Theme;
@@ -188,7 +189,19 @@ public class SlingshotPageMapper extends AbstractPageMapper
          */
     	if (objectId != null)
     	{
-    		context.setCurrentObjectId(objectId);    		
+        	Content content = null;
+        	try
+        	{
+        		content = loadContent(context, objectId);
+	        	if(content != null)
+	        	{
+	        		context.setCurrentObject(content);
+	        	}
+        	}
+    		catch(ContentLoaderException cle)
+    		{
+    			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
+    		}    		
     	}    	
     }
 }
