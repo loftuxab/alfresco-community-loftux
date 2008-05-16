@@ -30,13 +30,17 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.PropertyResourceBundle;
+import java.util.ResourceBundle;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
+import org.alfresco.i18n.I18NUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -57,6 +61,9 @@ public abstract class AbstractWebScript implements WebScript
     
     // script config
     private String xmlConfig;
+    
+    // service resources
+    private Map<Locale, ResourceBundle> resources = new HashMap<Locale, ResourceBundle>(4);
     
     // Status Template cache
     private Map<String, StatusTemplate> statusTemplates = new HashMap<String, StatusTemplate>();    
@@ -93,6 +100,9 @@ public abstract class AbstractWebScript implements WebScript
         
         // setup the script's config
         setupScriptConfig();
+        
+        // init the resources for the default locale
+        getResources();
     }
 
     /**
@@ -103,19 +113,56 @@ public abstract class AbstractWebScript implements WebScript
         return container;
     }
     
-    /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScript#getDescription()
+    /**
+     * @return the service description
      */
     final public Description getDescription()
     {
         return this.description;
+    }
+    
+    /**
+     * @return the services resources or null if none present
+     */
+    final public ResourceBundle getResources()
+    {
+        ResourceBundle result = null;
+        Locale locale = I18NUtil.getLocale();
+        
+        synchronized (this.resources)
+        {
+            result = this.resources.get(locale);
+            if (result == null && this.resources.containsKey(locale) == false)
+            {
+                // TODO: add locale resolution support (from java ResourceBundle code path?)
+                //       i.e. <descid><locale>.propeties
+                //            mywebscript_en_US.properties
+                //       for now we just get the default .properties file
+                String resourcePath = getDescription().getId() + ".properties";
+                try
+                {
+                    if (container.getSearchPath().hasDocument(resourcePath))
+                    {
+                        result = new PropertyResourceBundle(container.getSearchPath().getDocument(resourcePath));
+                    }
+                }
+                catch (IOException resErr)
+                {
+                    // no resources available if this occurs
+                }
+                
+                // push the resources into the cache - null value is acceptable if none found
+                this.resources.put(locale, result);
+            }
+        }
+        
+        return result;
     }
 
     
     //
     // Scripting Support
     //
-
 
     /**
      * Create a model for script usage
@@ -191,6 +238,9 @@ public abstract class AbstractWebScript implements WebScript
         params.put("scripturl", new ScriptUrlMethod(req, res));
         params.put("clienturlfunction", new ClientUrlFunctionMethod(res));
         params.put("formatwrite", new FormatWriterMethod(container.getFormatRegistry(), req.getFormat()));
+        MessageMethod message = new MessageMethod(this);
+        params.put("message", message);     // for compatability with repo webscripts
+        params.put("msg", message);         // short form for presentation webscripts
 
         // add request mimetype parameters
         FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
