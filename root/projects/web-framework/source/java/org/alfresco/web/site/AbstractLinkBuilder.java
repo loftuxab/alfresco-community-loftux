@@ -44,11 +44,6 @@ import java.util.Map;
  */
 public abstract class AbstractLinkBuilder implements LinkBuilder
 {
-    protected AbstractLinkBuilder()
-    {
-        super();
-    }
-
     /**
      * Constructs a link to a given page instance.
      * This will automatically use the default format.
@@ -89,7 +84,6 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
     {
         return page(context, pageId, formatId, objectId, null);
     }
-    
 
     /**
      * Constructs a link to a given page for a given format.
@@ -105,9 +99,6 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
     public abstract String page(RequestContext context, String pageId, 
             String formatId, String objectId, Map<String, String> params);
     
-    
-    
-
     /**
      * Constructs a link to a given page type.
      * This will automatically use the default format.
@@ -163,11 +154,6 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
     public abstract String pageType(RequestContext context, String pageTypeId, 
             String formatId, String objectId, Map<String, String> params);
 
-    
-    
-    
-    
-    
     /**
      * Constructs a link to a given object.
      * This will automatically use the default format.
@@ -207,6 +193,4 @@ public abstract class AbstractLinkBuilder implements LinkBuilder
      */    
     public abstract String object(RequestContext context, String objectId,
             String formatId, Map<String, String> params);
-
-
 }

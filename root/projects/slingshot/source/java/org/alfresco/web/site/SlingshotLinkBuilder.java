@@ -49,7 +49,6 @@ import java.util.Map;
  */
 public class SlingshotLinkBuilder extends AbstractLinkBuilder
 {
-    
     /**
      * Instantiates a new slingshot link builder.
      */
@@ -74,34 +73,35 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         }
         
         // TODO: how should we handle the format?
-
+        
         // construct the url
         StringBuffer buffer = new StringBuffer(128);
-        buffer.append("/page/" + pageId);
+        buffer.append("/page/").append(pageId);
         
         boolean first = true;        
-        if(objectId != null)
+        if (objectId != null)
         {
-        	buffer.append("?doc=" + objectId);
+        	buffer.append("?doc=").append(objectId);
         	first = false;
         }
-        if(params != null)
+        if (params != null)
         {
         	Iterator it = params.keySet().iterator();
         	while(it.hasNext())
         	{
         		String key = (String) it.next();
         		String value = (String) params.get(key);
-
-        		if(first)
+        		
+        		if (first)
             	{
-            		buffer.append("?");
+            		buffer.append('?');
+                    first = false;
             	}
         		
-                buffer.append(key + "=" + value);
+                buffer.append(key).append('=').append(value);
                 if(it.hasNext())
                 {
-                	buffer.append("&");
+                	buffer.append('&');
                 }
             }
         }
@@ -126,19 +126,19 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         }
 
         StringBuilder buffer = new StringBuilder(128);
-        buffer.append("?f=" + formatId);
-        buffer.append("&pt=" + pageTypeId);
+        buffer.append("?f=").append(formatId);
+        buffer.append("&pt=").append(pageTypeId);
         if (objectId != null && objectId.length() != 0)
         {
-              buffer.append("&o=" + objectId);
+              buffer.append("&o=").append(objectId);
         }
         if(params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {
                 String key = entry.getKey();
-                String value = entry.getValue();                
-                buffer.append("&" + key + "=" + value);
+                String value = entry.getValue();
+                buffer.append("&").append(key).append("=").append(value);
             }
         }
 
@@ -161,8 +161,8 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         }
 
         StringBuffer buffer = new StringBuffer(128);
-        buffer.append("?f=" + formatId);
-        buffer.append("&o=" + objectId);
+        buffer.append("?f=").append(formatId);
+        buffer.append("&o=").append(objectId);
       
         if(params != null)
         {
@@ -170,7 +170,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
             {
                 String key = entry.getKey();
                 String value = entry.getValue();                
-                buffer.append("&" + key + "=" + value);
+                buffer.append("&").append(key).append("=").append(value);
             }
         }
 
