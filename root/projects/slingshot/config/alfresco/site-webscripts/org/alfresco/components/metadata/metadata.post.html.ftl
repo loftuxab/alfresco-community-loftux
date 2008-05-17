@@ -1,4 +1,5 @@
-<h2>Post Result</h2>
+<#if formdata?exists>
+<h2>Post Result (multipart/form-data)</h2>
 
 <ul>
 <#list formdata.fields as field>
@@ -6,5 +7,22 @@
 </#list>
 </ul>
 
-<div style='padding-top: 20px;'><a href="javascript:history.back();">Back to form</a></div>
+<#elseif json?exists>
+${json}
 
+<#else>
+<h2>Post Result (application/x-www-form-urlencoded)</h2>
+
+<ul>
+<#list argsM?keys as arg>
+<#list argsM[arg] as val>
+<li>${arg} = ${val}</li>
+</#list>
+</#list>
+</ul>
+
+</#if>
+
+<#if !json?exists>
+<div style='padding-top: 20px;'><a href="javascript:history.back();">Back to form</a></div>
+</#if>

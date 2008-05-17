@@ -22,9 +22,15 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       this.formId = formId;
       this.validateOnSubmit = true;
       this.showSubmitStateDynamically = false;
-      this.ajaxSubmit = false;
+      this.submitAsJSON = false;
       this.submitIds = [];
       this.validations = [];
+      this.ajaxSubmit = false;
+      this.ajaxSubmitHandlers = 
+      {
+         successCallback: this._ajaxSubmitSuccessful,
+         failedCallback: this._ajaxSubmitFailed
+      }
       
       return this;
    };
@@ -74,6 +80,23 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       ajaxSubmit: null,
       
       /**
+       * Object holding the callback handlers for AJAX submissions.
+       * 
+       * @property ajaxSubmitHandlers
+       * @type object
+       */
+      ajaxSubmitHandlers: null,
+      
+      /**
+       * Flag to determine whether the form data should be submitted 
+       * represented by a JSON structure.
+       * 
+       * @property submitAsJSON
+       * @type boolean
+       */
+      submitAsJSON: null,
+      
+      /**
        * List of validations to execute when the form is submitted.
        * 
        * @property validations
@@ -98,6 +121,13 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          {
             // add the event to the form and make the scope of the handler this form.
             YAHOO.util.Event.addListener(form, "submit", this._submitInvoked, this, true);
+            
+            // determine if the AJAX and JSON submission should be enabled
+            if (form.enctype && form.enctype === "application/json")
+            {
+               this.ajaxSubmit = true;
+               this.submitAsJSON = true;
+            }
             
             // setup the submit elements if the feature is enabled
             if (this.showSubmitStateDynamically)
@@ -207,14 +237,33 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @param callbacks {object} Optional object representing callback handlers 
        *        to use, for example
        *        { 
-       *           preSubmitCallback: yourHandler,
+       *           beforeSubmitCallback: yourHandler,
        *           successCallback: yourHandler,
-       *           failedCallback: yourHandler,
+       *           failedCallback: yourHandler
        *        }
        */
-      enableAJAXSubmit: function(ajaxSubmit, callbacks)
+      setAJAXSubmit: function(ajaxSubmit, callbacks)
       {
-         alert("not implemented yet");
+         this.ajaxSubmit = ajaxSubmit;
+         
+         // TODO: merge the given callbacks and default handlers
+         //var test = YAHOO.lang.merge(this.ajaxSubmitHandlers, callbacks);
+      },
+      
+      /**
+       * Enables or disables submitting the form data in JSON format.
+       * Setting the enctype attribute of the form to "application/json"
+       * in Firefox will achieve the same result.
+       * 
+       * @method setSubmitAsJSON
+       * @param submitAsJSON {boolean} true to submit the form data as JSON, 
+       *        false to submit one of the standard types "multipart/form-data"
+       *        or "application/x-www-form-urlencoded" depending on the enctype
+       *        attribute on the form
+       */
+      setSubmitAsJSON: function(submitAsJSON)
+      {
+         this.submitAsJSON = submitAsJSON;
       },
       
       /**
@@ -296,7 +345,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * Retrieves the label text for a field
        * 
        * @method getFieldLabel
-       * @param fieldId {string | object} The id of a field or the HTML element representing the field
+       * @param fieldId {string} The id of the field to get the label for
        * @return {string} The label for the field or the fieldId if a label could not be found
        */
       getFieldLabel: function(fieldId)
@@ -368,7 +417,68 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          
          if (this.validateOnSubmit)
          {
-            if (!this._runValidations(false))
+            if (this._runValidations(false))
+            {
+               // validation was successful, now check whether
+               // submission should be done using AJAX, if not 
+               // the browser will do the submit
+               if (this.ajaxSubmit)
+               {
+                  // stop the browser from submitting the form
+                  YAHOO.util.Event.stopEvent(event);
+                  
+                  // get the form element
+                  var form = document.getElementById(this.formId);
+                  var submitUrl = form.action;
+                  
+                  if (Alfresco.logger.isDebugEnabled())
+                     Alfresco.logger.debug("Performing AJAX submission to url: ", submitUrl);
+                  
+                  // determine how to submit the form, if the enctype
+                  // on the form is set to "application/json" then
+                  // package the form data as an AJAX string and post
+                  if (form.enctype && form.enctype === "multipart/form-data")
+                  {
+                     this._showInternalError("AJAX multipart/form-data submission is not supported");
+                     return;
+                  }
+                  
+                  if (this.submitAsJSON)
+                  {
+                     var jsonData = this._buildAjaxForSubmit(form);
+                     
+                     if (Alfresco.logger.isDebugEnabled())
+                        Alfresco.logger.debug("Submitting JSON data: ", jsonData);
+                     
+                     Alfresco.util.Ajax.request(
+                     {
+                        method: "POST",
+                        url: submitUrl,
+                        contentType: "application/json",
+                        dataObj: jsonData,
+                        success: this.ajaxSubmitHandlers.successCallback,
+                        failure: this.ajaxSubmitHandlers.failedCallback,
+                        scope: this
+                     });
+                  }
+                  else
+                  {
+                     if (Alfresco.logger.isDebugEnabled())
+                        Alfresco.logger.debug("Submitting data in form: ", form.enctype);
+                     
+                     Alfresco.util.Ajax.request(
+                     {
+                        method: "POST",
+                        url: submitUrl,
+                        dataForm: form,
+                        success: this.ajaxSubmitHandlers.successCallback,
+                        failure: this.ajaxSubmitHandlers.failedCallback,
+                        scope: this
+                     });
+                  }
+               }
+            }
+            else
             {
                // stop the event from continuing and sending the form.
                YAHOO.util.Event.stopEvent(event);
@@ -378,6 +488,34 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          {
             if (Alfresco.logger.isDebugEnabled())
                Alfresco.logger.debug("Ignoring validations as submission validation is disabled");
+         }
+      },
+      
+      /**
+       * Builds a JSON representation of the current form
+       * 
+       * @method _buildAjaxForSubmit
+       * @param form {object} The form object to build the JSON for
+       * @private
+       */
+      _buildAjaxForSubmit: function(form)
+      {
+         if (form != null)
+         {
+            var formData = {};
+            var length = form.elements.length;
+            for (var i = 0; i < length; i++)
+            {
+               var element = form.elements[i];
+               var name = element.name;
+               var value = element.value;
+               if (name)
+               {
+                  formData[name] = value;
+               }
+            }
+            
+            return formData;
          }
       },
       
@@ -453,6 +591,30 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       _showInternalError: function(msg, field)
       {
          this.addError("Internal Form Error: " + msg, field, true);
+      },
+      
+      /**
+       * Callback handler executed when an AJAX submission was successful.
+       * 
+       * @method _ajaxSubmitSuccessful
+       * @param response {object} The response from the ajax call
+       * @private
+       */
+      _ajaxSubmitSuccessful: function(response)
+      {
+         
+      },
+      
+      /**
+       * Callback handler executed when an AJAX submission failed.
+       * 
+       * @method _ajaxSubmitFailed
+       * @param response {object} The response from the ajax call
+       * @private
+       */
+      _ajaxSubmitFailed: function(response)
+      {
+         
       }
    };
 })();
