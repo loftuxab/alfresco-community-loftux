@@ -321,40 +321,6 @@ Alfresco.util.Ajax = function()
 
 
       JSON: "application/json",
-      
-      /* STOP: REPLACE WITH GAVS FORM RUNTIMES!!! */
-      getFormInfo: function(formId, whiteList)
-      {
-         var form = document.getElementById(formId);
-         // todo: Make sure to use this when Proxy can handle POST:s
-         // var url = Alfresco.constants.PROXY_URI + "http://localhost:8080/alfresco/service/api/sites&alf_method=POST&alf_ticket=" + Alfresco.constants.TICKET + "&";
-         if(form != null && (form.tagName == "FORM" || form.tagName == "form"))
-         {
-            var formInfo = {};
-            //formInfo.action = form.action; This returns baseURI + action
-            formInfo.action = form.attributes.action.nodeValue; // don't use form.action since it returns baseURI + action
-            formInfo.method = form.method ? form.method.toUpperCase() : "";
-            formInfo.data = {};
-            var length = form.elements.length;
-            for (var i = 0; i < length; i++)
-            {
-               var element = form.elements[i];
-               var name = element.name;
-               var value = element.value;
-               if(name)
-               {
-                  formInfo.data[name] = value;
-               }
-            }
-            return formInfo;
-         }
-         else
-         {
-            throw new Error("Could not send form, since element with id " + formId + (form ? " is not of type form" : " does not exist" ));
-         }
-      },
-
-      /* STOP: REPLACE WITH GAVS FORM RUNTIMES!!! */
 
       requestConfig:
       {
@@ -365,7 +331,8 @@ Alfresco.util.Ajax = function()
          dataObj: null,        // Will be encoded to parameters (key1=value1&key2=value2)
                                // or a json string if contentType is set to JSON
          dataStr: null,        // Will be used in the request body, could be a already created parameter or json string
-                               // Will be overriden by the encoding result from dataObj ir dataObj is provided
+                               // Will be overriden by the encoding result from dataObj if dataObj is provided
+         dataForm: null,       // A form object or id that contains the data to be sent with request
          contentType: null,    // Set to JSON if json should be used
          success: null,        // Will be called in the scop of scope with a response object literal described below
          successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
@@ -441,24 +408,28 @@ Alfresco.util.Ajax = function()
          var c = YAHOO.lang.merge(this.requestConfig, config);
          Alfresco.util.assertNotEmpty(c.url, "Parameter 'url' can NOT be null");
          Alfresco.util.assertNotEmpty(c.method, "Parameter 'method' can NOT be null");
+         
          if(!c.context)
          {
             /* Since URL_CONTEXT can't be set during declaration of requestConfig */
             c.context = Alfresco.constants.URL_CONTEXT;
          }
-         if(c.contentType){
+         
+         if (c.contentType)
+         {
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", c.contentType);
          }
-         if(c.contentType === this.JSON)
+         
+         if (c.contentType === this.JSON)
          {
-            if(c.method.toUpperCase() === "GET")
+            if (c.method.toUpperCase() === "GET")
             {
                throw new Error("Parameter' method' can not be 'GET' when using contentType '" + c.contentType + "'");
             }
             else
             {
-               if(c.dataObj)
+               if (c.dataObj)
                {
                   c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj);
                }
@@ -466,19 +437,27 @@ Alfresco.util.Ajax = function()
          }
          else
          {
-            if(c.method.toUpperCase() === "GET")
+            if (c.method.toUpperCase() === "GET")
             {
                c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
             }
             else
             {
-               if(c.dataObj)
+               if (c.dataObj)
                {
                   c.dataStr = this._toParamString(c.dataObj);
                }
             }
          }
-         var callback = {
+         
+         if (c.dataForm !== null)
+         {
+            // set the form on the connection manager
+            YAHOO.util.Connect.setForm(c.dataForm);
+         }
+         
+         var callback = 
+         {
             success: this._successHandler,
             failure: this._failureHandler,
             argument:
@@ -486,7 +465,15 @@ Alfresco.util.Ajax = function()
                config: config
             }
          };
-         YAHOO.util.Connect.asyncRequest (c.method, c.context + c.url, callback, c.dataStr);
+         
+         var url = c.url;
+         if (url.indexOf("http") == -1 && url.indexOf("https"))
+         {
+            url = c.context + url;
+         }
+         
+         // make the request
+         YAHOO.util.Connect.asyncRequest (c.method, url, callback, c.dataStr);
       },
 
       _toParamString: function(obj)
