@@ -12,7 +12,7 @@
       Alfresco.util.ComponentManager.register(this);
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "containercore", "datasource", "datatable"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "history"], this.componentsLoaded, this);
       
       return this;
    }
@@ -46,9 +46,33 @@
       {
          var Dom = YAHOO.util.Dom,
             Event = YAHOO.util.Event;
+
+         var myThis = this;
          
-         this.currentPath = this.options.initialPath;
+         /* Decoupled event listeners */
+         YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
       
+         /* YUI History */
+         var bookmarkedPath = YAHOO.util.History.getBookmarkedState("path");
+         this.currentPath = bookmarkedPath || this.options.initialPath;
+         YAHOO.util.History.register("path", "", function(newPath)
+         {
+            this._updateDocList.call(this, newPath);
+         }, null, this);
+
+         /* Initialize the browser history management library */
+         try
+         {
+             YAHOO.util.History.initialize("yui-history-field", "yui-history-iframe");
+         }
+         catch (e)
+         {
+             /*
+              * The only exception that gets thrown here is when the browser is
+              * not supported (Opera, or not A-grade)
+              */
+         }
+         
          /* File Select Button */
          var fsButton = Dom.get(this.id + "-fileSelect-button");
          var fsMenu = Dom.get(this.id + "-fileSelect-menu");
@@ -81,31 +105,51 @@
             type: "button"
          });
          showFoldersButton.on("click", this.onShowFoldersButtonClick, this);
+
+         /* Folder Up Navigation button */
+         var fuButton = Dom.get(this.id + "-folderUp-button");
+         var folderUpButton = new YAHOO.widget.Button(fuButton,
+         {
+            type: "button"
+         });
+         folderUpButton.on("click", this.onFolderUpButtonClick, this);
+         
          
          /* DataTable Prototyping */
          this.formatThumbnail = function(elCell, oRecord, oColumn, sData)
          {
-             elCell.innerHTML = "<img src=\"" + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + "\" />";
+            elCell.innerHTML = "<img src=\"" + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + "\" />";
          };
          this.formatDescription = function(elCell, oRecord, oColumn, sData)
          {
-             elCell.innerHTML = "<p><b>" + oRecord.getData("name") + "</b></p><p>Description: La la la</p>";
+            var desc = "";
+            if (oRecord.getData("type") == "folder")
+            {
+               var newPath = myThis.currentPath + "/" + oRecord.getData("name");
+               
+               desc = "<p><a href=\"\" onclick=\"YAHOO.Bubbling.fire('onPathChanged', {path: '" + newPath.replace(/'/g, "\'") + "'}); return false;\"><b>" + oRecord.getData("name") + "</b></a></p>"
+            }
+            else
+            {
+               desc = "<p><b>" + oRecord.getData("name") + "</b></p><p>Description: La la la</p>";
+            }
+            elCell.innerHTML = desc;
          };
          this.formatActions = function(elCell, oRecord, oColumn, sData)
          {
-             elCell.innerHTML = "Actions here";
+            elCell.innerHTML = "Actions here";
          };
 
          var myColumnDefs =
          [
             {
-               key: "icon32", label: "Preview", sortable: false, formatter: this.formatThumbnail
+               key: "icon32", label: "Preview", sortable: false, formatter: this.formatThumbnail, width: 128
             },
             {
                key: "name", label: "Description", sortable: false, formatter: this.formatDescription
             },
             {
-               key: "actions", label: "Actions", sortable: false, formatter: this.formatActions
+               key: "actions", label: "Actions", sortable: false, formatter: this.formatActions, width: 256
             }
          ];
 
@@ -122,11 +166,13 @@
          var dlDataTable = Dom.get(this.id + "-documents");
          this.myDataTable = new YAHOO.widget.DataTable(dlDataTable, myColumnDefs, this.myDataSource,
          {
+            renderLoopSize: 5,
             initialRequest: "path=" + encodeURIComponent(this.currentPath)
          });
          
+         Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
-   
+      
       onFileSelectButtonClick: function(type, args)
       {
          if (type == "click")
@@ -140,7 +186,6 @@
       onFileUploadButtonClick: function(e, obj)
       {
          new Alfresco.module.CreateSite(obj.id + "-createSite").show();
-         
          /*
          var fuComponent = Alfresco.util.ComponentManager.find({name:"Alfresco.FileUpload"})[0];
          // config for update new version of a single image
@@ -155,11 +200,56 @@
       {
          obj.options.showFolders = !obj.options.showFolders;
          this.set("label", (obj.options.showFolders ? "Hide Folders" : "Show Folders"));
+         obj._updateDocList.call(obj);
+         /*
          obj.myDataSource.sendRequest("path=" + encodeURIComponent(obj.currentPath) + (obj.options.showFolders ? "" : "&type=documents"),
          {
                success: obj.myDataTable.onDataReturnReplaceRows,
                failure: null,
                scope: obj.myDataTable
+         });
+         */
+      },
+      
+      onFolderUpButtonClick: function(e, obj)
+      {
+         var newPath = obj.currentPath.substring(0, obj.currentPath.lastIndexOf("/"));
+         YAHOO.Bubbling.fire('onPathChanged',
+         {
+            path: newPath
+         });
+         YAHOO.util.Event.preventDefault(e);
+      },
+      
+      onPathChanged: function(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.path !== null))
+         {
+            try
+            {
+               YAHOO.util.History.navigate("path", obj.path);
+            }
+            catch (e)
+            {
+               obj._updateDocList.call(obj, obj.path);
+            }
+         }
+      },
+   
+      _updateDocList: function(path)
+      {
+         function successHandler(sRequest, oResponse, oPayload)
+         {
+            this.currentPath = path;
+            this.myDataTable.onDataReturnReplaceRows.call(this.myDataTable, sRequest, oResponse, oPayload);
+         }
+         
+         this.myDataSource.sendRequest("path=" + encodeURIComponent(path) + (this.options.showFolders ? "" : "&type=documents"),
+         {
+               success: successHandler,
+               failure: null,
+               scope: this
          });
       }
 

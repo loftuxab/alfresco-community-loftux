@@ -4,10 +4,10 @@
 (function()
 {
    /* Constants */
-   var DEFAULT_MinFilterPanelWidth = 150,
-      DEFAULT_MaxFilterPanelWidth = 600;
+   var DEFAULT_MIN_FILTER_PANEL_WIDTH = 150,
+      DEFAULT_MAX_FILTER_PANEL_WIDTH = 600;
    
-   Alfresco.DocumentLibrary = function()
+   Alfresco.DocumentLibrary = function DocumentLibrary_constructor()
    {
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["resize"], this.componentsLoaded, this);
@@ -17,19 +17,19 @@
    
    Alfresco.DocumentLibrary.prototype =
    {
-      componentsLoaded: function()
+      componentsLoaded: function DocumentLibrary_componentsLoaded()
       {
          YAHOO.util.Event.onDOMReady(this.init, this, true);
       },
    
-      init: function()
+      init: function DocumentLibrary_init()
       {
          /* Horizontal Resizer */
          var horizResize = new YAHOO.util.Resize('divDoclibFilters',
          {
             handles: ['r'],
-            minWidth: DEFAULT_MinFilterPanelWidth,
-            maxWidth: DEFAULT_MaxFilterPanelWidth
+            minWidth: DEFAULT_MIN_FILTER_PANEL_WIDTH,
+            maxWidth: DEFAULT_MAX_FILTER_PANEL_WIDTH
          });
 
          /* Resizer listener event */
@@ -39,10 +39,10 @@
          }, this, true);
 
          /* Initial size */
-         horizResize.resize(null, null, this.DEFAULT_MinFilterPanelWidth, 0, 0, true);
+         horizResize.resize(null, null, this.DEFAULT_MIN_FILTER_PANEL_WIDTH, 0, 0, true);
       },
    
-      doclibResize: function(width)
+      doclibResize: function DocumentLibrary_doclibResize(width)
       {
          var Dom = YAHOO.util.Dom;
          

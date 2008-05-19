@@ -15,7 +15,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["datatable", "datasource", "uploader"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "uploader"], this.componentsLoaded, this);
 
       return this;
    }
