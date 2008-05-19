@@ -1,11 +1,35 @@
-.doclist-documents thead {
+.doclist
+{
+   visibility: hidden;
+}
+
+.doclist table
+{
+   width: 100%;
+}
+
+.doclist thead
+{
    display: none;
 }
 
-.yui-skin-sam .yui-dt-bd table {
+.doclist .yui-dt-bd table
+{
    border: none;
 }
 
-.yui-skin-sam .yui-dt td {
+.doclist .yui-dt td
+{
    border: none;
+}
+
+
+#yui-history-iframe
+{
+   position: absolute;
+   top: 0;
+   left: 0;
+   width: 1px;
+   height: 1px; /* avoid scrollbars */
+   visibility: hidden;
 }

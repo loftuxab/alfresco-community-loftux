@@ -20,7 +20,6 @@
          <div class="yui-b" id="divDoclibFilters">
             <@region id="filter" scope="template" protected=true />
             <@region id="tree" scope="template" protected=true />
-            <@region id="packager" scope="template" protected=true />
          </div>
       </div>
    </div>

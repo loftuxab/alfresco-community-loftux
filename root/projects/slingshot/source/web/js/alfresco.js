@@ -91,6 +91,7 @@ Alfresco.util.YUILoaderHelper = function()
             yuiLoader = new YAHOO.util.YUILoader(
             {
                base: Alfresco.constants.URL_CONTEXT + "yui/",
+               filter: "DEBUG",
                loadOptional: false,
                skin:
                {
@@ -147,7 +148,7 @@ Alfresco.util.YUILoaderHelper = function()
       {
          if (yuiLoader !== null)
          {
-            yuiLoader.insert();
+            yuiLoader.insert(null, "js");
          }
       },
 
