@@ -105,7 +105,7 @@ public class FreemarkerRenderer extends AbstractRenderer
             if (templateProcessor.hasTemplate(templateName))
             {
                 // build the model
-                Map<String, Object> model = new HashMap<String, Object>(8);
+                Map<String, Object> model = new HashMap<String, Object>(32);
                 ProcessorModelHelper.populateTemplateModel(rendererContext, model);
                 
                 StringWriter out = new StringWriter(512);

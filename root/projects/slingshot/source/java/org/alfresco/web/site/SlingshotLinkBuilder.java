@@ -27,6 +27,8 @@ package org.alfresco.web.site;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.util.URLEncoder;
+
 /**
  * Link Construction class for Slingshot
  * 
@@ -46,11 +48,12 @@ import java.util.Map;
  * web site.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class SlingshotLinkBuilder extends AbstractLinkBuilder
 {
     /**
-     * Instantiates a new slingshot link builder.
+     * Instantiates a new slingshot link builder. For reflection based construction.
      */
     public SlingshotLinkBuilder()
     {
@@ -65,8 +68,9 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
     {
         if (pageId == null)
         {
-            return null;
+            throw new IllegalArgumentException("PageId is mandatory.");
         }
+        
         if (formatId == null)
         {
             formatId = context.getConfig().getDefaultFormatId();
@@ -98,7 +102,7 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
                     first = false;
             	}
         		
-                buffer.append(key).append('=').append(value);
+                buffer.append(key).append('=').append(URLEncoder.encode(value));
                 if(it.hasNext())
                 {
                 	buffer.append('&');
@@ -118,8 +122,9 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
     {
         if (pageTypeId == null)
         {
-            return null;
+            throw new IllegalArgumentException("PageTypeId is mandatory.");
         }
+        
         if (formatId == null)
         {
             formatId = context.getConfig().getDefaultFormatId();
@@ -132,13 +137,13 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         {
               buffer.append("&o=").append(objectId);
         }
-        if(params != null)
+        if (params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {
                 String key = entry.getKey();
                 String value = entry.getValue();
-                buffer.append("&").append(key).append("=").append(value);
+                buffer.append("&").append(key).append("=").append(URLEncoder.encode(value));
             }
         }
 
@@ -153,8 +158,9 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
     {
         if(objectId == null)
         {
-            return null;
+            throw new IllegalArgumentException("ObjectId is mandatory.");
         }
+        
         if (formatId == null)
         {
             formatId = context.getConfig().getDefaultFormatId();
@@ -164,17 +170,16 @@ public class SlingshotLinkBuilder extends AbstractLinkBuilder
         buffer.append("?f=").append(formatId);
         buffer.append("&o=").append(objectId);
       
-        if(params != null)
+        if (params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {
                 String key = entry.getKey();
                 String value = entry.getValue();                
-                buffer.append("&").append(key).append("=").append(value);
+                buffer.append("&").append(key).append("=").append(URLEncoder.encode(value));
             }
         }
 
         return buffer.toString();
     }
-
 }
