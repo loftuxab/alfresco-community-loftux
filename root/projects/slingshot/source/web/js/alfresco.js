@@ -218,7 +218,7 @@ Alfresco.util.PopupManager = function()
 
    return {
 
-      zIndex: 5,
+      zIndex: 15,
 
       displayMessageConfig: {
          text: null,
@@ -274,6 +274,7 @@ Alfresco.util.PopupManager = function()
 
       displayPrompt: function(userConfig)
       {
+         alert();
          var c = YAHOO.lang.merge(this.displayPromptConfig, userConfig);
          var prompt = new YAHOO.widget.SimpleDialog("prompt", {
             visible:false,
@@ -335,9 +336,9 @@ Alfresco.util.Ajax = function()
                                // Will be overriden by the encoding result from dataObj if dataObj is provided
          dataForm: null,       // A form object or id that contains the data to be sent with request
          contentType: null,    // Set to JSON if json should be used
-         success: null,        // Will be called in the scop of scope with a response object literal described below
+         successCallback: null,// Will be called in the scop of scope with a response object literal described below
          successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
-         failure: null,        // Will be called in the scop of scope with a response object literal described below
+         failureCallback: null,// Will be called in the scop of scope with a response object literal described below
          failureMessage: null  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
       },
 
@@ -406,6 +407,7 @@ Alfresco.util.Ajax = function()
        */
       request: function(config)
       {
+
          var c = YAHOO.lang.merge(this.requestConfig, config);
          Alfresco.util.assertNotEmpty(c.url, "Parameter 'url' can NOT be null");
          Alfresco.util.assertNotEmpty(c.method, "Parameter 'method' can NOT be null");
@@ -474,6 +476,7 @@ Alfresco.util.Ajax = function()
          }
          
          // make the request
+         alert(url + " -- " + c.dataStr);
          YAHOO.util.Connect.asyncRequest (c.method, url, callback, c.dataStr);
       },
 
@@ -500,14 +503,14 @@ Alfresco.util.Ajax = function()
       _successHandler: function(serverResponse)
       {
          var config = serverResponse.argument.config;
-         if(config.success)
+         if(config.successCallback)
          {
             /* User provided a custom successHandler */
             var json = null;
             if(config.contentType === "application/json"){
                json = YAHOO.lang.JSON.parse(serverResponse.responseText);
             }
-            YAHOO.lang.later(1, (config.scope ? config.scope : this), config.success, {config: config, json: json, serverResponse: serverResponse});
+            YAHOO.lang.later(0, (config.scope ? config.scope : this), config.successCallback, {config: config, json: json, serverResponse: serverResponse});
          }
          else if(config.successMessage)
          {
@@ -519,7 +522,7 @@ Alfresco.util.Ajax = function()
       _failureHandler: function(serverResponse)
       {
          var config = serverResponse.argument.config;
-         if(config.failure)
+         if(config.failureCallback)
          {
             /* User provided a custom failureHandler */
             var json = null;
@@ -527,22 +530,22 @@ Alfresco.util.Ajax = function()
                /* todo: When error response is in valid json format */
                //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
             }
-            YAHOO.lang.later(1, (config.scope ? config.scope : this), config.failure, {config: config, json: json, serverResponse: serverResponse});
+            YAHOO.lang.later(0, (config.scope ? config.scope : this), config.failureCallback, {config: config, json: json, serverResponse: serverResponse});
          }
-         else if(argument.failureMessage)
+         else if(config.failureMessage)
          {
             /* User did not provide a custom failureHandler but a custom failureMessage */
             Alfresco.util.PopupManager.displayPrompt({text: config.failureMessage});
          }
          else
          {
-            // User did not provide any failure info, display as good info as possible from the server response instead                        
+            // User did not provide any failure info, display as good info as possible from the server response instead
             if(config.contentType === "application/json"){
                var json = null;
                /* todo: When error response is in valid json format */
                // json = YAHOO.lang.JSON.parse(serverResponse.responseText);
                // Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
-               Alfresco.util.PopupManager.displayPrompt({title: serverResponse.statusText});
+               Alfresco.util.PopupManager.displayPrompt({title: serverResponse.statusText, text: "Failure"});
             }
             else if(serverResponse.statusText)
             {

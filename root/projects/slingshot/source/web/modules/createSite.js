@@ -11,7 +11,7 @@
       this.dialog = null;
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.componentsLoaded, this);
 
       return this;
    };
@@ -33,7 +33,7 @@
          {
             url: "modules/createSite",
             dataObj: {htmlid: this.id},
-            success: this.templateLoaded,
+            successCallback: this.templateLoaded,
             failureMessage: "Could not load create site template",
             scope: this
          });
@@ -45,16 +45,23 @@
 
          var div = document.createElement("div");
          div.innerHTML = response.serverResponse.responseText;
-         this.dialog = new YAHOO.widget.Dialog(div,
+         this.dialog = new YAHOO.widget.Panel(div,
          {
             fixedcenter: true,
             visible: false
          });
          this.dialog.render(document.body);
+                 
+         var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
+         createSiteForm.setShowSubmitStateDynamically(true);
+         createSiteForm.setSubmitIds(this.id + "-ok-button");
+         createSiteForm.setAJAXSubmit(true, {successCallback: this.onCreateSiteSuccess});
+         createSiteForm.setSubmitAsJSON(true)
+         createSiteForm.init();
 
-         var clButton = Dom.get(this.id + "-ok-button");
-         var clearButton = new YAHOO.widget.Button(clButton, {type: "button"});
-         clearButton.subscribe("click", this.onOkButtonClick, this, true);
+         //var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
+         //okButton.subscribe("click", this.onOkButtonClick, this, true);
 
          this.dialog.show();
       },
@@ -62,23 +69,15 @@
 
       onOkButtonClick: function(type, args)
       {
-
-         // The getFormInfo call will be replaced by Gav's forms runtime
-         // ...and perhaps its that runtime that will make the proxyRequest call instead?
-         // To do that it will need to take in success, failure, successMessage and failureMessage
-         var formInfo = Alfresco.util.Ajax.getFormInfo(this.id + "-createSite-form");
-         Alfresco.util.Ajax.jsonProxyRequest(
-         {
-            url: formInfo.action,
-            dataObj: formInfo.data,
-            success: this.onCreateSiteSucces,
-            failureMessage: "Could not create site"
-         });
+         // todo: remove when forms runtime handles yui buttons
+         var Dom = YAHOO.util.Dom;
+         var createSiteFormElement =  Dom.get(this.id + "-createSite-form");
+         createSiteFormElement.submit();
       },
 
-      onCreateSiteSucces: function(response)
+      onCreateSiteSuccess: function(response)
       {
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration/dashboard?site=" + response.json.shortName;
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration-dashboard?site=" + response.json.shortName;
       }
 
    };

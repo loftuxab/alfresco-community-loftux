@@ -16,15 +16,6 @@
 
    Alfresco.MySites.prototype =
    {
-      createSitePanel: null,
-      modalPanelConfig: {
-         fixedcenter: true,
-         close:false,
-         draggable:false,
-         zindex:4,
-         modal:true,
-         visible:true
-      },
 
       componentsLoaded: function()
       {
@@ -36,21 +27,12 @@
          var Dom = YAHOO.util.Dom;
 
          /* Create Site Button */
-         var csButton = Dom.getElementsByClassName("mysites-createSite-button", "span", this.id)[0];
-         var createSiteButton = new YAHOO.widget.Button(csButton,
-         {
-            type: "button"
-         });
+         var createSiteButton = new YAHOO.widget.Button(this.id + "-createSite-button", {type: "button"});
          createSiteButton.subscribe("click", this.onCreateSiteButtonClick, this, true);
-
-         var createSiteDiv = Dom.getElementsByClassName("mysites-createSite-panel", "div", this.id)[0];
-         this.createSitePanel = new YAHOO.widget.Panel(createSiteDiv, this.modalPanelConfig);
       },
 
       onCreateSiteButtonClick: function(event)
       {
-         // this.createSitePanel.render(document.body);
-         // this.createSitePanel.show();
          new Alfresco.module.CreateSite(this.id + "-createSite").show();
       }
 

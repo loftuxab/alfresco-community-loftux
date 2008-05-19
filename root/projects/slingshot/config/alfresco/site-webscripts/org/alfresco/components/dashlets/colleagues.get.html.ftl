@@ -1,10 +1,10 @@
-<div class="component">
-  <div class="component-title">Site Colleagues</div>
-  <div class="component-links">
+<div class="dashlet">
+  <div class="title">Site Colleagues</div>
+  <div class="menu">
     <a href="#" onclick="alert('Not implemented');">All</a> |
     <a href="#" onclick="alert('Not implemented');">Find</a> <input type="text" />
   </div>
-  <div class="component-list">
+  <div class="body scrollableList">
 
      <#if (memberships?size > 0) >
         <#list memberships as m>

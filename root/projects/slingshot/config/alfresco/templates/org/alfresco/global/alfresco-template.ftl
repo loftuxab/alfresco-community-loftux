@@ -1,7 +1,7 @@
 <#--
    Template "header" macro.
    Includes preloaded YUI assets and essential site-wide libraries.
--->
+-->                                                                           
 <#macro header>
 <#assign theme="sam">
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -26,6 +26,7 @@
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/controls.css" />
    <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
+   <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/",
       Alfresco.constants.THEME = "${theme}";
