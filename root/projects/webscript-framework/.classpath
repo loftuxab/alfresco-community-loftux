@@ -31,7 +31,7 @@
 	<classpathentry kind="lib" path="/3rd Party/lib/json.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/abdera/abdera.extensions.json.0.3.0-incubating.jar"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/devenv/junit.jar"/>
-	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.12.jar" sourcepath="/3rd Party/src/freemarker-2.3.12.zip"/>
+	<classpathentry kind="lib" path="/3rd Party/lib/freemarker-2.3.13.jar" sourcepath="/3rd Party/src/freemarker-2.3.13.zip"/>
 	<classpathentry kind="lib" path="/3rd Party/lib/commons/commons-httpclient-3.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
