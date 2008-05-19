@@ -28,8 +28,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       this.ajaxSubmit = false;
       this.ajaxSubmitHandlers = 
       {
-         successCallback: this._ajaxSubmitSuccessful,
-         failedCallback: this._ajaxSubmitFailed
+         successMessage: "The form was submitted successfully",
+         failureMessage: "The form submission failed"
       }
       
       return this;
@@ -80,7 +80,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       ajaxSubmit: null,
       
       /**
-       * Object holding the callback handlers for AJAX submissions.
+       * Object holding the callback handlers and messages for AJAX submissions.
        * 
        * @property ajaxSubmitHandlers
        * @type object
@@ -235,19 +235,23 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @param ajaxSubmit {boolean} true to submit using AJAX, false to submit
        *        using the browser's default behaviour
        * @param callbacks {object} Optional object representing callback handlers 
-       *        to use, for example
+       *        or messages to use, for example
        *        { 
-       *           beforeSubmitCallback: yourHandler,
        *           successCallback: yourHandler,
-       *           failedCallback: yourHandler
+       *           failureCallback: yourHandler,
+       *           successMessage: yourMessage,
+       *           failureMessage: yourMessage
        *        }
        */
       setAJAXSubmit: function(ajaxSubmit, callbacks)
       {
          this.ajaxSubmit = ajaxSubmit;
          
-         // TODO: merge the given callbacks and default handlers
-         //var test = YAHOO.lang.merge(this.ajaxSubmitHandlers, callbacks);
+         // merge the given callbacks and default handlers
+         if (typeof callbacks == "object")
+         {
+            this.ajaxSubmitHandlers = YAHOO.lang.merge(this.ajaxSubmitHandlers, callbacks);
+         }
       },
       
       /**
@@ -443,6 +447,31 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      return;
                   }
                   
+                  // create config object to pass to request helper
+                  var config = {
+                     method: "POST",
+                     url: submitUrl,
+                     scope: this
+                  };
+                  
+                  if (this.ajaxSubmitHandlers.successCallback)
+                  {
+                     config.success = this.ajaxSubmitHandlers.successCallback;
+                  }
+                  else
+                  {
+                     config.successMessage = this.ajaxSubmitHandlers.successMessage;
+                  }
+                  
+                  if (this.ajaxSubmitHandlers.failedCallback)
+                  {
+                     config.failure = this.ajaxSubmitHandlers.failedCallback;
+                  }
+                  else
+                  {
+                     config.failureMessage = this.ajaxSubmitHandlers.failureMessage;
+                  }
+                  
                   if (this.submitAsJSON)
                   {
                      var jsonData = this._buildAjaxForSubmit(form);
@@ -450,31 +479,19 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      if (Alfresco.logger.isDebugEnabled())
                         Alfresco.logger.debug("Submitting JSON data: ", jsonData);
                      
-                     Alfresco.util.Ajax.request(
-                     {
-                        method: "POST",
-                        url: submitUrl,
-                        contentType: "application/json",
-                        dataObj: jsonData,
-                        success: this.ajaxSubmitHandlers.successCallback,
-                        failure: this.ajaxSubmitHandlers.failedCallback,
-                        scope: this
-                     });
+                     // set up specific config
+                     config.contentType = "application/json";
+                     config.dataObj = jsonData;
+                     Alfresco.util.Ajax.request(config);
                   }
                   else
                   {
                      if (Alfresco.logger.isDebugEnabled())
                         Alfresco.logger.debug("Submitting data in form: ", form.enctype);
                      
-                     Alfresco.util.Ajax.request(
-                     {
-                        method: "POST",
-                        url: submitUrl,
-                        dataForm: form,
-                        success: this.ajaxSubmitHandlers.successCallback,
-                        failure: this.ajaxSubmitHandlers.failedCallback,
-                        scope: this
-                     });
+                     // set up specific config 
+                     config.dataForm = form;
+                     Alfresco.util.Ajax.request(config);
                   }
                }
             }
@@ -591,30 +608,6 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       _showInternalError: function(msg, field)
       {
          this.addError("Internal Form Error: " + msg, field, true);
-      },
-      
-      /**
-       * Callback handler executed when an AJAX submission was successful.
-       * 
-       * @method _ajaxSubmitSuccessful
-       * @param response {object} The response from the ajax call
-       * @private
-       */
-      _ajaxSubmitSuccessful: function(response)
-      {
-         
-      },
-      
-      /**
-       * Callback handler executed when an AJAX submission failed.
-       * 
-       * @method _ajaxSubmitFailed
-       * @param response {object} The response from the ajax call
-       * @private
-       */
-      _ajaxSubmitFailed: function(response)
-      {
-         
       }
    };
 })();
