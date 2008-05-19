@@ -1,12 +1,10 @@
-<!-- Main gui -->
-
-<div class="component">
-  <div class="component-title">My Limited Profile</div>
-  <div class="component-links">
+<div class="dashlet">
+  <div class="title">My Limited Profile</div>
+  <div class="menu">
     <a href="#" onclick="alert('Not implemented');">Edit profile ></a>
     <a href="#" onclick="alert('Not implemented');">View Full Profile ></a>
   </div>
-  <div class="component-body">
+  <div class="body">
      <div class="header">${profile.name}, Welcome</div>
      <div class="text">${profile.title}</div>
      <div class="text">${profile.department}, ${profile.company}</div>

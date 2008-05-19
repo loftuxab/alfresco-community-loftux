@@ -3,9 +3,5 @@
     <template-type>org/alfresco/collaboration-dashboard</template-type>
     <properties>
         <regions>9</regions>
-        <horizontalGap>20</horizontalGap>
-        <verticalGap>20</verticalGap>
-        <widthLeft>250</widthLeft>
-        <widthRight>250</widthRight>
     </properties>
 </template-instance>         

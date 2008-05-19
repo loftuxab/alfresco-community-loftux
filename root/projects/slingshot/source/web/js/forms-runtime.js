@@ -26,17 +26,13 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       this.submitIds = [];
       this.validations = [];
       this.ajaxSubmit = false;
-      this.ajaxSubmitHandlers = 
-      {
-         successMessage: "The form was submitted successfully",
-         failureMessage: "The form submission failed"
-      }
-      
+
       return this;
    };
    
    Alfresco.forms.Form.prototype =
    {
+
       /**
        * HTML id of the form being represented.
        * 
@@ -44,7 +40,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @type string
        */
       formId: null,
-      
+
       /**
        * List of ids of elements being used to submit the form.
        * 
@@ -61,7 +57,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @type boolean
        */
       validateOnSubmit: null,
-      
+
       /**
        * Flag to determine whether the submit elements dynamically update
        * their state depending on the current values in the form.
@@ -246,12 +242,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       setAJAXSubmit: function(ajaxSubmit, callbacks)
       {
          this.ajaxSubmit = ajaxSubmit;
-         
-         // merge the given callbacks and default handlers
-         if (typeof callbacks == "object")
-         {
-            this.ajaxSubmitHandlers = YAHOO.lang.merge(this.ajaxSubmitHandlers, callbacks);
-         }
+         this.ajaxSubmitHandlers = callbacks;
       },
       
       /**
@@ -269,7 +260,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       {
          this.submitAsJSON = submitAsJSON;
       },
-      
+
       /**
        * Adds validation for a specific field on the form.
        * 
@@ -453,25 +444,27 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      url: submitUrl,
                      scope: this
                   };
-                  
-                  if (this.ajaxSubmitHandlers.successCallback)
+
+                  if(this.ajaxSubmitHandlers)
                   {
-                     config.success = this.ajaxSubmitHandlers.successCallback;
+                     if (this.ajaxSubmitHandlers.successCallback)
+                     {
+                        config.successCallback = this.ajaxSubmitHandlers.successCallback;
+                     }
+                     if (this.ajaxSubmitHandlers.successMessage)
+                     {
+                        config.successMessage = this.ajaxSubmitHandlers.successMessage;
+                     }
+
+                     if (this.ajaxSubmitHandlers.failureCallback)
+                     {
+                        config.failureCallback = this.ajaxSubmitHandlers.failureCallback;
+                     }
+                     if(this.ajaxSubmitHandlers.failureMessage)
+                     {
+                        config.failureMessage = this.ajaxSubmitHandlers.failureMessage;
+                     }
                   }
-                  else
-                  {
-                     config.successMessage = this.ajaxSubmitHandlers.successMessage;
-                  }
-                  
-                  if (this.ajaxSubmitHandlers.failedCallback)
-                  {
-                     config.failure = this.ajaxSubmitHandlers.failedCallback;
-                  }
-                  else
-                  {
-                     config.failureMessage = this.ajaxSubmitHandlers.failureMessage;
-                  }
-                  
                   if (this.submitAsJSON)
                   {
                      var jsonData = this._buildAjaxForSubmit(form);
@@ -565,7 +558,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   {
                      field.focus();
                   }
-                  
+
                   valid = false;
                   break;
                }

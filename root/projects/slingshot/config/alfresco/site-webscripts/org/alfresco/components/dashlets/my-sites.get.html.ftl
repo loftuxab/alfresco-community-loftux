@@ -2,12 +2,12 @@
    new Alfresco.MySites("${args.htmlid}");
 //]]></script>
 
-<div class="component">
-  <div class="component-title">My Sites</div>
-  <div class="component-links">
-    <span class="mysites-createSite-button"><a href="#">Create site &gt;</a></span>
+<div class="dashlet">
+  <div class="title">My Sites</div>
+  <div class="menu">
+    <span id="${args.htmlid}-createSite-button"><a href="#">Create site &gt;</a></span>
   </div>
-  <div class="component-list">
+  <div class="body scrollableList">
 <#if sites?exists>
    <#list sites as site>
       <div>
