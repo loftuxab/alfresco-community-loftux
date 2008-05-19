@@ -29,8 +29,10 @@ import java.util.List;
 
 import org.alfresco.i18n.I18NUtil;
 
+import freemarker.template.TemplateDateModel;
 import freemarker.template.TemplateMethodModelEx;
 import freemarker.template.TemplateModelException;
+import freemarker.template.TemplateNumberModel;
 import freemarker.template.TemplateScalarModel;
 
 /**
@@ -97,6 +99,14 @@ public class MessageMethod implements TemplateMethodModelEx
                         if (arg instanceof TemplateScalarModel)
                         {
                             params[i] = ((TemplateScalarModel)arg).getAsString();
+                        }
+                        else if (arg instanceof TemplateNumberModel)
+                        {
+                            params[i] = ((TemplateNumberModel)arg).getAsNumber();
+                        }
+                        else if (arg instanceof TemplateDateModel)
+                        {
+                            params[i] = ((TemplateDateModel)arg).getAsDate();
                         }
                         else
                         {
