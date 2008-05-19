@@ -26,6 +26,8 @@ package org.alfresco.web.site;
 
 import java.util.Map;
 
+import org.alfresco.util.URLEncoder;
+
 /**
  * @author muzquiano
  */
@@ -36,20 +38,20 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
         super();
     }
 
-    
     public String page(RequestContext context, String pageId, 
             String formatId, String objectId, Map<String, String> params)
     {
         if (pageId == null)
         {
-            return null;
+            throw new IllegalArgumentException("PageId is mandatory.");
         }
+        
         if (formatId == null)
         {
             formatId = context.getConfig().getDefaultFormatId();
         }
         
-        StringBuilder buffer = new StringBuilder();
+        StringBuilder buffer = new StringBuilder(64);
         buffer.append("?f=" + formatId);
         buffer.append("&p=" + pageId);
         if (objectId != null && objectId.length() != 0)
@@ -62,10 +64,10 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
             {
                 String key = entry.getKey();
                 String value = entry.getValue();                
-                buffer.append("&" + key + "=" + value);
+                buffer.append("&" + key + "=" + URLEncoder.encode(value));
             }
         }
-
+        
         return buffer.toString();
     }
     
@@ -74,14 +76,15 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
     {
         if (pageTypeId == null)
         {
-            return null;
+            throw new IllegalArgumentException("PageTypeId is mandatory.");
         }
+        
         if (formatId == null)
         {
             formatId = context.getConfig().getDefaultFormatId();
         }
-
-        StringBuilder buffer = new StringBuilder();
+        
+        StringBuilder buffer = new StringBuilder(64);
         buffer.append("?f=" + formatId);
         buffer.append("&pt=" + pageTypeId);
         if (objectId != null && objectId.length() != 0)
@@ -94,39 +97,39 @@ public class DefaultLinkBuilder extends AbstractLinkBuilder
             {
                 String key = entry.getKey();
                 String value = entry.getValue();                
-                buffer.append("&" + key + "=" + value);
+                buffer.append("&" + key + "=" + URLEncoder.encode(value));
             }
         }
-
+        
         return buffer.toString();
     }    
 
     public String object(RequestContext context, String objectId,
             String formatId, Map<String, String> params)
     {
-        if(objectId == null)
+        if (objectId == null)
         {
-            return null;
+            throw new IllegalArgumentException("ObjectId is mandatory.");
         }
         if (formatId == null)
         {
             formatId = context.getConfig().getDefaultFormatId();
         }
-
-        StringBuilder buffer = new StringBuilder();
+        
+        StringBuilder buffer = new StringBuilder(64);
         buffer.append("?f=" + formatId);
         buffer.append("&o=" + objectId);
-      
+        
         if(params != null)
         {
             for (Map.Entry<String, String> entry : params.entrySet())
             {
                 String key = entry.getKey();
                 String value = entry.getValue();                
-                buffer.append("&" + key + "=" + value);
+                buffer.append("&" + key + "=" + URLEncoder.encode(value));
             }
         }
-
+        
         return buffer.toString();
     }
 }

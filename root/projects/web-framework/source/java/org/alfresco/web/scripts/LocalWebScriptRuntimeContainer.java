@@ -93,7 +93,7 @@ public class LocalWebScriptRuntimeContainer extends PresentationContainer
     public Map<String, Object> getTemplateParameters()
     {
         // NOTE: returns unmodifable map from super
-        Map<String, Object> params = new HashMap<String, Object>(8, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(32, 1.0f);
         params.putAll(super.getTemplateParameters());
         
         // Bind in Template Model elements

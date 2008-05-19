@@ -43,6 +43,8 @@ import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.alfresco.web.uri.UriUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -65,6 +67,8 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WebScriptRenderer extends AbstractRenderer
 {
+    private static Log logger = LogFactory.getLog(WebScriptRenderer.class);
+    
     private TemplateProcessor templateProcessor;
     private LocalWebScriptRuntimeContainer webScriptContainer;
     private Registry registry;
@@ -161,7 +165,7 @@ public class WebScriptRenderer extends AbstractRenderer
                      */
                     if (templateProcessor.hasTemplate(path))
                     {
-                        Map<String, Object> model = new HashMap<String, Object>(8);
+                        Map<String, Object> model = new HashMap<String, Object>(32);
                         ProcessorModelHelper.populateTemplateModel(rendererContext, model);
                         
                         /**
@@ -188,7 +192,12 @@ public class WebScriptRenderer extends AbstractRenderer
                         String result = out.toString();
                         if (result != null && result.length() > 0)
                         {
-                            head = super.head(rendererContext) + out.toString();
+                            head = out.toString();
+                            
+                            // output wrapping comment blocks if debug enabled
+                            if (logger.isDebugEnabled())
+                                head = super.head(rendererContext) + head;
+                                
                         }
                     }
                 }
