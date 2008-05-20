@@ -1,6 +1,7 @@
 /*
  *** Alfresco.module.CreateSite
 */
+
 (function()
 {
    Alfresco.module.CreateSite = function(containerId)
@@ -9,7 +10,10 @@
       this.id = containerId;
       
       this.dialog = null;
-      
+
+      /* Register this component */
+      Alfresco.util.ComponentManager.register(this);
+
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.componentsLoaded, this);
 
@@ -29,14 +33,21 @@
       
       show: function()
       {
-         Alfresco.util.Ajax.request(
+         if(this.dialog)
          {
-            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite",
-            dataObj: {htmlid: this.id},
-            successCallback: this.templateLoaded,
-            failureMessage: "Could not load create site template",
-            scope: this
-         });
+            this.dialog.show();
+         }
+         else
+         {
+            Alfresco.util.Ajax.request(
+            {
+               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite",
+               dataObj: {htmlid: this.id},
+               successCallback: this.templateLoaded,
+               failureMessage: "Could not load create site template",
+               scope: this
+            });
+         }
       },
       
       templateLoaded: function(response)
@@ -63,6 +74,9 @@
          //var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
          //okButton.subscribe("click", this.onOkButtonClick, this, true);
 
+         var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
+         cancelButton.subscribe("click", this.onCancelButtonClick, this, true);
+
          this.dialog.show();
       },
 
@@ -73,6 +87,11 @@
          var Dom = YAHOO.util.Dom;
          var createSiteFormElement =  Dom.get(this.id + "-createSite-form");
          createSiteFormElement.submit();
+      },
+
+      onCancelButtonClick: function(type, args)
+      {
+        this.dialog.hide();
       },
 
       onCreateSiteSuccess: function(response)

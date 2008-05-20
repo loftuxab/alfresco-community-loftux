@@ -17,6 +17,8 @@
    Alfresco.MySites.prototype =
    {
 
+      createSite: null,
+
       componentsLoaded: function()
       {
          YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
@@ -24,16 +26,17 @@
 
       init: function()
       {
-         var Dom = YAHOO.util.Dom;
-
-         /* Create Site Button */
          var createSiteButton = new YAHOO.widget.Button(this.id + "-createSite-button", {type: "button"});
          createSiteButton.subscribe("click", this.onCreateSiteButtonClick, this, true);
       },
 
       onCreateSiteButtonClick: function(event)
       {
-         new Alfresco.module.CreateSite(this.id + "-createSite").show();
+         if(!this.createSite)
+         {
+            this.createSite = new Alfresco.module.CreateSite(this.id + "-createSite");
+         }
+         this.createSite.show();
       }
 
    };

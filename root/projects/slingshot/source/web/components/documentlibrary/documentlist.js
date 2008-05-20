@@ -10,7 +10,7 @@
       
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
-      
+
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "history"], this.componentsLoaded, this);
       
@@ -84,7 +84,8 @@
          fileSelectButton.getMenu().subscribe("click", this.onFileSelectButtonClick, this, true);
          
          /* Show the Upload button if a FileUpload component has registered on the page */
-         var fileUploads = Alfresco.util.ComponentManager.find({name:"Alfresco.FileUpload"});
+         /*
+         var fileUploads = Alfresco.util.ComponentManager.find({name:"Alfresco.module.FileUpload"});
          if (fileUploads.length > 0)
          {
             this.fileUpload = fileUploads[0];
@@ -97,6 +98,10 @@
             var fuButtonWrap = Dom.get(this.id + "-fileUpload-buttonWrap");
             Dom.removeClass(fuButtonWrap, "hiddenComponents");
          }
+         */
+
+         var fileUploadButton = new YAHOO.widget.Button(this.id + "-fileUpload-button", {type: "button"});
+         fileUploadButton.subscribe("click", this.onFileUploadButtonClick, this, true);
 
          /* Hide/Show Folders button */
          var sfButton = Dom.get(this.id + "-showFolders-button");
@@ -185,15 +190,26 @@
 
       onFileUploadButtonClick: function(e, obj)
       {
-         new Alfresco.module.CreateSite(obj.id + "-createSite").show();
-         /*
-         var fuComponent = Alfresco.util.ComponentManager.find({name:"Alfresco.FileUpload"})[0];
-         // config for update new version of a single image
-         fuComponent.show("Upload New Version of Alfresco Logo.rtf", [{description:"Documents", extensions:"*.doc"}], false, 1, true);
-
-         // config for multi upload of new documents
-         //fuComponent.show("Upload Files", [{description:"Images", extensions:"*.jpg"}], true, 5, false);
-         */
+         if(!this.fileUpload)
+         {
+            this.fileUpload = new Alfresco.module.FileUpload(obj.id + "-createSite");
+         }
+         var showConfig2 = {
+            title: "Upload New Version of Alfresco Logo.rtf",
+            filter: [{description:"Documents", extensions:"*.doc"}],
+            multiSelect: false,
+            noOfVisibleRows: 1,
+            versionInput: true
+         };
+         // Use something like this for multi uploads
+         var showConfig = {
+            title: "Upload new files",
+            filter: [{description:"Documents", extensions:"*.doc"}],
+            multiSelect: true,
+            noOfVisibleRows: 5,
+            versionInput: false
+         }
+         this.fileUpload.show(showConfig);
       },
       
       onShowFoldersButtonClick: function(e, obj)

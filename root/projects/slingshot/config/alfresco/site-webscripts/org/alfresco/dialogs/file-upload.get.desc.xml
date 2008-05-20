@@ -1,5 +1,5 @@
 <webscript>
   <shortname>File upload</shortname>
   <description>File upload component</description>
-  <url>/components/documentlibrary/file-upload</url>
+  <url>/modules/file-upload</url>
 </webscript>
