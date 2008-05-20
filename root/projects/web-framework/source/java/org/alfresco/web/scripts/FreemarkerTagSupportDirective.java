@@ -48,7 +48,6 @@ import freemarker.template.TemplateDirectiveModel;
 public abstract class FreemarkerTagSupportDirective implements
         TemplateDirectiveModel
 {
-    
     /** The context. */
     private RequestContext context;
 
@@ -58,17 +57,6 @@ public abstract class FreemarkerTagSupportDirective implements
      * @param context the context
      */
     public FreemarkerTagSupportDirective(RequestContext context)
-    {
-        this(context, context.getCurrentPage());
-    }
-
-    /**
-     * Instantiates a new freemarker tag support directive.
-     * 
-     * @param context the context
-     * @param page the page
-     */
-    public FreemarkerTagSupportDirective(RequestContext context, Page page)
     {
         this.context = context;
     }

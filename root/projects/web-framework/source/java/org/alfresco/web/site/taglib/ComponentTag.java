@@ -83,7 +83,7 @@ public class ComponentTag extends TagBase
         
         // If we were not supplied with a component id, try to infer it
         // this will apply if we're rendering in a region
-        if(componentId == null)
+        if (componentId == null)
         {
             componentId = (String) context.getRenderContext().get(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID);
         }
@@ -91,17 +91,18 @@ public class ComponentTag extends TagBase
         // now render the component
         try
         {
+            // get overriden chrome id
             String chromeId = getChrome();
             boolean isChromeless = isChromeless();
 
             // if debug mode is on, we select a specific "debug" chrome
-            if(RequestContext.DEBUG_MODE_VALUE_COMPONENTS.equals(context.getDebugMode()))
+            if (RequestContext.DEBUG_MODE_VALUE_COMPONENTS.equals(context.getDebugMode()))
             {
                 chromeId = WebFrameworkConstants.DEBUG_COMPONENT_CHROME_ID;
                 isChromeless = false;
             }
             
-            if(!isChromeless)
+            if (!isChromeless)
             {
                 PresentationUtil.renderComponent(context, request, response, componentId, chromeId);
             }

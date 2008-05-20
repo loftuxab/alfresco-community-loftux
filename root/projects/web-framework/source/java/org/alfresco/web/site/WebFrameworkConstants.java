@@ -65,11 +65,9 @@ public class WebFrameworkConstants
     
     // Chromes
     public static final String DEFAULT_REGION_CHROME_ID = "default-region-chrome";
-    public static final String DEFAULT_COMPONENT_CHROME_ID = "default-component-chrome";
     public static final String CHROMELESS_REGION_CHROME_ID = "chromeless-region-chrome";
-    public static final String CHROMELESS_COMPONENT_CHROME_ID = "chromeless-component-chrome";
+    public static final String DEFAULT_COMPONENT_CHROME_ID = "default-component-chrome";
     public static final String DEBUG_COMPONENT_CHROME_ID = "debug-component-chrome";
-    //public static final String NO_CHROME = "NO_CHROME";
     
     // Misc
     public static final String DEFAULT_ALFRESCO_ENDPOINT_ID = "alfresco";

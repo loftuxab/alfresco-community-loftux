@@ -43,13 +43,13 @@ import org.alfresco.web.site.model.ModelObject;
  * 
  * @author muzquiano
  */
-public class RendererContext implements Serializable
+public final class RendererContext implements Serializable
 {
-    protected Map<String, Object> map;
-    protected ModelObject object;
-    protected RequestContext context;
-    protected HttpServletRequest request;
-    protected HttpServletResponse response;
+    private Map<String, Object> map;
+    private ModelObject object;
+    private RequestContext context;
+    private HttpServletRequest request;
+    private HttpServletResponse response;
 
     public RendererContext()
     {

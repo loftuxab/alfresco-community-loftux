@@ -188,6 +188,8 @@ public abstract class AbstractRequestContext implements RequestContext
     public void setCurrentPage(Page page)
     {
         this.currentPage = page;
+        // clear cached variable
+        this.currentTemplate = null;
     }
     
     /**
@@ -198,7 +200,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public String getCurrentPageId()
     {
-        if(getCurrentPage() != null)
+        if (getCurrentPage() != null)
         {
             return getCurrentPage().getId();
         }
@@ -236,11 +238,14 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public TemplateInstance getCurrentTemplate()
     {
-        if(getCurrentPage() != null)
+        if (this.currentTemplate == null)
         {
-            return getCurrentPage().getTemplate(this);
+            if (getCurrentPage() != null)
+            {
+                this.currentTemplate = getCurrentPage().getTemplate(this);
+            }
         }
-        return null;
+        return this.currentTemplate;
     }
     
     /**
@@ -251,7 +256,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public String getCurrentTemplateId()
     {
-        if(getCurrentTemplate() != null)
+        if (getCurrentTemplate() != null)
         {
             return getCurrentTemplate().getId();
         }
@@ -267,7 +272,7 @@ public abstract class AbstractRequestContext implements RequestContext
     public String getCurrentObjectId()
     {
     	String id = null;    	
-    	if(getCurrentObject() != null)
+    	if (getCurrentObject() != null)
     	{
     		id = getCurrentObject().getId();
     	}
@@ -493,6 +498,7 @@ public abstract class AbstractRequestContext implements RequestContext
     
     protected Map map;
     protected Page currentPage;
+    protected TemplateInstance currentTemplate;
     protected Content currentObject;
     protected String currentFormatId;
     protected IFileSystem fileSystem;

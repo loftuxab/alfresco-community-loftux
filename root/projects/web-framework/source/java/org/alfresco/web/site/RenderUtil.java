@@ -378,13 +378,22 @@ public class RenderUtil
         try
         {
             // bind the rendering to this component
-            RendererContextHelper.bind(context, component, request, response);
+            RendererContext rendererContext = RendererContextHelper.bind(context, component, request, response);
             
-            // determine the component renderer
-            RendererDescriptor descriptor = getComponentRendererDescriptor(context, component, overrideChromeId);
+            // determine the component renderer given the specified chrome
+            RendererDescriptor descriptor = getComponentChromeRendererDescriptor(
+                    context, component, overrideChromeId);
             
-            // execute
-            RenderUtil.executeRenderer(context, request, response, descriptor);
+            if (descriptor != null)
+            {
+                RenderUtil.executeRenderer(context, request, response, descriptor);
+            }
+            else
+            {
+                // build a renderer for this component
+                Renderable renderer = RendererFactory.newRenderer(context, component);
+                renderer.execute(rendererContext);
+            }
         }
         catch (Exception ex)
         {
@@ -863,26 +872,26 @@ public class RenderUtil
         // if the chrome id is empty, see if there is an override
         // this allows the template to "override" the chrome on a
         // per-region basis
-        if(chromeId == null)
+        if (chromeId == null)
         {
-            chromeId = template.getCustomProperty("region-" + regionId + "-chrome-id");
+            chromeId = template.getCustomProperty("region-" + regionId + "-chrome");
         }
         
         // see if a default chrome was specified
-        if(chromeId == null)
+        if (chromeId == null)
         {
             chromeId = context.getConfig().getDefaultRegionChrome();
         }
         
         // if there still isn't a chrome, then pick the system default
-        if(chromeId == null)
+        if (chromeId == null)
         {
             chromeId = WebFrameworkConstants.DEFAULT_REGION_CHROME_ID;
         }
         
         // load the chrome
         Chrome chrome = context.getModel().loadChrome(context, chromeId);
-        if(chrome != null)
+        if (chrome != null)
         {
             // return the renderer for this chrome
             return new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
@@ -903,42 +912,44 @@ public class RenderUtil
      * 
      * Or a specific component might override its settings.
      */
-    public static RendererDescriptor getComponentRendererDescriptor(RequestContext context, Component component, String chromeId)
+    public static RendererDescriptor getComponentChromeRendererDescriptor(
+            RequestContext context, Component component, String chromeId)
     {
+        RendererDescriptor descriptor = null;
+        
         // if the chrome id is empty, see if there is an override
         // this allows the component to "override" the chrome on a
         // per-component basis
-        if(chromeId == null)
+        if (chromeId == null)
         {
             chromeId = component.getCustomProperty("chrome");
-            if(chromeId == null)
-            {
-                chromeId = component.getCustomProperty("chrome-id");
-            }
         }
         
         // see if a default chrome was specified
-        if(chromeId == null)
+        if (chromeId == null)
         {
             chromeId = context.getConfig().getDefaultComponentChrome();
         }        
         
-        // if there still isn't a chrome, then pick the default
-        if(chromeId == null)
+        if (chromeId != null && chromeId.length() != 0)
         {
-            chromeId = WebFrameworkConstants.DEFAULT_COMPONENT_CHROME_ID;
+            // try to load the chrome
+            Chrome chrome = context.getModel().loadChrome(context, chromeId);
+            if (chrome != null)
+            {
+                // return the renderer for this chrome
+                descriptor = new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
+            }
+            else
+            {
+                // assume it's a freemarker renderer for system chrome
+                descriptor = new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
+            }
+  
         }
+        // if no chrome specified, then we won't use any
         
-        // load the chrome
-        Chrome chrome = context.getModel().loadChrome(context, chromeId);
-        if(chrome != null)
-        {
-            // return the renderer for this chrome
-            return new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
-        }
-
-        // assume it is a freemarker chrome
-        return new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
+        return descriptor;
     }
     
     /**
