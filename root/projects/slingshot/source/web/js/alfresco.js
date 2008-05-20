@@ -343,7 +343,8 @@ Alfresco.util.Ajax = function()
          successCallback: null,// Will be called in the scop of scope with a response object literal described below
          successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
          failureCallback: null,// Will be called in the scop of scope with a response object literal described below
-         failureMessage: null  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
+         failureMessage: null,  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
+         object: null           // An object that can be passed to be used by the success or failure handlers
       },
 
       jsonRequest: function(config)

@@ -23,7 +23,7 @@
       </div>
       <div class="yui-u">
          <div id="${args.htmlid}-viewButtons" class="doclist-viewButtons">
-            <span id="${args.htmlid}-fileUpload-buttonWrap" class="hiddenComponents"><a href="#" id="${args.htmlid}-fileUpload-button">Upload</a> | </span>
+            <span><a href="#" id="${args.htmlid}-fileUpload-button">Upload</a> | </span>
             <span><a href="#" id="${args.htmlid}-showFolders-button">Hide Folders</a> | </span>
             <span><a href="#">Detail List</a> | </span>
             <span><a href="#">Simple List</a></span>

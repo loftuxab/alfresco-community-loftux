@@ -38,6 +38,7 @@
             </div>
             <div class="yui-g">
                <input type="submit" id="${args.htmlid}-ok-button" value="OK" />
+               <input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
             </div>
          
       </div>
