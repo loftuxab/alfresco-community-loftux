@@ -424,7 +424,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   
                   // get the form element
                   var form = document.getElementById(this.formId);
-                  var submitUrl = form.action;
+                  var submitUrl = form.attributes.action.nodeValue; // form.action;
                   
                   if (Alfresco.logger.isDebugEnabled())
                      Alfresco.logger.debug("Performing AJAX submission to url: ", submitUrl);
@@ -473,9 +473,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                         Alfresco.logger.debug("Submitting JSON data: ", jsonData);
                      
                      // set up specific config
-                     config.contentType = "application/json";
                      config.dataObj = jsonData;
-                     Alfresco.util.Ajax.request(config);
+                     Alfresco.util.Ajax.jsonRequest(config);
                   }
                   else
                   {

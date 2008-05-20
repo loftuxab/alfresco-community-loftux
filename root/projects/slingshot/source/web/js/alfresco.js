@@ -274,7 +274,6 @@ Alfresco.util.PopupManager = function()
 
       displayPrompt: function(userConfig)
       {
-         alert();
          var c = YAHOO.lang.merge(this.displayPromptConfig, userConfig);
          var prompt = new YAHOO.widget.SimpleDialog("prompt", {
             visible:false,
@@ -324,50 +323,36 @@ Alfresco.util.Ajax = function()
 
       JSON: "application/json",
 
+      GET: "GET",
+      POST: "POST",
+      PUT: "PUT",
+      DELETE: "DELETE",
+
       requestConfig:
       {
          method: "GET",        // GET, POST and hopefully PUT or DELETE if ot works...
-         context: null,        // Default will be Alfresco.constants.URL_CONTEXT but it's not set during declaration
-         url: null,            // Must be set by user and should be relative to context
+         url: null,            // Must be set by user
          scope: this,          // The scope in which the success and failure handlers will be called.
          dataObj: null,        // Will be encoded to parameters (key1=value1&key2=value2)
                                // or a json string if contentType is set to JSON
          dataStr: null,        // Will be used in the request body, could be a already created parameter or json string
                                // Will be overriden by the encoding result from dataObj if dataObj is provided
          dataForm: null,       // A form object or id that contains the data to be sent with request
-         contentType: null,    // Set to JSON if json should be used
+         requestContentType: null,    // Set to JSON if json should be used
+         responseContentType: null,    // Set to JSON if json should be used
          successCallback: null,// Will be called in the scop of scope with a response object literal described below
          successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
          failureCallback: null,// Will be called in the scop of scope with a response object literal described below
          failureMessage: null  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
       },
 
-      jsonServiceRequest: function(config)
+      jsonRequest: function(config)
       {
-         config.method = "POST";
-         config.contentType = this.JSON;
-         this.serviceRequest(config);
-      },
-
-      serviceRequest: function(config)
-      {
-         config.context = Alfresco.constants.URL_SERVICECONTEXT;
+         config.requestContentType = this.JSON;
+         config.responseContentType = this.JSON;
          this.request(config);
       },
-
-      jsonProxyRequest: function(config)
-      {
-         config.method = "POST";
-         config.contentType = this.JSON;
-         this.proxyRequest(config);
-      },
-
-      proxyRequest: function(config)
-      {
-         config.context = Alfresco.constants.PROXY_URI;
-         this.request(config);
-      },
-
+      
       /*
        * Wraps a YAHOO.util.Connect.asyncRequest call and provides some default behaviour.
        *
@@ -411,24 +396,17 @@ Alfresco.util.Ajax = function()
          var c = YAHOO.lang.merge(this.requestConfig, config);
          Alfresco.util.assertNotEmpty(c.url, "Parameter 'url' can NOT be null");
          Alfresco.util.assertNotEmpty(c.method, "Parameter 'method' can NOT be null");
-         
-         if(!c.context)
-         {
-            /* Since URL_CONTEXT can't be set during declaration of requestConfig */
-            c.context = Alfresco.constants.URL_CONTEXT;
-         }
-         
-         if (c.contentType)
+         if (c.requestContentType)
          {
             YAHOO.util.Connect.setDefaultPostHeader(false);
-            YAHOO.util.Connect.initHeader("Content-Type", c.contentType);
+            YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
          }
          
-         if (c.contentType === this.JSON)
+         if (c.requestContentType === this.JSON)
          {
-            if (c.method.toUpperCase() === "GET")
+            if (c.method.toUpperCase() === this.GET)
             {
-               throw new Error("Parameter' method' can not be 'GET' when using contentType '" + c.contentType + "'");
+               throw new Error("Parameter 'method' can not be 'GET' when using contentType '" + c.requestContentType + "'");
             }
             else
             {
@@ -440,7 +418,7 @@ Alfresco.util.Ajax = function()
          }
          else
          {
-            if (c.method.toUpperCase() === "GET")
+            if (c.method.toUpperCase() === this.GET)
             {
                c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
             }
@@ -469,15 +447,8 @@ Alfresco.util.Ajax = function()
             }
          };
          
-         var url = c.url;
-         if (url.indexOf("http") == -1 && url.indexOf("https"))
-         {
-            url = c.context + url;
-         }
-         
          // make the request
-         alert(url + " -- " + c.dataStr);
-         YAHOO.util.Connect.asyncRequest (c.method, url, callback, c.dataStr);
+         YAHOO.util.Connect.asyncRequest (c.method, c.url, callback, c.dataStr);
       },
 
       _toParamString: function(obj)
@@ -507,8 +478,11 @@ Alfresco.util.Ajax = function()
          {
             /* User provided a custom successHandler */
             var json = null;
-            if(config.contentType === "application/json"){
-               json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+            if(config.responseContentType === "application/json"){
+               if(serverResponse.responseText && serverResponse.responseText.length > 0)
+               {
+                  json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+               }
             }
             YAHOO.lang.later(0, (config.scope ? config.scope : this), config.successCallback, {config: config, json: json, serverResponse: serverResponse});
          }
@@ -526,7 +500,7 @@ Alfresco.util.Ajax = function()
          {
             /* User provided a custom failureHandler */
             var json = null;
-            if(config.contentType === "application/json"){
+            if(config.responseContentType === "application/json"){
                /* todo: When error response is in valid json format */
                //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
             }
@@ -540,7 +514,7 @@ Alfresco.util.Ajax = function()
          else
          {
             // User did not provide any failure info, display as good info as possible from the server response instead
-            if(config.contentType === "application/json"){
+            if(config.responseContentType === "application/json"){
                var json = null;
                /* todo: When error response is in valid json format */
                // json = YAHOO.lang.JSON.parse(serverResponse.responseText);

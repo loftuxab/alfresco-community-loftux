@@ -29,9 +29,9 @@
       
       show: function()
       {
-         Alfresco.util.Ajax.serviceRequest(
+         Alfresco.util.Ajax.request(
          {
-            url: "modules/createSite",
+            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite",
             dataObj: {htmlid: this.id},
             successCallback: this.templateLoaded,
             failureMessage: "Could not load create site template",
