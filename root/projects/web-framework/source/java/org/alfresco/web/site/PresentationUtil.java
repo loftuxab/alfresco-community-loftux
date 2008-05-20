@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.web.site.exception.ComponentChromeRenderException;
+import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
 import org.alfresco.web.site.exception.PageRenderException;
 import org.alfresco.web.site.exception.RegionRenderException;
@@ -174,7 +175,15 @@ public class PresentationUtil
             HttpServletRequest request, HttpServletResponse response,
             String componentId) throws RequestDispatchException
     {
-        renderComponent(context, request, response, componentId, WebFrameworkConstants.CHROMELESS_COMPONENT_CHROME_ID);
+        try
+        {
+            RenderUtil.renderRawComponent(context, request, response, componentId);
+        }
+        catch (ComponentRenderException ex)
+        {
+            handleComponentRenderProblem(context, request, response, ex,
+                    componentId);
+        }
     }
     
     public static void renderComponent(RequestContext context,

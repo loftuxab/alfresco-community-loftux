@@ -64,6 +64,11 @@ public abstract class AbstractModelObject implements ModelObject
     protected Map<String, Object> modelProperties;    
     protected Map<String, Object> customProperties;
     
+    // cached values
+    protected String title;
+    protected String description;
+    
+    
     /**
      * Constructs a new model object
      * 
@@ -101,25 +106,24 @@ public abstract class AbstractModelObject implements ModelObject
         return this.modelVersion;
     }
 
+
     ///////////////////////////////////////////////////////////////
     // common model properties
     ///////////////////////////////////////////////////////////////
-
-    
     
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getId()
      */
     public String getId()
     {
-        if(this.id == null)
+        if (this.id == null)
         {
             // if it is NOT on the object, then we can assume the file name
             String fileName = this.getFileName();
 
             // strip off the extension
             int i = fileName.lastIndexOf(".");
-            if(i > -1)
+            if(i != -1)
             {
                 this.id = fileName.substring(0,i);
             }            
@@ -132,7 +136,11 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public String getTitle()
     {
-        return getProperty(PROP_TITLE);
+        if (this.title == null)
+        {
+            this.title = getProperty(PROP_TITLE);
+        }
+        return this.title;
     }
     
     /* (non-Javadoc)
@@ -141,6 +149,7 @@ public abstract class AbstractModelObject implements ModelObject
     public void setTitle(String title)
     {
         setProperty(PROP_TITLE, title);
+        this.title = title;
     }
 
     /* (non-Javadoc)
@@ -148,7 +157,11 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public String getDescription()
     {
-        return getProperty(PROP_DESCRIPTION);
+        if (this.description == null)
+        {
+            this.description = getProperty(PROP_DESCRIPTION);
+        }
+        return this.description;
     }
 
     /* (non-Javadoc)
@@ -157,6 +170,7 @@ public abstract class AbstractModelObject implements ModelObject
     public void setDescription(String value)
     {
         setProperty(PROP_DESCRIPTION, value);
+        this.description = value;
     }
     
     
@@ -228,9 +242,7 @@ public abstract class AbstractModelObject implements ModelObject
     public boolean getBooleanProperty(String propertyName)
     {
         String val = getProperty(propertyName);
-        if (val == null)
-            return false;
-        return ("true".equals(val));
+        return Boolean.parseBoolean(val);
     }
 
     /* (non-Javadoc)
@@ -238,10 +250,7 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public String getProperty(String propertyName)
     {
-        if (propertyName == null)
-            return null;
-        
-        if(isModelProperty(propertyName))
+        if (isModelProperty(propertyName))
         {
             return getModelProperty(propertyName);
         }
@@ -256,10 +265,7 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public void setProperty(String propertyName, String propertyValue)
     {
-        if (propertyName == null)
-            return;
-        
-        if(isModelProperty(propertyName))
+        if (isModelProperty(propertyName))
         {
             setModelProperty(propertyName, propertyValue);
         }
@@ -274,10 +280,7 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public void removeProperty(String propertyName)
     {
-        if (propertyName == null)
-            return;
-        
-        if(isModelProperty(propertyName))
+        if (isModelProperty(propertyName))
         {
             removeModelProperty(propertyName);
         }
@@ -314,16 +317,10 @@ public abstract class AbstractModelObject implements ModelObject
      */
     protected boolean isModelProperty(String propertyName)
     {
-        if(propertyName == null)
-        {
-            return false;
-        }
-
         return ModelHelper.isModelProperty(this, propertyName);
     }
     
     
-
     ////////////////////////////////////////////////////////////
     // Model Properties
     ////////////////////////////////////////////////////////////
@@ -335,7 +332,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
         if (propertyName == null)
         {
-            return null;
+            throw new IllegalArgumentException("Property Name is mandatory.");
         }
         
         return (String) getModelProperties().get(propertyName);
@@ -348,11 +345,11 @@ public abstract class AbstractModelObject implements ModelObject
     {
         if (propertyName == null)
         {
-            return;
+            throw new IllegalArgumentException("Property Name is mandatory.");
         }
         
         // if the propertyValue is null, remove the property
-        if(propertyValue == null)
+        if (propertyValue == null)
         {
             removeModelProperty(propertyName);
             return;
@@ -379,7 +376,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
         if (propertyName == null)
         {
-            return;
+            throw new IllegalArgumentException("Property Name is mandatory.");
         }
 
         // do the remove
@@ -394,8 +391,6 @@ public abstract class AbstractModelObject implements ModelObject
     }
 
     
-    
-    
     ////////////////////////////////////////////////////////////
     // Custom Properties
     ////////////////////////////////////////////////////////////
@@ -407,7 +402,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
         if (propertyName == null)
         {
-            return null;
+            throw new IllegalArgumentException("Property Name is mandatory.");
         }
         
         return (String) getCustomProperties().get(propertyName);
@@ -420,11 +415,11 @@ public abstract class AbstractModelObject implements ModelObject
     {
         if (propertyName == null)
         {
-            return;
+            throw new IllegalArgumentException("Property Name is mandatory.");
         }
         
         // if the propertyValue is null, remove the property
-        if(propertyValue == null)
+        if (propertyValue == null)
         {
             removeCustomProperty(propertyName);
             return;
@@ -432,7 +427,7 @@ public abstract class AbstractModelObject implements ModelObject
         
         // do the set
         Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
-        if(properties == null)
+        if (properties == null)
         {
             properties = getDocument().getRootElement().addElement(CONTAINER_PROPERTIES);
         }
@@ -457,7 +452,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
         if (propertyName == null)
         {
-            return;
+            throw new IllegalArgumentException("Property Name is mandatory.");
         }
         
         // do the remove
@@ -474,8 +469,6 @@ public abstract class AbstractModelObject implements ModelObject
             }
         }
     }
-
-    
     
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getProperties()
@@ -493,10 +486,10 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public Map<String, Object> getModelProperties()
     {
-    	if(this.modelProperties == null)
+    	if (this.modelProperties == null)
     	{
     		modelProperties = new HashMap<String, Object>(16);
-
+    		
     		List elements = getDocument().getRootElement().elements();
 	        for (int i = 0; i < elements.size(); i++)
 	        {
@@ -538,7 +531,6 @@ public abstract class AbstractModelObject implements ModelObject
     	return this.customProperties;
     }
     
-
 
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getModificationTime()
@@ -592,7 +584,6 @@ public abstract class AbstractModelObject implements ModelObject
      * @see org.alfresco.web.site.model.ModelObject#getTypeName()
      */
     public abstract String getTypeName();
-    
     
     
     ////////////////////////////////////////////////////////

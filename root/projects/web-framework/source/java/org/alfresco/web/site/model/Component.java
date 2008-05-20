@@ -46,6 +46,11 @@ public class Component extends AbstractModelObject
     // Frame types are handled by chrome definitions
     public static String PROP_FRAME_TYPE = "frame-type";
     
+    // cached values
+    private String regionId = null;
+    private String scope = null;
+    private String componentTypeId = null;
+    
     /**
      * Instantiates a new component for a given XML document.
      * 
@@ -63,7 +68,11 @@ public class Component extends AbstractModelObject
      */
     public String getRegionId()
     {
-        return getProperty(PROP_REGION_ID);
+        if (this.regionId == null)
+        {
+            this.regionId = getProperty(PROP_REGION_ID);
+        }
+        return this.regionId;
     }
 
     /**
@@ -74,6 +83,7 @@ public class Component extends AbstractModelObject
     public void setRegionId(String regionId)
     {
         setProperty(PROP_REGION_ID, regionId);
+        this.regionId = regionId;
     }
 
     /**
@@ -103,7 +113,11 @@ public class Component extends AbstractModelObject
      */
     public String getScope()
     {
-        return getProperty(PROP_SCOPE);
+        if (this.scope == null)
+        {
+            this.scope = getProperty(PROP_SCOPE);
+        }
+        return this.scope;
     }
 
     /**
@@ -114,6 +128,7 @@ public class Component extends AbstractModelObject
     public void setScope(String scope)
     {
         setProperty(PROP_SCOPE, scope);
+        this.scope = scope;
     }
 
     /**
@@ -123,7 +138,11 @@ public class Component extends AbstractModelObject
      */
     public String getComponentTypeId()
     {
-        return getProperty(PROP_COMPONENT_TYPE_ID);
+        if (this.componentTypeId == null)
+        {
+            this.componentTypeId = getProperty(PROP_COMPONENT_TYPE_ID);
+        }
+        return this.componentTypeId;
     }
 
     /**
@@ -134,6 +153,7 @@ public class Component extends AbstractModelObject
     public void setComponentTypeId(String componentTypeId)
     {
         setProperty(PROP_COMPONENT_TYPE_ID, componentTypeId);
+        this.componentTypeId = componentTypeId;
     }
 
     /**

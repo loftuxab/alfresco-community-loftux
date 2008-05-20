@@ -1,61 +1,65 @@
 <alfresco-config>
 
-	<!-- Add in additional Slingshot elements -->
-	<config evaluator="string-compare" condition="WebFramework">
-	   
-	   <web-framework>
-	   
-   		<link-builder>
-   			<id>slingshot</id>
-   			<name>Slingshot Link Builder</name>
-   			<description>Slingshot Link Builder</description>
-   			<class>org.alfresco.web.site.SlingshotLinkBuilder</class>
-   		</link-builder>
+   <!-- Add in additional Slingshot elements -->
+   <config evaluator="string-compare" condition="WebFramework">
+      
+      <web-framework>
+      
+         <link-builder>
+            <id>slingshot</id>
+            <name>Slingshot Link Builder</name>
+            <description>Slingshot Link Builder</description>
+            <class>org.alfresco.web.site.SlingshotLinkBuilder</class>
+         </link-builder>
    
-   		<page-mapper>
-   			<id>slingshot</id>
-   			<name>Slingshot Page Mapper</name>
-   			<description>Slingshot Page Mapper</description>
-   			<class>org.alfresco.web.site.SlingshotPageMapper</class>
-   		</page-mapper>
-   		
-   		<user-factory>
-   			<id>slingshot</id>
-   			<name>Slingshot User Factory</name>
-   			<description>Produces Users loaded from Slingshot (Alfresco) Repository</description>
-   			<class>org.alfresco.web.site.SlingshotUserFactory</class>
-   		</user-factory>
+         <page-mapper>
+            <id>slingshot</id>
+            <name>Slingshot Page Mapper</name>
+            <description>Slingshot Page Mapper</description>
+            <class>org.alfresco.web.site.SlingshotPageMapper</class>
+         </page-mapper>
+         
+         <user-factory>
+            <id>slingshot</id>
+            <name>Slingshot User Factory</name>
+            <description>Produces Users loaded from Slingshot (Alfresco) Repository</description>
+            <class>org.alfresco.web.site.SlingshotUserFactory</class>
+         </user-factory>
    
-   		<!-- Overrides -->
-   		<framework-defaults>
-   			<page-mapper>slingshot</page-mapper>
-   			<link-builder>slingshot</link-builder>			
-   			<user-factory>slingshot</user-factory>			
-   		</framework-defaults>
-   		
-   		<!-- Application Defaults -->
-			<application-defaults>
-				<theme>slingshot</theme>
-				<page-type>
-					<id>login</id>
-					<page-instance-id>page.slingshot-login</page-instance-id>
-				</page-type>
-				<page-type>
-					<id>logout</id>
-					<page-instance-id>page.slingshot-logout</page-instance-id>
-				</page-type>
-			</application-defaults>
-			
-			<!-- Error Handler Pages -->
-			<error-handler>
-				<id>region-nocomponent</id>
-				<renderer>org.alfresco.web.site.EmptyRegionRenderer</renderer>
-				<renderer-type>java</renderer-type>
-			</error-handler>
-   		
+         <!-- Overrides -->
+         <framework-defaults>
+            <page-mapper>slingshot</page-mapper>
+            <link-builder>slingshot</link-builder>       
+            <user-factory>slingshot</user-factory>       
+         </framework-defaults>
+         
+         <!-- Application Defaults -->
+         <application-defaults>
+            <theme>slingshot</theme>
+            <!-- slingshot region chrome override -->
+            <region-chrome>slingshot-region-chrome</region-chrome>
+            <!-- no chrome required for components -->
+            <component-chrome></component-chrome>
+            <page-type>
+               <id>login</id>
+               <page-instance-id>page.slingshot-login</page-instance-id>
+            </page-type>
+            <page-type>
+               <id>logout</id>
+               <page-instance-id>page.slingshot-logout</page-instance-id>
+            </page-type>
+         </application-defaults>
+         
+         <!-- Error Handler Pages -->
+         <error-handler>
+            <id>region-nocomponent</id>
+            <renderer>org.alfresco.web.site.EmptyRegionRenderer</renderer>
+            <renderer-type>java</renderer-type>
+         </error-handler>
+         
       </web-framework>
 
-	</config>
+   </config>
 
    <config evaluator="string-compare" condition="UriTemplate" replace="true">
       <!-- ordered list of URI Template mappings for application urls -->

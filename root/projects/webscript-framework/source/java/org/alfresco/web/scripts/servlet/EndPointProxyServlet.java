@@ -161,7 +161,6 @@ public class EndPointProxyServlet extends HttpServlet
                 client.setTicket(alfTicket);
             }
             
-            // TODO: copy request headers for proxy call
             String method = req.getMethod();
             client.setRequestContentType(req.getContentType());
             client.setRequestMethod(method);

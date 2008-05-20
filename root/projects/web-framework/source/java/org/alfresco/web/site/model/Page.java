@@ -124,10 +124,6 @@ public class Page extends AbstractModelObject
         {
             Element templateElement = templateElements.get(i);
             String _formatId = templateElement.attributeValue(ATTR_FORMAT_ID);
-            if (_formatId != null && _formatId.length() == 0)
-            {
-                _formatId = null;
-            }
             if (formatId == null)
             {
                 if (_formatId == null || _formatId.length() == 0)
@@ -136,13 +132,10 @@ public class Page extends AbstractModelObject
                     break;
                 }
             }
-            else
+            else if (formatId.equals(_formatId))
             {
-                if (formatId.equals(_formatId))
-                {
-                    result = templateElement;
-                    break;
-                }
+                result = templateElement;
+                break;
             }
         }
         return result;

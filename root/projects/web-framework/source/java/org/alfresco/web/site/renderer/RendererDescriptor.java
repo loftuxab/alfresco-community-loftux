@@ -86,6 +86,13 @@ public class RendererDescriptor
         return this.rendererType;
     }
     
+    @Override
+    public String toString()
+    {
+        return rendererType + " (" + renderer + ")";
+    }
+
+
     /** The renderer. */
     protected String renderer;
     

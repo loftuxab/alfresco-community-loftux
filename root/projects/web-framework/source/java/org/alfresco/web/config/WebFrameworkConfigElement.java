@@ -321,7 +321,6 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     	return (ContentLoaderDescriptor) this.contentLoaders.get(id);    	
     }
     
-
     // debug
     public boolean isTimerEnabled()
     {
@@ -331,19 +330,11 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     // application defaults
     public String getDefaultRegionChrome()
     {
-        if(this.defaultRegionChrome == null)
-        {
-            return "default-region-chrome";
-        }
         return this.defaultRegionChrome;
     }
     
     public String getDefaultComponentChrome()
     {
-        if(this.defaultComponentChrome == null)
-        {
-            return "default-component-chrome";
-        }
         return this.defaultComponentChrome;
     }
     
@@ -956,7 +947,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
                 configElement.defaultComponentChrome = _componentChrome;
             }
             String _theme = applicationDefaults.elementTextTrim("theme");
-            if(_theme != null)
+            if(_theme != null && _theme.length() != 0)
             {
                 configElement.defaultTheme = _theme;
             }

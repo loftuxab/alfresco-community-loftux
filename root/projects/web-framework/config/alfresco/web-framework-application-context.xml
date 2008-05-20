@@ -3,111 +3,104 @@
 
 <beans>
 
-	<!--                       -->
-	<!-- Configuration Service -->
-	<!--                       -->
+   <!--                       -->
+   <!-- Configuration Service -->
+   <!--                       -->
 
-	<bean id="webframework.configsource"
-		   class="org.alfresco.config.source.UrlConfigSource">
-		<constructor-arg>
-			<list>
-				<!-- Web Script Framework -->
-				<value>classpath:alfresco/webscript-framework-config.xml</value>
-				<value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
-				<value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
-			
-				<!--  Start TEST dependencies -->
-				<!--  These is included because some of the tests require it  -->
-				<!--  These should be removed -->
-				<!--<value>classpath:alfresco/pagerenderer-config.xml</value>-->
-				<value>classpath:alfresco/webscript-framework-config-test.xml</value>
-				<!--  End TEST dependencies -->				
-				
-				<!-- Web Framework -->
-				<value>classpath:alfresco/web-framework-config.xml</value>
-				<value>classpath:alfresco/web-framework-config-remote.xml</value>								
-				<value>classpath:alfresco/web-framework-config-application.xml</value>
-				<value>classpath:alfresco/extension/web-framework-config-custom.xml</value>
-				<value>jar:*!/META-INF/web-framework-config-custom.xml</value>
-			</list>
-		</constructor-arg>
-	</bean>
+   <bean id="webframework.configsource"
+         class="org.alfresco.config.source.UrlConfigSource">
+      <constructor-arg>
+         <list>
+            <!-- Web Script Framework -->
+            <value>classpath:alfresco/webscript-framework-config.xml</value>
+            <value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
+            <value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
+         
+            <!--  Start TEST dependencies -->
+            <!--  These is included because some of the tests require it  -->
+            <!--  These should be removed -->
+            <!--<value>classpath:alfresco/pagerenderer-config.xml</value>-->
+            <value>classpath:alfresco/webscript-framework-config-test.xml</value>
+            <!--  End TEST dependencies -->           
+            
+            <!-- Web Framework -->
+            <value>classpath:alfresco/web-framework-config.xml</value>
+            <value>classpath:alfresco/web-framework-config-remote.xml</value>                      
+            <value>classpath:alfresco/web-framework-config-application.xml</value>
+            <value>classpath:alfresco/extension/web-framework-config-custom.xml</value>
+            <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
+         </list>
+      </constructor-arg>
+   </bean>
 
    <!-- override the web config bean -->
-	<bean id="web.config"
-		   class="org.alfresco.config.xml.XMLConfigService" init-method="init">
-		<constructor-arg>
-			<ref bean="webframework.configsource" />
-		</constructor-arg>
-	</bean>
+   <bean id="web.config"
+         class="org.alfresco.config.xml.XMLConfigService" init-method="init">
+      <constructor-arg>
+         <ref bean="webframework.configsource" />
+      </constructor-arg>
+   </bean>
 
 
-	<!--                                                     -->
-	<!-- Configuration of the Web Script Runtime / Container -->
-	<!--                                                     -->
-	<bean id="webframework.store.webscripts" class="org.alfresco.web.scripts.ClassPathStore">
-		<property name="mustExist">
-			<value>true</value>
-		</property>
-		<property name="classPath">
-			<value>alfresco/site-webscripts</value>
-		</property>
-	</bean>
-	<bean id="webframework.searchpath" class="org.alfresco.web.scripts.SearchPath">
-		<property name="searchPath">
-			<list>
-				<ref bean="webframework.store.webscripts" />
-				<ref bean="webscripts.store" />
-			</list>
-		</property>
-	</bean>
-	<bean id="webframework.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
-		<property name="searchPath" ref="webframework.searchpath" />
-		<property name="updateDelay"><value>10</value></property>
-		<property name="defaultEncoding"><value>UTF-8</value></property>
-	</bean>
-	<bean id="webframework.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
-		<property name="searchPath" ref="webframework.searchpath" />
-	</bean>	
-	<bean id="webframework.webscripts.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />   
-	<bean id="webframework.webscripts.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.scripts.LocalWebScriptRuntimeContainer">
-		<property name="name"><value>WebFramework</value></property>
-		<property name="registry" ref="webframework.webscripts.registry" />
-		<property name="searchPath" ref="webframework.searchpath" />		
-		<property name="templateProcessor" ref="webframework.webscripts.templateprocessor" />
-		<property name="scriptProcessor" ref="webframework.webscripts.scriptprocessor" />
-		<property name="configService" ref="web.config" />
-	</bean>
-	<bean id="webframework.webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
-		<property name="container" ref="webframework.webscripts.container" />
-		<property name="uriIndex" ref="webframework.webscripts.index" />
-		<property name="searchPath" ref="webframework.searchpath" />
-		<property name="defaultWebScript"><value>webscript.default</value></property>
-	</bean>
-	
+   <!--                                                     -->
+   <!-- Configuration of the Web Script Runtime / Container -->
+   <!--                                                     -->
+   <bean id="webframework.store.webscripts" class="org.alfresco.web.scripts.ClassPathStore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/site-webscripts</value></property>
+   </bean>
+   
+   <bean id="webframework.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.store.webscripts" />
+            <ref bean="webscripts.store" />
+         </list>
+      </property>
+   </bean>
+   
+   <bean id="webframework.webscripts.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
+      <property name="searchPath" ref="webframework.searchpath" />
+      <property name="updateDelay"><value>10</value></property>
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+   </bean>
+   
+   <bean id="webframework.webscripts.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
+      <property name="searchPath" ref="webframework.searchpath" />
+   </bean>  
+   
+   <bean id="webframework.webscripts.index" class="org.alfresco.web.scripts.JaxRSUriIndex" />
+   
+   <bean id="webframework.webscripts.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.scripts.LocalWebScriptRuntimeContainer">
+      <property name="name"><value>WebFramework</value></property>
+      <property name="registry" ref="webframework.webscripts.registry" />
+      <property name="searchPath" ref="webframework.searchpath" />      
+      <property name="templateProcessor" ref="webframework.webscripts.templateprocessor" />
+      <property name="scriptProcessor" ref="webframework.webscripts.scriptprocessor" />
+      <property name="configService" ref="web.config" />
+   </bean>
+   
+   <bean id="webframework.webscripts.registry" class="org.alfresco.web.scripts.DeclarativeRegistry">
+      <property name="container" ref="webframework.webscripts.container" />
+      <property name="uriIndex" ref="webframework.webscripts.index" />
+      <property name="searchPath" ref="webframework.searchpath" />
+      <property name="defaultWebScript"><value>webscript.default</value></property>
+   </bean>
+   
 
-
-	<!--                                                    -->
-	<!-- Configuration of the FreeMarker Template Processor -->
-	<!--                                                    -->
-	<bean id="webframework.store.templates"
-		class="org.alfresco.web.scripts.ClassPathStore">
-		<property name="mustExist">
-			<value>true</value>
-		</property>
-		<property name="classPath">
-			<value>alfresco/templates</value>
-		</property>
-	</bean>
-	<bean id="webframework.store.system-templates"
-		class="org.alfresco.web.scripts.ClassPathStore">
-		<property name="mustExist">
-			<value>true</value>
-		</property>
-		<property name="classPath">
-			<value>alfresco/system-templates</value>
-		</property>
-	</bean>
+   <!--                                                    -->
+   <!-- Configuration of the FreeMarker Template Processor -->
+   <!--                                                    -->
+   <bean id="webframework.store.templates" class="org.alfresco.web.scripts.ClassPathStore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/templates</value></property>
+   </bean>
+   
+   <bean id="webframework.store.system-templates" class="org.alfresco.web.scripts.ClassPathStore">
+      <property name="mustExist"><value>true</value></property>
+      <property name="classPath"><value>alfresco/system-templates</value></property>
+   </bean>
+   
    <bean id="webframework.templates.searchpath" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
@@ -116,64 +109,60 @@
             <ref bean="webframework.store.webscripts" />
          </list>
       </property>
-   </bean>	
-	<bean id="webframework.templateprocessor"
-		class="org.alfresco.web.scripts.PresentationTemplateProcessor">
-		<property name="searchPath"
-			ref="webframework.templates.searchpath" />
-		<property name="defaultEncoding">
-			<value>UTF-8</value>
-		</property>
-	</bean>
-	<bean id="webframework.scriptprocessor"
-		class="org.alfresco.web.scripts.PresentationScriptProcessor">
-		<property name="searchPath"
-			ref="webframework.templates.searchpath" />
-	</bean>
+   </bean>
+   
+   <bean id="webframework.templateprocessor" class="org.alfresco.web.scripts.PresentationTemplateProcessor">
+      <property name="searchPath" ref="webframework.templates.searchpath" />
+      <property name="defaultEncoding"><value>UTF-8</value></property>
+      <property name="updateDelay"><value>10</value></property>
+   </bean>
+   
+   <bean id="webframework.scriptprocessor" class="org.alfresco.web.scripts.PresentationScriptProcessor">
+      <property name="searchPath" ref="webframework.templates.searchpath" />
+   </bean>
 
 
+   <!--                                -->
+   <!-- Resource Storage Configuration -->
+   <!--                                -->
+   <!-- 
+      TODO:  This isn't yet utilized but will be once storage can be
+      remoted from the Repo/AVM
+    -->
+   <bean id="webframework.store.modelobjects"
+      class="org.alfresco.web.scripts.ClassPathStore">
+      <property name="mustExist">
+         <value>true</value>
+      </property>
+      <property name="classPath">
+         <value>alfresco/site-data</value>
+      </property>
+   </bean>
+   <bean id="webframework.model.searchpath"
+      class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.store.modelobjects" />
+         </list>
+      </property>
+   </bean>
 
-	<!--                                -->
-	<!-- Resource Storage Configuration -->
-	<!--                                -->
-	<!-- 
-		TODO:  This isn't yet utilized but will be once storage can be
-		remoted from the Repo/AVM
-	 -->
-	<bean id="webframework.store.modelobjects"
-		class="org.alfresco.web.scripts.ClassPathStore">
-		<property name="mustExist">
-			<value>true</value>
-		</property>
-		<property name="classPath">
-			<value>alfresco/site-data</value>
-		</property>
-	</bean>
-	<bean id="webframework.model.searchpath"
-		class="org.alfresco.web.scripts.SearchPath">
-		<property name="searchPath">
-			<list>
-				<ref bean="webframework.store.modelobjects" />
-			</list>
-		</property>
-	</bean>
+   <!--  Declarative Site Web Script -->
+   <bean id="webscript.site" parent="webscript"
+      class="org.alfresco.web.scripts.DeclarativeSiteWebScript"
+      singleton="false">
+      <constructor-arg>
+         <ref bean="webframework.store.modelobjects" />
+      </constructor-arg>
+   </bean>
 
-	<!--  Declarative Site Web Script -->
-	<bean id="webscript.site" parent="webscript"
-		class="org.alfresco.web.scripts.DeclarativeSiteWebScript"
-		singleton="false">
-		<constructor-arg>
-			<ref bean="webframework.store.modelobjects" />
-		</constructor-arg>
-	</bean>
-
-	<!--  Dynamic Wizard Web Script -->
-	<bean id="webscript.wizard" parent="webscript"
-		class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript"
-		singleton="false">
-		<constructor-arg>
-			<ref bean="webframework.store.modelobjects" />
-		</constructor-arg>
-	</bean>
+   <!--  Dynamic Wizard Web Script -->
+   <bean id="webscript.wizard" parent="webscript"
+      class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript"
+      singleton="false">
+      <constructor-arg>
+         <ref bean="webframework.store.modelobjects" />
+      </constructor-arg>
+   </bean>
 
 </beans>

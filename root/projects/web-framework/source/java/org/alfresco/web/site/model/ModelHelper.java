@@ -26,7 +26,9 @@ package org.alfresco.web.site.model;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.alfresco.tools.ObjectGUID;
 import org.alfresco.tools.XMLUtil;
@@ -54,11 +56,9 @@ import org.dom4j.Document;
  * 
  * @author muzquiano
  */
-public class ModelHelper
+public final class ModelHelper
 {
-    protected static Map<String, Map> classMap;
-    
-    protected static String MODEL_PROPERTY = "model";
+    private static Map<String, Set> classMap = new HashMap<String, Set>();
     
     public static boolean isCustomProperty(ModelObject object, String propertyName)
     {
@@ -67,69 +67,59 @@ public class ModelHelper
 
     public static boolean isModelProperty(ModelObject object, String propertyName)
     {
-        if(object == null || propertyName == null)
+        if (object == null || propertyName == null)
         {
-            return false;
+            throw new IllegalArgumentException("ModelObject and PropertyName are mandatory.");
         }
         
         Class modelClass = object.getClass();
         
-        // our quick lookup cache
-        if(classMap == null)
-        {
-            classMap = new HashMap<String, Map>();
-        }
-        
         // grab the cache of property keys
-        Map<String, String> propertyMap = (Map) classMap.get(modelClass.getName());
-        if(propertyMap == null)
+        Set<String> propertyMap;
+        synchronized (classMap)
         {
-            // we need to build the property map cache
-            propertyMap = new HashMap<String, String>();
-            classMap.put(modelClass.getName(), propertyMap);
-
-            // reflect on the class
-            try
+            propertyMap = classMap.get(modelClass.getName());
+            if (propertyMap == null)
             {
-                Class klass = modelClass;
-                do
+                // we need to build the property map cache
+                propertyMap = new HashSet<String>();
+                classMap.put(modelClass.getName(), propertyMap);
+                
+                // reflect on the class
+                try
                 {
-                    Field[] fields = klass.getFields();
-                    for(int i = 0; i < fields.length; i++)
+                    Class klass = modelClass;
+                    do
                     {
-                        // is it a declared property?
-                        if(fields[i].getName().startsWith("PROP_"))
+                        Field[] fields = klass.getFields();
+                        for (int i = 0; i < fields.length; i++)
                         {
-                            String fieldValue = (String) fields[i].get(object);
-                            
-                            // mark it
-                            propertyMap.put(fieldValue, MODEL_PROPERTY);
+                            // is it a declared property?
+                            if (fields[i].getName().startsWith("PROP_"))
+                            {
+                                String fieldValue = (String) fields[i].get(object);
+                                
+                                // mark it
+                                propertyMap.add(fieldValue);
+                            }
                         }
+                        
+                        klass = klass.getSuperclass();
                     }
-                    
-                    klass = klass.getSuperclass();
+                    while (klass != null);
                 }
-                while(klass != null);
-            }
-            catch(IllegalAccessException iae)
-            {
-            	FrameworkHelper.getLogger().error(iae);
+                catch (IllegalAccessException iae)
+                {
+                	FrameworkHelper.getLogger().error(iae);
+                }
             }
         }
         
         // look up property in property map cache
-        if(propertyMap != null)
+        if (propertyMap != null)
         {
             // glean what kind of property it is from the cache
-            String gleaned = (String) propertyMap.get(propertyName);
-            if(MODEL_PROPERTY.equals(gleaned))
-            {
-                return true;
-            }
-            else
-            {
-                // either it is custom or it didn't exist
-            }
+            return propertyMap.contains(propertyName);
         }
         
         return false;
@@ -288,6 +278,4 @@ public class ModelHelper
         obj.setModificationTime(modificationTime);
         return obj;
     }
-    
-    
 }
