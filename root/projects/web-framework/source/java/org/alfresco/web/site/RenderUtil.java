@@ -111,7 +111,7 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response)
             throws PageRenderException
     {
-        Page page = context.getCurrentPage();
+        Page page = context.getPage();
         if (page == null)
         {
             throw new PageRenderException(
@@ -503,7 +503,7 @@ public class RenderUtil
             HttpServletRequest request, HttpServletResponse response,
             String objectId, String formatId)
     {
-        String pageId = context.getCurrentPage().getId();
+        String pageId = context.getPage().getId();
         String url = context.getLinkBuilder().page(context, pageId, formatId);
         if (url != null)
         {
@@ -626,8 +626,8 @@ public class RenderUtil
     public static String getSourceId(RequestContext context, String scopeId)
     {
         // rendering objects
-        Page page = context.getCurrentPage();
-        TemplateInstance template = context.getCurrentTemplate();
+        Page page = context.getPage();
+        TemplateInstance template = context.getTemplate();
 
         // get the component association in that scope
         String sourceId = null;
@@ -1066,8 +1066,8 @@ public class RenderUtil
     protected static Component[] getCurrentComponentBindings(RequestContext context)
     {
         Component[] globalComponents = ModelUtil.findComponents(context, null, WebFrameworkConstants.REGION_SCOPE_GLOBAL, null, null);
-        Component[] templateComponents = ModelUtil.findComponents(context, null, context.getCurrentTemplateId(), null, null);
-        Component[] pageComponents = ModelUtil.findComponents(context, null, context.getCurrentPageId(), null, null);
+        Component[] templateComponents = ModelUtil.findComponents(context, null, context.getTemplateId(), null, null);
+        Component[] pageComponents = ModelUtil.findComponents(context, null, context.getPageId(), null, null);
         
         Component[] array = new Component[globalComponents.length + templateComponents.length + pageComponents.length];
         int z = 0;

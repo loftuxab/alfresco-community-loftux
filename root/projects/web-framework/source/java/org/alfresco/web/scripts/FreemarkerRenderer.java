@@ -88,7 +88,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         String uri = this.getRenderer();
         
         // the current format
-        String format = context.getCurrentFormatId();
+        String format = context.getFormatId();
         
         /**
          * Attempt to execute the script's .head. file, if it has one
@@ -142,7 +142,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         String uri = this.getRenderer();
         
         // the current format
-        String format = context.getCurrentFormatId();
+        String format = context.getFormatId();
         
         // Now execute the real template
         String templateName = null;

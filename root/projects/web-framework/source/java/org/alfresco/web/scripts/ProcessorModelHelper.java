@@ -67,13 +67,13 @@ public class ProcessorModelHelper
         }
 
         // information about the current page being rendererd
-        if (context.getCurrentPage() != null)
+        if (context.getPage() != null)
         {
-            model.put("description", context.getCurrentPage().getDescription());
-            model.put("title", context.getCurrentPage().getTitle());
+            model.put("description", context.getPage().getDescription());
+            model.put("title", context.getPage().getTitle());
             
             // custom page properties - add to model
-            model.putAll(context.getCurrentPage().getCustomProperties());
+            model.putAll(context.getPage().getCustomProperties());
             
             // "page" object
             Map<String, Object> pageModel = new HashMap<String, Object>(4);
@@ -91,16 +91,16 @@ public class ProcessorModelHelper
                 URLHelper urlHelper = new URLHelper(request, args);
                 pageModel.put("url", urlHelper);
             }
-            pageModel.put("id", context.getCurrentPage().getId());
-            pageModel.put("title", context.getCurrentPage().getTitle());
+            pageModel.put("id", context.getPage().getId());
+            pageModel.put("title", context.getPage().getTitle());
             pageModel.put("theme", ThemeUtil.getCurrentThemeId(context));
             model.put("page", pageModel);
         }
         
         // things from the current template
-        if (context.getCurrentTemplate() != null)
+        if (context.getTemplate() != null)
         {
-            model.putAll(context.getCurrentTemplate().getCustomProperties());
+            model.putAll(context.getTemplate().getCustomProperties());
         }
         
         model.put("theme", ThemeUtil.getCurrentThemeId(context));

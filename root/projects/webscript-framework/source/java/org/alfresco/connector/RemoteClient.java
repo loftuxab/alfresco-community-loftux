@@ -410,7 +410,11 @@ public class RemoteClient extends AbstractClient
                 Map<String, List<String>> headers = connection.getHeaderFields();
                 for (String key : headers.keySet())
                 {
-                    // it's strange, but the key can be null...!
+                    // NOTE: Tomcat does not appear to be obeying the servlet spec here.
+                    //       If you setHeader() it is supposed to clear existing values - i.e. not add
+                    //       additional values to existing headers - but for Server and Transfer-Encoding if
+                    //       you set them, you get two values in the response...
+                    // it's strange, but in addition the key can be null...!
                     if (key != null && key.equals("Server") == false && key.equals("Transfer-Encoding") == false)
                     {
                         res.setHeader(key, connection.getHeaderField(key));

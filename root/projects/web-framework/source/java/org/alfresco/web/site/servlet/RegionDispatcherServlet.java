@@ -50,7 +50,7 @@ public class RegionDispatcherServlet extends DispatcherServlet
 
         String regionId = (String) request.getParameter("regionId");
         String regionScopeId = (String) request.getParameter("regionScopeId");
-        String templateId = (String) context.getCurrentTemplate().getId();
+        String templateId = (String) context.getTemplate().getId();
 
         PresentationUtil.renderRegion(context, request, response, templateId,
                 regionId, regionScopeId);
