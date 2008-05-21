@@ -111,14 +111,14 @@ public interface RequestContext extends Serializable
      * 
      * @return The current page
      */
-    public Page getCurrentPage();
+    public Page getPage();
 
     /**
      * Sets the currently executing page.
      * 
      * @param page
      */
-    public void setCurrentPage(Page page);
+    public void setPage(Page page);
     
     /**
      * Returns the id of the currently executing page.  If a currently
@@ -126,7 +126,7 @@ public interface RequestContext extends Serializable
      * 
      * @return The current page id (or null)
      */
-    public String getCurrentPageId();
+    public String getPageId();
 
     /**
      * Returns the LinkBuilder to be used for the currently executing
@@ -151,7 +151,7 @@ public interface RequestContext extends Serializable
      * 
      * @return
      */
-    public TemplateInstance getCurrentTemplate();
+    public TemplateInstance getTemplate();
     
     /**
      * Returns the id of the currently executing template.
@@ -159,7 +159,7 @@ public interface RequestContext extends Serializable
      * 
      * @return The current template id or null
      */
-    public String getCurrentTemplateId();
+    public String getTemplateId();
     
     /**
      * Returns the id of the current object
@@ -189,14 +189,14 @@ public interface RequestContext extends Serializable
      * 
      * @return
      */
-    public String getCurrentFormatId();
+    public String getFormatId();
 
     /**
      * Sets the current format id
      * 
      * @param formatId
      */
-    public void setCurrentFormatId(String formatId);
+    public void setFormatId(String formatId);
 
     /**
      * Returns the File System implementation which points to the

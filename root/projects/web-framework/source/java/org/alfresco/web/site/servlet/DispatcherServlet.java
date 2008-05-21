@@ -67,8 +67,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class DispatcherServlet extends BaseServlet
 {
+    private static final String ALF_REDIRECT_URL = "alfRedirectUrl";
     private static final String MIMETYPE_HTML = "text/html;charset=utf-8";
     
+    /**
+     * One time framework init
+     */
     public void init() throws ServletException
     {
         super.init();
@@ -85,8 +89,11 @@ public class DispatcherServlet extends BaseServlet
         }
     }
     
-    protected void service(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException
+    /**
+     * Service a request and dispatch to the appropriate page
+     */
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
     {
         // bind a timer for reporting of dispatches
         if (Timer.isTimerEnabled())
@@ -113,13 +120,17 @@ public class DispatcherServlet extends BaseServlet
         
         // stamp any theme information onto the request
         ThemeUtil.applyTheme(context, request);
-
+        
         // dispatch to render the page
         try
         {
             if (Timer.isTimerEnabled())
                 Timer.start(request, "dispatch");
             
+            // a quick test to ensure that the context is set up correctly
+            ensureDispatchState(context, request, response);
+            
+            // dispatch to page processing code
             dispatch(context, request, response);
             
             if (Timer.isTimerEnabled())
@@ -179,19 +190,13 @@ public class DispatcherServlet extends BaseServlet
             }
         }
     }
-
-    protected void dispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws RequestDispatchException
-    {
-        // a quick test to ensure that the context is set up correctly
-        ensureDispatchState(context, request, response);
-        
-        // dispatch to page processing code
-        doDispatch(context, request, response);
-    }
     
-    protected void ensureDispatchState(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response)
+    /**
+     * Ensure the currently available context and request state are ready for dispatch.
+     * This method will set the page to a system default if no valid page is requested.
+     */
+    protected void ensureDispatchState(
+            RequestContext context, HttpServletRequest request, HttpServletResponse response)
     {
         if (isDebugEnabled())
         {
@@ -200,14 +205,14 @@ public class DispatcherServlet extends BaseServlet
                 debug(context, "No site configuration - performing reset");
                 
                 // effectively, do a reset
-                context.setCurrentPage(null);
+                context.setPage(null);
                 context.setCurrentObject(null);
             }
         }
         
         // if we have absolutely nothing to dispatch to, then check to
         // see if there is a root-page declared to which we can go
-        if (context.getCurrentPage() == null && context.getCurrentObjectId() == null)
+        if (context.getPage() == null && context.getCurrentObjectId() == null)
         {
             // if the site configuration exists...
             if (context.getSiteConfiguration() != null)
@@ -219,24 +224,29 @@ public class DispatcherServlet extends BaseServlet
                     if (isDebugEnabled())
                         debug(context, "Set root page as current page");
                     
-                    context.setCurrentPage(rootPage);
+                    context.setPage(rootPage);
                 }            
             }
         }
     }
     
-    protected void doDispatch(RequestContext context, HttpServletRequest request,
-            HttpServletResponse response) throws RequestDispatchException
+    /**
+     * Dispatch to the page based on the given context and request.
+     * 
+     * @throws RequestDispatchException
+     */
+    protected void dispatch(RequestContext context, HttpServletRequest request, HttpServletResponse response)
+        throws RequestDispatchException
     {
-        String currentFormatId = context.getCurrentFormatId();
-        String currentObjectId = context.getCurrentObjectId();
-        String currentPageId = context.getCurrentPageId();
-        Page currentPage = context.getCurrentPage();
+        String formatId = context.getFormatId();
+        String objectId = context.getCurrentObjectId();
+        String pageId = context.getPageId();
+        Page page = context.getPage();
         
-        if (currentPage != null)
+        if (page != null)
         {
             // do we need to redirect to a login page type?
-            switch (currentPage.getAuthentication())
+            switch (page.getAuthentication())
             {
                 case user:
                     User user = context.getUser();
@@ -260,11 +270,11 @@ public class DispatcherServlet extends BaseServlet
                             loginPageId = context.getConfig().getDefaultPageTypeInstanceId(PageType.PAGETYPE_LOGIN);
                         }
                         
-                        Page page = null;
+                        Page loginPage = null;
                         if (loginPageId != null)
                         {
-                            page = context.getModel().loadPage(context, loginPageId);
-                            if (page != null)
+                            loginPage = context.getModel().loadPage(context, loginPageId);
+                            if (loginPage != null)
                             {
                                 // get URL arguments as a map ready for rebuilding the request params
                                 Map<String, String> args = new HashMap<String, String>(
@@ -277,15 +287,15 @@ public class DispatcherServlet extends BaseServlet
                                 }
                                 // construct redirection url
                                 String redirectUrl = context.getLinkBuilder().page(
-                                        context, currentPageId, currentFormatId, currentObjectId, args);
+                                        context, pageId, formatId, objectId, args);
                                 // set redirect url for use on login page template
-                                page.setCustomProperty("alfRedirectUrl", redirectUrl);
-                                dispatchPage(context, request, response, page, currentFormatId);
+                                loginPage.setCustomProperty(ALF_REDIRECT_URL, redirectUrl);
+                                dispatchPage(context, request, response, loginPage, formatId);
                                 return;
                             }
                         }
                         
-                        if (loginPageId == null || page == null)
+                        if (loginPageId == null || loginPage == null)
                         {
                             FrameworkHelper.getLogger().warn("No 'login' page type found - but page auth required it.");
                         }
@@ -298,13 +308,13 @@ public class DispatcherServlet extends BaseServlet
         
         if (isDebugEnabled())
         {
-            debug(context, "Current Page ID: " + currentPageId);
-            debug(context, "Current Format ID: " + currentFormatId);
-            debug(context, "Current Object ID: " + currentObjectId);
+            debug(context, "Current Page ID: " + pageId);
+            debug(context, "Current Format ID: " + formatId);
+            debug(context, "Current Object ID: " + objectId);
         }
         
         // if at this point there really is nothing to view...
-        if (currentPage == null && currentObjectId == null)
+        if (page == null && objectId == null)
         {
             if (isDebugEnabled())
                 debug(context, "No Page or Object determined");
@@ -318,10 +328,10 @@ public class DispatcherServlet extends BaseServlet
         {
             // we know we're dispatching to something...
             // if we have a page specified, then we'll go there
-            if(currentPageId != null)
+            if(pageId != null)
             {
                 if (isDebugEnabled())
-                    debug(context, "Dispatching to Page: " + currentPageId);
+                    debug(context, "Dispatching to Page: " + pageId);
                 
                 // if there happens to be a content item specified as well,
                 // it will just become part of the context
@@ -329,15 +339,15 @@ public class DispatcherServlet extends BaseServlet
                 // destination page if the destination page is specified
                 
                 // we're dispatching to the current page
-                dispatchCurrentPage(context, request, response, currentFormatId);                
+                dispatchPage(context, request, response, context.getPage(), formatId);
             }
             else
             {
                 // otherwise, a page wasn't specified and a content item was
                 if (isDebugEnabled())
-                    debug(context, "Dispatching to Content Object: " + currentObjectId);
+                    debug(context, "Dispatching to Content Object: " + objectId);
                 
-                dispatchContent(context, request, response, currentObjectId, currentFormatId);
+                dispatchContent(context, request, response, objectId, formatId);
             }
         }
     }
@@ -390,8 +400,8 @@ public class DispatcherServlet extends BaseServlet
 	                    debug(context, "Content - Dispatching to Page: " + page.getId());
 	
 	                // dispatch to content page
-	                context.setCurrentPage(page);
-	                dispatchCurrentPage(context, request, response, formatId);
+	                context.setPage(page);
+	                dispatchPage(context, request, response, context.getPage(), formatId);
 	            }
 	        }
 	        else
@@ -408,18 +418,16 @@ public class DispatcherServlet extends BaseServlet
 	        }
         }
     }
-
-    protected void dispatchCurrentPage(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
-            String formatId) throws RequestDispatchException
-    {
-        Page page = context.getCurrentPage();
-        dispatchPage(context, request, response, page, formatId);
-    }
     
-    protected void dispatchPage(RequestContext context,
-            HttpServletRequest request, HttpServletResponse response,
-            Page page, String formatId) throws RequestDispatchException
+    /**
+     * Dispatch to the specified page with the given option format id
+     * 
+     * @throws RequestDispatchException
+     */
+    protected void dispatchPage(
+            RequestContext context, HttpServletRequest request, HttpServletResponse response,
+            Page page, String formatId)
+        throws RequestDispatchException
     {
         if (isDebugEnabled())
             debug(context, "Template ID: " + page.getTemplateId());

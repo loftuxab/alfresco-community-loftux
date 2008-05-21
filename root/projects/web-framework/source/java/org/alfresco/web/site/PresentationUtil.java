@@ -90,7 +90,7 @@ public class PresentationUtil
         catch (PageRenderException ex)
         {
             handlePageRenderProblem(context, request, response, ex,
-                    context.getCurrentPage().getId());
+                    context.getPage().getId());
         }
     }
     
@@ -112,7 +112,7 @@ public class PresentationUtil
         catch (PageRenderException ex)
         {
             handlePageRenderProblem(context, request, response, ex,
-                    context.getCurrentPage().getId());
+                    context.getPage().getId());
         }
     }
 

@@ -56,9 +56,9 @@ import org.apache.commons.logging.Log;
 public abstract class AbstractRequestContext implements RequestContext
 {
     /*
-     * Increments every time a request context is manufactured
+     * Increments every time a request ID is required
      */
-    protected static int requestCount = 0;
+    protected static int idCounter = 0;
     
     /**
      * Constructs a new Request Context.  In general, you should not
@@ -68,20 +68,23 @@ public abstract class AbstractRequestContext implements RequestContext
     protected AbstractRequestContext()
     {
         this.map = new HashMap(16, 1.0f);
-        
-        synchronized(AbstractRequestContext.class)
-        {
-            requestCount++;
-            this.id = "" + requestCount;            
-        }
     }
 
     /**
-     * Each request context instance is stamped with a unique id
+     * Each request context instance is stamped with a unique id - generally only used for debugging
+     * 
      * @return The id of the request context
      */
     public String getId()
     {
+        synchronized (AbstractRequestContext.class)
+        {
+            if (this.id == null)
+            {
+                idCounter++;
+                this.id = Integer.toString(idCounter);
+            }
+        }
         return this.id;
     }
     
@@ -122,9 +125,9 @@ public abstract class AbstractRequestContext implements RequestContext
     {
         String title = "Default Page";
         
-        if (getCurrentPage() != null)
+        if (getPage() != null)
         {
-            title = getCurrentPage().getTitle();
+            title = getPage().getTitle();
         }
         
         return title;
@@ -175,7 +178,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return The current page
      */
-    public Page getCurrentPage()
+    public Page getPage()
     {
         return this.currentPage;
     }
@@ -185,7 +188,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @param page
      */
-    public void setCurrentPage(Page page)
+    public void setPage(Page page)
     {
         this.currentPage = page;
         // clear cached variable
@@ -198,11 +201,11 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return The current page id (or null)
      */
-    public String getCurrentPageId()
+    public String getPageId()
     {
-        if (getCurrentPage() != null)
+        if (getPage() != null)
         {
-            return getCurrentPage().getId();
+            return getPage().getId();
         }
         return null;
     }
@@ -236,13 +239,13 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return
      */
-    public TemplateInstance getCurrentTemplate()
+    public TemplateInstance getTemplate()
     {
         if (this.currentTemplate == null)
         {
-            if (getCurrentPage() != null)
+            if (getPage() != null)
             {
-                this.currentTemplate = getCurrentPage().getTemplate(this);
+                this.currentTemplate = getPage().getTemplate(this);
             }
         }
         return this.currentTemplate;
@@ -254,11 +257,11 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return The current template id or null
      */
-    public String getCurrentTemplateId()
+    public String getTemplateId()
     {
-        if (getCurrentTemplate() != null)
+        if (getTemplate() != null)
         {
-            return getCurrentTemplate().getId();
+            return getTemplate().getId();
         }
         return null;
     }
@@ -302,7 +305,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @return
      */
-    public String getCurrentFormatId()
+    public String getFormatId()
     {
         return this.currentFormatId;
     }
@@ -312,7 +315,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * 
      * @param formatId
      */
-    public void setCurrentFormatId(String formatId)
+    public void setFormatId(String formatId)
     {
         this.currentFormatId = formatId;
     }

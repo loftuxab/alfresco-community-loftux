@@ -33,7 +33,6 @@ public class HttpRequestContext extends AbstractRequestContext
 {
     public HttpRequestContext(HttpServletRequest request)
     {
-        super();
         this.request = request;
     }
 

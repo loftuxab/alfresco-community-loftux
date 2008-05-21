@@ -105,7 +105,7 @@ public class DefaultPageMapper extends AbstractPageMapper
         }
         if (formatId != null)
         {
-            context.setCurrentFormatId(formatId);
+            context.setFormatId(formatId);
         }
 
         /**
@@ -184,7 +184,7 @@ public class DefaultPageMapper extends AbstractPageMapper
                 Page page = context.getModel().loadPage(context, pageId);
                 if(page != null)
                 {
-                    context.setCurrentPage(page);
+                    context.setPage(page);
                 }
             }
         }
@@ -198,7 +198,7 @@ public class DefaultPageMapper extends AbstractPageMapper
             Page page = context.getModel().loadPage(context, pageId);
             if (page != null)
             {
-                context.setCurrentPage(page);
+                context.setPage(page);
             }
         }
     }

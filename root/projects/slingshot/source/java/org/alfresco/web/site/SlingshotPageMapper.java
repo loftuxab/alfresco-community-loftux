@@ -169,7 +169,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
             Page page = context.getModel().loadPage(context, pageId);
             if (page != null)
             {
-                context.setCurrentPage(page);
+                context.setPage(page);
             }
         }
         
@@ -181,7 +181,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
          * Note that if we didn't set it, it would still automatically
          * pick up the default format.
          */
-        context.setCurrentFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
+        context.setFormatId(FrameworkHelper.getConfig().getDefaultFormatId());
     	
         /**
          * If we received a "currently viewed object", then lets set it
