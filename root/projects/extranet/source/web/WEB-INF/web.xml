@@ -69,8 +69,15 @@
       <load-on-startup>1</load-on-startup>
    </servlet>
               
+   <servlet>
+      <servlet-name>componentServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.ComponentDispatcherServlet</servlet-class>
+   </servlet>
               
-              
+   <servlet-mapping>
+      <servlet-name>componentServlet</servlet-name>
+      <url-pattern>/component/*</url-pattern>
+   </servlet-mapping>              
                    
    <servlet-mapping>
       <servlet-name>logoutServlet</servlet-name>

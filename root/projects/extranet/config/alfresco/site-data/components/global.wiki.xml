@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+  <title>Wiki Component</title>  
+  <url>/components/wiki</url>
+  
+  <!-- Binding --> 
+  <scope>global</scope>
+  <source-id>global</source-id>
+  <region-id>wiki</region-id>
+  
+</component>

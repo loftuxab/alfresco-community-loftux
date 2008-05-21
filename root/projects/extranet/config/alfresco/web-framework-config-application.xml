@@ -1,5 +1,12 @@
 <alfresco-config>
 
+   <plug-ins>
+      <element-readers>
+         <element-reader element-name="remote" class="org.alfresco.web.config.RemoteConfigElementReader"/>
+	  </element-readers>
+   </plug-ins>
+
+
 	<!-- Web Framework Plugins -->
 	<config evaluator="string-compare" condition="WebFramework">
 
@@ -40,10 +47,54 @@
 
 			<application-defaults>
 				<theme>extranet</theme>
+				<site-configuration>extranet.site.configuration</site-configuration>
 			</application-defaults>
 			
 		</web-framework>
 	
+	</config>
+
+
+	<!--  Remote Config Plugins  -->
+	<config evaluator="string-compare" condition="Remote">
+
+		<remote>
+
+			<connector>
+				<id>mediawiki</id>
+				<name>Media Wiki Connector</name>
+				<description>Connects to a MediaWiki installation</description>
+				<class>org.alfresco.connector.MediaWikiConnector</class>
+				<authenticator-id>mediawiki-headers-auth</authenticator-id>				
+			</connector>
+			
+			<authenticator>
+				<id>mediawiki-headers-auth</id>
+				<name>MediaWiki Authenticator</name>
+				<description>MediaWiki Authenticator</description>
+				<class>org.alfresco.connector.MediaWikiAuthenticator</class>
+			</authenticator>
+
+			<endpoint>
+				<id>alfresco-wiki</id>
+				<name>Alfresco MediaWiki</name>
+				<description>Alfresco MediaWiki</description>
+				<connector-id>mediawiki</connector-id>
+				<endpoint-url>http://wiki.alfresco.com</endpoint-url>
+				<identity>user</identity>
+			</endpoint>
+			
+			<credential-vault>
+				<id>extranet</id>
+				<name>Extranet Credential Vault</name>
+				<description>Extranet Credential Vault</description>
+				<class>org.alfresco.connector.ExtranetCredentialVault</class>
+			</credential-vault>
+			
+			<default-credential-vault-id>extranet</default-credential-vault-id>
+		   
+		</remote>
+				
 	</config>
 
 </alfresco-config>

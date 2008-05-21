@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-  <id>site.configuration</id>
   <title>Alfresco Network</title>
   <description>The Alfresco Network Support Portal</description>
   <source-id>site</source-id>
