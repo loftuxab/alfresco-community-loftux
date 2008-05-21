@@ -62,17 +62,17 @@
             visible: false
          });
          this.dialog.render(document.body);
-                 
+         
+         var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
+         okButton.subscribe("click", this.onOkButtonClick, this, true);
+         
          var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
          createSiteForm.setShowSubmitStateDynamically(true);
-         createSiteForm.setSubmitIds(this.id + "-ok-button");
+         createSiteForm.setSubmitElements(okButton);
          createSiteForm.setAJAXSubmit(true, {successCallback: this.onCreateSiteSuccess});
-         createSiteForm.setSubmitAsJSON(true)
+         createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();
-
-         //var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
-         //okButton.subscribe("click", this.onOkButtonClick, this, true);
 
          var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          cancelButton.subscribe("click", this.onCancelButtonClick, this, true);
