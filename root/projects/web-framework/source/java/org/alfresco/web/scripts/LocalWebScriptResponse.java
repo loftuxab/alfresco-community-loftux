@@ -27,18 +27,25 @@ package org.alfresco.web.scripts;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
+import java.util.Map;
+
+import org.alfresco.util.URLEncoder;
 
 /**
+ * Implementation of a WebScript Response object for WebScript Component type.
+ * Mostly based on the existing WebScriptResponseImpl - just adds support for
+ * encoding URLs to manage user click requests to any component on the page.
+ * 
  * @author kevinr
- * @author muzquiano
  */
 public class LocalWebScriptResponse extends WebScriptResponseImpl
 {
     private Writer out;
     private Runtime runtime;
     private LocalWebScriptContext context;
+    private String scriptUrlPrefix = null;
 
-    public LocalWebScriptResponse(Runtime runtime,LocalWebScriptContext context, Writer out)
+    public LocalWebScriptResponse(Runtime runtime, LocalWebScriptContext context, Writer out)
     {
         super(runtime);
         this.context = context;
@@ -48,15 +55,31 @@ public class LocalWebScriptResponse extends WebScriptResponseImpl
 
     public String encodeScriptUrl(String url)
     {
-        // encode to allow presentation tier webscripts to call themselves
-        // non this page
-        // needs the servlet URL plus args to identify the webscript and it's
-        // new url
-        // return context.RequestPath + context.RequestURI + "?" +
-        // PARAM_COMPONENT_URL + "=" +
-        // URLEncoder.encode(url) + "&" + PARAM_COMPONENT_ID + "=" +
-        // componentId;
-        return null;
+        // encode to allow presentation tier webscripts to call back to themselves on a page
+        // needs the servlet URL plus args to identify the webscript id and the new url
+        if (scriptUrlPrefix == null)
+        {
+            // And build up the request URL - may be used by webscript responses to build further urls
+            StringBuffer buf = new StringBuffer(128);
+            buf.append(context.RendererContext.getRequest().getRequestURI());
+            boolean first = true;
+            for (Map.Entry<String, String> entry : context.Tokens.entrySet())
+            {
+                String key = entry.getKey();
+                if (!WebScriptRenderer.PARAM_WEBSCRIPT_URL.equals(key) &&
+                    !WebScriptRenderer.PARAM_WEBSCRIPT_ID.equals(key))
+                {
+                    String value = entry.getValue();                
+                    buf.append(first ? '?' : '&').append(key).append('=').append(URLEncoder.encode(value));
+                    first = false;
+                }
+            }
+            scriptUrlPrefix = buf.toString();
+        }
+        return scriptUrlPrefix + (context.Tokens.size() != 0 ? '&' : '?') +
+               WebScriptRenderer.PARAM_WEBSCRIPT_URL + "=" +
+               URLEncoder.encode(url) + "&" +
+               WebScriptRenderer.PARAM_WEBSCRIPT_ID + "=" + context.Object.getId();
     }
 
     public String getEncodeScriptUrlFunction(String name)
@@ -67,7 +90,7 @@ public class LocalWebScriptResponse extends WebScriptResponseImpl
 
     public OutputStream getOutputStream() throws IOException
     {
-        // NOTE: not support by locale WebScript runtime 
+        // NOTE: not support by local WebScript runtime 
         return null;
     }
 

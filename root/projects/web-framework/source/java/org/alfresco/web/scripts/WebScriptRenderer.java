@@ -67,6 +67,9 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class WebScriptRenderer extends AbstractRenderer
 {
+    static final String PARAM_WEBSCRIPT_ID  = "_wsId";
+    static final String PARAM_WEBSCRIPT_URL = "_wsUrl";
+    
     private static Log logger = LogFactory.getLog(WebScriptRenderer.class);
     
     private TemplateProcessor templateProcessor;
@@ -98,18 +101,6 @@ public class WebScriptRenderer extends AbstractRenderer
         }
     }
     
-    protected Map<String, String> getArgs(HttpServletRequest request)
-    {
-        Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
-        Enumeration names = request.getParameterNames();
-        while (names.hasMoreElements())
-        {
-           String name = (String)names.nextElement();
-           args.put(name, request.getParameter(name));
-        }
-        return args;        
-    }
-    
     /* (non-Javadoc)
      * @see org.alfresco.web.site.renderer.AbstractRenderer#head(org.alfresco.web.site.renderer.RendererContext)
      */
@@ -123,8 +114,8 @@ public class WebScriptRenderer extends AbstractRenderer
         
         // Copy in request parameters into a HashMap
         // This is so as to be compatible with UriUtils (and Token substitution)
-        Map<String, String> args = getArgs(request);
-
+        Map<String, String> args = buildArgs(request);
+        
         /**
          * If the ModelObject being rendered is a component, then we will
          * allow for the execution of .head template files ahead of the
@@ -197,7 +188,6 @@ public class WebScriptRenderer extends AbstractRenderer
                             // output wrapping comment blocks if debug enabled
                             if (logger.isDebugEnabled())
                                 head = super.head(rendererContext) + head;
-                                
                         }
                     }
                 }
@@ -213,40 +203,40 @@ public class WebScriptRenderer extends AbstractRenderer
     public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
-        // Pull a few necessary things from the renderer context
         HttpServletRequest request = rendererContext.getRequest();
-        RequestContext context = (RequestContext) rendererContext.getRequestContext();
+        RequestContext context = rendererContext.getRequestContext();
 
-        // Copy in request parameters into a HashMap
-        // This is so as to be compatible with UriUtils (and Token substitution)
-        Map<String, String> args = getArgs(request);
-
-        // Begin to process the actual web script.
-        // 
-        // Construct a "context" object that the Web Script Engine will use
-        // to figure out what we want it to do.
+        // Construct a "context" object that the Web Script engine will utilise
         LocalWebScriptContext webScriptContext = new LocalWebScriptContext();
         
-        // Get the web script url, do token substitution and lop off query string
-        // Set onto the context
-        String url = this.getRenderer();
-        url = UriUtils.replaceUriTokens(url, args);
-        String requestUri = url;
-        if (requestUri.lastIndexOf('?') != -1)
-        {
-            requestUri = requestUri.substring(0, requestUri.lastIndexOf('?'));
-        }
-        webScriptContext.RequestURI = requestUri;
+        // Copy in request parameters into a HashMap
+        // This is so as to be compatible with UriUtils (and Token substitution)
+        webScriptContext.Tokens = buildArgs(request);
         
-        // Set up the request path.
+        // Begin to process the actual web script.
+        
+        // Get the web script url, perform token substitution and remove query string
+        String url = UriUtils.replaceUriTokens(this.getRenderer(), webScriptContext.Tokens);
+        webScriptContext.ScriptUrl = (url.indexOf('?') == -1 ? url : url.substring(0, url.indexOf('?')));
+        
+        // Get up the request path.
         // If none is supplied, assume the servlet path.
-        String requestPath = (String) rendererContext.get("requestPath");
+        String requestPath = (String)rendererContext.get("requestPath");
         if (requestPath == null)
         {
             requestPath = request.getContextPath();
         }
-        webScriptContext.RequestPath = requestPath;
-        webScriptContext.ScriptUrl = requestPath + url;
+        
+        // if this webscript has been clicked, update the script URL - 
+        if (rendererContext.getObject().getId().equals(request.getParameter(PARAM_WEBSCRIPT_ID)))
+        {
+            webScriptContext.ExecuteUrl = request.getParameter(PARAM_WEBSCRIPT_URL);
+        }
+        else
+        {
+            // else use the webscript default url
+            webScriptContext.ExecuteUrl = requestPath + "/service" + url;
+        }
         
         // Set up character encoding.  If none, set the default.
         String encoding = request.getCharacterEncoding();
@@ -255,7 +245,6 @@ public class WebScriptRenderer extends AbstractRenderer
             try
             {
                 request.setCharacterEncoding(EncodingUtil.DEFAULT_ENCODING);
-                encoding = request.getCharacterEncoding();
             }
             catch (UnsupportedEncodingException uee)
             {
@@ -265,9 +254,8 @@ public class WebScriptRenderer extends AbstractRenderer
         
         // Set up state onto the web script context
         webScriptContext.RuntimeContainer = webScriptContainer;
-        webScriptContext.rendererContext = rendererContext;
+        webScriptContext.RendererContext = rendererContext;
         webScriptContext.Object = rendererContext.getObject();
-        webScriptContext.Tokens = args;
         webScriptContext.RequestContext = context;
         
         try
@@ -301,5 +289,20 @@ public class WebScriptRenderer extends AbstractRenderer
         {
             throw new RendererExecutionException("Unable to read back response from Web Script Runtime buffer", exc);
         }
+    }
+    
+    /**
+     * Helper to build argument map from the servlet request parameters
+     */
+    private static Map<String, String> buildArgs(HttpServletRequest request)
+    {
+        Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
+        Enumeration names = request.getParameterNames();
+        while (names.hasMoreElements())
+        {
+           String name = (String)names.nextElement();
+           args.put(name, request.getParameter(name));
+        }
+        return args;        
     }
 }
