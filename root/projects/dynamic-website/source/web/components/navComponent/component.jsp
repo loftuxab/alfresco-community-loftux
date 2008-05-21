@@ -25,15 +25,15 @@
 	String renderer = (String) context.getRenderContext().get("renderer");
 	if(renderer == null)
 	{
-		renderer = "renderers/horizontalNav1/horizontalNav1.jsp";
+		renderer = "/components/navComponent/renderers/horizontalNav1/horizontalNav1.jsp";
 		if("vertical".equalsIgnoreCase(orientation))
-			renderer = "renderers/verticalNav1/verticalNav1.jsp";
+			renderer = "/components/navComponent/renderers/verticalNav1/verticalNav1.jsp";
 	}
 	
 	// dispatch
 	if(renderer.endsWith(".jsp"))
 	{
-		RequestUtil.include(request, response, renderer);
+		RequestUtil.include(getServletContext(), request, response, renderer);
 	}
 	else if(renderer.endsWith(".xsl"))
 	{

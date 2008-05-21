@@ -31,7 +31,7 @@ function removeObjects(array)
 function assertSiteConfiguration(websiteName, websiteDescription)
 {
 	// ensure that we have a site configuration
-	var siteConfiguration = site.findConfiguration("site");
+	var siteConfiguration = site.getSiteConfiguration();
 	if(siteConfiguration == null)
 		siteConfiguration = site.newConfiguration();
 	siteConfiguration.setTitle(websiteName);

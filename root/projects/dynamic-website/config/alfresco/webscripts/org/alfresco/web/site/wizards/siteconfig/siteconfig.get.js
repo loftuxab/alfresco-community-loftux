@@ -5,7 +5,7 @@
 
 
 // get data off the XML document
-var siteConfiguration = site.findConfiguration("site");
+var siteConfiguration = site.getSiteConfiguration();
 if(siteConfiguration != null)
 {
 	websiteName = wizard.getSafeProperty(siteConfiguration, "title");

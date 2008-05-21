@@ -1,8 +1,6 @@
 <%@ page import="org.alfresco.web.site.*"%>
-<%@ page import="org.alfresco.web.site.model.*"%>
 <%@ page import="org.alfresco.tools.*" %>
 <%@ page import="java.util.*" %>
-<%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%
@@ -19,10 +17,10 @@
 	
 	// things to stamp onto page
 	String rootPageId = null;
-	String renderingPageId = context.getCurrentPage().getId();
+	String renderingPageId = context.getPage().getId();
 	String renderingTemplateId = "";
-	if(context.getCurrentTemplate() != null)
-		renderingTemplateId = context.getCurrentTemplate().getId();
+	if(context.getTemplate() != null)
+		renderingTemplateId = context.getTemplate().getId();
 	if(context.getRootPage() != null)
 		rootPageId = context.getRootPage().getId();
 			

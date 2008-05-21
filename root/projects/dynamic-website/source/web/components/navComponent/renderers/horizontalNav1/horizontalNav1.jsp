@@ -6,11 +6,11 @@
 	public void makeMenu(RequestContext context, StringBuffer buffer, Page page, int index, int groupIndex, boolean doChildren, boolean topMenuItem)
 	{
 		String currentPageId = null;
-		if(context.getCurrentPage() != null)
-			currentPageId = context.getCurrentPage().getId();
+		if(context.getPage() != null)
+			currentPageId = context.getPage().getId();
 		
 		String id = context.getModel().newGUID();
-		String href = context.getLinkBuilder().page(context, page.getId(), context.getCurrentFormatId());
+		String href = context.getLinkBuilder().page(context, page.getId(), context.getFormatId());
 		
 		boolean selected = false;
 		if(page.getId().equalsIgnoreCase(currentPageId))

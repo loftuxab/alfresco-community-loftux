@@ -10,6 +10,16 @@
 	
 		<web-framework>
 		
+			<!-- Make sure caching is turned off -->
+			<file-system>
+				<id>local</id>
+				<name>Local File System</name>
+				<description>Local File System</description>
+				<class>org.alfresco.web.site.filesystem.LocalFileSystem</class>
+				<use-cache>false</use-cache>
+				<root-path>/</root-path>
+			</file-system>
+		
 			<link-builder>
 				<id>direct</id>
 				<name>Direct Link Builder</name>
@@ -74,6 +84,7 @@
 			<application-defaults>
 				<region-chrome>dynamic-region-chrome</region-chrome>
 				<component-chrome>dynamic-component-chrome</component-chrome>
+				<site-configuration>dynamicwebsite.site.configuration</site-configuration>
 			</application-defaults>		
 
 		</web-framework>
