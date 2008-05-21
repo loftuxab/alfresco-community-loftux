@@ -61,7 +61,7 @@ public class LocalWebScriptRuntime extends AbstractRuntime
     @Override
     protected String getScriptUrl()
     {
-        return context.RequestURI;
+        return context.ScriptUrl;
     }
 
     @Override
@@ -69,7 +69,7 @@ public class LocalWebScriptRuntime extends AbstractRuntime
     {
         // this includes all elements of the xml
         Map properties = context.Object.getProperties();
-        String scriptUrl = context.ScriptUrl;
+        String scriptUrl = context.ExecuteUrl;
 
         // component ID is always available to the component
         properties.put("id", context.Object.getId());
@@ -81,7 +81,7 @@ public class LocalWebScriptRuntime extends AbstractRuntime
         }
 
         // add the html binding id
-        String htmlBindingId = (String)context.rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
+        String htmlBindingId = (String)context.RendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
         if (htmlBindingId != null)
         {
             properties.put(ProcessorModelHelper.PROP_HTMLID, htmlBindingId);

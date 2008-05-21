@@ -34,18 +34,18 @@ import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
+ * @author kevinr
  */
 public class LocalWebScriptContext
 {
     HttpServletRequest ServletRequest;
     RuntimeContainer RuntimeContainer;
-    String RequestURI;
-    String RequestPath;
     Map<String, String> Tokens;
+    String ExecuteUrl;
     String ScriptUrl;
     
     // Web Framework Elements
-    RendererContext rendererContext;
+    RendererContext RendererContext;
     ModelObject Object;
     RequestContext RequestContext;
 }
