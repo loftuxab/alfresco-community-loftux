@@ -898,8 +898,10 @@ function getDelayedTask(id)
 
 function refreshCache()
 {
+	var url = "/cache/?command=invalidateAll";
+	url = toBrowser(url);
 	Ext.Ajax.request({
-		url: "/cache/?command=invalidateAll",
+		url: url,
 		method: 'GET',
 		scriptTag: true
 	});

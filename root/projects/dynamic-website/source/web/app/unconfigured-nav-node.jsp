@@ -1,8 +1,5 @@
 <%@ page import="org.alfresco.web.site.*"%>
 <%@ page import="org.alfresco.web.site.model.*"%>
-<%@ page import="org.alfresco.tools.*" %>
-<%@ page import="java.util.*" %>
-<%@ page import="java.io.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
@@ -11,7 +8,7 @@
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 
-	Page currentPage = context.getCurrentPage();
+	Page currentPage = context.getPage();
 	String pageName = currentPage.getTitle();
 	
 	String backgroundImageUrl = "/images/logo/AlfrescoFadedBG.png";
