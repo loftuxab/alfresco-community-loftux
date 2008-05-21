@@ -106,7 +106,8 @@ public class ProcessorModelHelper
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
         
         // add in the web framework script objects
-        model.put("site", new ScriptSite(context));
+        model.put("site", new ScriptSite(context)); // TODO: Remove this
+        model.put("sitedata", new ScriptSite(context));
         if (context.getUser() != null)
         {
             model.put("user", new ScriptUser(context, context.getUser()));

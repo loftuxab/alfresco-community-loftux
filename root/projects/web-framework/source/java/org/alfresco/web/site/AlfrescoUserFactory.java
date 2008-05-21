@@ -75,8 +75,8 @@ public class AlfrescoUserFactory extends UserFactory
             // build the credentials to represent the successful login
             String id = ALFRESCO_ENDPOINT_ID + "_" + username;
             credentials = new SimpleCredentials(id);
-            credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
-            credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
+            credentials.setProperty(Credentials.CREDENTIAL_ALF_USERNAME, username);
+            credentials.setProperty(Credentials.CREDENTIAL_ALF_PASSWORD, password);
             credentials.setProperty(Credentials.CREDENTIAL_ALF_TICKET, ticket);
         }
         catch (Throwable ex) 

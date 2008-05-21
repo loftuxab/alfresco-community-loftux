@@ -91,6 +91,7 @@ public interface WebFrameworkConfigProperties
     public String[] getDefaultPageTypeIds();
     public String getDefaultPageTypeInstanceId(String id);
     public String getDefaultThemeId();
+    public String getDefaultSiteConfigurationId();
     
     // framework defaults
     public String getDefaultFormatId();

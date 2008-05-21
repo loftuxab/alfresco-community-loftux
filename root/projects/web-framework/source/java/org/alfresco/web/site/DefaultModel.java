@@ -256,6 +256,9 @@ public class DefaultModel extends AbstractModel implements Model
             int realFilesCount = 0;
             for(int z = 0; z < files.length; z++)
             {
+                // TODO: This solution is non-ideal
+                // However, we're going to be porting this to the new
+                // model loader - this will be refactored out soon
                 if(files[z].isFile())
                 {
                     realFilesCount++;

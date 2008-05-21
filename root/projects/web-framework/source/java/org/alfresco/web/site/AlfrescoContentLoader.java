@@ -76,7 +76,7 @@ public class AlfrescoContentLoader extends AbstractContentLoader
 					Credentials credz = context.getCredentialVault().retrieve(context.getUserId());
 					if(credz != null)
 					{
-						FrameworkHelper.getLogger().debug("u: " + credz.getProperty(Credentials.CREDENTIAL_USERNAME));
+						FrameworkHelper.getLogger().debug("u: " + credz.getProperty(Credentials.CREDENTIAL_ALF_USERNAME));
 						FrameworkHelper.getLogger().debug("ticket: " + credz.getProperty(Credentials.CREDENTIAL_ALF_TICKET));
 					}
 				}

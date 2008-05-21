@@ -43,7 +43,7 @@ public class RegionDispatcherServlet extends DispatcherServlet
     }
 
     // this servlet just dispatches regions
-    protected void doDispatch(RequestContext context, HttpServletRequest request,
+    protected void dispatch(RequestContext context, HttpServletRequest request,
             HttpServletResponse response) throws RequestDispatchException
     {
         this.setNoCacheHeaders(response);

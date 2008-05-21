@@ -63,6 +63,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected String defaultRegionChrome = null;
     protected String defaultComponentChrome = null;
     protected String defaultTheme = null;
+    protected String defaultSiteConfiguration = null;
 
     protected String rootPath;
 
@@ -185,6 +186,12 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if(configElement.rootPath != null)
         {
             combinedElement.rootPath = configElement.rootPath;
+        }
+        
+        combinedElement.defaultSiteConfiguration = this.defaultSiteConfiguration;
+        if(configElement.defaultSiteConfiguration != null)
+        {
+            combinedElement.defaultSiteConfiguration = configElement.defaultSiteConfiguration;
         }
 
         return combinedElement;
@@ -355,6 +362,15 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             return "default";
         }
         return this.defaultTheme;
+    }
+    
+    public String getDefaultSiteConfigurationId()
+    {
+        if(this.defaultSiteConfiguration == null)
+        {
+            return "default.site.configuration";
+        }
+        return this.defaultSiteConfiguration;
     }
 
     // framework defaults
@@ -959,6 +975,12 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
                 String pageTypeId = pageType.elementTextTrim("id");
                 String pageTypeInstanceId = pageType.elementTextTrim("page-instance-id");
                 configElement.pageTypes.put(pageTypeId, pageTypeInstanceId);
+            }
+            
+            String _siteConfiguration = applicationDefaults.elementTextTrim("site-configuration");
+            if(_siteConfiguration != null)
+            {
+                configElement.defaultSiteConfiguration = _siteConfiguration;
             }
         }
 

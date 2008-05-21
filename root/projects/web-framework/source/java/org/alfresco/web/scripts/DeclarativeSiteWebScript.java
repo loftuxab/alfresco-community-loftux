@@ -42,7 +42,8 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
 {
     
     private static final String ROOT_SCOPE_SITE = "site";
-    /** The store. */
+    private static final String ROOT_SCOPE_SITEDATA = "sitedata";
+    
     protected Store store;
 
     /**
@@ -104,7 +105,8 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
         if (context != null)
         {
             ScriptSite scriptSite = new ScriptSite(context);
-            params.put(ROOT_SCOPE_SITE, scriptSite);
+            params.put(ROOT_SCOPE_SITE, scriptSite); // TODO: Remove
+            params.put(ROOT_SCOPE_SITEDATA, scriptSite);
         }
         return params;
     }
@@ -129,11 +131,7 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
         }
         catch(RequestContextException rce)
         {
-            /**
-             * If we cannot acquire a request context for the current
-             * request, then we cannot supply the "site" object
-             */
-            logger.debug("Unable to place 'site' root scope object into web script");
+            logger.debug("Unable to retrieve the RequestContext instance from the current request");
             logger.debug(rce);
         }
         return context;

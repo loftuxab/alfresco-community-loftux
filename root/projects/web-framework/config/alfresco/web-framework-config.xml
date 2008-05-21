@@ -367,6 +367,7 @@
 			<!-- Application Defaults -->
 			<application-defaults>
 				<theme>default</theme>
+				<site-configuration>default.site.configuration</site-configuration>
 				<region-chrome>default-region-chrome</region-chrome>
 				<component-chrome>default-component-chrome</component-chrome>
 			</application-defaults>

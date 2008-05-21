@@ -31,7 +31,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import org.alfresco.web.page.PageRendererServlet;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
