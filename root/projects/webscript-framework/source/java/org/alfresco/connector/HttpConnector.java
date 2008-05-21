@@ -81,9 +81,9 @@ public class HttpConnector extends AbstractConnector
         if (getCredentials() != null)
         {
             String user = (String) getCredentials().getProperty(
-                    Credentials.CREDENTIAL_USERNAME);
+                    Credentials.CREDENTIAL_ALF_USERNAME);
             String pass = (String) getCredentials().getProperty(
-                    Credentials.CREDENTIAL_PASSWORD);
+                    Credentials.CREDENTIAL_ALF_PASSWORD);
             remoteClient.setUsernamePassword(user, pass);
         }
 

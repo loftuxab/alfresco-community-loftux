@@ -558,13 +558,8 @@ public class ModelUtil
 
     public static Configuration getSiteConfiguration(RequestContext context)
     {
-        Configuration[] configurations = ModelUtil.findConfigurations(context,
-                Configuration.VALUE_SOURCE_ID_SITE);
-        if (configurations != null && configurations.length > 0)
-        {
-            return configurations[0];
-        }
-        return null;
+        String defaultSiteConfigurationId = context.getConfig().getDefaultSiteConfigurationId();
+        return (Configuration) context.getModel().loadConfiguration(context, defaultSiteConfigurationId);
     }
     
     

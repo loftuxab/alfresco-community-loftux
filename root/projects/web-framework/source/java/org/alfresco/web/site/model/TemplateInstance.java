@@ -24,6 +24,10 @@
  */
 package org.alfresco.web.site.model;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 
@@ -37,6 +41,8 @@ public class TemplateInstance extends AbstractModelObject
     public static String TYPE_NAME = "template-instance";
     public static String PROP_TEMPLATE_TYPE = "template-type";
     
+    protected Map<String, Component> components = new HashMap<String, Component>(10, 1.0f);
+            
     /**
      * Instantiates a new template instance for a given XML document
      * 
@@ -100,4 +106,60 @@ public class TemplateInstance extends AbstractModelObject
         return TYPE_NAME;
     }
     
+    /**
+     * Returns the components that were bound to this template during the
+     * template rendering.  This is useful to determine what other components
+     * are configured on the current page.
+     * 
+     * If no rendering components are set, null will be returned
+     * 
+     * @return  An array of Component objects
+     */
+    public Component[] getRenderingComponents()
+    {
+        if(this.components == null)
+        {
+            resetRenderingComponents();
+        }
+        
+        Component[] array = null;
+        if(this.components.size() > 0)
+        {
+            array = new Component[this.components.size()];
+            
+            int i = 0;
+            Iterator it = this.components.values().iterator();
+            while(it.hasNext())
+            {
+                array[i] = (Component) it.next();
+                i++;
+            }
+        }
+        
+        return array;
+    }
+    
+    /**
+     * Indicates that the given component is being rendered as part of
+     * the rendering execution for this Template Instance object
+     *  
+     * @param component The component that is being rendered
+     */
+    public void setRenderingComponent(Component component)
+    {
+        if(this.components == null)
+        {
+            resetRenderingComponents();
+        }
+        
+        this.components.put(component.getId(), component);        
+    }
+    
+    /**
+     * Resets the rendering components
+     */
+    public void resetRenderingComponents()
+    {
+        this.components.clear();
+    }
 }

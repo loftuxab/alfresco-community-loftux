@@ -290,18 +290,18 @@ public class ConnectorFactory
                     {
                         credentials = new SimpleCredentials(bindingKey);
                         credentials.setProperty(
-                                Credentials.CREDENTIAL_USERNAME, username);
+                                Credentials.CREDENTIAL_ALF_USERNAME, username);
                         credentials.setProperty(
-                                Credentials.CREDENTIAL_PASSWORD, password);
+                                Credentials.CREDENTIAL_ALF_PASSWORD, password);
                         credentialVault.store(bindingKey, credentials);
                     }
                 }
                 else
                 {
                     credentials = new SimpleCredentials(bindingKey);
-                    credentials.setProperty(Credentials.CREDENTIAL_USERNAME,
+                    credentials.setProperty(Credentials.CREDENTIAL_ALF_USERNAME,
                             username);
-                    credentials.setProperty(Credentials.CREDENTIAL_PASSWORD,
+                    credentials.setProperty(Credentials.CREDENTIAL_ALF_PASSWORD,
                             password);
                 }
                 connector.setCredentials(credentials);

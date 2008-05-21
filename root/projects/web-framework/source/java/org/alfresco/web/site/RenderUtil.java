@@ -206,6 +206,51 @@ public class RenderUtil
                     "Unable to locate template: " + templateId);
         }
         
+        // PRE-RENDER: determine components
+        // if the rendering components for this template have not yet been determined
+        if(template.getRenderingComponents() == null)
+        {
+            try
+            {
+                if (Timer.isTimerEnabled())
+                    Timer.start(request, "PreRenderTemplate-" + templateId);
+                
+                // wrap the request and response
+                WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
+                FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
+                fakeResponse.setContentType(response.getContentType());
+
+                // bind the rendering to this template
+                RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
+                
+                // set the context into "passive" mode
+                context.setValue("passiveMode", "true");                
+                
+                // get the renderer and execute it
+                Renderable renderer = RendererFactory.newRenderer(context, template);
+                renderer.execute(rendererContext);
+            }
+            catch (Exception ex)
+            {
+                throw new TemplateRenderException(
+                        "An exception occurred while pre-rendering template: " + templateId,
+                        ex);
+            }
+            finally
+            {
+                // switch out of passive mode
+                context.removeValue("passiveMode");
+                
+                // unbind the rendering context
+                RendererContextHelper.unbind(context);
+                
+                if (Timer.isTimerEnabled())
+                    Timer.stop(request, "PreRenderTemplate-" + templateId);                            
+            }            
+        }
+        
+        
+        // RENDER: Process to output stream
         try
         {
             // bind the rendering to this template
@@ -695,9 +740,23 @@ public class RenderUtil
         WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
         FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
         fakeResponse.setContentType(response.getContentType());
+
+        // bind in a new renderer context
+        RendererContextHelper.bind(context, wrappedRequest, fakeResponse);
         
         // execute
-        executeRenderer(context, wrappedRequest, fakeResponse, rendererType, renderer);
+        try
+        {
+            executeRenderer(context, wrappedRequest, fakeResponse, rendererType, renderer);
+        }
+        catch(Exception ex)
+        {
+            throw new Exception("Exception occurred in processRenderer", ex);
+        }
+        finally
+        {
+            RendererContextHelper.unbind(context);
+        }
                 
         // return the result
         return fakeResponse.getContentAsString();        
@@ -990,16 +1049,17 @@ public class RenderUtil
             String rendererType = null;
             String renderer = null;
             try
-            {            
+            {         
                 Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
                 if (config != null)
                 {
                     // renderer properties
                     rendererType = config.getProperty("renderer-type");
                     renderer = config.getProperty("renderer");
-                    
-                    // execute renderer
+                                    
+                    // execute renderer                    
                     String tags = RenderUtil.processRenderer(context, rendererContext.getRequest(), rendererContext.getResponse(), rendererType, renderer);
+                    
                     buf.append(tags);
                     buf.append(NEWLINE);
                 }

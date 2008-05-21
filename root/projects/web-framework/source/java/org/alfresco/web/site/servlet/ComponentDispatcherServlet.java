@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.site.servlet;
 
+import java.util.StringTokenizer;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,12 +45,29 @@ public class ComponentDispatcherServlet extends DispatcherServlet
     }
 
     // this servlet just dispatches components
-    protected void doDispatch(RequestContext context, HttpServletRequest request,
+    protected void dispatch(RequestContext context, HttpServletRequest request,
             HttpServletResponse response) throws RequestDispatchException
     {
-        setNoCacheHeaders(response);
+        this.setNoCacheHeaders(response);
 
+        // allow for the component id to be specified on a parameter
         String componentId = (String) request.getParameter("componentId");
+        if(componentId == null)
+        {
+            // or allow for it to be passed in like this
+            // /dynamic-website/component/componentId
+            String requestURI = request.getRequestURI().substring(request.getContextPath().length());
+            try
+            {
+                StringTokenizer t = new StringTokenizer(requestURI, "/");
+                t.nextToken();        // skip servlet name
+                componentId = (String) t.nextToken();
+            }
+            catch(Exception ex)
+            {
+                // invalid string
+            }
+        }
 
         PresentationUtil.renderComponent(context, request, response,
                 componentId);

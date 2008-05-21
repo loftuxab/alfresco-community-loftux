@@ -31,8 +31,8 @@ package org.alfresco.connector;
  */
 public interface Credentials
 {
-    public final static String CREDENTIAL_USERNAME = "username";
-    public final static String CREDENTIAL_PASSWORD = "password";
+    public final static String CREDENTIAL_ALF_USERNAME = "alfUsername";
+    public final static String CREDENTIAL_ALF_PASSWORD = "alfPassword";
     public final static String CREDENTIAL_ALF_TICKET = "alfTicket";
 
     /**
