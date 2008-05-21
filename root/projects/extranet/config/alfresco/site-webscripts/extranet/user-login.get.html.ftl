@@ -20,7 +20,7 @@ Please enter your credentials to log in:
 		<td><input type="submit" value="Login"/></td>
 	</tr>
 </table>
-<input type="hidden" name="success" value="${url.context}"/>
+<input type="hidden" name="success" value="${successUrl}"/>
 <input type="hidden" name="failure" value="<@link pageType='login'/>"/>
 </form>
 

@@ -1,4 +1,4 @@
-model.currentPageId = site.getRequestContext().getCurrentPageId();
+model.currentPageId = site.getRequestContext().getPageId();
 
 var homePage = site.getRootPage();
 childPageAssociations = site.findChildPageAssociations(homePage.getId(), null);
