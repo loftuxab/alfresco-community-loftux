@@ -23,7 +23,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       this.validateOnSubmit = true;
       this.showSubmitStateDynamically = false;
       this.submitAsJSON = false;
-      this.submitIds = [];
+      this.submitElements = [];
       this.validations = [];
       this.ajaxSubmit = false;
 
@@ -42,12 +42,12 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       formId: null,
 
       /**
-       * List of ids of elements being used to submit the form.
+       * List of ids and/or elements being used to submit the form.
        * 
-       * @property submitIds
-       * @type string[]
+       * @property submitElements
+       * @type object[]
        */
-      submitIds: null,
+      submitElements: null,
       
       /**
        * Flag to indicate whether the form will validate upon submission, true
@@ -129,14 +129,14 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             if (this.showSubmitStateDynamically)
             {
                // find the default submit elements if there are no submitIds set
-               if (this.submitIds.length == 0)
+               if (this.submitElements.length == 0)
                {
                   // use a selector to find any submit elements for the form
                   var nodes = YAHOO.util.Selector.query('#' + this.formId + ' > input[type="submit"]');
                   for (var x = 0; x < nodes.length; x++)
                   {
                      var elem = nodes[x];
-                     this.submitIds.push(elem.id);
+                     this.submitElements.push(elem.id);
                   }
                }
                
@@ -167,22 +167,22 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       },
       
       /**
-       * Sets the list of ids of elements being used to submit the form.
+       * Sets the list of ids and/or elements being used to submit the form.
        * By default the forms runtime will look for and use the first
        * input field of type submit found in the form being managed.
        * 
-       * @method setSubmitIds
-       * @param submitIds {string | string[]} Single id or array of string ids
+       * @method setSubmitElements
+       * @param submitElements {object | object[]} Single object or array of objects
        */
-      setSubmitIds: function(submitIds)
+      setSubmitElements: function(submitElements)
       {
-         if (typeof submitIds == "string")
+         if (!YAHOO.lang.isArray(submitElements))
          {
-            this.submitIds[0] = submitIds;
+            this.submitElements[0] = submitElements;
          }
          else
          {
-            this.submitIds = submitIds;
+            this.submitElements = submitElements;
          }
       },
       
@@ -424,7 +424,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   
                   // get the form element
                   var form = document.getElementById(this.formId);
-                  var submitUrl = form.attributes.action.nodeValue; // form.action;
+                  var submitUrl = form.attributes.action.nodeValue;
                   
                   if (Alfresco.logger.isDebugEnabled())
                      Alfresco.logger.debug("Performing AJAX submission to url: ", submitUrl);
@@ -445,12 +445,13 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      scope: this
                   };
 
-                  if(this.ajaxSubmitHandlers)
+                  if (this.ajaxSubmitHandlers)
                   {
                      if (this.ajaxSubmitHandlers.successCallback)
                      {
                         config.successCallback = this.ajaxSubmitHandlers.successCallback;
                      }
+                     
                      if (this.ajaxSubmitHandlers.successMessage)
                      {
                         config.successMessage = this.ajaxSubmitHandlers.successMessage;
@@ -460,6 +461,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                      {
                         config.failureCallback = this.ajaxSubmitHandlers.failureCallback;
                      }
+                     
                      if(this.ajaxSubmitHandlers.failureMessage)
                      {
                         config.failureMessage = this.ajaxSubmitHandlers.failureMessage;
@@ -582,10 +584,21 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          var valid = this._runValidations(true);
          
          // make sure all submit elements show correct state
-         for (var x = 0; x < this.submitIds.length; x++)
+         for (var x = 0; x < this.submitElements.length; x++)
          {
-            var elem = document.getElementById(this.submitIds[x]);
-            elem.disabled = !valid;
+            var currentItem = this.submitElements[x];
+            
+            if (typeof currentItem == "string")
+            {
+               // get the element with the id and set the disabled attribute
+               var elem = document.getElementById(currentItem);
+               elem.disabled = !valid;
+            }
+            else
+            {
+               // TODO: for now if an object is passed presume it's a YUI button
+               currentItem.set("disabled", !valid);
+            }
          }
       },
       
