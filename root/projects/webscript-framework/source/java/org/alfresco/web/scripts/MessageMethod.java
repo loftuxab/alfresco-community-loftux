@@ -26,6 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import org.alfresco.i18n.I18NUtil;
 
@@ -82,7 +83,11 @@ public class MessageMethod implements TemplateMethodModelEx
                 if (argSize == 1)
                 {
                     // shortcut for no additional msg params
-                    result = webscript.getResources().getString(id);
+                    ResourceBundle resources = webscript.getResources();
+                    if (resources != null)
+                    {
+                        result = resources.getString(id);
+                    }
                     if (result == null)
                     {
                         result = I18NUtil.getMessage(id);
