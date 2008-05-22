@@ -42,7 +42,7 @@ namespace AlfrescoPowerPoint2003
          xmlResponse.InnerXml = SendWebDAVRequest(m_AlfrescoServer, "", Username, Password);
 
          // Did we get an HTTP 401 error?
-         if (xmlResponse.InnerXml.Contains("(401) Unauth"))
+         if (xmlResponse.InnerXml.Contains("(401) Unauth") || (xmlResponse.InnerXml.Contains("<error>")))
          {
             strTicket = "401";
          }
@@ -83,6 +83,7 @@ namespace AlfrescoPowerPoint2003
             // Configure HTTP headers
             webRequest.ContentType = "text/xml; charset=\"UTF-8\"";
             webRequest.ProtocolVersion = HttpVersion.Version11;
+            webRequest.KeepAlive = false;
             webRequest.Method = "PROPFIND";
             webRequest.Timeout = 10000;
             webRequest.Headers.Add("Translate", "f");
@@ -90,19 +91,20 @@ namespace AlfrescoPowerPoint2003
             webRequest.CookieContainer = new CookieContainer(1);
 
             // Credentials
+            NetworkCredential myCred = new NetworkCredential(username, password);
+            CredentialCache myCache = new CredentialCache();
             if (username.Length > 0)
             {
-               NetworkCredential myCred = new NetworkCredential(username, password);
-               CredentialCache myCache = new CredentialCache();
-               if (m_WebAuthenticationHeader.ToLower().StartsWith("basic"))
+               if ((m_WebAuthenticationHeader.ToLower().StartsWith("basic")) || (m_WebAuthenticationHeader == ""))
                {
-                  myCache.Add(new Uri(url), "BASIC", myCred);
+                  myCache.Add(new Uri(url), "Basic", myCred);
                }
                else
                {
-                  myCache.Add(new Uri(url), "DIGEST", myCred);
+                  myCache.Add(new Uri(url), "Digest", myCred);
                }
                webRequest.Credentials = myCache;
+               webRequest.PreAuthenticate = true;
             }
 
             // The body of the HTTP request contains the WebDAV request
@@ -152,6 +154,11 @@ namespace AlfrescoPowerPoint2003
             if (responseStream != null)
             {
                responseStream.Close();
+            }
+
+            if (webRequest != null)
+            {
+               webRequest.Abort();
             }
          }
 

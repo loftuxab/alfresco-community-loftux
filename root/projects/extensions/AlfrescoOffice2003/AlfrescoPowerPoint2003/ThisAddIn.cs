@@ -51,6 +51,7 @@ namespace AlfrescoPowerPoint2003
 
       private void ThisAddIn_Shutdown(object sender, System.EventArgs e)
       {
+         SaveToolbarPosition();
          CloseAlfrescoPane();
          m_AlfrescoPane = null;
       }
@@ -74,32 +75,37 @@ namespace AlfrescoPowerPoint2003
       /// </summary>
       private void AddToolbar()
       {
-         // Try to get a handle to the Alfresco CommandBar
+         // VSTO API uses object-wrapped booleans
+         object falseValue = false;
+         object trueValue = true;
+
+         // Try to get a handle to an existing Alfresco CommandBar
          try
          {
             m_CommandBar = Application.CommandBars["Alfresco"];
+
+            // If we found the CommandBar, then it's a permanent one we need to delete
+            // Note: if the user has manually created a toolbar called "Alfresco" it will get torched here
+            if (m_CommandBar != null)
+            {
+               m_CommandBar.Delete();
+            }
          }
          catch
          {
-            object falseValue = false;
-            // Toolbar named Alfresco does not exist so we should create it.
-            m_CommandBar = Application.CommandBars.Add("Alfresco", Office.MsoBarPosition.msoBarTop, falseValue, falseValue);
+            // Benign - the CommandBar didn't exist
          }
 
-         // Try to get a handle to the Alfresco CommandButton
-         try
-         {
-            m_AlfrescoButton = (Office.CommandBarButton)Application.CommandBars.FindControl(Office.MsoControlType.msoControlButton, missing, "AlfrescoButton", missing);
-         }
-         catch
-         {
-            m_AlfrescoButton = null;
-         }
+         // Create a temporary CommandBar named "Alfresco"
+         m_CommandBar = Application.CommandBars.Add("Alfresco", Office.MsoBarPosition.msoBarTop, falseValue, trueValue);
 
-         if (m_AlfrescoButton == null)
+         if (m_CommandBar != null)
          {
-            // Add our button to the command bar and an event handler.
-            m_AlfrescoButton = (Office.CommandBarButton)m_CommandBar.Controls.Add(Office.MsoControlType.msoControlButton, missing, missing, missing, false);
+            // Load any saved toolbar position
+            LoadToolbarPosition();
+
+            // Add our button to the command bar (as a temporary control) and an event handler.
+            m_AlfrescoButton = (Office.CommandBarButton)m_CommandBar.Controls.Add(Office.MsoControlType.msoControlButton, missing, missing, missing, trueValue);
             if (m_AlfrescoButton != null)
             {
                m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonCaption;
@@ -111,14 +117,47 @@ namespace AlfrescoPowerPoint2003
                m_AlfrescoButton.Mask = new ToolbarPicture(bmpMask);
                m_AlfrescoButton.Style = Office.MsoButtonStyle.msoButtonIconAndCaption;
                m_AlfrescoButton.Tag = "AlfrescoButton";
-            }
-         }
 
-         // Finally add the event handler and make sure the button is visible
-         if (m_AlfrescoButton != null)
+               // Finally add the event handler and make sure the button is visible
+               m_AlfrescoButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(m_AlfrescoButton_Click);
+               m_CommandBar.Visible = true;
+            }
+
+            // We need to find this toolbar later, so protect it from user changes
+            m_CommandBar.Protection = Microsoft.Office.Core.MsoBarProtection.msoBarNoCustomize;
+         }
+      }
+
+      /// <summary>
+      /// Save CommandBar position
+      /// </summary>
+      private void SaveToolbarPosition()
+      {
+         if (m_CommandBar != null)
          {
-            m_AlfrescoButton.Click += new Microsoft.Office.Core._CommandBarButtonEvents_ClickEventHandler(m_AlfrescoButton_Click);
-            m_CommandBar.Visible = true;
+            Properties.Settings.Default.ToolbarPosition = (int)m_CommandBar.Position;
+            Properties.Settings.Default.ToolbarRowIndex = m_CommandBar.RowIndex;
+            Properties.Settings.Default.ToolbarTop = m_CommandBar.Top;
+            Properties.Settings.Default.ToolbarLeft = m_CommandBar.Left;
+            Properties.Settings.Default.ToolbarSaved = true;
+            Properties.Settings.Default.Save();
+         }
+      }
+
+      /// <summary>
+      /// Load CommandBar position
+      /// </summary>
+      private void LoadToolbarPosition()
+      {
+         if (m_CommandBar != null)
+         {
+            if (Properties.Settings.Default.ToolbarSaved)
+            {
+               m_CommandBar.Position = (Microsoft.Office.Core.MsoBarPosition)Properties.Settings.Default.ToolbarPosition;
+               m_CommandBar.RowIndex = Properties.Settings.Default.ToolbarRowIndex;
+               m_CommandBar.Top = Properties.Settings.Default.ToolbarTop;
+               m_CommandBar.Left = Properties.Settings.Default.ToolbarLeft;
+            }
          }
       }
 
