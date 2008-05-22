@@ -49,49 +49,42 @@ div.site-content
    padding: 15px 10px 10px 10px;
 }
 
+/* SCROLL LISTS */
 
-div.component
-{
-   /*
-   padding: 5px;
-   border: 1px dashed #dedede;
-   */
-   padding: 0px;
-   border: 1px solid #dedede;
+.scrollableList{
+   padding: 2px 0px 2px 8px;
+   height:300px;
+   overflow:auto;
 }
 
-div.component-title
-{
+
+/* DASHLETS */
+
+.dashlet{
+   padding: 0px;
+   border: 1px solid #dedede;
+   background-color: white;
+}
+
+.dashlet .title{
    font-weight: bold;
    padding: 2px 0px 2px 8px;
    background-color: #CCCCCC;
    white-space: nowrap;
 }
 
-div.component-links
-{
-   font-weight: normal;
+.dashlet .menu{
    background-color: #dedede;
-    white-space: nowrap;
+   white-space: nowrap;
    margin: 0px 0px 0px 0px;
    padding: 2px 0px 2px 8px;
    border-bottom: 1px solid #dedede;
 }
 
-div.component-body
-{
-   padding: 2px 0px 2px 8px;
+.dashlet .body{
+   padding: 2px 0px 2px 8px;   
 }
 
-div.component-text-divider
-{
-    height: 1px;
-    width: 100%;
+.dashlet .scrollableList{
+   height: 200px;
 }
-
-div.component-list
-{
-   padding: 2px 0px 2px 8px;
-   overflow:auto;
-}
-

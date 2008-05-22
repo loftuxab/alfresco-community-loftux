@@ -3,9 +3,10 @@
     <div class="menu">
        <a href="#" onclick="alert('Not implemented');">Edit profile ></a>
     </div>
-    <div class="body scrollableList">
-       <h1>${profile.title}</h1>
-       <h2>${profile.sitePreset}</h2>
-       ${profile.description}
+    <div class="body">
+       <h1>${profile.title} ${profile.sitePreset}, Welcome </h1>
+       <p>${profile.description}</p>
+       <p>Tags: [tags]</p>
+       <p>Site admin: ${sitemanager.person.firstName} ${sitemanager.person.lastName}</p>
     </div>
 </div>
