@@ -294,7 +294,8 @@ public class RepositoryServiceSystemTest extends BaseWebServiceSystemTest
 		ResultSetRow row2 = result2.getResultSet().getRows()[0];
 		ResultSetRowNode rowNode2 = row2.getNode();
         assertNotNull(rowNode2);
-         assertNotNull(rowNode2.getType());   
+        assertEquals(BaseWebServiceSystemTest.contentReference.getUuid(), rowNode2.getId());  
+        assertNotNull(rowNode2.getType());   
         String[] aspects2 = rowNode2.getAspects();
         assertNotNull(aspects2);
     }
