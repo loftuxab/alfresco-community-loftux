@@ -40,14 +40,14 @@ public class ExceptionStackUtil
      * @return                  Returns the first instance that matches one of the given
      *                          possible types, or null if there is nothing in the stack
      */
-    public static Throwable getCause(Throwable throwable, Class ... possibleCauses)
+    public static Throwable getCause(Throwable throwable, Class<Object> ... possibleCauses)
     {
         while (throwable != null)
         {
-            for (Class possibleCauseClass : possibleCauses)
+            for (Class<Object> possibleCauseClass : possibleCauses)
             {
                 Class<? extends Throwable> throwableClass = throwable.getClass();
-                if (throwableClass.isAssignableFrom(possibleCauseClass))
+                if (possibleCauseClass.isAssignableFrom(throwableClass))
                 {
                     // We have a match
                     return throwable;

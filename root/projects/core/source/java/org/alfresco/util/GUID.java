@@ -53,7 +53,9 @@ public final class GUID
     */
    public static String generate()
    {
-      return UUIDGenerator.getInstance().generateTimeBasedUUID().toString();
+//      return UUIDGenerator.getInstance().generateTimeBasedUUID().toString();
+       // Request for random GUIDs: AR-2300
+       return UUIDGenerator.getInstance().generateRandomBasedUUID().toString();
    }
 
 // == Not sure if we need this functionality again (derekh) ==
