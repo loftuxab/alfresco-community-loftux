@@ -4,22 +4,8 @@ if (typeof Alfresco == "undefined" || !Alfresco)
    var Alfresco = {};
 }
 
-/* Site-wide constants */
-Alfresco.constants = Alfresco.constants ||
-{
-   /* AJAX Proxy URI stem */
-   PROXY_URI: "",
-   
-   /* THEME set by template header using ${theme} */
-   THEME: "./",
-   
-   /* URL_CONTEXT and URL_SERVICECONTEXT set by template header using ${url.context} */
-   URL_CONTEXT: "./",
-   URL_SERVICECONTEXT: "./service/"
-};
-
-
 /* Ensure top-level Alfresco namespaces exist */
+Alfresco.constants = Alfresco.constants || {};
 Alfresco.module = Alfresco.module || {};
 Alfresco.util = Alfresco.util || {};
 Alfresco.logger = Alfresco.logger || {};
@@ -91,7 +77,7 @@ Alfresco.util.YUILoaderHelper = function()
             yuiLoader = new YAHOO.util.YUILoader(
             {
                base: Alfresco.constants.URL_CONTEXT + "yui/",
-               filter: "DEBUG",
+               filter: Alfresco.constants.DEBUG ? "DEBUG" : "",
                loadOptional: false,
                skin:
                {
