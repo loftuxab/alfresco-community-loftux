@@ -43,8 +43,8 @@ namespace AlfrescoExcel2003
       public ServerDetails()
       {
          AssemblyCompanyAttribute assemblyCompany = (AssemblyCompanyAttribute)Attribute.GetCustomAttribute(Assembly.GetExecutingAssembly(), typeof(AssemblyCompanyAttribute));
-         m_IV = Encoding.ASCII.GetBytes(assemblyCompany.Company.Substring(0, 8));
-         for (int i = 8; i > 0; m_Key[i - 1] = (byte)(m_IV[8 - (i--)] ^ 0x20)) ;
+         m_IV = Encoding.ASCII.GetBytes(assemblyCompany.Company.PadRight(8, '*').Substring(0, 8));
+         for (int i = 8; i > 0; m_Key[i - 1] = (byte)(m_IV[8 - (i--)] ^ 0x20));
       }
 
       public string ServerName
@@ -296,6 +296,8 @@ namespace AlfrescoExcel2003
          serverKey.SetValue(REG_USERNAME, this.Username);
          serverKey.SetValue(REG_PASSWORD, this.EncryptedPassword);
          rootKey.SetValue("", this.ServerName);
+
+         m_AuthenticationTicket = "";
       }
 
       public string DocumentPath

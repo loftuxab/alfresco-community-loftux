@@ -18,16 +18,22 @@ namespace AlfrescoExcel2003
    [System.Runtime.InteropServices.ComVisibleAttribute(true)]
    public partial class AlfrescoPane : Form
    {
+      private const int INTERNET_OPTION_END_BROWSER_SESSION = 42;
+
       private Excel.Application m_ExcelApplication;
       private ServerDetails m_ServerDetails;
       private string m_TemplateRoot = "";
       private bool m_ShowPaneOnActivate = false;
       private bool m_ManuallyHidden = false;
       private bool m_LastWebPageSuccessful = true;
+      private bool m_ClearSession = false;
 
       // Win32 SDK functions
       [DllImport("user32.dll")]
       public static extern bool SetForegroundWindow(int hWnd);
+
+      [DllImport("wininet.dll")]
+      public static extern int InternetSetOption(int hInternet, int lOption, string sBuffer, int lBufferLength);
 
       public Excel.Application ExcelApplication
       {
@@ -79,7 +85,6 @@ namespace AlfrescoExcel2003
             else
             {
                m_ServerDetails.DocumentPath = "";
-               this.showHome(!bHaveDocument);
             }
 
             if (!m_ManuallyHidden)
@@ -170,6 +175,13 @@ namespace AlfrescoExcel2003
             {
                theURI += "&ticket=" + strAuthTicket;
             }
+
+            if (m_ClearSession)
+            {
+               m_ClearSession = false;
+               InternetSetOption(0, INTERNET_OPTION_END_BROWSER_SESSION, null, 0);
+            }
+
             if (!isClosing || (strAuthTicket != ""))
             {
                webBrowser.ObjectForScripting = this;
@@ -214,6 +226,13 @@ namespace AlfrescoExcel2003
             {
                theURI += "&ticket=" + strAuthTicket;
             }
+
+            if (m_ClearSession)
+            {
+               m_ClearSession = false;
+               InternetSetOption(0, INTERNET_OPTION_END_BROWSER_SESSION, null, 0);
+            }
+
             webBrowser.ObjectForScripting = this;
             UriBuilder uriBuilder = new UriBuilder(theURI);
             webBrowser.Navigate(uriBuilder.Uri.AbsoluteUri);
@@ -356,6 +375,11 @@ namespace AlfrescoExcel2003
          }
       }
 
+      public void showSettingsPanel()
+      {
+         PanelMode = PanelModes.Configuration;
+      }
+
       private enum PanelModes
       {
          WebBrowser,
@@ -418,23 +442,26 @@ namespace AlfrescoExcel2003
 
       private void btnDetailsOK_Click(object sender, EventArgs e)
       {
-         m_ServerDetails.WebClientURL = txtWebClientURL.Text;
-         m_ServerDetails.WebDAVURL = txtWebDAVURL.Text;
-         m_ServerDetails.CIFSServer = txtCIFSServer.Text;
-         if (chkRememberAuth.Checked)
+         if (m_SettingsChanged)
          {
-            m_ServerDetails.Username = txtUsername.Text;
-            m_ServerDetails.Password = txtPassword.Text;
-         }
-         else
-         {
-            m_ServerDetails.Username = "";
-            m_ServerDetails.Password = "";
+            m_ServerDetails.WebClientURL = txtWebClientURL.Text;
+            m_ServerDetails.WebDAVURL = txtWebDAVURL.Text;
+            m_ServerDetails.CIFSServer = txtCIFSServer.Text;
+            if (chkRememberAuth.Checked)
+            {
+               m_ServerDetails.Username = txtUsername.Text;
+               m_ServerDetails.Password = txtPassword.Text;
+            }
+            else
+            {
+               m_ServerDetails.Username = "";
+               m_ServerDetails.Password = "";
+            }
+
+            m_ServerDetails.SaveToRegistry();
+            m_ClearSession = true;
          }
 
-         m_ServerDetails.SaveToRegistry();
-
-         m_ServerDetails.clearAuthenticationTicket();
          this.OnDocumentChanged();
       }
 

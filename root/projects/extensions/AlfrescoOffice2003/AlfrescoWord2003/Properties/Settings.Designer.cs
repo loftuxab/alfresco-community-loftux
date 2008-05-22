@@ -31,5 +31,65 @@ namespace AlfrescoWord2003.Properties {
                 return ((string)(this["DefaultTemplate"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ToolbarPosition {
+            get {
+                return ((int)(this["ToolbarPosition"]));
+            }
+            set {
+                this["ToolbarPosition"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ToolbarRowIndex {
+            get {
+                return ((int)(this["ToolbarRowIndex"]));
+            }
+            set {
+                this["ToolbarRowIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ToolbarTop {
+            get {
+                return ((int)(this["ToolbarTop"]));
+            }
+            set {
+                this["ToolbarTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int ToolbarLeft {
+            get {
+                return ((int)(this["ToolbarLeft"]));
+            }
+            set {
+                this["ToolbarLeft"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ToolbarSaved {
+            get {
+                return ((bool)(this["ToolbarSaved"]));
+            }
+            set {
+                this["ToolbarSaved"] = value;
+            }
+        }
     }
 }
