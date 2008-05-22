@@ -7,7 +7,7 @@
       <div class="yui-t1">
 
             <div class="yui-g">
-               <h2>Info</h2>
+               <h2>${msg.hello} Info</h2>
                <hr/>
             </div>
             <div class="yui-gd">
