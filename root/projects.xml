@@ -1574,6 +1574,16 @@
       <!-- unzip and add 3rd party javascript library -->
       <unzip src="${file.zip.slingshot.yui}" 
              dest="${dir.project.slingshot.assemble}" />
+
+      <!-- *** TEMPORARY: COPY WEB-CLIENT FILETYPE IMAGES -->
+      <copy todir="${dir.project.slingshot.assemble}">
+         <fileset dir="${dir.project.webclient.src.web}"> 
+            <include name="**/images/filetypes32/*.gif" />
+            <include name="**/images/icons/project-icon-*.gif" />
+            <include name="**/images/icons/space-icon-*.gif" />
+            <exclude name="**/images/icons/*16.gif" />
+         </fileset>
+      </copy>
       
    </target>  
    
