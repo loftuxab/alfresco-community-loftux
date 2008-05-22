@@ -4,27 +4,46 @@
 -->                                                                           
 <#macro header>
 <#assign theme="sam">
+<#assign DEBUG=true>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-   <title>${title}</title> 
+   <title>${title}</title>
 
 <!-- Site-wide YUI Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/yui/reset-fonts-grids/reset-fonts-grids.css" />
    <link rel="stylesheet" type="text/css" href="${url.context}/yui/assets/skins/${theme}/skin.css" />
 
 <#-- Selected components preloaded here for better UI experience. -->
-<!-- Common YUI components -->
+<#if DEBUG>
+<!-- Common YUI components: DEBUG -->
+   <script type="text/javascript" src="${url.context}/yui/yahoo/yahoo-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/event/event-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/dom/dom-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/dragdrop/dragdrop-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/animation/animation-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/logger/logger-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/connection/connection-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/element/element-beta-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/get/get-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/yuiloader/yuiloader-beta-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/button/button-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/container/container-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/json/json-debug.js"></script>
+<#else>
+<!-- Common YUI components: RELEASE -->
    <script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
    <script type="text/javascript" src="${url.context}/yui/button/button-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/menu/menu-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/json/json-min.js"></script>
-   <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
+</#if>
 
 <!-- Site-wide Common Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/controls.css" />
+   <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
    <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
    <script type="text/javascript">//<![CDATA[

@@ -156,7 +156,10 @@ Alfresco.util.YUILoaderHelper = function()
       {
          for (var i = 0; i < callbacks.length; i++)
          {
-            callbacks[i].fn.call(callbacks[i].scope);
+            if (callbacks[i].fn)
+            {
+               callbacks[i].fn.call(callbacks[i].scope);
+            }
          }
          callbacks = [];
          initialLoaderComplete = true;

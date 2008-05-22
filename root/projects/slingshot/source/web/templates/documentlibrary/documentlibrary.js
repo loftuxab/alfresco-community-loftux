@@ -49,6 +49,7 @@
          if (typeof width != 'undefined')
          {
             /* 6px breathing space for resize gripper */
+            Dom.setStyle(Dom.get('divDoclibFilters'), 'height', 'auto');
             Dom.setStyle(Dom.get('divDoclibDocs'), 'margin-left', 6 + width + 'px');
          }
       }
