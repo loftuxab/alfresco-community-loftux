@@ -39,7 +39,8 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class ScriptUser extends ScriptBase
 {
-    protected User user;
+    private User user;
+    private ScriptableMap properties = null;
     
     public ScriptUser(RequestContext context, User user)
     {
@@ -49,16 +50,20 @@ public final class ScriptUser extends ScriptBase
     
     public ScriptableMap getProperties()
     {
-        Map<String, Serializable> userProperties = user.getProperties();
-        
-        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
-        for (Entry<String, Serializable> entry : userProperties.entrySet())
+        if (properties == null)
         {
-            String key = (String) entry.getKey();
-            Serializable value = entry.getValue();
-            map.put(key, value);            
+            Map<String, Serializable> userProperties = user.getProperties();
+            
+            ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
+            for (Entry<String, Serializable> entry : userProperties.entrySet())
+            {
+                String key = (String) entry.getKey();
+                Serializable value = entry.getValue();
+                map.put(key, value);            
+            }
+            properties = map;
         }
-        return map;
+        return properties;
     }
     
     @Override

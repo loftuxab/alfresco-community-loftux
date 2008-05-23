@@ -54,8 +54,9 @@ import org.alfresco.web.site.renderer.RendererFactory;
 /**
  * @author muzquiano
  */
-public class RenderUtil
+public final class RenderUtil
 {
+    public static final String PASSIVE_MODE = "passiveMode";
     private static final String NEWLINE = "\r\n";
 
     /**
@@ -206,26 +207,30 @@ public class RenderUtil
                     "Unable to locate template: " + templateId);
         }
 
-        // PRE-RENDER: determine components
-        // if the rendering components for this template have not yet been determined
-        if(template.getRenderingComponents() == null)
+        // We need to preprocess the template to calculate the component dependencies
+        // - component dependancies are resolved only when they have all executed.
+        // First pass is very fast as template pages themselves have very little implicit content and
+        // any associated behaviour logic is executed only once, with the result stored for the 2nd pass.
+        // The critical performance path is in executing the WebScript components - which is only
+        // performed during the second pass of the template - once component references are all resolved.
+        if (template.getRenderingComponents() == null)
         {
             try
             {
                 if (Timer.isTimerEnabled())
                     Timer.start(request, "PreRenderTemplate-" + templateId);
 
-                // wrap the request and response
+                // Wrap the request and response
+                // Output to a dummy writer as we don't want to keep the result.
                 WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
-                FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
-                fakeResponse.setContentType(response.getContentType());
-
+                FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(true);
+                
                 // bind the rendering to this template
                 RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
-
+                
                 // set the context into "passive" mode
-                context.setValue("passiveMode", "true");
-
+                context.setValue(PASSIVE_MODE, "true");
+                
                 // get the renderer and execute it
                 Renderable renderer = RendererFactory.newRenderer(context, template);
                 renderer.execute(rendererContext);
@@ -239,7 +244,7 @@ public class RenderUtil
             finally
             {
                 // switch out of passive mode
-                context.removeValue("passiveMode");
+                context.removeValue(PASSIVE_MODE);
 
                 // unbind the rendering context
                 RendererContextHelper.unbind(context);
@@ -248,14 +253,13 @@ public class RenderUtil
                     Timer.stop(request, "PreRenderTemplate-" + templateId);
             }
         }
-
-
-        // RENDER: Process to output stream
+        
+        // Second pass - render and process to output stream
         try
         {
             // bind the rendering to this template
             RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
-
+            
             // get the renderer and execute it
             Renderable renderer = RendererFactory.newRenderer(context, template);
             renderer.execute(rendererContext);
@@ -347,8 +351,8 @@ public class RenderUtil
                 // the renderer.
                 // rather, we will notify the template that this component
                 // is bound to it
-                boolean passiveMode = Boolean.parseBoolean((String)context.getValue("passiveMode"));
-                if(passiveMode)
+                boolean passiveMode = Boolean.parseBoolean((String)context.getValue(PASSIVE_MODE));
+                if (passiveMode)
                 {
                     // we don't render the component, we just inform the current
                     // template what our component is
@@ -1037,8 +1041,8 @@ public class RenderUtil
         throws RendererExecutionException
     {
         // if we're in passive mode, just return empty string
-        boolean passiveMode = Boolean.parseBoolean((String)rendererContext.getRequestContext().getValue("passiveMode"));
-        if(passiveMode)
+        boolean passiveMode = Boolean.parseBoolean((String)rendererContext.getRequestContext().getValue(PASSIVE_MODE));
+        if (passiveMode)
         {
             return "";
         }
@@ -1053,7 +1057,7 @@ public class RenderUtil
         String headTags = (String)context.getValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP);
         if (headTags == null)
         {
-            StringBuilder buf = new StringBuilder(4096);
+            StringBuilder buf = new StringBuilder(2048);
             buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
             buf.append(NEWLINE);
 
@@ -1100,7 +1104,7 @@ public class RenderUtil
                 try
                 {
                     Component[] components = template.getRenderingComponents();
-                    if(components != null)
+                    if (components != null)
                     {
                         for (int i = 0; i < components.length; i++)
                         {

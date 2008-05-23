@@ -51,16 +51,15 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 /**
  * The WebScriptRenderer is an implementation of Renderable which describes
  * a rendering engine that the Web Framework can use to execute a web script.
- * 
+ * <p>
  * A WebScriptRenderer can be used to execute a web script for any purpose
  * so long as an appropriate RendererContext instance is passed to it.
- * 
+ * <p>
  * Most commonly, the RendererContext passed in will describe a Component.
- * 
- * The WebScriptRenderer uses a buffering pattern internally as this is the
- * nature of web scripts.  The buffer is managed by the Web Script engine
- * and is purely read back and committed to the output stream at the end of
- * the WebScriptRenderer's execution.
+ * <p>
+ * The renderer supports "full page refresh" link backs to a webscript. The
+ * LocalWebScriptResponse object is responsable for encoding compatible links
+ * via the scripturl() template method.
  * 
  * @author muzquiano
  * @author kevinr
@@ -160,7 +159,7 @@ public class WebScriptRenderer extends AbstractRenderer
                         ProcessorModelHelper.populateTemplateModel(rendererContext, model);
                         
                         /**
-                         * TODO
+                         * TODO: clean up/remove this section?
                          * This is pretty bad form.  It seems that the Slingshot component .head files
                          * reference ${url}.  That should not be valid since url is a variable
                          * on page.  The correct reference should be ${page.url}.
