@@ -7,7 +7,7 @@
 
    <content mimetype="text/xml" viewer="viewers/xml.ftl" preload="true"/>
 
-   <content mimetype="application/x-shockwave-flash" viewer="viewers/flash.ftl" width="500" height="500"/>
+   <content mimetype="application/x-shockwave-flash" viewer="viewers/flash.ftl" width="200" height="200"/>
 
    <content mimetype="video/mpeg" viewer="viewers/video.ftl" />
 

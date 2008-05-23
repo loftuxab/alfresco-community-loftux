@@ -1,23 +1,9 @@
 <div class="dashlet">
   <div class="title">My Limited Profile</div>
   <div class="menu">
-    <a href="#" onclick="alert('Not implemented');">Edit profile ></a>
-    <a href="#" onclick="alert('Not implemented');">View Full Profile ></a>
+     &nbsp;
   </div>
   <div class="body">
-     <div class="header">${profile.name}, Welcome</div>
-     <div class="text">${profile.title}</div>
-     <div class="text">${profile.department}, ${profile.company}</div>
-     <div class="text">Based in ${profile.location}</div>
-     <#if profile.status == 'ONLINE'>
-     <div class="text">Online, ${profile.loggedIn}</div>
-     <#else>
-     <div class="text">Offline</div>
-     </#if>
-     <div class="component-text-divider"></div>
-     <div class="text">${profile.email}</div>
-     <div class="text">${profile.mobile}</div>
-     <div class="text">${profile.skype}</div>
-     <div class="text">${profile.linkedIn}</div>
+     <div class="header">${user}, Welcome</div>
   </div>
 </div>

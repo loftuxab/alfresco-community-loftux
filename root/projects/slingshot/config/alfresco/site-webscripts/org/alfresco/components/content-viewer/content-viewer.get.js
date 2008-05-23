@@ -18,7 +18,7 @@ var contentData = null;
 var content = contentviewer.content.(@mimetype==node.mimetype);
 if(content.length() == 1)
 {
-   content = content[0];
+   //content = content[0];
    logger.log("Found viewer " + content.@viewer + " - " + content.@preload);
    viewer = content.@viewer.toString();
    preload = (content.@preload.toString() == "true");
@@ -49,8 +49,9 @@ model.node = node;
 model.contentData = contentData;
 model.contentUrl = "/alfresco/service" + contentUrl;
 
-logger.log("H:"+content.@width);
-logger.log("W:"+content.@height);
+logger.log("C:"+content.toString());
+logger.log("H:"+content.@width.toString());
+logger.log("W:"+content.@height.toString());
 
 model.width = "100%"; // default value
 if(node.properties[mcns + "width"])

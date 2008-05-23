@@ -64,7 +64,7 @@
          this.dialog.render(document.body);
          
          var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
-         okButton.subscribe("click", this.onOkButtonClick, this, true);
+         //okButton.subscribe("click", this.onOkButtonClick, this, true);
          
          var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");

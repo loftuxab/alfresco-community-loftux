@@ -19,7 +19,7 @@
          	</tr>
          </table>
          <input type="hidden" name="success" value="<#if alfRedirectUrl?exists>${alfRedirectUrl}<#else>${url.context}</#if>"/>
-         <input type="hidden" name="failure" value="<@link pageType='login'/>"/>
+         <input type="hidden" name="failure" value=""/>
       </fieldset>
    </form>
 </div>
