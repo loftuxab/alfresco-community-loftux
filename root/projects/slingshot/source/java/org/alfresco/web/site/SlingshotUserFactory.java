@@ -26,7 +26,10 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.AlfrescoConnector;
+import org.alfresco.connector.Credentials;
 import org.alfresco.connector.User;
+import org.alfresco.web.scripts.WebFrameworkScriptRemote;
 import org.alfresco.web.site.exception.UserFactoryException;
 
 /**
@@ -58,9 +61,15 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
     public User loadUser(RequestContext context, HttpServletRequest request, String userId)
         throws UserFactoryException
     {
-    	SlingshotUser user = new SlingshotUser(userId);
-        user.setFirstName(userId);
-        user.setLastName(userId);
+    	User user = super.loadUser(context, request, userId);
+        
+        WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
+        AlfrescoConnector connector = (AlfrescoConnector)remote.connect(ALFRESCO_SYSTEM_ENDPOINT_ID);
+        
+        // custom property 'alfTicket' made available on slingshot user object - for use by Flash components etc.
+        String ticket = (String)connector.getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
+        user.setProperty("alfTicket", ticket);
+        
         return user;
     }
 }

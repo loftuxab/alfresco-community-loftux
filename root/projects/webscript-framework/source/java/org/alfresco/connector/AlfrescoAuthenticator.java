@@ -40,13 +40,6 @@ import org.dom4j.DocumentHelper;
  */
 public class AlfrescoAuthenticator implements Authenticator
 {
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.connector.Authenticator#authenticate(org.alfresco.connector.Client,
-     *      org.alfresco.connector.Credentials)
-     */
     public boolean authenticate(Client client, Credentials credentials)
             throws AuthenticationException
     {
@@ -84,8 +77,7 @@ public class AlfrescoAuthenticator implements Authenticator
                 }
 
                 // place the ticket back onto the Credentials object
-                credentials.setProperty(Credentials.CREDENTIAL_ALF_TICKET,
-                        ticket);
+                credentials.setProperty(Credentials.CREDENTIAL_ALF_TICKET, ticket);
 
                 authenticated = true;
             }
