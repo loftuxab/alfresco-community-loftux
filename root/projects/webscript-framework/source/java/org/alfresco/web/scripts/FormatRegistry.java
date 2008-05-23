@@ -197,7 +197,16 @@ public class FormatRegistry
     public FormatReader<Object> getReader(String mimetype)
     {
         // TODO: lookup by sorted mimetype list (most specific -> least specific)
-        return readers.get(mimetype);
+        FormatReader<Object> reader = readers.get(mimetype); 
+        if (reader == null)
+        {
+            String generalizedMimetype = generalizeMimetype(mimetype);
+            if (generalizedMimetype != null)
+            {
+                reader = readers.get(generalizedMimetype);
+            }
+        }
+        return reader;
     }
 
     /**
@@ -211,7 +220,36 @@ public class FormatRegistry
     public FormatWriter<Object> getWriter(Object object, String mimetype)
     {
         // TODO: lookup by sorted mimetype list (most specific -> least specific)
-        return writers.get(object.getClass().getName() + "||" + mimetype);
+        FormatWriter<Object> writer = writers.get(object.getClass().getName() + "||" + mimetype);
+        if (writer == null)
+        {
+            String generalizedMimetype = generalizeMimetype(mimetype);
+            if (generalizedMimetype != null)
+            {
+                writer = writers.get(object.getClass().getName() + "||" + generalizedMimetype);
+            }
+        }
+        return writer;
     }
-    
+
+    /**
+     * Generalize Mimetype
+     * 
+     * @param mimetype
+     * @return  generalized mimetype (null, if no generalization can be made)
+     */
+    public String generalizeMimetype(String mimetype)
+    {
+        String generalizedMimetype = null;
+        if (mimetype != null)
+        {
+            int params = mimetype.indexOf(";");
+            if (params != -1)
+            {
+                generalizedMimetype = mimetype.substring(0, params);
+            }
+        }
+        return generalizedMimetype;
+    }
+
 }
