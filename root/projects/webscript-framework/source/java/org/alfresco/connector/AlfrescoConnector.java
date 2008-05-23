@@ -75,11 +75,10 @@ public class AlfrescoConnector extends HttpConnector
         }
 
         // instantiate the remote client if not instantiated
-        RemoteClient remoteClient = ((RemoteClient) this.getClient());
+        RemoteClient remoteClient = ((RemoteClient)this.getClient());
 
         // check to see if we have a ticket
-        String alfTicket = (String) getCredentials().getProperty(
-                Credentials.CREDENTIAL_ALF_TICKET);
+        String alfTicket = (String)getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
 
         if (logger.isDebugEnabled())
             logger.debug("Pass 1: alfTicket = " + alfTicket);

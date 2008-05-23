@@ -51,6 +51,8 @@ public class User implements java.security.Principal, Serializable
     public static String PROP_MOBILE_PHONE = "mobile_phone";
     public static String PROP_STATE = "state";
     public static String PROP_ZIP_CODE = "zip_code";
+    public static String PROP_JOB_TITLE = "job_title";
+    public static String PROP_ORGANIZATION = "organization";
 
     protected boolean isAdmin = false;
     protected Map<String, Serializable> map = null;
@@ -208,6 +210,46 @@ public class User implements java.security.Principal, Serializable
     public void setHomePhone(String value)
     {
         setProperty(PROP_HOME_PHONE, value);
+    }
+    
+    /**
+     * Gets the job title.
+     * 
+     * @return the job title
+     */
+    public String getJobTitle()
+    {
+        return getStringProperty(PROP_JOB_TITLE);
+    }
+
+    /**
+     * Sets the job title.
+     * 
+     * @param value the new job title
+     */
+    public void setJobTitle(String value)
+    {
+        setProperty(PROP_JOB_TITLE, value);
+    }
+    
+    /**
+     * Gets the organization.
+     * 
+     * @return the organization
+     */
+    public String getOrganization()
+    {
+        return getStringProperty(PROP_ORGANIZATION);
+    }
+
+    /**
+     * Sets the organization.
+     * 
+     * @param value the new organization
+     */
+    public void setOrganization(String value)
+    {
+        setProperty(PROP_ORGANIZATION, value);
     }
 
     /**
