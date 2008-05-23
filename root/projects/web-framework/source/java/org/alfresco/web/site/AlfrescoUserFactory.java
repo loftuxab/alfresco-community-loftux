@@ -117,8 +117,14 @@ public class AlfrescoUserFactory extends UserFactory
             user = new User(userId);
             user.setFirstName(properties.getString("{http://www.alfresco.org/model/content/1.0}firstName"));
             user.setLastName(properties.getString("{http://www.alfresco.org/model/content/1.0}lastName"));
-            user.setJobTitle(properties.getString("{http://www.alfresco.org/model/content/1.0}jobtitle"));
-            user.setOrganization(properties.getString("{http://www.alfresco.org/model/content/1.0}organization"));
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}jobtitle"))
+            {
+                user.setJobTitle(properties.getString("{http://www.alfresco.org/model/content/1.0}jobtitle"));
+            }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}organization"))
+            {
+                user.setOrganization(properties.getString("{http://www.alfresco.org/model/content/1.0}organization"));
+            }
             
             // TODO: apply other user properties
         }
