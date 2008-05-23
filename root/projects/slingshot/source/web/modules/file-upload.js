@@ -234,7 +234,9 @@
          for(var i = 0; i < length; i++){
             var record = this.dataTable.getRecordSet().getRecord(i);
             var idToUpload = record.getData("id");
-            this.uploader.upload(idToUpload, "http://localhost:8080/alfresco/uploadFileServlet?ticket=heppTicket123");
+            //var url = Alfresco.constants.PROXY_URI + "api/upload";
+            var url = "/alfresco/service/api/upload";
+            this.uploader.upload(idToUpload, url, "POST", {foo: "bar"});
          }
       },
 

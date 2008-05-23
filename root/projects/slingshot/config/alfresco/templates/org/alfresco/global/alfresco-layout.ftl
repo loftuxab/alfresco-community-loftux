@@ -11,17 +11,15 @@
 </#macro>
 
 <#macro _fluidGrid numberOfColumns numberOfComponents regionIdPrefix nestingGridClass>
-   <#-- doc3 = 100% -->
-   <div id="doc3" class="yui-t7">
-      <div id="bd">
-         <div class="${nestingGridClass}">
+   <div class="${nestingGridClass}">
    <#list 1..numberOfColumns as column>
-         <div class="yui-u<#if column == 1> first</#if>">
-            <#list 1..numberOfComponents as component>
-               <#if (component % numberOfColumns) == (column % numberOfColumns)>
-                  <@region id="${regionIdPrefix + component}" scope="page" protected=true/>
-               </#if>
-            </#list>
-         </div>
+      <div class="yui-u<#if column == 1> first</#if>">
+      <#list 1..numberOfComponents as component>
+         <#if (component % numberOfColumns) == (column % numberOfColumns)>
+         <@region id="${regionIdPrefix + component}" scope="page" protected=true/>
+         </#if>
+      </#list>
+      </div>
    </#list>
+   </div>
 </#macro>

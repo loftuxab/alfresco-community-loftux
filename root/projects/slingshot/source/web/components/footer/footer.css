@@ -1,11 +1,7 @@
 /* Footer css */
 
-div.site-footer{
-   padding: 2px 8px 2px 8px;
-   border-top: 1px solid #dedede;
-}
 
-span.footer-menu-item {
+.copyright {
     vertical-align: middle;
     padding: 0px 10px 0px 10px;
     margin: 0px;
@@ -13,11 +9,7 @@ span.footer-menu-item {
     white-space: nowrap;
 }
 
-div.support-menu {
-    float: left;
-    margin: 0px 0px 0px 10px;
-}
-div.copyright-label {
+.footer {
     float: none;
     text-align: center;
     margin: 5px 0px 0px 0px;
