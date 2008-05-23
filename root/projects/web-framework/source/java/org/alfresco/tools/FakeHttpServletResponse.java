@@ -58,6 +58,20 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class FakeHttpServletResponse implements HttpServletResponse
 {
+    public FakeHttpServletResponse()
+    {
+        this(false);
+    }
+    
+    public FakeHttpServletResponse(boolean fakeOutputStream)
+    {
+        if (!fakeOutputStream)
+        {
+            content = new ByteArrayOutputStream(1024);
+            outputStream = new DelegatingServletOutputStream(this.content);
+        }
+    }
+    
     /* (non-Javadoc)
      * @see javax.servlet.ServletResponse#setCharacterEncoding(java.lang.String)
      */
@@ -89,9 +103,31 @@ public class FakeHttpServletResponse implements HttpServletResponse
     {
         if (writer == null)
         {
-            Writer targetWriter = (characterEncoding != null ? new OutputStreamWriter(
-                    content, characterEncoding) : new OutputStreamWriter(
-                    content));
+            Writer targetWriter;
+            if (this.outputStream != null)
+            {
+                // create a writer wrapping the underlying content output stream
+                targetWriter = (characterEncoding != null ? new OutputStreamWriter(
+                        content, characterEncoding) : new OutputStreamWriter(content));
+            }
+            else
+            {
+                // create a "fake" or dummy writer as we have no output stream
+                targetWriter = new Writer()
+                {
+                    public void write(char[] cbuf, int off, int len) throws IOException
+                    {
+                    }
+
+                    public void flush() throws IOException
+                    {
+                    }
+
+                    public void close() throws IOException
+                    {
+                    }
+                };
+            }
             
             writer = new PrintWriter(targetWriter, true);
         }
@@ -626,11 +662,10 @@ public class FakeHttpServletResponse implements HttpServletResponse
     private String characterEncoding = "UTF-8";
 
     /** The content. */
-    private final ByteArrayOutputStream content = new ByteArrayOutputStream();
+    private ByteArrayOutputStream content;
     
     /** The output stream. */
-    private final DelegatingServletOutputStream outputStream = new DelegatingServletOutputStream(
-            this.content);
+    private DelegatingServletOutputStream outputStream;
 
     /** The writer. */
     private PrintWriter writer;

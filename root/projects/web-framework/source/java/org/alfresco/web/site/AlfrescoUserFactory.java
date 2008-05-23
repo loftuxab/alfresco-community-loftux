@@ -26,6 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.AlfrescoConnector;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
@@ -45,33 +46,33 @@ import org.json.JSONObject;
  */
 public class AlfrescoUserFactory extends UserFactory
 {
-    private static final String ALFRESCO_ENDPOINT_ID = "alfresco";
-    private static final String ALFRESCO_SYSTEM_ENDPOINT_ID = "alfresco-system";
+    public static final String ALFRESCO_ENDPOINT_ID = "alfresco";
+    public static final String ALFRESCO_SYSTEM_ENDPOINT_ID = "alfresco-system";
 
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
-	 */
-	public Credentials authenticate(HttpServletRequest request, String username, String password)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
+     */
+    public Credentials authenticate(HttpServletRequest request, String username, String password)
     {
-		Credentials credentials = null;
-		try
-		{
-			// request context
-			RequestContext context = RequestUtil.getRequestContext(request);
-			
-			// create a connector for the current user
-			WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-			Connector connector = remote.connect(ALFRESCO_ENDPOINT_ID);
-			
-			// call the authentication ticket provider
-			String uri = "/api/login?u=" + username + "&pw=" + password;
-			Response response = connector.call(uri);
-			
-			// parse out the ticket
-        	Document document = org.dom4j.DocumentHelper.parseText(response.getResponse());
-        	String ticket = document.getRootElement().getText();
-            
+        Credentials credentials = null;
+        try
+        {
+            // request context
+            RequestContext context = RequestUtil.getRequestContext(request);
+
+            // create a connector for the current user
+            WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
+            Connector connector = remote.connect(ALFRESCO_ENDPOINT_ID);
+
+            // call the authentication ticket provider
+            String uri = "/api/login?u=" + username + "&pw=" + password;
+            Response response = connector.call(uri);
+
+            // parse out the ticket
+            Document document = org.dom4j.DocumentHelper.parseText(response.getResponse());
+            String ticket = document.getRootElement().getText();
+
             // build the credentials to represent the successful login
             String id = ALFRESCO_ENDPOINT_ID + "_" + username;
             credentials = new SimpleCredentials(id);
@@ -81,14 +82,14 @@ public class AlfrescoUserFactory extends UserFactory
         }
         catch (Throwable ex) 
         {
-        	// many things might have happened
-        	// an invalid ticket or perhaps a connectivity issue
-        	// at any rate, we cannot authenticate
+            // many things might have happened
+            // an invalid ticket or perhaps a connectivity issue
+            // at any rate, we cannot authenticate
         }
-        
+
         return credentials;
     }
-	
+
     /* (non-Javadoc)
      * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
      */
@@ -96,35 +97,37 @@ public class AlfrescoUserFactory extends UserFactory
         throws UserFactoryException
     {
         User user = null;
-		try
-		{
-			// create a connector for the current user
-			WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-			Connector connector = remote.connect(ALFRESCO_SYSTEM_ENDPOINT_ID);
-			
-			// call the authentication ticket provider
-			String uri = "/webframework/content/metadata?user=" + userId;
-			Response response = connector.call(uri);
-			
-			String responseString = response.getResponse();
-					
-	        // Load the user from the JSON parser
-	        JSONObject jsonObject = new JSONObject(responseString);
-	        
-        	JSONObject properties = jsonObject.getJSONObject("properties");
-        	
-        	user = new User(userId);
+        try
+        {
+            // create a connector for the current user
+            WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
+            AlfrescoConnector connector = (AlfrescoConnector)remote.connect(ALFRESCO_SYSTEM_ENDPOINT_ID);
+            
+            // call the authentication ticket provider
+            String uri = "/webframework/content/metadata?user=" + userId;
+            Response response = connector.call(uri);
+            
+            String responseString = response.getResponse();
+            
+            // Load the user from the JSON parser
+            JSONObject jsonObject = new JSONObject(responseString);
+            
+            JSONObject properties = jsonObject.getJSONObject("properties");
+            
+            user = new User(userId);
             user.setFirstName(properties.getString("{http://www.alfresco.org/model/content/1.0}firstName"));
             user.setLastName(properties.getString("{http://www.alfresco.org/model/content/1.0}lastName"));
+            user.setJobTitle(properties.getString("{http://www.alfresco.org/model/content/1.0}jobtitle"));
+            user.setOrganization(properties.getString("{http://www.alfresco.org/model/content/1.0}organization"));
             
             // TODO: apply other user properties
         }
         catch (Exception ex)
         {
-        	// unable to read back the user json object
-        	throw new UserFactoryException("Unable to retrieve user from repository", ex);
+            // unable to read back the user json object
+            throw new UserFactoryException("Unable to retrieve user from repository", ex);
         }
-
+        
         return user;
     }
 }

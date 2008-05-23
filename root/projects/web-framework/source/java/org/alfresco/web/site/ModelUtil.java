@@ -59,17 +59,14 @@ public class ModelUtil
         return findChrome(context, null);
     }
 
-    public static Chrome[] findChrome(RequestContext context,
-            String chromeType)
+    public static Chrome[] findChrome(RequestContext context, String chromeType)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
-        addPropertyConstraint(propertyConstraintMap,
-                Chrome.PROP_CHROME_TYPE, chromeType);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
+        addPropertyConstraint(propertyConstraintMap, Chrome.PROP_CHROME_TYPE, chromeType);
 
         // do the lookup
-        ModelObject[] objects = findObjects(context, Chrome.TYPE_NAME,
-                propertyConstraintMap);
+        ModelObject[] objects = findObjects(context, Chrome.TYPE_NAME, propertyConstraintMap);
         
         // convert to return type
         Chrome[] array = new Chrome[objects.length];
@@ -80,8 +77,8 @@ public class ModelUtil
         return array;
     }
 
-    //////////////////////////
     // configurations
+    
     public static Configuration[] findConfigurations(RequestContext context)
     {
         return findConfigurations(context, null);
@@ -91,13 +88,11 @@ public class ModelUtil
             String sourceId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
-        addPropertyConstraint(propertyConstraintMap,
-                Configuration.PROP_SOURCE_ID, sourceId);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
+        addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
 
         // do the lookup
-        ModelObject[] objects = findObjects(context, Configuration.TYPE_NAME,
-                propertyConstraintMap);
+        ModelObject[] objects = findObjects(context, Configuration.TYPE_NAME, propertyConstraintMap);
         
         // convert to return type
         Configuration[] array = new Configuration[objects.length];
@@ -120,7 +115,7 @@ public class ModelUtil
             String associationType)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(4, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 PageAssociation.PROP_SOURCE_ID, sourceId);
         addPropertyConstraint(propertyConstraintMap,
@@ -199,7 +194,7 @@ public class ModelUtil
             String assocType, String formatId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(8, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 ContentAssociation.PROP_SOURCE_ID, sourceId);
         addPropertyConstraint(propertyConstraintMap,
@@ -269,7 +264,7 @@ public class ModelUtil
             String componentTypeId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(4, 1.0f);
         addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE,
                 scope);
         addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID,
@@ -342,7 +337,7 @@ public class ModelUtil
             String templateType)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
         addPropertyConstraint(propertyConstraintMap,
                 TemplateInstance.PROP_TEMPLATE_TYPE, templateType);
 
@@ -368,7 +363,7 @@ public class ModelUtil
             String uri)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
         addPropertyConstraint(propertyConstraintMap, TemplateType.PROP_URI, uri);
 
         // do the lookup
@@ -399,7 +394,7 @@ public class ModelUtil
             String uri)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
         addPropertyConstraint(propertyConstraintMap, ComponentType.PROP_URI,
                 uri);
 
@@ -425,7 +420,7 @@ public class ModelUtil
             String rootPage, String pageTypeId)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(4, 1.0f);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_ROOT_PAGE,
@@ -454,7 +449,7 @@ public class ModelUtil
     public static PageType[] findPageTypes(RequestContext context, String temp)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
         /*
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
@@ -482,7 +477,7 @@ public class ModelUtil
     public static Theme[] findThemes(RequestContext context, String temp)
     {
         // build property map
-        HashMap propertyConstraintMap = new HashMap(16, 1.0f);
+        HashMap propertyConstraintMap = new HashMap(1, 1.0f);
         /*
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
@@ -570,16 +565,13 @@ public class ModelUtil
     protected static ModelObject[] findObjects(RequestContext context,
             String typeName, HashMap propertyConstraintMap)
     {
-        ModelObject[] array = new ModelObject[] {};
+        ModelObject[] array = new ModelObject[0];
         try
         {
-            ModelObject[] objects = context.getModel().loadObjects(context,
-                    typeName);
-            if (objects != null && objects.length > 0)
+            ModelObject[] objects = context.getModel().loadObjects(context, typeName);
+            if (objects != null && objects.length != 0)
             {
-                // TODO: What should the default size be for this array list?
-                // Using a high value here for the time being
-                List arrayList = new ArrayList(512);
+                List<ModelObject> arrayList = new ArrayList<ModelObject>(objects.length);
                 for (int i = 0; i < objects.length; i++)
                 {
                     ModelObject object = (ModelObject) objects[i];
@@ -621,18 +613,15 @@ public class ModelUtil
                         arrayList.add(object);
                     }
                 }
-
-                array = new ModelObject[arrayList.size()];
-                for (int j = 0; j < arrayList.size(); j++)
-                {
-                    array[j] = (ModelObject) arrayList.get(j);
-                }
+                
+                array = arrayList.toArray(new ModelObject[arrayList.size()]);
             }
         }
         catch (Exception ex)
         {
             FrameworkHelper.getLogger().fatal(ex);
         }
+        
         return array;
     }
 

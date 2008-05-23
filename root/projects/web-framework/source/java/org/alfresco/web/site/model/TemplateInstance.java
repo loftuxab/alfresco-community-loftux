@@ -25,7 +25,6 @@
 package org.alfresco.web.site.model;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.web.site.RequestContext;
@@ -41,8 +40,8 @@ public class TemplateInstance extends AbstractModelObject
     public static String TYPE_NAME = "template-instance";
     public static String PROP_TEMPLATE_TYPE = "template-type";
     
-    protected Map<String, Component> components = new HashMap<String, Component>(10, 1.0f);
-            
+    protected Map<String, Component> components = new HashMap<String, Component>(16, 1.0f);
+    
     /**
      * Instantiates a new template instance for a given XML document
      * 
@@ -82,8 +81,6 @@ public class TemplateInstance extends AbstractModelObject
         setProperty(PROP_TEMPLATE_TYPE, templateType);
     }
 
-    // Helpers
-
     /**
      * Gets the template type.
      * 
@@ -94,8 +91,7 @@ public class TemplateInstance extends AbstractModelObject
     public TemplateType getTemplateType(RequestContext context)
     {
         // either 'global', template or page
-        return context.getModel().loadTemplateType(context,
-                getTemplateType());
+        return context.getModel().loadTemplateType(context, getTemplateType());
     }
 
     /* (non-Javadoc)
@@ -117,26 +113,14 @@ public class TemplateInstance extends AbstractModelObject
      */
     public Component[] getRenderingComponents()
     {
-        if(this.components == null)
+        if (this.components.size() == 0)
         {
-            resetRenderingComponents();
+            return null;
         }
-        
-        Component[] array = null;
-        if(this.components.size() > 0)
+        else
         {
-            array = new Component[this.components.size()];
-            
-            int i = 0;
-            Iterator it = this.components.values().iterator();
-            while(it.hasNext())
-            {
-                array[i] = (Component) it.next();
-                i++;
-            }
+            return this.components.values().toArray(new Component[this.components.size()]);
         }
-        
-        return array;
     }
     
     /**
@@ -147,11 +131,6 @@ public class TemplateInstance extends AbstractModelObject
      */
     public void setRenderingComponent(Component component)
     {
-        if(this.components == null)
-        {
-            resetRenderingComponents();
-        }
-        
         this.components.put(component.getId(), component);        
     }
     

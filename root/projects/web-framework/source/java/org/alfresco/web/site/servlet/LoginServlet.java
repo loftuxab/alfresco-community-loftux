@@ -37,21 +37,12 @@ import org.alfresco.web.site.RequestUtil;
 import org.alfresco.web.site.UserFactory;
 
 /**
- * Responds to Login POSTs to allow the user to authenticate to the
- * web site.
+ * Responds to Login POSTs to allow the user to authenticate to the web site.
  * 
  * @author muzquiano
  */
 public class LoginServlet extends BaseServlet
 {
-    /* (non-Javadoc)
-     * @see javax.servlet.GenericServlet#init()
-     */
-    public void init() throws ServletException
-    {
-        super.init();
-    }
-
     /* (non-Javadoc)
      * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
      */
