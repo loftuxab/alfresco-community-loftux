@@ -15,11 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
- * As a special exception to the terms and conditions of version 2.0 of 
- * the GPL, you may redistribute this Program in connection with Free/Libre 
- * and Open Source Software ("FLOSS") applications as described in Alfresco's 
- * FLOSS exception.  You should have recieved a copy of the text describing 
- * the FLOSS exception, and it is also available here: 
+ * As a special exception to the terms and conditions of version 2.0 of
+ * the GPL, you may redistribute this Program in connection with Free/Libre
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's
+ * FLOSS exception.  You should have recieved a copy of the text describing
+ * the FLOSS exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.web.site;
@@ -60,10 +60,10 @@ public class RenderUtil
 
     /**
      * Renders a given JSP page.
-     * 
+     *
      * This renders the JSP page directly and does not perform
      * any wrapping of the servlet objects.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -77,10 +77,10 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderJspPage-" + dispatchPath);
-        
+
         // bind the rendering to this page
         RendererContextHelper.bind(context, request, response);
-        
+
         try
         {
             executeRenderer(context, request, response, WebFrameworkConstants.RENDERER_TYPE_JSP, dispatchPath);
@@ -93,7 +93,7 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderJspPage-" + dispatchPath);
         }
@@ -101,7 +101,7 @@ public class RenderUtil
 
     /**
      * Renders the current page as provided by the request context.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -117,14 +117,14 @@ public class RenderUtil
             throw new PageRenderException(
                     "Unable to locate current page in request context");
         }
-        
+
         renderPage(context, request, response, page.getId());
     }
 
     /**
      * Renders a given page.  This will determine the active template
      * and then delegate to the template renderer.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -138,7 +138,7 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderPage-" + pageId);
-        
+
         // look up the page
         Page page = (Page) context.getModel().loadPage(context, pageId);
         if (page == null)
@@ -153,14 +153,14 @@ public class RenderUtil
             throw new PageRenderException(
                     "Unable to locate template for page: " + pageId);
         }
-        
+
         // render the template
         try
         {
             // bind the rendering to this page
             RendererContextHelper.bind(context, page, request, response);
-            
-            // Execute the template        
+
+            // Execute the template
             RenderUtil.renderTemplate(context, request, response, currentTemplate.getId());
         }
         catch (Exception ex)
@@ -183,7 +183,7 @@ public class RenderUtil
      * Renders a given template instance.  This fetches the abstract renderer
      * instance for the given template's type and then binds configuration data
      * to the rendering engine.  It then executes the template.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -205,7 +205,7 @@ public class RenderUtil
             throw new TemplateRenderException(
                     "Unable to locate template: " + templateId);
         }
-        
+
         // PRE-RENDER: determine components
         // if the rendering components for this template have not yet been determined
         if(template.getRenderingComponents() == null)
@@ -214,7 +214,7 @@ public class RenderUtil
             {
                 if (Timer.isTimerEnabled())
                     Timer.start(request, "PreRenderTemplate-" + templateId);
-                
+
                 // wrap the request and response
                 WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
                 FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse();
@@ -222,10 +222,10 @@ public class RenderUtil
 
                 // bind the rendering to this template
                 RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
-                
+
                 // set the context into "passive" mode
-                context.setValue("passiveMode", "true");                
-                
+                context.setValue("passiveMode", "true");
+
                 // get the renderer and execute it
                 Renderable renderer = RendererFactory.newRenderer(context, template);
                 renderer.execute(rendererContext);
@@ -240,22 +240,22 @@ public class RenderUtil
             {
                 // switch out of passive mode
                 context.removeValue("passiveMode");
-                
+
                 // unbind the rendering context
                 RendererContextHelper.unbind(context);
-                
+
                 if (Timer.isTimerEnabled())
-                    Timer.stop(request, "PreRenderTemplate-" + templateId);                            
-            }            
+                    Timer.stop(request, "PreRenderTemplate-" + templateId);
+            }
         }
-        
-        
+
+
         // RENDER: Process to output stream
         try
         {
             // bind the rendering to this template
             RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
-            
+
             // get the renderer and execute it
             Renderable renderer = RendererFactory.newRenderer(context, template);
             renderer.execute(rendererContext);
@@ -270,15 +270,15 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
-                Timer.stop(request, "RenderTemplate-" + templateId);            
+                Timer.stop(request, "RenderTemplate-" + templateId);
         }
     }
 
     /**
      * Renders a region for a given template.
-     *  
+     *
      * @param context
      * @param request
      * @param response
@@ -286,7 +286,7 @@ public class RenderUtil
      * @param regionId
      * @param regionScopeId
      * @throws Exception
-     */    
+     */
     public static void renderRegion(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String templateId, String regionId, String regionScopeId)
@@ -297,7 +297,7 @@ public class RenderUtil
 
     /**
      * Renders a region for a given template.
-     *  
+     *
      * @param context
      * @param request
      * @param response
@@ -315,7 +315,7 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
-        
+
         // get the template
         TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context, templateId);
         if (template == null)
@@ -327,7 +327,7 @@ public class RenderUtil
         {
             // bind the rendering to this template
             RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
-            
+
             // regions have to set by hand (not auto populated)
             String regionSourceId = getSourceId(context, regionScopeId);
             rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
@@ -335,27 +335,41 @@ public class RenderUtil
             rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_SOURCE_ID, regionSourceId);
 
             // determine the region renderer
-            RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);            
-            
+            RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);
+
             // render in either one of two ways
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
             Component[] components = ModelUtil.findComponents(context, regionScopeId, regionSourceId, regionId, null);
             if (components.length != 0)
             {
-                // merge in component to render data
-                RendererContext compRenderData = RendererContextHelper.generate(context, components[0]);
-                rendererContext.putAll(compRenderData);
-                
-                // execute renderer
-                RenderUtil.executeRenderer(context, request, response, descriptor);
+                // if we are in passive mode, then we won't bother to execute
+                // the renderer.
+                // rather, we will notify the template that this component
+                // is bound to it
+                boolean passiveMode = Boolean.parseBoolean((String)context.getValue("passiveMode"));
+                if(passiveMode)
+                {
+                    // we don't render the component, we just inform the current
+                    // template what our component is
+                    template.setRenderingComponent(components[0]);
+                }
+                else
+                {
+                    // merge in component to render data
+                    RendererContext compRenderData = RendererContextHelper.generate(context, components[0]);
+                    rendererContext.putAll(compRenderData);
+
+                    // execute renderer
+                    RenderUtil.executeRenderer(context, request, response, descriptor);
+                }
             }
             else
             {
                 // if we couldn't find a component, then redirect to a
                 // region "no-component" renderer
-                RenderUtil.renderErrorHandlerPage(context, request, 
-                        response, 
+                RenderUtil.renderErrorHandlerPage(context, request,
+                        response,
                         WebFrameworkConstants.DISPATCHER_HANDLER_REGION_NO_COMPONENT,
                         WebFrameworkConstants.DEFAULT_DISPATCHER_HANDLER_REGION_NO_COMPONENT  );
             }
@@ -368,7 +382,7 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
         }
@@ -376,10 +390,10 @@ public class RenderUtil
 
     /**
      * Renders a given component with default chrome.
-     * 
+     *
      * If you would like to render a component without chrome, then
      * see the renderRawComponent method.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -395,16 +409,16 @@ public class RenderUtil
 
     /**
      * Renders a given component with the given chrome.
-     * 
+     *
      * If you would like to render a component without chrome, then
      * see the renderRawComponent method.
-     * 
+     *
      * @param context
      * @param request
      * @param response
      * @param componentId
      * @throws Exception
-     */    
+     */
     public static void renderComponent(RequestContext context,
             HttpServletRequest request, HttpServletResponse response,
             String componentId, String overrideChromeId) throws ComponentChromeRenderException
@@ -412,7 +426,7 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderComponent-" + componentId);
-        
+
         Component component = context.getModel().loadComponent(context, componentId);
         if (component == null)
         {
@@ -424,11 +438,11 @@ public class RenderUtil
         {
             // bind the rendering to this component
             RendererContext rendererContext = RendererContextHelper.bind(context, component, request, response);
-            
+
             // determine the component renderer given the specified chrome
             RendererDescriptor descriptor = getComponentChromeRendererDescriptor(
                     context, component, overrideChromeId);
-            
+
             if (descriptor != null)
             {
                 RenderUtil.executeRenderer(context, request, response, descriptor);
@@ -449,17 +463,17 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderComponent-" + componentId);
         }
     }
-    
+
     /**
      * Renders a given component instance.  This fetches the abstract renderer
      * instance for the given component's type and then binds configuration data
      * to the rendering engine.  It then executes the component.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -473,7 +487,7 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderRawComponent-" + componentId);
-        
+
         Component component = context.getModel().loadComponent(context,
                 componentId);
         if (component == null)
@@ -486,7 +500,7 @@ public class RenderUtil
         {
             // bind the rendering to this component
             RendererContext rendererContext = RendererContextHelper.bind(context, component, request, response);
-            
+
             // build a renderer for this component
             Renderable renderer = RendererFactory.newRenderer(context, component);
             renderer.execute(rendererContext);
@@ -502,7 +516,7 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderRawComponent-" + componentId);
         }
@@ -510,7 +524,7 @@ public class RenderUtil
 
     /**
      * Renders the fully formed URL string for a link to a given page
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -537,7 +551,7 @@ public class RenderUtil
     /**
     /**
      * Renders the fully formed URL string for a link to a given content object
-     *  
+     *
      * @param context
      * @param request
      * @param response
@@ -565,7 +579,7 @@ public class RenderUtil
 
     /**
      * Renders the fully formed URL string for a link to a given page type
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -588,7 +602,7 @@ public class RenderUtil
             }
         }
     }
-    
+
     public static String renderScriptImport(RequestContext context, String src)
     {
         if (context instanceof HttpRequestContext)
@@ -697,13 +711,13 @@ public class RenderUtil
     {
         response.getWriter().print(str);
     }
-       
+
     /**
      * Executes a renderer inside of a wrapped context so that the
      * output stream is trapped and returned as a string.  The provided
      * servlet context objects are wrapped and used to help build
      * the output string.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -723,7 +737,7 @@ public class RenderUtil
      * output stream is trapped and returned as a string.  The provided
      * servlet context objects are wrapped and used to help build
      * the output string.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -743,7 +757,7 @@ public class RenderUtil
 
         // bind in a new renderer context
         RendererContextHelper.bind(context, wrappedRequest, fakeResponse);
-        
+
         // execute
         try
         {
@@ -757,15 +771,15 @@ public class RenderUtil
         {
             RendererContextHelper.unbind(context);
         }
-                
+
         // return the result
-        return fakeResponse.getContentAsString();        
+        return fakeResponse.getContentAsString();
     }
 
     /**
      * Executes a renderer against the given context and request.
      * The outputstream is committed directly to the given servlet objects.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -778,11 +792,11 @@ public class RenderUtil
     {
         executeRenderer(context, request, response, descriptor.getRendererType(), descriptor.getRenderer());
     }
-    
+
     /**
      * Executes a renderer against the given context and request.
      * The outputstream is committed directly to the given servlet objects.
-     *  
+     *
      * @param context
      * @param request
      * @param response
@@ -796,20 +810,20 @@ public class RenderUtil
     {
         // grab the renderer config
         RendererContext rendererContext = RendererContextHelper.current(context);
-                
+
         // build a renderer for this descriptor
-        Renderable rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer); 
+        Renderable rendererInstance = RendererFactory.newRenderer(context, rendererType, renderer);
         rendererInstance.execute(rendererContext);
     }
-    
+
     /**
      * Renders a system page
-     * 
+     *
      * A system page is a "special page" designed to handle one of a few
      * exception cases such as when an error occurs or a page has not
      * yet been configured.  We want to show something rather than
      * have an exception purely occur.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -822,10 +836,10 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderErrorHandlerPage-" + errorHandlerPageId);
-        
+
         // bind the rendering to this page
         RendererContextHelper.bind(context, request, response);
-    	
+
         String renderer = null;
         String rendererType = null;
         try
@@ -852,18 +866,18 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderErrorHandlerPage-" + errorHandlerPageId);
-        }        
+        }
     }
 
     /**
      * Renders a system container
-     * 
+     *
      * A system container is a page fragment that is rendered
      * as a container of other elements like components.
-     * 
+     *
      * @param context
      * @param request
      * @param response
@@ -876,10 +890,10 @@ public class RenderUtil
         // start a timer
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderSystemPage-" + systemPageId);
-        
+
         // bind the rendering to this page
         RendererContextHelper.bind(context, request, response);
-        
+
         String renderer = null;
         String rendererType = null;
         try
@@ -906,25 +920,25 @@ public class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-            
+
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderSystemPage-" + systemPageId);
         }
     }
-    
+
 
     // logic that I want to move somewhere else
 
     /**
      * Returns the renderer to use to render the given region
-     * 
+     *
      * Currently, this just resorts to using the system default but
      * the idea is that it could be overridden at various levels.
-     * 
+     *
      * For example, the Theme could change the default chrome for a region.
-     * 
+     *
      * Or, a specific region might be "forced" to another chrome.
-     * 
+     *
      */
     public static RendererDescriptor getRegionRendererDescriptor(RequestContext context, TemplateInstance template, String regionId, String chromeId)
     {
@@ -935,19 +949,19 @@ public class RenderUtil
         {
             chromeId = template.getCustomProperty("region-" + regionId + "-chrome");
         }
-        
+
         // see if a default chrome was specified
         if (chromeId == null)
         {
             chromeId = context.getConfig().getDefaultRegionChrome();
         }
-        
+
         // if there still isn't a chrome, then pick the system default
         if (chromeId == null)
         {
             chromeId = WebFrameworkConstants.DEFAULT_REGION_CHROME_ID;
         }
-        
+
         // load the chrome
         Chrome chrome = context.getModel().loadChrome(context, chromeId);
         if (chrome != null)
@@ -956,26 +970,26 @@ public class RenderUtil
             return new RendererDescriptor(chrome.getRenderer(), chrome.getRendererType());
         }
 
-        // assume it is a freemarker chrome        
+        // assume it is a freemarker chrome
         return new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
     }
 
     /**
      * Returns the renderer to use to render the given component chrome
-     * 
+     *
      * Currently, this just resorts to using the system default but
      * the idea is that it could be overridden at various levels.
-     * 
+     *
      * For example, the Theme could change the default chrome for
      * all components in the site.
-     * 
+     *
      * Or a specific component might override its settings.
      */
     public static RendererDescriptor getComponentChromeRendererDescriptor(
             RequestContext context, Component component, String chromeId)
     {
         RendererDescriptor descriptor = null;
-        
+
         // if the chrome id is empty, see if there is an override
         // this allows the component to "override" the chrome on a
         // per-component basis
@@ -983,13 +997,13 @@ public class RenderUtil
         {
             chromeId = component.getCustomProperty("chrome");
         }
-        
+
         // see if a default chrome was specified
         if (chromeId == null)
         {
             chromeId = context.getConfig().getDefaultComponentChrome();
-        }        
-        
+        }
+
         if (chromeId != null && chromeId.length() != 0)
         {
             // try to load the chrome
@@ -1004,26 +1018,33 @@ public class RenderUtil
                 // assume it's a freemarker renderer for system chrome
                 descriptor = new RendererDescriptor(chromeId, WebFrameworkConstants.RENDERER_TYPE_FREEMARKER);
             }
-  
+
         }
         // if no chrome specified, then we won't use any
-        
+
         return descriptor;
     }
-    
+
     /**
      * Generates text to be inserted into template markup head for a given
      * renderer context.  The renderer context must describe a template.
-     * 
+     *
      * @param rendererContext
-     * 
+     *
      * @return head tags render output
      */
     public static String processHeader(RendererContext rendererContext)
         throws RendererExecutionException
     {
+        // if we're in passive mode, just return empty string
+        boolean passiveMode = Boolean.parseBoolean((String)rendererContext.getRequestContext().getValue("passiveMode"));
+        if(passiveMode)
+        {
+            return "";
+        }
+
         RequestContext context = rendererContext.getRequestContext();
-        
+
         /**
          * Allow for the head tags to be generated once per request
          * If they're sought a second time, we can just throw down what
@@ -1034,32 +1055,32 @@ public class RenderUtil
         {
             StringBuilder buf = new StringBuilder(4096);
             buf.append(WebFrameworkConstants.WEB_FRAMEWORK_SIGNATURE);
-            buf.append(NEWLINE); 
-            
+            buf.append(NEWLINE);
+
             /**
              * This is a work in progress.  Still not sure what the best
              * way is to define a "global" include.
-             * 
+             *
              * With this approach, allow a global.head.renderer.xml file
              * to live as a Configuration object.
-             * 
+             *
              * If this file is available, it is automatically read
              * and the renderer described therein is executed.
              */
             String rendererType = null;
             String renderer = null;
             try
-            {         
+            {
                 Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
                 if (config != null)
                 {
                     // renderer properties
                     rendererType = config.getProperty("renderer-type");
                     renderer = config.getProperty("renderer");
-                                    
-                    // execute renderer                    
+
+                    // execute renderer
                     String tags = RenderUtil.processRenderer(context, rendererContext.getRequest(), rendererContext.getResponse(), rendererType, renderer);
-                    
+
                     buf.append(tags);
                     buf.append(NEWLINE);
                 }
@@ -1068,32 +1089,37 @@ public class RenderUtil
             {
                 throw new RendererExecutionException("Unable to render global include for renderer: " + renderer + " of type: " + rendererType, ex);
             }
-            
+
             // If the current renderer is rendering a TemplateInstance,
             // then we should additionally process downstream components
             if (rendererContext.getObject() instanceof TemplateInstance)
             {
+				TemplateInstance template = (TemplateInstance) rendererContext.getObject();
+
                 Component component = null;
                 try
                 {
-                    Component[] components = RenderUtil.getCurrentComponentBindings(context);
-                    for (int i = 0; i < components.length; i++)
+                    Component[] components = template.getRenderingComponents();
+                    if(components != null)
                     {
-                        component = components[i];
-                        
-                        // bind the component into context
-                        RendererContext componentRendererContext = RendererContextHelper.bind(context, component, rendererContext.getRequest(), rendererContext.getResponse());
-                        
-                        Renderable renderable = RendererFactory.newRenderer(context, component);
-                        String head = renderable.head(componentRendererContext);
-                        if (head != null)
+                        for (int i = 0; i < components.length; i++)
                         {
-                            buf.append(head);
-                            buf.append(NEWLINE);
+                            component = components[i];
+
+                            // bind the component into context
+                            RendererContext componentRendererContext = RendererContextHelper.bind(context, component, rendererContext.getRequest(), rendererContext.getResponse());
+
+                            Renderable renderable = RendererFactory.newRenderer(context, component);
+                            String head = renderable.head(componentRendererContext);
+                            if (head != null)
+                            {
+                                buf.append(head);
+                                buf.append(NEWLINE);
+                            }
+
+                            // unbind the component
+                            RendererContextHelper.unbind(context);
                         }
-                        
-                        // unbind the component
-                        RendererContextHelper.unbind(context);
                     }
                 }
                 catch (RendererNotFoundException rnfe)
@@ -1107,46 +1133,12 @@ public class RenderUtil
                     throw new RendererExecutionException("HEAD Renderer failed to execute for component: " + component.getId(), ree);
                 }
             }
-            
+
             // bind result into request context
             headTags = buf.toString();
             context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);
         }
-        
+
         return headTags;
-    }
-    
-    /**
-     * Retrieves all of the component bindings that are present on the
-     * current view (global + template + page)
-     * 
-     * @param context
-     * @return
-     */
-    protected static Component[] getCurrentComponentBindings(RequestContext context)
-    {
-        Component[] globalComponents = ModelUtil.findComponents(context, null, WebFrameworkConstants.REGION_SCOPE_GLOBAL, null, null);
-        Component[] templateComponents = ModelUtil.findComponents(context, null, context.getTemplateId(), null, null);
-        Component[] pageComponents = ModelUtil.findComponents(context, null, context.getPageId(), null, null);
-        
-        Component[] array = new Component[globalComponents.length + templateComponents.length + pageComponents.length];
-        int z = 0;
-        for(int i = 0; i < globalComponents.length; i++)
-        {
-            array[z] = globalComponents[i];
-            z++;
-        }
-        for(int i = 0; i < templateComponents.length; i++)
-        {
-            array[z] = templateComponents[i];
-            z++;
-        }
-        for(int i = 0; i < pageComponents.length; i++)
-        {
-            array[z] = pageComponents[i];
-            z++;
-        }
-        
-        return array;
     }
 }
