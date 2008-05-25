@@ -18,7 +18,7 @@
          		<td><input type="submit" value="Login"/></td>
          	</tr>
          </table>
-         <input type="hidden" name="success" value="<#if alfRedirectUrl?exists>${alfRedirectUrl}<#else>${url.context}</#if>"/>
+         <input type="hidden" name="success" value="${successUrl}"/>
          <input type="hidden" name="failure" value=""/>
       </fieldset>
    </form>
