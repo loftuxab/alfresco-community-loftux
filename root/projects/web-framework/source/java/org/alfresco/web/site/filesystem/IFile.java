@@ -44,7 +44,7 @@ public interface IFile
 
     public boolean isFile();
 
-    public long getModificationDate();
+    public long getModificationTime();
 
     public byte[] readBytes();
 

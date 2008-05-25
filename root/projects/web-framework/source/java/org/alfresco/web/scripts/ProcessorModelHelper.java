@@ -46,6 +46,35 @@ import org.alfresco.web.site.renderer.RendererContext;
 public class ProcessorModelHelper
 {
     public static final String PROP_HTMLID = "htmlid";
+    
+    /**
+     * Templates have the following:
+     * 
+     * sitedata
+     * context
+     * content
+     * user
+     * instance (current object being rendered)
+     * page (legacy but souped up)
+     * theme
+     * htmlid
+     * 
+     * url
+     * head
+     * 
+     * 
+     * Components have the following
+     * 
+     * sitedata
+     * context
+     * content
+     * user
+     * instance (current object being rendered)
+     * page (legacy but souped up)
+     * theme
+     * htmlid
+     * 
+     */
 
     /**
      * Populates the model with common things for all processors
@@ -69,11 +98,19 @@ public class ProcessorModelHelper
         // information about the current page being rendererd
         if (context.getPage() != null)
         {
+            // TODO:Remove these
+            // it should be ${page.description} and ${page.title}
             model.put("description", context.getPage().getDescription());
             model.put("title", context.getPage().getTitle());
+            // TODO: End of remove this
             
             // custom page properties - add to model
+            // TODO: Remove this
+            // Instead of retrieving properties from the root scope
+            // we should use ${instance.properties["abc"]}
             model.putAll(context.getPage().getCustomProperties());
+            // TODO: End of remove this
+
             
             // "page" object
             Map<String, Object> pageModel = new HashMap<String, Object>(4);
@@ -93,25 +130,48 @@ public class ProcessorModelHelper
             }
             pageModel.put("id", context.getPage().getId());
             pageModel.put("title", context.getPage().getTitle());
+            pageModel.put("description", context.getPage().getDescription());
             pageModel.put("theme", ThemeUtil.getCurrentThemeId(context));
             model.put("page", pageModel);
         }
         
+        
         // things from the current template
+        // TODO: Remove this
+        // instead of getting template properties from the root scope
+        // we should use ${instance.properties["abc"]}
         if (context.getTemplate() != null)
         {
             model.putAll(context.getTemplate().getCustomProperties());
         }
+        // TODO: End of Remove this
         
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
         
-        // add in the web framework script objects
-        model.put("site", new ScriptSite(context)); // TODO: Remove this
-        model.put("sitedata", new ScriptSite(context));
+        //
+        // add in the root-scoped web framework script objects
+        //
+        ScriptSiteData scriptSiteData = new ScriptSiteData(context); 
+        model.put("sitedata", scriptSiteData);
+        //
+        ScriptRequestContext scriptRequestContext = new ScriptRequestContext(context);
+        model.put("context", scriptRequestContext);
+        //
+        if(context.getCurrentObject() != null)
+        {
+            ScriptContentObject scriptContent = new ScriptContentObject(context, context.getCurrentObject());
+            model.put("content", scriptContent);
+        }
+        //
+        ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(rendererContext);
+        model.put("instance", scriptRenderer);
+        //
         if (context.getUser() != null)
         {
-            model.put("user", new ScriptUser(context, context.getUser()));
-        }        
+            ScriptUser scriptUser = new ScriptUser(context, context.getUser());
+            model.put("user", scriptUser);
+        }                        
+
         
         // we are also given the "rendering configuration" for the current
         // object.  usually, this is either a component or a template.
@@ -120,11 +180,15 @@ public class ProcessorModelHelper
         // it needs for the component or template to process
         if (rendererContext != null)
         {
+            // TODO: Remove this, it's redundant to do this
+            /*
             ModelObject object = rendererContext.getObject();
             if (object != null)
             {
                 model.putAll(object.getCustomProperties());
             }
+            */
+            // TODO: End of remove this
             
             String htmlBindingId = (String) rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
             if (htmlBindingId != null && htmlBindingId.length() > 0)
@@ -132,8 +196,11 @@ public class ProcessorModelHelper
                 model.put(PROP_HTMLID, htmlBindingId);
             }
             
+            // TODO: Remove this
+            // This has been replaced by ${instance.<property>} and stuff like that
             // copy in render data settings
-            model.putAll(rendererContext.map());
+            //model.putAll(rendererContext.map());
+            // TODO: End of remove this
         }
     }
     
@@ -228,6 +295,8 @@ public class ProcessorModelHelper
         model.put("component", new ComponentFreemarkerTagDirective(context));
         addDirective(context, model, "componentInclude", "org.alfresco.web.site.taglib.ComponentIncludeTag");
         addDirective(context, model, "pageTitle", "org.alfresco.web.site.taglib.PageTitleTag");
+        
+        // TODO: remove the directive tag
         addDirective(context, model, "require", "org.alfresco.web.site.taglib.RequireTag");
         
         // content specific

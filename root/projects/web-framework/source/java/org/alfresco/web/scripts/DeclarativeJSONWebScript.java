@@ -44,15 +44,9 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DeclarativeJSONWebScript extends AbstractWebScript
 {
-    // Logger
-    /** The Constant logger. */
     protected static final Log logger = LogFactory.getLog(DeclarativeJSONWebScript.class);
 
-    // Script Context
-    /** The base path. */
     protected String basePath;
-    
-    /** The execute script. */
     protected ScriptContent executeScript;
 
     /**

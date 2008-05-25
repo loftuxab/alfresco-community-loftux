@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site.renderer;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Stack;
 
@@ -234,7 +235,7 @@ public class RendererContextHelper
         if (newData != null)
         {
             // populate with custom properties settings
-            Map<String, Object> properties = object.getCustomProperties();
+            Map<String, Serializable> properties = object.getCustomProperties();
             newData.putAll(properties);
         }
         

@@ -54,7 +54,7 @@ public class LocalFile extends AbstractFileDirectory implements IFile
         return file.length();
     }
 
-    public long getModificationDate()
+    public long getModificationTime()
     {
         return file.lastModified();
     }

@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -39,7 +40,7 @@ import org.json.JSONObject;
 public class AlfrescoContent extends AbstractContent
 {
     protected JSONObject json;
-    protected Map<String, Object> properties;
+    protected Map<String, Serializable> properties;
 
     /**
      * Instantiates a new alfresco content.
@@ -83,11 +84,11 @@ public class AlfrescoContent extends AbstractContent
      * 
      * @see org.alfresco.web.site.Content#getProperties()
      */
-    public Map<String, Object> getProperties()
+    public Map<String, Serializable> getProperties()
     {
         if (this.properties == null)
         {
-            this.properties = new HashMap<String, Object>(48, 1.0f);
+            this.properties = new HashMap<String, Serializable>(48, 1.0f);
 
             // load in root level properties
             // this pulls in specific things which the repo-side
@@ -113,8 +114,14 @@ public class AlfrescoContent extends AbstractContent
                                 je);
                     }
                     if (value != null)
-                    {
-                        this.properties.put(key, value);
+                    {  
+                        if(value instanceof org.json.JSONArray)
+                        {
+                        }
+                        else
+                        {
+                            this.properties.put(key, (Serializable)value);
+                        }
                     }
                 }
             }
@@ -135,7 +142,7 @@ public class AlfrescoContent extends AbstractContent
                         Object value = props.get(key);
                         if (value != null)
                         {
-                            this.properties.put(key, value);
+                            this.properties.put(key, (Serializable)value);
                         }
                     }
                 }

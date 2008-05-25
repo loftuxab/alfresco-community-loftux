@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.connector.CredentialVault;
@@ -171,6 +172,16 @@ public abstract class AbstractRequestContext implements RequestContext
         }
     }
 
+    /**
+     * Returns an Iterator over the keys of the custom key/value pairs
+     * stored on this RequestContext instance
+     * 
+     * @return An iterator of String keys
+     */
+    public Iterator keys()
+    {
+        return map.keySet().iterator();
+    }
 
     /**
      * If a page instance is currently executing, it can be retrieved

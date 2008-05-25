@@ -31,18 +31,16 @@ import org.alfresco.web.site.RequestContext;
 
 /**
  * Declarative web script implementation that automatically self-provisions
- * with the Web Framework "dialog" and "wizard" root scope objects.
+ * with the Web Framework and "wizard" root scope objects.
  * 
  * As this inherits from DeclarativeSiteWebScript, web script implementations
- * also receive the "site" root scope object.
+ * also receive the "sitedata" root scope object.
  * 
  * @author muzquiano
  */
 public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
 {
-    
     private static final String ROOT_SCOPE_WIZARD = "wizard";
-    private static final String ROOT_SCOPE_DIALOG = "dialog";
 
     /**
      * Instantiates a new declarative site wizard web script.
@@ -79,9 +77,6 @@ public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
         RequestContext context = getRequestContext(req);
         if (context != null)
         {
-            ScriptDialog scriptDialog = new ScriptDialog(context);
-            params.put(ROOT_SCOPE_DIALOG, scriptDialog);
-
             ScriptWizard scriptWizard = new ScriptWizard(context);
             scriptWizard.setModel(params);
             params.put(ROOT_SCOPE_WIZARD, scriptWizard);

@@ -34,14 +34,12 @@ import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * Declarative web script implementation that automatically self-provisions
- * with the Web Framework "site" root objects.
+ * with the Web Framework "sitedata" root objects.
  * 
  * @author muzquiano
  */
 public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
 {
-    
-    private static final String ROOT_SCOPE_SITE = "site";
     private static final String ROOT_SCOPE_SITEDATA = "sitedata";
     
     protected Store store;
@@ -85,9 +83,9 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
 
     /**
      * This is overridden so that all web script implementation classes that
-     * inherit from this one automatically have a "site" root object.
+     * inherit from this one automatically have a "sitedata" root object.
      * 
-     * This also makes sure that the "site" root object is set up with an
+     * This also makes sure that the "sitedata" root object is set up with an
      * appropriate request context implementation that uses the correct store.
      * 
      * @param req the req
@@ -104,9 +102,8 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
         RequestContext context = getRequestContext(req);
         if (context != null)
         {
-            ScriptSite scriptSite = new ScriptSite(context);
-            params.put(ROOT_SCOPE_SITE, scriptSite); // TODO: Remove
-            params.put(ROOT_SCOPE_SITEDATA, scriptSite);
+            ScriptSiteData scriptSiteData = new ScriptSiteData(context);
+            params.put(ROOT_SCOPE_SITEDATA, scriptSiteData);
         }
         return params;
     }

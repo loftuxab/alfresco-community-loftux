@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -69,7 +70,7 @@ public interface Content
 	 * 
 	 * @return the properties
 	 */
-	public Map<String, Object> getProperties();
+	public Map<String, Serializable> getProperties();
 	
 	/**
 	 * Returns the endpoint id from which the content was retrieved

@@ -86,7 +86,7 @@ public class ModelObjectCache extends BasicCache
             {
                 try
                 {
-                    long currentModificationTime = file.getModificationDate();
+                    long currentModificationTime = file.getModificationTime();
                     if (currentModificationTime > cachedModificationTime)
                     {
                         remove(key);

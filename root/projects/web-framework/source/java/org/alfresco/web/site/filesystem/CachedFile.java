@@ -72,10 +72,10 @@ public class CachedFile implements IFile
         return file.isFile();
     }
 
-    public long getModificationDate()
+    public long getModificationTime()
     {
         if (modDate == -1)
-            modDate = file.getModificationDate();
+            modDate = file.getModificationTime();
         return modDate;
     }
 

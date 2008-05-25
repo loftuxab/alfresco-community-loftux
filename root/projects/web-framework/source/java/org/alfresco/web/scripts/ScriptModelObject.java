@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -31,82 +31,266 @@ import java.util.Map;
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.model.ModelObject;
+import org.mozilla.javascript.Scriptable;
 
 /**
+ * Provides a write-able model object wrapper to the script engine.
+ * 
+ * The properties of this object are writeable which means that the
+ * developer has the option to use either the properties array or
+ * explicit methods.
+ * 
+ * The following commands are equivalent:
+ * 
+ * myObject.properties.title = "abc";
+ * myObject.properties["title"] = "abc";
+ * myObject.setProperty("title", "abc");
+ * 
+ * Note: The index on the properties array is not supported.  Thus, a command
+ * such as this:
+ * 
+ * myObject.properties[0] = "abc";
+ * 
+ * will no-op and do nothing.
+ * 
  * @author muzquiano
  */
-public final class ScriptModelObject implements Serializable
+public final class ScriptModelObject extends ScriptBase
 {
+    // unmodifiable "system" properties
+    private static final String PROP_ID = "id";
+    private static final String PROP_RELATIVE_FILE_PATH = "relativeFilePath";
+    private static final String PROP_FILE_NAME = "fileName";
+    private static final String PROP_RELATIVE_PATH = "relativePath";
+    private static final String PROP_TIMESTAMP = "timestamp";
     private static final long serialVersionUID = -3378946227712939601L;
-
-    protected RequestContext context;
     protected ModelObject modelObject;
     
+    /**
+     * Instantiates a new script model object.
+     * 
+     * @param context the context
+     * @param modelObject the model object
+     */
     public ScriptModelObject(RequestContext context, ModelObject modelObject)
     {
-        this.context = context;
+        super(context);
+        
+        // store a reference to the model object
         this.modelObject = modelObject;
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.AbstractScriptableObject#buildProperties()
+     */
+    protected ScriptableMap buildProperties()
+    {
+        if(this.properties == null)
+        {
+            this.properties = new ScriptableMap<String, Serializable>()
+            {
+                // trap this method so that we can adjust the model object
+                public void put(String name, Scriptable start, Object value)
+                {
+                    put(name, (Serializable)value);
 
+                    // update the model object
+                    modelObject.setProperty(name, (String) value);
+                }
+
+                // do not allow
+                public void put(int index, Scriptable start, Object value)
+                {
+                }
+
+                // trap this method so that we can adjust the model object
+                public void delete(String name)
+                {
+                    remove(name);
+                    
+                    // update the model object
+                    modelObject.removeProperty(name);
+                }
+
+                // do not allow
+                public void delete(int index)
+                {
+                }
+            };
+    
+            // add in all of our model object properties
+            Map allProperties = modelObject.getProperties();
+            Iterator it = allProperties.keySet().iterator();
+            while (it.hasNext())
+            {
+                String key = (String) it.next();
+                String value = (String) allProperties.get(key);
+                this.properties.put(key, value);
+            }
+        }
+        
+        return this.properties;
+    }
+    
+    
+    // --------------------------------------------------------------
+    // JavaScript Properties
+    //
+    
     public String getId()
     {
         return modelObject.getId();
     }
-
+    
     public String getTitle()
     {
         return modelObject.getTitle();
     }
-
-    public void setTitle(String value)
+    
+    public void setTitle(Object value)
     {
-        ParameterCheck.mandatory("value", value);
-        modelObject.setTitle(value);
+        if(value != null)
+        {
+            getProperties().put("title", value);
+        }
+        else
+        {
+            getProperties().delete("title");
+        }
     }
     
     public String getDescription()
     {
         return modelObject.getDescription();
     }
-
-    public void setDescription(String value)
+    
+    public void setDescription(Object value)
     {
-        ParameterCheck.mandatory("value", value);
-        modelObject.setDescription(value);
+        if(value != null)
+        {
+            getProperties().put("description", value);
+        }
+        else
+        {
+            getProperties().delete("description");
+        }
+    }
+    
+    public long getTimestamp()
+    {
+        return modelObject.getModificationTime();
+    }
+    
+    public String getRelativePath()
+    {
+        return modelObject.getRelativePath();
+    }
+    
+    public String getFileName()
+    {
+        return modelObject.getFileName();
+    }
+    
+    public String getRelativeFilePath()
+    {
+        return modelObject.getRelativeFilePath();
     }
 
+    
+    // --------------------------------------------------------------
+    // JavaScript Functions
+    //    
+    
+    
+    /**
+     * Save.
+     */
     public void save()
     {
+        // retrieve values from our properties array
+        Iterator it = getProperties().keySet().iterator();
+        while(it.hasNext())
+        {
+            String propertyName = (String) it.next();
+            String propertyValue = (String) getProperties().get(propertyName);
+            modelObject.setProperty(propertyName, propertyValue);
+        }
+        
         modelObject.save(context);
     }
 
+    /**
+     * Reload.
+     */
     public void reload()
     {
         modelObject.reload(context);
+        
+        // this forces all of the properties to reload
+        this.properties = null;
     }
 
+    /**
+     * Removes the.
+     */
     public void remove()
     {
         modelObject.remove(context);
     }
 
+    /**
+     * To xml.
+     * 
+     * @return the string
+     */
     public String toXML()
     {
         return modelObject.toXML();
     }
-
+    
+    /**
+     * Touch.
+     */
+    public void touch()
+    {
+        modelObject.touch();
+        
+        // this forces all of the properties to reload
+        this.properties = null;
+    }
+    
+    /**
+     * Gets the boolean property.
+     * 
+     * @param propertyName the property name
+     * 
+     * @return the boolean property
+     */
     public boolean getBooleanProperty(String propertyName)
     {
         ParameterCheck.mandatory("propertyName", propertyName);
         return modelObject.getBooleanProperty(propertyName);
     }
 
+    /**
+     * Gets the property.
+     * 
+     * @param propertyName the property name
+     * 
+     * @return the property
+     */
     public String getProperty(String propertyName)
     {
         ParameterCheck.mandatory("propertyName", propertyName);
         return modelObject.getProperty(propertyName);
     }
 
+    /**
+     * Sets the property.
+     * 
+     * @param propertyName the property name
+     * @param propertyValue the property value
+     */
     public void setProperty(String propertyName, String propertyValue)
     {
         ParameterCheck.mandatory("propertyName", propertyName);
@@ -114,72 +298,14 @@ public final class ScriptModelObject implements Serializable
         modelObject.setProperty(propertyName, propertyValue);
     }
 
+    /**
+     * Removes the property.
+     * 
+     * @param propertyName the property name
+     */
     public void removeProperty(String propertyName)
     {
         ParameterCheck.mandatory("propertyName", propertyName);
         modelObject.removeProperty(propertyName);
-    }
-
-    public long getModificationTime()
-    {
-        return modelObject.getModificationTime();
-    }
-
-    public void setModificationTime(long modificationTime)
-    {
-        ParameterCheck.mandatory("modificationTime", modificationTime);
-        modelObject.setModificationTime(modificationTime);
-    }
-
-    public void touch()
-    {
-        modelObject.touch();
-    }
-
-    public String getRelativePath()
-    {
-        return modelObject.getRelativePath();
-    }
-
-    public String getFileName()
-    {
-        return modelObject.getFileName();
-    }
-
-    public String getRelativeFilePath()
-    {
-        return modelObject.getRelativeFilePath();
-    }
-
-    public Map getProperties()
-    {
-        ScriptableMap map = new ScriptableMap();
-
-        Map properties = modelObject.getProperties();
-        Iterator it = properties.keySet().iterator();
-        while (it.hasNext())
-        {
-            String key = (String) it.next();
-            String value = (String) properties.get(key);
-            map.put(key, value);
-        }
-
-        return map;
-    }
-    
-    public Map getCustomProperties()
-    {
-    	ScriptableMap map = new ScriptableMap();
-    	
-        Map properties = modelObject.getCustomProperties();
-        Iterator it = properties.keySet().iterator();
-        while (it.hasNext())
-        {
-            String key = (String) it.next();
-            String value = (String) properties.get(key);
-            map.put(key, value);
-        }
-
-        return map;
-    }
+    }    
 }
