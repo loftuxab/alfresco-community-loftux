@@ -1,8 +1,7 @@
-var successUrl = url.context;
-
-if(typeof alfRedirectUrl!="undefined")
+var successUrl = context.properties["alfRedirectUrl"];
+if(successUrl == null)
 {
-	successUrl = alfRedirectUrl;
+	successUrl = url.context;
 }
 
 model.successUrl = successUrl;

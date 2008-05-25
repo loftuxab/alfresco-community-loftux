@@ -1,2 +1,2 @@
 // log the user off
-site.logout();
+sitedata.logout();

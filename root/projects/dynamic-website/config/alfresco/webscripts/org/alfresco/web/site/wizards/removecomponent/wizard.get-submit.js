@@ -4,10 +4,10 @@
 var componentId = wizard.request("componentId");
 if(componentId != null)
 {
-	var component = site.getObject(componentId);
+	var component = sitedata.getObject(componentId);
 	if(component != null)
 	{
-		site.unassociateComponent(componentId);
+		sitedata.unassociateComponent(componentId);
 	}
 }
 

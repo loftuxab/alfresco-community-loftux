@@ -3,7 +3,7 @@
 
 // things we receive
 var componentId = wizard.request("componentId");
-var component = site.getObject(componentId);
+var component = sitedata.getObject(componentId);
 if(component != null)
 {
 	component.setProperty("orientation", orientation);

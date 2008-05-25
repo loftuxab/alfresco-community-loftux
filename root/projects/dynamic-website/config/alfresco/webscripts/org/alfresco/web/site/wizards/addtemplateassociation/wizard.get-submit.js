@@ -6,8 +6,8 @@
 // binding: templateTypeId
 
 
-var page = site.getObject(pageId);
-var templateType = site.getObject(templateTypeId);
+var page = sitedata.getObject(pageId);
+var templateType = sitedata.getObject(templateTypeId);
 
 logger.log("pageId: " + pageId);
 logger.log("formatId: " + formatId);
@@ -17,13 +17,13 @@ var completed = false;
 if(pageId != null && templateTypeId != null && formatId != null)
 {
 	// create a new template
-	var template = site.newTemplate();
+	var template = sitedata.newTemplate();
 	template.setProperty("template-type", templateTypeId);
 	template.save();
 	
 	// associate template to page
 	var templateId = template.getId();
-	site.associateTemplate(templateId, pageId, formatId);
+	sitedata.associateTemplate(templateId, pageId, formatId);
 	completed = true;
 }
 

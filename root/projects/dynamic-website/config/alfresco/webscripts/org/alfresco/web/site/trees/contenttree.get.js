@@ -7,22 +7,22 @@ var avmStoreId = args["avmStoreId"];
 // return
 var json = new Array();
 
-var fs = site.getFileSystem();
+var fs = sitedata.fileSystem;
 var rootFile = fs.getFile(relativePath);
 
-var children = rootFile.getChildren();
+var children = rootFile.children;
 for(var i = 0; i < children.length; i++)
 {
 	var scriptFile = children[i];
+	var fileName = scriptFile.name;
 	
 	json[i] = { };
-	var fileName = scriptFile.getName();
-	json[i]["text"] = fileName;	
+	json[i]["text"] = fileName;
 	json[i]["draggable"] = true;
 	json[i]["leaf"] = true;
 	
 	// file case
-	if(scriptFile.isFile())
+	if(scriptFile.isFile)
 	{
 		json[i]["alfType"] = "file";
 		
@@ -71,10 +71,10 @@ for(var i = 0; i < children.length; i++)
 	}
 	
 	// directory case
-	if(scriptFile.isDirectory())
+	if(scriptFile.isDirectory)
 	{
 		json[i]["alfType"] = "directory";
-		if(scriptFile.getChildren() != null && scriptFile.getChildren().length > 0)
+		if(scriptFile.children != null && scriptFile.children.length > 0)
 		{
 			json[i]["leaf"] = false;
 		}

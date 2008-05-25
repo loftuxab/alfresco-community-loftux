@@ -8,13 +8,13 @@ if(formatId == null)
 	formatId = "default"; // TODO CHANGE THIS
 
 // load the page
-var page = site.getObject(pageId);
+var page = sitedata.getObject(pageId);
 
 // remove the template
 var completed = false;
 if(page != null)
 {
-	site.removeTemplate(pageId, formatId);
+	sitedata.removeTemplate(pageId, formatId);
 	completed = true;
 }
 

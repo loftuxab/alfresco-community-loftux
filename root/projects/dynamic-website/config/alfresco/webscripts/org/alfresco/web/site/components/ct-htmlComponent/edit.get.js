@@ -3,13 +3,13 @@
 
 // inputs
 var componentId = wizard.request("componentId");
-var component = site.getObject(componentId);
+var component = sitedata.getObject(componentId);
 
 // process
 if(component != null)
 {
 	var markupData = wizard.getSafeProperty(component, "markupData");
-	markupData = site.decode(markupData);
+	markupData = sitedata.decode(markupData);
 
 	// the controls
 	wizard.addElement("markupData", markupData);

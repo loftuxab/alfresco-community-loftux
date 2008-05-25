@@ -32,7 +32,7 @@ if(nodeId != null)
 	
 	if("component-types" == nodeId)
 	{
-		var componentTypes = site.getComponentTypes();
+		var componentTypes = sitedata.getComponentTypes();
 		for(var i = 0; i < componentTypes.length; i++)
 		{
 			var componentType = componentTypes[i];
@@ -50,14 +50,14 @@ if(nodeId != null)
 
 	if("web-script-components" == nodeId)
 	{
-		var dirs = site.getModelFileSystem().getFiles("/site-webscripts");
+		var dirs = sitedata.getModelFileSystem().getFiles("/site-webscripts");
 		if(dirs != null)
 		{
 			for(var x = 0; x < dirs.length; x++)
 			{
 				if(dirs[x].isDirectory())
 				{
-					var files = site.getModelFileSystem().getFiles("/site-webscripts/" + dirs[x].getName());
+					var files = sitedata.getModelFileSystem().getFiles("/site-webscripts/" + dirs[x].getName());
 					if(files != null)
 					{
 						for(var i = 0; i < files.length; i++)

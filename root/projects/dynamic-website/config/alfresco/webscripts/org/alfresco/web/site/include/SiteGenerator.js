@@ -9,12 +9,12 @@ function clearCurrentSite()
 {
 	// note: we do not remove TemplateTypes or ComponentTypes
 	// since those are reusable
-	removeObjects(site.getComponents());
-	//removeObjects(site.getConfigurations()); // don't delete these
-	removeObjects(site.getContentAssociations());
-	removeObjects(site.getPages());
-	removeObjects(site.getPageAssociations());
-	removeObjects(site.getTemplates());
+	removeObjects(sitedata.getComponents());
+	//removeObjects(sitedata.getConfigurations()); // don't delete these
+	removeObjects(sitedata.getContentAssociations());
+	removeObjects(sitedata.getPages());
+	removeObjects(sitedata.getPageAssociations());
+	removeObjects(sitedata.getTemplates());
 }
 
 function generateSite(siteType)
@@ -46,7 +46,7 @@ function generateSite(siteType)
 
 function buildBasicPublicWebsite()
 {
-	var rootPage = site.getRootPage();
+	var rootPage = sitedata.getRootPage();
 	
 	// create root navigation nodes
 	var nd1 = newPage("Products", rootPage);

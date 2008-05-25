@@ -3,7 +3,7 @@
 
 // get the navigation node
 var pageId = wizard.request("pageId");
-var page = site.getObject(pageId);
+var page = sitedata.getObject(pageId);
 
 
 // set up form elements

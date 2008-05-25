@@ -3,7 +3,7 @@
 
 // inputs
 var componentId = wizard.request("componentId");
-var component = site.getObject(componentId);
+var component = sitedata.getObject(componentId);
 
 // process
 if(component != null)

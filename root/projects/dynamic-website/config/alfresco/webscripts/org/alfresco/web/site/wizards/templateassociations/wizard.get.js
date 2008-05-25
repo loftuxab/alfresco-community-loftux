@@ -2,7 +2,7 @@
 
 
 var pageId = wizard.request("pageId");
-var page = site.getObject(pageId);
+var page = sitedata.getObject(pageId);
 
 wizard.addGridColumn("formatid", "Format");
 wizard.addGridColumn("templatename", "Template Name");
@@ -22,7 +22,7 @@ wizard.addGridNoDataMessage("There are no templates associated with this node.")
 
 
 // get all of the templates associated to this node
-var templates = site.findTemplatesMap(pageId);
+var templates = sitedata.findTemplatesMap(pageId);
 for(formatId in templates)
 {
 	var template = templates[formatId];

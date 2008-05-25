@@ -3,7 +3,7 @@
 
 
 var okay = true;
-var endpoints = site.getEndpoints();
+var endpoints = sitedata.getEndpoints();
 for(var x = 0; x < endpoints.length; x++)
 {
 	var _endpointId = endpoints[x].getProperty("endpointId");
@@ -15,7 +15,7 @@ wizard.setResponseMessage("Successfully created endpoint.");
 
 if(okay)
 {
-	var endpoint = site.newEndpoint();
+	var endpoint = sitedata.newEndpoint();
 	
 	endpoint.setProperty("endpoint-id", endpointId);
 	

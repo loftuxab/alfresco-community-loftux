@@ -2,8 +2,7 @@
 
 // get the existing template
 var completed = false;
-logger.log("TEMPLATE ID: " + templateId);
-var template = site.getObject(templateId);
+var template = sitedata.getObject(templateId);
 if(template != null)
 {	
 	// do updates

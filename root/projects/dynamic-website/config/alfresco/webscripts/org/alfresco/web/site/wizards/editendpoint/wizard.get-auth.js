@@ -7,7 +7,7 @@ if(endpointObjectId != null && endpointObjectId != "")
 	wizard.addHiddenElement("endpointObjectId", endpointObjectId);
 
 	// data from the object
-	var endpoint = site.getObject(endpointObjectId);	
+	var endpoint = sitedata.getObject(endpointObjectId);	
 	
 	// properties
 	var authId = wizard.getSafeProperty(endpoint, "auth-id");

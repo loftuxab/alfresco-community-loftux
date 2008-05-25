@@ -3,16 +3,16 @@
 
 // inputs
 var componentId = wizard.request("componentId");
-var component = site.getObject(componentId);
+var component = sitedata.getObject(componentId);
 
 // process
 if(component != null)
 {
 	var markupData = wizard.getSafeProperty(component, "markupData");
-	markupData = site.decode(markupData);
+	markupData = sitedata.decode(markupData);
 
 	// the controls
-	markupData = site.encode(markupData);
+	markupData = sitedata.encode(markupData);
 	wizard.addElement("markupData", markupData);
 	wizard.addElementFormat("markupData", null, "textarea", 460, 210);
 }

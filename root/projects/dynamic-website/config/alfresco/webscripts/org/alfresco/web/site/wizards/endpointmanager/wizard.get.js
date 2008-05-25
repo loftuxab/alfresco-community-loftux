@@ -20,7 +20,7 @@ wizard.addGridNoDataMessage("There are no endpoints currently defined.");
 
 
 // get all of the endpoints
-var endpoints = site.getEndpoints();
+var endpoints = sitedata.getEndpoints();
 for(var i = 0; i < endpoints.length; i++)
 {
 	var endpointId = endpoints[i].getProperty("endpoint-id");

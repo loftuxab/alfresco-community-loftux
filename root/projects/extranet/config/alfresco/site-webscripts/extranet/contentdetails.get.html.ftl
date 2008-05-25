@@ -5,7 +5,7 @@
 		ID
 	</td>
 	<td>
-		${content.getId()}
+		${content.id}
 	</td>
 </tr>
 <tr>
@@ -13,7 +13,7 @@
 		Type
 	</td>
 	<td>
-		${content.getTypeId()}
+		${content.typeId}
 	</td>
 </tr>
 <tr>
@@ -35,4 +35,4 @@
 
 </table>
 
-<a href="${content.getProperty("url")}">Download</a>
+<a href="${content.properties.url}">Download</a>

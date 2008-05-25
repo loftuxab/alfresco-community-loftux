@@ -24,7 +24,7 @@ wizard.addGridNoDataMessage("There are no associations currently defined.");
 
 
 // get all of the content template associations
-var associations = site.findContentAssociations(null, null, null, null);
+var associations = sitedata.findContentAssociations(null, null, null, null);
 for(var i = 0; i < associations.length; i++)
 {
 	var sourceId = associations[i].getProperty("source-id");
@@ -35,7 +35,7 @@ for(var i = 0; i < associations.length; i++)
 
 		var destId = associations[i].getProperty("dest-id");
 		var pageName = "NOT FOUND";
-		var page = site.getObject(destId);
+		var page = sitedata.getObject(destId);
 		if(page != null)
 			pageName = page.getTitle();
 

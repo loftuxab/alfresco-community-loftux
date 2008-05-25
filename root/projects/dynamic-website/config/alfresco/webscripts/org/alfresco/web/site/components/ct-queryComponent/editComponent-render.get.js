@@ -37,11 +37,11 @@ if(endpointId == null)
 // these are stored on the component
 // todo: rework and expose the configuration manager concept through javascript
 
-var componentAssociation = site.getObject(componentAssociationId);
+var componentAssociation = sitedata.getObject(componentAssociationId);
 if(componentAssociation != null)
 {
 	var componentId = componentAssociation.getProperty("componentId");
-	var component = site.getObject(componentId);
+	var component = sitedata.getObject(componentId);
 	if(component != null)
 	{
 		// RENDITION TYPE			
