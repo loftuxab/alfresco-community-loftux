@@ -8,10 +8,10 @@ if(formatId == null)
 	formatId = "default"; // TODO CHANGE THIS
 
 // load the page
-var page = site.getObject(pageId);
+var page = sitedata.getObject(pageId);
 
 // load the template
-var templatesMap = site.findTemplatesMap(pageId);
+var templatesMap = sitedata.findTemplatesMap(pageId);
 var template = templatesMap[formatId];
 if(template != null)
 {

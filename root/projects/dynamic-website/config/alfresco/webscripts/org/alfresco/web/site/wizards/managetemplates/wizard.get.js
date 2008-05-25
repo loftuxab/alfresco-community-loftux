@@ -23,7 +23,7 @@ wizard.addGridNoDataMessage("There are no templates currently defined for this w
 
 
 // get all of the templates
-var templates = site.getTemplates();
+var templates = sitedata.getTemplates();
 for(var i = 0; i < templates.length; i++)
 {
 	var array = new Array();
@@ -31,7 +31,7 @@ for(var i = 0; i < templates.length; i++)
 	array[1] = templates[i].getId();
 	array[2] = "";
 	
-	var templateType = site.getObject(templates[i].getProperty("template-type-id"));
+	var templateType = sitedata.getObject(templates[i].getProperty("template-type-id"));
 	if(templateType != null)
 		array[2] = templateType.getTitle();
 		

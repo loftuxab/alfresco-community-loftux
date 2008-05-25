@@ -8,18 +8,16 @@ if(path == null || path == "")
 
 path = path.replace(/ /g, "%20");
 
-// remote call
+// json
 var json = new Array();
-//var responseString = site.callRemote("http://localhost:8080", "admin", "admin", "/alfresco/service/content/query?path="+path);
-var responseString = site.callRemote("http://localhost:8080", "admin", "admin", "/alfresco/service/webframework/content/metadata?path="+path);
+
+// remote call
+var connector = remote.connect("alfresco-system");
+var responseString = connector.call("/webframework/content/metadata?path="+path);
 if(responseString != null)
 {
-	// this is done to convert the string to a javascript literal
-	var rString = "" + responseString.toString();
-
-	// get the response
-	var response = rString.parseJSON();
-
+	var response = eval('(' + responseString.toString() + ')');
+	
 	//
 	// walk the json tree and convert to the tree structure that the UI expects
 	//	
@@ -45,7 +43,6 @@ if(responseString != null)
 
 		// copy in some alfresco metadata
 		json[i]["cmType"] = node.type;
-
 
 		var icon = node.properties["{http://www.alfresco.org/model/application/1.0}icon"];
 		if(icon != null)

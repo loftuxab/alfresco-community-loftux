@@ -10,8 +10,8 @@ var json = new Array();
 
 // get children of this node
 var ctr = 0;
-var page = site.getObject(pageId);
-var associations = site.findChildPageAssociations(pageId, null);
+var page = sitedata.getObject(pageId);
+var associations = sitedata.findChildPageAssociations(pageId, null);
 for(var i = 0; i < associations.length; i++)
 {
 	var association = associations[i];
@@ -25,7 +25,7 @@ for(var i = 0; i < associations.length; i++)
 	if("child" == associationType)
 	{
 		// get the child node
-		var childNode = site.getObject(destId);
+		var childNode = sitedata.getObject(destId);
 		if(childNode != null)
 		{
 			json[ctr] = { };
@@ -38,7 +38,7 @@ for(var i = 0; i < associations.length; i++)
 			json[ctr]["text"] = childNode.getTitle();
 		
 			// does this have children?
-			var childAssociations = site.findChildPageAssociations(destId, null);
+			var childAssociations = sitedata.findChildPageAssociations(destId, null);
 			if(childAssociations.length == 0)
 				json[ctr]["leaf"] = true;
 			

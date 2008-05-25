@@ -9,7 +9,7 @@ if(endpointId == "")
 if(endpointId != null)
 {
 	// find the endpoint object
-	var endpoint = site.findEndpoint(endpointId);
+	var endpoint = sitedata.findEndpoint(endpointId);
 	if(endpoint != null)
 	{
 		// data from the object

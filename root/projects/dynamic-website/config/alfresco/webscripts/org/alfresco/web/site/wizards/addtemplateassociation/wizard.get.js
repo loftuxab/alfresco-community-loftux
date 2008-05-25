@@ -3,9 +3,9 @@
 
 // incomings
 var pageId = wizard.request("pageId");
-var page = site.getObject(pageId);
+var page = sitedata.getObject(pageId);
 
-var templateTypes = site.getTemplateTypes();
+var templateTypes = sitedata.getTemplateTypes();
 
 // set up form elements
 wizard.addHiddenElement("pageId", pageId);

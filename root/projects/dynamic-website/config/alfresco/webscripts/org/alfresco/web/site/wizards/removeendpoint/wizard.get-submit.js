@@ -6,7 +6,7 @@ var completed = false;
 var endpointId = wizard.request("endpointId");
 if(endpointId != null)
 {
-	var endpoint = site.findEndpoint(endpointId);
+	var endpoint = sitedata.findEndpoint(endpointId);
 	if(endpoint != null)
 	{
 		remove(endpoint);

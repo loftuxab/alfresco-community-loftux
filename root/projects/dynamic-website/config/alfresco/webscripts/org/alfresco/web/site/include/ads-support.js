@@ -31,19 +31,19 @@ function removeObjects(array)
 function assertSiteConfiguration(websiteName, websiteDescription)
 {
 	// ensure that we have a site configuration
-	var siteConfiguration = site.getSiteConfiguration();
+	var siteConfiguration = sitedata.getSiteConfiguration();
 	if(siteConfiguration == null)
-		siteConfiguration = site.newConfiguration();
+		siteConfiguration = sitedata.newConfiguration();
 	siteConfiguration.setTitle(websiteName);
 	siteConfiguration.setDescription(websiteDescription);
 	siteConfiguration.setProperty("source-id", "site");
 	siteConfiguration.save();
 
 	// ensure that we have a root page
-	var rootPage = site.getRootPage();
+	var rootPage = sitedata.getRootPage();
 	if(rootPage == null)
 	{
-		rootPage = site.newPage();
+		rootPage = sitedata.newPage();
 		rootPage.setTitle("Home");
 		rootPage.setProperty("root-page", "true");
 	}
@@ -54,7 +54,7 @@ function assertSiteConfiguration(websiteName, websiteDescription)
 
 function assertPage(pageId, pageName, pageDescription)
 {
-	var page = site.getObject(pageId);
+	var page = sitedata.getObject(pageId);
 	if(page != null)
 	{
 		page.setTitle(pageName);
@@ -66,14 +66,14 @@ function assertPage(pageId, pageName, pageDescription)
 
 function addChildPage(parentPageId, pageName, pageDescription)
 {
-	var childPage = site.newPage();
+	var childPage = sitedata.newPage();
 	childPage.setTitle(pageName);
 	childPage.setDescription(pageDescription);
 	childPage.save();
 	
 	// associate to parent with child relationship
 	if(parentPageId != null)
-		site.associatePage(parentPageId, childPage.getId());
+		sitedata.associatePage(parentPageId, childPage.getId());
 		
 	return childPage;
 }
@@ -81,23 +81,23 @@ function addChildPage(parentPageId, pageName, pageDescription)
 
 function removeChildPage(parentPageId, childPageId, recurse)
 {
-	site.unassociatePage(parentPageId, childPageId);
+	sitedata.unassociatePage(parentPageId, childPageId);
 }
 
 /*
 function findEndpoint(endpointId)
 {
-	return site.findEndpoint(endpointId);
+	return sitedata.findEndpoint(endpointId);
 }
 */
 
 function newPage(name, parentPage)
 {
-	var page = site.newPage();
+	var page = sitedata.newPage();
 	page.setTitle(name);
 	page.save();	
 	if(parentPage != null)
-		site.associatePage(parentPage.getId(), page.getId());		
+		sitedata.associatePage(parentPage.getId(), page.getId());		
 	return page;
 }
 
@@ -105,10 +105,10 @@ function newPage(name, parentPage)
 function newTemplate(name, templateTypeId)
 {
 	var template = null;
-	var templateType = site.getObject(templateTypeId);
+	var templateType = sitedata.getObject(templateTypeId);
 	if(templateType != null)
 	{
-		var template = site.newTemplate();
+		var template = sitedata.newTemplate();
 		template.setTitle(name);
 		template.setProperty("template-type", templateTypeId);		
 		template.save();
@@ -118,7 +118,7 @@ function newTemplate(name, templateTypeId)
 
 function newFreemarkerTemplate(name, uri)
 {
-	var template = site.newTemplate();
+	var template = sitedata.newTemplate();
 	template.setTitle(name);
 	template.setProperty("template-type", "freemarker");
 	template.setProperty("uri", uri);
@@ -129,22 +129,22 @@ function newFreemarkerTemplate(name, uri)
 
 function associateTemplate(page, template, formatId)
 {
-	site.associateTemplate(template.getId(), page.getId());
+	sitedata.associateTemplate(template.getId(), page.getId());
 }
 
 function associateContent(contentId, pageId, formatId)
 {
-	site.associateContent(contentId, pageId, formatId);
+	sitedata.associateContent(contentId, pageId, formatId);
 }
 
 function associateContentType(contentTypeId, pageId, formatId)
 {
-	site.associateContentType(contentTypeId, pageId, formatId);
+	sitedata.associateContentType(contentTypeId, pageId, formatId);
 }
 
 function newComponent(name, componentTypeId)
 {
-	var c = site.newComponent();
+	var c = sitedata.newComponent();
 	c.setTitle(name);
 	c.setProperty("component-type-id", componentTypeId);
 	c.save();
@@ -158,17 +158,17 @@ function associateSiteComponent(component, regionId)
 
 function associateGlobalComponent(component, regionId)
 {
-	site.associateComponent(component.getId(), "global", "global", regionId);
+	sitedata.associateComponent(component.getId(), "global", "global", regionId);
 }
 
 function associateTemplateComponent(component, template, regionId)
 {
-	site.associateComponent(component.getId(), "template", template.getId(), regionId);
+	sitedata.associateComponent(component.getId(), "template", template.getId(), regionId);
 }
 
 function associatePageComponent(component, page, regionId)
 {	
-	site.associateComponent(component.getId(), "page", page.getId(), regionId);
+	sitedata.associateComponent(component.getId(), "page", page.getId(), regionId);
 }
 
 function setConfig(o, propertyName, propertyValue)
@@ -235,7 +235,7 @@ function newWebScriptComponent(name, uri)
 function newEndpoint(endpointId, connectorId, authId, endpointUrl, defaultUri, identity, username, password)
 {
 /*
-	var endpoint = site.newEndpoint();
+	var endpoint = sitedata.newEndpoint();
 	endpoint.setProperty("endpoint-id", endpointId);
 
 	endpoint.setProperty("connector-id", connectorId);

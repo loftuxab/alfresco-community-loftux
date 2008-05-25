@@ -3,7 +3,7 @@
 // incoming endpoint id
 if(endpointObjectId != null && endpointObjectId != "")
 {
-	var endpoint = site.getObject(endpointObjectId);
+	var endpoint = sitedata.getObject(endpointObjectId);
 	
 	endpoint.setProperty("endpoint-id", endpointId);
 	

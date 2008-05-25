@@ -17,7 +17,7 @@ wizard.addElementFormat("componentTypeId", "Type", "combo", 290);
 wizard.addElementFormatKeyPair("componentTypeId", "emptyText", "Please select a Component Type");
 wizard.addElementFormatKeyPair("componentTypeId", "title", "Component Types");
 
-var componentTypes = site.getComponentTypes();
+var componentTypes = sitedata.getComponentTypes();
 for(var i = 0; i < componentTypes.length; i++)
 {
 	var _componentTypeId = componentTypes[i].getId();

@@ -22,11 +22,11 @@ var componentAssociationId = requestJSON["componentAssociationId"];
 // these are stored on the component
 // todo: rework and expose the configuration manager concept through javascript
 
-var componentAssociation = site.getObject(componentAssociationId);
+var componentAssociation = sitedata.getObject(componentAssociationId);
 if(componentAssociation != null)
 {
 	var componentId = componentAssociation.getProperty("componentId");
-	var component = site.getObject(componentId);
+	var component = sitedata.getObject(componentId);
 	if(component != null)
 	{
 		var queryType = component.getProperty("queryType");
@@ -58,7 +58,7 @@ if(componentAssociation != null)
 		addElement("endpointId", endpointId);
 		addElementFormat("endpointId", "Endpoint ID", "combo", 220);
 		addElementSelectionValue("endpointId", "none", "None");
-		var endpoints = site.getEndpointIds();
+		var endpoints = sitedata.getEndpointIds();
 		for(var z = 0; z < endpoints.length; z++)
 		{
 			var _endpointId = endpoints[z];

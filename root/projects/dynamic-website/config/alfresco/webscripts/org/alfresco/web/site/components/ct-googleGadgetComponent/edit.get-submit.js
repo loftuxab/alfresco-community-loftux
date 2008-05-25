@@ -2,10 +2,10 @@
 
 // things we receive
 var componentId = wizard.request("componentId");
-var component = site.getObject(componentId);
+var component = sitedata.getObject(componentId);
 if(component != null)
 {
-	markupData = site.encode(markupData);
+	markupData = sitedata.encode(markupData);
 	component.setProperty("markupData", markupData);
 	save(component);
 }

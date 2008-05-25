@@ -22,7 +22,7 @@ if(regionSourceId == null)
 //
 // create the component
 //
-var component = site.newComponent();
+var component = sitedata.newComponent();
 component.setProperty("name", componentName);
 component.setProperty("description", componentDescription);
 component.setProperty("component-type-id", componentTypeId);
@@ -34,7 +34,7 @@ save(component);
 // associate the component to the region
 //
 var componentId = component.getId();
-site.associateComponent(componentId, regionScopeId, regionSourceId, regionId);
+sitedata.associateComponent(componentId, regionScopeId, regionSourceId, regionId);
 
 
 

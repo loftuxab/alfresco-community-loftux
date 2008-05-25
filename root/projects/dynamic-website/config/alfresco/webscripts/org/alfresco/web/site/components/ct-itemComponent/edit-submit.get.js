@@ -9,11 +9,11 @@ var endpointId = getSafeElementValue("endpointId");
 
 // process
 var componentAssociationId = requestJSON["componentAssociationId"];
-var componentAssociation = site.getObject(componentAssociationId);
+var componentAssociation = sitedata.getObject(componentAssociationId);
 if(componentAssociation != null)
 {
 	var componentId = componentAssociation.getProperty("componentId");
-	var component = site.getObject(componentId);
+	var component = sitedata.getObject(componentId);
 	if(component != null)
 	{
 		component.setProperty("itemType", itemType);

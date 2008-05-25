@@ -53,7 +53,7 @@ if(proceed)
 		//
 		// binding a component
 		//
-		component = site.getObject(componentId);
+		component = sitedata.getObject(componentId);
 		componentTypeId = component.getProperty("component-type-id");
 		json["componentId"] = componentId;
 		json["componentId"] = componentTypeId;		
@@ -66,7 +66,7 @@ if(proceed)
 		//
 		
 		// build the component
-		component = site.newComponent();
+		component = sitedata.newComponent();
 		component.setProperty("component-type-id", componentTypeId);
 		save(component);
 	
@@ -84,7 +84,7 @@ if(proceed)
 	
 	if(component != null)
 	{
-		site.associateComponent(componentId, regionScopeId, regionSourceId, regionId);		
+		sitedata.associateComponent(componentId, regionScopeId, regionSourceId, regionId);		
 	}
 }
 

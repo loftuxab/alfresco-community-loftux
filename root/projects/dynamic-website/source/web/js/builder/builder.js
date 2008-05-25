@@ -1899,7 +1899,7 @@ function makeSearchPanel(panelId)
 function startSearchHandler(item, e)
 {
 	var searchQueryField = Ext.ComponentMgr.get('searchQueryField');
-	alert(searchQueryField.getValue());
+//	alert(searchQueryField.getValue());
 	
 	var webscriptUri = "/ads/search/lucene";
 	var proxiedURL = getAdsWebScriptURL(webscriptUri);
