@@ -45,7 +45,7 @@ import org.alfresco.web.site.model.ModelObject;
  */
 public final class RendererContext implements Serializable
 {
-    private Map<String, Object> map;
+    private Map<String, Serializable> map;
     private ModelObject object;
     private RequestContext context;
     private HttpServletRequest request;
@@ -53,7 +53,7 @@ public final class RendererContext implements Serializable
 
     public RendererContext()
     {
-        this.map = new HashMap<String, Object>();
+        this.map = new HashMap<String, Serializable>();
     }
 
     public RendererContext(RequestContext context, ModelObject object)
@@ -115,7 +115,7 @@ public final class RendererContext implements Serializable
         return this.context.getUser();
     }
     
-    public void put(String key, Object value)
+    public void put(String key, Serializable value)
     {
         this.map.put(key, value);
     }
@@ -151,7 +151,7 @@ public final class RendererContext implements Serializable
         return c;
     }
 
-    public void putAll(Map<String, Object> map)
+    public void putAll(Map<String, Serializable> map)
     {
         if(map != null)
         {
@@ -172,7 +172,7 @@ public final class RendererContext implements Serializable
         return map.keySet().iterator();
     }
     
-    public Map<String, Object> map()
+    public Map<String, Serializable> map()
     {
         return this.map;        
     }

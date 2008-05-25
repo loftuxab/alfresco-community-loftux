@@ -117,19 +117,19 @@ public interface ModelObject extends Serializable
     public String getProperty(String propertyName);
     public void setProperty(String propertyName, String propertyValue);
     public void removeProperty(String propertyName);
-    public Map<String, Object> getProperties();
+    public Map<String, Serializable> getProperties();
 
     // model properties
     public String getModelProperty(String propertyName);
     public void setModelProperty(String propertyName, String propertyValue);
     public void removeModelProperty(String propertyName);
-    public Map<String, Object> getModelProperties();
+    public Map<String, Serializable> getModelProperties();
     
     // custom properties
     public String getCustomProperty(String propertyName);
     public void setCustomProperty(String propertyName, String propertyValue);
     public void removeCustomProperty(String propertyName);
-    public Map<String, Object> getCustomProperties();
+    public Map<String, Serializable> getCustomProperties();
     
     // modification stamps
     public long getModificationTime();

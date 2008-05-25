@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
@@ -73,7 +74,7 @@ public class UnloadedContent extends AbstractContent
 	/* (non-Javadoc)
 	 * @see org.alfresco.web.site.Content#getProperties()
 	 */
-	public Map<String, Object> getProperties()
+	public Map<String, Serializable> getProperties()
 	{
 		return null;
 	}	

@@ -61,7 +61,7 @@ public abstract class AbstractFileDirectory implements IFile
 
     public abstract long length();
 
-    public abstract long getModificationDate();
+    public abstract long getModificationTime();
 
     public abstract String getName();
 

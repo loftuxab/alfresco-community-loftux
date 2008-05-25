@@ -24,7 +24,7 @@
  */
 package org.alfresco.web.site.model;
 
-import java.util.Collections;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +61,8 @@ public abstract class AbstractModelObject implements ModelObject
     protected boolean isSaved;
     protected long modificationTime;
     protected String modelVersion;
-    protected Map<String, Object> modelProperties;    
-    protected Map<String, Object> customProperties;
+    protected Map<String, Serializable> modelProperties;    
+    protected Map<String, Serializable> customProperties;
     
     // cached values
     protected String title;
@@ -473,9 +473,9 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getProperties()
      */
-    public Map<String, Object> getProperties()
+    public Map<String, Serializable> getProperties()
     {
-        Map<String, Object> properties = new HashMap<String, Object>();
+        Map<String, Serializable> properties = new HashMap<String, Serializable>(16, 1.0f);
         properties.putAll(getModelProperties());
         properties.putAll(getCustomProperties());
         return properties;        
@@ -484,11 +484,11 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getModelProperties()
      */
-    public Map<String, Object> getModelProperties()
+    public Map<String, Serializable> getModelProperties()
     {
     	if (this.modelProperties == null)
     	{
-    		modelProperties = new HashMap<String, Object>(16);
+    		modelProperties = new HashMap<String, Serializable>(16, 1.0f);
     		
     		List elements = getDocument().getRootElement().elements();
 	        for (int i = 0; i < elements.size(); i++)
@@ -511,11 +511,11 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getCustomProperties()
      */
-    public Map<String, Object> getCustomProperties()
+    public Map<String, Serializable> getCustomProperties()
     {
     	if (this.customProperties == null)
     	{
-    		this.customProperties = new HashMap<String, Object>(8);
+    		this.customProperties = new HashMap<String, Serializable>(8, 1.0f);
     		
     		Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
 	        if (properties != null)

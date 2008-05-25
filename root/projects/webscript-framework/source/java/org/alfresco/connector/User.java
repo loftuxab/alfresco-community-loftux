@@ -54,6 +54,7 @@ public class User implements java.security.Principal, Serializable
     public static String PROP_JOB_TITLE = "job_title";
     public static String PROP_ORGANIZATION = "organization";
 
+    protected String fullName = null;
     protected boolean isAdmin = false;
     protected Map<String, Serializable> map = null;
 
@@ -458,5 +459,55 @@ public class User implements java.security.Principal, Serializable
     public String toString()
     {
         return map.toString();
+    }
+    
+    /**
+     * Provides the full name for the user.  This makes a best attempt at
+     * building the full name based on what it knows about the user.
+     * 
+     * If a first name is not known, the returned name will be the user id
+     * of the user.
+     * 
+     * If a first name is known, then the first name will be returned.
+     * If a first and middle name are known, then the first and middle name
+     * will be returned.
+     * 
+     * Valid full names are therefore:
+     * 
+     *      jsmith
+     *      Joe
+     *      Joe D
+     *      Joe Smith
+     *      Joe D Smith
+     * 
+     * @return A valid full name
+     */
+    public String getFullName()
+    {
+        if(this.fullName == null)
+        {
+            boolean hasFirstName = (getFirstName() != null && getFirstName().length() > 0);
+            boolean hasMiddleName = (getMiddleName() != null && getMiddleName().length() > 0);
+            boolean hasLastName = (getLastName() != null && getLastName().length() > 0);
+            
+            // if they don't have a first name, then use their user id
+            this.fullName = getId();
+            if(hasFirstName)
+            {
+                this.fullName = getFirstName();
+                
+                if(hasMiddleName)
+                {
+                    this.fullName += " " + getMiddleName();
+                }
+                
+                if(hasLastName)
+                {
+                    this.fullName += " " + getLastName();
+                }
+            }
+        }
+        
+        return this.fullName;
     }
 }

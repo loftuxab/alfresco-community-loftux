@@ -135,7 +135,7 @@ public final class ModelHelper
         {
             Document document = ModelUtil.readDocument(file);
             obj = convertDocumentToModelObject(document,
-                    file.getModificationDate());
+                    file.getModificationTime());
             
             // determine the type of this object
             String typeName = obj.getTypeName();

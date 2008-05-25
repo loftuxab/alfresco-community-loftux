@@ -289,7 +289,7 @@ public class DispatcherServlet extends BaseServlet
                                 String redirectUrl = context.getLinkBuilder().page(
                                         context, pageId, formatId, objectId, args);
                                 // set redirect url for use on login page template
-                                loginPage.setCustomProperty(ALF_REDIRECT_URL, redirectUrl);
+                                context.setValue(ALF_REDIRECT_URL, redirectUrl);
                                 dispatchPage(context, request, response, loginPage, formatId);
                                 return;
                             }

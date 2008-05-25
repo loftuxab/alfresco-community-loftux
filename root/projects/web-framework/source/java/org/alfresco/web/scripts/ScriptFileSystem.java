@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2007 Alfresco Software Limited.
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,24 +24,64 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.Serializable;
-
-import org.alfresco.web.site.filesystem.IDirectory;
 import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.filesystem.IFileSystem;
 
 /**
+ * The ScriptFileSystem object is a starting point for looking up
+ * ScriptFile objects.
+ * 
+ * The following is valid:
+ * 
+ * var root = fileSystem.root;
+ * var rootParent = root.parent; // == null
+ * 
+ * var file1 = root.getFile("/a/b/c/readme.txt");
+ * var file2 = root.getFile("/a/b/c", "readme.txt");
+ * var test = (file1 == file2); // == true
+ * 
+ * var folder = root.getFile("/a/b/c");
+ * var children = folder.getChildren();
+ * var children2 = root.getFiles("/a/b/c");
+ * 
+ * // children identical set to children2
+ * 
+ * var file3 = root.createFile("/a/b/c/test1.txt");
+ * var file4 = root.createFile("/a/b/c", "test2.txt");
+ * 
+ * var file3parent = root.getParent("/a/b/c/test1.txt");
+ * var file4parent = root.getParent("/a/b/c/test2.txt");
+ * 
+ * // file3parent and file4parent are same folder (/a/b/c)
+ * 
+ * root.deleteFile("/a/b/c/test1.txt");
+ * root.deleteFile("/a/b/c", "test2.txt");
+ * 
+ * 
+ * 
  * @author muzquiano
  */
 public final class ScriptFileSystem extends ScriptBase
 {
     protected IFileSystem fileSystem;
 
+    /**
+     * Instantiates a new script file system.
+     * 
+     * @param fileSystem the file system
+     */
     public ScriptFileSystem(IFileSystem fileSystem)
     {
         this.fileSystem = fileSystem;
     }
-
+    
+    /**
+     * Wrap file.
+     * 
+     * @param file the file
+     * 
+     * @return the script file
+     */
     protected ScriptFile wrapFile(IFile file)
     {
         if (file == null)
@@ -51,6 +91,13 @@ public final class ScriptFileSystem extends ScriptBase
         return new ScriptFile(this, file);
     }
 
+    /**
+     * Wrap files.
+     * 
+     * @param files the files
+     * 
+     * @return the object[]
+     */
     protected Object[] wrapFiles(IFile[] files)
     {
         if (files == null)
@@ -67,144 +114,123 @@ public final class ScriptFileSystem extends ScriptBase
         return scriptFiles;
     }
 
-    // API
-
+    // no support for properties
+    protected ScriptableMap buildProperties()
+    {
+        return null;
+    }
+    
+    
+    //------------------------------------------------------------
+    // JavaScript Properties
+    //
+    
     public ScriptFile getRoot()
     {
         return wrapFile(fileSystem.getRoot());
     }
-
+    
+    
+    //------------------------------------------------------------
+    // JavaScript Functions
+    //
+    
+    /**
+     * Gets the file.
+     * 
+     * @param path the path
+     * 
+     * @return the file
+     */
     public ScriptFile getFile(String path)
     {
         return wrapFile(fileSystem.getFile(path));
     }
 
+    /**
+     * Gets the file.
+     * 
+     * @param path the path
+     * @param name the name
+     * 
+     * @return the file
+     */
     public ScriptFile getFile(String path, String name)
     {
         return wrapFile(fileSystem.getFile(path, name));
     }
 
+    /**
+     * Gets the files.
+     * 
+     * @param path the path
+     * 
+     * @return the files
+     */
     public Object[] getFiles(String path)
     {
         return wrapFiles(fileSystem.getFiles(path));
     }
 
+    /**
+     * Creates the file.
+     * 
+     * @param relativePath the relative path
+     * 
+     * @return the script file
+     */
     public ScriptFile createFile(String relativePath)
     {
         return wrapFile(fileSystem.createFile(relativePath));
     }
 
+    /**
+     * Creates the file.
+     * 
+     * @param relativeDirectoryPath the relative directory path
+     * @param fileName the file name
+     * 
+     * @return the script file
+     */
     public ScriptFile createFile(String relativeDirectoryPath, String fileName)
     {
         return wrapFile(fileSystem.createFile(relativeDirectoryPath, fileName));
     }
 
+    /**
+     * Delete file.
+     * 
+     * @param relativePath the relative path
+     * 
+     * @return true, if successful
+     */
     public boolean deleteFile(String relativePath)
     {
         return fileSystem.deleteFile(relativePath);
     }
 
+    /**
+     * Delete file.
+     * 
+     * @param relativeDirectoryPath the relative directory path
+     * @param fileName the file name
+     * 
+     * @return true, if successful
+     */
     public boolean deleteFile(String relativeDirectoryPath, String fileName)
     {
         return fileSystem.deleteFile(relativeDirectoryPath, fileName);
     }
 
+    /**
+     * Gets the parent.
+     * 
+     * @param path the path
+     * 
+     * @return the parent
+     */
     public ScriptFile getParent(String path)
     {
         return wrapFile(fileSystem.getParent(path));
-    }
-
-    // inner classes
-
-    public class ScriptFile implements Serializable
-    {
-        public ScriptFileSystem scriptFileSystem;
-        public IFile file;
-
-        public ScriptFile(ScriptFileSystem scriptFileSystem, IFile file)
-        {
-            this.scriptFileSystem = scriptFileSystem;
-            this.file = file;
-        }
-
-        public String getName()
-        {
-            return file.getName();
-        }
-
-        public ScriptFile getParent()
-        {
-            return scriptFileSystem.wrapFile(file.getParent());
-        }
-
-        public boolean delete()
-        {
-            return file.delete();
-        }
-
-        public String getPath()
-        {
-            return file.getPath();
-        }
-
-        public long length()
-        {
-            return file.length();
-        }
-
-        public boolean isFile()
-        {
-            return file.isFile();
-        }
-
-        public boolean isDirectory()
-        {
-            return !file.isFile();
-        }
-
-        public long getModificationDate()
-        {
-            return file.getModificationDate();
-        }
-
-        public String readContents()
-        {
-            return file.readContents();
-        }
-
-        public void writeContents(String contents)
-        {
-            file.writeContents(contents);
-        }
-
-        // for directories
-
-        public Object[] getChildren()
-        {
-            if (file.isFile())
-            {
-                return null;
-            }
-
-            IFile[] files = ((IDirectory) file).getChildren();
-            return scriptFileSystem.wrapFiles(files);
-        }
-
-        public ScriptFile getChild(String name)
-        {
-            if (file.isFile())
-            {
-                return null;
-            }
-
-            IFile child = ((IDirectory) file).getChild(name);
-            return scriptFileSystem.wrapFile(child);
-        }
-
-        public ScriptFile createFile(String name)
-        {
-            return scriptFileSystem.createFile(file.getPath(), name);
-        }
-
-    }
+    }    
 }

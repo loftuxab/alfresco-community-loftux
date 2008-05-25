@@ -44,8 +44,8 @@ import org.alfresco.web.site.model.TemplateInstance;
 import org.mozilla.javascript.Scriptable;
 
 /**
- * A root-scoped Java object for working with the Web Framework and
- * the Web Framework object model.
+ * A read-only root-scoped Java object for working with the Web Framework 
+ * and the Web Framework object model.
  * 
  * Using this object, you can query the Web Framework object model,
  * perform read and write operations and configure your web application.
@@ -55,7 +55,7 @@ import org.mozilla.javascript.Scriptable;
  * 
  * @author muzquiano
  */
-public final class ScriptSite extends ScriptBase
+public final class ScriptSiteData extends ScriptBase
 {
     protected ScriptFileSystem rootFileSystem;
     protected ScriptFileSystem modelFileSystem;
@@ -65,11 +65,23 @@ public final class ScriptSite extends ScriptBase
      * 
      * @param context   The RequestContext instance for the current request
      */
-    public ScriptSite(RequestContext context)
+    public ScriptSiteData(RequestContext context)
     {
         super(context);
     }
+    
+    // no properties
+    public ScriptableMap buildProperties()
+    {
+        return null;
+    }
+    
 
+    // --------------------------------------------------------------
+    // JavaScript Properties
+    //
+
+    
     /**
      * Provides access to the root page for the web application.  If no
      * root page is defined, null will be returned.
@@ -79,7 +91,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject getRootPage()
     {
         ModelObject modelObject = context.getRootPage();
-        return toScriptModelObject(context, modelObject);
+        return ScriptHelper.toScriptModelObject(context, modelObject);
     }
     
     /**
@@ -92,9 +104,9 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject getSiteConfiguration()
     {
         ModelObject modelObject = context.getSiteConfiguration();
-        return toScriptModelObject(context, modelObject);
+        return ScriptHelper.toScriptModelObject(context, modelObject);
     }
-
+    
     /**
      * Provides access to the web application file system abstraction.
      * This is file system mounted to the root of the web application.
@@ -110,6 +122,11 @@ public final class ScriptSite extends ScriptBase
         }
         return rootFileSystem;
     }
+    
+    // --------------------------------------------------------------
+    // JavaScript Functions
+    //
+    
 
     /**
      * Provides access to the file system for the current model.
@@ -130,24 +147,11 @@ public final class ScriptSite extends ScriptBase
     }
 
     /**
-     * Provide access to the RequestContext instance bound to this object.
-     * 
-     * In general, this is the same as the RequestContext instance which
-     * is bound to the currently executing request.
-     * 
-     * @return The bound RequestContext instance
-     */
-    public RequestContext getRequestContext()
-    {
-        return context;
-    }
-
-    /**
      * @return  An array of all Component instances in the web application
      */
     public Object[] getComponents()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findComponents(context));
     }
 
@@ -156,7 +160,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Object[] getComponentTypes()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findComponentTypes(context));
     }
 
@@ -165,7 +169,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Object[] getConfigurations()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findConfigurations(context));
     }
 
@@ -174,7 +178,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Object[] getContentAssociations()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findContentAssociations(context));
     }
 
@@ -183,15 +187,23 @@ public final class ScriptSite extends ScriptBase
      */    
     public Object[] getPages()
     {
-        return toScriptModelObjectArray(context, ModelUtil.findPages(context));
+        return ScriptHelper.toScriptModelObjectArray(context, ModelUtil.findPages(context));
     }
 
+    /**
+     * @return  An array of all PageType instances in the web application
+     */    
+    public Object[] getPageTypes()
+    {
+        return ScriptHelper.toScriptModelObjectArray(context, ModelUtil.findPageTypes(context));
+    }
+    
     /**
      * @return  An array of all PageAssociation instances in the web application
      */    
     public Object[] getPageAssociations()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findPageAssociations(context));
     }
 
@@ -200,7 +212,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Object[] getTemplates()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findTemplates(context));
     }
 
@@ -209,7 +221,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Object[] getTemplateTypes()
     {
-        return toScriptModelObjectArray(context,
+        return ScriptHelper.toScriptModelObjectArray(context,
                 ModelUtil.findTemplateTypes(context));
     }
 
@@ -219,7 +231,7 @@ public final class ScriptSite extends ScriptBase
      */
     public Scriptable getComponentsMap()
     {
-        return toScriptableMap(context, ModelUtil.findComponents(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findComponents(context));
     }
 
     /**
@@ -228,7 +240,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Scriptable getComponentTypesMap()
     {
-        return toScriptableMap(context, ModelUtil.findComponentTypes(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findComponentTypes(context));
     }
 
     /**
@@ -237,7 +249,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Scriptable getConfigurationsMap()
     {
-        return toScriptableMap(context, ModelUtil.findConfigurations(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findConfigurations(context));
     }
 
     /**
@@ -246,7 +258,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Scriptable getContentAssociationsMap()
     {
-        return toScriptableMap(context,
+        return ScriptHelper.toScriptableMap(context,
                 ModelUtil.findContentAssociations(context));
     }
 
@@ -256,7 +268,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Scriptable getPagesMap()
     {
-        return toScriptableMap(context, ModelUtil.findPages(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findPages(context));
     }
 
     /**
@@ -265,7 +277,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Scriptable getPageAssociationsMap()
     {
-        return toScriptableMap(context, ModelUtil.findPageAssociations(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findPageAssociations(context));
     }
 
     /**
@@ -274,7 +286,7 @@ public final class ScriptSite extends ScriptBase
      */
     public Scriptable getTemplatesMap()
     {
-        return toScriptableMap(context, ModelUtil.findTemplates(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findTemplates(context));
     }
 
     /**
@@ -283,7 +295,7 @@ public final class ScriptSite extends ScriptBase
      */    
     public Scriptable getTemplateTypesMap()
     {
-        return toScriptableMap(context, ModelUtil.findTemplateTypes(context));
+        return ScriptHelper.toScriptableMap(context, ModelUtil.findTemplateTypes(context));
     }
 
     /**
@@ -298,7 +310,7 @@ public final class ScriptSite extends ScriptBase
     {
         Component component = (Component) FrameworkHelper.getModel().newComponent(
                 context);
-        return toScriptModelObject(context, component);
+        return ScriptHelper.toScriptModelObject(context, component);
     }
 
     /**
@@ -319,7 +331,7 @@ public final class ScriptSite extends ScriptBase
         Component component = (Component) FrameworkHelper.getModel().newComponent(
                 context);
         component.setComponentTypeId(componentTypeId);
-        return toScriptModelObject(context, component);
+        return ScriptHelper.toScriptModelObject(context, component);
     }
 
     /**
@@ -347,7 +359,7 @@ public final class ScriptSite extends ScriptBase
         component.setComponentTypeId(componentTypeId);
         component.setTitle(title);
         component.setDescription(description);
-        return toScriptModelObject(context, component);
+        return ScriptHelper.toScriptModelObject(context, component);
     }
 
     /**
@@ -361,7 +373,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject newComponentType()
     {
         ModelObject modelObject = FrameworkHelper.getModel().newComponentType(context);
-        return toScriptModelObject(context, modelObject);
+        return ScriptHelper.toScriptModelObject(context, modelObject);
     }
 
     /**
@@ -376,7 +388,7 @@ public final class ScriptSite extends ScriptBase
     {
         Configuration configuration = (Configuration) FrameworkHelper.getModel().newConfiguration(
                 context);
-        return toScriptModelObject(context, configuration);
+        return ScriptHelper.toScriptModelObject(context, configuration);
     }
 
     /**
@@ -396,7 +408,7 @@ public final class ScriptSite extends ScriptBase
         Configuration configuration = (Configuration) FrameworkHelper.getModel().newConfiguration(
                 context);
         configuration.setSourceId(sourceId);
-        return toScriptModelObject(context, configuration);
+        return ScriptHelper.toScriptModelObject(context, configuration);
     }
 
     /**
@@ -410,7 +422,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject newPage()
     {
         Page page = (Page) FrameworkHelper.getModel().newPage(context);
-        return toScriptModelObject(context, page);
+        return ScriptHelper.toScriptModelObject(context, page);
     }
 
     /**
@@ -430,9 +442,9 @@ public final class ScriptSite extends ScriptBase
         ParameterCheck.mandatory("description", description);
 
         Page page = (Page) FrameworkHelper.getModel().newPage(context);
-        return toScriptModelObject(context, page);
+        return ScriptHelper.toScriptModelObject(context, page);
     }
-
+    
     /**
      * Creates a new Template instance.
      * 
@@ -444,7 +456,7 @@ public final class ScriptSite extends ScriptBase
     public ScriptModelObject newTemplate()
     {
         TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
-        return toScriptModelObject(context, template);
+        return ScriptHelper.toScriptModelObject(context, template);
     }
 
     /**
@@ -453,16 +465,16 @@ public final class ScriptSite extends ScriptBase
      * The id for the instance is generated using the Web Framework's Random
      * GUID generator.
      * 
-     * @param templateType  The id of the TemplateType object that describes
+     * @param templateTypeId  The id of the TemplateType object that describes
      *                      the type of this template
      *                      
      * @return A ScriptModelObject representing the new instance
      */
-    public ScriptModelObject newTemplate(String templateType)
+    public ScriptModelObject newTemplate(String templateTypeId)
     {
         TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
-        template.setTemplateType(templateType);
-        return toScriptModelObject(context, template);
+        template.setTemplateType(templateTypeId);
+        return ScriptHelper.toScriptModelObject(context, template);
     }
 
     /**
@@ -478,18 +490,18 @@ public final class ScriptSite extends ScriptBase
      *  
      * @return A ScriptModelObject representing the new instance
      */    
-    public ScriptModelObject newTemplate(String templateType, String title,
+    public ScriptModelObject newTemplate(String templateTypeId, String title,
             String description)
     {
-        ParameterCheck.mandatory("templateType", templateType);
+        ParameterCheck.mandatory("templateTypeId", templateTypeId);
         ParameterCheck.mandatory("title", title);
         ParameterCheck.mandatory("description", description);
         
         TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
-        template.setTemplateType(templateType);
+        template.setTemplateType(templateTypeId);
         template.setTitle(title);
         template.setDescription(description);
-        return toScriptModelObject(context, template);
+        return ScriptHelper.toScriptModelObject(context, template);
     }
 
     /**
@@ -510,7 +522,7 @@ public final class ScriptSite extends ScriptBase
     {
         Component[] components = ModelUtil.findComponents(context, scopeId,
                 sourceId, regionId, componentTypeId);
-        return toScriptModelObjectArray(context, components);
+        return ScriptHelper.toScriptModelObjectArray(context, components);
     }
 
     /**
@@ -548,7 +560,7 @@ public final class ScriptSite extends ScriptBase
     {
         PageAssociation[] associations = ModelUtil.findPageAssociations(
                 context, sourceId, destId, associationType);
-        return toScriptModelObjectArray(context, associations);
+        return ScriptHelper.toScriptModelObjectArray(context, associations);
     }
 
     /**
@@ -569,7 +581,7 @@ public final class ScriptSite extends ScriptBase
     {
         ContentAssociation[] associations = ModelUtil.findContentAssociations(
                 context, sourceId, destId, assocType, formatId);
-        return toScriptModelObjectArray(context, associations);
+        return ScriptHelper.toScriptModelObjectArray(context, associations);
     }
 
     /**
@@ -589,7 +601,7 @@ public final class ScriptSite extends ScriptBase
     {
         Component[] components = ModelUtil.findComponents(context, scopeId,
                 sourceId, regionId, componentTypeId);
-        return toScriptableMap(context, components);
+        return ScriptHelper.toScriptableMap(context, components);
     }
 
     /**
@@ -608,7 +620,7 @@ public final class ScriptSite extends ScriptBase
     {
         PageAssociation[] associations = ModelUtil.findPageAssociations(
                 context, sourceId, destId, associationType);
-        return toScriptableMap(context, associations);
+        return ScriptHelper.toScriptableMap(context, associations);
     }
 
     /**
@@ -628,7 +640,7 @@ public final class ScriptSite extends ScriptBase
     {
         ContentAssociation[] associations = ModelUtil.findContentAssociations(
                 context, sourceId, destId, assocType, formatId);
-        return toScriptableMap(context, associations);
+        return ScriptHelper.toScriptableMap(context, associations);
     }
 
     /**
@@ -654,7 +666,7 @@ public final class ScriptSite extends ScriptBase
                 String formatId = (String) it.next();
                 TemplateInstance template = templatesMap.get(formatId);
                 
-                ScriptModelObject scriptModelObject = toScriptModelObject(context, template);
+                ScriptModelObject scriptModelObject = ScriptHelper.toScriptModelObject(context, template);
                 map.put(formatId, scriptModelObject);
             }
             return map; 
@@ -675,7 +687,9 @@ public final class ScriptSite extends ScriptBase
         Configuration[] configurations = ModelUtil.findConfigurations(context,
                 sourceId);
         if (configurations != null && configurations.length > 0)
-            return toScriptModelObject(context, configurations[0]);
+        {
+            return ScriptHelper.toScriptModelObject(context, configurations[0]);
+        }
         return null;
     }
 
@@ -708,7 +722,9 @@ public final class ScriptSite extends ScriptBase
         {
             TemplateInstance t = page.getTemplate(context, formatId);
             if (t != null)
-                return this.toScriptModelObject(context, t);
+            {
+                return ScriptHelper.toScriptModelObject(context, t);
+            }
         }
         return null;
     }
@@ -733,12 +749,13 @@ public final class ScriptSite extends ScriptBase
         }
     }
 
+    
     // Create and Remove Associations
 
-    public void associateComponent(String componentId, String scope,
+    public void associateComponent(String componentId, String scopeId,
             String sourceId, String regionId)
     {
-        ModelUtil.associateComponent(context, componentId, scope, sourceId,
+        ModelUtil.associateComponent(context, componentId, scopeId, sourceId,
                 regionId);
     }
 
@@ -825,13 +842,11 @@ public final class ScriptSite extends ScriptBase
     public String decode(String input, String encoding)
     {
         return EncodingUtil.decode(input, encoding);
-    }
-   
-    // methods that are still in progress
+    }    
     
+    // methods that are still in progress
     public void logout()
     {
-    	AuthenticationUtil.logout(context);
-    }
-    
+        AuthenticationUtil.logout(getRequestContext());
+    }        
 }

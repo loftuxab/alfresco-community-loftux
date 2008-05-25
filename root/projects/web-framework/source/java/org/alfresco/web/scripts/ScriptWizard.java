@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,11 +46,13 @@ import org.json.JSONObject;
 /**
  * @author muzquiano
  */
-public final class ScriptWizard extends ScriptBase
+public final class ScriptWizard implements Serializable
 {
+    protected RequestContext context = null;
+    
     public ScriptWizard(RequestContext context)
     {
-        super(context);
+        this.context = context;
     }
 
     protected HttpServletRequest getHttpServletRequest()
@@ -153,7 +156,9 @@ public final class ScriptWizard extends ScriptBase
         {
             String _previousPageId = (String) request.get("currentPageId");
             if (_previousPageId != null)
+            {
                 previousPageId = _previousPageId;
+            }
         }
         catch (Exception ex)
         {
@@ -162,7 +167,9 @@ public final class ScriptWizard extends ScriptBase
         {
             String _currentPageId = (String) request.get("requestedPageId");
             if (_currentPageId != null)
+            {
                 currentPageId = _currentPageId;
+            }
         }
         catch (Exception ex)
         {
@@ -879,5 +886,17 @@ public final class ScriptWizard extends ScriptBase
         if (value == null)
             value = "";
         return value;
-    }    
+    }   
+    
+    public void setModel(Map<String, Object> model)
+    {
+        this.model = model;
+    }
+
+    public Map<String, Object> getModel()
+    {
+        return this.model;
+    }
+
+    protected Map<String, Object> model;    
 }

@@ -57,7 +57,7 @@ public class StoreFile extends AbstractFileDirectory implements IFile
     }
 
     // TODO
-    public long getModificationDate()
+    public long getModificationTime()
     {
         return 0;
     }

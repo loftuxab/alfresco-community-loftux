@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import java.io.Serializable;
+import java.util.Iterator;
 
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
@@ -104,6 +105,13 @@ public interface RequestContext extends Serializable
      */
     public void removeValue(String key);
 
+    /**
+     * Returns an Iterator over the keys of the custom key/value pairs
+     * stored on this RequestContext instance
+     * 
+     * @return An iterator of String keys
+     */
+    public Iterator keys();
 
     /**
      * If a page instance is currently executing, it can be retrieved
