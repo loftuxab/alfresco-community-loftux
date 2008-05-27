@@ -4,7 +4,7 @@
    <div class="menu">&nbsp;</div>
 
    <div class="body">
-      &nbsp
+      &nbsp;
    </div>
 
 </div>
