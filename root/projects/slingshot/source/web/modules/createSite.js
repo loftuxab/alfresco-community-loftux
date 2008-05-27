@@ -80,15 +80,6 @@
          this.dialog.show();
       },
 
-
-      onOkButtonClick: function(type, args)
-      {
-         // todo: remove when forms runtime handles yui buttons
-         var Dom = YAHOO.util.Dom;
-         var createSiteFormElement =  Dom.get(this.id + "-createSite-form");
-         createSiteFormElement.submit();
-      },
-
       onCancelButtonClick: function(type, args)
       {
         this.dialog.hide();

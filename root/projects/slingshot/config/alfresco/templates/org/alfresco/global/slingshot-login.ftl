@@ -19,7 +19,7 @@
          	</tr>
          </table>
          <input type="hidden" name="success" value="${successUrl}"/>
-         <input type="hidden" name="failure" value=""/>
+         <input type="hidden" name="failure" value="<@link pageType='login'/>"/>
       </fieldset>
    </form>
 </div>

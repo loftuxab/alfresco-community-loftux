@@ -58,6 +58,20 @@
    Alfresco.DocListTree.prototype =
    {
       /**
+       * Object container for initialization options
+       */
+      options:
+      {
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: ""
+      },
+      
+      /**
        * Flag set after TreeView instantiated.
        * 
        * @property isReady
@@ -90,6 +104,17 @@
       pathsToExpand: [],
 
       /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       */
+      setOptions: function DLT_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+      },
+      
+      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        * @method onComponentsLoaded
@@ -106,6 +131,79 @@
        */
       onReady: function DLT_onReady()
       {
+         // Reference to self - used in inline functions
+         var me = this;
+         
+         /**
+          * Dynamically loads TreeView nodes.
+          * This MUST be inline in order to have access to the Alfresco.DocListTree class.
+          * @method loadNodeData
+          * @param node {object} Parent node
+          * @param fnLoadComplete {function} Expanding node's callback function
+          */
+         this.fnLoadNodeData = function DLT_loadNodeData(node, fnLoadComplete)
+         {
+            // Get the path this node refers to
+            var nodePath = node.data.path;
+
+            // Prepare URI for XHR data request
+            var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode?site=" + encodeURIComponent(me.options.siteId) + "&path=" + encodeURIComponent(nodePath);
+
+            // Prepare the XHR callback object
+            var callback =
+            {
+               success: function DLT_lND_success(oResponse)
+               {
+                  var results = eval("(" + oResponse.responseText + ")");
+
+                  if (results.treenode.items)
+                  {
+                     for (var i = 0, j = results.treenode.items.length; i < j; i++)
+                     {
+                        var item = results.treenode.items[i];
+                        var tempNode = new YAHOO.widget.TextNode(
+                        {
+                           label: item.name,
+                           path: nodePath + "/" + item.name,
+                           nodeRef: item.nodeRef,
+                           description: item.description
+                        }, node, false);
+
+                        if (!item.hasChildren)
+                        {
+                           tempNode.isLeaf = true;
+                        }
+                     }
+                  }
+
+                  /**
+                  * Execute the node's loadComplete callback method which comes in via the argument
+                  * in the response object
+                  */
+                  oResponse.argument.fnLoadComplete();
+               },
+
+               // If the XHR call is not successful, fire the TreeView callback anyway
+               failure: function DLT_lND_failure(oResponse)
+               {
+                  oResponse.argument.fnLoadComplete();
+               },
+
+               // XHR response argument information
+               argument:
+               {
+                  "node": node,
+                  "fnLoadComplete": fnLoadComplete
+               },
+
+               // Timeout -- abort the transaction after 7 seconds
+               timeout: 7000
+            };
+
+            // Make the XHR call using Connection Manager's asyncRequest method
+            YAHOO.util.Connect.asyncRequest('GET', uri, callback);
+         };
+
          // Build the TreeView widget
          this._buildTree();
          
@@ -185,7 +283,7 @@
        * @method onExpandComplete
        * @param oNode {YAHOO.widget.Node} the node recently expanded
        */
-      onExpandComplete: function(oNode)
+      onExpandComplete: function DLT_onExpandComplete(oNode)
       {
          if (this.pathsToExpand.length > 0)
          {
@@ -226,7 +324,7 @@
          this.treeview = tree;
 
          // Turn dynamic loading on for entire tree
-         tree.setDynamicLoad(this.loadNodeData);
+         tree.setDynamicLoad(this.fnLoadNodeData);
 
          // Get root node for tree
          var root = tree.getRoot();
@@ -245,75 +343,7 @@
 
          // Render tree with this one top-level node
          tree.draw();
-      },
-
-      /**
-       * Dynamically loads TreeView nodes.
-       * @method loadNodeData
-       * @param node {object} Parent node
-       * @param fnLoadComplete {function} Expanding node's callback function
-       */
-      loadNodeData: function DLT_loadNodeData(node, fnLoadComplete)
-      {
-         // Get the path this node refers to
-         var nodePath = node.data.path;
-         
-         // Prepare URI for XHR data request
-         var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode?path=" + encodeURIComponent(nodePath);
-         
-         // Prepare the XHR callback object
-         var callback =
-         {
-            success: function DLT_lND_success(oResponse)
-            {
-               var results = eval("(" + oResponse.responseText + ")");
-
-               if (results.treenode.items)
-               {
-                  for (var i = 0, j = results.treenode.items.length; i < j; i++)
-                  {
-                     var item = results.treenode.items[i];
-                     var tempNode = new YAHOO.widget.TextNode(
-                     {
-                        label: item.name,
-                        path: nodePath + "/" + item.name,
-                        nodeRef: item.nodeRef,
-                        description: item.description
-                     }, node, false);
-                     
-                     if (!item.hasChildren)
-                     {
-                        tempNode.isLeaf = true;
-                     }
-                  }
-               }
-
-               /**
-               * Execute the node's loadComplete callback method which comes in via the argument
-               * in the response object
-               */
-               oResponse.argument.fnLoadComplete();
-            },
-
-            // If the XHR call is not successful, fire the TreeView callback anyway
-            failure: function DLT_lND_failure(oResponse)
-            {
-               oResponse.argument.fnLoadComplete();
-            },
-
-            // XHR response argument information
-            argument:
-            {
-               "node": node,
-               "fnLoadComplete": fnLoadComplete
-            },
-
-            // Timeout -- abort the transaction after 7 seconds
-            timeout: 7000
-         };
-
-         // Make the XHR call using Connection Manager's asyncRequest method
-         YAHOO.util.Connect.asyncRequest('GET', uri, callback);
       }
+
    };
 })();

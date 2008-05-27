@@ -1,6 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
    <id>user-dashboard</id>
+   <page-type>userdash</page-type>
    <title>User Dashboard</title>
    <description>Users dashboard page</description>
    <template-instance>user-dashboard</template-instance>

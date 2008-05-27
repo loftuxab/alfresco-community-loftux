@@ -3,6 +3,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DocumentList("${args.htmlid}").setOptions(
    {
+      siteId: "${page.url.args["site"]!""}",
       initialPath: "${page.url.args["path"]!""}"
    });
 //]]></script>
@@ -12,9 +13,11 @@
          <div class="doclist-fileSelector">
             <input type="button" id="${args.htmlid}-fileSelect-button" name="doclist-fileSelect-button" value="Select..." />
             <select id="${args.htmlid}-fileSelect-menu" name="doclist-fileSelect-menu">
-                <option value="one">One</option>
-                <option value="two">Two</option>
-                <option value="three">Three</option>                
+                <option value="all">All</option>
+                <option value="none">None</option>
+                <option value="invert">Invert Selection</option>                
+                <option value="documents">Documents</option>                
+                <option value="folders">Folders</option>                
             </select>
          </div>
       </div>

@@ -528,13 +528,16 @@ Alfresco.util.Ajax = function()
 
 Alfresco.logger.isDebugEnabled = function()
 {
-   // TODO: make this switchable
-   
-   return false;
+   return Alfresco.constants.DEBUG;
 }
 
 Alfresco.logger.debug = function(p1, p2)
 {
+   if (!this.isDebugEnabled())
+   {
+      return;
+   }
+   
    var msg;
    
    if (typeof p1 == "string" && p2 != null)
