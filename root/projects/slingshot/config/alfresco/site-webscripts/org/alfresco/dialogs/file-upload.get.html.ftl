@@ -16,7 +16,7 @@
       Unable to load Flash content. You can download the latest version of Flash Player from the
       <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player Download Center</a>.
    </div>
-   <div id="${args.htmlid}-filelist-table"></div>
+   <div id="${args.htmlid}-filelist-table" class="fileUpload-filelist-table"></div>
    <div id="${args.htmlid}-versionSection-div">
       <span>VERSION INFO</span>
       <div class="yui-gd">
@@ -38,19 +38,24 @@
       </div>
    </div>
    <div>
-      <input id="${args.htmlid}-upload-button" type="button" value="Start upload" />
-      <input id="${args.htmlid}-cancel-button" type="button" value="Cancel" />
+      <input id="${args.htmlid}-startStop-button" type="button" value="Start upload" />
+      <input id="${args.htmlid}-cancelOk-button" type="button" value="Cancel" />
    </div>
    <div class="hiddenComponents">
       <div id="${args.htmlid}-fileItemTemplate-div">
-         <div class="fileupload-leftcolumn-div">&nbsp;</div>
+         <!--<div class="fileupload-leftcolumn-div">&nbsp;</div>-->
          <div class="fileupload-actions-div">
-            <input class="fileupload-remove-button" type="button" value="Remove" />
+            <input class="fileupload-file-button" type="button" value="Remove" />
          </div>
          <div class="progressBar">
             <span class="progressSuccess">&nbsp;</span>
             <span class="progressInfo">{progressInfo}</span>
-            <span class="progressPercentage">{percentage}</span>
+            <div class="progressPercentageAndContentType">
+               <span class="progressPercentage">{percentage}</span>
+               <select class="fileupload-contentType-menu">
+                  <option value="Content">Content</option>
+               </select>
+            </div>
          </div>
       </div>
    </div>

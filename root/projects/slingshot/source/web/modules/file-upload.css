@@ -1,17 +1,57 @@
 .fileupload-fileItemTemplate-div{
    padding: 0px 0px 0px 0px;
    margin: 0px;
-   background-color: #929292;
+   /*background-color: #929292;*/
 }
 
+/*
 .fileupload-leftcolumn-div{
    float: left;
    width: 20px;
 }
-
+*/
 .fileupload-actions-div{
    float: right;
    width: 90px;
    text-align: center;
    padding-top: 3px;
+}
+
+.fileUpload-filelist-table .yui-dt-liner {
+   margin:0pt;
+   padding:0px 0px;
+}
+
+.progressBar{
+   position: relative;
+   /*background: url( images/progress-bar-background.gif ) 0 0 repeat-x;*/
+   height: 30px;
+   padding: 0px 25px 0px 95px;
+   margin: 0px;
+   overflow: hidden;
+}
+
+.progressBar .progressSuccess, .progressBar .progressFailure{
+   position: absolute;
+   background: url( images/progress-bar-success.gif ) 0 0 repeat-x;
+   top: 0px;
+   left: -420px;
+   height: 30px;
+   width: 420px;
+}
+
+.progressBar .progressFailure{
+   background: url( images/progress-bar-failure.gif ) 0 0 repeat-x;
+}
+
+.progressInfo{
+   position: absolute;
+   left: 5px;
+   top: 8px;
+}
+
+.progressPercentageAndContentType{
+   position: absolute;
+   right: 5px;
+   top: 2px;
 }
