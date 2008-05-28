@@ -401,6 +401,8 @@ public class RemoteClient extends AbstractClient
             }
             
             // prepare to write the connection result to the output stream
+            // at this point - if the remote server returned an error status code
+            // this call will trigger an IOException which is handled below
             InputStream input = connection.getInputStream();
             
             // proxy over any headers we find after getting the input stream
@@ -468,11 +470,7 @@ public class RemoteClient extends AbstractClient
             }
             
             // if we get here call was successful
-            status.setCode(connection.getResponseCode());
-            if (res != null)
-            {
-                res.setStatus(connection.getResponseCode());
-            }
+            status.setCode(HttpServletResponse.SC_OK);
             
             return encoding;
         }
@@ -482,6 +480,10 @@ public class RemoteClient extends AbstractClient
             status.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             status.setException(conErr);
             status.setMessage(conErr.getMessage());
+            if (res != null)
+            {
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            }
             
             throw conErr;
         }
@@ -491,6 +493,10 @@ public class RemoteClient extends AbstractClient
             status.setCode(connection.getResponseCode());
             status.setException(ioErr);
             status.setMessage(ioErr.getMessage());
+            if (res != null)
+            {
+                res.setStatus(connection.getResponseCode());
+            }
             
             throw ioErr;
         }
