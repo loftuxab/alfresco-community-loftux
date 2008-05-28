@@ -379,36 +379,20 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
       {
          if (this.fileUpload === null)
          {
-            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-createSite");
+            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
          }
-
-         var showConfig2 =
+         // Use  like this for multi uploads
+         var multiUploadConfig =
          {
-            title: "Upload New Version of Alfresco Logo.rtf",
-            filter: [
-            {
-               description: "Documents",
-               extensions: "*.doc"
-            }],
-            multiSelect: false,
-            noOfVisibleRows: 1,
-            versionInput: true
-         };
-
-         // Use something like this for multi uploads
-         var showConfig =
-         {
+            siteId: this.siteId,
+            path: this.currentPath,
             title: "Upload new files",
-            filter: [
-            {
-               description: "Documents",
-               extensions: "*.doc"
-            }],
+            filter: [],
             multiSelect: true,
             noOfVisibleRows: 5,
             versionInput: false
          }
-         this.fileUpload.show(showConfig);
+         this.fileUpload.show(multiUploadConfig);
          YAHOO.util.Event.preventDefault(e);
       },
       

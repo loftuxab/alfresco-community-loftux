@@ -53,6 +53,9 @@
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
+   <#if (user.properties.alfTicket?exists)>
+      Alfresco.constants.ALF_TICKET = "${user.properties.alfTicket}";
+   </#if>
    //]]></script>
 
 <!-- Component Assets -->

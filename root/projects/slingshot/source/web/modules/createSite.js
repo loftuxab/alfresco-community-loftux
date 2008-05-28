@@ -58,7 +58,10 @@
          div.innerHTML = response.serverResponse.responseText;
          this.dialog = new YAHOO.widget.Panel(div,
          {
+            modal: true,
+            draggable: false,
             fixedcenter: true,
+            close: false,
             visible: false
          });
          this.dialog.render(document.body);
@@ -87,7 +90,14 @@
 
       onCreateSiteSuccess: function(response)
       {
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration-dashboard?site=" + response.json.shortName;
+         if(response.json === undefined || response.json.shortName === undefined || response.json.shortName.length == 0)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: "Received a success message with missing variables (shortname)"});
+         }
+         else
+         {
+            document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration-dashboard?site=" + response.json.shortName;
+         }
       }
 
    };
