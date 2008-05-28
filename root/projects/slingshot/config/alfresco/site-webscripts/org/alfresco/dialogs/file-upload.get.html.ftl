@@ -52,8 +52,12 @@
             <span class="progressInfo">{progressInfo}</span>
             <div class="progressPercentageAndContentType">
                <span class="progressPercentage">{percentage}</span>
-               <select class="fileupload-contentType-menu">
-                  <option value="Content">Content</option>
+               <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hiddenComponents</#if>">
+                  <#if (contentTypes?size > 0)>
+                     <#list contentTypes as contentType>
+                        <option value="${contentType.id}">${contentType.value}</option>
+                     </#list>
+                  </#if>
                </select>
             </div>
          </div>

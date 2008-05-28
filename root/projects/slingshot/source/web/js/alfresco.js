@@ -221,6 +221,10 @@ Alfresco.util.PopupManager = function()
       displayMessage: function(userConfig)
       {
          var c = YAHOO.lang.merge(this.displayMessageConfig, userConfig);
+         if(c.text === undefined)
+         {
+            alert("Propety text in userConfig must be set");
+         }
          var message = new YAHOO.widget.Dialog("message",
             {
                visible: false,
@@ -264,6 +268,10 @@ Alfresco.util.PopupManager = function()
       displayPrompt: function(userConfig)
       {
          var c = YAHOO.lang.merge(this.displayPromptConfig, userConfig);
+         if(c.text === undefined)
+         {
+            alert("Propety text in userConfig must be set");
+         }
          var prompt = new YAHOO.widget.SimpleDialog("prompt", {
             visible:false,
             draggable:false,

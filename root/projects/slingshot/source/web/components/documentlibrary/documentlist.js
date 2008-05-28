@@ -387,7 +387,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             siteId: this.options.siteId,
             componentId: "documentLibrary",
             path: this.currentPath,
-            title: "Upload new files",
+            title: "Upload file(s)",
             filter: [],
             multiSelect: true,
             noOfVisibleRows: 5,

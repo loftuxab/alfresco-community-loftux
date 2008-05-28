@@ -53,5 +53,7 @@
 .progressPercentageAndContentType{
    position: absolute;
    right: 5px;
-   top: 2px;
+   /*top: 2px;*/
+   height: 30px;
+
 }
