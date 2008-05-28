@@ -16,7 +16,7 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first"><label for="${args.htmlid}-shortName">Short name:</label></div>
-            <div class="yui-u"><input id="${args.htmlid}-shortName" type="text" name="shortName"/></div>
+            <div class="yui-u"><input id="${args.htmlid}-shortName" type="text" name="shortName"/>&nbsp;*</div>
          </div>
          <div class="yui-gd">
             <div class="yui-u first">Description:</div>

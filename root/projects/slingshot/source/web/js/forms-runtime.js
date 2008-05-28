@@ -389,7 +389,8 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
             Alfresco.logger.debug("Event has been fired for field: " + validation.fieldId);
          
          // call handler
-         validation.handler(YAHOO.util.Event.getTarget(event), validation.args, this);
+         validation.handler(YAHOO.util.Event.getTarget(event), validation.args, this, 
+               this.showSubmitStateDynamically);
          
          // update submit elements state, if required
          if (this.showSubmitStateDynamically)
