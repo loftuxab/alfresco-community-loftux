@@ -1,7 +1,5 @@
 <div class="dashlet">
-   <div class="title">A Component</div>
-
-   <div class="menu">&nbsp;</div>
+   <div class="title">Simple Component</div>
 
    <div class="body">
       &nbsp;

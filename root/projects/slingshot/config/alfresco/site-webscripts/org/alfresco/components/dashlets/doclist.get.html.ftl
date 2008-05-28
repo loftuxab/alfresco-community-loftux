@@ -1,6 +1,6 @@
 <div class="dashlet">
    <div class="title">Doclist</div>
-   <div class="menu">
+   <div class="toolbar">
       <a href="#">Recently created</a>
    </div>
    <div class="body scrollableList">
