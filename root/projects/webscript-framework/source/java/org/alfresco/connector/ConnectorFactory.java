@@ -58,8 +58,7 @@ public class ConnectorFactory
 
     private ConfigService configService;
 
-    private static HashMap<String, Object> cache = new HashMap<String, Object>(
-            8, 1.0f);
+    private static HashMap<String, Object> cache = new HashMap<String, Object>(8, 1.0f);
 
     /**
      * Returns an instance of the ConnectorFactory.
@@ -268,10 +267,8 @@ public class ConnectorFactory
 
         // set credentials onto the connector
         // credentials are either "declared", "user", or "none":
-        // "declared" indicates that pre-set fixed declarative user credentials
-        // are to be used
-        // "user" indicates that the current user's credentials should
-        // be drawn from the vault and used
+        // "declared" indicates that pre-set fixed declarative user credentials are to be used
+        // "user" indicates that the current user's credentials should be drawn from the vault and used
         // "none" means that we don't include any credentials
         IdentityType identity = endpointDescriptor.getIdentity();
         switch (identity)
@@ -280,7 +277,7 @@ public class ConnectorFactory
             {
                 String username = (String) endpointDescriptor.getUsername();
                 String password = (String) endpointDescriptor.getPassword();
-                String bindingKey = endpointId + "_" + username;
+                String bindingKey = CredentialVaultFactory.buildBindingKey(endpointId, username);
                 Credentials credentials = null;
 
                 if (credentialVault != null)
@@ -289,20 +286,16 @@ public class ConnectorFactory
                     if (credentials == null)
                     {
                         credentials = new SimpleCredentials(bindingKey);
-                        credentials.setProperty(
-                                Credentials.CREDENTIAL_ALF_USERNAME, username);
-                        credentials.setProperty(
-                                Credentials.CREDENTIAL_ALF_PASSWORD, password);
+                        credentials.setProperty(Credentials.CREDENTIAL_ALF_USERNAME, username);
+                        credentials.setProperty(Credentials.CREDENTIAL_ALF_PASSWORD, password);
                         credentialVault.store(bindingKey, credentials);
                     }
                 }
                 else
                 {
                     credentials = new SimpleCredentials(bindingKey);
-                    credentials.setProperty(Credentials.CREDENTIAL_ALF_USERNAME,
-                            username);
-                    credentials.setProperty(Credentials.CREDENTIAL_ALF_PASSWORD,
-                            password);
+                    credentials.setProperty(Credentials.CREDENTIAL_ALF_USERNAME, username);
+                    credentials.setProperty(Credentials.CREDENTIAL_ALF_PASSWORD, password);
                 }
                 connector.setCredentials(credentials);
                 break;
@@ -310,7 +303,7 @@ public class ConnectorFactory
 
             case USER:
             {
-                String bindingKey = endpointId + "_" + credentialId;
+                String bindingKey = CredentialVaultFactory.buildBindingKey(endpointId, credentialId);
 
                 Credentials credentials = null;
                 if (credentialVault != null)
@@ -324,7 +317,8 @@ public class ConnectorFactory
                 }
                 else
                 {
-                    logger.warn("Unable to find credentials for binding key: " + bindingKey);
+                    if (logger.isDebugEnabled())
+                        logger.debug("Unable to find credentials for binding key: " + bindingKey);
                 }
             }
         }
@@ -376,10 +370,10 @@ public class ConnectorFactory
         if (auth == null)
         {
             auth = (Authenticator) ReflectionHelper.newObject(className);
-
+            
             cache.put(className, auth);
         }
-
+        
         return auth;
     }
 

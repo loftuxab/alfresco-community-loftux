@@ -44,18 +44,12 @@ import org.apache.commons.logging.LogFactory;
  */
 public class CredentialVaultFactory
 {
-
-    /** The logger. */
     private static Log logger = LogFactory.getLog(CredentialVaultFactory.class);
 
-    /** The config service. */
     private ConfigService configService = null;
-
-    /** The cache. */
-    private static HashMap<String, CredentialVault> cache = new HashMap<String, CredentialVault>(
-            16, 1.0f);
-
-    /** The factory. */
+    
+    private static HashMap<String, CredentialVault> cache = new HashMap<String, CredentialVault>(16, 1.0f);
+    
     private static CredentialVaultFactory factory = null;
 
     /**
@@ -193,5 +187,18 @@ public class CredentialVaultFactory
         }
 
         return vault;
+    }
+
+    /**
+     * Build a binding key for a credential in the credential vault
+     * 
+     * @param endpointId        Endpoint Id
+     * @param credentialId      Credential ID (generally this is the "userid")
+     * 
+     * @return binding key for the provided details 
+     */
+    public static String buildBindingKey(String endpointId, String credentialId)
+    {
+        return endpointId + '_' + credentialId;
     }
 }

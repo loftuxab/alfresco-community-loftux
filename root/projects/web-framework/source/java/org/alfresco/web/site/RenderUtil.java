@@ -53,10 +53,11 @@ import org.alfresco.web.site.renderer.RendererFactory;
 
 /**
  * @author muzquiano
+ * @author kevinr
  */
 public final class RenderUtil
 {
-    public static final String PASSIVE_MODE = "passiveMode";
+    public static final String PASSIVE_MODE_MARKER = "passiveMode";
     private static final String NEWLINE = "\r\n";
 
     /**
@@ -229,7 +230,7 @@ public final class RenderUtil
                 RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
                 
                 // set the context into "passive" mode
-                context.setValue(PASSIVE_MODE, "true");
+                context.setValue(PASSIVE_MODE_MARKER, Boolean.TRUE);
                 
                 // get the renderer and execute it
                 Renderable renderer = RendererFactory.newRenderer(context, template);
@@ -244,7 +245,7 @@ public final class RenderUtil
             finally
             {
                 // switch out of passive mode
-                context.removeValue(PASSIVE_MODE);
+                context.removeValue(PASSIVE_MODE_MARKER);
 
                 // unbind the rendering context
                 RendererContextHelper.unbind(context);
@@ -347,11 +348,9 @@ public final class RenderUtil
             Component[] components = ModelUtil.findComponents(context, regionScopeId, regionSourceId, regionId, null);
             if (components.length != 0)
             {
-                // if we are in passive mode, then we won't bother to execute
-                // the renderer.
-                // rather, we will notify the template that this component
-                // is bound to it
-                boolean passiveMode = Boolean.parseBoolean((String)context.getValue(PASSIVE_MODE));
+                // if we are in passive mode, then we won't bother to executethe renderer.
+                // rather, we will notify the template that this componentis bound to it
+                boolean passiveMode = context.hasValue(PASSIVE_MODE_MARKER);
                 if (passiveMode)
                 {
                     // we don't render the component, we just inform the current
@@ -370,8 +369,7 @@ public final class RenderUtil
             }
             else
             {
-                // if we couldn't find a component, then redirect to a
-                // region "no-component" renderer
+                // if we couldn't find a component, then redirect to a region "no-component" renderer
                 RenderUtil.renderErrorHandlerPage(context, request,
                         response,
                         WebFrameworkConstants.DISPATCHER_HANDLER_REGION_NO_COMPONENT,
@@ -1041,7 +1039,7 @@ public final class RenderUtil
         throws RendererExecutionException
     {
         // if we're in passive mode, just return empty string
-        boolean passiveMode = Boolean.parseBoolean((String)rendererContext.getRequestContext().getValue(PASSIVE_MODE));
+        boolean passiveMode = rendererContext.getRequestContext().hasValue(PASSIVE_MODE_MARKER);
         if (passiveMode)
         {
             return "";
