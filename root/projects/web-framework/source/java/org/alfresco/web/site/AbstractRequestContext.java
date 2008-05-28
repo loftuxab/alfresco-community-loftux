@@ -142,10 +142,11 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public void setValue(String key, Object value)
     {
-        if (key != null && value != null)
+        if (key == null)
         {
-            map.put(key, value);
+            throw new IllegalArgumentException("Key is mandatory.");
         }
+        map.put(key, value);
     }
 
     /**
@@ -156,6 +157,10 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Object getValue(String key)
     {
+        if (key == null)
+        {
+            throw new IllegalArgumentException("Key is mandatory.");
+        }
         return map.get(key);
     }
 
@@ -166,10 +171,27 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public void removeValue(String key)
     {
-        if (map.containsKey(key))
+        if (key == null)
         {
-            map.remove(key);
+            throw new IllegalArgumentException("Key is mandatory.");
         }
+        map.remove(key);
+    }
+    
+    /**
+     * Returns true if a custom value exists in the request context for the given key
+     * 
+     * @param key
+     * 
+     * @return true if a custom value exists in the request context for the given key
+     */
+    public boolean hasValue(String key)
+    {
+        if (key == null)
+        {
+            throw new IllegalArgumentException("Key is mandatory.");
+        }
+        return map.containsKey(key);
     }
 
     /**

@@ -104,6 +104,14 @@ public interface RequestContext extends Serializable
      * @param key
      */
     public void removeValue(String key);
+    
+    /**
+     * Returns true if a custom value exists in the request context
+     * 
+     * @param key
+     * @return true if a custom value exists in the request context
+     */
+    public boolean hasValue(String key);
 
     /**
      * Returns an Iterator over the keys of the custom key/value pairs

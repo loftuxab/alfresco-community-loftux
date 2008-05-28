@@ -30,6 +30,7 @@ import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.model.TemplateInstance;
@@ -42,15 +43,21 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * Implementation of a renderer that executes a Freemarker template.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class FreemarkerRenderer extends AbstractRenderer
 {
+    private static final String SCRIPT_RESULTS = "freemarkerRendererScriptResults";
     private PresentationTemplateProcessor templateProcessor;
     private PresentationScriptProcessor scriptProcessor;
     private Store templateStore;
-        
+    
+    /**
+     * One time init for the renderer instance
+     */
     public void init(RendererContext rendererContext)
     {
+        // retrieve the various Spring beans that are required for the renderer
         ServletContext servletContext = rendererContext.getRequest().getSession().getServletContext();
         ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(servletContext);
         RequestContext context = rendererContext.getRequestContext();
@@ -113,10 +120,6 @@ public class FreemarkerRenderer extends AbstractRenderer
                 
                 head = out.toString();
             }
-            else
-            {
-                head = super.head(rendererContext);
-            }
         }
         catch (Exception ex) 
         {   
@@ -149,24 +152,42 @@ public class FreemarkerRenderer extends AbstractRenderer
         try
         {
             // the result model
-            Map<String, Object> resultModel = new HashMap<String, Object>(8, 1.0f);
+            Map<String, Object> resultModel = null;
             
             if (rendererContext.getObject() instanceof TemplateInstance)
             {
-                // Attempt to execute a .js file for this page template
-                String scriptPath = uri + ".js";
-                ScriptContent script = templateStore.getScriptLoader().getScript(scriptPath);
-                if (script != null)
+                if (context.hasValue(SCRIPT_RESULTS) == false)
                 {
-                    // build the model
-                    Map<String, Object> scriptModel = new HashMap<String, Object>(8);
-                    ProcessorModelHelper.populateScriptModel(rendererContext, scriptModel);
+                    // Attempt to execute a .js file for this page template
+                    resultModel = new HashMap<String, Object>(8, 1.0f);
+                    ScriptContent script = templateStore.getScriptLoader().getScript(uri + ".js");
+                    if (script != null)
+                    {
+                        // build the model
+                        Map<String, Object> scriptModel = new HashMap<String, Object>(8);
+                        ProcessorModelHelper.populateScriptModel(rendererContext, scriptModel);
+                        
+                        // add in the model object
+                        scriptModel.put("model", resultModel);
+                        
+                        // execute the script
+                        scriptProcessor.executeScript(script, scriptModel);
+                    }
                     
-                    // add in the model object
-                    scriptModel.put("model", resultModel);
+                    // store the result model in the request context for the next pass
+                    // this removes the need to execute the script twice
+                    if (context.hasValue(RenderUtil.PASSIVE_MODE_MARKER))
+                    {
+                        context.setValue(SCRIPT_RESULTS, resultModel);
+                    }
+                }
+                else
+                {
+                    // retrieve results from the request context - we already executed a pass
+                    resultModel = (Map<String, Object>)context.getValue(SCRIPT_RESULTS);
                     
-                    // execute the script
-                    scriptProcessor.executeScript(script, scriptModel);
+                    // remove the results from the context - we do not want other templates finding it
+                    context.removeValue(SCRIPT_RESULTS);
                 }
             }
             
@@ -176,12 +197,15 @@ public class FreemarkerRenderer extends AbstractRenderer
             
             // merge script results model into the template model
             // these may not exist if a .js file was not found
-            for (Map.Entry<String, Object> entry : resultModel.entrySet())
+            if (resultModel != null)
             {
-                // retrieve script model value and unwrap each java object from script object
-                Object value = entry.getValue();
-                Object templateValue = scriptProcessor.unwrapValue(value);
-                templateModel.put(entry.getKey(), templateValue);
+                for (Map.Entry<String, Object> entry : resultModel.entrySet())
+                {
+                    // retrieve script model value and unwrap each java object from script object
+                    Object value = entry.getValue();
+                    Object templateValue = scriptProcessor.unwrapValue(value);
+                    templateModel.put(entry.getKey(), templateValue);
+                }
             }
             
             // path to the template (switches on format)

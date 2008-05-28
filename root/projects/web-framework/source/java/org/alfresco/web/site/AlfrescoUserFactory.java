@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.AlfrescoConnector;
 import org.alfresco.connector.Connector;
+import org.alfresco.connector.CredentialVaultFactory;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.SimpleCredentials;
@@ -74,7 +75,7 @@ public class AlfrescoUserFactory extends UserFactory
             String ticket = document.getRootElement().getText();
 
             // build the credentials to represent the successful login
-            String id = ALFRESCO_ENDPOINT_ID + "_" + username;
+            String id = CredentialVaultFactory.buildBindingKey(ALFRESCO_ENDPOINT_ID, username);
             credentials = new SimpleCredentials(id);
             credentials.setProperty(Credentials.CREDENTIAL_ALF_USERNAME, username);
             credentials.setProperty(Credentials.CREDENTIAL_ALF_PASSWORD, password);
