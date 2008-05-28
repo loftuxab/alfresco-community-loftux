@@ -1,26 +1,38 @@
-/* Header css */
+/* Header Component */
+.header
+{
+   padding-top: 0.5em;
+}
 
-span.menu-item {
+.header span.menu-item
+{
     vertical-align: middle;
-    padding: 0px 10px 0px 10px;
+    padding: 0px 10px;
     margin: 0px;
     text-valign: middle;
     white-space: nowrap;
 }
 
-div.logo {
+.header div.logo
+{
     float: left;
     margin: 0px 0px 0px 10px;
 }
-div.personal-menu {
+
+.header div.personal-menu
+{
     float: left;
     margin: 5px 0px 0px 10px;
 }
-div.collaboration-menu {
+
+.header div.collaboration-menu
+{
     text-align: center;
     margin: 5px 0px 0px 0px;
 }
-div.util-menu {
+
+.header div.util-menu
+{
     margin: 5px 10px 0px 0px;
     float: right;
 }

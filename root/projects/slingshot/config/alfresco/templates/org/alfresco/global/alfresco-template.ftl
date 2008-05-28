@@ -1,10 +1,11 @@
 <#--
-   Template "header" macro.
+   Template "head" macro.
    Includes preloaded YUI assets and essential site-wide libraries.
 -->                                                                           
-<#macro header>
 <#assign theme="sam">
 <#assign DEBUG=true>
+
+<#macro header>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
@@ -69,8 +70,25 @@ ${head}
 -->
 <#macro body>
 <body class="yui-skin-${theme}">
+   <div class="sticky-wrapper">
+      <div id="doc3">
 <#-- Template-specific body markup -->
 <#nested>
+      </div>
+      <div class="sticky-push"></div>
+   </div>
+</#macro>
+
+
+<#--
+   Template "footer" macro.
+   Pulls in template footer.
+-->
+<#macro footer>
+   <div class="sticky-footer">
+<#-- Template-specific footer markup -->
+<#nested>
+   </div>
 <#-- This function call MUST come after all other component includes. -->
    <script type="text/javascript">//<![CDATA[
       Alfresco.util.YUILoaderHelper.loadComponents();

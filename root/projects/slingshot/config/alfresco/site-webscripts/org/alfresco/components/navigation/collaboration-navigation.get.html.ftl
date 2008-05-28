@@ -5,11 +5,11 @@
    <span class="navigation-separator">|</span>
    <span class="navigation-menu-item"><a href="#">Blog</a></span>
    <span class="navigation-separator">|</span>
-   <span class="navigation-menu-item"><a href="${url.context}/page/documentlibrary?site=${page.url.args.site}">Docs</a></span>
+   <span class="navigation-menu-item"><a href="${url.context}/page/documentlibrary?site=${page.url.args.site}">Document Library</a></span>
    <span class="navigation-separator">|</span>
-   <span class="navigation-menu-item"><a href="#">Media</a></span>
+   <span class="navigation-menu-item"><a href="#">Media Library</a></span>
    <span class="navigation-separator">|</span>
-   <span class="navigation-menu-item"><a href="#">Events</a></span>
+   <span class="navigation-menu-item"><a href="#">Calendar and Events</a></span>
    <span class="navigation-separator">|</span>
-   <span class="navigation-menu-item"><a href="#">Forum</a></span>
+   <span class="navigation-menu-item"><a href="#">Discussion Forum</a></span>
 </div>

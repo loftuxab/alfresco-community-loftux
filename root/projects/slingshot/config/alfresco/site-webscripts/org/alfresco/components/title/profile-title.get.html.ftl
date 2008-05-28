@@ -1,3 +1,1 @@
-<div class="site-title">
-My Profile
-</div>
+<h1>My Profile</h1>
