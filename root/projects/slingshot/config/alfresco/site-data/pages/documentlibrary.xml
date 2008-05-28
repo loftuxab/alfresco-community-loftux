@@ -4,6 +4,6 @@
    <page-type>doclib</page-type>
    <title>Document Library: Test Page</title>
    <description>Test page for document library components</description>
-   <template-instance>documentlibrary-full</template-instance>
+   <template-instance>documentlibrary</template-instance>
    <authentication>user</authentication>
 </page>

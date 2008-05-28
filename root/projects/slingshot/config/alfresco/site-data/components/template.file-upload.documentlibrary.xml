@@ -2,6 +2,6 @@
 <component>
    <scope>template</scope>
    <region-id>file-upload</region-id>
-   <source-id>documentlibrary-full</source-id>
+   <source-id>documentlibrary</source-id>
    <url>/components/documentlibrary/file-upload</url>
 </component>
