@@ -1,6 +1,6 @@
 /*
 
-YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidth
+YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
 
 */
 
@@ -384,7 +384,8 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
          // Use  like this for multi uploads
          var multiUploadConfig =
          {
-            siteId: this.siteId,
+            siteId: this.options.siteId,
+            componentId: "documentLibrary",
             path: this.currentPath,
             title: "Upload new files",
             filter: [],
