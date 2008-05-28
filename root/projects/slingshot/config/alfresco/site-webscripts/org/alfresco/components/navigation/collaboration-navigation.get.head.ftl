@@ -2,14 +2,16 @@
 
    div.site-navigation
    {
-      margin-bottom: 1em;
-      padding: 1em;
-      background-color: #eeeeee;
-      border-bottom: 1px solid #dedede;
+      color: white;
+      background-color: #5ba1d0;
+      border-top: 1px dotted #84b4d5;
+      margin: 0px -10px 4px -10px;
+      padding: 8px 10px;
    }
 
    span.navigation-separator, span.navigation-item
    {
+      color: #9fc6e1;
       vertical-align: middle;
       margin: 0px;
       text-valign: middle;
@@ -20,6 +22,16 @@
       padding: 0px 0px 0px 10px;
       white-space: nowrap;
    }
+   
+   span.navigation-item a
+   {
+      color: white;
+   }
+   
+   span.navigation-item a:hover
+   {
+      color: white;
+   }
 
    span.navigation-separator
    {
@@ -27,4 +39,5 @@
       text-align: center;
    }
 
+   
 </style>
