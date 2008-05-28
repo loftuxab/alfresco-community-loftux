@@ -8,7 +8,7 @@
    <div id="hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="page" protected=true />
-      <@region id="navigation" scope="page" protected=true />
+      <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
       <div class="yui-t1" id="divDocLibraryWrapper">
