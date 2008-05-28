@@ -5,7 +5,7 @@
 <div class="dashlet">
   <div class="title">My Sites</div>
   <div class="menu">
-    <span id="${args.htmlid}-createSite-button"><a href="#">Create site &gt;</a></span>
+    <a href="#" id="${args.htmlid}-createSite-button">Create site &gt;</a>
   </div>
   <div class="body scrollableList">
 <#if sites?exists>

@@ -75,6 +75,14 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
          showFolders: true,
 
          /**
+          * Flag indicating whether the list shows a detailed view or a simple one.
+          * 
+          * @property showDetail
+          * @type boolean
+          */
+         showDetail: true,
+
+         /**
           * Current siteId.
           * 
           * @property siteId
@@ -210,6 +218,13 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
          });
          this.widgets.showFoldersButton.on("click", this.onShowFoldersButtonClick, this.widgets.showFoldersButton, this);
 
+         // Detailed/Simple List button
+         this.widgets.showDetailButton = new YAHOO.widget.Button(this.id + "-showDetail-button",
+         {
+            type: "button"
+         });
+         this.widgets.showDetailButton.on("click", this.onShowDetailButtonClick, this.widgets.showDetailButton, this);
+
          // Folder Up Navigation button
          this.widgets.folderUpButton = new YAHOO.widget.Button(this.id + "-folderUp-button",
          {
@@ -228,7 +243,9 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
              fields: ["nodeRef", "type", "icon32", "name", "description"]
          };
          
-         // Custom error message
+         // Custom error messages
+         YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
+         
          this.widgets.dataSource.doBeforeParseData = function(oRequest, oFullResponse)
          {
             if (oFullResponse.doclist.error)
@@ -360,21 +377,33 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
        */
       onFileUploadButtonClick: function DL_onFileUploadButtonClick(e, oValue)
       {
-         if(!this.fileUpload)
+         if (this.fileUpload === null)
          {
-            this.fileUpload = new Alfresco.module.FileUpload(obj.id + "-createSite");
+            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-createSite");
          }
-         var showConfig2 = {
+
+         var showConfig2 =
+         {
             title: "Upload New Version of Alfresco Logo.rtf",
-            filter: [{description:"Documents", extensions:"*.doc"}],
+            filter: [
+            {
+               description: "Documents",
+               extensions: "*.doc"
+            }],
             multiSelect: false,
             noOfVisibleRows: 1,
             versionInput: true
          };
+
          // Use something like this for multi uploads
-         var showConfig = {
+         var showConfig =
+         {
             title: "Upload new files",
-            filter: [{description:"Documents", extensions:"*.doc"}],
+            filter: [
+            {
+               description: "Documents",
+               extensions: "*.doc"
+            }],
             multiSelect: true,
             noOfVisibleRows: 5,
             versionInput: false
@@ -394,6 +423,22 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-full-body").clientWidt
       {
          this.options.showFolders = !this.options.showFolders;
          oValue.set("label", (this.options.showFolders ? "Hide Folders" : "Show Folders"));
+
+         YAHOO.Bubbling.fire('onDoclistRefresh');
+         YAHOO.util.Event.preventDefault(e);
+      },
+      
+      /**
+       * Show/Hide detailed list button click handler
+       *
+       * @method onShowDetailButtonClick
+       * @param e {object} DomEvent
+       * @param oValue {object} Object passed back from addListener method
+       */
+      onShowDetailButtonClick: function DL_onShowDetailButtonClick(e, oValue)
+      {
+         this.options.showDetail = !this.options.showDetail;
+         oValue.set("label", (this.options.showDetail ? "Simple List" : "Detailed List"));
 
          YAHOO.Bubbling.fire('onDoclistRefresh');
          YAHOO.util.Event.preventDefault(e);

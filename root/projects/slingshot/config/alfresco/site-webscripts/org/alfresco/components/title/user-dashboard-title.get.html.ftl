@@ -1,3 +1,1 @@
-<div class="site-title">
-My Dashboard
-</div>
+<h1>My Dashboard</h1>

@@ -1,3 +1,1 @@
-<div class="site-title">
-Collaboration Site
-</div>
+<h1>Collaboration Site</h1>

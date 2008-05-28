@@ -22,14 +22,13 @@
          </div>
       </div>
       <div class="yui-u">
-         <div id="${args.htmlid}-pager" class="doclist-pager"><a href="#">&lt;</a> <a href="#">1</a> <a href="#">2</a> <a href="#">3</a> <a href="#">4</a> <a href="#">&gt;</a></div>
+         <div id="${args.htmlid}-pager" class="doclist-pager">&nbsp;</div>
       </div>
       <div class="yui-u">
          <div id="${args.htmlid}-viewButtons" class="doclist-viewButtons">
             <span><a href="#" id="${args.htmlid}-fileUpload-button">Upload</a> | </span>
             <span><a href="#" id="${args.htmlid}-showFolders-button">Hide Folders</a> | </span>
-            <span><a href="#">Detail List</a> | </span>
-            <span><a href="#">Simple List</a></span>
+            <span><a href="#" id="${args.htmlid}-showDetail-button">Detailed List</a></span>
          </div>
       </div>
    </div>

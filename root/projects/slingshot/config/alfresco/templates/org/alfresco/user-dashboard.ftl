@@ -3,8 +3,8 @@
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/dashboard/dashboard.css" />      
 </@>
+
 <@template.body>
-<div id="doc3">
    <div id="hd">
       <@region id="header" scope="global" protected=true/>
       <@region id="title" scope="template" protected=true />
@@ -13,10 +13,12 @@
    <div id="bd">
       <@layout.grid 3 "fluid" 9 "component-"/>
    </div>
+</@>
+
+<@template.footer>
    <div id="ft">
       <@region id="footer" scope="global" protected=true />
    </div>
-</div>
 </@>
 
       

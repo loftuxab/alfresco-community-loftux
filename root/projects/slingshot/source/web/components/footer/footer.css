@@ -1,17 +1,9 @@
-/* Footer css */
-
-
-.copyright {
-    vertical-align: middle;
-    padding: 0px 10px 0px 10px;
-    margin: 0px;
-    text-valign: middle;
-    white-space: nowrap;
+/* Footer Component */
+.footer .links
+{
+   padding: 0 2em;
 }
 
-.footer {
-    float: none;
-    text-align: center;
-    margin: 5px 0px 0px 0px;
+.footer .copyright
+{
 }
-
