@@ -469,6 +469,10 @@ public class RemoteClient extends AbstractClient
             
             // if we get here call was successful
             status.setCode(connection.getResponseCode());
+            if (res != null)
+            {
+                res.setStatus(connection.getResponseCode());
+            }
             
             return encoding;
         }
