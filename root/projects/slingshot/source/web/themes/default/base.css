@@ -19,7 +19,7 @@ html, body
 
 .sticky-footer, .sticky-push
 {
-   height: 1.5em;
+   height: 3.5em;
 }
 
 
@@ -46,13 +46,27 @@ div.clear
     padding: 0;
 }
 
+a
+{
+   color: black;
+   text-decoration: none;
+}
+
+a:hover
+{
+   color: black;
+   text-decoration: underline;
+}
+
+a:visited
+{
+   color: black;
+}
+
 h1
 {
    font-weight: bold;
    font-size: 167%;
-   border-bottom: 1px solid #dedede;
-   border-top: 1px solid #dedede;
-   padding: 8px 5px 5px 5px;
 }
 
 h2
@@ -60,11 +74,43 @@ h2
    font-weight: bold;
    font-size: 123.1%;
 }
+
 h2 .light
 {
    color: #808080;
 }
 
-.yui-skin-sam .yui-panel .bd, .yui-skin-sam .yui-panel .ft {
+h3
+{
+   font-weight: bold;
+   font-size: 108%;
+}
+
+h4
+{
+   font-weight: bold;
+}
+
+p
+{
+   padding-top: 10px;
+   padding-bottom: 3px;
+}
+
+.label
+{
+   font-weight: bold;
+}
+
+.page-title
+{
+   color: white;
+   background-color: #5497c4;
+   margin: 2px -10px 0px -10px;
+   padding: 8px 10px;
+}
+
+.yui-skin-sam .yui-panel .bd, .yui-skin-sam .yui-panel .ft 
+{
    background-color: #FFFFFF;
 }
