@@ -4,13 +4,13 @@
 
 <div class="dashlet">
   <div class="title">My Sites</div>
-  <div class="menu">
-    <a href="#" id="${args.htmlid}-createSite-button">Create site &gt;</a>
+  <div class="toolbar">
+    <a href="#" id="${args.htmlid}-createSite-button">Create site</a>
   </div>
   <div class="body scrollableList">
 <#if sites?exists>
    <#list sites as site>
-      <div>
+      <div class="list-item">
         <a href="${url.context}/page/collaboration-dashboard?site=${site.shortName}">${site.title}</a>
       </div>
    </#list>

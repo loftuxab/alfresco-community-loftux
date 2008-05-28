@@ -60,7 +60,30 @@ h2
    font-weight: bold;
    font-size: 123.1%;
 }
+
 h2 .light
 {
    color: #808080;
+}
+
+h3
+{
+   font-weight: bold;
+   font-size: 108%;
+}
+
+h4
+{
+   font-weight: bold;
+}
+
+p
+{
+   padding-top: 10px;
+   padding-bottom: 3px;
+}
+
+.label
+{
+   font-weight: bold;
 }

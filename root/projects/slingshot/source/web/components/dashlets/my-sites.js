@@ -26,11 +26,14 @@
 
       init: function()
       {
-         var createSiteButton = new YAHOO.widget.Button(this.id + "-createSite-button", {type: "button"});
-         createSiteButton.subscribe("click", this.onCreateSiteButtonClick, this, true);
+         //var createSiteButton = new YAHOO.widget.Button(this.id + "-createSite-button", {type: "button"});
+         //createSiteButton.subscribe("click", this.onCreateSiteButtonClick, this, true);
+         
+         var createSiteLink = document.getElementById(this.id + "-createSite-button");
+         YAHOO.util.Event.addListener(createSiteLink, "click", this.onCreateSiteLinkClick, this, true);
       },
 
-      onCreateSiteButtonClick: function(event)
+      onCreateSiteLinkClick: function(event)
       {
          if(!this.createSite)
          {

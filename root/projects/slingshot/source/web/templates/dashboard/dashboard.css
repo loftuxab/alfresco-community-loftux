@@ -1,34 +1,50 @@
 /* DASHLETS */
+
 .dashlet
 {
    padding: 0px;
-   border: 1px solid #dedede;
+   border: 1px solid #bababa;
    background-color: white;
+   margin: 10px 0px 10px 0px;
 }
 
 .dashlet .title
 {
-   font-weight: bold;
-   padding: 2px 0px 2px 8px;
-   background-color: #CCCCCC;
-   white-space: nowrap;
+   padding: 5px 9px 5px 9px;
+   background-color: #d7e0e7;
+   border-bottom: 1px dotted #bababa;
 }
 
-.dashlet .menu
+.dashlet .toolbar
 {
-   background-color: #dedede;
-   white-space: nowrap;
-   margin: 0px 0px 0px 0px;
-   padding: 2px 0px 2px 8px;
-   border-bottom: 1px solid #dedede;
+   background-color: #f6f6f6;
+   padding: 5px 9px 5px 9px;
+   border-bottom: 1px solid #d3d3d3;
+}
+
+.dashlet .toolbar a
+{
+   color: #97c1ed;
+   text-decoration: none;
+}
+
+.dashlet .toolbar a:hover
+{
+   text-decoration: underline;
 }
 
 .dashlet .body
 {
-   padding: 2px 0px 2px 8px;
+	background-color: #f5f9fc;
+   padding: 9px;
 }
 
 .dashlet .scrollableList
 {
    height: 200px;
+}
+
+.dashlet .list-item
+{
+   padding-bottom: 6px;
 }
