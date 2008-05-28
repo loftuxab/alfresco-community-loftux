@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>page</scope>
-   <region-id>component-4</region-id>
-   <source-id>user-dashboard</source-id>
-   <url>/components/simple</url>
-</component>
