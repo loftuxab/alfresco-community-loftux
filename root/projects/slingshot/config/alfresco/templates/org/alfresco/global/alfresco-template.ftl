@@ -43,7 +43,6 @@
 
 <!-- Site-wide Common Assets -->
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/base.css" />
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/controls.css" />
    <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
    <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
@@ -53,9 +52,7 @@
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
-   <#if (user.properties.alfTicket?exists)>
-      Alfresco.constants.ALF_TICKET = "${user.properties.alfTicket}";
-   </#if>
+      Alfresco.constants.ALF_TICKET = "${user.properties.alfTicket!""}";
    //]]></script>
 
 <!-- Component Assets -->

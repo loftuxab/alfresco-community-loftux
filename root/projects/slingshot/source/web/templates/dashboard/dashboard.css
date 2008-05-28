@@ -42,6 +42,8 @@
 .dashlet .scrollableList
 {
    height: 200px;
+   padding: 2px 0px 2px 8px;
+   overflow:auto;
 }
 
 .dashlet .list-item

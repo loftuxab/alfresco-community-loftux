@@ -43,6 +43,7 @@
 
       defaultConfig: {
          siteId: null,
+         componentId: null,
          path: null,
          title: "",
          multiSelect: false,
@@ -363,12 +364,11 @@
                var fileInfo = this.fileStore[flashId];
                var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
-               // todo remove the line below (so it will use the proxy) when the proxy can redirect status codes
-               url = "/alfresco/service/api/upload";
                this.uploader.upload(flashId, url, "POST",
                {
                   path: this.config.path,
                   siteId: this.config.siteId,
+                  componentId: this.config.componentId,
                   contentType: contentType
                }, "filedata");
             }
