@@ -215,7 +215,7 @@ public class RemoteClient extends AbstractClient
             // error information already applied to Status object during service() call
             result = new Response(status);
         }
-
+        
         return result;
     }
 
@@ -265,7 +265,7 @@ public class RemoteClient extends AbstractClient
             // error information already applied to Status object during service() call
             result = new Response(status);
         }
-
+        
         return result;
     }
 
@@ -299,7 +299,7 @@ public class RemoteClient extends AbstractClient
             // error information already applied to Status object during service() call
             result = new Response(status);
         }
-
+        
         return result;
     }
 
@@ -343,7 +343,7 @@ public class RemoteClient extends AbstractClient
      * @throws IOException
      */
     private String service(URL url, InputStream in, OutputStream out, Status status)
-    throws IOException
+        throws IOException
     {
         return service(url, in, out, null, status);
     }
@@ -364,25 +364,24 @@ public class RemoteClient extends AbstractClient
      * @throws IOException
      */
     private String service(URL url, InputStream in, OutputStream out, HttpServletResponse res, Status status)
-    throws IOException
+        throws IOException
     {
         if (logger.isDebugEnabled())
             logger.debug("Executing " + (in == null ?
-                    "(" + (requestMethod != null ? requestMethod : "GET") + ")" :
-            "(POST)") + ' ' + url.toString());
-
+                    "(" + (requestMethod != null ? requestMethod : "GET") + ")" : "(POST)") + ' ' + url.toString());
+        
         HttpURLConnection connection = null;
         try
         {
             connection = (HttpURLConnection)url.openConnection();
-
+            
             // HTTP basic auth support
             if (this.username != null && this.password != null)
             {
                 String auth = this.username + ':' + this.password;
                 connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
             }
-
+            
             // always perform a POST to the connection if input supplied
             if (in != null)
             {
@@ -392,7 +391,7 @@ public class RemoteClient extends AbstractClient
                 connection.setUseCaches(false);
                 connection.setRequestProperty ("Content-Type",
                         (this.requestContentType != null ? this.requestContentType : "application/octet-stream"));
-
+                
                 FileCopyUtils.copy(in, new BufferedOutputStream(connection.getOutputStream()));
             }
             // set the request method - if not supplied then the default of GET will be used anyway
@@ -400,10 +399,10 @@ public class RemoteClient extends AbstractClient
             {
                 connection.setRequestMethod(this.requestMethod);
             }
-
+            
             // prepare to write the connection result to the output stream
             InputStream input = connection.getInputStream();
-
+            
             // proxy over any headers we find after getting the input stream
             if (res != null)
             {
@@ -421,7 +420,7 @@ public class RemoteClient extends AbstractClient
                     }
                 }
             }
-
+            
             // perform the write to the output
             try
             {
@@ -455,7 +454,7 @@ public class RemoteClient extends AbstractClient
                         logger.warn("Exception during close() of HTTP API connection", e);
                 }
             }
-
+            
             // locate response encoding from the headers
             String encoding = null;
             String ct = connection.getContentType();
@@ -467,10 +466,10 @@ public class RemoteClient extends AbstractClient
                     encoding = ct.substring(csi + CHARSETEQUALS.length());
                 }
             }
-
+            
             // if we get here call was successful
-            status.setCode(HttpServletResponse.SC_OK);
-
+            status.setCode(connection.getResponseCode());
+            
             return encoding;
         }
         catch (ConnectException conErr)
@@ -479,7 +478,7 @@ public class RemoteClient extends AbstractClient
             status.setCode(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             status.setException(conErr);
             status.setMessage(conErr.getMessage());
-
+            
             throw conErr;
         }
         catch (IOException ioErr)
@@ -488,7 +487,7 @@ public class RemoteClient extends AbstractClient
             status.setCode(connection.getResponseCode());
             status.setException(ioErr);
             status.setMessage(ioErr.getMessage());
-
+            
             throw ioErr;
         }
     }
