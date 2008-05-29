@@ -35,7 +35,7 @@
          
          <!-- Application Defaults -->
          <application-defaults>
-            <theme>sam</theme>
+            <theme>default</theme>
             <site-configuration>slingshot.site.configuration</site-configuration>
             <!-- slingshot region chrome override -->
             <region-chrome>slingshot-region-chrome</region-chrome>
