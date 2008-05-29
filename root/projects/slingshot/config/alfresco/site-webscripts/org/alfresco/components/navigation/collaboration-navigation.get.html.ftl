@@ -9,7 +9,7 @@
    <span class="navigation-separator">|</span>
    <span class="navigation-item"><a href="#">Media Library</a></span>
    <span class="navigation-separator">|</span>
-   <span class="navigation-item"><a href="#">Calendar and Events</a></span>
+   <span class="navigation-item"><a href="${url.context}/page/documentlibrary?site=${page.url.args.site}">Calendar and Events</a></span>
    <span class="navigation-separator">|</span>
    <span class="navigation-item"><a href="#">Discussion Forum</a></span>
 </div>
