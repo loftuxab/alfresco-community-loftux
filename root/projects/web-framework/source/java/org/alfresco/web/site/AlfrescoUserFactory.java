@@ -126,6 +126,10 @@ public class AlfrescoUserFactory extends UserFactory
             {
                 user.setOrganization(properties.getString("{http://www.alfresco.org/model/content/1.0}organization"));
             }
+            if (properties.has("{http://www.alfresco.org/model/content/1.0}location"))
+            {
+                user.setLocation(properties.getString("{http://www.alfresco.org/model/content/1.0}location"));
+            }
             
             // TODO: apply other user properties
         }

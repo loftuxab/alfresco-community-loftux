@@ -53,6 +53,7 @@ public class User implements java.security.Principal, Serializable
     public static String PROP_ZIP_CODE = "zip_code";
     public static String PROP_JOB_TITLE = "job_title";
     public static String PROP_ORGANIZATION = "organization";
+    public static String PROP_LOCATION = "location";
 
     protected String fullName = null;
     protected boolean isAdmin = false;
@@ -392,10 +393,21 @@ public class User implements java.security.Principal, Serializable
     {
         setProperty(PROP_ZIP_CODE, value);
     }
+    
+    public String getLocation()
+    {
+        return getStringProperty(PROP_LOCATION);
+    }
+
+    public void setLocation(String value)
+    {
+        setProperty(PROP_LOCATION, value);
+    }
 
     //
     // general accessors
     //
+
 
     /**
      * Gets the property.
