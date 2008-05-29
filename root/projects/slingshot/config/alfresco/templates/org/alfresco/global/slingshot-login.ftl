@@ -1,4 +1,4 @@
-<#import "alfresco-template.ftl" as template />
+<#import "../import/alfresco-template.ftl" as template />
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/login/login.css" />
    <style type="text/css">

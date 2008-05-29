@@ -1,5 +1,5 @@
-<#import "global/alfresco-template.ftl" as template />
-<#import "global/alfresco-layout.ftl" as layout />
+<#import "import/alfresco-template.ftl" as template />
+<#import "import/alfresco-layout.ftl" as layout/>
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />
 </@>
