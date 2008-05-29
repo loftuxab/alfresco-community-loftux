@@ -1,4 +1,4 @@
-<#import "global/alfresco-template.ftl" as template />
+<#import "import/alfresco-template.ftl" as template />
 <@template.header />
 
 <@template.body>

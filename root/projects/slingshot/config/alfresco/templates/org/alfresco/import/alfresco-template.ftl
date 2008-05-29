@@ -89,9 +89,11 @@ ${head}
 <#nested>
    </div>
 <#-- This function call MUST come after all other component includes. -->
+   <div class="hiddenComponents">
    <script type="text/javascript">//<![CDATA[
       Alfresco.util.YUILoaderHelper.loadComponents();
    //]]></script>
+   </div>
 </body>
 </html>
 </#macro>
