@@ -1,6 +1,6 @@
 <#import "global/alfresco-template.ftl" as template />
 <@template.header>
-   <link rel="stylesheet" type="text/css" href="${url.context}/templates/dashboard/dashboard.css" />      
+   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />      
 </@>
 
 <@template.body>
