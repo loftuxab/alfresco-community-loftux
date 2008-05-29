@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.site.Content;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.ModelUtil;
@@ -95,6 +96,8 @@ public class DispatcherServlet extends BaseServlet
     protected void service(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException
     {
+        boolean errorOccured = false;
+        
         // bind a timer for reporting of dispatches
         if (Timer.isTimerEnabled())
         {
@@ -161,25 +164,28 @@ public class DispatcherServlet extends BaseServlet
              * back.  We must handle that case as well.
              */
             
-            // Either way, print stuff out to log
+            errorOccured = true;
+            
             FrameworkHelper.getLogger().error(t);
             
-            // If it is a runtime exception, we should handle
+            // for now, we will throw back to servlet container
             if (t instanceof RuntimeException)
             {
-                // TODO: How?
+                throw (RuntimeException)t;
             }
             else
             {
-                // otherwise, we will throw back to servlet container
-                throw new ServletException(t);
+                throw new ServletException("Error during dispatch: " + t.getMessage(), t);
             }
         }
         finally
         {
-            // clean up
-            response.getWriter().flush();
-            response.getWriter().close();
+            // clean up - unless an error occured as then we don't want to commit the response yet
+            if (!errorOccured)
+            {
+                response.getWriter().flush();
+                response.getWriter().close();
+            }
             
             // stop the service timer and print out any timing information (if enabled)
             if (Timer.isTimerEnabled())
@@ -297,7 +303,7 @@ public class DispatcherServlet extends BaseServlet
                         
                         if (loginPageId == null || loginPage == null)
                         {
-                            FrameworkHelper.getLogger().warn("No 'login' page type found - but page auth required it.");
+                            throw new AlfrescoRuntimeException("No 'login' page type configured - but page auth required it.");
                         }
                     }
                     break;

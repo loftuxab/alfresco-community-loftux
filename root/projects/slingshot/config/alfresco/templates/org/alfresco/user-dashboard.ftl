@@ -1,17 +1,17 @@
 <#import "global/alfresco-template.ftl" as template />
-<#import "global/alfresco-layout.ftl" as layout/>
+<#import "global/alfresco-layout.ftl" as layout />
 <@template.header>
-   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />      
+   <link rel="stylesheet" type="text/css" href="${url.context}/themes/${theme}/dashboard.css" />
 </@>
 
 <@template.body>
    <div id="hd">
-      <@region id="header" scope="global" protected=true/>
+      <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@layout.grid 3 "fluid" 9 "component-"/>
+      <@layout.grid 3 "fluid" 9 "component-" />
    </div>
 </@>
 
@@ -20,5 +20,3 @@
       <@region id="footer" scope="global" protected=true />
    </div>
 </@>
-
-      
