@@ -2,7 +2,6 @@
    Template "head" macro.
    Includes preloaded YUI assets and essential site-wide libraries.
 -->                                                                           
-<#assign theme="sam">
 <#assign DEBUG=true>
 
 <#macro header>

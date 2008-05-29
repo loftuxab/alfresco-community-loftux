@@ -8,7 +8,7 @@
          top: 16px;
          height: 64px;
          width: 450px;
-         background: transparent url("${url.context}/themes/sam/images/logo.png") no-repeat;
+         background: transparent url("${url.context}/themes/${theme}/images/logo.png") no-repeat;
       }
    </style>
 </@>

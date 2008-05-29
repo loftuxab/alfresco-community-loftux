@@ -114,6 +114,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.renderers.putAll(this.renderers);
         combinedElement.types.putAll(this.types);
         combinedElement.contentLoaders.putAll(this.contentLoaders);
+        combinedElement.pageTypes.putAll(this.pageTypes);
 
         // override with things from the merging object
         combinedElement.formats.putAll(configElement.formats);
@@ -128,6 +129,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         combinedElement.renderers.putAll(configElement.renderers);
         combinedElement.types.putAll(configElement.types);
         combinedElement.contentLoaders.putAll(configElement.contentLoaders);
+        combinedElement.pageTypes.putAll(configElement.pageTypes);
 
         // other properties
         combinedElement.isTimerEnabled = this.isTimerEnabled;
