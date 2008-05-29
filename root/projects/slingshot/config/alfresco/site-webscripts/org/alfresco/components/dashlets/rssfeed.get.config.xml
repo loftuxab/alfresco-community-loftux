@@ -1,0 +1,5 @@
+<feeds id="rssfeed">
+	<feed>http://blogs.alfresco.com/rss20.xml</feed>
+	<feed>alfresco-system:///calendar/rssfeed</feed>
+	<feed>http://newsrss.bbc.co.uk/rss/newsonline_uk_edition/front_page/rss.xml</feed>
+</feeds>
