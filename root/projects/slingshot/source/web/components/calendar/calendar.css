@@ -1,0 +1,119 @@
+.y2008 .w25 td { 
+	background-color:yellow 
+}
+
+tr.odd  td {
+	background-color: #D3E6FE;
+}
+
+tr.even  td {
+	background-color: #FFFFFF;
+}
+
+table#week-view {
+	border: 1px solid #000000;
+}
+
+table#week-view th {
+	text-align: center;
+}
+
+table#week-view th a {
+	text-decoration: none;
+}
+
+.yui-content {
+	background: #FFFFFF; /* content background color */
+}
+
+table#month-view {
+	width: 100%; 
+	border-collapse: collapse;
+}
+table#month-view th {
+	text-align: center;
+	border-bottom: 1px solid #CCCCCC;
+	font-weight: normal;
+	color: #000000;
+}
+
+table#month-view td {
+	height: 80px;
+	width: 14%;
+	vertical-align: top;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #CCCCCC;
+}
+
+div.dayLabel {
+	text-align: right;
+	padding-right: 5px;
+	margin: 0;
+}
+
+div.dayLabel a {
+	text-decoration: none;
+/*	color: #808080; */
+	color: #000000; /* text color */
+	font-size: normal;
+}
+
+div.cal-event-entry {
+	font-size: 11px;
+	padding-left: 5px;
+	color: #000000;
+}
+
+#monthLabel {
+	font-weight: bold;
+	text-align: center;
+}
+
+div.boxOutline {
+	margin: 0;
+	overflow: hidden;
+}
+
+.nextBtn {
+	background: url(/slingshot/images/calendar/next.gif) no-repeat center center;
+}
+
+.today {
+	background-color: #FFFFCC;
+}
+
+#calendarcontainer {
+	padding:10px;
+}
+
+#calendarmenu {
+   position: absolute; 
+}
+
+#calendarendpicker button, #calendarpicker button {
+	background: url(../../images/misc/calendar_icon.gif) center center no-repeat;
+   text-align: left;
+   text-indent: -10em;
+   overflow: hidden;
+   *margin-left: 10em; /* For IE */
+   *padding: 0 3em;    /* For IE */
+   white-space: nowrap;
+}
+ 
+#year-field { 
+	width: 3em;
+}
+
+#datefields {
+	border: solid 1px #666;
+	padding: .5em;
+}
+
+#calendarpicker  {
+	vertical-align: baseline;	
+}
+
+/* Styles calendar dashlet */
+.yui-skin-sam .yui-calendar td.event { background-color:#999; }
+
