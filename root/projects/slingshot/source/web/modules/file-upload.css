@@ -1,73 +1,90 @@
-.fileupload-fileItemTemplate-div
-{
-   padding: 0px 0px 0px 0px;
-   margin: 0px;
-   /*background-color: #929292;*/
+/* Style YIU components */
+
+.fileUpload-filelist-table .yui-dt-liner {
+   margin:0pt;
+   padding:0px 0px;
 }
 
-/*
-.fileupload-leftcolumn-div{
-   float: left;
-   width: 20px;
+.removeButton a {
+   padding-left: 2.25em;
+   background: url(../images/icons/close_panel.gif) 10% 50% no-repeat;
 }
-*/
-.fileupload-actions-div
-{
-   float: right;
-   width: 90px;
+
+.fileupload-fileItemTemplate-div{
+   padding: 1px 0px 1px 0px;
+   margin: 0px;
+   border-bottom: #929292;
+}
+
+.fileupload-percentage-div, .fileupload-fileButton-div{
+   height: 40px;
    text-align: center;
-   padding-top: 3px;
+   background-color: #FAF9F9;
 }
 
-.fileUpload-filelist-table .yui-dt-liner
-{
-   margin: 0;
-   padding: 0;
+.fileupload-fileButton-div{
+   width: 120px;
+   float: right;
 }
 
-.fileUpload-filelist-table .yui-dt-col-3
-{
-   overflow: hidden;
-   width: 508px;
+.fileupload-percentage-div{
+   width: 80px;
+   float: left;
 }
 
-.progressBar
-{
+.fileupload-percentage-span{
    position: relative;
+   top: 12px;
+}
+
+.fileupload-fileButton-span{
+   position: relative;
+   top: 5px;
+}
+
+.fileupload-fileinfo-div{
+   background-color: #FFFFFF;
+   height: 40px;
+   padding: 0px 120px 0px 80px;
+}
+
+.fileupload-progressBar-div{
+   position: absolute;
+   width: 100%;
    /*background: url( images/progress-bar-background.gif ) 0 0 repeat-x;*/
-   height: 30px;
-   padding: 0px 25px 0px 95px;
-   margin: 0px;
+   height: 40px;
    overflow: hidden;
 }
 
-.progressBar .progressSuccess, .progressBar .progressFailure
-{
+.fileupload-progressBar-div .fileupload-progressSuccess-span, .fileupload-progressBar-div .fileupload-progressFailure-span{
    position: absolute;
-   background: url(images/progress-bar-success.gif) 0 0 repeat-x;
+   /*background: url( images/progress-bar-success.gif ) 0 0 repeat-x;*/
+   background-color: #DCECCC;
    top: 0px;
-   left: -420px;
-   height: 30px;
-   width: 420px;
+   left: -400px;
+   height: 40px;
+   width: 400px;
 }
 
-.progressBar .progressFailure
-{
-   background: url(images/progress-bar-failure.gif) 0 0 repeat-x;
-}
-
-.progressInfo
-{
+.fileupload-docImage-img{
    position: absolute;
    left: 5px;
-   top: 8px;
+   top: 4px;
 }
 
-.progressPercentageAndContentType
-{
-   position: absolute;
+.fileupload-progressBar-div .fileupload-progressFailure-span{
+   background: url( images/progress-bar-failure.gif ) 0 0 repeat-x;
+}
+
+.fileupload-progressInfo-span{
+   position: relative;
+   left: 40px;
+   top: 12px;
+}
+
+.fileupload-progressContentType-div{
+   position: relative;
    right: 5px;
-   /*top: 2px;*/
-   height: 30px;
+   top: 10px;
 
 }

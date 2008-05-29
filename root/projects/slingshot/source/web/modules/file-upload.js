@@ -142,7 +142,7 @@
             fixedcenter: true,
             visible: false,
             close: false,
-            width: "530px"
+            width: "650px"
          });
          this.panel.render(document.body);
 
@@ -151,9 +151,6 @@
          this.createEmptyDataTable();
 
          this.titleText = Dom.get(this.id + "-title-span");
-
-         var clearButton = new YAHOO.widget.Button(this.id + "-clear-button", {type: "button"});
-         clearButton.subscribe("click", this.clear, this, true);
 
          this.browseButton = new YAHOO.widget.Button(this.id + "-browse-button", {type: "button"});
          this.browseButton.subscribe("click", this.browse, this, true);
@@ -198,15 +195,15 @@
             var templateInstance = myThis.fileItemTemplate.cloneNode(true);
             templateInstance.setAttribute("id", myThis.id + "-fileItemTemplate-div-" + flashId);
 
-            var progress = Dom.getElementsByClassName("progressSuccess", "span", templateInstance)[0];
+            var progress = Dom.getElementsByClassName("fileupload-progressSuccess-span", "span", templateInstance)[0];
 
-            var progressInfo = Dom.getElementsByClassName("progressInfo", "span", templateInstance)[0];
+            var progressInfo = Dom.getElementsByClassName("fileupload-progressInfo-span", "span", templateInstance)[0];
             progressInfo["innerHTML"] = fileInfoStr;
 
             var contentType = Dom.getElementsByClassName("fileupload-contentType-menu", "select", templateInstance)[0];
 
-            var progressPercentage = Dom.getElementsByClassName("progressPercentage", "span", templateInstance)[0];
-            progressPercentage["innerHTML"] = "";
+            var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance)[0];
+            //progressPercentage["innerHTML"] = "";
 
             var fButton = Dom.getElementsByClassName("fileupload-file-button", "input", templateInstance)[0];
             var fileButton = new YAHOO.widget.Button(fButton, {type: "button"});
@@ -225,7 +222,7 @@
          };
 
          var myColumnDefs = [
-            {key:"id", label: "Files", width:500, resizable: true, formatter: this.formatCell} //this.formatFileInfoCell}
+            {key:"id", label: "Files", width:600, resizable: true, formatter: this.formatCell} //this.formatFileInfoCell}
          ];
 
          var myDataSource = new YAHOO.util.DataSource([]);
@@ -300,8 +297,10 @@
          var fileInfo = this.fileStore[event["id"]];
          fileInfo.state = this.SUCCESS;
          fileInfo.fileButton.set("disabled", true);
-         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " Success";                  
+         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " Success";
+         fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");                     
          YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
+         this.uploadFromQueue(1);
          this.adjustIfUploaded();
       },
 
@@ -333,7 +332,7 @@
          fileInfo.progressPercentage["innerHTML"] = Math.round(uploaded * 100) + "%";
 
          // Set progress position
-         var left = (-320 + (uploaded * 320));
+         var left = (-400 + (uploaded * 400));
          YAHOO.util.Dom.setStyle(fileInfo.progress, "left", left + "px");
       },
 
@@ -352,9 +351,10 @@
          {
             fileInfo.state = this.FAILURE;
             fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " Failure";
-            fileInfo.progress.setAttribute("class", "progressFailure");
+            fileInfo.progress.setAttribute("class", "fileupload-progressFailure-span");
             fileInfo.fileButton.set("disabled", true);
             YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
+            this.uploadFromQueue(1);            
             this.adjustIfUploaded();
          }
       },
@@ -416,11 +416,25 @@
                this.startStopButton.set("disabled", true);
                this.browseButton.set("disabled", true);
             }
-            for(var i = 0; i < length; i++)
+            this.uploadFromQueue(2);
+         }
+         else if(this.state === this.UPLOADING)
+         {
+            this.cancelAllUploads();
+         }
+      },
+
+      uploadFromQueue: function(noOfUploadsToStart){
+         var startedUploads = 0;
+         var length = this.dataTable.getRecordSet().getLength();
+         for(var i = 0; i < length && startedUploads < noOfUploadsToStart; i++)
+         {
+            var record = this.dataTable.getRecordSet().getRecord(i);
+            var flashId = record.getData("id");
+            var fileInfo = this.fileStore[flashId];
+            if(fileInfo.state === this.BROWSING)
             {
-               var record = this.dataTable.getRecordSet().getRecord(i);
-               var flashId = record.getData("id");
-               var fileInfo = this.fileStore[flashId];
+               fileInfo.state = this.UPLOADING;               
                var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
                this.uploader.upload(flashId, url, "POST",
@@ -430,11 +444,8 @@
                   componentId: this.config.componentId,
                   contentType: contentType
                }, "filedata");
+               startedUploads++;
             }
-         }
-         else if(this.state === this.UPLOADING)
-         {
-            this.cancelAllUploads();
          }
       },
 
