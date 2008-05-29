@@ -35,20 +35,20 @@
          
          <!-- Application Defaults -->
          <application-defaults>
-            <theme>slingshot</theme>
+            <theme>sam</theme>
             <site-configuration>slingshot.site.configuration</site-configuration>
             <!-- slingshot region chrome override -->
             <region-chrome>slingshot-region-chrome</region-chrome>
             <!-- no chrome required for components -->
             <component-chrome></component-chrome>
-            <page-type>
-               <id>login</id>
-               <page-instance-id>page.slingshot-login</page-instance-id>
-            </page-type>
-            <page-type>
-               <id>logout</id>
-               <page-instance-id>page.slingshot-logout</page-instance-id>
-            </page-type>
+      		<page-type>
+      			<id>login</id>
+      			<page-instance-id>slingshot-login</page-instance-id>
+      		</page-type>
+      		<page-type>
+      			<id>logout</id>
+      			<page-instance-id>slingshot-logout</page-instance-id>
+      		</page-type>
          </application-defaults>
          
          <!-- Error Handler Pages -->
