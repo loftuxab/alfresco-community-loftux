@@ -6,12 +6,12 @@
 
 <@template.body>
    <div id="hd">
-      <@region id="header" scope="global" protected=true/>
+      <@region id="header" scope="global" protected=true />
       <@region id="title" scope="template" protected=true />
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@layout.grid 3 "fluid" 9 "component-"/>
+      <@layout.grid 3 "fluid" 9 "component-" />
    </div>
 </@>
 
