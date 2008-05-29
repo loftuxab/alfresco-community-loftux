@@ -13,12 +13,13 @@ html, body
 {
    min-height: 99%;
    height: auto !important;
-   margin: 0 auto -2.8em;
+   height: 100%;
+   margin: 0 auto -2.4em;
 }
 
 .sticky-footer, .sticky-push
 {
-   height: 0em;
+   height: 2.4em;
 }
 
 /* Site-wide Styles */
