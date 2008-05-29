@@ -54,6 +54,7 @@
          <pathelement location="${dir.project.webclient.config}"/>
          <pathelement location="${dir.project.deployment.config}"/>
          <pathelement location="${dir.project.webscriptframework.config}"/>
+         <pathelement location="${dir.project.remoteapi.config}"/>
          <dirset dir="${dir.projects}">
             <include name="**/${dir.name.source}/${dir.name.test.resources}" />
          </dirset>
