@@ -67,9 +67,12 @@
 				{
 					var cal = o.argument[0];
 					var selected = eventDates.join(",");
+					var site = this.siteId;
 					
 					cal.addRenderer(selected, function(workingDate, cell) {
-						cell.innerHTML = '<a href="calendar?view=tab" class="' + this.Style.CSS_CELL_SELECTOR + '">' + this.buildDayLabel(workingDate) + "</a>"; 
+						var date = new Date(workingDate);
+						var dateStr = date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate();
+						cell.innerHTML = '<a href="calendar?site=' + site + '&date=' + dateStr + '">' + this.buildDayLabel(workingDate) + "</a>"; 
 						YAHOO.util.Dom.addClass(cell, "highlight1"); 
 						return YAHOO.widget.Calendar.STOP_RENDER; 
 					});

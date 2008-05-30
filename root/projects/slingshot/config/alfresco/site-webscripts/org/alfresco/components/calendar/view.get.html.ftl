@@ -1,5 +1,9 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.CalendarView("${args.htmlid}").setSiteId("${page.url.args["site"]!""}");
+   var view = new Alfresco.CalendarView("${args.htmlid}");
+   view.setSiteId("${page.url.args["site"]!""}");
+<#if page.url.args["date"]?exists>
+   view.currentDate = new Date("${page.url.args["date"]}");
+</#if>
 //]]></script>
 
 <div id="${args.htmlid}">
