@@ -34,9 +34,11 @@ import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.util.Base64;
@@ -241,9 +243,11 @@ public class RemoteClient extends AbstractClient
      * 
      * @param uri    WebScript URI - for example /test/myscript?arg=value
      * @param in     The optional InputStream to the call - if supplied a POST will be performed
-     * @param out    OutputStream to stream successful response to - will be closed automatically.
+     * @param out    OutputStream to stream response to - will be closed automatically.
      *               A response data string will not therefore be available in the Response object.
-     *               If remote call fails the OutputStream will not be modified or closed.
+     *               If remote call returns a status code then any available error response will be
+     *               streamed into the output.
+     *               If remote call fails completely the OutputStream will not be modified or closed.
      * 
      * @return Response object from the call {@link Response}
      */
@@ -271,23 +275,31 @@ public class RemoteClient extends AbstractClient
 
     /**
      * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
-     * as the prefix for the full WebScript url.
+     * as the prefix for the full WebScript url. The request method should be set on this instance
+     * before calling this specific method as otherwise GET is the default.
      * 
      * @param uri    WebScript URI - for example /test/myscript?arg=value
-     * @param in     The optional InputStream to the call - if supplied a POST will be performed
-     * @param out    OutputStream to stream successful response to - will be closed automatically.
+     * @param req    HttpServletRequest the request to retrieve input and headers etc. from
+     * @param res    HttpServletResponse the response to stream response to - will be closed automatically.
      *               A response data string will not therefore be available in the Response object.
-     *               If remote call fails the OutputStream will not be modified or closed.
+     *               If a POST is required, it must be set as the request method on this RemoteClient
+     *               instance otherwise the InputStream will not be retrieve from the request.
+     *               If remote call returns a status code then any available error response will be
+     *               streamed into the response object. 
+     *               If remote call fails completely the OutputStream will not be modified or closed.
      * 
      * @return Response object from the call {@link Response}
      */
-    public Response call(String uri, InputStream in, HttpServletResponse res)
+    public Response call(String uri, HttpServletRequest req, HttpServletResponse res)
     {
         Response result;
         Status status = new Status();
         try
         {
-            String encoding = service(buildURL(uri), in, res.getOutputStream(), res, status);
+            String encoding = service(
+                    buildURL(uri),
+                    "POST".equalsIgnoreCase(requestMethod) ? req.getInputStream() : null,
+                    res.getOutputStream(), req, res, status);
             result = new Response(status);
             result.setEncoding(encoding);
         }
@@ -345,7 +357,7 @@ public class RemoteClient extends AbstractClient
     private String service(URL url, InputStream in, OutputStream out, Status status)
         throws IOException
     {
-        return service(url, in, out, null, status);
+        return service(url, in, out, null, null, status);
     }
 
     /**
@@ -363,7 +375,8 @@ public class RemoteClient extends AbstractClient
      * 
      * @throws IOException
      */
-    private String service(URL url, InputStream in, OutputStream out, HttpServletResponse res, Status status)
+    private String service(URL url, InputStream in, OutputStream out,
+            HttpServletRequest req, HttpServletResponse res, Status status)
         throws IOException
     {
         if (logger.isDebugEnabled())
@@ -374,6 +387,20 @@ public class RemoteClient extends AbstractClient
         try
         {
             connection = (HttpURLConnection)url.openConnection();
+            
+            // proxy over any headers from the request stream to proxied request
+            if (res != null)
+            {
+                Enumeration<String> headers = req.getHeaderNames();
+                while (headers.hasMoreElements())
+                {
+                    String key = headers.nextElement();
+                    if (key != null)
+                    {
+                        connection.setRequestProperty(key, req.getHeader(key));
+                    }
+                }
+            }
             
             // HTTP basic auth support
             if (this.username != null && this.password != null)
@@ -403,6 +430,7 @@ public class RemoteClient extends AbstractClient
             // prepare to write the connection result to the output stream
             // at this point - if the remote server returned an error status code
             // this call will trigger an IOException which is handled below
+            String errorMessage = null;
             InputStream input;
             try
             {
@@ -410,20 +438,17 @@ public class RemoteClient extends AbstractClient
             }
             catch (IOException ioErr)
             {
-                // caught an IO exception - record the status code and message
-                status.setCode(connection.getResponseCode());
+                // caught an IO exception - record exception and error message
+                // we record all status codes later regardless
                 status.setException(ioErr);
                 status.setMessage(ioErr.getMessage());
-                if (res != null)
-                {
-                    res.setStatus(connection.getResponseCode(), ioErr.getMessage());
-                }
+                errorMessage = ioErr.getMessage();
                 
                 // now use the error response stream instead - if there is one
                 input = connection.getErrorStream();
             }
             
-            // proxy over any headers we find after getting the input stream
+            // proxy over any headers we get from the proxied response stream to actual response
             if (res != null)
             {
                 Map<String, List<String>> headers = connection.getHeaderFields();
@@ -490,7 +515,13 @@ public class RemoteClient extends AbstractClient
                 }
             }
             
-            // if we get here call was successful
+            // record status code
+            status.setCode(connection.getResponseCode());
+            if (res != null)
+            {
+                res.setStatus(connection.getResponseCode(), errorMessage);
+            }
+            
             return encoding;
         }
         catch (ConnectException conErr)
