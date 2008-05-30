@@ -478,6 +478,17 @@
       <copy todir="${dir.deploy.tomcat.webclient}" verbose="${copy.verbose}">
          <fileset dir="${dir.project.webclient.src.web}" excludes="WEB-INF/**" />
       </copy>
+      
+      <copy todir="${dir.deploy.tomcat.webclient}/WEB-INF/classes" verbose="${copy.verbose}">
+         <fileset dir="${dir.project.repository.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.remoteapi.config}"
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webclient.config}" 
+                  excludes="**/extension/**" />
+         <fileset dir="${dir.project.webscriptframework.config}" 
+                  excludes="**/extension/**" />
+      </copy>
    </target>
    
    <target name="deploy-webscriptframework-tomcat" depends="init" 
