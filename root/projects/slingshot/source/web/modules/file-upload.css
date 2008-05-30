@@ -1,19 +1,16 @@
 /* Style YIU components */
 
-.fileUpload-filelist-table .yui-dt-liner {
-   margin:0pt;
-   padding:0px 0px;
+.fileUpload-filelist-table tbody .yui-dt-liner {
+   margin:0px;
+   padding:0px 0px 0px 0px;
+   border-bottom-style:solid;
+   border-bottom-color: #CBCBCB;
+   border-bottom-width: 1px;
 }
 
 .removeButton a {
    padding-left: 2.25em;
    background: url(../images/icons/close_panel.gif) 10% 50% no-repeat;
-}
-
-.fileupload-fileItemTemplate-div{
-   padding: 1px 0px 1px 0px;
-   margin: 0px;
-   border-bottom: #929292;
 }
 
 .fileupload-percentage-div, .fileupload-fileButton-div{
@@ -35,51 +32,59 @@
 .fileupload-percentage-span{
    position: relative;
    top: 12px;
+   /* Can't make it pick up h2 from base.css, copy in h2:s values for now */
+   font-weight: bold;
+   font-size: 123.1%;
 }
 
 .fileupload-fileButton-span{
    position: relative;
-   top: 5px;
+   top: 7px;
 }
 
-.fileupload-fileinfo-div{
-   background-color: #FFFFFF;
-   height: 40px;
-   padding: 0px 120px 0px 80px;
+.fileupload-docImage-img{
+   position: absolute;               
+   left: 5px;
+   top: 4px;
 }
 
 .fileupload-progressBar-div{
-   position: absolute;
-   width: 100%;
-   /*background: url( images/progress-bar-background.gif ) 0 0 repeat-x;*/
+   background-color: #FFFFFF;   
+   position: relative;
    height: 40px;
+   /*padding: 0px 120px 0px 80px;*/
+   padding: 0px 0px 0px 0px;
+   margin: 0px;
    overflow: hidden;
 }
 
-.fileupload-progressBar-div .fileupload-progressSuccess-span, .fileupload-progressBar-div .fileupload-progressFailure-span{
+.fileupload-progressBar-div .fileupload-progressSuccess-span, .fileupload-progressBar-div .fileupload-progressFailure-span, .fileupload-progressBar-div .fileupload-progressFinished-span{
    position: absolute;
-   /*background: url( images/progress-bar-success.gif ) 0 0 repeat-x;*/
-   background-color: #DCECCC;
    top: 0px;
    left: -400px;
    height: 40px;
    width: 400px;
 }
 
-.fileupload-docImage-img{
-   position: absolute;
-   left: 5px;
-   top: 4px;
+.fileupload-progressSuccess-span{
+   background-color: #DCECCC;
 }
 
-.fileupload-progressBar-div .fileupload-progressFailure-span{
-   background: url( images/progress-bar-failure.gif ) 0 0 repeat-x;
+.fileupload-progressFinished-span{
+   background-color: #9AC68C;
+}
+
+.fileupload-progressFailure-span{
+   background-color: #E98B3C;
 }
 
 .fileupload-progressInfo-span{
    position: relative;
    left: 40px;
    top: 12px;
+   /* Can't make it pick up h3 from base.css, copy in h3:s values for now */
+   font-weight: bold;
+   font-size: 108%;
 }
 
 .fileupload-progressContentType-div{
