@@ -3,6 +3,22 @@
    visibility: hidden;
 }
 
+
+/* Buttons */
+.doclist .new-folder button
+{
+   padding-left: 2.5em; 
+   background: url(images/new-folder.png) 10% 50% no-repeat;
+}
+
+.doclist .file-upload button
+{
+   padding-left: 2.5em; 
+   background: url(images/file-upload.png) 10% 50% no-repeat;
+}
+
+/* Data Table */
+
 .doclist table
 {
    width: 100%;
@@ -23,6 +39,8 @@
    border: none;
 }
 
+
+/* History Manager */
 
 #yui-history-iframe
 {

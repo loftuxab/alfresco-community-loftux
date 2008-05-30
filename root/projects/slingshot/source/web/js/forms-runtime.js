@@ -77,6 +77,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       
       /**
        * Object holding the callback handlers and messages for AJAX submissions.
+       * The callback handlers are themselves an object of the form:
+       *   fn: function, // The handler to call when the event fires.
+       *   obj: object, // An object to pass back to the handler.
+       *   scope: object // The object to use for the scope of the handler.
        * 
        * @property ajaxSubmitHandlers
        * @type object
@@ -233,10 +237,16 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @param callbacks {object} Optional object representing callback handlers 
        *        or messages to use, for example
        *        { 
-       *           successCallback: yourHandler,
-       *           failureCallback: yourHandler,
+       *           successCallback: yourHandlerObject,
+       *           failureCallback: yourHandlerObject,
        *           successMessage: yourMessage,
        *           failureMessage: yourMessage
+       *        }
+       *        Callback handler objects are of the form:
+       *        { 
+       *           fn: function, // The handler to call when the event fires.
+       *           obj: object, // An object to pass back to the handler.
+       *           scope: object // The object to use for the scope of the handler.
        *        }
        */
       setAJAXSubmit: function(ajaxSubmit, callbacks)
@@ -440,10 +450,10 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   }
                   
                   // create config object to pass to request helper
-                  var config = {
+                  var config =
+                  {
                      method: "POST",
-                     url: submitUrl,
-                     scope: this
+                     url: submitUrl
                   };
 
                   if (this.ajaxSubmitHandlers)

@@ -61,7 +61,7 @@
        * @property DEFAULT_FILTER_PANEL_WIDTH
        * @type int
        */
-      DEFAULT_FILTER_PANEL_WIDTH: 240,
+      DEFAULT_FILTER_PANEL_WIDTH: 160,
 
       /**
        * Maximum Filter Panel width.

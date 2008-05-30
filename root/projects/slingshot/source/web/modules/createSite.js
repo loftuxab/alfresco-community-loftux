@@ -42,8 +42,15 @@
             Alfresco.util.Ajax.request(
             {
                url: Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite",
-               dataObj: {htmlid: this.id},
-               successCallback: this.templateLoaded,
+               dataObj:
+               {
+                  htmlid: this.id
+               },
+               successCallback:
+               {
+                  fn: this.templateLoaded,
+                  scope: this
+               },
                failureMessage: "Could not load create site template",
                scope: this
             });
@@ -88,9 +95,9 @@
         this.dialog.hide();
       },
 
-      onCreateSiteSuccess: function(response)
+      onCreateSiteSuccess: function(p_obj, response)
       {
-         if(response.json === undefined || response.json.shortName === undefined || response.json.shortName.length == 0)
+         if (response.json === undefined || response.json.shortName === undefined || response.json.shortName.length == 0)
          {
             Alfresco.util.PopupManager.displayMessage({text: "Received a success message with missing variables (shortname)"});
          }
