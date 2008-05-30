@@ -1,10 +1,10 @@
 <div class="hd">Create site</div>
 <div class="bd">
 
-   <form id="${args.htmlid}-createSite-form" action="${url.context}/proxy/alfresco/api/sites" method="POST">
-      <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
+   <div class="yui-t1 createSite-panel">
 
-      <div class="yui-t1">
+      <form id="${args.htmlid}-createSite-form" action="${url.context}/proxy/alfresco/api/sites" method="POST">
+         <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
 
          <div class="yui-g">
             <h2>Info</h2>
@@ -42,10 +42,9 @@
             <input type="submit" id="${args.htmlid}-ok-button" value="OK" />
             <input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
          </div>
-         
-      </div>
 
-   </form>
+      </form>
 
+   </div>
 
 </div>

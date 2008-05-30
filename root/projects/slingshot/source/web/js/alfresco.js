@@ -123,6 +123,37 @@ Alfresco.util.assertNotEmpty = function(param, message)
 };
 
 /**
+ * Converts a file size in bytes to human readable form
+ * @method Alfresco.util.assertNotEmpty
+ * @param fileSize {number} File size in bytes
+ * @return {tring} The file size in a readable form, i.e 1.2mb
+ * @static
+ * @throws {Error}
+ */
+Alfresco.util.formatFileSize = function(fileSize)
+{   
+   if (fileSize < 999)
+   {
+      return fileSize + " B"
+   }
+   else if (fileSize < 999999)
+   {
+      fileSize = Math.round(fileSize / 1024);
+      return fileSize + " KB"
+   }
+   else if (fileSize < 999999999)
+   {
+      fileSize = Math.round(fileSize / 1048576);
+      return fileSize + " MB";
+   }
+   else
+   {
+      fileSize = Math.round(fileSize / 1073741824);
+      return fileSize + " GB";
+   }
+};
+
+/**
  * Wrapper to create a YUI Button with common attributes.
  * All supplied object parameters are passed to the button constructor
  * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});
