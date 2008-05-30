@@ -37,10 +37,30 @@
 {
    height: 200px;
    padding: 9px;
-   overflow:auto;
+   overflow: auto;
+   /* TODO: need to revisit this */
+   margin-right: 1px;
 }
 
-.dashlet .list-item
+.dashlet .text-list-item
 {
    padding-bottom: 6px;
+}
+
+.dashlet .detail-list-item
+{
+   clear: both;
+   padding-top: 9px;
+   padding-bottom: 9px;
+   border-bottom: 1px solid #e9e9e9;
+}
+
+.dashlet .detail-list-item .icon
+{
+   float: left;
+}
+
+.dashlet .detail-list-item .details
+{
+   padding-left: 40px;
 }
