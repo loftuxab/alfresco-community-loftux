@@ -1,6 +1,39 @@
-.yui-t1 {
+/* Document Library Template */
+.yui-t1
+{
    width: auto;
 }
-.yui-t1 #yui-main {
+.yui-t1 #yui-main
+{
    margin-left: -50em;
+}
+
+/* Create Folder */
+.create-folder
+{
+   text-align: left;
+   width: 30em;
+}
+
+.create-folder .caret-fix
+{
+   overflow: auto;
+}
+
+.create-folder input,
+.create-folder textarea
+{
+   border: 1px solid #C5D6E2;
+   padding: 2px;
+   font-weight: normal;
+}
+
+.create-folder .yui-gd
+{
+   padding-bottom: 0.5em;
+}
+
+.create-folder .section-title
+{
+   padding-bottom: 0.5em;
 }

@@ -2,8 +2,8 @@
 <page>
    <id>documentlibrary</id>
    <page-type>doclib</page-type>
-   <title>Document Library: Test Page</title>
-   <description>Test page for document library components</description>
+   <title>Document Library</title>
+   <description>Document library with Tree view</description>
    <template-instance>documentlibrary</template-instance>
    <authentication>user</authentication>
 </page>

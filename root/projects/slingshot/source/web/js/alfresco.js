@@ -124,17 +124,18 @@ Alfresco.util.assertNotEmpty = function(param, message)
 
 /**
  * Wrapper to create a YUI Button with common attributes.
- * All supplied object parameters are passed to the button constructor, except onClick and scope.
- * onClick is camelCase to allow the Button's onclick parameter to be used if desired.
- * e.g. Alfresco.util.createYUIButton(myId, {type: "submit", onClick: myFunction, scope: myScope});
+ * All supplied object parameters are passed to the button constructor
+ * e.g. Alfresco.util.createYUIButton(this, "OK", this.onOK, {type: "submit"});
  *
  * @method Alfresco.util.createYUIButton
- * @param p_htmlId {string} Dom element ID to decorate with button markup
+ * @param p_scope {object} Component containing button; must have "id" parameter
+ * @param p_name {string} Dom element ID of markup that button is created from {p_scope.id}-{name}
+ * @param p_onclick {function} If supplied, registered with the button's click event
  * @param p_obj {object} Optional extra object parameters to pass to button constructor
  * @return {YUI.widget.Button} New Button instance
  * @static
  */
-Alfresco.util.createYUIButton = function(p_htmlId, p_obj)
+Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
 {
    // Default button parameters
    var obj =
@@ -146,19 +147,31 @@ Alfresco.util.createYUIButton = function(p_htmlId, p_obj)
    if (typeof p_obj == "object")
    {
       obj = YAHOO.lang.merge(obj, p_obj);
-      // But we don't want onClick or scope in there if they were supplied
-      delete obj.onClick;
-      delete obj.scope;
+   }
+   
+   // Fix-up the menu element ID
+   if ((obj.type == "menu") && (typeof obj.menu == "string"))
+   {
+      obj.menu = p_scope.id + "-" + obj.menu;
    }
    
    // Create the button
-   var button = new YAHOO.widget.Button(p_htmlId, obj);
+   var htmlId = p_scope.id + "-" + p_name;
+   var button = new YAHOO.widget.Button(htmlId, obj);
    if (typeof button == "object")
    {
       // Register the click listener if one was supplied
-      if (typeof p_obj.onClick == "function")
+      if (typeof p_onclick == "function")
       {
-         button.on("click", p_obj.onClick, button, (typeof p_obj.scope == "object" ? p_obj.scope : window));
+         // Special case for a menu
+         if (obj.type == "menu")
+         {
+            button.getMenu().subscribe("click", p_onclick, p_scope, true);
+         }
+         else
+         {
+            button.on("click", p_onclick, button, p_scope);
+         }
       }
    }
    return button;
@@ -488,7 +501,6 @@ Alfresco.util.Ajax = function()
       {
          method: "GET",        // GET, POST and hopefully PUT or DELETE if ot works...
          url: null,            // Must be set by user
-         scope: this,          // The scope in which the success and failure handlers will be called.
          dataObj: null,        // Will be encoded to parameters (key1=value1&key2=value2)
                                // or a json string if contentType is set to JSON
          dataStr: null,        // Will be used in the request body, could be a already created parameter or json string
@@ -496,9 +508,9 @@ Alfresco.util.Ajax = function()
          dataForm: null,       // A form object or id that contains the data to be sent with request
          requestContentType: null,    // Set to JSON if json should be used
          responseContentType: null,    // Set to JSON if json should be used
-         successCallback: null,// Will be called in the scop of scope with a response object literal described below
+         successCallback: null,// Object literal representing callback upon successful operation
          successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
-         failureCallback: null,// Will be called in the scop of scope with a response object literal described below
+         failureCallback: null,// Object literal representing callback upon failed operation
          failureMessage: null,  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
          object: null           // An object that can be passed to be used by the success or failure handlers
       },
@@ -630,7 +642,8 @@ Alfresco.util.Ajax = function()
       _successHandler: function(serverResponse)
       {
          var config = serverResponse.argument.config;
-         if (config.successCallback)
+         var callback = config.successCallback;
+         if (typeof callback.fn == "function")
          {
             /* User provided a custom successHandler */
             var json = null;
@@ -641,12 +654,12 @@ Alfresco.util.Ajax = function()
                   json = YAHOO.lang.JSON.parse(serverResponse.responseText);
                }
             }
-            YAHOO.lang.later(0, (config.scope ? config.scope : this), config.successCallback,
+            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
             {
                config: config,
                json: json,
                serverResponse: serverResponse
-            });
+            }, callback.object);
          }
          else if (config.successMessage)
          {
@@ -661,7 +674,8 @@ Alfresco.util.Ajax = function()
       _failureHandler: function(serverResponse)
       {
          var config = serverResponse.argument.config;
-         if (config.failureCallback)
+         var callback = config.failureCallback;
+         if (typeof callback.fn == "function")
          {
             /* User provided a custom failureHandler */
             var json = null;
@@ -670,12 +684,12 @@ Alfresco.util.Ajax = function()
                /* TODO: When error response is in valid json format */
                //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
             }
-            YAHOO.lang.later(0, (config.scope ? config.scope : this), config.failureCallback,
+            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
             {
                config: config,
                json: json,
                serverResponse: serverResponse
-            });
+            }, callback.object);
          }
          else if (config.failureMessage)
          {
