@@ -403,7 +403,25 @@ public class RemoteClient extends AbstractClient
             // prepare to write the connection result to the output stream
             // at this point - if the remote server returned an error status code
             // this call will trigger an IOException which is handled below
-            InputStream input = connection.getInputStream();
+            InputStream input;
+            try
+            {
+                input = connection.getInputStream();
+            }
+            catch (IOException ioErr)
+            {
+                // caught an IO exception - record the status code and message
+                status.setCode(connection.getResponseCode());
+                status.setException(ioErr);
+                status.setMessage(ioErr.getMessage());
+                if (res != null)
+                {
+                    res.setStatus(connection.getResponseCode(), ioErr.getMessage());
+                }
+                
+                // now use the error response stream instead - if there is one
+                input = connection.getErrorStream();
+            }
             
             // proxy over any headers we find after getting the input stream
             if (res != null)
@@ -423,37 +441,40 @@ public class RemoteClient extends AbstractClient
                 }
             }
             
-            // perform the write to the output
-            try
-            {
-                byte[] buffer = new byte[BUFFERSIZE];
-                int read = input.read(buffer);
-                while (read != -1)
-                {
-                    out.write(buffer, 0, read);
-                    read = input.read(buffer);
-                }
-            }
-            finally
+            // perform the stream write from the response to the output
+            if (input != null)
             {
                 try
                 {
-                    if (input != null)
+                    byte[] buffer = new byte[BUFFERSIZE];
+                    int read = input.read(buffer);
+                    while (read != -1)
                     {
-                        input.close();
+                        out.write(buffer, 0, read);
+                        read = input.read(buffer);
                     }
-                    if (out != null)
-                    {
-                        out.flush();
-                        out.close();
-                    }
-                    // TODO: required?
-                    connection.disconnect();
                 }
-                catch (IOException e)
+                finally
                 {
-                    if (logger.isWarnEnabled())
-                        logger.warn("Exception during close() of HTTP API connection", e);
+                    try
+                    {
+                        if (input != null)
+                        {
+                            input.close();
+                        }
+                        if (out != null)
+                        {
+                            out.flush();
+                            out.close();
+                        }
+                        // TODO: required?
+                        connection.disconnect();
+                    }
+                    catch (IOException e)
+                    {
+                        if (logger.isWarnEnabled())
+                            logger.warn("Exception during close() of HTTP API connection", e);
+                    }
                 }
             }
             
@@ -470,8 +491,6 @@ public class RemoteClient extends AbstractClient
             }
             
             // if we get here call was successful
-            status.setCode(HttpServletResponse.SC_OK);
-            
             return encoding;
         }
         catch (ConnectException conErr)
@@ -482,23 +501,10 @@ public class RemoteClient extends AbstractClient
             status.setMessage(conErr.getMessage());
             if (res != null)
             {
-                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, conErr.getMessage());
             }
             
             throw conErr;
-        }
-        catch (IOException ioErr)
-        {
-            // caught an IO exception - record the status code and message
-            status.setCode(connection.getResponseCode());
-            status.setException(ioErr);
-            status.setMessage(ioErr.getMessage());
-            if (res != null)
-            {
-                res.setStatus(connection.getResponseCode());
-            }
-            
-            throw ioErr;
         }
     }
 }
