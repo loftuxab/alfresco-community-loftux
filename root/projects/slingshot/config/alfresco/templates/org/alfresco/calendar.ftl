@@ -2,15 +2,21 @@
 <@template.header />
 
 <@template.body>
-   <div id="doc3">
    <div id="hd">
       <@region id="header" scope="global" protected=true />
       <@region id="title" scope="page" protected=true />
       <@region id="navigation" scope="template" protected=true />
    </div>
-   <@region id="calendar" scope="page" protected=true />
-   <@region id="view" scope="page" protected=true />
-   </div>
+   <div id="bd">
+	<div class="yui-gf">
+		<div class="yui-u first">
+   			<@region id="calendar" scope="page" protected=true />
+   		</div>
+		<div class="yui-u">
+			<@region id="view" scope="page" protected=true />
+   		</div>
+ 	</div>
+	</div>
 </@>
 
 <@template.footer>

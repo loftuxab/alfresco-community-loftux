@@ -1,8 +1,9 @@
 <script type="text/javascript">//<![CDATA[
-   var calendarView = new Alfresco.CalendarView("${args.htmlid}");
+   new Alfresco.CalendarView("${args.htmlid}").setSiteId("${page.url.args["site"]!""}");
 //]]></script>
 
-<div id="calendar-view" class="yui-navset" style="height: 500px; overflow-x: hidden; overflow-y: scroll; border: 1px solid black;"">
+<div id="${args.htmlid}">
+<div id="calendar-view" class="yui-navset" style="height: 500px; overflow-x: hidden; overflow-y: scroll;">
 <ul class="yui-nav">
   <li><a href="#day"><em>Day</em></a></li>
   <li><a href="#week"><em>Week</em></a></li>
@@ -97,5 +98,6 @@
 	<div id="#agenda">
 	Nothing to see here.
 	</div>
+</div>
 </div>
 </div>
