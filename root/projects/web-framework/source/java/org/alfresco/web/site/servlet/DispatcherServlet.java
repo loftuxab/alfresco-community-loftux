@@ -121,6 +121,13 @@ public class DispatcherServlet extends BaseServlet
             throw new ServletException(ex);
         }
         
+        if (isDebugEnabled())
+        {
+            String qs = request.getQueryString();
+            debug(context, "Processing URL: ("  + request.getMethod() + ") " + request.getRequestURI() + 
+                  ((qs != null && qs.length() != 0) ? ("?" + qs) : ""));
+        }
+        
         // stamp any theme information onto the request
         ThemeUtil.applyTheme(context, request);
         
