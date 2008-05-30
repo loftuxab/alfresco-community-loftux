@@ -674,7 +674,7 @@ Alfresco.util.Ajax = function()
       {
          var config = serverResponse.argument.config;
          var callback = config.successCallback;
-         if (typeof callback.fn == "function")
+         if (callback && typeof callback.fn == "function")
          {
             /* User provided a custom successHandler */
             var json = null;
@@ -685,8 +685,7 @@ Alfresco.util.Ajax = function()
                   json = YAHOO.lang.JSON.parse(serverResponse.responseText);
                }
             }
-            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
-            {
+            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), {
                config: config,
                json: json,
                serverResponse: serverResponse
@@ -706,7 +705,7 @@ Alfresco.util.Ajax = function()
       {
          var config = serverResponse.argument.config;
          var callback = config.failureCallback;
-         if (typeof callback.fn == "function")
+         if (callback && typeof callback.fn == "function")
          {
             /* User provided a custom failureHandler */
             var json = null;
@@ -741,15 +740,16 @@ Alfresco.util.Ajax = function()
                // Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
                Alfresco.util.PopupManager.displayPrompt(
                {
-                  title: serverResponse.statusText,
-                  text: "Failure"
+                  title: "Failure",
+                  text: serverResponse.statusText
                });
             }
             else if (serverResponse.statusText)
             {
                Alfresco.util.PopupManager.displayPrompt(
                {
-                  title: serverResponse.statusText
+                  title: "Failure",
+                  text: serverResponse.statusText
                });
             }
             else

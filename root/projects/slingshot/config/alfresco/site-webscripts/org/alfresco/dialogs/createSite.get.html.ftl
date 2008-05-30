@@ -1,14 +1,13 @@
 <div class="hd">Create site</div>
 <div class="bd">
 
-   <div class="yui-t1 createSite-panel">
+   <div class="yui-t1">
 
       <form id="${args.htmlid}-createSite-form" action="${url.context}/proxy/alfresco/api/sites" method="POST">
          <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
 
-         <div class="yui-g">
+         <div class="yui-g section-title">
             <h2>Info</h2>
-            <hr/>
          </div>
          <div class="yui-gd">
             <div class="yui-u first">Name:</div>
@@ -20,11 +19,10 @@
          </div>
          <div class="yui-gd">
             <div class="yui-u first">Description:</div>
-            <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3" cols="20"></textarea></div>
+            <div class="yui-u"><textarea id="${args.htmlid}-description" name="description" rows="3"></textarea></div>
          </div>
-         <div class="yui-g">
+         <div class="yui-g section-title">
             <h2>Type</h2>
-            <hr/>
          </div>
          <div class="yui-gd">
             <div class="yui-u first">Type:</div>
@@ -38,7 +36,7 @@
             <hr/>
          </div>
          -->
-         <div class="yui-g">
+         <div class="yui-g section-buttons">
             <input type="submit" id="${args.htmlid}-ok-button" value="OK" />
             <input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
          </div>
