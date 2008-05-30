@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+  <title>Knowledge Base Search</title>  
+  <url>/components/kbsearch</url>
+  
+  <!-- Binding --> 
+  <scope>global</scope>
+  <source-id>global</source-id>
+  <region-id>kbsearch</region-id>
+  
+</component>
