@@ -7,7 +7,9 @@
       <input id="${args.htmlid}-browse-button" type="button" value="Browse" />
       <span id="${args.htmlid}-multiSelect-span">NOTE: You can select multiple files by using the CTRL or SHIFT key.</span>
    </p>
-
+   <p>
+      <span id="${args.htmlid}-status-span">HEJ</span>      
+   </p>
    <div id="${args.htmlid}-flashuploader-div" style="width:0px;height:0px">
       Unable to load Flash content. You can download the latest version of Flash Player from the
       <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player Download Center</a>.
@@ -46,14 +48,14 @@
          <div class="fileupload-percentage-div">
             <span class="fileupload-percentage-span">&nbsp;</span>
          </div>
-         <div class="fileupload-fileButton-div">
+         <div class="fileupload-fileButton-div">                         
             <span class="fileupload-fileButton-span">
-               <input class="fileupload-file-button" type="button" value="Remove" />
+               <button class="fileupload-file-button" value="Remove">Remove</button>
             </span>
          </div>         
          <div class="fileupload-progressBar-div">
             <span class="fileupload-progressSuccess-span">&nbsp;</span>
-            <img src="${url.context}/images/filetypes32/_default.gif" class="fileupload-docImage-img"/>
+            <img src="${url.context}/modules/images/_default.gif" class="fileupload-docImage-img"/>
             <span class="fileupload-progressInfo-span">{progressInfo}</span>
             <div class="fileupload-progressContentType-div">
                <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hiddenComponents</#if>">

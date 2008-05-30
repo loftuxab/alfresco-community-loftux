@@ -68,6 +68,10 @@
       addedFiles: {}, // unique id of files data to keep track of which ones that have been added
       fileStore: {}, // flashId : {fileButton, state}
 
+      statusText: null,
+      noOfSuccessfulUploads: 0,
+      noOfFailedUploads: 0,
+
       previousFileListEmptyMessage: null,
 
       show: function(userConfig)
@@ -133,6 +137,7 @@
          var Dom = YAHOO.util.Dom;
 
          var div = document.createElement("div");
+         Dom.addClass(div, "file-upload")                  
          div.innerHTML = response.serverResponse.responseText;
          this.panel = new YAHOO.widget.Panel(div,
          {
@@ -141,7 +146,7 @@
             fixedcenter: true,
             visible: false,
             close: false,
-            width: "650px"
+            width: "622px"
          });
          this.panel.render(document.body);
 
@@ -156,6 +161,7 @@
 
          this.versionSection = Dom.get(this.id + "-versionSection-div");
          this.multiSelectText = Dom.get(this.id + "-multiSelect-span");
+         this.statusText = Dom.get(this.id + "-status-span");
 
          var vGroup = Dom.get(this.id + "-version-buttongroup");
          var oButtonGroup1 = new YAHOO.widget.ButtonGroup(vGroup);
@@ -204,7 +210,7 @@
 
             var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance)[0];
 
-            var fButton = Dom.getElementsByClassName("fileupload-file-button", "input", templateInstance)[0];
+            var fButton = Dom.getElementsByClassName("fileupload-file-button", "button", templateInstance)[0];
             var fileButton = new YAHOO.widget.Button(fButton, {type: "button"});
             fileButton.subscribe("click", function(){ myThis.handleFileButtonClick(flashId, oRecord.getId()); }, myThis, true);
             myThis.fileStore[flashId] =
@@ -221,7 +227,7 @@
          };
 
          var myColumnDefs = [
-            {key:"id", label: "Files", width:600, resizable: false, formatter: this.formatCell} //this.formatFileInfoCell}
+            {key:"id", label: "Files", width:580, resizable: false, formatter: this.formatCell} //this.formatFileInfoCell}
          ];
 
          var myDataSource = new YAHOO.util.DataSource([]);
@@ -235,7 +241,9 @@
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
             scrollable: true,
-            height: "200px"
+            height: "200px",
+            width: "600px",
+            renderLoopSize: 5
          });
          this.dataTable.subscribe("rowAddEvent", this.rememberAddedFiles, this, true);
       },
@@ -243,6 +251,9 @@
       showPanel: function()
       {
          this.state = this.BROWSING;
+         this.noOfFailedUploads = 0;
+         this.noOfSuccessfulUploads = 0;
+         this.statusText["innerHTML"] = "&nbsp;";
          this.startStopButton.set("label", "Upload Files");
          this.startStopButton.set("disabled", true);
          this.cancelOkButton.set("label", "Cancel");
@@ -300,8 +311,20 @@
          fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");                     
          YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
          fileInfo.progressPercentage["innerHTML"] = "100%";
+         this.noOfSuccessfulUploads++;
+         this.updateStatus();
          this.uploadFromQueue(1);
          this.adjustIfUploaded();
+      },
+
+      updateStatus: function(){
+         var status = "Status: " + this.noOfSuccessfulUploads + "/" +
+                      this.dataTable.getRecordSet().getLength() + " uploaded";
+         if(this.noOfFailedUploads > 0)
+         {
+            status +=" (" + this.noOfFailedUploads + " failed)";
+         }
+         this.statusText["innerHTML"] = status; 
       },
 
       adjustIfUploaded: function()
@@ -354,6 +377,8 @@
             fileInfo.progress.setAttribute("class", "fileupload-progressFailure-span");
             fileInfo.fileButton.set("disabled", true);
             YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
+            this.noOfFailedUploads++;
+            this.updateStatus();
             this.uploadFromQueue(1);            
             this.adjustIfUploaded();
          }
@@ -467,6 +492,8 @@
          else if(this.state === this.UPLOADING)
          {
             this.uploader.cancel(flashId);
+            this.updateStatus();            
+            this.uploadFromQueue(1);
             this.adjustIfUploaded();
          }
       },

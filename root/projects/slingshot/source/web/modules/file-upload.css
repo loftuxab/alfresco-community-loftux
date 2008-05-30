@@ -6,11 +6,12 @@
    border-bottom-style:solid;
    border-bottom-color: #CBCBCB;
    border-bottom-width: 1px;
+   white-space: nowrap;
 }
 
-.removeButton a {
-   padding-left: 2.25em;
-   background: url(../images/icons/close_panel.gif) 10% 50% no-repeat;
+.file-upload .fileupload-fileButton-span button{
+   padding-left: 2.5em;
+   background: url(images/close_panel.gif) 10% 50% no-repeat;
 }
 
 .fileupload-percentage-div, .fileupload-fileButton-div{
@@ -67,11 +68,11 @@
 }
 
 .fileupload-progressSuccess-span{
-   background-color: #DCECCC;
+   background-color: #9AC68C;
 }
 
 .fileupload-progressFinished-span{
-   background-color: #9AC68C;
+   background-color: #DCECCC;
 }
 
 .fileupload-progressFailure-span{
