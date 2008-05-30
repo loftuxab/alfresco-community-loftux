@@ -6,17 +6,17 @@
 	Alfresco.CalendarView = function(htmlId)
 	{
 		this.name = "Alfresco.CalendarView";
-	    this.id = htmlId;
+	   this.id = htmlId;
 
 		this.currentDate = new Date();
 		
-	    /* Register this component */
-	    Alfresco.util.ComponentManager.register(this);
-
-	    /* Load YUI Components */
-	    Alfresco.util.YUILoaderHelper.require(["tabview", "button"], this.componentsLoaded, this);
-
-	    return this;
+	   /* Register this component */
+	   Alfresco.util.ComponentManager.register(this);
+	
+	   /* Load YUI Components */
+	   Alfresco.util.YUILoaderHelper.require(["tabview", "button"], this.onComponentsLoaded, this);
+	
+	   return this;
 	}
 	
 	Alfresco.CalendarView.prototype = 
@@ -39,7 +39,20 @@
 			"December"
 		],
 		
-		componentsLoaded: function()
+		/**
+       * Event data (cached).
+       * 
+       * @property eventData
+       * @type object
+       */
+		eventData: {},
+		
+		setSiteId: function(siteId)
+		{
+			this.siteId = siteId;
+		},
+		
+		onComponentsLoaded: function()
 		{
 			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
 		},
@@ -54,75 +67,73 @@
 			this._addButton(this.id + "-current-button", this.displayCurrentMonth);
 		
 			/* Initialise the current view */
-			this.loadData(this.currentDate.getFullYear(), this.currentDate.getMonth());
-		},
-		
-		_addButton: function(id, func)
-		{
-			var Dom = YAHOO.util.Dom;
-			
-			var elem = Dom.get(id);
-			if (elem !== null) 
-			{
-				var button = new YAHOO.widget.Button(elem,
+			Alfresco.util.Ajax.request({
+				url: Alfresco.constants.PROXY_URI + "calendar/eventList",
+				dataObj: 
+				{ 
+					"site": this.siteId 
+				},
+				successCallback:
 				{
-						type: "push"
-				});
-				button.addListener("click", func, this);	
-			}
-		},
-		
-		displayCurrentMonth: function(e, obj)
-		{
-			obj.currentDate = new Date();
-			/* Add check to see what the date is. If it hasn't changed, don't load the data */
-			obj.loadData(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
-		},
-		
-		displayNextMonth: function(e, obj)
-		{
-			obj.currentDate.setMonth( obj.currentDate.getMonth() + 1 );
-			obj.loadData(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
-		},
-		
-		displayPrevMonth: function(e, obj)
-		{
-			obj.currentDate.setMonth( obj.currentDate.getMonth() - 1 );
-			obj.loadData(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
-		},
-		
-		loadData: function(year, month)
-		{
-			var workspace = "workspace://SpacesStore/bd8ace13-1d07-11dd-b77e-7720ead70151";
-			var uriEvents = Alfresco.constants.PROXY_URI + "calendar/RetrieveMonthEvents.json?";
-			uriEvents += "s=" + workspace +"&";
-			uriEvents += "d=" + year + "/" + (month+1) + "/1&";
-			
-			var callback =
-			{
-				success: this.onSuccess,
-				failure: this.onFailure,
-				argument: [year, month],
-				scope: this
-			};
-
-			YAHOO.util.Connect.asyncRequest('GET', uriEvents, callback);
+					fn: this.onDataLoad,
+					scope: this
+				},
+				failureMessage: "Could not load calendar data"
+			});
+				
+			// Decoupled event listeners
+	      YAHOO.Bubbling.on("onEventSaved", this.onEventSaved, this);
 		},
 		
 		/**
-		 * 
-		 * @param o JSON response
-		 */
-		onSuccess: function(o)
+       * View Refresh Required event handler.
+   	 * Called when a new event has been created.
+       *
+       * @method onEventSaved
+       * @param e {object} Event fired
+       * @param args {array} Event parameters (depends on event type)
+       */
+		onEventSaved: function(e, args)
 		{
-			if (o.responseText === "")
+			var obj = args[1];
+			if (obj !== null)
 			{
-				return; /* error */
+				var events = this.eventData[obj.from];
+				if (events === undefined)
+				{
+					events = [];
+					this.eventData[obj.from] = events;
+				}
+
+				events.push({
+					"name": obj.name
+				});
+
+				// Check to see if we need to refresh the current view
+				var dateStr = obj.from.split("/");
+				
+				var fromDate = new Date();
+				fromDate.setYear(dateStr[2]);
+				fromDate.setMonth((dateStr[0]-1));
+				fromDate.setDate(dateStr[1]);
+				
+				// Is it the same month?
+				if (fromDate.getFullYear() === this.currentDate.getFullYear() 
+					&& fromDate.getMonth() === this.currentDate.getMonth())
+				{
+					this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
+				}
 			}
-			var eventlist = YAHOO.lang.JSON.parse(o.responseText);
-			var year = o.argument[0];
-			var month = o.argument[1];
-			
+		},
+		
+		onDataLoad: function(o)
+		{
+			this.eventData = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
+			this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
+		},
+		
+		refresh: function(year, month)
+		{
 			/* Set to the first day of the month */
 			var date = new Date(year, month);
 			var startDay = date.getDay();
@@ -149,15 +160,15 @@
 						h.innerHTML = "<a href=\"#\">" + daynum + "</a>"; /* JavaScript days are 1 less */
 						elem.appendChild(h);
 						
-						/* TODO: change key to yyyy-mm-dd */
-						var events = eventlist[daynum];
+						var key = (month+1) + "/" + daynum + "/" + year;
+						var events = this.eventData[key];
 						if (events) 
 						{
 							for (var j=0; j < events.length; j++)
 							{
 								var d = document.createElement('div');
 								Dom.addClass(d, 'cal-event-entry');
-								d.innerHTML = events[j];
+								d.innerHTML = events[j].name;
 								elem.appendChild(d);
 							}
 						}
@@ -167,9 +178,38 @@
 			}
 		},
 		
-		onFailure: function(o)
+		_addButton: function(id, func)
 		{
-			alert("Failed to load data");
+			var Dom = YAHOO.util.Dom;
+			
+			var elem = Dom.get(id);
+			if (elem !== null) 
+			{
+				var button = new YAHOO.widget.Button(elem,
+				{
+						type: "push"
+				});
+				button.addListener("click", func, this);	
+			}
+		},
+		
+		displayCurrentMonth: function(e, obj)
+		{
+			obj.currentDate = new Date();
+			/* Add check to see what the date is. If it hasn't changed, don't load the data */
+			obj.refresh(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
+		},
+		
+		displayNextMonth: function(e, obj)
+		{
+			obj.currentDate.setMonth( obj.currentDate.getMonth() + 1 );
+			obj.refresh(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
+		},
+		
+		displayPrevMonth: function(e, obj)
+		{
+			obj.currentDate.setMonth( obj.currentDate.getMonth() - 1 );
+			obj.refresh(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
 		}
 	};
 }) ();

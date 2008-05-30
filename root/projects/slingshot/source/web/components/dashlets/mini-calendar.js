@@ -67,7 +67,7 @@
 				{
 					var cal = o.argument[0];
 					var selected = eventDates.join(",");
-				
+					
 					cal.addRenderer(selected, function(workingDate, cell) {
 						cell.innerHTML = '<a href="calendar?view=tab" class="' + this.Style.CSS_CELL_SELECTOR + '">' + this.buildDayLabel(workingDate) + "</a>"; 
 						YAHOO.util.Dom.addClass(cell, "highlight1"); 

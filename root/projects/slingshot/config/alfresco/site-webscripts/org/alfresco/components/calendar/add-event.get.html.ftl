@@ -3,11 +3,11 @@
 <div class="bd">
 
    <form id="${args.htmlid}-addEvent-form" action="${url.context}/proxy/alfresco/calendar/create" method="POST">
-        <input type="hidden" name="id" value="bd8ace13-1d07-11dd-b77e-7720ead70151" />
-		<input type="hidden" name="tt" value="12:00" />
-		<input type="hidden" name="ft" value="12:00" />
-      <div class="yui-t1">
-
+      <div class="yui-t1" style="width: 500px; min-width: 500px">
+			<input type="hidden" name="site" value="${args["site"]!""}" />
+			<input type="hidden" id="from" name="from" value="" />
+			<input type="hidden" id="to" name="to" value="" />
+			
             <div class="yui-g">
                <h2>Details</h2>
                <hr/>
@@ -30,11 +30,19 @@
 	        </div>
 			<div class="yui-gd">
 				<div class="yui-u first">Start date:</div>
-				<div class="yui-u" id="${args.htmlid}-startdate"><input id="fd" type="text" name="fd"/></div>
+				<div class="yui-u" id="${args.htmlid}-startdate"><input id="fd" type="text" name="datefrom" readonly="readonly"/></div>
+			</div>
+			<div class="yui-gd">
+				<div class="yui-u first">&nbsp;</div>
+				<div class="yui-u">&nbsp;at&nbsp;<input name="start" value="12:00" type="text" size="10" /></div>
 			</div>
 			<div class="yui-gd">
 				<div class="yui-u first">End date:</div>
-				<div class="yui-u" id="${args.htmlid}-enddate"><input id="td" type="text" name="td"/></div>
+				<div class="yui-u" id="${args.htmlid}-enddate"><input id="td" type="text" name="dateto" readonly="readonly"/></div>
+			</div>
+			<div class="yui-gd">
+				<div class="yui-u first">&nbsp;</div>
+				<div class="yui-u">&nbsp;at&nbsp;<input name="end" value="12:00" type="text" size="10" /></div>
 			</div>
          	<div class="yui-g">
 	            <input type="submit" id="${args.htmlid}-ok-button" value="OK" />

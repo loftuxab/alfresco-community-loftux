@@ -11,13 +11,18 @@
       this.panel = null;
       
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "calendar", "container", "connection"], this.componentsLoaded, this);
 
       return this;
    };
 
    Alfresco.module.AddEvent.prototype =
    {
+		setSiteId: function(siteId)
+		{
+			this.siteId = siteId;
+		},
+		
    	componentsLoaded: function()
       {
          /* Shortcut for dummy instance */
@@ -31,10 +36,14 @@
       {
 			Alfresco.util.Ajax.request(
 	      {
-	      	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event?htmlid=" + this.id,
-	        	successCallback: this.templateLoaded,
-	        	failureMessage: "Could not load add event template",
-	        	scope: this
+	      	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+				dataObj: { "htmlid" : this.id, "site" : this.siteId },
+				successCallback:
+				{
+					fn: this.templateLoaded,
+					scope: this
+				},
+	        	failureMessage: "Could not load add event template"
 	      });
       },
       
@@ -58,15 +67,18 @@
 		 	var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.setShowSubmitStateDynamically(true);
          eventForm.setSubmitElements(okButton);
-         eventForm.setAJAXSubmit(true, {successCallback: this.onCreateEventSuccess});
-         eventForm.init();
+			eventForm.setAJAXSubmit(true, 
+			{
+				successCallback:
+				{
+					fn: this.onCreateEventSuccess,
+					scope: this
+				}
+			});
+       	eventForm.init();
 
 			var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          cancelButton.subscribe("click", this.onCancelButtonClick, this, true);
-
-			// Add button handler for mini-calendar
-			//YAHOO.util.Event.addListener(this.id + "-fd", "click", this.onFocusEvent, this);
-			//var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
 		
 			var startButton = new YAHOO.widget.Button({
 				 type: "push", 
@@ -120,17 +132,20 @@
 					var mStr = oCalendar.cfg.getProperty("MONTHS_LONG")[selDate.getMonth()];
 					var yStr = selDate.getFullYear();
 					
-					var id;
+					var prettyId, hiddenId;
 					if (container.indexOf("enddate") > -1)
 					{
-						id = "td";
+						prettyId = "td";
+						hiddenId = "to";
 					}
 					else 
 					{
-						id = "fd";
+						prettyId = "fd";
+						hiddenId = "from"
 					}
 
-					Dom.get(id).value = (wStr + ", " + dStr + " " + mStr + " " + yStr);
+					Dom.get(prettyId).value = (wStr + ", " + dStr + " " + mStr + " " + yStr);
+					Dom.get(hiddenId).value = (yStr + "/" + (selDate.getMonth()+1) + "/"+ dStr);
 				}
 			
 				oCalendarMenu.hide();
@@ -143,14 +158,24 @@
 			
 		},
 
-		onCancelButtonClick: function(type, args)
+		onCancelButtonClick: function()
 	   {
 	   	this.panel.hide();
 	   },
 
-	  	onCreateEventSuccess: function(response)
+	  	onCreateEventSuccess: function(e)
 	  	{
 			this.panel.hide();
+			
+			var result = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
+			if (result.event)
+			{
+				YAHOO.Bubbling.fire('onEventSaved', 
+				{
+					name: result.event.name,
+					from: result.event.from
+				});	
+			}
 	  	},
       
       templateFailed: function()

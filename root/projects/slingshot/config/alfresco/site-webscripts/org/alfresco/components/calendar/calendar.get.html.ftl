@@ -1,7 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.Calendar("${args.htmlid}");
+   new Alfresco.Calendar("${args.htmlid}").setSiteId("${page.url.args["site"]!""}");
 //]]></script>
 
+<div id="${args.htmlid}">
 <div id="calendar"></div>
 
 <div class="yui-u">
@@ -9,3 +10,4 @@
 </div>
 
 <div id="${args.htmlid}-addEvent"></div>
+</div>
