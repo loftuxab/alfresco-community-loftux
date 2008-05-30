@@ -82,7 +82,7 @@
    position: relative;
    left: 40px;
    top: 12px;
-   /* Can't make it pick up h3 from base.css, copy in h3:s values for now */
+   /* Can't make it pick up h3 from base.css, copy in h3:s values for now */   
    font-weight: bold;
    font-size: 108%;
 }

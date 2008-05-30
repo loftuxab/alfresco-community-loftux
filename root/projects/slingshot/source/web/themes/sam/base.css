@@ -97,6 +97,12 @@ p
    padding-bottom: 3px;
 }
 
+hr
+{
+   margin-top: 5px;
+   margin-bottom: 8px;
+}
+
 .label
 {
    font-weight: bold;

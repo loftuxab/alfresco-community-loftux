@@ -188,7 +188,8 @@
          this.formatCell = function(el, oRecord) {
             var flashId = oRecord.getData()["id"];
             var cell = new YAHOO.util.Element(el);
-            var readableSize = oRecord.getData()["size"] + "b";
+            var readableSize = new Number(oRecord.getData()["size"]);
+            readableSize = Alfresco.util.formatFileSize(readableSize);
             var fileInfoStr = oRecord.getData()["name"] + " (" + readableSize + ")";
 
             var templateInstance = myThis.fileItemTemplate.cloneNode(true);
@@ -202,7 +203,6 @@
             var contentType = Dom.getElementsByClassName("fileupload-contentType-menu", "select", templateInstance)[0];
 
             var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance)[0];
-            //progressPercentage["innerHTML"] = "";
 
             var fButton = Dom.getElementsByClassName("fileupload-file-button", "input", templateInstance)[0];
             var fileButton = new YAHOO.widget.Button(fButton, {type: "button"});
@@ -299,6 +299,7 @@
          fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " Success";
          fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");                     
          YAHOO.util.Dom.setStyle(fileInfo.progress, "left", 0 + "px");
+         fileInfo.progressPercentage["innerHTML"] = "100%";
          this.uploadFromQueue(1);
          this.adjustIfUploaded();
       },
