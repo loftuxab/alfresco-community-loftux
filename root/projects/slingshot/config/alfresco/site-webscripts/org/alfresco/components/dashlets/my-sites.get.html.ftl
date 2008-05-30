@@ -10,14 +10,12 @@
   <div class="body scrollableList">
 <#if sites?exists>
    <#list sites as site>
-      <div class="list-item">
+      <div class="text-list-item">
         <a href="${url.context}/page/collaboration-dashboard?site=${site.shortName}">${site.title}</a>
       </div>
    </#list>
 <#else>
-      <div>
-        <p>No sites yet - why don&apos;t you create one?</p>
-      </div>
+      <span>No items to display</span>
 </#if>
   </div>
 </div>

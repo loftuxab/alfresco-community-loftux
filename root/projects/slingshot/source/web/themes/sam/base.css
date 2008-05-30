@@ -101,6 +101,11 @@ p
    font-weight: bold;
 }
 
+.error
+{
+   color: red;
+}
+
 .yui-skin-sam .yui-panel .bd, .yui-skin-sam .yui-panel .ft 
 {
    background-color: #E3EBEC;
