@@ -7,7 +7,7 @@
 //]]></script>
 
 <div id="${args.htmlid}">
-<div id="calendar-view" class="yui-navset" style="height: 500px; overflow-x: hidden; overflow-y: scroll;">
+<div id="calendar-view" class="yui-navset">
 <ul class="yui-nav">
   <li><a href="#day"><em>Day</em></a></li>
   <li><a href="#week"><em>Week</em></a></li>

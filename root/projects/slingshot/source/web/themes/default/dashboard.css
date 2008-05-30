@@ -35,7 +35,7 @@
 
 .dashlet .scrollableList
 {
-   height: 200px;
+   height: 208px;
    padding: 9px;
    overflow: auto;
    /* TODO: need to revisit this */
