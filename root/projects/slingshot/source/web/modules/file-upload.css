@@ -1,4 +1,4 @@
-/* Style YIU components */
+/* Style YUI components */
 
 .fileUpload-filelist-table tbody .yui-dt-liner {
    margin:0px;
@@ -11,7 +11,7 @@
 
 .file-upload .fileupload-fileButton-span button{
    padding-left: 2.5em;
-   background: url(images/close_panel.gif) 10% 50% no-repeat;
+   background: url(../images/icons/close_panel.gif) 10% 50% no-repeat; 
 }
 
 .fileupload-percentage-div, .fileupload-fileButton-div{
