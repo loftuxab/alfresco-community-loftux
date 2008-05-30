@@ -14,7 +14,7 @@
                         <img src="${url.context}${doc.icon32}" />
                      </div>
                      <div class="details">
-                        <h4><a target="content" href="${url.context}/proxy/alfresco${doc.contentUrl}">${doc.name}</a></h4>
+                        <h4><a target="content" href="${url.context}/proxy/alfresco${doc.contentUrl}/${doc.name?url}">${doc.name?html}</a></h4>
                         <div>modified by ${doc.modifiedBy} on ${doc.modifiedOn}</div>
                      </div>
                   </div>
