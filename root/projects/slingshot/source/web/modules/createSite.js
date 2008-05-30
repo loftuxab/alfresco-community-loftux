@@ -80,7 +80,14 @@
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
          createSiteForm.setShowSubmitStateDynamically(true);
          createSiteForm.setSubmitElements(okButton);
-         createSiteForm.setAJAXSubmit(true, {successCallback: this.onCreateSiteSuccess});
+         createSiteForm.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+               fn: this.onCreateSiteSuccess,
+               scope: this
+            }
+         });
          createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();
 
