@@ -51,8 +51,7 @@
                   fn: this.templateLoaded,
                   scope: this
                },
-               failureMessage: "Could not load create site template",
-               scope: this
+               failureMessage: "Could not load create site template"
             });
          }
       },
@@ -62,6 +61,7 @@
          var Dom = YAHOO.util.Dom;
 
          var div = document.createElement("div");
+         Dom.addClass(div, "create-site")         
          div.innerHTML = response.serverResponse.responseText;
          this.dialog = new YAHOO.widget.Panel(div,
          {
@@ -102,7 +102,7 @@
         this.dialog.hide();
       },
 
-      onCreateSiteSuccess: function(p_obj, response)
+      onCreateSiteSuccess: function(response)
       {
          if (response.json === undefined || response.json.shortName === undefined || response.json.shortName.length == 0)
          {
