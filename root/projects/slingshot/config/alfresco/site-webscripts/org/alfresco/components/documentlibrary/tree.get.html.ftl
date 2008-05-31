@@ -4,5 +4,7 @@
       siteId: "${page.url.args["site"]!""}"
    });
 //]]></script>
-<h2>LIBRARY</h2>
-<div id="${args.htmlid}-treeview"></div>
+<div id="${args.htmlid}-body" class="treeview doclib-filter">
+   <h2>LIBRARY</h2>
+   <div id="${args.htmlid}-treeview"></div>
+</div>

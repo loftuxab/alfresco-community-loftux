@@ -2,6 +2,7 @@
 <@template.header>
    <link rel="stylesheet" type="text/css" href="${url.context}/templates/documentlibrary/documentlibrary.css" />
    <script type="text/javascript" src="${url.context}/templates/documentlibrary/documentlibrary.js"></script>
+   <script type="text/javascript" src="${url.context}/modules/documentlibrary/doclib-actions.js"></script>
 </@>
 
 <@template.body>

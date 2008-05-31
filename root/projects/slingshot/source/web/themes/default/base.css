@@ -114,7 +114,7 @@ hr
    color: red;
 }
 
-.yui-skin-sam .yui-panel .bd, .yui-skin-sam .yui-panel .ft
+.yui-skin-default .yui-panel .bd, .yui-skin-default .yui-panel .ft
 {
    background-color: #FFFFFF;
 }
@@ -134,7 +134,7 @@ div.site-navigation
    color: white;
    background-color: #5ba1d0;
    border-top: 1px dotted #84b4d5;
-   margin: 0px -10px 4px -10px;
+   margin: 0px -10px 1px -10px;
    padding: 8px 10px;
 }
 
@@ -167,5 +167,3 @@ span.navigation-separator
    padding: 0px 10px;
    text-align: center;
 }
-
->>>>>>> .r9314
