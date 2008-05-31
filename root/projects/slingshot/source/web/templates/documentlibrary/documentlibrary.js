@@ -53,7 +53,7 @@
        * @property MIN_FILTER_PANEL_WIDTH
        * @type int
        */
-      MIN_FILTER_PANEL_WIDTH: 100,
+      MIN_FILTER_PANEL_WIDTH: 140,
 
       /**
        * Default Filter Panel width.

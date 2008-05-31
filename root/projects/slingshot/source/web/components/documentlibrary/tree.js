@@ -51,6 +51,9 @@
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onDoclistPathChanged", this.onDoclistPathChanged, this);
+      YAHOO.Bubbling.on("onDoclistFolderRenamed", this.onDoclistFolderRenamed, this);
+      YAHOO.Bubbling.on("onDoclistFolderCreated", this.onDoclistFolderCreated, this);
+      YAHOO.Bubbling.on("onDoclistFolderDeleted", this.onDoclistFolderDeleted, this);
 
       return this;
    }
@@ -278,6 +281,48 @@
          }
       },
       
+      /**
+       * Fired when a folder has been renamed
+       * @method onDoclistFolderRenamed
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onDoclistFolderRenamed: function DLT_onDoclistFolderRenamed(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.path !== null))
+         {
+         }
+      },
+
+      /**
+       * Fired when a folder has been created
+       * @method onDoclistFolderCreated
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onDoclistFolderCreated: function DLT_onDoclistFolderCreated(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.path !== null))
+         {
+         }
+      },
+
+      /**
+       * Fired when a folder has been deleted
+       * @method onDoclistFolderDeleted
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onDoclistFolderDeleted: function DLT_onDoclistFolderDeleted(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.path !== null))
+         {
+         }
+      },
+
       /**
        * Fired by YUI TreeView when a node has finished expanding
        * @method onExpandComplete

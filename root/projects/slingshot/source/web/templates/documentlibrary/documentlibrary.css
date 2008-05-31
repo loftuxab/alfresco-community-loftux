@@ -1,4 +1,5 @@
 /* Document Library Template */
+
 .yui-t1
 {
    width: auto;
@@ -8,7 +9,19 @@
    margin-left: -50em;
 }
 
+
+/* Filters, Tree View, etc. */
+
+.doclib-filter h2
+{
+   background: url(images/arrow-right.gif) no-repeat 0% 50%;
+   margin-top: 1em;
+   padding-left: 1em;
+}
+
+
 /* Create Folder */
+
 .create-folder
 {
    text-align: left;

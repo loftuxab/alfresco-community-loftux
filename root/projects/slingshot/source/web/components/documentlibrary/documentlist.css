@@ -3,40 +3,162 @@
    visibility: hidden;
 }
 
+.doclist .align-center
+{
+   text-align: center;
+}
+
+.doclist .align-right
+{
+   text-align: right;
+}
+
+
+/* Toolbars */
+
+.doclist .header-bar
+{
+   background-color: #e3eaec;
+   border-bottom: 2px solid #f0f3f4;
+   margin: 0 -10px;
+   padding: 0.5em;
+}
+
+.doclist .nav-bar
+{
+   background-color: #e9edef;
+   border-bottom: 2px solid #c7ccce;
+   margin: 0 -10px;
+   padding: 0.5em;
+}
+
+.doclist .pager-bar
+{
+   margin: 0 -10px;
+   padding: 0.5em;
+}
+
+.doclist span.separator
+{
+   padding: 0 10px;
+   text-align: center;
+}
 
 /* Buttons */
+
 .doclist .new-folder button
 {
    padding-left: 2.5em; 
-   background: url(images/new-folder.png) 10% 50% no-repeat;
+   background: url(images/new-folder.png) no-repeat 10% 50%;
 }
 
 .doclist .file-upload button
 {
    padding-left: 2.5em; 
-   background: url(images/file-upload.png) 10% 50% no-repeat;
+   background: url(images/file-upload.png) no-repeat 10% 50%;
 }
+
 
 /* Data Table */
 
-.doclist table
+.doclist .documents table
 {
    width: 100%;
 }
 
-.doclist thead
+.doclist .documents thead
 {
    display: none;
 }
 
-.doclist .yui-dt-bd table
+.doclist .documents .yui-dt-bd table
 {
    border: none;
 }
 
-.doclist .yui-dt td
+.doclist tr.yui-dt-odd
 {
-   border: none;
+   background-color: #ffffff;
+}
+.doclist tr.yui-dt-odd.yui-dt-highlighted
+{
+   background-color: #b2d2ff;
+}
+
+.doclist .documents.yui-dt td
+{
+   border-right: medium none;
+   border-bottom: 1px solid #f0f0f0;
+   vertical-align: top;
+}
+
+.doclist .documents.yui-dt td.yui-dt-last
+{
+   vertical-align: middle;
+}
+
+
+/* Cell Renderers */
+
+.doclist .documents .demo-thumbnail
+{
+   background: url(images/demo-thumbnail.jpg) no-repeat;
+   border: 1px solid #e0e0e0;
+   display: block;
+   height: 100px;
+   width: 77px;
+}
+
+.doclist .documents .demo-folder
+{
+   background: url(images/demo-folder.gif) no-repeat;
+   display: block;
+   margin-left: 24px;
+   height: 32px;
+   width: 32px;
+}
+
+.doclist .documents .demo-other
+{
+   background: url(images/demo-other.jpg) no-repeat;
+   border: 1px solid #e0e0e0;
+   display: block;
+   height: 100px;
+   width: 77px;
+}
+
+.doclist .documents .demo-other img
+{
+   margin: 30px 0 0 20px;
+}
+
+.doclist .documents .detail
+{
+   
+}
+
+.doclist .documents .detail span
+{
+   padding-right: 2em;
+}
+
+
+/* Actions Rollover */
+
+.doclist .documents .hidden
+{
+   visibility: hidden;
+}
+
+
+/* Actions */
+
+.doclist .onDeleteDocument a,
+.doclist .onDeleteFolder a
+{
+   background: url(images/delete.gif) no-repeat;
+   padding-left: 16px;
+   font-weight: bold;
 }
 
 
