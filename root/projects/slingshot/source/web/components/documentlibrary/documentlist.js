@@ -327,7 +327,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             {
                var newPath = me.currentPath + "/" + oRecord.getData("name");
                // TODO: *** Update the onclick to be logically-bound, not via HTML
-               elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/'/g, "\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
+               elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
             }
             else
             {
@@ -352,7 +352,14 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                var newPath = me.currentPath + "/" + oRecord.getData("name");
 
                // TODO: *** Update the onclick to be logically-bound, not via HTML
-               desc = '<p><a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/'/g, "\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></p>';
+               desc = '<h3><a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></h3>';
+               if (me.options.detailedView)
+               {
+                  if (oRecord.getData("description").length > 0)
+                  {
+                     desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
+                  }
+               }
             }
             else
             {
