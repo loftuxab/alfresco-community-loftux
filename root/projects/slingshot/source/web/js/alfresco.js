@@ -170,8 +170,15 @@ Alfresco.util.formatFileSize = function(fileSize)
  * @static
  */
 Alfresco.util.formatDate = function(date)
-{ 
-   return Alfresco.thirdparty.dateFormat(date);
+{
+   try
+   {
+      return Alfresco.thirdparty.dateFormat(date);
+   }
+   catch(e)
+   {
+      return date;
+   }
 }
 
 /**
