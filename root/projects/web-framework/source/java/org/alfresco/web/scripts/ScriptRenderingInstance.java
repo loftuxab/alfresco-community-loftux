@@ -64,28 +64,18 @@ public final class ScriptRenderingInstance extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
-            this.properties = new ScriptableMap<String, Serializable>();
-
-            // copy in properties from object
-            Map<String, Serializable> objectProperties = this.rendererContext.getObject().getProperties();
-            for (Entry<String, Serializable> entry : objectProperties.entrySet())
-            {
-                String key = (String) entry.getKey();
-                Serializable value = entry.getValue();
-                properties.put(key, value);            
-            }
+            this.properties = new ScriptableMap<String, Serializable>(
+                    this.rendererContext.getObject().getProperties());
         }
         
         return this.properties;
     }
-
+    
     
     // --------------------------------------------------------------
     // JavaScript Properties
-    //
-    
     
     /**
      * Gets the object.

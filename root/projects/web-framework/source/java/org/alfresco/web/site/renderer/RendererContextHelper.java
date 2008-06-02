@@ -121,7 +121,7 @@ public class RendererContextHelper
             stack = new Stack<RendererContext>();
             
             // push a "root" rendererContext into the stack
-            RendererContext rootRendererContext = new RendererContext();
+            RendererContext rootRendererContext = new RendererContext(requestContext);
             stack.push(rootRendererContext);
             
             requestContext.setValue(WebFrameworkConstants.RENDER_DATA_REQUEST_CONTEXT_STACK_KEY, stack); 
@@ -155,13 +155,13 @@ public class RendererContextHelper
         {
             // clone the current render data
             newRendererContext = currentRendererContext.clone();
+            newRendererContext.setRequestContext(context);
         }
         else
         {
             // create a new render data
-            newRendererContext = new RendererContext();
+            newRendererContext = new RendererContext(context);
         }
-        newRendererContext.setRequestContext(context);
         newRendererContext.setRequest(request);
         newRendererContext.setResponse(response);
         

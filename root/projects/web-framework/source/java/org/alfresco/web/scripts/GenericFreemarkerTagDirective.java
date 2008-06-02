@@ -89,39 +89,40 @@ public class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
     {
         // instantiate the tag class
         Tag tag = (Tag) ReflectionHelper.newObject(getTagClassName());
-        
-        if(tag != null)
+        if (tag == null)
         {
-            // set directive parameters onto the tag
-            Iterator it = params.keySet().iterator();
-            while(it.hasNext())
-            {
-                String name = (String) it.next();
-                TemplateModel value = (TemplateModel) params.get(name);
+            throw new IllegalArgumentException("Unable to create tag with class name: " + getTagClassName());
+        }
+        
+        // set directive parameters onto the tag
+        Iterator it = params.keySet().iterator();
+        while (it.hasNext())
+        {
+            String name = (String) it.next();
+            TemplateModel value = (TemplateModel) params.get(name);
 
-                // If the value is a scalar, we can do the set
-                // However, we can only do Strings (at the moment)
-                if(value instanceof TemplateScalarModel)
-                {
-                    // TODO: Totally improve how this is done
-                    String method = "set" + name.substring(0,1).toUpperCase() + name.substring(1, name.length());
-                    Class[] argTypes = new Class[] { String.class };
-                    String v = ((TemplateScalarModel)value).getAsString();
-                    String[] args = new String[] { v };
-                    ReflectionHelper.invoke(tag, method, argTypes, args);
-                }
-                else
-                {
-                    throw new TemplateModelException("The '"+name+"' parameter to the '" + getTagName() + "' directive must be a string.");                    
-                }
+            // If the value is a scalar, we can do the set
+            // However, we can only do Strings (at the moment)
+            if (value instanceof TemplateScalarModel)
+            {
+                // TODO: Totally improve how this is done
+                String method = "set" + name.substring(0,1).toUpperCase() + name.substring(1, name.length());
+                Class[] argTypes = new Class[] { String.class };
+                String v = ((TemplateScalarModel)value).getAsString();
+                String[] args = new String[] { v };
+                ReflectionHelper.invoke(tag, method, argTypes, args);
+            }
+            else
+            {
+                throw new TemplateModelException("The '"+name+"' parameter to the '" + getTagName() + "' directive must be a string.");                    
             }
         }
         
         // copy in body content (if there is any)
         String bodyContentString = null;
-        if(body != null)
+        if (body != null)
         {
-            if(tag instanceof BodyTagSupport)
+            if (tag instanceof BodyTagSupport)
             {
                 // dump out the Freemarker body content
                 StringWriter bodyStringWriter = new StringWriter();

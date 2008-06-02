@@ -1,1 +1,1 @@
-model.regions = parseInt(regions);
+model.regions = parseInt(template.properties.regions);

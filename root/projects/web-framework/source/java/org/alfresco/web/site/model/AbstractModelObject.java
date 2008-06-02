@@ -488,7 +488,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
     	if (this.modelProperties == null)
     	{
-    		modelProperties = new HashMap<String, Serializable>(16, 1.0f);
+    		modelProperties = new HashMap<String, Serializable>(8, 1.0f);
     		
     		List elements = getDocument().getRootElement().elements();
 	        for (int i = 0; i < elements.size(); i++)
@@ -515,7 +515,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
     	if (this.customProperties == null)
     	{
-    		this.customProperties = new HashMap<String, Serializable>(8, 1.0f);
+    		this.customProperties = new HashMap<String, Serializable>(4, 1.0f);
     		
     		Element properties = getDocument().getRootElement().element(CONTAINER_PROPERTIES);
 	        if (properties != null)

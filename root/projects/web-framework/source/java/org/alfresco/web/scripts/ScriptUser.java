@@ -25,8 +25,6 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.alfresco.connector.User;
 import org.alfresco.web.site.RequestContext;
@@ -70,19 +68,11 @@ public final class ScriptUser extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
-            Map<String, Serializable> userProperties = user.getProperties();
-            
-            this.properties = new ScriptableMap<String, Serializable>();
-            for (Entry<String, Serializable> entry : userProperties.entrySet())
-            {
-                String key = (String) entry.getKey();
-                Serializable value = entry.getValue();
-                properties.put(key, value);            
-            }
+            this.properties = new ScriptableMap<String, Serializable>(user.getProperties());
         }
-
+        
         return this.properties;
     }
     

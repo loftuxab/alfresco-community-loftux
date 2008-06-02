@@ -49,8 +49,6 @@ public abstract class ScriptBase implements Serializable
      */
     public ScriptBase(RequestContext context)
     {
-        super();
-        
         // store a reference to the request context
         this.context = context;
     }

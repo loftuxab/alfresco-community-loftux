@@ -25,8 +25,6 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.alfresco.web.site.Content;
 import org.alfresco.web.site.RequestContext;
@@ -79,21 +77,14 @@ public final class ScriptContentObject extends ScriptBase
      */
     public ScriptableMap buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
-            Map<String, Serializable> contentProperties = content.getProperties();
-            if(contentProperties != null)
-            {            
-                this.properties = new ScriptableMap<String, Serializable>();
-                for (Entry<String, Serializable> entry : contentProperties.entrySet())
-                {
-                    String key = (String) entry.getKey();
-                    Serializable value = entry.getValue();
-                    this.properties.put(key, value);            
-                }
+            if (content.getProperties() != null)
+            {
+                this.properties = new ScriptableMap<String, Serializable>(content.getProperties());
             }
         }
-
+        
         return this.properties;
     }    
     
