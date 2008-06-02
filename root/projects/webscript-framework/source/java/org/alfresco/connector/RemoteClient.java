@@ -430,6 +430,7 @@ public class RemoteClient extends AbstractClient
             // prepare to write the connection result to the output stream
             // at this point - if the remote server returned an error status code
             // this call will trigger an IOException which is handled below
+            boolean caughtError = false;
             String errorMessage = null;
             InputStream input;
             try
@@ -446,6 +447,7 @@ public class RemoteClient extends AbstractClient
                 
                 // now use the error response stream instead - if there is one
                 input = connection.getErrorStream();
+                caughtError = true;
             }
             
             // proxy over any headers we get from the proxied response stream to actual response
@@ -467,38 +469,41 @@ public class RemoteClient extends AbstractClient
             }
             
             // perform the stream write from the response to the output
-            if (input != null)
+            if (connection.getResponseCode() != HttpServletResponse.SC_NOT_MODIFIED)
             {
-                try
-                {
-                    byte[] buffer = new byte[BUFFERSIZE];
-                    int read = input.read(buffer);
-                    while (read != -1)
-                    {
-                        out.write(buffer, 0, read);
-                        read = input.read(buffer);
-                    }
-                }
-                finally
+                if (input != null)
                 {
                     try
                     {
-                        if (input != null)
+                        byte[] buffer = new byte[BUFFERSIZE];
+                        int read = input.read(buffer);
+                        while (read != -1)
                         {
-                            input.close();
+                            out.write(buffer, 0, read);
+                            read = input.read(buffer);
                         }
-                        if (out != null)
-                        {
-                            out.flush();
-                            out.close();
-                        }
-                        // TODO: required?
-                        connection.disconnect();
                     }
-                    catch (IOException e)
+                    finally
                     {
-                        if (logger.isWarnEnabled())
-                            logger.warn("Exception during close() of HTTP API connection", e);
+                        try
+                        {
+                            if (input != null)
+                            {
+                                input.close();
+                            }
+                            if (out != null)
+                            {
+                                out.flush();
+                                out.close();
+                            }
+                            // TODO: required?
+                            connection.disconnect();
+                        }
+                        catch (IOException e)
+                        {
+                            if (logger.isWarnEnabled())
+                                logger.warn("Exception during close() of HTTP API connection", e);
+                        }
                     }
                 }
             }
@@ -519,7 +524,14 @@ public class RemoteClient extends AbstractClient
             status.setCode(connection.getResponseCode());
             if (res != null)
             {
-                res.setStatus(connection.getResponseCode(), errorMessage);
+                if (!caughtError)
+                {
+                    res.setStatus(connection.getResponseCode());
+                }
+                else
+                {
+                    res.sendError(connection.getResponseCode(), errorMessage);
+                }
             }
             
             return encoding;
