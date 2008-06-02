@@ -44,17 +44,20 @@
    </div>
    
    <script type="text/javascript">//<![CDATA[
+   YAHOO.util.Event.onContentReady("alflogin", function()
+   {
       var panel = new YAHOO.widget.Overlay(YAHOO.util.Dom.get("alflogin"), 
-         {
-            modal: false,
-            draggable: false,
-            fixedcenter: true,
-            close: false,
-            visible: true,
-            iframe: false
-         });
+      {
+         modal: false,
+         draggable: false,
+         fixedcenter: true,
+         close: false,
+         visible: true,
+         iframe: false
+      });
       panel.render(document.body);
       
       YAHOO.util.Dom.get("username").focus();
+   });
    //]]></script>
 </@>
