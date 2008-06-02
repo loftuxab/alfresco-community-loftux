@@ -83,7 +83,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
           * @property showFolders
           * @type boolean
           */
-         showFolders: true,
+         showFolders: false,
 
          /**
           * Flag indicating whether the list shows a detailed view or a simple one.
@@ -243,6 +243,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          });
 
          // Hide/Show Folders button
+         Dom.get(this.id + "-showFolders-button").innerHTML = this.options.showFolders ? "Hide Folders" : "Show Folders";
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
 
          // Detailed/Simple List button
@@ -414,7 +415,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 8,
-            initialRequest: "site=" + encodeURIComponent(this.options.siteId) + "&path=" + encodeURIComponent(this.currentPath)
+            initialRequest: "site=" + encodeURIComponent(this.options.siteId) + "&path=" + encodeURIComponent(this.currentPath) + (this.options.showFolders ? "" : "&type=documents")
          });
          
          // File checked handler
