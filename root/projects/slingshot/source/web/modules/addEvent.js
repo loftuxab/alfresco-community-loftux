@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+
 /*
  *** Alfresco.module.AddEvent
 */
@@ -18,13 +43,31 @@
 
    Alfresco.module.AddEvent.prototype =
    {
+		/**
+	    * AddModule module instance.
+	    * 
+	    * @property panel
+	    * @type Alfresco.module.AddEvent
+	    */
 		panel: null,	
 	
+		/**
+       * Sets the current site for this component.
+       * 
+       * @property siteId
+       * @type string
+       */
 		setSiteId: function(siteId)
 		{
 			this.siteId = siteId;
 		},
 		
+		/**
+		 * Fired by YUILoaderHelper when required component script files have
+		 * been loaded into the browser.
+		 *
+		 * @method onComponentsLoaded
+		 */
    	componentsLoaded: function()
       {
          /* Shortcut for dummy instance */
@@ -34,6 +77,13 @@
          }
       },
       
+		/**
+		 * Renders the event create form. If the form has been previously rendered
+		 * it clears the form of any previously entered values otherwise fires off a 
+		 * request to web script that generates the form.
+		 *
+		 * @method show
+		 */
       show: function()
       {
 			if (this.panel)
@@ -67,11 +117,18 @@
 						fn: this.templateLoaded,
 						scope: this
 					},
-		        	failureMessage: "Could not load add event template"
+		        	failureMessage: "Could not load add event form"
 		      });
 			}
       },
       
+		/**
+		 * Fired when the event create form has loaded successfully.
+		 * Sets up the various widgets on the form and initialises the forms runtime.
+		 * 
+		 * @method templateLoaded
+		 * @param response {object} DomEvent 
+		 */
       templateLoaded: function(response)
       {
          var div = document.createElement("div");
@@ -87,7 +144,6 @@
 		 	this.panel.render(document.body);
 		
 			var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
-       	okButton.subscribe("click", this.onOkButtonClick, this, true);
 		
 		 	var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
          eventForm.setShowSubmitStateDynamically(true);
@@ -105,6 +161,10 @@
 			var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
          cancelButton.subscribe("click", this.onCancelButtonClick, this, true);
 		
+			/**
+			 * Button declarations that, when clicked, display 
+			 * the calendar date picker widget.
+			 */
 			var startButton = new YAHOO.widget.Button({
 				 type: "push", 
              id: "calendarpicker", 
@@ -122,6 +182,14 @@
          this.panel.show();
       },
 
+		/**
+		 * Event handler that gets fired when a user clicks on the date selection
+		 * button in the event creation form. Displays a mini YUI calendar. 
+		 * Gets called for both the start and end date buttons.
+		 *
+		 * @method onCreateEventSuccess
+		 * @param e {object} DomEvent
+		 */
 		onDateSelectButton: function(e)
 		{
 			var oCalendarMenu = new YAHOO.widget.Overlay("calendarmenu");
@@ -177,17 +245,27 @@
 			});
 		},
 
-		onOkButtonClick: function(type, args)
-		{
-			
-			
-		},
-
-		onCancelButtonClick: function()
+		/**
+       * Event handler that gets fired when a user clicks
+       * on the cancel button in the event create form.
+       *
+       * @method onCancelButtonClick
+       * @param e {object} DomEvent
+       * @param obj {object} Object passed back from addListener method
+       */
+		onCancelButtonClick: function(e, obj)
 	   {
 	   	this.panel.hide();
 	   },
 
+		/**
+	    * Event handler that gets fired when an event is (successfully) created.
+		 * It in turns fires an 'onEventSaved' event passing in the name and start date
+		 * of the newly created event.
+	    *
+	    * @method onCreateEventSuccess
+	    * @param e {object} DomEvent
+	    */
 	  	onCreateEventSuccess: function(e)
 	  	{
 			this.panel.hide();
@@ -201,12 +279,7 @@
 					from: result.event.from
 				});	
 			}
-	  	},
-      
-      templateFailed: function()
-      {
-         YAHOO.util.Dom.get(this.id).innerHTML = "<b>Couldn't get template</b>";
-      }
+	  	}
    };
 })();
 

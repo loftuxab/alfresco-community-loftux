@@ -1,4 +1,29 @@
 /**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+
+/**
  * Alfresco.CalendarView
  */
 (function()
@@ -21,10 +46,23 @@
 	
 	Alfresco.CalendarView.prototype = 
 	{
-		/* TODO: move to separate date utilities class */
-		days : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
+		/**
+		 * Array of the number of days in each calendar month starting with January
+		 *
+		 * TODO: move to separate date utilities class
+		 *
+		 * @property days
+		 * @type array
+		 */
+		DAYS : [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
 		
-		months: [
+		/**
+       * Array of month names.
+       * 
+       * @property months
+       * @type array
+       */
+		MONTHS: [
 			"January", 
 			"February", 
 			"March", 
@@ -47,24 +85,42 @@
        */
 		eventData: {},
 		
+		/**
+       * Sets the current site for this component.
+       * 
+       * @property siteId
+       * @type string
+       */
 		setSiteId: function(siteId)
 		{
 			this.siteId = siteId;
 		},
 		
+		/**
+	    * Fired by YUILoaderHelper when required component script files have
+	    * been loaded into the browser.
+	    *
+	    * @method onComponentsLoaded
+	    */
 		onComponentsLoaded: function()
 		{
 			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
 		},
 		
+		/**
+		 * Fired by YUI when parent element is available for scripting.
+		 * Initialises components, including YUI widgets and loads event data.
+		 *
+		 * @method init
+		 */
 		init: function()
-		{
+		{	
 			var tabView = new YAHOO.widget.TabView('calendar-view'); 
 			
 			/* Initialise buttons and handlers */
-			this._addButton(this.id + "-next-button", this.displayNextMonth);
-			this._addButton(this.id + "-prev-button", this.displayPrevMonth);
-			this._addButton(this.id + "-current-button", this.displayCurrentMonth);
+			Alfresco.util.createYUIButton(this, "next-button", this.displayNextMonth, { type: "push" });
+			Alfresco.util.createYUIButton(this, "prev-button", this.displayPrevMonth, { type: "push" });
+			Alfresco.util.createYUIButton(this, "current-button", this.displayCurrentMonth, { type: "push" });
 		
 			/* Initialise the current view */
 			Alfresco.util.Ajax.request({
@@ -81,13 +137,14 @@
 				failureMessage: "Could not load calendar data"
 			});
 				
-			// Decoupled event listeners
+			// Decoupled event listener
 	      YAHOO.Bubbling.on("onEventSaved", this.onEventSaved, this);
 		},
 		
 		/**
        * View Refresh Required event handler.
    	 * Called when a new event has been created.
+ 		 * Updates the current view with details of the newly created event.
        *
        * @method onEventSaved
        * @param e {object} Event fired
@@ -126,12 +183,27 @@
 			}
 		},
 		
+		/**
+		 * Fired when the event data has loaded successfully.
+		 * Caches the data locally and updates the view with the current event data.
+		 * 
+		 * @method onDataLoad
+		 * @param o {object} DomEvent 
+		 */
 		onDataLoad: function(o)
 		{
 			this.eventData = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
 			this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
 		},
 		
+		/**
+		 * Updates the view to display events that occur during the specified period
+		 * as indicated by the "year" and "month" parameters.
+		 *
+		 * @method refresh
+		 * @param year {integer}
+		 * @param month {integer} 
+		 */
 		refresh: function(year, month)
 		{
 			/* Set to the first day of the month */
@@ -142,9 +214,9 @@
 
 			/* Change the month label */
 			var label = Dom.get("monthLabel");
-			label.innerHTML = this.months[date.getMonth()] + " " + date.getFullYear();
+			label.innerHTML = this.MONTHS[date.getMonth()] + " " + date.getFullYear();
 
-			var days_in_month = this.days[month]; /* TODO: Add check for leap year */
+			var days_in_month = this.DAYS[month]; /* TODO: Add check for leap year */
 			var daynum = 1;
 			
 			for (var i = 0; i < 42; i++)
@@ -178,38 +250,47 @@
 			}
 		},
 		
-		_addButton: function(id, func)
-		{
-			var Dom = YAHOO.util.Dom;
-			
-			var elem = Dom.get(id);
-			if (elem !== null) 
-			{
-				var button = new YAHOO.widget.Button(elem,
-				{
-						type: "push"
-				});
-				button.addListener("click", func, this);	
-			}
-		},
-		
+		/*
+		 * Fired when the "This Month" button is clicked.
+	    * Updates currentDate to today then refreshes the view.
+		 * 
+		 * @param e {object} DomEvent
+		 * @param obj {object} Object passed back from addListener method
+		 * @method  displayCurrentMonth
+		 */
 		displayCurrentMonth: function(e, obj)
 		{
-			obj.currentDate = new Date();
+			this.currentDate = new Date();
 			/* Add check to see what the date is. If it hasn't changed, don't load the data */
-			obj.refresh(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
+			this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
 		},
 		
+		/*
+		 * Fired when the "Next" button is clicked.
+		 * Updates currentDate to the next month then refreshes the view.
+		 * 
+		 * @param e {object} DomEvent
+		 * @param obj {object} Object passed back from addListener method
+		 * @method  displayNextMonth
+		 */
 		displayNextMonth: function(e, obj)
 		{
-			obj.currentDate.setMonth( obj.currentDate.getMonth() + 1 );
-			obj.refresh(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
+			this.currentDate.setMonth( this.currentDate.getMonth() + 1 );
+			this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
 		},
 		
+		/*
+		 * Fired when the "Previous" button is clicked.
+		 * Updates currentDate to the previous month then refreshes the view.
+		 * 
+		 * @param e {object} DomEvent
+		 * @param obj {object} Object passed back from addListener method
+		 * @method  displayPrevMonth
+		 */
 		displayPrevMonth: function(e, obj)
 		{
-			obj.currentDate.setMonth( obj.currentDate.getMonth() - 1 );
-			obj.refresh(obj.currentDate.getFullYear(), obj.currentDate.getMonth());
+			this.currentDate.setMonth( this.currentDate.getMonth() - 1 );
+			this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
 		}
 	};
 }) ();
