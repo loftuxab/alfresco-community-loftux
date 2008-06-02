@@ -34,7 +34,7 @@
 			</div>
 			<div class="yui-gd">
 				<div class="yui-u first">&nbsp;</div>
-				<div class="yui-u">&nbsp;at&nbsp;<input name="start" value="12:00" type="text" size="10" /></div>
+				<div class="yui-u">&nbsp;at&nbsp;<input id="${args.htmlid}-start" name="start" value="12:00" type="text" size="10" /></div>
 			</div>
 			<div class="yui-gd">
 				<div class="yui-u first">End date:</div>
@@ -42,7 +42,7 @@
 			</div>
 			<div class="yui-gd">
 				<div class="yui-u first">&nbsp;</div>
-				<div class="yui-u">&nbsp;at&nbsp;<input name="end" value="12:00" type="text" size="10" /></div>
+				<div class="yui-u">&nbsp;at&nbsp;<input id="${args.htmlid}-end" name="end" value="12:00" type="text" size="10" /></div>
 			</div>
          	<div class="yui-g">
 	            <input type="submit" id="${args.htmlid}-ok-button" value="OK" />

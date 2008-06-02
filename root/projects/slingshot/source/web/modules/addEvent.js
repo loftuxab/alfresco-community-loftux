@@ -18,6 +18,8 @@
 
    Alfresco.module.AddEvent.prototype =
    {
+		panel: null,	
+	
 		setSiteId: function(siteId)
 		{
 			this.siteId = siteId;
@@ -34,17 +36,40 @@
       
       show: function()
       {
-			Alfresco.util.Ajax.request(
-	      {
-	      	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
-				dataObj: { "htmlid" : this.id, "site" : this.siteId },
-				successCallback:
+			if (this.panel)
+			{
+				var Dom = YAHOO.util.Dom;
+				// Clear the form of any previously set values
+				var elems = [
+					this.id + "-title",
+					this.id + "-location",
+					this.id + "-description",
+					"fd",
+					"td"
+				];
+				for (var i=0; i < elems.length; i++)
 				{
-					fn: this.templateLoaded,
-					scope: this
-				},
-	        	failureMessage: "Could not load add event template"
-	      });
+					Dom.get(elems[i]).value = "";
+				}
+				Dom.get(this.id + "-start").value = "12:00";
+				Dom.get(this.id + "-end").value = "12:00";
+				
+				this.panel.show();
+			}
+			else 
+			{
+				Alfresco.util.Ajax.request(
+		      {
+		      	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+					dataObj: { "htmlid" : this.id, "site" : this.siteId },
+					successCallback:
+					{
+						fn: this.templateLoaded,
+						scope: this
+					},
+		        	failureMessage: "Could not load add event template"
+		      });
+			}
       },
       
       templateLoaded: function(response)

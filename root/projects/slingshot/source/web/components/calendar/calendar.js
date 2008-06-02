@@ -1,3 +1,28 @@
+/**
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+
 /*
  *** Alfresco.Calendar
  */
@@ -27,11 +52,23 @@
        */
       eventDialog: null,
 
+		/**
+       * Sets the current site for this component.
+       * 
+       * @property siteId
+       * @type string
+       */
       setSiteId: function(siteId)
 		{
 			this.siteId = siteId;
 		},
-			
+		
+	   /**
+	    * Fired by YUILoaderHelper when required component script files have
+	    * been loaded into the browser.
+	    *
+	    * @method onComponentsLoaded
+	    */	
 		componentsLoaded: function()
     	{
 			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
@@ -42,13 +79,8 @@
 			var Dom = YAHOO.util.Dom;
 		
 			/* Add Event Button */
-	    	var aeButton = Dom.get(this.id + "-addEvent-button");
-	    	var addEventButton = new YAHOO.widget.Button(aeButton,
-	    	{
-	    		type: "push" 
-	    	});
-			addEventButton.on("click", this.onButtonClick, addEventButton, this);
-
+         var aeButton = Alfresco.util.createYUIButton(this, "addEvent-button", this.onButtonClick);
+			
 			/* 
 		 	 * Separate the (initial) rendering of the calendar from the data loading.
 		 	 * If for some reason the data fails to load, the calendar will still display.
