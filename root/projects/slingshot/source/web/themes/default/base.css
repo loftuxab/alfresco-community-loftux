@@ -75,7 +75,8 @@ h2
    font-size: 123.1%;
 }
 
-h1 .light, h2 .light
+h1 .light,
+h2 .light
 {
    color: #adcde3;
 }

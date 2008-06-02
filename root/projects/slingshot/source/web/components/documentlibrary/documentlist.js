@@ -316,23 +316,44 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
           */
          renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
-
             var name = oRecord.getData("name");
             var extn = name.substring(name.lastIndexOf("."));
-            if (".doc.docx.xls.xlsx.ppt.pptx".indexOf(extn) != -1)
+
+            if (me.options.detailedView)
             {
-               elCell.innerHTML = '<span class="demo-thumbnail"></span>';
-            }
-            else if (oRecord.getData("type") == "folder")
-            {
-               var newPath = me.currentPath + "/" + oRecord.getData("name");
-               // TODO: *** Update the onclick to be logically-bound, not via HTML
-               elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
+               oColumn.width = 80;
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+               if (".doc.docx.xls.xlsx.ppt.pptx".indexOf(extn) != -1)
+               {
+                  elCell.innerHTML = '<span class="demo-thumbnail"></span>';
+               }
+               else if (oRecord.getData("type") == "folder")
+               {
+                  var newPath = me.currentPath + "/" + oRecord.getData("name");
+                  // TODO: *** Update the onclick to be logically-bound, not via HTML
+                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
+               }
+               else
+               {
+                  elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" /></span>';
+               }
             }
             else
             {
-               elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" /></span>';
+               oColumn.width = 40;
+               Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+               if (oRecord.getData("type") == "folder")
+               {
+                  var newPath = me.currentPath + "/" + oRecord.getData("name");
+                  // TODO: *** Update the onclick to be logically-bound, not via HTML
+                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
+               }
+               else
+               {
+                  elCell.innerHTML = '<span class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" /></span>';
+               }
             }
          };
 

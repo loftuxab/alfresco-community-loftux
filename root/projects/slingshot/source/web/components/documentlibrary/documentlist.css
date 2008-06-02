@@ -117,6 +117,13 @@
    height: 32px;
    width: 32px;
 }
+.doclist .documents .demo-folder-small
+{
+   background: url(images/demo-folder.png) no-repeat;
+   display: block;
+   height: 32px;
+   width: 32px;
+}
 
 .doclist .documents .demo-other
 {
@@ -126,6 +133,12 @@
    height: 100px;
    width: 77px;
 }
+.doclist .documents .demo-other-small
+{
+   display: block;
+   height: 32px;
+   width: 32px;
+}
 
 .doclist .documents .demo-other img
 {
@@ -134,7 +147,6 @@
 
 .doclist .documents .detail
 {
-   
 }
 
 .doclist .documents .detail span

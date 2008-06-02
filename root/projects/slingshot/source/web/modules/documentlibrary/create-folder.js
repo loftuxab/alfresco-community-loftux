@@ -232,7 +232,7 @@
 
          // Form definition
          var form = new Alfresco.forms.Form(this.id + "-form");
-         form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "blur");
+         form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "keyup");
          form.setShowSubmitStateDynamically(true);
          form.setSubmitElements(this.widgets.okButton);
          form.setAJAXSubmit(true,
