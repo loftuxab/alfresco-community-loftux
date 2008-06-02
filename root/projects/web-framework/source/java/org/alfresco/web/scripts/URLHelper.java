@@ -1,5 +1,6 @@
 package org.alfresco.web.scripts;
 
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -24,7 +25,35 @@ public class URLHelper
      * 
      * @param req       Servlet request to build URL model helper from
      */
+    public URLHelper(HttpServletRequest req)
+    {
+        init(req);
+        Map<String, String> args = new HashMap<String, String>(req.getParameterMap().size());
+        Enumeration names = req.getParameterNames();
+        while (names.hasMoreElements())
+        {
+            String name = (String)names.nextElement();
+            args.put(name, req.getParameter(name));
+        }
+        this.args = args;
+    }
+    
+    /**
+     * Construction
+     * 
+     * @param req       Servlet request to build URL model helper from
+     */
     public URLHelper(HttpServletRequest req, Map<String, String> reqArgs)
+    {
+        init(req);
+        if (reqArgs == null)
+        {
+            throw new IllegalArgumentException("Argument map is mandatory.");
+        }
+        this.args = reqArgs;
+    }
+    
+    private void init(HttpServletRequest req)
     {
         this.context = req.getContextPath();
         this.uri = req.getRequestURI();
@@ -39,8 +68,6 @@ public class URLHelper
             this.pageContext = this.context;
         }
         this.queryString = (req.getQueryString() != null ? req.getQueryString() : "");
-        this.args = new HashMap<String, String>(reqArgs.size());
-        this.args.putAll(reqArgs);
     }
 
     public String getContext()

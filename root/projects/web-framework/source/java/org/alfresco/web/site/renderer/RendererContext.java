@@ -51,15 +51,19 @@ public final class RendererContext implements Serializable
     private HttpServletRequest request;
     private HttpServletResponse response;
 
-    public RendererContext()
+    public RendererContext(RequestContext context)
     {
-        this.map = new HashMap<String, Serializable>();
+        this.map = new HashMap<String, Serializable>(8, 1.0f);
+        if (context == null)
+        {
+            throw new IllegalArgumentException("RequestContext is mandatory.");
+        }
+        this.context = context;
     }
-
+    
     public RendererContext(RequestContext context, ModelObject object)
     {
-        this();
-        this.context = context;
+        this(context);
         this.object = object;
     }
     
@@ -72,7 +76,7 @@ public final class RendererContext implements Serializable
     
     public RequestContext getRequestContext()
     {
-        return this.context;        
+        return this.context;
     }
     
     public void setRequestContext(RequestContext context)
@@ -143,9 +147,8 @@ public final class RendererContext implements Serializable
     
     public RendererContext clone()
     {
-        RendererContext c = new RendererContext();
+        RendererContext c = new RendererContext(this.getRequestContext());
         c.setObject(this.getObject());
-        c.setRequestContext(this.getRequestContext());
         c.putAll(this);
         
         return c;

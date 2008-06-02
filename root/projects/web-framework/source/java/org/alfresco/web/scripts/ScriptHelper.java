@@ -26,7 +26,6 @@ package org.alfresco.web.scripts;
 
 import java.io.Serializable;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
@@ -53,15 +52,15 @@ public abstract class ScriptHelper implements Serializable
     public static ScriptableMap toScriptableMap(RequestContext context,
             ModelObject[] modelObjects)
     {
-        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
-
+        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>(modelObjects.length);
+        
         for (int i = 0; i < modelObjects.length; i++)
         {
             ScriptModelObject scriptModelObject = toScriptModelObject(context, modelObjects[i]);
             String id = modelObjects[i].getId();
             map.put(id, scriptModelObject);
         }
-
+        
         return map;
     }
     
@@ -74,14 +73,7 @@ public abstract class ScriptHelper implements Serializable
      */
     public static ScriptableMap toScriptableMap(Map<String, Serializable> map)
     {
-        ScriptableMap<String, Serializable> newMap = new ScriptableMap<String, Serializable>();
-        for (Entry<String, Serializable> entry : map.entrySet())
-        {
-            String key = (String) entry.getKey();
-            Serializable value = entry.getValue();
-            newMap.put(key, value);            
-        }
-        return newMap;
+        return new ScriptableMap<String, Serializable>(map);
     }
 
     /**

@@ -24,7 +24,8 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.Enumeration;
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,14 +37,13 @@ import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.RendererContext;
 
 /**
  * @author muzquiano
  */
-public class ProcessorModelHelper
+public final class ProcessorModelHelper
 {
     public static final String PROP_HTMLID = "htmlid";
     
@@ -55,7 +55,7 @@ public class ProcessorModelHelper
      * content
      * user
      * instance (current object being rendered)
-     * page (legacy but souped up)
+     * page
      * theme
      * htmlid
      * 
@@ -70,82 +70,81 @@ public class ProcessorModelHelper
      * content
      * user
      * instance (current object being rendered)
-     * page (legacy but souped up)
+     * page
      * theme
      * htmlid
      * 
      */
 
     /**
-     * Populates the model with common things for all processors
+     * Populates the common model for all processors
      * 
      * @param rendererContext
      * @param model
      */
-    public static void populateModel(RendererContext rendererContext, Map<String, Object> model)
+    private static void populateModel(RendererContext rendererContext, Map<String, Object> model)
     {
-        if(model == null)
+        if (model == null)
         {
-            return;
+            throw new IllegalArgumentException("Model is mandatory.");
         }
         
         RequestContext context = rendererContext.getRequestContext();
-        if(context == null)
-        {
-            return;
-        }
-
+        
         // information about the current page being rendererd
         if (context.getPage() != null)
         {
-            // TODO:Remove these
-            // it should be ${page.description} and ${page.title}
-            model.put("description", context.getPage().getDescription());
-            model.put("title", context.getPage().getTitle());
-            // TODO: End of remove this
-            
-            // custom page properties - add to model
-            // TODO: Remove this
-            // Instead of retrieving properties from the root scope
-            // we should use ${instance.properties["abc"]}
-            model.putAll(context.getPage().getCustomProperties());
-            // TODO: End of remove this
-
-            
-            // "page" object
-            Map<String, Object> pageModel = new HashMap<String, Object>(4);
-            if(context instanceof HttpRequestContext)
+            // "page" model object
+            Map<String, Object> pageModel = new HashMap<String, Object>(8, 1.0f);
+            if (context instanceof HttpRequestContext)
             {
                 HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-                
-                Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size(), 1.0f);
-                Enumeration names = request.getParameterNames();
-                while (names.hasMoreElements())
-                {
-                    String name = (String)names.nextElement();
-                    args.put(name, request.getParameter(name));
-                }
-                URLHelper urlHelper = new URLHelper(request, args);
+                URLHelper urlHelper = new URLHelper(request);
                 pageModel.put("url", urlHelper);
             }
             pageModel.put("id", context.getPage().getId());
             pageModel.put("title", context.getPage().getTitle());
             pageModel.put("description", context.getPage().getDescription());
             pageModel.put("theme", ThemeUtil.getCurrentThemeId(context));
+            
+            // custom page properties - add to model
+            // use ${page.properties["abc"]}
+            if (context.getPage().getCustomProperties().size() != 0)
+            {
+                Map<String, Serializable> customProps = new HashMap<String, Serializable>(
+                        context.getPage().getCustomProperties().size());
+                customProps.putAll(context.getPage().getCustomProperties());
+                pageModel.put("properties", customProps);
+            }
+            else
+            {
+                pageModel.put("properties", Collections.EMPTY_MAP);
+            }
+            
             model.put("page", pageModel);
         }
         
-        
         // things from the current template
-        // TODO: Remove this
-        // instead of getting template properties from the root scope
-        // we should use ${instance.properties["abc"]}
+        // use ${template.properties["abc"]}
         if (context.getTemplate() != null)
         {
-            model.putAll(context.getTemplate().getCustomProperties());
+            Map<String, Object> templateModel = new HashMap<String, Object>(1, 1.0f);
+            if (context.getTemplate().getCustomProperties().size() != 0)
+            {
+                Map<String, Serializable> customProps = new HashMap<String, Serializable>(
+                            context.getTemplate().getCustomProperties());
+                customProps.putAll(context.getTemplate().getCustomProperties());
+                templateModel.put("properties", customProps);
+            }
+            else
+            {
+                templateModel.put("properties", Collections.EMPTY_MAP);
+            }
+            
+            model.put("template", templateModel);
         }
-        // TODO: End of Remove this
         
+        // the global app theme
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
         
         //
@@ -153,26 +152,25 @@ public class ProcessorModelHelper
         //
         ScriptSiteData scriptSiteData = new ScriptSiteData(context); 
         model.put("sitedata", scriptSiteData);
-        //
+        
         ScriptRequestContext scriptRequestContext = new ScriptRequestContext(context);
         model.put("context", scriptRequestContext);
-        //
-        if(context.getCurrentObject() != null)
+        
+        if (context.getCurrentObject() != null)
         {
             ScriptContentObject scriptContent = new ScriptContentObject(context, context.getCurrentObject());
             model.put("content", scriptContent);
         }
-        //
+        
         ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(rendererContext);
         model.put("instance", scriptRenderer);
-        //
+        
         if (context.getUser() != null)
         {
             ScriptUser scriptUser = new ScriptUser(context, context.getUser());
             model.put("user", scriptUser);
         }                        
 
-        
         // we are also given the "rendering configuration" for the current
         // object.  usually, this is either a component or a template.
         // in either case, the configuration is set up ahead of time
@@ -180,63 +178,36 @@ public class ProcessorModelHelper
         // it needs for the component or template to process
         if (rendererContext != null)
         {
-            // TODO: Remove this, it's redundant to do this
-            /*
-            ModelObject object = rendererContext.getObject();
-            if (object != null)
-            {
-                model.putAll(object.getCustomProperties());
-            }
-            */
-            // TODO: End of remove this
-            
             String htmlBindingId = (String) rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
             if (htmlBindingId != null && htmlBindingId.length() > 0)
             {
                 model.put(PROP_HTMLID, htmlBindingId);
             }
-            
-            // TODO: Remove this
-            // This has been replaced by ${instance.<property>} and stuff like that
-            // copy in render data settings
-            //model.putAll(rendererContext.map());
-            // TODO: End of remove this
         }
     }
     
     public static void populateScriptModel(RendererContext rendererContext, Map<String, Object> model)
     {
-        if(model == null)
+        if (model == null)
         {
-            return;
-        }
-        
-        RequestContext context = rendererContext.getRequestContext();
-        if(context == null)
-        {
-            return;
+            throw new IllegalArgumentException("Model is mandatory.");
         }
         
         // common population
         populateModel(rendererContext, model);
 
-        // script specific
-        // none... at the moment
+        // no script specific model objects to add currently
     }
     
     public static void populateTemplateModel(RendererContext rendererContext, Map<String, Object> model)
         throws RendererExecutionException
     {
-        if(model == null)
+        if (model == null)
         {
-            return;
+            throw new IllegalArgumentException("Model is mandatory.");
         }
         
         RequestContext context = rendererContext.getRequestContext();
-        if(context == null)
-        {
-            return;
-        }
 
         // common population
         populateModel(rendererContext, model);
@@ -253,22 +224,8 @@ public class ProcessorModelHelper
             {
                 HttpServletRequest request = ((HttpRequestContext)context).getRequest();
                 
-                Map<String, String> args = new HashMap<String, String>(request.getParameterMap().size());
-                Enumeration names = request.getParameterNames();
-                while (names.hasMoreElements())
-                {
-                    String name = (String)names.nextElement();
-                    args.put(name, request.getParameter(name));
-                }
-                
-                /**
-                 * The template processor could be called standalone or as a
-                 * processor for a web script.  Some variables might have
-                 * already been provided by the web script engine, such as the
-                 * "url" variable here.  Thus, if one already exists, we can
-                 * just use that one.
-                 */
-                URLHelper urlHelper = new URLHelper(request, args);
+                // provide the URL helper for the template
+                URLHelper urlHelper = new URLHelper(request);
                 model.put("url", urlHelper);
             }
             
@@ -309,7 +266,7 @@ public class ProcessorModelHelper
         addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");        
     }
     
-    protected static void addDirective(RequestContext context, Map<String, Object> model, String name, String className)
+    private static void addDirective(RequestContext context, Map<String, Object> model, String name, String className)
     {
         GenericFreemarkerTagDirective directive = new GenericFreemarkerTagDirective(context, name, className);
         model.put(name, directive);

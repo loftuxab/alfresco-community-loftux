@@ -158,24 +158,6 @@ public class WebScriptRenderer extends AbstractRenderer
                         Map<String, Object> model = new HashMap<String, Object>(32);
                         ProcessorModelHelper.populateTemplateModel(rendererContext, model);
                         
-                        /**
-                         * TODO: clean up/remove this section?
-                         * This is pretty bad form.  It seems that the Slingshot component .head files
-                         * reference ${url}.  That should not be valid since url is a variable
-                         * on page.  The correct reference should be ${page.url}.
-                         * 
-                         * At any rate, we can add this in for the time being.
-                         */
-                        Map pageModel = (Map) model.get("page");
-                        if (pageModel != null && model.get("url") == null)
-                        {
-                            URLHelper helper = (URLHelper) pageModel.get("url");
-                            if(helper != null)
-                            {
-                                model.put("url", helper);
-                            }
-                        }
-
                         StringWriter out = new StringWriter();
                         templateProcessor.process(path, model, out);
                         

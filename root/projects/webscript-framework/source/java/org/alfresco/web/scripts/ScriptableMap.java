@@ -26,6 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.mozilla.javascript.Scriptable;
 
@@ -40,6 +41,21 @@ public class ScriptableMap<K,V> extends LinkedHashMap<K, V> implements Scriptabl
     
     private Scriptable parentScope;
     private Scriptable prototype;
+    
+    
+    public ScriptableMap()
+    {
+    }
+    
+    public ScriptableMap(int initialCapacity)
+    {
+        super(initialCapacity);
+    }
+    
+    public ScriptableMap(Map<K, V> source)
+    {
+        super(source);
+    }
     
     /**
      * @see org.mozilla.javascript.Scriptable#getClassName()

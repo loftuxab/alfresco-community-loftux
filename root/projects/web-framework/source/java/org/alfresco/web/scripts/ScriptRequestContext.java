@@ -65,16 +65,16 @@ public final class ScriptRequestContext extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
             this.properties = new ScriptableMap<String, Serializable>();
             
             // copy in any custom values that have been applied to the RequestContext
             Iterator it = context.keys();
-            while(it.hasNext())
+            while (it.hasNext())
             {
                 String key = (String) it.next();
-                Serializable value = (Serializable) context.getValue(key);
+                Serializable value = (Serializable)context.getValue(key);
                 properties.put(key, value);
             }
         }

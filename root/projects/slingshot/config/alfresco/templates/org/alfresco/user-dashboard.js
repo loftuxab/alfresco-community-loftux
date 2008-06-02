@@ -1,5 +1,6 @@
-model.regions = parseInt(regions);
-model.widthLeft = parseInt(widthLeft);
-model.widthRight = parseInt(widthRight);
-model.horizontalGap = parseInt(horizontalGap);
-model.verticalGap = parseInt(verticalGap);
+var p = template.properties;
+model.regions = parseInt(p.regions);
+model.widthLeft = parseInt(p.widthLeft);
+model.widthRight = parseInt(p.widthRight);
+model.horizontalGap = parseInt(p.horizontalGap);
+model.verticalGap = parseInt(p.verticalGap);

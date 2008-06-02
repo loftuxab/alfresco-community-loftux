@@ -26,7 +26,6 @@ package org.alfresco.web.scripts;
 
 import java.io.Serializable;
 import java.util.Iterator;
-import java.util.Map;
 
 import org.alfresco.util.ParameterCheck;
 import org.alfresco.web.site.RequestContext;
@@ -85,9 +84,10 @@ public final class ScriptModelObject extends ScriptBase
      */
     protected ScriptableMap buildProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
-            this.properties = new ScriptableMap<String, Serializable>()
+            // construct and add in all of our model object properties
+            this.properties = new ScriptableMap<String, Serializable>(modelObject.getProperties())
             {
                 // trap this method so that we can adjust the model object
                 public void put(String name, Scriptable start, Object value)
@@ -117,16 +117,6 @@ public final class ScriptModelObject extends ScriptBase
                 {
                 }
             };
-    
-            // add in all of our model object properties
-            Map allProperties = modelObject.getProperties();
-            Iterator it = allProperties.keySet().iterator();
-            while (it.hasNext())
-            {
-                String key = (String) it.next();
-                String value = (String) allProperties.get(key);
-                this.properties.put(key, value);
-            }
         }
         
         return this.properties;

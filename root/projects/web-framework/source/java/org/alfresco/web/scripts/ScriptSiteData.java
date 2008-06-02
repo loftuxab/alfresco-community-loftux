@@ -655,13 +655,13 @@ public final class ScriptSiteData extends ScriptBase
     public Scriptable findTemplatesMap(String pageId)
     {
         Page page = context.getModel().loadPage(context, pageId);
-        if(page != null)
+        if (page != null)
         {
             Map<String, TemplateInstance> templatesMap = page.getTemplates(context);
             
-            ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>();
+            ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>(templatesMap.size());
             Iterator it = templatesMap.keySet().iterator();
-            while(it.hasNext())
+            while (it.hasNext())
             {
                 String formatId = (String) it.next();
                 TemplateInstance template = templatesMap.get(formatId);
