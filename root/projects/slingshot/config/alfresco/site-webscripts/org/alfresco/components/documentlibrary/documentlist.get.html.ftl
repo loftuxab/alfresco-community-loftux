@@ -46,7 +46,7 @@
          <span>&lt; 1 &gt;</span>
       </div>
       <div class="yui-u align-right">
-         <span><a href="#" id="${args.htmlid}-showFolders-button">Hide Folders</a></span>
+         <span><a href="#" id="${args.htmlid}-showFolders-button"></a></span>
          <span class="separator">|</span>
          <span><a href="#" id="${args.htmlid}-detailedView-button">Simple List</a></span>
       </div>
