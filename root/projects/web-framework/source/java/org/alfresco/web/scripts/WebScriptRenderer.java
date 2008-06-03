@@ -147,7 +147,7 @@ public class WebScriptRenderer extends AbstractRenderer
                      * it against a template model.
                      * 
                      * We then trap the results and append them into the
-                     * request context "tags" buffer for later processing.
+                     * request context "tags" buffer for output later.
                      */
                     if (templateProcessor.hasTemplate(path))
                     {
@@ -255,10 +255,10 @@ public class WebScriptRenderer extends AbstractRenderer
              * the thread local variable and does its thing. 
              */
             webScriptContainer.bindRendererContext(rendererContext);
-    
+            
             // Execute the script
             runtime.executeScript();
-    
+            
             // Be sure to unbind the request context thread local variable
             webScriptContainer.unbindRendererContext();
         }

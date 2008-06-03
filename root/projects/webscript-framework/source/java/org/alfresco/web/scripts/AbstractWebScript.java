@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Writer;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -41,8 +42,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
 import org.alfresco.i18n.I18NUtil;
+import org.alfresco.util.StringBuilderWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.json.JSONException;
+import org.json.JSONWriter;
 
 
 /**
@@ -222,7 +226,7 @@ public abstract class AbstractWebScript implements WebScript
      */
     protected Map<String, Object> createTemplateParameters(WebScriptRequest req, WebScriptResponse res, Map<String, Object> customParams)
     {
-        Map<String, Object> params = new HashMap<String, Object>(16, 1.0f);
+        Map<String, Object> params = new HashMap<String, Object>(32, 1.0f);
         
         // add web script parameters
         params.put("webscript", req.getServiceMatch().getWebScript().getDescription());
@@ -241,6 +245,8 @@ public abstract class AbstractWebScript implements WebScript
         MessageMethod message = new MessageMethod(this);
         params.put("message", message);     // for compatability with repo webscripts
         params.put("msg", message);         // short form for presentation webscripts
+        // add the webscript I18N resources as a JSON object
+        params.put("messages", renderJSONResources(getResources()));
 
         // add request mimetype parameters
         FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());
@@ -602,6 +608,40 @@ public abstract class AbstractWebScript implements WebScript
             logger.debug("Executed script " + location.getPathDescription() + " in " + (System.nanoTime() - start)/1000000f + "ms");
     }
     
+    /**
+     * Helper to render a bundle of webscript I18N resources as a JSON object
+     * 
+     * @param resources     To render - can be null if no resources present,
+     *                      in which case an empty JSON object will be output.
+     * 
+     * @return JSON object string
+     */
+    private static String renderJSONResources(ResourceBundle resources)
+    {
+        if (resources == null) return "{}";
+        
+        StringBuilderWriter buf = new StringBuilderWriter(256);
+        JSONWriter out = new JSONWriter(buf);
+        try
+        {
+            out.object();
+            Enumeration<String> keys = resources.getKeys();
+            while (keys.hasMoreElements())
+            {
+                String key = keys.nextElement();
+                out.key(key);
+                out.value(resources.getString(key));
+            }
+            out.endObject();
+        }
+        catch (JSONException jsonErr)
+        {
+            throw new WebScriptException("Error rendering I18N resources.", jsonErr);
+        }
+        
+        return buf.toString();
+    }
+    
     
     /**
      * Status Template
@@ -623,5 +663,4 @@ public abstract class AbstractWebScript implements WebScript
         private String path;
         private String format;
     }
-    
 }

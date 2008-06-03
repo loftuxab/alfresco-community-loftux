@@ -31,6 +31,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.i18n.I18NUtil;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
@@ -146,6 +147,9 @@ public final class ProcessorModelHelper
         
         // the global app theme
         model.put("theme", ThemeUtil.getCurrentThemeId(context));
+        
+        // locale for the current thread
+        model.put("locale", I18NUtil.getLocale().toString());
         
         //
         // add in the root-scoped web framework script objects
