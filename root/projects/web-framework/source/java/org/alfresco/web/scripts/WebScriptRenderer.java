@@ -26,7 +26,6 @@ package org.alfresco.web.scripts;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -37,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.tools.EncodingUtil;
+import org.alfresco.util.StringBuilderWriter;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.model.Component;
@@ -108,24 +108,20 @@ public class WebScriptRenderer extends AbstractRenderer
     {
         String head = null;
         
-        // Pull a few necessary things from the renderer context
-        HttpServletRequest request = rendererContext.getRequest();
-        
-        // Copy in request parameters into a HashMap
-        // This is so as to be compatible with UriUtils (and Token substitution)
-        Map<String, String> args = buildArgs(request);
-        
         /**
          * If the ModelObject being rendered is a component, then we will
          * allow for the execution of .head template files ahead of the
          * actual WebScript execution.
-         * 
-         * .head template files are committed to a wrapped output stream
-         * that is then committed into the completed output stream
-         * at the end.
          */
         if (rendererContext.getObject() instanceof Component)
         {
+            // Pull a few necessary things from the renderer context
+            HttpServletRequest request = rendererContext.getRequest();
+            
+            // Copy in request parameters into a HashMap
+            // This is so as to be compatible with UriUtils (and Token substitution)
+            Map<String, String> args = buildArgs(request);
+            
             // Get the component and its URL.  Do a token replacement
             // on the URL right away and remove the query string
             Component component = (Component) rendererContext.getObject();
@@ -158,7 +154,7 @@ public class WebScriptRenderer extends AbstractRenderer
                         Map<String, Object> model = new HashMap<String, Object>(32);
                         ProcessorModelHelper.populateTemplateModel(rendererContext, model);
                         
-                        StringWriter out = new StringWriter();
+                        StringBuilderWriter out = new StringBuilderWriter(512);
                         templateProcessor.process(path, model, out);
                         
                         String result = out.toString();

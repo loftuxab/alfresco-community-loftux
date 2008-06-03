@@ -24,12 +24,12 @@
  */
 package org.alfresco.web.scripts;
 
-import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
 
+import org.alfresco.util.StringBuilderWriter;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
@@ -98,8 +98,7 @@ public class FreemarkerRenderer extends AbstractRenderer
         String format = context.getFormatId();
         
         /**
-         * Attempt to execute the script's .head. file, if it has one
-         * This output is trapped and placed into the aggregated HEAD capture
+         * Attempt to execute the templates associated .head. file, if it has one
          */
         String head = null;
         String templateName = null;
@@ -115,7 +114,7 @@ public class FreemarkerRenderer extends AbstractRenderer
                 Map<String, Object> model = new HashMap<String, Object>(32);
                 ProcessorModelHelper.populateTemplateModel(rendererContext, model);
                 
-                StringWriter out = new StringWriter(512);
+                StringBuilderWriter out = new StringBuilderWriter(512);
                 templateProcessor.process(templateName, model, out);
                 
                 head = out.toString();

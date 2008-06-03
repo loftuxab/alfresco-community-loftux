@@ -31,13 +31,13 @@ import java.io.Writer;
 
 import javax.servlet.jsp.JspWriter;
 
+import org.alfresco.util.StringBuilderWriter;
+
 /**
- * The Class FakeJspWriter.
+ * akeJspWriter.
  */
-public class FakeJspWriter 
-	extends JspWriter
+public class FakeJspWriter extends JspWriter
 {
-	
 	/** The root writer. */
 	private Writer rootWriter = null;
 	
@@ -50,7 +50,7 @@ public class FakeJspWriter
 	public FakeJspWriter() {
 		super(0, false);
 		
-		rootWriter = new StringWriter();
+		rootWriter = new StringBuilderWriter(512);
 		printWriter = new PrintWriter(rootWriter);
 	}
 
@@ -78,7 +78,7 @@ public class FakeJspWriter
 	public FakeJspWriter(int arg0, boolean arg1) {
 		super(arg0, arg1);
 
-		rootWriter = new StringWriter();
+		rootWriter = new StringBuilderWriter(512);
 		printWriter = new PrintWriter(rootWriter);		
 	}
 
