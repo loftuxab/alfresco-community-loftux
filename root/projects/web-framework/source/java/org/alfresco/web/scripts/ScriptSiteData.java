@@ -848,5 +848,13 @@ public final class ScriptSiteData extends ScriptBase
     public void logout()
     {
         AuthenticationUtil.logout(getRequestContext());
-    }        
+    }
+    
+    // also still in progress
+    
+    // returns the credential vault for the current user
+    public ScriptCredentialVault getCredentialVault()
+    {
+        return new ScriptCredentialVault(getRequestContext());
+    }
 }

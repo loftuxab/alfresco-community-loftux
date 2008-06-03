@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.Credentials;
+import org.alfresco.web.site.AuthenticationUtil;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
@@ -51,29 +52,25 @@ public class LoginServlet extends BaseServlet
     {
     	String username = (String) request.getParameter("username");
     	String password = (String) request.getParameter("password");
-    	
     	String successPage = (String) request.getParameter("success");
     	String failurePage = (String) request.getParameter("failure");
     	
     	// See if we can load the user with this identity
-    	Credentials credentials = null;
+    	boolean success = false;
     	try
     	{
 	    	UserFactory userFactory = FrameworkHelper.getUserFactory();
             
-            // authenticate and load the user details if successful
-    	    credentials = userFactory.authenticate(request, username, password);
-    	    if (credentials != null)
-    	    {
-    	        // set this onto the session
-    	        request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, username);
-    	        
-    	        // apply credentials to the default credentials vault
-    	        FrameworkHelper.getCredentialVault().store(credentials.getId(), credentials);
-                
-                // this applies the User object to the Session
+            // this does a call to see if user can be initialized
+            boolean initialized = userFactory.initializeUser(request, username, password);
+            if(initialized)
+            {
+                // log the user in
                 RequestContext context = RequestUtil.getRequestContext(request);
-                userFactory.getUser(context, request);
+                AuthenticationUtil.login(context, username);
+                
+                // mark the fact that we succeeded
+                success = true;
     	    }
     	}
     	catch (Throwable err)
@@ -83,7 +80,7 @@ public class LoginServlet extends BaseServlet
     	
         // If they succeeded in logging in, redirect to the success page
         // Otherwise, redirect to the failure page
-        if (credentials != null)
+        if (success)
         {
         	if (successPage != null)
         	{

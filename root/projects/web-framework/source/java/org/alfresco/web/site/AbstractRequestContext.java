@@ -490,7 +490,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public CredentialVault getCredentialVault()
     {
-    	return FrameworkHelper.getCredentialVault();
+        return FrameworkHelper.getCredentialVault(this.getUserId());
     }
 
     /**

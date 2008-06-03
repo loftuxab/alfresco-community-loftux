@@ -67,6 +67,7 @@
 				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://localhost:8080/alfresco/service</endpoint-url>
 				<identity>user</identity>
+				<storage>none</storage>				
 			</endpoint>
 			
 			<!-- Credential Vaults -->

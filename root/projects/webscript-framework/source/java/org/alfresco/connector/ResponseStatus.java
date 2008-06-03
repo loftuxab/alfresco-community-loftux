@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2008 Alfresco Software Limited.
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,36 +22,49 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.web.site;
+package org.alfresco.connector;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.alfresco.connector.User;
-import org.alfresco.web.site.exception.UserFactoryException;
+import org.alfresco.web.scripts.Status;
 
 /**
- * The world's simplest user factory.
- * This just returns guest users.  NOP users, essentially.
+ * Wrapper around the Status object that allows the Remote Client to
+ * expose header state.
+ * 
+ * Records the outcome of a call
  * 
  * @author muzquiano
  */
-public class DefaultUserFactory extends UserFactory
+public class ResponseStatus extends Status
 {
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.UserFactory#validate(javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
-     */
-    public boolean initializeUser(HttpServletRequest request,
-    		String username, String password)
+    protected Map<String, String> headers = new HashMap<String, String>(16, 1.0f);
+    
+    @Override
+    public String toString()
     {
-    	return false;
+        return Integer.toString(getCode());
     }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
+    
+    /**
+     * Allows for response headers to be stored onto the status
+     * 
+     * @param headerName name of the header
+     * @param headerValue value of the header
      */
-    public User loadUser(RequestContext context, HttpServletRequest request,
-            String user_id) throws UserFactoryException
+    public void setHeader(String headerName, String headerValue)
     {
-        return this.getGuestUser(context, request);
+        this.headers.put(headerName, headerValue);
+    }
+    
+    /**
+     * Retrieves response headers
+     * 
+     * @return map of response headers
+     */
+    public Map<String, String> getHeaders()
+    {
+        return this.headers;
     }
 }

@@ -39,6 +39,7 @@ import java.util.Map;
 public class User implements java.security.Principal, Serializable
 {
     public static String PROP_ID = "id";
+    public static String PROP_EMAIL = "email";
     public static String PROP_ADDRESS1 = "address1";
     public static String PROP_ADDRESS2 = "address2";
     public static String PROP_CITY = "city";
@@ -403,6 +404,27 @@ public class User implements java.security.Principal, Serializable
     {
         setProperty(PROP_LOCATION, value);
     }
+    
+    /**
+     * Gets the email.
+     * 
+     * @return the email
+     */
+    public String getEmail()
+    {
+        return getStringProperty(PROP_EMAIL);
+    }
+
+    /**
+     * Sets the email.
+     * 
+     * @param value the new email
+     */
+    public void setEmail(String value)
+    {
+        setProperty(PROP_EMAIL, value);
+    }
+    
 
     //
     // general accessors

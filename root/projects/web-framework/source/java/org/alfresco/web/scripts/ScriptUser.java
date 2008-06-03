@@ -225,6 +225,16 @@ public final class ScriptUser extends ScriptBase
     {
         return this.user.getZipCode();
     }
+
+    /**
+     * Gets the email.
+     * 
+     * @return the email
+     */
+    public String getEmail()
+    {
+        return this.user.getEmail();
+    }
     
     /* (non-Javadoc)
      * @see java.lang.Object#toString()

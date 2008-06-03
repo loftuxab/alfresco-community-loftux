@@ -23,7 +23,6 @@
     	a:hover             { color:blue; text-decoration:underline; }
     	a:active            { color:red; text-decoration:underline; }
     </style>
-</style>
 </head>
 <body>
 <table width="100%" height="100%" border="0" style="background-image:url('<%=backgroundImageUrl%>'); background-repeat:no-repeat;">

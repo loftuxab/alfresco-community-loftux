@@ -27,9 +27,9 @@ package org.alfresco.connector;
 import org.alfresco.connector.exception.AuthenticationException;
 
 /**
- * Interface that defines authenticator implementations that the connector
- * framework can use to handshake with remote servers for valid endpoint
- * credentials.
+ * Interface that defines an Authenticator.  Authenticators are used to
+ * retrieve cookies and tokens from a remote service based on credentials
+ * which are locally managed and passed to the remote service.
  * 
  * Authenticator objects are used when a "token" must be passed to the endpoint
  * and the current token is either invalid or non-existent. The Connectors must
@@ -48,12 +48,21 @@ import org.alfresco.connector.exception.AuthenticationException;
 public interface Authenticator
 {
     /**
-     * Authenticate against the given Client with the supplied Credentials
+     * Authenticate against the given Endpoint URL with the supplied Credentials
      * 
-     * @return true on success, false otherwise
+     * @return The connector session instance
      * 
      * @throws AuthenticationException on error
      */
-    public boolean authenticate(Client client, Credentials credentials)
+    public ConnectorSession authenticate(String endpoint, Credentials credentials, ConnectorSession connectorSession)
             throws AuthenticationException;
+
+    /**
+     * Returns whether the current connector session has been authenticated or not
+     * 
+     * @param endpoint
+     * @param connectorSession
+     * @return
+     */
+    public boolean isAuthenticated(String endpoint, ConnectorSession connectorSession);
 }

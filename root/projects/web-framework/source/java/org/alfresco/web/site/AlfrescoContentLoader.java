@@ -25,7 +25,6 @@
 package org.alfresco.web.site;
 
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.web.scripts.Status;
@@ -68,26 +67,13 @@ public class AlfrescoContentLoader extends AbstractContentLoader
 		{
 			if(context != null && context.getUserId() != null)
 			{
-				// we have credentials
-
-				// debug the credentials
-				if(FrameworkHelper.getLogger().isDebugEnabled())
-				{
-					Credentials credz = context.getCredentialVault().retrieve(context.getUserId());
-					if(credz != null)
-					{
-						FrameworkHelper.getLogger().debug("u: " + credz.getProperty(Credentials.CREDENTIAL_ALF_USERNAME));
-						FrameworkHelper.getLogger().debug("ticket: " + credz.getProperty(Credentials.CREDENTIAL_ALF_TICKET));
-					}
-				}
-				
 				// create a connector that uses these credentials
-				connector = FrameworkHelper.getConnectorFactory().connector(getEndpointId(), context.getUserId(), context.getCredentialVault());
+				connector = FrameworkHelper.getConnector(context, getEndpointId());
 			}
 			else
 			{
 				// create an unauthenticated connector
-				connector = FrameworkHelper.getConnectorFactory().connector(getEndpointId());
+				connector = FrameworkHelper.getConnector(getEndpointId());
 			}
 		}
 		catch(RemoteConfigException rce)

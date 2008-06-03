@@ -37,8 +37,28 @@ public class AuthenticationUtil
 		{
 			HttpServletRequest request = ((HttpRequestContext)context).getRequest();
 		
+            // remove their connector sessions
+            FrameworkHelper.removeConnectorSessions(context);
+            
+            // remove the user object from session
 	    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
 	    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+            
+            // reset theme
+            ThemeUtil.clearTheme(context, request);
 		}
 	}
+    
+    public static void login(RequestContext context, String userId)
+    {
+        logout(context);
+        
+        if(context instanceof HttpRequestContext)
+        {
+            HttpServletRequest request = ((HttpRequestContext)context).getRequest();
+
+            // place user id onto the session
+            request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
+        }
+    }
 }

@@ -34,15 +34,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorFactory;
-import org.alfresco.connector.CredentialVault;
-import org.alfresco.connector.CredentialVaultFactory;
-import org.alfresco.connector.Credentials;
-import org.alfresco.connector.RemoteClient;
-import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.connector.ConnectorContext;
+import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -75,12 +74,12 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class EndPointProxyServlet extends HttpServlet
 {
+    private static Log logger = LogFactory.getLog(EndPointProxyServlet.class);
+    
     private static final long serialVersionUID = -176412355613122789L;
 
     protected RemoteConfigElement config;
-    protected ConnectorFactory connectorFactory;
-    protected CredentialVault credentialsVault;
-
+    protected ConnectorService connectorService;
 
     @Override
     public void init() throws ServletException
@@ -91,15 +90,9 @@ public class EndPointProxyServlet extends HttpServlet
         
         // retrieve the remote configuration
         this.config = (RemoteConfigElement)configService.getConfig("Remote").getConfigElement("remote");
-        this.connectorFactory = ConnectorFactory.getInstance(configService);
-        try
-        {
-            this.credentialsVault = CredentialVaultFactory.getInstance(configService).vault();
-        }
-        catch (RemoteConfigException err)
-        {
-            throw new AlfrescoRuntimeException("Error retrieving CredentialVault: " + err.getMessage(), err);
-        }
+        
+        // retrieve the connector service
+        this.connectorService = (ConnectorService) context.getBean("connector.service");
     }
 
     @Override
@@ -118,16 +111,22 @@ public class EndPointProxyServlet extends HttpServlet
         String endpointId = t.nextToken();
         
         // rebuild rest of the URL for the proxy request
-        if (!t.hasMoreTokens())
-        {
-            throw new IllegalArgumentException("Proxy URL did not specify destination URL.");
-        }
         StringBuilder buf = new StringBuilder(64);
-        do
+        if(t.hasMoreTokens())
         {
+            do
+            {
+                buf.append('/');
+                buf.append(t.nextToken());
+            } while (t.hasMoreTokens());
+        }
+        else
+        {
+            // allow for an empty uri to be passed in
+            // this could therefore refer to the root of a service
+            // i.e. /webapp/axis
             buf.append('/');
-            buf.append(t.nextToken());
-        } while (t.hasMoreTokens());
+        }
         
         try
         {
@@ -138,33 +137,42 @@ public class EndPointProxyServlet extends HttpServlet
                 // throw an exception if endpoint ID is does not exist or invalid
                 throw new AlfrescoRuntimeException("Invalid EndPoint Id: " + endpointId);
             }
-            
+
             // userid from session
-            // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?
+            // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?            
             String userId = (String)req.getSession().getAttribute("USER_ID");
             
-            // retrieve the connector for this user and endpoint - get user credentials from the supplied vault
-            Connector connector = this.connectorFactory.connector(endpointId, userId, this.credentialsVault);
-            
+            // build a connector
+            Connector connector = this.connectorService.getConnector(endpointId, userId, req.getSession());
+
+            // build a lightweight connector context
+            // this stores information about how we will drive the remote client
+            ConnectorContext context = new ConnectorContext();
+            context.setContentType(req.getContentType());
+            context.setMethod(req.getMethod());
+                        
             // build proxy URL referencing the endpoint
             String q = req.getQueryString();
             String url = buf.toString() + (q != null && q.length() != 0 ? "?" + q : "");
             
-            // execute proxy URL via remote client
-            RemoteClient client = ((RemoteClient)connector.getClient());
-            
-            // check to see if we have a ticket from the credentials on the connector
-            Credentials credentials = connector.getCredentials();
-            if (credentials != null)
+            // debug output
+            if(logger.isDebugEnabled())
             {
-                String alfTicket = (String)credentials.getProperty(Credentials.CREDENTIAL_ALF_TICKET);
-                client.setTicket(alfTicket);
+                logger.debug("EndPointProxyServlet preparing to proxy");
+                logger.debug(" - endpointId: " + endpointId);
+                logger.debug(" - userId: " + userId);
+                logger.debug(" - connector: " + connector);
+                logger.debug(" - url: " + url);
             }
             
-            String method = req.getMethod();
-            client.setRequestContentType(req.getContentType());
-            client.setRequestMethod(method);
-            client.call(url, req, res);
+            // call through
+            Response response = connector.call(url, context, req, res);
+
+            // debug output
+            if(logger.isDebugEnabled())
+            {
+                logger.debug("EndPointProxyServlet returned code: " + response.getStatus().getCode());
+            }
         }
         catch (Throwable err)
         {

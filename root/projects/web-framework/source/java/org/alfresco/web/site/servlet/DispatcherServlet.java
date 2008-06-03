@@ -263,8 +263,7 @@ public class DispatcherServlet extends BaseServlet
             {
                 case user:
                     User user = context.getUser();
-                    if ((user == null || user.getId().equals(UserFactory.USER_GUEST)) ||
-                        (user != null && context.getCredentialVault().hasCredentials(user) == false))
+                    if ((user == null || user.getId().equals(UserFactory.USER_GUEST)))
                     {
                         // no valid user found - login required
                         String loginPageId = null;
@@ -301,8 +300,10 @@ public class DispatcherServlet extends BaseServlet
                                 // construct redirection url
                                 String redirectUrl = context.getLinkBuilder().page(
                                         context, pageId, formatId, objectId, args);
+
                                 // set redirect url for use on login page template
                                 context.setValue(ALF_REDIRECT_URL, redirectUrl);
+                                
                                 dispatchPage(context, request, response, loginPage, formatId);
                                 return;
                             }

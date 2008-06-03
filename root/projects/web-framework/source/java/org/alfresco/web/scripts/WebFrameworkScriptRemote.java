@@ -24,11 +24,8 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.Map;
-
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorFactory;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.User;
@@ -77,14 +74,14 @@ public class WebFrameworkScriptRemote
     }
         
     /**
-     * Constructs a RemoteClient to a default endpoint (if configured)
+     * Constructs a ScriptRemoteConnector to a default endpoint (if configured)
      * If a default endpoint is not configured, null will be returned.
      * 
-     * @return the remote client
+     * @return the remote connector
      */
-    public Connector connect()
+    public ScriptRemoteConnector connect()
     {
-    	Connector connector = null;
+    	ScriptRemoteConnector remoteConnector = null;
     	
     	// Check whether a remote configuration has been provided
     	RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
@@ -95,24 +92,24 @@ public class WebFrameworkScriptRemote
         	if(defaultEndpointId != null)
         	{
         		// Construct for this endpoint id
-        		connector = connect(defaultEndpointId);
+                remoteConnector = connect(defaultEndpointId);
         	}
         }
         
-        return connector;
+        return remoteConnector;
     }
 
     /**
-     * Constructs a RemoteClient to a specific endpoint.
+     * Constructs a ScirptRemoteConnector to a specific endpoint.
      * If the endpoint does not exist, null is returned.
      * 
      * @param endpointId the endpoint id
      * 
      * @return the remote client
      */
-    public Connector connect(String endpointId)
+    public ScriptRemoteConnector connect(String endpointId)
     {
-    	Connector connector = null;
+    	ScriptRemoteConnector remoteConnector = null;
     	
     	// Check whether a remote configuration has been provided    	
     	RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
@@ -140,13 +137,14 @@ public class WebFrameworkScriptRemote
 
     				// check whether we have a current user
     				User user = getRequestContext().getUser();
-    				if (user == null)
+    				if (user == null || vault == null)
     				{
     					if(logger.isDebugEnabled())
     						logger.debug("No user was found, creating unauthenticated connector");
 
     					// return the non-credential'ed connector to this endpoint
-    					connector = ConnectorFactory.getInstance(configService).connector(endpointId);
+                        Connector connector = FrameworkHelper.getConnector(endpointId);                       
+                        remoteConnector = new ScriptRemoteConnector(connector);
     				}
     				else
     				{
@@ -154,7 +152,8 @@ public class WebFrameworkScriptRemote
     						logger.debug("User '" + user.getId() + "' was found, creating authenticated connector");
 
     					// return the credential'ed connector to this endpoint
-    					connector = ConnectorFactory.getInstance(configService).connector(endpointId, user.getId(), vault);
+                        Connector connector = FrameworkHelper.getConnector(context, endpointId);                        
+                        remoteConnector = new ScriptRemoteConnector(connector);
     				}
     			}
     			catch (RemoteConfigException rce)
@@ -164,7 +163,7 @@ public class WebFrameworkScriptRemote
     		}
         }
         
-        return connector;
+        return remoteConnector;
     }
     
     
@@ -186,32 +185,4 @@ public class WebFrameworkScriptRemote
     {
     	return this.connect().call(uri);
     }
-
-    /**
-     * Invoke a specific URI on the default endpoint
-     * Pass in the given parameters
-     * 
-     * @param uri
-     * @param parameters
-     * @return
-     */
-    public Response call(String uri, Map parameters)
-    {
-    	return this.connect().call(uri, parameters);
-    }
-
-    /**
-     * Invoke a specific URI on the default endpoint
-     * Pass in the given parameters
-     * Apply the provided headers
-     * 
-     * @param uri
-     * @param parameters
-     * @param headers
-     * @return
-     */
-    public Response call(String uri, Map parameters, Map headers)
-    {
-    	return this.connect().call(uri, parameters, headers);
-    }    
 }

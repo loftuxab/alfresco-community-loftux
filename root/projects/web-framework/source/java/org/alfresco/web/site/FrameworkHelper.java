@@ -26,12 +26,14 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
-import org.alfresco.connector.ConnectorFactory;
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.ConnectorSession;
 import org.alfresco.connector.CredentialVault;
-import org.alfresco.connector.CredentialVaultFactory;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
@@ -53,6 +55,8 @@ import org.springframework.context.ApplicationContext;
  */
 public class FrameworkHelper
 {
+    private static final String CONNECTOR_SERVICE_ID = "connector.service";
+
     private static Log logger = LogFactory.getLog(FrameworkHelper.class);
     
     /**
@@ -102,19 +106,6 @@ public class FrameworkHelper
                     servletContext, modelRootPath);
             Model model = new DefaultModel(modelFileSystem);
             setModel(model);
-            
-            
-            // Fetches the credential vault and makes it available
-            CredentialVaultFactory vaultFactory = CredentialVaultFactory.getInstance(getConfigService());
-            try 
-            {
-            	// grab the default vault
-            	credentialVault = (CredentialVault) vaultFactory.vault();
-            }
-            catch(RemoteConfigException rce)
-            {
-            	throw new FrameworkInitializationException("Unable to load the default credential vault", rce);
-            }
             
             
             logger.info("Successfully Initialized Web Framework");
@@ -202,20 +193,28 @@ public class FrameworkHelper
     {
     	return applicationContext;
     }
-    
-    public static CredentialVault getCredentialVault()
+        
+    public static ConnectorService getConnectorService()
     {
-    	return credentialVault;
-    }
-    
-    public static ConnectorFactory getConnectorFactory()
-    {
-    	return ConnectorFactory.getInstance(getConfigService());
+        return (ConnectorService) getApplicationContext().getBean(CONNECTOR_SERVICE_ID);
     }
     
     public static EndpointDescriptor getEndpoint(String endpointId)
     {
     	return getRemoteConfig().getEndpointDescriptor(endpointId);
+    }
+    
+    public static Connector getConnector(String endpointId)
+        throws RemoteConfigException
+    {
+        return getConnectorService().getConnector(endpointId);
+    }
+    
+    public static Connector getConnector(RequestContext context, String endpointId)
+        throws RemoteConfigException
+    {
+        HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+        return getConnectorService().getConnector(endpointId, context.getUserId(), httpSession);
     }
     
     public static synchronized UserFactory getUserFactory()
@@ -253,9 +252,58 @@ public class FrameworkHelper
         return userFactory;
     }
     
+    public static CredentialVault getCredentialVault(String userId)
+    {
+        CredentialVault vault = null;
+        try
+        {
+            vault = FrameworkHelper.getConnectorService().getCredentialVault(userId);
+        }
+        catch(RemoteConfigException rce)
+        {
+            logger.error("Unable to retrieve credential vault for user: " + userId, rce);
+        }
+        
+        return vault;
+    }
+    
+    public static ConnectorSession getConnectorSession(RequestContext context, String endpointId)
+    {
+        ConnectorSession connectorSession = null;
+        
+        try
+        {
+            HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+            connectorSession = FrameworkHelper.getConnectorService().getConnectorSession(httpSession, endpointId);
+        }
+        catch(Exception ex)
+        {
+            logger.error("Unable to retrieve connector session for endpoint id: " + endpointId);
+        }
+        
+        return connectorSession;
+    }
+
+    public static void removeConnectorSessions(RequestContext context)
+    {
+        try
+        {
+            HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+            
+            String[] endpointIds = FrameworkHelper.getRemoteConfig().getEndpointIds();
+            for(int i = 0; i < endpointIds.length; i++)
+            {
+                FrameworkHelper.getConnectorService().removeConnectorSession(httpSession, endpointIds[i]);
+            }
+        }
+        catch(Exception ex)
+        {
+            logger.error("Unable to remove connector sessions", ex);
+        }
+    }
+    
     private static Model model = null;
     private static ApplicationContext applicationContext = null;
-    private static CredentialVault credentialVault = null;
     private static RemoteConfigElement remoteConfig = null;
     private static WebFrameworkConfigElement webFrameworkConfig = null;
     private static UserFactory userFactory = null;

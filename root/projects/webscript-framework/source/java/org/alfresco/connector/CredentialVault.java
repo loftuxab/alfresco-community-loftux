@@ -38,27 +38,47 @@ package org.alfresco.connector;
 public interface CredentialVault
 {
     /**
-     * Stores a given credential into the vault
+     * Places the given credentials into the vault
      * 
-     * @param key the key
      * @param credentials the credentials
      */
-    public void store(String key, Credentials credentials);
+    public void store(Credentials credentials);
 
     /**
-     * Retrieves a credential from the vault
+     * Retrieves credentials for a given endpoint id from the vault
      * 
-     * @param key the key
+     * @param endpointId the endpoint id
      * 
      * @return the credentials
      */
-    public Credentials retrieve(String key);
+    public Credentials retrieve(String endpointId);
+    
+    /**
+     * Removes credentials for a given endpoint id from the vault
+     * @param endpointId
+     */
+    public void remove(String endpointId);
+    
+    /**
+     * @return true if any credentials are stored for this endpoint id
+     */
+    public boolean hasCredentials(String endpointId);
 
     /**
-     * @return true if any credentials are stored for this user
+     * Creates new credentials which are stored in this vault
+     * 
+     * @param endpointId
+     * @return the credentials object
      */
-    public boolean hasCredentials(User user);
-
+    public Credentials newCredentials(String endpointId);
+    
+    /**
+     * Returns the ids for stored credentials
+     * 
+     * @return
+     */
+    public String[] getStoredIds();
+    
     /**
      * Tells the Credential Vault to load state from persisted store
      */

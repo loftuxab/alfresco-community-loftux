@@ -42,6 +42,8 @@ import org.alfresco.web.site.model.Theme;
 public class ThemeUtil
 {
     
+    private static final String CURRENT_THEME_ID = "currentThemeId";
+
     /**
      * Gets the current theme id.
      * 
@@ -80,7 +82,7 @@ public class ThemeUtil
      */
     public static String getCurrentThemeId(HttpServletRequest request)
     {
-        return (String) request.getSession().getAttribute("currentThemeId");
+        return (String) request.getSession().getAttribute(CURRENT_THEME_ID);
     }
 
     /**
@@ -94,7 +96,7 @@ public class ThemeUtil
     {
         if (themeId != null)
         {
-            request.getSession().setAttribute("currentThemeId", themeId);
+            request.getSession().setAttribute(CURRENT_THEME_ID, themeId);
         }
     }
 
@@ -122,5 +124,16 @@ public class ThemeUtil
         	setCurrentThemeId(request, themeId);
             context.setThemeId(themeId);
         }
+    }
+    
+    /**
+     * Clears the theme (from the session)
+     * 
+     * @param context
+     * @param request
+     */
+    public static void clearTheme(RequestContext context, HttpServletRequest request)
+    {
+        request.getSession().removeAttribute(CURRENT_THEME_ID);
     }
 }

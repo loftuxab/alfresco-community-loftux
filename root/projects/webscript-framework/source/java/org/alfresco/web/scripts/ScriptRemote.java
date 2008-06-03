@@ -24,11 +24,9 @@
  */
 package org.alfresco.web.scripts;
 
-import java.util.Map;
-
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
-import org.alfresco.connector.ConnectorFactory;
+import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.Response;
 import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.web.config.RemoteConfigElement;
@@ -48,17 +46,21 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ScriptRemote
 {
+    private static final String CONNECTOR_SERVICE_ID = "connector.service";
+
     private static final Log logger = LogFactory.getLog(ScriptRemote.class);
 
     private ConfigService configService;
+    private Container container;
 
     /**
      * Instantiates a new script remote.
      * 
      * @param configService the config service
      */
-    protected ScriptRemote(ConfigService configService)
+    protected ScriptRemote(Container container)
     {
+        this.container = container;
         this.configService = configService;
     }
 
@@ -68,9 +70,9 @@ public class ScriptRemote
      * 
      * @return the remote client
      */
-    public Connector connect()
+    public ScriptRemoteConnector connect()
     {
-        Connector connector = null;
+        ScriptRemoteConnector remoteConnector = null;
 
         // Check whether a remote configuration has been provided
         RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
@@ -82,11 +84,11 @@ public class ScriptRemote
             if (defaultEndpointId != null)
             {
                 // Construct for this endpoint id
-                connector = connect(defaultEndpointId);
+                remoteConnector = connect(defaultEndpointId);
             }
         }
 
-        return connector;
+        return remoteConnector;
     }
 
     /**
@@ -97,9 +99,9 @@ public class ScriptRemote
      * 
      * @return the remote client
      */
-    public Connector connect(String endpointId)
+    public ScriptRemoteConnector connect(String endpointId)
     {
-        Connector connector = null;
+        ScriptRemoteConnector remoteConnector = null;
 
         // Check whether a remote configuration has been provided
         RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
@@ -126,8 +128,27 @@ public class ScriptRemote
                     // or connections to endpoints that have "declared" user
                     // settings (which is to say, forced usernames and
                     // passwords within the configuration file)
-                    connector = ConnectorFactory.getInstance(configService).connector(
-                            endpointId);
+                    
+                    // Note - we can only properly do this if the container
+                    // provides us with a reference to the application context
+                    if(this.container instanceof AbstractRuntimeContainer)
+                    {
+                        ConnectorService connectorService = (ConnectorService) ((AbstractRuntimeContainer)container).getApplicationContext().getBean(CONNECTOR_SERVICE_ID);
+                        if(connectorService != null)
+                        {
+                            Connector connector = connectorService.getConnector(endpointId);
+                            remoteConnector = new ScriptRemoteConnector(connector);
+                        }
+                        else
+                        {
+                            throw new RemoteConfigException("Unable to locate ConnectorService for Spring bean id: " + CONNECTOR_SERVICE_ID);
+                        }
+                    }
+                    else
+                    {
+                        throw new RemoteConfigException("The container is not an AbstractRuntimeContainer, unable to fetch ApplicationContext");
+                    }
+                    
                 }
                 catch (RemoteConfigException rce)
                 {
@@ -138,7 +159,7 @@ public class ScriptRemote
             }
         }
 
-        return connector;
+        return remoteConnector;
     }
 
     // //////////////////////////////////////////////////////////////
@@ -160,33 +181,6 @@ public class ScriptRemote
     }
 
     /**
-     * Invoke a specific URI on the default endpoint Pass in the given
-     * parameters
-     * 
-     * @param uri
-     * @param parameters
-     * @return
-     */
-    public Response call(String uri, Map parameters)
-    {
-        return this.connect().call(uri, parameters);
-    }
-
-    /**
-     * Invoke a specific URI on the default endpoint Pass in the given
-     * parameters Apply the provided headers
-     * 
-     * @param uri
-     * @param parameters
-     * @param headers
-     * @return
-     */
-    public Response call(String uri, Map parameters, Map headers)
-    {
-        return this.connect().call(uri, parameters, headers);
-    }
-
-    /**
      * Useful in a script should you wish to list the ids of available
      * endpoints.
      * 
@@ -194,14 +188,16 @@ public class ScriptRemote
      */
     public String[] getEndpointIds()
     {
+        String[] endpointIds = new String[] { };
+        
         RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
                 "Remote").getConfigElement("remote");
-        if (remoteConfig == null)
+        if(remoteConfig != null)
         {
-            return new String[] {};
+            endpointIds = remoteConfig.getEndpointIds();
         }
-
-        return remoteConfig.getEndpointIds();
+        
+        return endpointIds;
     }
 
     /**
@@ -252,6 +248,6 @@ public class ScriptRemote
         }
 
         return descriptor.getDescription();
-    }
-
+    }    
+    
 }
