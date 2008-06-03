@@ -24,8 +24,6 @@
  */
 package org.alfresco.web.site;
 
-import java.io.IOException;
-
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.Renderable;
 import org.alfresco.web.site.renderer.RendererContext;
