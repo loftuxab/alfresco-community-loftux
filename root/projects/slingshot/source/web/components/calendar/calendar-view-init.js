@@ -117,6 +117,9 @@
 		{	
 			var tabView = new YAHOO.widget.TabView('calendar-view'); 
 			
+			var Dom = YAHOO.util.Dom;
+			Dom.get('calendar-view').style.visibility = "visible";
+			
 			/* Initialise buttons and handlers */
 			Alfresco.util.createYUIButton(this, "next-button", this.displayNextMonth, { type: "push" });
 			Alfresco.util.createYUIButton(this, "prev-button", this.displayPrevMonth, { type: "push" });
