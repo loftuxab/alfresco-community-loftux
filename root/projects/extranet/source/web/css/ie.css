@@ -1,0 +1,26 @@
+body {
+	height: 100%;
+}
+#custom-doc {
+	width:69.75em;
+}
+.logo {
+	width: 23.85em;
+	height: 6.3em;
+}
+#nav {
+	height: 2.25em;
+}
+.lb {
+	bottom: -2px;
+}
+.rb {
+	bottom: -2px;
+}
+#bd {
+	margin: 2.55em 0 0;
+}
+#ft .cms {
+	width: 6.6em;
+	height: 2.4em;
+}

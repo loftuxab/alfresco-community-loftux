@@ -24,12 +24,26 @@
  */
 package org.alfresco.web.site;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.alfresco.connector.User;
+import org.alfresco.web.site.exception.UserFactoryException;
+
 /**
  * This factory loads users from Alfresco, fetching their properties
  * and so forth.
  * 
  * @author muzquiano
  */
-public class ExtranetUserFactory extends DefaultUserFactory
+public class ExtranetUserFactory extends AlfrescoUserFactory
 {
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.UserFactory#loadUser(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String)
+     */
+    public User loadUser(RequestContext context, HttpServletRequest request, String userId)
+        throws UserFactoryException
+    {
+        return super.loadUser(context, request, userId);
+    }
+    
 }

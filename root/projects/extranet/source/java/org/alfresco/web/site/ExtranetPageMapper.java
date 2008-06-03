@@ -24,13 +24,48 @@
  */
 package org.alfresco.web.site;
 
+import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+
+import org.alfresco.connector.User;
+import org.alfresco.web.site.exception.PageMapperException;
+
 /**
  * @author muzquiano
  */
 public class ExtranetPageMapper extends DefaultPageMapper
 {
-    protected ExtranetPageMapper()
+    public ExtranetPageMapper()
     {
         super();
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.AbstractPageMapper#execute(org.alfresco.web.site.RequestContext, javax.servlet.ServletRequest)
+     */
+    public void execute(RequestContext context, ServletRequest request)
+        throws PageMapperException
+    {
+        super.execute(context, request);
+        
+        // based on the user's properties, flip the theme
+        User user = context.getUser();
+        if(user != null)
+        {
+            String userId = user.getId();
+            if("guest".equals(userId))
+            {
+                // TODO: special handling for guest?
+            }
+            else
+            {
+                // TODO: change this
+                // just a test
+                // if the user is not the guest user, then we assume they are enterprise
+                // clearly, a weak assumption but it will do for now
+                ThemeUtil.setCurrentThemeId((HttpServletRequest)request, "enterprise");
+                context.setThemeId("enterprise");
+            }
+        }
+    }    
 }
