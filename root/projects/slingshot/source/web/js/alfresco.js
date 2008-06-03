@@ -423,30 +423,66 @@ Alfresco.util.ComponentManager = function()
 
 /**
  * Provides a common interface for displaying popups in various forms
+ *
  * @class Alfresco.util.PopupManager
  */
 Alfresco.util.PopupManager = function()
 {
    return {
+
+      /**
+       * The html zIndex startvalue that will be incremented for each popup
+       * that is displayed to make sure the popup is visible to the user.
+       *
+       * @property zIndex
+       * @type int
+       */
       zIndex: 15,
 
-      displayMessageConfig:
+      /**
+       * The default config for the displaying messages, can be overriden
+       * when calling displayMessage()
+       *
+       * @property defaultDisplayMessageConfig
+       * @type object
+       */
+      defaultDisplayMessageConfig:
       {
          text: null,
-         autoHide: true,
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
          displayTime: 2.5,
          modal: false
       },
 
-      displayMessage: function(userConfig)
+      /**
+       * Intended usage: To quickly assure the user that the expected happened.
+       *
+       * Displays a message as a popup on the screen.
+       * In default mode it fades, is visible for half a second and then fades out.
+       *
+       * @method displayMessage
+       * @param config {object}
+       * The config object is in the form of:
+       * {
+       *    text: {string},         // The message text to display, mandatory 
+       *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when shpwing and hiding the message,
+       *                                            // default is YAHOO.widget.ContainerEffect.FADE
+       *    effectDuration: {int},  // time in seconds that the effect should be played, default is 0.5
+       *    displayTime: {int},     // time in seconds that the message will be displayed, default is 2.5
+       *    modal: {true}           // if the message should modal (the background overlayed with a gray transparent layer), default is false
+       * }
+       */
+      displayMessage: function(config)
       {
-         var c = YAHOO.lang.merge(this.displayMessageConfig, userConfig);
+         // Merge the users config with the default config and check mandatory properties
+         var c = YAHOO.lang.merge(this.defaultDisplayMessageConfig, config);
          if (c.text === undefined)
          {
-            alert("Property text in userConfig must be set");
+            throw new Error("Property text in userConfig must be set");
          }
+
+         // Construct the YUI Dialog that will display the message
          var message = new YAHOO.widget.Dialog("message",
          {
             visible: false,
@@ -456,20 +492,31 @@ Alfresco.util.PopupManager = function()
             modal: c.modal,
             zIndex: this.zIndex++
          });
+
+         // Set the message that should be displayed
          message.setBody(c.text);
+
+         /**
+          * Add it to the dom, center it, schedule the fade out of the message
+          * and show it.
+          */
          message.render(document.body);
          message.center();
-         if (c.autoHide)
+         message.subscribe("show", this._delayPopupHide,
          {
-            message.subscribe("show", this._delayPopupHide,
-            {
-               popup: message,
-               displayTime: (c.displayTime * 1000)
-            }, true);
-         }
+            popup: message,
+            displayTime: (c.displayTime * 1000)
+         }, true);
          message.show();
       },
 
+      /**
+       * Gets called after the message has been displayed as long as it was
+       * configured.
+       * Hides the message from the user.
+       *
+       * @method _delayPopupHide
+       */
       _delayPopupHide: function()
       {         
          YAHOO.lang.later(this.displayTime, this, function()
@@ -478,12 +525,18 @@ Alfresco.util.PopupManager = function()
          });
       },
 
-      displayPromptConfig:
+      /**
+       * The default config for the displaying messages, can be overriden
+       * when calling displayPromp()
+       *
+       * @property defaultDisplayPromptConfig
+       * @type object
+       */
+      defaultDisplayPromptConfig:
       {
          title: null,
          text: null,
          icon: null,
-         autoHide: true,
          effect: null,
          effectDuration: 0.5,
          modal: true,
@@ -499,12 +552,35 @@ Alfresco.util.PopupManager = function()
          }]
       },
 
-      displayPrompt: function(userConfig)
+      /**
+       * Intended usage: To inform the user that something unexpected happened
+       * OR that ask the user if if an action should be performed.
+       *
+       * Displays a message as a popup on the screen with a button to make sure
+       * the user responds to the prompt.
+       *
+       * In default mode it shows with an OK button that needs clicking to get closed.
+       *
+       * @method displayPrompt
+       * @param config {object}
+       * The config object is in the form of:
+       * {
+       *    title: {string},       // the title of the dialog, default is null
+       *    text: {string},        // the text to display for the user, mandatory
+       *    icon: null,            // the icon to display next to the text, default is null
+       *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when showing and hiding the prompt, default is null
+       *    effectDuration: {int}, // the time in seconds that the effect should run, default is 0.5
+       *    modal: {boolean},      // if a grey transparent overlay should be displayed in the background
+       *    close: {boolean},      // if a close icon should be displayed in the right upper corner, default is false
+       *    buttons: []            // an array of button configs as described by YUI:s SimpleDialog, default is a single OK button
+       * }
+       */
+      displayPrompt: function(config)
       {
-         var c = YAHOO.lang.merge(this.displayPromptConfig, userConfig);
+         var c = YAHOO.lang.merge(this.defaultDisplayPromptConfig, config);
          if (c.text === undefined)
          {
-            alert("Property text in userConfig must be set");
+            throw new Error("Property text in userConfig must be set");
          }
 
          var prompt = new YAHOO.widget.SimpleDialog("prompt",
@@ -533,12 +609,8 @@ Alfresco.util.PopupManager = function()
          prompt.render(document.body);
          prompt.center();
          prompt.show();
-      },
-
-      displayDialog: function()
-      {
-         alert("Not implemented");
       }
+
    };
 }();
 

@@ -78,6 +78,7 @@
          
          var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^ ]*$/}, "blur");         
          createSiteForm.setShowSubmitStateDynamically(true);
          createSiteForm.setSubmitElements(okButton);
          createSiteForm.setAJAXSubmit(true,
