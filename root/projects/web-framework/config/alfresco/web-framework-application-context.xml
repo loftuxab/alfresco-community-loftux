@@ -147,19 +147,23 @@
       </property>
    </bean>
 
+
+   <!--                             -->
+   <!--  Web Script Implementations -->
+   <!--                             -->
+
+   <!--  I18N resources and messages Web Script -->
+   <bean id="webscript.org.alfresco.web.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" singleton="false"/>
+
    <!--  Declarative Site Web Script -->
-   <bean id="webscript.site" parent="webscript"
-      class="org.alfresco.web.scripts.DeclarativeSiteWebScript"
-      singleton="false">
+   <bean id="webscript.site" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWebScript" singleton="false">
       <constructor-arg>
          <ref bean="webframework.store.modelobjects" />
       </constructor-arg>
    </bean>
 
    <!--  Dynamic Wizard Web Script -->
-   <bean id="webscript.wizard" parent="webscript"
-      class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript"
-      singleton="false">
+   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false">
       <constructor-arg>
          <ref bean="webframework.store.modelobjects" />
       </constructor-arg>

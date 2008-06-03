@@ -30,6 +30,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -41,6 +42,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.Base64;
 import org.alfresco.web.scripts.Status;
 import org.apache.commons.logging.Log;
@@ -49,16 +51,18 @@ import org.springframework.util.FileCopyUtils;
 
 /**
  * Remote client for for accessing data from remote URLs.
- * 
+ * <p>
  * Can be used as a Script root object for simple HTTP requests.
- * 
+ * <p>
  * Generally remote URLs will be "data" webscripts (i.e. returning XML/JSON) called from
  * web-tier script objects and will be housed within an Alfresco Repository server.
- * 
- * Also supports POST of content data 
- * 
+ * <p>
+ * Supports HTTP methods of GET, PUT, DELETE and POST of body content data.
+ * <p>
  * A 'Response' is returned containing the response data stream as a String and the Status
- * object representing the status code and error information if any.
+ * object representing the status code and error information if any. Methods supplying an
+ * InputStream will force a POST and methods supplying an OutputStream will stream the result
+ * directly to it and not generate a response in the 'Response' object. 
  * 
  * @author Kevin Roast
  */
@@ -155,6 +159,27 @@ public class RemoteClient extends AbstractClient
     public Response call(String uri)
     {
         return call(uri, true, null);
+    }
+    
+    /**
+     * Call a remote WebScript uri, passing the supplied body as a POST request.
+     * 
+     * @param uri    Uri to call on the endpoint
+     * @param body   Body of the POST request.
+     * 
+     * @return Response object from the call {@link Response}
+     */
+    public Response call(String uri, String body)
+    {
+        try
+        {
+            byte[] bytes = body.getBytes("UTF-8");
+            return call(uri, true, new ByteArrayInputStream(bytes));
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            throw new AlfrescoRuntimeException("Encoding not supported.", e);
+        }
     }
 
     /**

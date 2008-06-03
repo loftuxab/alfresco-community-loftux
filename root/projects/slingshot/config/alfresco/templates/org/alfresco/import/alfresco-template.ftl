@@ -45,6 +45,7 @@
    <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
    <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
+   <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants.DEBUG = ${DEBUG?string};
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";

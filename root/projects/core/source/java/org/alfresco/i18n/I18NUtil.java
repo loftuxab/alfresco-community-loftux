@@ -347,6 +347,22 @@ public class I18NUtil
     }
     
     /**
+     * @return the map of all available messages for the current locale
+     */
+    public static Map<String, String> getAllMessages()
+    {
+        return getLocaleProperties(getLocale());
+    }
+    
+    /**
+     * @return the map of all available messages for the specified locale
+     */
+    public static Map<String, String> getAllMessages(Locale locale)
+    {
+        return getLocaleProperties(locale);
+    }
+    
+    /**
      * Get the messages for a locale.
      * <p>
      * Will use cache where available otherwise will load into cache from bundles.
