@@ -1,0 +1,358 @@
+html {
+	height: 100%;
+}
+body {
+	background: #ccc url('../images/bg-body.jpg') repeat-x;
+	min-height: 100%;
+	font-family: Verdana, Arial, sans-serif;
+	color: #000555;
+}
+a {
+	color: #039;
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+
+/* page holder */
+#custom-doc {
+	margin:auto;
+	text-align:left;
+	width:73.84em;
+	min-width:960px;
+}
+.wrap {
+	width: 100%;
+	overflow: hidden;
+}
+.left {
+	float: left;
+}
+.right {
+	float:right;
+}
+
+
+/* header */
+#hd {
+	padding: 0 1.538em;
+}
+.logo {
+	float: left;
+	width: 24.461em;
+	height: 6.461em;
+}
+.logo2 {
+	float: left;
+	width: 400px;
+	height: 6.461em;
+}
+#top-links {
+	padding: 0.461em 0 1.924em;
+	float: right;
+}
+#top-links li {
+	float: left;
+	padding-left: 0.769em;
+}
+#top-links a {
+	color: #060;
+	font: 11px/14px 'Trebuchet MS', Arial, sans-serif;
+}
+.search {
+	float: right;
+	clear: right;
+	white-space: nowrap;
+	color: #666;
+	font-size: 0.932em;
+}
+.search select,
+.search .text {
+	border: 2px solid #9c9c9c;
+	border-bottom: 2px solid #f8f8f8;
+	border-right: 2px solid #f8f8f8;
+}
+.search .text {
+	padding: 0 5px;
+	width: 10.41em;
+}
+.search .button {
+	background: #666;
+	border: 1px solid #fff;
+	color: #fff;
+}
+
+/* navigation */
+#nav {
+	background: #2d2d2d url('../images/bg-nav.gif') repeat-x;
+	border-bottom: 1px solid #373737;
+	width: 100%;
+	position: relative;
+	height: 2.307em;
+}
+#nav ul {
+	float: right;
+	padding: 0 .38em;
+}
+#nav ul li {
+	float: left;
+}
+#nav ul li.first {
+	position: absolute;
+	left: .615em;
+	top: 0;
+	z-index: 2;
+}
+#nav ul li a {
+	color: #fff;
+	font: 1.153em/2em 'Trebuchet MS', Arial, sans-serif;
+	padding: 0 12px;
+	float: left;
+	background: url('../images/spr-nav.gif') no-repeat 0 50%;
+}
+#nav ul li.first a {
+	background: url('../images/spr-nav.gif') no-repeat 100% 50%;
+}
+.lt,
+.lb,
+.rt,
+.rb {
+	display: block;
+	width: 4px;
+	height: 4px;
+	overflow: hidden;
+	position: absolute;
+	z-index: 99;
+}
+.lt {
+	left: 0;
+	top: 0;
+	background: url('../images/lt.gif') no-repeat;
+}
+.lb {
+	left: 0;
+	bottom: -1px;
+	background: url('../images/lb.gif') no-repeat;
+}
+.rt {
+	right: 0;
+	top: 0;
+	background: url('../images/rt.gif') no-repeat;
+}
+.rb {
+	right: 0;
+	bottom: -1px;
+	background: url('../images/rb.gif') no-repeat;
+}
+
+
+/* body */
+#bd {
+	border: 1px solid #ccc;
+	padding: 28px 20px;
+	background: #fff;
+	margin: 2.615em 0 0;
+}
+.yui-b {
+	font-family: 'Trebuchet MS', Arial, sans-serif;
+}
+#yui-main h1 {
+	font: bold 1.384em 'Trebuchet MS', Arial, sans-serif;
+	margin: 2em 0 0;
+}
+#yui-main p.bigger {
+	font: 1.230em/1.125em 'Trebuchet MS', Arial, sans-serif;
+}
+#yui-main p,
+#yui-main ul {
+	font: 1.076em/1.357em 'Trebuchet MS', Arial, sans-serif;
+	margin: .5em 0;
+}
+#yui-main ul {
+	margin: 0.5em 0 2em;
+}
+#yui-main ul li {
+	padding: 0.23em 0;
+}
+#yui-main h2 {
+	font: bold 1.230em 'Trebuchet MS', Arial, sans-serif;
+	border-bottom: 1px solid #ccc;
+	margin: 1em 0 0;
+}
+#yui-main ul li {
+	padding-left: 11px;
+	background: url('../images/arrow.gif') no-repeat 0 0.63em;
+}
+#bd a {
+	color: #0000ff;
+}
+.rightalign {
+	text-align: right;
+	padding: 3em 0 0;
+}
+.box {
+	width: 22.307em;
+	padding: 1em 0 0 0.769em;
+	overflow: hidden;
+}
+#yui-main .box {
+	padding: 1.153em 0;
+	width: 100%;
+}
+.box img {
+	float: left;
+}
+#yui-main .box img {
+	margin: 0 5px 35px 0;
+}
+.box .txt {
+	font-size: 0.932em;
+	float: right;
+	width: 19.16em;
+}
+h3 {
+	font: bold 1.076em 'Trebuchet MS', Arial, sans-serif;
+	color: #666;
+	margin: 1.8em 0 0;
+}
+#yui-main h3 {
+	color: #333;
+	margin: 0;
+}
+.path {
+	width: 100%;
+	overflow: hidden;
+}
+.path li {
+	float: left;
+	display: inline;
+	position: relative;
+	background: #ccc url('../images/bg-path-span.gif') repeat-x;
+}
+.path li.last {
+	background: #fff;
+}
+.path li a {
+	float: left;
+	font: 1.23em/32px 'Trebuchet MS', Arial, sans-serif;
+	background: url('../images/bg-path.gif') no-repeat 100% 0;
+	padding: 0 28px 0 15px;
+}
+
+
+/* footer */
+#ft .wrap {
+	margin: 15px 0 0;
+	background: #fff url('../images/corner-ft-lb.gif') no-repeat 0 100%;
+}
+#ft .wrap .inner {
+	background: url('../images/corner-ft-rb.gif') no-repeat 100% 100%;
+	padding: 0.769em 1.538em;
+}
+#ft .centeralign {
+	color: #666;
+	font: 0.932em/1.2em Verdana, Arial, sans-serif;
+	padding: 0.38em 0;
+	text-align: center;
+}
+#ft .cms {
+	width: 6.769em;
+	height: 2.461em;
+	float: right;
+}
+#ft ul {
+	width: 80%;
+	overflow: hidden;
+}
+#ft ul li {
+	float: left;
+	margin-right: 1em;
+}
+#ft ul li a {
+	font: 0.932em Verfana, Arial, sans-serif;
+}
+.rss {
+	padding-right: 15px;
+	background: url('../images/rss.gif') no-repeat 100% 50%;
+}
+#ft p {
+	font: 0.769em Verdana, Arial, sans-serif;
+	margin: 0.6em 0 0;
+	color: #039;
+}
+
+.roundbox {
+	border: 0.077em solid #cacfd3;
+	background: url('../images/bg-box.gif') repeat-x 0 100%;
+	margin: 0 0 2.307em;
+	width: 22.923em;
+}
+.roundbox .inner1 {
+	background: url('../images/corner-lt.gif') no-repeat;
+}
+.roundbox .inner2 {
+	background: url('../images/corner-rt.gif') no-repeat 100% 0;
+}
+.roundbox .inner3 {
+	background: url('../images/corner-lb.gif') no-repeat 0 100%;
+}
+.roundbox .inner4 {
+	background: url('../images/corner-rb.gif') no-repeat 100% 100%;
+}
+.roundbox .inner1,
+.roundbox .inner2,
+.roundbox .inner3,
+.roundbox .inner4 {
+	margin: -0.077em;
+	width: 22.923em;
+	padding: 0.077em;
+	position: relative;
+}
+.roundbox .inner4 {
+	width: 20.923em;
+	padding: 1.077em;
+}
+.gradient {
+	background: #f9f8f9 url('../images/bg-gradbox.gif') repeat-x;
+}
+.gradient .txt-box {
+	font: 1.076em/1.714em 'Trebuchet MS', Arial, sans-serif;
+}
+.login-form {
+	font-size: 0.846em;
+}
+.login-form ul {
+	width: 100%;
+	overflow: hidden;
+	margin: 0.5em 0 0;
+}
+.login-form ul li {
+	float: left;
+	width: 100%;
+	padding: 4px 0;
+	color: #024689;
+}
+.login-form a {
+	color: #024689 !important;
+}
+.login-form label {
+	float: left;
+	width: 5.4em;
+}
+.login-form .text {
+	border: 2px solid #848484;
+	border-bottom: 2px solid #fafafa;
+	border-right: 2px solid #fafafa;
+	width: 18em;
+	padding: 0 2px;
+	font-size: 1em;
+	float: right;
+}
+.login-form .button {
+	float: right;
+	background: #f0f0f0;
+	border: 2px solid #fafafa;
+	border-bottom: 2px solid #848484;
+	border-right: 2px solid #848484;
+}
