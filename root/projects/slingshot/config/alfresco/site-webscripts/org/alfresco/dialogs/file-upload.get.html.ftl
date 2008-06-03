@@ -34,11 +34,11 @@
          <div class="yui-u">
             <textarea cols="40" rows="4"></textarea>
          </div>
-      </div>
+      </div>          
    </div>
 
    <p>
-      <input id="${args.htmlid}-startStop-button" type="button" value="Start upload" />
+      <input id="${args.htmlid}-upload-button" type="button" value="Start upload" />
       <input id="${args.htmlid}-cancelOk-button" type="button" value="Cancel" />
    </p>
 
