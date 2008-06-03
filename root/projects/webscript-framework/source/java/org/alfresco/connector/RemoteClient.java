@@ -298,7 +298,7 @@ public class RemoteClient extends AbstractClient
         {
             String encoding = service(
                     buildURL(uri),
-                    "POST".equalsIgnoreCase(requestMethod) ? req.getInputStream() : null,
+                    "GET".equalsIgnoreCase(requestMethod) ? null : req.getInputStream(),
                     res.getOutputStream(), req, res, status);
             result = new Response(status);
             result.setEncoding(encoding);
@@ -412,7 +412,7 @@ public class RemoteClient extends AbstractClient
             // always perform a POST to the connection if input supplied
             if (in != null)
             {
-                connection.setRequestMethod("POST");
+                connection.setRequestMethod(req.getMethod());
                 connection.setDoOutput(true);
                 connection.setDoInput(true);
                 connection.setUseCaches(false);
