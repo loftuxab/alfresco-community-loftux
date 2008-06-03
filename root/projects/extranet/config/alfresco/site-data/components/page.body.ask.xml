@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+  <title>Knowledge Base Browse</title>  
+  <url>/components/extranet/kbbrowse</url>
+  
+  <!-- Binding --> 
+  <scope>page</scope>
+  <region-id>body</region-id>
+  <source-id>ask</source-id>  
+  
+</component>

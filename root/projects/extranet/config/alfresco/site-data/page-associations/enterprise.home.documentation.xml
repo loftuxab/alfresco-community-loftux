@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page-association>
+  <title>Documentation</title>
+  <source-id>home</source-id>
+  <dest-id>documentation</dest-id>
+  <assoc-type>enterprise</assoc-type>
+</page-association>

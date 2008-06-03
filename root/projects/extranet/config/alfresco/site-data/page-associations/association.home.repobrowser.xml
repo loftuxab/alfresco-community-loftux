@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<page-association>
-  <title>Repo Browser</title>
-  <source-id>page.home</source-id>
-  <dest-id>page.repobrowser</dest-id>
-  <assoc-type>child</assoc-type>
-</page-association>

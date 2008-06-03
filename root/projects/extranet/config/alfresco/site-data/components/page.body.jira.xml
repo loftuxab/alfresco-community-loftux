@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+	<title>JIRA</title>  
+	<url>/components/extranet/jira</url>
+	
+	<!-- Binding --> 
+	<scope>page</scope>
+	<region-id>body</region-id>
+	<source-id>jira</source-id>
+  
+</component>

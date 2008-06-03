@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<page-association>
-  <title>Wiki</title>
-  <source-id>page.home</source-id>
-  <dest-id>page.wiki</dest-id>
-  <assoc-type>child</assoc-type>
-</page-association>

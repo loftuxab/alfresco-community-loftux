@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+	<url>/components/extranet/header/enterprise</url>
+	
+	<!-- Binding --> 
+	<scope>theme</scope>
+	<region-id>header</region-id>
+	<source-id>enterprise-header</source-id>
+  
+</component>

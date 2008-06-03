@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page-association>
+  <title>Issues</title>
+  <source-id>home</source-id>
+  <dest-id>contribute</dest-id>
+  <assoc-type>final</assoc-type>
+</page-association>

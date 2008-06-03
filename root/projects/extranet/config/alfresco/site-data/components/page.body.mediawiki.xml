@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+	<title>MediaWiki Component</title>  
+	<url>/components/extranet/mediawiki</url>
+  
+	<!-- Binding -->  
+	<scope>page</scope>
+	<region-id>body</region-id>
+	<source-id>wiki</source-id>
+  
+</component>

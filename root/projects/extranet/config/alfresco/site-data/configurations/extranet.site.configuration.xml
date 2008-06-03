@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <configuration>
-  <title>Alfresco Network</title>
-  <description>The Alfresco Network Support Portal</description>
+  <title>Alfresco Extranet</title>
+  <description>The Alfresco Extranet Portal</description>
   <source-id>site</source-id>
   <properties>
-    <root-page>page.home</root-page>
+    <root-page>home</root-page>
   </properties>  
 </configuration>

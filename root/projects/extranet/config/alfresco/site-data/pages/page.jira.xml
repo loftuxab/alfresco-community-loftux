@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<page>
-  <title>JIRA</title>
-  <template-instance>template.jira</template-instance>
-  <authentication>none</authentication>  
-</page>

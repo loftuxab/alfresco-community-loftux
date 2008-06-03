@@ -1,0 +1,1 @@
+<import resource="classpath:/alfresco/extranet/core.js">

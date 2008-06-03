@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<page>
-  <id>page.home</id>
-  <title>Home Page</title>
-  <template-instance>template.home</template-instance>
-  <authentication>none</authentication>  
-</page>

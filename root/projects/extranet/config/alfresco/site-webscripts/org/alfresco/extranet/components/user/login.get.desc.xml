@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>User Login Component</shortname>
+  <description>User Login Component</description>
+  <url>/components/extranet/login</url>
+</webscript>
