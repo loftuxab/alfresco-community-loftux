@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page-association>
+  <title>Resources</title>
+  <source-id>home</source-id>
+  <dest-id>resources</dest-id>
+  <assoc-type>community-registered</assoc-type>
+</page-association>

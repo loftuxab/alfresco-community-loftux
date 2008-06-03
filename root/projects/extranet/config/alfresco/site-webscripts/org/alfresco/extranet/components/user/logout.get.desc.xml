@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>User Logout Component</shortname>
+  <description>User Logout Component</description>
+  <url>/components/extranet/logout</url>
+</webscript>

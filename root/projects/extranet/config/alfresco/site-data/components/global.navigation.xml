@@ -2,12 +2,11 @@
 
 <component> 
 
-  <title>Navigation</title>  
-  <url>/components/navigation</url>
-  
-  <!-- Binding --> 
-  <scope>global</scope>
-  <source-id>global</source-id>
-  <region-id>navigation</region-id>
+	<url>/components/extranet/navigation</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>navigation</region-id>
+	<source-id>global</source-id>
   
 </component>

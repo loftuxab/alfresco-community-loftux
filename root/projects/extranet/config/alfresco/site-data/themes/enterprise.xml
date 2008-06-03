@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<theme>
+	<title>Extranet - Enterprise Theme</title>
+	<page-types>
+		<page-type>
+			<id>login</id>
+			<page-instance-id>extranet-login</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>logout</id>
+			<page-instance-id>extranet-logout</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>viewprofile</id>
+			<page-instance-id>extranet-viewprofile</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>editprofile</id>
+			<page-instance-id>extranet-editprofile</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>viewcredentials</id>
+			<page-instance-id>extranet-viewcredentials</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>editcredentials</id>
+			<page-instance-id>extranet-editcredentials</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>viewcontentdetails</id>
+			<page-instance-id>extranet-viewcontentdetails</page-instance-id>
+		</page-type>
+		<page-type>
+			<id>register</id>
+			<page-instance-id>extranet-register</page-instance-id>
+		</page-type>
+	</page-types>
+	<defaults>
+		<component>
+			<region-id>header</region-id>
+			<component-id>theme.header.enterprise-header</component-id>
+		</component>
+		<component>
+			<region-id>navigation</region-id>
+			<component-id>theme.navigation.enterprise-navigation</component-id>
+		</component>
+	</defaults>
+</theme>

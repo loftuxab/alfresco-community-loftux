@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
-<configuration>
-  <id>global.head.renderer</id>
-  <title>Global Header Renderer</title>
-  <properties>
-    <renderer>/app/global-header.jsp</renderer>
-  </properties>
-</configuration>

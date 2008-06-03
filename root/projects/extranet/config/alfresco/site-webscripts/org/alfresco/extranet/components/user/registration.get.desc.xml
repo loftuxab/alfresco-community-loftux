@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>User Registration Component</shortname>
+  <description>User Registration Component</description>
+  <url>/components/extranet/register</url>
+</webscript>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <title>Extranet - View Profile Page</title>
+  <page-type>viewprofile</page-type>
+  <template-instance>usermanagement</template-instance>
+  <authentication>none</authentication>  
+</page>

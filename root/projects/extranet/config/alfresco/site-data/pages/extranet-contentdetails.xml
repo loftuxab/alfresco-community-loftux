@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <title>Content Details</title>
+  <page-type>viewcontentdetails</page-type>
+  <template-instance>viewcontentdetails</template-instance>
+  <authentication>none</authentication>  
+</page>
