@@ -26,7 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.connector.Credentials;
+import org.alfresco.connector.ConnectorSession;
 import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.UserFactoryException;
 
@@ -60,7 +60,7 @@ public abstract class UserFactory
         return this.guestUser;
     }
 
-    public User getUser(RequestContext context, HttpServletRequest request)
+    public User faultUser(RequestContext context, HttpServletRequest request)
         throws UserFactoryException
     {
         User user = null;
@@ -103,7 +103,7 @@ public abstract class UserFactory
             RequestContext context, HttpServletRequest request, String user_id)
         throws UserFactoryException;
 
-    public abstract Credentials authenticate(
+    public abstract boolean initializeUser(
             HttpServletRequest request, String username, String password);
     
     public void setId(String id)

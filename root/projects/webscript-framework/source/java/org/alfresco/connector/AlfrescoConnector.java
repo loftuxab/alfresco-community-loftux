@@ -24,23 +24,22 @@
  */
 package org.alfresco.connector;
 
-import java.util.Map;
-
-import org.alfresco.connector.exception.AuthenticationException;
 import org.alfresco.web.config.RemoteConfigElement.ConnectorDescriptor;
-import org.alfresco.web.scripts.Status;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 /**
- * Connector object that can be used for HTTP or HTTPS calls to an endpoint. The
- * connector supports basic authentication.
+ * An implementation of an Alfresco Connector that can be used to conncet
+ * to an Alfresco Repository and issue URL invokes against it.
+ * 
+ * The Alfresco Connector extends the Http Connector and provides the
+ * additional functionality of stamping a ticket onto the outgoing request.
+ * 
+ * The ticket is retrieved from the connector session.
  * 
  * @author muzquiano
  */
 public class AlfrescoConnector extends HttpConnector
 {
-    protected static Log logger = LogFactory.getLog(AlfrescoConnector.class);
+    private static final String PARAM_TICKETNAME_ALF_TICKET = "alf_ticket";
 
     /**
      * Instantiates a new alfresco connector.
@@ -53,105 +52,25 @@ public class AlfrescoConnector extends HttpConnector
         super(descriptor, endpoint);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.alfresco.connector.AbstractConnector#call(java.lang.String,
-     *      java.util.Map, java.util.Map)
+    /* (non-Javadoc)
+     * @see org.alfresco.connector.HttpConnector#stampCredentials(org.alfresco.connector.RemoteClient, org.alfresco.connector.ConnectorContext)
      */
-    public Response call(String uri, Map parameters, Map headers)
+    protected void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
     {
-        if (logger.isDebugEnabled())
-            logger.debug("Start [uri = " + uri + "]");
-
-        // if we don't have any credentials, we'll just call the super class
-        // method since that will implement unauthenticated HTTP
-        if (getCredentials() == null)
+        // support for Alfresco ticket-based authentication
+        if (getCredentials() != null)
         {
-            if (logger.isDebugEnabled())
-                logger.debug("No credentials, performing unauthenticated call");
-
-            return super.call(uri, parameters, headers);
-        }
-
-        // instantiate the remote client if not instantiated
-        RemoteClient remoteClient = ((RemoteClient)this.getClient());
-
-        // check to see if we have a ticket
-        String alfTicket = (String)getCredentials().getProperty(Credentials.CREDENTIAL_ALF_TICKET);
-
-        if (logger.isDebugEnabled())
-            logger.debug("Pass 1: alfTicket = " + alfTicket);
-
-        // if we have a ticket, we assume it is valid
-        // it may, however, be possible that the ticket is invalid
-        // if it is invalid, we will have to fetch another ticket
-        if (alfTicket != null)
-        {
-            remoteClient.setTicket(alfTicket);
-
-            if (logger.isDebugEnabled())
-                logger.debug("Pass 1: Alf Ticket not null, passing into remote call");
-
-            Response response = remoteClient.call(uri);
-            if (response.getStatus().getCode() == 200)
+            // if this connector is managing session info
+            if(getConnectorSession() != null)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug("Pass 1: Remote call succeeded");
-
-                // successful response, so simply return
-                return response;
+                // apply alfresco ticket
+                String alfTicket = (String) getConnectorSession().getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
+                if (alfTicket != null)
+                {
+                    remoteClient.setTicket(alfTicket);
+                    remoteClient.setTicketName(PARAM_TICKETNAME_ALF_TICKET);
+                }
             }
-        }
-
-        // otherwise, we either have an invalid ticket or we have no ticket
-        // either way, we want to do a handshake to get a new ticket
-        Response response = null;
-        boolean authenticated = false;
-        try
-        {
-            if (logger.isDebugEnabled())
-                logger.debug("Pass 2: Call authenticate on Alfresco authenticator");
-
-            authenticated = authenticate();
-
-            if (logger.isDebugEnabled())
-                logger.debug("Pass 2: authenticated: " + authenticated);
-        }
-        catch (AuthenticationException ae)
-        {
-            if (logger.isDebugEnabled())
-                logger.debug("AuthenticationException during authenticate call");
-
-            Status status = new Status();
-            status.setCode(401);
-            status.setException(ae);
-            response = new Response(status);
-            authenticated = false;
-        }
-
-        if (logger.isDebugEnabled())
-            logger.debug("Pass 2: authenticated = " + authenticated);
-
-        // did we successfully authenticate?
-        if (authenticated)
-        {
-            // now we have a valid ticket
-            // this ticket has been placed back onto the Credentials object
-            // we retrieve it here
-            alfTicket = (String) getCredentials().getProperty(
-                    Credentials.CREDENTIAL_ALF_TICKET);
-            remoteClient.setTicket(alfTicket);
-
-            if (logger.isDebugEnabled())
-                logger.debug("Pass 3: Calling remote client with alfTicket = " + alfTicket);
-
-            response = remoteClient.call(uri);
-        }
-
-        if (logger.isDebugEnabled())
-            logger.debug("Response: " + response);
-
-        return response;
-    }
+        }        
+    }  
 }

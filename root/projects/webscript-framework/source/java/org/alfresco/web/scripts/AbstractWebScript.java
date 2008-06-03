@@ -191,7 +191,10 @@ public abstract class AbstractWebScript implements WebScript
         params.put("url", new URLModel(req));
         
         // add remote object
-        params.put("remote", new ScriptRemote(this.container.getConfigService()));
+        if(this.container instanceof AbstractRuntimeContainer)
+        {
+            params.put("remote", new ScriptRemote(this.container));
+        }
         
         // add request mimetype parameters
         FormatReader<Object> reader = container.getFormatRegistry().getReader(req.getContentType());

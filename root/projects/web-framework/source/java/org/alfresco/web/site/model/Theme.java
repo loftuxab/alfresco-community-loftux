@@ -26,11 +26,12 @@ package org.alfresco.web.site.model;
 
 import java.util.List;
 
+import org.alfresco.web.site.RequestContext;
 import org.dom4j.Document;
 import org.dom4j.Element;
 
 /**
- * Theme model object
+ * Theme model object.
  * 
  * @author muzquiano
  */
@@ -39,7 +40,7 @@ public class Theme extends AbstractModelObject
     public static String TYPE_NAME = "theme";
     
     /**
-     * Instantiates a new theme for a given XML document
+     * Instantiates a new theme for a given XML document.
      * 
      * @param document the document
      */
@@ -135,4 +136,111 @@ public class Theme extends AbstractModelObject
         Element pageInstanceIdElement = theElement.addElement("page-instance-id");
         pageInstanceIdElement.setText(pageId);
     }
+    
+    /**
+     * Gets the default component id for a given region id
+     * 
+     * @param regionId the region id
+     * 
+     * @return the default component id
+     */
+    public String getDefaultComponentId(String regionId)
+    {
+        String componentId = null;
+        
+        Element defaults = document.getRootElement().element("defaults");
+        if(defaults != null)
+        {
+            List components = defaults.elements("component");
+            for(int i = 0; i < components.size(); i++)
+            {
+                Element component = (Element) components.get(i);
+                
+                String _regionId = (String) component.elementText("region-id");
+                if(_regionId != null && _regionId.equals(regionId))
+                {
+                    componentId = component.elementText("component-id");
+                }
+            }
+        }
+        
+        return componentId;
+    }
+    
+    /**
+     * Removes the default component for a given region id
+     * 
+     * @param regionId the region id
+     */
+    public void removeDefaultComponentId(String regionId)
+    {
+        Element defaults = document.getRootElement().element("defaults");
+        if(defaults != null)
+        {
+            Element toRemove = null;
+            
+            List components = defaults.elements("component");
+            for(int i = 0; i < components.size(); i++)
+            {
+                Element component = (Element) components.get(i);
+                
+                String _regionId = (String) component.elementText("region-id");
+                if(_regionId != null && _regionId.equals(regionId))
+                {
+                    toRemove = component;
+                }
+            }
+            
+            defaults.remove(toRemove);
+        }
+    }
+    
+    /**
+     * Sets the default component id.
+     * 
+     * @param regionId the region id
+     * @param sourceId the source id
+     * @param scope the scope
+     * @param componentId the component id
+     */
+    public void setDefaultComponentId(String regionId, String componentId)
+    {
+        // remove the default component bound to this region id
+        // (if it already exists)
+        removeDefaultComponentId(regionId);
+        
+        // set the component
+        Element defaults = document.getRootElement().element("defaults");
+        if(defaults == null)
+        {
+            defaults = document.getRootElement().addElement("defaults");
+        }
+        if(defaults != null)
+        {
+            Element component = defaults.addElement("component");
+            component.addElement("region-id", regionId);
+            component.addElement("component-id", componentId);
+        }
+    }
+    
+    /**
+     * Gets the default component.
+     * 
+     * @param context the context
+     * @param regionId the region id
+     * 
+     * @return the default component
+     */
+    public Component getDefaultComponent(RequestContext context, String regionId)
+    {
+        Component component = null;
+        
+        String id = getDefaultComponentId(regionId);
+        if(id != null)
+        {
+            component = context.getModel().loadComponent(context, id);
+        }
+        
+        return component;
+    }    
 }

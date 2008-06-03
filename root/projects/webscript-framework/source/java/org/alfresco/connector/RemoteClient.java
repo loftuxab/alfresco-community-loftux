@@ -36,6 +36,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +45,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.Base64;
-import org.alfresco.web.scripts.Status;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.util.FileCopyUtils;
@@ -75,11 +75,14 @@ public class RemoteClient extends AbstractClient
 
     private String defaultEncoding;
     private String ticket;
+    private String ticketName;
     private String requestContentType;
     private String requestMethod;
 
     private String username;
     private String password;
+    
+    private Map<String, String> defaultRequestProperties;
 
 
     /**
@@ -107,7 +110,7 @@ public class RemoteClient extends AbstractClient
     }
 
     /**
-     * Authentication ticket to use
+     * Sets the authentication ticket to use
      * 
      * @param ticket
      */
@@ -115,7 +118,45 @@ public class RemoteClient extends AbstractClient
     {
         this.ticket = ticket;
     }
+    
+    /**
+     * Returns the authentication ticket
+     * 
+     * @return
+     */
+    public String getTicket()
+    {
+        return this.ticket;
+    }
 
+    /**
+     * Sets the authentication ticket name to use
+     * 
+     * This allows the ticket mechanism to be repurposed for non-Alfresco
+     * implementations that may require similar argument passing
+     * 
+     * @param ticket
+     */
+    public void setTicketName(String ticketName)
+    {
+        this.ticketName = ticketName;
+    }
+    
+    /**
+     * Returns the authenticaiton ticket name to use
+     * 
+     * @return
+     */
+    public String getTicketName()
+    {
+        if(this.ticketName == null)
+        {
+            // assume a default of 'alf_ticket' if not specified
+            this.ticketName = "alf_ticket"; 
+        }
+        return this.ticketName;
+    }
+    
     /**
      * Basic HTTP auth
      * 
@@ -145,6 +186,18 @@ public class RemoteClient extends AbstractClient
     {
         this.requestMethod = requestMethod;
     }
+    
+    /**
+     * Allows for default request properties to be set onto this object
+     * These request properties are applied to the connection when
+     * the connection is called.
+     * 
+     * @param requestProperties
+     */
+    public void setDefaultRequestProperties(Map<String, String> requestProperties)
+    {
+        this.defaultRequestProperties = requestProperties;
+    }    
 
     /**
      * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
@@ -210,7 +263,7 @@ public class RemoteClient extends AbstractClient
     public Response call(String uri, boolean buildResponseString, InputStream in)
     {
         Response result;
-        Status status = new Status();
+        ResponseStatus status = new ResponseStatus();
         try
         {
             ByteArrayOutputStream bOut = new ByteArrayOutputStream(BUFFERSIZE);
@@ -242,7 +295,7 @@ public class RemoteClient extends AbstractClient
             // error information already applied to Status object during service() call
             result = new Response(status);
         }
-        
+
         return result;
     }
 
@@ -279,7 +332,7 @@ public class RemoteClient extends AbstractClient
     public Response call(String uri, InputStream in, OutputStream out)
     {
         Response result;
-        Status status = new Status();
+        ResponseStatus status = new ResponseStatus();
         try
         {
             String encoding = service(buildURL(uri), in, out, status);
@@ -294,7 +347,7 @@ public class RemoteClient extends AbstractClient
             // error information already applied to Status object during service() call
             result = new Response(status);
         }
-        
+
         return result;
     }
 
@@ -318,7 +371,7 @@ public class RemoteClient extends AbstractClient
     public Response call(String uri, HttpServletRequest req, HttpServletResponse res)
     {
         Response result;
-        Status status = new Status();
+        ResponseStatus status = new ResponseStatus();
         try
         {
             String encoding = service(
@@ -339,7 +392,7 @@ public class RemoteClient extends AbstractClient
         
         return result;
     }
-
+    
     /**
      * Build the URL object based on the supplied uri and configured endpoint. Ticket
      * will be appiled as an argument if available.
@@ -353,14 +406,14 @@ public class RemoteClient extends AbstractClient
     private URL buildURL(String uri) throws MalformedURLException
     {
         URL url;
-        if (this.ticket == null)
+        if (getTicket() == null)
         {
             url = new URL(endpoint + uri);
         }
         else
         {
             url = new URL(endpoint + uri +
-                    (uri.lastIndexOf('?') == -1 ? ("?alf_ticket="+ticket) : ("&alf_ticket="+ticket)));
+                    (uri.lastIndexOf('?') == -1 ? ("?"+getTicketName()+"="+getTicket()) : ("&"+getTicketName()+"="+getTicket())));
         }
         return url;
     }
@@ -379,7 +432,7 @@ public class RemoteClient extends AbstractClient
      * 
      * @throws IOException
      */
-    private String service(URL url, InputStream in, OutputStream out, Status status)
+    private String service(URL url, InputStream in, OutputStream out, ResponseStatus status)
         throws IOException
     {
         return service(url, in, out, null, null, status);
@@ -401,12 +454,12 @@ public class RemoteClient extends AbstractClient
      * @throws IOException
      */
     private String service(URL url, InputStream in, OutputStream out,
-            HttpServletRequest req, HttpServletResponse res, Status status)
+            HttpServletRequest req, HttpServletResponse res, ResponseStatus status)
         throws IOException
     {
         if (logger.isDebugEnabled())
             logger.debug("Executing " + (in == null ?
-                    "(" + (requestMethod != null ? requestMethod : "GET") + ")" : "(POST)") + ' ' + url.toString());
+                    "(" + (requestMethod != null ? requestMethod : "GET") + ")" : "(POST)") + ' ' + url.toString());    
         
         HttpURLConnection connection = null;
         try
@@ -425,8 +478,21 @@ public class RemoteClient extends AbstractClient
                         connection.setRequestProperty(key, req.getHeader(key));
                     }
                 }
-            }
+            }            
             
+            // default request properties
+            // allows for the assignment of specific header properties
+            if(this.defaultRequestProperties != null && this.defaultRequestProperties.size() > 0)
+            {
+                Iterator it = this.defaultRequestProperties.keySet().iterator();
+                while(it.hasNext())
+                {
+                    String headerName = (String) it.next();
+                    String headerValue = (String) this.defaultRequestProperties.get(headerName);
+                    connection.addRequestProperty(headerName, headerValue);
+                }
+            }
+                        
             // HTTP basic auth support
             if (this.username != null && this.password != null)
             {
@@ -454,9 +520,9 @@ public class RemoteClient extends AbstractClient
             
             // prepare to write the connection result to the output stream
             // at this point - if the remote server returned an error status code
-            // this call will trigger an IOException which is handled below
-            boolean caughtError = false;
-            String errorMessage = null;
+            // this call will trigger an IOException which is handled below            
+            boolean caughtError = false;            
+            String errorMessage = null;            
             InputStream input;
             try
             {
@@ -469,27 +535,32 @@ public class RemoteClient extends AbstractClient
                 status.setException(ioErr);
                 status.setMessage(ioErr.getMessage());
                 errorMessage = ioErr.getMessage();
-                
+                                
                 // now use the error response stream instead - if there is one
                 input = connection.getErrorStream();
-                caughtError = true;
+                caughtError = true;                
             }
             
-            // proxy over any headers we get from the proxied response stream to actual response
-            if (res != null)
+            // walk over headers that are returned from the connection
+            // if we have a servlet response, proxy the headers back to the response
+            // otherwise, store headers on status
+            Map<String, List<String>> headers = connection.getHeaderFields();
+            for (String key : headers.keySet())
             {
-                Map<String, List<String>> headers = connection.getHeaderFields();
-                for (String key : headers.keySet())
+                // NOTE: Tomcat does not appear to be obeying the servlet spec here.
+                //       If you setHeader() it is supposed to clear existing values - i.e. not add
+                //       additional values to existing headers - but for Server and Transfer-Encoding if
+                //       you set them, you get two values in the response...
+                // it's strange, but in addition the key can be null...!
+                if (key != null && key.equals("Server") == false && key.equals("Transfer-Encoding") == false)
                 {
-                    // NOTE: Tomcat does not appear to be obeying the servlet spec here.
-                    //       If you setHeader() it is supposed to clear existing values - i.e. not add
-                    //       additional values to existing headers - but for Server and Transfer-Encoding if
-                    //       you set them, you get two values in the response...
-                    // it's strange, but in addition the key can be null...!
-                    if (key != null && key.equals("Server") == false && key.equals("Transfer-Encoding") == false)
+                    if(res != null)
                     {
                         res.setHeader(key, connection.getHeaderField(key));
                     }
+                    
+                    // store headers back onto status
+                    status.setHeader(key, connection.getHeaderField(key));
                 }
             }
             
@@ -508,8 +579,8 @@ public class RemoteClient extends AbstractClient
                             read = input.read(buffer);
                         }
                     }
-                    finally
-                    {
+        		    finally
+        		    {
                         try
                         {
                             if (input != null)
@@ -557,8 +628,9 @@ public class RemoteClient extends AbstractClient
                 {
                     res.sendError(connection.getResponseCode(), errorMessage);
                 }
-            }
+            }            
             
+            // if we get here call was successful
             return encoding;
         }
         catch (ConnectException conErr)
@@ -570,9 +642,9 @@ public class RemoteClient extends AbstractClient
             if (res != null)
             {
                 res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, conErr.getMessage());
-            }
+            }            
             
             throw conErr;
         }
-    }
+    }    
 }

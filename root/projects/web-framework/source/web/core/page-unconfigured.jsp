@@ -7,8 +7,7 @@
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
 
-	Page currentPage = context.getCurrentPage();
-	String pageName = currentPage.getTitle();
+	Page currentPage = context.getPage();
 	
 	String backgroundImageUrl = "/images/logo/AlfrescoFadedBG.png";
 	backgroundImageUrl = URLUtil.browser(context, backgroundImageUrl);
@@ -25,9 +24,9 @@
 		<td valign="center" align="middle">
 			This is an unconfigured page.
 			<br/><br/>
-			<b><%=context.getCurrentPage().getName()%></b>
+			<b><%=context.getPage().getTitle()%></b>
 			<br/>
-			(<%=context.getCurrentPage().getId()%>)
+			(<%=context.getPage().getId()%>)
 			<br/><br/>
 			Please check the page configuration.
 			<br/><br/>

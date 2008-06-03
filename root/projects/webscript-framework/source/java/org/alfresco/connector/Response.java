@@ -28,8 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
-import org.alfresco.web.scripts.Status;
-
 /**
  * Representation of the response from a remote HTTP API call.
  * 
@@ -39,7 +37,7 @@ public class Response
 {
     private String data;
     private InputStream is;
-    private Status status;
+    private ResponseStatus status;
     private String encoding = null;
 
     /**
@@ -47,7 +45,7 @@ public class Response
      * 
      * @param status the status
      */
-    Response(Status status)
+    Response(ResponseStatus status)
     {
         this.status = status;
     }
@@ -58,7 +56,7 @@ public class Response
      * @param data the data
      * @param status the status
      */
-    Response(String data, Status status)
+    Response(String data, ResponseStatus status)
     {
         this.data = data;
         this.status = status;
@@ -70,7 +68,7 @@ public class Response
      * @param is the is
      * @param status the status
      */
-    Response(InputStream is, Status status)
+    Response(InputStream is, ResponseStatus status)
     {
         this.is = is;
         this.status = status;
@@ -121,9 +119,9 @@ public class Response
      * Gets the status.
      * 
      * @return Status object representing the response status and any error
-     *         information {@link Status}
+     *         information
      */
-    public Status getStatus()
+    public ResponseStatus getStatus()
     {
         return this.status;
     }

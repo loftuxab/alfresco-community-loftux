@@ -1,39 +1,53 @@
 /*
  * Copyright (C) 2005-2008 Alfresco Software Limited.
- * 
- * This program is free software; you can redistribute it and/or modify it under
- * the terms of the GNU General Public License as published by the Free Software
- * Foundation; either version 2 of the License, or (at your option) any later
- * version.
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
- * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
- * details.
- * 
- * You should have received a copy of the GNU General Public License along with
- * this program; if not, write to the Free Software Foundation, Inc., 51
- * Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
- * 
- * As a special exception to the terms and conditions of version 2.0 of the GPL,
- * you may redistribute this Program in connection with Free/Libre and Open
- * Source Software ("FLOSS") applications as described in Alfresco's FLOSS
- * exception. You should have recieved a copy of the text describing the FLOSS
- * exception, and it is also available here:
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
 package org.alfresco.connector;
 
-import java.util.Map;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-import org.alfresco.connector.exception.AuthenticationException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
- * Describes a connector to a remote endpoint.
+ * Describes a connector to a remote endpoint for a given user.
  * 
- * A connector is scoped to a given user. When a connector is constructed, it
- * obtains access to a given user's credentials. Thus, all subsequent connector
- * activity is processed in the context of that user.
+ * All connectors are scoped to a particular user and a particular
+ * endpoint.  As such, their endpoints and user bindings cannot
+ * be swapped once they are created.  Rather, you should create
+ * new connectors for new users and new endpoints.
+ * 
+ * A connector is scoped to a given user and a given endpoint.
+ * 
+ * All calls using a connector will be stamped with a user's
+ * connector credentials.  These connector credentials usually consist
+ * of things like cookies, tokens, additional request parameters and
+ * other HTTP request state.
+ * 
+ * The caller does not have to pass this data manually.  It is managed
+ * for the developer by the underlying ConnectorService during the
+ * factory construction of Connector objects.
  * 
  * If a connector is constructed without user information, then it is scoped to
  * a null user. No credential information is passed through and the connections
@@ -44,7 +58,10 @@ import org.alfresco.connector.exception.AuthenticationException;
 public interface Connector
 {
     /**
-     * Invokes a URI on the endpoint.
+     * Invokes a URI on a remote service.
+     * 
+     * The response data is buffered into a data element on the returned
+     * object of type Response.
      * 
      * @param uri the uri
      * 
@@ -53,82 +70,66 @@ public interface Connector
     public Response call(String uri);
 
     /**
-     * Invokes a URI on the endpoint and passes in the provided parameters as
-     * GET request parameters.
+     * Invokes a URI on a remote service.
+     * If the context is null, then it will not be utilized.
+     * 
+     * The response data is buffered into a data element on the returned
+     * object of type Response.
      * 
      * @param uri the uri
-     * @param parameters the parameters
+     * @param context the context of the invoke
      * 
      * @return the response
      */
-    public Response call(String uri, Map parameters);
+    public Response call(String uri, ConnectorContext context);
 
     /**
-     * Invokes a URI on the endpoint and passes in the provided parameters as
-     * GET request parameters. The provided headers are plugged into the
-     * request.
+     * Invokes a URI on a remote service.  Data is streamed back from the
+     * response into the provided output stream.  Headers and response state
+     * is maintained on the Response object.
+     * 
+     * If the context is null, then it will not be utilized.
+     * 
+     * The response data is not buffered
      * 
      * @param uri the uri
-     * @param parameters the parameters
-     * @param headers the headers
+     * @param context the context of the invoke
+     * @param in the input stream
+     * @param out the output stream
      * 
      * @return the response
-     */
-    public Response call(String uri, Map parameters, Map headers);
+     */    
+    public Response call(String uri, ConnectorContext context, InputStream in, OutputStream out);
 
     /**
-     * Method to be called by the connector in the event that the client returns
-     * an authentication problem.
+     * Invokes a URI on a remote service and streams back results to the
+     * provided response object.  This method makes sure that the full
+     * response is propagated into the servlet response, including headers,
+     * exception states and more.
      * 
-     * Connectors will generally follow one of the following patterns:
+     * If the context is null, then it will not be utilized.
      * 
-     * 1) They will always pass authentication information (as is the case in
-     * the basic authentication schema)
+     * The response data is not buffered.
      * 
-     * 2) They will wait to be challenged and then respond with the correct
-     * authentication information (retrieving the endpoint credential for
-     * subsequent use)
-     * 
-     * 3) They will receive an "unauthorized response" and then have to go
-     * through an authentication call to retrieve an authentication token which
-     * should then be passed into a reattempt of the original call.
-     * 
-     * The latter is akin to how Alfresco handles its authentication via Web
-     * Scripts.
-     * 
-     * This method provides a means for implemented the separate authentication
-     * call for #3.
-     * 
-     * @return true, if authenticate
+     * @param uri
+     * @param context
+     * @param req
+     * @param res
+     * @return
      */
-    public boolean authenticate() throws AuthenticationException;
+    public Response call(String uri, ConnectorContext context, HttpServletRequest req, HttpServletResponse res);
 
     /**
-     * Returns the id of the authentication scheme currently configured for this
-     * connector.
-     * 
-     * @return the authenticator
-     */
-    public Authenticator getAuthenticator();
-
-    /**
-     * Sets the authenticator.
-     * 
-     * @param authenticator the new authenticator
-     */
-    public void setAuthenticator(Authenticator authenticator);
-
-    /**
-     * Binds Credentials to this connector
+     * Binds Credentials to this connector.
      * 
      * @param credentials the new credentials
      */
     public void setCredentials(Credentials credentials);
 
     /**
-     * Returns the cre
+     * Returns the credents for this connector.
      * 
-     * @return
+     * @return the credentials
      */
     public Credentials getCredentials();
 
@@ -140,9 +141,23 @@ public interface Connector
     public void setEndpoint(String endpoint);
 
     /**
-     * Gets the client.
+     * Returns the endpoint to which this connector connects.
      * 
-     * @return the client
+     * @return endpoint the endpoint
      */
-    public Client getClient();
+    public String getEndpoint();
+    
+    /**
+     * Sets the connector session
+     * 
+     * @param connectorSession
+     */
+    public void setConnectorSession(ConnectorSession connectorSession);
+    
+    /**
+     * Returns the connector session
+     * 
+     * @return
+     */
+    public ConnectorSession getConnectorSession();    
 }

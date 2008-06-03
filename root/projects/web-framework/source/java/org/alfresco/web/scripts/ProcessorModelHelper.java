@@ -274,5 +274,5 @@ public final class ProcessorModelHelper
     {
         GenericFreemarkerTagDirective directive = new GenericFreemarkerTagDirective(context, name, className);
         model.put(name, directive);
-    }
+    }    
 }

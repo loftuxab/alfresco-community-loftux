@@ -63,7 +63,7 @@ public abstract class ScriptBase implements Serializable
      * 
      * @return the request context
      */
-    protected RequestContext getRequestContext()
+    public RequestContext getRequestContext()
     {
         return context;
     }

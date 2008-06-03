@@ -22,61 +22,52 @@
  * exception, and it is also available here:
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.connector;
+package org.alfresco.web.scripts;
+
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.Response;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
- * Interface that describes the credentials for a given service 
- * or user.
+ * Describes a connector to a remote endpoint.
+ * 
+ * This is a wrapper around the true connector object and it provides
+ * Script-style interfaces for working with buffered response strings
+ * and the like.
  * 
  * @author muzquiano
  */
-public interface Credentials
+public class ScriptRemoteConnector
 {
-    public final static String CREDENTIAL_USERNAME = "cleartextUsername";
-    public final static String CREDENTIAL_PASSWORD = "cleartextPassword";
-
-    /**
-     * Gets the endpoint id.
-     * 
-     * @return the endpoint id
-     */
-    public String getEndpointId();
-
-    /**
-     * Gets a given property
-     * 
-     * @param key the key
-     * 
-     * @return the property
-     */
-    public Object getProperty(String key);
-
-    /**
-     * Sets a given property
-     * 
-     * @param key the key
-     * @param value the value
-     */
-    public void setProperty(String key, Object value);
-
-    /**
-     * Removes a given property
-     * 
-     * @param key
-     */
-    public void removeProperty(String key);
+    private static final Log logger = LogFactory.getLog(ScriptRemote.class);
+    
+    protected Connector connector = null;
+    
+    public ScriptRemoteConnector(Connector connector)
+    {
+        this.connector = connector;
+    }
     
     /**
-     * Removes all properties
+     * Invokes a URI on the endpoint.
      * 
-     * @param key
+     * @param uri the uri
+     * 
+     * @return the response
      */
-    public void removeAllProperties(String key);
+    public Response call(String uri)
+    {
+        return this.connector.call(uri);
+    } 
     
     /**
-     * Returns the property keys
+     * Returns the endpoint string
      * 
-     * @return array of property keys
+     * @return endpoint
      */
-    public String[] getPropertyKeys();
+    public String getEndpoint()
+    {
+        return this.connector.getEndpoint();
+    }
 }

@@ -45,6 +45,7 @@ import org.alfresco.web.site.model.Component;
 import org.alfresco.web.site.model.Configuration;
 import org.alfresco.web.site.model.Page;
 import org.alfresco.web.site.model.TemplateInstance;
+import org.alfresco.web.site.model.Theme;
 import org.alfresco.web.site.renderer.Renderable;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.alfresco.web.site.renderer.RendererContextHelper;
@@ -53,10 +54,10 @@ import org.alfresco.web.site.renderer.RendererFactory;
 
 /**
  * @author muzquiano
- * @author kevinr
  */
 public final class RenderUtil
 {
+    private static final String THEME = "theme";
     public static final String PASSIVE_MODE_MARKER = "passiveMode";
     private static final String NEWLINE = "\r\n";
 
@@ -225,13 +226,13 @@ public final class RenderUtil
                 // Output to a dummy writer as we don't want to keep the result.
                 WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
                 FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(true);
-                
+
                 // bind the rendering to this template
                 RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
-                
+
                 // set the context into "passive" mode
                 context.setValue(PASSIVE_MODE_MARKER, Boolean.TRUE);
-                
+
                 // get the renderer and execute it
                 Renderable renderer = RendererFactory.newRenderer(context, template);
                 renderer.execute(rendererContext);
@@ -254,13 +255,13 @@ public final class RenderUtil
                     Timer.stop(request, "PreRenderTemplate-" + templateId);
             }
         }
-        
+
         // Second pass - render and process to output stream
         try
         {
             // bind the rendering to this template
             RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
-            
+
             // get the renderer and execute it
             Renderable renderer = RendererFactory.newRenderer(context, template);
             renderer.execute(rendererContext);
@@ -342,25 +343,42 @@ public final class RenderUtil
             // determine the region renderer
             RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);
 
+            // determine the component to render
+            Component component = null;
+
             // render in either one of two ways
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
             Component[] components = ModelUtil.findComponents(context, regionScopeId, regionSourceId, regionId, null);
-            if (components.length != 0)
+            if(components.length != 0)
             {
-                // if we are in passive mode, then we won't bother to executethe renderer.
-                // rather, we will notify the template that this componentis bound to it
+                component = components[0];
+            }
+            if(component == null || THEME.equals(regionScopeId))
+            {
+                // check to see whether the current theme specifies a default component for this region id
+                Theme theme = ThemeUtil.getCurrentTheme(context);
+                if(theme != null)
+                {
+                    component = theme.getDefaultComponent(context, regionId);
+                }
+
+            }
+            if(component != null)
+            {
+                // if we are in passive mode, then we won't bother to execute the renderer.
+                // rather, we will notify the template that this component is bound to it
                 boolean passiveMode = context.hasValue(PASSIVE_MODE_MARKER);
                 if (passiveMode)
                 {
                     // we don't render the component, we just inform the current
                     // template what our component is
-                    template.setRenderingComponent(components[0]);
+                    template.setRenderingComponent(component);
                 }
                 else
                 {
                     // merge in component to render data
-                    RendererContext compRenderData = RendererContextHelper.generate(context, components[0]);
+                    RendererContext compRenderData = RendererContextHelper.generate(context, component);
                     rendererContext.putAll(compRenderData);
 
                     // execute renderer

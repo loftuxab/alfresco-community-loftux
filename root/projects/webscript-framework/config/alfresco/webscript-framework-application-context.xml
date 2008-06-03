@@ -245,6 +245,15 @@
    <bean id="facebook.service" class="org.alfresco.web.scripts.facebook.FacebookService">
       <property name="container" ref="webscripts.container" />
    </bean>
+   
+   
+   <!--                   -->
+   <!-- Connector Service -->
+   <!--                   -->
+   <bean id="connector.service" class="org.alfresco.connector.ConnectorService">
+      <property name="configService" ref="web.config" />
+   </bean>
+   
 
 
    <!--                             -->
