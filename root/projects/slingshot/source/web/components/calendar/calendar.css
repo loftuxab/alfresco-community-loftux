@@ -114,6 +114,10 @@ div.boxOutline {
 	vertical-align: baseline;	
 }
 
+#calendar-view {
+	visibility: hidden;
+}
+
 /* Styles calendar dashlet */
 .yui-skin-sam .yui-calendar td.event { background-color:#999; }
 

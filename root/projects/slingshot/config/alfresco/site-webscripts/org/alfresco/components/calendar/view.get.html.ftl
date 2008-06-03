@@ -14,6 +14,7 @@
   <li class="selected"><a href="#month"><em>Month</em></a></li>
   <li><a href="#agenda"><em>Agenda</em></a></li>
 </ul>
+
 <div class="yui-content" style="background: #FFFFFF;">
 	<div id="#day">
 	 <div style="text-align:center">
@@ -24,19 +25,27 @@
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
 			<tr><td align="center" style="font-weight: bold;">17 May 2008</td></tr>
 		</table>
+		<br />
 		<table id="day-view" cellspacing="0" cellpadding="2" border="1" width="100%">
-		<#assign counter=0>
-		<#list timeLabels as time>
-			<#if counter % 2 == 0>
-				<tr class="even">
-			<#else>
-				<tr class="odd">
-			</#if>
-			<td class="label">${time}</td>
-			<td></td>
-			</tr>
-			<#assign counter = counter + 1>
-		</#list>
+			<#list 0..23 as i>
+				<#assign time = i?string>
+				<#if i < 10>
+					<#assign time = "0" + time>
+				</#if>
+				<#if i % 2 == 0>
+					<#assign class="even">
+				<#else>
+					<#assign class="odd">
+				</#if>
+				<tr class="${class}">	
+				<td class="label">${time}:00</td>
+				<td></td>
+				</tr>
+				<tr class="<#if class == "even">odd<#else>even</#if>">
+					<td class="label">${time}:30</td>
+					<td></td>
+				</tr>	
+			</#list>
 		</table>
 	</div>
 	<div id="#week">
@@ -56,19 +65,29 @@
 			<th align="center" valign="top"><a href="#">${header?string("E M/d")}</a></th>
 		</#list>
 		</tr>
-		<#assign counter=0>
-		<#list timeLabels as time>
-			<#if counter % 2 == 0>
-				<tr class="even">
-			<#else>
-				<tr class="odd">
-			</#if>
-			<td class="label">${time}</td>
+		<#assign cells>
 			<#list 1..7 as day>
 				<td></td>
-			</#list>	
+			</#list>
+		</#assign>
+		<#list 0..23 as i>
+			<#assign time = i?string>
+			<#if i < 10>
+				<#assign time = "0" + time>
+			</#if>
+			<#if i % 2 == 0>
+				<#assign class="even">
+			<#else>
+				<#assign class="odd">
+			</#if>
+			<tr class="${class}">	
+			<td class="label">${time}:00</td>
+			${cells}
 			</tr>
-			<#assign counter = counter + 1>
+			<tr class="<#if class == "even">odd<#else>even</#if>">
+				<td class="label">${time}:30</td>
+				${cells}
+			</tr>	
 		</#list>
 		</table>
 	</div>
