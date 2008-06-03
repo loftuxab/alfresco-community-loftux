@@ -26,9 +26,9 @@ package org.alfresco.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.List;
 
+import org.alfresco.util.StringBuilderWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -271,7 +271,7 @@ public class XMLUtil
             OutputFormat format = OutputFormat.createPrettyPrint();
             format.setSuppressDeclaration(false);
 
-            StringWriter writer = new StringWriter();
+            StringBuilderWriter writer = new StringBuilderWriter(256);
             XMLWriter xmlWriter = new XMLWriter(writer, format);
             try
             {

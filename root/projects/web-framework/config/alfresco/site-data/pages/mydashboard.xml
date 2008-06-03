@@ -4,5 +4,5 @@
    <title>The test dashboard page</title>
    <description>Test of a 2 column dashboard page template</description>
    <template-instance>dashboard-2column</template-instance>
-   <authentication>user</authentication>
+   <authentication>none</authentication>
 </page>

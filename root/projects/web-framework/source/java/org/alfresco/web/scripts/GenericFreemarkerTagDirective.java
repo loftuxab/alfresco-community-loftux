@@ -25,7 +25,6 @@
 package org.alfresco.web.scripts;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import javax.servlet.jsp.tagext.BodyTagSupport;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.alfresco.util.ReflectionHelper;
+import org.alfresco.util.StringBuilderWriter;
 import org.alfresco.web.site.RequestContext;
 
 import freemarker.core.Environment;
@@ -125,7 +125,7 @@ public class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
             if (tag instanceof BodyTagSupport)
             {
                 // dump out the Freemarker body content
-                StringWriter bodyStringWriter = new StringWriter();
+                StringBuilderWriter bodyStringWriter = new StringBuilderWriter(256);
                 body.render(bodyStringWriter);
                 bodyContentString = bodyStringWriter.toString();
             }
