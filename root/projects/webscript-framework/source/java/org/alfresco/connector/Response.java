@@ -74,12 +74,12 @@ public class Response
         this.status = status;
     }
 
-    /* package *//**
-                 * Sets the encoding.
-                 * 
-                 * @param encoding the new encoding
-                 */
-    void setEncoding(String encoding)
+    /**
+     * Sets the encoding.
+     * 
+     * @param encoding the new encoding
+     */
+    /*package*/ void setEncoding(String encoding)
     {
         this.encoding = encoding;
     }
@@ -98,8 +98,7 @@ public class Response
     /**
      * Gets the response stream.
      * 
-     * @return the response InputStream if set during construction, else will be
-     *         null.
+     * @return the response InputStream if set during construction, else will be null.
      */
     public InputStream getResponseStream()
     {
@@ -118,8 +117,7 @@ public class Response
     /**
      * Gets the status.
      * 
-     * @return Status object representing the response status and any error
-     *         information
+     * @return Status object representing the response status and any error information
      */
     public ResponseStatus getStatus()
     {

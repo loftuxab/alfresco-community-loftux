@@ -47,9 +47,15 @@ public class TestRemoteClient extends TestCase
    {
       RemoteClient remote = new RemoteClient("http://localhost:8080/alfresco/s");
       
+      // test simple GET
       Response res = remote.call("/index");
       assertEquals(200, res.getStatus().getCode());
       assertTrue(res.getResponse().length()!= 0);
+      
+      // test POST with simple string body
+      String filename = Long.toString((new Random().nextLong())) + ".txt";
+      res = remote.call("/remotestore/create/" + filename, TEST_CONTENT1);
+      assertEquals(200, res.getStatus().getCode());
    }
    
    public void testRemoteStore()

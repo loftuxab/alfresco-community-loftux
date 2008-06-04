@@ -24,8 +24,14 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
+
 import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorContext;
+import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,12 +43,14 @@ import org.apache.commons.logging.LogFactory;
  * and the like.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class ScriptRemoteConnector
 {
     private static final Log logger = LogFactory.getLog(ScriptRemote.class);
     
-    protected Connector connector = null;
+    private Connector connector = null;
+    
     
     public ScriptRemoteConnector(Connector connector)
     {
@@ -54,12 +62,82 @@ public class ScriptRemoteConnector
      * 
      * @param uri the uri
      * 
-     * @return the response
+     * @return Response object from the call {@link Response}
      */
     public Response call(String uri)
     {
         return this.connector.call(uri);
-    } 
+    }
+    
+    /**
+     * Invokes a GET request URI on the endpoint.
+     * 
+     * @param uri the uri
+     * 
+     * @return Response object from the call {@link Response}
+     */
+    public Response get(String uri)
+    {
+        return call(uri);
+    }
+    
+    /**
+     * Invokes a URI on a remote service, passing the supplied body as a POST request.
+     * 
+     * @param uri    Uri to call on the endpoint
+     * @param body   Body of the POST request.
+     * 
+     * @return Response object from the call {@link Response}
+     */
+    public Response post(String uri, String body)
+    {
+        ConnectorContext context = new ConnectorContext();
+        context.setMethod(HttpMethod.POST);
+        try
+        {
+            return this.connector.call(uri, context, new ByteArrayInputStream(body.getBytes("UTF-8")));
+        }
+        catch (UnsupportedEncodingException err)
+        {
+            throw new AlfrescoRuntimeException("Unsupported encoding.", err);
+        }
+    }
+    
+    /**
+     * Invokes a URI on a remote service, passing the supplied body as a PUT request.
+     * 
+     * @param uri    Uri to call on the endpoint
+     * @param body   Body of the PUT request.
+     * 
+     * @return Response object from the call {@link Response}
+     */
+    public Response put(String uri, String body)
+    {
+        ConnectorContext context = new ConnectorContext();
+        context.setMethod(HttpMethod.PUT);
+        try
+        {
+            return this.connector.call(uri, context, new ByteArrayInputStream(body.getBytes("UTF-8")));
+        }
+        catch (UnsupportedEncodingException err)
+        {
+            throw new AlfrescoRuntimeException("Unsupported encoding.", err);
+        }
+    }
+    
+    /**
+     * Invokes a URI on a remote service as DELETE request.
+     * 
+     * @param uri    Uri to call on the endpoint
+     * 
+     * @return Response object from the call {@link Response}
+     */
+    public Response delete(String uri)
+    {
+        ConnectorContext context = new ConnectorContext();
+        context.setMethod(HttpMethod.DELETE);
+        return this.connector.call(uri, context);
+    }
     
     /**
      * Returns the endpoint string

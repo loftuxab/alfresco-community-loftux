@@ -36,6 +36,7 @@ import org.alfresco.config.ConfigService;
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorContext;
 import org.alfresco.connector.ConnectorService;
+import org.alfresco.connector.HttpMethod;
 import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.RemoteConfigElement;
@@ -68,7 +69,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  * 
  * /proxy/alf1/api/sites?name=mysite&desc=description
  * 
- * The proxy currently supports HTTP methods of GET and POST.
+ * The proxy currently supports all valid HTTP methods.
  * 
  * @author kevinr
  */
@@ -112,7 +113,7 @@ public class EndPointProxyServlet extends HttpServlet
         
         // rebuild rest of the URL for the proxy request
         StringBuilder buf = new StringBuilder(64);
-        if(t.hasMoreTokens())
+        if (t.hasMoreTokens())
         {
             do
             {
@@ -123,8 +124,7 @@ public class EndPointProxyServlet extends HttpServlet
         else
         {
             // allow for an empty uri to be passed in
-            // this could therefore refer to the root of a service
-            // i.e. /webapp/axis
+            // this could therefore refer to the root of a service i.e. /webapp/axis
             buf.append('/');
         }
         
@@ -137,41 +137,39 @@ public class EndPointProxyServlet extends HttpServlet
                 // throw an exception if endpoint ID is does not exist or invalid
                 throw new AlfrescoRuntimeException("Invalid EndPoint Id: " + endpointId);
             }
-
+            
             // userid from session
             // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?            
             String userId = (String)req.getSession().getAttribute("USER_ID");
             
             // build a connector
             Connector connector = this.connectorService.getConnector(endpointId, userId, req.getSession());
-
-            // build a lightweight connector context
-            // this stores information about how we will drive the remote client
+            
+            // build a connector context, stores information about how we will drive the remote client
             ConnectorContext context = new ConnectorContext();
             context.setContentType(req.getContentType());
-            context.setMethod(req.getMethod());
-                        
+            context.setMethod(HttpMethod.valueOf(req.getMethod().toUpperCase()));
+            
             // build proxy URL referencing the endpoint
             String q = req.getQueryString();
             String url = buf.toString() + (q != null && q.length() != 0 ? "?" + q : "");
             
-            // debug output
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
             {
                 logger.debug("EndPointProxyServlet preparing to proxy");
                 logger.debug(" - endpointId: " + endpointId);
                 logger.debug(" - userId: " + userId);
                 logger.debug(" - connector: " + connector);
+                logger.debug(" - method: " + context.getMethod());
                 logger.debug(" - url: " + url);
             }
             
-            // call through
+            // call through using our connector to proxy
             Response response = connector.call(url, context, req, res);
-
-            // debug output
-            if(logger.isDebugEnabled())
+            
+            if (logger.isDebugEnabled())
             {
-                logger.debug("EndPointProxyServlet returned code: " + response.getStatus().getCode());
+                logger.debug("Return code: " + response.getStatus().getCode());
             }
         }
         catch (Throwable err)

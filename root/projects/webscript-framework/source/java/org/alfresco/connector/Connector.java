@@ -84,6 +84,24 @@ public interface Connector
     public Response call(String uri, ConnectorContext context);
 
     /**
+     * Invokes a URI on a remote service, passing the input as supplied via
+     * a POST/PUT.
+     * 
+     * If the context is null, then it will not be utilized and POST will
+     * be assumed.
+     * 
+     * The response data is buffered into a data element on the returned
+     * object of type Response.
+     * 
+     * @param uri the uri
+     * @param context the context of the invoke
+     * @param in the input stream
+     * 
+     * @return the response
+     */    
+    public Response call(String uri, ConnectorContext context, InputStream in);
+    
+    /**
      * Invokes a URI on a remote service.  Data is streamed back from the
      * response into the provided output stream.  Headers and response state
      * is maintained on the Response object.
@@ -111,11 +129,12 @@ public interface Connector
      * 
      * The response data is not buffered.
      * 
-     * @param uri
-     * @param context
-     * @param req
-     * @param res
-     * @return
+     * @param uri the uri
+     * @param context the context of the invoke
+     * @param req Request to proxy from
+     * @param res Response to proxy onto
+     * 
+     * @return the response
      */
     public Response call(String uri, ConnectorContext context, HttpServletRequest req, HttpServletResponse res);
 
@@ -157,7 +176,7 @@ public interface Connector
     /**
      * Returns the connector session
      * 
-     * @return
+     * @return the connector session
      */
     public ConnectorSession getConnectorSession();    
 }

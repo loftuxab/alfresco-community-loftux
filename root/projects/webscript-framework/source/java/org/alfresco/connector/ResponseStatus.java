@@ -39,13 +39,7 @@ import org.alfresco.web.scripts.Status;
  */
 public class ResponseStatus extends Status
 {
-    protected Map<String, String> headers = new HashMap<String, String>(16, 1.0f);
-    
-    @Override
-    public String toString()
-    {
-        return Integer.toString(getCode());
-    }
+    private Map<String, String> headers = new HashMap<String, String>(16, 1.0f);
     
     /**
      * Allows for response headers to be stored onto the status

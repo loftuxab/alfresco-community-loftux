@@ -43,6 +43,7 @@ import org.apache.commons.logging.LogFactory;
  * authentication.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class HttpConnector extends AbstractConnector
 {
@@ -59,28 +60,10 @@ public class HttpConnector extends AbstractConnector
         super(descriptor, endpoint);
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.AbstractConnector#call(java.lang.String, org.alfresco.connector.ConnectorContext)
-     */
+
     public Response call(String uri, ConnectorContext context)
     {
-        // create a remote client
-        RemoteClient remoteClient = new RemoteClient(getEndpoint());
-
-        // configure the client
-        if(context != null)
-        {
-            remoteClient.setRequestContentType(context.getContentType());
-            remoteClient.setRequestMethod(context.getMethod());
-        }
-        
-        // stamp headers onto the remote client
-        applyRequestHeaders(remoteClient, context);
-        
-        // TODO: copy parameters
-        
-        // stamp credentials onto the remote client
-        applyRequestAuthentication(remoteClient, context);
+        RemoteClient remoteClient = initRemoteClient(context);
                 
         // call client and process response
         Response response = remoteClient.call(uri);
@@ -89,29 +72,21 @@ public class HttpConnector extends AbstractConnector
         return response;        
     }
 
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.AbstractConnector#call(java.lang.String, org.alfresco.connector.ConnectorContext, java.io.InputStream, java.io.OutputStream)
-     */
+    public Response call(String uri, ConnectorContext context, InputStream in)
+    {
+        RemoteClient remoteClient = initRemoteClient(context);
+        
+        // call client and process response
+        Response response = remoteClient.call(uri, in);
+        processResponse(response);
+        
+        return response;
+    }
+
     public Response call(String uri, ConnectorContext context, InputStream in, OutputStream out)
     {
-        // create a remote client
-        RemoteClient remoteClient = new RemoteClient(getEndpoint());
-
-        // configure the client
-        if(context != null)
-        {
-            remoteClient.setRequestContentType(context.getContentType());
-            remoteClient.setRequestMethod(context.getMethod());
-        }
+        RemoteClient remoteClient = initRemoteClient(context);
         
-        // stamp headers onto the remote client
-        applyRequestHeaders(remoteClient, context);
-        
-        // TODO: copy parameters
-        
-        // stamp credentials onto the remote client
-        applyRequestAuthentication(remoteClient, context);
-                
         // call client and process response
         Response response = remoteClient.call(uri, in, out);
         processResponse(response);
@@ -121,23 +96,7 @@ public class HttpConnector extends AbstractConnector
     
     public Response call(String uri, ConnectorContext context, HttpServletRequest req, HttpServletResponse res)
     {
-        // create a remote client
-        RemoteClient remoteClient = new RemoteClient(getEndpoint());
-
-        // configure the client
-        if(context != null)
-        {
-            remoteClient.setRequestContentType(context.getContentType());
-            remoteClient.setRequestMethod(context.getMethod());
-        }
-        
-        // stamp headers onto the remote client
-        applyRequestHeaders(remoteClient, context);
-        
-        // TODO: copy parameters
-        
-        // stamp credentials onto the remote client
-        applyRequestAuthentication(remoteClient, context);
+        RemoteClient remoteClient = initRemoteClient(context);
                 
         // call client and process response
         Response response = remoteClient.call(uri, req, res);
@@ -152,30 +111,29 @@ public class HttpConnector extends AbstractConnector
      * @param remoteClient
      * @param context
      */
-    protected void applyRequestHeaders(RemoteClient remoteClient, ConnectorContext context)
+    private void applyRequestHeaders(RemoteClient remoteClient, ConnectorContext context)
     {
         // get the headers
-        Map<String, String> headers = new HashMap<String, String>(48, 1.0f);
-        if(context != null)
+        Map<String, String> headers = new HashMap<String, String>(8, 1.0f);
+        if (context != null)
         {
             headers.putAll(context.getHeaders());
         }
 
-        // copy in cookies that have been stored back as part of the
-        // connector session
-        if(getConnectorSession() != null)
+        // copy in cookies that have been stored back as part of the connector session
+        if (getConnectorSession() != null)
         {
             String[] keys = getConnectorSession().getCookieNames();
-            if(keys.length > 0)
+            if (keys.length != 0)
             {
                 StringBuilder builder = new StringBuilder(256);
                 
-                for(int i = 0; i < keys.length; i++)
+                for (int i = 0; i < keys.length; i++)
                 {
-                    String cookieName = (String) keys[i];
-                    String cookieValue = (String) getConnectorSession().getCookie(cookieName);
+                    String cookieName = keys[i];
+                    String cookieValue = getConnectorSession().getCookie(cookieName);
                     
-                    if(builder.length() > 0)
+                    if (builder.length() != 0)
                     {
                         builder.append(";");
                     }
@@ -186,7 +144,7 @@ public class HttpConnector extends AbstractConnector
                 
                 String cookieString = builder.toString();
                 
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("HttpConnector setting cookie header: " + cookieString);
                 
                 headers.put("Cookie", cookieString);
@@ -194,9 +152,9 @@ public class HttpConnector extends AbstractConnector
         }
         
         // stamp all headers onto the remote client
-        if(headers.size() > 0)
+        if (headers.size() != 0)
         {
-            remoteClient.setDefaultRequestProperties(headers);
+            remoteClient.setRequestProperties(headers);
         }
     }
     
@@ -205,7 +163,7 @@ public class HttpConnector extends AbstractConnector
      * 
      * @param remoteClient
      */
-    protected void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
+    private void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
     {
         // TODO: is this necessary?
         // support for basic authentication
@@ -225,35 +183,64 @@ public class HttpConnector extends AbstractConnector
     protected void processResponse(Response response)
     {
         Map<String, String> headers = response.getStatus().getHeaders();
-        Iterator it = headers.keySet().iterator();
-        while(it.hasNext())
+        Iterator<String> it = headers.keySet().iterator();
+        while (it.hasNext())
         {
-            String headerName = (String) it.next();
-            if(headerName.toLowerCase().equals("set-cookie"))
+            String headerName = it.next();
+            if (headerName.toLowerCase().equals("set-cookie"))
             {
-                String headerValue = (String) headers.get(headerName);
+                String headerValue = headers.get(headerName);
                 
                 int z = headerValue.indexOf("=");
-                if(z > -1)
+                if (z != -1)
                 {
-                    String cookieName = (String) headerValue.substring(0,z);
-                    String cookieValue = (String) headerValue.substring(z+1, headerValue.length());
+                    String cookieName = headerValue.substring(0,z);
+                    String cookieValue = headerValue.substring(z+1, headerValue.length());
                     int y = cookieValue.indexOf(";");
-                    if(y > -1)
+                    if (y != -1)
                     {
                         cookieValue = cookieValue.substring(0,y);
                     }
 
                     // store cookie back
-                    if(logger.isDebugEnabled())
+                    if (logger.isDebugEnabled())
                         logger.debug("Connector found set-cookie: " + cookieName + " = " + cookieValue);
                     
-                    if(getConnectorSession() != null)
+                    if (getConnectorSession() != null)
                     {
                         getConnectorSession().setCookie(cookieName, cookieValue);
                     }
                 }
             }
         }
+    }
+    
+    /**
+     * Init the RemoteClient object based on the Connector Context.
+     * Applies Request headers and authentication as required.
+     * 
+     * @return RemoteClient
+     */
+    protected RemoteClient initRemoteClient(ConnectorContext context)
+    {
+        // create a remote client
+        RemoteClient remoteClient = new RemoteClient(getEndpoint());
+        
+        // configure the client
+        if (context != null)
+        {
+            remoteClient.setRequestContentType(context.getContentType());
+            remoteClient.setRequestMethod(context.getMethod());
+        }
+        
+        // stamp headers onto the remote client
+        applyRequestHeaders(remoteClient, context);
+        
+        // TODO: copy parameters
+        
+        // stamp credentials onto the remote client
+        applyRequestAuthentication(remoteClient, context);
+        
+        return remoteClient;
     }
 }
