@@ -110,7 +110,7 @@
 				<#assign id = (row?number * 7) + column>
 				<td width="14%" id="cal_month_t_${id}">
 					<div class="boxOutline">
-						<div id="dh${id}" class="dayLabel"><a href="?${id}">${id}</a></div>
+						<div id="dh${id}" class="dayLabel"></div>
 					</div>
 				</td>
 				</#list>

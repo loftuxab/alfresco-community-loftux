@@ -146,6 +146,7 @@
 			var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
 		
 		 	var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
+			eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
          eventForm.setShowSubmitStateDynamically(true);
          eventForm.setSubmitElements(okButton);
 			eventForm.setAJAXSubmit(true, 
@@ -177,8 +178,18 @@
 				id: "calendarendpicker",
 				container: this.id + "-enddate"											
 			});
-			endButton.on("click", this.onDateSelectButton);									
+			endButton.on("click", this.onDateSelectButton);	
 			
+			// Initialise the start and end dates to today
+			var today = new Date();
+			var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
+			
+			var Dom = YAHOO.util.Dom;
+			
+			Dom.get("fd").value = dateStr;
+			Dom.get("td").value = dateStr;								
+			
+			// Display the panel
          this.panel.show();
       },
 
@@ -217,14 +228,6 @@
 				var Dom = YAHOO.util.Dom;
 				
 				if (args) {
-					date = args[0][0];
-					var selDate = new Date(date[0], (date[1]-1), date[2]);
-				
-					var wStr = oCalendar.cfg.getProperty("WEEKDAYS_LONG")[selDate.getDay()];
-					var dStr = selDate.getDate();
-					var mStr = oCalendar.cfg.getProperty("MONTHS_LONG")[selDate.getMonth()];
-					var yStr = selDate.getFullYear();
-					
 					var prettyId, hiddenId;
 					if (container.indexOf("enddate") > -1)
 					{
@@ -236,9 +239,12 @@
 						prettyId = "fd";
 						hiddenId = "from"
 					}
-
-					Dom.get(prettyId).value = (wStr + ", " + dStr + " " + mStr + " " + yStr);
-					Dom.get(hiddenId).value = (yStr + "/" + (selDate.getMonth()+1) + "/"+ dStr);
+					
+					date = args[0][0];
+					var selectedDate = new Date(date[0], (date[1]-1), date[2]);
+					
+					Dom.get(prettyId).value = Alfresco.util.formatDate(selectedDate, "dddd, d mmmm yyyy");
+					Dom.get(hiddenId).value = Alfresco.util.formatDate(selectedDate, "yyyy/mm/d");
 				}
 			
 				oCalendarMenu.hide();
