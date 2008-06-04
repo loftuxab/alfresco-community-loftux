@@ -214,7 +214,13 @@ public class FrameworkHelper
         throws RemoteConfigException
     {
         HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
-        return getConnectorService().getConnector(endpointId, context.getUserId(), httpSession);
+        return getConnector(httpSession, context.getUserId(), endpointId);
+    }
+    
+    public static Connector getConnector(HttpSession httpSession, String userId, String endpointId)
+        throws RemoteConfigException
+    {
+        return getConnectorService().getConnector(endpointId, userId, httpSession);
     }
     
     public static synchronized UserFactory getUserFactory()
@@ -269,21 +275,15 @@ public class FrameworkHelper
     
     public static ConnectorSession getConnectorSession(RequestContext context, String endpointId)
     {
-        ConnectorSession connectorSession = null;
-        
-        try
-        {
-            HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
-            connectorSession = FrameworkHelper.getConnectorService().getConnectorSession(httpSession, endpointId);
-        }
-        catch(Exception ex)
-        {
-            logger.error("Unable to retrieve connector session for endpoint id: " + endpointId);
-        }
-        
-        return connectorSession;
+        HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+        return getConnectorSession(httpSession, endpointId);
     }
 
+    public static ConnectorSession getConnectorSession(HttpSession httpSession, String endpointId)
+    {
+        return FrameworkHelper.getConnectorService().getConnectorSession(httpSession, endpointId);
+    }
+    
     public static void removeConnectorSessions(RequestContext context)
     {
         try

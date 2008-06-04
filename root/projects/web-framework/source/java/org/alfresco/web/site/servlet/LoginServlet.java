@@ -60,12 +60,12 @@ public class LoginServlet extends BaseServlet
     	try
     	{
 	    	UserFactory userFactory = FrameworkHelper.getUserFactory();
-            
-            // this does a call to see if user can be initialized
-            boolean initialized = userFactory.initializeUser(request, username, password);
-            if(initialized)
+
+            // see if we can authenticate the user
+            boolean authenticated = userFactory.authenticate(request, username, password);
+            if(authenticated)
             {
-                // log the user in
+                // this will fully reset all connector sessions
                 RequestContext context = RequestUtil.getRequestContext(request);
                 AuthenticationUtil.login(context, username);
                 

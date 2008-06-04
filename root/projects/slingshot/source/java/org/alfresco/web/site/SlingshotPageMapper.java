@@ -205,8 +205,8 @@ public class SlingshotPageMapper extends AbstractPageMapper
     			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
     		}    		
     	}
-        
-        // get the connector "session" to this endpoint (for this user)
+
+        // get the connector "session" to this endpoint (for this user)        
         ConnectorSession connectorSession =
             FrameworkHelper.getConnectorSession(context, AlfrescoUserFactory.ALFRESCO_ENDPOINT_ID);
         if (connectorSession != null)
