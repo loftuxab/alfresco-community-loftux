@@ -98,7 +98,7 @@
              */
             Alfresco.util.Ajax.request(
             {
-               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/createSite",
+               url: Alfresco.constants.URL_SERVICECONTEXT + "modules/create-site",
                dataObj:
                {
                   htmlid: this.id
@@ -151,9 +151,12 @@
          // Configure the forms runtime
          var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
 
-         // Shortname is mandatory and can NOT contain space characters
+         // Shortname is mandatory
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^ ]*$/}, "blur");
+         // and can NOT contain whitespace characters
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "blur");
+         // and should be valid file name
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "blur");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
          createSiteForm.setShowSubmitStateDynamically(true);
