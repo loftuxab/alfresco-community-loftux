@@ -37,7 +37,7 @@
                   &copy; 2005-2008 Alfresco Software Inc. All rights reserved.
                </span>
             </div>
-            <input type="hidden" name="success" value="${successUrl}"/>
+            <input type="hidden" id="success" name="success" value="${successUrl}"/>
             <input type="hidden" name="failure" value="<@link pageType='login'/>"/>
          </fieldset>
       </form>
@@ -57,6 +57,7 @@
       });
       panel.render(document.body);
       
+      YAHOO.util.Dom.get("success").value += window.location.hash;
       YAHOO.util.Dom.get("username").focus();
    });
    //]]></script>
