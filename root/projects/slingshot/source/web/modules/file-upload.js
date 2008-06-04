@@ -369,7 +369,7 @@
                url: Alfresco.constants.URL_SERVICECONTEXT + "modules/file-upload?htmlid=" + this.id,
                successCallback:
                {
-                  fn: this._onTemplateLoaded,
+                  fn: this.onTemplateLoaded,
                   scope: this
                },
                failureMessage: "Could not load file upload template"
@@ -746,22 +746,23 @@
        * saves references to HTMLElements inside the template for easy access
        * during upload progress and finally shows the panel with the gui inside.
        *
-       * @method _onTemplateLoaded
-       * @param response {object} a response object created by the
-       *                          Alfresco.util.Ajax.request method.
-       * @private
+       * @method onTemplateLoaded
+       * @param response {object} a Alfresco.util.Ajax.request response object
        */
-      _onTemplateLoaded: function(response)
+      onTemplateLoaded: function(response)
       {
+         var Dom = YAHOO.util.Dom;
+
          // Remember the label for empty data tables so we can reset it on close
          this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
          YAHOO.widget.DataTable.MSG_EMPTY = "No files to display. Click 'Browse' select files to upload.";
 
-         // Create a panel and set it contents to markup received from the server
-         var Dom = YAHOO.util.Dom;
+         // Create a placeHolder for the template string to be rendered in
          var div = document.createElement("div");
-         Dom.addClass(div, "file-upload")
          div.innerHTML = response.serverResponse.responseText;
+
+         // Move the template node out from the placeHolder and create a panel from it
+         div = Dom.getElementsByClassName("file-upload", "div", div)[0];
          this.panel = new YAHOO.widget.Panel(div,
          {
             modal: true,
