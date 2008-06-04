@@ -340,7 +340,7 @@ public class AuthenticatingConnector implements Connector
      * 
      * @return true, if successful
      */
-    protected boolean handshake()
+    public boolean handshake()
     {
         boolean success = false;
         

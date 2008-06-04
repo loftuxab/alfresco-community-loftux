@@ -66,7 +66,7 @@
 				<name>Alfresco - System access</name>
 				<description>System account access to Alfresco</description>
 				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://hosted13.alfresco.com:8080/alfresco/service</endpoint-url>
+				<endpoint-url>http://hosted13.alfresco.com/alfresco/service</endpoint-url>
 				<identity>declared</identity>
 				<username>extranet</username>
 				<password>(FILL IN)</password>
@@ -79,7 +79,7 @@
 				<name>Alfresco - user access</name>
 				<description>Access to Alfresco Repository WebScripts</description>
 				<connector-id>alfresco</connector-id>
-				<endpoint-url>http://hosted13.alfresco.com:8080/alfresco/service</endpoint-url>
+				<endpoint-url>http://hosted13.alfresco.com/alfresco/service</endpoint-url>
 				<identity>user</identity>
 				<storage>none</storage>				
 			</endpoint>

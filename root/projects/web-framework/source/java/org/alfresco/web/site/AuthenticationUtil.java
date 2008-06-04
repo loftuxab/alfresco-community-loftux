@@ -48,15 +48,21 @@ public class AuthenticationUtil
             ThemeUtil.clearTheme(context, request);
 		}
 	}
-    
+
     public static void login(RequestContext context, String userId)
     {
-        logout(context);
-        
         if(context instanceof HttpRequestContext)
         {
             HttpServletRequest request = ((HttpRequestContext)context).getRequest();
 
+            // check whether there is already a user logged in
+            String currentUserId = (String) request.getSession().getAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
+            if(currentUserId != null)
+            {
+                // log out the current user
+                logout(context);
+            }
+            
             // place user id onto the session
             request.getSession().setAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID, userId);
         }

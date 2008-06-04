@@ -26,13 +26,12 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.connector.AuthenticatingConnector;
+import org.alfresco.connector.Connector;
 import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.Credentials;
 import org.alfresco.connector.Response;
-import org.alfresco.connector.ResponseStatus;
 import org.alfresco.connector.User;
-import org.alfresco.web.scripts.ScriptRemoteConnector;
-import org.alfresco.web.scripts.WebFrameworkScriptRemote;
 import org.alfresco.web.site.exception.UserFactoryException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -56,35 +55,20 @@ public class AlfrescoUserFactory extends UserFactory
     /* (non-Javadoc)
      * @see org.alfresco.web.site.UserFactory#authenticate(org.alfresco.web.site.RequestContext, javax.servlet.http.HttpServletRequest, java.lang.String, java.lang.String)
      */
-    public boolean initializeUser(HttpServletRequest request, String username, String password)
+    public boolean authenticate(HttpServletRequest request, String username, String password)
     {
-        boolean initialized = false;
+        boolean authenticated = false;
         try
         {
-            RequestContext context = RequestUtil.getRequestContext(request);
-
-            // create new credentials
-            // populate the credentials
+            // make sure our credentials are in the vault
             CredentialVault vault = FrameworkHelper.getCredentialVault(username);
             Credentials credentials = vault.newCredentials(ALFRESCO_ENDPOINT_ID);
             credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
             credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
 
-            // create a connector for the current user
-            WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-            ScriptRemoteConnector connector = remote.connect(ALFRESCO_ENDPOINT_ID);
-
-            // we can really call any protected uri on Alfresco
-            // the handshake will proceed and we'll have our alf_ticket
-            String uri = "/api/login?u=" + username + "&pw=" + password;
-            Response response = connector.call(uri);
-
-            // check to make sure we got a 200 back
-            if (response.getStatus().getCode() == ResponseStatus.STATUS_OK)
-            {
-                // things are good
-                initialized = true;
-            }
+            // build a connector whose connector session is bound to the current session
+            AuthenticatingConnector connector = (AuthenticatingConnector) FrameworkHelper.getConnector(request.getSession(), username, ALFRESCO_ENDPOINT_ID);
+            authenticated = connector.handshake();
         }
         catch (Throwable ex)
         {
@@ -95,7 +79,7 @@ public class AlfrescoUserFactory extends UserFactory
                 logger.debug("Exception on initializeUser", ex);
         }
 
-        return initialized;
+        return authenticated;
     }
 
     /* (non-Javadoc)
@@ -107,10 +91,9 @@ public class AlfrescoUserFactory extends UserFactory
         User user = null;
         try
         {
-            // create a connector for the current user
-            WebFrameworkScriptRemote remote = new WebFrameworkScriptRemote(context);
-            ScriptRemoteConnector connector = (ScriptRemoteConnector)remote.connect(ALFRESCO_SYSTEM_ENDPOINT_ID);
-
+            // build a connector whose connector session is bound to the current session
+            Connector connector = FrameworkHelper.getConnector(request.getSession(), userId, ALFRESCO_SYSTEM_ENDPOINT_ID);
+            
             // call the authentication ticket provider
             String uri = "/webframework/content/metadata?user=" + userId;
 

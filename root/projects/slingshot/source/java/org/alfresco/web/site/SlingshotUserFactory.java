@@ -26,8 +26,6 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.connector.AlfrescoAuthenticator;
-import org.alfresco.connector.ConnectorSession;
 import org.alfresco.connector.User;
 import org.alfresco.web.site.exception.UserFactoryException;
 
