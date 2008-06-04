@@ -6,4 +6,6 @@ if(contentTypes === undefined || contentTypes.length < 1)
    status.message = "Could not get contentTypes from the system";
    status.redirect = true;
 }
+
+// Prepare the model
 model.contentTypes = contentTypes;

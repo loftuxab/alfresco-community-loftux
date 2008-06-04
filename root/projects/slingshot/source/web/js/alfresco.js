@@ -506,7 +506,7 @@ Alfresco.util.PopupManager = function()
          {
             popup: message,
             displayTime: (c.displayTime * 1000)
-         }, true);
+        }, true);
          message.show();
       },
 
@@ -577,12 +577,14 @@ Alfresco.util.PopupManager = function()
        */
       displayPrompt: function(config)
       {
+         // Merge users config and the default config and check manadatory properties
          var c = YAHOO.lang.merge(this.defaultDisplayPromptConfig, config);
          if (c.text === undefined)
          {
             throw new Error("Property text in userConfig must be set");
          }
 
+         // Create the SImpleDialog that will display the text
          var prompt = new YAHOO.widget.SimpleDialog("prompt",
          {
             visible: false,
@@ -592,20 +594,30 @@ Alfresco.util.PopupManager = function()
             close: c.close,
             zIndex: this.zIndex++
          });
+
+         // Show the title if it exists
          if (c.title)
          {
             prompt.setHeader(c.title);
          }
+
+         // Show the actual text taht should be prompted for the user
          prompt.setBody(c.text);
+
+         // Show the title if it exists
          if (c.icon)
          {
             prompt.cfg.setProperty("icon", c.icon);
          }
+
          // TODO: Localize the OK label
+         // Add the buttons to the dialog
          if (c.buttons)
          {
             prompt.cfg.queueProperty("buttons", c.buttons);
          }
+
+         // Add the dialog to the dom, center it and show it.
          prompt.render(document.body);
          prompt.center();
          prompt.show();
@@ -616,19 +628,65 @@ Alfresco.util.PopupManager = function()
 
 
 /**
+ * Helper class for submitting data to serverthat wraps a
+ * YAHOO.util.Connect.asyncRequest call.
+ *
+ * The request methid provides default behaviour for displaying messages on
+ * success and error events and simplifies json handling with encoding and decoding.
+ *
  * @class Alfresco.util.Ajax
  */
 Alfresco.util.Ajax = function()
 {
    return {
+
+      /**
+       * Constant for contentType of type json
+       *
+       * @property JSON
+       * @type string
+       */
       JSON: "application/json",
 
+      /**
+       * Constant for method of type GET
+       *
+       * @property GET
+       * @type string
+       */
       GET: "GET",
+
+      /**
+       * Constant for method of type POST
+       *
+       * @property POST
+       * @type string
+       */
       POST: "POST",
+
+      /**
+       * Constant for method of type PUT
+       *
+       * @property PUT
+       * @type string
+       */
       PUT: "PUT",
+
+      /**
+       * Constant for method of type DELETE
+       *
+       * @property DELETE
+       * @type string
+       */
       DELETE: "DELETE",
 
-      requestConfig:
+      /**
+       * The default request config used by method request()
+       *
+       * @property defaultRequestConfig
+       * @type object
+       */
+      defaultRequestConfig:
       {
          method: "GET",        // GET, POST and hopefully PUT or DELETE if ot works...
          url: null,            // Must be set by user
@@ -646,63 +704,92 @@ Alfresco.util.Ajax = function()
          object: null           // An object that can be passed to be used by the success or failure handlers
       },
 
-      jsonRequest: function(config)
-      {
-         config.requestContentType = this.JSON;
-         config.responseContentType = this.JSON;
-         this.request(config);
-      },
-      
       /**
-       * Wraps a YAHOO.util.Connect.asyncRequest call and provides some default behaviour.
+       * Wraps a YAHOO.util.Connect.asyncRequest call and provides some default
+       * behaviour for displaying error or success messages, uri encoding and
+       * json encoding and decoding.
        *
-       * If json is used it encodes config.dataObj to json (if provided)
-       * and decodes the server response to the response.json provided to the callback.
-       * If a json string already has been created it should be sent in as the config.dataStr.
+       * JSON
        *
-       * If normal parameters are used it can create them from config.dataObj handles enconding and decoding.
-       * If a parameter string already has been created it should have been added to the
-       * config.url for GET:s or config.dataStr for other methods.
+       * If requestContentType is JSON, config.dataObj (if available) is encoded
+       * to a json string and set in the request body.
        *
-       * If request succeeds it calls the success handler (if provided),
-       * if not displays the successMessage (if provided),
-       * otherwise it does nothing.
+       * If a json string already has been created by the application it should
+       * be passed in as the config.dataStr which will be put in the rewuest body.
        *
-       * If request fails it calls the failure handler (if provided),
-       * if not displays the failureMessage (if provided),
-       * otherwise displays the best error message it can from the server response.
+       * If responseContentType is JSON the server response is decoded to a
+       * json object and set in the "json" attribute in the response object
+       * which is passed to the succes or failure callback.
        *
-       * The success or failure handler can expect a response object that looks like this and to be run int the scope
-       * defined by config.scope:
+       * PARAMETERS
+       *
+       * If requestContentType is null, config.dataObj (if available) is encoded
+       * to a normal parameter string which is added to the url if method is
+       * GET or DELETE and to the request body if method is POST or PUT.
+       *
+       * FORMS
+       * A form can also be passed it and submitted just as desccribed in the
+       * YUI documentation.
+       *
+       * SUCCESS
+       *
+       * If the request is successful successCallback.fn is called.
+       * If successCallback.fn isn't provided successMessage is displayed.
+       * If successMessage isn't provided nothing happens.
+       *
+       * FAILURE
+       *
+       * If the request fails failureCallback.fn is called.
+       * If failureCallback.fn isn't displayed failureMessage is displayed.
+       * If failureMessage isn't provided the "best error message as possible"
+       * from the server response is displayed.
+       *
+       * CALLBACKS
+       *
+       * The success or failure handlers can expect a response object of the
+       * following form (they will be called in the scope defined by config.scope)
+       *
        * {
-       *   config: config,                  // The config object passed in to the request,
-       *                                    // use config to add application specific attributes that the application
-       *                                    // needs when handling the reponse or the give a certain id to the request
-       *   serverResponse: serverResponse,  // The response provided by YIU
-       *   json: json                       // If json was used this is the parsed result of serverResponse.responseText
+       *   config: {object},         // The config object passed in to the request,
+       *   serverResponse: {object}, // The response provided by YUI
+       *   json: {object}            // The serverResponse parsed and ready as an object
        * }
        *
-       * Should be called from the helper functions above to simplify the request calls and "hide" the paths to the
-       * proxies, services etc.
-       *
        * @method request
-       * @param config {Object literal} Overridings of requestConfig, url is mandatory.
-       *                                Use config to add application specific attributes that the application
-       *                                needs when handling the reponse or the give a certain id to the request.
+       * @param config {object} Description of the request that should be made
+       * The config object has the following form:
+       * {
+       *    method: {string}               // GET, POST, PUT or DELETE, default is GET
+       *    url: {string},                 // the url to send the request to, mandatory
+       *    dataObj: {object},             // Will be encoded to parameters (key1=value1&key2=value2) or a json string if requestContentType is set to JSON
+       *    dataStr: {string},             // the request body, will be overriden by the encoding result from dataObj if dataObj is provided
+       *    dataForm: {HTMLElement},       // A form object or id that contains the data to be sent with request
+       *    requestContentType: {string},  // Set to JSON if json should be used
+       *    responseContentType: {string}, // Set to JSON if json should be used
+       *    successCallback: {object},     // Callback for successful request, should have the following form: {fn: successHandler, scope: scopeForSuccessHandler}
+       *    successMessage: {string},      // Will be displayed using Alfresco.util.displayMessage if successCallback isn't provided
+       *    failureCallback: {object},     // Callback for failed request, should have the following form: {fn: failureHandler, scope: scopeForFailureHandler}
+       *    failureMessage: {string},      // Will be displayed by Alfresco.util.displayPrompt if no failureCallback isn't provided
+       *    object: {object}               // An object that can be passed to be used by the success or failure handlers
+       * }
        */
       request: function(config)
       {
-         var c = YAHOO.lang.merge(this.requestConfig, config);
+         // Merge the user config with the default config and check for mandatory parameters
+         var c = YAHOO.lang.merge(this.defaultRequestConfig, config);
          Alfresco.util.assertNotEmpty(c.url, "Parameter 'url' can NOT be null");
          Alfresco.util.assertNotEmpty(c.method, "Parameter 'method' can NOT be null");
+
+         // If a contentType is provided set it in the header
          if (c.requestContentType)
          {
             YAHOO.util.Connect.setDefaultPostHeader(false);
             YAHOO.util.Connect.initHeader("Content-Type", c.requestContentType);
          }
-         
+
          if (c.requestContentType === this.JSON)
          {
+            // If json is used encode the dataObj parameter and put it in the body
             if (c.method.toUpperCase() === this.GET)
             {
                throw new Error("Parameter 'method' can not be 'GET' when using contentType '" + c.requestContentType + "'");
@@ -717,14 +804,17 @@ Alfresco.util.Ajax = function()
          }
          else
          {
+            // Normal URL parameters
             if (c.method.toUpperCase() === this.GET)
             {
+               // Encode the dataObj and put it in the url
                c.url += (c.url.indexOf("?") == -1 ? "?" : "&") + this._toParamString(c.dataObj);
             }
             else
             {
                if (c.dataObj)
                {
+                  // Enccode the dataObj and put it in the body
                   c.dataStr = this._toParamString(c.dataObj);
                }
             }
@@ -732,24 +822,55 @@ Alfresco.util.Ajax = function()
          
          if (c.dataForm !== null)
          {
-            // set the form on the connection manager
+            // Set the form on the connection manager
             YAHOO.util.Connect.setForm(c.dataForm);
          }
-         
+
+         /**
+          * The private "inner" callback that will handle json and displaying
+          * of messages and prompts
+          */
          var callback = 
          {
             success: this._successHandler,
             failure: this._failureHandler,
+            scope: this,
             argument:
             {
                config: config
             }
          };
-         
-         // make the request
+
+         // Encode url to make sure it is transfered correctly
+         c.url = encodeURI(c.url);
+
+         // Make the request
          YAHOO.util.Connect.asyncRequest (c.method, c.url, callback, c.dataStr);
       },
 
+      /**
+       * Helper function for pure json requests, where both the request and
+       * response are using json. Will result in a call to request() with
+       * requestContentType and responseContentType set to JSON.
+       *
+       * @method request
+       * @param config {object} Description of the request that should be made
+       */
+      jsonRequest: function(config)
+      {
+         config.requestContentType = this.JSON;
+         config.responseContentType = this.JSON;
+         this.request(config);
+      },
+
+      /**
+       * Takes an object and creates a decoded URL parameter string of it.
+       * Note! Does not contain a '?' character in the beginning.
+       *
+       * @method request
+       * @param obj
+       * @private
+       */
       _toParamString: function(obj)
       {
          var params = "";
@@ -764,27 +885,43 @@ Alfresco.util.Ajax = function()
             {
                params += "&";
             }
-            /* TODO: Decode any url reserved characters */
-            params += attr + "=" + obj[attr];
+            // Make sure no user input destroys the url 
+            params += encodeURIComponent(attr) + "=" + encodeURIComponent(obj[attr]);
          }
          return params;
       },
 
+      /**
+       * Handles successful request triggered by the request() method.
+       * If the responseContentType was set to json the response is decoded
+       * for easy access to the success callback.
+       * If no success callback is provided the successMessage is displayed
+       * using Alfresco.util.PopupManager.displayMessage().
+       * If no successMessage is provided nothing happens.
+       *
+       * @method request
+       * @param serverResponse
+       * @private
+       */
       _successHandler: function(serverResponse)
       {
+         // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
          var callback = config.successCallback;
          if (callback && typeof callback.fn == "function")
          {
-            /* User provided a custom successHandler */
+            // User provided a custom successHandler
             var json = null;
             if (config.responseContentType === "application/json")
             {
                if (serverResponse.responseText && serverResponse.responseText.length > 0)
                {
-                  json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+                  // Decode the response since it should be json
+                  json = this._parseJSON(serverResponse);
                }
             }
+
+            // Call the success callback in the correct scope
             callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), {
                config: config,
                json: json,
@@ -793,7 +930,10 @@ Alfresco.util.Ajax = function()
          }
          else if (config.successMessage)
          {
-            /* User did not provide a custom successHandler but a custom successMessage */
+            /**
+             * User did not provide a custom successHandler, instead
+             * display successMessage if it exits.
+             */
             Alfresco.util.PopupManager.displayMessage(
             {
                text: config.successMessage
@@ -801,18 +941,31 @@ Alfresco.util.Ajax = function()
          }
       },
 
+      /**
+       * Handles failed request triggered by the request() method.
+       * If the responseContentType was set to json the response is decoded
+       * for easy access to the failure callback.
+       * If no failure callback is provided the failureMessage is displayed
+       * using Alfresco.util.PopupManager.displayPrompt().
+       * If no failureMessage is provided "the best available server response"
+       * is displayed using Alfresco.util.PopupManager.displayPrompt().
+       *
+       * @method request
+       * @param serverResponse
+       * @private
+       */
       _failureHandler: function(serverResponse)
       {
+         // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
          var callback = config.failureCallback;
          if (callback && typeof callback.fn == "function")
          {
-            /* User provided a custom failureHandler */
+            // User provided a custom failureHandler
             var json = null;
             if (config.responseContentType === "application/json")
             {
-               /* TODO: When error response is in valid json format */
-               //json = YAHOO.lang.JSON.parse(serverResponse.responseText);
+               json = this._parseJSON(serverResponse);
             }
             callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
             {
@@ -823,7 +976,10 @@ Alfresco.util.Ajax = function()
          }
          else if (config.failureMessage)
          {
-            /* User did not provide a custom failureHandler but a custom failureMessage */
+            /**
+            * User did not provide a custom failureHandler, instead display
+            * the failureMessage if it exists
+            */
             Alfresco.util.PopupManager.displayPrompt(
             {
                text: config.failureMessage
@@ -831,18 +987,14 @@ Alfresco.util.Ajax = function()
          }
          else
          {
-            // User did not provide any failure info, display as good info as possible from the server response instead
+            /**
+             * User did not provide any failure info at all, display as good
+             * info as possible from the server response.
+             */
             if (config.responseContentType == "application/json")
             {
-               var json = null;
-               /* TODO: When error response is in valid json format */
-               // json = YAHOO.lang.JSON.parse(serverResponse.responseText);
-               // Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
-               Alfresco.util.PopupManager.displayPrompt(
-               {
-                  title: "Failure",
-                  text: serverResponse.statusText
-               });
+               var json = this._parseJSON(serverResponse.responseText);
+               Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
             }
             else if (serverResponse.statusText)
             {
@@ -860,7 +1012,24 @@ Alfresco.util.Ajax = function()
                });
             }
          }
+      },
+
+      _parseJSON: function(serverResponse)
+      {
+         try
+         {
+            return YAHOO.lang.JSON.parse(serverResponse.responseText)
+         }
+         catch(error)
+         {
+            Alfresco.util.PopupManager.displayPrompt(
+            {
+               title: "Failure",
+               text: "Can't parse response as json: " + serverResponse.statusText
+            });
+         }
       }
+
    };
 }();
 

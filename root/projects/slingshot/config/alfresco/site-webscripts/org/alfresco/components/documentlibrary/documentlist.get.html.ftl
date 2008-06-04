@@ -64,5 +64,4 @@
       </div>
    </div>
 
-   <div id="${args.htmlid}-createFolder" class="create-folder"></div>
 </div>

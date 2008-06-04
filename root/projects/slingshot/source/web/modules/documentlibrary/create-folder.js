@@ -200,12 +200,19 @@
       {
          var Dom = YAHOO.util.Dom;
 
+         // Create a placeHolder for the template string to be rendered in
+         var div = document.createElement("div");
+         div.innerHTML = response.serverResponse.responseText;
+
+         // Move the template node out from the placeHolder and create a panel from it
+         div = Dom.getElementsByClassName("create-folder", "div", div)[0];
+
          // Inject the template from the XHR request into the DOM
-         var container = Dom.get(this.id);
-         container.innerHTML = response.serverResponse.responseText;
+         //var container = Dom.get(this.id);
+         //container.innerHTML = response.serverResponse.responseText;
          
          // Create and render the YUI dialog
-         this.dialog = new YAHOO.widget.Panel(container,
+         this.dialog = new YAHOO.widget.Panel(div,
          {
             modal: true,
             draggable: false,
