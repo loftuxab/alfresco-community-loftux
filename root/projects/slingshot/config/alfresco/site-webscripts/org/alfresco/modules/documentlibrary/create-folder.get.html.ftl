@@ -1,12 +1,7 @@
-<div class="create-folder">
+<div id="${args.htmlid}-dialog" class="create-folder">
    <div class="hd">New Folder</div>
    <div class="bd">
-      <form id="${args.htmlid}-form" action="${url.context}/proxy/alfresco/slingshot/doclib/action" method="post">
-         <input type="hidden" name="action" value="createFolder" />
-         <input type="hidden" name="site" value="" />
-         <input type="hidden" name="componentId" value="" />
-         <input type="hidden" name="path" value="" />
-
+      <form id="${args.htmlid}-form" action="" method="post">
          <div class="yui-g section-title">
             <h2>New folder details:</h2>
          </div>

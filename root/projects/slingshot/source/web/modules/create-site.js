@@ -46,19 +46,32 @@
       this.name = "Alfresco.module.CreateSite";
       this.id = containerId;
       
-      this.dialog = null;
-
       // Register this component
       Alfresco.util.ComponentManager.register(this);
 
       // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.componentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "connection", "selector", "json", "event"], this.onComponentsLoaded, this);
 
       return this;
    };
 
    Alfresco.module.CreateSite.prototype =
    {
+      /**
+       * Dialog instance.
+       * 
+       * @property dialog
+       * @type YUI.widget.Panel
+       */
+      dialog: null,
+
+      /**
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
+       */
+       widgets: {},
 
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -66,7 +79,7 @@
        *
        * @method onComponentsLoaded
        */
-      componentsLoaded: function()
+      onComponentsLoaded: function()
       {
          /* Shortcut for dummy instance */
          if (this.id === null)
@@ -105,7 +118,7 @@
                },
                successCallback:
                {
-                  fn: this.templateLoaded,
+                  fn: this.onTemplateLoaded,
                   scope: this
                },
                failureMessage: "Could not load create site template"
@@ -120,16 +133,16 @@
        * @method onTemplateLoaded
        * @param response {object} a Alfresco.util.Ajax.request response object 
        */
-      templateLoaded: function(response)
+      onTemplateLoaded: function(response)
       {
-         // Create a placeHolder for the template string to be rendered in
-         var Dom = YAHOO.util.Dom;
-         var div = document.createElement("div");
-         div.innerHTML = response.serverResponse.responseText;
+         // Inject the template from the XHR request into a new DIV element
+         var containerDiv = document.createElement("div");
+         containerDiv.innerHTML = response.serverResponse.responseText;
 
-         // Move the template node out from the placeHolder and create a panel from it
-         div = Dom.getElementsByClassName("create-site", "div", div)[0];
-         this.dialog = new YAHOO.widget.Panel(div,
+         // The panel is created from the HTML returned in the XHR request, not the container
+         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+
+         this.dialog = new YAHOO.widget.Panel(dialogDiv,
          {
             modal: true,
             draggable: false,
@@ -142,11 +155,13 @@
          this.dialog.render(document.body);
 
          // Create the cancel button
-         var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
-         cancelButton.subscribe("click", this.onCancelButtonClick, this, true);
+         this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
          // Create the ok button, the forms runtime will handle when its clicked
-         var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
+         this.widgets.okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
+         {
+            type: "submit"
+         });
 
          // Configure the forms runtime
          var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
@@ -160,7 +175,7 @@
 
          // The ok button is the submit button, and it should be enabled when the form is ready
          createSiteForm.setShowSubmitStateDynamically(true);
-         createSiteForm.setSubmitElements(okButton);
+         createSiteForm.setSubmitElements(this.widgets.okButton);
 
          // Submit as an ajax submit (not leave the page), in json format
          createSiteForm.setAJAXSubmit(true,

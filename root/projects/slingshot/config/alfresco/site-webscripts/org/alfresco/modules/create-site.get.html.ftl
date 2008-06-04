@@ -1,4 +1,4 @@
-<div class="create-site">
+<div id="${args.htmlid}-dialog" class="create-site">
    <div class="hd">Create site</div>
    <div class="bd">
 

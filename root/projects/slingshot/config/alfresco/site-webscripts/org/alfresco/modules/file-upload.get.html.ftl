@@ -1,4 +1,4 @@
-<div class="file-upload">
+<div id="${args.htmlid}-dialog" class="file-upload">
    <div class="hd">
       <span id="${args.htmlid}-title-span">[the title shall be provided in show()]</span>
    </div>
