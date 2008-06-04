@@ -13,7 +13,7 @@
                <hr/>
             </div>
             <div class="yui-gd">
-               <div class="yui-u first">What:</div>
+               <div class="yui-u first">What: *</div>
                <div class="yui-u"><input id="${args.htmlid}-title" type="text" name="what"/></div>
             </div>
 			<div class="yui-gd">

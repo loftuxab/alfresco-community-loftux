@@ -19,16 +19,34 @@
    
    Alfresco.MiniCalendar.prototype =
    {
+		/**
+       * Sets the current site for this component.
+       * 
+       * @property siteId
+       * @type string
+       */
 	  	setSiteId: function(siteId)
 		{
 			this.siteId = siteId;
 		},
 		
+		/**
+		 * Fired by YUILoaderHelper when required component script files have
+		 * been loaded into the browser.
+		 *
+		 * @method onComponentsLoaded
+	    */	
  		componentsLoaded: function()
     	{
 			YAHOO.util.Event.onContentReady(this.id, this.init, this, true);
 		},
-       
+      
+		/**
+	    * Fired by YUI when parent element is available for scripting.
+	    * Initialises components, including YUI widgets.
+	    *
+	    * @method init
+	    */ 
     	init: function()
     	{
 			/* 
@@ -51,6 +69,13 @@
 			YAHOO.util.Connect.asyncRequest('GET', uriEvents, callback);
 		},
 
+		/**
+		 * Event handler that gets fired when the calendar data for the current site.
+	    * is loaded successfully.
+		 *
+		 * @method onSuccess
+		 * @param e {object} DomEvent
+		 */
 		onSuccess: function(o)
 		{
 			try {
@@ -86,10 +111,17 @@
 			}
 		},
 	
+		/**
+		 * Event handler that gets fired when the calendar data for the current site.
+	    * fails to load. Displays an alert informing the user that the data didn't load.
+		 *
+		 * @method onFailure
+		 * @param e {object} DomEvent
+		 */
 		onFailure: function(o)
 		{
 			/* Failed */
-			alert("Authentication failed");
+			alert("Failed to load calendar data.");
 		}	
    
 	};

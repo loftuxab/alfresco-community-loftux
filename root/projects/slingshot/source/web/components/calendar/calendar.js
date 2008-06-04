@@ -53,6 +53,14 @@
       eventDialog: null,
 
 		/**
+       * A reference to the YAHOO calendar component.
+       * 
+       * @property calendar
+       * @type YAHOO.widget.CalendarGroup
+       */
+		calendar: null,
+
+		/**
        * Sets the current site for this component.
        * 
        * @property siteId
@@ -89,8 +97,46 @@
 		
 		 	// Separate the (initial) rendering of the calendar from the data loading.
 		 	// If for some reason the data fails to load, the calendar will still display.
-			var cal = new YAHOO.widget.Calendar("calendar");
-			cal.render();
+			this.calendar = new YAHOO.widget.CalendarGroup("calendar");
+			this.calendar.render();
+			
+			// Register for changes to the calendar data
+			YAHOO.Bubbling.on('onEventDataLoad', this.onEventDataLoad, this);
+		},
+		
+		/*
+		 * This method is called when the "onEventDataLoad" event is fired; this
+		 * usually occurs when the page first loads. The calendar data is retrieved
+		 * and is used to update the view with the corresponding events.
+		 *
+		 * @method onEventDataLoad
+		 * @param e {object} Event fired
+		 * @param args {array} Event parameters (depends on event type)
+		 */
+		onEventDataLoad: function(e, args)
+		{
+			var params = args[1];
+			if (params)
+			{
+				// Grab the source of the event
+				var source = params.source;
+				if (source)
+				{
+					var events = source.eventData;
+					var selectedDates = [];
+					
+					for (var key in events)
+					{
+						if (events.hasOwnProperty(key)) {
+							selectedDates.push(key);
+						}
+					}
+					
+					// Get the data and refresh the view
+					this.calendar.cfg.setProperty("selected", selectedDates.join(","));
+					this.calendar.render();
+				}
+			}
 		},
 	
 		/*

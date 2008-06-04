@@ -117,8 +117,8 @@
 		{	
 			var tabView = new YAHOO.widget.TabView('calendar-view'); 
 			
-			var Dom = YAHOO.util.Dom;
-			Dom.get('calendar-view').style.visibility = "visible";
+			//var Dom = YAHOO.util.Dom;
+			//Dom.get('calendar-view').style.visibility = "visible";
 			
 			/* Initialise buttons and handlers */
 			Alfresco.util.createYUIButton(this, "next-button", this.displayNextMonth, { type: "push" });
@@ -197,6 +197,16 @@
 		{
 			this.eventData = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
 			this.refresh(this.currentDate.getFullYear(), this.currentDate.getMonth());
+			
+			// Now that the data has been loaded we can display the calendar
+			var Dom = YAHOO.util.Dom;
+			Dom.get('calendar-view').style.visibility = "visible";
+			
+			// Fire "onEventDataLoad" event to inform other components to refresh their view
+			YAHOO.Bubbling.fire('onEventDataLoad', 
+			{
+				source: this
+			});
 		},
 		
 		/**
