@@ -100,7 +100,7 @@
 	<classpathentry exported="true" kind="lib" path="alfresco-repository.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/xmlsec-1.4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/rhino-js-1.6R7.jar"/>
-	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-httpclient-3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="dependencies/commons/commons-httpclient-3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/fontbox-0.1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/guessencoding-1.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="dependencies/hsqldb.jar"/>
