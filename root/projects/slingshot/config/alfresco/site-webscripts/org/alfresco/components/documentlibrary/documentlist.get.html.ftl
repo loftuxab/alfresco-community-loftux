@@ -56,11 +56,11 @@
    
    <div class="hiddenComponents">
       <div id="${args.htmlid}-actions-document">
-         <span class="onDeleteDocument"><a href="" class="action-link">Delete document</a></span>
+         <span class="onDeleteAsset"><a href="" class="action-link">Delete document</a></span>
       </div>
 
       <div id="${args.htmlid}-actions-folder">
-         <span class="onDeleteFolder"><a href="" class="action-link">Delete folder</a></span>
+         <span class="onDeleteAsset"><a href="" class="action-link">Delete folder</a></span>
       </div>
    </div>
 

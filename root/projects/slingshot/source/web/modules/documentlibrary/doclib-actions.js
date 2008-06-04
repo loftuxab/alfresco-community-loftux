@@ -61,7 +61,7 @@
       defaultConfig:
       {
          method: "POST",
-         url: Alfresco.constants.PROXY_URI + "slingshot/doclib/action",
+         url: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/",
          dataObj: null,
          successCallback: null,
          successMessage: null,
@@ -88,7 +88,7 @@
        * @private
        * @return {boolean} false: module not ready for use
        */
-      _runAction: function DLA__runAction(config)
+      _runAction: function DLA__runAction(config, obj)
       {
          // Check components loaded
          if (!this.isReady)
@@ -96,39 +96,45 @@
             return false;
          }
 
-         Alfresco.util.Ajax.jsonRequest(config);
-      },
-      
-      
-      /**
-       * ACTION: Delete item.
-       * Deletes an item from the component container, given filepath
-       *
-       * @method deleteItem
-       * @param file {string} file (or folder) to be deleted
-       * @return {boolean} false: module not ready
-       */
-      deleteItem: function DLA_deleteItem(site, componentId, path, file, obj)
-      {
-         var config = YAHOO.lang.merge(this.defaultConfig,
-         {
-            dataObj:
-            {
-               action: "delete",
-               site: site,
-               componentId: componentId,
-               path: path,
-               file: file
-            }
-         });
-
-         // Also merge-in any supplied object
+         // Merge-in any supplied object
          if (typeof obj == "object")
          {
             config = YAHOO.lang.merge(config, obj);
          }
          
-         return this._runAction(config);
+         if (config.method == Alfresco.util.Ajax.DELETE)
+         {
+            Alfresco.util.Ajax.request(config);
+         }
+         else
+         {
+            Alfresco.util.Ajax.jsonRequest(config);
+         }
+      },
+      
+      
+      /**
+       * ACTION: Delete file.
+       * Deletes a file from the component container, given filepath
+       *
+       * @method deleteFile
+       * @param site {string} current site
+       * @param componentId {string} component container
+       * @param path {string} path where file is located
+       * @param file {string} file to be deleted
+       * @param obj {object} optional additional request configuration
+       * @return {boolean} false: module not ready
+       */
+      deleteFile: function DLA_deleteFile(site, componentId, path, file, obj)
+      {
+         var config = YAHOO.lang.merge(this.defaultConfig,
+         {
+            url: this.defaultConfig.url + "file/" + site + "/" + componentId + (path.length > 0 ? "/" + path : "") + "/" + file,
+            method: Alfresco.util.Ajax.DELETE,
+            responseContentType: Alfresco.util.Ajax.JSON
+         });
+
+         return this._runAction(config, obj);
       }
    };
 })();

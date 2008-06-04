@@ -1054,7 +1054,7 @@ Alfresco.logger.isDebugEnabled = function()
  */
 Alfresco.logger.debug = function(p1, p2)
 {
-   if (!this.isDebugEnabled())
+   if (!Alfresco.constants.DEBUG)
    {
       return;
    }
@@ -1082,7 +1082,9 @@ Alfresco.logger.debug = function(p1, p2)
    }
    else
    {
+      /* Too annoying!
       alert(msg);
+      */
    }
 }
 
