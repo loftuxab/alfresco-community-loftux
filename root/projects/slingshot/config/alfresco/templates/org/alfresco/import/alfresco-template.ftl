@@ -52,7 +52,7 @@
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
-      Alfresco.constants.ALF_TICKET = "${user.properties.alfTicket!""}";
+      Alfresco.constants.ALF_TICKET = "${context.properties.alfTicket!""}";
    //]]></script>
 
 <!-- Component Assets -->
