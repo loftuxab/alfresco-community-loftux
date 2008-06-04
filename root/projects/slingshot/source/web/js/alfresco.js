@@ -165,15 +165,16 @@ Alfresco.util.formatFileSize = function(fileSize)
  * Formats a Freemarker datetime into more UI-friendly format
  *
  * @method Alfresco.util.formatDate
- * @param date {string} Date as returned from data webscript
+ * @param date {string} Optional: Date as returned from data webscript. Today used if missing.
+ * @param mask {string} Optional: Mask to use to override default.
  * @return {string} Date formatted for UI
  * @static
  */
-Alfresco.util.formatDate = function(date)
+Alfresco.util.formatDate = function()
 {
    try
    {
-      return Alfresco.thirdparty.dateFormat(date);
+      return Alfresco.thirdparty.dateFormat.apply(this, arguments);
    }
    catch(e)
    {
