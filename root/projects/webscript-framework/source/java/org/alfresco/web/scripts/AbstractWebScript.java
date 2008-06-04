@@ -191,7 +191,7 @@ public abstract class AbstractWebScript implements WebScript
         params.put("url", new URLModel(req));
         
         // add remote object
-        if(this.container instanceof AbstractRuntimeContainer)
+        if (this.container instanceof PresentationContainer)
         {
             params.put("remote", new ScriptRemote(this.container));
         }

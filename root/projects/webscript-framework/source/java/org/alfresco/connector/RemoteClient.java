@@ -36,7 +36,6 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +56,7 @@ import org.springframework.util.FileCopyUtils;
  * Generally remote URLs will be "data" webscripts (i.e. returning XML/JSON) called from
  * web-tier script objects and will be housed within an Alfresco Repository server.
  * <p>
- * Supports HTTP methods of GET, PUT, DELETE and POST of body content data.
+ * Supports HTTP methods of GET, DELETE, PUT and POST of body content data.
  * <p>
  * A 'Response' is returned containing the response data stream as a String and the Status
  * object representing the status code and error information if any. Methods supplying an
@@ -69,20 +68,20 @@ import org.springframework.util.FileCopyUtils;
 public class RemoteClient extends AbstractClient
 {
     private static Log logger = LogFactory.getLog(RemoteClient.class);
-
+    
     private static final String CHARSETEQUALS = "charset=";
     private static final int BUFFERSIZE = 4096;
-
+    
     private String defaultEncoding;
     private String ticket;
     private String ticketName;
-    private String requestContentType;
-    private String requestMethod;
-
+    private String requestContentType = "application/octet-stream";
+    private HttpMethod requestMethod = HttpMethod.GET;
+    
     private String username;
     private String password;
     
-    private Map<String, String> defaultRequestProperties;
+    private Map<String, String> requestProperties;
 
 
     /**
@@ -110,7 +109,7 @@ public class RemoteClient extends AbstractClient
     }
 
     /**
-     * Sets the authentication ticket to use
+     * Sets the authentication ticket to use. Will be used for all future call() requests.
      * 
      * @param ticket
      */
@@ -130,7 +129,7 @@ public class RemoteClient extends AbstractClient
     }
 
     /**
-     * Sets the authentication ticket name to use
+     * Sets the authentication ticket name to use.  Will be used for all future call() requests.
      * 
      * This allows the ticket mechanism to be repurposed for non-Alfresco
      * implementations that may require similar argument passing
@@ -158,7 +157,7 @@ public class RemoteClient extends AbstractClient
     }
     
     /**
-     * Basic HTTP auth
+     * Basic HTTP auth. Will be used for all future call() requests.
      * 
      * @param user
      * @param pass
@@ -171,32 +170,40 @@ public class RemoteClient extends AbstractClient
 
     /**
      * @param requestContentType     the POST request "Content-Type" header value to set
+     *        NOTE: this value is reset to the default of GET after a call() is made. 
      */
     public void setRequestContentType(String contentType)
     {
-        this.requestContentType = contentType;
+        if (requestContentType != null && requestContentType.length() != 0)
+        {
+            this.requestContentType = contentType;
+        }
     }
 
     /**
      * @param requestMethod  the request Method to set i.e. one of GET/POST/PUT/DELETE etc.
      *        if not set, GET will be assumed unless an InputStream is supplied during call()
-     *        in which case POST will always be used.
+     *        in which case POST will be used unless the request method overrides it with PUT.
+     *        NOTE: this value is reset to the default of GET after a call() is made. 
      */
-    public void setRequestMethod(String requestMethod)
+    public void setRequestMethod(HttpMethod method)
     {
-        this.requestMethod = requestMethod;
+        if (method != null)
+        {
+            this.requestMethod = method;
+        }
     }
     
     /**
-     * Allows for default request properties to be set onto this object
+     * Allows for additional request properties to be set onto this object
      * These request properties are applied to the connection when
-     * the connection is called.
+     * the connection is called. Will be used for all future call() requests.
      * 
      * @param requestProperties
      */
-    public void setDefaultRequestProperties(Map<String, String> requestProperties)
+    public void setRequestProperties(Map<String, String> requestProperties)
     {
-        this.defaultRequestProperties = requestProperties;
+        this.requestProperties = requestProperties;
     }    
 
     /**
@@ -215,7 +222,8 @@ public class RemoteClient extends AbstractClient
     }
     
     /**
-     * Call a remote WebScript uri, passing the supplied body as a POST request.
+     * Call a remote WebScript uri, passing the supplied body as a POST request (unless the
+     * request method is set to override as say PUT).
      * 
      * @param uri    Uri to call on the endpoint
      * @param body   Body of the POST request.
@@ -262,6 +270,15 @@ public class RemoteClient extends AbstractClient
      */
     public Response call(String uri, boolean buildResponseString, InputStream in)
     {
+        if (in != null)
+        {
+            // we have been supplied an input for the request - either POST or PUT
+            if (this.requestMethod != HttpMethod.POST && this.requestMethod != HttpMethod.PUT)
+            {
+                this.requestMethod = HttpMethod.POST;
+            }
+        }
+        
         Response result;
         ResponseStatus status = new ResponseStatus();
         try
@@ -331,6 +348,15 @@ public class RemoteClient extends AbstractClient
      */
     public Response call(String uri, InputStream in, OutputStream out)
     {
+        if (in != null)
+        {
+            // we have been supplied an input for the request - either POST or PUT
+            if (this.requestMethod != HttpMethod.POST && this.requestMethod != HttpMethod.PUT)
+            {
+                this.requestMethod = HttpMethod.POST;
+            }
+        }
+        
         Response result;
         ResponseStatus status = new ResponseStatus();
         try
@@ -353,15 +379,14 @@ public class RemoteClient extends AbstractClient
 
     /**
      * Call a remote WebScript uri. The endpoint as supplied in the constructor will be used
-     * as the prefix for the full WebScript url. The request method should be set on this instance
-     * before calling this specific method as otherwise GET is the default.
+     * as the prefix for the full WebScript url.
      * 
      * @param uri    WebScript URI - for example /test/myscript?arg=value
      * @param req    HttpServletRequest the request to retrieve input and headers etc. from
      * @param res    HttpServletResponse the response to stream response to - will be closed automatically.
      *               A response data string will not therefore be available in the Response object.
-     *               If a POST is required, it must be set as the request method on this RemoteClient
-     *               instance otherwise the InputStream will not be retrieve from the request.
+     *               The HTTP method to be used should be set via the setter otherwise GET will be assumed
+     *               and the InputStream will not be retrieve from the request.
      *               If remote call returns a status code then any available error response will be
      *               streamed into the response object. 
      *               If remote call fails completely the OutputStream will not be modified or closed.
@@ -374,10 +399,12 @@ public class RemoteClient extends AbstractClient
         ResponseStatus status = new ResponseStatus();
         try
         {
+            boolean isPush = (requestMethod == HttpMethod.POST || requestMethod == HttpMethod.PUT);
             String encoding = service(
                     buildURL(uri),
-                    "GET".equalsIgnoreCase(requestMethod) ? null : req.getInputStream(),
-                    res.getOutputStream(), req, res, status);
+                    isPush ? req.getInputStream() : null,
+                    res.getOutputStream(),
+                    req, res, status);
             result = new Response(status);
             result.setEncoding(encoding);
         }
@@ -444,7 +471,7 @@ public class RemoteClient extends AbstractClient
      * pushed to the url. Otherwise a standard GET will be performed.
      * 
      * @param url    The URL to open and retrieve data from
-     * @param in     The optional InputStream - if set a POST will be performed
+     * @param in     The optional InputStream - if set a POST or similar will be performed
      * @param out    The OutputStream to write result to
      * @param res    Optional HttpServletResponse - to which response headers will be copied - i.e. proxied
      * @param status The status object to apply the response code too
@@ -458,8 +485,12 @@ public class RemoteClient extends AbstractClient
         throws IOException
     {
         if (logger.isDebugEnabled())
-            logger.debug("Executing " + (in == null ?
-                    "(" + (requestMethod != null ? requestMethod : "GET") + ")" : "(POST)") + ' ' + url.toString());    
+        {
+            logger.debug("Executing " + "(" + requestMethod + ") " + url.toString());
+            if (in != null)  logger.debug(" - InputStream supplied - will push...");
+            if (out != null) logger.debug(" - OutputStream supplied - will stream response...");
+            if (req != null) logger.debug(" - Full Proxy mode, will apply headers and stream...");
+        }
         
         HttpURLConnection connection = null;
         try
@@ -480,19 +511,16 @@ public class RemoteClient extends AbstractClient
                 }
             }            
             
-            // default request properties
-            // allows for the assignment of specific header properties
-            if(this.defaultRequestProperties != null && this.defaultRequestProperties.size() > 0)
+            // apply request properties, allows for the assignment of specific header properties
+            if (this.requestProperties != null && this.requestProperties.size() != 0)
             {
-                Iterator it = this.defaultRequestProperties.keySet().iterator();
-                while(it.hasNext())
+                for (Map.Entry<String, String> entry : requestProperties.entrySet())
                 {
-                    String headerName = (String) it.next();
-                    String headerValue = (String) this.defaultRequestProperties.get(headerName);
-                    connection.addRequestProperty(headerName, headerValue);
+                    String headerName = entry.getKey();
+                    connection.addRequestProperty(headerName, this.requestProperties.get(headerName));
                 }
             }
-                        
+            
             // HTTP basic auth support
             if (this.username != null && this.password != null)
             {
@@ -500,22 +528,18 @@ public class RemoteClient extends AbstractClient
                 connection.addRequestProperty("Authorization", "Basic " + Base64.encodeBytes(auth.getBytes()));
             }
             
-            // always perform a POST to the connection if input supplied
+            // set the request method - the default of GET will be used if not explicitly set
+            connection.setRequestMethod(this.requestMethod.toString());
+            
+            // perform a POST/PUT to the connection if input supplied
             if (in != null)
             {
-                connection.setRequestMethod(req.getMethod());
                 connection.setDoOutput(true);
                 connection.setDoInput(true);
                 connection.setUseCaches(false);
-                connection.setRequestProperty ("Content-Type",
-                        (this.requestContentType != null ? this.requestContentType : "application/octet-stream"));
+                connection.setRequestProperty ("Content-Type", this.requestContentType);
                 
                 FileCopyUtils.copy(in, new BufferedOutputStream(connection.getOutputStream()));
-            }
-            // set the request method - if not supplied then the default of GET will be used anyway
-            else if (this.requestMethod != null)
-            {
-                connection.setRequestMethod(this.requestMethod);
             }
             
             // prepare to write the connection result to the output stream
@@ -538,7 +562,10 @@ public class RemoteClient extends AbstractClient
                                 
                 // now use the error response stream instead - if there is one
                 input = connection.getErrorStream();
-                caughtError = true;                
+                caughtError = true;
+                
+                if (logger.isDebugEnabled())
+                    logger.debug(" --- Caught error code: " + connection.getResponseCode() + " - " + errorMessage);
             }
             
             // walk over headers that are returned from the connection
@@ -554,7 +581,7 @@ public class RemoteClient extends AbstractClient
                 // it's strange, but in addition the key can be null...!
                 if (key != null && key.equals("Server") == false && key.equals("Transfer-Encoding") == false)
                 {
-                    if(res != null)
+                    if (res != null)
                     {
                         res.setHeader(key, connection.getHeaderField(key));
                     }
@@ -645,6 +672,12 @@ public class RemoteClient extends AbstractClient
             }            
             
             throw conErr;
+        }
+        finally
+        {
+            // reset state values
+            this.requestContentType = "application/octet-stream";
+            this.requestMethod = HttpMethod.GET;
         }
     }    
 }

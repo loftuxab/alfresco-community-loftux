@@ -72,21 +72,6 @@ public abstract class AbstractConnector implements Connector
     {
         return call(uri, null);
     }
-
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.Connector#call(java.lang.String, org.alfresco.connector.ConnectorContext)
-     */
-    public abstract Response call(String uri, ConnectorContext context);
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.Connector#call(java.lang.String, org.alfresco.connector.ConnectorContext, java.io.InputStream, java.io.OutputStream)
-     */
-    public abstract Response call(String uri, ConnectorContext context, InputStream in, OutputStream out);
-        
-    /* (non-Javadoc)
-     * @see org.alfresco.connector.Connector#call(java.lang.String, org.alfresco.connector.ConnectorContext, javax.servlet.http.HttpServletRequest req, javax.servlet.http.HttpServletResponse)
-     */
-    public abstract Response call(String uri, ConnectorContext context, HttpServletRequest req, HttpServletResponse res);
     
     /*
      * (non-Javadoc)

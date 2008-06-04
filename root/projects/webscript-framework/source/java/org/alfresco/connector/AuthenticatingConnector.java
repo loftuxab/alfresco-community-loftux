@@ -158,6 +158,44 @@ public class AuthenticatingConnector implements Connector
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.connector.Connector#call(java.lang.String, org.alfresco.connector.ConnectorContext, java.io.InputStream)
+     */
+    public Response call(String uri, ConnectorContext context, InputStream in)
+    {
+        Response response = null;
+        boolean handshake = false;
+        
+        if(isAuthenticated())
+        {
+            // try to call into the connector to see if we can successfully do this
+            response = this.connector.call(uri, context, in);
+            
+            // if there was an authentication challenge, handle here
+            if(response.getStatus().getCode() == ResponseStatus.STATUS_UNAUTHORIZED)
+            {
+                handshake = true;
+            }
+        }
+        else
+        {
+            handshake = true;
+        }
+        
+        if(handshake)
+        {
+            handshake();
+
+            // now that we've authenticated, try again
+            response = this.connector.call(uri, context, in);
+        }
+
+        if(logger.isDebugEnabled())
+            logger.debug("Received " + response.getStatus().getCode() + " on second call to: " + uri);
+        
+        return response;
+    }
+    
+    /* (non-Javadoc)
      * @see org.alfresco.connector.Connector#call(java.lang.String, org.alfresco.connector.ConnectorContext, java.io.InputStream, java.io.OutputStream)
      */
     public Response call(String uri, ConnectorContext context, InputStream in, OutputStream out)

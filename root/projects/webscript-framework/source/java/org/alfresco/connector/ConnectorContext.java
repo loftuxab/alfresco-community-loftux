@@ -24,6 +24,7 @@
  */
 package org.alfresco.connector;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,22 +37,20 @@ import java.util.Map;
  * 
  * @author Uzquiano
  */
-public class ConnectorContext
+public final class ConnectorContext
 {
-    private static final String METHOD_GET = "GET";
-    private static final String METHOD_POST = "POST";
-    
     /** The parameters. */
-    protected Map parameters;
+    private Map<String, String> parameters = Collections.<String, String>emptyMap();
     
     /** The headers. */
-    protected Map headers;
+    private Map<String, String> headers = Collections.<String, String>emptyMap();
     
     /** The content type. */
-    protected String contentType;
+    private String contentType;
     
     /** The method. */
-    protected String method;
+    private HttpMethod method = HttpMethod.GET;
+    
     
     /**
      * Instantiates a new connector context.
@@ -79,24 +78,21 @@ public class ConnectorContext
      * @param parameters the parameters
      * @param headers the headers
      */
-    public ConnectorContext(String method, Map parameters, Map headers)
+    public ConnectorContext(HttpMethod method, Map parameters, Map headers)
     {
-        this.method = method;
-        this.parameters = new HashMap();
-        this.headers = new HashMap();
-        
-        if(parameters != null)
+        if (method != null)
         {
+            this.method = method;
+        }
+        if (parameters != null)
+        {
+            this.parameters = new HashMap<String, String>(parameters.size());
             this.parameters.putAll(parameters);
         }
-        if(headers != null)
+        if (headers != null)
         {
+            this.headers = new HashMap<String, String>(headers.size());
             this.headers.putAll(headers);
-        }
-        
-        if(this.method == null)
-        {
-            this.method = METHOD_GET;
         }
     }
     
@@ -145,7 +141,7 @@ public class ConnectorContext
      * 
      * @return the method
      */
-    public String getMethod()
+    public HttpMethod getMethod()
     {
         return this.method;
     }
@@ -155,8 +151,11 @@ public class ConnectorContext
      * 
      * @param method the new method
      */
-    public void setMethod(String method)
+    public void setMethod(HttpMethod method)
     {
-        this.method = method;
+        if (method != null)
+        {
+            this.method = method;
+        }
     }
 }
