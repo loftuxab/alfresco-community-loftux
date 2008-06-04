@@ -80,7 +80,7 @@ public class AlfrescoUserFactory extends UserFactory
             Response response = connector.call(uri);
 
             // check to make sure we got a 200 back
-            if(response.getStatus().getCode() == ResponseStatus.STATUS_OK)
+            if (response.getStatus().getCode() == ResponseStatus.STATUS_OK)
             {
                 // things are good
                 initialized = true;

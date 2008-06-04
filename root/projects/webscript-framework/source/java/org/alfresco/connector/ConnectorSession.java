@@ -24,6 +24,7 @@
  */
 package org.alfresco.connector;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,12 +39,13 @@ import java.util.Map;
  * 
  * @author muzquiano
  */
-public class ConnectorSession
+public class ConnectorSession implements Serializable
 {
-    protected Map<String, String> parameters = null;
-    protected Map<String, String> cookies = null;
-    protected String endpointId;
-
+    private Map<String, String> parameters = null;
+    private Map<String, String> cookies = null;
+    private String endpointId;
+    
+    
     /**
      * Instantiates a new connector session.
      * 

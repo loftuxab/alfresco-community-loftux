@@ -61,13 +61,6 @@ public class SlingshotUserFactory extends AlfrescoUserFactory
         throws UserFactoryException
     {
     	User user = super.loadUser(context, request, userId);
-
-        // get the connector "session" to this endpoint (for this user)
-        ConnectorSession connectorSession = FrameworkHelper.getConnectorSession(context, ALFRESCO_ENDPOINT_ID);
-        
-        // retrieve the alfTicket
-        String ticket = (String) connectorSession.getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
-        user.setProperty("alfTicket", ticket);
         
         return user;
     }
