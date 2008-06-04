@@ -221,31 +221,15 @@
       panel: null,
 
       /**
-       * Triggers the OS file selector
-       *
-       * @property browseButton
-       * @type YAHOO.widget.Button
+       * Object container for storing YUI widget instances.
+       * 
+       * @property widgets
+       * @type object
        */
-      browseButton: null,
+       widgets: {},
 
       /**
-       * Triggers the flash movie to upload the files
-       *
-       * @property uploadButton
-       * @type YAHOO.widget.Button
-       */
-      uploadButton: null,
-
-      /**
-       * Cancels the current uploads and closes the window
-       *
-       * @property cancelButton
-       * @type YAHOO.widget.Button
-       */
-      cancelOkButton: null,
-      
-      /**
-       * YIU class that controls the .swf to open the browser dialog window
+       * YUI class that controls the .swf to open the browser dialog window
        * and transfers the files.
        *
        * @property uploader
@@ -416,9 +400,9 @@
          // Enable the upload button if there are files in the list
          // and it wasn't enabled already
          if (this.dataTable.getRecordSet().getLength() > 0 &&
-             this.uploadButton.get("disabled"))
+             this.widgets.uploadButton.get("disabled"))
          {
-            this.uploadButton.set("disabled", false);
+            this.widgets.uploadButton.set("disabled", false);
          }
       },
 
@@ -598,8 +582,8 @@
             if (this.dataTable.getRecordSet().getLength() === 0)
             {
                // If it was the last file, disable the gui since no files exist.
-               this.uploadButton.set("disabled", true);
-               this.browseButton.set("disabled", false);
+               this.widgets.uploadButton.set("disabled", true);
+               this.widgets.browseButton.set("disabled", false);
             }
          }
          else if (this.state === this.STATE_UPLOADING)
@@ -669,6 +653,13 @@
 
          // Hide the panel
          this.panel.hide();
+         
+         // Firefox 2 isn't always great at hiding the panel
+         if (YAHOO.env.ua.gecko == 1.8)
+         {
+            this.panel.destroy();
+            this.panel = null;
+         }
 
          // Remove all files and references for this upload "session"
          this._clear();
@@ -696,9 +687,9 @@
             if (length > 0)
             {
                this.state = this.STATE_UPLOADING;
-               this.uploadButton.set("label", "Uploading...");
-               this.uploadButton.set("disabled", true);
-               this.browseButton.set("disabled", true);
+               this.widgets.uploadButton.set("label", "Uploading...");
+               this.widgets.uploadButton.set("disabled", true);
+               this.widgets.browseButton.set("disabled", true);
             }
             // And start uploading from the queue
             this._uploadFromQueue(2);
@@ -757,13 +748,14 @@
          this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
          YAHOO.widget.DataTable.MSG_EMPTY = "No files to display. Click 'Browse' select files to upload.";
 
-         // Create a placeHolder for the template string to be rendered in
-         var div = document.createElement("div");
-         div.innerHTML = response.serverResponse.responseText;
+         // Inject the template from the XHR request into a new DIV element
+         var containerDiv = document.createElement("div");
+         containerDiv.innerHTML = response.serverResponse.responseText;
 
-         // Move the template node out from the placeHolder and create a panel from it
-         div = Dom.getElementsByClassName("file-upload", "div", div)[0];
-         this.panel = new YAHOO.widget.Panel(div,
+         // The panel is created from the HTML returned in the XHR request, not the container
+         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+
+         this.panel = new YAHOO.widget.Panel(dialogDiv,
          {
             modal: true,
             draggable: false,
@@ -786,8 +778,7 @@
          this.statusText = Dom.get(this.id + "-status-span");
 
          // Save a reference to browseButton so wa can change it later
-         this.browseButton = new YAHOO.widget.Button(this.id + "-browse-button", {type: "button"});
-         this.browseButton.subscribe("click", this.onBrowseButtonClick, this, true);
+         this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
 
          // Save a reference to the HTMLElement displaying version input so we can hide or show it
          this.versionSection = Dom.get(this.id + "-versionSection-div");
@@ -797,12 +788,10 @@
          var oButtonGroup1 = new YAHOO.widget.ButtonGroup(vGroup);
 
          // Create and save a reference to the uploadButton so we can alter it later
-         this.uploadButton = new YAHOO.widget.Button(this.id + "-upload-button", {type: "button"});
-         this.uploadButton.subscribe("click", this.onUploadButtonClick, this, true);
+         this.widgets.uploadButton = Alfresco.util.createYUIButton(this, "upload-button", this.onUploadButtonClick);
 
          // Create and save a reference to the cancelOkButton so we can alter it later
-         this.cancelOkButton = new YAHOO.widget.Button(this.id + "-cancelOk-button", {type: "button"});
-         this.cancelOkButton.subscribe("click", this.onCancelOkButtonClick, this, true);
+         this.widgets.cancelOkButton = Alfresco.util.createYUIButton(this, "cancelOk-button", this.onCancelOkButtonClick);
 
          // Create and save a reference to the uploader so we can call it later
          this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
@@ -933,11 +922,11 @@
          this.noOfFailedUploads = 0;
          this.noOfSuccessfulUploads = 0;
          this.statusText["innerHTML"] = "&nbsp;";
-         this.uploadButton.set("label", "Upload Files");
-         this.uploadButton.set("disabled", true);
-         this.cancelOkButton.set("label", "Cancel");
-         this.cancelOkButton.set("disabled", false);
-         this.browseButton.set("disabled", false);
+         this.widgets.uploadButton.set("label", "Upload Files");
+         this.widgets.uploadButton.set("disabled", true);
+         this.widgets.cancelOkButton.set("label", "Cancel");
+         this.widgets.cancelOkButton.set("disabled", false);
+         this.widgets.browseButton.set("disabled", false);
 
          // Apply the config before it is showed
          this._applyConfig();
@@ -995,8 +984,8 @@
             }
          }
          this.state = this.STATE_FINISHED;
-         this.cancelOkButton.set("label", "Ok");
-         this.uploadButton.set("disabled", true);
+         this.widgets.cancelOkButton.set("label", "Ok");
+         this.widgets.uploadButton.set("disabled", true);
       },
 
       /**

@@ -48,6 +48,14 @@
    Alfresco.module.CreateFolder.prototype =
    {
       /**
+       * REST API template.
+       * 
+       * @property REST_API
+       * @type string
+       */
+      REST_API: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/{siteid}/{componentid}/{filepath}",
+      
+      /**
        * Dialog instance.
        * 
        * @property dialog
@@ -179,15 +187,35 @@
        */
       _showDialog: function DLCF__showDialog()
       {
+         // Construct the REST API
+         var filePath = this.options.parentPath;
+         if (filePath[0] = "/")
+         {
+            filePath = filePath.substring(1);
+         }
+         var action = YAHOO.lang.substitute(this.REST_API,
+         {
+            siteid: this.options.siteId,
+            componentid: this.options.componentId,
+            filepath: filePath
+         });
+         
+         form = YAHOO.util.Dom.get(this.id + "-form");
+         form.attributes.action.nodeValue = action;
+
          this.dialog.show();
          YAHOO.util.Dom.get(this.id + "-name").focus();
 
-         var nodes = YAHOO.util.Selector.query("#" + this.id + " .yui-u");
-         for (var x = 0; x < nodes.length; x++)
+         // Firefox insertion caret fix
+         YAHOO.lang.later(0, this, function()
          {
-            var elem = nodes[x];
-            YAHOO.util.Dom.addClass(elem, "caret-fix");
-         }
+            var nodes = YAHOO.util.Selector.query("#" + this.id + " .yui-u");
+            for (var x = 0; x < nodes.length; x++)
+            {
+               var elem = nodes[x];
+               YAHOO.util.Dom.addClass(elem, "caret-fix");
+            }
+         })
       },
       
       /**
@@ -198,21 +226,15 @@
        */
       onTemplateLoaded: function DLCF_onTemplateLoaded(response)
       {
-         var Dom = YAHOO.util.Dom;
+         // Inject the template from the XHR request into a new DIV element
+         var containerDiv = document.createElement("div");
+         containerDiv.innerHTML = response.serverResponse.responseText;
 
-         // Create a placeHolder for the template string to be rendered in
-         var div = document.createElement("div");
-         div.innerHTML = response.serverResponse.responseText;
+         // The panel is created from the HTML returned in the XHR request, not the container
+         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
 
-         // Move the template node out from the placeHolder and create a panel from it
-         div = Dom.getElementsByClassName("create-folder", "div", div)[0];
-
-         // Inject the template from the XHR request into the DOM
-         //var container = Dom.get(this.id);
-         //container.innerHTML = response.serverResponse.responseText;
-         
          // Create and render the YUI dialog
-         this.dialog = new YAHOO.widget.Panel(div,
+         this.dialog = new YAHOO.widget.Panel(dialogDiv,
          {
             modal: true,
             draggable: false,
@@ -230,12 +252,6 @@
 
          // Cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel", this.onCancel);
-
-         // Form hidden variables
-         var domForm = Dom.get(this.id + "-form");
-         domForm.elements["site"].value = this.options.siteId;
-         domForm.elements["componentId"].value = this.options.componentId;
-         domForm.elements["path"].value = this.options.path;
 
          // Form definition
          var form = new Alfresco.forms.Form(this.id + "-form");
