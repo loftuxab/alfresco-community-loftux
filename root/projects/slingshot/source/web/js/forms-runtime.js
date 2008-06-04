@@ -832,16 +832,48 @@ Alfresco.forms.validation.numberRange = function numberRange(field, args, form, 
 };
 
 /**
+ * Node name validation handler, tests that the given field's value is a valid
+ * name for a node in the repository.
+ *
+ * @method nodeName
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.forms.validation.nodeName = function number(field, args, form, silent)
+{
+   if (Alfresco.logger.isDebugEnabled())
+      Alfresco.logger.debug("Validating field '" + field.id + "' is a valid node name");
+
+   if(!args)
+   {
+      args = {};
+   }
+   args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([ ]+$)|([\.]?[\.]+$)/;
+   args.match = false;
+
+   return Alfresco.forms.validation.regexMatch(field, args, form, silent);
+};
+
+
+/**
  * Regular expression validation handler, tests that the given field's value matches
  * the supplied regular expression.
  * 
  * @method regexMatch
  * @param field {object} The element representing the field the validation is for
- * @param args {object} Object representing the expression, for example to validate
- *        a field represents an email address:
- *        {
- *           pattern: /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/}
- *        }
+ * @param args {object} Object representing the expression.
+ * The args object should have the form of:
+ * {
+ *    pattern: {regexp}, // A regular expression
+ *    match: {boolean}   // set to false if the regexp should NOT match the input, default is true
+ * }
+ * An example to validate a field represents an email address can look like:
+ * {
+ *    pattern: /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/
+ * }
  * @param form {object} The forms runtime class instance the field is being managed by
  * @param silent {boolean} Determines whether the user should be informed upon failure
  * @static
@@ -856,9 +888,23 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, form, si
    
    if (field.value.length > 0)
    {
+      // The pattern SHOULD match by default
+      if(args.match === undefined)
+      {
+          args.match = true;
+      }
+
+      // Check if the patterns match
       var pattern = new RegExp(args.pattern);
       valid = pattern.test(field.value);
-      
+
+      // Adjust the result if the test wasn't intended to match
+      if(!args.match)
+      {
+         valid = !valid;
+      }
+
+      // Inform the user if invalid
       if (!valid && !silent && form !== null)
       {
          form.addError(form.getFieldLabel(field.id) + " is invalid.", field, true);
