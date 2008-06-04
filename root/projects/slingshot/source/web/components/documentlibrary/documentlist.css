@@ -88,7 +88,7 @@
 .doclist .documents.yui-dt td
 {
    border-right: medium none;
-   border-bottom: 1px solid #f0f0f0;
+   border-top: 1px solid #f0f0f0;
    vertical-align: top;
 }
 
@@ -165,8 +165,7 @@
 
 /* Actions */
 
-.doclist .onDeleteDocument a,
-.doclist .onDeleteFolder a
+.doclist .onDeleteAsset a
 {
    background: url(images/delete.gif) no-repeat;
    padding-left: 16px;

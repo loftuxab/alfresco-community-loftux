@@ -62,14 +62,6 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
    Alfresco.DocumentList.prototype =
    {
       /**
-       * ComponentId constant
-       *
-       * @property COMPONENT_ID
-       * @type string
-       */
-      COMPONENT_ID: "documentLibrary",
-      
-      /**
        * Object container for initialization options
        *
        * @property options
@@ -100,6 +92,15 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
           * @type string
           */
          siteId: "",
+
+         /**
+          * ComponentId representing root container
+          *
+          * @property componentId
+          * @type string
+          * @default "documentLibrary"
+          */
+         componentId: "documentLibrary",
 
          /**
           * Initial path to show on load.
@@ -203,6 +204,8 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       
          // YUI History
          var bookmarkedPath = History.getBookmarkedState("path");
+         while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath)));
+         
          this.currentPath = bookmarkedPath || this.options.initialPath || "";
          if ((this.currentPath.length > 0) && (this.currentPath[0] != "/"))
          {
@@ -212,7 +215,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          // Register History Manager path update callback
          History.register("path", "", function(newPath)
          {
-            this._updateDocList.call(this, newPath);
+            this._updateDocList.call(this, (YAHOO.env.ua.gecko) ? decodeURIComponent(newPath) : newPath);
          }, null, this);
 
          // Initialize the browser history management library
@@ -273,7 +276,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          // Custom error messages
          YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
          
-         this.widgets.dataSource.doBeforeParseData = function(oRequest, oFullResponse)
+         this.widgets.dataSource.doBeforeParseData = function DL_doBeforeParseData(oRequest, oFullResponse)
          {
             if (oFullResponse.doclist.error)
             {
@@ -436,7 +439,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 8,
-            initialRequest: "site=" + encodeURIComponent(this.options.siteId) + "&path=" + encodeURIComponent(this.currentPath) + (this.options.showFolders ? "" : "&type=documents")
+            initialRequest: this._buildDocListParams(this.currentPath)
          });
          
          // File checked handler
@@ -494,18 +497,18 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * @param e {object} DomEvent
        * @param p_obj {object} Object passed back from addListener method
        */
-      onNewFolder: function DL_onFileUpload(e, p_obj)
+      onNewFolder: function DL_onNewFolder(e, p_obj)
       {
          if (!this.modules.createFolder)
          {
             this.modules.createFolder = new Alfresco.module.CreateFolder(this.id + "-createFolder").setOptions(
             {
                siteId: this.options.siteId,
-               componentId: this.COMPONENT_ID,
-               path: this.currentPath,
+               componentId: this.options.componentId,
+               parentPath: this.currentPath,
                onSuccess:
                {
-                  fn: function()
+                  fn: function DL_onNewFolder_callback()
                   {
                      YAHOO.Bubbling.fire("onDoclistRefresh");
                   },
@@ -534,7 +537,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          var multiUploadConfig =
          {
             siteId: this.options.siteId,
-            componentId: this.COMPONENT_ID,
+            componentId: this.options.componentId,
             path: this.currentPath,
             title: "Upload file(s)",
             filter: [],
@@ -671,7 +674,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * @param oArgs.event {HTMLEvent} Event object.
        * @param oArgs.target {HTMLElement} Target element.
        */
-      onEventHighlightRow: function(oArgs)
+      onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
          var target = oArgs.target;
          var actionsId = this.id + "-actions-" + target.yuiRecordId;
@@ -694,7 +697,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * @param oArgs.event {HTMLEvent} Event object.
        * @param oArgs.target {HTMLElement} Target element.
        */
-      onEventUnhighlightRow: function(oArgs)
+      onEventUnhighlightRow: function DL_onEventUnhighlightRow(oArgs)
       {
          var target = oArgs.target;
          var actionsId = this.id + "-actions-" + target.yuiRecordId;
@@ -711,11 +714,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        */
 
       /**
-       * Delete Document.
+       * Delete Asset.
        *
-       * @method onDeleteDocument
+       * @method onDeleteAsset
        */
-      onDeleteDocument: function DL_onDeleteDocument(row)
+      onDeleteAsset: function DL_onDeleteAsset(row)
       {
          var me = this;
          var record = this.widgets.dataTable.getRecord(row);
@@ -725,16 +728,16 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             buttons: [
             {
                text: "Delete",
-               handler: function()
+               handler: function DL_onDeleteAsset_delete()
                {
                   this.hide();
-                  me._onDeleteDocumentConfirm.call(me, record);
+                  me._onDeleteAssetConfirm.call(me, record);
                },
                isDefault: true
             },
             {
                text: "Cancel",
-               handler: function()
+               handler: function DL_onDeleteAsset_cancel()
                {
                   this.hide();
                }
@@ -743,21 +746,28 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       },
 
       /**
-       * Delete Document confirmed.
+       * Delete Asset confirmed.
        *
-       * @method _onDeleteDocumentConfirm
+       * @method _onDeleteAssetConfirm
        * @private
        */
-      _onDeleteDocumentConfirm: function DL__onDeleteDocumentConfirm(record)
+      _onDeleteAssetConfirm: function DL__onDeleteAssetConfirm(record)
       {
          var me = this;
          var obj =
          {
             successCallback:
             {
-               fn: function()
+               fn: function DL__onDeleteAssetConfirm_success()
                {
+                  // Fire the notification events
+                  if (record.getData("type") == "folder")
+                  {
+                     YAHOO.Bubbling.fire("onDoclistFolderDeleted");
+                  }
                   YAHOO.Bubbling.fire("onDoclistRefresh");
+                  
+                  // Success confirmation message
                   Alfresco.util.PopupManager.displayMessage(
                   {
                      text: record.getData("name") + " was deleted."
@@ -767,7 +777,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             },
             failureCallback:
             {
-               fn: function()
+               fn: function DL__onDeleteAssetConfirm_failure()
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
@@ -778,22 +788,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             }
          }
          var action = new Alfresco.module.DoclibActions();
-         action.deleteItem(this.options.siteId, this.COMPONENT_ID, this.currentPath, record.getData("name"), obj);
-      },
-
-      /**
-       * Delete Folder.
-       *
-       * @method onDeleteFolder
-       */
-      onDeleteFolder: function DL_onDeleteFolder(row)
-      {
-         var me = this;
-         var record = this.widgets.dataTable.getRecord(row);
-         Alfresco.util.PopupManager.displayMessage(
-         {
-            text: "You can't delete folders yet, only files.",
-         });
+         action.deleteFile(this.options.siteId, this.options.componentId, this.currentPath, record.getData("name"), obj);
       },
 
 
@@ -826,7 +821,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                try
                {
                   // Update History Manager with new path. It will callback to update the doclist
-                  YAHOO.util.History.navigate("path", obj.path);
+                  YAHOO.util.History.navigate("path", (YAHOO.env.ua.gecko) ? encodeURIComponent(obj.path) : obj.path);
                }
                catch (e)
                {
@@ -870,13 +865,26 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
-         this.widgets.dataSource.sendRequest("site=" + encodeURIComponent(this.options.siteId) + "&path=" + encodeURIComponent(path) + (this.options.showFolders ? "" : "&type=documents"),
+         this.widgets.dataSource.sendRequest(this._buildDocListParams(path),
          {
                success: successHandler,
                failure: null,
                scope: this
          });
-      }
+      },
 
+      /**
+       * Build URI parameter string for doclist JSON data webscript
+       *
+       * @method _buildDocListParams
+       * @param path {string} Path to query
+       */
+       _buildDocListParams: function DL__buildDocListParams(path)
+       {
+          var params = "path=" + encodeURIComponent(path);
+          params += "&site=" + encodeURIComponent(this.options.siteId);
+          params += this.options.showFolders ? "" : "&type=documents";
+          return params;
+       }
    };
 })();
