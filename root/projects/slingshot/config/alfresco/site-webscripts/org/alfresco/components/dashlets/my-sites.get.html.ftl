@@ -3,9 +3,9 @@
 //]]></script>
 
 <div class="dashlet">
-  <div class="title">My Sites</div>
+  <div class="title">${msg("title")}</div>
   <div class="toolbar">
-    <a href="#" id="${args.htmlid}-createSite-button">Create site</a>
+    <a href="#" id="${args.htmlid}-createSite-button">${msg("createSite")}</a>
   </div>
   <div class="body scrollableList">
 <#if sites?exists>
@@ -15,7 +15,7 @@
       </div>
    </#list>
 <#else>
-      <span>No items to display</span>
+      <span>${msg("noSites")}</span>
 </#if>
   </div>
 </div>

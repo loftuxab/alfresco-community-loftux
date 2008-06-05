@@ -339,7 +339,6 @@
          {
             this.showConfig.path = "/";
          }
-
          // Check if the uploader has been shoed before
          if (this.panel)
          {
@@ -728,7 +727,10 @@
          }
 
          // Display the help label for how to select multiple files
-         Dom.setStyle(this.multiSelectText, "display", (this.showConfig.multiSelect ? "true" : "none"));
+         if(!this.showConfig.multiSelect)
+         {
+            Dom.addClass(this.multiSelectText, "hiddenComponents");
+         }
       },
 
       /**
@@ -1057,10 +1059,10 @@
           * and this class's references.
           */
          var length = this.dataTable.getRecordSet().getLength();
-         this.uploader.clearFileList();
          this.addedFiles = {};
          this.fileStore = {};
          this.dataTable.deleteRows(0, length);
+         this.uploader.clearFileList();
       }
 
    };
