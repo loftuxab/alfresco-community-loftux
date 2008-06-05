@@ -559,13 +559,17 @@ public class RemoteClient extends AbstractClient
                 status.setException(ioErr);
                 status.setMessage(ioErr.getMessage());
                 errorMessage = ioErr.getMessage();
-                                
+                
                 // now use the error response stream instead - if there is one
                 input = connection.getErrorStream();
                 caughtError = true;
                 
                 if (logger.isDebugEnabled())
                     logger.debug(" --- Caught error code: " + connection.getResponseCode() + " - " + errorMessage);
+            }
+            if (res != null)
+            {
+                res.setStatus(connection.getResponseCode());
             }
             
             // walk over headers that are returned from the connection
@@ -592,6 +596,7 @@ public class RemoteClient extends AbstractClient
             }
             
             // perform the stream write from the response to the output
+            boolean responseCommit = false;
             if (connection.getResponseCode() != HttpServletResponse.SC_NOT_MODIFIED)
             {
                 if (input != null)
@@ -600,6 +605,7 @@ public class RemoteClient extends AbstractClient
                     {
                         byte[] buffer = new byte[BUFFERSIZE];
                         int read = input.read(buffer);
+                        if (read != -1) responseCommit = true;
                         while (read != -1)
                         {
                             out.write(buffer, 0, read);
@@ -610,16 +616,12 @@ public class RemoteClient extends AbstractClient
         		    {
                         try
                         {
-                            if (input != null)
-                            {
-                                input.close();
-                            }
-                            if (out != null)
+                            input.close();
+                            if (responseCommit)
                             {
                                 out.flush();
                                 out.close();
                             }
-                            // TODO: required?
                             connection.disconnect();
                         }
                         catch (IOException e)
@@ -645,17 +647,10 @@ public class RemoteClient extends AbstractClient
             
             // record status code
             status.setCode(connection.getResponseCode());
-            if (res != null)
+            if (res != null && caughtError && !responseCommit)
             {
-                if (!caughtError)
-                {
-                    res.setStatus(connection.getResponseCode());
-                }
-                else
-                {
-                    res.sendError(connection.getResponseCode(), errorMessage);
-                }
-            }            
+                res.sendError(connection.getResponseCode(), errorMessage);
+            }
             
             // if we get here call was successful
             return encoding;
