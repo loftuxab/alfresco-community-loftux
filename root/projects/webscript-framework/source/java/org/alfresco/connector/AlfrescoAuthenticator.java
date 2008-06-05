@@ -116,8 +116,7 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
      */
     public boolean isAuthenticated(String endpoint, ConnectorSession connectorSession)
     {
-        String ticket = connectorSession.getParameter(CS_PARAM_ALF_TICKET);
-        return (ticket != null);
+        return (connectorSession.getParameter(CS_PARAM_ALF_TICKET) != null);
     }
     
 }

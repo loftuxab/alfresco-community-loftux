@@ -30,6 +30,7 @@ import javax.servlet.http.HttpSession;
 
 import org.alfresco.config.ConfigService;
 import org.alfresco.connector.exception.RemoteConfigException;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.AuthenticatorDescriptor;
@@ -39,6 +40,10 @@ import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.alfresco.web.config.RemoteConfigElement.IdentityType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * The ConnectorService acts as a singleton that can be used to
@@ -50,9 +55,9 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author muzquiano
  */
-public class ConnectorService
+public class ConnectorService implements ApplicationListener
 {
-    private static final String PREFIX_CONNECTOR_SESSION = "_webscriptframework_connector_session_";
+    private static final String PREFIX_CONNECTOR_SESSION = "_alfwsf_consession_";
     
     private static Log logger = LogFactory.getLog(ConnectorService.class);
     private static HashMap<String, CredentialVault> credentialVaultCache = null;
@@ -60,6 +65,7 @@ public class ConnectorService
     protected static ConnectorService connectorService = null;
     
     private ConfigService configService;
+    private RemoteConfigElement remoteConfig;
 
     /**
      * Instantiates a new connector service.
@@ -88,6 +94,28 @@ public class ConnectorService
     public ConfigService getConfigService()
     {
         return this.configService;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
+     */
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ContextRefreshedEvent)
+        {
+            ContextRefreshedEvent refreshEvent = (ContextRefreshedEvent)event;
+            ApplicationContext refreshContext = refreshEvent.getApplicationContext();
+            if (refreshContext != null)
+            {
+                // cache the remote configuration block
+                this.remoteConfig = (RemoteConfigElement) getConfigService().getConfig("Remote").getConfigElement("remote");
+                if (this.remoteConfig == null)
+                {
+                    throw new AlfrescoRuntimeException(
+                            "The 'Remote' configuration was not found.");
+                }
+            }
+        }
     }
     
     
@@ -173,15 +201,6 @@ public class ConnectorService
     public Connector getConnector(String endpointId, UserContext userContext)
         throws RemoteConfigException
     {
-        // get the remote configuration block
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if (remoteConfig == null)
-        {
-            throw new RemoteConfigException(
-                    "The 'Remote' configuration was not found, unable to lookup the endpoint definition.");
-        }
-
         // load the endpoint
         EndpointDescriptor endpointDescriptor = remoteConfig.getEndpointDescriptor(endpointId);
         if (endpointDescriptor == null)
@@ -239,16 +258,11 @@ public class ConnectorService
             connector = new AuthenticatingConnector(connector, authenticator);
         }
         
-
-        
-
         // set credentials onto the connector
         // credentials are either "declared", "user", or "none":
-        // "declared" indicates that pre-set fixed declarative user credentials
-        // are to be used
-        // "user" indicates that the current user's credentials should
-        // be drawn from the vault and used
-        // "none" means that we don't include any credentials
+        //  "declared" indicates that pre-set fixed declarative user credentials are to be used
+        //  "user" indicates that the current user's credentials should be drawn from the vault and used
+        //  "none" means that we don't include any credentials
         IdentityType identity = endpointDescriptor.getIdentity();
         switch (identity)
         {
@@ -260,17 +274,15 @@ public class ConnectorService
                     // reuse previously vaulted credentials
                     credentials = userContext.getCredentials();
                 }                
-                if(credentials == null)
+                if (credentials == null)
                 {
                     // create new credentials for this declared user
                     String username = (String) endpointDescriptor.getUsername();
                     String password = (String) endpointDescriptor.getPassword();
-
+                    
                     credentials = new SimpleCredentials(endpointId);
-                    credentials.setProperty(
-                            Credentials.CREDENTIAL_USERNAME, username);
-                    credentials.setProperty(
-                            Credentials.CREDENTIAL_PASSWORD, password);
+                    credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
+                    credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
                     
                     // store back into vault
                     getCredentialVault(username).store(credentials);
@@ -289,14 +301,14 @@ public class ConnectorService
                     // reuse previously vaulted credentials
                     credentials = userContext.getCredentials();
                 }
-
+                
                 if (credentials != null)
                 {
                     connector.setCredentials(credentials);
                 }
                 else
                 {
-                    if(userContext != null)
+                    if (userContext != null)
                     {
                         logger.warn("Unable to find credentials for user: " + userContext.getUserId() + " and endpoint: " + endpointId);
                     }
@@ -310,24 +322,22 @@ public class ConnectorService
         
         // Establish Connector Session
         ConnectorSession connectorSession = null;
-        if(userContext != null && userContext.getConnectorSession() != null)
+        if (userContext != null && userContext.getConnectorSession() != null)
         {
             // reuse previously session-bound connector session
             connectorSession = userContext.getConnectorSession();
         }
-        if(connectorSession == null)
+        if (connectorSession == null)
         {
             // create a new "temporary" connector session
             // this will not get bound back into the session
             connectorSession = new ConnectorSession(endpointId);
         }
         connector.setConnectorSession(connectorSession);
-
+        
         return connector;
     }
 
-    
-    
     
     /////////////////////////////////////////////////////////////////
     //
@@ -345,26 +355,16 @@ public class ConnectorService
      */
     public Authenticator getAuthenticator(String id) throws RemoteConfigException
     {
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if (remoteConfig == null)
-        {
-            throw new RemoteConfigException(
-                    "Unable to find remote configuration, cannot load authenticator settings");
-        }
-
         AuthenticatorDescriptor descriptor = remoteConfig.getAuthenticatorDescriptor(id);
         if (descriptor == null)
         {
             throw new RemoteConfigException(
                     "Unable to find authenticator for id: " + id);
         }
-
-        String className = descriptor.getImplementationClass();
-        return buildAuthenticator(className);
+        
+        return buildAuthenticator(descriptor.getImplementationClass());
     }
 
-    
     
     /////////////////////////////////////////////////////////////////
     //
@@ -383,7 +383,7 @@ public class ConnectorService
     {
         String key = getSessionEndpointKey(endpointId);
         ConnectorSession cs = (ConnectorSession) session.getAttribute(key);
-        if(cs == null)
+        if (cs == null)
         {
             cs = new ConnectorSession(key);
             session.setAttribute(key, cs);
@@ -422,19 +422,10 @@ public class ConnectorService
      * 
      * @throws RemoteConfigException the remote config exception
      */
-    public synchronized CredentialVault getCredentialVault(String userId) 
+    public CredentialVault getCredentialVault(String userId) 
         throws RemoteConfigException
     {
-        // get the remote configuration block
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if (remoteConfig == null)
-        {
-            throw new RemoteConfigException(
-                    "The 'Remote' configuration was not found, unable to lookup the vault definition.");
-        }
-    
-        return getCredentialVault(userId, remoteConfig.getDefaultCredentialVaultId());
+        return getCredentialVault(userId, null);
     }
 
     /**
@@ -448,54 +439,56 @@ public class ConnectorService
      * 
      * @throws RemoteConfigException the remote config exception
      */
-    public synchronized CredentialVault getCredentialVault(String userId, String vaultId)
+    public CredentialVault getCredentialVault(String userId, String vaultId)
         throws RemoteConfigException
     {
-        if(userId == null || vaultId == null)
+        if (userId == null)
         {
-            return null;
+            throw new IllegalArgumentException("UserId is mandatory.");
+        }
+        
+        if (vaultId == null)
+        {
+            vaultId = remoteConfig.getDefaultCredentialVaultId();
         }
         
         // cache binding key
         String cacheKey = userId + ":" + vaultId;
         
         // grab the vault
-        CredentialVault vault = (CredentialVault) credentialVaultCache.get(cacheKey);
-        if (vault == null)
+        // TODO: we have to sync on a static object here - this is very bad for thread scaling
+        //       suggest this object is stored in the user session - as it is keyed to the user id!
+        CredentialVault vault;
+        synchronized (credentialVaultCache)
         {
-            // get the remote configuration block
-            RemoteConfigElement remoteConfig = (RemoteConfigElement) getConfigService().getConfig(
-                    "Remote").getConfigElement("remote");
-            if (remoteConfig == null)
+            vault = credentialVaultCache.get(cacheKey);
+            if (vault == null)
             {
-                throw new RemoteConfigException(
-                        "The 'Remote' configuration was not found, unable to lookup the vault definition.");
-            }
-    
-            // load the vault
-            CredentialVaultDescriptor descriptor = remoteConfig.getCredentialVaultDescriptor(vaultId);
-            if (descriptor == null)
-            {
-                throw new RemoteConfigException(
-                        "Unable to find credential vault definition for id: " + vaultId);
-            }
-    
-            // build the vault
-            vault = (CredentialVault) buildCredentialVault(userId, descriptor);
-            
-            // tell the vault to load (from persisted state)
-            vault.load();
-    
-            // place into cache
-            if (vault != null)
-            {
-                credentialVaultCache.put(cacheKey, vault);
+                // load the vault
+                CredentialVaultDescriptor descriptor = remoteConfig.getCredentialVaultDescriptor(vaultId);
+                if (descriptor == null)
+                {
+                    throw new RemoteConfigException(
+                            "Unable to find credential vault definition for id: " + vaultId);
+                }
+                
+                // build the vault
+                vault = buildCredentialVault(userId, descriptor);
+                
+                // place into cache
+                if (vault != null)
+                {
+                    // tell the vault to load (from persisted state)
+                    vault.load();
+                    
+                    credentialVaultCache.put(cacheKey, vault);
+                }
             }
         }
-    
+        
         return vault;
     }
-
+    
     
     /**
      * Internal method for building an Authenticator.
@@ -507,8 +500,7 @@ public class ConnectorService
      * 
      * @return the authenticator
      */
-    protected static Authenticator buildAuthenticator(
-            String className)
+    private static Authenticator buildAuthenticator(String className)
     {
         Authenticator auth = (Authenticator) authenticatorCache.get(className);
         if (auth == null)
@@ -531,7 +523,7 @@ public class ConnectorService
      * 
      * @return the connector
      */
-    protected static Connector buildConnector(ConnectorDescriptor descriptor,
+    private static Connector buildConnector(ConnectorDescriptor descriptor,
             String url)
     {
         Class[] argTypes = new Class[] { descriptor.getClass(), url.getClass() };
@@ -551,7 +543,7 @@ public class ConnectorService
      * 
      * @return the credential vault
      */
-    protected static CredentialVault buildCredentialVault(String id, CredentialVaultDescriptor descriptor)
+    private static CredentialVault buildCredentialVault(String id, CredentialVaultDescriptor descriptor)
     {
         Class[] argTypes = new Class[] { id.getClass(), descriptor.getClass() };
         Object[] args = new Object[] { id, descriptor };
@@ -566,9 +558,8 @@ public class ConnectorService
      * 
      * @return the session endpoint key
      */
-    protected static String getSessionEndpointKey(String endpointId)
+    private static String getSessionEndpointKey(String endpointId)
     {
         return PREFIX_CONNECTOR_SESSION + endpointId;        
     }
-    
 }

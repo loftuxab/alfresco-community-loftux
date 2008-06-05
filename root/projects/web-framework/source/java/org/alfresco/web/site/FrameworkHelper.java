@@ -72,8 +72,7 @@ public class FrameworkHelper
      * @param servletContext
      * @param context
      */
-    public synchronized static void initFramework(ServletContext servletContext,
-            ApplicationContext context)
+    public synchronized static void initFramework(ServletContext servletContext, ApplicationContext context)
     	throws FrameworkInitializationException
     {
         if (!isInitialized())
@@ -106,6 +105,35 @@ public class FrameworkHelper
                     servletContext, modelRootPath);
             Model model = new DefaultModel(modelFileSystem);
             setModel(model);
+            
+            
+            /**
+             * Init the User Factory for the framework.
+             */
+            String className = "org.alfresco.web.site.DefaultUserFactory";
+            
+            // check the config for an override
+            String defaultId = getConfig().getDefaultUserFactoryId();
+            if (defaultId != null)
+            {
+                String _className = getConfig().getUserFactoryDescriptor(defaultId).getImplementationClass();
+                if (_className != null)
+                {
+                    className = _className;
+                }
+            }
+            UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
+            if (factory == null)
+            {
+                throw new FrameworkInitializationException(
+                        "Unable to create user factory for class name: " + className);
+            }
+            factory.setId(defaultId);
+            
+            if (logger.isDebugEnabled())
+                logger.debug("Created User Factory: " + className);
+            
+            userFactory = factory;
             
             
             logger.info("Successfully Initialized Web Framework");
@@ -223,38 +251,8 @@ public class FrameworkHelper
         return getConnectorService().getConnector(endpointId, userId, httpSession);
     }
     
-    public static synchronized UserFactory getUserFactory()
-        throws UserFactoryException
+    public static UserFactory getUserFactory()
     {
-        if (userFactory == null)
-        {
-            // default that we will use
-            String className = "org.alfresco.web.site.DefaultUserFactory";
-            
-            // check the config for an override
-            String defaultId = FrameworkHelper.getConfig().getDefaultUserFactoryId();
-            if(defaultId != null)
-            {
-                String _className = FrameworkHelper.getConfig().getUserFactoryDescriptor(defaultId).getImplementationClass();
-                if (_className != null)
-                {
-                    className = _className;
-                }
-            }
-            
-            UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
-            if(factory == null)
-            {
-                throw new UserFactoryException("Unable to create user factory for class name: " + className);
-            }
-            factory.setId(defaultId);
-            
-            if (logger.isDebugEnabled())
-                logger.debug("Created User Factory: " + className);
-            
-            userFactory = factory;
-        }
-        
         return userFactory;
     }
     

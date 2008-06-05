@@ -70,11 +70,8 @@ public class HttpRequestContextFactory implements RequestContextFactory
 
             // Construct/load the user and place them onto the request context
             UserFactory userFactory = FrameworkHelper.getUserFactory();
-            if (userFactory != null)
-            {
-                User user = userFactory.faultUser(context, (HttpServletRequest)request);
-                context.setUser(user);
-            }
+            User user = userFactory.faultUser(context, (HttpServletRequest)request);
+            context.setUser(user);
             
             // Determine the store id and set it onto the request context
             initStoreId(context);

@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author muzquiano
  */
-public class WebFrameworkScriptRemote
+public final class WebFrameworkScriptRemote
 {
     private static final Log logger = LogFactory.getLog(WebFrameworkScriptRemote.class);
     
@@ -68,7 +68,7 @@ public class WebFrameworkScriptRemote
      * 
      * @return
      */
-    protected RequestContext getRequestContext()
+    private RequestContext getRequestContext()
     {
     	return this.context;
     }
@@ -173,7 +173,6 @@ public class WebFrameworkScriptRemote
     //
     ////////////////////////////////////////////////////////////////
 
-    
     /**
      * Invoke a specific URI on the default endpoint
      * 
