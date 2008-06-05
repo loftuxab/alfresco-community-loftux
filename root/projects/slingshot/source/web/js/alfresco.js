@@ -76,6 +76,19 @@ Alfresco.logger = Alfresco.logger || {};
 Alfresco.thirdparty = Alfresco.thirdparty || {};
 
 /**
+ * Alfresco top-level messages namespace.
+ * 
+ * @namespace Alfresco
+ * @class Alfresco.messages
+ */
+Alfresco.messages = Alfresco.messages ||
+{
+   global: null,
+   scope: {}
+};
+
+
+/**
  * Appends an array onto an object
  * @method Alfresco.util.appendArrayToObject
  * @param obj {object} Object to be appended to
@@ -170,7 +183,7 @@ Alfresco.util.formatFileSize = function(fileSize)
  * @return {string} Date formatted for UI
  * @static
  */
-Alfresco.util.formatDate = function()
+Alfresco.util.formatDate = function(date)
 {
    try
    {
@@ -236,6 +249,73 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
    }
    return button;
 }
+
+/**
+ * Add a component's messages to the central message store.
+ *
+ * @method Alfresco.util.addMessages
+ * @param p_obj {object} Object literal containing messages in the correct locale
+ * @param p_messageScope {string} Message scope to add these to, e.g. componentId
+ * @return {boolean} true if messages added
+ * @throws {Error}
+ * @static
+ */
+Alfresco.util.addMessages = function(p_obj, p_messageScope)
+{
+   if (p_messageScope === undefined)
+   {
+      throw new Error("messageScope must be defined");
+   }
+   else if (p_messageScope == "global")
+   {
+      throw new Error("messageScope cannot be 'global'");
+   }
+   else
+   {
+      Alfresco.messages.scope[p_messageScope] = p_obj;
+      return true;
+   }
+   // for completeness...
+   return false;
+}
+
+/**
+ * Resolve a messageId into a message.
+ * If a messageScope is supplied, that container will be searched first
+ * followed by the "global" message scope.
+ *
+ * @method Alfresco.util.message
+ * @param p_messageId {string} Message id to resolve
+ * @param p_messageScope {string} Message scope, e.g. componentId
+ * @return {string} The localized message string or the messageId if not found
+ * @throws {Error}
+ * @static
+ */
+Alfresco.util.message = function(p_messageId, p_messageScope)
+{
+   if (typeof p_messageId != "string")
+   {
+      throw new Error("Missing or invalid argument: messageId");
+   }
+   
+   if ((typeof p_messageScope == "string") && (typeof Alfresco.messages.scope[p_messageScope] == "object"))
+   {
+      var scopeMsg = Alfresco.messages.scope[p_messageScope][p_messageId];
+      if (typeof scopeMsg == "string")
+      {
+         return scopeMsg;
+      }
+   }
+   
+   var globalMsg = Alfresco.messages.global[p_messageId];
+   if (typeof globalMsg == "string")
+   {
+      return globalMsg;
+   }
+   
+   return p_messageId;
+}
+
 
 /**
  * Wrapper for helping components specify their YUI components.
@@ -1091,6 +1171,8 @@ Alfresco.logger.debug = function(p1, p2)
 
 /**
  * Format a date object to a user-specified mask
+ * Modified to retrieve i18n strings from Alfresco.messages
+ *
  * Original code:
  *    Date Format 1.1
  *    (c) 2007 Steven Levithan <stevenlevithan.com>

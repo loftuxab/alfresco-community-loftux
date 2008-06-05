@@ -6,7 +6,7 @@
    <ul class="filterLink">
       <li class="recentlyModified"><a href="" class="filter-link">Recently modified</a></li>
       <li class="recentlyAdded"><a href="" class="filter-link">Recently added</a></li>
-      <li class="iAmEditing"><a href="" class="filter-link">I&apos;m editing</a></li>
+      <li class="iAmEditing"><a href="" class="filter-link">I'm editing</a></li>
       <li class="othersAreEditing"><a href="" class="filter-link">Others are editing</a></li>
    </ul>
 </div>

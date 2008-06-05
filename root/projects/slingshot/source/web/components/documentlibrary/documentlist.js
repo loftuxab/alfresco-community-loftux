@@ -133,31 +133,31 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * @property widgets
        * @type object
        */
-       widgets: {},
+      widgets: {},
 
-       /**
-        * Object container for storing module instances.
-        * 
-        * @property modules
-        * @type object
-        */
-        modules: {},
+      /**
+       * Object container for storing module instances.
+       * 
+       * @property modules
+       * @type object
+       */
+      modules: {},
 
-        /**
-         * Object container for storing action markup elements.
-         * 
-         * @property actions
-         * @type object
-         */
-         actions: {},
+      /**
+       * Object container for storing action markup elements.
+       * 
+       * @property actions
+       * @type object
+       */
+      actions: {},
 
-        /**
-         * Array of selected states for visible files.
-         * 
-         * @property selectedFiles
-         * @type array
-         */
-         selectedFiles: [],
+      /**
+       * Array of selected states for visible files.
+       * 
+       * @property selectedFiles
+       * @type array
+       */
+      selectedFiles: [],
 
       /**
        * Set multiple initialization options at once.
@@ -168,6 +168,18 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       setOptions: function DL_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
+      
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       */
+      setMessages: function DL_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
          return this;
       },
       
@@ -246,10 +258,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          });
 
          // Hide/Show Folders button
-         Dom.get(this.id + "-showFolders-button").innerHTML = this.options.showFolders ? "Hide Folders" : "Show Folders";
+         Dom.get(this.id + "-showFolders-button").innerHTML = this.options.showFolders ? this._msg("button.hide-folders") : this._msg("button.show-folders");
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
 
          // Detailed/Simple List button
+         Dom.get(this.id + "-detailedView-button").innerHTML = this.options.detailedView ? this._msg("button.simple-view") : this._msg("button.detailed-view");
          this.widgets.detailedView =  Alfresco.util.createYUIButton(this, "detailedView-button", this.onDetailedView);
 
          // Folder Up Navigation button
@@ -594,7 +607,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       onDetailedView: function DL_onDetailedView(e, p_obj)
       {
          this.options.detailedView = !this.options.detailedView;
-         p_obj.set("label", (this.options.detailedView ? "Simple List" : "Detailed List"));
+         p_obj.set("label", (this.options.detailedView ? this._msg("button.simple-view") : this._msg("button.detailed-view")));
 
          YAHOO.Bubbling.fire("onDoclistRefresh");
          YAHOO.util.Event.preventDefault(e);
@@ -867,6 +880,16 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * PRIVATE FUNCTIONS
        */
 
+        /**
+         * Gets a custom messages
+         *
+         * @method _msg
+         */
+       _msg: function DL__msg(messageId)
+       {
+          return Alfresco.util.message(messageId, "Alfresco.DocumentList");
+       },
+      
         /**
          * Resets the YUI DataTable errors to our custom messages
          *

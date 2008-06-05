@@ -95,7 +95,7 @@ public class MessagesWebScript extends AbstractWebScript
             if (result == null)
             {
                 Writer writer = new StringBuilderWriter(8192);
-                writer.write("Alfresco.messages = ");
+                writer.write("Alfresco.messages.global = ");
                 JSONWriter out = new JSONWriter(writer);
                 try
                 {
