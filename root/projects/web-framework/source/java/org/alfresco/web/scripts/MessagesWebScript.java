@@ -120,5 +120,7 @@ public class MessagesWebScript extends AbstractWebScript
             }
         }
         res.getWriter().write(result);
+        res.getWriter().flush();
+        res.getWriter().close();
     }
 }
