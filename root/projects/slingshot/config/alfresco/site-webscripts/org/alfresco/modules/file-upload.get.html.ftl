@@ -10,7 +10,7 @@
       <p>
          <span id="${args.htmlid}-status-span">HEJ</span>
       </p>
-      <div id="${args.htmlid}-flashuploader-div" style="width:0px;height:0px">
+      <div id="${args.htmlid}-flashuploader-div" style="width:200px;height:200px">         
          Unable to load Flash content. You can download the latest version of Flash Player from the
          <a href="http://www.adobe.com/go/getflashplayer">Adobe Flash Player Download Center</a>.
       </div>
