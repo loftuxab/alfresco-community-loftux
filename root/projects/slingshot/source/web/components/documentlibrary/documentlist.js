@@ -203,7 +203,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          YAHOO.Bubbling.on("onDoclistRefresh", this.onDoclistRefresh, this);
       
          // YUI History
-         var bookmarkedPath = History.getBookmarkedState("path");
+         var bookmarkedPath = History.getBookmarkedState("path") || "";
          while (bookmarkedPath != (bookmarkedPath = decodeURIComponent(bookmarkedPath)));
          
          this.currentPath = bookmarkedPath || this.options.initialPath || "";
@@ -270,11 +270,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "doclist.items",
-             fields: ["index", "nodeRef", "type", "icon32", "name", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "version", "contentUrl"]
+             fields: ["index", "nodeRef", "type", "icon32", "name", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl"]
          };
          
          // Custom error messages
-         YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
+         this._setDataTableErrors();
          
          this.widgets.dataSource.doBeforeParseData = function DL_doBeforeParseData(oRequest, oFullResponse)
          {
@@ -397,6 +397,10 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                   desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
                   desc += '<div class="detail"><span><b>Comments:</b> 0</span></div>';
                }
+               else
+               {
+                  desc += '<span>' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+               }
             }
             elCell.innerHTML = desc;
          };
@@ -471,6 +475,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                if (typeof me[action] == "function")
                {
                   me[action].call(me, target.offsetParent);
+                  args[1].stop = true;
                }
             }
       		 
@@ -677,14 +682,25 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
          var target = oArgs.target;
-         var actionsId = this.id + "-actions-" + target.yuiRecordId;
-         // TODO: Cache the types for each recordId
-         var actionType = this.widgets.dataTable.getRecord(target).getData("type");
+         // activeId is the element id of the active table cell where we'll inject the actual links
+         var activeId = this.id + "-actions-" + target.yuiRecordId;
+         
+         // Inject the correct action elements into the activeId element
+         var elActive = YAHOO.util.Dom.get(activeId);
+         if (elActive.firstChild === null)
+         {
+            // Retrieve the actionType - currently keyed off folder or file type.
+            // TODO (M): Data webscript to inject action type into data record
+            // TODO (S): Cache the types for each recordId?
+            var actionType = this.widgets.dataTable.getRecord(target).getData("type");
 
-         // Append the correct action template type to the active cell
-         var elAction = YAHOO.util.Dom.get(actionsId);
-         elAction.appendChild(this.actions[actionType]);
-         YAHOO.util.Dom.removeClass(elAction, "hidden");
+            var elActions = YAHOO.util.Dom.get(this.id + "-actions-" + actionType);
+            var clone = elActions.cloneNode(true);
+            clone.id = activeId + "_a";
+            elActive.appendChild(clone);
+         }
+         // Show the actions
+         YAHOO.util.Dom.removeClass(elActive, "hidden");
          
          // Call through to get the row highlighted by YUI
          this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
@@ -701,8 +717,10 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       {
          var target = oArgs.target;
          var actionsId = this.id + "-actions-" + target.yuiRecordId;
-         YAHOO.util.Dom.addClass(actionsId, "hidden");
 
+         // Just hide the action links
+         YAHOO.util.Dom.addClass(actionsId, "hidden");
+         
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
       },
@@ -848,6 +866,16 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       /**
        * PRIVATE FUNCTIONS
        */
+
+        /**
+         * Resets the YUI DataTable errors to our custom messages
+         *
+         * @method _setDataTableErrors
+         */
+       _setDataTableErrors: function DL__setdataTableErrors()
+       {
+          YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
+       },
       
        /**
         * Updates document list by calling data webscript with current site and path
@@ -858,6 +886,9 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       _updateDocList: function DL__updateDocList(path)
       {
          Alfresco.logger.debug("DocList_updateDocList:", path);
+         
+         // Reset the custom error messages
+         this._setDataTableErrors();
          
          function successHandler(sRequest, oResponse, oPayload)
          {
