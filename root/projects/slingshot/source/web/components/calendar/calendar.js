@@ -102,6 +102,35 @@
 			
 			// Register for changes to the calendar data
 			YAHOO.Bubbling.on('onEventDataLoad', this.onEventDataLoad, this);
+			YAHOO.Bubbling.on('onEventSaved', this.onEventSaved, this);
+		},
+		
+		/*
+		 * This method is called when the "onEventSaved" event is fired; this
+		 * usually occurs when an event is successfully created. The calendar 
+		 * updates its view to hightlight the date of the event.
+		 *
+		 * @method onEventSaved
+		 * @param e {object} Event fired
+		 * @param args {array} Event parameters (depends on event type)
+		 */
+		onEventSaved: function(e, args)
+		{
+			var params = args[1];
+			if (params)
+			{
+				var from = params.from;
+				var selectedDates = this.calendar.getSelectedDates();
+				
+				var dates = selectedDates.map(function(d)
+				{
+					return Alfresco.util.formatDate(d, "mm/dd/yyyy");
+				});
+				dates.push(from);
+				
+				this.calendar.cfg.setProperty("selected", dates.join(","));
+				this.calendar.render();
+			}
 		},
 		
 		/*
