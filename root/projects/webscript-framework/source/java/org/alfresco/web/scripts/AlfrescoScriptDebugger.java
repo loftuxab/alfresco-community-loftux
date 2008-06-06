@@ -22,18 +22,15 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.jscript;
+package org.alfresco.web.scripts;
 
 import java.awt.event.ActionEvent;
 
 import javax.swing.WindowConstants;
 
-import org.alfresco.repo.security.authentication.AuthenticationUtil;
-import org.alfresco.repo.security.authentication.AuthenticationUtil.RunAsWork;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.Kit;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.tools.debugger.Dim;
 import org.mozilla.javascript.tools.debugger.ScopeProvider;
@@ -44,20 +41,21 @@ import org.mozilla.javascript.tools.shell.Global;
 /**
  * Alfresco implementation of Rhino JavaScript debugger
  * 
- * Provides support for authenticated access to object inspection.
- * 
  * @author davidc
  */
-public class AlfrescoRhinoScriptDebugger 
+public class AlfrescoScriptDebugger implements Runnable
 {
-    // Logger
-    private static final Log logger = LogFactory.getLog(AlfrescoRhinoScriptDebugger.class);
+    private static final Log logger = LogFactory.getLog(AlfrescoScriptDebugger.class);
     
     private ContextFactory factory = null;
-    private AlfrescoDim dim = null;
     private SwingGui gui = null;
+    protected Dim dim = null;
     
-
+    
+    protected void initDebugger()
+    {
+        dim = new Dim();
+    }
     
     /**
      * Start the Debugger
@@ -82,12 +80,12 @@ public class AlfrescoRhinoScriptDebugger
         global.setIn(System.in);
         global.setOut(System.out);
         global.setErr(System.err);        
-        dim = new AlfrescoDim();
-        ScopeProvider sp = IProxy.newScopeProvider((Scriptable)global);
+        initDebugger();
+        ScopeProvider sp = new AlfrescoScopeProvider((Scriptable)global);
         dim.setScopeProvider(sp);
         gui = new AlfrescoGui(dim, "Alfresco JavaScript Debugger", this);
         gui.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        gui.setExitAction((Runnable)sp);
+        gui.setExitAction(this);
     }
 
     
@@ -141,35 +139,23 @@ public class AlfrescoRhinoScriptDebugger
     {
         return gui != null;
     }
-
-            
-    public static class AlfrescoDim extends Dim
+    
+    /**
+     * Exit action.
+     */
+    public void run()
     {
-        /* (non-Javadoc)
-         * @see org.mozilla.javascript.tools.debugger.Dim#objectToString(java.lang.Object)
-         */
-        @Override
-        public String objectToString(final Object arg0)
-        {
-            // execute command in context of currently selected user
-            return AuthenticationUtil.runAs(new RunAsWork<String>()
-            {
-                @SuppressWarnings("synthetic-access")
-                public String doWork() throws Exception
-                {
-                    return AlfrescoDim.super.objectToString(arg0);
-                }
-            }, AuthenticationUtil.getSystemUserName());
-        }
+        dim.detach();
+        gui.dispose();
     }
     
     
     private static class AlfrescoGui extends SwingGui
     {
         private static final long serialVersionUID = 5053205080777378416L;
-        private AlfrescoRhinoScriptDebugger debugger;
+        private AlfrescoScriptDebugger debugger;
         
-        public AlfrescoGui(Dim dim, String title, AlfrescoRhinoScriptDebugger debugger)
+        public AlfrescoGui(Dim dim, String title, AlfrescoScriptDebugger debugger)
         {
             super(dim, title);
             this.debugger = debugger;
@@ -190,64 +176,23 @@ public class AlfrescoRhinoScriptDebugger
     }
     
     
-    public static class IProxy implements Runnable, ScopeProvider
+    public static class AlfrescoScopeProvider implements ScopeProvider
     {
-        // Constants for 'type'.
-        public static final int EXIT_ACTION = 1;
-        public static final int SCOPE_PROVIDER = 2;
-
+        AlfrescoScopeProvider(Scriptable scope)
+        {
+            this.scope = scope;
+        }
+        
         /**
-         * The type of interface.
-         */
-        private final int type;
-
-        /**
-         * The scope object to expose when {@link #type} =
-         * {@link #SCOPE_PROVIDER}.
+         * The scope object to expose
          */
         private Scriptable scope;
         
-        
-        /**
-         * Creates a new IProxy.
-         */
-        public IProxy(int type)
-        {
-            this.type = type;
-        }
-
-        /**
-         * Creates a new IProxy that acts as a {@link ScopeProvider}.
-         */
-        public static ScopeProvider newScopeProvider(Scriptable scope)
-        {
-            IProxy scopeProvider = new IProxy(EXIT_ACTION);
-            scopeProvider.scope = scope;
-            return scopeProvider;
-        }
-
-        // ContextAction
-
-        /**
-         * Exit action.
-         */
-        public void run()
-        {
-            if (type != EXIT_ACTION)
-                Kit.codeBug();
-        }
-
-        // ScopeProvider
-
         /**
          * Returns the scope for script evaluations.
          */
         public Scriptable getScope()
         {
-            if (type != SCOPE_PROVIDER)
-                Kit.codeBug();
-            if (scope == null)
-                Kit.codeBug();
             return scope;
         }
     }

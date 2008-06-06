@@ -300,4 +300,16 @@
    <!--  Install -->
    <bean id="webscript.org.alfresco.scriptinstall.post" class="org.alfresco.web.scripts.bean.ServiceInstall" parent="webscript" singleton="false" />
    
+   <!--  Javascript APIs -->
+   
+   <!--  Switch on debugger by setting log4j.logger.org.alfresco.web.scripts.AlfrescoScriptDebugger to DEBUG -->
+   <bean id="scriptDebugger" class="org.alfresco.web.scripts.AlfrescoScriptDebugger" init-method="start"/>
+   
+   <bean id="webscript.org.alfresco.jsdebugger.get" class="org.alfresco.web.scripts.bean.JavascriptDebugger" parent="webscript" singleton="false">
+      <property name="debugger" ref="scriptDebugger" />
+   </bean>
+   <bean id="webscript.org.alfresco.jsdebugger.post" class="org.alfresco.web.scripts.bean.JavascriptDebuggerPost" parent="webscript" singleton="false">
+      <property name="debugger" ref="scriptDebugger" />
+   </bean>
+   
 </beans>
