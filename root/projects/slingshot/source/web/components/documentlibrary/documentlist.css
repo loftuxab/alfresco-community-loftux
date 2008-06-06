@@ -45,6 +45,10 @@
 }
 
 /* Buttons */
+.doclist div.inline
+{
+   display: inline;
+}
 
 .doclist .new-folder button
 {

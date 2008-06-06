@@ -28,11 +28,6 @@
    width: 30em;
 }
 
-.create-folder .caret-fix
-{
-   overflow: auto;
-}
-
 .create-folder input,
 .create-folder textarea
 {

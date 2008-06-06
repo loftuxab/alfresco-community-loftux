@@ -191,6 +191,11 @@
 
          // Show the dialog
          this.dialog.show();
+
+         // Firefox insertion caret fix
+         Alfresco.util.caretFix(this.id + "-createSite-form");
+
+         YAHOO.util.Dom.get(this.id + "-title").focus();
       },
 
       /**
