@@ -22,15 +22,15 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing"
  */
-package org.alfresco.repo.web.scripts.bean;
+package org.alfresco.web.scripts.bean;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.repo.jscript.AlfrescoRhinoScriptDebugger;
+import org.alfresco.web.scripts.AlfrescoScriptDebugger;
 import org.alfresco.web.scripts.DeclarativeWebScript;
-import org.alfresco.web.scripts.WebScriptRequest;
 import org.alfresco.web.scripts.Status;
+import org.alfresco.web.scripts.WebScriptRequest;
 
 
 /**
@@ -38,15 +38,16 @@ import org.alfresco.web.scripts.Status;
  * 
  * @author davidc
  */
-public class JavascriptDebuggerPost extends DeclarativeWebScript
+public class JavascriptDebugger extends DeclarativeWebScript
 {
     // dependencies
-    private AlfrescoRhinoScriptDebugger debugger;
+    private AlfrescoScriptDebugger debugger;
+    
     
     /**
      * @param ticketComponent
      */
-    public void setDebugger(AlfrescoRhinoScriptDebugger debugger)
+    public void setDebugger(AlfrescoScriptDebugger debugger)
     {
         this.debugger = debugger;
     }
@@ -58,21 +59,9 @@ public class JavascriptDebuggerPost extends DeclarativeWebScript
     @Override
     protected Map<String, Object> executeImpl(WebScriptRequest req, Status status)
     {
-        String visibleStr = req.getParameter("visible");
-        boolean visible = Boolean.valueOf(visibleStr);
-        
-        if (visible)
-        {
-            debugger.show();
-        }
-        else
-        {
-            debugger.hide();
-        }
-
+        // construct model
         Map<String, Object> model = new HashMap<String, Object>(7, 1.0f);
         model.put("visible", debugger.isVisible());
         return model;
     }
-
 }
