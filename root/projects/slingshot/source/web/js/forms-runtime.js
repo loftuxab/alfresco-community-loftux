@@ -76,6 +76,23 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       ajaxSubmit: null,
       
       /**
+       * Object holding the callback handlers and messages for pre-submission callback.
+       * The callback handlers are themselves an object of the form:
+       *   fn: function, // The handler to call when the event fires.
+       *   obj: object, // An object to pass back to the handler.
+       *   scope: object // The object to use for the scope of the handler.
+       * 
+       * @property doBeforeFormSubmit
+       * @type object
+       */
+      doBeforeFormSubmit:
+      {
+         fn: function(form, obj){},
+         obj: null,
+         scope: this
+      },
+      
+      /**
        * Object holding the callback handlers and messages for AJAX submissions.
        * The callback handlers are themselves an object of the form:
        *   fn: function, // The handler to call when the event fires.
@@ -425,16 +442,21 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
          {
             if (this._runValidations(false))
             {
-               // validation was successful, now check whether
-               // submission should be done using AJAX, if not 
-               // the browser will do the submit
+               // validation was successful
+               // get the form element
+               var form = document.getElementById(this.formId);
+
+               // call the pre-submit function, passing the form for last-chance processing
+               this.doBeforeFormSubmit.fn.call(this.doBeforeFormSubmit.scope, form, this.doBeforeFormSubmit.obj);
+
+               // should submission be done using AJAX, or let 
+               // the browser do the submit?
                if (this.ajaxSubmit)
                {
                   // stop the browser from submitting the form
                   YAHOO.util.Event.stopEvent(event);
                   
-                  // get the form element
-                  var form = document.getElementById(this.formId);
+                  // get the form's action URL
                   var submitUrl = form.attributes.action.nodeValue;
                   
                   if (Alfresco.logger.isDebugEnabled())
