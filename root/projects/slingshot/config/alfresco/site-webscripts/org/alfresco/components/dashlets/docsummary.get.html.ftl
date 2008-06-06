@@ -11,10 +11,10 @@
                <div class="detail-list-item">
                   <div>
                      <div class="icon">
-                        <img src="${url.context}${doc.icon32}" />
+                        <img src="${url.context}${doc.icon32}" alt="*" />
                      </div>
                      <div class="details">
-                        <h4><a target="content" href="${url.context}/proxy/alfresco${doc.contentUrl}/${doc.name?url}">${doc.name?html}</a></h4>
+                        <h4><a rel="content" href="${url.context}/proxy/alfresco${doc.contentUrl}/${doc.name?url}">${doc.name?html}</a></h4>
                         <div>modified by ${doc.modifiedBy} on ${doc.modifiedOn}</div>
                      </div>
                   </div>
@@ -24,3 +24,13 @@
       </#if>
    </div>
 </div>
+<script type="text/javascript">//<![CDATA[
+(function()
+{
+   var links = YAHOO.util.Selector.query("a[rel]", "${args.htmlid}");
+   for (var i = 0, len = links.length; i < len; ++i)
+   {
+      links[i].setAttribute("target", links[i].getAttribute("rel"));
+   }
+})();
+//]]></script>

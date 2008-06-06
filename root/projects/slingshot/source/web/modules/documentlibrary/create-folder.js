@@ -204,18 +204,11 @@
          form.attributes.action.nodeValue = action;
 
          this.dialog.show();
-         YAHOO.util.Dom.get(this.id + "-name").focus();
 
          // Firefox insertion caret fix
-         YAHOO.lang.later(0, this, function()
-         {
-            var nodes = YAHOO.util.Selector.query("#" + this.id + " .yui-u");
-            for (var x = 0; x < nodes.length; x++)
-            {
-               var elem = nodes[x];
-               YAHOO.util.Dom.addClass(elem, "caret-fix");
-            }
-         })
+         Alfresco.util.caretFix(form);
+
+         YAHOO.util.Dom.get(this.id + "-name").focus();
       },
       
       /**
@@ -255,7 +248,13 @@
 
          // Form definition
          var form = new Alfresco.forms.Form(this.id + "-form");
+
+         // Validation
+         // Name: mandatory value
          form.addValidation(this.id + "-name", Alfresco.forms.validation.mandatory, null, "keyup");
+         // Name: valid filename
+         form.addValidation(this.id + "-name", Alfresco.forms.validation.nodeName, null, "keyup");
+
          form.setShowSubmitStateDynamically(true);
          form.setSubmitElements(this.widgets.okButton);
          form.setAJAXSubmit(true,

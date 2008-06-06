@@ -202,31 +202,22 @@
        */
       _showDialog: function AmSD__showDialog()
       {
+         var form = YAHOO.util.Dom.get(this.id + "-form");
+         
          if (this.options.actionUrl !== null)
          {
-            form = YAHOO.util.Dom.get(this.id + "-form");
             form.attributes.action.nodeValue = this.options.actionUrl;
          }
 
          this.dialog.show();
+
+         // Fix Firefox caret issue
+         Alfresco.util.firefoxCaretFix(form);
          
+         // Set focus if required
          if (this.options.firstFocus !== null)
          {
-            YAHOO.util.Dom.get(this.id + this.options.firstFocus).focus();
-         }
-
-         // Firefox insertion caret fix
-         if (YAHOO.env.ua.gecko)
-         {
-            YAHOO.lang.later(0, this, function()
-            {
-               var nodes = YAHOO.util.Selector.query("#" + this.id + " .yui-u");
-               for (var x = 0; x < nodes.length; x++)
-               {
-                  var elem = nodes[x];
-                  YAHOO.util.Dom.addClass(elem, "caret-fix");
-               }
-            })
+            YAHOO.util.Dom.get(this.options.firstFocus).focus();
          }
       },
       

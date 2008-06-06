@@ -31,6 +31,7 @@
    <script type="text/javascript" src="${url.context}/yui/container/container-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/menu/menu-debug.js"></script>
    <script type="text/javascript" src="${url.context}/yui/json/json-debug.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/selector/selector-beta-debug.js"></script>
 <#else>
 <!-- Common YUI components: RELEASE -->
    <script type="text/javascript" src="${url.context}/yui/utilities/utilities.js"></script>
@@ -38,6 +39,7 @@
    <script type="text/javascript" src="${url.context}/yui/container/container-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/menu/menu-min.js"></script>
    <script type="text/javascript" src="${url.context}/yui/json/json-min.js"></script>
+   <script type="text/javascript" src="${url.context}/yui/selector/selector-min.js"></script>
 </#if>
 
 <!-- Site-wide Common Assets -->

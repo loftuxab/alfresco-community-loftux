@@ -4,13 +4,10 @@
    /*width: 30em;*/
 }
 
-.create-site .yui-t1{
+.create-site .yui-t1
+{
    width: 450px;
    min-width:450px;
-}
-.create-site .caret-fix
-{
-   overflow: auto;
 }
 
 .create-site select,

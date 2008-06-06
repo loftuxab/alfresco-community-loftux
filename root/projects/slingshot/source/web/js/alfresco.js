@@ -316,6 +316,22 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
    return p_messageId;
 }
 
+Alfresco.util.caretFix = function(p_formElement)
+{
+   if (YAHOO.env.ua.gecko == 1.8)
+   {
+      if (typeof p_formElement == "string")
+      {
+         p_formElement = YAHOO.util.Dom.get(p_formElement);
+      }
+      var nodes = YAHOO.util.Selector.query(".yui-u", p_formElement);
+      for (var x = 0; x < nodes.length; x++)
+      {
+         var elem = nodes[x];
+         YAHOO.util.Dom.addClass(elem, "caret-fix");
+      }
+   }
+}
 
 /**
  * Wrapper for helping components specify their YUI components.

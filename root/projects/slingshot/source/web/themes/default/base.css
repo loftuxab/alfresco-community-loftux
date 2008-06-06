@@ -35,6 +35,11 @@ body
    display: none;
 }
 
+.caret-fix
+{
+   overflow: auto;
+}
+
 div.clear
 {
     clear: both;
