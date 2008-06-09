@@ -279,14 +279,20 @@
       versionSection: null,
 
       /**
-       * HTMLElement of type div that is used to as a template to display a
+       * HTMLElements of type div that is used to to display a column in a
        * row in the file table list. It is loaded dynamically from the server
-       * and then cloned for each row in the file list.
+       * and then cloned for each row and column in the file list.
+       * The fileItemTemplates has the following form:
+       * {
+       *    left:   HTMLElement to display the left column
+       *    center: HTMLElement to display the center column
+       *    right:  HTMLElement to display the right column
+       * }
        *
-       * @property fileItemTemplate
+       * @property fileItemTemplates
        * @type HTMLElement
        */
-      fileItemTemplate: null,
+      fileItemTemplates: {},
 
       /**
        * Fired by YUILoaderHelper when required component script files have
@@ -360,6 +366,84 @@
          }
       },
 
+
+      /**
+       * Called when the uploader html template has been returned from the server.
+       * Creates the YIU gui objects such as the data table and panel,
+       * saves references to HTMLElements inside the template for easy access
+       * during upload progress and finally shows the panel with the gui inside.
+       *
+       * @method onTemplateLoaded
+       * @param response {object} a Alfresco.util.Ajax.request response object
+       */
+      onTemplateLoaded: function(response)
+      {
+         var Dom = YAHOO.util.Dom;
+
+         // Remember the label for empty data tables so we can reset it on close
+         this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
+         YAHOO.widget.DataTable.MSG_EMPTY = "No files to display. Click 'Browse' select files to upload.";
+
+         // Inject the template from the XHR request into a new DIV element
+         var containerDiv = document.createElement("div");
+         containerDiv.innerHTML = response.serverResponse.responseText;
+
+         // The panel is created from the HTML returned in the XHR request, not the container
+         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+
+         this.panel = new YAHOO.widget.Panel(dialogDiv,
+         {
+            modal: true,
+            draggable: false,
+            fixedcenter: true,
+            visible: false,
+            close: false
+         });
+         this.panel.render(document.body);
+
+         // Save a reference to the file row template that is hidden inside the markup
+         this.fileItemTemplates.left = Dom.get(this.id + "-left-div");
+         this.fileItemTemplates.center = Dom.get(this.id + "-center-div");
+         this.fileItemTemplates.right = Dom.get(this.id + "-right-div");
+
+         // Create the YIU datatable object
+         this._createEmptyDataTable();
+
+         // Save a reference to the HTMLElement displaying texts so we can alter the texts later
+         this.titleText = Dom.get(this.id + "-title-span");
+         this.multiSelectText = Dom.get(this.id + "-multiSelect-span");
+         this.statusText = Dom.get(this.id + "-status-span");
+
+         // Save a reference to browseButton so wa can change it later
+         this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
+
+         // Save a reference to the HTMLElement displaying version input so we can hide or show it
+         this.versionSection = Dom.get(this.id + "-versionSection-div");
+
+         // Create a buttongroup for versions
+         var vGroup = Dom.get(this.id + "-version-buttongroup");
+         var oButtonGroup1 = new YAHOO.widget.ButtonGroup(vGroup);
+
+         // Create and save a reference to the uploadButton so we can alter it later
+         this.widgets.uploadButton = Alfresco.util.createYUIButton(this, "upload-button", this.onUploadButtonClick);
+
+         // Create and save a reference to the cancelOkButton so we can alter it later
+         this.widgets.cancelOkButton = Alfresco.util.createYUIButton(this, "cancelOk-button", this.onCancelOkButtonClick);
+
+         // Create and save a reference to the uploader so we can call it later
+         this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
+         this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
+         this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
+         this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
+         this.uploader.subscribe("uploadStart",this.onUploadStart, this, true);
+         this.uploader.subscribe("uploadCancel",this.onUploadCancel, this, true);
+         this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
+         this.uploader.subscribe("uploadError",this.onUploadError, this, true);
+
+         // Show the uploader panel
+         this._showPanel();
+      },
+
       /**
        * Fired by YUI:s DataTable when a row has been added to the data table list.
        * Keeps track of added files.
@@ -414,12 +498,20 @@
        */
       onUploadStart: function(event)
       {
-         // Hide the contentType drop down if it wasn't selected already
+         // Get the reference to the files gui components
          var Dom = YAHOO.util.Dom;
          var fileInfo = this.fileStore[event["id"]];
+
+         // Hide the contentType drop down if it wasn't hidden already
          if (!Dom.hasClass(fileInfo.contentType, "hiddenComponents"))
          {
             Dom.addClass(fileInfo.contentType, "hiddenComponents");
+         }
+
+         // Show the progress percentage if it wasn't visible already
+         if (Dom.hasClass(fileInfo.progressPercentage, "hiddenComponents"))
+         {
+            Dom.removeClass(fileInfo.progressPercentage, "hiddenComponents");
          }
 
          // Make sure we know have gone into upload state
@@ -449,12 +541,28 @@
 
       /**
        * Fired by YIU:s Uploader when transfer is complete for one of the files.
-       * Adjusts the gui and calls for another file to upload.
        *
        * @method onUploadComplete
        * @param event {object} an Uploader "uploadComplete" event
        */
       onUploadComplete: function(event)
+      {
+         /**
+          * Actions taken on a completed upload is handled by the
+          * onUploadCompleteData() method instead.
+          */
+      },
+
+      /**
+       * Fired by YIU:s Uploader when transfer is completed for a file.
+       * A difference compared to the onUploadComplete() method is that
+       * the response body is available in the event.
+       * Adjusts the gui and calls for another file to upload.
+       *
+       * @method onUploadCompleteData
+       * @param event {object} an Uploader "uploadCompleteData" event
+       */
+      onUploadCompleteData: function(event)
       {
          // The individual file has been transfered completely
          // Now adjust the gui for the individual file row
@@ -477,18 +585,6 @@
          this._updateStatus();
          this._uploadFromQueue(1);
          this._adjustGuiIfFinished();
-      },
-
-      /**
-       * Fired by YIU:s Uploader when transfer is completed for ALL files.
-       * Doesn't do anything.
-       *
-       * @method onUploadCompleteData
-       * @param event {object} an Uploader "uploadCompleteData" event
-       */
-      onUploadCompleteData: function(event)
-      {
-          // We don't do anything since we handle the uploading queue ourselves.
       },
 
       /**
@@ -617,7 +713,7 @@
       {
          var message;
          if (this.state === this.STATE_BROWSING)
-         {
+         {     
             // Do nothing (but close the panel, which happens below)
          }
          else if (this.state === this.STATE_UPLOADING)
@@ -734,82 +830,6 @@
       },
 
       /**
-       * Called when the uploader html template has been returned from the server.
-       * Creates the YIU gui objects such as the data table and panel,
-       * saves references to HTMLElements inside the template for easy access
-       * during upload progress and finally shows the panel with the gui inside.
-       *
-       * @method onTemplateLoaded
-       * @param response {object} a Alfresco.util.Ajax.request response object
-       */
-      onTemplateLoaded: function(response)
-      {
-         var Dom = YAHOO.util.Dom;
-
-         // Remember the label for empty data tables so we can reset it on close
-         this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
-         YAHOO.widget.DataTable.MSG_EMPTY = "No files to display. Click 'Browse' select files to upload.";
-
-         // Inject the template from the XHR request into a new DIV element
-         var containerDiv = document.createElement("div");
-         containerDiv.innerHTML = response.serverResponse.responseText;
-
-         // The panel is created from the HTML returned in the XHR request, not the container
-         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
-
-         this.panel = new YAHOO.widget.Panel(dialogDiv,
-         {
-            modal: true,
-            draggable: false,
-            fixedcenter: true,
-            visible: false,
-            close: false,
-            width: "622px"
-         });
-         this.panel.render(document.body);
-
-         // Save a reference to the file row template that is hidden inside the markup
-         this.fileItemTemplate = Dom.get(this.id + "-fileItemTemplate-div");
-
-         // Create the YIU datatable object
-         this._createEmptyDataTable();
-
-         // Save a reference to the HTMLElement displaying texts so we can alter the texts later
-         this.titleText = Dom.get(this.id + "-title-span");
-         this.multiSelectText = Dom.get(this.id + "-multiSelect-span");
-         this.statusText = Dom.get(this.id + "-status-span");
-
-         // Save a reference to browseButton so wa can change it later
-         this.widgets.browseButton = Alfresco.util.createYUIButton(this, "browse-button", this.onBrowseButtonClick);
-
-         // Save a reference to the HTMLElement displaying version input so we can hide or show it
-         this.versionSection = Dom.get(this.id + "-versionSection-div");
-
-         // Create a buttongroup for versions
-         var vGroup = Dom.get(this.id + "-version-buttongroup");
-         var oButtonGroup1 = new YAHOO.widget.ButtonGroup(vGroup);
-
-         // Create and save a reference to the uploadButton so we can alter it later
-         this.widgets.uploadButton = Alfresco.util.createYUIButton(this, "upload-button", this.onUploadButtonClick);
-
-         // Create and save a reference to the cancelOkButton so we can alter it later
-         this.widgets.cancelOkButton = Alfresco.util.createYUIButton(this, "cancelOk-button", this.onCancelOkButtonClick);
-
-         // Create and save a reference to the uploader so we can call it later
-         this.uploader = new YAHOO.widget.Uploader(this.id + "-flashuploader-div");
-         this.uploader.subscribe("fileSelect", this.onFileSelect, this, true);
-         this.uploader.subscribe("uploadComplete",this.onUploadComplete, this, true);
-         this.uploader.subscribe("uploadProgress",this.onUploadProgress, this, true);
-         this.uploader.subscribe("uploadStart",this.onUploadStart, this, true);
-         this.uploader.subscribe("uploadCancel",this.onUploadCancel, this, true);
-         this.uploader.subscribe("uploadCompleteData",this.onUploadCompleteData, this, true);
-         this.uploader.subscribe("uploadError",this.onUploadError, this, true);
-
-         // Show the uploader panel
-         this._showPanel();
-      },
-
-      /**
        * Helper function to create the data table and its cell formatter.
        *
        * @method _createEmptyDataTable
@@ -822,73 +842,120 @@
 
          /**
           * Save a reference of 'this' so that the formatter below can use it
-          * later. This is hard other wise since the formatter method gets
-          * called with another scope than 'this'.
+          * later (since the formatter method gets called with another scope
+          * than 'this').
           */
          var myThis = this;
 
          /**
-          * Responsible for rendering a row in the data table
+          * Responsible for rendering the left row in the data table
           *
           * @param el HTMLElement the td element
           * @param oRecord Holds the file data object
           */
-         this.formatCell = function(el, oRecord) {
+         this.formatLeftCell = function(el, oRecord) {
+            myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.left);
+         };
 
-            // Get the id that is used to reference each file in the uploader
+         /**
+          * Responsible for rendering the center row in the data table
+          *
+          * @param el HTMLElement the td element
+          * @param oRecord Holds the file data object
+          */
+         this.formatCenterCell = function(el, oRecord) {
+            myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.center);
+         };
+
+         /**
+          * Responsible for rendering the right row in the data table
+          *
+          * @param el HTMLElement the td element
+          * @param oRecord Holds the file data object
+          */
+         this.formatRightCell = function(el, oRecord) {
+            myThis._formatCellElements(el, oRecord, myThis.fileItemTemplates.right);
+         };
+
+         /**
+          * Takes a left, center or right column template and looks for expected
+          * html components and vcreates yui objects or saves references to
+          * them so they can be updated during the upload progress.
+          *
+          * @param el HTMLElement the td element
+          * @param oRecord Holds the file data object
+          * @param template the template to display in the column
+          */
+         this._formatCellElements = function(el, oRecord, template) {
+
+            // Set the state for this file(/row) if it hasn't been set
             var flashId = oRecord.getData()["id"];
-
-            // Wrap the HTMLELement el in YIU Element
-            var cell = new YAHOO.util.Element(el);
-
-            // Display the file size in human readable format after the filename
-            var readableSize = new Number(oRecord.getData()["size"]);
-            readableSize = Alfresco.util.formatFileSize(readableSize);
-            var fileInfoStr = oRecord.getData()["name"] + " (" + readableSize + ")";
-
-            /**
-             * Use the hidden template found in the gui provided by the server
-             * to display each row in the table. Give it a unique id.
-             */
-            var templateInstance = myThis.fileItemTemplate.cloneNode(true);
-            templateInstance.setAttribute("id", myThis.id + "-fileItemTemplate-div-" + flashId);
-
-            /**
-             * Find parts in the gui that will be changed during the upload
-             * progress and therefore should be referenced for easy access.
-             */
-            var progress = Dom.getElementsByClassName("fileupload-progressSuccess-span", "span", templateInstance)[0];
-            var progressInfo = Dom.getElementsByClassName("fileupload-progressInfo-span", "span", templateInstance)[0];
-            progressInfo["innerHTML"] = fileInfoStr;
-            var contentType = Dom.getElementsByClassName("fileupload-contentType-menu", "select", templateInstance)[0];
-            var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance)[0];
-
-            // Create a yui button for the fileButton
-            var fButton = Dom.getElementsByClassName("fileupload-file-button", "button", templateInstance)[0];
-            var fileButton = new YAHOO.widget.Button(fButton, {type: "button"});
-            fileButton.subscribe("click", function(){ myThis._onFileButtonClickHandler(flashId, oRecord.getId()); }, myThis, true);
-
-            /**
-             * Save all the references in the fileStore object for easy access
-             * during the upload progress during which they should be altered.
-             */
-            myThis.fileStore[flashId] =
+            if(!this.fileStore[flashId])
             {
-               fileButton: fileButton,
-               state: myThis.STATE_BROWSING,
-               progress: progress,
-               progressInfo: progressInfo,
-               progressPercentage: progressPercentage,
-               contentType: contentType
-            };
+               this.fileStore[flashId] = { state: this.STATE_BROWSING };
+            }
 
-            // Insert the new row inside the browsers DOM.
+            // create an instance from the template and give it a uniqueue id.
+            var cell = new YAHOO.util.Element(el);
+            var templateInstance = template.cloneNode(true);
+            templateInstance.setAttribute("id", templateInstance.getAttribute("id") + flashId);
+
+            // Save references to elements that will be updated during upload.
+            var progress = Dom.getElementsByClassName("fileupload-progressSuccess-span", "span", templateInstance);
+            if(progress.length == 1)
+            {
+               this.fileStore[flashId].progress = progress[0];
+            }
+            var progressInfo = Dom.getElementsByClassName("fileupload-progressInfo-span", "span", templateInstance);
+            if(progressInfo.length == 1)
+            {
+               // Display the file size in human readable format after the filename.
+               var readableSize = new Number(oRecord.getData()["size"]);
+               readableSize = Alfresco.util.formatFileSize(readableSize);
+               var fileInfoStr = oRecord.getData()["name"] + " (" + readableSize + ")";
+
+               // Display the file name and size.
+               progressInfo = progressInfo[0];
+               this.fileStore[flashId].progressInfo = progressInfo;
+               this.fileStore[flashId].progressInfo["innerHTML"] = fileInfoStr;
+            }
+
+            /**
+             * Save a reference to the contentType dropdown so we can find each
+             * files contentType before upload.
+             */
+            var contentType = Dom.getElementsByClassName("fileupload-contentType-menu", "select", templateInstance);
+            if(contentType.length == 1)
+            {
+               this.fileStore[flashId].contentType = contentType[0];
+            }
+
+            // Save references to elements that will be updated during upload.
+            var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance);
+            if(progressPercentage.length == 1)
+            {
+               this.fileStore[flashId].progressPercentage = progressPercentage[0];
+            }
+
+            // Create a yui button for the fileButton.
+            var fButton = Dom.getElementsByClassName("fileupload-file-button", "button", templateInstance);
+            if(fButton.length == 1)
+            {
+               var fileButton = new YAHOO.widget.Button(fButton[0], {type: "button"});
+               fileButton.subscribe("click", function(){ this._onFileButtonClickHandler(flashId, oRecord.getId()); }, this, true);
+               this.fileStore[flashId].fileButton = fileButton;
+            }
+
+            // Insert the templateInstance to the column.
             cell.appendChild (templateInstance);
          };
 
+
          // Definition of the data table column
          var myColumnDefs = [
-            {key:"id", label: "Files", width:580, resizable: false, formatter: this.formatCell}
+            {className:"col-left", label: "Left", resizable: false, formatter: this.formatLeftCell},
+            {className:"col-center", label: "Center", resizable: false, formatter: this.formatCenterCell},
+            {className:"col-right", label: "Right", resizable: false, formatter: this.formatRightCell}
          ];
 
          // The data tables underlying data source.
@@ -900,12 +967,12 @@
          };
 
          // Create the data table.
+         YAHOO.widget.DataTable._bStylesheetFallback = !!YAHOO.env.ua.ie;
          var dataTableDiv = Dom.get(this.id + "-filelist-table");
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
             scrollable: true,
             height: "200px",
-            width: "600px",
             renderLoopSize: 5
          });
          this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
@@ -1015,7 +1082,8 @@
 
                // The contentType that the file should be uploaded as.
                var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
-               var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+               //var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+               var url = "http://localhost:8080/alfresco/service/api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
                this.uploader.upload(flashId, url, "POST",
                {
                   path: this.showConfig.path,

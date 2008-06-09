@@ -1,5 +1,27 @@
 /* Style YUI components */
 
+/* Width of the panel, IE doesn't fill out the header othwerwise. */
+.file-upload .hd
+{
+   width: 620px;
+   text-align: center;
+}
+
+/* Width of the panel. */
+.file-upload .bd
+{
+   width: 620px;
+   text-align: left; /* If not present IE7 puts the table outside the panel */
+}
+
+
+/* Center text and buttons inside p elements */
+.file-upload p
+{
+   text-align: center;
+}
+
+/* Create a visible gray line beneath each row */
 .fileUpload-filelist-table tbody .yui-dt-liner
 {
    margin: 0;
@@ -10,34 +32,48 @@
    white-space: nowrap;
 }
 
+/* Eidth of the file list */
+.fileUpload-filelist-table .yui-dt-bd table
+{
+   width: 600px;
+}
+
+/* Hide the table header */
 .fileUpload-filelist-table .yui-dt-hd table
 {
-   width: 100%;
+   display: none;
 }
 
-.file-upload .fileupload-fileButton-span button
+/**
+ * If an element with "position: relative;" is used inside
+ * another element with "overflow: scroll;" IE takes the inner element "out of
+ * the flow" which makes statically positioned on the screen ignoring to be
+ * hidden and following the scrollbar.
+ *
+ * In this component, position relative is used for the progress bars, but
+ * a YUI button is also used which causes the same problem.
+ *
+ * If the outer element also has "position: relative;" it works though.
+ */
+.fileUpload-filelist-table .yui-dt-bd
 {
-   padding-left: 2.5em;
-   background: url(../images/icons/close_panel.gif) 10% 50% no-repeat; 
+   position:relative;
+   width:620px;
 }
 
-.fileupload-percentage-div, .fileupload-fileButton-div
+/* Style left column and its elements */
+
+.fileUpload-filelist-table tbody .col-left
 {
    height: 40px;
+   width: 100px;
+}
+
+.fileupload-left-div
+{
    text-align: center;
+   height: 40px;
    background-color: #FAF9F9;
-}
-
-.fileupload-fileButton-div
-{
-   width: 120px;
-   float: right;
-}
-
-.fileupload-percentage-div
-{
-   width: 80px;
-   float: left;
 }
 
 .fileupload-percentage-span
@@ -48,33 +84,49 @@
    font-size: 123.1%;
 }
 
-.fileupload-fileButton-span
+.fileupload-contentType-menu
 {
    position: relative;
-   top: 7px;
+   top: 10px;
 }
 
-.fileupload-docImage-img
+/* Style center column and its elements */
+
+.fileUpload-filelist-table tbody .col-center
 {
-   position: absolute;               
-   left: 5px;
-   top: 4px;
+   height: 40px;
+   width: 400px;
 }
 
-.fileupload-progressBar-div
+.fileupload-center-div
 {
-   background-color: #FFFFFF;   
+   background-color: #FFFFFF;
    position: relative;
    height: 40px;
-   /*padding: 0px 120px 0px 80px;*/
    padding: 0px 0px 0px 0px;
    margin: 0px;
    overflow: hidden;
 }
 
-.fileupload-progressBar-div .fileupload-progressSuccess-span,
-.fileupload-progressBar-div .fileupload-progressFailure-span,
-.fileupload-progressBar-div .fileupload-progressFinished-span
+.fileupload-docImage-img
+{
+   position: absolute;
+   left: 5px;
+   top: 4px;
+}
+
+.fileupload-progressInfo-span
+{
+   position: absolute;
+   left: 40px;
+   top: 12px;
+   font-weight: bold;
+   font-size: 108%;
+}
+
+.fileupload-center-div .fileupload-progressSuccess-span,
+.fileupload-center-div .fileupload-progressFailure-span,
+.fileupload-center-div .fileupload-progressFinished-span
 {
    position: absolute;
    top: 0px;
@@ -98,18 +150,30 @@
    background-color: #E98B3C;
 }
 
-.fileupload-progressInfo-span
+/* Style right column and its elements */
+
+.fileUpload-filelist-table tbody .col-right
 {
-   position: relative;
-   left: 40px;
-   top: 12px;
-   font-weight: bold;
-   font-size: 108%;
+   height: 40px;
+   width: 100px;
 }
 
-.fileupload-progressContentType-div
+.fileupload-right-div
+{
+   text-align: center;
+   height: 40px;
+   background-color: #FAF9F9;
+}
+
+.fileupload-fileButton-span
 {
    position: relative;
-   right: 5px;
-   top: 10px;
+   top: 7px;
 }
+
+.file-upload .fileupload-fileButton-span button
+{
+   padding-left: 2.5em;
+   background: url(../images/icons/close_panel.gif) 10% 50% no-repeat;
+}
+

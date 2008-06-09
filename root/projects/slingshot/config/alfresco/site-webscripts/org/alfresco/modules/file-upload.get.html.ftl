@@ -44,29 +44,25 @@
       </p>
 
       <div class="hiddenComponents">
-         <div id="${args.htmlid}-fileItemTemplate-div">
-            <div class="fileupload-percentage-div">
-               <span class="fileupload-percentage-span">&nbsp;</span>
-            </div>
-            <div class="fileupload-fileButton-div">
-               <span class="fileupload-fileButton-span">
-                  <button class="fileupload-file-button" value="Remove">Remove</button>
-               </span>
-            </div>
-            <div class="fileupload-progressBar-div">
-               <span class="fileupload-progressSuccess-span">&nbsp;</span>
-               <img src="${url.context}/images/filetypes32/_default.gif" class="fileupload-docImage-img"/>
-               <span class="fileupload-progressInfo-span">{progressInfo}</span>
-               <div class="fileupload-progressContentType-div">
-                  <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hiddenComponents</#if>">
-                     <#if (contentTypes?size > 0)>
-                        <#list contentTypes as contentType>
-                           <option value="${contentType.id}">${contentType.value}</option>
-                        </#list>
-                     </#if>
-                  </select>
-               </div>
-            </div>
+         <div id="${args.htmlid}-left-div" class="fileupload-left-div">
+            <span class="fileupload-percentage-span hiddenComponents">&nbsp;</span>
+            <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hiddenComponents666</#if>">
+               <#if (contentTypes?size > 0)>
+                  <#list contentTypes as contentType>
+                     <option value="${contentType.id}">${contentType.value}</option>
+                  </#list>
+               </#if>
+            </select>
+         </div>
+         <div id="${args.htmlid}-center-div" class="fileupload-center-div">
+            <span class="fileupload-progressSuccess-span">&nbsp;</span>
+            <img src="${url.context}/images/filetypes32/_default.gif" class="fileupload-docImage-img"/>
+            <span class="fileupload-progressInfo-span">{progressInfo}</span>
+         </div>
+         <div id="${args.htmlid}-right-div" class="fileupload-right-div">
+            <span class="fileupload-fileButton-span">
+               <button class="fileupload-file-button" value="Remove">Remove</button>
+            </span>
          </div>
       </div>
    </div>
