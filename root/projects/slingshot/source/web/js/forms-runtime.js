@@ -26,6 +26,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       this.submitElements = [];
       this.validations = [];
       this.ajaxSubmit = false;
+      this.errorContainer = "alert";
 
       return this;
    };
@@ -74,6 +75,16 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @type boolean
        */
       ajaxSubmit: null,
+      
+      /**
+       * String representing where errors should be displayed. 
+       * If the value is not "alert" it's presumed the string is the id of an 
+       * HTML object to be used as the error container.
+       * 
+       * @property errorContainer
+       * @type string
+       */
+      errorContainer: null,
       
       /**
        * Object holding the callback handlers and messages for pre-submission callback.
@@ -211,12 +222,14 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * Sets the position where errors will be displayed.
        * 
        * @method setErrorPosition
-       * @param position {string} Position of errors, can be one of:
-       *        'alert', 'popup', 'afterField' or 'beforeForm'.
+       * @param position {string} String representing where errors should
+       *        be displayed. If the value is not "alert" it's presumed the 
+       *        string is the id of an HTML object to be used as the error 
+       *        container
        */
       setErrorPosition: function(position)
       {
-         alert("not implemented yet");
+         this.errorContainer = position;
       },
       
       /**
@@ -354,12 +367,21 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        */
       addError: function(msg, field, showNow)
       {
-         // TODO: Add the error next to the field if supplied otherwise
-         //       at the top of the form
-         
-         if (showNow)
+         if (showNow && this.errorContainer != null)
          {
-            alert(msg);
+            if (this.errorContainer === "alert")
+            {
+               alert(msg);
+            }
+            else
+            {
+               var htmlNode = document.getElementById(this.errorContainer);
+               if (htmlNode != null)
+               {
+                  htmlNode.style.display = "block";
+                  htmlNode.innerHTML = msg;
+               }
+            }
          }
       },
       
@@ -402,6 +424,25 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       },
       
       /**
+       * Clears any errors displayed by previous validation failures.
+       * 
+       * @method _clearErrors
+       * @private
+       */
+      _clearErrors: function()
+      {
+         if (this.errorContainer !== "alert")
+         {
+            var htmlNode = document.getElementById(this.errorContainer);
+            if (htmlNode != null)
+            {
+               htmlNode.style.display = "none";
+               htmlNode.innerHTML = "";
+            }
+         }
+      },
+      
+      /**
        * Event handler called when a validation event is fired by any registered field.
        * 
        * @method _validationEventFired
@@ -437,6 +478,9 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       {
          if (Alfresco.logger.isDebugEnabled())
             Alfresco.logger.debug("Submit invoked on form: ", this);
+         
+         // clear any errors that may be visible
+         this._clearErrors();
          
          if (this.validateOnSubmit)
          {
@@ -869,12 +913,40 @@ Alfresco.forms.validation.nodeName = function number(field, args, form, silent)
    if (Alfresco.logger.isDebugEnabled())
       Alfresco.logger.debug("Validating field '" + field.id + "' is a valid node name");
 
-   if(!args)
+   if (!args)
    {
       args = {};
    }
+   
    args.pattern = /([\"\*\\\>\<\?\/\:\|]+)|([ ]+$)|([\.]?[\.]+$)/;
    args.match = false;
+
+   return Alfresco.forms.validation.regexMatch(field, args, form, silent);
+};
+
+/**
+ * Email validation handler, tests that the given field's value is a valid
+ * email address.
+ *
+ * @method email
+ * @param field {object} The element representing the field the validation is for
+ * @param args {object} Not used
+ * @param form {object} The forms runtime class instance the field is being managed by
+ * @param silent {boolean} Determines whether the user should be informed upon failure
+ * @static
+ */
+Alfresco.forms.validation.email = function number(field, args, form, silent)
+{
+   if (Alfresco.logger.isDebugEnabled())
+      Alfresco.logger.debug("Validating field '" + field.id + "' is a valid email address");
+
+   if (!args)
+   {
+      args = {};
+   }
+   
+   args.pattern = /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/;
+   args.match = true;
 
    return Alfresco.forms.validation.regexMatch(field, args, form, silent);
 };
@@ -911,7 +983,7 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, form, si
    if (field.value.length > 0)
    {
       // The pattern SHOULD match by default
-      if(args.match === undefined)
+      if (args.match === undefined)
       {
           args.match = true;
       }
@@ -921,7 +993,7 @@ Alfresco.forms.validation.regexMatch = function regexMatch(field, args, form, si
       valid = pattern.test(field.value);
 
       // Adjust the result if the test wasn't intended to match
-      if(!args.match)
+      if (!args.match)
       {
          valid = !valid;
       }

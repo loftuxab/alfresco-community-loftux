@@ -22,12 +22,26 @@
       <script type="text/javascript" src="../../build/assemble/yui/calendar/calendar-min.js"></script>
       <script type="text/javascript" src="../web/js/alfresco.js"></script>
       <script type="text/javascript" src="../web/js/forms-runtime.js"></script>
+      
+      <style>
+         .errors
+         {
+            color: red;
+            border: 1px dashed #dedede;
+            padding: 4px;
+            margin-bottom: 10px;
+            display: none;
+         }
+      </style>
    </head>
    
    <body>
-      <h3>Metadata Example</h3>
+      <h3>Registration Example</h3>
       
-      <form id="regform" class="alfForm" action="http://localhost:8081/slingshot/service/components/metadata" 
+      <div id="form-errors" class="errors">
+      </div>
+      
+      <form id="regform" action="http://localhost:8081/slingshot/service/components/metadata" 
             method="post" enctype="multipart/form-data" accept-charset="utf-8">
          <fieldset>
             <legend>Login details</legend>
@@ -81,7 +95,36 @@
       
          <br/>
          
-         <input id="submit" type="submit" value="Submit" />
+         <input id="regsubmit" type="submit" value="Submit" />
+         <input value="Clear" type="reset" />
+      </form>
+      
+      <h3>Address Example</h3>
+      
+      <form id="addressform" action="http://localhost:8081/slingshot/service/components/metadata" 
+            method="post" enctype="multipart/form-data" accept-charset="utf-8">
+         <fieldset>
+            <legend>Address</legend>
+            <label for="housenumber">House Number</label>
+            <input id="housenumber" name="housenumber" type="text" size="6" />
+            <br />
+      
+            <label for="street">Street</label>
+            <input id="street" name="street" type="text" size="40" />
+            <br />
+            
+            <label for="town">Town</label>
+            <input id="town" name="town" type="text" size="40" />
+            <br />
+            
+            <label for="county">County</label>
+            <input id="county" name="county" type="text" size="40" />
+            <br />
+         </fieldset>
+         
+         <br/>
+         
+         <input id="addrsubmit" type="submit" value="Set Address" />
          <input value="Clear" type="reset" />
       </form>
       
@@ -101,18 +144,27 @@
          //cal1.selectEvent.subscribe(updateDate, cal1, true);
          //cal1.render(); 
          
-         // setup form   
+         // setup registration form   
          var regform = new Alfresco.forms.Form("regform");
          regform.addValidation("username", Alfresco.forms.validation.length, {min: 3, max: 10}, "blur");
          regform.addValidation("age", Alfresco.forms.validation.mandatory);
          regform.addValidation("age", Alfresco.forms.validation.numberRange, {min: 18}, "blur");
          regform.addValidation("country", Alfresco.forms.validation.mandatory);
          regform.addValidation("gender", Alfresco.forms.validation.mandatory);
-         regform.addValidation("email", Alfresco.forms.validation.regexMatch, {pattern: /(\w+@[a-zA-Z_]+?\.[a-zA-Z]{2,6})/}, "blur");
+         regform.addValidation("email", Alfresco.forms.validation.email, null, "blur");
          //regform.setValidateOnSubmit(false);
-         //regform.setShowSubmitStateDynamically(true);
          //regform.setSubmitIds("submit");
+         regform.setErrorPosition("form-errors");
          regform.init();
+
+         // setup address form   
+         var addrform = new Alfresco.forms.Form("addressform");
+         addrform.addValidation("housenumber", Alfresco.forms.validation.mandatory, null, "keyup");
+         addrform.addValidation("street", Alfresco.forms.validation.mandatory, null, "keyup");
+         addrform.addValidation("housenumber", Alfresco.forms.validation.number, null, "blur");
+         addrform.setShowSubmitStateDynamically(true);
+         addrform.setErrorPosition("form-errors");
+         addrform.init();
       </script>
       
    </body>
