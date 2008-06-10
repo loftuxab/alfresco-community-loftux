@@ -1,8 +1,8 @@
 <div class="dashlet">
-   <div class="title">Site Colleagues</div>
+   <div class="title">${msg("header.colleagues")}</div>
    <div class="toolbar">
-      <a href="#">All</a> |
-      <span>Find: </span><input type="text" />
+      <a href="#">${msg("link.viewAll")}</a> |
+      <span>${msg("link.find")} </span><input type="text" />
    </div>
    <div class="body scrollableList">
 
@@ -12,7 +12,7 @@
       <span>${m.role}</span>
    </#list>
 <#else>
-      <h3>No members in this site yet</h3>
+      <h3>${msg("label.noMembers")}</h3>
 </#if>
    </div>
 </div>
