@@ -3,19 +3,19 @@
 //]]></script>
 <div class="header">
    <div class="logo">
-      <img src="${url.context}${args.logo}" alt="Alfresco" />
+      <img src="${url.context}${args.logo}"/>
    </div>
    <div class="personal-menu">
-      <span class="menu-item"><a href="${url.context}/page/user-dashboard">My Dashboard</a></span>
-      <span class="menu-item"><a href="${url.context}/page/user-profile">My Profile</a></span>
-      <span class="menu-item"><a href="#">Sites</a></span>
-      <span class="menu-item"><a href="#">Users</a></span>
+      <span class="menu-item"><a href="${url.context}/page/user-dashboard">${msg("link.myDashboard")}</a></span>
+      <span class="menu-item"><a href="${url.context}/page/user-profile">${msg("link.myProfile")}</a></span>
+      <span class="menu-item"><a href="#">${msg("link.sites")}</a></span>
+      <span class="menu-item"><a href="#">${msg("link.users")}</a></span>
    </div>
    <div class="util-menu">
-      <span class="menu-item"><a href="#">Help</a></span>
-      <span class="menu-item"><a href="#">Search</a></span>
-      <span class="menu-item"><input type="text" name="search" value="All Sites" /></span>
-      <span class="menu-item"><a href="#">Logout</a></span>
+      <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
+      <span class="menu-item"><a href="#">${msg("link.search")}</a></span>
+      <span class="menu-item"><input type="text" name="search" value="${msg("label.searchTip")}" /></span>
+      <span class="menu-item"><a href="#">${msg("link.logout")}</a></span>
    </div>
 </div>
 <div class="clear"></div>

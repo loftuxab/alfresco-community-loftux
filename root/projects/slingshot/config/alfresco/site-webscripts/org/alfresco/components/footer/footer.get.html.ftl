@@ -3,5 +3,5 @@
 //]]></script>
 
 <div class="footer">
-   <span class="copyright">Alfresco Software Inc. &copy; 2005-2008. All rights reserved.</span>
+   <span class="copyright">${msg("label.copyright")}</span>
 </div>

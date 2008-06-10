@@ -62,9 +62,11 @@
    Alfresco.module.FileUpload = function(containerId)
    {
       this.name = "Alfresco.module.FileUpload";
-      this.id = containerId;
-      
+      this.id = containerId;      
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
+
+      /* Register this component */
+      Alfresco.util.ComponentManager.register(this);
 
       // Load YUI Components
       Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "uploader"], this.onComponentsLoaded, this);
@@ -295,6 +297,18 @@
       fileItemTemplates: {},
 
       /**
+       * Set messages for this module.
+       *       
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       */
+      setMessages: function setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+
+      /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
        *
@@ -333,7 +347,7 @@
       {
          // Remember the the label used by other components so we can reset it at close
          this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
-         YAHOO.widget.DataTable.MSG_EMPTY = "No files to display. Click 'Browse' select files to upload.";
+         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("label.noFiles", this.name);
 
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
@@ -352,6 +366,8 @@
          }
          else
          {
+            /* TODO: Probably place the loading of i18n messages here (or in the constructor) */            
+
             // If it hasn't load the gui (template) from the server
             Alfresco.util.Ajax.request(
             {
@@ -363,6 +379,7 @@
                },
                failureMessage: "Could not load file upload template"
             });
+            
          }
       },
 
@@ -380,17 +397,12 @@
       {
          var Dom = YAHOO.util.Dom;
 
-         // Remember the label for empty data tables so we can reset it on close
-         this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
-         YAHOO.widget.DataTable.MSG_EMPTY = "No files to display. Click 'Browse' select files to upload.";
-
          // Inject the template from the XHR request into a new DIV element
          var containerDiv = document.createElement("div");
-         containerDiv.innerHTML = response.serverResponse.responseText;
+         containerDiv.innerHTML = response.serverResponse.responseText;         
 
-         // The panel is created from the HTML returned in the XHR request, not the container
+         // Create the panel from the HTML returned in the server reponse
          var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
-
          this.panel = new YAHOO.widget.Panel(dialogDiv,
          {
             modal: true,
@@ -399,7 +411,17 @@
             visible: false,
             close: false
          });
+
+         /**
+          * Render the server reponse so the contents get inserted in the Dom.
+          * Scripts in the template, such as setMessage(),  will also get run
+          * at this moment. 
+          */
          this.panel.render(document.body);
+
+         // Remember the label for empty data tables so we can reset it on close
+         this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
+         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("label.noFiles", this.name);
 
          // Save a reference to the file row template that is hidden inside the markup
          this.fileItemTemplates.left = Dom.get(this.id + "-left-div");
@@ -455,7 +477,7 @@
       {
          // Since the flash movie allows the user to select one file several
          // times we need to keep track of the selected files by our selves
-         var uniqueFileToken = this._getUniqeFileToken(event.record.getData());
+         var uniqueFileToken = this._getUniqueFileToken(event.record.getData());
          this.addedFiles[uniqueFileToken] = event.record.getId();
       },
 
@@ -475,7 +497,7 @@
          for (var i in event.fileList)
          {
             var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
-            if (!this.addedFiles[this._getUniqeFileToken(data)])
+            if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
                this.dataTable.addRow(data, 0);
             }
@@ -509,12 +531,13 @@
          }
 
          // Show the progress percentage if it wasn't visible already
+         fileInfo.progressPercentage["innerHTML"] = "0%";
          if (Dom.hasClass(fileInfo.progressPercentage, "hiddenComponents"))
          {
             Dom.removeClass(fileInfo.progressPercentage, "hiddenComponents");
          }
 
-         // Make sure we know have gone into upload state
+         // Make sure we know we are in upload state
          fileInfo.state = this.STATE_UPLOADING;
       },
 
@@ -571,7 +594,8 @@
          fileInfo.fileButton.set("disabled", true);
 
          // Add the label "Successful" after the filename
-         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " Success";
+         fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] +
+                                              " " + Alfresco.util.message("label.success", this.name);
 
          // Change the style of the progress bar
          fileInfo.progress.setAttribute("class", "fileupload-progressFinished-span");
@@ -616,7 +640,8 @@
             fileInfo.state = this.STATE_FAILURE;
 
             // Add the label "Failure" to the filename
-            fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] + " Failure";
+            fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] +
+                                                 " " + Alfresco.util.message("label.failure", this.name);
 
             // Change the style of the progress bar
             fileInfo.progress.setAttribute("class", "fileupload-progressFailure-span");
@@ -667,7 +692,7 @@
           * Remove the file from the datatable and all references to it.
           */
          var r = this.dataTable.getRecordSet().getRecord(recordId);
-         this.addedFiles[this._getUniqeFileToken(r.getData())] = null;
+         this.addedFiles[this._getUniqueFileToken(r.getData())] = null;
          this.fileStore[flashId] = null;
          this.dataTable.deleteRow(r);
          if (this.state === this.STATE_BROWSING)
@@ -731,7 +756,8 @@
             }
             if (noOfUploadedFiles > 0)
             {
-               message = "The remaining upload(s) has been cancel, at least " + noOfUploadedFiles + " file(s) were uploaded.";
+               message = Alfresco.util.message("label.cancelStatus", this.name);
+               message = YAHOO.lang.substitute(message, {"0": noOfUploadedFiles});
             }
 
             // Tell the document list to refresh itself if present
@@ -782,7 +808,7 @@
             if (length > 0)
             {
                this.state = this.STATE_UPLOADING;
-               this.widgets.uploadButton.set("label", "Uploading...");
+               this.widgets.uploadButton.set("label", Alfresco.util.message("button.uploading", this.name));
                this.widgets.uploadButton.set("disabled", true);
                this.widgets.browseButton.set("disabled", true);
             }
@@ -953,9 +979,9 @@
 
          // Definition of the data table column
          var myColumnDefs = [
-            {className:"col-left", label: "Left", resizable: false, formatter: this.formatLeftCell},
-            {className:"col-center", label: "Center", resizable: false, formatter: this.formatCenterCell},
-            {className:"col-right", label: "Right", resizable: false, formatter: this.formatRightCell}
+            {className:"col-left", resizable: false, formatter: this.formatLeftCell},
+            {className:"col-center", resizable: false, formatter: this.formatCenterCell},
+            {className:"col-right", resizable: false, formatter: this.formatRightCell}
          ];
 
          // The data tables underlying data source.
@@ -991,9 +1017,9 @@
          this.noOfFailedUploads = 0;
          this.noOfSuccessfulUploads = 0;
          this.statusText["innerHTML"] = "&nbsp;";
-         this.widgets.uploadButton.set("label", "Upload Files");
+         this.widgets.uploadButton.set("label", Alfresco.util.message("button.upload", this.name));
          this.widgets.uploadButton.set("disabled", true);
-         this.widgets.cancelOkButton.set("label", "Cancel");
+         this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.cancel", this.name));
          this.widgets.cancelOkButton.set("disabled", false);
          this.widgets.browseButton.set("disabled", false);
 
@@ -1007,11 +1033,11 @@
       /**
        * Helper function to create a unique file token from the file data object
        *
-       * @method _getUniqeFileToken
+       * @method _getUniqueFileToken
        * @param data {object} a file data object describing a file
        * @private
        */
-      _getUniqeFileToken: function(data)
+      _getUniqueFileToken: function(data)
       {
          return data.name + ":" + data.size + ":" + data.cDate + ":" + data.mDate
       },
@@ -1024,12 +1050,13 @@
        */
       _updateStatus: function(){
          // Update the status label with the latest information about the upload progress
-         var status = "Status: " + this.noOfSuccessfulUploads + "/" +
-                      this.dataTable.getRecordSet().getLength() + " uploaded";
-         if (this.noOfFailedUploads > 0)
+         var status = Alfresco.util.message("label.uploadStatus", this.name);
+         status = YAHOO.lang.substitute(status,
          {
-            status +=" (" + this.noOfFailedUploads + " failed)";
-         }
+            "0" : this.noOfSuccessfulUploads,
+            "1" : this.dataTable.getRecordSet().getLength(),
+            "2" : this.noOfFailedUploads
+         });
          this.statusText["innerHTML"] = status; 
       },
 
@@ -1053,7 +1080,7 @@
             }
          }
          this.state = this.STATE_FINISHED;
-         this.widgets.cancelOkButton.set("label", "Ok");
+         this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.ok", this.name));
          this.widgets.uploadButton.set("disabled", true);
       },
 
