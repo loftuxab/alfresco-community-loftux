@@ -31,14 +31,15 @@ import java.io.IOException;
  * 
  * @author muzquiano
  */
-public class CacheItem<K> implements java.io.Serializable
+public final class CacheItem<K> implements java.io.Serializable
 {
     private static final long serialVersionUID = 4526472295622776147L;
 
-    protected String m_key;
-    protected K m_object;
-    protected long m_timeout;
-    protected long m_stamp;
+    private String key;
+    K object;
+    private long timeout;
+    private long stamp;
+    long lastChecked;
     
     /**
      * Instantiates a new cache item.
@@ -49,10 +50,10 @@ public class CacheItem<K> implements java.io.Serializable
      */
     public CacheItem(String key, K obj, long timeout)
     {
-        m_timeout = timeout;
-        m_key = key;
-        m_object = obj;
-        m_stamp = System.currentTimeMillis();
+        this.timeout = timeout;
+        this.key = key;
+        this.object = obj;
+        this.lastChecked = this.stamp = System.currentTimeMillis();
     }
 
     /**
@@ -63,12 +64,12 @@ public class CacheItem<K> implements java.io.Serializable
     public boolean isExpired()
     {
         // never timeout for -1
-        if (m_timeout == -1)
+        if (timeout == -1)
         {
             return false;
         }
 
-        return (m_timeout < (System.currentTimeMillis() - m_stamp));
+        return (timeout < (System.currentTimeMillis() - stamp));
     }
 
     /**
@@ -80,10 +81,10 @@ public class CacheItem<K> implements java.io.Serializable
      */
     public void writeObject(java.io.ObjectOutputStream out) throws IOException
     {
-        out.writeObject(this.m_key);
-        out.writeObject(new Long(this.m_timeout));
-        out.writeObject(new Long(this.m_stamp));
-        out.writeObject(this.m_object);
+        out.writeObject(this.key);
+        out.writeObject(new Long(this.timeout));
+        out.writeObject(new Long(this.stamp));
+        out.writeObject(this.object);
     }
 
     /**
@@ -97,9 +98,9 @@ public class CacheItem<K> implements java.io.Serializable
     public void readObject(java.io.ObjectInputStream in) throws IOException,
             ClassNotFoundException
     {
-        this.m_key = (String) in.readObject();
-        this.m_timeout = ((Long) in.readObject()).longValue();
-        this.m_stamp = ((Long) in.readObject()).longValue();
-        this.m_object = ((K) in.readObject());
+        this.key = (String) in.readObject();
+        this.timeout = ((Long) in.readObject()).longValue();
+        this.stamp = ((Long) in.readObject()).longValue();
+        this.object = ((K) in.readObject());
     }
 }

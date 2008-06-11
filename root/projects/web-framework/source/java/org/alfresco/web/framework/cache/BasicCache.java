@@ -34,18 +34,18 @@ import java.util.WeakHashMap;
  */
 public class BasicCache<K> implements ContentCache<K>
 {
-    protected WeakHashMap<String, CacheItem<K>> m_cache;
-    protected long m_default_timeout;
+    protected WeakHashMap<String, CacheItem<K>> cache;
+    protected long timeout;
     
     /**
      * Instantiates a new basic cache.
      * 
-     * @param default_timeout the default_timeout
+     * @param timeout   the timeout
      */
-    public BasicCache(long default_timeout)
+    public BasicCache(long timeout)
     {
-        m_default_timeout = default_timeout;
-        m_cache = new WeakHashMap<String, CacheItem<K>>(256);
+        this.timeout = timeout;
+        this.cache = new WeakHashMap<String, CacheItem<K>>(256);
     }
 
     /* (non-Javadoc)
@@ -54,7 +54,7 @@ public class BasicCache<K> implements ContentCache<K>
     public synchronized K get(String key)
     {
         // get the content item from the cache
-        CacheItem<K> item = m_cache.get(key);
+        CacheItem<K> item = cache.get(key);
         
         // if the cache item is null, return right away
         if (item == null)
@@ -71,7 +71,7 @@ public class BasicCache<K> implements ContentCache<K>
                 return null;
             }
             
-            return item.m_object;
+            return item.object;
         }
     }
 
@@ -84,7 +84,7 @@ public class BasicCache<K> implements ContentCache<K>
         {
             return;
         }
-        m_cache.remove(key);
+        cache.remove(key);
     }
 
     /* (non-Javadoc)
@@ -92,7 +92,7 @@ public class BasicCache<K> implements ContentCache<K>
      */
     public synchronized void put(String key, K obj)
     {
-        put(key, obj, m_default_timeout);
+        put(key, obj, timeout);
     }
 
     /* (non-Javadoc)
@@ -102,7 +102,7 @@ public class BasicCache<K> implements ContentCache<K>
     {
         // create the cache item
         CacheItem<K> item = new CacheItem<K>(key, obj, timeout);
-        m_cache.put(key, item);
+        cache.put(key, item);
     }
 
     /* (non-Javadoc)
@@ -110,6 +110,6 @@ public class BasicCache<K> implements ContentCache<K>
      */
     public void invalidate()
     {
-        m_cache.clear();
+        cache.clear();
     }
 }

@@ -65,7 +65,7 @@ public class PersistentCache extends BasicCache
         boolean bReloadedFromDisk = false;
 
         // get the content item from the cache
-        CacheItem item = (CacheItem) m_cache.get(key);
+        CacheItem item = (CacheItem) cache.get(key);
 
         // if the cache item is null, then we should try to reload it
         // from disk.  it might have been cached and cleared from memory.
@@ -106,10 +106,10 @@ public class PersistentCache extends BasicCache
 
         // if it was reloaded, make sure its stored in memory
         if (bReloadedFromDisk)
-            m_cache.put(key, item);
+            cache.put(key, item);
 
         // return this
-        return item.m_object;
+        return item.object;
     }
 
     /* (non-Javadoc)
@@ -120,7 +120,7 @@ public class PersistentCache extends BasicCache
         if (key == null)
             return;
 
-        m_cache.remove(key);
+        cache.remove(key);
         removeFromDisk(key);
     }
 
@@ -136,7 +136,7 @@ public class PersistentCache extends BasicCache
         CacheItem item = new CacheItem(key, obj, timeout);
         if (writeToDisk(key, item))
         {
-            m_cache.put(key, item);
+            cache.put(key, item);
         }
     }
 

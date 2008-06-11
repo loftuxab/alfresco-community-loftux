@@ -226,7 +226,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
         ModelObjectCache cache = objectCaches.get(key);
         if (cache == null)
         {
-            cache = new ModelObjectCache(this.store, DEFAULT_CACHE_TIMEOUT);
+            cache = new ModelObjectCache(this.store, DEFAULT_CACHE_DELAY);
             objectCaches.put(key, cache);
         }
         

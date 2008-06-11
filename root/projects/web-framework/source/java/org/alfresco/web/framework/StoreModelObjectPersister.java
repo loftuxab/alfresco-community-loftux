@@ -56,7 +56,8 @@ import org.dom4j.DocumentException;
 public class StoreModelObjectPersister extends AbstractModelObjectPersister
 {
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
-    protected static long DEFAULT_CACHE_TIMEOUT = 30*60*1000; // 30 minutes
+    // TODO: make this configurable!
+    static long DEFAULT_CACHE_DELAY = 1L*60L*1000L; // 1 minutes
 
     protected String id;
     protected Store store;
@@ -434,7 +435,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         ModelObjectCache cache = objectCaches.get(key);
         if (cache == null)
         {
-            cache = new ModelObjectCache(this.store, DEFAULT_CACHE_TIMEOUT);
+            cache = new ModelObjectCache(this.store, DEFAULT_CACHE_DELAY);
             objectCaches.put(key, cache);
         }
         
