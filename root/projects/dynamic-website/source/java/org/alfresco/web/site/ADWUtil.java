@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.alfresco.web.framework.ModelPersistenceContext;
 
 /**
  * @author muzquiano
@@ -51,7 +52,7 @@ public class ADWUtil
 
         // endpoint settings
         String endpointURL = endpoint.getEndpointUrl();
-        String sandbox = context.getStoreId();
+        String sandbox = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
         String uri = "/alfresco/service/adw/redirect/incontext/" + sandbox + "/";
 
         // build the url
