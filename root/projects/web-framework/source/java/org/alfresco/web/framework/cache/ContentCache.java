@@ -30,7 +30,7 @@ package org.alfresco.web.framework.cache;
  * 
  * @author muzquiano
  */
-public interface ContentCache
+public interface ContentCache<K>
 {
     /**
      * Gets content stored in the cache 
@@ -47,7 +47,7 @@ public interface ContentCache
      * @param key the key
      * @param obj the obj
      */
-    public void put(String key, Object obj);
+    public void put(String key, K obj);
     
     /**
      * Places content into the cache
@@ -56,7 +56,7 @@ public interface ContentCache
      * @param obj the obj
      * @param timeout the timeout in milliseconds
      */
-    public void put(String key, Object obj, long timeout);
+    public void put(String key, K obj, long timeout);
     
     /**
      * Removes a content object from the cache.

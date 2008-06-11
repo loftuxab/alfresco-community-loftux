@@ -151,7 +151,7 @@ public class WebFrameworkService
         {
             modelObjectManager = ModelObjectManager.newInstance(this, context);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             throw new WebFrameworkServiceException("Exception while instantiating model object manager", ex);
         }

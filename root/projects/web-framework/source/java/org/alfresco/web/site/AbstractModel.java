@@ -33,15 +33,15 @@ import org.alfresco.web.framework.ModelObjectManager;
  */
 public abstract class AbstractModel implements Model
 {
-    protected ModelObjectManager service;
+    protected ModelObjectManager manager;
 
-    public AbstractModel(ModelObjectManager service)
+    public AbstractModel(ModelObjectManager manager)
     {
-        this.service = service;
+        this.manager = manager;
     }
     
     public ModelObjectManager getObjectManager()
     {
-        return this.service;
+        return this.manager;
     }    
 }

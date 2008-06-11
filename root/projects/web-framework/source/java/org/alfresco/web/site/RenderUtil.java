@@ -351,21 +351,21 @@ public final class RenderUtil
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
             Map<String, ModelObject> components = context.getModel().findComponents(regionScopeId, regionSourceId, regionId, null);
-            if(components.size() > 0)
+            if (components.size() != 0)
             {
                 component = (Component) components.values().iterator().next();
             }
-            if(component == null || THEME.equals(regionScopeId))
+            if (component == null || THEME.equals(regionScopeId))
             {
                 // check to see whether the current theme specifies a default component for this region id
                 Theme theme = ThemeUtil.getCurrentTheme(context);
-                if(theme != null)
+                if (theme != null)
                 {
                     component = theme.getDefaultComponent(context, regionId);
                 }
 
             }
-            if(component != null)
+            if (component != null)
             {
                 // if we are in passive mode, then we won't bother to execute the renderer.
                 // rather, we will notify the template that this component is bound to it

@@ -138,8 +138,8 @@ public class RendererFactory
      * 
      * @throws RendererNotFoundException
      */
-    public static Renderable newRenderer(RequestContext context,
-            TemplateInstance template) throws RendererNotFoundException
+    public static Renderable newRenderer(RequestContext context, TemplateInstance template)
+        throws RendererNotFoundException
     {                
         /**
          * Special case for Web Scripts as default
@@ -149,15 +149,14 @@ public class RendererFactory
          * value is the name/path to a web script.
          */
         String templateTypeId = template.getTemplateType();
-        if(templateTypeId != null)
+        if (templateTypeId != null)
         {
             TemplateType testTemplateType = context.getModel().getTemplateType(templateTypeId);
-            if(testTemplateType == null)
+            if (testTemplateType == null)
             {
                 // execute as a freemarker template type
                 TemplateType templateType = context.getModel().getTemplateType("freemarker");
-                return _newRenderer(context, templateType.getRendererType(),
-                        templateTypeId);                
+                return _newRenderer(context, templateType.getRendererType(), templateTypeId);
             }
         }
         

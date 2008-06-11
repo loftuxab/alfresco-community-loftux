@@ -31,12 +31,12 @@ import java.io.IOException;
  * 
  * @author muzquiano
  */
-public class CacheItem implements java.io.Serializable
+public class CacheItem<K> implements java.io.Serializable
 {
     private static final long serialVersionUID = 4526472295622776147L;
 
     protected String m_key;
-    protected Object m_object;
+    protected K m_object;
     protected long m_timeout;
     protected long m_stamp;
     
@@ -47,7 +47,7 @@ public class CacheItem implements java.io.Serializable
      * @param obj the obj
      * @param timeout the timeout
      */
-    public CacheItem(String key, Object obj, long timeout)
+    public CacheItem(String key, K obj, long timeout)
     {
         m_timeout = timeout;
         m_key = key;
@@ -100,6 +100,6 @@ public class CacheItem implements java.io.Serializable
         this.m_key = (String) in.readObject();
         this.m_timeout = ((Long) in.readObject()).longValue();
         this.m_stamp = ((Long) in.readObject()).longValue();
-        this.m_object = ((Object) in.readObject());
+        this.m_object = ((K) in.readObject());
     }
 }

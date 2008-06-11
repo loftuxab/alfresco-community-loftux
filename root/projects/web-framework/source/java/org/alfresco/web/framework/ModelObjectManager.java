@@ -35,26 +35,27 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Provides core services for loading, retrieving and persisting
  * model objects to one or more back-end Stores.
- * 
+ * <p>
  * A model object type has an associated search path id.  The search
  * path defines the set of stores from which objects of a given model
  * type can be loaded.
- * 
+ * <p>
  * Loaded model objects are bound to a particular store and will be
  * persisted back to that store unless copied or moved.
- * 
+ * <p>
  * New model objects are created within a given store or they are
  * created within the default store for the particular model object
  * type (this is defined in configuration).
  * 
  * @author muzquiano
  */
-public class ModelObjectManager
+public final class ModelObjectManager
 {
     private static final Log logger = LogFactory.getLog(ModelObjectManager.class);
 
-    protected WebFrameworkService service;
-    protected ModelPersistenceContext context;
+    private WebFrameworkService service;
+    private ModelPersistenceContext context;
+    
     
     /**
      * Constrcuts a new ModelObjectService which is scoped to the given
@@ -90,7 +91,7 @@ public class ModelObjectManager
      * @return
      * @throws ModelObjectManagerException
      */
-    protected static ModelObjectManager newInstance(WebFrameworkService service, ModelPersistenceContext context)
+    static ModelObjectManager newInstance(WebFrameworkService service, ModelPersistenceContext context)
         throws ModelObjectManagerException, IllegalArgumentException
     {
         if(service == null)
@@ -320,5 +321,4 @@ public class ModelObjectManager
             persisters[i].invalidateCache();
         }       
     }
-    
 }

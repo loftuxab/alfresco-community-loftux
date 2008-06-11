@@ -47,12 +47,21 @@ import java.util.Set;
  * 
  * @author muzquiano
  */
-public class ModelPersistenceContext
+public final class ModelPersistenceContext
 {
     public static String REPO_STOREID = "REPO_STOREID";
     
-    protected String userId;
-    protected Map<String, Object> values;
+    private String userId;
+    private Map<String, Object> values = new HashMap<String, Object>(4, 1.0f);
+    
+    
+    /**
+     * Instantiates a new persister context
+     *
+     */
+    public ModelPersistenceContext()
+    {
+    }
     
     /**
      * Instantiates a new persister context.
@@ -61,19 +70,9 @@ public class ModelPersistenceContext
      */
     public ModelPersistenceContext(String userId)
     {
-        this();
         this.userId = userId;
     }
 
-    /**
-     * Instantiates a new persister context
-     *
-     */
-    public ModelPersistenceContext()
-    {
-        values = new HashMap<String, Object>(4, 1.0f);
-    }
-    
     /**
      * Gets the user id.
      * 
@@ -110,7 +109,7 @@ public class ModelPersistenceContext
     /**
      * Returns the set of keys
      * 
-     * @return the set< string>
+     * @return the set
      */
     public Set<String> keys()
     {
@@ -120,7 +119,7 @@ public class ModelPersistenceContext
     /**
      * Returns the collection of values
      * 
-     * @return the collection< object>
+     * @return the collection
      */
     public Collection<Object> values()
     {
@@ -132,5 +131,4 @@ public class ModelPersistenceContext
     {
         return "PersisterContext-" + userId + "-" + values.toString();
     } 
-    
 }

@@ -53,6 +53,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     private static Log logger = LogFactory.getLog(RemoteStoreModelObjectPersister.class);
     
     protected RemoteStore remoteStore;
+    
 
     /**
      * Instantiates a new store model object persister.
@@ -63,20 +64,18 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     public RemoteStoreModelObjectPersister(String typeId, Store store)
     {
         super(typeId, store);
-        this.remoteStore = (RemoteStore) store;
-    }
-    
-    /* (non-Javadoc)
-     * @see org.alfresco.web.framework.StoreModelObjectPersister#getId()
-     */
-    public String getId()
-    {
-        return "RemoteStoreModelObjectPersister_" + this.store.getBasePath() + "_" + this.objectTypeId; 
+        if (store instanceof RemoteStore == false)
+        {
+            throw new IllegalArgumentException("Store must be a RemoteStore instance.");
+        }
+        this.remoteStore = (RemoteStore)store;
+        this.id = "RemoteStore_" + this.store.getBasePath() + "_" + this.objectTypeId; 
     }
     
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.StoreModelObjectPersister#getObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
+    @Override
     public ModelObject getObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
@@ -99,6 +98,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.StoreModelObjectPersister#saveObject(org.alfresco.web.framework.ModelPersistenceContext, org.alfresco.web.framework.ModelObject)
      */
+    @Override
     public synchronized boolean saveObject(ModelPersistenceContext context, ModelObject modelObject)
         throws ModelObjectPersisterException    
     {
@@ -121,6 +121,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.StoreModelObjectPersister#removeObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
+    @Override
     public boolean removeObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
@@ -143,6 +144,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.StoreModelObjectPersister#newObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
+    @Override
     public ModelObject newObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
@@ -165,6 +167,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.StoreModelObjectPersister#hasObject(org.alfresco.web.framework.ModelPersistenceContext, java.lang.String)
      */
+    @Override
     public boolean hasObject(ModelPersistenceContext context, String objectId)
     {
         String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
@@ -187,12 +190,13 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.StoreModelObjectPersister#getAllObjects(org.alfresco.web.framework.ModelPersistenceContext)
      */
+    @Override
     public Map<String, ModelObject> getAllObjects(ModelPersistenceContext context)
         throws ModelObjectPersisterException
     {
         String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
         
-        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(8, 1.0f);
+        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(1, 1.0f);
         try
         {
             remoteStore.bindRepositoryStoreId(storeId);
@@ -214,13 +218,13 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
      * @return the cache
      */
     @Override
-    protected synchronized ContentCache getCache(ModelPersistenceContext context)
+    protected ModelObjectCache getCache(ModelPersistenceContext context)
     {
         String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
         String key = "[" + storeId + "]:" + getId();
         
-        ModelObjectCache cache = (ModelObjectCache) objectCaches.get(key);
-        if(cache == null)
+        ModelObjectCache cache = objectCaches.get(key);
+        if (cache == null)
         {
             cache = new ModelObjectCache(this.store, DEFAULT_CACHE_TIMEOUT);
             objectCaches.put(key, cache);
