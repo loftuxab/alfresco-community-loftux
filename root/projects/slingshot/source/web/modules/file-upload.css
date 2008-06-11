@@ -177,3 +177,24 @@
    background: url(../images/icons/close_panel.gif) 10% 50% no-repeat;
 }
 
+/* General styling */
+
+.file-upload select,
+.file-upload input,
+.file-upload textarea
+{
+   border: 1px solid #C5D6E2;
+   padding: 2px;
+   font-weight: normal;
+   width: 150px;
+}
+
+.file-upload .yui-gd
+{
+   padding-bottom: 0.5em;
+}
+
+.file-upload .section-title
+{
+   padding-bottom: 0.5em;
+}
