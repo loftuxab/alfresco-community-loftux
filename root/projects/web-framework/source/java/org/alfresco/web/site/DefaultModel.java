@@ -79,6 +79,16 @@ public class DefaultModel extends AbstractModel
     }
 
     /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getComponent(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public Component getComponent(String scopeId, String regionId, String sourceId)
+    {
+        String componentId = Component.generateId(scopeId, regionId, sourceId);
+        return getComponent(componentId);
+    }
+    
+
+    /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#getComponentType(java.lang.String)
      */
     public ComponentType getComponentType(String objectId)
@@ -182,6 +192,20 @@ public class DefaultModel extends AbstractModel
     public Component newComponent(String objectId)
     {
         return (Component) newObject(Component.TYPE_ID, objectId);
+    }
+    
+    /**
+     * Creates a new Component object
+     * 
+     * @param scopeId the scope
+     * @param regionId the region id
+     * @param sourceId the source id
+     * @return the object
+     */
+    public Component newComponent(String scopeId, String regionId, String sourceId)
+    {
+        String componentId = Component.generateId(scopeId, regionId, sourceId);
+        return newComponent(componentId);
     }
     
     /* (non-Javadoc)

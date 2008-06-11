@@ -36,6 +36,7 @@ public class ModelObjectKey implements Serializable
     private String persisterId;
     private String storagePath;
     private String id;
+    private boolean saved;
         
     /**
      * Instantiates a new model object key.
@@ -44,11 +45,12 @@ public class ModelObjectKey implements Serializable
      * @param storagePath the storage path
      * @param id the id
      */
-    public ModelObjectKey(String persisterId, String storagePath, String id)
+    public ModelObjectKey(String persisterId, String storagePath, String id, boolean saved)
     {
         this.persisterId = persisterId;
         this.storagePath = storagePath;
         this.id = id;
+        this.saved = saved;
     }
     
     /**
@@ -100,4 +102,24 @@ public class ModelObjectKey implements Serializable
     {
         return this.id;
     }    
+    
+    /**
+     * Returns whether the object is currently saved or not
+     * 
+     * @return whether saved
+     */
+    public boolean isSaved()
+    {
+        return this.saved;
+    }
+    
+    /**
+     * Marks the saved flag on the key
+     * 
+     * @param saved
+     */
+    public void setSaved(boolean saved)
+    {
+        this.saved = saved;
+    }
 }

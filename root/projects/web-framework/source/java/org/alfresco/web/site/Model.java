@@ -41,6 +41,16 @@ public interface Model
     public Component getComponent(String id);
 
     /**
+     * Retrieves a Component object from storage
+     * 
+     * @param scopeId the scope
+     * @param regionId the region id
+     * @param sourceId the source id
+     * @return the object
+     */
+    public Component getComponent(String scopeId, String regionId, String sourceId);
+    
+    /**
      * Retrieves a ComponentType object from storage
      * 
      * @param id the id of a the object to be retrieved
@@ -134,7 +144,7 @@ public interface Model
      * @return the object
      */
     public Component newComponent();
-
+    
     /**
      * Creates a new Component object with the given id
      * 
@@ -144,6 +154,16 @@ public interface Model
      */    
     public Component newComponent(String objectId);
 
+    /**
+     * Creates a new Component object
+     * 
+     * @param scopeId the scope
+     * @param regionId the region id
+     * @param sourceId the source id
+     * @return the object
+     */
+    public Component newComponent(String scopeId, String regionId, String sourceId);
+    
     /**
      * Creates a new ComponentType object
      * 
