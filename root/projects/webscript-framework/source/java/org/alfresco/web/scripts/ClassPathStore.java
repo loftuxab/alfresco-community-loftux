@@ -365,6 +365,17 @@ public class ClassPathStore implements Store
             output.close();
         }
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#removeDocument(java.lang.String)
+     */
+    public boolean removeDocument(String documentPath)
+        throws IOException
+    {
+        // do not allow for deletion of documents from the classpath
+        // the classpath is read-only
+        return false;
+    }    
 
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#getTemplateLoader()

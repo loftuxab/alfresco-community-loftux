@@ -84,16 +84,7 @@
 				<use-cache>true</use-cache>
 				<root-path>/</root-path>
 			</file-system>
-			
-			<!-- File System Implementation (STORE) -->
-			<file-system>
-				<id>store</id>
-				<name>Web Script Store File System</name>
-				<description>Web Script Store File System</description>
-				<class>org.alfresco.web.site.filesystem.StoreFileSystem</class>
-				<use-cache>true</use-cache>
-			</file-system>
-			
+						
 			<!-- Formats -->
 			<format>
 				<id>default</id>
@@ -112,17 +103,15 @@
 			</format>
 			
 			<!-- object model -->
-			<model-root-path>/WEB-INF/classes/alfresco</model-root-path>
 			<model-type>
 				<id>chrome</id>
 				<version>1.0</version>					
 				<name>Chrome</name>
 				<description>Chrome</description>
 				<namespace></namespace>
-				<tagname>chrome</tagname>
-				<class>org.alfresco.web.site.model.Chrome</class>
-				<path>/site-data/chrome</path>
-				<prefix>ch-</prefix>
+				<class>org.alfresco.web.framework.model.Chrome</class>
+				<search-path-id>webframework.searchpath.chrome</search-path-id>
+				<default-store-id>webframework.localstore.chrome</default-store-id>
 			</model-type>
 			<model-type>
 				<id>component</id>
@@ -130,10 +119,9 @@
 				<name>Component</name>
 				<description>Component</description>
 				<namespace></namespace>
-				<tagname>component</tagname>
-				<class>org.alfresco.web.site.model.Component</class>
-				<path>/site-data/components</path>
-				<prefix>cm-</prefix>
+				<class>org.alfresco.web.framework.model.Component</class>
+				<search-path-id>webframework.searchpath.component</search-path-id>
+				<default-store-id>webframework.localstore.component</default-store-id>
 			</model-type>
 			<model-type>
 				<id>component-type</id>
@@ -141,10 +129,9 @@
 				<name>Component Type</name>
 				<description>Component Type</description>
 				<namespace></namespace>
-				<tagname>component-type</tagname>
-				<class>org.alfresco.web.site.model.ComponentType</class>
-				<path>/site-data/component-types</path>
-				<prefix>ct-</prefix>
+				<class>org.alfresco.web.framework.model.ComponentType</class>
+				<search-path-id>webframework.searchpath.componenttype</search-path-id>
+				<default-store-id>webframework.localstore.componenttype</default-store-id>
 			</model-type>
 			<model-type>
 				<id>configuration</id>
@@ -152,10 +139,9 @@
 				<name>Configuration</name>
 				<description>Configuration</description>
 				<namespace></namespace>
-				<tagname>configuration</tagname>
-				<class>org.alfresco.web.site.model.Configuration</class>
-				<path>/site-data/configurations</path>
-				<prefix>co-</prefix>
+				<class>org.alfresco.web.framework.model.Configuration</class>
+				<search-path-id>webframework.searchpath.configuration</search-path-id>
+				<default-store-id>webframework.localstore.configuration</default-store-id>
 			</model-type>
 			<model-type>
 				<id>content-association</id>
@@ -163,21 +149,9 @@
 				<name>Content Association</name>
 				<description>Content Association</description>
 				<namespace></namespace>
-				<tagname>content-association</tagname>
-				<class>org.alfresco.web.site.model.ContentAssociation</class>
-				<path>/site-data/content-associations</path>
-				<prefix>ca-</prefix>
-			</model-type>
-			<model-type>
-				<id>endpoint</id>
-				<version>1.0</version>
-				<name>Endpoint</name>
-				<description>Endpoint</description>
-				<namespace></namespace>
-				<tagname>endpoint</tagname>
-				<class>org.alfresco.web.site.model.Endpoint</class>
-				<path>/site-data/endpoints</path>
-				<prefix>ep-</prefix>
+				<class>org.alfresco.web.framework.model.ContentAssociation</class>
+				<search-path-id>webframework.searchpath.contentassociation</search-path-id>
+				<default-store-id>webframework.localstore.contentassociation</default-store-id>
 			</model-type>
 			<model-type>
 				<id>page</id>
@@ -185,10 +159,9 @@
 				<name>Page</name>
 				<description>Page</description>
 				<namespace></namespace>
-				<tagname>page</tagname>
-				<class>org.alfresco.web.site.model.Page</class>
-				<path>/site-data/pages</path>
-				<prefix>pg-</prefix>
+				<class>org.alfresco.web.framework.model.Page</class>
+				<search-path-id>webframework.searchpath.page</search-path-id>
+				<default-store-id>webframework.localstore.page</default-store-id>
 			</model-type>
 			<model-type>
 				<id>page-type</id>
@@ -196,10 +169,9 @@
 				<name>Page Type</name>
 				<description>Page Type</description>
 				<namespace></namespace>
-				<tagname>page-type</tagname>
-				<class>org.alfresco.web.site.model.PageType</class>
-				<path>/site-data/page-types</path>
-				<prefix>pt-</prefix>
+				<class>org.alfresco.web.framework.model.PageType</class>
+				<search-path-id>webframework.searchpath.pagetype</search-path-id>
+				<default-store-id>webframework.localstore.pagetype</default-store-id>
 			</model-type>
 			<model-type>
 				<id>page-association</id>
@@ -207,10 +179,9 @@
 				<name>Page Association</name>
 				<description>Page Association</description>
 				<namespace></namespace>
-				<tagname>page-association</tagname>
-				<class>org.alfresco.web.site.model.PageAssociation</class>
-				<path>/site-data/page-associations</path>
-				<prefix>pa-</prefix>
+				<class>org.alfresco.web.framework.model.PageAssociation</class>
+				<search-path-id>webframework.searchpath.pageassociation</search-path-id>
+				<default-store-id>webframework.localstore.pageassociation</default-store-id>
 			</model-type>
 			<model-type>
 				<id>template-instance</id>
@@ -218,10 +189,9 @@
 				<name>Template Instance</name>
 				<description>Template Instance</description>
 				<namespace></namespace>
-				<tagname>template-instance</tagname>
-				<class>org.alfresco.web.site.model.TemplateInstance</class>
-				<path>/site-data/template-instances</path>
-				<prefix>tm-</prefix>
+				<class>org.alfresco.web.framework.model.TemplateInstance</class>
+				<search-path-id>webframework.searchpath.templateinstance</search-path-id>
+				<default-store-id>webframework.localstore.templateinstance</default-store-id>
 			</model-type>
 			<model-type>
 				<id>template-type</id>
@@ -229,10 +199,9 @@
 				<name>Template Type</name>
 				<description>Template Type</description>
 				<namespace></namespace>
-				<tagname>template-type</tagname>
-				<class>org.alfresco.web.site.model.TemplateType</class>
-				<path>/site-data/template-types</path>
-				<prefix>tt-</prefix>
+				<class>org.alfresco.web.framework.model.TemplateType</class>
+				<search-path-id>webframework.searchpath.templatetype</search-path-id>
+				<default-store-id>webframework.localstore.templatetype</default-store-id>
 			</model-type>
 			<model-type>
 				<id>theme</id>
@@ -240,10 +209,9 @@
 				<name>Theme</name>
 				<description>Theme</description>
 				<namespace></namespace>
-				<tagname>theme</tagname>
-				<class>org.alfresco.web.site.model.Theme</class>
-				<path>/site-data/themes</path>
-				<prefix>th-</prefix>
+				<class>org.alfresco.web.framework.model.Theme</class>
+				<search-path-id>webframework.searchpath.theme</search-path-id>
+				<default-store-id>webframework.localstore.theme</default-store-id>
 			</model-type>										
 
 			<!-- Add in the ALF tag library -->

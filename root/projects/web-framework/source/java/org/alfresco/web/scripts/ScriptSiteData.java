@@ -30,17 +30,13 @@ import java.util.Map;
 
 import org.alfresco.tools.EncodingUtil;
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.model.Component;
+import org.alfresco.web.framework.model.Configuration;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.AuthenticationUtil;
-import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.Component;
-import org.alfresco.web.site.model.Configuration;
-import org.alfresco.web.site.model.ContentAssociation;
-import org.alfresco.web.site.model.ModelObject;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.PageAssociation;
-import org.alfresco.web.site.model.TemplateInstance;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -126,33 +122,13 @@ public final class ScriptSiteData extends ScriptBase
     // --------------------------------------------------------------
     // JavaScript Functions
     //
-    
-
-    /**
-     * Provides access to the file system for the current model.
-     * 
-     * Model files are stored in a root folder - the file system paths
-     * returned by this file system are relative to that root folder.
-     * 
-     * @return The model File System abstraction
-     */
-    public ScriptFileSystem getModelFileSystem()
-    {
-        if (modelFileSystem == null)
-        {
-            modelFileSystem = new ScriptFileSystem(
-                    getRequestContext().getModel().getFileSystem());
-        }
-        return modelFileSystem;
-    }
 
     /**
      * @return  An array of all Component instances in the web application
      */
     public Object[] getComponents()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findComponents(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findComponents());
     }
 
     /**
@@ -160,8 +136,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getComponentTypes()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findComponentTypes(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findComponentTypes());
     }
 
     /**
@@ -169,8 +144,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getConfigurations()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findConfigurations(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findConfigurations());
     }
 
     /**
@@ -178,8 +152,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getContentAssociations()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findContentAssociations(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findContentAssociations());
     }
 
     /**
@@ -187,7 +160,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getPages()
     {
-        return ScriptHelper.toScriptModelObjectArray(context, ModelUtil.findPages(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findPages());
     }
 
     /**
@@ -195,7 +168,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getPageTypes()
     {
-        return ScriptHelper.toScriptModelObjectArray(context, ModelUtil.findPageTypes(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findPageTypes());
     }
     
     /**
@@ -203,8 +176,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getPageAssociations()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findPageAssociations(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findPageAssociations());
     }
 
     /**
@@ -212,8 +184,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getTemplates()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findTemplates(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findTemplates());
     }
 
     /**
@@ -221,8 +192,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Object[] getTemplateTypes()
     {
-        return ScriptHelper.toScriptModelObjectArray(context,
-                ModelUtil.findTemplateTypes(context));
+        return ScriptHelper.toScriptModelObjectArray(context, getModel().findTemplateTypes());
     }
 
     /**
@@ -231,7 +201,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public Scriptable getComponentsMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findComponents(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findComponents());
     }
 
     /**
@@ -240,7 +210,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Scriptable getComponentTypesMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findComponentTypes(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findComponentTypes());
     }
 
     /**
@@ -249,7 +219,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Scriptable getConfigurationsMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findConfigurations(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findConfigurations());
     }
 
     /**
@@ -258,8 +228,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Scriptable getContentAssociationsMap()
     {
-        return ScriptHelper.toScriptableMap(context,
-                ModelUtil.findContentAssociations(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findContentAssociations());
     }
 
     /**
@@ -268,7 +237,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Scriptable getPagesMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findPages(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findPages());
     }
 
     /**
@@ -277,7 +246,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Scriptable getPageAssociationsMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findPageAssociations(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findPageAssociations());
     }
 
     /**
@@ -286,7 +255,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public Scriptable getTemplatesMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findTemplates(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findTemplates());
     }
 
     /**
@@ -295,7 +264,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public Scriptable getTemplateTypesMap()
     {
-        return ScriptHelper.toScriptableMap(context, ModelUtil.findTemplateTypes(context));
+        return ScriptHelper.toScriptableMap(context, getModel().findTemplateTypes());
     }
 
     /**
@@ -308,8 +277,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject newComponent()
     {
-        Component component = (Component) FrameworkHelper.getModel().newComponent(
-                context);
+        Component component = (Component) getModel().newComponent();
         return ScriptHelper.toScriptModelObject(context, component);
     }
 
@@ -328,8 +296,7 @@ public final class ScriptSiteData extends ScriptBase
     {
         ParameterCheck.mandatory("componentTypeId", componentTypeId);
 
-        Component component = (Component) FrameworkHelper.getModel().newComponent(
-                context);
+        Component component = (Component) getModel().newComponent();
         component.setComponentTypeId(componentTypeId);
         return ScriptHelper.toScriptModelObject(context, component);
     }
@@ -354,8 +321,7 @@ public final class ScriptSiteData extends ScriptBase
         ParameterCheck.mandatory("title", title);
         ParameterCheck.mandatory("description", description);
 
-        Component component = (Component) FrameworkHelper.getModel().newComponent(
-                context);
+        Component component = (Component) getModel().newComponent();
         component.setComponentTypeId(componentTypeId);
         component.setTitle(title);
         component.setDescription(description);
@@ -372,7 +338,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject newComponentType()
     {
-        ModelObject modelObject = FrameworkHelper.getModel().newComponentType(context);
+        ModelObject modelObject = getModel().newComponentType();
         return ScriptHelper.toScriptModelObject(context, modelObject);
     }
 
@@ -386,8 +352,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newConfiguration()
     {
-        Configuration configuration = (Configuration) FrameworkHelper.getModel().newConfiguration(
-                context);
+        Configuration configuration = (Configuration) getModel().newConfiguration();
         return ScriptHelper.toScriptModelObject(context, configuration);
     }
 
@@ -405,8 +370,7 @@ public final class ScriptSiteData extends ScriptBase
     {
         ParameterCheck.mandatory("sourceId", sourceId);
 
-        Configuration configuration = (Configuration) FrameworkHelper.getModel().newConfiguration(
-                context);
+        Configuration configuration = (Configuration) getModel().newConfiguration();
         configuration.setSourceId(sourceId);
         return ScriptHelper.toScriptModelObject(context, configuration);
     }
@@ -421,7 +385,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newPage()
     {
-        Page page = (Page) FrameworkHelper.getModel().newPage(context);
+        Page page = (Page) getModel().newPage();
         return ScriptHelper.toScriptModelObject(context, page);
     }
 
@@ -441,7 +405,7 @@ public final class ScriptSiteData extends ScriptBase
         ParameterCheck.mandatory("title", title);
         ParameterCheck.mandatory("description", description);
 
-        Page page = (Page) FrameworkHelper.getModel().newPage(context);
+        Page page = (Page) getModel().newPage();
         return ScriptHelper.toScriptModelObject(context, page);
     }
     
@@ -455,7 +419,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newTemplate()
     {
-        TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) getModel().newTemplate();
         return ScriptHelper.toScriptModelObject(context, template);
     }
 
@@ -472,7 +436,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject newTemplate(String templateTypeId)
     {
-        TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) getModel().newTemplate();
         template.setTemplateType(templateTypeId);
         return ScriptHelper.toScriptModelObject(context, template);
     }
@@ -497,7 +461,7 @@ public final class ScriptSiteData extends ScriptBase
         ParameterCheck.mandatory("title", title);
         ParameterCheck.mandatory("description", description);
         
-        TemplateInstance template = (TemplateInstance) FrameworkHelper.getModel().newTemplate(context);
+        TemplateInstance template = (TemplateInstance) getModel().newTemplate();
         template.setTemplateType(templateTypeId);
         template.setTitle(title);
         template.setDescription(description);
@@ -520,9 +484,8 @@ public final class ScriptSiteData extends ScriptBase
     public Object[] findComponents(String scopeId, String sourceId,
             String regionId, String componentTypeId)
     {
-        Component[] components = ModelUtil.findComponents(context, scopeId,
-                sourceId, regionId, componentTypeId);
-        return ScriptHelper.toScriptModelObjectArray(context, components);
+        Map<String, ModelObject> objects = getModel().findComponents(scopeId, sourceId, regionId, componentTypeId);
+        return ScriptHelper.toScriptModelObjectArray(context, objects);
     }
 
     /**
@@ -558,9 +521,9 @@ public final class ScriptSiteData extends ScriptBase
     public Object[] findPageAssociations(String sourceId, String destId,
             String associationType)
     {
-        PageAssociation[] associations = ModelUtil.findPageAssociations(
-                context, sourceId, destId, associationType);
-        return ScriptHelper.toScriptModelObjectArray(context, associations);
+        Map<String, ModelObject> objects = getModel().findPageAssociations(
+                sourceId, destId, associationType);
+        return ScriptHelper.toScriptModelObjectArray(context, objects);
     }
 
     /**
@@ -579,9 +542,9 @@ public final class ScriptSiteData extends ScriptBase
     public Object[] findContentAssociations(String sourceId, String destId,
             String assocType, String formatId)
     {
-        ContentAssociation[] associations = ModelUtil.findContentAssociations(
-                context, sourceId, destId, assocType, formatId);
-        return ScriptHelper.toScriptModelObjectArray(context, associations);
+        Map<String, ModelObject> objects = getModel().findContentAssociations(
+                sourceId, destId, assocType, formatId);
+        return ScriptHelper.toScriptModelObjectArray(context, objects);
     }
 
     /**
@@ -599,9 +562,9 @@ public final class ScriptSiteData extends ScriptBase
     public Scriptable findComponentsMap(String scopeId, String sourceId,
             String regionId, String componentTypeId)
     {
-        Component[] components = ModelUtil.findComponents(context, scopeId,
+        Map<String, ModelObject> objects = getModel().findComponents(scopeId,
                 sourceId, regionId, componentTypeId);
-        return ScriptHelper.toScriptableMap(context, components);
+        return ScriptHelper.toScriptableMap(context, objects);
     }
 
     /**
@@ -618,9 +581,9 @@ public final class ScriptSiteData extends ScriptBase
     public Scriptable findPageAssociationsMap(String sourceId, String destId,
             String associationType)
     {
-        PageAssociation[] associations = ModelUtil.findPageAssociations(
-                context, sourceId, destId, associationType);
-        return ScriptHelper.toScriptableMap(context, associations);
+        Map<String, ModelObject> objects = getModel().findPageAssociations(
+                sourceId, destId, associationType);
+        return ScriptHelper.toScriptableMap(context, objects);
     }
 
     /**
@@ -638,9 +601,9 @@ public final class ScriptSiteData extends ScriptBase
     public Scriptable findContentAssociationsMap(String sourceId,
             String destId, String assocType, String formatId)
     {
-        ContentAssociation[] associations = ModelUtil.findContentAssociations(
-                context, sourceId, destId, assocType, formatId);
-        return ScriptHelper.toScriptableMap(context, associations);
+        Map<String, ModelObject> objects = getModel().findContentAssociations(
+                sourceId, destId, assocType, formatId);
+        return ScriptHelper.toScriptableMap(context, objects);
     }
 
     /**
@@ -654,7 +617,7 @@ public final class ScriptSiteData extends ScriptBase
      */                    
     public Scriptable findTemplatesMap(String pageId)
     {
-        Page page = context.getModel().loadPage(context, pageId);
+        Page page = context.getModel().getPage(pageId);
         if (page != null)
         {
             Map<String, TemplateInstance> templatesMap = page.getTemplates(context);
@@ -684,13 +647,16 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject findConfiguration(String sourceId)
     {
-        Configuration[] configurations = ModelUtil.findConfigurations(context,
-                sourceId);
-        if (configurations != null && configurations.length > 0)
+        ScriptModelObject scriptModelObject = null;
+        
+        Map<String, ModelObject> objects = getModel().findConfigurations(sourceId);
+        if(objects.size() > 0)
         {
-            return ScriptHelper.toScriptModelObject(context, configurations[0]);
+            ModelObject object = (ModelObject) objects.values().iterator().next();
+            scriptModelObject = ScriptHelper.toScriptModelObject(context, object);
         }
-        return null;
+        
+        return scriptModelObject;
     }
 
     /**
@@ -717,7 +683,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject findTemplate(String pageId, String formatId)
     {
-        Page page = (Page) context.getModel().loadPage(context, pageId);
+        Page page = (Page) context.getModel().getPage(pageId);
         if (page != null)
         {
             TemplateInstance t = page.getTemplate(context, formatId);
@@ -741,27 +707,26 @@ public final class ScriptSiteData extends ScriptBase
      */
     public void removeTemplate(String pageId, String formatId)
     {
-        Page page = (Page) context.getModel().loadPage(context, pageId);
+        Page page = (Page) context.getModel().getPage(pageId);
         if (page != null)
         {
             page.removeTemplateId(formatId);
-            page.save(context);
+            context.getModel().saveObject(page);
         }
     }
 
     
     // Create and Remove Associations
 
-    public void associateComponent(String componentId, String scopeId,
+    public void bindComponent(String componentId, String scopeId,
             String sourceId, String regionId)
     {
-        ModelUtil.associateComponent(context, componentId, scopeId, sourceId,
-                regionId);
+        getModel().bindComponent(componentId, scopeId, sourceId, regionId);
     }
 
-    public void unassociateComponent(String componentId)
+    public void unbindComponent(String componentId)
     {
-        ModelUtil.unassociateComponent(context, componentId);
+        getModel().unbindComponent(componentId);
     }
 
     public void associateTemplate(String templateId, String pageId)
@@ -772,7 +737,7 @@ public final class ScriptSiteData extends ScriptBase
     public void associateTemplate(String templateId, String pageId,
             String formatId)
     {
-        ModelUtil.associateTemplate(context, templateId, pageId, formatId);
+        getModel().associateTemplate(templateId, pageId, formatId);
     }
 
     public void unassociateTemplate(String pageId)
@@ -782,44 +747,44 @@ public final class ScriptSiteData extends ScriptBase
 
     public void unassociateTemplate(String pageId, String formatId)
     {
-        ModelUtil.unassociateTemplate(context, pageId, formatId);
+        getModel().unassociateTemplate(pageId, formatId);
     }
 
     public void associatePage(String sourceId, String destId)
     {
-        ModelUtil.associatePage(context, sourceId, destId);
+        getModel().associatePage(sourceId, destId);
     }
 
     public void unassociatePage(String sourceId, String destId)
     {
-        ModelUtil.unassociatePage(context, sourceId, destId);
+        getModel().unassociatePage(sourceId, destId);
     }
 
     public void associateContent(String contentId, String pageId,
             String formatId)
     {
-        ModelUtil.associateContent(context, contentId, pageId, "content",
+        getModel().associateContent(contentId, pageId, "content",
                 formatId);
     }
 
     public void unassociateContent(String contentId, String pageId,
             String formatId)
     {
-        ModelUtil.unassociateContent(context, contentId, pageId, "content",
+        getModel().unassociateContent(contentId, pageId, "content",
                 formatId);
     }
 
     public void associateContentType(String contentTypeId, String pageId,
             String formatId)
     {
-        ModelUtil.associateContent(context, contentTypeId, pageId,
+        getModel().associateContent(contentTypeId, pageId,
                 "content-type", formatId);
     }
 
     public void unassociateContentType(String contentTypeId, String pageId,
             String formatId)
     {
-        ModelUtil.unassociateContent(context, contentTypeId, pageId,
+        getModel().unassociateContent(contentTypeId, pageId,
                 "content-type", formatId);
     }
 
@@ -856,5 +821,72 @@ public final class ScriptSiteData extends ScriptBase
     public ScriptCredentialVault getCredentialVault()
     {
         return new ScriptCredentialVault(getRequestContext());
+    }
+    
+        
+    public ScriptModelObject getChrome(String objectId)
+    {
+        ModelObject obj = getModel().getChrome(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+
+    public ScriptModelObject getComponent(String objectId)
+    {
+        ModelObject obj = getModel().getComponent(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    public ScriptModelObject getComponentType(String objectId)
+    {
+        ModelObject obj = getModel().getComponentType(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    public ScriptModelObject getConfiguration(String objectId)
+    {
+        ModelObject obj = getModel().getConfiguration(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+
+    public ScriptModelObject getContentAssociation(String objectId)
+    {
+        ModelObject obj = getModel().getContentAssociation(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+
+    public ScriptModelObject getPage(String objectId)
+    {
+        ModelObject obj = getModel().getPage(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+
+    public ScriptModelObject getPageType(String objectId)
+    {
+        ModelObject obj = getModel().getPageType(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    public ScriptModelObject getPageAssociation(String objectId)
+    {
+        ModelObject obj = getModel().getPageAssociation(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    public ScriptModelObject getTemplate(String objectId)
+    {
+        ModelObject obj = getModel().getTemplate(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+
+    public ScriptModelObject getTemplateType(String objectId)
+    {
+        ModelObject obj = getModel().getTemplateType(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    public ScriptModelObject getTheme(String objectId)
+    {
+        ModelObject obj = getModel().getTheme(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
     }
 }

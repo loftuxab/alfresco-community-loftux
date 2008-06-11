@@ -41,7 +41,7 @@ public interface Store
 	 * Initialise Store (called once) 
 	 */
 	public void init();
-	
+    	
     /**
      * Determines whether the store actually exists
      * 
@@ -138,6 +138,17 @@ public interface Store
      * @throws IOException if the document does not exist or the update fails
      */
     public void updateDocument(String documentPath, String content)
+        throws IOException;
+    
+    /**
+     * Removes an existing document.
+     * 
+     * @param documentPath  document path
+     * @return  whether the operation succeeded
+     * 
+     * @throws IOException if the document does not exist or the remove fails
+     */
+    public boolean removeDocument(String documentPath)
         throws IOException;
     
     /**

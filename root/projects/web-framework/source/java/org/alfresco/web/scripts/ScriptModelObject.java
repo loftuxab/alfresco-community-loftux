@@ -28,8 +28,8 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.ModelObject;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -57,11 +57,6 @@ import org.mozilla.javascript.Scriptable;
 public final class ScriptModelObject extends ScriptBase
 {
     // unmodifiable "system" properties
-    private static final String PROP_ID = "id";
-    private static final String PROP_RELATIVE_FILE_PATH = "relativeFilePath";
-    private static final String PROP_FILE_NAME = "fileName";
-    private static final String PROP_RELATIVE_PATH = "relativePath";
-    private static final String PROP_TIMESTAMP = "timestamp";
     private static final long serialVersionUID = -3378946227712939601L;
     protected ModelObject modelObject;
     
@@ -171,20 +166,16 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getModificationTime();
     }
     
-    public String getRelativePath()
+    public String getStorageId()
     {
-        return modelObject.getRelativePath();
+        return modelObject.getPersisterId();
     }
     
-    public String getFileName()
+    public String getStoragePath()
     {
-        return modelObject.getFileName();
+        return modelObject.getStoragePath();
     }
     
-    public String getRelativeFilePath()
-    {
-        return modelObject.getRelativeFilePath();
-    }
 
     
     // --------------------------------------------------------------
@@ -206,26 +197,20 @@ public final class ScriptModelObject extends ScriptBase
             modelObject.setProperty(propertyName, propertyValue);
         }
         
-        modelObject.save(context);
+        context.getModel().saveObject(modelObject);
     }
 
     /**
-     * Reload.
-     */
-    public void reload()
-    {
-        modelObject.reload(context);
-        
-        // this forces all of the properties to reload
-        this.properties = null;
-    }
-
-    /**
-     * Removes the.
+     * Removes the object
      */
     public void remove()
     {
-        modelObject.remove(context);
+        context.getModel().removeObject(modelObject);
+    }
+    
+    public void delete()
+    {
+        remove();
     }
 
     /**

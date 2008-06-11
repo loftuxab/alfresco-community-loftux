@@ -32,10 +32,10 @@ import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.framework.model.Configuration;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.filesystem.IFileSystem;
-import org.alfresco.web.site.model.Configuration;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.alfresco.web.site.renderer.RendererContextHelper;
 import org.apache.commons.logging.Log;
@@ -95,7 +95,14 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Configuration getSiteConfiguration()
     {
-        return ModelUtil.getSiteConfiguration(this);
+        if(this.siteConfiguration == null)
+        {
+            // get the default site configuration
+            String defaultSiteConfigurationId = getConfig().getDefaultSiteConfigurationId();
+            this. siteConfiguration = getModel().getConfiguration(defaultSiteConfigurationId);
+        }
+        
+        return this.siteConfiguration;
     }
 
     /**
@@ -264,7 +271,7 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Page getRootPage()
     {
-        return ModelUtil.getRootPage(this);
+        return SiteUtil.getRootPage(this, getSiteConfiguration());
     }
 
     /**
@@ -378,36 +385,6 @@ public abstract class AbstractRequestContext implements RequestContext
     }
 
     /**
-     * Returns the current AVM store ID.
-     * 
-     * This is an Alfresco specific property which can either be set
-     * by hand or picked up automatically from the virtual server.
-     * 
-     * This property is inspected downstream by the AVM remote store.
-     * 
-     * @return
-     */
-    public String getStoreId()
-    {
-        if (this.storeId == null)
-        {
-            this.storeId = "";
-        }
-        return this.storeId;
-    }
-
-    /**
-     * Sets the current AVM store ID.
-     * 
-     * @param storeId
-     */
-    public void setStoreId(String storeId)
-    {
-        this.storeId = storeId;
-    }
-
-
-    /**
      * Returns the model.  The model allows object model manipulation
      * and persistence.  Models are intended to be pluggable so that
      * multiple implementations could be supported.
@@ -416,8 +393,17 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Model getModel()
     {
-        return FrameworkHelper.getModel();
+        return this.model;
     }
+    
+    public void setModel(Model model)
+    {
+        this.model = model;
+    }
+    
+    /**
+     * Sets the model
+     */
 
     /**
      * Returns the configuration for the framework.
@@ -542,6 +528,8 @@ public abstract class AbstractRequestContext implements RequestContext
     protected User user;
     protected String id;
     protected String themeId;
+    protected Configuration siteConfiguration;
+    protected Model model;
 
     // constants
     

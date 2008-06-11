@@ -68,8 +68,8 @@ public class CacheControlServlet extends BaseServlet
             // invalidate the file system cache, if it exists
             CacheUtil.invalidateFileSystemCache(context);
 
-            // invalidate the ADS object cache
-            CacheUtil.invalidateADSObjectCache(context);
+            // invalidate the model service object cache
+            CacheUtil.invalidateModelObjectServiceCache(context);
         }
         if ("invalidate".equalsIgnoreCase(command))
         {

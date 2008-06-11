@@ -739,14 +739,13 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
 
     public static class TypeDescriptor extends Descriptor
     {
-        private static final String PREFIX = "prefix";
-        private static final String PATH = "path";
         private static final String CLAZZ = "class";
-        private static final String TAGNAME = "tagname";
         private static final String NAMESPACE = "namespace";
         private static final String DESCRIPTION = "description";
         private static final String NAME = "name";
         private static final String VERSION = "version";
+        private static final String SEARCH_PATH_ID = "search-path-id";
+        private static final String DEFAULT_STORE_ID = "default-store-id";
 
         TypeDescriptor(Element el)
         {
@@ -769,22 +768,19 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         {
             return getStringProperty(NAMESPACE);
         }
-        public String getPath() 
-        {
-            return getStringProperty(PATH);
-        }
-        public String getPrefix() 
-        {
-            return getStringProperty(PREFIX);
-        }
-        public String getTagname() 
-        {
-            return getStringProperty(TAGNAME);
-        }
         public String getVersion() 
         {
             return getStringProperty(VERSION);
         }
+        public String getSearchPathId() 
+        {
+            return getStringProperty(SEARCH_PATH_ID);
+        }
+        public String getDefaultStoreId() 
+        {
+            return getStringProperty(DEFAULT_STORE_ID);
+        }
+
     }
     
     public static class ContentLoaderDescriptor extends Descriptor

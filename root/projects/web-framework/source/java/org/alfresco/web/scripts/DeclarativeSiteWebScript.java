@@ -42,43 +42,11 @@ public class DeclarativeSiteWebScript extends DeclarativeJSONWebScript
 {
     private static final String ROOT_SCOPE_SITEDATA = "sitedata";
     
-    protected Store store;
-
     /**
      * Instantiates a new declarative site web script.
      */
     public DeclarativeSiteWebScript()
     {
-    }
-
-    /**
-     * Instantiates a new declarative site web script.
-     * 
-     * @param store the store
-     */
-    public DeclarativeSiteWebScript(Store store)
-    {
-        this.store = store;
-    }
-
-    /**
-     * Sets the store.
-     * 
-     * @param store the new store
-     */
-    public void setStore(Store store)
-    {
-        this.store = store;
-    }
-
-    /**
-     * Gets the store.
-     * 
-     * @return the store
-     */
-    public Store getStore()
-    {
-        return this.store;
     }
 
     /**

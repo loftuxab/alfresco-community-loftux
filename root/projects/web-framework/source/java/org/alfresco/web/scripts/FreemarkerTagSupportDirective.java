@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.tagext.Tag;
 
 import org.alfresco.tools.TagUtil;
+import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.TagExecutionException;
-import org.alfresco.web.site.model.Page;
 
 import freemarker.template.TemplateDirectiveModel;
 

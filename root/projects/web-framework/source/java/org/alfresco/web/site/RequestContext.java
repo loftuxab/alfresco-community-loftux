@@ -31,10 +31,10 @@ import org.alfresco.connector.CredentialVault;
 import org.alfresco.connector.User;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.framework.model.Configuration;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.filesystem.IFileSystem;
-import org.alfresco.web.site.model.Configuration;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.apache.commons.logging.Log;
 
@@ -233,25 +233,6 @@ public interface RequestContext extends Serializable
     public void setFileSystem(IFileSystem fileSystem);
 
     /**
-     * Returns the current AVM store ID.
-     * 
-     * This is an Alfresco specific property which can either be set
-     * by hand or picked up automatically from the virtual server.
-     * 
-     * This property is inspected downstream by the AVM remote store.
-     * 
-     * @return
-     */
-    public String getStoreId();
-
-    /**
-     * Sets the current AVM store ID.
-     * 
-     * @param storeId
-     */
-    public void setStoreId(String storeId);
-
-    /**
      * Returns the model.  The model allows object model manipulation
      * and persistence.  Models are intended to be pluggable so that
      * multiple implementations could be supported.
@@ -332,6 +313,13 @@ public interface RequestContext extends Serializable
      * Sets the current theme id
      */
     public void setThemeId(String themeId);
+        
+    /**
+     * Sets the current model
+     * 
+     * @param model
+     */
+    public void setModel(Model model);
         
     public static final String VALUE_HEAD_TAGS = "headTags";
     public static final String VALUE_CREDENTIAL_VAULT = "credential_vault";

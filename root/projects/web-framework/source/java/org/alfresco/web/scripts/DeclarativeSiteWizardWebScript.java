@@ -50,16 +50,6 @@ public class DeclarativeSiteWizardWebScript extends DeclarativeSiteWebScript
     }
 
     /**
-     * Instantiates a new declarative site wizard web script.
-     * 
-     * @param store the store
-     */
-    public DeclarativeSiteWizardWebScript(Store store)
-    {
-        super(store);
-    }
-
-    /**
      * This is overridden so that all web script implementation classes that
      * inherit from this one automatically have a "wizard" root object.
      * 

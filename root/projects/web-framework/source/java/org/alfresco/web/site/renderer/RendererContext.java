@@ -33,8 +33,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
+import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.ModelObject;
 
 /**
  * A render context instance is available to all rendering engines
@@ -138,7 +138,7 @@ public final class RendererContext implements Serializable
     {
         if(this.object != null)
         {
-            return this.object.getTypeName() + "___" + this.object.getId();
+            return this.object.getTypeId() + "___" + this.object.getId();
         }
         return "unknown";        
     }

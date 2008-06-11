@@ -30,10 +30,10 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.alfresco.util.StringBuilderWriter;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.AbstractRenderer;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.springframework.context.ApplicationContext;

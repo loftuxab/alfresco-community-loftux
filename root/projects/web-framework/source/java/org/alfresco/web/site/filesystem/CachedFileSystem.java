@@ -27,23 +27,25 @@ package org.alfresco.web.site.filesystem;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.alfresco.web.framework.cache.BasicCache;
+import org.alfresco.web.framework.cache.ContentCache;
 import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.cache.CacheFactory;
-import org.alfresco.web.site.cache.IContentCache;
 
 /**
  * @author muzquiano
  */
 public class CachedFileSystem implements IFileSystem
 {
+    protected static long DEFAULT_CACHE_TIMEOUT = 30* 60 * 60;
+    
     public CachedFileSystem(IFileSystem fileSystem)
     {
         this.fileSystem = fileSystem;
 
         // initialize the caches
-        this.fileCache = CacheFactory.createBasicCache(30 * 60 * 60);
-        this.childrenCache = CacheFactory.createBasicCache(30 * 60 * 60);
-        this.parentCache = CacheFactory.createBasicCache(30 * 60 * 60);
+        this.fileCache = new BasicCache(DEFAULT_CACHE_TIMEOUT);
+        this.childrenCache = new BasicCache(DEFAULT_CACHE_TIMEOUT);
+        this.parentCache = new BasicCache(DEFAULT_CACHE_TIMEOUT);
 
         FrameworkHelper.getLogger().info("CachedFileSystem started");
     }
@@ -195,9 +197,9 @@ public class CachedFileSystem implements IFileSystem
     // blow away the entire cache
     public void refresh()
     {
-        this.fileCache.invalidateAll();
-        this.parentCache.invalidateAll();
-        this.childrenCache.invalidateAll();
+        this.fileCache.invalidate();
+        this.parentCache.invalidate();
+        this.childrenCache.invalidate();
 
     }
 
@@ -205,13 +207,13 @@ public class CachedFileSystem implements IFileSystem
     protected IFileSystem fileSystem;
 
     // path -> 1 CachedFile or CachedDirectory object
-    protected IContentCache fileCache;
+    protected ContentCache fileCache;
 
     // path -> 1 CachedDirectory parent
-    protected IContentCache parentCache;
+    protected ContentCache parentCache;
 
     // path -> Many CachedFile and/or CachedDirectory objects
-    protected IContentCache childrenCache;
+    protected ContentCache childrenCache;
 
     ///////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////

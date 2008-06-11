@@ -33,12 +33,6 @@ import javax.servlet.http.HttpServletResponse;
  */
 public abstract class BaseServlet extends HttpServlet
 {
-    /** an existing Ticket can be passed to most servlet for non-session based authentication */
-    private static final String ARG_TICKET = "ticket";
-
-    /** forcing guess access is available on most servlets */
-    private static final String ARG_GUEST = "guest";
-
     /**
      * Apply the headers required to disallow caching of the response in the browser
      */

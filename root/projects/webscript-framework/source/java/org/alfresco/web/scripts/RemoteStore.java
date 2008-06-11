@@ -43,9 +43,49 @@ import freemarker.cache.TemplateLoader;
  */
 public class RemoteStore implements Store
 {
+    private String defaultRepositoryStoreId;
     private String path;
     private String endpoint;
     private RemoteClient remote;
+    
+    private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();    
+    
+    /**
+     * Binds this instance to the given repository store id for the 
+     * current thread
+     * 
+     * @param repositoryStoreId
+     */
+    public void bindRepositoryStoreId(String repositoryStoreId)
+    {
+        this.repositoryStoreId.set(repositoryStoreId);
+    }
+
+    /**
+     * Unbinds this instance from any repository store for the 
+     * current thread
+     *
+     */
+    public void unbindRepositoryStoreId()
+    {
+        this.repositoryStoreId.remove();
+    }
+
+    /**
+     * Gets the repostiry store id currently bound to this instance 
+     * for the current thread
+     * 
+     * @return
+     */
+    public String getRepositoryStoreId()
+    {
+        String storeId = defaultRepositoryStoreId;
+        if(storeId == null)
+        {
+            storeId = this.repositoryStoreId.get();
+        }
+        return storeId;
+    }
     
     /**
      * @param path      the relative path to set
@@ -61,6 +101,11 @@ public class RemoteStore implements Store
     public void setEndpoint(String endpoint)
     {
         this.endpoint = endpoint;
+    }
+    
+    public void setDefaultRepositoryStoreId(String repoStoreId)
+    {
+        this.defaultRepositoryStoreId = repoStoreId;
     }
 
 
@@ -126,6 +171,16 @@ public class RemoteStore implements Store
                 " due to error: " + res.getStatus().getMessage());
        }
     }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Store#removeDocument(java.lang.String)
+     */
+    public boolean removeDocument(String documentPath)
+        throws IOException
+    {
+        // TODO: Implement remove for Remote Store
+        return false;
+    }        
     
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.Store#createDocument(java.lang.String, java.lang.String)
@@ -227,6 +282,16 @@ public class RemoteStore implements Store
      */
     private String buildEncodeCall(String method, String documentPath)
     {
+        // TODO: Have this method take into account the currently bound
+        // store id.  The store id could be an avm store id but it could
+        // also potentially be any store in the repository
+        
+        // TODO: Do we need to separate out the concept of a store id
+        // from an AVM store Id?  Are they different?  AVM stores currently
+        // assume a certain path structure to accomodate web projects.
+        // Ideally, this could all be handled via configuration and still
+        // use a single remote store implementation.
+        
         StringBuilder buf = new StringBuilder(128);
         
         buf.append('/');

@@ -32,13 +32,13 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.i18n.I18NUtil;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.RendererExecutionException;
-import org.alfresco.web.site.model.TemplateInstance;
 import org.alfresco.web.site.renderer.RendererContext;
 
 /**
