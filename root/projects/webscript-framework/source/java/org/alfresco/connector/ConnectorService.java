@@ -306,15 +306,15 @@ public class ConnectorService implements ApplicationListener
                 {
                     connector.setCredentials(credentials);
                 }
-                else
+                else if (logger.isDebugEnabled())
                 {
                     if (userContext != null)
                     {
-                        logger.warn("Unable to find credentials for user: " + userContext.getUserId() + " and endpoint: " + endpointId);
+                        logger.debug("Unable to find credentials for user: " + userContext.getUserId() + " and endpoint: " + endpointId);
                     }
                     else
                     {
-                        logger.warn("Unable to find credentials for endpoint: " + endpointId);
+                        logger.debug("Unable to find credentials for endpoint: " + endpointId);
                     }
                 }
             }

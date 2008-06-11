@@ -51,11 +51,21 @@ import org.springframework.context.ApplicationContext;
  * 
  * @author muzquiano
  */
-public class FrameworkHelper
+public final class FrameworkHelper
 {
     private static final String CONNECTOR_SERVICE_ID = "connector.service";
-
+    
     private static Log logger = LogFactory.getLog(FrameworkHelper.class);
+    
+    private static ApplicationContext applicationContext = null;
+    private static WebFrameworkService webFrameworkService = null;
+    private static ConnectorService connectorService = null;
+    private static RemoteConfigElement remoteConfig = null;
+    private static WebFrameworkConfigElement webFrameworkConfig = null;
+    private static UserFactory userFactory = null;
+    private static RequestContextFactory requestContextFactory = null;
+    private static boolean isInitialized = false;
+    
     
     /**
      * Initializes the Web Framework.  This method must be called once
@@ -66,9 +76,6 @@ public class FrameworkHelper
      * This should be very quick to do.  The objects loaded here are
      * classloader scoped and should then be available to all future
      * requests.
-     * 
-     * @param servletContext
-     * @param context
      */
     public synchronized static void initFramework(ServletContext servletContext, ApplicationContext context)
     	throws FrameworkInitializationException
@@ -79,14 +86,18 @@ public class FrameworkHelper
         	applicationContext = context;
         	
             
-            // init config cache
+            // Get the WebFramework spring bean services
+            webFrameworkService = (WebFrameworkService)getApplicationContext().getBean("webframework.service");
+            connectorService = (ConnectorService)getApplicationContext().getBean(CONNECTOR_SERVICE_ID);
+            
+            
+            // init config caches
             ConfigService configService = (ConfigService) applicationContext.getBean("web.config");
             Config config = configService.getConfig("Remote");
             remoteConfig = (RemoteConfigElement)config.getConfigElement("remote");
             config = getConfigService().getConfig("WebFramework");
             webFrameworkConfig = (WebFrameworkConfigElement)config.getConfigElement("web-framework");
             
-                        
             
             /**
              * Init the User Factory for the framework.
@@ -117,6 +128,19 @@ public class FrameworkHelper
             userFactory = factory;
             
             
+            /**
+             * Retrieve the configured RequestContextFactory implementation.
+             */
+            try
+            {
+                requestContextFactory = RequestContextFactoryBuilder.newFactory();
+            }
+            catch (RequestContextException re)
+            {
+                throw new FrameworkInitializationException("RequestContextFactory failed.", re);
+            }
+            
+            
             isInitialized = true;
             logger.info("Successfully Initialized Web Framework");
         }
@@ -136,25 +160,9 @@ public class FrameworkHelper
         throws RequestContextException
     {
         /**
-         * Retrieve the configured RequestContextFactory implementation.
-         * If one has already been retrieved, it will be reused.
-         * If not, then a new one will be instantiated.
+         * Using the factory, produce a new RequestContext instance for the given request.
          */
-        RequestContextFactory factory = RequestContextFactoryBuilder.newFactory();
-        if(factory == null)
-        {
-            throw new RequestContextException("Unable to load RequestContextFactory");
-        }
-        
-        /**
-         * Using the factory, produce a new RequestContext instance for the
-         * given request.
-         */
-        RequestContext context = factory.newInstance(request);
-        if(context == null)
-        {
-            throw new RequestContextException("A request context was not manufactured");
-        }
+        RequestContext context = requestContextFactory.newInstance(request);
         
         /**
          * Bind the new request context instance to the request.
@@ -171,7 +179,7 @@ public class FrameworkHelper
     
     public static WebFrameworkService getWebFrameworkService()
     {
-        return (WebFrameworkService) getApplicationContext().getBean("webframework.service");
+        return webFrameworkService;
     }
         
     public static Log getLogger()
@@ -201,7 +209,7 @@ public class FrameworkHelper
         
     public static ConnectorService getConnectorService()
     {
-        return (ConnectorService) getApplicationContext().getBean(CONNECTOR_SERVICE_ID);
+        return connectorService;
     }
     
     public static EndpointDescriptor getEndpoint(String endpointId)
@@ -238,7 +246,7 @@ public class FrameworkHelper
         CredentialVault vault = null;
         try
         {
-            vault = FrameworkHelper.getConnectorService().getCredentialVault(userId);
+            vault = getConnectorService().getCredentialVault(userId);
         }
         catch(RemoteConfigException rce)
         {
@@ -256,7 +264,7 @@ public class FrameworkHelper
 
     public static ConnectorSession getConnectorSession(HttpSession httpSession, String endpointId)
     {
-        return FrameworkHelper.getConnectorService().getConnectorSession(httpSession, endpointId);
+        return getConnectorService().getConnectorSession(httpSession, endpointId);
     }
     
     public static void removeConnectorSessions(RequestContext context)
@@ -266,20 +274,14 @@ public class FrameworkHelper
             HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
             
             String[] endpointIds = FrameworkHelper.getRemoteConfig().getEndpointIds();
-            for(int i = 0; i < endpointIds.length; i++)
+            for (int i = 0; i < endpointIds.length; i++)
             {
-                FrameworkHelper.getConnectorService().removeConnectorSession(httpSession, endpointIds[i]);
+                getConnectorService().removeConnectorSession(httpSession, endpointIds[i]);
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             logger.error("Unable to remove connector sessions", ex);
         }
     }
-    
-    private static ApplicationContext applicationContext = null;
-    private static RemoteConfigElement remoteConfig = null;
-    private static WebFrameworkConfigElement webFrameworkConfig = null;
-    private static UserFactory userFactory = null;
-    private static boolean isInitialized = false;
 }

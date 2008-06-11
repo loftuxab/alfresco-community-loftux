@@ -30,7 +30,6 @@ import java.util.Map;
 
 import org.alfresco.tools.XMLUtil;
 import org.alfresco.util.ReflectionHelper;
-import org.alfresco.web.framework.cache.ContentCache;
 import org.alfresco.web.framework.cache.ModelObjectCache;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.scripts.Store;
@@ -59,8 +58,10 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
     protected static long DEFAULT_CACHE_TIMEOUT = 30*60*1000; // 30 minutes
 
+    protected String id;
     protected Store store;
-    protected Map<String, ContentCache> objectCaches;    
+    protected Map<String, ModelObjectCache> objectCaches;
+
 
     /**
      * Instantiates a new store model object persister.
@@ -72,7 +73,8 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     {
         super(objectTypeId);
         this.store = store;
-        this.objectCaches = new HashMap<String, ContentCache>(16, 1.0f);
+        this.id = "Store_" + this.store.getBasePath() + "_" + this.objectTypeId;
+        this.objectCaches = new HashMap<String, ModelObjectCache>(16, 1.0f);
     }
     
     /* (non-Javadoc)
@@ -80,7 +82,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     public String getId()
     {
-        return "StoreModelObjectPersister_" + this.store.getBasePath() + "_" + this.objectTypeId; 
+        return this.id;
     }
     
     /* (non-Javadoc)
@@ -103,14 +105,14 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      * 
      * @throws ModelObjectPersisterException the model object persister exception
      */
-    protected ModelObject getObjectByPath(ModelPersistenceContext context, String path)
+    protected synchronized ModelObject getObjectByPath(ModelPersistenceContext context, String path)
         throws ModelObjectPersisterException
     {
-        // CACHE: get the object from the cache (if possible)
+        // get the object from the cache if possible
         ModelObject obj = cacheGet(context, path);
-        if(obj == null)
+        if (obj == null)
         {
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Loading object for path: " + path);
             
             try
@@ -118,13 +120,13 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 // parse to Document
                 Document document = XMLUtil.parse(store.getDocument(path));
 
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Parsed document: " + document);
                 
                 String persisterId = this.getId();
                 String storagePath = path;
                 String id = pathToId(storagePath);
-                if(id != null)
+                if (id != null)
                 {                
                     ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, id);                
                     String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
@@ -132,7 +134,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                             implClassName, new Class[] { ModelObjectKey.class, Document.class },
                             new Object[] { key, document });
                     
-                    if(obj != null)
+                    if (obj != null)
                     {
                         obj.touch();
                         
@@ -145,7 +147,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw new ModelObjectPersisterException("Unable to load model object for path: " + path, ex);
             }
@@ -178,11 +180,11 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         
         // if the storage path and id are the same, then the file hasn't been
         // renamed, so we can just save it to the same place
-        if(this.store.hasDocument(storagePath))
+        if (this.store.hasDocument(storagePath))
         {
             try
             {
-                if(!fileMoved)
+                if (!fileMoved)
                 {
                     // the file wasn't moved, so just update
                     this.store.updateDocument(storagePath, content);
@@ -218,7 +220,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                     saved = true;
                 }
             }
-            catch(IOException ex)
+            catch (IOException ex)
             {
                 throw new ModelObjectPersisterException("Unable to update model object: " + storagePath, ex);
             }
@@ -227,10 +229,10 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         {
             try
             {
-                if(fileMoved)
+                if (fileMoved)
                 {
                     // check whether a file already exists at the intended path
-                    if(!this.store.hasDocument(_storagePath))
+                    if (!this.store.hasDocument(_storagePath))
                     {
                         // create the document
                         this.store.createDocument(_storagePath, content);
@@ -281,12 +283,12 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      * 
      * @throws ModelObjectPersisterException the model object persister exception
      */
-    protected boolean removeObjectByPath(ModelPersistenceContext context, String path)
+    protected synchronized boolean removeObjectByPath(ModelPersistenceContext context, String path)
         throws ModelObjectPersisterException
     {    
         boolean removed = false;
         
-        if(this.store.hasDocument(path))
+        if (this.store.hasDocument(path))
         {
             try
             {
@@ -309,22 +311,21 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     public ModelObject newObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
-    {        
-        // mock up some XML
+    {
+        // create the minimum XML - nodes will be added using DOM methods to it
         String xml = "<" + this.objectTypeId + "></" + this.objectTypeId + ">";
-
+        
         // build the object
         ModelObject obj = null;
-
         try
         {
             Document document = XMLUtil.parse(xml);
             XMLUtil.addChildValue(document.getRootElement(), "version", FrameworkHelper.getConfig().getTypeDescriptor(this.objectTypeId).getVersion());
-
+            
             String persisterId = this.getId();
             String storagePath = this.idToPath(objectId);
             
-            if(objectId != null)
+            if (objectId != null)
             {            
                 ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, objectId);                
                 String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
@@ -332,7 +333,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                         implClassName, new Class[] { ModelObjectKey.class, Document.class },
                         new Object[] { key, document });
                 
-                if(obj != null)
+                if (obj != null)
                 {
                     obj.touch();
 
@@ -346,10 +347,10 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 }
             }
         }
-        catch(DocumentException de)
+        catch (DocumentException de)
         {
             // something failed while trying to load the xml object
-            if(logger.isWarnEnabled())
+            if (logger.isWarnEnabled())
                 logger.warn(de);
         }
         
@@ -362,7 +363,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public boolean hasObject(ModelPersistenceContext context, String objectId)
     {
         String path = this.idToPath(objectId);
-        return hasObject(context, path);
+        return hasObjectByPath(context, path);
     }  
 
     /**
@@ -384,22 +385,18 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public Map<String, ModelObject> getAllObjects(ModelPersistenceContext context)
         throws ModelObjectPersisterException
     {
-        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(512, 1.0f);
-        
         String[] docPaths = this.store.getAllDocumentPaths();
-        if(docPaths != null)
+        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(docPaths.length, 1.0f);
+        for (int i = 0; i < docPaths.length; i++)
         {
-            for(int i = 0; i < docPaths.length; i++)
-            {
-                // load object from path
-                // this will retrieve from cache, if possible
-                ModelObject object = getObjectByPath(context, docPaths[i]);
-                
-                // place into collected map
-                objects.put(object.getId(), object);
-            }
+            // load object from path
+            // this will retrieve from cache, if possible
+            ModelObject object = getObjectByPath(context, docPaths[i]);
+            
+            // place into collected map
+            objects.put(object.getId(), object);
         }
-
+        
         return objects;
     }
     
@@ -410,7 +407,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         throws ModelObjectPersisterException
     {
         String path = this.idToPath(objectId);
-        return getTimestamp(context, path);
+        return getTimestampByPath(context, path);
     }
 
     /**
@@ -443,9 +440,6 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     {
         this.objectCaches.clear();
     }
-
-    
-    // protected cache methods
     
     
     /**
@@ -453,12 +447,12 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      * 
      * @return the cache
      */
-    protected synchronized ContentCache getCache(ModelPersistenceContext context)
+    protected ModelObjectCache getCache(ModelPersistenceContext context)
     {
         String key = getId();
         
-        ModelObjectCache cache = (ModelObjectCache) objectCaches.get(key);
-        if(cache == null)
+        ModelObjectCache cache = objectCaches.get(key);
+        if (cache == null)
         {
             cache = new ModelObjectCache(this.store, DEFAULT_CACHE_TIMEOUT);
             objectCaches.put(key, cache);
@@ -477,7 +471,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     protected ModelObject cacheGet(ModelPersistenceContext context, String path)
     {
-        ModelObject obj = (ModelObject) getCache(context).get(path);
+        ModelObject obj = getCache(context).get(path);
         if(logger.isDebugEnabled())
         {
             if(obj != null)
@@ -489,7 +483,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 logger.debug("Cache miss: " + path);
             }
         }
-        return obj;        
+        return obj;
     }   
     
     /**

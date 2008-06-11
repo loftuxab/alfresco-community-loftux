@@ -24,6 +24,8 @@
  */
 package org.alfresco.web.framework.cache;
 
+import java.io.IOException;
+
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.scripts.Store;
 
@@ -35,8 +37,10 @@ import org.alfresco.web.scripts.Store;
  * 
  * @author muzquiano
  */
-public class ModelObjectCache extends BasicCache
+public class ModelObjectCache extends BasicCache<ModelObject>
 {
+    protected Store store = null;
+    
     /**
      * Instantiates a new model object cache.
      * 
@@ -50,14 +54,12 @@ public class ModelObjectCache extends BasicCache
         this.store = store;
     }
  
-    protected Store store = null;
-
     /* (non-Javadoc)
      * @see org.alfresco.web.site.cache.BasicCache#get(java.lang.String)
      */
-    public synchronized Object get(String key)
+    public synchronized ModelObject get(String key)
     {
-        ModelObject obj = (ModelObject) super.get(key);
+        ModelObject obj = super.get(key);
         if (obj != null)
         {
             // modification time of our model objec
@@ -69,24 +71,22 @@ public class ModelObjectCache extends BasicCache
             {
                 storeTimestamp = store.lastModified(key);
             }
-            catch(Exception ex)
+            catch (IOException ex)
             {
                 // unable to access the timestamp in the store
                 // could be many reasons but lets assume the worst case
                 // the file may have been deleted
                 // thus, remove from cache
-                
                 remove(key);
                 obj = null;
             }
             
-            if(storeTimestamp > -1)
+            if (storeTimestamp > -1)
             {
                 if (storeTimestamp > objectTimestamp)
                 {
                     // the in-memory copy is stale
                     // thus, remove from cache
-                    
                     remove(key);
                     obj = null;
                 }

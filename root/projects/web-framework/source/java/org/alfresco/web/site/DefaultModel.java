@@ -54,16 +54,14 @@ public class DefaultModel extends AbstractModel
     /**
      * Instantiates a new default model.
      * 
-     * @param service the service
+     * @param manager the ModelObjectManager
      */
-    public DefaultModel(ModelObjectManager service)
+    public DefaultModel(ModelObjectManager manager)
     {
-        super(service);
+        super(manager);
     }
-        
-
-    // load
-
+    
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#getChrome(java.lang.String)
      */
@@ -392,12 +390,6 @@ public class DefaultModel extends AbstractModel
     {
         return this.getObjectManager().getAllObjects(objectTypeId);
     }
-    
-    
-    
-    //////
-    
-    
     
     
     ///////////////////////////////////
@@ -852,7 +844,7 @@ public class DefaultModel extends AbstractModel
      * @param typeName the type name
      * @param propertyConstraintMap the property constraint map
      * 
-     * @return the map< string, model object>
+     * @return the map
      */
     protected Map<String, ModelObject> findObjects(String objectTypeId, Map<String, Object> propertyConstraintMap)
     {

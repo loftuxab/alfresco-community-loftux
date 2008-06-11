@@ -30,12 +30,12 @@ import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * Interface for a RequestContext factory.
- * 
+ * <p>
  * A request context factory is invoked by the framework at the start of the
  * request chain.  It is responsible for producing a RequestContext object
  * which is bound to the request.  The RequestContext object is a single
  * object instance with which all downstream framework elements can consult.
- * 
+ * <p>
  * The RequestContext object is scoped to the request.
  * 
  * @author muzquiano
@@ -43,7 +43,8 @@ import org.alfresco.web.site.exception.RequestContextException;
 public interface RequestContextFactory
 {
     /**
-     * Produces a new RequestContext instance for a given request
+     * Produces a new RequestContext instance for a given request. Always returns
+     * a new RequestContext instance - or an exception is thrown.
      * 
      * @return The RequestContext instance
      * @throws RequestContextException

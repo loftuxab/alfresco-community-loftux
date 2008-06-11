@@ -43,34 +43,36 @@ import org.alfresco.web.site.filesystem.IFileSystem;
 /**
  * Produces HttpRequestContext instances for HttpServletRequest request
  * inputs.  The HttpRequestContext type has an additional convenience
- * accessor method.
+ * accessor method to return the HttpServletRequest.
  *  
  * @author muzquiano
  */
 public class HttpRequestContextFactory implements RequestContextFactory
 {
     /**
-     * Produces a new RequestContext instance for a given request
+     * Produces a new RequestContext instance for a given request. Always returns
+     * a RequestContext instance - or an exception is thrown.
      * 
      * @return The RequestContext instance
+     * 
      * @throws RequestContextException
      */    
     public RequestContext newInstance(ServletRequest request)
         throws RequestContextException
     {
-        if(!(request instanceof HttpServletRequest))
+        if (!(request instanceof HttpServletRequest))
         {
             throw new RequestContextException("HttpRequestContextFactory can only produce HttpRequestContext instances for HttpServletRequest requests");
         }
 
-        HttpRequestContext context = null;
+        HttpRequestContext context;
         
         // Load the user and place the user onto the RequestContext
         try
         {
             // Construct the HttpRequestContext instance
             context = new HttpRequestContext((HttpServletRequest)request);
-
+            
             // Construct/load the user and place them onto the request context
             UserFactory userFactory = FrameworkHelper.getUserFactory();
             User user = userFactory.faultUser(context, (HttpServletRequest)request);
@@ -143,12 +145,12 @@ public class HttpRequestContextFactory implements RequestContextFactory
         
         // see if we can determine a store id that is being virtualized
         String repositoryStoreId = null; // TODO
-        if(repositoryStoreId == null)
+        if (repositoryStoreId == null)
         {
             // TODO: This is just for testing
             repositoryStoreId = (String) request.getParameter("storeId");
         }
-        if(repositoryStoreId != null)
+        if (repositoryStoreId != null)
         {
             mpc.putValue(ModelPersistenceContext.REPO_STOREID, repositoryStoreId);
         }

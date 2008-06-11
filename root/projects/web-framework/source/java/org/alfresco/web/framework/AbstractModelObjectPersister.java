@@ -75,7 +75,7 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
         String id = null;
         
         int x = storagePath.lastIndexOf(".");
-        if(x > -1)
+        if (x != -1)
         {
             id = storagePath.substring(0, x);
         }

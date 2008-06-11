@@ -91,25 +91,25 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         
         // for each persister, see if we can load the object from its
         // underlying storage
-        Iterator it = this.persisters.keySet().iterator();
-        while(it.hasNext())
+        Iterator<String> it = this.persisters.keySet().iterator();
+        while (it.hasNext())
         {
-            String persisterId = (String) it.next();
-            ModelObjectPersister persister = (ModelObjectPersister) persisters.get(persisterId);
+            String persisterId = it.next();
+            ModelObjectPersister persister = persisters.get(persisterId);
             
             // try to load the object
             try
             {
                 modelObject = persister.getObject(context, objectId);
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug(mope);
             }
-            if(modelObject != null)
+            if (modelObject != null)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("getObject loaded '" + objectId + "' from persister: " + persisterId); 
 
                 // if we have the object, jump out
@@ -117,11 +117,11 @@ public class MultiModelObjectPersister implements ModelObjectPersister
             }
         }
         
-        if(logger.isDebugEnabled() && modelObject == null)
+        if (modelObject == null && logger.isDebugEnabled())
         {
-            logger.debug("getObject unable to get object from any persisters");
+            logger.debug("getObject() unable to get object from any persisters");
         }
-
+        
         return modelObject;
     }
     
@@ -134,18 +134,18 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         boolean saved = false;
         
         String persisterId = object.getPersisterId();
-        if(persisterId == null)
+        if (persisterId == null)
         {
             // get the default persister id for a given type id
             persisterId = this.service.getPersisterId(this.objectTypeId);
         }
         
         // see if we have a persister
-        ModelObjectPersister persister = (ModelObjectPersister) persisters.get(persisterId);
-        if(persister != null)
+        ModelObjectPersister persister = persisters.get(persisterId);
+        if (persister != null)
         {
             saved = persister.saveObject(context, object);
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("saveObject save to persister '" + persisterId + "' returned: " + saved);
         }
         
@@ -169,15 +169,14 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         boolean removed = false;
         
-        // for each persister, see if we can load the object from its
-        // underlying storage
-        Iterator it = this.persisters.keySet().iterator();
-        while(it.hasNext())
+        // for each persister, see if we can load the object from its underlying storage
+        Iterator<String> it = this.persisters.keySet().iterator();
+        while (it.hasNext())
         {
-            String persisterId = (String) it.next();
-            ModelObjectPersister persister = (ModelObjectPersister) persisters.get(persisterId);
+            String persisterId = it.next();
+            ModelObjectPersister persister = persisters.get(persisterId);
             
-            if(persister.hasObject(context, objectId))
+            if (persister.hasObject(context, objectId))
             {
                 removed = persister.removeObject(context, objectId);
                 
@@ -206,15 +205,14 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         boolean hasObject = false;
         
-        // for each persister, see if we can load the object from its
-        // underlying storage
-        Iterator it = this.persisters.keySet().iterator();
-        while(it.hasNext())
+        // for each persister, see if we can load the object from its underlying storage
+        Iterator<String> it = this.persisters.keySet().iterator();
+        while (it.hasNext())
         {
-            String persisterId = (String) it.next();
-            ModelObjectPersister persister = (ModelObjectPersister) persisters.get(persisterId);
-
-            if(persister.hasObject(context, objectId))
+            String persisterId = it.next();
+            ModelObjectPersister persister = persisters.get(persisterId);
+            
+            if (persister.hasObject(context, objectId))
             {
                 hasObject = true;
             }
@@ -233,11 +231,11 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         
         // get the default persister for this object type
         ModelObjectPersister persister = this.service.getPersister(this.objectTypeId);
-        if(persister != null)
+        if (persister != null)
         {
            obj = persister.newObject(context, objectId);
            
-           if(logger.isDebugEnabled())
+           if (logger.isDebugEnabled())
                logger.debug("newObject created on persister '" + persister.getId() + "' returned: " + obj);
         }
         
@@ -252,19 +250,18 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         Map<String, ModelObject> objects = new HashMap<String, ModelObject>(512, 1.0f);
         
-        // for each persister, see if we can load the object from its
-        // underlying storage
-        Iterator it = this.persisters.keySet().iterator();
-        while(it.hasNext())
+        // for each persister, see if we can load the object from its underlying storage
+        Iterator<String> it = this.persisters.keySet().iterator();
+        while (it.hasNext())
         {
-            String persisterId = (String) it.next();
-            ModelObjectPersister persister = (ModelObjectPersister) persisters.get(persisterId);
+            String persisterId = it.next();
+            ModelObjectPersister persister = persisters.get(persisterId);
             
             Map<String, ModelObject> map = persister.getAllObjects(context);
             objects.putAll(map);
         }
         
-        if(logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
             logger.debug("getAllObjects for type: " + this.objectTypeId + " return set of size: " + objects.size());
         
         return objects;
@@ -279,19 +276,19 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         long timestamp = -1;
         
         // find the persister that has the object
-        Iterator it = this.persisters.keySet().iterator();
-        while(it.hasNext())
+        Iterator<String> it = this.persisters.keySet().iterator();
+        while (it.hasNext())
         {
-            String persisterId = (String) it.next();
-            ModelObjectPersister persister = (ModelObjectPersister) persisters.get(persisterId);
-
-            if(persister.hasObject(context, objectId))
+            String persisterId = it.next();
+            ModelObjectPersister persister = persisters.get(persisterId);
+            
+            if (persister.hasObject(context, objectId))
             {
                 timestamp = persister.getTimestamp(context, objectId);
             }
         }
         
-        if(timestamp == -1)
+        if (timestamp == -1)
         {
             throw new ModelObjectPersisterException("Unable to find object: " + objectId + " in any persister, unable to return timestamp");
         }
@@ -304,10 +301,10 @@ public class MultiModelObjectPersister implements ModelObjectPersister
      */
     public void invalidateCache()
     {
-        Iterator it = this.persisters.values().iterator();
-        while(it.hasNext())
+        Iterator<ModelObjectPersister> it = this.persisters.values().iterator();
+        while (it.hasNext())
         {
-            ModelObjectPersister persister = (ModelObjectPersister) it.next();            
+            ModelObjectPersister persister = it.next();            
             persister.invalidateCache();
         }
     }    

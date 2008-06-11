@@ -25,10 +25,12 @@
 package org.alfresco.web.site;
 
 import org.alfresco.util.ReflectionHelper;
+import org.alfresco.web.config.WebFrameworkConfigElement.RequestContextDescriptor;
+import org.alfresco.web.site.exception.RequestContextException;
 
 /**
  * Manages the construction of RequestContextFactory objects.
- * 
+ * <p>
  * The Web Framework configuration could specify one or more
  * RequestContextFactory implementations.
  * 
@@ -36,11 +38,12 @@ import org.alfresco.util.ReflectionHelper;
  */
 public class RequestContextFactoryBuilder
 {
-    
+    private static final String HTTP_REQUEST_CONTEXT_FACTORY = "org.alfresco.web.site.HttpRequestContextFactory";
+
     /**
-     * Instantiates a new request context factory builder.
+     * Private Constructor - ensure singleton pattern
      */
-    protected RequestContextFactoryBuilder()
+    private RequestContextFactoryBuilder()
     {
     }
 
@@ -49,28 +52,40 @@ public class RequestContextFactoryBuilder
      * Web Framework configuration
      * 
      * @return the request context factory
+     * 
+     * @throws RequestContextException if factory cannot be instantiated
      */
-    public static RequestContextFactory newFactory()
+    public static RequestContextFactory newFactory() throws RequestContextException
     {
         // the default class name that we will use
-        String className = "org.alfresco.web.site.HttpRequestContextFactory";
-
+        String className = HTTP_REQUEST_CONTEXT_FACTORY;
+        
         // default request context id
         String requestContextId = FrameworkHelper.getConfig().getDefaultRequestContextId();
-        if(requestContextId != null)
+        if (requestContextId != null)
         {
 	        // see if another class name was configured
-	        String _className = FrameworkHelper.getConfig().getRequestContextDescriptor(requestContextId).getImplementationClass();
-	        if (_className != null)
-	            className = _className;
+            RequestContextDescriptor desc = FrameworkHelper.getConfig().getRequestContextDescriptor(requestContextId);
+            if (desc != null)
+            {
+    	        String _className = desc.getImplementationClass();
+    	        if (_className != null)
+                {
+    	            className = _className;
+                }
+            }
         }
-
-        // instantiate the object
-        RequestContextFactory factory = (RequestContextFactory) ReflectionHelper.newObject(className);
         
-        // log the creation
-        FrameworkHelper.getLogger().debug("New request context factory: " + className);
-
+        // instantiate the object
+        RequestContextFactory factory = (RequestContextFactory)ReflectionHelper.newObject(className);
+        if (factory == null)
+        {
+            throw new RequestContextException("Unable to load RequestContextFactory: " + className);
+        }
+        
+        if (FrameworkHelper.getLogger().isDebugEnabled())
+            FrameworkHelper.getLogger().debug("New request context factory: " + className);
+        
         return factory;
     }    
 }

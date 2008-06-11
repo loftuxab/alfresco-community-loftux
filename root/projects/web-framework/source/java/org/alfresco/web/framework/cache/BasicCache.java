@@ -32,9 +32,9 @@ import java.util.WeakHashMap;
  * 
  * @author muzquiano
  */
-public class BasicCache implements ContentCache
+public class BasicCache<K> implements ContentCache<K>
 {
-    protected WeakHashMap m_cache;
+    protected WeakHashMap<String, CacheItem<K>> m_cache;
     protected long m_default_timeout;
     
     /**
@@ -45,17 +45,17 @@ public class BasicCache implements ContentCache
     public BasicCache(long default_timeout)
     {
         m_default_timeout = default_timeout;
-        m_cache = new WeakHashMap(256);
+        m_cache = new WeakHashMap<String, CacheItem<K>>(256);
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.site.cache.ContentCache#get(java.lang.String)
      */
-    public synchronized Object get(String key)
+    public synchronized K get(String key)
     {
         // get the content item from the cache
-        CacheItem item = (CacheItem) m_cache.get(key);
-
+        CacheItem<K> item = m_cache.get(key);
+        
         // if the cache item is null, return right away
         if (item == null)
         {
@@ -70,8 +70,7 @@ public class BasicCache implements ContentCache
                 remove(key);
                 return null;
             }
-
-            // return this
+            
             return item.m_object;
         }
     }
@@ -91,7 +90,7 @@ public class BasicCache implements ContentCache
     /* (non-Javadoc)
      * @see org.alfresco.web.site.cache.ContentCache#put(java.lang.String, java.lang.Object)
      */
-    public synchronized void put(String key, Object obj)
+    public synchronized void put(String key, K obj)
     {
         put(key, obj, m_default_timeout);
     }
@@ -99,10 +98,10 @@ public class BasicCache implements ContentCache
     /* (non-Javadoc)
      * @see org.alfresco.web.site.cache.ContentCache#put(java.lang.String, java.lang.Object, long)
      */
-    public synchronized void put(String key, Object obj, long timeout)
+    public synchronized void put(String key, K obj, long timeout)
     {
         // create the cache item
-        CacheItem item = new CacheItem(key, obj, timeout);
+        CacheItem<K> item = new CacheItem<K>(key, obj, timeout);
         m_cache.put(key, item);
     }
 

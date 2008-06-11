@@ -121,7 +121,7 @@ public class FileSystemManager
 
             // flip on caching?
             String useCache = FrameworkHelper.getConfig().getFileSystemDescriptor("local").getUseCache(); 
-            if("true".equals(useCache))
+            if (Boolean.parseBoolean(useCache))
             {
                 fileSystem = new CachedFileSystem(fileSystem);
             }
