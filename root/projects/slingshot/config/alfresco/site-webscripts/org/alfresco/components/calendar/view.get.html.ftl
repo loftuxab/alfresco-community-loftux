@@ -17,36 +17,27 @@
 
 <div class="yui-content" style="background: #FFFFFF;">
 	<div id="#day">
-	 <div style="text-align:center">
-	         <img src="/slingshot/images/calendar/prevMinor.gif" title="Previous Day" style="cursor:pointer" />
-	         <img src="/slingshot/images/calendar/now.gif" title="Today" style="cursor:pointer" />
-	         <img src="/slingshot/images/calendar/nextMinor.gif" title="Next Day" style="cursor:pointer" />
-	    </div>
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
 			<tr><td align="center" style="font-weight: bold;">17 May 2008</td></tr>
 		</table>
 		<br />
-		<table id="day-view" cellspacing="0" cellpadding="2" border="1" width="100%">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+		  <tr><td>
+		<div id="dayContainer">
+		  <div id="timeLabels">
 			<#list 0..23 as i>
 				<#assign time = i?string>
 				<#if i < 10>
 					<#assign time = "0" + time>
 				</#if>
-				<#if i % 2 == 0>
-					<#assign class="even">
-				<#else>
-					<#assign class="odd">
-				</#if>
-				<tr class="${class}">	
-				<td class="label">${time}:00</td>
-				<td></td>
-				</tr>
-				<tr class="<#if class == "even">odd<#else>even</#if>">
-					<td class="label">${time}:30</td>
-					<td></td>
-				</tr>	
+				<div class="timeLabel">${time}:00</div>
+				<div class="timeLabel">${time}:30</div>
 			</#list>
-		</table>
+		  </div>
+		  <div id="${args.htmlid}-dayEventsView" class="dayEventsView"><#-- events go here --></div>
+		</div>
+		</td></tr>
+		</table>						
 	</div>
 	<div id="#week">
 	    <div style="text-align:center">
@@ -65,11 +56,7 @@
 			<th align="center" valign="top"><a href="#">${header?string("E M/d")}</a></th>
 		</#list>
 		</tr>
-		<#assign cells>
-			<#list 1..7 as day>
-				<td></td>
-			</#list>
-		</#assign>
+		<#assign cellcount = 0  />
 		<#list 0..23 as i>
 			<#assign time = i?string>
 			<#if i < 10>
@@ -82,11 +69,17 @@
 			</#if>
 			<tr class="${class}">	
 			<td class="label">${time}:00</td>
-			${cells}
+			<#list 1..7 as day>
+				<td id="${args.htmlid}_calendar_cell${cellcount}"></td>
+				<#assign cellcount = cellcount + 1 />
+			</#list>
 			</tr>
 			<tr class="<#if class == "even">odd<#else>even</#if>">
 				<td class="label">${time}:30</td>
-				${cells}
+				<#list 1..7 as day>
+					<td id="${args.htmlid}_calendar_cell${cellcount}"></td>
+					<#assign cellcount = cellcount + 1 />
+				</#list>
 			</tr>	
 		</#list>
 		</table>

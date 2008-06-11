@@ -121,3 +121,43 @@ div.boxOutline {
 /* Styles calendar dashlet */
 .yui-skin-sam .yui-calendar td.event { background-color:#999; }
 
+/* Day view styles */
+div.timeLabel {
+  	height: 20px;
+  	width: 50px;
+  	font-size: 12px;
+	border: 1px solid #CCC;
+	border-bottom: none;
+	text-align: right;
+	padding-right: 5px;
+}
+
+div#timeLabels {
+    float: left;
+    width: 57px;
+    border: 1px solid black;
+}
+
+div.dayEventsView {
+	float: left;
+	border: 1px solid black;
+	font-family: Arial;
+	font-size: 11px;
+	text-align: left;
+	position: relative;
+}
+
+div#dayContainer {
+    float: left; 
+    width: 100%;
+    border: 1px solid blue;
+}
+
+div.dayEvent {
+    position: absolute; 
+    font-family: Arial;
+    font-size: 11px;
+    text-align: left;
+    border: 1px solid black;
+    width: 80px;
+}
