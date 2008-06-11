@@ -44,7 +44,7 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     {
         this.objectTypeId = objectTypeId;
     }
-        
+    
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#removeObject(org.alfresco.web.framework.ModelPersistenceContext, org.alfresco.web.framework.ModelObject)
      */

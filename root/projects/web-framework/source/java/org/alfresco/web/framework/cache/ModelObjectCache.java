@@ -40,58 +40,64 @@ import org.alfresco.web.scripts.Store;
 public class ModelObjectCache extends BasicCache<ModelObject>
 {
     protected Store store = null;
+    private final static long timeout = 24L*60L*60L*1000L;   // 24 hours
+    private long delay = 0;          // i.e. 5L*60L*1000L = minutes
     
     /**
      * Instantiates a new model object cache.
      * 
-     * @param store the store
-     * @param default_timeout the default_timeout
+     * @param store     the store
+     * @param delay     the delay to check modified dates for items in the cache
      */
-    public ModelObjectCache(Store store, long default_timeout)
+    public ModelObjectCache(Store store, long delay)
     {
-        super(default_timeout);
-        
+        super(timeout);
+        this.delay = delay;
         this.store = store;
     }
  
     /* (non-Javadoc)
      * @see org.alfresco.web.site.cache.BasicCache#get(java.lang.String)
      */
+    @Override
     public synchronized ModelObject get(String key)
     {
-        ModelObject obj = super.get(key);
-        if (obj != null)
+        ModelObject obj = null;
+        CacheItem<ModelObject> item = cache.get(key);
+        if (item != null)
         {
-            // modification time of our model objec
-            long objectTimestamp = obj.getModificationTime();
+            // get the content item from the cache
+            long now = System.currentTimeMillis();
             
-            // check the modification time in the store
-            long storeTimestamp = -1;
-            try
-            {
-                storeTimestamp = store.lastModified(key);
-            }
-            catch (IOException ex)
-            {
-                // unable to access the timestamp in the store
-                // could be many reasons but lets assume the worst case
-                // the file may have been deleted
-                // thus, remove from cache
-                remove(key);
-                obj = null;
-            }
+            obj = item.object;
             
-            if (storeTimestamp > -1)
+            if (this.delay < now - item.lastChecked)
             {
-                if (storeTimestamp > objectTimestamp)
+                // delay hit - check cached item
+                // modification time of our model object
+                // check the modification time in the store
+                item.lastChecked = now;
+                try
                 {
-                    // the in-memory copy is stale
+                    if (store.lastModified(key) > obj.getModificationTime())
+                    {
+                        // the in-memory copy is stale, remove from cache
+                        remove(key);
+                        obj = null;
+                    }
+                }
+                catch (IOException ex)
+                {
+                    // unable to access the timestamp in the store
+                    // could be many reasons but lets assume the worst case
+                    // the file may have been deleted
                     // thus, remove from cache
                     remove(key);
                     obj = null;
                 }
             }
         }
+        
         return obj;
     }
 }
