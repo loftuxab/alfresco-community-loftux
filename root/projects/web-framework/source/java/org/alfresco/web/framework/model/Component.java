@@ -28,6 +28,7 @@ import org.alfresco.web.framework.AbstractModelObject;
 import org.alfresco.web.framework.ModelObjectKey;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
+import org.alfresco.web.site.WebFrameworkConstants;
 import org.dom4j.Document;
 
 /**
@@ -249,5 +250,23 @@ public class Component extends AbstractModelObject
     public String getTypeId()
     {
         return TYPE_ID;
+    }
+    
+    /**
+     * Generates the deterministic component id from its key properties
+     * 
+     * @param scopeId
+     * @param regionId
+     * @param sourceId
+     * @return
+     */
+    public static String generateId(String scopeId, String regionId, String sourceId)
+    {
+        String id = scopeId + "." + regionId;
+        if(!WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+        {
+            id += "." + sourceId;
+        }
+        return id;        
     }
 }

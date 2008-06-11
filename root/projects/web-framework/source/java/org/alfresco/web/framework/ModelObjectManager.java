@@ -152,7 +152,8 @@ public final class ModelObjectManager
     {
         ModelObject obj = null;
         
-        ModelObjectPersister persister = this.service.getPersister(objectTypeId);
+        // get the default persister for this object type
+        ModelObjectPersister persister = this.service.getDefaultPersister(objectTypeId);
         if(persister != null)
         {
             try
@@ -163,6 +164,8 @@ public final class ModelObjectManager
             {
                 if(logger.isDebugEnabled())
                     logger.debug("Unable to create object: " + objectId + " of type " + objectTypeId, mope);
+                
+                // allow null to be returned
             }                
         }
        
@@ -180,7 +183,8 @@ public final class ModelObjectManager
     {
         ModelObject obj = null;
         
-        ModelObjectPersister persister = this.service.getPersister(objectTypeId);
+        // get the default persister for this object type
+        ModelObjectPersister persister = this.service.getDefaultPersister(objectTypeId);        
         if(persister != null)
         {
             String objectId = newGUID();
@@ -207,7 +211,7 @@ public final class ModelObjectManager
     {
         boolean saved = false;
         
-        ModelObjectPersister persister = this.service.getPersister(object.getTypeId());
+        ModelObjectPersister persister = this.service.getPersisterById(object.getPersisterId());
         if(persister != null)
         {
             try

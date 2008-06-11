@@ -127,6 +127,11 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getId();
     }
     
+    public void setId(String id)
+    {
+        modelObject.setId(id);
+    }
+    
     public String getTitle()
     {
         return modelObject.getTitle();
@@ -166,7 +171,7 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getModificationTime();
     }
     
-    public String getStorageId()
+    public String getPersisterId()
     {
         return modelObject.getPersisterId();
     }

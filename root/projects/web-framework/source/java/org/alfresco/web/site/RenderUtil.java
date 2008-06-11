@@ -25,14 +25,12 @@
 package org.alfresco.web.site;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
-import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.framework.model.Chrome;
 import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.framework.model.Configuration;
@@ -344,17 +342,10 @@ public final class RenderUtil
             // determine the region renderer
             RendererDescriptor descriptor = getRegionRendererDescriptor(context, template, regionId, overrideChromeId);
 
-            // determine the component to render
-            Component component = null;
-
             // render in either one of two ways
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
-            Map<String, ModelObject> components = context.getModel().findComponents(regionScopeId, regionSourceId, regionId, null);
-            if (components.size() != 0)
-            {
-                component = (Component) components.values().iterator().next();
-            }
+            Component component = context.getModel().getComponent(regionScopeId, regionId, regionSourceId);
             if (component == null || THEME.equals(regionScopeId))
             {
                 // check to see whether the current theme specifies a default component for this region id
@@ -388,7 +379,7 @@ public final class RenderUtil
             }
             else
             {
-                // if we couldn't find a component, then redirect to a region "no-component" renderer
+                // if we couldn't get a component, then redirect to a region "no-component" renderer
                 RenderUtil.renderErrorHandlerPage(context, request,
                         response,
                         WebFrameworkConstants.DISPATCHER_HANDLER_REGION_NO_COMPONENT,

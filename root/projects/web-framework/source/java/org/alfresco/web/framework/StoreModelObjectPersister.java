@@ -128,7 +128,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 String id = pathToId(storagePath);
                 if (id != null)
                 {                
-                    ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, id);                
+                    ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, id, true);                
                     String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
                     obj = (ModelObject) ReflectionHelper.newObject(
                             implClassName, new Class[] { ModelObjectKey.class, Document.class },
@@ -166,98 +166,79 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         
         String content = modelObject.toXML();
         
-        // this is the path that we expect to save the object
-        // either the object was originally stored at this location
-        // or it is the path that was initialized when the object was created
-        String storagePath = modelObject.getStoragePath();
+        // the path to which we expect to save
+        // this is essentially the path against which we were instantiated
+        // or from which we were loaded
+        String path = modelObject.getStoragePath();
         
-        // now get the storage id and the theoretical path where it would store
-        // the end user might have changed the id
-        String storageId = modelObject.getPersisterId();
-        String _storagePath = storageId + ".xml";
-        
-        boolean fileMoved = !(storagePath.equals(_storagePath));
-        
-        // if the storage path and id are the same, then the file hasn't been
-        // renamed, so we can just save it to the same place
-        if (this.store.hasDocument(storagePath))
+        // now figure out what path we want to save to
+        String _path = this.idToPath(modelObject.getId());
+        try
         {
-            try
+            // if the object hasn't been saved yet
+            if(!modelObject.isSaved())
             {
-                if (!fileMoved)
+                // create the document
+                this.store.createDocument(_path, content);
+                
+                // adjust the key to reflect new storage state
+                String _id = pathToId(_path);                        
+                modelObject.getKey().setId(_id);
+                modelObject.getKey().setStoragePath(_path);
+                modelObject.getKey().setSaved(true);
+                
+                // flag that the save was successful
+                saved = true;
+            }
+            else
+            {
+                // object was already saved
+                // what we do in this case depends on whether the path changed
+                
+                if(!path.equals(_path))
                 {
-                    // the file wasn't moved, so just update
-                    this.store.updateDocument(storagePath, content);
+                    // path has changed
                     
-                    // CACHE: remove object from cache
-                    // this will force it to reload the next time around
-                    cacheRemove(context, storagePath);
+                    // TODO: introduce move() mechanics into the store?
                     
+                    // create the new object
+                    this.store.createDocument(_path, content);
+                    
+                    // adjust the key to reflect new storage state
+                    String _id = pathToId(_path);                        
+                    modelObject.getKey().setId(_id);
+                    modelObject.getKey().setStoragePath(_path);
+                    modelObject.getKey().setSaved(true);
+
+                    // CACHE: put object into new cache location
+                    cachePut(context, _path, modelObject);
+
+                    // remove the old object
+                    this.store.removeDocument(path);
+                    
+                    // CACHE: remove oobject from old cache location
+                    cacheRemove(context, path);
+                    
+                    // flag that the save was successful
                     saved = true;
                 }
                 else
                 {
-                    // the file was moved and it already exists in the store
+                    // file not moved
+                    // so just do an update
+                    this.store.updateDocument(path, content);
                     
-                    // TODO: move this down into the store so that we can
-                    // provide some transactional support
+                    // make sure it is marked as saved
+                    modelObject.getKey().setSaved(true);
                     
-                    // create the new object
-                    this.store.createDocument(_storagePath, content);
-                    
-                    // adjust the key to reflect new storage state
-                    String _id = pathToId(_storagePath);                        
-                    modelObject.getKey().setId(_id);
-                    modelObject.getKey().setStoragePath(_storagePath);
-                    
-                    // remove the old object
-                    this.store.removeDocument(storagePath);
-                    
-                    // CACHE: remove object from cache
-                    // this will force it to reload the next time around
-                    cacheRemove(context, storagePath);
-                    
+                    // flag that the save was succesful
                     saved = true;
                 }
             }
-            catch (IOException ex)
-            {
-                throw new ModelObjectPersisterException("Unable to update model object: " + storagePath, ex);
-            }
         }
-        else
+        catch (IOException ex)
         {
-            try
-            {
-                if (fileMoved)
-                {
-                    // check whether a file already exists at the intended path
-                    if (!this.store.hasDocument(_storagePath))
-                    {
-                        // create the document
-                        this.store.createDocument(_storagePath, content);
-                        
-                        // adjust the key to reflect new storage state
-                        String _id = pathToId(_storagePath);                        
-                        modelObject.getKey().setId(_id);
-                        modelObject.getKey().setStoragePath(_storagePath);
-                        
-                        // CACHE: remove object from cache
-                        // this will force it to reload the next time around
-                        cacheRemove(context, storagePath);
-                        
-                        saved = true;
-                    }
-                    else
-                    {
-                        throw new ModelObjectPersisterException("A file already exists at the path: " + _storagePath);
-                    }
-                }
-            }
-            catch(IOException ex)
-            {
-                throw new ModelObjectPersisterException("Unable to create new model object: " + storagePath, ex);
-            }                
+            throw new ModelObjectPersisterException("Unable to save object: " + path + " (" + _path + ")", ex);
         }
         
         return saved;
@@ -320,14 +301,14 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         try
         {
             Document document = XMLUtil.parse(xml);
-            XMLUtil.addChildValue(document.getRootElement(), "version", FrameworkHelper.getConfig().getTypeDescriptor(this.objectTypeId).getVersion());
+            //XMLUtil.addChildValue(document.getRootElement(), "version", FrameworkHelper.getConfig().getTypeDescriptor(this.objectTypeId).getVersion());
             
             String persisterId = this.getId();
-            String storagePath = this.idToPath(objectId);
+            String path = this.idToPath(objectId);
             
             if (objectId != null)
             {            
-                ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, objectId);                
+                ModelObjectKey key = new ModelObjectKey(persisterId, path, objectId, false);                
                 String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
                 obj = (ModelObject) ReflectionHelper.newObject(
                         implClassName, new Class[] { ModelObjectKey.class, Document.class },
@@ -337,13 +318,12 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 {
                     obj.touch();
 
-                    // NOTE: do not add to cache at this point
-                    // We want the cache to only represent persisted objects
-                    // Objects are not persisted until they are saved
+                    // CACHE: add to cache
+                    cachePut(context, path, obj);
                 }
                 else
                 {
-                    throw new ModelObjectPersisterException("Unable to create new object for path: " + storagePath);
+                    throw new ModelObjectPersisterException("Unable to create new object for path: " + path);
                 }
             }
         }

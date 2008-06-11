@@ -61,7 +61,13 @@ public class WebFrameworkService
     private WebFrameworkConfigElement webFrameworkConfig;
     
     /** A map of type ids to MultiModelObjectPersister implementations. */
-    private Map<String, ModelObjectPersister> typeIdToPersisterMap;
+    private Map<String, ModelObjectPersister> typeIdToMultiPersisterMap;
+    
+    /** A map of type ids to default Persister implementations. */
+    private Map<String, ModelObjectPersister> typeIdToDefaultPersisterMap;
+
+    /** A map of persister ids to Persister implementations. */
+    private Map<String, ModelObjectPersister> persisterIdToPersisterMap;
     
     /* (non-Javadoc)
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)
@@ -177,6 +183,17 @@ public class WebFrameworkService
     }
     
     /**
+     * Returns the default persister for a given object type id
+     * 
+     * @param objectTypeId
+     * @return
+     */
+    public ModelObjectPersister getDefaultPersister(String objectTypeId)
+    {
+        return (ModelObjectPersister) typeIdToDefaultPersisterMap.get(objectTypeId);
+    }
+    
+    /**
      * Returns a persister for the given object type id
      * If a persister has not been instantiated, null is returned
      * 
@@ -185,7 +202,7 @@ public class WebFrameworkService
      */
     public ModelObjectPersister getPersister(String objectTypeId)
     {
-        return (ModelObjectPersister) typeIdToPersisterMap.get(objectTypeId);
+        return (ModelObjectPersister) typeIdToMultiPersisterMap.get(objectTypeId);
     }
     
     /**
@@ -207,7 +224,18 @@ public class WebFrameworkService
      */
     public ModelObjectPersister[] getPersisters()
     {
-        return this.typeIdToPersisterMap.values().toArray(new ModelObjectPersister[this.typeIdToPersisterMap.size()]);
+        return this.typeIdToMultiPersisterMap.values().toArray(new ModelObjectPersister[this.typeIdToMultiPersisterMap.size()]);
+    }
+    
+    /**
+     * Returns a Persister implementation by persister id
+     * 
+     * @param persisterId
+     * @return
+     */
+    public ModelObjectPersister getPersisterById(String persisterId)
+    {
+       return (ModelObjectPersister) this.persisterIdToPersisterMap.get(persisterId); 
     }
     
     /**
@@ -215,8 +243,14 @@ public class WebFrameworkService
      */
     public void initPersisters()
     {
-        // initialize the persisters map
-        typeIdToPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);        
+        // initialize the multi persisters map
+        typeIdToMultiPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
+        
+        // initialize the default persisters map
+        typeIdToDefaultPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
+        
+        // initialize the
+        persisterIdToPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
 
         // walk over the model types and prepare persisters for each
         WebFrameworkConfigElement wfConfig = getWebFrameworkConfig();
@@ -228,16 +262,16 @@ public class WebFrameworkService
 
             TypeDescriptor descriptor = wfConfig.getTypeDescriptor(typeIds[i]);
             
+            // get the default store id
+            String defaultStoreId = descriptor.getDefaultStoreId();
+            Store defaultStore = (Store) getApplicationContext().getBean(defaultStoreId);
+            boolean addedDefaultStore = false;
+            
             // get the search path
             String searchPathId = descriptor.getSearchPathId();
             SearchPath searchPath = (SearchPath) getApplicationContext().getBean(searchPathId);
             if(searchPath != null)
             {            
-                if(logger.isDebugEnabled())
-                {
-                    logger.debug(" -> Found Search Path: " + searchPath);
-                }
-                
                 // walk the stores in this search path
                 // create persisters for each
                 // store into a map keyed by store base path
@@ -254,15 +288,29 @@ public class WebFrameworkService
                         persister = new StoreModelObjectPersister(typeIds[i], store);
                     }
                     persisters.put(persister.getId(), persister);
+                    
+                    // add to persister id map
+                    persisterIdToPersisterMap.put(persister.getId(), persister);
 
-                    if(logger.isDebugEnabled())
-                        logger.debug(" -> Added Persister: " + persister.getId() + " for store: " + store.getBasePath());                     
+                    // check whether this is the default store
+                    if(store.equals(defaultStore))
+                    {
+                        typeIdToDefaultPersisterMap.put(typeIds[i], persister);
+                        addedDefaultStore = true;
+                    }
                 }
                 
                 // wrap all of these persisters into a single multi persister
                 // and store onto map (keyed by type id)
                 ModelObjectPersister persister = new MultiModelObjectPersister(typeIds[i], this, persisters);
-                typeIdToPersisterMap.put(typeIds[i], persister);
+                typeIdToMultiPersisterMap.put(typeIds[i], persister);
+                
+                // debug
+                if(!addedDefaultStore)
+                {
+                    if(logger.isDebugEnabled())
+                        logger.debug("Unable to add default store persister for object type id: " + typeIds[i]);                                             
+                }
             }
         }
     }

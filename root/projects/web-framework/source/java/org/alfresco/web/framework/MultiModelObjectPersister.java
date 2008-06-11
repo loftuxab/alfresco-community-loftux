@@ -133,15 +133,8 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     {
         boolean saved = false;
         
-        String persisterId = object.getPersisterId();
-        if (persisterId == null)
-        {
-            // get the default persister id for a given type id
-            persisterId = this.service.getPersisterId(this.objectTypeId);
-        }
-        
-        // see if we have a persister
-        ModelObjectPersister persister = persisters.get(persisterId);
+        // get the persister to use for this object
+        ModelObjectPersister persister = this.service.getPersisterById(object.getPersisterId());
         if (persister != null)
         {
             saved = persister.saveObject(context, object);
@@ -230,13 +223,17 @@ public class MultiModelObjectPersister implements ModelObjectPersister
         ModelObject obj = null;
         
         // get the default persister for this object type
-        ModelObjectPersister persister = this.service.getPersister(this.objectTypeId);
+        ModelObjectPersister persister = this.service.getDefaultPersister(this.objectTypeId);
         if (persister != null)
         {
            obj = persister.newObject(context, objectId);
            
            if (logger.isDebugEnabled())
                logger.debug("newObject created on persister '" + persister.getId() + "' returned: " + obj);
+        }
+        else
+        {
+            throw new ModelObjectPersisterException("Unable to create new object - no default persister found for object type id: " + this.objectTypeId);
         }
         
         return obj;

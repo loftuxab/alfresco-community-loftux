@@ -56,9 +56,9 @@ public abstract class AbstractModelObject implements ModelObject
     protected Document document;
     protected ModelObjectKey key;
     
-    protected boolean isSaved;
     protected long modificationTime;
     protected String modelVersion;
+    protected String id;
     
     protected Map<String, Serializable> modelProperties;    
     protected Map<String, Serializable> customProperties;
@@ -77,6 +77,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
         this.key = key;
         this.document = document;
+        this.id = key.getId();
 
         /**
          * The model version should be supplied with the serialized XML
@@ -121,7 +122,15 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public String getId()
     {
-        return this.key.getId();
+        return this.id;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.model.ModelObject#setId(java.lang.String)
+     */    
+    public void setId(String id)
+    {
+        this.id = id;
     }
     
     /* (non-Javadoc)
@@ -171,7 +180,7 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public boolean isSaved()
     {
-        return this.isSaved;
+        return this.key.isSaved();
     }
     
     
@@ -550,15 +559,4 @@ public abstract class AbstractModelObject implements ModelObject
     {
         return this.key.getStoragePath();
     }
-
-    /**
-     * Sets the saved flag
-     * 
-     * @param b
-     */
-    protected void setSaved(boolean b)
-    {
-        this.isSaved = b;
-    }
-    
 }
