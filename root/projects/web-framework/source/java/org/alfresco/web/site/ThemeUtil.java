@@ -26,7 +26,7 @@ package org.alfresco.web.site;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.alfresco.web.site.model.Theme;
+import org.alfresco.web.framework.model.Theme;
 
 /**
  * A helper class for working with themes.
@@ -68,7 +68,7 @@ public class ThemeUtil
         String themeId = getCurrentThemeId(context);
         if(themeId != null)
         {
-            return (Theme) context.getModel().loadTheme(context, themeId);
+            return (Theme) context.getModel().getTheme(themeId);
         }
         return null;
     }

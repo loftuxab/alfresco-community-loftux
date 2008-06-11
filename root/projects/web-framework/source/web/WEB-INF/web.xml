@@ -3,13 +3,14 @@
 
 <web-app>
 
-   <display-name>Web Framework</display-name>    
-   <description>Web Framework</description>
+   <display-name>Alfresco Web Framework</display-name>    
+   <description>Alfresco Web Framework</description>
    
    <context-param>
       <param-name>contextConfigLocation</param-name>
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
+         classpath:alfresco/web-framework-model-context.xml                  
          classpath:alfresco/web-framework-application-context.xml
          classpath:alfresco/pagerenderer-application-context.xml
       </param-value>

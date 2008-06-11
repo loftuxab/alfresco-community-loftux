@@ -35,9 +35,14 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.model.ContentAssociation;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.PageType;
+import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.Content;
 import org.alfresco.web.site.FrameworkHelper;
-import org.alfresco.web.site.ModelUtil;
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
@@ -47,11 +52,6 @@ import org.alfresco.web.site.UserFactory;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestDispatchException;
-import org.alfresco.web.site.model.ContentAssociation;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.PageType;
-import org.alfresco.web.site.model.TemplateInstance;
-import org.alfresco.web.site.model.Theme;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -231,7 +231,7 @@ public class DispatcherServlet extends BaseServlet
             if (context.getSiteConfiguration() != null)
             {
                 // check if a root page exists to which we can forward
-                Page rootPage = ModelUtil.getRootPage(context);
+                Page rootPage = context.getRootPage();
                 if (rootPage != null)
                 {
                     if (isDebugEnabled())
@@ -270,7 +270,7 @@ public class DispatcherServlet extends BaseServlet
                         
                         // Consider the theme first - which can override common page types
                         String themeId = (String) context.getThemeId();
-                        Theme theme = context.getModel().loadTheme(context, themeId);
+                        Theme theme = context.getModel().getTheme(themeId);
                         if (theme != null)
                         {
                             loginPageId = theme.getPageId(PageType.PAGETYPE_LOGIN);
@@ -285,7 +285,7 @@ public class DispatcherServlet extends BaseServlet
                         Page loginPage = null;
                         if (loginPageId != null)
                         {
-                            loginPage = context.getModel().loadPage(context, loginPageId);
+                            loginPage = context.getModel().getPage(loginPageId);
                             if (loginPage != null)
                             {
                                 // get URL arguments as a map ready for rebuilding the request params
@@ -403,11 +403,11 @@ public class DispatcherServlet extends BaseServlet
 	    	
 	    	// Look up which page to use to display this contnet
 	    	// this must also take into account the current format
-	        ContentAssociation[] associations = ModelUtil.findContentAssociations(
-	                context, sourceId, null, null, null);
-	        if (associations != null && associations.length > 0)
-	        {
-	        	Page page = associations[0].getPage(context);
+            Map<String, ModelObject> objects = context.getModel().findContentAssociations(sourceId, null, null, null);
+            if(objects.size() > 0)
+            {
+                ContentAssociation association = (ContentAssociation) objects.values().iterator().next();
+                Page page = association.getPage(context);
 	            if (page != null)
 	            {
 	                if (isDebugEnabled())

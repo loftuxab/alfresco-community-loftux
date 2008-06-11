@@ -26,6 +26,8 @@ package org.alfresco.web.scripts;
 
 import java.io.Serializable;
 
+import org.alfresco.web.config.WebFrameworkConfigElement;
+import org.alfresco.web.site.Model;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -41,6 +43,9 @@ public abstract class ScriptBase implements Serializable
 {
     protected RequestContext context;
     protected ScriptableMap properties;
+
+    protected Model model;
+    protected WebFrameworkConfigElement config;
 
     /**
      * Instantiates a new web framework script base
@@ -77,9 +82,9 @@ public abstract class ScriptBase implements Serializable
      * 
      * @return the script model object
      */
-    public ScriptModelObject getObject(String id)
+    public ScriptModelObject getObject(String objectTypeId, String objectId)
     {
-        return ScriptHelper.getObject(getRequestContext(), id);
+        return ScriptHelper.getObject(getRequestContext(), objectTypeId, objectId);
     }        
     
     public ScriptableMap getProperties()
@@ -91,6 +96,24 @@ public abstract class ScriptBase implements Serializable
         
         return this.properties;
     }    
+    
+    public Model getModel()
+    {
+        if(this.model == null)
+        {
+            this.model = context.getModel();
+        }
+        return this.model;
+    }
+    
+    public WebFrameworkConfigElement getConfig()
+    {
+        if(this.config == null)
+        {
+            this.config = context.getConfig();
+        }
+        return this.config;
+    }
 
     /* (non-Javadoc)
      * @see java.lang.Object#toString()
@@ -112,5 +135,5 @@ public abstract class ScriptBase implements Serializable
         return toString;
     }
     
-    protected abstract ScriptableMap buildProperties();    
+    protected abstract ScriptableMap buildProperties();
 }

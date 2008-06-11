@@ -28,12 +28,12 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.alfresco.connector.User;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.Content;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.ThemeUtil;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.TemplateInstance;
-import org.alfresco.web.site.model.Theme;
 
 /**
  * A read-only root-scoped Java object that wraps the Request Context 

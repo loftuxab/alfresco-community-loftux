@@ -39,11 +39,9 @@ import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.alfresco.web.framework.WebFrameworkService;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestContextException;
-import org.alfresco.web.site.exception.UserFactoryException;
-import org.alfresco.web.site.filesystem.FileSystemManager;
-import org.alfresco.web.site.filesystem.IFileSystem;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -88,24 +86,7 @@ public class FrameworkHelper
             config = getConfigService().getConfig("WebFramework");
             webFrameworkConfig = (WebFrameworkConfigElement)config.getConfigElement("web-framework");
             
-            
-            /**
-             * Loads the model implementation onto the framework.
-             * 
-             * A model implementation is the persister layer between the
-             * model objects and the XML on disk.
-             * 
-             * TODO:  At present, this mounts against a FileSystem
-             * implementation which is pointed at the model root directory.
-             * We would like to change this to use the Store abstraction
-             * (which is underway but not yet complete).
-             */
-            String modelRootPath = getConfig().getRootPath();
-            IFileSystem modelFileSystem = FileSystemManager.getLocalFileSystem(
-                    servletContext, modelRootPath);
-            Model model = new DefaultModel(modelFileSystem);
-            setModel(model);
-            
+                        
             
             /**
              * Init the User Factory for the framework.
@@ -136,6 +117,7 @@ public class FrameworkHelper
             userFactory = factory;
             
             
+            isInitialized = true;
             logger.info("Successfully Initialized Web Framework");
         }
     }
@@ -184,19 +166,14 @@ public class FrameworkHelper
     
     public static boolean isInitialized()
     {
-        return (getModel() != null);
+        return isInitialized;
     }
     
-    public static Model getModel()
+    public static WebFrameworkService getWebFrameworkService()
     {
-        return model;
+        return (WebFrameworkService) getApplicationContext().getBean("webframework.service");
     }
-
-    public static void setModel(Model model)
-    {
-        FrameworkHelper.model = model;
-    }
-    
+        
     public static Log getLogger()
     {
         return logger;
@@ -300,9 +277,9 @@ public class FrameworkHelper
         }
     }
     
-    private static Model model = null;
     private static ApplicationContext applicationContext = null;
     private static RemoteConfigElement remoteConfig = null;
     private static WebFrameworkConfigElement webFrameworkConfig = null;
     private static UserFactory userFactory = null;
+    private static boolean isInitialized = false;
 }

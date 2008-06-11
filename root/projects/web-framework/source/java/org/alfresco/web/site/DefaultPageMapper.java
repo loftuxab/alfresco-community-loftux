@@ -26,10 +26,10 @@ package org.alfresco.web.site;
 
 import javax.servlet.ServletRequest;
 
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.Theme;
 
 /**
  * The default page mapper instance.
@@ -154,7 +154,7 @@ public class DefaultPageMapper extends AbstractPageMapper
              * Consider the theme
              */
             String themeId = (String) context.getThemeId();
-            Theme theme = context.getModel().loadTheme(context, themeId);
+            Theme theme = context.getModel().getTheme(themeId);
             if(theme != null)
             {
                 pageId = theme.getPageId(pageTypeId);
@@ -181,7 +181,7 @@ public class DefaultPageMapper extends AbstractPageMapper
              */
             if(pageId != null)
             {
-                Page page = context.getModel().loadPage(context, pageId);
+                Page page = context.getModel().getPage(pageId);
                 if(page != null)
                 {
                     context.setPage(page);
@@ -195,7 +195,7 @@ public class DefaultPageMapper extends AbstractPageMapper
         String pageId = (String) request.getParameter("p");
         if(pageId != null && pageId.length() != 0)
         {
-            Page page = context.getModel().loadPage(context, pageId);
+            Page page = context.getModel().getPage(pageId);
             if (page != null)
             {
                 context.setPage(page);

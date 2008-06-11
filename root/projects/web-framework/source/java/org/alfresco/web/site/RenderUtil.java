@@ -25,12 +25,20 @@
 package org.alfresco.web.site;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
+import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.model.Chrome;
+import org.alfresco.web.framework.model.Component;
+import org.alfresco.web.framework.model.Configuration;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.exception.ComponentChromeRenderException;
 import org.alfresco.web.site.exception.ComponentRenderException;
 import org.alfresco.web.site.exception.JspRenderException;
@@ -40,12 +48,6 @@ import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.exception.RendererNotFoundException;
 import org.alfresco.web.site.exception.RequestDispatchException;
 import org.alfresco.web.site.exception.TemplateRenderException;
-import org.alfresco.web.site.model.Chrome;
-import org.alfresco.web.site.model.Component;
-import org.alfresco.web.site.model.Configuration;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.TemplateInstance;
-import org.alfresco.web.site.model.Theme;
 import org.alfresco.web.site.renderer.Renderable;
 import org.alfresco.web.site.renderer.RendererContext;
 import org.alfresco.web.site.renderer.RendererContextHelper;
@@ -143,7 +145,7 @@ public final class RenderUtil
             Timer.start(request, "RenderPage-" + pageId);
 
         // look up the page
-        Page page = (Page) context.getModel().loadPage(context, pageId);
+        Page page = (Page) context.getModel().getPage(pageId);
         if (page == null)
         {
             throw new PageRenderException("Unable to locate page: " + pageId);
@@ -201,8 +203,7 @@ public final class RenderUtil
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderTemplate-" + templateId);
 
-        TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context,
-                templateId);
+        TemplateInstance template = (TemplateInstance) context.getModel().getTemplate(templateId);
         if (template == null)
         {
             throw new TemplateRenderException(
@@ -323,7 +324,7 @@ public final class RenderUtil
             Timer.start(request, "RenderRegion-" + templateId+"-"+regionId+"-"+regionScopeId);
 
         // get the template
-        TemplateInstance template = (TemplateInstance) context.getModel().loadTemplate(context, templateId);
+        TemplateInstance template = (TemplateInstance) context.getModel().getTemplate(templateId);
         if (template == null)
         {
             throw new RegionRenderException("Unable to locate template: " + templateId);
@@ -349,10 +350,10 @@ public final class RenderUtil
             // render in either one of two ways
             // if there is a component bound, then continue processing downstream
             // if not, then render a "no component" screen
-            Component[] components = ModelUtil.findComponents(context, regionScopeId, regionSourceId, regionId, null);
-            if(components.length != 0)
+            Map<String, ModelObject> components = context.getModel().findComponents(regionScopeId, regionSourceId, regionId, null);
+            if(components.size() > 0)
             {
-                component = components[0];
+                component = (Component) components.values().iterator().next();
             }
             if(component == null || THEME.equals(regionScopeId))
             {
@@ -447,7 +448,7 @@ public final class RenderUtil
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderComponent-" + componentId);
 
-        Component component = context.getModel().loadComponent(context, componentId);
+        Component component = context.getModel().getComponent(componentId);
         if (component == null)
         {
             throw new ComponentChromeRenderException(
@@ -508,8 +509,7 @@ public final class RenderUtil
         if (Timer.isTimerEnabled())
             Timer.start(request, "RenderRawComponent-" + componentId);
 
-        Component component = context.getModel().loadComponent(context,
-                componentId);
+        Component component = context.getModel().getComponent(componentId);
         if (component == null)
         {
             throw new ComponentRenderException(
@@ -724,6 +724,37 @@ public final class RenderUtil
         }
 
         return sourceId;
+    }
+
+    /**
+     * Returns the object to which this component is bound
+     * This is the same as calling component.getSourceObject()
+     * 
+     * @param context
+     * @param component
+     * @return
+     */
+    public static Object getComponentBindingSourceObject(RequestContext context, Component component)
+    {
+        Object obj = null;
+        
+        String scopeId = component.getScope();
+        String sourceId = component.getSourceId();
+        
+        if (WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+        {
+            obj = WebFrameworkConstants.REGION_SCOPE_GLOBAL;
+        }
+        if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
+        {
+            obj = context.getModel().getTemplate(sourceId);
+        }
+        if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
+        {
+            obj = context.getModel().getPage(sourceId);
+        }
+        
+        return obj;
     }
 
     public static void print(HttpServletResponse response, String str)
@@ -983,7 +1014,7 @@ public final class RenderUtil
         }
 
         // load the chrome
-        Chrome chrome = context.getModel().loadChrome(context, chromeId);
+        Chrome chrome = context.getModel().getChrome(chromeId);
         if (chrome != null)
         {
             // return the renderer for this chrome
@@ -1027,7 +1058,7 @@ public final class RenderUtil
         if (chromeId != null && chromeId.length() != 0)
         {
             // try to load the chrome
-            Chrome chrome = context.getModel().loadChrome(context, chromeId);
+            Chrome chrome = context.getModel().getChrome(chromeId);
             if (chrome != null)
             {
                 // return the renderer for this chrome
@@ -1091,7 +1122,7 @@ public final class RenderUtil
             String renderer = null;
             try
             {
-                Configuration config = context.getModel().loadConfiguration(context, "global.head.renderer");
+                Configuration config = context.getModel().getConfiguration("global.head.renderer");
                 if (config != null)
                 {
                     // renderer properties

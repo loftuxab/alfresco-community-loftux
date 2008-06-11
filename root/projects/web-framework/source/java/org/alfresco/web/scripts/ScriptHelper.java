@@ -25,11 +25,12 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.ModelObject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
@@ -59,6 +60,33 @@ public abstract class ScriptHelper implements Serializable
             ScriptModelObject scriptModelObject = toScriptModelObject(context, modelObjects[i]);
             String id = modelObjects[i].getId();
             map.put(id, scriptModelObject);
+        }
+        
+        return map;
+    }
+
+    /**
+     * Creates a Scriptable Map for a given map of model objects
+     * 
+     * @param context the context
+     * @param objects a map of model objects (keyed by object id)
+     * 
+     * @return the scriptable map
+     */
+    public static ScriptableMap toScriptableMap(RequestContext context,
+            Map<String, ModelObject> objects)
+    {
+        ScriptableMap<String, Serializable> map = new ScriptableMap<String, Serializable>(objects.size());
+        
+        // convert to map of script model objects
+        Iterator it = objects.keySet().iterator();
+        while(it.hasNext())
+        {
+            String id = (String) it.next();
+            ModelObject modelObject = (ModelObject) objects.get(id);
+            
+            ScriptModelObject scriptModelObject = toScriptModelObject(context, modelObject);
+            map.put(id, scriptModelObject);            
         }
         
         return map;
@@ -116,7 +144,7 @@ public abstract class ScriptHelper implements Serializable
     }
 
     /**
-     * Converst an array of ModelObjects to an array of ScriptModelObjects
+     * Converts an array of ModelObjects to an array of ScriptModelObjects
      * which can be used by the script and Freemarker engines.
      * 
      * @param context the context
@@ -140,6 +168,31 @@ public abstract class ScriptHelper implements Serializable
     }
 
     /**
+     * Converts a map of model objects to an array of ScriptModelObjects
+     * which can be used by the script and Freemarker engines.
+     * 
+     * @param context the context
+     * @param objects the model objects
+     * 
+     * @return the object[]
+     */
+    public static Object[] toScriptModelObjectArray(RequestContext context,
+            Map<String, ModelObject> objects)
+    {
+        // convert to array
+        Object[] array = objects.values().toArray(new Object[objects.size()]);
+        
+        // walk through array and wrap everything as a script model object
+        for (int i = 0; i < array.length; i++)
+        {
+            array[i] = toScriptModelObject(context, (ModelObject)array[i]);
+        }
+        
+        return array;
+    }
+    
+    
+    /**
      * Retrieves a model object from the underlying store and hands it back
      * wrapped as a ScriptModelObject.  If the model object cannot be found,
      * null will be returned.
@@ -148,11 +201,11 @@ public abstract class ScriptHelper implements Serializable
      * 
      * @return the script model object
      */
-    public static ScriptModelObject getObject(RequestContext context, String id)
+    public static ScriptModelObject getObject(RequestContext context, String objectTypeId, String objectId)
     {
         ScriptModelObject scriptModelObject = null;
         
-        ModelObject modelObject = FrameworkHelper.getModel().loadObject(context, id);
+        ModelObject modelObject = context.getModel().getObject(objectTypeId, objectId);
         if (modelObject != null)
         {
             scriptModelObject = new ScriptModelObject(context, modelObject);

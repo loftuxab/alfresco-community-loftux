@@ -26,13 +26,13 @@ package org.alfresco.web.site.renderer;
 
 import java.util.HashMap;
 
+import org.alfresco.web.framework.model.Component;
+import org.alfresco.web.framework.model.ComponentType;
+import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.framework.model.TemplateType;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.RendererNotFoundException;
-import org.alfresco.web.site.model.Component;
-import org.alfresco.web.site.model.ComponentType;
-import org.alfresco.web.site.model.TemplateInstance;
-import org.alfresco.web.site.model.TemplateType;
 
 /**
  * Produces the appropriate renderer implementations for a given
@@ -80,8 +80,7 @@ public class RendererFactory
              * If it had a URI property, then we're assuming it is a
              * webscript component type.
              */
-            ComponentType componentType = context.getModel().loadComponentType(
-                    context, "webscript");
+            ComponentType componentType = context.getModel().getComponentType("webscript");
             return _newRenderer(context, componentType.getRendererType(), uri);
         }
         
@@ -95,12 +94,11 @@ public class RendererFactory
         String componentTypeId = component.getComponentTypeId();
         if(componentTypeId != null)
         {
-            ComponentType testComponentType = context.getModel().loadComponentType(context, componentTypeId);
+            ComponentType testComponentType = context.getModel().getComponentType(componentTypeId);
             if(testComponentType == null)
             {
                 // use a web script component
-                ComponentType componentType = context.getModel().loadComponentType(
-                        context, "webscript");
+                ComponentType componentType = context.getModel().getComponentType("webscript");
                 return _newRenderer(context, componentType.getRendererType(),
                         componentTypeId);                
             }
@@ -153,11 +151,11 @@ public class RendererFactory
         String templateTypeId = template.getTemplateType();
         if(templateTypeId != null)
         {
-            TemplateType testTemplateType = context.getModel().loadTemplateType(context, templateTypeId);
+            TemplateType testTemplateType = context.getModel().getTemplateType(templateTypeId);
             if(testTemplateType == null)
             {
                 // execute as a freemarker template type
-                TemplateType templateType = context.getModel().loadTemplateType(context, "freemarker");
+                TemplateType templateType = context.getModel().getTemplateType("freemarker");
                 return _newRenderer(context, templateType.getRendererType(),
                         templateTypeId);                
             }

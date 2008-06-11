@@ -83,6 +83,5 @@ public abstract class AbstractPageMapper implements PageMapper
     	throws ContentLoaderException
     {
     	return ContentLoaderUtil.loadContent(context, objectId);
-    }
-    
+    }    
 }

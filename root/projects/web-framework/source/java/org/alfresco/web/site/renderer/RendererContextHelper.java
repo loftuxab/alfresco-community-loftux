@@ -31,12 +31,12 @@ import java.util.Stack;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.model.Component;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.site.model.Component;
-import org.alfresco.web.site.model.ModelObject;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.TemplateInstance;
 
 /**
  * Provides stack management for renderer context objects.

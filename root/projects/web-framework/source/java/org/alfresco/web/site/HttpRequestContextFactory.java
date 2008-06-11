@@ -31,6 +31,9 @@ import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.User;
+import org.alfresco.web.framework.ModelObjectManager;
+import org.alfresco.web.framework.ModelPersistenceContext;
+import org.alfresco.web.framework.exception.WebFrameworkServiceException;
 import org.alfresco.web.site.exception.PageMapperException;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.alfresco.web.site.exception.UserFactoryException;
@@ -73,11 +76,10 @@ public class HttpRequestContextFactory implements RequestContextFactory
             User user = userFactory.faultUser(context, (HttpServletRequest)request);
             context.setUser(user);
             
-            // Determine the store id and set it onto the request context
-            initStoreId(context);
+            // Bind the model into the requestcontext
+            initModel(context, (HttpServletRequest) request);
             
             // Initialize the file system
-            // TODO: remove this - replace with Store abstraction
             String rootPath = context.getConfig().getFileSystemDescriptor("local").getRootPath();
             initFileSystem(context, (HttpServletRequest)request, rootPath);
             
@@ -89,6 +91,10 @@ public class HttpRequestContextFactory implements RequestContextFactory
              */
             PageMapper pageMapper = PageMapperFactory.newInstance(context);
             pageMapper.execute(context, (HttpServletRequest)request);
+        }
+        catch (WebFrameworkServiceException wfse)
+        {
+            throw new RequestContextException("Exception instantiating model in HttpRequestContextFactory", wfse);            
         }
         catch (UserFactoryException ufe)
         {
@@ -121,20 +127,42 @@ public class HttpRequestContextFactory implements RequestContextFactory
         IFileSystem fileSystem = FileSystemManager.getLocalFileSystem(dir);
         context.setFileSystem(fileSystem);
     }
-
+    
     /**
-     * Sets the AVM store id onto the request.
+     * Initializes the model and places it onto the request context
      * 
-     * This method purely copies the default value as described in the
-     * configuration into the request context.
-     * 
-     * @param context The request context instance
+     * @param context
      * @param request
      */
-    public void initStoreId(RequestContext context)
+    public void initModel(RequestContext context, HttpServletRequest request)
+        throws WebFrameworkServiceException
     {
-        String defId = context.getConfig().getDefaultFileSystemId();
-        String storeId = context.getConfig().getFileSystemDescriptor(defId).getStore();
-        context.setStoreId(storeId);
+        String userId = context.getUserId();
+        
+        ModelPersistenceContext mpc = new ModelPersistenceContext(userId);
+        
+        // see if we can determine a store id that is being virtualized
+        String repositoryStoreId = null; // TODO
+        if(repositoryStoreId == null)
+        {
+            // TODO: This is just for testing
+            repositoryStoreId = (String) request.getParameter("storeId");
+        }
+        if(repositoryStoreId != null)
+        {
+            mpc.putValue(ModelPersistenceContext.REPO_STOREID, repositoryStoreId);
+        }
+        
+        // retrieve the model object service which is scoped to this user
+        // and this persistence context
+        ModelObjectManager modelObjectService = FrameworkHelper.getWebFrameworkService().getObjectManager(mpc);
+        
+        // create a new model
+        // this model reflects the state of the objects as per the
+        // persistence context
+        Model model = new DefaultModel(modelObjectService);
+        
+        // place onto request context
+        context.setModel(model);
     }
 }

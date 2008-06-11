@@ -28,8 +28,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.model.ModelObject;
 import org.alfresco.web.site.renderer.RendererContext;
 
 /**

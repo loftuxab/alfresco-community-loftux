@@ -122,51 +122,26 @@
    </bean>
 
 
-   <!--                                -->
-   <!-- Resource Storage Configuration -->
-   <!--                                -->
-   <!-- 
-      TODO:  This isn't yet utilized but will be once storage can be
-      remoted from the Repo/AVM
-    -->
-   <bean id="webframework.store.modelobjects"
-      class="org.alfresco.web.scripts.ClassPathStore">
-      <property name="mustExist">
-         <value>true</value>
-      </property>
-      <property name="classPath">
-         <value>alfresco/site-data</value>
-      </property>
-   </bean>
-   <bean id="webframework.model.searchpath"
-      class="org.alfresco.web.scripts.SearchPath">
-      <property name="searchPath">
-         <list>
-            <ref bean="webframework.store.modelobjects" />
-         </list>
-      </property>
-   </bean>
-
 
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
 
    <!--  I18N resources and messages Web Script -->
-   <bean id="webscript.org.alfresco.web.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" singleton="false"/>
+   <bean id="webscript.org.alfresco.web.messages.get" parent="webscript" class="org.alfresco.web.scripts.MessagesWebScript" singleton="false" />
 
    <!--  Declarative Site Web Script -->
-   <bean id="webscript.site" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWebScript" singleton="false">
-      <constructor-arg>
-         <ref bean="webframework.store.modelobjects" />
-      </constructor-arg>
-   </bean>
+   <bean id="webscript.site" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWebScript" singleton="false" />
 
    <!--  Dynamic Wizard Web Script -->
-   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false">
-      <constructor-arg>
-         <ref bean="webframework.store.modelobjects" />
-      </constructor-arg>
-   </bean>
+   <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false" />
 
+
+
+   <!--  Web Framework Service -->
+   <bean id="webframework.service" class="org.alfresco.web.framework.WebFrameworkService" init-method="init">
+      <property name="configService" ref="web.config" />
+   </bean>
+   
+   
 </beans>

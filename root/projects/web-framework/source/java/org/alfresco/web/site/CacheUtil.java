@@ -40,7 +40,6 @@ import org.alfresco.web.site.filesystem.IFileSystem;
  */
 public class CacheUtil
 {
-    
     /**
      * Invalidate file system cache.
      * 
@@ -59,19 +58,16 @@ public class CacheUtil
     }
 
     /**
-     * Invalidate ads object cache.
+     * Invalidate model object service object cache.
      * 
      * @param context the context
      */
-    public static void invalidateADSObjectCache(RequestContext context)
+    public static void invalidateModelObjectServiceCache(RequestContext context)
     {
-        Model model = context.getModel();
-        if (model instanceof DefaultModel)
-        {
-            ((DefaultModel) model).cacheInvalidateAll(context);
-            
-            FrameworkHelper.getLogger().info("Invalidated Object Cache");
-        }
+        // invalidate the model object service state for this user context
+        context.getModel().getObjectManager().invalidateCache();
+
+        FrameworkHelper.getLogger().info("Invalidated Object Cache");
     }
 
     /**

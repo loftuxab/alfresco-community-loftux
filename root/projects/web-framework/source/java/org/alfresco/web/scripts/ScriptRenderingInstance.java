@@ -25,8 +25,6 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.renderer.RendererContext;

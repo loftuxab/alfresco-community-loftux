@@ -28,10 +28,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.jsp.JspException;
 
+import org.alfresco.web.framework.model.Chrome;
 import org.alfresco.web.site.PresentationUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
-import org.alfresco.web.site.model.Chrome;
 
 /**
  * @author muzquiano
