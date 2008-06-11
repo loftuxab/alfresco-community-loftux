@@ -33,8 +33,10 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.tools.DataUtil;
 import org.alfresco.tools.FakeHttpServletResponse;
 import org.alfresco.tools.WrappedHttpServletRequest;
+import org.alfresco.web.site.filesystem.IFile;
 import org.alfresco.web.site.parser.ITagletHandler;
 import org.alfresco.web.site.parser.tags.PageTokenizer;
 import org.alfresco.web.site.parser.tags.TagletParser;
@@ -162,11 +164,15 @@ public class FilterUtil
                 String tldUrl = (String) tldUrlMap.get(prefix);
 
                 // load the xml
-                String xml = ModelUtil.getFileStringContents(context,
-                        relativePath);
+                IFile file = context.getFileSystem().getFile(relativePath);
+                if(file != null)
+                {
+                    InputStream input = file.getInputStream();
+                    String xml = DataUtil.copyToString(input, true);
 
-                // import the tag library
-                parser.importNamespace(prefix, tldUrl, xml);
+                    // import the tag library
+                    parser.importNamespace(prefix, tldUrl, xml);
+                }
             }
         }
         catch (Exception ex)

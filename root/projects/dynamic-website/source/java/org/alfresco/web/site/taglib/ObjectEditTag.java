@@ -26,6 +26,7 @@ package org.alfresco.web.site.taglib;
 
 import javax.servlet.jsp.JspException;
 
+import org.alfresco.web.framework.ModelHelper;
 import org.alfresco.web.site.ADWUtil;
 import org.alfresco.web.site.DynamicWebsite;
 import org.alfresco.web.site.RequestContext;
@@ -98,7 +99,8 @@ public class ObjectEditTag extends AbstractObjectTag
 
             // render
             StringBuffer buffer = new StringBuffer();
-            buffer.append("<div id='ipe-" + context.getModel().newGUID() + "'>");
+            String newGuid = ModelHelper.newGUID();
+            buffer.append("<div id='ipe-" + newGuid + "'>");
             buffer.append("<a href='" + url + "' " + newTargetString + ">");
             buffer.append("<img border='0' src='" + newIconUri + "'/>");
             buffer.append("</a>");

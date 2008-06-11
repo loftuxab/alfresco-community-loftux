@@ -24,11 +24,15 @@
  */
 package org.alfresco.web.site;
 
+import java.io.InputStream;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.tools.DataUtil;
 import org.alfresco.web.site.exception.RequestContextException;
+import org.alfresco.web.site.filesystem.IFile;
 
 /**
  * The Class HTMLUtil.
@@ -60,14 +64,16 @@ public class HTMLUtil
         	throw new ServletException("Unable to locate request context in the request", rce);
         }
 
-        // load the html
-        String unprocessedHtml = ModelUtil.getFileStringContents(
-                context, renditionRelativePath);
-
         // process the tags in the html
         // this executes and commits to the writer
         try
         {
+            // load the html
+            IFile file = context.getFileSystem().getFile(renditionRelativePath);        
+            InputStream input = file.getInputStream();
+            String unprocessedHtml = DataUtil.copyToString(input, true);
+
+            // process the html
             String content = FilterUtil.filterContent(context, request, response,
                     unprocessedHtml, originalRelativePath);
             response.getWriter().write(content);
@@ -101,12 +107,13 @@ public class HTMLUtil
         	throw new ServletException("Unable to locate request context in the request", rce);
         }
 
-        // load the html
-        String unprocessedHtml = ModelUtil.getFileStringContents(
-                context, renditionRelativePath);
-
         try
         {
+            // load the html
+            IFile file = context.getFileSystem().getFile(renditionRelativePath);        
+            InputStream input = file.getInputStream();
+            String unprocessedHtml = DataUtil.copyToString(input, true);
+            
             // process the tags in the html
             // this executes and commits to the writer
             String content = FilterUtil.filterContent(context, request, response,

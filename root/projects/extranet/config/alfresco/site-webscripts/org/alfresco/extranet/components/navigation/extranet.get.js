@@ -13,7 +13,7 @@ if(alfCommunity)
 	for(var i = 0; i < pageAssociations.length; i++)
 	{
 		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getObject(destId);
+		var page = sitedata.getPage(destId);
 		model.pages[model.pages.length] = page;
 	}
 }
@@ -25,7 +25,7 @@ if(alfRegistered)
 	for(var i = 0; i < pageAssociations.length; i++)
 	{
 		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getObject(destId);
+		var page = sitedata.getPage(destId);
 		model.pages[model.pages.length] = page;
 	}
 }
@@ -37,7 +37,7 @@ if(alfEnterprise)
 	for(var i = 0; i < pageAssociations.length; i++)
 	{
 		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getObject(destId);
+		var page = sitedata.getPage(destId);
 		model.pages[model.pages.length] = page;
 	}
 }
@@ -47,6 +47,6 @@ var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "final")
 for(var i = 0; i < pageAssociations.length; i++)
 {
 	var destId = pageAssociations[i].properties["dest-id"];
-	var page = sitedata.getObject(destId);
+	var page = sitedata.getPage(destId);
 	model.pages[model.pages.length] = page;
 }
