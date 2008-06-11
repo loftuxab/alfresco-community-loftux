@@ -11,8 +11,8 @@
       <param-value>
          classpath:alfresco/webscript-framework-application-context.xml
          classpath:alfresco/web-framework-application-context.xml
-         classpath:alfresco/web-framework-model-context.xml         
-         classpath:alfresco/pagerenderer-application-context.xml
+         classpath:alfresco/web-framework-model-context.xml
+         classpath:alfresco/slingshot-application-context.xml
       </param-value>
       <description>Spring config file locations</description>
    </context-param>

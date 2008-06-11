@@ -15,7 +15,7 @@
             <value>classpath:alfresco/webscript-framework-config.xml</value>
             <value>classpath:alfresco/extension/webscript-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/webscript-framework-config-custom.xml</value>
-         
+            
             <!--  Start TEST dependencies -->
             <!--  These is included because some of the tests require it  -->
             <!--  These should be removed -->

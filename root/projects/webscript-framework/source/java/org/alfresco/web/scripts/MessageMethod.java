@@ -66,7 +66,7 @@ public class MessageMethod implements TemplateMethodModelEx
      */
     public Object exec(List args) throws TemplateModelException
     {
-        String result = "";
+        String result = null;
         int argSize = args.size();
         
         if (argSize != 0)
@@ -84,11 +84,11 @@ public class MessageMethod implements TemplateMethodModelEx
                 {
                     // shortcut for no additional msg params
                     ResourceBundle resources = webscript.getResources();
-                    if (resources != null)
+                    if (resources != null && resources.containsKey(id))
                     {
                         result = resources.getString(id);
                     }
-                    if (result == null)
+                    else
                     {
                         result = I18NUtil.getMessage(id);
                     }
@@ -118,8 +118,14 @@ public class MessageMethod implements TemplateMethodModelEx
                             params[i] = "";
                         }
                     }
-                    String msg = webscript.getResources().getString(id);
-                    if (msg == null)
+                    
+                    String msg;
+                    ResourceBundle resources = webscript.getResources();
+                    if (resources != null && resources.containsKey(id))
+                    {
+                        msg = resources.getString(id);
+                    }
+                    else
                     {
                         msg = I18NUtil.getMessage(id);
                     }
@@ -131,6 +137,6 @@ public class MessageMethod implements TemplateMethodModelEx
             }
         }
         
-        return result;
+        return (result != null ? result : "");
     }
 }

@@ -1,0 +1,16 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!DOCTYPE beans PUBLIC '-//SPRING//DTD BEAN//EN' 'http://www.springframework.org/dtd/spring-beans.dtd'>
+
+<beans>
+   
+   <!--  Override Web Script Messages -->
+   <bean id="webscripts.resources" class="org.alfresco.i18n.ResourceBundleBootstrapComponent">
+      <property name="resourceBundles">
+         <list>
+            <value>alfresco.messages.webscripts</value>
+            <value>alfresco.messages.slingshot</value>
+         </list>
+      </property>
+   </bean>
+   
+</beans>
