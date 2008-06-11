@@ -104,6 +104,30 @@ public class ScriptRemoteConnector
     }
     
     /**
+     * Invokes a URI on a remote service, passing the supplied body as a POST request.
+     * 
+     * @param uri    Uri to call on the endpoint
+     * @param body   Body of the POST request.
+     * @param contentType   Content mimetype of the request body
+     * 
+     * @return Response object from the call {@link Response}
+     */
+    public Response post(String uri, String body, String contentType)
+    {
+        ConnectorContext context = new ConnectorContext();
+        context.setMethod(HttpMethod.POST);
+        context.setContentType(contentType);
+        try
+        {
+            return this.connector.call(uri, context, new ByteArrayInputStream(body.getBytes("UTF-8")));
+        }
+        catch (UnsupportedEncodingException err)
+        {
+            throw new AlfrescoRuntimeException("Unsupported encoding.", err);
+        }
+    }
+    
+    /**
      * Invokes a URI on a remote service, passing the supplied body as a PUT request.
      * 
      * @param uri    Uri to call on the endpoint
