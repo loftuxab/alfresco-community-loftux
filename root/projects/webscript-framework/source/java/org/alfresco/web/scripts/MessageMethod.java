@@ -26,6 +26,7 @@ package org.alfresco.web.scripts;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import org.alfresco.i18n.I18NUtil;
@@ -84,11 +85,18 @@ public class MessageMethod implements TemplateMethodModelEx
                 {
                     // shortcut for no additional msg params
                     ResourceBundle resources = webscript.getResources();
-                    if (resources != null && resources.containsKey(id))
+                    if (resources != null)
                     {
-                        result = resources.getString(id);
+                        try
+                        {
+                            result = resources.getString(id);
+                        }
+                        catch (MissingResourceException mre)
+                        {
+                            // key not present
+                        }
                     }
-                    else
+                    if (result == null)
                     {
                         result = I18NUtil.getMessage(id);
                     }
@@ -119,13 +127,20 @@ public class MessageMethod implements TemplateMethodModelEx
                         }
                     }
                     
-                    String msg;
+                    String msg = null;
                     ResourceBundle resources = webscript.getResources();
-                    if (resources != null && resources.containsKey(id))
+                    if (resources != null)
                     {
-                        msg = resources.getString(id);
+                        try
+                        {
+                            msg = resources.getString(id);
+                        }
+                        catch (MissingResourceException mre)
+                        {
+                            // key not present
+                        }
                     }
-                    else
+                    if (msg == null)
                     {
                         msg = I18NUtil.getMessage(id);
                     }
