@@ -334,6 +334,33 @@ Alfresco.util.caretFix = function(p_formElement)
 }
 
 /**
+ * Parses a string to a json object and returns it.
+ * If str contains invalid json code that is displayed using displayPrompt().
+ *
+ * @method Alfresco.util.parseJSON
+ * @param jsonStr {string} Message id to resolve
+ * @return {object} The object representing the json str
+ * @throws {Error} if str contains invalid json
+ * @static
+ */
+Alfresco.util.parseJSON = function(jsonStr)
+{
+   try
+   {
+      return YAHOO.lang.JSON.parse(jsonStr)
+   }
+   catch(error)
+   {
+      Alfresco.util.PopupManager.displayPrompt(
+      {
+         title: "Failure",
+         text: "Can't parse response as json: '" + jsonStr + "'"
+      });
+      throw error;
+   }
+}
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */
@@ -640,7 +667,7 @@ Alfresco.util.PopupManager = function()
          close: false,
          buttons: [
          {
-            text:"OK",
+            text: null, // To early to localize at this time, do it when called instead
             handler: function()
             {
                this.hide();
@@ -674,6 +701,14 @@ Alfresco.util.PopupManager = function()
        */
       displayPrompt: function(config)
       {
+         if(this.defaultDisplayPromptConfig.buttons[0].text === null)
+         {
+            /**
+             * This default value could not be set at instantion time since the
+             * localized messages weren't present at that time
+             */
+            this.defaultDisplayPromptConfig.buttons[0].text = Alfresco.util.message("button.ok", this.name);
+         }
          // Merge users config and the default config and check manadatory properties
          var c = YAHOO.lang.merge(this.defaultDisplayPromptConfig, config);
          if (c.text === undefined)
@@ -707,7 +742,6 @@ Alfresco.util.PopupManager = function()
             prompt.cfg.setProperty("icon", c.icon);
          }
 
-         // TODO: Localize the OK label
          // Add the buttons to the dialog
          if (c.buttons)
          {
@@ -1011,11 +1045,8 @@ Alfresco.util.Ajax = function()
             var json = null;
             if (config.responseContentType === "application/json")
             {
-               if (serverResponse.responseText && serverResponse.responseText.length > 0)
-               {
-                  // Decode the response since it should be json
-                  json = this._parseJSON(serverResponse);
-               }
+               // Decode the response since it should be json
+               json = Alfresco.util.parseJSON(serverResponse.responseText);
             }
 
             // Call the success callback in the correct scope
@@ -1062,7 +1093,7 @@ Alfresco.util.Ajax = function()
             var json = null;
             if (config.responseContentType === "application/json")
             {
-               json = this._parseJSON(serverResponse);
+               json = Alfresco.util.parseJSON(serverResponse.responseText);
             }
             callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
             {
@@ -1090,7 +1121,7 @@ Alfresco.util.Ajax = function()
              */
             if (config.responseContentType == "application/json")
             {
-               var json = this._parseJSON(serverResponse.responseText);
+               var json = Alfresco.util.parseJSON(serverResponse.responseText);
                Alfresco.util.PopupManager.displayPrompt({title: json.status.name, text: json.message});
             }
             else if (serverResponse.statusText)
@@ -1108,22 +1139,6 @@ Alfresco.util.Ajax = function()
                   text: "Error sending data to server."
                });
             }
-         }
-      },
-
-      _parseJSON: function(serverResponse)
-      {
-         try
-         {
-            return YAHOO.lang.JSON.parse(serverResponse.responseText)
-         }
-         catch(error)
-         {
-            Alfresco.util.PopupManager.displayPrompt(
-            {
-               title: "Failure",
-               text: "Can't parse response as json: " + serverResponse.statusText
-            });
          }
       }
 

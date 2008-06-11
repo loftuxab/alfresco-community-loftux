@@ -56,22 +56,22 @@
       <div id="${args.htmlid}-filelist-table" class="fileUpload-filelist-table"></div>
 
       <div id="${args.htmlid}-versionSection-div">
-         <span>${msg("section.version")}</span>
+         <div class="yui-g section-title">
+            <h2>${msg("section.version")}</h2>
+         </div>
          <div class="yui-gd">
             <div class="yui-u first">
                ${msg("label.version")}
             </div>
             <div class="yui-u">
-               <div id="${args.htmlid}-version-buttongroup" class="yui-buttongroup">
-                  <input id="${args.htmlid}-minorChanges" type="radio" name="newVersion" value="1.1" checked="checked"/>
-                  <input id="${args.htmlid}-majorChanges" type="radio" name="newVersion" value="2.0"/>
-               </div>
+               Minor changes: <input id="${args.htmlid}-minorChanges" type="radio" name="newVersion" value="1.1" checked="checked"/><br>
+               Major changes: <input id="${args.htmlid}-majorChanges" type="radio" name="newVersion" value="2.0"/>
             </div>
             <div class="yui-u first">
                Comments:
             </div>
             <div class="yui-u">
-               <textarea cols="40" rows="4"></textarea>
+               <textarea rows="4"></textarea>
             </div>
          </div>
       </div>

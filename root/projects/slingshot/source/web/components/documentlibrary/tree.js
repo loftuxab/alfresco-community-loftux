@@ -111,12 +111,27 @@
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.DocListTree} returns 'this' for method chaining
        */
       setOptions: function DLT_setOptions(obj)
       {
          this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
       },
-      
+
+      /**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       */
+      setMessages: function DL_setMessages(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
+
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -377,7 +392,7 @@
          // Add default top-level node
          var tempNode = new YAHOO.widget.TextNode(
          {
-            label: "Documents",
+            label: Alfresco.util.message("node.root", this.name),
             path: "",
             nodeRef: ""
          }, root, false);

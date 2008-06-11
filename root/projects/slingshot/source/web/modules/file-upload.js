@@ -38,11 +38,8 @@
  *    siteId: siteId,
  *    componentId: doclibComponentId,
  *    path: docLibUploadPath,
- *    title: "Upload file(s)",
  *    filter: [],
- *    multiSelect: true,
- *    noOfVisibleRows: 5,
- *    versionInput: false
+ *    mode: fileUpload.MODE_MULTI_UPLOAD,
  * }
  * this.fileUpload.show(multiUploadConfig); 
  *
@@ -51,6 +48,7 @@
  */
 (function()
 {
+
 
    /**
     * FileUpload constructor.
@@ -174,10 +172,37 @@
        */
       addedFiles: {},
 
+   /**
+        * Shows uploader in single upload mode.
+        *
+        * @property MODE_SINGLE_UPLOAD
+        * @static
+        * @type int
+        */
+      MODE_SINGLE_UPLOAD: 1,
+
+      /**
+        * Shows uploader in single update mode.
+        *
+        * @property MODE_SINGLE_UPDATE
+        * @static
+        * @type int
+        */
+      MODE_SINGLE_UPDATE: 2,
+
+      /**
+        * Shows uploader in multi upload mode.
+        *
+        * @property MODE_MULTI_UPLOAD
+        * @static
+        * @type int
+        */
+      MODE_MULTI_UPLOAD: 3,
+      
       /**
        * The default config for the gui state for the uploader.
        * The user can override these properties in the show() method to use the
-       * uploader for both single and multi uploads.
+       * uploader for both single & multi uploads and single updates.
        *
        * @property defaultShowConfig
        * @type object
@@ -186,11 +211,8 @@
          siteId: null,
          componentId: null,
          path: null,
-         title: "",
-         multiSelect: false,
-         filter: [],
-         noOfVisibleRows: 1,
-         versionInput: true
+         mode: this.MODE_SINGLE_UPLOAD,
+         filter: []
       },
 
       /**
@@ -301,8 +323,9 @@
        *       
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocListTree} returns 'this' for method chaining
        */
-      setMessages: function setMessages(obj)
+      setMessages: function FU_setMessages(obj)
       {
          Alfresco.util.addMessages(obj, this.name);
          return this;
@@ -314,7 +337,7 @@
        *
        * @method onComponentsLoaded
        */
-      onComponentsLoaded: function()
+      onComponentsLoaded: function FU_onComponentsLoaded()
       {
          // Tell the YUI class where the swf is
          YAHOO.widget.Uploader.SWFURL = this.swf;
@@ -337,13 +360,11 @@
        *    siteId: {string},       // site to upload file(s) to
        *    componentId: {string},  // component to upload file(s) to (i.e. a doclib id)
        *    path: {string},         // path inside the component to upload file(s) to
-       *    title: {string},        // dialog title
-       *    multiSelect: {boolean}, // true if the user shall be able to select multiple files, false is default
+       *    mode: {int},            // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},        // limits what kind of files the user can select in the OS file selector
-       *    versionInput: {boolean} // true if version input should be displayed, default is true
-       * }                                
+       * }
        */
-      show: function(config)
+      show: function FU_show(config)
       {
          // Remember the the label used by other components so we can reset it at close
          this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
@@ -393,7 +414,7 @@
        * @method onTemplateLoaded
        * @param response {object} a Alfresco.util.Ajax.request response object
        */
-      onTemplateLoaded: function(response)
+      onTemplateLoaded: function FU_onTemplateLoaded(response)
       {
          var Dom = YAHOO.util.Dom;
 
@@ -442,10 +463,6 @@
          // Save a reference to the HTMLElement displaying version input so we can hide or show it
          this.versionSection = Dom.get(this.id + "-versionSection-div");
 
-         // Create a buttongroup for versions
-         var vGroup = Dom.get(this.id + "-version-buttongroup");
-         var oButtonGroup1 = new YAHOO.widget.ButtonGroup(vGroup);
-
          // Create and save a reference to the uploadButton so we can alter it later
          this.widgets.uploadButton = Alfresco.util.createYUIButton(this, "upload-button", this.onUploadButtonClick);
 
@@ -473,7 +490,7 @@
        * @method onReady
        * @param event {object} a DataTable "rowAdd" event
        */
-      onRowAddEvent: function(event)
+      onRowAddEvent: function FU_onRowAddEvent(event)
       {
          // Since the flash movie allows the user to select one file several
          // times we need to keep track of the selected files by our selves
@@ -489,7 +506,7 @@
        * @method onFileSelect
        * @param event {object} an Uploader "fileSelect" event
        */
-      onFileSelect: function(event)
+      onFileSelect: function FU_onFileSelect(event)
       {
          // For each time the user select new files, all the previous selected
          // files also are included in the event.fileList. Make sure we only
@@ -518,7 +535,7 @@
        * @method onUploadStart
        * @param event {object} an Uploader "uploadStart" event
        */
-      onUploadStart: function(event)
+      onUploadStart: function FU_onUploadStart(event)
       {
          // Get the reference to the files gui components
          var Dom = YAHOO.util.Dom;
@@ -548,7 +565,7 @@
        * @method onUploadComplete
        * @param event {object} an Uploader "uploadProgress" event
        */
-      onUploadProgress: function(event)
+      onUploadProgress: function FU_onUploadProgress(event)
       {
          var flashId = event["id"];
          var fileInfo = this.fileStore[flashId];
@@ -568,7 +585,7 @@
        * @method onUploadComplete
        * @param event {object} an Uploader "uploadComplete" event
        */
-      onUploadComplete: function(event)
+      onUploadComplete: function FU_onUploadComplete(event)
       {
          /**
           * Actions taken on a completed upload is handled by the
@@ -580,13 +597,17 @@
        * Fired by YIU:s Uploader when transfer is completed for a file.
        * A difference compared to the onUploadComplete() method is that
        * the response body is available in the event.
-       * Adjusts the gui and calls for another file to upload.
+       * Adjusts the gui and calls for another file to upload if the upload
+       * was succesful.
        *
        * @method onUploadCompleteData
        * @param event {object} an Uploader "uploadCompleteData" event
        */
-      onUploadCompleteData: function(event)
+      onUploadCompleteData: function FU_onUploadCompleteData(event)
       {
+         // todo: Check that the upload was succesful when a standardized
+         // json response is returned form the server
+
          // The individual file has been transfered completely
          // Now adjust the gui for the individual file row
          var fileInfo = this.fileStore[event["id"]];
@@ -618,7 +639,7 @@
        * @method onUploadCancel
        * @param event {object} an Uploader "uploadCancel" event
        */
-      onUploadCancel: function(event)
+      onUploadCancel: function FU_onUploadCancel(event)
       {
          // The gui has already been adjusted in the function that caused the cancel
       },
@@ -630,7 +651,7 @@
        * @method onUploadError
        * @param event {object} an Uploader "uploadError" event
        */
-      onUploadError: function(event)
+      onUploadError: function FU_onUploadError(event)
       {
          var fileInfo = this.fileStore[event["id"]];
 
@@ -667,13 +688,14 @@
        * @method onBrowseButtonClick
        * @param event {object} an Uploader "browseButtonClick" event
        */
-      onBrowseButtonClick: function(event)
+      onBrowseButtonClick: function FU_onBrowseButtonClick(event)
       {
          // Make sure we know have gone into browsing state
          this.state = this.STATE_BROWSING;
 
          // Tell the flash movie to display the OS's file selector dialog
-         this.uploader.browse(this.showConfig.multiSelect, this.showConfig.filter);
+         var multiSelect = this.showConfig.mode === this.MODE_MULTI_UPLOAD;
+         this.uploader.browse(multiSelect, this.showConfig.filter);
       },
 
       /**
@@ -685,7 +707,7 @@
        * @param flashId {string} an id matching the flash movies fileId
        * @param recordId {int} an id matching a record in the data tables data source
        */
-      _onFileButtonClickHandler: function(flashId, recordId)
+      _onFileButtonClickHandler: function FU__onFileButtonClickHandler(flashId, recordId)
       {
          /**
           * The file button has been clicked to remove a file.
@@ -734,7 +756,7 @@
        * @method onBrowseButtonClick
        * @param event {object} a Button "click" event
        */
-      onCancelOkButtonClick: function()
+      onCancelOkButtonClick: function FU_onCancelOkButtonClick()
       {
          var message;
          if (this.state === this.STATE_BROWSING)
@@ -776,11 +798,17 @@
          this.panel.hide();
          
          // Firefox 2 isn't always great at hiding the panel
+         /*
+
+         Since panel is set to null it will make the panel load its template
+         from the server everytime show() is called. Find another solution...
+
          if (YAHOO.env.ua.gecko == 1.8)
          {
             this.panel.destroy();
             this.panel = null;
          }
+         */
 
          // Remove all files and references for this upload "session"
          this._clear();
@@ -799,7 +827,7 @@
        * @method onBrowseButtonClick
        * @param event {object} a Button "click" event
        */
-      onUploadButtonClick: function()
+      onUploadButtonClick: function FU_onUploadButtonClick()
       {
          if (this.state === this.STATE_BROWSING)
          {
@@ -823,36 +851,66 @@
        * @method _applyConfig
        * @private
        */
-      _applyConfig: function()
+      _applyConfig: function FU__applyConfig()
       {
          var Dom = YAHOO.util.Dom;
 
          // Set the panel title
-         this.titleText["innerHTML"] = this.showConfig.title;
-
-         // Display the version input form
-         if (this.showConfig.versionInput)
+         var title;
+         if(this.showConfig.mode === this.MODE_SINGLE_UPLOAD)
          {
-            if (this.showConfig.multiSelect)
+            title = Alfresco.util.message("header.singleUpload", this.name);
+         }
+         else if(this.showConfig.mode === this.MODE_MULTI_UPLOAD)
+         {
+            title = Alfresco.util.message("header.multiUpload", this.name);
+         }
+         else if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+         {
+            title = Alfresco.util.message("header.singleUpdate", this.name);
+         }
+         this.titleText["innerHTML"] = title;
+
+         if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+         {
+            // Display the version input form
+            if(Dom.hasClass(this.versionSection, "hiddenComponents"))
             {
-               // Doesn't make sense since version input only applies to a single file
-               throw new Error("Cannot show version input fields for multiple files");
-            }
-            else
-            {
-               Dom.setStyle(this.versionSection, "display", "true");
+               Dom.removeClass(this.versionSection, "hiddenComponents");
             }
          }
          else
          {
-            Dom.setStyle(this.versionSection, "display", "none");
+            // Hide the version input form
+            if(!Dom.hasClass(this.versionSection, "hiddenComponents"))
+            {
+               Dom.addClass(this.versionSection, "hiddenComponents");
+            }
          }
 
-         // Display the help label for how to select multiple files
-         if(!this.showConfig.multiSelect)
+         if(this.showConfig.mode === this.MODE_MULTI_UPLOAD)
          {
-            Dom.addClass(this.multiSelectText, "hiddenComponents");
+            // Show the help label for how to select multiple files
+            if(Dom.hasClass(this.multiSelectText, "hiddenComponents"))
+            {
+               Dom.removeClass(this.multiSelectText, "hiddenComponents");
+            }
+
+            // Make the file list long
+            this.dataTable.set("height", "204px");
          }
+         else
+         {
+            // Hide the help label for how to select multiple files
+            if(!Dom.hasClass(this.multiSelectText, "hiddenComponents"))
+            {
+               Dom.addClass(this.multiSelectText, "hiddenComponents");
+            }
+
+            // Make the file list short
+            this.dataTable.set("height", "40px");
+         }
+
       },
 
       /**
@@ -861,7 +919,7 @@
        * @method _createEmptyDataTable
        * @private
        */
-      _createEmptyDataTable: function()
+      _createEmptyDataTable: function FU__createEmptyDataTable()
       {
 
          var Dom = YAHOO.util.Dom;
@@ -992,13 +1050,17 @@
             fields: ["id","name","created","modified","type", "size", "progress"]
          };
 
-         // Create the data table.
+         /**
+          * Create the data table.
+          * Set the properties even if they will get changed in applyConfig
+          * afterwards, if not set here they will not be changed later.
+          */
          YAHOO.widget.DataTable._bStylesheetFallback = !!YAHOO.env.ua.ie;
          var dataTableDiv = Dom.get(this.id + "-filelist-table");
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
             scrollable: true,
-            height: "200px",
+            height: "1px",
             renderLoopSize: 5
          });
          this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
@@ -1010,7 +1072,7 @@
        * @method _showPanel
        * @private
        */
-      _showPanel: function()
+      _showPanel: function FU__showPanel()
       {
          // Reset references and the gui before showing it
          this.state = this.STATE_BROWSING;
@@ -1037,7 +1099,7 @@
        * @param data {object} a file data object describing a file
        * @private
        */
-      _getUniqueFileToken: function(data)
+      _getUniqueFileToken: function FU__getUniqueFileToken(data)
       {
          return data.name + ":" + data.size + ":" + data.cDate + ":" + data.mDate
       },
@@ -1048,7 +1110,7 @@
        * @method _updateStatus
        * @private
        */
-      _updateStatus: function(){
+      _updateStatus: function FU__updateStatus(){
          // Update the status label with the latest information about the upload progress
          var status = Alfresco.util.message("label.uploadStatus", this.name);
          status = YAHOO.lang.substitute(status,
@@ -1067,7 +1129,7 @@
        * @method _adjustGuiIfFinished
        * @private
        */
-      _adjustGuiIfFinished: function()
+      _adjustGuiIfFinished: function FU__adjustGuiIfFinished()
       {
          // Go into finished state if all files are finished: successful or failures
          for (var i in this.fileStore)
@@ -1092,7 +1154,7 @@
        * @param noOfUploadsToStart
        * @private
        */
-      _uploadFromQueue: function(noOfUploadsToStart){
+      _uploadFromQueue: function FU__uploadFromQueue(noOfUploadsToStart){
 
          // Find files to upload
          var startedUploads = 0;
@@ -1129,7 +1191,7 @@
        * @method _cancelAllUploads
        * @private
        */
-      _cancelAllUploads: function()
+      _cancelAllUploads: function FU__cancelAllUploads()
       {
          // Cancel all uploads inside the flash movie
          var length = this.dataTable.getRecordSet().getLength();
@@ -1147,7 +1209,7 @@
        * @method _clear
        * @private
        */
-      _clear: function()
+      _clear: function FU__clear()
       {
          /**
           * Remove all references to files inside the data table, flash movie

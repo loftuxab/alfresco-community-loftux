@@ -58,12 +58,12 @@
    Alfresco.module.CreateSite.prototype =
    {
       /**
-       * Dialog instance.
+       * Panel instance.
        * 
-       * @property dialog
+       * @property panel
        * @type YUI.widget.Panel
        */
-      dialog: null,
+      panel: null,
 
       /**
        * Object container for storing YUI widget instances.
@@ -95,13 +95,15 @@
        */
       show: function()
       {
-         if(this.dialog)
+         alert('1');
+         if(this.panel)
          {
+            alert('a');
             /**
-             * The dialog gui has been showed before and its gui has already
+             * The panel gui has been showed before and its gui has already
              * been loaded and created
              */
-            this.dialog.show();
+            this._showPanel();
          }
          else
          {
@@ -109,6 +111,7 @@
              * Load the gui from the server and let the templateLoaded() method
              * handle the rest.
              */
+            alert('b');
             Alfresco.util.Ajax.request(
             {
                url: Alfresco.constants.URL_SERVICECONTEXT + "modules/create-site",
@@ -135,14 +138,15 @@
        */
       onTemplateLoaded: function(response)
       {
+         alert('t');
          // Inject the template from the XHR request into a new DIV element
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;
 
          // The panel is created from the HTML returned in the XHR request, not the container
-         var dialogDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+         var panelDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
 
-         this.dialog = new YAHOO.widget.Panel(dialogDiv,
+         this.panel = new YAHOO.widget.Panel(panelDiv,
          {
             modal: true,
             draggable: false,
@@ -152,7 +156,7 @@
          });
 
          // Add it to the Dom
-         this.dialog.render(document.body);
+         this.panel.render(document.body);
 
          // Create the cancel button
          this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -189,18 +193,16 @@
          createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();
 
-         // Show the dialog
-         this.dialog.show();
-
          // Firefox insertion caret fix
          Alfresco.util.caretFix(this.id + "-createSite-form");
 
-         YAHOO.util.Dom.get(this.id + "-title").focus();
+         // Show the panel
+         this._showPanel();
       },
 
       /**
        * Called when user clicks on the cancel button.
-       * Closes the CreateSite dialog.
+       * Closes the CreateSite panel.
        *
        * @method onCancelButtonClick
        * @param type
@@ -208,7 +210,7 @@
        */
       onCancelButtonClick: function(type, args)
       {
-        this.dialog.hide();
+        this.panel.hide();
       },
 
       /**
@@ -231,6 +233,21 @@
             // The site has been successfully created, redirect the user to it.
             document.location.href = Alfresco.constants.URL_CONTEXT + "page/collaboration-dashboard?site=" + response.json.shortName;
          }
+      },
+
+      /**
+       * Prepares the gui and shows the panel.
+       *
+       * @method _showPanel
+       * @private
+       */
+      _showPanel: function()
+      {
+         // Set the focus on the first field
+         YAHOO.util.Dom.get(this.id + "-title").focus();
+
+         // Show the upload panel
+         this.panel.show();
       }
 
    };

@@ -164,6 +164,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        *
        * @method setOptions
        * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.DocListTree} returns 'this' for method chaining
        */
       setOptions: function DL_setOptions(obj)
       {
@@ -176,6 +177,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        *
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocListTree} returns 'this' for method chaining
        */
       setMessages: function DL_setMessages(obj)
       {
@@ -551,22 +553,19 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
          }
          
-         // Multi-file upload configuration
+         // Show uploader for multiple files
          var multiUploadConfig =
          {
             siteId: this.options.siteId,
             componentId: this.options.componentId,
             path: this.currentPath,
-            title: "Upload file(s)",
             filter: [],
-            multiSelect: true,
-            noOfVisibleRows: 5,
-            versionInput: false
+            mode: this.fileUpload.MODE_MULTI_UPLOAD
          }
          this.fileUpload.show(multiUploadConfig);
          YAHOO.util.Event.preventDefault(e);
       },
-      
+
        /**
         * Selected Items button click handler
         *
