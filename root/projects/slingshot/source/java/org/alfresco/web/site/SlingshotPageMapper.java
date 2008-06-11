@@ -31,10 +31,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.framework.model.Theme;
 import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
-import org.alfresco.web.site.model.Page;
-import org.alfresco.web.site.model.Theme;
 
 /**
  * This is a Page Mapper class which serves to interpret URLs at dispatch
@@ -145,7 +145,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
             
             // Consider the theme
             String themeId = (String) context.getThemeId();
-            Theme theme = context.getModel().loadTheme(context, themeId);
+            Theme theme = context.getModel().getTheme(themeId);
             if (theme != null)
             {
                 pageId = theme.getPageId(pageTypeId);
@@ -168,7 +168,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
     	if (pageId != null)
     	{
     		// We have a page Id.  We must resolve it to a page.
-            Page page = context.getModel().loadPage(context, pageId);
+            Page page = context.getModel().getPage(pageId);
             if (page != null)
             {
                 context.setPage(page);
