@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
    <scope>page</scope>
-   <region-id>component-3</region-id>
+   <region-id>component-2-1</region-id>
    <source-id>user-dashboard</source-id>
-   <url>/components/dashlets/my-sites</url>
+   <url>/components/simple</url>
 </component>

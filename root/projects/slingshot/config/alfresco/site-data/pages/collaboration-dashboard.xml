@@ -4,6 +4,6 @@
    <page-type>collabdash</page-type>
    <title>Collboration Site Dashboard</title>
    <description>Collaboration site's dashboard page</description>
-   <template-instance>collaboration-dashboard</template-instance>
+   <template-instance>dashboard-3-columns</template-instance>
    <authentication>user</authentication>
 </page>

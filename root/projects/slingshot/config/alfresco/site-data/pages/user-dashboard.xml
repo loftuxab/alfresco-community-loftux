@@ -4,6 +4,6 @@
    <page-type>userdash</page-type>
    <title>User Dashboard</title>
    <description>Users dashboard page</description>
-   <template-instance>user-dashboard</template-instance>
+   <template-instance>dashboard-3-columns</template-instance>
    <authentication>user</authentication>
 </page>
