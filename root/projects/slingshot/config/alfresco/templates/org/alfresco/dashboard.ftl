@@ -11,7 +11,7 @@
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@layout.grid 3 "fluid" 9 "component-" />
+      <@layout.grid gridColumns gridClass "component" />
    </div>
 </@>
 

@@ -2,6 +2,9 @@
 <template-instance>
     <template-type>org/alfresco/dashboard</template-type>
     <properties>
-        <regions>9</regions>
+       <gridClass>yui-gb</gridClass>
+       <gridColumn1>5</gridColumn1>
+       <gridColumn2>5</gridColumn2>
+       <gridColumn3>5</gridColumn3>
     </properties>
 </template-instance>

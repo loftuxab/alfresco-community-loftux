@@ -2,6 +2,7 @@
 <template-instance>
     <template-type>org/alfresco/dashboard</template-type>
     <properties>
-        <regions>9</regions>
+       <gridClass></gridClass>
+       <gridColumn1>5</gridColumn1>
     </properties>
-</template-instance>         
+</template-instance>

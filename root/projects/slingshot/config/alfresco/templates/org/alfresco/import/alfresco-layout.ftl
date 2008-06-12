@@ -1,25 +1,38 @@
-<#macro grid noOfColumns columnFlow numberOfComponents regionIdPrefix>
-   <#if (columnFlow == "fluid" && noOfColumns == 1)>
-      <@_fluidGrid noOfColumns numberOfComponents regionIdPrefix ""/>
-   <#elseif (columnFlow == "fluid" && noOfColumns == 2)>
-      <@_fluidGrid noOfColumns numberOfComponents regionIdPrefix "yui-g"/>
-   <#elseif (columnFlow == "fluid" && noOfColumns == 3)>
-      <@_fluidGrid noOfColumns numberOfComponents regionIdPrefix "yui-gb"/>
-   <#elseif (columnFlow == "fluid" && noOfColumns > 3)>
-      Error:: alfresco-layout.ftl@grid :: Can only handle 1,2 or 3 columns
+
+<#macro grid columns class bindPrefix>
+   <#if (columns?size &lt; 4)>
+      <@_normalGrid columns class bindPrefix/>
+   <#else>
+      <@_nestedGrid columns class bindPrefix/>
    </#if>
 </#macro>
 
-<#macro _fluidGrid numberOfColumns numberOfComponents regionIdPrefix nestingGridClass>
-   <div class="${nestingGridClass}">
-   <#list 1..numberOfColumns as column>
-      <div class="yui-u<#if column == 1> first</#if>">
-      <#list 1..numberOfComponents as component>
-         <#if (component % numberOfColumns) == (column % numberOfColumns)>
-         <@region id="${regionIdPrefix + component}" scope="page" protected=true/>
+<#macro _normalGrid columns class bindPrefix>
+   <div class="${class}">
+      <#list columns as column>
+         <div class="yui-u<#if column_index == 0> first</#if>">
+            <#list 1..column.components as component>
+               <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="page" protected=true/>
+            </#list>
+         </div>
+      </#list>
+   </div>
+</#macro>
+
+<#macro _nestedGrid columns class bindPrefix>
+   <div class="${class}">
+      <#list columns as column>
+         <#if (column_index % 2 == 0)>
+            <div class="yui-g<#if column_index == 0> first</#if>">
+         </#if>
+         <div class="yui-u<#if column_index%2 == 0> first</#if>">
+            <#list 1..column.components as component>
+               <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="page" protected=true/>
+            </#list>
+         </div>
+         <#if (column_index % 2 == 1 || !column_has_next)>
+            </div>
          </#if>
       </#list>
-      </div>
-   </#list>
    </div>
 </#macro>
