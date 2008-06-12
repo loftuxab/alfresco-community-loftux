@@ -85,6 +85,17 @@
          */
         eventData: {},
 
+			/**
+			 * The index of the tab that is currently selected:
+			 * 0 -> Day; 1 -> Week; 2 -> Month; 3 -> Agenda
+			 * 
+			 * All tab indices are 0-based.
+			 *
+			 * @property activeIndex
+			 * @type integer
+			 */
+			activeIndex: 2, // default value
+			
         /**
          * Sets the current site for this component.
          *
@@ -138,19 +149,17 @@
                 tab.on("click", this.onTabSelected, this, true);
             }
 
-            //var Dom = YAHOO.util.Dom;
-            //Dom.get('calendar-view').style.visibility = "visible";
-
             /* Initialise buttons and handlers */
             Alfresco.util.createYUIButton(this, "next-button", this.displayNextMonth, { type: "push" });
             Alfresco.util.createYUIButton(this, "prev-button", this.displayPrevMonth, { type: "push" });
             Alfresco.util.createYUIButton(this, "current-button", this.displayCurrentMonth, { type: "push" });
 
             /* Initialise the current view */
-            Alfresco.util.Ajax.request({
+            Alfresco.util.Ajax.request(
+				{
                 url: Alfresco.constants.PROXY_URI + "calendar/eventList",
                 dataObj:
-                    {
+                {
                     "site": this.siteId
                 },
                 successCallback:
@@ -165,12 +174,21 @@
             YAHOO.Bubbling.on("onEventSaved", this.onEventSaved, this);
         },
 
+		  /**
+			* Gets fired when one of the tabs is selected. Records which tab is currently selected.
+			*
+			* @method onTabSelected
+			* @param e {object} Event fired
+			*/
         onTabSelected: function(e)
         {
             // TODO: set this is a prototype variable
             var funcs = [this.refreshDay, this.refreshWeek, this.refreshMonth, null];
 
             var idx = this.tabView.get('activeIndex');
+				// Record the tab that is currently selected
+				this.activeIndex = idx;
+				
             var f = funcs[idx];
             if (f)
             {
@@ -222,20 +240,42 @@
 						}
 					});
 					
-               // Check to see if we need to refresh the current view
                var dateStr = obj.from.split("/");
 
-               var fromDate = new Date();
-               fromDate.setYear(dateStr[2]);
-               fromDate.setMonth((dateStr[0]-1));
-               fromDate.setDate(dateStr[1]);
+               var eventDate = new Date();
+               eventDate.setYear(dateStr[2]);
+               eventDate.setMonth((dateStr[0]-1));
+               eventDate.setDate(dateStr[1]);
 
-               // Is it the same month?
-               if (fromDate.getFullYear() === this.currentDate.getFullYear()
-                    && fromDate.getMonth() === this.currentDate.getMonth())
-               {
-                    this.refreshMonth(this.currentDate);
-               }
+ 					var DateMath = YAHOO.widget.DateMath;
+					var dateBegin, dateEnd, f;
+					// For the current view, figure out if it needs updating based on the event that was just created
+					switch (this.activeIndex)
+					{
+						case 0: // day
+							dateBegin = DateMath.getDate(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate());
+							dateEnd = DateMath.add(dateBegin, DateMath.DAY, 1);
+							f = this.refreshDay;
+							break;
+						case 1: // week
+							dateBegin = DateMath.subtract(this.currentDate, DateMath.DAY, this.currentDate.getDay());
+							dateBegin.setHours(0, 0, 0);
+							dateEnd = DateMath.add(dateBegin, DateMath.DAY, 7);
+							f = this.refreshWeek;
+							break;
+						case 2: // month
+							dateBegin = DateMath.findMonthStart(this.currentDate);
+							dateEnd = DateMath.findMonthEnd(this.currentDate);
+							f = this.refreshMonth;
+							break;
+					}
+
+					if (DateMath.between(eventDate, dateBegin, dateEnd))
+					{
+						var args = [this.currentDate];
+	               f.apply(this, args);
+					}
+             
             }
         },
 
@@ -251,10 +291,12 @@
             this.eventData = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
             // Initialise the default view (month)
             this.refreshMonth(this.currentDate);
-
-            // Now that the data has been loaded we can display the calendar
-            var Dom = YAHOO.util.Dom;
-            Dom.get('calendar-view').style.visibility = "visible";
+				// Now that the data has been loaded we can display the calendar
+	         var Dom = YAHOO.util.Dom;
+	         Dom.get('calendar-view').style.visibility = "visible";
+			
+				this.refreshWeek(this.currentDate);
+				this.refreshDay(this.currentDate);
 
             // Fire "onEventDataLoad" event to inform other components to refresh their view
             YAHOO.Bubbling.fire('onEventDataLoad',
@@ -404,6 +446,7 @@
                             var id = this.id + "_calendar_cell" + (row*7 + col);
 
                             var elem = Dom.get(id);
+									 elem.innerHTML = ""; // reset
                             if (elem)
                             {
                                 var d = document.createElement('div');
@@ -442,6 +485,7 @@
             var DENOM = 1000 * 60 * 30; // 30 minute slots
 
             var container = Dom.get(this.id + "-dayEventsView");
+				container.innerHTML = ""; // reset
             var events = this.eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
             var total = events.length;
             if (total > 0)
