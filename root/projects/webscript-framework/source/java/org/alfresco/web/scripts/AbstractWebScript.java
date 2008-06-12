@@ -43,6 +43,7 @@ import org.alfresco.config.ScriptConfigModel;
 import org.alfresco.config.TemplateConfigModel;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.util.StringBuilderWriter;
+import org.alfresco.web.scripts.json.JSONUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONException;
@@ -189,6 +190,9 @@ public abstract class AbstractWebScript implements WebScript
         params.put("headersM", createHeadersM(req));
         params.put("guest", req.isGuest());
         params.put("url", new URLModel(req));
+        
+        // add the json utilities
+        params.put("jsonUtils", new JSONUtils());
         
         // add remote object
         if (this.container instanceof PresentationContainer)
