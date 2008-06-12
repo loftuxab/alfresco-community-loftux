@@ -94,7 +94,21 @@
         setSiteId: function(siteId)
         {
             this.siteId = siteId;
+				return this;
         },
+
+		/**
+		 * Set messages for this component
+		 *
+		 * @method setMessages
+		 * @param obj {object} Object literal specifying a set of messages
+		 */
+		setMessages: function(obj)
+		{
+			Alfresco.util.addMessages(obj, this.name);
+			return this;
+		},
+
 
         /**
          * Fired by YUILoaderHelper when required component script files have
@@ -144,7 +158,7 @@
                     fn: this.onDataLoad,
                     scope: this
                 },
-                failureMessage: "Could not load calendar data"
+                failureMessage: Alfresco.util.message("load.fail", "Alfresco.CalendarView")
             });
 
             // Decoupled event listener
