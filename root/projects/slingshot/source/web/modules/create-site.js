@@ -95,10 +95,8 @@
        */
       show: function()
       {
-         alert('1');
          if(this.panel)
          {
-            alert('a');
             /**
              * The panel gui has been showed before and its gui has already
              * been loaded and created
@@ -111,7 +109,6 @@
              * Load the gui from the server and let the templateLoaded() method
              * handle the rest.
              */
-            alert('b');
             Alfresco.util.Ajax.request(
             {
                url: Alfresco.constants.URL_SERVICECONTEXT + "modules/create-site",
@@ -138,7 +135,6 @@
        */
       onTemplateLoaded: function(response)
       {
-         alert('t');
          // Inject the template from the XHR request into a new DIV element
          var containerDiv = document.createElement("div");
          containerDiv.innerHTML = response.serverResponse.responseText;
