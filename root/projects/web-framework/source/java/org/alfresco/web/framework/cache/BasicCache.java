@@ -34,8 +34,8 @@ import java.util.WeakHashMap;
  */
 public class BasicCache<K> implements ContentCache<K>
 {
-    protected WeakHashMap<String, CacheItem<K>> cache;
-    protected long timeout;
+    protected final WeakHashMap<String, CacheItem<K>> cache;
+    protected final long timeout;
     
     /**
      * Instantiates a new basic cache.
@@ -44,8 +44,23 @@ public class BasicCache<K> implements ContentCache<K>
      */
     public BasicCache(long timeout)
     {
+        this(timeout, 256);
+    }
+    
+    /**
+     * Instantiates a new basic cache.
+     * 
+     * @param timeout   the timeout
+     * @param size      Cache size
+     */
+    public BasicCache(long timeout, int size)
+    {
         this.timeout = timeout;
-        this.cache = new WeakHashMap<String, CacheItem<K>>(256);
+        if (size < 1)
+        {
+            throw new IllegalArgumentException("Cache size must be +ve value");
+        }
+        this.cache = new WeakHashMap<String, CacheItem<K>>(size);
     }
 
     /* (non-Javadoc)

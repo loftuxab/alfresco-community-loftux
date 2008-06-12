@@ -102,6 +102,13 @@
 				<description>Wireless Format</description>
 			</format>
 			
+			<!-- persister config -->
+			<persisters>
+			   <!-- delay in seconds between checking store caches are dirty -->
+			   <!-- can be overriden below on a per model-type basis -->
+			   <cache-check-delay>60</cache-check-delay>
+			</persisters>
+			
 			<!-- object model -->
 			<model-type>
 				<id>chrome</id>
@@ -112,6 +119,8 @@
 				<class>org.alfresco.web.framework.model.Chrome</class>
 				<search-path-id>webframework.searchpath.chrome</search-path-id>
 				<default-store-id>webframework.localstore.chrome</default-store-id>
+				<!-- store cache check override example -->
+				<!--<cache-check-delay>10</cache-check-delay>-->
 			</model-type>
 			<model-type>
 				<id>component</id>

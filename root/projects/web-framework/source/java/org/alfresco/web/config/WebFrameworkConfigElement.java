@@ -64,6 +64,8 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
     protected String defaultComponentChrome = null;
     protected String defaultTheme = null;
     protected String defaultSiteConfiguration = null;
+    
+    protected Integer persisterCacheCheckDelay = null;
 
     protected String rootPath;
 
@@ -194,6 +196,12 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         if(configElement.defaultSiteConfiguration != null)
         {
             combinedElement.defaultSiteConfiguration = configElement.defaultSiteConfiguration;
+        }
+        
+        combinedElement.persisterCacheCheckDelay = this.persisterCacheCheckDelay;
+        if(configElement.persisterCacheCheckDelay != null)
+        {
+            combinedElement.persisterCacheCheckDelay = configElement.persisterCacheCheckDelay;
         }
 
         return combinedElement;
@@ -428,6 +436,18 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             return "local";
         }
         return this.defaultFileSystemId;
+    }
+    
+    public int getPersisterCacheCheckDelay()
+    {
+        if (persisterCacheCheckDelay != null)
+        {
+            return persisterCacheCheckDelay.intValue();
+        }
+        else
+        {
+            return 0;
+        }
     }
 
 
@@ -746,6 +766,7 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         private static final String VERSION = "version";
         private static final String SEARCH_PATH_ID = "search-path-id";
         private static final String DEFAULT_STORE_ID = "default-store-id";
+        private static final String CACHE_CHECK_DELAY = "cache-check-delay";
 
         TypeDescriptor(Element el)
         {
@@ -780,7 +801,16 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
         {
             return getStringProperty(DEFAULT_STORE_ID);
         }
-
+        public Integer getCacheCheckDelay()
+        {
+            Integer value = null;
+            String v =  getStringProperty(CACHE_CHECK_DELAY);
+            if (v != null && v.length() != 0)
+            {
+                value = Integer.valueOf(v);
+            }
+            return value;
+        }
     }
     
     public static class ContentLoaderDescriptor extends Descriptor
@@ -1025,6 +1055,17 @@ public class WebFrameworkConfigElement extends ConfigElementAdapter implements W
             Element el = (Element) loaders.get(i);
             ContentLoaderDescriptor descriptor = new ContentLoaderDescriptor(el);
             configElement.contentLoaders.put(descriptor.getId(), descriptor);
+        }
+        
+        
+        Element persisterElement = elem.element("persisters");
+        if (persisterElement != null)
+        {
+            if (persisterElement.element("cache-check-delay") != null)
+            {
+                configElement.persisterCacheCheckDelay = Integer.valueOf(
+                        persisterElement.elementTextTrim("cache-check-delay"));
+            }
         }
         
         return configElement;

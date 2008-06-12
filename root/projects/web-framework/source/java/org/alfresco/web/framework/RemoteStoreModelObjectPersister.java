@@ -27,7 +27,6 @@ package org.alfresco.web.framework;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.alfresco.web.framework.cache.ContentCache;
 import org.alfresco.web.framework.cache.ModelObjectCache;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.scripts.RemoteStore;
@@ -52,18 +51,19 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
 {
     private static Log logger = LogFactory.getLog(RemoteStoreModelObjectPersister.class);
     
-    protected RemoteStore remoteStore;
+    protected final RemoteStore remoteStore;
     
-
+    
     /**
      * Instantiates a new store model object persister.
      * 
      * @param typeId the type id
      * @param store the store
      */
-    public RemoteStoreModelObjectPersister(String typeId, Store store)
+    public RemoteStoreModelObjectPersister(String typeId, Store store, int delay)
     {
-        super(typeId, store);
+        super(typeId, store, delay);
+        
         if (store instanceof RemoteStore == false)
         {
             throw new IllegalArgumentException("Store must be a RemoteStore instance.");
@@ -209,7 +209,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
         
         return objects;     
     }
-        
+    
     /**
      * Gets the cache for a particular model persistence context
      * 
@@ -221,12 +221,12 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     protected ModelObjectCache getCache(ModelPersistenceContext context)
     {
         String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        String key = "[" + storeId + "]:" + getId();
+        String key = new StringBuilder(128).append(storeId).append(':').append(getId()).toString();
         
         ModelObjectCache cache = objectCaches.get(key);
         if (cache == null)
         {
-            cache = new ModelObjectCache(this.store, DEFAULT_CACHE_DELAY);
+            cache = new ModelObjectCache(this.store, this.delay);
             objectCaches.put(key, cache);
         }
         

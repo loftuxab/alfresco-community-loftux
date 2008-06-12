@@ -56,9 +56,8 @@ import org.dom4j.DocumentException;
 public class StoreModelObjectPersister extends AbstractModelObjectPersister
 {
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
-    // TODO: make this configurable!
-    static long DEFAULT_CACHE_DELAY = 1L*60L*1000L; // 1 minutes
-
+    
+    protected long delay;
     protected String id;
     protected Store store;
     protected Map<String, ModelObjectCache> objectCaches;
@@ -67,12 +66,14 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     /**
      * Instantiates a new store model object persister.
      * 
-     * @param store the store
-     * @param objectTypeId the object type id
+     * @param store             the store
+     * @param objectTypeId      the object type id
+     * @param cacheCheckDelay   delay in seconds between checking last modified date of cached items 
      */
-    public StoreModelObjectPersister(String objectTypeId, Store store)
+    public StoreModelObjectPersister(String objectTypeId, Store store, int cacheCheckDelay)
     {
         super(objectTypeId);
+        this.delay = (cacheCheckDelay * 1000L);
         this.store = store;
         this.id = "Store_" + this.store.getBasePath() + "_" + this.objectTypeId;
         this.objectCaches = new HashMap<String, ModelObjectCache>(16, 1.0f);
@@ -435,7 +436,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         ModelObjectCache cache = objectCaches.get(key);
         if (cache == null)
         {
-            cache = new ModelObjectCache(this.store, DEFAULT_CACHE_DELAY);
+            cache = new ModelObjectCache(this.store, this.delay);
             objectCaches.put(key, cache);
         }
         

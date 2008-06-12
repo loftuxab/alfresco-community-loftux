@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.alfresco.config.Config;
 import org.alfresco.config.ConfigService;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement.TypeDescriptor;
 import org.alfresco.web.framework.exception.WebFrameworkServiceException;
@@ -61,7 +62,7 @@ public class WebFrameworkService
     private WebFrameworkConfigElement webFrameworkConfig;
     
     /** A map of type ids to MultiModelObjectPersister implementations. */
-    private Map<String, ModelObjectPersister> typeIdToMultiPersisterMap;
+    private Map<String, ModelObjectPersister> typeIdToPersisterMap;
     
     /** A map of type ids to default Persister implementations. */
     private Map<String, ModelObjectPersister> typeIdToDefaultPersisterMap;
@@ -202,7 +203,7 @@ public class WebFrameworkService
      */
     public ModelObjectPersister getPersister(String objectTypeId)
     {
-        return (ModelObjectPersister) typeIdToMultiPersisterMap.get(objectTypeId);
+        return (ModelObjectPersister) typeIdToPersisterMap.get(objectTypeId);
     }
     
     /**
@@ -224,7 +225,7 @@ public class WebFrameworkService
      */
     public ModelObjectPersister[] getPersisters()
     {
-        return this.typeIdToMultiPersisterMap.values().toArray(new ModelObjectPersister[this.typeIdToMultiPersisterMap.size()]);
+        return this.typeIdToPersisterMap.values().toArray(new ModelObjectPersister[this.typeIdToPersisterMap.size()]);
     }
     
     /**
@@ -244,73 +245,86 @@ public class WebFrameworkService
     public void initPersisters()
     {
         // initialize the multi persisters map
-        typeIdToMultiPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
+        typeIdToPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
         
         // initialize the default persisters map
         typeIdToDefaultPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
         
-        // initialize the
+        // initialize the map of persisters ids to Persister objects
         persisterIdToPersisterMap = new HashMap<String, ModelObjectPersister>(16, 1.0f);
-
+        
         // walk over the model types and prepare persisters for each
         WebFrameworkConfigElement wfConfig = getWebFrameworkConfig();
         String[] typeIds = wfConfig.getTypeIds();
-        for(int i = 0; i < typeIds.length; i++)
+        for (int i = 0; i < typeIds.length; i++)
         {
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("Initializing model type: " + typeIds[i]);
-
+            
             TypeDescriptor descriptor = wfConfig.getTypeDescriptor(typeIds[i]);
             
             // get the default store id
-            String defaultStoreId = descriptor.getDefaultStoreId();
-            Store defaultStore = (Store) getApplicationContext().getBean(defaultStoreId);
+            Store defaultStore = (Store) getApplicationContext().getBean(descriptor.getDefaultStoreId());
             boolean addedDefaultStore = false;
             
-            // get the search path
-            String searchPathId = descriptor.getSearchPathId();
-            SearchPath searchPath = (SearchPath) getApplicationContext().getBean(searchPathId);
-            if(searchPath != null)
-            {            
-                // walk the stores in this search path
-                // create persisters for each
-                // store into a map keyed by store base path
-                Map<String, ModelObjectPersister> persisters = new HashMap<String, ModelObjectPersister>(16, 1.0f);
-                for (Store store : searchPath.getStores())
+            // cache check delay settings (can override default per store)
+            int delay = wfConfig.getPersisterCacheCheckDelay();
+            if (descriptor.getCacheCheckDelay() != null)
+            {
+                delay = descriptor.getCacheCheckDelay();
+            }
+            
+            // get the search path and walk all stores
+            SearchPath searchPath = (SearchPath)getApplicationContext().getBean(descriptor.getSearchPathId());
+            if (searchPath == null)
+            {
+                throw new AlfrescoRuntimeException("Search path mandatory for model type config.");
+            }
+            
+            // create persisters for each store into a map keyed by store base path
+            Map<String, ModelObjectPersister> persisters = new HashMap<String, ModelObjectPersister>(16, 1.0f);
+            for (Store store : searchPath.getStores())
+            {
+                ModelObjectPersister persister = null;
+                if (store instanceof RemoteStore)
                 {
-                    ModelObjectPersister persister = null;
-                    if(store instanceof RemoteStore)
-                    {
-                        persister = new RemoteStoreModelObjectPersister(typeIds[i], store);
-                    }
-                    else
-                    {
-                        persister = new StoreModelObjectPersister(typeIds[i], store);
-                    }
-                    persisters.put(persister.getId(), persister);
-                    
-                    // add to persister id map
-                    persisterIdToPersisterMap.put(persister.getId(), persister);
+                    persister = new RemoteStoreModelObjectPersister(typeIds[i], store, delay);
+                }
+                else
+                {
+                    persister = new StoreModelObjectPersister(typeIds[i], store, delay);
+                }
+                persisters.put(persister.getId(), persister);
+                
+                // add to persister id map
+                persisterIdToPersisterMap.put(persister.getId(), persister);
 
-                    // check whether this is the default store
-                    if(store.equals(defaultStore))
-                    {
-                        typeIdToDefaultPersisterMap.put(typeIds[i], persister);
-                        addedDefaultStore = true;
-                    }
-                }
-                
-                // wrap all of these persisters into a single multi persister
-                // and store onto map (keyed by type id)
-                ModelObjectPersister persister = new MultiModelObjectPersister(typeIds[i], this, persisters);
-                typeIdToMultiPersisterMap.put(typeIds[i], persister);
-                
-                // debug
-                if(!addedDefaultStore)
+                // check whether this is the default store
+                if (store.equals(defaultStore))
                 {
-                    if(logger.isDebugEnabled())
-                        logger.debug("Unable to add default store persister for object type id: " + typeIds[i]);                                             
+                    typeIdToDefaultPersisterMap.put(typeIds[i], persister);
+                    addedDefaultStore = true;
                 }
+            }
+            
+            // if required, wrap all of these persisters into a single multi persister
+            // and store result onto map (keyed by type id)
+            ModelObjectPersister persister;
+            if (persisters.size() == 1)
+            {
+                persister = persisters.values().iterator().next();
+            }
+            else
+            {
+                persister = new MultiModelObjectPersister(typeIds[i], this, persisters);
+            }
+            typeIdToPersisterMap.put(typeIds[i], persister);
+            
+            // debug
+            if (!addedDefaultStore)
+            {
+                if(logger.isDebugEnabled())
+                    logger.debug("Unable to add default store persister for object type id: " + typeIds[i]);                                             
             }
         }
     }
