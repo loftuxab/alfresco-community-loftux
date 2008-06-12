@@ -69,6 +69,19 @@
       setSiteId: function(siteId)
 		{
 			this.siteId = siteId;
+			return this;
+		},
+		
+		/**
+		 * Set messages for this component
+		 *
+		 * @method setMessages
+		 * @param obj {object} Object literal specifying a set of messages
+		 */
+		setMessages: function(obj)
+		{
+			Alfresco.util.addMessages(obj, this.name);
+			return this;
 		},
 		
 	   /**
@@ -98,6 +111,13 @@
 		 	// Separate the (initial) rendering of the calendar from the data loading.
 		 	// If for some reason the data fails to load, the calendar will still display.
 			this.calendar = new YAHOO.widget.CalendarGroup("calendar");
+			// Set localised properties
+			this.calendar.cfg.setProperty("MONTHS_SHORT", eval(Alfresco.util.message("yui.calendar.months_short", this.name)));
+			this.calendar.cfg.setProperty("MONTHS_LONG", eval(Alfresco.util.message("yui.calendar.months_long", this.name)));
+			this.calendar.cfg.setProperty("WEEKDAYS_1CHAR", eval(Alfresco.util.message("yui.calendar.weekdays_1char", this.name)));
+			this.calendar.cfg.setProperty("WEEKDAYS_SHORT", eval(Alfresco.util.message("yui.calendar.weekdays_short", this.name)));
+			this.calendar.cfg.setProperty("WEEKDAYS_MEDIUM", eval(Alfresco.util.message("yui.calendar.weekdays_medium", this.name)));
+			this.calendar.cfg.setProperty("WEEKDAYS_LONG", eval(Alfresco.util.message("yui.calendar.weekdays_long", this.name)));
 			this.calendar.render();
 			
 			// Register for changes to the calendar data

@@ -1,6 +1,9 @@
 <script type="text/javascript">//<![CDATA[
-   var view = new Alfresco.CalendarView("${args.htmlid}");
-   view.setSiteId("${page.url.args["site"]!""}");
+   var view = new Alfresco.CalendarView("${args.htmlid}").setSiteId(
+	"${page.url.args["site"]!""}"
+	).setMessages(
+		${messages}
+	);
 <#if page.url.args["date"]?exists>
    view.currentDate = new Date("${page.url.args["date"]}");
 </#if>
@@ -9,10 +12,10 @@
 <div id="${args.htmlid}">
 <div id="calendar-view" class="yui-navset">
 <ul class="yui-nav">
-  <li><a href="#day"><em>Day</em></a></li>
-  <li><a href="#week"><em>Week</em></a></li>
-  <li class="selected"><a href="#month"><em>Month</em></a></li>
-  <li><a href="#agenda"><em>Agenda</em></a></li>
+  <li><a href="#day"><em>${msg("label.day")}</em></a></li>
+  <li><a href="#week"><em>${msg("label.week")}</em></a></li>
+  <li class="selected"><a href="#month"><em>${msg("label.month")}</em></a></li>
+  <li><a href="#agenda"><em>${msg("label.agenda")}</em></a></li>
 </ul>
 
 <div class="yui-content" style="background: #FFFFFF;">
@@ -40,11 +43,6 @@
 		</table>						
 	</div>
 	<div id="#week">
-	    <div style="text-align:center">
-	         <img src="/slingshot/images/calendar/prevMinor.gif" title="Previous Week" style="cursor:pointer" />
-	         <img src="/slingshot/images/calendar/now.gif" title="This Week" style="cursor:pointer" />
-	         <img src="/slingshot/images/calendar/nextMinor.gif" title="Next Week" style="cursor:pointer" />
-	    </div>
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
 		        <tr><td align="center" style="font-weight: bold;">11 - 17 May 2008</td></tr>
 		</table>
@@ -86,7 +84,7 @@
 	</div>
 	<div id="#month">
 		<div style="text-align:center">
-			<a href="#" id="${args.htmlid}-prev-button">Previous</a><a href="#" id="${args.htmlid}-current-button">This Month</a><a href="#" id="${args.htmlid}-next-button">Next</a> 
+			<a href="#" id="${args.htmlid}-prev-button">${msg("button.previous")}</a><a href="#" id="${args.htmlid}-current-button">${msg("button.current_month")}</a><a href="#" id="${args.htmlid}-next-button">${msg("button.next")}</a> 
 		</div>
 		<div id="monthLabel">May 2008</div>
 		<br/>
