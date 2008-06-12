@@ -39,9 +39,9 @@ import org.alfresco.web.scripts.Store;
  */
 public class ModelObjectCache extends BasicCache<ModelObject>
 {
-    protected Store store = null;
+    protected final Store store;
     private final static long timeout = 24L*60L*60L*1000L;   // 24 hours
-    private long delay = 0;          // i.e. 5L*60L*1000L = minutes
+    private final long delay;
     
     /**
      * Instantiates a new model object cache.
