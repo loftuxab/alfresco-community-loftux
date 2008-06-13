@@ -183,7 +183,7 @@
         onTabSelected: function(e)
         {
             // TODO: set this is a prototype variable
-            var funcs = [this.refreshDay, this.refreshWeek, this.refreshMonth, null];
+            var funcs = [this.refreshDay, this.refreshWeek, this.refreshMonth, this.refreshAgenda];
 
             var idx = this.tabView.get('activeIndex');
 				// Record the tab that is currently selected
@@ -295,8 +295,8 @@
 	         var Dom = YAHOO.util.Dom;
 	         Dom.get('calendar-view').style.visibility = "visible";
 			
-				this.refreshWeek(this.currentDate);
-				this.refreshDay(this.currentDate);
+				//this.refreshWeek(this.currentDate);
+				//this.refreshDay(this.currentDate);
 
             // Fire "onEventDataLoad" event to inform other components to refresh their view
             YAHOO.Bubbling.fire('onEventDataLoad',
@@ -565,7 +565,63 @@
                 }
             }
 
-        }
+        },
+
+		/**
+		 * Methods specific to the agenda view 
+		 * of events.
+		 */
+
+		/**
+		 * Updates the agenda view. Currently displays ALL the events for a site.
+		 *
+		 * @method refreshAgenda
+		 */
+		refreshAgenda: function()
+		{
+			var Dom = YAHOO.util.Dom;
+			var innerHTML = "";
+			
+			for (var key in this.eventData)
+			{
+				if (this.eventData.hasOwnProperty(key)) {
+					var dateParts = key.split("/");
+					var eventdate = YAHOO.widget.DateMath.getDate(dateParts[2], (dateParts[0]-1), dateParts[1]);
+					innerHTML += this.agendaDayCellRenderer(eventdate);
+				}
+			}
+			
+			var elem = Dom.get(this.id + "-agendaContainer");
+			elem.innerHTML = innerHTML;
+		},
+		
+		/**
+		 * This method generates the HTML to display the events 
+		 * for a given day, specified by the "date" parameter.
+		 * 
+		 * @method agendaItemCellRenderer
+		 * @param date {Date} JavaScript date object
+		 */
+		agendaDayCellRenderer: function(date)
+		{
+			var thedate = Alfresco.util.formatDate(date, "m/d/yyyy");
+			var events = this.eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
+			var html = "";
+			if (events && events.length > 0)
+			{
+				var title = Alfresco.util.formatDate(date, "mediumDate");
+				html += '<div class="agenda-item">'
+				html += '<div class="dayheader">' + title + '</div>';
+				html += '<table class="daytable">'
+				for (var i=0; i < events.length; i++)
+				{
+					var event = events[i];
+					html += '<tr><td class="timelabel">' + event.start + '</td><td>' + event.name + '</td></tr>';
+				}
+				html += '</table></div>';
+			}
+			return html;
+		}
 
     };
 }) ();

@@ -140,11 +140,12 @@ div#timeLabels {
 
 div.dayEventsView {
 	float: left;
-	border: 1px solid black;
+/*	border: 1px solid red; */
 	font-family: Arial;
 	font-size: 11px;
 	text-align: left;
 	position: relative;
+	height: 100px;
 }
 
 div#dayContainer {
@@ -160,4 +161,34 @@ div.dayEvent {
     text-align: left;
     border: 1px solid black;
     width: 80px;
+}
+
+/** Styling for the agenda view **/
+div.dayheader {
+	width: 100%;
+	border-bottom: 1px solid #000;
+	font-family: Arial;
+	font-size: 16px;
+	font-weight: bold;
+	margin-bottom: 5px;
+}
+
+table.daytable {
+	width: 100%;
+}
+
+table.daytable td.timelabel {
+	width: 7%;
+}
+
+table.daytable td {
+	font-size: 12px;
+	color: #333;
+	text-align: left;
+	padding: 2px;
+}
+
+div.agenda-item {
+	margin-top: 20px;
+	margin-bottom: 20px;
 }

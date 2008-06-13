@@ -21,7 +21,7 @@
 <div class="yui-content" style="background: #FFFFFF;">
 	<div id="#day">
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
-			<tr><td align="center" style="font-weight: bold;">17 May 2008</td></tr>
+			<tr><td align="center" style="font-weight: bold;"><#-- default date goes here --></td></tr>
 		</table>
 		<br />
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
@@ -110,7 +110,7 @@
 		</table>
 	</div>
 	<div id="#agenda">
-	Nothing to see here.
+		<div id="${args.htmlid}-agendaContainer" style="width: 100%;"></div>
 	</div>
 </div>
 </div>
