@@ -24,7 +24,6 @@
  */
 package org.alfresco.web.framework;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.web.framework.cache.ModelObjectCache;
@@ -69,7 +68,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
             throw new IllegalArgumentException("Store must be a RemoteStore instance.");
         }
         this.remoteStore = (RemoteStore)store;
-        this.id = "RemoteStore_" + this.store.getBasePath() + "_" + this.objectTypeId; 
+        this.id = "RemoteStore_" + store.getBasePath() + "_" + this.objectTypeId; 
     }
     
     /* (non-Javadoc)
@@ -79,17 +78,15 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     public ModelObject getObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        
         ModelObject obj = null;
         try
         {
-            remoteStore.bindRepositoryStoreId(storeId);
+            remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
             obj = super.getObject(context, objectId);
         }
         finally
         {
-            remoteStore.unbindRepositoryStoreId();
+            remoteStore.unbind();
         }
         
         return obj;
@@ -102,17 +99,15 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     public synchronized boolean saveObject(ModelPersistenceContext context, ModelObject modelObject)
         throws ModelObjectPersisterException    
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        
         boolean saved = false;
         try
         {
-            remoteStore.bindRepositoryStoreId(storeId);
+            remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
             saved = super.saveObject(context, modelObject);
         }
         finally
         {
-            remoteStore.unbindRepositoryStoreId();
+            remoteStore.unbind();
         }
         
         return saved;
@@ -125,17 +120,15 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     public boolean removeObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        
         boolean removed = false;
         try
         {
-            remoteStore.bindRepositoryStoreId(storeId);
+            remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
             removed = super.removeObject(context, objectId);
         }
         finally
         {
-            remoteStore.unbindRepositoryStoreId();
+            remoteStore.unbind();
         }
         
         return removed;
@@ -148,17 +141,15 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     public ModelObject newObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        
         ModelObject obj = null;
         try
         {
-            remoteStore.bindRepositoryStoreId(storeId);
+            remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
             obj = super.newObject(context, objectId);
         }
         finally
         {
-            remoteStore.unbindRepositoryStoreId();
+            remoteStore.unbind();
         }
         
         return obj;        
@@ -170,21 +161,18 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     @Override
     public boolean hasObject(ModelPersistenceContext context, String objectId)
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        
         boolean hasObject = false;
         try
         {
-            remoteStore.bindRepositoryStoreId(storeId);
+            remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
             hasObject = super.hasObject(context, objectId);
         }
         finally
         {
-            remoteStore.unbindRepositoryStoreId();
+            remoteStore.unbind();
         }
         
         return hasObject;
-        
     }  
     
     /* (non-Javadoc)
@@ -194,17 +182,15 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     public Map<String, ModelObject> getAllObjects(ModelPersistenceContext context)
         throws ModelObjectPersisterException
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        
-        Map<String, ModelObject> objects = new HashMap<String, ModelObject>(1, 1.0f);
+        Map<String, ModelObject> objects;
         try
         {
-            remoteStore.bindRepositoryStoreId(storeId);
+            remoteStore.bindRepositoryStoreId((String)context.getValue(ModelPersistenceContext.REPO_STOREID));
             objects = super.getAllObjects(context);
         }
         finally
         {
-            remoteStore.unbindRepositoryStoreId();
+            remoteStore.unbind();
         }
         
         return objects;     
@@ -220,8 +206,8 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
     @Override
     protected ModelObjectCache getCache(ModelPersistenceContext context)
     {
-        String storeId = (String) context.getValue(ModelPersistenceContext.REPO_STOREID);
-        String key = new StringBuilder(128).append(storeId).append(':').append(getId()).toString();
+        String storeId = (String)context.getValue(ModelPersistenceContext.REPO_STOREID);
+        String key = new StringBuilder(100).append(storeId).append(':').append(getId()).toString();
         
         ModelObjectCache cache = objectCaches.get(key);
         if (cache == null)

@@ -51,17 +51,9 @@ public final class ModelPersistenceContext
 {
     public static String REPO_STOREID = "REPO_STOREID";
     
-    private String userId;
-    private Map<String, Object> values = new HashMap<String, Object>(4, 1.0f);
+    private final String userId;
+    private final Map<String, Object> values = new HashMap<String, Object>(4, 1.0f);
     
-    
-    /**
-     * Instantiates a new persister context
-     *
-     */
-    public ModelPersistenceContext()
-    {
-    }
     
     /**
      * Instantiates a new persister context.

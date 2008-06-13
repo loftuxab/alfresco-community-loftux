@@ -63,7 +63,7 @@ public class Component extends AbstractModelObject
     public Component(ModelObjectKey key, Document document)
     {
         super(key, document);
-    }    
+    }
 
     /**
      * Gets the region id.

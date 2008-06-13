@@ -26,24 +26,22 @@ package org.alfresco.connector;
 
 /**
  * Describes bound-context for a given user.
- * 
+ * <p>
  * Bound context includes Credentials and Connector session information.
- * 
+ * <p>
  * Credentials may or may not be bound to a CredentialVault.
  * ConnectorSessions may or may not be bound to an Http Session.
+ * <p>
+ * This class is immutable.
  * 
  * @author muzquiano
+ * @author kevinr
  */
-public class UserContext
+public final class UserContext
 {
-    protected String userId;
-    protected Credentials credentials;
-    protected ConnectorSession connectorSession;
-    
-    public UserContext(String userId)
-    {
-        this(userId, null, null);
-    }
+    private final String userId;
+    private final Credentials credentials;
+    private final ConnectorSession connectorSession;
     
     public UserContext(String userId, Credentials credentials, ConnectorSession connectorSession)
     {
@@ -57,28 +55,13 @@ public class UserContext
         return this.userId;
     }
     
-    public void setUserId(String userId)
-    {
-        this.userId = userId;
-    }
-    
     public Credentials getCredentials()
     {
         return this.credentials;
     }
     
-    public void setCredentials(Credentials credentials)
-    {
-        this.credentials = credentials;
-    }
-    
     public ConnectorSession getConnectorSession()
     {
         return this.connectorSession;
-    }
-    
-    public void setConnectorSession(ConnectorSession connectorSession)
-    {
-        this.connectorSession = connectorSession;
     }
 }

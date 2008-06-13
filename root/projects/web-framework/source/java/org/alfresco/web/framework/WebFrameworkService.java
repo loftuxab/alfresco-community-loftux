@@ -25,6 +25,7 @@
 package org.alfresco.web.framework;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.alfresco.config.Config;
@@ -129,18 +130,6 @@ public class WebFrameworkService
         
         initPersisters();
     }
-
-    /**
-     * Returns an object manager instance which has no bindings to
-     * persister context.
-     * 
-     * @return object manager
-     */
-    public ModelObjectManager getObjectManager()
-        throws WebFrameworkServiceException
-    {
-        return getObjectManager(new ModelPersistenceContext());
-    }
     
     /**
      * Returns an object manager instance which has been bound to the
@@ -174,7 +163,7 @@ public class WebFrameworkService
      * 
      * @return the object service
      */
-    public ModelObjectManager getObjectService(String userId, String repositoryStoreId)
+    public ModelObjectManager getObjectManager(String userId, String repositoryStoreId)
         throws WebFrameworkServiceException
     {
         ModelPersistenceContext context = new ModelPersistenceContext(userId);
@@ -282,7 +271,7 @@ public class WebFrameworkService
             }
             
             // create persisters for each store into a map keyed by store base path
-            Map<String, ModelObjectPersister> persisters = new HashMap<String, ModelObjectPersister>(16, 1.0f);
+            Map<String, ModelObjectPersister> persisters = new LinkedHashMap<String, ModelObjectPersister>(4, 1.0f);
             for (Store store : searchPath.getStores())
             {
                 ModelObjectPersister persister = null;

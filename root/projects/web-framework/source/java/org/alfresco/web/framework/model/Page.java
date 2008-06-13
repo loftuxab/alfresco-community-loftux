@@ -70,15 +70,6 @@ public class Page extends AbstractModelObject
         }
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "Page Instance: " + getId() + ", " + toXML();
-    }
-
     /**
      * Gets the template id.
      * 

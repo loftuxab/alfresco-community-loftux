@@ -48,7 +48,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
 /**
  * The ConnectorService acts as a singleton that can be used to
  * build any of the objects utilized by the Connector layer.
- * 
+ * <p>
  * This class is mounted as a Spring Bean within the
  * Web Script Framework so that developers can access it from the
  * application context.
@@ -60,21 +60,15 @@ public class ConnectorService implements ApplicationListener
     private static final String PREFIX_CONNECTOR_SESSION = "_alfwsf_consession_";
     
     private static Log logger = LogFactory.getLog(ConnectorService.class);
-    private static HashMap<String, CredentialVault> credentialVaultCache = null;
-    private static HashMap<String, Authenticator> authenticatorCache = null;
+    private final static HashMap<String, CredentialVault> credentialVaultCache =
+        new HashMap<String, CredentialVault>(48, 1.0f);
+    private final static HashMap<String, Authenticator> authenticatorCache =
+        new HashMap<String, Authenticator>(8, 1.0f);
     protected static ConnectorService connectorService = null;
     
     private ConfigService configService;
     private RemoteConfigElement remoteConfig;
 
-    /**
-     * Instantiates a new connector service.
-     */
-    public ConnectorService()
-    {
-        credentialVaultCache = new HashMap<String, CredentialVault>(48, 1.0f);
-        authenticatorCache = new HashMap<String, Authenticator>(8, 1.0f);
-    }
     
     /**
      * Sets the config service.
@@ -166,20 +160,18 @@ public class ConnectorService implements ApplicationListener
         throws RemoteConfigException
     {
         UserContext userContext = null;
-        if(userId != null && session != null)
-        {
-            userContext = new UserContext(userId);
         
+        if (userId != null && session != null)
+        {
             // set credentials
             Credentials credentials = this.getCredentialVault(userId).retrieve(endpointId);
-            userContext.setCredentials(credentials);
             
             // set connector session
             ConnectorSession connectorSession = this.getConnectorSession(session, endpointId);
-            userContext.setConnectorSession(connectorSession);
+            
+            userContext = new UserContext(userId, credentials, connectorSession);
         }
         
-        // return the connector
         return getConnector(endpointId, userContext);
     }
 
@@ -210,7 +202,7 @@ public class ConnectorService implements ApplicationListener
         }
 
         // load the connector
-        String connectorId = (String) endpointDescriptor.getConnectorId();
+        String connectorId = (String)endpointDescriptor.getConnectorId();
         if (connectorId == null)
         {
             throw new RemoteConfigException(

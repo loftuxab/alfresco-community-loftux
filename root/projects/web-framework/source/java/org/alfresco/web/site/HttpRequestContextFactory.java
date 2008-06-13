@@ -143,17 +143,16 @@ public class HttpRequestContextFactory implements RequestContextFactory
         
         ModelPersistenceContext mpc = new ModelPersistenceContext(userId);
         
-        // see if we can determine a store id that is being virtualized
-        String repositoryStoreId = null; // TODO
+        // TODO: see if we can determine a store id that is being virtualized
+        /*String repositoryStoreId = null;
         if (repositoryStoreId == null)
         {
-            // TODO: This is just for testing
             repositoryStoreId = (String) request.getParameter("storeId");
         }
         if (repositoryStoreId != null)
         {
             mpc.putValue(ModelPersistenceContext.REPO_STOREID, repositoryStoreId);
-        }
+        }*/
         
         // retrieve the model object service which is scoped to this user
         // and this persistence context

@@ -50,15 +50,6 @@ public class TemplateType extends AbstractModelObject
         super(key, document);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "TemplateType Instance: " + getId() + ", " + toXML();
-    }
-
     /**
      * Gets the uRI.
      * 

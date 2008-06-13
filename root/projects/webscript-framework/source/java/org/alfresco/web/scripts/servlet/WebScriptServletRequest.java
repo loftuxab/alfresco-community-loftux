@@ -382,4 +382,12 @@ public class WebScriptServletRequest extends WebScriptRequestImpl
         return Boolean.valueOf(forceSuccess);
     }
 
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return getURL();
+    }
 }

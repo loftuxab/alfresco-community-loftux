@@ -31,6 +31,7 @@ import java.util.Map;
 import org.alfresco.tools.XMLUtil;
 import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.framework.cache.ModelObjectCache;
+import org.alfresco.web.framework.cache.ModelObjectCache.ModelObjectSentinel;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.scripts.Store;
 import org.alfresco.web.site.FrameworkHelper;
@@ -57,10 +58,10 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
 {
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
     
-    protected long delay;
+    protected final long delay;
     protected String id;
-    protected Store store;
-    protected Map<String, ModelObjectCache> objectCaches;
+    protected final Store store;
+    protected final Map<String, ModelObjectCache> objectCaches;
 
 
     /**
@@ -119,40 +120,55 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
             
             try
             {
-                // parse to Document
-                Document document = XMLUtil.parse(store.getDocument(path));
-
-                if (logger.isDebugEnabled())
-                    logger.debug("Parsed document: " + document);
-                
-                String persisterId = this.getId();
-                String storagePath = path;
-                String id = pathToId(storagePath);
-                if (id != null)
-                {                
-                    ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, id, true);                
-                    String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
-                    obj = (ModelObject) ReflectionHelper.newObject(
-                            implClassName, new Class[] { ModelObjectKey.class, Document.class },
-                            new Object[] { key, document });
+                // check to see if the requested object is present in the store
+                if (store.hasDocument(path))
+                {
+                    // parse XML to a Document DOM
+                    Document document = XMLUtil.parse(store.getDocument(path));
                     
-                    if (obj != null)
-                    {
-                        obj.touch();
+                    if (logger.isDebugEnabled())
+                        logger.debug("Parsed document: " + document);
+                    
+                    String persisterId = this.getId();
+                    String storagePath = path;
+                    String id = pathToId(storagePath);
+                    if (id != null)
+                    {                
+                        ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, id, true);                
+                        String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
+                        obj = (ModelObject) ReflectionHelper.newObject(
+                                implClassName, new Class[] { ModelObjectKey.class, Document.class },
+                                new Object[] { key, document });
                         
-                        // CACHE: put the object into the cache
-                        cachePut(context, path, obj);
+                        // if found, place the object into the cache
+                        if (obj != null)
+                        {
+                            obj.touch();
+                            
+                            cachePut(context, path, obj);
+                        }
+                        else
+                        {
+                            throw new ModelObjectPersisterException("Unable to create object of type '" + implClassName + "' via reflection");
+                        }
                     }
-                    else
-                    {
-                        throw new ModelObjectPersisterException("Unable to create object of type '" + implClassName + "' via reflection");
-                    }
+                }
+                else    
+                {
+                    // document does not exist - add sentinel object, this will timeout like other cached values
+                    cachePut(context, path, ModelObjectSentinel.getInstance());
                 }
             }
             catch (Exception ex)
             {
-                throw new ModelObjectPersisterException("Unable to load model object for path: " + path, ex);
+                throw new ModelObjectPersisterException("Failure to load model object for path: " + path, ex);
             }
+        }
+        
+        // handle cached sentinel case - we return null but the cache keeps the sentinel object reference
+        if (obj == ModelObjectSentinel.getInstance())
+        {
+            obj = null;
         }
         
         return obj;
@@ -454,9 +470,9 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     protected ModelObject cacheGet(ModelPersistenceContext context, String path)
     {
         ModelObject obj = getCache(context).get(path);
-        if(logger.isDebugEnabled())
+        if (logger.isDebugEnabled())
         {
-            if(obj != null)
+            if (obj != null)
             {
                 logger.debug("Cache hit: " + path);
             }
@@ -507,5 +523,11 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
             logger.debug("Remove from cache: " + path);
         
         getCache(context).remove(path);
+    }
+
+    @Override
+    public String toString()
+    {
+        return this.id;
     }
 }
