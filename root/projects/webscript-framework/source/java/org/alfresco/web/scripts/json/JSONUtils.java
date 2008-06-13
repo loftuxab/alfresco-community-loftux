@@ -27,8 +27,10 @@ package org.alfresco.web.scripts.json;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.json.JSONException;
 import org.json.JSONStringer;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.IdScriptableObject;
 import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeJavaObject;
 import org.mozilla.javascript.NativeObject;
 
 /**
@@ -187,6 +189,11 @@ public class JSONUtils
                     .key("milliseconds").value(milliSeconds)
                 .endObject();
             
+        }
+        else if (value instanceof NativeJavaObject)
+        {
+            Object javaValue = Context.jsToJava(value, Object.class);
+            json.value(javaValue);
         }
         else if (value instanceof NativeArray)
         {

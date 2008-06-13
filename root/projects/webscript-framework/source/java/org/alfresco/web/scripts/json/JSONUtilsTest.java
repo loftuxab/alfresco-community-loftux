@@ -96,6 +96,15 @@ public class JSONUtilsTest extends TestCase
         assertEquals(true, arr.getBoolean(3));
         assertEquals("hello", arr.getJSONObject(4).getString("hello"));
         assertEquals(123, arr.getJSONObject(4).getInt("goodbye"));
+        
+        JSONObject testObject = new JSONObject();
+        testObject.put("string", "myString");
+        model.put("json", testObject);        
+        
+        result = executeScript(SCRIPT_4, model, true);
+        value = Context.toString(result);
+        
+        System.out.println(value);
     }
     
     private Object executeScript(String script, Map<String, Object> model, boolean secure)
@@ -172,5 +181,9 @@ public class JSONUtilsTest extends TestCase
         "array[3] = true;" +
         "array[4] = myObject;" +
         "jsonUtils.toJSONString(array);";
+    private static final String SCRIPT_4 =
+        "var obj = new Object();" +
+        "obj.value = json.getString(\"string\");" +
+        "jsonUtils.toJSONString(obj);";
     
 }
