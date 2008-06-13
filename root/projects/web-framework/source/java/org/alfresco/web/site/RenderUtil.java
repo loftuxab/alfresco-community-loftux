@@ -214,53 +214,50 @@ public final class RenderUtil
         // any associated behaviour logic is executed only once, with the result stored for the 2nd pass.
         // The critical performance path is in executing the WebScript components - which is only
         // performed during the second pass of the template - once component references are all resolved.
-        if (template.getRenderingComponents() == null)
+        try
         {
-            try
-            {
-                if (Timer.isTimerEnabled())
-                    Timer.start(request, "PreRenderTemplate-" + templateId);
-
-                // Wrap the request and response
-                // Output to a dummy writer as we don't want to keep the result.
-                WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
-                FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(true);
-
-                // bind the rendering to this template
-                RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
-
-                // set the context into "passive" mode
-                context.setValue(PASSIVE_MODE_MARKER, Boolean.TRUE);
-
-                // get the renderer and execute it
-                Renderable renderer = RendererFactory.newRenderer(context, template);
-                renderer.execute(rendererContext);
-            }
-            catch (Exception ex)
-            {
-                throw new TemplateRenderException(
-                        "An exception occurred while pre-rendering template: " + templateId,
-                        ex);
-            }
-            finally
-            {
-                // switch out of passive mode
-                context.removeValue(PASSIVE_MODE_MARKER);
-
-                // unbind the rendering context
-                RendererContextHelper.unbind(context);
-
-                if (Timer.isTimerEnabled())
-                    Timer.stop(request, "PreRenderTemplate-" + templateId);
-            }
+            if (Timer.isTimerEnabled())
+                Timer.start(request, "PreRenderTemplate-" + templateId);
+            
+            // Wrap the request and response
+            // Output to a dummy writer as we don't want to keep the result.
+            WrappedHttpServletRequest wrappedRequest = new WrappedHttpServletRequest(request);
+            FakeHttpServletResponse fakeResponse = new FakeHttpServletResponse(true);
+            
+            // bind the rendering to this template
+            RendererContext rendererContext = RendererContextHelper.bind(context, template, wrappedRequest, fakeResponse);
+            
+            // set the context into "passive" mode
+            context.setValue(PASSIVE_MODE_MARKER, Boolean.TRUE);
+            
+            // get the renderer and execute it
+            Renderable renderer = RendererFactory.newRenderer(context, template);
+            renderer.execute(rendererContext);
         }
-
+        catch (Exception ex)
+        {
+            throw new TemplateRenderException(
+                    "An exception occurred while pre-rendering template: " + templateId,
+                    ex);
+        }
+        finally
+        {
+            // switch out of passive mode
+            context.removeValue(PASSIVE_MODE_MARKER);
+            
+            // unbind the rendering context
+            RendererContextHelper.unbind(context);
+            
+            if (Timer.isTimerEnabled())
+                Timer.stop(request, "PreRenderTemplate-" + templateId);
+        }
+        
         // Second pass - render and process to output stream
         try
         {
             // bind the rendering to this template
             RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
-
+            
             // get the renderer and execute it
             Renderable renderer = RendererFactory.newRenderer(context, template);
             renderer.execute(rendererContext);
@@ -275,7 +272,7 @@ public final class RenderUtil
         {
             // unbind the rendering context
             RendererContextHelper.unbind(context);
-
+            
             if (Timer.isTimerEnabled())
                 Timer.stop(request, "RenderTemplate-" + templateId);
         }
@@ -332,7 +329,7 @@ public final class RenderUtil
         {
             // bind the rendering to this template
             RendererContext rendererContext = RendererContextHelper.bind(context, template, request, response);
-
+            
             // regions have to set by hand (not auto populated)
             String regionSourceId = getSourceId(context, regionScopeId);
             rendererContext.put(WebFrameworkConstants.RENDER_DATA_REGION_ID, regionId);
@@ -363,16 +360,16 @@ public final class RenderUtil
                 boolean passiveMode = context.hasValue(PASSIVE_MODE_MARKER);
                 if (passiveMode)
                 {
-                    // we don't render the component, we just inform the current
-                    // template what our component is
-                    template.setRenderingComponent(component);
+                    // we don't render the component, we just inform the current context
+                    // what our component is
+                    rendererContext.setRenderingComponent(component);
                 }
                 else
                 {
                     // merge in component to render data
                     RendererContext compRenderData = RendererContextHelper.generate(context, component);
                     rendererContext.putAll(compRenderData);
-
+                    
                     // execute renderer
                     RenderUtil.executeRenderer(context, request, response, descriptor);
                 }
@@ -1141,7 +1138,7 @@ public final class RenderUtil
                 Component component = null;
                 try
                 {
-                    Component[] components = template.getRenderingComponents();
+                    Component[] components = rendererContext.getRenderingComponents();
                     if (components != null)
                     {
                         for (int i = 0; i < components.length; i++)

@@ -24,9 +24,6 @@
  */
 package org.alfresco.web.framework.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.alfresco.web.framework.AbstractModelObject;
 import org.alfresco.web.framework.ModelObjectKey;
 import org.alfresco.web.site.RequestContext;
@@ -41,8 +38,6 @@ public class TemplateInstance extends AbstractModelObject
 {
     public static String TYPE_ID = "template-instance";
     public static String PROP_TEMPLATE_TYPE = "template-type";
-    
-    protected Map<String, Component> components = new HashMap<String, Component>(16, 1.0f);
     
     /**
      * Instantiates a new template instance for a given XML document
@@ -93,45 +88,5 @@ public class TemplateInstance extends AbstractModelObject
     public String getTypeId() 
     {
         return TYPE_ID;
-    }
-    
-    /**
-     * Returns the components that were bound to this template during the
-     * template rendering.  This is useful to determine what other components
-     * are configured on the current page.
-     * 
-     * If no rendering components are set, null will be returned
-     * 
-     * @return  An array of Component objects
-     */
-    public Component[] getRenderingComponents()
-    {
-        if (this.components.size() == 0)
-        {
-            return null;
-        }
-        else
-        {
-            return this.components.values().toArray(new Component[this.components.size()]);
-        }
-    }
-    
-    /**
-     * Indicates that the given component is being rendered as part of
-     * the rendering execution for this Template Instance object
-     *  
-     * @param component The component that is being rendered
-     */
-    public void setRenderingComponent(Component component)
-    {
-        this.components.put(component.getId(), component);        
-    }
-    
-    /**
-     * Resets the rendering components
-     */
-    public void resetRenderingComponents()
-    {
-        this.components.clear();
     }
 }

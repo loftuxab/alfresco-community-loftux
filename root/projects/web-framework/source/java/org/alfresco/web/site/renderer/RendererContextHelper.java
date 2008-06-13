@@ -40,31 +40,31 @@ import org.alfresco.web.site.WebFrameworkConstants;
 
 /**
  * Provides stack management for renderer context objects.
- * 
+ * <p>
  * A rendering context is manufactured for each execution of a rendering
  * engine.  These rendering contexts are stored in a stack that is bound
  * to the current request context.  Thus, executing thread will have its
  * own private rendering stack.
- * 
+ * <p>
  * Each stack may contain one or more layered rendering contexts.
- * 
+ * <p>
  * When a template begins to execute, a rendering context is pushed onto the
  * stack for the given request context.  This rendering context is used
  * while working the present template.  The context is consulted to retrieve
  * execution context which includes the current object, custom properties,
  * access to request information and more.
- * 
+ * <p>
  * When the template then discovers a component to execute, a new renderer
  * context is manufactured and pushed onto the stack.  This then becomes the
  * current renderer context.
- * 
+ * <p>
  * The context is available for the full execution of the component.  When
  * the component finishes running, the context is popped off the stack and
  * the template context is restored.
  * 
  * @author muzquiano
  */
-public class RendererContextHelper
+public final class RendererContextHelper
 {
     /**
      * Push.
@@ -250,7 +250,7 @@ public class RendererContextHelper
      * 
      * @return the renderer context
      */
-    protected static RendererContext generate(RequestContext context, Page page)
+    private static RendererContext generate(RequestContext context, Page page)
     {
         RendererContext rendererContext = new RendererContext(context, page);
                 
@@ -274,7 +274,7 @@ public class RendererContextHelper
      * 
      * @return the renderer context
      */
-    protected static RendererContext generate(RequestContext context, TemplateInstance template)
+    private static RendererContext generate(RequestContext context, TemplateInstance template)
     {
         RendererContext rendererContext = new RendererContext(context, template);
         
@@ -297,7 +297,7 @@ public class RendererContextHelper
      * 
      * @return the renderer context
      */
-    protected static RendererContext generate(RequestContext context, Component component)
+    private static RendererContext generate(RequestContext context, Component component)
     {
         RendererContext rendererContext = new RendererContext(context, component);
         
