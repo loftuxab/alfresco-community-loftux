@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
-   <scope>template</scope>
+   <scope>page</scope>
    <region-id>title</region-id>
    <source-id>user-dashboard</source-id>
    <url>/components/title/user-dashboard-title</url>
