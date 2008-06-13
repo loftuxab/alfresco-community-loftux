@@ -98,6 +98,10 @@ public abstract class AbstractModelObject implements ModelObject
             }
         }        
     }
+    
+    protected AbstractModelObject()
+    {
+    }
 
     public ModelObjectKey getKey()
     {
@@ -541,7 +545,7 @@ public abstract class AbstractModelObject implements ModelObject
     @Override
     public String toString()
     {
-        return this.document.toString();
+        return getTypeId() + ": " + getId() + ", " + toXML();
     }
     
     /**

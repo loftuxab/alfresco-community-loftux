@@ -50,15 +50,6 @@ public class ComponentType extends AbstractModelObject
         super(key, document);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "ComponentType Instance: " + getId() + ", " + toXML();
-    }
-
     /**
      * Gets the uRI.
      * 
@@ -126,5 +117,4 @@ public class ComponentType extends AbstractModelObject
     {
         return TYPE_ID;
     }
-    
 }

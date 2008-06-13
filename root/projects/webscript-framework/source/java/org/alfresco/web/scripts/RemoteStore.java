@@ -31,30 +31,35 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.connector.RemoteClient;
+import org.alfresco.connector.Connector;
+import org.alfresco.connector.ConnectorService;
 import org.alfresco.connector.Response;
+import org.alfresco.connector.exception.RemoteConfigException;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.util.URLEncoder;
 
 import freemarker.cache.TemplateLoader;
 
 /**
+ * Store implementation that queries and retrieves documents from a remote HTTP endpoint.
+ * <p>
+ * The endpoint is assumed to support a WebScript Remote Store implementation (such as
+ * AVMRemoteStore) that mirrors the required Store API. 
+ * 
  * @author Kevin Roast
  */
 public class RemoteStore implements Store
 {
+    private ConnectorService connectorService;
     private String defaultRepositoryStoreId;
+    private String api;
     private String path;
     private String endpoint;
-    private RemoteClient remote;
     
-    private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();    
+    private ThreadLocal<String> repositoryStoreId = new ThreadLocal<String>();
     
     /**
-     * Binds this instance to the given repository store id for the 
-     * current thread
-     * 
-     * @param repositoryStoreId
+     * Binds this instance to the given repository store id for the current thread
      */
     public void bindRepositoryStoreId(String repositoryStoreId)
     {
@@ -62,33 +67,36 @@ public class RemoteStore implements Store
     }
 
     /**
-     * Unbinds this instance from any repository store for the 
-     * current thread
-     *
+     * Unbinds this instance from any thread local values
      */
-    public void unbindRepositoryStoreId()
+    public void unbind()
     {
         this.repositoryStoreId.remove();
     }
 
     /**
-     * Gets the repostiry store id currently bound to this instance 
-     * for the current thread
-     * 
-     * @return
+     * @return repository store id currently bound to this instance for the current thread
      */
     public String getRepositoryStoreId()
     {
-        String storeId = defaultRepositoryStoreId;
-        if(storeId == null)
+        String storeId = this.repositoryStoreId.get();
+        if (storeId == null)
         {
-            storeId = this.repositoryStoreId.get();
+            storeId = this.defaultRepositoryStoreId;
         }
         return storeId;
     }
     
     /**
-     * @param path      the relative path to set
+     * @param api       the WebScript API path to set for the remote store i.e. "/remotestore"
+     */
+    public void setApi(String api)
+    {
+        this.api = api;
+    }
+    
+    /**
+     * @param path      the path prefix to set for the remote store i.e. "/site-data/components"
      */
     public void setPath(String path)
     {
@@ -96,16 +104,27 @@ public class RemoteStore implements Store
     }
     
     /**
-     * @param endpoint  the endpoint to set
+     * @param endpoint  the endpoint ID to use when calling the remote API
      */
     public void setEndpoint(String endpoint)
     {
         this.endpoint = endpoint;
     }
     
+    /**
+     * @param repoStoreId   the default repostory store ID to use - overriden by thread local setting
+     */
     public void setDefaultRepositoryStoreId(String repoStoreId)
     {
         this.defaultRepositoryStoreId = repoStoreId;
+    }
+    
+    /**
+     * @param service   The ConnectorService bean
+     */
+    public void setConnectorService(ConnectorService service)
+    {
+        this.connectorService = service;
     }
 
 
@@ -114,7 +133,22 @@ public class RemoteStore implements Store
      */
     public void init()
     {
-        this.remote = new RemoteClient(this.endpoint);
+        if (this.connectorService == null)
+        {
+            throw new IllegalArgumentException("ConnectorService reference is mandatory for RemoteStore.");
+        }
+        if (this.endpoint == null || this.endpoint.length() == 0)
+        {
+            throw new IllegalArgumentException("Endpoint ID is mandatory for RemoteStore.");
+        }
+        if (this.api == null || this.api.length() == 0)
+        {
+            throw new IllegalArgumentException("API name is mandatory for RemoteStore.");
+        }
+        if (this.path == null)
+        {
+            throw new IllegalArgumentException("Path prefix is mandatory for RemoteStore.");
+        }
     }
     
     /* (non-Javadoc)
@@ -131,7 +165,7 @@ public class RemoteStore implements Store
     public boolean hasDocument(String documentPath)
     {
         boolean hasDocument = false;
-        Response res = this.remote.call(buildEncodeCall("has", documentPath));
+        Response res = call(buildEncodeCall("has", documentPath));
         if (HttpServletResponse.SC_OK == res.getStatus().getCode())
         {
             hasDocument = Boolean.parseBoolean(res.getResponse());
@@ -144,7 +178,7 @@ public class RemoteStore implements Store
      */
     public long lastModified(String documentPath) throws IOException
     {
-        Response res = this.remote.call(buildEncodeCall("lastmodified", documentPath));
+        Response res = call(buildEncodeCall("lastmodified", documentPath));
         if (HttpServletResponse.SC_OK == res.getStatus().getCode())
         {
             return Long.parseLong(res.getResponse());
@@ -163,7 +197,7 @@ public class RemoteStore implements Store
     public void updateDocument(String documentPath, String content) throws IOException
     {
        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
-       Response res = this.remote.call(buildEncodeCall("update", documentPath), true, in);
+       Response res = call(buildEncodeCall("update", documentPath), in);
        if (HttpServletResponse.SC_OK != res.getStatus().getCode())
        {
           throw new IOException("Unable to update document path: " + documentPath +
@@ -188,7 +222,7 @@ public class RemoteStore implements Store
     public void createDocument(String documentPath, String content) throws IOException
     {
        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
-       Response res = this.remote.call(buildEncodeCall("create", documentPath), true, in);
+       Response res = call(buildEncodeCall("create", documentPath), in);
        if (HttpServletResponse.SC_OK != res.getStatus().getCode())
        {
           throw new IOException("Unable to create document path: " + documentPath +
@@ -202,7 +236,7 @@ public class RemoteStore implements Store
      */
     public InputStream getDocument(String documentPath) throws IOException
     {
-        Response res = this.remote.call(buildEncodeCall("get", documentPath));
+        Response res = call(buildEncodeCall("get", documentPath));
         if (HttpServletResponse.SC_OK == res.getStatus().getCode())
         {
             return res.getResponseStream();
@@ -220,6 +254,7 @@ public class RemoteStore implements Store
      */
     public String[] getAllDocumentPaths()
     {
+        // TODO: implement getAllDocumentPaths()
         throw new AlfrescoRuntimeException("getAllDocumentPaths() not supported by remote store.");
     }
     
@@ -228,6 +263,7 @@ public class RemoteStore implements Store
      */
     public String[] getDocumentPaths(String path, boolean includeSubPaths, String documentPattern)
     {
+        // TODO: implement getDocumentPaths()
         throw new AlfrescoRuntimeException("getDocumentPaths() not supported by remote store.");
     }
     
@@ -236,6 +272,7 @@ public class RemoteStore implements Store
      */
     public String[] getDescriptionDocumentPaths()
     {
+        // TODO: implement getDescriptionDocumentPaths()
         throw new AlfrescoRuntimeException("getDescriptionDocumentPaths() not supported by remote store.");
     }
 
@@ -244,6 +281,7 @@ public class RemoteStore implements Store
      */
     public String[] getScriptDocumentPaths(WebScript script)
     {
+        // TODO: implement getScriptDocumentPaths()
         throw new AlfrescoRuntimeException("getScriptDocumentPaths() not supported by remote store.");
     }
 
@@ -294,6 +332,7 @@ public class RemoteStore implements Store
         
         StringBuilder buf = new StringBuilder(128);
         
+        buf.append(this.api);
         buf.append('/');
         buf.append(method);
         buf.append(this.path);
@@ -304,5 +343,31 @@ public class RemoteStore implements Store
         }
         
         return buf.toString();
+    }
+    
+    private Response call(String uri, InputStream in)
+    {
+        try
+        {
+            Connector con = this.connectorService.getConnector(this.endpoint);
+            return con.call(uri, null, in);
+        }
+        catch (RemoteConfigException re)
+        {
+            throw new AlfrescoRuntimeException("Unable to find config for remote store.", re);
+        }
+    }
+    
+    private Response call(String uri)
+    {
+        try
+        {
+            Connector con = this.connectorService.getConnector(this.endpoint);
+            return con.call(uri);
+        }
+        catch (RemoteConfigException re)
+        {
+            throw new AlfrescoRuntimeException("Unable to find config for remote store.", re);
+        }
     }
 }

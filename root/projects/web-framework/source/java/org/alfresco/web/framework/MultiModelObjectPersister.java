@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -104,14 +105,13 @@ public class MultiModelObjectPersister implements ModelObjectPersister
             }
             catch (ModelObjectPersisterException mope)
             {
-                if (logger.isDebugEnabled())
-                    logger.debug(mope);
+                throw new ModelObjectPersisterException("Error loading object id: " + objectId + " from persister id: " + persisterId, mope);
             }
             if (modelObject != null)
             {
                 if (logger.isDebugEnabled())
                     logger.debug("getObject loaded '" + objectId + "' from persister: " + persisterId); 
-
+                
                 // if we have the object, jump out
                 break;
             }

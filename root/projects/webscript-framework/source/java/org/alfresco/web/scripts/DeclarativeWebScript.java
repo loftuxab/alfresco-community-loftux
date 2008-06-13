@@ -269,4 +269,13 @@ public class DeclarativeWebScript extends AbstractWebScript
         renderTemplate(templatePath, model, writer);
     }
 
+    
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString()
+    {
+        return this.basePath;
+    }
 }

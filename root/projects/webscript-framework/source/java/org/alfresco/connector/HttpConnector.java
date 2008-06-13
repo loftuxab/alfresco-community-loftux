@@ -163,7 +163,7 @@ public class HttpConnector extends AbstractConnector
      * 
      * @param remoteClient
      */
-    private void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
+    private void applyRequestAuthentication(RemoteClient remoteClient)
     {
         // TODO: is this necessary?
         // support for basic authentication
@@ -239,7 +239,7 @@ public class HttpConnector extends AbstractConnector
         // TODO: copy parameters
         
         // stamp credentials onto the remote client
-        applyRequestAuthentication(remoteClient, context);
+        applyRequestAuthentication(remoteClient);
         
         return remoteClient;
     }

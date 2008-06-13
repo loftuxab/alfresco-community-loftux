@@ -74,7 +74,7 @@ public class RemoteClient extends AbstractClient
     
     private String defaultEncoding;
     private String ticket;
-    private String ticketName;
+    private String ticketName = "alf_ticket";
     private String requestContentType = "application/octet-stream";
     private HttpMethod requestMethod = HttpMethod.GET;
     
@@ -142,17 +142,10 @@ public class RemoteClient extends AbstractClient
     }
     
     /**
-     * Returns the authenticaiton ticket name to use
-     * 
-     * @return
+     * @return the authentication ticket name to use
      */
     public String getTicketName()
     {
-        if(this.ticketName == null)
-        {
-            // assume a default of 'alf_ticket' if not specified
-            this.ticketName = "alf_ticket"; 
-        }
         return this.ticketName;
     }
     

@@ -26,6 +26,7 @@ package org.alfresco.web.framework.cache;
 
 import java.io.IOException;
 
+import org.alfresco.web.framework.AbstractModelObject;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.scripts.Store;
 
@@ -77,21 +78,29 @@ public class ModelObjectCache extends BasicCache<ModelObject>
                 // modification time of our model object
                 // check the modification time in the store
                 item.lastChecked = now;
-                try
+                if (obj != ModelObjectSentinel.instance)
                 {
-                    if (store.lastModified(key) > obj.getModificationTime())
+                    try
                     {
-                        // the in-memory copy is stale, remove from cache
+                        if (store.lastModified(key) > obj.getModificationTime())
+                        {
+                            // the in-memory copy is stale, remove from cache
+                            remove(key);
+                            obj = null;
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        // unable to access the timestamp in the store
+                        // could be many reasons but lets assume the worst case
+                        // the file may have been deleted, so remove from the cache
                         remove(key);
                         obj = null;
                     }
                 }
-                catch (IOException ex)
+                else
                 {
-                    // unable to access the timestamp in the store
-                    // could be many reasons but lets assume the worst case
-                    // the file may have been deleted
-                    // thus, remove from cache
+                    // no point checking the store as this was a sentinel
                     remove(key);
                     obj = null;
                 }
@@ -99,5 +108,34 @@ public class ModelObjectCache extends BasicCache<ModelObject>
         }
         
         return obj;
+    }
+    
+    
+    /**
+     * Singleton sentinel class used to represent a 'null' value in the cache
+     *  
+     * @author Kevin Roast
+     */
+    public static class ModelObjectSentinel extends AbstractModelObject
+    {
+        private static ModelObjectSentinel instance = new ModelObjectSentinel();
+        
+        private ModelObjectSentinel()
+        {
+        }
+        
+        public static ModelObjectSentinel getInstance()
+        {
+            return instance;
+        }
+        
+        /* (non-Javadoc)
+         * @see org.alfresco.web.framework.AbstractModelObject#getTypeId()
+         */
+        @Override
+        public String getTypeId()
+        {
+            return "ModelObjectSentinel";
+        }
     }
 }

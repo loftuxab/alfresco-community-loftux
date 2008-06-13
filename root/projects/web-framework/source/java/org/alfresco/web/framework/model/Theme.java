@@ -50,15 +50,6 @@ public class Theme extends AbstractModelObject
     {
         super(key, document);
     }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "Theme: " + getId() + ", " + toXML();
-    }
     
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.AbstractModelObject#getTypeName()

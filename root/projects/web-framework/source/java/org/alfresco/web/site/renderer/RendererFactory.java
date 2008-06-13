@@ -38,13 +38,19 @@ import org.alfresco.web.site.exception.RendererNotFoundException;
  * Produces the appropriate renderer implementations for a given
  * model object.  The methods provided here look at the model and walk the
  * object tree to determine its type and type of renderer to use.
- * 
+ * <p>
  * In general, renderers are instantiated for Components and Templates.
  * 
  * @author muzquiano
  */
-public class RendererFactory
+public final class RendererFactory
 {
+    private static final String RENDERER_JSP = "org.alfresco.web.site.renderer.JSPRenderer";
+    
+    /** Renderers cache */
+    private final static HashMap<String, Renderable> renderers = new HashMap<String, Renderable>();
+    
+    
     /**
      * Constructs a renderer for a given component instance.
      * 
@@ -55,8 +61,8 @@ public class RendererFactory
      * 
      * @throws RendererNotFoundException 
      */
-    public static Renderable newRenderer(RequestContext context,
-            Component component) throws RendererNotFoundException
+    public static Renderable newRenderer(RequestContext context, Component component)
+        throws RendererNotFoundException
     {
         /**
          * Special Case for Web Scripts as default
@@ -66,15 +72,15 @@ public class RendererFactory
          * a short-hand way to express web script components.
          */
         String uri = component.getURL();
-        if(uri == null)
+        if (uri == null)
         {
             uri = component.getProperty("uri");
         }
-        if(uri == null)
+        if (uri == null)
         {
             uri = component.getProperty("url");
         }
-        if(uri != null && uri.length() != 0)
+        if (uri != null && uri.length() != 0)
         {
             /**
              * If it had a URI property, then we're assuming it is a
@@ -92,15 +98,14 @@ public class RendererFactory
          * value is the name/path to a web script.
          */
         String componentTypeId = component.getComponentTypeId();
-        if(componentTypeId != null)
+        if (componentTypeId != null)
         {
             ComponentType testComponentType = context.getModel().getComponentType(componentTypeId);
-            if(testComponentType == null)
+            if (testComponentType == null)
             {
                 // use a web script component
                 ComponentType componentType = context.getModel().getComponentType("webscript");
-                return _newRenderer(context, componentType.getRendererType(),
-                        componentTypeId);                
+                return _newRenderer(context, componentType.getRendererType(), componentTypeId);                
             }
         }
 
@@ -209,9 +214,8 @@ public class RendererFactory
      * 
      * @throws RendererNotFoundException
      */
-    protected static Renderable _newRenderer(RequestContext context,
-            String rendererType, String renderer)
-            throws RendererNotFoundException
+    protected static Renderable _newRenderer(RequestContext context, String rendererType, String renderer)
+        throws RendererNotFoundException
     {
         /**
          * If a renderer type is not specified, assume JSP.
@@ -220,7 +224,7 @@ public class RendererFactory
         if (rendererType == null || rendererType.length() == 0)
         {
             rendererType = WebFrameworkConstants.RENDERER_TYPE_JSP;
-            className = "org.alfresco.web.site.renderer.JSPRenderer";
+            className = RENDERER_JSP;
         }
         else
         {
@@ -231,45 +235,39 @@ public class RendererFactory
         }
 
         /**
-         * We only want to instantiate renderers once, so make sure
-         * that renderer cache is instantiated
-         */
-        if (renderers == null)
-        {
-            renderers = new HashMap<String, Renderable>();
-        }
-
-        /**
          * Check the cache to see if this renderer has already been
          * instantiated.  If not, then create a new one
          */
         String cacheKey = className + "_" + renderer;
-        Renderable r = (Renderable) renderers.get(cacheKey);
-        if (r == null)
+        Renderable r;
+        // TODO: sync on static object is BAD - find a better way to do this
+        //       maybe Threadlocal setting on Spring bean renderer instances (i.e. one per type)
+        synchronized (renderers)
         {
-            try
+            r = (Renderable)renderers.get(cacheKey);
+            if (r == null)
             {
-                r = (Renderable)Class.forName(className).newInstance();
-                
-                // setup and single time initialisation
-                r.setRenderer(renderer);
-                r.setRendererType(rendererType);
-                r.init(context.getRenderContext());
-                
-                renderers.put(cacheKey, r);
-            }
-            catch (Exception ex)
-            {
-                /**
-                 * If for whatever reason we could not instantiate, throw
-                 * back with the RendererNotFoundException
-                 */
-                throw new RendererNotFoundException(ex);
+                try
+                {
+                    r = (Renderable)Class.forName(className).newInstance();
+                    
+                    // setup and single time initialisation
+                    r.setRenderer(renderer);
+                    r.setRendererType(rendererType);
+                    r.init(context.getRenderContext());
+                    
+                    renderers.put(cacheKey, r);
+                }
+                catch (Exception ex)
+                {
+                    /**
+                     * If for whatever reason we could not instantiate, throw
+                     * back with the RendererNotFoundException
+                     */
+                    throw new RendererNotFoundException(ex);
+                }
             }
         }
         return r;
     }
-
-    /** The renderers */
-    protected static HashMap<String, Renderable> renderers = null;
 }

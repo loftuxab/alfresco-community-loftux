@@ -6,8 +6,12 @@
    <!-- Abstract Store Instances -->
    <bean id="webframework.remotestore" parent="webscripts.remotestore" abstract="true" init-method="init">
       <property name="endpoint">
-         <value>http://localhost:8080/alfresco/s/remotestore</value>
+         <value>alfresco-system</value>
       </property>
+      <property name="api">
+         <value>/remotestore</value>
+      </property>
+      <property name="connectorService" ref="connector.service" />
    </bean>
    
    <bean id="webframework.localstore" class="org.alfresco.web.scripts.LocalFileSystemStore" abstract="true" init-method="init">
@@ -20,15 +24,12 @@
 
 
    <!-- Chrome -->
-   <!--
    <bean id="webframework.remotestore.chrome" parent="webframework.remotestore">
       <property name="path"><value>/site-data/chrome</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.chrome" parent="webframework.localstore">
       <property name="path"><value>/site-data/chrome</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.chrome" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/chrome</value></property>
@@ -46,15 +47,12 @@
 	
 
    <!-- Component -->
-   <!-- 
    <bean id="webframework.remotestore.component" parent="webframework.remotestore">
       <property name="path"><value>/site-data/components</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.component" parent="webframework.localstore">
       <property name="path"><value>/site-data/components</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.component" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/components</value></property>
@@ -72,15 +70,12 @@
 
 
    <!-- ComponentType -->
-   <!-- 
    <bean id="webframework.remotestore.componenttype" parent="webframework.remotestore">
       <property name="path"><value>/site-data/component-types</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.componenttype" parent="webframework.localstore">
       <property name="path"><value>/site-data/component-types</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.componenttype" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/component-types</value></property>
@@ -98,15 +93,12 @@
 	  
 	  
    <!-- Configuration -->
-   <!-- 
    <bean id="webframework.remotestore.configuration" parent="webframework.remotestore">
       <property name="path"><value>/site-data/configurations</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.configuration" parent="webframework.localstore">
       <property name="path"><value>/site-data/configurations</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.configuration" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/configurations</value></property>
@@ -124,15 +116,12 @@
 
 
    <!-- Content Association -->
-   <!-- 
    <bean id="webframework.remotestore.contentassociation" parent="webframework.remotestore">
       <property name="path"><value>/site-data/content-associations</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.contentassociation" parent="webframework.localstore">
       <property name="path"><value>/site-data/content-associations</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.contentassociation" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/content-associations</value></property>
@@ -150,15 +139,12 @@
 
 
    <!-- Page -->
-   <!--
    <bean id="webframework.remotestore.page" parent="webframework.remotestore">
       <property name="path"><value>/site-data/pages</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.page" parent="webframework.localstore">
       <property name="path"><value>/site-data/pages</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.page" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/pages</value></property>
@@ -176,15 +162,12 @@
 
 
    <!-- Page Association -->
-   <!--
    <bean id="webframework.remotestore.pageassociation" parent="webframework.remotestore">
       <property name="path"><value>/site-data/page-associations</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.pageassociation" parent="webframework.localstore">
       <property name="path"><value>/site-data/page-associations</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.pageassociation" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/page-associations</value></property>
@@ -202,15 +185,12 @@
 
 
    <!-- Page Type -->
-   <!-- 
    <bean id="webframework.remotestore.pagetype" parent="webframework.remotestore">
       <property name="path"><value>/site-data/page-types</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.pagetype" parent="webframework.localstore">
       <property name="path"><value>/site-data/page-types</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.pagetype" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/page-types</value></property>
@@ -228,15 +208,12 @@
 
 
    <!-- Template Instance -->
-   <!--
    <bean id="webframework.remotestore.templateinstance" parent="webframework.remotestore">
       <property name="path"><value>/site-data/template-instances</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.templateinstance" parent="webframework.localstore">
       <property name="path"><value>/site-data/template-instances</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.templateinstance" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/template-instances</value></property>
@@ -254,15 +231,12 @@
 
 
    <!-- Template Type -->
-   <!--
    <bean id="webframework.remotestore.templatetype" parent="webframework.remotestore">
       <property name="path"><value>/site-data/template-types</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.templatetype" parent="webframework.localstore">
       <property name="path"><value>/site-data/template-types</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.templatetype" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/template-types</value></property>
@@ -280,15 +254,12 @@
 
 
    <!-- Theme -->
-   <!--
    <bean id="webframework.remotestore.theme" parent="webframework.remotestore">
       <property name="path"><value>/site-data/themes</value></property>
    </bean>
-   -->
    <bean id="webframework.localstore.theme" parent="webframework.localstore">
       <property name="path"><value>/site-data/themes</value></property>
    </bean>
-   
    <bean id="webframework.classpathstore.theme" parent="webframework.classpathstore">
       <property name="mustExist"><value>true</value></property>   
       <property name="classPath"><value>alfresco/site-data/themes</value></property>

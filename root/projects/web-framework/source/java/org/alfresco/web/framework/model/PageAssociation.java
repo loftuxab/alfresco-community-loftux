@@ -53,15 +53,6 @@ public class PageAssociation extends AbstractModelObject
         super(key, document);
     }
 
-    /* (non-Javadoc)
-     * @see java.lang.Object#toString()
-     */
-    @Override
-    public String toString()
-    {
-        return "Page Association: " + getId() + ", " + toXML();
-    }
-
     /**
      * Gets the source id.
      * 

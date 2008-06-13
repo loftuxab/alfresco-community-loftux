@@ -27,6 +27,7 @@ package org.alfresco.web.framework;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.framework.exception.ModelObjectManagerException;
 import org.apache.commons.logging.Log;
@@ -94,11 +95,11 @@ public final class ModelObjectManager
     static ModelObjectManager newInstance(WebFrameworkService service, ModelPersistenceContext context)
         throws ModelObjectManagerException, IllegalArgumentException
     {
-        if(service == null)
+        if (service == null)
         {
             throw new IllegalArgumentException("WebFrameworkService is null");
         }
-        if(context == null)
+        if (context == null)
         {
             throw new IllegalArgumentException("PersisterContext is null");
         }
@@ -121,19 +122,18 @@ public final class ModelObjectManager
         ModelObject obj = null;
         
         ModelObjectPersister persister = this.service.getPersister(objectTypeId);
-        if(persister != null)
+        if (persister != null)
         {
-            if(logger.isDebugEnabled())
+            if (logger.isDebugEnabled())
                 logger.debug("getObject loading: " + objectId);
             
             try
             {
                 obj = persister.getObject(this.context, objectId);
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
-                    logger.debug("Unable to retrieve object: " + objectId + " of type " + objectTypeId, mope);
+                throw new AlfrescoRuntimeException("Unable to retrieve object: " + objectId + " of type: " + objectTypeId, mope);
             }
         }
        
