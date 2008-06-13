@@ -34,6 +34,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.User;
 import org.alfresco.web.framework.ModelObject;
+import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.site.RequestContext;
 
 /**
@@ -45,15 +46,17 @@ import org.alfresco.web.site.RequestContext;
  */
 public final class RendererContext implements Serializable
 {
-    private Map<String, Serializable> map;
-    private ModelObject object;
+    private final Map<String, Serializable> map = new HashMap<String, Serializable>(8, 1.0f);
     private RequestContext context;
+    private ModelObject object;
     private HttpServletRequest request;
     private HttpServletResponse response;
-
+    
+    private Map<String, Component> components = new HashMap<String, Component>(16, 1.0f);
+    
+    
     public RendererContext(RequestContext context)
     {
-        this.map = new HashMap<String, Serializable>(8, 1.0f);
         if (context == null)
         {
             throw new IllegalArgumentException("RequestContext is mandatory.");
@@ -151,12 +154,16 @@ public final class RendererContext implements Serializable
         c.setObject(this.getObject());
         c.putAll(this);
         
+        // NOTE: we want this reference to travel with all child render context objects
+        //       it describes all components that are rendering for this and all parent context
+        c.components = this.components;
+        
         return c;
     }
 
     public void putAll(Map<String, Serializable> map)
     {
-        if(map != null)
+        if (map != null)
         {
             this.map.putAll(map);
         }
@@ -164,7 +171,7 @@ public final class RendererContext implements Serializable
 
     public void putAll(RendererContext rendererContext)
     {
-        if(rendererContext != null)
+        if (rendererContext != null)
         {
             putAll(rendererContext.map);
         }
@@ -178,6 +185,38 @@ public final class RendererContext implements Serializable
     public Map<String, Serializable> map()
     {
         return this.map;        
+    }
+    
+    /**
+     * Returns the components that were bound to this and any of its parent context
+     * during the rendering.  This is useful to determine what other components
+     * are configured on the current page.
+     * 
+     * If no rendering components are set, null will be returned
+     * 
+     * @return  An array of Component objects
+     */
+    public Component[] getRenderingComponents()
+    {
+        if (this.components.size() == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return this.components.values().toArray(new Component[this.components.size()]);
+        }
+    }
+    
+    /**
+     * Indicates that the given component is being rendered as part of
+     * the rendering execution for this and any parent rendering context.
+     *  
+     * @param component The component that is being rendered
+     */
+    public void setRenderingComponent(Component component)
+    {
+        this.components.put(component.getId(), component);        
     }
 
     @Override
