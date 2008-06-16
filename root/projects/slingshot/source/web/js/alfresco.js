@@ -832,6 +832,7 @@ Alfresco.util.Ajax = function()
          successMessage: null, // Will be displayed by Alfresco.util.displayMessage if no success handler is provided
          failureCallback: null,// Object literal representing callback upon failed operation
          failureMessage: null,  // Will be displayed by Alfresco.util.displayPrompt if no failure handler is provided
+         execScripts: false,    // Whether embedded <script> tags will be executed within the successful response
          object: null           // An object that can be passed to be used by the success or failure handlers
       },
 
@@ -901,6 +902,7 @@ Alfresco.util.Ajax = function()
        *    successMessage: {string},      // Will be displayed using Alfresco.util.displayMessage if successCallback isn't provided
        *    failureCallback: {object},     // Callback for failed request, should have the following form: {fn: failureHandler, scope: scopeForFailureHandler}
        *    failureMessage: {string},      // Will be displayed by Alfresco.util.displayPrompt if no failureCallback isn't provided
+       *    execScripts: {boolean},        // Whether embedded <script> tags will be executed within the successful response
        *    object: {object}               // An object that can be passed to be used by the success or failure handlers
        * }
        */
@@ -1024,6 +1026,45 @@ Alfresco.util.Ajax = function()
 
       /**
        * Handles successful request triggered by the request() method.
+       * If execScripts was requested, retrieve and execute the script(s).
+       * Otherwise, fall through to the _successHandlerPostExec function immediately.
+       *
+       * @method request
+       * @param serverResponse
+       * @private
+       */
+      _successHandler: function(serverResponse)
+      {
+         // Get the config that was used in the request() method
+         var config = serverResponse.argument.config;
+         
+         // Need to execute embedded "<script>" tags?
+         if (config.execScripts)
+         {
+            var scripts = [];
+            var script = null;
+            var regexp = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+            while ((script = regexp.exec(serverResponse.responseText)))
+            {
+               scripts.push(script[1]);
+            }
+            scripts = scripts.join("\n");
+
+            // Use setTimeout to execute the script. Note scope will always be "window"
+            window.setTimeout(scripts, 0);
+
+            // Delay-call the PostExec function to continue response processing after the setTimeout above
+            YAHOO.lang.later(0, this, this._successHandlerPostExec, serverResponse);
+         }
+         else
+         {
+            this._successHandlerPostExec(serverResponse);
+         }
+      },
+      
+      /**
+       * Follow-up handler after successful request triggered by the request() method.
+       * If execScripts was requested, this function continues after the scripts have been run.
        * If the responseContentType was set to json the response is decoded
        * for easy access to the success callback.
        * If no success callback is provided the successMessage is displayed
@@ -1034,7 +1075,7 @@ Alfresco.util.Ajax = function()
        * @param serverResponse
        * @private
        */
-      _successHandler: function(serverResponse)
+      _successHandlerPostExec: function(serverResponse)
       {
          // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
