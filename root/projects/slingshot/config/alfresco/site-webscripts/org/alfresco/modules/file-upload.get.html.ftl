@@ -1,43 +1,4 @@
 <div id="${args.htmlid}-dialog" class="file-upload">
-   <script type="text/javascript">//<![CDATA[
-
-   /**
-    * Note!
-    *
-    * IE doesn't run scripts when this template is rendered into the Dom!
-    * So for now i18n doesn't work for the uploader in IE.
-    *
-    * A solution could be for the uploader (and all other modules that needs
-    * i18n) to first only load the messages through a call to a service similar
-    * to the one used for global messages:
-    *
-    * YAHOO.util.Get.script("http://localhost:8080/slingshot/service/messages/urlToComponent&messageScopeNameOrModuleIdOrName=id",
-    * {
-    *    onSuccess: aCallBackThatLaterLoadsTheTemplate
-    * };
-    *
-    * and then loads the gui-template from the callback to ensure all messages
-    * were loaded before the gui was displayed. Might make the popups feel too
-    * slow. If so place the i18n-script call in the FileUpload constructor instead.
-    *
-    * The loaded script would look something like this (or look up the component
-    * and use setMessages() as the script below):
-    *
-    * Alfresco.util.addMessages({"button.upload":"Upload File(s)","message.uploadStatus":"The remaining upload(s) has been cancel, at least {0} file(s) were uploaded.","label.noFiles":"No files to display. Click 'Browse' select files to upload.","header.update":"Update {0}","label.browseTip":"NOTE: You can select multiple files by using the CTRL or SHIFT key.","button.uploading":"Uploading...","header.upload":"Upload file(s)"}, "Alfresco.module.FileUpload");
-    *
-    * A 3rd solution would be to let the calling component set it.
-    *
-    * Have tried: XmlHttpRequest, GET.script, YAHOO.asyncRequest without a solution.
-    */
-
-   var uploaderComponent = Alfresco.util.ComponentManager.find({id: '${args.htmlid}'});
-   if(uploaderComponent && uploaderComponent.length > 0)
-   {
-      // The component was instantiated and registered, lets localize it
-      uploaderComponent[0].setMessages(${messages});
-   }
-   //]]></script>
-
    <div class="hd">
       <span id="${args.htmlid}-title-span"></span>
    </div>
@@ -105,3 +66,7 @@
       </div>
    </div>
 </div>
+
+<script type="text/javascript">//<![CDATA[
+Alfresco.util.addMessages(${messages}, "Alfresco.module.FileUpload");
+//]]></script>

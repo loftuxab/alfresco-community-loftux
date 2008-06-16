@@ -48,8 +48,6 @@
  */
 (function()
 {
-
-
    /**
     * FileUpload constructor.
     *
@@ -323,7 +321,7 @@
        *       
        * @method setMessages
        * @param obj {object} Object literal specifying a set of messages
-       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       * @return {Alfresco.module.FileUpload} returns 'this' for method chaining
        */
       setMessages: function FU_setMessages(obj)
       {
@@ -398,7 +396,8 @@
                   fn: this.onTemplateLoaded,
                   scope: this
                },
-               failureMessage: "Could not load file upload template"
+               failureMessage: "Could not load file upload template",
+               execScripts: true
             });
             
          }
