@@ -1,5 +1,8 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.DocListToolbar("${args.htmlid}").setMessages(
+   new Alfresco.DocListToolbar("${args.htmlid}").setOptions(
+   {
+      siteId: "${page.url.args["site"]!""}"
+   }).setMessages(
       ${messages}
    );
 //]]></script>
