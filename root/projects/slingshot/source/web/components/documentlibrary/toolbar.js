@@ -66,6 +66,22 @@
        */
       options:
       {
+         /**
+          * Current siteId.
+          * 
+          * @property siteId
+          * @type string
+          */
+         siteId: "",
+
+         /**
+          * ComponentId representing root container
+          *
+          * @property componentId
+          * @type string
+          * @default "documentLibrary"
+          */
+         componentId: "documentLibrary"
       },
       
       /**
