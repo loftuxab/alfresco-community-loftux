@@ -45,7 +45,7 @@
     }
 
     Alfresco.CalendarView.prototype =
-	{
+	 {
         /**
          * Array of the number of days in each calendar month starting with January
          *
@@ -265,7 +265,9 @@
 							break;
 						case 2: // month
 							dateBegin = DateMath.findMonthStart(this.currentDate);
-							dateEnd = DateMath.findMonthEnd(this.currentDate);
+							var monthEnd = DateMath.findMonthEnd(this.currentDate);
+							// This is to catch events that occur on the last day of the current mont
+							dateEnd = DateMath.add(monthEnd, DateMath.DAY, 1);
 							f = this.refreshMonth;
 							break;
 					}
