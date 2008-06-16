@@ -15,6 +15,7 @@
       <div class="yui-t1" id="divDocLibraryWrapper">
          <div id="yui-main">
             <div class="yui-b" id="divDocLibraryDocs">
+               <@region id="toolbar" scope="template" protected=true />
                <@region id="documentlist" scope="template" protected=true />
             </div>
          </div>

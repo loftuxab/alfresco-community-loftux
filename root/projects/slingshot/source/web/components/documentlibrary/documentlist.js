@@ -205,15 +205,15 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       onReady: function DL_onReady()
       {
          var Dom = YAHOO.util.Dom,
-            Event = YAHOO.util.Event
-            Element = YAHOO.util.Element
+            Event = YAHOO.util.Event,
+            Element = YAHOO.util.Element,
             History = YAHOO.util.History;
 
          // Reference to self used by inline functions
          var me = this;
          
          // Decoupled event listeners
-         YAHOO.Bubbling.on("onDoclistPathChanged", this.onDoclistPathChanged, this);
+         YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
          YAHOO.Bubbling.on("onDoclistRefresh", this.onDoclistRefresh, this);
       
          // YUI History
@@ -246,19 +246,6 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             Alfresco.logger.debug("DocList_onReady: Couldn't initialize HistoryManager.", e.toString());
          }
          
-         // New Folder button
-         this.widgets.newFolder = Alfresco.util.createYUIButton(this, "newFolder-button", this.onNewFolder);
-         
-         // File Upload button
-         this.widgets.fileUpload = Alfresco.util.createYUIButton(this, "fileUpload-button", this.onFileUpload);
-
-         // Selected Items menu button
-         this.widgets.selectedItems = Alfresco.util.createYUIButton(this, "selectedItems-button", this.onSelectedItems,
-         {
-            type: "menu", 
-            menu: "selectedItems-menu"
-         });
-
          // Hide/Show Folders button
          Dom.get(this.id + "-showFolders-button").innerHTML = this.options.showFolders ? this._msg("button.hide-folders") : this._msg("button.show-folders");
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
@@ -267,9 +254,6 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          Dom.get(this.id + "-detailedView-button").innerHTML = this.options.detailedView ? this._msg("button.simple-view") : this._msg("button.detailed-view");
          this.widgets.detailedView =  Alfresco.util.createYUIButton(this, "detailedView-button", this.onDetailedView);
 
-         // Folder Up Navigation button
-         this.widgets.folderUp =  Alfresco.util.createYUIButton(this, "folderUp-button", this.onFolderUp);
-         
          // File Select menu button
          this.widgets.fileSelect = Alfresco.util.createYUIButton(this, "fileSelect-button", this.onFileSelect,
          {
@@ -350,7 +334,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                {
                   var newPath = me.currentPath + "/" + oRecord.getData("name");
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
-                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
+                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
                }
                else
                {
@@ -366,7 +350,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                {
                   var newPath = me.currentPath + "/" + oRecord.getData("name");
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
-                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
+                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
                }
                else
                {
@@ -392,7 +376,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                var newPath = me.currentPath + "/" + oRecord.getData("name");
 
                // TODO: *** Update the onclick to be logically-bound, not via HTML
-               desc = '<h3><a href="" onclick="YAHOO.Bubbling.fire(\'onDoclistPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></h3>';
+               desc = '<h3><a href="" onclick="YAHOO.Bubbling.fire(\'onPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></h3>';
                if (me.options.detailedView)
                {
                   if (oRecord.getData("description").length > 0)
@@ -473,7 +457,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
          
          // Fire disconnected event, but add "ignore" flag this time, due to initialRequest above
-         YAHOO.Bubbling.fire("onDoclistPathChanged",
+         YAHOO.Bubbling.fire("onPathChanged",
          {
             doclistInitialNav: true,
             path: this.currentPath
@@ -501,6 +485,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.actions["document"] = YAHOO.util.Dom.get(this.id + "-actions-document");
          this.actions["folder"] = YAHOO.util.Dom.get(this.id + "-actions-folder");
          
+         // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
       
@@ -509,76 +494,6 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * YUI WIDGET EVENT HANDLERS
        * Handlers for standard events fired from YUI widgets, e.g. "click"
        */
-
-      /**
-       * New Folder button click handler
-       *
-       * @method onNewFolder
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
-       */
-      onNewFolder: function DL_onNewFolder(e, p_obj)
-      {
-         if (!this.modules.createFolder)
-         {
-            this.modules.createFolder = new Alfresco.module.CreateFolder(this.id + "-createFolder").setOptions(
-            {
-               siteId: this.options.siteId,
-               componentId: this.options.componentId,
-               parentPath: this.currentPath,
-               onSuccess:
-               {
-                  fn: function DL_onNewFolder_callback()
-                  {
-                     YAHOO.Bubbling.fire("onDoclistRefresh");
-                  },
-                  scope: this
-               }
-            });
-         }
-         this.modules.createFolder.show();
-      },
-
-      /**
-       * File Upload button click handler
-       *
-       * @method onFileUpload
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
-       */
-      onFileUpload: function DL_onFileUpload(e, p_obj)
-      {
-         if (this.fileUpload === null)
-         {
-            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
-         }
-         
-         // Show uploader for multiple files
-         var multiUploadConfig =
-         {
-            siteId: this.options.siteId,
-            componentId: this.options.componentId,
-            path: this.currentPath,
-            filter: [],
-            mode: this.fileUpload.MODE_MULTI_UPLOAD
-         }
-         this.fileUpload.show(multiUploadConfig);
-         YAHOO.util.Event.preventDefault(e);
-      },
-
-       /**
-        * Selected Items button click handler
-        *
-        * @method onSelectedItems
-        * @param sType {string} Event type, e.g. "click"
-        * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
-        * @param p_obj {object} Object passed back from subscribe method
-        */
-      onSelectedItems: function DL_onSelectedItems(sType, aArgs, p_obj)
-      {
-         var domEvent = aArgs[0]
-         var eventTarget = aArgs[1];
-      },
 
       /**
        * Show/Hide folders button click handler
@@ -613,30 +528,13 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       },
       
       /**
-       * Folder Up Navigate button click handler
+       * Multi-file select button click handler
        *
-       * @method onFolderUp
-       * @param e {object} DomEvent
-       * @param p_obj {object} Object passed back from addListener method
+       * @method onFileSelect
+       * @param sType {string} Event type, e.g. "click"
+       * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
+       * @param p_obj {object} Object passed back from subscribe method
        */
-      onFolderUp: function DL_onFolderUp(e, p_obj)
-      {
-         var newPath = this.currentPath.substring(0, this.currentPath.lastIndexOf("/"));
-         YAHOO.Bubbling.fire("onDoclistPathChanged",
-         {
-            path: newPath
-         });
-         YAHOO.util.Event.preventDefault(e);
-      },
-      
-       /**
-        * Multi-file select button click handler
-        *
-        * @method onFileSelect
-        * @param sType {string} Event type, e.g. "click"
-        * @param aArgs {array} Arguments array, [0] = DomEvent, [1] = EventTarget
-        * @param p_obj {object} Object passed back from subscribe method
-        */
       onFileSelect: function DL_onFileSelect(sType, aArgs, p_obj)
       {
          var domEvent = aArgs[0]
@@ -793,7 +691,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                   // Fire the notification events
                   if (record.getData("type") == "folder")
                   {
-                     YAHOO.Bubbling.fire("onDoclistFolderDeleted");
+                     YAHOO.Bubbling.fire("onFolderDeleted");
                   }
                   YAHOO.Bubbling.fire("onDoclistRefresh");
                   
@@ -830,11 +728,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       /**
        * Path Changed event handler
        *
-       * @method onDoclistPathChanged
+       * @method onPathChanged
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onDoclistPathChanged: function DL_onDoclistPathChanged(layer, args)
+      onPathChanged: function DL_onPathChanged(layer, args)
       {
          var obj = args[1];
          if (obj !== null)
@@ -879,32 +777,32 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * PRIVATE FUNCTIONS
        */
 
-        /**
-         * Gets a custom messages
-         *
-         * @method _msg
-         */
-       _msg: function DL__msg(messageId)
-       {
-          return Alfresco.util.message(messageId, "Alfresco.DocumentList");
-       },
+      /**
+       * Gets a custom messages
+       *
+       * @method _msg
+       */
+      _msg: function DL__msg(messageId)
+      {
+         return Alfresco.util.message(messageId, "Alfresco.DocumentList");
+      },
       
-        /**
-         * Resets the YUI DataTable errors to our custom messages
-         *
-         * @method _setDataTableErrors
-         */
-       _setDataTableErrors: function DL__setdataTableErrors()
-       {
-          YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
-       },
+      /**
+       * Resets the YUI DataTable errors to our custom messages
+       *
+       * @method _setDataTableErrors
+       */
+      _setDataTableErrors: function DL__setdataTableErrors()
+      {
+         YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
+      },
       
-       /**
-        * Updates document list by calling data webscript with current site and path
-        *
-        * @method _updateDocList
-        * @param path {string} Path to navigate to
-        */
+      /**
+       * Updates document list by calling data webscript with current site and path
+       *
+       * @method _updateDocList
+       * @param path {string} Path to navigate to
+       */
       _updateDocList: function DL__updateDocList(path)
       {
          Alfresco.logger.debug("DocList_updateDocList:", path);
