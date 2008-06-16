@@ -50,10 +50,10 @@
       Alfresco.util.YUILoaderHelper.require(["treeview"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
-      YAHOO.Bubbling.on("onDoclistPathChanged", this.onDoclistPathChanged, this);
-      YAHOO.Bubbling.on("onDoclistFolderRenamed", this.onDoclistFolderRenamed, this);
-      YAHOO.Bubbling.on("onDoclistFolderCreated", this.onDoclistFolderCreated, this);
-      YAHOO.Bubbling.on("onDoclistFolderDeleted", this.onDoclistFolderDeleted, this);
+      YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
+      YAHOO.Bubbling.on("onFolderRenamed", this.onFolderRenamed, this);
+      YAHOO.Bubbling.on("onFolderCreated", this.onFolderCreated, this);
+      YAHOO.Bubbling.on("onFolderDeleted", this.onFolderDeleted, this);
 
       return this;
    }
@@ -228,8 +228,8 @@
          this.isReady = true;
          if (this.initialPath !== null)
          {
-            // We missed the onDoclistPathChanged event, so fake it here
-            this.onDoclistPathChanged("onDoclistPathChanged",
+            // We missed the onPathChanged event, so fake it here
+            this.onPathChanged("onPathChanged",
             [
                null,
                {
@@ -241,11 +241,11 @@
 
       /**
        * Fired when the path has changed
-       * @method onDoclistPathChanged
+       * @method onPathChanged
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDoclistPathChanged: function DLT_onDoclistPathChanged(layer, args)
+      onPathChanged: function DLT_onPathChanged(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
@@ -298,11 +298,11 @@
       
       /**
        * Fired when a folder has been renamed
-       * @method onDoclistFolderRenamed
+       * @method onFolderRenamed
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDoclistFolderRenamed: function DLT_onDoclistFolderRenamed(layer, args)
+      onFolderRenamed: function DLT_onFolderRenamed(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
@@ -312,11 +312,11 @@
 
       /**
        * Fired when a folder has been created
-       * @method onDoclistFolderCreated
+       * @method onFolderCreated
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDoclistFolderCreated: function DLT_onDoclistFolderCreated(layer, args)
+      onFolderCreated: function DLT_onFolderCreated(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
@@ -326,11 +326,11 @@
 
       /**
        * Fired when a folder has been deleted
-       * @method onDoclistFolderDeleted
+       * @method onFolderDeleted
        * @param layer {string} the event source
        * @param args {object} arguments object
        */
-      onDoclistFolderDeleted: function DLT_onDoclistFolderDeleted(layer, args)
+      onFolderDeleted: function DLT_onFolderDeleted(layer, args)
       {
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
@@ -363,7 +363,7 @@
        */
       onNodeClicked: function DLT_onNodeClicked(node)
       {
-         YAHOO.Bubbling.fire('onDoclistPathChanged',
+         YAHOO.Bubbling.fire('onPathChanged',
          {
             path: node.data.path
          });
