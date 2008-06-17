@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.config;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
@@ -174,11 +175,11 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
     /**
      * EndPoint Descriptor class
      */
-    public static class Descriptor
+    public static class Descriptor implements Serializable
     {
         private static final String ID = "id";
 
-        HashMap<String, Object> map;
+        protected HashMap<String, Object> map = new HashMap<String, Object>();
 
         Descriptor(Element el)
         {
@@ -192,11 +193,6 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
 
         public void put(Element el)
         {
-            if(this.map == null)
-            {
-                this.map = new HashMap<String, Object>();
-            }
-
             String key = el.getName();
             Object value = (Object) el.getTextTrim();
             if(value != null)
@@ -207,11 +203,6 @@ public class RemoteConfigElement extends ConfigElementAdapter implements RemoteC
 
         public Object get(String key)
         {
-            if(this.map == null)
-            {
-                this.map = new HashMap<String, Object>();
-            }
-
             return (Object) this.map.get(key);
         }	
 

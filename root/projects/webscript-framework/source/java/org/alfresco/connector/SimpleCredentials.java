@@ -24,6 +24,7 @@
  */
 package org.alfresco.connector;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -39,10 +40,10 @@ import java.util.Iterator;
  * 
  * @author muzquiano
  */
-public class SimpleCredentials implements Credentials
+public class SimpleCredentials implements Credentials, Serializable
 {
     protected String endpointId;
-    protected HashMap<String, Object> properties;
+    protected HashMap<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Instantiates a new user credential.
@@ -52,7 +53,6 @@ public class SimpleCredentials implements Credentials
     public SimpleCredentials(String endpointId)
     {
         this.endpointId = endpointId;
-        this.properties = new HashMap<String, Object>();
     }
 
     /* (non-Javadoc)
@@ -79,7 +79,6 @@ public class SimpleCredentials implements Credentials
         this.properties.put(key, value);
     }
 
-    
     /* (non-Javadoc)
      * @see org.alfresco.connector.Credentials#removeProperty(java.lang.String)
      */
@@ -95,7 +94,6 @@ public class SimpleCredentials implements Credentials
     {
         this.properties.clear();
     }
-    
     
     /* (non-Javadoc)
      * @see org.alfresco.connector.Credentials#getPropertyKeys()

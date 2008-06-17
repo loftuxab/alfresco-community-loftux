@@ -241,12 +241,12 @@ public final class FrameworkHelper
         return userFactory;
     }
     
-    public static CredentialVault getCredentialVault(String userId)
+    public static CredentialVault getCredentialVault(HttpSession httpSession, String userId)
     {
         CredentialVault vault = null;
         try
         {
-            vault = getConnectorService().getCredentialVault(userId);
+            vault = getConnectorService().getCredentialVault(httpSession, userId);
         }
         catch(RemoteConfigException rce)
         {
@@ -254,6 +254,13 @@ public final class FrameworkHelper
         }
         
         return vault;
+    }
+    
+    public static CredentialVault getCredentialVault(RequestContext context, String userId)
+    {
+        HttpSession httpSession = ((HttpRequestContext)context).getRequest().getSession();
+        
+        return getCredentialVault(httpSession, userId);
     }
     
     public static ConnectorSession getConnectorSession(RequestContext context, String endpointId)

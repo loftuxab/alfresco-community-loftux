@@ -24,6 +24,7 @@
  */
 package org.alfresco.connector;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,22 +33,21 @@ import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
 /**
  * A simple implementation of a credential vault that does not persist anything
  * to disk or database.
- * 
- * Credentials can be stored and retrieved from this vault but they will perish
- * into lands unknown when the server is restarted.
- * 
+ * <p>
+ * Credentials can be stored and retrieved from this vault but they will be lost
+ * when the server is restarted.
+ * <p>
  * That said, this implementation will likely be very useable for any situations
  * where you wish to explicitly challenge the end user but only challenge them
- * once. If the vault is loaded as a Spring bean, it will remain active across
- * user connector sessions.
+ * once.
  * 
  * @author muzquiano
  */
-public class SimpleCredentialVault implements CredentialVault
+public class SimpleCredentialVault implements CredentialVault, Serializable
 {
-    public static Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(16, 1.0f);
-    public CredentialVaultDescriptor descriptor;
-    public String id;
+    public final Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(8, 1.0f);
+    public final CredentialVaultDescriptor descriptor;
+    public final String id;
 
     /**
      * Instantiates a new simple credential vault.
@@ -93,7 +93,6 @@ public class SimpleCredentialVault implements CredentialVault
         return (retrieve(endpointId) != null);
     }
     
-    
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#getStoredIds()
      */
@@ -101,8 +100,6 @@ public class SimpleCredentialVault implements CredentialVault
     {
         return this.credentialsMap.keySet().toArray(new String[this.credentialsMap.size()]);
     }
-    
-    
     
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#newCredentials(java.lang.String)
