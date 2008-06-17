@@ -21,11 +21,11 @@
             <!--  These should be removed -->
             <!--<value>classpath:alfresco/pagerenderer-config.xml</value>-->
             <value>classpath:alfresco/webscript-framework-config-test.xml</value>
-            <!--  End TEST dependencies -->           
+            <!--  End TEST dependencies -->
             
             <!-- Web Framework -->
             <value>classpath:alfresco/web-framework-config.xml</value>
-            <value>classpath:alfresco/web-framework-config-remote.xml</value>                      
+            <value>classpath:alfresco/web-framework-config-remote.xml</value>
             <value>classpath:alfresco/web-framework-config-application.xml</value>
             <value>classpath:alfresco/extension/web-framework-config-custom.xml</value>
             <value>jar:*!/META-INF/web-framework-config-custom.xml</value>
@@ -74,7 +74,7 @@
    <bean id="webframework.webscripts.container" parent="webscripts.abstractcontainer" class="org.alfresco.web.scripts.LocalWebScriptRuntimeContainer">
       <property name="name"><value>WebFramework</value></property>
       <property name="registry" ref="webframework.webscripts.registry" />
-      <property name="searchPath" ref="webframework.searchpath" />      
+      <property name="searchPath" ref="webframework.searchpath" />
       <property name="templateProcessor" ref="webframework.webscripts.templateprocessor" />
       <property name="scriptProcessor" ref="webframework.webscripts.scriptprocessor" />
       <property name="configService" ref="web.config" />
@@ -122,7 +122,6 @@
    </bean>
 
 
-
    <!--                             -->
    <!--  Web Script Implementations -->
    <!--                             -->
@@ -137,11 +136,9 @@
    <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false" />
 
 
-
    <!--  Web Framework Service -->
    <bean id="webframework.service" class="org.alfresco.web.framework.WebFrameworkService" init-method="init">
       <property name="configService" ref="web.config" />
    </bean>
-   
    
 </beans>

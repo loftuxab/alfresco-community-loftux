@@ -61,13 +61,14 @@ public class AlfrescoUserFactory extends UserFactory
         try
         {
             // make sure our credentials are in the vault
-            CredentialVault vault = FrameworkHelper.getCredentialVault(username);
+            CredentialVault vault = FrameworkHelper.getCredentialVault(request.getSession(), username);
             Credentials credentials = vault.newCredentials(ALFRESCO_ENDPOINT_ID);
             credentials.setProperty(Credentials.CREDENTIAL_USERNAME, username);
             credentials.setProperty(Credentials.CREDENTIAL_PASSWORD, password);
 
             // build a connector whose connector session is bound to the current session
-            AuthenticatingConnector connector = (AuthenticatingConnector) FrameworkHelper.getConnector(request.getSession(), username, ALFRESCO_ENDPOINT_ID);
+            AuthenticatingConnector connector = (AuthenticatingConnector)
+                FrameworkHelper.getConnector(request.getSession(), username, ALFRESCO_ENDPOINT_ID);
             authenticated = connector.handshake();
         }
         catch (Throwable ex)

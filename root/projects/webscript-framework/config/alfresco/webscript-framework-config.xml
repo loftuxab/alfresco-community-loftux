@@ -6,8 +6,8 @@
 		 <element-reader element-name="remote" class="org.alfresco.web.config.RemoteConfigElementReader"/>
       </element-readers>
    </plug-ins>
-   
-   
+
+
    <config evaluator="string-compare" condition="Server">
       <server>
          <!-- Enable and adjust the following settings to allow for proxied use of WebScript Framework
@@ -18,11 +18,11 @@
          -->
       </server>
    </config>
-   
-   
+
+
    <config evaluator="string-compare" condition="Remote">
 		<remote>
-		
+
 			<!-- Connector Implementations -->
 			<connector>
 				<id>http</id>
@@ -30,15 +30,15 @@
 				<description>Simple HTTP Connector</description>
 				<class>org.alfresco.connector.HttpConnector</class>
 			</connector>
-			
+
 			<connector>
 				<id>alfresco</id>
 				<name>Alfresco Connector</name>
 				<description>Connects to an Alfresco instance using ticket-based authentication</description>
 				<class>org.alfresco.connector.AlfrescoConnector</class>
-				<authenticator-id>alfresco-ticket</authenticator-id>				
+				<authenticator-id>alfresco-ticket</authenticator-id>
 			</connector>
-			
+
 			<!-- Authenticator Implementations -->
 			<authenticator>
 				<id>alfresco-ticket</id>
@@ -46,7 +46,7 @@
 				<description>Alfresco Authenticator</description>
 				<class>org.alfresco.connector.AlfrescoAuthenticator</class>
 			</authenticator>
-			
+
 			<!-- Endpoints -->
 			<endpoint>
 				<id>alfresco-system</id>
@@ -59,7 +59,7 @@
 				<password>admin</password>
 				<unsecure>true</unsecure>
 			</endpoint>
-			
+
 			<endpoint>
 				<id>alfresco</id>
 				<name>Alfresco - user access</name>
@@ -67,9 +67,8 @@
 				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://localhost:8080/alfresco/s</endpoint-url>
 				<identity>user</identity>
-				<storage>none</storage>				
 			</endpoint>
-			
+
 			<!-- Credential Vaults -->
 			<credential-vault>
 				<id>default</id>
@@ -77,14 +76,14 @@
 				<description>Implementation of simple, non-persistent credential vault</description>
 				<class>org.alfresco.connector.SimpleCredentialVault</class>
 			</credential-vault>
-			
+
 			<!-- The default endpoint -->
 			<default-endpoint-id>alfresco</default-endpoint-id>
-			
+
 			<!-- The default credential vault -->
 			<default-credential-vault-id>default</default-credential-vault-id>
 
 		</remote>
-	</config>   
+	</config>
 
 </alfresco-config>
