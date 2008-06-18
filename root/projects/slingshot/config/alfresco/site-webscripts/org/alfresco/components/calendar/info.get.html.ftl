@@ -8,7 +8,7 @@
             </div>
             <div class="yui-gd">
                <div class="yui-u first">What: *</div>
-               <div class="yui-u">${result.name!""}</div>
+               <div class="yui-u">${result.what!""}</div>
             </div>
 			<div class="yui-gd">
 				<div class="yui-u first">Where:</div>
@@ -32,7 +32,7 @@
 			</div>
 			</div>
          	<div class="yui-g">
-	            <input type="submit" id="${args.htmlid}-ok-button" value="OK" />
+	            <input type="submit" id="${args.htmlid}-edit-button" value="Edit" />
 				<input type="submit" id="${args.htmlid}-delete-button" value="Delete" />
 	        </div>
       </div>

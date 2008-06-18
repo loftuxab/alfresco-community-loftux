@@ -59,6 +59,18 @@
 		 * @type object
 		 */
 		event: null,
+		
+		/**
+         * Sets the current site for this component.
+         *
+         * @property siteId
+         * @type string
+         */
+        setSiteId: function(siteId)
+        {
+            this.siteId = siteId;
+			return this;
+        },
 
 		/**
 		 * Fired by YUILoaderHelper when required component script files have
@@ -124,7 +136,28 @@
 	      		type: "push"
 	      	});
 	
+			// Edit Button
+			var editButton = Alfresco.util.createYUIButton(this, "edit-button", this.onEditClick,
+			{
+				type: "push"
+			});
+	
 			this.panel.show(); // Display the panel
+		},
+		
+		/**
+		 * Fired when the user selects the "Edit" button.
+		 *
+		 * @method onEventClick
+		 * @param e {object} DomEvent
+		 */
+		onEditClick: function(e)
+		{
+			this.panel.hide();
+			
+			var eventDialog = new Alfresco.module.AddEvent(this.id + "-addEvent");
+			eventDialog.setSiteId(this.siteId);
+			eventDialog.show("/" + this.event.uri);
 		},
 		
 		/**
