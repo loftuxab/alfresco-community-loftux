@@ -50,7 +50,15 @@
 	    * @type Alfresco.module.AddEvent
 	    */
 		panel: null,
-
+		
+		/**
+		 * Stores the URI of the event IF an edit is happening 
+		 *
+		 * @property eventURI
+		 * @type String
+		 */
+		eventURI: null,
+		
 		/**
        * Sets the current site for this component.
        *
@@ -68,14 +76,14 @@
 		 *
 		 * @method onComponentsLoaded
 		 */
-   	componentsLoaded: function()
-      {
-         /* Shortcut for dummy instance */
-         if (this.id === null)
-         {
-            return;
-         }
-      },
+   		componentsLoaded: function()
+      	{
+         	/* Shortcut for dummy instance */
+         	if (this.id === null)
+         	{
+            	return;
+         	}
+      	},
 
 		/**
 		 * Renders the event create form. If the form has been previously rendered
@@ -84,52 +92,35 @@
 		 *
 		 * @method show
 		 */
-	   show: function()
-      {
-			if (this.panel)
+	   	show: function(uri)
+      	{
+			var args = {
+				"htmlid": this.id,
+				"site": this.siteId
+			}
+			
+			if (uri)
 			{
-				var Dom = YAHOO.util.Dom;
-				// Clear the form of any previously set values
-				var elems = [
-					this.id + "-title",
-					this.id + "-location",
-					this.id + "-description"
-				];
-				for (var i=0; i < elems.length; i++)
+				this.eventURI = uri;
+				args['uri'] = this.eventURI;
+			}
+			else 
+			{
+				this.eventURI = null; // reset
+			}
+			
+			Alfresco.util.Ajax.request(
+		    {
+		    	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
+				dataObj: args,
+				successCallback:
 				{
-					Dom.get(elems[i]).value = "";
-				}
-			     Dom.get(this.id + "-start").value = "12:00";
-			     Dom.get(this.id + "-end").value = "12:00";
-
-			     // Initialise the start and end dates to today
-			     var today = new Date();
-
-			     var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
-			     Dom.get("fd").value = dateStr;
-			     Dom.get("td").value = dateStr;
-
-			     var ansiDate = Alfresco.util.formatDate(today, "yyyy/mm/dd");
-			     Dom.get("from").value = ansiDate;
-			     Dom.get("to").value = ansiDate;
-
-			     this.panel.show();
-			}
-			else
-			{
-				Alfresco.util.Ajax.request(
-		      {
-		      	url: Alfresco.constants.URL_SERVICECONTEXT + "components/calendar/add-event",
-					dataObj: { "htmlid" : this.id, "site" : this.siteId },
-					successCallback:
-					{
-						fn: this.templateLoaded,
-						scope: this
-					},
-		        	failureMessage: "Could not load add event form"
-		      });
-			}
-      },
+					fn: this.templateLoaded,
+					scope: this
+				},
+		        failureMessage: "Could not load add event form"
+			});
+      	},
 
 		/**
 		 * Fired when the event create form has loaded successfully.
@@ -138,40 +129,52 @@
 		 * @method templateLoaded
 		 * @param response {object} DomEvent
 		 */
-      templateLoaded: function(response)
-      {
-         var div = document.createElement("div");
-         div.innerHTML = response.serverResponse.responseText;
+      	templateLoaded: function(response)
+      	{
+         	//var div = document.createElement("div");
+			var div = document.getElementById("addEventPanel");
+         	div.innerHTML = response.serverResponse.responseText;
 
-         this.panel = new YAHOO.widget.Panel(div,
-         {
-            fixedcenter: true,
-            visible: false,
-            constraintoviewport: true
-         });
+         	this.panel = new YAHOO.widget.Panel(div,
+         	{
+            	fixedcenter: true,
+            	visible: false,
+            	constraintoviewport: true
+         	});
 
 		 	this.panel.render(document.body);
 
-			// OK Button
-			var okButton = Alfresco.util.createYUIButton(this, "ok-button", this.onOKSelect,
-         {
-            type: "submit"
-         });
-
-		 	var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
-			eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-         eventForm.setShowSubmitStateDynamically(true);
-	   	eventForm.setSubmitElements(okButton);
-			eventForm.setAJAXSubmit(true,
+			if (!this.eventURI) // Create
 			{
-				successCallback:
+				// OK Button
+				var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
+	         	{
+	            	type: "submit"
+	         	});
+	
+				var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
+				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
+	         	eventForm.setShowSubmitStateDynamically(true);
+		   		eventForm.setSubmitElements(okButton);
+				eventForm.setAJAXSubmit(true,
 				{
-					fn: this.onCreateEventSuccess,
-					scope: this
-				}
-			});
-       			eventForm.init();
-
+					successCallback:
+					{
+						fn: this.onCreateEventSuccess,
+						scope: this
+					}
+				});
+	       		eventForm.init();
+			}
+			else 
+			{
+				// OK Button
+				var okButton = Alfresco.util.createYUIButton(this, "ok-button", this.onOKSelect,
+	         	{
+	            	type: "push"
+	         	});
+			}
+			
 			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
 			/**
@@ -207,6 +210,51 @@
 			// Display the panel
 			this.panel.show();
 		},
+		
+		onOKSelect: function(e)
+		{
+			if (this.eventURI)
+			{
+				// TODO: this exists in the forms runtime, currently private
+				var form = document.getElementById(this.id + "-addEvent-form");
+				if (form)
+		        {
+		        	var formData = {};
+		            var length = form.elements.length;
+		            for (var i = 0; i < length; i++)
+		            {
+		               var element = form.elements[i];
+		               var name = element.name;
+		               var value = element.value;
+		               if (name)
+		               {
+		                  formData[name] = value;
+		               }
+		            }
+		
+					// Submit PUT request 
+					Alfresco.util.Ajax.request(
+					{
+						method: Alfresco.util.Ajax.PUT,
+				      	url: Alfresco.constants.PROXY_URI + this.eventURI,
+						requestContentType: Alfresco.util.Ajax.JSON,
+						dataObj: formData,
+						successCallback:
+						{
+							fn: this.onEventUpdated,
+							scope: this
+						},
+				      	failureMessage: "Update event failed"
+				   });
+		      	}
+			}
+		},
+		
+		onEventUpdated: function(e)
+		{
+			// TODO
+			this.panel.hide();
+		},
 
 		/**
 		 * Event handler that gets fired when a user clicks on the date selection
@@ -229,7 +277,7 @@
 			// Align the Overlay to the Button instance
 			oCalendarMenu.align();
 
-   		var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
+   			var oCalendar = new YAHOO.widget.Calendar("buttoncalendar", oCalendarMenu.body.id);
 			oCalendar.render();
 
 			oCalendar.changePageEvent.subscribe(function () {
@@ -299,7 +347,8 @@
 					name: result.event.name,
 					from: result.event.from,
 					start: result.event.start,
-					end: result.event.end
+					end: result.event.end,
+					uri: result.event.uri
 				});
 			}
 	  	}

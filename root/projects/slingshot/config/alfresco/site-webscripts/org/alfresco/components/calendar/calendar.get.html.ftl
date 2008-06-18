@@ -12,6 +12,6 @@
 <div class="yui-u">
     <div id="${args.htmlid}-viewButtons" class="doclist-viewButtons"><a href="#" id="${args.htmlid}-addEvent-button">${msg("button.add-event")}</a></div>
 </div>
-
+<div id="addEventPanel"></div>
 <div id="${args.htmlid}-addEvent"></div>
 </div>
