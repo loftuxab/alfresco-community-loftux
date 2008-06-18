@@ -170,8 +170,10 @@
                 failureMessage: Alfresco.util.message("load.fail", "Alfresco.CalendarView")
             });
 
-            // Decoupled event listener
+            // Decoupled event listeners
             YAHOO.Bubbling.on("onEventSaved", this.onEventSaved, this);
+			// Listen for when an event has been deleted as view will need refreshing.
+			YAHOO.Bubbling.on("eventDeleted", this.onEventDelete, this);
         },
 
 		  /**
@@ -182,20 +184,56 @@
 			*/
         onTabSelected: function(e)
         {
-            // TODO: set this is a prototype variable
-            var funcs = [this.refreshDay, this.refreshWeek, this.refreshMonth, this.refreshAgenda];
-
             var idx = this.tabView.get('activeIndex');
-				// Record the tab that is currently selected
-				this.activeIndex = idx;
-				
-            var f = funcs[idx];
-            if (f)
-            {
-                var args = [this.currentDate];
-                f.apply(this, args);
-            }
+			// Record the tab that is currently selected
+			this.activeIndex = idx;
+			this._refreshCurrentView();
         },
+
+		_refreshCurrentView: function()
+		{
+			var funcs = [this.refreshDay, this.refreshWeek, this.refreshMonth, this.refreshAgenda];
+			
+			var idx = this.tabView.get('activeIndex');
+			var f = funcs[idx];
+			if (f)
+			{
+				var args = [this.currentDate];
+				f.apply(this, args);
+			}
+		},
+
+		/**
+		 * Gets fired when an event is deleted. Removes the event from the cached data
+		 * and refreshes the view, if necessary.
+		 * 
+		 * @method onEventDelete
+		 * @param e {object} Event fired
+		 * @param args {array} Event parameters
+		 */
+		onEventDelete: function(e, args)
+		{
+			var obj = args[1];
+			if (obj)
+			{
+				var events = this.eventData[obj.from];
+				if (events)
+				{
+					// Try and find the event that was just deleted and remove it
+					for (var i=0; i < events.length; i++)
+					{
+						var e = events[i];
+						if (e.name === obj.name)
+						{
+							// Remove it
+							events.splice(i, 1);
+							this._refreshCurrentView();
+							break;
+						}
+					}
+				}
+			}
+		},
 
         /**
          * View Refresh Required event handler.
@@ -212,72 +250,72 @@
             if (obj)
             {
             	var events = this.eventData[obj.from];
-               if (events === undefined)
-               {
-                    events = [];
+               	if (events === undefined)
+               	{
+                	events = [];
                     this.eventData[obj.from] = events;
-               }
+               	}
 
-               events.push({
+               	events.push({
                     	"name": obj.name,
-							"start": obj.start,
-							"end": obj.end
-               });
+						"start": obj.start,
+						"end": obj.end,
+						"uri": obj.uri
+               	});
 					
-					// Need to re-order on start time
-					events.sort(function(a,b)
-					{
-						var startTimeA = a.start.split(":");
-						var startTimeB = b.start.split(":");
+				// Need to re-order on start time
+				events.sort(function(a,b)
+				{
+					var startTimeA = a.start.split(":");
+					var startTimeB = b.start.split(":");
 						
-						if (startTimeA[0] < startTimeB[0] || startTimeA[1] < startTimeB[1])
-						{
-							return 0;
-						}
-						else
-						{
-							return 1;
-						}
-					});
+					if (startTimeA[0] < startTimeB[0] || startTimeA[1] < startTimeB[1])
+					{
+						return 0;
+					}
+					else
+					{
+						return 1;
+					}
+				});
 					
-               var dateStr = obj.from.split("/");
+               	var dateStr = obj.from.split("/");
 
-               var eventDate = new Date();
-               eventDate.setYear(dateStr[2]);
-               eventDate.setMonth((dateStr[0]-1));
-               eventDate.setDate(dateStr[1]);
+               	var eventDate = new Date();
+               	eventDate.setYear(dateStr[2]);
+               	eventDate.setMonth((dateStr[0]-1));
+               	eventDate.setDate(dateStr[1]);
 
- 					var DateMath = YAHOO.widget.DateMath;
-					var dateBegin, dateEnd, f;
-					// For the current view, figure out if it needs updating based on the event that was just created
-					switch (this.activeIndex)
-					{
-						case 0: // day
-							dateBegin = DateMath.getDate(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate());
-							dateEnd = DateMath.add(dateBegin, DateMath.DAY, 1);
-							f = this.refreshDay;
-							break;
-						case 1: // week
-							dateBegin = DateMath.subtract(this.currentDate, DateMath.DAY, this.currentDate.getDay());
-							dateBegin.setHours(0, 0, 0);
-							dateEnd = DateMath.add(dateBegin, DateMath.DAY, 7);
-							f = this.refreshWeek;
-							break;
-						case 2: // month
-							dateBegin = DateMath.findMonthStart(this.currentDate);
-							var monthEnd = DateMath.findMonthEnd(this.currentDate);
-							// This is to catch events that occur on the last day of the current mont
-							dateEnd = DateMath.add(monthEnd, DateMath.DAY, 1);
-							f = this.refreshMonth;
-							break;
-					}
+ 				var DateMath = YAHOO.widget.DateMath;
+				var dateBegin, dateEnd, f;
+				// For the current view, figure out if it needs updating based on the event that was just created
+				switch (this.activeIndex)
+				{
+					case 0: // day
+						dateBegin = DateMath.getDate(this.currentDate.getFullYear(), this.currentDate.getMonth(), this.currentDate.getDate());
+						dateEnd = DateMath.add(dateBegin, DateMath.DAY, 1);
+						f = this.refreshDay;
+						break;
+					case 1: // week
+						dateBegin = DateMath.subtract(this.currentDate, DateMath.DAY, this.currentDate.getDay());
+						dateBegin.setHours(0, 0, 0);
+						dateEnd = DateMath.add(dateBegin, DateMath.DAY, 7);
+						f = this.refreshWeek;
+						break;
+					case 2: // month
+						dateBegin = DateMath.findMonthStart(this.currentDate);
+						var monthEnd = DateMath.findMonthEnd(this.currentDate);
+						// This is to catch events that occur on the last day of the current mont
+						dateEnd = DateMath.add(monthEnd, DateMath.DAY, 1);
+						f = this.refreshMonth;
+						break;
+				}
 
-					if (DateMath.between(eventDate, dateBegin, dateEnd))
-					{
-						var args = [this.currentDate];
-	               f.apply(this, args);
-					}
-             
+				if (DateMath.between(eventDate, dateBegin, dateEnd))
+				{
+					var args = [this.currentDate];
+	               	f.apply(this, args);
+				}
             }
         },
 
@@ -350,10 +388,11 @@
                         {
                             for (var j=0; j < events.length; j++)
                             {
-                                var d = document.createElement('div');
-                                Dom.addClass(d, 'cal-event-entry');
-                                d.innerHTML = events[j].name;
-                                elem.appendChild(d);
+                            	var d = document.createElement('div');
+                              	Dom.addClass(d, 'cal-event-entry');
+                              	d.innerHTML = events[j].name;
+								YAHOO.util.Event.addListener(d, 'click', this.onEventClick, events[j], this);
+                              	elem.appendChild(d);
                             }
                         }
                         ++daynum;
@@ -361,6 +400,12 @@
                 }
             }
         },
+
+		onEventClick: function(e, obj)
+		{
+			var panel = new Alfresco.EventInfo(this.id + "-eventInfo");
+			panel.show(obj); // event object
+		},
 
         /*
          * Fired when the "This Month" button is clicked.

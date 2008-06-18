@@ -10,6 +10,7 @@
 //]]></script>
 
 <div id="${args.htmlid}">
+<div id="eventInfoPanel"></div>
 <div id="calendar-view" class="yui-navset">
 <ul class="yui-nav">
   <li><a href="#day"><em>${msg("label.day")}</em></a></li>
