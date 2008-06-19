@@ -154,34 +154,45 @@
             Alfresco.util.createYUIButton(this, "prev-button", this.displayPrevMonth, { type: "push" });
             Alfresco.util.createYUIButton(this, "current-button", this.displayCurrentMonth, { type: "push" });
 
-            /* Initialise the current view */
-            Alfresco.util.Ajax.request(
-				{
-                url: Alfresco.constants.PROXY_URI + "calendar/eventList",
-                dataObj:
-                {
-                    "site": this.siteId
-                },
-                successCallback:
-                    {
-                    fn: this.onDataLoad,
-                    scope: this
-                },
-                failureMessage: Alfresco.util.message("load.fail", "Alfresco.CalendarView")
-            });
+            /* Load the data */
+            this._loadData();
 
             // Decoupled event listeners
             YAHOO.Bubbling.on("onEventSaved", this.onEventSaved, this);
 			// Listen for when an event has been deleted as view will need refreshing.
 			YAHOO.Bubbling.on("eventDeleted", this.onEventDelete, this);
+			// Listen for when an event has been updated
+			YAHOO.Bubbling.on("eventUpdated", this.onEventUpdate, this);
         },
 
-		  /**
-			* Gets fired when one of the tabs is selected. Records which tab is currently selected.
-			*
-			* @method onTabSelected
-			* @param e {object} Event fired
-			*/
+		/**
+		 * Loads the most recent event data. Resets the (cached) data.
+		 *
+		 * @method _loadData
+		 */
+		_loadData: function()
+		{
+			Alfresco.util.Ajax.request({
+				url: Alfresco.constants.PROXY_URI + "calendar/eventList",
+				dataObj:
+				{
+					"site": this.siteId
+				},
+				successCallback:
+				{
+					fn: this.onDataLoad,
+					scope: this
+				},
+				failureMessage: Alfresco.util.message("load.fail", "Alfresco.CalendarView")
+			});
+		},
+
+		/**
+		 * Gets fired when one of the tabs is selected. Records which tab is currently selected.
+		 *
+		 * @method onTabSelected
+		 * @param e {object} Event fired
+		 */
         onTabSelected: function(e)
         {
             var idx = this.tabView.get('activeIndex');
@@ -202,7 +213,19 @@
 				f.apply(this, args);
 			}
 		},
-
+		
+		/**
+		 * Gets called when an event is (successfully) updated.
+		 *
+		 * @method onEventUpdate
+		 * @param e {object} Event fired
+		 * @param args {array} Event parameters
+		 */
+		onEventUpdate: function(e, args)
+		{
+			this._loadData(); // refresh the data
+		},
+		
 		/**
 		 * Gets fired when an event is deleted. Removes the event from the cached data
 		 * and refreshes the view, if necessary.
@@ -329,14 +352,12 @@
         onDataLoad: function(o)
         {
             this.eventData = YAHOO.lang.JSON.parse(o.serverResponse.responseText);
-            // Initialise the default view (month)
-            this.refreshMonth(this.currentDate);
-				// Now that the data has been loaded we can display the calendar
-	         var Dom = YAHOO.util.Dom;
-	         Dom.get('calendar-view').style.visibility = "visible";
-			
-				//this.refreshWeek(this.currentDate);
-				//this.refreshDay(this.currentDate);
+            // Initialise the current view 
+            this._refreshCurrentView();
+
+			// Now that the data has been loaded we can display the calendar
+	        var Dom = YAHOO.util.Dom;
+	        Dom.get('calendar-view').style.visibility = "visible";
 
             // Fire "onEventDataLoad" event to inform other components to refresh their view
             YAHOO.Bubbling.fire('onEventDataLoad',
@@ -355,8 +376,8 @@
          */
         refreshMonth: function(date)
         {
-				/* Set to the first day of the month */
-				var startDate = YAHOO.widget.DateMath.findMonthStart(date);
+			/* Set to the first day of the month */
+			var startDate = YAHOO.widget.DateMath.findMonthStart(date);
             var startDay = startDate.getDay();
 
             var Dom = YAHOO.util.Dom;
@@ -472,6 +493,21 @@
 
             var startDate = DateMath.subtract(date, DateMath.DAY, date.getDay());
 
+			// Clear any previous events
+			var container = document.getElementById("week-view");
+			if (container)
+			{
+				var elems = this._getWeekViewEvents(container, "cal-event-entry");
+				if (elems)
+				{	
+					for (var i=0; i < elems.length; i++)
+					{
+						// TODO: the node should really be deleted
+						elems[i].innerHTML = "";  
+					}
+				}
+			}
+
             for (var day=0; day < 7; day++)
             {
                 /* Event data is keyed on m/d/yyyy */
@@ -494,12 +530,13 @@
                             var id = this.id + "_calendar_cell" + (row*7 + col);
 
                             var elem = Dom.get(id);
-									 elem.innerHTML = ""; // reset
+							elem.innerHTML = ""; // reset
                             if (elem)
                             {
                                 var d = document.createElement('div');
                                 Dom.addClass(d, 'cal-event-entry');
                                 d.innerHTML = event.name;
+								YAHOO.util.Event.addListener(d, 'click', this.onEventClick, event, this);
                                 elem.appendChild(d);
                             }
                         }
@@ -508,6 +545,24 @@
                 startDate = DateMath.add(startDate, DateMath.DAY, 1);
             }
         },
+
+		_getWeekViewEvents: function(container, className)
+		{
+			var arrElems = container.getElementsByTagName("div");
+			className = className.replace(/\-/g, "\\-");
+			var regExp = new RegExp("(^|\\s)" + className + "(\\s|$)");
+			var returnElems = [];
+			var elem;
+			for (var i=0; i < arrElems.length; i++)
+			{
+				elem = arrElems[i];
+				if (regExp.test(elem.className))
+				{
+					returnElems.push(elem);
+				}
+			}	
+			return returnElems;
+		},
 
         /**
          * Functions specific to the day view
@@ -533,7 +588,7 @@
             var DENOM = 1000 * 60 * 30; // 30 minute slots
 
             var container = Dom.get(this.id + "-dayEventsView");
-				container.innerHTML = ""; // reset
+			container.innerHTML = ""; // reset
             var events = this.eventData[ Alfresco.util.formatDate(date, "m/d/yyyy") ];
             var total = events.length;
             if (total > 0)
@@ -600,6 +655,7 @@
                     var div = document.createElement("div");
                     div.setAttribute("class", "dayEvent");
                     div.innerHTML = event.name;
+					YAHOO.util.Event.addListener(div, 'click', this.onEventClick, event, this);
                     // Figure out the height of the div based upon
                     // the number of half hour slots it occupies
                     var span = Math.round((endDate.getTime() - startDate.getTime()) / DENOM);
