@@ -54,7 +54,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       Alfresco.util.ComponentManager.register(this);
 
       /* Load YUI Components */
-      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "history"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "menu", "container", "datasource", "datatable", "json", "history"], this.onComponentsLoaded, this);
       
       return this;
    }
@@ -247,11 +247,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          }
          
          // Hide/Show Folders button
-         Dom.get(this.id + "-showFolders-button").innerHTML = this.options.showFolders ? this._msg("button.hide-folders") : this._msg("button.show-folders");
+         Dom.get(this.id + "-showFolders-button").innerHTML = this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show");
          this.widgets.showFolders = Alfresco.util.createYUIButton(this, "showFolders-button", this.onShowFolders);
 
          // Detailed/Simple List button
-         Dom.get(this.id + "-detailedView-button").innerHTML = this.options.detailedView ? this._msg("button.simple-view") : this._msg("button.detailed-view");
+         Dom.get(this.id + "-detailedView-button").innerHTML = this._msg(this.options.detailedView ? "button.view.simple" : "button.view.detailed");
          this.widgets.detailedView =  Alfresco.util.createYUIButton(this, "detailedView-button", this.onDetailedView);
 
          // File Select menu button
@@ -272,18 +272,6 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
              fields: ["index", "nodeRef", "type", "icon32", "name", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl"]
          };
          
-         // Custom error messages
-         this._setDataTableErrors();
-         
-         this.widgets.dataSource.doBeforeParseData = function DL_doBeforeParseData(oRequest, oFullResponse)
-         {
-            if (oFullResponse.doclist.error)
-            {
-               YAHOO.widget.DataTable.MSG_ERROR = oFullResponse.doclist.error;
-            }
-            return oFullResponse;
-         }
-
          /**
           * DataTable Cell Renderers
           *
@@ -445,6 +433,28 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             initialRequest: this._buildDocListParams(this.currentPath)
          });
          
+         // Custom error messages
+         this._setDefaultDataTableErrors();
+
+         // Override abstract function within DataTable to set custom error message
+         this.widgets.dataTable.doBeforeLoadData = function DL_doBeforeLoadData(sRequest, oResponse, oPayload)
+         {
+            if (oResponse.error)
+            {
+               try
+               {
+                  var response = YAHOO.lang.JSON.parse(oResponse.responseText);
+                  YAHOO.widget.DataTable.MSG_ERROR = response.message;
+               }
+               catch(e)
+               {
+                  this._setDefaultDataTableErrors();
+               }
+            }
+            // Must return true to have the "Loading..." message replaced by the error message
+            return true;
+         }
+
          // File checked handler
          this.widgets.dataTable.subscribe("checkboxClickEvent", function(e)
          { 
@@ -505,7 +515,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       onShowFolders: function DL_onShowFolders(e, p_obj)
       {
          this.options.showFolders = !this.options.showFolders;
-         p_obj.set("label", (this.options.showFolders ? "Hide Folders" : "Show Folders"));
+         p_obj.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
 
          YAHOO.Bubbling.fire("onDoclistRefresh");
          YAHOO.util.Event.preventDefault(e);
@@ -521,7 +531,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       onDetailedView: function DL_onDetailedView(e, p_obj)
       {
          this.options.detailedView = !this.options.detailedView;
-         p_obj.set("label", (this.options.detailedView ? this._msg("button.simple-view") : this._msg("button.detailed-view")));
+         p_obj.set("label", this._msg(this.options.detailedView ? "button.view.simple" : "button.view.detailed"));
 
          YAHOO.Bubbling.fire("onDoclistRefresh");
          YAHOO.util.Event.preventDefault(e);
@@ -698,7 +708,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                   // Success confirmation message
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: record.getData("name") + " was deleted."
+                     text: this._msg("message.delete.success", record.getData("name"))
                   });
                },
                scope: this
@@ -709,7 +719,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: "Failed to delete '" + record.getData("name") + "'."
+                     text: this._msg("message.delete.failure", record.getData("name"))
                   });
                },
                scope: this
@@ -778,23 +788,29 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        */
 
       /**
-       * Gets a custom messages
+       * Gets a custom message
        *
        * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
        */
       _msg: function DL__msg(messageId)
       {
-         return Alfresco.util.message(messageId, "Alfresco.DocumentList");
+         return Alfresco.util.message.call(this, messageId, "Alfresco.DocumentList", Array.prototype.slice.call(arguments).slice(1));
       },
       
       /**
        * Resets the YUI DataTable errors to our custom messages
+       * NOTE: Scope could be YAHOO.widget.DataTable, so can't use "this"
        *
-       * @method _setDataTableErrors
+       * @method _setDefaultDataTableErrors
        */
-      _setDataTableErrors: function DL__setdataTableErrors()
+      _setDefaultDataTableErrors: function DL__setDefaultDataTableErrors()
       {
-         YAHOO.widget.DataTable.MSG_EMPTY = "No documents or folders found in Document Library.";
+         var msg = Alfresco.util.message;
+         YAHOO.widget.DataTable.MSG_EMPTY = msg("message.empty", "Alfresco.DocumentList");
+         YAHOO.widget.DataTable.MSG_ERROR = msg("message.error", "Alfresco.DocumentList");
       },
       
       /**
@@ -808,7 +824,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          Alfresco.logger.debug("DocList_updateDocList:", path);
          
          // Reset the custom error messages
-         this._setDataTableErrors();
+         this._setDefaultDataTableErrors();
          
          function successHandler(sRequest, oResponse, oPayload)
          {
