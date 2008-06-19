@@ -56,7 +56,7 @@ public class AlfrescoAuthenticator extends AbstractAuthenticator
     {
         ConnectorSession cs = null;
         
-        if(credentials != null)
+        if (credentials != null)
         {
             // build a new remote client
             RemoteClient remoteClient = new RemoteClient(endpoint);

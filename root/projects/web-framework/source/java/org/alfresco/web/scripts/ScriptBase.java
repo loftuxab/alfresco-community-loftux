@@ -131,5 +131,5 @@ public abstract class ScriptBase implements Serializable
         }
     }
     
-    protected abstract ScriptableMap buildProperties();
+    protected abstract ScriptableMap<String, Serializable> buildProperties();
 }

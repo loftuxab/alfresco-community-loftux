@@ -49,7 +49,7 @@ public final class ScriptCredentials extends ScriptBase
     /* (non-Javadoc)
      * @see org.alfresco.web.scripts.WebFrameworkScriptBase#buildProperties()
      */
-    protected ScriptableMap buildProperties()
+    protected ScriptableMap<String, Serializable> buildProperties()
     {
         if(this.properties == null)
         {
@@ -60,7 +60,7 @@ public final class ScriptCredentials extends ScriptBase
             for(int i = 0; i < keys.length; i++)
             {
                 Object propertyValue = this.credentials.getProperty(keys[i]);
-                this.properties.put(keys[i], propertyValue);
+                this.properties.put(keys[i], (Serializable)propertyValue);
             }
         }
         

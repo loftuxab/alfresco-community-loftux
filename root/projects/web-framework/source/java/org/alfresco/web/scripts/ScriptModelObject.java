@@ -137,7 +137,7 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getTitle();
     }
     
-    public void setTitle(Object value)
+    public void setTitle(Serializable value)
     {
         if(value != null)
         {
@@ -154,7 +154,7 @@ public final class ScriptModelObject extends ScriptBase
         return modelObject.getDescription();
     }
     
-    public void setDescription(Object value)
+    public void setDescription(Serializable value)
     {
         if(value != null)
         {
