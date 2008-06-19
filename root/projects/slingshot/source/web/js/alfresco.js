@@ -287,12 +287,15 @@ Alfresco.util.addMessages = function(p_obj, p_messageScope)
  * @method Alfresco.util.message
  * @param p_messageId {string} Message id to resolve
  * @param p_messageScope {string} Message scope, e.g. componentId
+ * @param multiple-values {string} Values to replace tokens with
  * @return {string} The localized message string or the messageId if not found
  * @throws {Error}
  * @static
  */
 Alfresco.util.message = function(p_messageId, p_messageScope)
 {
+   var msg = p_messageId;
+   
    if (typeof p_messageId != "string")
    {
       throw new Error("Missing or invalid argument: messageId");
@@ -303,19 +306,39 @@ Alfresco.util.message = function(p_messageId, p_messageScope)
       var scopeMsg = Alfresco.messages.scope[p_messageScope][p_messageId];
       if (typeof scopeMsg == "string")
       {
-         return scopeMsg;
+         msg = scopeMsg;
       }
    }
    
    var globalMsg = Alfresco.messages.global[p_messageId];
    if (typeof globalMsg == "string")
    {
-      return globalMsg;
+      msg = globalMsg;
    }
    
-   return p_messageId;
+   // Search/replace tokens
+   var tokens;
+   if ((arguments.length == 3) && (typeof arguments[2] == "object"))
+   {
+      tokens = arguments[2];
+   }
+   else
+   {
+      tokens = Array.prototype.slice.call(arguments).slice(2);
+   }
+   msg = YAHOO.lang.substitute(msg, tokens);
+   
+   return msg;
 }
 
+/**
+ * Fixes the hidden caret problem in Firefox 2.x.
+ * Assumes <input> or <textarea> elements are wrapped in a <div class="yui-u"></div>
+ *
+ * @method Alfresco.util.caretFix
+ * @param p_formElement {element|string} Form element to fix input boxes within
+ * @static
+ */
 Alfresco.util.caretFix = function(p_formElement)
 {
    if (YAHOO.env.ua.gecko == 1.8)
@@ -572,6 +595,7 @@ Alfresco.util.PopupManager = function()
        */
       defaultDisplayMessageConfig:
       {
+         title: null,
          text: null,
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
