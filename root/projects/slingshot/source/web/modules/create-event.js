@@ -251,8 +251,9 @@
 		
 		onEventUpdated: function(e)
 		{
-			// TODO
 			this.panel.hide();
+			// Fire off "eventUpdated" event
+			YAHOO.Bubbling.fire('eventUpdated');
 		},
 
 		/**
