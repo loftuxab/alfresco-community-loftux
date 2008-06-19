@@ -302,10 +302,11 @@
          }
          else
          {
+            var folderName = response.config.dataObj.name;
             // Invoke the callback if one was supplied
             if (typeof this.options.onSuccess.fn == "function")
             {
-               this.options.onSuccess.fn.call(this.options.onSuccess.scope, this.options.onSuccess.obj);
+               this.options.onSuccess.fn.call(this.options.onSuccess.scope, folderName, this.options.onSuccess.obj);
             }
          }
       }
