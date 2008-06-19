@@ -1,11 +1,19 @@
-// CAll the repo for the site profile
+// Call the repository for the site profile
 var json = remote.call("/api/sites/" + page.url.args.site);
 
-// Create javascript objects from the repo response
-var profile = eval('(' + json + ')');
-if(!profile)
-{                                                        
-   profile = {};
+var profile =
+{
+   title: "[Not Found]"
+};
+
+if (json.status == 200)
+{
+   // Create javascript objects from the repo response
+   var obj = eval('(' + json + ')');
+   if (obj && obj.title)
+   {
+      profile = obj;
+   }
 }
 
 // Prepare the model
