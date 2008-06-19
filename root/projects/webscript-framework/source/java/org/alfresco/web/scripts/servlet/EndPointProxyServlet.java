@@ -41,6 +41,7 @@ import org.alfresco.connector.Response;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.alfresco.web.config.RemoteConfigElement.IdentityType;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.context.ApplicationContext;
@@ -138,12 +139,26 @@ public class EndPointProxyServlet extends HttpServlet
                 throw new AlfrescoRuntimeException("Invalid EndPoint Id: " + endpointId);
             }
             
-            // userid from session
-            // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?            
+            // user id from session
+            // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?
+            Connector connector;
             String userId = (String)req.getSession().getAttribute("USER_ID");
-            
-            // build a connector
-            Connector connector = this.connectorService.getConnector(endpointId, userId, req.getSession());
+            if (userId != null)
+            {
+                // build an authenticated connector - as we have a userId
+                connector = this.connectorService.getConnector(endpointId, userId, req.getSession());
+            }
+            else if (descriptor.getIdentity() == IdentityType.NONE ||
+                     descriptor.getIdentity() == IdentityType.DECLARED)
+            {
+                // build an unauthenticated/predeclared authentication connector
+                connector = this.connectorService.getConnector(endpointId);
+            }
+            else
+            {
+                throw new AlfrescoRuntimeException("No USER_ID found in session and" +
+                        " requested 'endpoint' requires authentication.");
+            }
             
             // build a connector context, stores information about how we will drive the remote client
             ConnectorContext context = new ConnectorContext();
@@ -156,7 +171,7 @@ public class EndPointProxyServlet extends HttpServlet
             
             if (logger.isDebugEnabled())
             {
-                logger.debug("EndPointProxyServlet preparing to proxy");
+                logger.debug("EndPointProxyServlet preparing to proxy:");
                 logger.debug(" - endpointId: " + endpointId);
                 logger.debug(" - userId: " + userId);
                 logger.debug(" - connector: " + connector);
