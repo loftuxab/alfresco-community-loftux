@@ -70,10 +70,10 @@ public final class ScriptRequestContext extends ScriptBase
             this.properties = new ScriptableMap<String, Serializable>();
             
             // copy in any custom values that have been applied to the RequestContext
-            Iterator it = context.keys();
+            Iterator<String> it = context.keys();
             while (it.hasNext())
             {
-                String key = (String) it.next();
+                String key = it.next();
                 Serializable value = (Serializable)context.getValue(key);
                 properties.put(key, value);
             }

@@ -42,7 +42,7 @@ import org.alfresco.web.site.RequestContext;
 public abstract class ScriptBase implements Serializable
 {
     protected RequestContext context;
-    protected ScriptableMap properties;
+    protected ScriptableMap<String, Serializable> properties;
 
     protected Model model;
     protected WebFrameworkConfigElement config;
@@ -87,9 +87,9 @@ public abstract class ScriptBase implements Serializable
         return ScriptHelper.getObject(getRequestContext(), objectTypeId, objectId);
     }        
     
-    public ScriptableMap getProperties()
+    public ScriptableMap<String, Serializable> getProperties()
     {
-        if(this.properties == null)
+        if (this.properties == null)
         {
             this.properties = buildProperties();
         }
@@ -121,18 +121,14 @@ public abstract class ScriptBase implements Serializable
     @Override
     public String toString()
     {
-        String toString = null;
-        
-        if(getProperties() != null)
+        if (getProperties() != null)
         {
-            toString = getProperties().toString();
+            return getProperties().toString();
         }
         else
         {
-            toString = getRequestContext().toString();
+            return this.context.toString();
         }
-        
-        return toString;
     }
     
     protected abstract ScriptableMap buildProperties();

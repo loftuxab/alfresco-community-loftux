@@ -83,9 +83,14 @@ public class AlfrescoScriptDebugger implements Runnable
         initDebugger();
         ScopeProvider sp = new AlfrescoScopeProvider((Scriptable)global);
         dim.setScopeProvider(sp);
-        gui = new AlfrescoGui(dim, "Alfresco JavaScript Debugger", this);
+        gui = new AlfrescoGui(dim, getTitle(), this);
         gui.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         gui.setExitAction(this);
+    }
+    
+    protected String getTitle()
+    {
+        return "Alfresco web-tier JavaScript Debugger";
     }
 
     
