@@ -220,9 +220,13 @@
                parentPath: this.currentPath,
                onSuccess:
                {
-                  fn: function DLTB_onNewFolder_callback()
+                  fn: function DLTB_onNewFolder_callback(folderName)
                   {
                      YAHOO.Bubbling.fire("onDoclistRefresh");
+                     Alfresco.util.PopupManager.displayMessage(
+                     {
+                        text: this._msg("message.new-folder.success", folderName)
+                     });
                   },
                   scope: this
                }
@@ -312,6 +316,7 @@
             if (obj.path !== null)
             {
                this.currentPath = obj.path;
+               this._generateBreadcrumb();
             }
          }
       },
@@ -338,13 +343,76 @@
        */
 
       /**
-       * Gets a custom messages
+       * Generates the HTML mark-up for the breadcrumb from the currentPath
+       *
+       * @method _generateBreadcrumb
+       * @private
+       */
+      _generateBreadcrumb: function DLTB__generateBreadcrumb()
+      {
+         var Dom = YAHOO.util.Dom,
+            Element = YAHOO.util.Element;
+         
+         var divBC = Dom.get(this.id + "-breadcrumb");
+         if (divBC === null)
+         {
+            return;
+         }
+         divBC.innerHTML = "";
+         
+         var paths = this.currentPath.split("/");
+         // Clone the array and re-use the root node name from the DocListTree
+         var displayPaths = paths.concat();
+         displayPaths[0] = Alfresco.util.message("node.root", "Alfresco.DocListTree");
+         
+         var eBreadcrumb = new Element(divBC);
+         for (var i = 0, j = paths.length; i < j; ++i)
+         {
+            var eCrumb = new Element(document.createElement("span"));
+            eCrumb.addClass("crumb");
+
+            // Last crumb shouldn't be rendered as a link
+            if (j - i < 2)
+            {
+               eCrumb.set("innerHTML", displayPaths[i]);
+            }
+            else
+            {
+               var eLink = new Element(document.createElement("a"),
+               {
+                  href: "",
+                  innerHTML: displayPaths[i]
+               });
+               var newPath = paths.slice(0, i+1).join("/");
+               eLink.on("click", function DLTB__gB_click(e)
+               {
+                  YAHOO.Bubbling.fire("onPathChanged",
+                  {
+                     path: newPath
+                  });
+                  YAHOO.util.Event.stopEvent(e);
+               });
+               eCrumb.appendChild(eLink);
+               eCrumb.appendChild(new Element(document.createElement("span"),
+               {
+                  innerHTML: " &gt; "
+               }));
+            }
+            eBreadcrumb.appendChild(eCrumb);
+         }
+      },
+
+      /**
+       * Gets a custom message
        *
        * @method _msg
+       * @param messageId {string} The messageId to retrieve
+       * @return {string} The custom message
+       * @private
        */
       _msg: function DLTB__msg(messageId)
       {
-         return Alfresco.util.message(messageId, "Alfresco.Toolbar");
+         return Alfresco.util.message.call(this, messageId, "Alfresco.DocListToolbar", Array.prototype.slice.call(arguments).slice(1));
       }
    
    };
