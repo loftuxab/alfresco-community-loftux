@@ -3,7 +3,7 @@
 //]]></script>
 <div class="header">
    <div class="logo">
-      <img src="${url.context}${args.logo}"/>
+      <img src="${url.context}${args.logo}" alt="Company Logo"/>
    </div>
    <div class="personal-menu">
       <span class="menu-item"><a href="${url.context}/page/user-dashboard">${msg("link.myDashboard")}</a></span>
