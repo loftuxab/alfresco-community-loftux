@@ -73,6 +73,14 @@
    vertical-align: middle;
 }
 
+.doclist .yui-dt-error
+{
+   background: red;
+   color: white;
+   font-weight: bold;
+   margin: 1em auto;
+   padding: 1em;
+}
 
 /* Cell Renderers */
 
