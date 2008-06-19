@@ -11,6 +11,9 @@
 
 <div id="${args.htmlid}">
 <div id="eventInfoPanel"></div>
+<div style="text-align:right;">
+	<a href="#" id="${args.htmlid}-prev-button">${msg("button.previous")}</a><a href="#" id="${args.htmlid}-next-button">${msg("button.next")}</a><a href="#" id="${args.htmlid}-current-button">${msg("button.today")}</a> 
+</div>
 <div id="calendar-view" class="yui-navset">
 <ul class="yui-nav">
   <li><a href="#day"><em>${msg("label.day")}</em></a></li>
@@ -21,9 +24,7 @@
 
 <div class="yui-content" style="background: #FFFFFF;">
 	<div id="#day">
-		<table width="100%" cellpadding="0" cellspacing="0" border="0">
-			<tr><td align="center" style="font-weight: bold;"><#-- default date goes here --></td></tr>
-		</table>
+		<div id="${args.htmlid}-dayLabel"></div>
 		<br />
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
 		  <tr><td>
@@ -44,15 +45,13 @@
 		</table>						
 	</div>
 	<div id="#week">
-		<table width="100%" cellpadding="0" cellspacing="0" border="0">
-		        <tr><td align="center" style="font-weight: bold;">11 - 17 May 2008</td></tr>
-		</table>
+		<div id="${args.htmlid}-weekLabel">May 2008</div>
 		<br/>
 		<table id="week-view" cellspacing="0" cellpadding="2" border="1" width="100%">
 		<tr>
 		<th></th>
 		<#list columnHeaders as header>
-			<th align="center" valign="top"><a href="#">${header?string("E M/d")}</a></th>
+			<th id="${args.htmlid}-weekheader-${header_index}" align="center" valign="top"><a href="#">${header?string("E M/d")}</a></th>
 		</#list>
 		</tr>
 		<#assign cellcount = 0  />
@@ -84,10 +83,7 @@
 		</table>
 	</div>
 	<div id="#month">
-		<div style="text-align:center">
-			<a href="#" id="${args.htmlid}-prev-button">${msg("button.previous")}</a><a href="#" id="${args.htmlid}-current-button">${msg("button.current_month")}</a><a href="#" id="${args.htmlid}-next-button">${msg("button.next")}</a> 
-		</div>
-		<div id="monthLabel">May 2008</div>
+		<div id="${args.htmlid}-monthLabel"></div>
 		<br/>
 		<table id="month-view">
 		<tr>
