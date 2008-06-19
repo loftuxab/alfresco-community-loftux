@@ -24,11 +24,19 @@
 	        </div>
 			<div class="yui-gd">
 				<div class="yui-u first">Start date:</div>
-				<div class="yui-u" id="${args.htmlid}-startdate">${result.from!""}</div>
+				<div class="yui-u" id="${args.htmlid}-startdate"><#if result.from?exists>${result.from?date("MM/dd/yyy")?string("EEEE, MMMM dd yyyy")}</#if></div>
+			</div>
+			<div class="yui-gd">
+				<div class="yui-u first">Start time:</div>
+				<div class="yui-u">${result.start!""}</div>
 			</div>
 			<div class="yui-gd">
 				<div class="yui-u first">End date:</div>
-				<div class="yui-u" id="${args.htmlid}-enddate">${result.to!""}</div>
+				<div class="yui-u" id="${args.htmlid}-enddate"><#if result.to?exists>${result.to?date("MM/dd/yyy")?string("EEEE, MMMM dd yyyy")}</#if></div>
+			</div>
+			<div class="yui-gd">
+				<div class="yui-u first">End time:</div>
+				<div class="yui-u">${result.end!""}</div>
 			</div>
 			</div>
          	<div class="yui-g">

@@ -131,7 +131,6 @@
 		 */
       	templateLoaded: function(response)
       	{
-         	//var div = document.createElement("div");
 			var div = document.getElementById("addEventPanel");
          	div.innerHTML = response.serverResponse.responseText;
 
@@ -165,6 +164,18 @@
 					}
 				});
 	       		eventForm.init();
+	
+				// Initialise the start and end dates to today
+				var Dom = YAHOO.util.Dom;
+				var today = new Date();
+
+				var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
+				Dom.get("fd").value = dateStr;
+				Dom.get("td").value = dateStr;
+
+				var ansiDate = Alfresco.util.formatDate(today, "yyyy/mm/dd");
+				Dom.get("from").value = ansiDate;
+				Dom.get("to").value = ansiDate;
 			}
 			else 
 			{
@@ -194,18 +205,6 @@
 				container: this.id + "-enddate"
 			});
 			endButton.on("click", this.onDateSelectButton);
-
-			// Initialise the start and end dates to today
-			var Dom = YAHOO.util.Dom;
-			var today = new Date();
-
-			var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
-			Dom.get("fd").value = dateStr;
-			Dom.get("td").value = dateStr;
-
-			var ansiDate = Alfresco.util.formatDate(today, "yyyy/mm/dd");
-			Dom.get("from").value = ansiDate;
-			Dom.get("to").value = ansiDate;
 
 			// Display the panel
 			this.panel.show();
