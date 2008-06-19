@@ -1,6 +1,6 @@
 {
-  <#-- Details of the responce code -->
-  status : 
+  <#-- Details of the response code -->
+  "status" : 
   {
     "code" : ${status.code},
     "name" : "${status.codeName}",
