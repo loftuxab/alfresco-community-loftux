@@ -55,13 +55,14 @@ public class AlfrescoConnector extends HttpConnector
     /* (non-Javadoc)
      * @see org.alfresco.connector.HttpConnector#stampCredentials(org.alfresco.connector.RemoteClient, org.alfresco.connector.ConnectorContext)
      */
+    @Override
     protected void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
     {
         // support for Alfresco ticket-based authentication
         if (getCredentials() != null)
         {
             // if this connector is managing session info
-            if(getConnectorSession() != null)
+            if (getConnectorSession() != null)
             {
                 // apply alfresco ticket
                 String alfTicket = (String) getConnectorSession().getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
