@@ -1,20 +1,31 @@
 // Call the repo for the sites profile
-var json = remote.call("/api/sites/" + page.url.args.site);
+var profile =
+{
+   description: "[Not found]"
+}
 
-// Create javascript object from the repo response
-var profile = eval('(' + json + ')');
-if(!profile)
-{                                                        
-   profile = {};
+var json = remote.call("/api/sites/" + page.url.args.site);
+if (json.status == 200)
+{
+   // Create javascript object from the repo response
+   var obj = eval('(' + json + ')');
+   if (obj && obj.description)
+   {
+      profile = obj;
+   }
 }
 
 // Find the manager for the site
+var sitemanagers = [{}];
+
 json = remote.call("/api/sites/" + page.url.args.site + "/memberships?rf=SiteManager");
-var sitemanagers = eval('(' + json + ')');
-if(!sitemanagers)
+if (json.status == 200)
 {
-   sitemanagers = new Array();
-   sitemanagers[0] = {};
+   var obj = eval('(' + json + ')');
+   if (obj)
+   {
+      sitemanagers = obj;
+   }
 }
 
 // Prepare the model
