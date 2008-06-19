@@ -150,9 +150,9 @@
             }
 
             /* Initialise buttons and handlers */
-            Alfresco.util.createYUIButton(this, "next-button", this.displayNextMonth, { type: "push" });
-            Alfresco.util.createYUIButton(this, "prev-button", this.displayPrevMonth, { type: "push" });
-            Alfresco.util.createYUIButton(this, "current-button", this.displayCurrentMonth, { type: "push" });
+            Alfresco.util.createYUIButton(this, "next-button", this.onNextNav, { type: "push" });
+            Alfresco.util.createYUIButton(this, "prev-button", this.onPrevNav, { type: "push" });
+            Alfresco.util.createYUIButton(this, "current-button", this.onTodayNav, { type: "push" });
 
             /* Load the data */
             this._loadData();
@@ -164,6 +164,65 @@
 			// Listen for when an event has been updated
 			YAHOO.Bubbling.on("eventUpdated", this.onEventUpdate, this);
         },
+
+		/**
+		 * Event handlers for the navigation buttons - Next, Prev and Today
+		 *
+		 */
+		
+		/**
+		 * Fired when the user selects the "Next" button.
+		 * For example, if the user is looking at the month view, when the user
+		 * selects "Next", the next month will be displayed.
+		 *
+		 * @method onNextNav
+		 * @param e {object} DomEvent
+		 */
+		onNextNav: function(e)
+		{
+			var DateMath = YAHOO.widget.DateMath;
+			var fields = [DateMath.DAY, DateMath.WEEK, DateMath.MONTH, null];
+			
+			var field = fields[this.tabView.get('activeIndex')];
+			if (field)
+			{
+				this.currentDate = DateMath.add(this.currentDate, field, 1);
+				this._refreshCurrentView();
+			}
+		},
+		
+		/**
+		 * Fired when the user selects the "Previous" button.
+		 * For example, if the user is looking at the month view, when the user
+		 * selects "Previous", the previous month will be displayed.
+		 *
+		 * @method onPrevNav
+		 * @param e {object} DomEvent
+		 */
+		onPrevNav: function(e)
+		{
+			var DateMath = YAHOO.widget.DateMath;
+			var fields = [DateMath.DAY, DateMath.WEEK, DateMath.MONTH, null];
+			
+			var field = fields[this.tabView.get('activeIndex')];
+			if (field)
+			{
+				this.currentDate = DateMath.subtract(this.currentDate, field, 1);
+				this._refreshCurrentView();
+			}
+		},
+		
+		/**
+		 * Sets the current date (and view) to today.
+		 *
+		 * @method onTodayNav
+		 * @param e {object} DomEvent
+		 */
+		onTodayNav: function(e)
+		{
+			this.currentDate = new Date();
+			this._refreshCurrentView();
+		},
 
 		/**
 		 * Loads the most recent event data. Resets the (cached) data.
@@ -384,7 +443,7 @@
 
             /* Change the month label */
             var month = date.getMonth();
-            var label = Dom.get("monthLabel");
+            var label = Dom.get(this.id + "-monthLabel");
             label.innerHTML = this.MONTHS[month] + " " + date.getFullYear();
 
             var days_in_month = this.DAYS[month]; /* TODO: Add check for leap year */
@@ -487,11 +546,38 @@
          */
         refreshWeek: function(date)
         {
-            // TODO: refresh column headers
             var DateMath = YAHOO.widget.DateMath;
             var Dom = YAHOO.util.Dom;
 
             var startDate = DateMath.subtract(date, DateMath.DAY, date.getDay());
+			var endDate = DateMath.add(startDate, DateMath.DAY, 6);
+			
+			/* Update the week label */
+			var weekLabel = "";
+			if (startDate.getMonth() === endDate.getMonth())
+			{
+				weekLabel = startDate.getDate() + " - " + Alfresco.util.formatDate(endDate, "d mmm yyyy");
+			}
+			else
+			{
+				weekLabel = Alfresco.util.formatDate(startDate, "d mmm yyyy") + " - " + Alfresco.util.formatDate(endDate, "d mmm yyyy");
+			}
+			
+			var label = Dom.get(this.id + "-weekLabel");
+	        label.innerHTML = weekLabel;
+	
+			var colElem;
+			var colDate = startDate;
+			/* Update the column headers */
+			for (var col=0; col < 7; col++)
+			{
+				colElem = Dom.get(this.id + "-weekheader-" + col);
+				if (colElem)
+				{
+					colElem.innerHTML = Alfresco.util.formatDate(colDate, "ddd d/m");
+				}
+				colDate = DateMath.add(colDate, DateMath.DAY, 1);
+			}
 
 			// Clear any previous events
 			var container = document.getElementById("week-view");
@@ -583,6 +669,10 @@
             var DateMath = YAHOO.widget.DateMath;
             var Dom = YAHOO.util.Dom;
 
+			/* Change the day label */
+	        var label = Dom.get(this.id + "-dayLabel");
+	        label.innerHTML = Alfresco.util.formatDate(date, "dd mmm yyyy");
+
             var WIDTH = 82; // 80px + 1px + 1px
             var HEIGHT = 22;
             var DENOM = 1000 * 60 * 30; // 30 minute slots
@@ -636,17 +726,6 @@
                             indent += 1;
                           }
                         }
-                        
-                        /**
-                        if (YAHOO.widget.DateMath.between(startDate, sDate, eDate) ||
-                            YAHOO.widget.DateMath.between(endDate, sDate, eDate))
-                        {
-                            if (indent === indents[j])
-                            {
-                                indent += 1;
-                            }
-                        }
-                        */
                     }
                     // Store the offset for each event
                     indents[i] = indent;
