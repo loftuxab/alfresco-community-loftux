@@ -9,10 +9,10 @@
 <div id="${args.htmlid}-body" class="toolbar doclib-toolbar">
 
    <div id="${args.htmlid}-headerBar" class="header-bar">
-      <div class="new-folder inline"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
-      <span class="separator">|</span>
-      <div class="file-upload inline"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
-      <span class="separator">|</span>
+      <div class="new-folder"><button id="${args.htmlid}-newFolder-button" name="newFolder">${msg("button.new-folder")}</button></div>
+      <div class="separator">|</div>
+      <div class="file-upload"><button id="${args.htmlid}-fileUpload-button" name="fileUpload">${msg("button.upload")}</button></div>
+      <div class="separator">|</div>
       <div class="inline">
          <button id="${args.htmlid}-selectedItems-button" name="doclist-selectedItems-button">${msg("menu.selected-items")}</button>
          <select id="${args.htmlid}-selectedItems-menu" name="doclist-selectedItems-menu">
@@ -24,9 +24,9 @@
    </div>
 
    <div id="${args.htmlid}-navBar" class="nav-bar">
-      <div class="inline"><button id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
-      <span class="separator">|</span>
-      <span id="${args.htmlid}-breadcrumb"></span>
+      <div class=""><button id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
+      <div class="separator">|</div>
+      <div id="${args.htmlid}-breadcrumb" class="breadcrumb"></div>
    </div>
 
 </div>
