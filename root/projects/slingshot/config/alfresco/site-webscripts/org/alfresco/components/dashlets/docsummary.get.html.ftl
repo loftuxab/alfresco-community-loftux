@@ -11,11 +11,11 @@
                <div class="detail-list-item">
                   <div>
                      <div class="icon">
-                        <img src="${url.context}${doc.icon32}" alt="*" />
+                        <img src="${url.context}${doc.icon32}" alt="${doc.name?html}" />
                      </div>
                      <div class="details">
                         <h4><a rel="content" href="${url.context}/proxy/alfresco${doc.contentUrl}/${doc.name?url}">${doc.name?html}</a></h4>
-                        <div>${msg("text.docDetails", doc.modifiedBy, doc.modifiedOn)}$</div>
+                        <div>${msg("text.docDetails", doc.modifiedBy, doc.modifiedOn)?html}</div>
                      </div>
                   </div>
                </div>
