@@ -38,7 +38,7 @@
                </span>
             </div>
             <input type="hidden" id="success" name="success" value="${successUrl}"/>
-            <input type="hidden" name="failure" value="<@link pageType='login'/>"/>
+            <input type="hidden" name="failure" value="<#assign link><@link pageType='login'/></#assign>${link?html}"/>
          </fieldset>
       </form>
    </div>
@@ -62,3 +62,5 @@
    });
    //]]></script>
 </@>
+</body>
+</html>
