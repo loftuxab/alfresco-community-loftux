@@ -516,8 +516,13 @@ public abstract class AbstractRequestContext implements RequestContext
         this.themeId = themeId;
     }
     
-    // variables
-    
+    @Override
+    public String toString()
+    {
+        return map.toString();
+    }
+
+
     protected Map map;
     protected Page currentPage;
     protected TemplateInstance currentTemplate;

@@ -119,7 +119,7 @@ public interface RequestContext extends Serializable
      * 
      * @return An iterator of String keys
      */
-    public Iterator keys();
+    public Iterator<String> keys();
 
     /**
      * If a page instance is currently executing, it can be retrieved
