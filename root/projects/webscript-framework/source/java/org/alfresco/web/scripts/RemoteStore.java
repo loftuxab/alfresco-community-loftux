@@ -27,9 +27,9 @@ package org.alfresco.web.scripts;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.servlet.http.HttpServletResponse;
 
 import org.alfresco.connector.Connector;
 import org.alfresco.connector.ConnectorService;
@@ -166,7 +166,7 @@ public class RemoteStore implements Store
     {
         boolean hasDocument = false;
         Response res = call(buildEncodeCall("has", documentPath));
-        if (HttpServletResponse.SC_OK == res.getStatus().getCode())
+        if (Status.STATUS_OK == res.getStatus().getCode())
         {
             hasDocument = Boolean.parseBoolean(res.getResponse());
         }
@@ -179,7 +179,7 @@ public class RemoteStore implements Store
     public long lastModified(String documentPath) throws IOException
     {
         Response res = call(buildEncodeCall("lastmodified", documentPath));
-        if (HttpServletResponse.SC_OK == res.getStatus().getCode())
+        if (Status.STATUS_OK == res.getStatus().getCode())
         {
             return Long.parseLong(res.getResponse());
         }
@@ -198,7 +198,7 @@ public class RemoteStore implements Store
     {
        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
        Response res = call(buildEncodeCall("update", documentPath), in);
-       if (HttpServletResponse.SC_OK != res.getStatus().getCode())
+       if (Status.STATUS_OK != res.getStatus().getCode())
        {
           throw new IOException("Unable to update document path: " + documentPath +
                 " in remote store: " + endpoint +
@@ -223,7 +223,7 @@ public class RemoteStore implements Store
     {
        ByteArrayInputStream in = new ByteArrayInputStream(content.getBytes());
        Response res = call(buildEncodeCall("create", documentPath), in);
-       if (HttpServletResponse.SC_OK != res.getStatus().getCode())
+       if (Status.STATUS_OK != res.getStatus().getCode())
        {
           throw new IOException("Unable to create document path: " + documentPath +
                 " in remote store: " + endpoint +
@@ -237,7 +237,7 @@ public class RemoteStore implements Store
     public InputStream getDocument(String documentPath) throws IOException
     {
         Response res = call(buildEncodeCall("get", documentPath));
-        if (HttpServletResponse.SC_OK == res.getStatus().getCode())
+        if (Status.STATUS_OK == res.getStatus().getCode())
         {
             return res.getResponseStream();
         }
@@ -254,8 +254,21 @@ public class RemoteStore implements Store
      */
     public String[] getAllDocumentPaths()
     {
-        // TODO: implement getAllDocumentPaths()
-        throw new AlfrescoRuntimeException("getAllDocumentPaths() not supported by remote store.");
+        Response res = call(buildEncodeCall("listall", ""));
+        if (Status.STATUS_OK == res.getStatus().getCode())
+        {
+            List<String> list = new ArrayList<String>(32);
+            StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
+            while (t.hasMoreTokens())
+            {
+                list.add(t.nextToken());
+            }
+            return list.toArray(new String[list.size()]);
+        }
+        else
+        {
+            return new String[0];
+        }
     }
     
     /* (non-Javadoc)
