@@ -24,73 +24,28 @@
  */
 package org.alfresco.connector;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.util.Random;
-
 import junit.framework.TestCase;
 
 /**
- * JUnit test for Remote HTTP client and Remote Store API.
+ * JUnit test for Remote HTTP client.
  * 
- * Requires that an Alfresco repo is running on http://localhost:8080/alfresco
- * and that the default remote store (an AVM store called 'sitestore') exists.
+ * Requires that an Alfresco repo is running on http://localhost:8080/alfresco.
  * 
  * @author Kevin Roast
  */
 public class TestRemoteClient extends TestCase
 {
-   String TEST_CONTENT1 = "some test text";
-   String TEST_CONTENT2 = "some text text - updated";
-   
    public void testRemoteClient()
    {
       RemoteClient remote = new RemoteClient("http://localhost:8080/alfresco/s");
       
-      // test simple GET
+      // test GET
       Response res = remote.call("/index");
       assertEquals(200, res.getStatus().getCode());
       assertTrue(res.getResponse().length()!= 0);
       
-      // test POST with simple string body
-      String filename = Long.toString((new Random().nextLong())) + ".txt";
-      res = remote.call("/remotestore/create/" + filename, TEST_CONTENT1);
+      // test POST
+      res = remote.call("/index", "");
       assertEquals(200, res.getStatus().getCode());
-   }
-   
-   public void testRemoteStore()
-   {
-      RemoteClient remote = new RemoteClient("http://localhost:8080/alfresco/s");
-      
-      // POST a new file
-      String filename = Long.toString((new Random().nextLong())) + ".txt";
-      Response res = remote.call("/remotestore/create/" + filename, new ByteArrayInputStream(TEST_CONTENT1.getBytes()));
-      assertEquals(200, res.getStatus().getCode());
-      
-      // get it back again into a response string
-      res = remote.call("/remotestore/get/" + filename);
-      assertEquals(200, res.getStatus().getCode());
-      assertEquals(TEST_CONTENT1, res.getResponse());
-      
-      // get it back again into an output stream
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      res = remote.call("/remotestore/get/" + filename, out);
-      assertEquals(200, res.getStatus().getCode());
-      assertEquals(TEST_CONTENT1, out.toString());
-      
-      // test simple 'has' method
-      res = remote.call("/remotestore/has/" + filename);
-      assertEquals(200, res.getStatus().getCode());
-      assertEquals(res.getResponse(), "true");
-      
-      // POST to update the file
-      res = remote.call("/remotestore/update/" + filename, new ByteArrayInputStream(TEST_CONTENT2.getBytes()));
-      assertEquals(200, res.getStatus().getCode());
-      
-      // get it back again to confirm update
-      out = new ByteArrayOutputStream();
-      res = remote.call("/remotestore/get/" + filename, out);
-      assertEquals(200, res.getStatus().getCode());
-      assertEquals(TEST_CONTENT2, out.toString());
    }
 }

@@ -66,7 +66,7 @@ public class Status
     public static final int STATUS_PROXY_AUTHENTICATION_REQUIRED = HttpServletResponse.SC_PROXY_AUTHENTICATION_REQUIRED;
     public static final int STATUS_REQUEST_TIMEOUT = HttpServletResponse.SC_REQUEST_TIMEOUT;
     public static final int STATUS_CONFLICT = HttpServletResponse.SC_CONFLICT;
-    public static final int STATUS_GONE = HttpServletResponse.SC_CONFLICT;
+    public static final int STATUS_GONE = HttpServletResponse.SC_GONE;
     public static final int STATUS_LENGTH_REQUIRED = HttpServletResponse.SC_LENGTH_REQUIRED;
     public static final int STATUS_PRECONDITION_FAILED = HttpServletResponse.SC_PRECONDITION_FAILED;
     public static final int STATUS_REQUEST_ENTITY_TOO_LARGE = HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE;
