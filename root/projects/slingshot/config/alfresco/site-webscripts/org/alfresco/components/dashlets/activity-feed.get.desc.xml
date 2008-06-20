@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Activity Feed</shortname>
+   <description>Lists recent activities for a given site.</description>
+   <url>/components/dashlets/activityfeed</url>
+</webscript>
