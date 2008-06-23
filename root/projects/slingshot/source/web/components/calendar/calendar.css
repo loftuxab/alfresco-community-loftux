@@ -192,3 +192,7 @@ div.agenda-item {
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
+
+div.cal-event-entry a {
+	text-decoration: none;
+}

@@ -470,7 +470,7 @@
                             {
                             	var d = document.createElement('div');
                               	Dom.addClass(d, 'cal-event-entry');
-                              	d.innerHTML = events[j].name;
+                              	d.innerHTML = '<a href="#">' + events[j].name + '</a>';
 								YAHOO.util.Event.addListener(d, 'click', this.onEventClick, events[j], this);
                               	elem.appendChild(d);
                             }
@@ -487,49 +487,6 @@
 			panel.setSiteId(this.siteId);
 			panel.show(obj); // event object
 		},
-
-        /*
-         * Fired when the "This Month" button is clicked.
-         * Updates currentDate to today then refreshes the view.
-         *
-         * @param e {object} DomEvent
-         * @param obj {object} Object passed back from addListener method
-         * @method  displayCurrentMonth
-         */
-        displayCurrentMonth: function(e, obj)
-        {
-            this.currentDate = new Date();
-            /* Add check to see what the date is. If it hasn't changed, don't load the data */
-            this.refreshMonth(this.currentDate);
-        },
-
-        /*
-         * Fired when the "Next" button is clicked.
-         * Updates currentDate to the next month then refreshes the view.
-         *
-         * @param e {object} DomEvent
-         * @param obj {object} Object passed back from addListener method
-         * @method  displayNextMonth
-         */
-        displayNextMonth: function(e, obj)
-        {
-            this.currentDate.setMonth( this.currentDate.getMonth() + 1 );
-            this.refreshMonth(this.currentDate);
-        },
-
-        /*
-         * Fired when the "Previous" button is clicked.
-         * Updates currentDate to the previous month then refreshes the view.
-         *
-         * @param e {object} DomEvent
-         * @param obj {object} Object passed back from addListener method
-         * @method  displayPrevMonth
-         */
-        displayPrevMonth: function(e, obj)
-        {
-            this.currentDate.setMonth( this.currentDate.getMonth() - 1 );
-            this.refreshMonth(this.currentDate);
-        },
 
         /**
          * Functions specific to the week view
@@ -588,7 +545,7 @@
 				{	
 					for (var i=0; i < elems.length; i++)
 					{
-						// TODO: the node should really be deleted
+						// FIXME: the node should really be deleted
 						elems[i].innerHTML = "";  
 					}
 				}
@@ -621,7 +578,7 @@
                             {
                                 var d = document.createElement('div');
                                 Dom.addClass(d, 'cal-event-entry');
-                                d.innerHTML = event.name;
+                                d.innerHTML = '<a href="#">' + event.name + '</a>';
 								YAHOO.util.Event.addListener(d, 'click', this.onEventClick, event, this);
                                 elem.appendChild(d);
                             }
@@ -732,8 +689,8 @@
 
                     // Now display the event
                     var div = document.createElement("div");
-                    div.setAttribute("class", "dayEvent");
-                    div.innerHTML = event.name;
+                    div.setAttribute("class", "dayEvent cal-event-entry");
+                    div.innerHTML = '<a href="#">' + event.name + '</a>';
 					YAHOO.util.Event.addListener(div, 'click', this.onEventClick, event, this);
                     // Figure out the height of the div based upon
                     // the number of half hour slots it occupies

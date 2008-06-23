@@ -123,6 +123,7 @@
 
          	this.panel = new YAHOO.widget.Panel(div,
          	{
+				modal: true,
             	fixedcenter: true,
             	visible: false,
             	constraintoviewport: true
@@ -141,8 +142,25 @@
 			{
 				type: "push"
 			});
+			
+			// Cancel Button
+			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelClick,
+			{
+				type: "push"
+			});
 	
 			this.panel.show(); // Display the panel
+		},
+		
+		/**
+		 * Fired when the use selected the "Cancel" button.
+		 *
+		 * @method onCancelClick
+		 * @param e {object} DomEvent
+		 */
+		onCancelClick: function(e)
+		{
+			this.panel.hide();
 		},
 		
 		/**
@@ -161,7 +179,7 @@
 		},
 		
 		/**
-		 * Fired when the delete button is clicked. Kicks of a DELETE request
+		 * Fired when the delete button is clicked. Kicks off a DELETE request
 		 * to the Alfresco repo to remove an event.
 		 *
 		 * @method onDeleteClick
