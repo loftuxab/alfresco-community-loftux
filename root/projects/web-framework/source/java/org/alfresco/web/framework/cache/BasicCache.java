@@ -24,17 +24,20 @@
  */
 package org.alfresco.web.framework.cache;
 
-import java.util.WeakHashMap;
+import java.util.HashMap;
 
 /**
  * This is an implementation of a purely in-memory cache that uses a
- * WeakHashMap to provide a basic form of caching.
+ * HashMap to provide a basic form of caching.
+ * 
+ * This class is thread safe for concurrent usage of the cache.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public class BasicCache<K> implements ContentCache<K>
 {
-    protected final WeakHashMap<String, CacheItem<K>> cache;
+    protected final HashMap<String, CacheItem<K>> cache;
     protected final long timeout;
     
     /**
@@ -60,7 +63,7 @@ public class BasicCache<K> implements ContentCache<K>
         {
             throw new IllegalArgumentException("Cache size must be +ve value");
         }
-        this.cache = new WeakHashMap<String, CacheItem<K>>(size);
+        this.cache = new HashMap<String, CacheItem<K>>(size);
     }
 
     /* (non-Javadoc)
@@ -123,7 +126,7 @@ public class BasicCache<K> implements ContentCache<K>
     /* (non-Javadoc)
      * @see org.alfresco.web.site.cache.ContentCache#invalidate()
      */
-    public void invalidate()
+    public synchronized void invalidate()
     {
         cache.clear();
     }

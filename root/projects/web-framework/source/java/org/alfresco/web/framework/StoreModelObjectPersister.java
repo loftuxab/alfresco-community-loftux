@@ -436,7 +436,10 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     public void invalidateCache()
     {
-        this.objectCaches.clear();
+        synchronized (objectCaches)
+        {
+            this.objectCaches.clear();
+        }
     }
     
     
@@ -449,11 +452,15 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     {
         String key = getId();
         
-        ModelObjectCache cache = objectCaches.get(key);
-        if (cache == null)
+        ModelObjectCache cache;
+        synchronized (objectCaches)
         {
-            cache = new ModelObjectCache(this.store, this.delay);
-            objectCaches.put(key, cache);
+            cache = objectCaches.get(key);
+            if (cache == null)
+            {
+                cache = new ModelObjectCache(this.store, this.delay);
+                objectCaches.put(key, cache);
+            }
         }
         
         return cache;
