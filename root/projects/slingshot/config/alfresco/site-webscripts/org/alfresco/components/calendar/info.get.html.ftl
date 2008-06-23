@@ -42,6 +42,7 @@
          	<div class="yui-g">
 	            <input type="submit" id="${args.htmlid}-edit-button" value="Edit" />
 				<input type="submit" id="${args.htmlid}-delete-button" value="Delete" />
+				<input type="submit" id="${args.htmlid}-cancel-button" value="Cancel" />
 	        </div>
       </div>
 </div>

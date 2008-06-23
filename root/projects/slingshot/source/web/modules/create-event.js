@@ -136,6 +136,7 @@
 
          	this.panel = new YAHOO.widget.Panel(div,
          	{
+		modal: true,
             	fixedcenter: true,
             	visible: false,
             	constraintoviewport: true
