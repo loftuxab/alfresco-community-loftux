@@ -271,7 +271,8 @@ public final class ScriptSiteData extends ScriptBase
      * Creates a new Component instance.
      * 
      * The id for the instance is generated using the Web Framework's Random
-     * GUID generator.
+     * GUID generator. The scope, region and sourceId parameters should be
+     * explicitly set before the component is persisted.
      * 
      * @return A ScriptModelObject representing the new instance
      */
@@ -285,7 +286,8 @@ public final class ScriptSiteData extends ScriptBase
      * Creates a new Component instance of the given component type
      * 
      * The id for the instance is generated using the Web Framework's Random
-     * GUID generator.
+     * GUID generator. The scope, region and sourceId parameters should be
+     * explicitly set before the component is persisted.
      * 
      * @param componentTypeId   The id of the ComponentType which describes 
      *                          the type of this component
@@ -302,29 +304,42 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * Creates a new Component instance of the given component type
-     * 
-     * The id for the instance is generated using the Web Framework's Random
-     * GUID generator.
+     * Creates a new Component instance of the given component type. The ID is
+     * generated from the supplied scope, region and sourceId parameters.
      * 
      * @param componentTypeId   The id of the ComponentType which describes 
      *                          the type of this component.
-     * @param title The name of the component instance
-     * @param description The description of the Component instance
      * 
      * @return A ScriptModelObject representing the new instance
      */    
-    public ScriptModelObject newComponent(String componentTypeId, String title,
-            String description)
+    public ScriptModelObject newComponent(String scope, String region, String sourceId)
+    {
+        ParameterCheck.mandatory("scope", scope);
+        ParameterCheck.mandatory("region", region);
+        ParameterCheck.mandatory("sourceId", sourceId);
+        
+        Component component = (Component) getModel().newComponent(scope, region, sourceId);
+        return ScriptHelper.toScriptModelObject(context, component);
+    }
+    
+    /**
+     * Creates a new Component instance of the given component type. The ID is
+     * generated from the supplied scope, region and sourceId parameters.
+     * 
+     * @param componentTypeId   The id of the ComponentType which describes 
+     *                          the type of this component.
+     * 
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newComponent(String componentTypeId, String scope, String region, String sourceId)
     {
         ParameterCheck.mandatory("componentTypeId", componentTypeId);
-        ParameterCheck.mandatory("title", title);
-        ParameterCheck.mandatory("description", description);
-
-        Component component = (Component) getModel().newComponent();
+        ParameterCheck.mandatory("scope", scope);
+        ParameterCheck.mandatory("region", region);
+        ParameterCheck.mandatory("sourceId", sourceId);
+        
+        Component component = (Component) getModel().newComponent(scope, region, sourceId);
         component.setComponentTypeId(componentTypeId);
-        component.setTitle(title);
-        component.setDescription(description);
         return ScriptHelper.toScriptModelObject(context, component);
     }
 
@@ -390,22 +405,37 @@ public final class ScriptSiteData extends ScriptBase
     }
 
     /**
-     * Creates a new Page instance.
+     * Creates a new Page instance with the specified ID.
      * 
-     * The id for the instance is generated using the Web Framework's Random
-     * GUID generator.
-     * 
-     * @param title  The title of the new instance
-     * @param description   The description of the new instance
+     * @param id  The id of the page instance
      * 
      * @return A ScriptModelObject representing the new instance
      */    
-    public ScriptModelObject newPage(String title, String description)
+    public ScriptModelObject newPage(String id)
     {
+        ParameterCheck.mandatory("id", id);
+        Page page = (Page) getModel().newPage(id);
+        return ScriptHelper.toScriptModelObject(context, page);
+    }
+    
+    /**
+     * Creates a new Page instance with the specified ID.
+     * 
+     * @param id  The id of the page instance
+     * @param title The title of the page instance
+     * @param description The description of the page instance
+     * 
+     * @return A ScriptModelObject representing the new instance
+     */    
+    public ScriptModelObject newPage(String id, String title, String description)
+    {
+        ParameterCheck.mandatory("id", id);
         ParameterCheck.mandatory("title", title);
         ParameterCheck.mandatory("description", description);
-
-        Page page = (Page) getModel().newPage();
+        
+        Page page = (Page) getModel().newPage(id);
+        page.setTitle(title);
+        page.setDescription(description);
         return ScriptHelper.toScriptModelObject(context, page);
     }
     
@@ -436,6 +466,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject newTemplate(String templateTypeId)
     {
+        ParameterCheck.mandatory("templateTypeId", templateTypeId);
         TemplateInstance template = (TemplateInstance) getModel().newTemplate();
         template.setTemplateType(templateTypeId);
         return ScriptHelper.toScriptModelObject(context, template);
@@ -449,13 +480,12 @@ public final class ScriptSiteData extends ScriptBase
      * 
      * @param componentTypeId   The id of the ComponentType which describes 
      *                          the type of this component.
-     * @param title The name of the TemplateType instance
-     * @param description The description of the TemplateType instance
+     * @param title The name of the Template instance
+     * @param description The description of the Template instance
      *  
      * @return A ScriptModelObject representing the new instance
      */    
-    public ScriptModelObject newTemplate(String templateTypeId, String title,
-            String description)
+    public ScriptModelObject newTemplate(String templateTypeId, String title, String description)
     {
         ParameterCheck.mandatory("templateTypeId", templateTypeId);
         ParameterCheck.mandatory("title", title);
@@ -481,8 +511,7 @@ public final class ScriptSiteData extends ScriptBase
      * @return  An array of ScriptModelObject instances that wrap the
      *          Component results of the search
      */
-    public Object[] findComponents(String scopeId, String sourceId,
-            String regionId, String componentTypeId)
+    public Object[] findComponents(String scopeId, String sourceId, String regionId, String componentTypeId)
     {
         Map<String, ModelObject> objects = getModel().findComponents(scopeId, sourceId, regionId, componentTypeId);
         return ScriptHelper.toScriptModelObjectArray(context, objects);
@@ -518,8 +547,7 @@ public final class ScriptSiteData extends ScriptBase
      * @return  An array of ScriptModelObject instances that wrap the
      *          PageAssociation results of the search
      */        
-    public Object[] findPageAssociations(String sourceId, String destId,
-            String associationType)
+    public Object[] findPageAssociations(String sourceId, String destId, String associationType)
     {
         Map<String, ModelObject> objects = getModel().findPageAssociations(
                 sourceId, destId, associationType);
@@ -539,8 +567,7 @@ public final class ScriptSiteData extends ScriptBase
      * @return  An array of ScriptModelObject instances that wrap the
      *          ContentAssociation results of the search
      */        
-    public Object[] findContentAssociations(String sourceId, String destId,
-            String assocType, String formatId)
+    public Object[] findContentAssociations(String sourceId, String destId, String assocType, String formatId)
     {
         Map<String, ModelObject> objects = getModel().findContentAssociations(
                 sourceId, destId, assocType, formatId);
@@ -559,8 +586,7 @@ public final class ScriptSiteData extends ScriptBase
      * @return  An array of ScriptModelObject instances that wrap the
      *          Component results of the search
      */            
-    public Scriptable findComponentsMap(String scopeId, String sourceId,
-            String regionId, String componentTypeId)
+    public Scriptable findComponentsMap(String scopeId, String sourceId, String regionId, String componentTypeId)
     {
         Map<String, ModelObject> objects = getModel().findComponents(scopeId,
                 sourceId, regionId, componentTypeId);
@@ -578,8 +604,7 @@ public final class ScriptSiteData extends ScriptBase
      * @return  An array of ScriptModelObject instances that wrap the
      *          PageAssociation results of the search
      */            
-    public Scriptable findPageAssociationsMap(String sourceId, String destId,
-            String associationType)
+    public Scriptable findPageAssociationsMap(String sourceId, String destId, String associationType)
     {
         Map<String, ModelObject> objects = getModel().findPageAssociations(
                 sourceId, destId, associationType);
@@ -598,8 +623,7 @@ public final class ScriptSiteData extends ScriptBase
      * @return  An array of ScriptModelObject instances that wrap the
      *          ContentAssociation results of the search
      */            
-    public Scriptable findContentAssociationsMap(String sourceId,
-            String destId, String assocType, String formatId)
+    public Scriptable findContentAssociationsMap(String sourceId, String destId, String assocType, String formatId)
     {
         Map<String, ModelObject> objects = getModel().findContentAssociations(
                 sourceId, destId, assocType, formatId);

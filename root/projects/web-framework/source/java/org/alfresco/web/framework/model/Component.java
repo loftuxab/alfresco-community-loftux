@@ -53,6 +53,7 @@ public class Component extends AbstractModelObject
     // cached values
     private String regionId = null;
     private String scope = null;
+    private String sourceId = null;
     private String componentTypeId = null;
     
     /**
@@ -97,7 +98,11 @@ public class Component extends AbstractModelObject
      */
     public String getSourceId()
     {
-        return getProperty(PROP_SOURCE_ID);
+        if (this.sourceId == null)
+        {
+            this.sourceId = getProperty(PROP_SOURCE_ID); 
+        }
+        return this.sourceId;
     }
 
     /**
@@ -108,6 +113,7 @@ public class Component extends AbstractModelObject
     public void setSourceId(String sourceId)
     {
         setProperty(PROP_SOURCE_ID, sourceId);
+        this.sourceId = sourceId;
     }
 
     /**

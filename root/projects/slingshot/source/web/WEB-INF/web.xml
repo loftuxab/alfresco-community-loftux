@@ -47,6 +47,11 @@
    </servlet>
    
    <servlet>
+      <servlet-name>cacheControlServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
+   </servlet>
+   
+   <servlet>
       <servlet-name>loginServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.LoginServlet</servlet-class>
    </servlet> 
@@ -55,18 +60,6 @@
       <servlet-name>logoutServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.LogoutServlet</servlet-class>
    </servlet> 
-
-<!--
-   <servlet>
-      <servlet-name>componentDispatcherServlet</servlet-name>
-      <servlet-class>org.alfresco.web.site.servlet.ComponentDispatcherServlet</servlet-class>
-   </servlet>
-
-   <servlet-mapping>
-      <servlet-name>componentDispatcherServlet</servlet-name>
-      <url-pattern>/component/*</url-pattern>
-   </servlet-mapping>
--->   
 
    <servlet-mapping>
       <servlet-name>logoutServlet</servlet-name>
@@ -101,6 +94,11 @@
    <servlet-mapping>
       <servlet-name>uriTemplateServlet</servlet-name>
       <url-pattern>/s/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>cacheControlServlet</servlet-name>
+      <url-pattern>/cache</url-pattern>
    </servlet-mapping>
    
    <session-config>

@@ -17,7 +17,7 @@
    <bean id="webframework.searchpath.chrome" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.chrome" /> -->
+         	<ref bean="webframework.remotestore.chrome" />
 			   <ref bean="webframework.classpathstore.chrome" />
          </list>
       </property>
@@ -26,7 +26,7 @@
    <bean id="webframework.searchpath.component" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.component" /> -->
+         	<ref bean="webframework.remotestore.component" />
 			   <ref bean="webframework.classpathstore.component" />
          </list>
       </property>
@@ -35,7 +35,7 @@
    <bean id="webframework.searchpath.componenttype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.componenttype" /> -->
+         	<ref bean="webframework.remotestore.componenttype" />
 			   <ref bean="webframework.classpathstore.componenttype" />
          </list>
       </property>
@@ -44,7 +44,7 @@
    <bean id="webframework.searchpath.configuration" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.configuration" /> -->
+         	<ref bean="webframework.remotestore.configuration" />
 			   <ref bean="webframework.classpathstore.configuration" />
          </list>
       </property>
@@ -53,7 +53,7 @@
    <bean id="webframework.searchpath.contentassociation" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.contentassociation" /> -->
+         	<ref bean="webframework.remotestore.contentassociation" />
 			   <ref bean="webframework.classpathstore.contentassociation" />
          </list>
       </property>
@@ -62,7 +62,7 @@
    <bean id="webframework.searchpath.page" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.page" /> -->
+         	<ref bean="webframework.remotestore.page" />
 			   <ref bean="webframework.classpathstore.page" />
          </list>
       </property>
@@ -71,7 +71,7 @@
    <bean id="webframework.searchpath.pageassociation" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.pageassociation" /> -->
+         	<ref bean="webframework.remotestore.pageassociation" />
 			   <ref bean="webframework.classpathstore.pageassociation" />
          </list>
       </property>
@@ -80,7 +80,7 @@
    <bean id="webframework.searchpath.pagetype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.pagetype" /> -->
+         	<ref bean="webframework.remotestore.pagetype" />
 			   <ref bean="webframework.classpathstore.pagetype" />
          </list>
       </property>
@@ -89,7 +89,7 @@
    <bean id="webframework.searchpath.templateinstance" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-         	<!-- <ref bean="webframework.remotestore.templateinstance" /> -->
+         	<ref bean="webframework.remotestore.templateinstance" />
 			   <ref bean="webframework.classpathstore.templateinstance" />
          </list>
       </property>
@@ -98,7 +98,7 @@
    <bean id="webframework.searchpath.templatetype" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-	         <!-- <ref bean="webframework.remotestore.templatetype" /> -->
+	         <ref bean="webframework.remotestore.templatetype" />
 			   <ref bean="webframework.classpathstore.templatetype" />
          </list>
       </property>
@@ -107,7 +107,7 @@
    <bean id="webframework.searchpath.theme" class="org.alfresco.web.scripts.SearchPath">
       <property name="searchPath">
          <list>
-			   <!--<ref bean="webframework.remotestore.theme" /> -->
+			   <ref bean="webframework.remotestore.theme" />
             <ref bean="webframework.classpathstore.theme" />
          </list>
       </property>

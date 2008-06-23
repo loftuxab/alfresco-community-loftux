@@ -53,8 +53,25 @@
       <servlet-name>pageRendererServlet</servlet-name>
       <servlet-class>org.alfresco.web.site.servlet.DispatcherServlet</servlet-class>
       <load-on-startup>1</load-on-startup>
-   </servlet>  
+   </servlet>
    
+   <servlet>
+      <servlet-name>cacheControlServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.CacheControlServlet</servlet-class>
+   </servlet>
+   
+   <!--
+   <servlet>
+      <servlet-name>componentDispatcherServlet</servlet-name>
+      <servlet-class>org.alfresco.web.site.servlet.ComponentDispatcherServlet</servlet-class>
+   </servlet>
+
+   <servlet-mapping>
+      <servlet-name>componentDispatcherServlet</servlet-name>
+      <url-pattern>/component/*</url-pattern>
+   </servlet-mapping>
+   -->
+
 
    <servlet-mapping>
       <servlet-name>apiServlet</servlet-name>
@@ -63,7 +80,7 @@
    
    <servlet-mapping>
       <servlet-name>proxyServlet</servlet-name>
-      <url-pattern>/proxy</url-pattern>
+      <url-pattern>/proxy/*</url-pattern>
    </servlet-mapping>
    
    <servlet-mapping>
@@ -79,6 +96,11 @@
    <servlet-mapping>
       <servlet-name>uriTemplateServlet</servlet-name>
       <url-pattern>/s/*</url-pattern>
+   </servlet-mapping>
+   
+   <servlet-mapping>
+      <servlet-name>cacheControlServlet</servlet-name>
+      <url-pattern>/cache</url-pattern>
    </servlet-mapping>
    
    <session-config>

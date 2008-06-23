@@ -189,9 +189,9 @@ public class DefaultModel extends AbstractModel
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#newComponent(java.lang.String)
      */
-    public Component newComponent(String objectId)
+    public Component newComponent(String typeId)
     {
-        return (Component) newObject(Component.TYPE_ID, objectId);
+        return (Component) newObject(Component.TYPE_ID, typeId);
     }
     
     /**

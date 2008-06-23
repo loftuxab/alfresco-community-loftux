@@ -36,7 +36,10 @@ import org.alfresco.web.scripts.Store;
  * store.  The persisted store is a Store implementation that is checked
  * in order to verify that the content is still valid in the cache.
  * 
+ * The delay between checks against the persitent store can be configured.
+ * 
  * @author muzquiano
+ * @author kevinr
  */
 public class ModelObjectCache extends BasicCache<ModelObject>
 {
