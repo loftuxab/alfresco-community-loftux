@@ -35,6 +35,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.NativeObject;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrapFactory;
@@ -105,6 +106,43 @@ public class JSONUtilsTest extends TestCase
         value = Context.toString(result);
         
         System.out.println(value);
+    }
+    
+    public void testToObject()
+        throws Exception
+    {
+        Map<String, Object> model = new HashMap<String, Object>(1);
+        model.put("jsonUtils", new JSONUtils());
+        
+        JSONObject testObject = new JSONObject();
+        testObject.put("string", "myString");
+        testObject.put("int", 10);
+        testObject.put("number", 3.142);
+        JSONObject subObj = new JSONObject();
+        subObj.put("sunValue", "tad-ahhhh");
+        testObject.put("comp1", subObj);
+        model.put("json", testObject); 
+        model.put("jsonString", testObject.toString());        
+        
+        Object result = executeScript(SCRIPT_5, model, true);
+        assertNotNull(result);
+        NativeObject nativeObj = (NativeObject)result;
+        assertEquals("myString", nativeObj.get("string", nativeObj));
+        assertEquals(10, nativeObj.get("int", nativeObj));
+        assertEquals(3.142, nativeObj.get("number", nativeObj));
+        NativeObject subObjResult = (NativeObject)nativeObj.get("comp1", nativeObj);
+        assertEquals("tad-ahhhh", subObjResult.get("sunValue", subObjResult));      
+        
+        result = executeScript(SCRIPT_6, model, true);
+        assertNotNull(result);
+        nativeObj = (NativeObject)result;
+        assertEquals("myString", nativeObj.get("string", nativeObj));
+        assertEquals(10, nativeObj.get("int", nativeObj));
+        assertEquals(3.142, nativeObj.get("number", nativeObj));
+        subObjResult = (NativeObject)nativeObj.get("comp1", nativeObj);
+        assertEquals("tad-ahhhh", subObjResult.get("sunValue", subObjResult)); 
+        
+        
     }
     
     private Object executeScript(String script, Map<String, Object> model, boolean secure)
@@ -185,5 +223,12 @@ public class JSONUtilsTest extends TestCase
         "var obj = new Object();" +
         "obj.value = json.getString(\"string\");" +
         "jsonUtils.toJSONString(obj);";
+    private static final String SCRIPT_5 =
+        "var obj = jsonUtils.toObject(json);" +
+        "obj;";
+    private static final String SCRIPT_6 =
+        "var obj = jsonUtils.toObject(jsonString);" +
+        "obj;";
+    
     
 }

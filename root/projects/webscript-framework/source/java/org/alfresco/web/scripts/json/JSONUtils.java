@@ -24,8 +24,11 @@
  */
 package org.alfresco.web.scripts.json;
 
+import java.util.Iterator;
+
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.json.JSONStringer;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.IdScriptableObject;
@@ -67,6 +70,56 @@ public class JSONUtils
         }        
         
         return json.toString();
+    }
+    
+    /**
+     * Takes a JSON string and converts it to a native java script object
+     * 
+     * @param  jsonString       a valid json string
+     * @return NativeObject     the created native JS object that represents the JSON object
+     * @throws JSONException    
+     */
+    public NativeObject toObject(String jsonString)
+        throws JSONException
+    {
+        // TODO deal with json array stirngs
+        
+        // Parse JSON string
+        JSONObject jsonObject = new JSONObject(jsonString);
+        
+        // Create native object 
+        return toObject(jsonObject);
+    }
+    
+    /**
+     * Takes a JSON object and converts it to a native JS object.
+     * 
+     * @param jsonObject        the json object
+     * @return NativeObject     the created native object
+     * @throws JSONException
+     */
+    public NativeObject toObject(JSONObject jsonObject)
+        throws JSONException
+    {
+        // Create native object 
+        NativeObject object = new NativeObject();
+        
+        Iterator<String> keys = jsonObject.keys();
+        while (keys.hasNext())
+        {
+            String key = (String)keys.next();
+            Object value = jsonObject.get(key);
+            if (value instanceof JSONObject)
+            {
+                object.put(key, object, toObject((JSONObject)value));
+            }
+            else
+            {
+                object.put(key, object, value);
+            }
+        }
+        
+        return object;
     }
     
     /**
@@ -209,70 +262,5 @@ public class JSONUtils
         {
             json.value(value);
         }
-    }
-    
-    // TODO commented out for now since further investigation is required to ensure this is the best 
-    //      JSON escaping strategy
-    
-//    public String escapeJSONString(String s)
-//    {
-//        String result = null;
-//        
-//        if (s != null)
-//        {
-//            StringBuffer sb=new StringBuffer();
-//            for(int i=0;i<s.length();i++)
-//            {
-//                char ch=s.charAt(i);
-//                switch(ch)
-//                {
-//                    case '"':
-//                        sb.append("\\\"");
-//                        break;
-//                    case '\\':
-//                        sb.append("\\\\");
-//                        break;
-//                    case '\b':
-//                        sb.append("\\b");
-//                        break;
-//                    case '\f':
-//                        sb.append("\\f");
-//                        break;
-//                    case '\n':
-//                        sb.append("\\n");
-//                        break;
-//                    case '\r':
-//                        sb.append("\\r");
-//                        break;
-//                    case '\t':
-//                        sb.append("\\t");
-//                        break;
-//                    case '/':
-//                        sb.append("\\/");
-//                        break;
-//                    default:
-//                        if(ch>='\u0000' && ch<='\u001F')
-//                        {
-//                            String ss=Integer.toHexString(ch);
-//                            sb.append("\\u");
-//                            for(int k=0;k<4-ss.length();k++)
-//                            {
-//                                sb.append('0');
-//                            }
-//                            sb.append(ss.toUpperCase());
-//                        }
-//                        else
-//                        {
-//                            sb.append(ch);
-//                        }
-//                }
-//            }
-//        
-//            // Set result string
-//            result = sb.toString();
-//        }
-//        
-//        return result;
-//    }
-    
+    }    
 }
