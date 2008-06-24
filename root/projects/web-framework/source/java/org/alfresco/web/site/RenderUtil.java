@@ -367,8 +367,7 @@ public final class RenderUtil
                 else
                 {
                     // merge in component to render data
-                    RendererContext compRenderData = RendererContextHelper.generate(context, component);
-                    rendererContext.putAll(compRenderData);
+                    RendererContextHelper.mergeObject(rendererContext, component);
                     
                     // execute renderer
                     RenderUtil.executeRenderer(context, request, response, descriptor);

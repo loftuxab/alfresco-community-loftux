@@ -85,11 +85,6 @@ public final class ProcessorModelHelper
      */
     private static void populateModel(RendererContext rendererContext, Map<String, Object> model)
     {
-        if (model == null)
-        {
-            throw new IllegalArgumentException("Model is mandatory.");
-        }
-        
         RequestContext context = rendererContext.getRequestContext();
         
         // information about the current page being rendererd
@@ -183,7 +178,7 @@ public final class ProcessorModelHelper
         if (rendererContext != null)
         {
             String htmlBindingId = (String) rendererContext.get(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID);
-            if (htmlBindingId != null && htmlBindingId.length() > 0)
+            if (htmlBindingId != null && htmlBindingId.length() != 0)
             {
                 model.put(PROP_HTMLID, htmlBindingId);
             }
@@ -254,11 +249,8 @@ public final class ProcessorModelHelper
         
         model.put("region", new RegionFreemarkerTagDirective(context));
         model.put("component", new ComponentFreemarkerTagDirective(context));
-        addDirective(context, model, "componentInclude", "org.alfresco.web.site.taglib.ComponentIncludeTag");
-        addDirective(context, model, "pageTitle", "org.alfresco.web.site.taglib.PageTitleTag");
         
-        // TODO: remove the directive tag
-        addDirective(context, model, "require", "org.alfresco.web.site.taglib.RequireTag");
+        addDirective(context, model, "componentInclude", "org.alfresco.web.site.taglib.ComponentIncludeTag");
         
         // content specific
         addDirective(context, model, "anchor", "org.alfresco.web.site.taglib.ObjectAnchorTag");
@@ -267,7 +259,7 @@ public final class ProcessorModelHelper
         addDirective(context, model, "link", "org.alfresco.web.site.taglib.ObjectLinkTag");
         
         // temporary: add floating menu
-        addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");        
+        //addDirective(context, model, "floatingMenu", "org.alfresco.web.site.taglib.FloatingMenuTag");        
     }
     
     private static void addDirective(RequestContext context, Map<String, Object> model, String name, String className)

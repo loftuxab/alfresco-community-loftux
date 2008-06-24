@@ -45,7 +45,6 @@ import freemarker.template.TemplateScalarModel;
  */
 public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirective
 {
-    
     /**
      * Instantiates a new component freemarker tag directive.
      * 

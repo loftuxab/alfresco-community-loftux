@@ -162,9 +162,9 @@ public class ReflectionHelper
      */
     public static Object invoke(Object obj, String method, Class[] argTypes, Object[] args)
     {
-        if(obj == null || method == null)
+        if (obj == null || method == null)
         {
-            return null;
+            throw new IllegalArgumentException("Object and Method must be supplied.");
         }
         
         /**
