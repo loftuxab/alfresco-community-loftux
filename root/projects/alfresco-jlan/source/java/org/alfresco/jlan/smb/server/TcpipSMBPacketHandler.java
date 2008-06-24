@@ -32,110 +32,116 @@ import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
 import org.alfresco.jlan.util.DataPacker;
 
 /**
- * Tcpip SMB Packet Handler Class 
- *
+ * Tcpip SMB Packet Handler Class
+ * 
  * @author gkspencer
  */
 public class TcpipSMBPacketHandler extends SocketPacketHandler {
 
+	// Buffer to read the request header
+	
+	private byte[] m_headerBuf = new byte[4];
+	
 	/**
 	 * Class constructor
 	 * 
 	 * @param sock Socket
-	 * @exception IOException		If a network error occurs
+	 * @param packetPool CIFSPacketPool
+	 * @exception IOException If a network error occurs
 	 */
-	public TcpipSMBPacketHandler(Socket sock)
-		throws IOException {
-		super(sock,SMBSrvPacket.PROTOCOL_TCPIP, "TCP-SMB", "T");			
+	public TcpipSMBPacketHandler(Socket sock, CIFSPacketPool packetPool) throws IOException {
+		super(sock, SMBSrvPacket.PROTOCOL_TCPIP, "TCP-SMB", "T", packetPool);
 	}
-	
+
 	/**
 	 * Read a packet from the input stream
 	 * 
-	 * @param pkt SMBSrvPacket
-	 * @return int
-	 * @exception IOexception		If a network error occurs
+	 * @return SMBSrvPacket
+	 * @exception IOexception If a network error occurs
 	 */
-	public int readPacket(SMBSrvPacket pkt)
+	public SMBSrvPacket readPacket()
 		throws IOException {
-		
-		//	Read the packet header
-		
-		byte[] buf = pkt.getBuffer();
-		int len = 0;
-				
-		while ( len < RFCNetBIOSProtocol.HEADER_LEN && len != -1)
-			len = readPacket(buf,len, RFCNetBIOSProtocol.HEADER_LEN - len);
-		
-		//	Check if the connection has been closed, read length equals -1
-		
+
+		// Read the packet header
+
+		int len = readBytes( m_headerBuf, 0, 4);
+
+		// Check if the connection has been closed, read length equals -1
+
 		if ( len == -1)
-			return len;
-			
-		//	Check if we received a valid header
-		
+			throw new IOException("Connection closed (header read)");
+
+		// Check if we received a valid header
+
 		if ( len < RFCNetBIOSProtocol.HEADER_LEN)
 			throw new IOException("Invalid header, len=" + len);
+
+		// Get the packet type from the header
+
+//		int typ = (int) ( m_headerBuf[0] & 0xFF);
+		int dlen = (int) DataPacker.getShort( m_headerBuf, 2);
+
+		// Check for a large packet, add to the data length
+
+		if ( m_headerBuf[1] != 0) {
+			int llen = (int) m_headerBuf[1];
+			dlen += (llen << 16);
+		}
+
+		// Get a packet from the pool to hold the request data, allow for the NetBIOS header length
+		// so that the CIFS request lines up with other implementations.
+		
+		SMBSrvPacket pkt = getPacketPool().allocatePacket( dlen + RFCNetBIOSProtocol.HEADER_LEN);
+		
+		// Read the data part of the packet into the users buffer, this may take
+		// several reads
+
+		int offset = RFCNetBIOSProtocol.HEADER_LEN;
+		int totlen = offset;
+
+		try {
 			
-    //  Get the packet type from the header
+			while (dlen > 0) {
+	
+				// Read the data
+	
+				len = readBytes( pkt.getBuffer(), offset, dlen);
+	
+				// Check if the connection has been closed
+	
+				if ( len == -1)
+					throw new IOException("Connection closed (request read)");
+	
+				// Update the received length and remaining data length
+	
+				totlen += len;
+				dlen -= len;
+	
+				// Update the user buffer offset as more reads will be required
+				// to complete the data read
+	
+				offset += len;
+	
+			}
+		}
+		catch (IOException ex) {
+			
+			// Release the packet back to the pool
+			
+			getPacketPool().releasePacket( pkt);
+			
+			// Rethrow the exception
+			
+			throw ex;
+		}
 
-    int typ = ( int) ( buf [ 0] & 0xFF);
-    int dlen = ( int) DataPacker.getShort ( buf, 2);
-    
-    //	Check for a large packet, add to the data length
-    
-    if ( buf[1] != 0) {
-    	int llen = (int) buf[1];
-    	dlen += (llen << 16);
-    }
-    
-    //	Check if the packet buffer is large enough to hold the data + header
-    
-    if ( buf.length < (dlen + RFCNetBIOSProtocol.HEADER_LEN)) {
-    	
-    	//	Allocate a new buffer to hold the data and copy the existing header
-    	
-    	byte[] newBuf = new byte[dlen + RFCNetBIOSProtocol.HEADER_LEN];
-    	System.arraycopy(buf, 0, newBuf, 0, 4);
-    		
-    	//	Attach the new buffer to the SMB packet
-    	
-    	pkt.setBuffer(newBuf);
-    	buf = newBuf;
-    }    	
-    
-	  //  Read the data part of the packet into the users buffer, this may take
-	  //  several reads
+		// Set the received request length
+		
+		pkt.setReceivedLength( totlen);
+		
+		// Return the received packet
 
-	  int offset = RFCNetBIOSProtocol.HEADER_LEN;
-	  int totlen = offset;
-
-	  while ( dlen > 0) {
-
-	    //  Read the data
-
-	    len = readPacket(buf,offset,dlen);
-
-	    //	Check if the connection has been closed
-	    
-	    if ( len == -1)
-	    	return -1;
-
-	    //  Update the received length and remaining data length
-
-	    totlen += len;
-	    dlen -= len;
-
-	    //  Update the user buffer offset as more reads will be required
-	    //  to complete the data read
-
-	    offset += len;
-
-	  } // end while reading data
-		    
-		//	Return the received packet length
-
-		return totlen;
+		return pkt;
 	}
 
 	/**
@@ -143,20 +149,21 @@ public class TcpipSMBPacketHandler extends SocketPacketHandler {
 	 * 
 	 * @param pkt SMBSrvPacket
 	 * @param len int
-	 * @exception IOexception		If a network error occurs
+	 * @param writeRaw boolean
+	 * @exception IOexception If a network error occurs
 	 */
-	public void writePacket(SMBSrvPacket pkt, int len)
+	public void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)
 		throws IOException {
 
-	  //  Fill in the TCP SMB message header, this is already allocated as
-	  //  part of the users buffer.
+		// Fill in the TCP SMB message header, this is already allocated as
+		// part of the users buffer.
 
 		byte[] buf = pkt.getBuffer();
 		DataPacker.putInt(len, buf, 0);
 
-	  //  Output the data packet
+		// Output the data packet
 
-	  int bufSiz = len + RFCNetBIOSProtocol.HEADER_LEN;
-	  writePacket(buf,0,bufSiz);
+		int bufSiz = len + RFCNetBIOSProtocol.HEADER_LEN;
+		writeBytes(buf, 0, bufSiz);
 	}
 }

@@ -25,21 +25,23 @@
 
 package org.alfresco.jlan.netbios.win32;
 
+import java.io.IOException;
+
 /**
  * NetBIOS Socket Exception Class
- *
+ * 
  * @author gkspencer
  */
-public class NetBIOSSocketException extends Exception {
-  
-  private static final long serialVersionUID = 2363178480979507007L;
+public class NetBIOSSocketException extends IOException {
 
-  /**
-   * Class constructor
-   * 
-   * @param msg String
-   */
-  public NetBIOSSocketException(String msg) {
-    super(msg);
-  }
+	private static final long serialVersionUID = 2363178480979507007L;
+
+	/**
+	 * Class constructor
+	 * 
+	 * @param msg String
+	 */
+	public NetBIOSSocketException(String msg) {
+		super(msg);
+	}
 }

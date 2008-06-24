@@ -55,12 +55,13 @@ public abstract class SocketPacketHandler extends PacketHandler {
    * @param typ int
    * @param name String
    * @param shortName String
+   * 2param packetPool CIFSPacketPool
    * @exception IOException   If a network error occurs
    */
-  public SocketPacketHandler(Socket sock, int typ, String name, String shortName)
+  public SocketPacketHandler(Socket sock, int typ, String name, String shortName, CIFSPacketPool packetPool)
     throws IOException {
     
-    super(typ, name, shortName);
+    super(typ, name, shortName, packetPool);
     
     m_socket = sock;
 
@@ -92,33 +93,30 @@ public abstract class SocketPacketHandler extends PacketHandler {
   }
   
   /**
-   * Read a packet
+   * Read bytes from the socket input stream
    * 
-   * @param pkt byte[]
-   * @param off int
-   * @param len int
    * @return int
    * @exception IOException   If a network error occurs.
    */
-  public int readPacket(byte[] pkt, int off, int len)
+  protected int readBytes( byte[] buf, int offset, int len)
     throws IOException {
       
     //  Read a packet of data
     
     if ( m_in != null)
-      return m_in.read(pkt,off,len);
+      return m_in.read( buf, offset, len);
     return 0;
   }
   
   /**
-   * Send an SMB request packet
+   * Write bytes to the output socket stream
    * 
    * @param pkt byte[]
    * @param off int
    * @param len int
    * @exception IOException   If a network error occurs.
    */
-  public void writePacket(byte[] pkt, int off, int len)
+  protected void writeBytes(byte[] pkt, int off, int len)
     throws IOException {
 
     //  Output the raw packet

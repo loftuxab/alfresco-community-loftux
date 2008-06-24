@@ -52,7 +52,7 @@ public class VirtualCircuitList {
 
   // Active virtual circuits
   
-  private Hashtable m_vcircuits;
+  private Hashtable<Integer, VirtualCircuit> m_vcircuits;
   private int m_UID;
   
   /**
@@ -74,7 +74,7 @@ public class VirtualCircuitList {
     //  Check if the circuit table has been allocated
 
     if (m_vcircuits == null)
-      m_vcircuits = new Hashtable(DefaultCircuits);
+      m_vcircuits = new Hashtable<Integer, VirtualCircuit>(DefaultCircuits);
 
     //  Allocate an id for the tree connection
     
@@ -126,7 +126,7 @@ public class VirtualCircuitList {
 
     //  Get the required tree connection details
 
-    return (VirtualCircuit) m_vcircuits.get(new Integer(uid));
+    return m_vcircuits.get(new Integer(uid));
   }
 
   /**
@@ -150,9 +150,9 @@ public class VirtualCircuitList {
   /**
    * Enumerate the virtual circiuts
    * 
-   * @return Enumeration
+   * @return Enumeration<Integer>
    */
-  public final Enumeration enumerateUIDs() {
+  public final Enumeration<Integer> enumerateUIDs() {
     return m_vcircuits.keys();
   }
   
@@ -176,7 +176,7 @@ public class VirtualCircuitList {
       //  Get the circuit
       
       Integer key = new Integer(uid);
-      VirtualCircuit vc = ( VirtualCircuit) m_vcircuits.get(key);
+      VirtualCircuit vc = m_vcircuits.get(key);
       
       //  Close the virtual circuit, release resources
 

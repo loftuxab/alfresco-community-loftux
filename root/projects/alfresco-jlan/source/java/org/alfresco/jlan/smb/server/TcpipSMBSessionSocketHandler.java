@@ -27,22 +27,21 @@ package org.alfresco.jlan.smb.server;
 
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 
 import org.alfresco.jlan.debug.Debug;
+import org.alfresco.jlan.server.SocketSessionHandler;
 import org.alfresco.jlan.server.config.ServerConfiguration;
-
 
 /**
  * Native SMB Session Socket Handler Class
- *
+ * 
  * @author gkspencer
  */
-public class TcpipSMBSessionSocketHandler extends SessionSocketHandler {
+public class TcpipSMBSessionSocketHandler extends SocketSessionHandler {
 
-  // Thread group
-  
-  private static final ThreadGroup TcpipSMBGroup = new ThreadGroup( "TcpipSMBSessions");
+	// Thread group
+
+	private static final ThreadGroup TcpipSMBGroup = new ThreadGroup("TcpipSMBSessions");
 
 	/**
 	 * Class constructor
@@ -53,91 +52,46 @@ public class TcpipSMBSessionSocketHandler extends SessionSocketHandler {
 	 * @param debug boolean
 	 */
 	public TcpipSMBSessionSocketHandler(SMBServer srv, int port, InetAddress bindAddr, boolean debug) {
-		super("TCP-SMB", srv, port, bindAddr, debug);
+		super("TCP-SMB", "SMB", srv, bindAddr, port);
+		
+		// Enable/disable debug output
+		
+		setDebug( debug);
 	}
-	
+
 	/**
-	 * Run the native SMB session socket handler
+	 * Accept a new connection on the specified socket
+	 * 
+	 * @param sock Socket
 	 */
-	public void run() {
+	protected void acceptConnection(Socket sock) {
 
 		try {
-		
-			//	Clear the shutdown flag
-			
-			clearShutdown();
-			
-		  //  Wait for incoming connection requests
-		
-		  while (hasShutdown() == false) {
-		
-		    //  Debug
-		
-		    if (Debug.EnableInfo && hasDebug())
-		      Debug.println("[SMB] Waiting for TCP-SMB session request ...");
-		
-		    //  Wait for a connection
-		
-		    Socket sessSock = getSocket().accept();
-		
-		    //  Debug
-		
-		    if (Debug.EnableInfo && hasDebug())
-		      Debug.println("[SMB] TCP-SMB session request received from " + sessSock.getInetAddress().getHostAddress());
 
-				try {
+			// Create a packet handler for the session
 
-					//	Create a packet handler for the session
-					
-					PacketHandler pktHandler = new TcpipSMBPacketHandler(sessSock);
-		
-			    //  Create a server session for the new request, and set the session id.
-			
-			    SMBSrvSession srvSess = SMBSrvSession.createSession(pktHandler, getServer(), getNextSessionId());
+			SMBServer smbServer = (SMBServer) getServer();
+			PacketHandler pktHandler = new TcpipSMBPacketHandler( sock, smbServer.getPacketPool());
 
-          //  Start the new session in a seperate thread
-			
-			    Thread srvThread = new Thread(TcpipSMBGroup, srvSess);
-			    srvThread.setDaemon(true);
-			    srvThread.setName("Sess_T" + srvSess.getSessionId() + "_" + sessSock.getInetAddress().getHostAddress());
-			    srvThread.start();
-			  }
-				catch (Exception ex) {
-					
-					//	Debug
-					
-					if ( Debug.EnableInfo && hasDebug())
-						Debug.println("[SMB] TCP-SMB Failed to create session, " + ex.toString());
-				}
-		  }
-		}
-		catch (SocketException ex) {
-		
-		  //	Do not report an error if the server has shutdown, closing the server socket
-		  //	causes an exception to be thrown.
-		
-		  if ( hasShutdown() == false) {
-		    Debug.println("[SMB] TCP-SMB Socket error : " + ex.toString());
-		  	Debug.println(ex);
-		  }
+			// Create a server session for the new request, and set the session id.
+
+			SMBSrvSession srvSess = SMBSrvSession.createSession(pktHandler, smbServer, getNextSessionId());
+
+			// Start the new session in a seperate thread
+
+			Thread srvThread = new Thread(TcpipSMBGroup, srvSess);
+			srvThread.setDaemon(true);
+			srvThread.setName("Sess_T" + srvSess.getSessionId() + "_" + sock.getInetAddress().getHostAddress());
+			srvThread.start();
 		}
 		catch (Exception ex) {
-		
-		  //	Do not report an error if the server has shutdown, closing the server socket
-		  //	causes an exception to be thrown.
-		
-			if ( hasShutdown() == false) {
-		    Debug.println("[SMB] TCP-SMB Server error : " + ex.toString());
-				Debug.println(ex);
-			}
+
+			// Debug
+
+			if ( Debug.EnableInfo && hasDebug())
+				Debug.println("[SMB] TCP-SMB Failed to create session, " + ex.toString());
 		}
-		
-		//	Debug
-		
-		if (Debug.EnableInfo && hasDebug())
-			Debug.println("[SMB] TCP-SMB session handler closed");
 	}
-	
 	/**
 	 * Create the TCP/IP native SMB/CIFS session socket handlers for the main SMB/CIFS server
 	 * 
@@ -147,28 +101,28 @@ public class TcpipSMBSessionSocketHandler extends SessionSocketHandler {
 	 */
 	public final static void createSessionHandlers(SMBServer server, boolean sockDbg)
 		throws Exception {
-	  
-	  //	Access the CIFS server configuration
-	  
-	  ServerConfiguration config = server.getConfiguration();
-    CIFSConfigSection cifsConfig = (CIFSConfigSection) config.getConfigSection( CIFSConfigSection.SectionName);
 
-	  //	Create the NetBIOS SMB handler
-		
-		SessionSocketHandler sessHandler = new TcpipSMBSessionSocketHandler( server, cifsConfig.getTcpipSMBPort(), cifsConfig.getSMBBindAddress(), sockDbg);
+		// Access the CIFS server configuration
 
-		sessHandler.initialize();
-		server.addSessionHandler(sessHandler);
+		ServerConfiguration config = server.getConfiguration();
+		CIFSConfigSection cifsConfig = (CIFSConfigSection) config.getConfigSection(CIFSConfigSection.SectionName);
 
-		//	Run the TCP/IP SMB session handler in a seperate thread
-					
+		// Create the NetBIOS SMB handler
+
+		SocketSessionHandler sessHandler = new TcpipSMBSessionSocketHandler(server, cifsConfig.getTcpipSMBPort(), cifsConfig.getSMBBindAddress(), sockDbg);
+
+		sessHandler.initializeSessionHandler(server);
+//		server.addSessionHandler(sessHandler);
+
+		// Run the TCP/IP SMB session handler in a seperate thread
+
 		Thread tcpThread = new Thread(sessHandler);
 		tcpThread.setName("TcpipSMB_Handler");
 		tcpThread.start();
 
-		//	DEBUG
-	  
-	  if ( Debug.EnableError && sockDbg)
-	    Debug.println("[SMB] Native SMB TCP session handler created");
-	}	
+		// DEBUG
+
+		if ( Debug.EnableError && sockDbg)
+			Debug.println("[SMB] Native SMB TCP session handler created");
+	}
 }

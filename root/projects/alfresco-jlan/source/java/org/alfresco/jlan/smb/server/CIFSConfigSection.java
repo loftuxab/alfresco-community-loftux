@@ -141,6 +141,10 @@ public class CIFSConfigSection extends ConfigSection {
   
   private boolean m_macExtensions;
 
+  // Disable NIO based code
+  
+  private boolean m_disableNIO;
+  
   //--------------------------------------------------------------------------------
   //  Win32 NetBIOS configuration
   //
@@ -385,6 +389,15 @@ public class CIFSConfigSection extends ConfigSection {
   public final boolean useWinsockNetBIOS()
   {
     return m_win32NBUseWinsock;
+  }
+
+  /**
+   * Determine if NIO based code should be disabled
+   * 
+   * @return boolean
+   */
+  public final boolean hasDisableNIOCode() {
+	  return m_disableNIO;
   }
   
   /**
@@ -1315,7 +1328,27 @@ public class CIFSConfigSection extends ConfigSection {
 
     return sts;
   }
-  
+
+  /**
+   * Set the disable NIO code flag
+   * 
+   * @param disableNIO boolean
+   * @return int 
+   * @exception InvalidConfigurationException 
+   */
+  public final int setDisableNIOCode(boolean disableNIO)
+    throws InvalidConfigurationException {
+
+	  //  Inform listeners, validate the configuration change
+	
+	  int sts = fireConfigurationChange(ConfigId.SMBDisableNIO, new Boolean( disableNIO));
+	  m_disableNIO = disableNIO;
+	
+	  //  Return the change status
+	
+	  return sts;
+  }
+
   /**
    * Close the configuration section
    */

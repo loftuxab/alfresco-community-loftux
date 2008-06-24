@@ -34,70 +34,70 @@ import org.alfresco.jlan.server.core.SharedDevice;
 import org.alfresco.jlan.server.core.SharedDeviceList;
 import org.alfresco.jlan.server.filesys.TransactionalFilesystemInterface;
 
-
 /**
  * Server Session Base Class
  * 
- * <p>Base class for server session implementations for different protocols.
- *
+ * <p>
+ * Base class for server session implementations for different protocols.
+ * 
  * @author gkspencer
  */
 public abstract class SrvSession {
 
-	//	Network server this session is associated with
-	
+	// Network server this session is associated with
+
 	private NetworkServer m_server;
-	
-  //	Session id/slot number
 
-  private int m_sessId;
-  
-  //	Unique session id string
-  
-  private String m_uniqueId;
+	// Session id/slot number
 
-	//	Process id
-	
+	private int m_sessId;
+
+	// Unique session id string
+
+	private String m_uniqueId;
+
+	// Process id
+
 	private int m_processId = -1;
-	
-	//	Session/user is logged on/validated
-	
+
+	// Session/user is logged on/validated
+
 	private boolean m_loggedOn;
-	
-	//  Client details
 
-	private ClientInfo m_clientInfo;
+	// Client details
 
-  //  Authentication context, used during the initial session setup phase
-  
-  private AuthContext m_authContext;
-	
-  // Debug flags for this session, and debug output interface.
+	private ThreadLocal<ClientInfo> m_clientInfo;
 
-  private int m_debug;
-  private String m_dbgPrefix;
+	// Authentication context, used during the initial session setup phase
 
-	//	List of dynamic/temporary shares created for this session
-	
+	private AuthContext m_authContext;
+
+	// Debug flags for this session, and debug output interface.
+
+	private int m_debug;
+	private String m_dbgPrefix;
+
+	// List of dynamic/temporary shares created for this session
+
 	private SharedDeviceList m_dynamicShares;
-	
-	//	Session shutdown flag
-	
+
+	// Session shutdown flag
+
 	private boolean m_shutdown;
 
-	//	Protocol type
-	
+	// Protocol type
+
 	private String m_protocol;
-	
-	//	Remote client/host name
-	
+
+	// Remote client/host name
+
 	private String m_remoteName;
-  
-  // Transaction object, for filesystems that implement the TransactionalFilesystemInterface
-  
-  private ThreadLocal<Object> m_tx;
-  private TransactionalFilesystemInterface m_txInterface;
-  
+
+	// Transaction object, for filesystems that implement the TransactionalFilesystemInterface
+
+	private ThreadLocal<Object> m_tx;
+	private ThreadLocal<TransactionalFilesystemInterface> m_txInterface;
+
 	/**
 	 * Class constructor
 	 * 
@@ -106,12 +106,16 @@ public abstract class SrvSession {
 	 * @param proto String
 	 * @param remName String
 	 */
-	public SrvSession (int sessId, NetworkServer srv, String proto, String remName) {
+	public SrvSession(int sessId, NetworkServer srv, String proto, String remName) {
 		m_sessId = sessId;
 		m_server = srv;
-		
+
 		setProtocolName(proto);
 		setRemoteName(remName);
+		
+		// Allocate the client information thread local
+		
+		m_clientInfo = new ThreadLocal<ClientInfo>();
 	}
 
 	/**
@@ -122,9 +126,9 @@ public abstract class SrvSession {
 	public final void debugPrint(String str) {
 		Debug.print(str);
 	}
-	
+
 	/**
-	 * Output a  string and a newline to the debug device
+	 * Output a string and a newline to the debug device
 	 * 
 	 * @param str String
 	 */
@@ -132,7 +136,7 @@ public abstract class SrvSession {
 		Debug.print(m_dbgPrefix);
 		Debug.println(str);
 	}
-	
+
 	/**
 	 * Output an exception stack trace to the debug device
 	 * 
@@ -142,41 +146,41 @@ public abstract class SrvSession {
 		Debug.println(ex);
 	}
 
-  /**
-   * Check if the session has an authentication context
-   * 
-   * @return boolean
-   */
-  public final boolean hasAuthenticationContext() {
-    return m_authContext != null ? true : false;
-  }
-  
-  /**
-   * Return the authentication context for this sesion
-   * 
-   * @return AuthContext
-   */
-  public final AuthContext getAuthenticationContext() {
-    return m_authContext;
-  }
-  
+	/**
+	 * Check if the session has an authentication context
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasAuthenticationContext() {
+		return m_authContext != null ? true : false;
+	}
+
+	/**
+	 * Return the authentication context for this sesion
+	 * 
+	 * @return AuthContext
+	 */
+	public final AuthContext getAuthenticationContext() {
+		return m_authContext;
+	}
+
 	/**
 	 * Add a dynamic share to the list of shares created for this session
 	 * 
 	 * @param shrDev SharedDevice
 	 */
 	public final void addDynamicShare(SharedDevice shrDev) {
-		
-		//	Check if the dynamic share list must be allocated
-		
+
+		// Check if the dynamic share list must be allocated
+
 		if ( m_dynamicShares == null)
 			m_dynamicShares = new SharedDeviceList();
-			
-		//	Add the new share to the list
-		
+
+		// Add the new share to the list
+
 		m_dynamicShares.addShare(shrDev);
 	}
-	
+
 	/**
 	 * Determine if the session has any dynamic shares
 	 * 
@@ -203,29 +207,29 @@ public abstract class SrvSession {
 	public final int getProcessId() {
 		return m_processId;
 	}
-	
+
 	/**
 	 * Return the remote client network address
 	 * 
 	 * @return InetAddress
 	 */
 	public abstract InetAddress getRemoteAddress();
-			
-  /**
-   * Return the session id for this session.
-   *
-   * @return int
-   */
-  public final int getSessionId() {
-    return m_sessId;
-  }
+
+	/**
+	 * Return the session id for this session.
+	 * 
+	 * @return int
+	 */
+	public final int getSessionId() {
+		return m_sessId;
+	}
 
 	/**
 	 * Return the server this session is associated with
 	 * 
 	 * @return NetworkServer
 	 */
-	public final NetworkServer getServer () { 
+	public final NetworkServer getServer() {
 		return m_server;
 	}
 
@@ -235,23 +239,23 @@ public abstract class SrvSession {
 	 * @return boolean
 	 */
 	public final boolean hasClientInformation() {
-		return m_clientInfo != null ? true : false;
+		return m_clientInfo.get() != null ? true : false;
 	}
-	
+
 	/**
 	 * Return the client information
 	 * 
 	 * @return ClientInfo
 	 */
 	public final ClientInfo getClientInformation() {
-		return m_clientInfo;
+		return m_clientInfo.get();
 	}
 
 	/**
 	 * Determine if the protocol type has been set
 	 * 
 	 * @return boolean
-	 */		
+	 */
 	public final boolean hasProtocolName() {
 		return m_protocol != null ? true : false;
 	}
@@ -260,11 +264,11 @@ public abstract class SrvSession {
 	 * Return the protocol name
 	 * 
 	 * @return String
-	 */	
+	 */
 	public final String getProtocolName() {
 		return m_protocol;
 	}
-	
+
 	/**
 	 * Determine if the remote client name has been set
 	 * 
@@ -273,7 +277,7 @@ public abstract class SrvSession {
 	public final boolean hasRemoteName() {
 		return m_remoteName != null ? true : false;
 	}
-	
+
 	/**
 	 * Return the remote client name
 	 * 
@@ -282,16 +286,16 @@ public abstract class SrvSession {
 	public final String getRemoteName() {
 		return m_remoteName;
 	}
-	
+
 	/**
 	 * Determine if the session is logged on/validated
 	 * 
 	 * @return boolean
-	 */	
+	 */
 	public final boolean isLoggedOn() {
 		return m_loggedOn;
 	}
-	
+
 	/**
 	 * Determine if the session has been shut down
 	 * 
@@ -300,7 +304,7 @@ public abstract class SrvSession {
 	public final boolean isShutdown() {
 		return m_shutdown;
 	}
-	
+
 	/**
 	 * Return the unique session id
 	 * 
@@ -310,44 +314,44 @@ public abstract class SrvSession {
 		return m_uniqueId;
 	}
 
-  /**
-   * Determine if the specified debug flag is enabled.
-   *
-   * @param dbgFlag int
-   * @return boolean
-   */
-  public final boolean hasDebug(int dbgFlag) {
-    if ((m_debug & dbgFlag) != 0)
-      return true;
-    return false;
-  }
+	/**
+	 * Determine if the specified debug flag is enabled.
+	 * 
+	 * @param dbgFlag int
+	 * @return boolean
+	 */
+	public final boolean hasDebug(int dbgFlag) {
+		if ( (m_debug & dbgFlag) != 0)
+			return true;
+		return false;
+	}
 
-  /**
-   * Set the authentication context, used during the initial session setup phase
-   * 
-   * @param ctx AuthContext
-   */
-  public final void setAuthenticationContext( AuthContext ctx) {
-    m_authContext = ctx;
-  }
-  
+	/**
+	 * Set the authentication context, used during the initial session setup phase
+	 * 
+	 * @param ctx AuthContext
+	 */
+	public final void setAuthenticationContext(AuthContext ctx) {
+		m_authContext = ctx;
+	}
+
 	/**
 	 * Set the client information
 	 * 
 	 * @param client ClientInfo
 	 */
 	public final void setClientInformation(ClientInfo client) {
-		m_clientInfo = client;
+		m_clientInfo.set(client);
 	}
-	
-  /**
-   * Set the debug output interface.
-   *
-   * @param flgs int
-   */
-  public final void setDebug(int flgs) {
-    m_debug = flgs;
-  }
+
+	/**
+	 * Set the debug output interface.
+	 * 
+	 * @param flgs int
+	 */
+	public final void setDebug(int flgs) {
+		m_debug = flgs;
+	}
 
 	/**
 	 * Set the debug output prefix for this session
@@ -380,11 +384,11 @@ public abstract class SrvSession {
 	 * Set the protocol name
 	 * 
 	 * @param name String
-	 */	
+	 */
 	public final void setProtocolName(String name) {
 		m_protocol = name;
 	}
-	
+
 	/**
 	 * Set the remote client name
 	 * 
@@ -393,10 +397,10 @@ public abstract class SrvSession {
 	public final void setRemoteName(String name) {
 		m_remoteName = name;
 	}
-	
+
 	/**
 	 * Set the session id for this session.
-	 *
+	 * 
 	 * @param id int
 	 */
 	public final void setSessionId(int id) {
@@ -411,88 +415,101 @@ public abstract class SrvSession {
 	public final void setUniqueId(String unid) {
 		m_uniqueId = unid;
 	}
-	 
+
 	/**
 	 * Set the shutdown flag
 	 * 
 	 * @param flg boolean
 	 */
 	protected final void setShutdown(boolean flg) {
-		m_shutdown = flg; 
+		m_shutdown = flg;
 	}
 
-  /**
-   * Close the network session
-   */
-  public void closeSession() {
-  	
-  	//	Release any dynamic shares owned by this session
-  	
-  	if ( hasDynamicShares()) {
-  		
-  		//	Close the dynamic shares
-  		
-  		getServer().getShareMapper().deleteShares(this);
-  	}
-  }
+	/**
+	 * Close the network session
+	 */
+	public void closeSession() {
 
-  /**
-   * Initialize the thread local transaction object
-   */
-  public final void initializeTransactionObject() {
-    if ( m_tx == null)
-      m_tx = new ThreadLocal<Object>();
-  }
-  
-  /**
-   * Return the transaction context
-   * 
-   * @return ThreadLocal<Object>
-   */
-  public final ThreadLocal<Object> getTransactionObject() {
-    return m_tx;
-  }
-  
-  /**
-   * Set the active transaction and transaction interface
-   * 
-   * @param tx ThreadLocal<Object>
-   * @param txIface TransactionalFilesystemInterface
-   */
-  public final void setTransaction( ThreadLocal<Object> tx, TransactionalFilesystemInterface txIface) {
-    m_tx = tx;
-    m_txInterface = txIface;
-  }
-  
-  /**
-   * Set the active transaction interface
-   * 
-   * @param txIface TransactionalFilesystemInterface
-   */
-  public final void setTransaction( TransactionalFilesystemInterface txIface) {
-    m_txInterface = txIface;
-  }
-  
-  /**
-   * Clear the stored transaction
-   */
-  public final void clearTransaction() {
-    m_tx = null;
-    m_txInterface = null;
-  }
-  
-  /**
-   * End a transaction
-   */
-  public final void endTransaction() {
-    
-    // Check if there is an active transaction
-    
-    if ( m_txInterface != null && m_tx != null) {
-      
-      // Use the transaction interface to end the transaction
-      
-      m_txInterface.endTransaction( this, m_tx);
-    }
-  }
+		// Release any dynamic shares owned by this session
+
+		if ( hasDynamicShares()) {
+
+			// Close the dynamic shares
+
+			getServer().getShareMapper().deleteShares(this);
+		}
+	}
+
+	/**
+	 * Initialize the thread local transaction objects
+	 */
+	public final void initializeTransactionObject() {
+		if ( m_tx == null)
+			m_tx = new ThreadLocal<Object>();
+		if ( m_txInterface == null)
+			m_txInterface = new ThreadLocal<TransactionalFilesystemInterface>();
+	}
+
+	/**
+	 * Return the transaction context
+	 * 
+	 * @return ThreadLocal<Object>
+	 */
+	public final ThreadLocal<Object> getTransactionObject() {
+		return m_tx;
+	}
+
+	/**
+	 * Set the active transaction and transaction interface
+	 * 
+	 * @param tx Object
+	 * @param txIface TransactionalFilesystemInterface
+	 */
+	public final void setTransaction(Object tx, TransactionalFilesystemInterface txIface) {
+		m_tx.set( tx);
+		m_txInterface.set( txIface);
+	}
+
+	/**
+	 * Set the active transaction interface
+	 * 
+	 * @param txIface TransactionalFilesystemInterface
+	 */
+	public final void setTransaction(TransactionalFilesystemInterface txIface) {
+		m_txInterface.set( txIface);
+	}
+
+	/**
+	 * Clear the stored transaction
+	 */
+	public final void clearTransaction() {
+		m_tx.set( null);
+		m_txInterface.set( null);
+	}
+
+	/**
+	 * End a transaction
+	 */
+	public final void endTransaction() {
+
+		// Check if there is an active transaction
+
+		if ( m_txInterface != null && m_txInterface.get() != null && m_tx != null) {
+
+			// Use the transaction interface to end the transaction
+
+			m_txInterface.get().endTransaction(this, m_tx.get());
+		}
+	}
+	
+	/**
+	 * Check if there is an active transaction
+	 * 
+	 * @return boolean
+	 */
+	public final boolean hasTransaction() {
+		if ( m_tx == null)
+			return false;
+		return m_tx.get() != null ? true : false;
+	}
 }

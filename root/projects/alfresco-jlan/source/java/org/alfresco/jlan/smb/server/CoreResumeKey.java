@@ -38,16 +38,16 @@ class CoreResumeKey {
 
   //	Resume key offsets/lengths
 
-  private static final int RESBITS 			= 0;
-  private static final int FILENAME 		= 1;
-  private static final int RESSERVER 		= 12;
+  private static final int RESBITS 		= 0;
+  private static final int FILENAME 	= 1;
+  private static final int RESSERVER 	= 12;
   private static final int RESCONSUMER 	= 17;
 
   private static final int FILENAMELEN 	= 11;
-  private static final int RESSRVLEN 		= 5;
+  private static final int RESSRVLEN 	= 5;
   private static final int RESCONSUMLEN = 4;
 
-  public static final int LENGTH 				= 21;
+  public static final int LENGTH 		= 21;
   
   /**
    * Dump the resume key to the specified output stream.

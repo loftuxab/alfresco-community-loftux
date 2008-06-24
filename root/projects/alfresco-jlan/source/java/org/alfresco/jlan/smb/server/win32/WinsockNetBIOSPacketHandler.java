@@ -27,228 +27,256 @@ package org.alfresco.jlan.smb.server.win32;
 
 import java.io.IOException;
 
-import org.alfresco.jlan.netbios.RFCNetBIOSProtocol;
+import org.alfresco.jlan.debug.Debug;
 import org.alfresco.jlan.netbios.win32.NetBIOSSocket;
-import org.alfresco.jlan.netbios.win32.WinsockError;
-import org.alfresco.jlan.netbios.win32.WinsockNetBIOSException;
+import org.alfresco.jlan.smb.server.CIFSPacketPool;
 import org.alfresco.jlan.smb.server.PacketHandler;
 import org.alfresco.jlan.smb.server.SMBSrvPacket;
 
 /**
  * Winsock NetBIOS Packet Handler Class
  * 
- * <p>Uses a Windows Winsock NetBIOS socket to provide the low level session layer for better
+ * <p>
+ * Uses a Windows Winsock NetBIOS socket to provide the low level session layer for better
  * integration with Windows.
- *
+ * 
  * @author gkspencer
  */
 public class WinsockNetBIOSPacketHandler extends PacketHandler {
 
-  // Constants
-  //
-  // Receive error indicating a receive buffer error
+	// Constants
+	//
+	// Receive error indicating a receive buffer error
 
-  private static final int ReceiveBufferSizeError = 0x80000000;
+	private static final int ReceiveBufferSizeError = 0x80000000;
 
-  // Network LAN adapter to use
+	// Network LAN adapter to use
 
-  private int m_lana;
+	private int m_lana;
 
-  // NetBIOS session socket
+	// NetBIOS session socket
 
-  private NetBIOSSocket m_sessSock;
+	private NetBIOSSocket m_sessSock;
 
-  /**
-   * Class constructor
-   * 
-   * @param lana int
-   * @param sock NetBIOSSocket
-   */
-  public WinsockNetBIOSPacketHandler(int lana, NetBIOSSocket sock) {
-    super(SMBSrvPacket.PROTOCOL_WIN32NETBIOS, "WinsockNB", "WSNB", sock.getName().getName());
+	/**
+	 * Class constructor
+	 * 
+	 * @param lana int
+	 * @param sock NetBIOSSocket
+	 * @param packetPool CIFSPacketPool
+	 */
+	public WinsockNetBIOSPacketHandler(int lana, NetBIOSSocket sock, CIFSPacketPool packetPool) {
+		super(SMBSrvPacket.PROTOCOL_WIN32NETBIOS, "WinsockNB", "WSNB", sock.getName().getName(), packetPool);
 
-    m_lana = lana;
-    m_sessSock = sock;
-  }
+		m_lana = lana;
+		m_sessSock = sock;
+	}
 
-  /**
-   * Return the LANA number
-   * 
-   * @return int
-   */
-  public final int getLANA() {
-    return m_lana;
-  }
+	/**
+	 * Return the LANA number
+	 * 
+	 * @return int
+	 */
+	public final int getLANA() {
+		return m_lana;
+	}
 
-  /**
-   * Return the NetBIOS socket
-   * 
-   * @return NetBIOSSocket
-   */
-  public final NetBIOSSocket getSocket() {
-    return m_sessSock;
-  }
+	/**
+	 * Return the NetBIOS socket
+	 * 
+	 * @return NetBIOSSocket
+	 */
+	public final NetBIOSSocket getSocket() {
+		return m_sessSock;
+	}
 
-  /**
-   * Return the count of available bytes in the receive input stream
-   * 
-   * @return int
-   * @exception IOException   If a network error occurs.
-   */
-  public int availableBytes()
-    throws IOException {
-    
-    // Do not know the available byte count
-    
-    return -1;
-  }
+	/**
+	 * Return the count of available bytes in the receive input stream
+	 * 
+	 * @return int
+	 * @exception IOException If a network error occurs.
+	 */
+	public int availableBytes()
+		throws IOException {
 
-  /**
-   * Read a packet
-   * 
-   * @param pkt byte[]
-   * @param off int
-   * @param len int
-   * @return int
-   * @exception IOException   If a network error occurs.
-   */
-  public int readPacket(byte[] pkt, int off, int len)
-    throws IOException {
-    
-    // Not implemented
-    
-    throw new IOException("readPacket() not implemented");
-  }
-  
-  /**
-   * Read a packet from the client
-   * 
-   * @param pkt SMBSrvPacket
-   * @return int
-   * @throws IOException
-   */
-  public int readPacket(SMBSrvPacket pkt) throws IOException {
+		// Do not know the available byte count
 
-    // Receive an SMB/CIFS request packet via the Winsock NetBIOS socket
+		return -1;
+	}
 
-    int rxlen = 0;
+	/**
+	 * Read a packet from the client
+	 * 
+	 * @return SMBSrvPacket
+	 * @throws IOException
+	 */
+	public SMBSrvPacket readPacket()
+		throws IOException {
 
-    try {
+		// Get the length of the pending receive data, so we can allocate the correct sized buffer
+		
+		int rxlen = m_sessSock.available();
+		SMBSrvPacket pkt = getPacketPool().allocatePacket( rxlen + 8);
+		
+		// Receive an SMB/CIFS request packet via the Winsock NetBIOS socket
 
-      // Read a packet of data
+		try {
 
-      rxlen = m_sessSock.read(pkt.getBuffer(), 4, pkt.getBufferLength() - 4);
+			// Read a packet of data
 
-      // Check if the buffer is not big enough to receive the entire packet, extend the buffer
-      // and read the remaining part of the packet
+			rxlen = m_sessSock.read(pkt.getBuffer(), 4, pkt.getBufferLength() - 4);
 
-      if (rxlen == ReceiveBufferSizeError) {
+			// Check if the buffer is not big enough to receive the entire packet, extend the buffer
+			// and read the remaining part of the packet
 
-        // Check if the packet buffer is already at the maximum size (we assume the maximum
-        // size is the maximum that RFC NetBIOS can send which is 17bits)
+			if ( rxlen == ReceiveBufferSizeError) {
 
-        if (pkt.getBuffer().length < RFCNetBIOSProtocol.MaxPacketSize) {
-          
-          // Set the initial receive size, assume a full read
+				// Check if there is a larger buffer size available from the packet pool
+				
+				if ( pkt.getBufferLength() >= getPacketPool().getLargestSize()) {
+					
+					// Release the packet back to the pool
+					
+					getPacketPool().releasePacket( pkt);
+				
+					// Throw an exception
+					
+					throw new RuntimeException("Winsock NetBIOS receive over max available buffer size");
+				}
+				
+				// Get the remaining data length
+				
+				int rxlen2 = m_sessSock.available();
+				
+				if ( rxlen2 > 0) {
+					
+					// Allocate a larger buffer to hold the full packet
+					
+					SMBSrvPacket pkt2 = getPacketPool().allocatePacket( pkt.getBufferLength() + rxlen2);
+					
+					// Copy the existing receive data to the new packet
+					
+					rxlen = pkt.getBufferLength() - 4;
+					System.arraycopy(pkt.getBuffer(), 4, pkt2.getBuffer(), 4, rxlen);
+					
+					// Release the original packet buffer, switch to the new packet
+					
+					getPacketPool().releasePacket( pkt);
+					pkt = pkt2;
+					
+					// Read the remaining data
+					
+					rxlen2 = m_sessSock.read( pkt.getBuffer(), rxlen + 4, rxlen2);
+					
+					// Update the total received length
+					
+					if ( rxlen2 == ReceiveBufferSizeError) {
+						
+						// Release the packet back to the pool
+						
+						getPacketPool().releasePacket( pkt);
+					
+						// Throw an exception
+						
+						throw new RuntimeException("Winsock NetBIOS receive error on second stage receive");
+					}
+					
+					// Update the total receive length
+					
+					rxlen += rxlen2;
+				}
+			}
+		}
+		catch (IOException ex) {
 
-          rxlen = pkt.getBufferLength() - 4;
+			// Release the packet back to the pool
+			
+			getPacketPool().releasePacket( pkt);
+			
+			// Clear the received packet to indicate error
+			
+			pkt = null;
+		}
 
-          // Allocate a new buffer, copy the existing data to the new buffer
+		// Set the received packet length
+		
+		if ( pkt != null)
+			pkt.setReceivedLength( rxlen);
+		
+		// Return the received packet
 
-          byte[] newbuf = new byte[RFCNetBIOSProtocol.MaxPacketSize];
-          System.arraycopy(pkt.getBuffer(), 4, newbuf, 4, rxlen);
-          pkt.setBuffer(newbuf);
+		return pkt;
+	}
 
-          // Receive the packet
+	/**
+	 * Write a packet to the client
+	 * 
+	 * @param pkt SMBSrvPacket
+	 * @param len int
+	 * @param writeRaw boolean
+	 * @throws IOException
+	 */
+	public void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)
+		throws IOException {
 
-          int rxlen2 = m_sessSock.read(pkt.getBuffer(), rxlen + 4, pkt.getBufferLength() - (rxlen + 4));
+		// Output the packet via the Winsock NetBIOS socket
+		//
+		// As Windows is handling the NetBIOS session layer we do not send the 4 byte header that is
+		// used by the NetBIOS over TCP/IP and native SMB packet handlers.
 
-          if (rxlen2 == ReceiveBufferSizeError)
-            throw new WinsockNetBIOSException(WinsockError.WsaEMsgSize);
+		int pos = 4;
+		int wrlen = len;
+		int txlen = 0;
+		
+		while ( wrlen > 0) {
+			
+			// Write the packet
+		
+			txlen = m_sessSock.write(pkt.getBuffer(), pos, wrlen);
+			
+			// If the write length is zero wait a short while before retrying
+			
+			if ( txlen == 0) {
+				try {
+					Thread.sleep( 50);
+					System.out.println( "*** Zero length write, wait 50ms ***");
+				}
+				catch ( InterruptedException ex) {
+				}
+			}
+			else {
+				
+				// Adjust the write length
+				
+				wrlen -= txlen;
+				pos   += txlen;
+			}
+		}
 
-          rxlen += rxlen2;
-        }
-        else
-          throw new WinsockNetBIOSException(WinsockError.WsaEMsgSize);
-      }
-    }
-    catch (WinsockNetBIOSException ex) {
-      
-      // Check if the remote client has closed the socket
+		// Do not check the status, if the session has been closed the next receive will fail
+	}
 
-      if (ex.getErrorCode() == WinsockError.WsaEConnReset) {
-        
-        // Indicate that the socket has been closed
+	/**
+	 * Flush the output socket
+	 * 
+	 * @exception IOException If a network error occurs
+	 */
+	public void flushPacket()
+		throws IOException {
 
-        rxlen = -1;
-      }
-      else {
-        
-        // Rethrow the exception
+		// Nothing to do
+	}
 
-        throw ex;
-      }
-    }
+	/**
+	 * Close the Winsock NetBIOS packet handler.
+	 */
+	public void closeHandler() {
 
-    // Return the received packet length
+		super.closeHandler();
 
-    return rxlen;
-  }
+		// Close the session socket
 
-  /**
-   * Write a packet to the client
-   * 
-   * @param pkt SMBSrvPacket
-   * @param len int
-   * @throws IOException
-   */
-  public void writePacket(SMBSrvPacket pkt, int len) throws IOException {
-
-    // Output the packet via the Winsock NetBIOS socket
-    //
-    // As Windows is handling the NetBIOS session layer we do not send the 4 byte header that is
-    // used by the NetBIOS over TCP/IP and native SMB packet handlers.
-
-    m_sessSock.write(pkt.getBuffer(), 4, len);
-
-    // Do not check the status, if the session has been closed the next receive will fail
-  }
-
-  /**
-   * Send an SMB request packet
-   * 
-   * @param pkt byte[]
-   * @param off int
-   * @param len int
-   * @exception IOException   If a network error occurs.
-   */
-  public void writePacket(byte[] pkt, int off, int len)
-    throws IOException {
-    
-    throw new IOException("writePacket() not implemented");
-  }
-
-  /**
-   * Flush the output socket
-   * 
-   * @exception IOException   If a network error occurs
-   */
-  public void flushPacket()
-    throws IOException {
-    
-    // Nothing to do
-  }
-  
-  /**
-   * Close the Winsock NetBIOS packet handler.
-   */
-  public void closeHandler() {
-
-    super.closeHandler();
-
-    // Close the session socket
-
-    if (m_sessSock != null)
-      m_sessSock.closeSocket();
-  }
+		if ( m_sessSock != null)
+			m_sessSock.closeSocket();
+	}
 }

@@ -33,111 +33,121 @@ import org.alfresco.jlan.util.DataPacker;
 
 /**
  * NetBIOS Protocol Packet Handler Class
- *
+ * 
  * @author gkspencer
  */
 public class NetBIOSPacketHandler extends SocketPacketHandler {
+
+	// Buffer to read the request header
+
+	private byte[] m_headerBuf = new byte[4];
 
 	/**
 	 * Class constructor
 	 * 
 	 * @param sock Socket
-	 * @exception IOException		If a network error occurs
+	 * @param packetPool CIFSPacketPool
+	 * @exception IOException If a network error occurs
 	 */
-	public NetBIOSPacketHandler(Socket sock)
-		throws IOException {
-		super(sock,SMBSrvPacket.PROTOCOL_NETBIOS, "NetBIOS", "NB");			
+	public NetBIOSPacketHandler(Socket sock, CIFSPacketPool packetPool) throws IOException {
+		super(sock, SMBSrvPacket.PROTOCOL_NETBIOS, "NetBIOS", "NB", packetPool);
 	}
-	
+
 	/**
 	 * Read a packet from the input stream
 	 * 
-	 * @param pkt SMBSrvPacket
-	 * @return int
-	 * @exception IOexception		If a network error occurs
+	 * @return SMBSrvPacket
+	 * @exception IOexception If a network error occurs
 	 */
-	public final int readPacket(SMBSrvPacket pkt)
+	public final SMBSrvPacket readPacket()
 		throws IOException {
-		
-		//	Read the packet header
-		
-		byte[] buf = pkt.getBuffer();
-		int len = 0;
-				
-		while ( len < RFCNetBIOSProtocol.HEADER_LEN && len != -1)
-			len = readPacket(buf,len, RFCNetBIOSProtocol.HEADER_LEN - len);
-		
-		//	Check if the connection has been closed, read length equals -1
-		
-		if ( len == -1)
-			return len;
 
-		//	Check if we received a valid NetBIOS header
-		
+		// Read the packet header
+
+		int len = readBytes(m_headerBuf, 0, 4);
+
+		// Check if the connection has been closed, read length equals -1
+
+		if ( len == -1)
+			throw new IOException("Connection closed (header read)");
+
+		// Check if we received a valid NetBIOS header
+
 		if ( len < RFCNetBIOSProtocol.HEADER_LEN)
 			throw new IOException("Invalid NetBIOS header, len=" + len);
+
+		// Get the packet type from the header
+
+		int typ = (int) (m_headerBuf[0] & 0xFF);
+		int flags = (int) m_headerBuf[1];
+		int dlen = (int) DataPacker.getShort(m_headerBuf, 2);
+
+		if ( (flags & 0x01) != 0)
+			dlen += 0x10000;
+
+		// Check for a session keep alive type message
+
+		if ( typ == RFCNetBIOSProtocol.SESSION_KEEPALIVE)
+			return null;
+
+		// Get a packet from the pool to hold the request data, allow for the NetBIOS header length
+		// so that the CIFS request lines up with other implementations.
+		
+		SMBSrvPacket pkt = getPacketPool().allocatePacket( dlen + RFCNetBIOSProtocol.HEADER_LEN);
+		
+		// Read the data part of the packet into the users buffer, this may take
+		// several reads
+
+		int offset = RFCNetBIOSProtocol.HEADER_LEN;
+		int totlen = offset;
+
+		try {
 			
-    //  Get the packet type from the header
+			while (dlen > 0) {
+	
+				// Read the data
+	
+				len = readBytes( pkt.getBuffer(), offset, dlen);
+	
+				// Check if the connection has been closed
+	
+				if ( len == -1)
+					throw new IOException("Connection closed (request read)");
+	
+				// Update the received length and remaining data length
+	
+				totlen += len;
+				dlen -= len;
+	
+				// Update the user buffer offset as more reads will be required
+				// to complete the data read
+	
+				offset += len;
+	
+			}
+		}
+		catch (IOException ex) {
+			
+			// Release the packet back to the pool
+			
+			getPacketPool().releasePacket( pkt);
+			
+			// Rethrow the exception
+			
+			throw ex;
+		}
 
-    int typ  = ( int) ( buf [ 0] & 0xFF);
-    int flags= ( int) buf[1];
-    int dlen = ( int) DataPacker.getShort ( buf, 2);
-    
-    if (( flags & 0x01) != 0)
-    	dlen += 0x10000;
+		// Copy the NetBIOS header to the request buffer
+		
+		System.arraycopy( m_headerBuf, 0, pkt.getBuffer(), 0, 4);
+		
+		// Set the received request length
+		
+		pkt.setReceivedLength( totlen);
+		
+		// Return the received packet
 
-    //	Check for a session keep alive type message
-    
-    if ( typ == RFCNetBIOSProtocol.SESSION_KEEPALIVE)
-      return 0;
-      
-    //	Check if the packet buffer is large enough to hold the data + header
-    
-    if ( buf.length < (dlen + RFCNetBIOSProtocol.HEADER_LEN)) {
-    	
-    	//	Allocate a new buffer to hold the data and copy the existing header
-    	
-    	byte[] newBuf = new byte[dlen + RFCNetBIOSProtocol.HEADER_LEN];
-    	System.arraycopy(buf, 0, newBuf, 0, 4);
-    		
-    	//	Attach the new buffer to the SMB packet
-    	
-    	pkt.setBuffer(newBuf);
-    	buf = newBuf;
-    }    	
-    
-	  //  Read the data part of the packet into the users buffer, this may take
-	  //  several reads
-
-	  int offset = RFCNetBIOSProtocol.HEADER_LEN;
-	  int totlen = offset;
-
-	  while ( dlen > 0) {
-
-	    //  Read the data
-
-	    len = readPacket(buf,offset,dlen);
-	    
-	    //	Check if the connection has been closed
-	    
-	    if ( len == -1)
-	    	return -1;
-
-	    //  Update the received length and remaining data length
-
-	    totlen += len;
-	    dlen -= len;
-
-	    //  Update the user buffer offset as more reads will be required
-	    //  to complete the data read
-
-	    offset += len;
-
-	  } // end while reading data
-		    
-		//	Return the received packet length
-
-		return totlen;
+		return pkt;
 	}
 
 	/**
@@ -145,38 +155,47 @@ public class NetBIOSPacketHandler extends SocketPacketHandler {
 	 * 
 	 * @param pkt SMBSrvPacket
 	 * @param len int
-	 * @exception IOexception		If a network error occurs
+	 * @param writeRaw boolean
+	 * @exception IOexception If a network error occurs
 	 */
-	public final void writePacket(SMBSrvPacket pkt, int len)
+	public final void writePacket(SMBSrvPacket pkt, int len, boolean writeRaw)
 		throws IOException {
 
-	  //  Fill in the NetBIOS message header, this is already allocated as
-	  //  part of the users buffer.
-
+		// Update the NetBIOS header, unless this is  write raw request
+		
 		byte[] buf = pkt.getBuffer();
-	  buf [ 0] = ( byte) RFCNetBIOSProtocol.SESSION_MESSAGE;
-	  buf [ 1] = ( byte) 0;
-	  
-	  if ( len > 0xFFFF) {
-	  	
-	  	//	Set the >64K flag
-	  	
-	  	buf [ 1] = ( byte) 0x01;
-	  	
-	  	//	Set the low word of the data length
-	  	
-	  	DataPacker.putShort (( short) (len & 0xFFFF), buf, 2);
-	  }
-	  else {
-
-			//	Set the data length
+		 
+		if ( writeRaw == false) {
 			
-		  DataPacker.putShort (( short) len, buf, 2);
-	  }
+			// Fill in the NetBIOS message header, this is already allocated as part of the users buffer.
+	
+			buf[0] = (byte) RFCNetBIOSProtocol.SESSION_MESSAGE;
+			buf[1] = (byte) 0;
+	
+			if ( len > 0xFFFF) {
+	
+				// Set the >64K flag
+	
+				buf[1] = (byte) 0x01;
+	
+				// Set the low word of the data length
+	
+				DataPacker.putShort((short) (len & 0xFFFF), buf, 2);
+			}
+			else {
+	
+				// Set the data length
+	
+				DataPacker.putShort((short) len, buf, 2);
+			}
+			
+			// Update the length to include the NetBIOS header
+			
+			len += RFCNetBIOSProtocol.HEADER_LEN;
+		}
+		
+		// Output the data packet
 
-	  //  Output the data packet
-
-	  int bufSiz = len + RFCNetBIOSProtocol.HEADER_LEN;
-	  writePacket(buf,0,bufSiz);
+		writeBytes(buf, 0, len);
 	}
 }

@@ -62,6 +62,7 @@ public class NTLM {
   public static final int FlagChallengeNonNT      = 0x00040000;
   public static final int FlagNTLM2Key            = 0x00080000;
   public static final int FlagTargetInfo          = 0x00800000;
+  public static final int FlagRequestVersion	  = 0x02000000;
   public static final int Flag128Bit              = 0x20000000;
   public static final int FlagKeyExchange         = 0x40000000;
   public static final int Flag56Bit               = 0x80000000;
