@@ -24,7 +24,7 @@
    </div>
 
    <div id="${args.htmlid}-navBar" class="nav-bar">
-      <div class=""><button id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
+      <div class="folder-up"><button id="${args.htmlid}-folderUp-button" name="folderUp">${msg("button.up")}</button></div>
       <div class="separator">|</div>
       <div id="${args.htmlid}-breadcrumb" class="breadcrumb"></div>
    </div>

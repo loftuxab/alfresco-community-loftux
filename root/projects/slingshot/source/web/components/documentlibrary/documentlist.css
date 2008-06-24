@@ -56,9 +56,10 @@
 {
    background-color: #ffffff;
 }
-.doclist tr.yui-dt-odd.yui-dt-highlighted
+.doclist tr.yui-dt-odd.yui-dt-highlighted,
+.doclist tr.yui-dt-even.yui-dt-highlighted
 {
-   background-color: #b2d2ff;
+   background-color: #d2e5f2;
 }
 
 .doclist .documents.yui-dt td
