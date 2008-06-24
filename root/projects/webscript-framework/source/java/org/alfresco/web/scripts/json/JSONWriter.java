@@ -22,7 +22,7 @@
  * the FLOSS exception, and it is also available here: 
  * http://www.alfresco.com/legal/licensing
  */
-package org.alfresco.web.bean.ajax;
+package org.alfresco.web.scripts.json;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -31,10 +31,13 @@ import java.util.Stack;
 /**
  * Fast and simple JSON stream writer. Wraps a Writer to output a JSON object stream.
  * No intermediate objects are created - writes are immediate to the underlying stream.
+ * Quoted and correct JSON encoding is performed on string values, - encoding is
+ * not performed on key names - it is assumed they are simple strings. The developer must
+ * call JSONWriter.encodeJSONString() on the key name if required.
  * 
  * @author Kevin Roast
  */
-public class JSONWriter
+public final class JSONWriter
 {
    private Writer out;
    private Stack<Boolean> stack = new Stack<Boolean>();
@@ -78,8 +81,9 @@ public class JSONWriter
    public void startValue(String name) throws IOException
    {
       if (stack.peek() == true) out.write(", ");
+      out.write('"');
       out.write(name);
-      out.write(": ");
+      out.write("\": ");
       stack.pop();
       stack.push(Boolean.TRUE);
       stack.push(Boolean.FALSE);
@@ -93,9 +97,10 @@ public class JSONWriter
    public void writeValue(String name, String value) throws IOException
    {
       if (stack.peek() == true) out.write(", ");
+      out.write('"');
       out.write(name);
-      out.write(": \"");
-      out.write(value);
+      out.write("\": \"");
+      out.write(encodeJSONString(value));
       out.write('"');
       stack.pop();
       stack.push(Boolean.TRUE);
@@ -104,8 +109,9 @@ public class JSONWriter
    public void writeValue(String name, int value) throws IOException
    {
       if (stack.peek() == true) out.write(", ");
+      out.write('"');
       out.write(name);
-      out.write(": ");
+      out.write("\": ");
       out.write(Integer.toString(value));
       stack.pop();
       stack.push(Boolean.TRUE);
@@ -114,8 +120,9 @@ public class JSONWriter
    public void writeValue(String name, boolean value) throws IOException
    {
       if (stack.peek() == true) out.write(", ");
+      out.write('"');
       out.write(name);
-      out.write(": ");
+      out.write("\": ");
       out.write(Boolean.toString(value));
       stack.pop();
       stack.push(Boolean.TRUE);
@@ -124,9 +131,92 @@ public class JSONWriter
    public void writeNullValue(String name) throws IOException
    {
       if (stack.peek() == true) out.write(", ");
+      out.write('"');
       out.write(name);
-      out.write(": null");
+      out.write("\": null");
       stack.pop();
       stack.push(Boolean.TRUE);
+   }
+
+   public static String encodeJSONString(final String s)
+   {
+       if (s == null || s.length() == 0)
+       {
+           return "";
+       }
+       
+       StringBuilder sb = null;      // create on demand
+       String enc;
+       char c;
+       int len = s.length();
+       for (int i = 0; i < len; i++)
+       {
+           enc = null;
+           c = s.charAt(i);
+           switch (c)
+           {
+               case '\\':
+                   enc = "\\\\";
+                   break;
+               case '"':
+                   enc = "\\\"";
+                   break;
+               case '/':
+                   enc = "\\/";
+                   break;
+               case '\b':
+                   enc = "\\b";
+                   break;
+               case '\t':
+                   enc = "\\t";
+                   break;
+               case '\n':
+                   enc = "\\n";
+                   break;
+               case '\f':
+                   enc = "\\f";
+                   break;
+               case '\r':
+                   enc = "\\r";
+                   break;
+
+               default:
+                   if (((int)c) >= 0x80)
+                   {
+                       //encode all non basic latin characters
+                       String u = "000" + Integer.toHexString((int)c);
+                       enc = "\\u" + u.substring(u.length() - 4);
+
+                   }
+               break;
+           }
+
+           if (enc != null)
+           {
+               if (sb == null)
+               {
+                   String soFar = s.substring(0, i);
+                   sb = new StringBuilder(i + 8);
+                   sb.append(soFar);
+               }
+               sb.append(enc);
+           }
+           else
+           {
+               if (sb != null)
+               {
+                   sb.append(c);
+               }
+           }
+       }
+
+       if (sb == null)
+       {
+           return s;
+       }
+       else
+       {
+           return sb.toString();
+       }
    }
 }
