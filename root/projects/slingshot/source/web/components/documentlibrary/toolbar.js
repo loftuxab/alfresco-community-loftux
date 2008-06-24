@@ -51,6 +51,7 @@
       
       // Decoupled event listeners
       YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
+      YAHOO.Bubbling.on("onFolderRenamed", this.onPathChanged, this);
       YAHOO.Bubbling.on("onFileSelected", this.onFileSelected, this);
    
       return this;
@@ -75,13 +76,13 @@
          siteId: "",
 
          /**
-          * ComponentId representing root container
+          * ContainerId representing root container
           *
-          * @property componentId
+          * @property containerId
           * @type string
           * @default "documentLibrary"
           */
-         componentId: "documentLibrary"
+         containerId: "documentLibrary"
       },
       
       /**
@@ -216,21 +217,35 @@
             this.modules.createFolder = new Alfresco.module.CreateFolder(this.id + "-createFolder").setOptions(
             {
                siteId: this.options.siteId,
-               componentId: this.options.componentId,
+               containerId: this.options.containerId,
                parentPath: this.currentPath,
                onSuccess:
                {
-                  fn: function DLTB_onNewFolder_callback(folderName)
+                  fn: function DLTB_onNewFolder_callback(folder)
                   {
-                     YAHOO.Bubbling.fire("onDoclistRefresh");
+                     YAHOO.Bubbling.fire("onFolderCreated",
+                     {
+                        name: folder.name,
+                        parentPath: folder.parentPath,
+                        nodeRef: folder.nodeRef
+                     });
                      Alfresco.util.PopupManager.displayMessage(
                      {
-                        text: this._msg("message.new-folder.success", folderName)
+                        text: this._msg("message.new-folder.success", folder.name)
                      });
                   },
                   scope: this
                }
             });
+         }
+         else
+         {
+            this.modules.createFolder.setOptions(
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               parentPath: this.currentPath
+            })
          }
          this.modules.createFolder.show();
       },
@@ -253,7 +268,7 @@
          var multiUploadConfig =
          {
             siteId: this.options.siteId,
-            componentId: this.options.componentId,
+            containerId: this.options.containerId,
             path: this.currentPath,
             filter: [],
             mode: this.fileUpload.MODE_MULTI_UPLOAD
@@ -328,7 +343,7 @@
        * @param layer {object} Event fired
        * @param args {array} Event parameters (depends on event type)
        */
-      onFileSelected: function DLTB_onPathChanged(layer, args)
+      onFileSelected: function DLTB_onFileSelected(layer, args)
       {
          var obj = args[1];
          if (obj !== null)
@@ -384,14 +399,14 @@
                   innerHTML: displayPaths[i]
                });
                var newPath = paths.slice(0, i+1).join("/");
-               eLink.on("click", function DLTB__gB_click(e)
+               eLink.on("click", function DLTB__gB_click(e, path)
                {
                   YAHOO.Bubbling.fire("onPathChanged",
                   {
-                     path: newPath
+                     path: path
                   });
                   YAHOO.util.Event.stopEvent(e);
-               });
+               }, newPath);
                eCrumb.appendChild(eLink);
                eCrumb.appendChild(new Element(document.createElement("span"),
                {

@@ -119,19 +119,26 @@
        *
        * @method deleteFile
        * @param site {string} current site
-       * @param componentId {string} component container
+       * @param containerId {string} component container
        * @param path {string} path where file is located
        * @param file {string} file to be deleted
        * @param obj {object} optional additional request configuration
        * @return {boolean} false: module not ready
        */
-      deleteFile: function DLA_deleteFile(site, componentId, path, file, obj)
+      deleteFile: function DLA_deleteFile(site, containerId, path, file, obj)
       {
+         var filePath =  path + "/" + file;
+         
          var config = YAHOO.lang.merge(this.defaultConfig,
          {
-            url: this.defaultConfig.url + "file/" + site + "/" + componentId + (path.length > 0 ? "/" + path : "") + "/" + file,
+            url: this.defaultConfig.url + "file/" + site + "/" + containerId + filePath,
             method: Alfresco.util.Ajax.DELETE,
-            responseContentType: Alfresco.util.Ajax.JSON
+            responseContentType: Alfresco.util.Ajax.JSON,
+            object:
+            {
+               filePath: filePath,
+               fileName: file
+            }
          });
 
          return this._runAction(config, obj);

@@ -7,5 +7,7 @@
    <chrome>
       <frame>div</frame>
    </chrome>
-   <properties></properties>
+   <properties>
+      <container>documentLibrary</container>
+   </properties>
 </component>

@@ -36,7 +36,7 @@
  * var multiUploadConfig =
  * {
  *    siteId: siteId,
- *    componentId: doclibComponentId,
+ *    containerId: doclibContainerId,
  *    path: docLibUploadPath,
  *    filter: [],
  *    mode: fileUpload.MODE_MULTI_UPLOAD,
@@ -207,7 +207,7 @@
        */
       defaultShowConfig: {
          siteId: null,
-         componentId: null,
+         containerId: null,
          path: null,
          mode: this.MODE_SINGLE_UPLOAD,
          filter: []
@@ -356,7 +356,7 @@
        * The config object is in the form of:
        * {
        *    siteId: {string},       // site to upload file(s) to
-       *    componentId: {string},  // component to upload file(s) to (i.e. a doclib id)
+       *    containerId: {string},  // container to upload file(s) to (i.e. a doclib id)
        *    path: {string},         // path inside the component to upload file(s) to
        *    mode: {int},            // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},        // limits what kind of files the user can select in the OS file selector
@@ -1176,7 +1176,7 @@
                {
                   path: this.showConfig.path,
                   siteId: this.showConfig.siteId,
-                  componentId: this.showConfig.componentId,
+                  containerId: this.showConfig.containerId,
                   contentType: contentType
                }, "filedata");
                startedUploads++;

@@ -6,6 +6,7 @@
    new Alfresco.DocumentList("${args.htmlid}").setOptions(
    {
       siteId: "${page.url.args["site"]!""}",
+      containerId: "${args.container!"documentLibrary"}",
       initialPath: "${page.url.args["path"]!""}"
    }).setMessages(
       ${messages}
