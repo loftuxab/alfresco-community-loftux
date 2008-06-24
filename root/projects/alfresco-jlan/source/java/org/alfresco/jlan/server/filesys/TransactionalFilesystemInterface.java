@@ -55,7 +55,7 @@ public interface TransactionalFilesystemInterface {
    * End an active transaction
    * 
    * @param sess SrvSession
-   * @param tx ThreadLocal<Object>
+   * @param tx Object
    */
-  public void endTransaction(SrvSession sess, ThreadLocal<Object> tx);
+  public void endTransaction(SrvSession sess, Object tx);
 }

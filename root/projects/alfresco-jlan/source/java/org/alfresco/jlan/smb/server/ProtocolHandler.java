@@ -45,7 +45,7 @@ import org.alfresco.jlan.smb.PacketType;
  */
 abstract class ProtocolHandler {
 
-  //	Server session that this protocol handler is associated with.
+  // Server session that this protocol handler is associated with.
 
   protected SMBSrvSession m_sess;
   
@@ -74,10 +74,12 @@ abstract class ProtocolHandler {
   /**
    * Run the SMB protocol handler for this server session.
    *
-   * @exception java.io.IOException
-   * @exception org.alfresco.aifs.smb.SMBSrvException
+   * @param smbPkt SMBSrvPacket
+   * @exception IOException
+   * @exception SMBSrvException
+   * @exception TooManyConnectionsException
    */
-  public abstract boolean runProtocol()
+  public abstract boolean runProtocol( SMBSrvPacket smbPkt)
     throws IOException, SMBSrvException, TooManyConnectionsException;
     
   /**

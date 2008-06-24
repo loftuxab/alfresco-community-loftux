@@ -20,6 +20,14 @@
  #define UNICODE
 #endif
 
+// Define the maximum number of sockets per select for asynchronous I/O
+//
+// Note: Must be done before winsock2.h is included
+
+#define MaxSocketsPerSelect	256
+
+// Includes
+
 #include <stdio.h>
 #include <winsock2.h>
 #include <windows.h>
@@ -1144,6 +1152,38 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_ListenS
 
 /*
  * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    ConnectSocket
+ * Signature: (I[B)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_ConnectSocket
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr, jbyteArray remoteName)
+{
+	jbyte* pBuffer = NULL;
+	SOCKADDR_NB remNbAddr;
+
+	/*
+	 * Access the remote server name
+	 */
+
+	pBuffer = (*jnienv)->GetByteArrayElements(jnienv, remoteName, 0);
+
+	/*
+	 * Fill in the remote server details
+	 */
+
+	memset( &remNbAddr, 0, sizeof(SOCKADDR_NB));
+	SET_NETBIOS_SOCKADDR( &remNbAddr, NETBIOS_UNIQUE_NAME, pBuffer, pBuffer[15]);
+	(*jnienv)->ReleaseByteArrayElements(jnienv, remoteName, pBuffer, 0);
+
+	/*
+	 * Connect to the remote NetBIOS file server
+	 */
+	if ( connect(( SOCKET) sockPtr, (const struct sockaddr*) &remNbAddr, sizeof( remNbAddr)) == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "ConnectSocket");
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
  * Method:    CloseSocket
  * Signature: (I)V
  */
@@ -1185,8 +1225,22 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SendSoc
 
 	(*jnienv)->ReleaseByteArrayElements(jnienv, jbuf, pBuffer, 0);
 
-	if ( sts == SOCKET_ERROR)
-		throwWinsockException(jnienv, WSAGetLastError(), "SendSocket");
+	if ( sts == SOCKET_ERROR) {
+
+		/*
+		 * Check if the error indicates that a non-blocking socket would block
+		 */
+		int wsts = WSAGetLastError();
+		if ( wsts == WSAEWOULDBLOCK) {
+
+			/*
+			 * Indicate no data sent, try again
+			 */
+			return 0;
+		}
+		else
+			throwWinsockException(jnienv, wsts, "SendSocket");
+	}
 
 	/*
 	 * Return the actual length of data written
@@ -1240,6 +1294,31 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Receive
 }
 
 /*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    ReceiveLengthSocket
+ * Signature: (I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_ReceiveLengthSocket
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr)
+{
+	long rxLen;
+
+	/*
+	 * Get the available read data length for the socket
+	 */
+	if ( ioctlsocket((SOCKET) sockPtr, FIONREAD, (u_long*) &rxLen) == 0)
+		return rxLen;
+	else {
+
+		/*
+		 * Return the error
+		 */
+		throwWinsockException(jnienv, WSAGetLastError(), "ReceiveLengthSocket");
+		return 0;
+	}
+}
+
+/*
 * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
 * Method:    SendSocketDatagram
 * Signature: (I[B[BII)I
@@ -1289,6 +1368,118 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SendSoc
 	 */
 
 	return sts;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    SetNonBlockingSocket
+ * Signature: (IZ)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SetNonBlockingSocket
+  (JNIEnv* jnienv, jclass jthis, jint sockPtr, jboolean nonBlocking)
+{
+	SOCKET sock = (SOCKET) sockPtr;
+	int sockMode = 0;
+	int sts = 0;
+
+	/*
+	 * Set the blocking/non-blocking mode
+	 */
+	
+	if ( nonBlocking == 0)
+		sockMode = 1;
+
+	/*
+	 * Set the socket non-blocking I/O mode
+	 */
+	
+	sts = ioctlsocket( sock, FIONBIO, (u_long*) &sockMode);
+	if ( sts == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "SetNonBlockingSocket");
+
+	/*
+	 * Return the new non-blocking mode
+	 */
+	
+	return sockMode;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    SelectReceiveSockets
+ * Signature: (I[I[I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SelectReceiveSockets
+  (JNIEnv* jnienv, jclass jthis, jint jsockCnt, jintArray jreadSocksIn, jintArray jreadSocksOut)
+{
+	jint* pReadSocksIn = NULL;
+	jsize readArrayLen = 0;
+	int sts = 0;
+	fd_set readfds;
+    int readCnt = 0;
+	unsigned int idx = 0;
+
+	/*
+	 * Access the list of sockets to wait for a read event
+	 */
+
+	pReadSocksIn = (*jnienv)->GetIntArrayElements( jnienv, jreadSocksIn, 0);
+	readArrayLen = (*jnienv)->GetArrayLength( jnienv, jreadSocksIn);
+
+	/*
+	 * Copy the read socket details to the FS_SET structure
+	 */
+	for ( idx = 0; idx < (unsigned int) jsockCnt; idx++) {
+
+		/*
+		 * Check if the current read socket is valid, add it to the set of sockets to wait for read events
+		 */
+
+		readfds.fd_array[ readCnt++] = pReadSocksIn[ idx];
+	}
+
+	/*
+	 * Release the input array
+	 */
+
+	(*jnienv)->ReleaseIntArrayElements(jnienv, jreadSocksIn, pReadSocksIn, 0);
+
+	/*
+	 * Set the cound of read sockets to monitor for events
+	 */
+
+	readfds.fd_count = readCnt;
+
+	/*
+	 * Wait for a read event on one or more sockets
+	 */
+
+	sts = select( 0, &readfds, NULL, NULL, NULL);
+	if ( sts == SOCKET_ERROR)
+		throwWinsockException(jnienv, WSAGetLastError(), "SelectSockets");
+
+	/*
+	 * Copy the list of triggered sockets to the output array
+	 */
+
+	(*jnienv)->SetIntArrayRegion( jnienv, jreadSocksOut, 0, ( jsize) readfds.fd_count, (jint*) &readfds.fd_array[0]);
+
+	/*
+	 * Return the count of triggered sockets
+	 */
+
+	return readfds.fd_count;
+}
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    GetMaximumSocketsPerSelect
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_GetMaximumSocketsPerSelect
+  (JNIEnv* jnienv, jclass jthis)
+{
+	return MaxSocketsPerSelect;
 }
 
 /*

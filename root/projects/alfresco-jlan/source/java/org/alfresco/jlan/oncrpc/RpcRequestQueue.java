@@ -69,7 +69,7 @@ public class RpcRequestQueue {
 		
 		//	Notify workers that there is a request to process
 		
-		notifyAll();
+		notifyAll();	// should be notify() ?
 	}
 	
 	/**

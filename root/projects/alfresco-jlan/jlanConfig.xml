@@ -33,7 +33,7 @@
 <!--    <netbiosDebug/> -->
 <!--    <announceDebug/> -->
     
-		<authenticator type="local">
+		<authenticator type="enterprise">
 			<mode>USER</mode>
 			<NOallowGuest/>
       <Debug/>

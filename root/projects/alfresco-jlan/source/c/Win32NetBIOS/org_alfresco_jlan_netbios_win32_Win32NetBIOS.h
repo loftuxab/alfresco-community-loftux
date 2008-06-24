@@ -171,14 +171,6 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_CreateS
 
 /*
  * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
- * Method:    CreateDatagramSocket
- * Signature: (I)I
- */
-JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_CreateDatagramSocket
-  (JNIEnv *, jclass, jint);
-
-/*
- * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
  * Method:    BindSocket
  * Signature: (I[B)I
  */
@@ -191,6 +183,14 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_BindSoc
  * Signature: (I[B)I
  */
 JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_ListenSocket
+  (JNIEnv *, jclass, jint, jbyteArray);
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    ConnectSocket
+ * Signature: (I[B)V
+ */
+JNIEXPORT void JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_ConnectSocket
   (JNIEnv *, jclass, jint, jbyteArray);
 
 /*
@@ -219,11 +219,35 @@ JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_Receive
 
 /*
  * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
- * Method:    SendSocketDatagram
- * Signature: (I[B[BII)I
+ * Method:    ReceiveLengthSocket
+ * Signature: (I)I
  */
-JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SendSocketDatagram
-  (JNIEnv *, jclass, jint, jbyteArray, jbyteArray, jint, jint);
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_ReceiveLengthSocket
+  (JNIEnv *, jclass, jint);
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    SetNonBlockingSocket
+ * Signature: (IZ)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SetNonBlockingSocket
+  (JNIEnv *, jclass, jint, jboolean);
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    SelectReceiveSockets
+ * Signature: (I[I[I)I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_SelectReceiveSockets
+  (JNIEnv *, jclass, jint, jintArray, jintArray);
+
+/*
+ * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS
+ * Method:    GetMaximumSocketsPerSelect
+ * Signature: ()I
+ */
+JNIEXPORT jint JNICALL Java_org_alfresco_jlan_netbios_win32_Win32NetBIOS_GetMaximumSocketsPerSelect
+  (JNIEnv *, jclass);
 
 /*
  * Class:     org_alfresco_jlan_netbios_win32_Win32NetBIOS

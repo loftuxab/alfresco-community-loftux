@@ -29,6 +29,7 @@ import java.io.IOException;
 
 import org.alfresco.jlan.smb.dcerpc.DCEBuffer;
 import org.alfresco.jlan.smb.server.SMBSrvException;
+import org.alfresco.jlan.smb.server.SMBSrvPacket;
 import org.alfresco.jlan.smb.server.SMBSrvSession;
 
 /**
@@ -44,9 +45,10 @@ public interface DCEHandler {
 	 * @param sess SMBSrvSession
 	 * @param inBuf DCEBuffer
 	 * @param pipeFile DCEPipeFile
+	 * @param smbPkt Request packet
 	 * @exception IOException
 	 * @exception SMBSrvException
 	 */
-	public void processRequest(SMBSrvSession sess, DCEBuffer inBuf, DCEPipeFile pipeFile)
+	public void processRequest(SMBSrvSession sess, DCEBuffer inBuf, DCEPipeFile pipeFile, SMBSrvPacket smbPkt)
 		throws IOException, SMBSrvException;
 }

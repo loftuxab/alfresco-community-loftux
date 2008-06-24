@@ -27,35 +27,35 @@ package org.alfresco.jlan.smb.server;
 
 /**
  * Default Server Session Factory Class
- *
+ * 
  * @author gkspencer
  */
 public class DefaultSrvSessionFactory implements SrvSessionFactory {
 
 	/**
-	 *	Create a server session object
+	 * Create a server session object
 	 * 
 	 * @param handler PacketHandler
 	 * @param server SMBServer
-   * @param sessId int
+	 * @param sessId int
 	 * @return SMBSrvSession
 	 */
 	public SMBSrvSession createSession(PacketHandler handler, SMBServer server, int sessId) {
-    
-    // Create a new SMB session
-    
-    SMBSrvSession sess = new SMBSrvSession(handler, server);
-    
-    sess.setSessionId(sessId);
-    sess.setUniqueId(handler.getShortName() + sess.getSessionId());
-    sess.setDebugPrefix("[" + handler.getShortName() + sessId + "] ");
 
-    //  Add the session to the active session list
+		// Create a new SMB session
 
-    server.addSession(sess);
-    
-    // Return the new session
-    
-    return sess;
+		SMBSrvSession sess = new SMBSrvSession(handler, server);
+
+		sess.setSessionId(sessId);
+		sess.setUniqueId(handler.getShortName() + sess.getSessionId());
+		sess.setDebugPrefix("[" + handler.getShortName() + sessId + "] ");
+
+		// Add the session to the active session list
+
+		server.addSession(sess);
+
+		// Return the new session
+
+		return sess;
 	}
 }

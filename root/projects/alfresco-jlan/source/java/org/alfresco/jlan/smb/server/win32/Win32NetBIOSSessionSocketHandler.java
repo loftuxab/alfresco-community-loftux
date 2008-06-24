@@ -25,6 +25,7 @@
 
 package org.alfresco.jlan.smb.server.win32;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,13 +36,14 @@ import org.alfresco.jlan.netbios.win32.NetBIOSSocket;
 import org.alfresco.jlan.netbios.win32.Win32NetBIOS;
 import org.alfresco.jlan.netbios.win32.WinsockError;
 import org.alfresco.jlan.netbios.win32.WinsockNetBIOSException;
+import org.alfresco.jlan.server.NetworkServer;
+import org.alfresco.jlan.server.SessionHandlerBase;
 import org.alfresco.jlan.server.config.ServerConfiguration;
 import org.alfresco.jlan.smb.mailslot.win32.Win32NetBIOSHostAnnouncer;
 import org.alfresco.jlan.smb.server.CIFSConfigSection;
 import org.alfresco.jlan.smb.server.PacketHandler;
 import org.alfresco.jlan.smb.server.SMBServer;
 import org.alfresco.jlan.smb.server.SMBSrvSession;
-import org.alfresco.jlan.smb.server.SessionSocketHandler;
 
 /**
  * Win32 NetBIOS Session Socket Handler Class
@@ -49,983 +51,1005 @@ import org.alfresco.jlan.smb.server.SessionSocketHandler;
  * <p>
  * Uses the Win32 Netbios() call to provide the low level session layer for better integration with
  * Windows.
- *
+ * 
  * @author gkspencer
  */
-public class Win32NetBIOSSessionSocketHandler extends SessionSocketHandler implements LanaListener {
+public class Win32NetBIOSSessionSocketHandler extends SessionHandlerBase implements Runnable, LanaListener {
 
-  // Constants
-  //
-  // Default LANA offline polling interval
+	// Constants
+	//
+	// Default LANA offline polling interval
 
-  public static final long LANAPollingInterval = 5000; // 5 seconds
+	public static final long LANAPollingInterval = 5000; // 5 seconds
 
-  // Thread group
-  
-  private static final ThreadGroup Win32NetBIOSGroup = new ThreadGroup( "Win32NetBIOSSessions");
-  
-  // File server name
+	// Thread group
 
-  private String m_srvName;
+	private static final ThreadGroup Win32NetBIOSGroup = new ThreadGroup("Win32NetBIOSSessions");
 
-  // Accept connections from any clients or the named client only
+	// File server name
 
-  private byte[] m_acceptClient;
-  private boolean m_acceptAny;
-  private String m_acceptClientStr;
-  
-  // Local NetBIOS name to listen for sessions on and assigned name number
+	private String m_srvName;
 
-  private NetBIOSName m_nbName;
+	// Accept connections from any clients or the named client only
 
-  private int m_nameNum;
+	private byte[] m_acceptClient;
+	private boolean m_acceptAny;
+	private String m_acceptClientStr;
 
-  // Workstation NetBIOS name and assigned name number
+	// Local NetBIOS name to listen for sessions on and assigned name number
 
-  private NetBIOSName m_wksNbName;
+	private NetBIOSName m_nbName;
 
-  private int m_wksNameNum;
+	private int m_nameNum;
 
-  // NetBIOS LAN adapter to use
+	// Workstation NetBIOS name and assigned name number
 
-  private int m_lana = -1;
+	private NetBIOSName m_wksNbName;
 
-  // Flag to indicate if the LANA is valid or the network adapter is currently
-  // unplugged/offline/disabled
+	private int m_wksNameNum;
 
-  private boolean m_lanaValid;
+	// NetBIOS LAN adapter to use
 
-  // Polling interval in milliseconds to check if the configured LANA is back online
+	private int m_lana = -1;
 
-  private long m_lanaPoll;
+	// Flag to indicate if the LANA is valid or the network adapter is currently
+	// unplugged/offline/disabled
 
-  // Flag to indicate if we are using Win32 Netbios() or Winsock calls
+	private boolean m_lanaValid;
 
-  private boolean m_useWinsock;
+	// Polling interval in milliseconds to check if the configured LANA is back online
 
-  // Winsock Netbios socket to listen for incoming connections
+	private long m_lanaPoll;
 
-  private NetBIOSSocket m_nbSocket;
+	// Flag to indicate if we are using Win32 Netbios() or Winsock calls
 
-  // Dummy socket used to register the workstation name that some clients search for, although they
-  // connect
-  // to the file server service
+	private boolean m_useWinsock;
 
-  private NetBIOSSocket m_wksSocket;
+	// Winsock Netbios socket to listen for incoming connections
 
-  /**
-   * Class constructor
-   * 
-   * @param srv SMBServer
-   * @param debug boolean
-   */
-  public Win32NetBIOSSessionSocketHandler(SMBServer srv, boolean debug) {
+	private NetBIOSSocket m_nbSocket;
 
-    super("Win32 NetBIOS", srv, debug);
+	// Dummy socket used to register the workstation name that some clients search for, although
+	// they connect to the file server service
 
-    // Get the Win32 NetBIOS file server name
+	private NetBIOSSocket m_wksSocket;
 
-    if (srv.getCIFSConfiguration().getWin32ServerName() != null)
-      m_srvName = srv.getCIFSConfiguration().getWin32ServerName();
-    else
-      m_srvName = srv.getCIFSConfiguration().getServerName();
+	/**
+	 * Class constructor
+	 * 
+	 * @param srv SMBServer
+	 * @param debug boolean
+	 */
+	public Win32NetBIOSSessionSocketHandler(SMBServer srv, boolean debug) {
 
-    // Get the accepted client string, defaults to '*' to accept any client connection
+		super("Win32 NetBIOS", "SMB", srv, null, 0);
 
-    m_acceptClientStr = srv.getCIFSConfiguration().getWin32ClientAccept();
-    NetBIOSName accName = new NetBIOSName(m_acceptClientStr, NetBIOSName.WorkStation, false);
-    m_acceptClient = accName.getNetBIOSName();
+		// Enable/disable debug output
 
-    if ( srv.getCIFSConfiguration().getWin32ClientAccept().equals( "*"))
-      m_acceptAny = true;
-    
-    // Set the LANA to use, or -1 to use the first available
+		setDebug(debug);
 
-    m_lana = srv.getCIFSConfiguration().getWin32LANA();
+		// Get the Win32 NetBIOS file server name
 
-    // Set the Win32 NetBIOS code to use either the Netbios() API call or Winsock NetBIOS calls
+		if ( srv.getCIFSConfiguration().getWin32ServerName() != null)
+			m_srvName = srv.getCIFSConfiguration().getWin32ServerName();
+		else
+			m_srvName = srv.getCIFSConfiguration().getServerName();
 
-    m_useWinsock = srv.getCIFSConfiguration().useWinsockNetBIOS();
+		// Get the accepted client string, defaults to '*' to accept any client connection
 
-    // Debug
+		m_acceptClientStr = srv.getCIFSConfiguration().getWin32ClientAccept();
+		NetBIOSName accName = new NetBIOSName(m_acceptClientStr, NetBIOSName.WorkStation, false);
+		m_acceptClient = accName.getNetBIOSName();
 
-    if (Debug.EnableInfo && hasDebug())
-      Debug.println("[SMB] Win32 NetBIOS server " + m_srvName + " (using " + (isUsingWinsock() ? "Winsock" : "Netbios() API") + ")");
+		if ( srv.getCIFSConfiguration().getWin32ClientAccept().equals("*"))
+			m_acceptAny = true;
 
-    // Set the LANA offline polling interval
+		// Set the LANA to use, or -1 to use the first available
 
-    m_lanaPoll = LANAPollingInterval;
-  }
+		m_lana = srv.getCIFSConfiguration().getWin32LANA();
 
-  /**
-   * Class constructor
-   * 
-   * @param srv SMBServer
-   * @param lana int
-   * @param debug boolean
-   */
-  public Win32NetBIOSSessionSocketHandler(SMBServer srv, int lana, boolean debug) {
+		// Set the Win32 NetBIOS code to use either the Netbios() API call or Winsock NetBIOS calls
 
-    super("Win32 NetBIOS", srv, debug);
+		m_useWinsock = srv.getCIFSConfiguration().useWinsockNetBIOS();
 
-    // Get the Win32 NetBIOS file server name
+		// Debug
 
-    if (srv.getCIFSConfiguration().getWin32ServerName() != null)
-      m_srvName = srv.getCIFSConfiguration().getWin32ServerName();
-    else
-      m_srvName = srv.getCIFSConfiguration().getServerName();
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("[SMB] Win32 NetBIOS server " + m_srvName + " (using "
+					+ (isUsingWinsock() ? "Winsock" : "Netbios() API") + ")");
 
-    // Get the accepted client string, defaults to '*' to accept any client connection
+		// Set the LANA offline polling interval
 
-    m_acceptClientStr = srv.getCIFSConfiguration().getWin32ClientAccept();
-    NetBIOSName accName = new NetBIOSName(m_acceptClientStr, NetBIOSName.WorkStation, false);
-    m_acceptClient = accName.getNetBIOSName();
+		m_lanaPoll = LANAPollingInterval;
+	}
 
-    if ( srv.getCIFSConfiguration().getWin32ClientAccept().equals( "*"))
-      m_acceptAny = true;
-    
-    // Set the LANA to use, or -1 to use the first available
+	/**
+	 * Class constructor
+	 * 
+	 * @param srv SMBServer
+	 * @param lana int
+	 * @param debug boolean
+	 */
+	public Win32NetBIOSSessionSocketHandler(SMBServer srv, int lana, boolean debug) {
 
-    m_lana = lana;
+		super("Win32 NetBIOS", "SMB", srv, null, 0);
 
-    // Set the Win32 NetBIOS code to use either the Netbios() API call or Winsock NetBIOS calls
+		// Enable/disable debug output
 
-    m_useWinsock = srv.getCIFSConfiguration().useWinsockNetBIOS();
+		setDebug(debug);
 
-    // Debug
+		// Get the Win32 NetBIOS file server name
 
-    if (Debug.EnableInfo && hasDebug())
-      Debug.println("[SMB] Win32 NetBIOS server " + m_srvName + " (using " + (isUsingWinsock() ? "Winsock" : "Netbios() API")  + ")");
+		if ( srv.getCIFSConfiguration().getWin32ServerName() != null)
+			m_srvName = srv.getCIFSConfiguration().getWin32ServerName();
+		else
+			m_srvName = srv.getCIFSConfiguration().getServerName();
 
-    // Set the LANA offline polling interval
+		// Get the accepted client string, defaults to '*' to accept any client connection
 
-    m_lanaPoll = LANAPollingInterval;
-  }
+		m_acceptClientStr = srv.getCIFSConfiguration().getWin32ClientAccept();
+		NetBIOSName accName = new NetBIOSName(m_acceptClientStr, NetBIOSName.WorkStation, false);
+		m_acceptClient = accName.getNetBIOSName();
 
-  /**
-   * Return the LANA number that is being used
-   * 
-   * @return int
-   */
-  public final int getLANANumber() {
+		if ( srv.getCIFSConfiguration().getWin32ClientAccept().equals("*"))
+			m_acceptAny = true;
 
-    return m_lana;
-  }
+		// Set the LANA to use, or -1 to use the first available
 
-  /**
-   * Return the LANA offline polling interval to check for the LANA coming back online
-   * 
-   * @return long
-   */
-  public final long getLANAOfflinePollingInterval() {
+		m_lana = lana;
 
-    return m_lanaPoll;
-  }
+		// Set the Win32 NetBIOS code to use either the Netbios() API call or Winsock NetBIOS calls
 
-  /**
-   * Return the assigned NetBIOS name number
-   * 
-   * @return int
-   */
-  public final int getNameNumber() {
+		m_useWinsock = srv.getCIFSConfiguration().useWinsockNetBIOS();
 
-    return m_nameNum;
-  }
+		// Debug
 
-  /**
-   * Return the local server name
-   * 
-   * @return String
-   */
-  public final String getServerName() {
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("[SMB] Win32 NetBIOS server " + m_srvName + " (using "
+					+ (isUsingWinsock() ? "Winsock" : "Netbios() API") + ")");
 
-    return m_srvName;
-  }
+		// Set the LANA offline polling interval
 
-  /**
-   * Determine if Netbios() API calls or Winsock calls are being used
-   * 
-   * @return boolean
-   */
-  public final boolean isUsingWinsock() {
+		m_lanaPoll = LANAPollingInterval;
+	}
 
-    return m_useWinsock;
-  }
+	/**
+	 * Return the LANA number that is being used
+	 * 
+	 * @return int
+	 */
+	public final int getLANANumber() {
 
-  /**
-   * Initialize the session socket handler.
-   * 
-   * @throws Exception
-   */
-  public void initialize() throws Exception {
+		return m_lana;
+	}
 
-    // Enumerate the LAN adapters, use the first available if the LANA has not been specified in
-    // the configuration
+	/**
+	 * Return the LANA offline polling interval to check for the LANA coming back online
+	 * 
+	 * @return long
+	 */
+	public final long getLANAOfflinePollingInterval() {
 
-    int[] lanas = Win32NetBIOS.LanaEnumerate();
-    if (lanas.length > 0) {
+		return m_lanaPoll;
+	}
 
-      // Check if the LANA has been specified via the configuration, if not then use the first
-      // available
+	/**
+	 * Return the assigned NetBIOS name number
+	 * 
+	 * @return int
+	 */
+	public final int getNameNumber() {
 
-      if (m_lana == -1)
-        m_lana = lanas[0];
-      else {
+		return m_nameNum;
+	}
 
-        // Check if the required LANA is available
+	/**
+	 * Return the local server name
+	 * 
+	 * @return String
+	 */
+	public final String getServerName() {
 
-        boolean lanaOnline = false;
-        int idx = 0;
+		return m_srvName;
+	}
 
-        while (idx < lanas.length && lanaOnline == false) {
+	/**
+	 * Determine if Netbios() API calls or Winsock calls are being used
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isUsingWinsock() {
 
-          // Check if the LANA is listed
+		return m_useWinsock;
+	}
 
-          if (lanas[idx++] == getLANANumber())
-            lanaOnline = true;
-        }
+	/**
+	 * Initialize the session socket handler.
+	 * 
+	 * @param server NetworkServer
+	 * @throws IOException
+	 */
+	public void initializeSessionHandler(NetworkServer server)
+		throws IOException {
 
-        // If the LANA is not available the main listener thread will poll the available
-        // LANAs until the required LANA is available
+		// Enumerate the LAN adapters, use the first available if the LANA has not been specified in
+		// the configuration
 
-        if (lanaOnline == false) {
+		int[] lanas = Win32NetBIOS.LanaEnumerate();
+		if ( lanas.length > 0) {
 
-          // Indicate that the LANA is not offline/unplugged/disabled
+			// Check if the LANA has been specified via the configuration, if not then use the first
+			// available
 
-          m_lanaValid = false;
-          return;
-        }
-      }
-    } else {
+			if ( m_lana == -1)
+				m_lana = lanas[0];
+			else {
 
-      // If the LANA has not been set throw an exception as no LANAs are available
+				// Check if the required LANA is available
 
-      if (m_lana == -1)
-        throw new Exception("No Win32 NetBIOS LANAs available");
+				boolean lanaOnline = false;
+				int idx = 0;
 
-      // The required LANA is offline/unplugged/disabled
+				while (idx < lanas.length && lanaOnline == false) {
 
-      m_lanaValid = false;
-      return;
-    }
+					// Check if the LANA is listed
 
-    // Create the local NetBIOS name to listen for incoming connections on
+					if ( lanas[idx++] == getLANANumber())
+						lanaOnline = true;
+				}
 
-    m_nbName = new NetBIOSName(m_srvName, NetBIOSName.FileServer, false);
-    m_wksNbName = new NetBIOSName(m_srvName, NetBIOSName.WorkStation, false);
+				// If the LANA is not available the main listener thread will poll the available
+				// LANAs until the required LANA is available
 
-    // Initialize the Win32 NetBIOS interface, either Winsock or Netbios() API
+				if ( lanaOnline == false) {
 
-    if (isUsingWinsock())
-      initializeWinsockNetBIOS();
-    else
-      initializeNetbiosAPI();
+					// Indicate that the LANA is offline/unplugged/disabled
 
-    // Send a server event to indicate NetBIOS names have been added
-    
-    getServer().fireNetBIOSNamesAddedEvent( m_lana);
-    
-    // Indicate that the LANA is valid
+					m_lanaValid = false;
+					return;
+				}
+			}
+		}
+		else {
 
-    m_lanaValid = true;
-  }
+			// If the LANA has not been set throw an exception as no LANAs are available
 
-  /**
-   * Initialize the Win32 Netbios() API interface, add the server names
-   * 
-   * @exception Exception If the NetBIOS add name fails
-   */
-  private final void initializeNetbiosAPI() throws Exception {
+			if ( m_lana == -1)
+				throw new IOException("No Win32 NetBIOS LANAs available");
 
-    // Reset the LANA
+			// The required LANA is offline/unplugged/disabled
 
-    Win32NetBIOS.Reset(m_lana);
+			m_lanaValid = false;
+			return;
+		}
 
-    // Add the NetBIOS name to the local name table
+		// Create the local NetBIOS name to listen for incoming connections on
 
-    m_nameNum = Win32NetBIOS.AddName(m_lana, m_nbName.getNetBIOSName());
-    if (m_nameNum < 0)
-      throw new Exception("Win32 NetBIOS AddName failed (file server), status = 0x" + Integer.toHexString(-m_nameNum) + ", "
-          + NetBIOS.getErrorString(-m_nameNum));
+		m_nbName = new NetBIOSName(m_srvName, NetBIOSName.FileServer, false);
+		m_wksNbName = new NetBIOSName(m_srvName, NetBIOSName.WorkStation, false);
 
-    // Register a NetBIOS name for the server name with the workstation name type, some clients
-    // use this name to find the server
+		// Initialize the Win32 NetBIOS interface, either Winsock or Netbios() API
 
-    m_wksNameNum = Win32NetBIOS.AddName(m_lana, m_wksNbName.getNetBIOSName());
-    if (m_wksNameNum < 0)
-      throw new Exception("Win32 NetBIOS AddName failed (workstation), status = 0x" + Integer.toHexString(-m_wksNameNum) + ", "
-          + NetBIOS.getErrorString(-m_wksNameNum));
-  }
+		if ( isUsingWinsock())
+			initializeWinsockNetBIOS();
+		else
+			initializeNetbiosAPI();
 
-  /**
-   * Initialize the Winsock NetBIOS interface
-   * 
-   * @exception Exception If a Winsock error occurs
-   */
-  private final void initializeWinsockNetBIOS() throws Exception {
+		// Send a server event to indicate NetBIOS names have been added
 
-    // Create the NetBIOS listener socket, this will add the file server name
+		((SMBServer) getServer()).fireNetBIOSNamesAddedEvent(m_lana);
 
-    m_nbSocket = NetBIOSSocket.createListenerSocket(getLANANumber(), m_nbName);
+		// Indicate that the LANA is valid
 
-    // Create a NetBIOS socket using the workstation name, some clients search for this name
+		m_lanaValid = true;
+	}
 
-    m_wksSocket = NetBIOSSocket.createListenerSocket(getLANANumber(), m_wksNbName);
-  }
+	/**
+	 * Initialize the Win32 Netbios() API interface, add the server names
+	 * 
+	 * @exception IOException If the NetBIOS add name fails
+	 */
+	private final void initializeNetbiosAPI()
+		throws IOException {
 
-  /**
-   * Check if the LANA is valid and accepting incoming sessions or the associated network adapter is
-   * unplugged/disabled/offline.
-   * 
-   * @return boolean
-   */
-  public final boolean isLANAValid() {
+		// Reset the LANA
 
-    return m_lanaValid;
-  }
+		Win32NetBIOS.Reset(m_lana);
 
-  /**
-   * Shutdown the Win32 NetBIOS interface
-   */
-  public void shutdownRequest() {
+		// Add the NetBIOS name to the local name table
 
-    super.shutdownRequest();
+		m_nameNum = Win32NetBIOS.AddName(m_lana, m_nbName.getNetBIOSName());
+		if ( m_nameNum < 0)
+			throw new IOException("Win32 NetBIOS AddName failed (file server), status = 0x" + Integer.toHexString(-m_nameNum)
+					+ ", " + NetBIOS.getErrorString(-m_nameNum));
 
-    // Reset the LANA, if valid, to wake the main session listener thread
+		// Register a NetBIOS name for the server name with the workstation name type, some clients
+		// use this name to find the server
 
-    if (isLANAValid())
-      Win32NetBIOS.Reset(m_lana);
+		m_wksNameNum = Win32NetBIOS.AddName(m_lana, m_wksNbName.getNetBIOSName());
+		if ( m_wksNameNum < 0)
+			throw new IOException("Win32 NetBIOS AddName failed (workstation), status = 0x" + Integer.toHexString(-m_wksNameNum)
+					+ ", " + NetBIOS.getErrorString(-m_wksNameNum));
+	}
 
-    // If Winsock calls are being used close the sockets
+	/**
+	 * Initialize the Winsock NetBIOS interface
+	 * 
+	 * @exception IOException If a Winsock error occurs
+	 */
+	private final void initializeWinsockNetBIOS()
+		throws IOException {
 
-    if (isUsingWinsock()) {
-      if (m_nbSocket != null) {
-        m_nbSocket.closeSocket();
-        m_nbSocket = null;
-      }
+		// Create the NetBIOS listener socket, this will add the file server name
 
-      if (m_wksSocket != null) {
-        m_wksSocket.closeSocket();
-        m_wksSocket = null;
-      }
-    }
-  }
+		m_nbSocket = NetBIOSSocket.createListenerSocket(getLANANumber(), m_nbName);
 
-  /**
-   * Run the NetBIOS session socket handler
-   */
-  public void run() {
+		// Create a NetBIOS socket using the workstation name, some clients search for this name
 
-    try {
+		m_wksSocket = NetBIOSSocket.createListenerSocket(getLANANumber(), m_wksNbName);
+	}
 
-      // Clear the shutdown flag
+	/**
+	 * Check if the LANA is valid and accepting incoming sessions or the associated network adapter
+	 * is unplugged/disabled/offline.
+	 * 
+	 * @return boolean
+	 */
+	public final boolean isLANAValid() {
 
-      clearShutdown();
+		return m_lanaValid;
+	}
 
-      // Wait for incoming connection requests
+	/**
+	 * Close the session handler
+	 * 
+	 * @param server NetworkServer
+	 */
+	public void closeSessionHandler(NetworkServer server) {
 
-      while (hasShutdown() == false) {
+		// Reset the LANA, if valid, to wake the main session listener thread
 
-        // Check if the LANA is valid and ready to accept incoming sessions
+		if ( isLANAValid())
+			Win32NetBIOS.Reset(m_lana);
 
-        if (isLANAValid()) {
-          
-          // Wait for an incoming session request
+		// If Winsock calls are being used close the sockets
 
-          if (isUsingWinsock()) {
-            
-            // Wait for an incoming session request using the Winsock NetBIOS interface
+		if ( isUsingWinsock()) {
+			if ( m_nbSocket != null) {
+				m_nbSocket.closeSocket();
+				m_nbSocket = null;
+			}
 
-            runWinsock();
-          }
-          else {
-            
-            // Wait for an incoming session request using the Win32 Netbios() API interface
+			if ( m_wksSocket != null) {
+				m_wksSocket.closeSocket();
+				m_wksSocket = null;
+			}
+		}
+	}
 
-            runNetBIOS();
-          }
-        }
-        else {
+	/**
+	 * Run the NetBIOS session socket handler
+	 */
+	public void run() {
 
-          // Sleep for a short while ...
+		try {
 
-          try {
-            Thread.sleep(getLANAOfflinePollingInterval());
-          }
-          catch (Exception ex) {
-          }
+			// Clear the shutdown flag
 
-          // Check if the network adapter/LANA is back online, if so then re-initialize
-          // the LANA to start accepting sessions again
+			clearShutdown();
 
-          try {
-            initialize();
-          }
-          catch (Exception ex) {
+			// Wait for incoming connection requests
 
-            // DEBUG
+			while (hasShutdown() == false) {
 
-            if (Debug.EnableError && hasDebug()) {
-              Debug.println("[SMB] Win32 NetBIOS Failed To ReInitialize LANA");
-              Debug.println("  " + ex.getMessage());
-            }
-          }
+				// Check if the LANA is valid and ready to accept incoming sessions
 
-          // DEBUG
+				if ( isLANAValid()) {
 
-          if (Debug.EnableError && hasDebug() && isLANAValid())
-            Debug.println("[SMB] Win32 NetBIOS LANA " + getLANANumber() + " Back Online");
-        }
-      }
-    }
-    catch (Exception ex) {
+					// Wait for an incoming session request
 
-      // Do not report an error if the server has shutdown, closing the server socket
-      // causes an exception to be thrown.
+					if ( isUsingWinsock()) {
 
-      if (hasShutdown() == false) {
-        Debug.println("[SMB] Win32 NetBIOS Server error : " + ex.toString());
-        Debug.println(ex);
-      }
-    }
+						// Wait for an incoming session request using the Winsock NetBIOS interface
 
-    // Debug
+						runWinsock();
+					}
+					else {
 
-    if (Debug.EnableInfo && hasDebug())
-      Debug.println("[SMB] Win32 NetBIOS session handler closed");
-  }
+						// Wait for an incoming session request using the Win32 Netbios() API
+						// interface
 
-  /**
-   * Run the Win32 Netbios() API listen code
-   * 
-   * @exception Exception If an unhandled error occurs
-   */
-  private final void runNetBIOS() throws Exception {
+						runNetBIOS();
+					}
+				}
+				else {
 
-    // Debug
+					// Sleep for a short while ...
 
-    if (Debug.EnableInfo && hasDebug())
-      Debug.println("[SMB] Waiting for Win32 NetBIOS session request (Netbios API) ...");
+					try {
+						Thread.sleep(getLANAOfflinePollingInterval());
+					}
+					catch (Exception ex) {
+					}
 
-    // Clear the caller name
+					// Check if the network adapter/LANA is back online, if so then re-initialize
+					// the LANA to start accepting sessions again
 
-    byte[] callerNameBuf = new byte[NetBIOS.NCBNameSize];
-    String callerName = null;
+					try {
+						initializeSessionHandler(getServer());
+					}
+					catch (Exception ex) {
 
-    callerNameBuf[0] = '\0';
-    callerName = null;
+						// DEBUG
 
-    // Wait for a new NetBIOS session
+						if ( Debug.EnableError && hasDebug()) {
+							Debug.println("[SMB] Win32 NetBIOS Failed To ReInitialize LANA");
+							Debug.println("  " + ex.getMessage());
+						}
+					}
 
-    int lsn = Win32NetBIOS.Listen(m_lana, m_nbName.getNetBIOSName(), m_acceptClient, callerNameBuf);
+					// DEBUG
 
-    // Check if the session listener has been shutdown
+					if ( Debug.EnableError && hasDebug() && isLANAValid())
+						Debug.println("[SMB] Win32 NetBIOS LANA " + getLANANumber() + " Back Online");
+				}
+			}
+		}
+		catch (Exception ex) {
 
-    if (hasShutdown())
-      return;
+			// Do not report an error if the server has shutdown, closing the server socket
+			// causes an exception to be thrown.
 
-    // Get the caller name, if available
+			if ( hasShutdown() == false) {
+				Debug.println("[SMB] Win32 NetBIOS Server error : " + ex.toString());
+				Debug.println(ex);
+			}
+		}
 
-    if (callerNameBuf[0] != '\0')
-      callerName = new String(callerNameBuf).trim();
-    else
-      callerName = "";
+		// Debug
 
-    // Create a packet handler and thread for the new session
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("[SMB] Win32 NetBIOS session handler closed");
+	}
 
-    if (lsn >= 0) {
+	/**
+	 * Run the Win32 Netbios() API listen code
+	 * 
+	 * @exception Exception If an unhandled error occurs
+	 */
+	private final void runNetBIOS()
+		throws Exception {
 
-      // Create a new session thread
+		// Debug
 
-      try {
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("[SMB] Waiting for Win32 NetBIOS session request (Netbios API) ...");
 
-        // Debug
+		// Clear the caller name
 
-        if (Debug.EnableInfo && hasDebug())
-          Debug.println("[SMB] Win32 NetBIOS session request received, lsn=" + lsn + ", caller=[" + callerName + "]");
+		byte[] callerNameBuf = new byte[NetBIOS.NCBNameSize];
+		String callerName = null;
 
-        // Check if the connection should be accepted
-        
-        if ( acceptCaller( callerName)) {
-          
-          // Create a packet handler for the session
-  
-          PacketHandler pktHandler = new Win32NetBIOSPacketHandler(m_lana, lsn, callerName);
-  
-          // Create a server session for the new request, and set the session id.
-  
-          SMBSrvSession srvSess = SMBSrvSession.createSession(pktHandler, getServer(), getNextSessionId());
-  
-          // Start the new session in a seperate thread
-  
-          Thread srvThread = new Thread(Win32NetBIOSGroup, srvSess);
-          srvThread.setDaemon(true);
-          srvThread.setName("Sess_W" + srvSess.getSessionId() + "_LSN" + lsn);
-          srvThread.start();
-        }
-        else {
-          
-          // DEBUG
-          
-          if ( Debug.EnableDbg && hasDebug())
-            Debug.println("[SMB] Win32 NetBIOS Reject client " + callerName);
-          
-          // Hangup the session
-          
-          Win32NetBIOS.Hangup(m_lana, lsn);
-        }
-      }
-      catch (Exception ex) {
+		callerNameBuf[0] = '\0';
+		callerName = null;
 
-        // Debug
+		// Wait for a new NetBIOS session
 
-        if (Debug.EnableError && hasDebug())
-          Debug.println("[SMB] Win32 NetBIOS Failed to create session, " + ex.toString());
-      }
-    }
-    else {
+		int lsn = Win32NetBIOS.Listen(m_lana, m_nbName.getNetBIOSName(), m_acceptClient, callerNameBuf);
 
-      // Check if the error indicates the network adapter is
-      // unplugged/offline/disabled
+		// Check if the session listener has been shutdown
 
-      int sts = -lsn;
+		if ( hasShutdown())
+			return;
 
-      if (sts == NetBIOS.NRC_Bridge) {
+		// Get the caller name, if available
 
-        // Indicate that the LANA is no longer valid
+		if ( callerNameBuf[0] != '\0')
+			callerName = new String(callerNameBuf).trim();
+		else
+			callerName = "";
 
-        m_lanaValid = false;
+		// Create a packet handler and thread for the new session
 
-        // DEBUG
+		if ( lsn >= 0) {
 
-        if (Debug.EnableError && hasDebug())
-          Debug.println("[SMB] Win32 NetBIOS LANA offline/disabled, LANA=" + getLANANumber());
-      }
-      else if (Debug.EnableError && hasDebug())
-        Debug.println("[SMB] Win32 NetBIOS Listen error, 0x" + Integer.toHexString(-lsn) + ", " + NetBIOS.getErrorString(-lsn));
-    }
-  }
+			// Create a new session thread
 
-  /**
-   * Run the Winsock NetBIOS listen code
-   * 
-   * @exception Exception If an unhandled error occurs
-   */
-  private final void runWinsock() throws Exception {
+			try {
 
-    // Debug
+				// Debug
 
-    if (Debug.EnableInfo && hasDebug())
-      Debug.println("[SMB] Waiting for Win32 NetBIOS session request (Winsock) ...");
+				if ( Debug.EnableInfo && hasDebug())
+					Debug.println("[SMB] Win32 NetBIOS session request received, lsn=" + lsn + ", caller=[" + callerName + "]");
 
-    // Wait for a new NetBIOS session
+				// Check if the connection should be accepted
 
-    NetBIOSSocket sessSock = null;
+				if ( acceptCaller(callerName)) {
 
-    try {
-      
-      // Wait for an incoming session connection
+					// Create a packet handler for the session
 
-      sessSock = m_nbSocket.listen();
-    }
-    catch (WinsockNetBIOSException ex) {
-      
-      // Check if the network is down
+					SMBServer smbServer = (SMBServer) getServer();
+					PacketHandler pktHandler = new Win32NetBIOSPacketHandler(m_lana, lsn, callerName, smbServer.getPacketPool());
 
-      if (ex.getErrorCode() == WinsockError.WsaENetDown) {
-        
-        // Check if the LANA we are listening on is no longer valid
+					// Create a server session for the new request, and set the session id.
 
-        if (isLANAOnline(m_lana) == false) {
-          
-          // Network/LANA is offline, cleanup the current listening sockets and wait for the
-          // LANA to come back online
+					SMBSrvSession srvSess = SMBSrvSession.createSession(pktHandler, smbServer, getNextSessionId());
 
-          if (m_nbSocket != null) {
-            m_nbSocket.closeSocket();
-            m_nbSocket = null;
-          }
+					// Start the new session in a seperate thread
 
-          if (m_wksSocket != null) {
-            m_wksSocket.closeSocket();
-            m_wksSocket = null;
-          }
+					Thread srvThread = new Thread(Win32NetBIOSGroup, srvSess);
+					srvThread.setDaemon(true);
+					srvThread.setName("Sess_W" + srvSess.getSessionId() + "_LSN" + lsn);
+					srvThread.start();
+				}
+				else {
 
-          // Indciate that the LANA is no longer valid
+					// DEBUG
 
-          m_lanaValid = false;
+					if ( Debug.EnableDbg && hasDebug())
+						Debug.println("[SMB] Win32 NetBIOS Reject client " + callerName);
 
-          // Debug
+					// Hangup the session
 
-          if (Debug.EnableError && hasDebug())
-            Debug.println("[SMB] Winsock NetBIOS network down, LANA=" + m_lana);
-        }
-      } else {
-        
-        // Debug
+					Win32NetBIOS.Hangup(m_lana, lsn);
+				}
+			}
+			catch (Exception ex) {
 
-        if (hasShutdown() == false && Debug.EnableError && hasDebug())
-          Debug.println("[SMB] Winsock NetBIOS listen error, " + ex.getMessage());
-      }
-    }
+				// Debug
 
-    // Check if the session listener has been shutdown
+				if ( Debug.EnableError && hasDebug())
+					Debug.println("[SMB] Win32 NetBIOS Failed to create session, " + ex.toString());
+			}
+		}
+		else {
 
-    if (hasShutdown())
-      return;
+			// Check if the error indicates the network adapter is
+			// unplugged/offline/disabled
 
-    // Create a packet handler and thread for the new session
+			int sts = -lsn;
 
-    if (sessSock != null) {
+			if ( sts == NetBIOS.NRC_Bridge) {
 
-      // Create a new session thread
+				// Indicate that the LANA is no longer valid
 
-      try {
+				m_lanaValid = false;
 
-        // Debug
+				// DEBUG
 
-        if (Debug.EnableInfo && hasDebug())
-          Debug.println("[SMB] Winsock NetBIOS session request received, caller=" + sessSock.getName());
+				if ( Debug.EnableError && hasDebug())
+					Debug.println("[SMB] Win32 NetBIOS LANA offline/disabled, LANA=" + getLANANumber());
+			}
+			else if ( Debug.EnableError && hasDebug())
+				Debug.println("[SMB] Win32 NetBIOS Listen error, 0x" + Integer.toHexString(-lsn) + ", "
+						+ NetBIOS.getErrorString(-lsn));
+		}
+	}
 
-        // Check if the connection should be accepted
-        
-        if ( acceptCaller( sessSock.getName())) {
-          
-          // Create a packet handler for the session
-  
-          PacketHandler pktHandler = new WinsockNetBIOSPacketHandler(m_lana, sessSock);
-  
-          // Create a server session for the new request, and set the session id.
-  
-          SMBSrvSession srvSess = SMBSrvSession.createSession(pktHandler, getServer(), getNextSessionId());
-  
-          // Start the new session in a seperate thread
-  
-          Thread srvThread = new Thread(Win32NetBIOSGroup, srvSess);
-          srvThread.setDaemon(true);
-          srvThread.setName("Sess_WS" + srvSess.getSessionId());
-          srvThread.start();
-        }
-        else {
-          
-          // DEBUG
-          
-          if ( Debug.EnableDbg && hasDebug())
-            Debug.println("[SMB] Winsock NetBIOS Reject client " + sessSock.getName());
-          
-          // Close the session
+	/**
+	 * Run the Winsock NetBIOS listen code
+	 * 
+	 * @exception Exception If an unhandled error occurs
+	 */
+	private final void runWinsock()
+		throws Exception {
 
-          sessSock.closeSocket();
-        }
-      }
-      catch (Exception ex) {
+		// Debug
 
-        // Debug
+		if ( Debug.EnableInfo && hasDebug())
+			Debug.println("[SMB] Waiting for Win32 NetBIOS session request (Winsock) ...");
 
-        if (Debug.EnableError && hasDebug())
-          Debug.println("[SMB] Winsock NetBIOS Failed to create session, " + ex.toString());
-      }
-    }
-  }
+		// Wait for a new NetBIOS session
 
-  /**
-   * Create the Win32 NetBIOS session socket handlers for the main SMB/CIFS server
-   * 
-   * @param server SMBServer
-   * @param sockDbg boolean
-   */
-  public final static void createSessionHandlers(SMBServer server, boolean sockDbg) {
+		NetBIOSSocket sessSock = null;
 
-    // Access the server configuration
+		try {
 
-    ServerConfiguration config = server.getConfiguration();
-    CIFSConfigSection cifsConfig = (CIFSConfigSection) config.getConfigSection( CIFSConfigSection.SectionName);
+			// Wait for an incoming session connection
 
-    // DEBUG
+			sessSock = m_nbSocket.accept();
+		}
+		catch (WinsockNetBIOSException ex) {
 
-    if (Debug.EnableInfo && sockDbg) {
-      int[] lanas = Win32NetBIOS.LanaEnumerate();
+			// Check if the network is down
 
-      StringBuffer lanaStr = new StringBuffer();
-      if (lanas != null && lanas.length > 0) {
-        for (int i = 0; i < lanas.length; i++) {
-          lanaStr.append(Integer.toString(lanas[i]));
-          lanaStr.append(" ");
-        }
-      }
-      Debug.println("[SMB] Win32 NetBIOS Available LANAs: " + lanaStr.toString());
-    }
+			if ( ex.getErrorCode() == WinsockError.WsaENetDown) {
 
-    // Check if the Win32 NetBIOS session handler should use a particular LANA/network adapter
-    // or should use all available LANAs/network adapters (that have NetBIOS enabled).
+				// Check if the LANA we are listening on is no longer valid
 
-    Win32NetBIOSSessionSocketHandler sessHandler = null;
-    List lanaListeners = new ArrayList();
+				if ( isLANAOnline(m_lana) == false) {
 
-    if ( cifsConfig.getWin32LANA() != -1) {
+					// Network/LANA is offline, cleanup the current listening sockets and wait for
+					// the LANA to come back online
 
-      // Create a single Win32 NetBIOS session handler using the specified LANA
+					if ( m_nbSocket != null) {
+						m_nbSocket.closeSocket();
+						m_nbSocket = null;
+					}
 
-      sessHandler = new Win32NetBIOSSessionSocketHandler(server, cifsConfig.getWin32LANA(), sockDbg);
+					if ( m_wksSocket != null) {
+						m_wksSocket.closeSocket();
+						m_wksSocket = null;
+					}
 
-      try {
-        sessHandler.initialize();
-      }
-      catch (Exception ex) {
+					// Indciate that the LANA is no longer valid
 
-        // DEBUG
+					m_lanaValid = false;
 
-        if (Debug.EnableError && sockDbg) {
-          Debug.println("[SMB] Win32 NetBIOS failed to create session handler for LANA " + cifsConfig.getWin32LANA());
-          Debug.println("      " + ex.getMessage());
-        }
-      }
+					// Debug
 
-      // Add the session handler to the SMB/CIFS server
+					if ( Debug.EnableError && hasDebug())
+						Debug.println("[SMB] Winsock NetBIOS network down, LANA=" + m_lana);
+				}
+			}
+			else {
 
-      server.addSessionHandler(sessHandler);
+				// Debug
 
-      // Run the NetBIOS session handler in a seperate thread
+				if ( hasShutdown() == false && Debug.EnableError && hasDebug())
+					Debug.println("[SMB] Winsock NetBIOS listen error, " + ex.getMessage());
+			}
+		}
 
-      Thread nbThread = new Thread(sessHandler);
-      nbThread.setName("Win32NB_Handler_" + cifsConfig.getWin32LANA());
-      nbThread.start();
+		// Check if the session listener has been shutdown
 
-      // DEBUG
+		if ( hasShutdown())
+			return;
 
-      if (Debug.EnableInfo && sockDbg)
-        Debug.println("[SMB] Win32 NetBIOS created session handler on LANA " + cifsConfig.getWin32LANA());
+		// Create a packet handler and thread for the new session
 
-      // Check if a host announcer should be enabled
+		if ( sessSock != null) {
 
-      if ( cifsConfig.hasWin32EnableAnnouncer()) {
+			// Create a new session thread
 
-        // Create a host announcer
+			try {
 
-        Win32NetBIOSHostAnnouncer hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, cifsConfig.getDomainName(),
-            cifsConfig.getWin32HostAnnounceInterval());
-        hostAnnouncer.setDebug(sockDbg);
+				// Debug
 
-        // Add the host announcer to the SMB/CIFS server list
+				if ( Debug.EnableInfo && hasDebug())
+					Debug.println("[SMB] Winsock NetBIOS session request received, caller=" + sessSock.getName());
 
-        server.addHostAnnouncer(hostAnnouncer);
-        hostAnnouncer.start();
+				// Check if the connection should be accepted
 
-        // DEBUG
+				if ( acceptCaller(sessSock.getName())) {
 
-        if (Debug.EnableInfo && sockDbg)
-          Debug.println("[SMB] Win32 NetBIOS host announcer enabled on LANA " + cifsConfig.getWin32LANA());
-      }
+					// Create a packet handler for the session
 
-      // Check if the session handler implements the LANA listener interface
+					SMBServer smbServer = (SMBServer) getServer();
+					PacketHandler pktHandler = new WinsockNetBIOSPacketHandler(m_lana, sessSock, smbServer.getPacketPool());
 
-      if (sessHandler instanceof LanaListener)
-        lanaListeners.add(sessHandler);
-    } else {
+					// Create a server session for the new request, and set the session id.
 
-      // Get a list of the available LANAs
+					SMBSrvSession srvSess = SMBSrvSession.createSession(pktHandler, smbServer, getNextSessionId());
 
-      int[] lanas = Win32NetBIOS.LanaEnumerate();
+					// Start the new session in a seperate thread
 
-      if (lanas != null && lanas.length > 0) {
+					Thread srvThread = new Thread(Win32NetBIOSGroup, srvSess);
+					srvThread.setDaemon(true);
+					srvThread.setName("Sess_WS" + srvSess.getSessionId());
+					srvThread.start();
+				}
+				else {
 
-        // Create a session handler for each available LANA
+					// DEBUG
 
-        for (int i = 0; i < lanas.length; i++) {
+					if ( Debug.EnableDbg && hasDebug())
+						Debug.println("[SMB] Winsock NetBIOS Reject client " + sessSock.getName());
 
-          // Get the current LANA
+					// Close the session
 
-          int lana = lanas[i];
+					sessSock.closeSocket();
+				}
+			}
+			catch (Exception ex) {
 
-          // Create a session handler
+				// Debug
 
-          sessHandler = new Win32NetBIOSSessionSocketHandler(server, lana, sockDbg);
+				if ( Debug.EnableError && hasDebug())
+					Debug.println("[SMB] Winsock NetBIOS Failed to create session, " + ex.toString());
+			}
+		}
+	}
 
-          try {
-            sessHandler.initialize();
-          }
-          catch (Exception ex) {
+	/**
+	 * Create the Win32 NetBIOS session socket handlers for the main SMB/CIFS server
+	 * 
+	 * @param server SMBServer
+	 * @param sockDbg boolean
+	 */
+	public final static void createSessionHandlers(SMBServer server, boolean sockDbg) {
 
-            // DEBUG
+		// Access the server configuration
 
-            if (Debug.EnableError && sockDbg) {
-              Debug.println("[SMB] Win32 NetBIOS failed to create session handler for LANA " + lana);
-              Debug.println("      " + ex.getMessage());
-            }
-          }
+		ServerConfiguration config = server.getConfiguration();
+		CIFSConfigSection cifsConfig = (CIFSConfigSection) config.getConfigSection(CIFSConfigSection.SectionName);
 
-          // Add the session handler to the SMB/CIFS server
+		// DEBUG
 
-          server.addSessionHandler(sessHandler);
+		if ( Debug.EnableInfo && sockDbg) {
+			int[] lanas = Win32NetBIOS.LanaEnumerate();
 
-          // Run the NetBIOS session handler in a seperate thread
+			StringBuffer lanaStr = new StringBuffer();
+			if ( lanas != null && lanas.length > 0) {
+				for (int i = 0; i < lanas.length; i++) {
+					lanaStr.append(Integer.toString(lanas[i]));
+					lanaStr.append(" ");
+				}
+			}
+			Debug.println("[SMB] Win32 NetBIOS Available LANAs: " + lanaStr.toString());
+		}
 
-          Thread nbThread = new Thread(sessHandler);
-          nbThread.setName("Win32NB_Handler_" + lana);
-          nbThread.start();
+		// Check if the Win32 NetBIOS session handler should use a particular LANA/network adapter
+		// or should use all available LANAs/network adapters (that have NetBIOS enabled).
 
-          // DEBUG
+		Win32NetBIOSSessionSocketHandler sessHandler = null;
+		List<Win32NetBIOSSessionSocketHandler> lanaListeners = new ArrayList<Win32NetBIOSSessionSocketHandler>();
 
-          if (Debug.EnableError && sockDbg)
-            Debug.println("[SMB] Win32 NetBIOS created session handler on LANA " + lana);
+		if ( cifsConfig.getWin32LANA() != -1) {
 
-          // Check if a host announcer should be enabled
+			// Create a single Win32 NetBIOS session handler using the specified LANA
 
-          if ( cifsConfig.hasWin32EnableAnnouncer()) {
+			sessHandler = new Win32NetBIOSSessionSocketHandler(server, cifsConfig.getWin32LANA(), sockDbg);
 
-            // Create a host announcer
+			try {
+				sessHandler.initializeSessionHandler(server);
+			}
+			catch (Exception ex) {
 
-            Win32NetBIOSHostAnnouncer hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, cifsConfig.getDomainName(),
-                cifsConfig.getWin32HostAnnounceInterval());
-            hostAnnouncer.setDebug(sockDbg);
+				// DEBUG
 
-            // Add the host announcer to the SMB/CIFS server list
+				if ( Debug.EnableError && sockDbg) {
+					Debug.println("[SMB] Win32 NetBIOS failed to create session handler for LANA " + cifsConfig.getWin32LANA());
+					Debug.println("      " + ex.getMessage());
+				}
+			}
 
-            server.addHostAnnouncer(hostAnnouncer);
-            hostAnnouncer.start();
+			// Add the session handler to the SMB/CIFS server
 
-            // DEBUG
+			// server.addSessionHandler(sessHandler);
 
-            if (Debug.EnableInfo && sockDbg)
-              Debug.println("[SMB] Win32 NetBIOS host announcer enabled on LANA " + lana);
-          }
+			// Run the NetBIOS session handler in a seperate thread
 
-          // Check if the session handler implements the LANA listener interface
+			Thread nbThread = new Thread(sessHandler);
+			nbThread.setName("Win32NB_Handler_" + cifsConfig.getWin32LANA());
+			nbThread.start();
 
-          if (sessHandler instanceof LanaListener)
-            lanaListeners.add(sessHandler);
-        }
-      }
+			// DEBUG
 
-      // Create a LANA monitor to check for new LANAs becoming available
+			if ( Debug.EnableInfo && sockDbg)
+				Debug.println("[SMB] Win32 NetBIOS created session handler on LANA " + cifsConfig.getWin32LANA());
 
-      Win32NetBIOSLanaMonitor lanaMonitor = new Win32NetBIOSLanaMonitor(server, lanas, LANAPollingInterval, sockDbg);
+			// Check if a host announcer should be enabled
 
-      // Register any session handlers that are LANA listeners
+			if ( cifsConfig.hasWin32EnableAnnouncer()) {
 
-      if (lanaListeners.size() > 0) {
+				// Create a host announcer
 
-        for (int i = 0; i < lanaListeners.size(); i++) {
+				Win32NetBIOSHostAnnouncer hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, cifsConfig.getDomainName(),
+						cifsConfig.getWin32HostAnnounceInterval());
+				hostAnnouncer.setDebug(sockDbg);
 
-          // Get the current LANA listener
+				// Add the host announcer to the SMB/CIFS server list
 
-          Win32NetBIOSSessionSocketHandler handler = (Win32NetBIOSSessionSocketHandler) lanaListeners.get(i);
+				// server.addHostAnnouncer(hostAnnouncer);
+				hostAnnouncer.start();
 
-          // Register the LANA listener
+				// DEBUG
 
-          lanaMonitor.addLanaListener(handler.getLANANumber(), handler);
-        }
-      }
-    }
-  }
+				if ( Debug.EnableInfo && sockDbg)
+					Debug.println("[SMB] Win32 NetBIOS host announcer enabled on LANA " + cifsConfig.getWin32LANA());
+			}
 
-  /**
-   * Check if the specified LANA is online
-   * 
-   * @param lana int
-   * @return boolean
-   */
-  private final boolean isLANAOnline(int lana) {
+			// Check if the session handler implements the LANA listener interface
 
-    // Get a list of the available LANAs
+			if ( sessHandler instanceof LanaListener)
+				lanaListeners.add(sessHandler);
+		}
+		else {
 
-    int[] lanas = Win32NetBIOS.LanaEnumerate();
+			// Get a list of the available LANAs
 
-    if (lanas != null && lanas.length > 0) {
+			int[] lanas = Win32NetBIOS.LanaEnumerate();
 
-      // Check if the specified LANA is available
+			if ( lanas != null && lanas.length > 0) {
 
-      for (int i = 0; i < lanas.length; i++) {
-        if (lanas[i] == lana)
-          return true;
-      }
-    }
+				// Create a session handler for each available LANA
 
-    // LANA not online
+				for (int i = 0; i < lanas.length; i++) {
 
-    return false;
-  }
+					// Get the current LANA
 
-  /**
-   * LANA listener status change callback
-   * 
-   * @param lana int
-   * @param online boolean
-   */
-  public void lanaStatusChange(int lana, boolean online) {
+					int lana = lanas[i];
 
-    // If the LANA has gone offline, close the listening socket and wait for the LANA to
-    // come back online
+					// Create a session handler
 
-    if (online == false) {
+					sessHandler = new Win32NetBIOSSessionSocketHandler(server, lana, sockDbg);
 
-      // Indicate that the LANA is offline
+					try {
+						sessHandler.initializeSessionHandler(server);
+					}
+					catch (Exception ex) {
 
-      m_lanaValid = false;
+						// DEBUG
 
-      // Close the listening sockets
+						if ( Debug.EnableError && sockDbg) {
+							Debug.println("[SMB] Win32 NetBIOS failed to create session handler for LANA " + lana);
+							Debug.println("      " + ex.getMessage());
+						}
+					}
 
-      if (m_nbSocket != null) {
-        m_nbSocket.closeSocket();
-        m_nbSocket = null;
-      }
+					// Add the session handler to the SMB/CIFS server
 
-      if (m_wksSocket != null) {
-        m_wksSocket.closeSocket();
-        m_wksSocket = null;
-      }
-    }
-  }
-  
-  /**
-   * Check if the new session should be accepted, if we are only allowing connections
-   * from a specific name the session may be rejected.
-   * 
-   * @param callerName String
-   * @return boolean
-   */
-  private final boolean acceptCaller( String callerName) {
-    
-    // Check if we are accepting connections from any client
-    
-    if ( m_acceptAny)
-      return true;
-    
-    // Check if the caller name matches the accept name
+					// server.addSessionHandler(sessHandler);
 
-    if ( callerName.equalsIgnoreCase( m_acceptClientStr))
-      return true;
-    
-    // Reject the client
-    
-    return false;
-  }
+					// Run the NetBIOS session handler in a seperate thread
 
-  /**
-   * Check if the new session should be accepted, if we are only allowing connections
-   * from a specific name the session may be rejected.
-   * 
-   * @param callerNBName NetBIOSName
-   * @return boolean
-   */
-  private final boolean acceptCaller( NetBIOSName callerNBName) {
-    
-    // Check if we are accepting connections from any client
-    
-    if ( m_acceptAny)
-      return true;
-    
-    // Check if the caller name matches the accept name
-    
-    byte[] callerName = callerNBName.getNetBIOSName();
-    
-    for ( int i = 0; i < NetBIOS.NCBNameSize - 1; i++) {
-      if ( callerName[i] != m_acceptClient[i])
-        return false;
-    }
-    
-    // Accept the client
-    
-    return true;
-  }
+					Thread nbThread = new Thread(sessHandler);
+					nbThread.setName("Win32NB_Handler_" + lana);
+					nbThread.start();
+
+					// DEBUG
+
+					if ( Debug.EnableError && sockDbg)
+						Debug.println("[SMB] Win32 NetBIOS created session handler on LANA " + lana);
+
+					// Check if a host announcer should be enabled
+
+					if ( cifsConfig.hasWin32EnableAnnouncer()) {
+
+						// Create a host announcer
+
+						Win32NetBIOSHostAnnouncer hostAnnouncer = new Win32NetBIOSHostAnnouncer(sessHandler, cifsConfig
+								.getDomainName(), cifsConfig.getWin32HostAnnounceInterval());
+						hostAnnouncer.setDebug(sockDbg);
+
+						// Add the host announcer to the SMB/CIFS server list
+
+						// server.addHostAnnouncer(hostAnnouncer);
+						hostAnnouncer.start();
+
+						// DEBUG
+
+						if ( Debug.EnableInfo && sockDbg)
+							Debug.println("[SMB] Win32 NetBIOS host announcer enabled on LANA " + lana);
+					}
+
+					// Check if the session handler implements the LANA listener interface
+
+					if ( sessHandler instanceof LanaListener)
+						lanaListeners.add(sessHandler);
+				}
+			}
+
+			// Create a LANA monitor to check for new LANAs becoming available
+
+			Win32NetBIOSLanaMonitor lanaMonitor = new Win32NetBIOSLanaMonitor(server, lanas, LANAPollingInterval, sockDbg);
+
+			// Register any session handlers that are LANA listeners
+
+			if ( lanaListeners.size() > 0) {
+
+				for (int i = 0; i < lanaListeners.size(); i++) {
+
+					// Get the current LANA listener
+
+					Win32NetBIOSSessionSocketHandler handler = lanaListeners.get(i);
+
+					// Register the LANA listener
+
+					lanaMonitor.addLanaListener(handler.getLANANumber(), handler);
+				}
+			}
+		}
+	}
+
+	/**
+	 * Check if the specified LANA is online
+	 * 
+	 * @param lana int
+	 * @return boolean
+	 */
+	private final boolean isLANAOnline(int lana) {
+
+		// Get a list of the available LANAs
+
+		int[] lanas = Win32NetBIOS.LanaEnumerate();
+
+		if ( lanas != null && lanas.length > 0) {
+
+			// Check if the specified LANA is available
+
+			for (int i = 0; i < lanas.length; i++) {
+				if ( lanas[i] == lana)
+					return true;
+			}
+		}
+
+		// LANA not online
+
+		return false;
+	}
+
+	/**
+	 * LANA listener status change callback
+	 * 
+	 * @param lana int
+	 * @param online boolean
+	 */
+	public void lanaStatusChange(int lana, boolean online) {
+
+		// If the LANA has gone offline, close the listening socket and wait for the LANA to
+		// come back online
+
+		if ( online == false) {
+
+			// Indicate that the LANA is offline
+
+			m_lanaValid = false;
+
+			// Close the listening sockets
+
+			if ( m_nbSocket != null) {
+				m_nbSocket.closeSocket();
+				m_nbSocket = null;
+			}
+
+			if ( m_wksSocket != null) {
+				m_wksSocket.closeSocket();
+				m_wksSocket = null;
+			}
+		}
+	}
+
+	/**
+	 * Check if the new session should be accepted, if we are only allowing connections from a
+	 * specific name the session may be rejected.
+	 * 
+	 * @param callerName String
+	 * @return boolean
+	 */
+	private final boolean acceptCaller(String callerName) {
+
+		// Check if we are accepting connections from any client
+
+		if ( m_acceptAny)
+			return true;
+
+		// Check if the caller name matches the accept name
+
+		if ( callerName.equalsIgnoreCase(m_acceptClientStr))
+			return true;
+
+		// Reject the client
+
+		return false;
+	}
+
+	/**
+	 * Check if the new session should be accepted, if we are only allowing connections from a
+	 * specific name the session may be rejected.
+	 * 
+	 * @param callerNBName NetBIOSName
+	 * @return boolean
+	 */
+	private final boolean acceptCaller(NetBIOSName callerNBName) {
+
+		// Check if we are accepting connections from any client
+
+		if ( m_acceptAny)
+			return true;
+
+		// Check if the caller name matches the accept name
+
+		byte[] callerName = callerNBName.getNetBIOSName();
+
+		for (int i = 0; i < NetBIOS.NCBNameSize - 1; i++) {
+			if ( callerName[i] != m_acceptClient[i])
+				return false;
+		}
+
+		// Accept the client
+
+		return true;
+	}
 }
