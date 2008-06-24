@@ -63,6 +63,7 @@ import org.alfresco.web.site.WebFrameworkConstants;
  * the template context is restored.
  * 
  * @author muzquiano
+ * @author kevinr
  */
 public final class RendererContextHelper
 {
@@ -113,7 +114,7 @@ public final class RendererContextHelper
      * 
      * @return the stack
      */
-    protected static Stack<RendererContext> getStack(RequestContext requestContext)
+    private static Stack<RendererContext> getStack(RequestContext requestContext)
     {
         Stack<RendererContext> stack = (Stack)requestContext.getValue(WebFrameworkConstants.RENDER_DATA_REQUEST_CONTEXT_STACK_KEY);
         if (stack == null)
@@ -129,13 +130,22 @@ public final class RendererContextHelper
         return stack;        
     }
 
+    /**
+     * Bind data into a render context.
+     * 
+     * @param context
+     * @param request
+     * @param response
+     * 
+     * @return the renderer context
+     */
     public static RendererContext bind(RequestContext context, HttpServletRequest request, HttpServletResponse response)
     {
         return bind(context, null, request, response);
     }
     
     /**
-     * Bind.
+     * Bind data into a render context.
      * 
      * @param context the context
      * @param object the object
@@ -169,10 +179,7 @@ public final class RendererContextHelper
         if (object != null)
         {
             newRendererContext.setObject(object);
-            RendererContext generatedRenderData = generate(context, object);
-
-            // populate into newRenderData
-            newRendererContext.putAll(generatedRenderData);            
+            mergeObject(newRendererContext, object);
         }
         
         // push onto the stack
@@ -207,39 +214,30 @@ public final class RendererContextHelper
     }
     
     /**
-     * Generate.
+     * Merge object properties into a render context.
      * 
-     * @param context the context
-     * @param object the object
-     * 
-     * @return the renderer context
+     * @param context the context to merge properties into.
+     * @param object the object to merge properties from.
      */
-    public static RendererContext generate(RequestContext context, ModelObject object)
+    public static void mergeObject(RendererContext context, ModelObject object)
     {
-        RendererContext newData = null;
-
         // switch on object type
         if (object instanceof Component)
         {
-            newData = generate(context, (Component) object);
+            merge(context, (Component) object);
         }
         else if (object instanceof Page)
         {
-            newData = generate(context, (Page) object);
+            merge(context, (Page) object);
         }
         else if (object instanceof TemplateInstance)
         {
-            newData = generate(context, (TemplateInstance) object);
+            merge(context, (TemplateInstance) object);
         }
         
-        if (newData != null)
-        {
-            // populate with custom properties settings
-            Map<String, Serializable> properties = object.getCustomProperties();
-            newData.putAll(properties);
-        }
-        
-        return newData;
+        // populate with custom properties settings
+        Map<String, Serializable> properties = object.getCustomProperties();
+        context.putAll(properties);
     }
 
     /**
@@ -247,22 +245,16 @@ public final class RendererContextHelper
      * 
      * @param context the context
      * @param page the page
-     * 
-     * @return the renderer context
      */
-    private static RendererContext generate(RequestContext context, Page page)
+    private static void merge(RendererContext context, Page page)
     {
-        RendererContext rendererContext = new RendererContext(context, page);
-                
         // properties about the page
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_PAGE_ID, page.getId());
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_PAGE_TYPE_ID, page.getPageTypeId());
+        context.put(WebFrameworkConstants.RENDER_DATA_PAGE_ID, page.getId());
+        context.put(WebFrameworkConstants.RENDER_DATA_PAGE_TYPE_ID, page.getPageTypeId());
 
         // properties about the html binding id
         String htmlBindingId = page.getId();
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
-        
-        return rendererContext;
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
     }
     
     
@@ -271,22 +263,16 @@ public final class RendererContextHelper
      * 
      * @param context the context
      * @param template the template
-     * 
-     * @return the renderer context
      */
-    private static RendererContext generate(RequestContext context, TemplateInstance template)
+    private static void merge(RendererContext context, TemplateInstance template)
     {
-        RendererContext rendererContext = new RendererContext(context, template);
-        
         // properties about the template
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_TEMPLATE_ID, template.getId());
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_TEMPLATE_TYPE_ID, template.getTemplateType());
+        context.put(WebFrameworkConstants.RENDER_DATA_TEMPLATE_ID, template.getId());
+        context.put(WebFrameworkConstants.RENDER_DATA_TEMPLATE_TYPE_ID, template.getTemplateType());
         
         // properties about the html binding id
         String htmlBindingId = template.getId();
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
-        
-        return rendererContext;
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
     }
 
     /**
@@ -294,18 +280,14 @@ public final class RendererContextHelper
      * 
      * @param context the context
      * @param component the component
-     * 
-     * @return the renderer context
      */
-    private static RendererContext generate(RequestContext context, Component component)
+    private static void merge(RendererContext context, Component component)
     {
-        RendererContext rendererContext = new RendererContext(context, component);
-        
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID, component.getId());
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_TYPE_ID, component.getComponentTypeId());
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_REGION_ID, component.getRegionId());
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SOURCE_ID, component.getSourceId());
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SCOPE_ID, component.getScope());
+        context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_ID, component.getId());
+        context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_TYPE_ID, component.getComponentTypeId());
+        context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_REGION_ID, component.getRegionId());
+        context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SOURCE_ID, component.getSourceId());
+        context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SCOPE_ID, component.getScope());
 
         // construct the html binding id
         // TODO: apply transformation
@@ -318,8 +300,6 @@ public final class RendererContextHelper
             htmlBindingId += "." + component.getSourceId();
         }
         */
-        rendererContext.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
-        
-        return rendererContext;
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
     }    
 }

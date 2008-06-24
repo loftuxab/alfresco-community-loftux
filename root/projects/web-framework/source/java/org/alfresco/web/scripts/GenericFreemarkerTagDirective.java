@@ -47,36 +47,23 @@ import freemarker.template.TemplateScalarModel;
  * 
  * @author muzquiano
  */
-public class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
+public final class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
 {
+    private static final Class[] CLASSES_STRING = new Class[] { String.class };
+
+    private final String tagName;
+    private final String tagClassName;
+    
     public GenericFreemarkerTagDirective(RequestContext context, String tagName, String tagClassName)
     {
-        this(context);
-        setTagName(tagName);
-        setTagClassName(tagClassName);
-    }
-
-    public GenericFreemarkerTagDirective(RequestContext context)
-    {
         super(context);
-    }
-    
-    protected String tagName;
-    protected String tagClassName;
-    
-    public void setTagClassName(String tagClassName)
-    {
+        this.tagName = tagName;
         this.tagClassName = tagClassName;
     }
-    
+
     public String getTagClassName()
     {
         return this.tagClassName;
-    }
-    
-    public void setTagName(String tagName)
-    {
-        this.tagName = tagName;
     }
     
     public String getTagName()
@@ -107,14 +94,15 @@ public class GenericFreemarkerTagDirective extends FreemarkerTagSupportDirective
             {
                 // TODO: Totally improve how this is done
                 String method = "set" + name.substring(0,1).toUpperCase() + name.substring(1, name.length());
-                Class[] argTypes = new Class[] { String.class };
+                Class[] argTypes = CLASSES_STRING;
                 String v = ((TemplateScalarModel)value).getAsString();
                 String[] args = new String[] { v };
                 ReflectionHelper.invoke(tag, method, argTypes, args);
             }
             else
             {
-                throw new TemplateModelException("The '"+name+"' parameter to the '" + getTagName() + "' directive must be a string.");                    
+                throw new TemplateModelException("The '" + name + "' parameter to the '" +
+                        getTagName() + "' directive must be a string.");                    
             }
         }
         

@@ -45,11 +45,10 @@ import freemarker.template.TemplateDirectiveModel;
  * 
  * @author Michael Uzquiano
  */
-public abstract class FreemarkerTagSupportDirective implements
-        TemplateDirectiveModel
+public abstract class FreemarkerTagSupportDirective implements TemplateDirectiveModel
 {
     /** The context. */
-    private RequestContext context;
+    private final RequestContext context;
 
     /**
      * Instantiates a new freemarker tag support directive.

@@ -52,8 +52,16 @@ public final class RendererContext implements Serializable
     private HttpServletRequest request;
     private HttpServletResponse response;
     
-    private Map<String, Component> components = new HashMap<String, Component>(16, 1.0f);
+    private Map<String, Component> components = null;
     
+    
+    /**
+     * Private copy constructor - used in clone()
+     *
+     */
+    private RendererContext()
+    {
+    }
     
     public RendererContext(RequestContext context)
     {
@@ -62,19 +70,13 @@ public final class RendererContext implements Serializable
             throw new IllegalArgumentException("RequestContext is mandatory.");
         }
         this.context = context;
+        this.components = new HashMap<String, Component>(16, 1.0f);
     }
     
     public RendererContext(RequestContext context, ModelObject object)
     {
         this(context);
         this.object = object;
-    }
-    
-    public RendererContext(RequestContext context, ModelObject object, HttpServletRequest request, HttpServletResponse response)
-    {
-        this(context, object);
-        this.request = request;
-        this.response = response;
     }
     
     public RequestContext getRequestContext()
@@ -150,9 +152,10 @@ public final class RendererContext implements Serializable
     
     public RendererContext clone()
     {
-        RendererContext c = new RendererContext(this.getRequestContext());
-        c.setObject(this.getObject());
-        c.putAll(this);
+        RendererContext c = new RendererContext();
+        c.context = this.getRequestContext();
+        c.object = this.getObject();
+        c.map.putAll(this.map);
         
         // NOTE: we want this reference to travel with all child render context objects
         //       it describes all components that are rendering for this and all parent context
