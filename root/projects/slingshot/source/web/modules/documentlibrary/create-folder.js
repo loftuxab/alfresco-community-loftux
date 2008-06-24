@@ -53,7 +53,7 @@
        * @property REST_API
        * @type string
        */
-      REST_API: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/{siteid}/{componentid}/{filepath}",
+      REST_API: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/{siteid}/{containerId}/{filepath}",
       
       /**
        * Dialog instance.
@@ -86,13 +86,13 @@
           siteId: "",
 
           /**
-           * Component ID defining the root container.
+           * ContainerID defining the root container.
            * 
-           * @property componentId
+           * @property containerId
            * @type string
            * @default "documentLibrary"
            */
-          componentId: "documentLibrary",
+          containerId: "documentLibrary",
 
           /**
            * Parent path for the new folder.
@@ -196,7 +196,7 @@
          var action = YAHOO.lang.substitute(this.REST_API,
          {
             siteid: this.options.siteId,
-            componentid: this.options.componentId,
+            containerId: this.options.containerId,
             filepath: filePath
          });
          
@@ -280,7 +280,14 @@
        */
       onCancel: function DLCF_onCancel(e, p_obj)
       {
-        this.dialog.hide();
+         this.dialog.hide();
+
+         // Firefox 2 still has the hidden caret issue unless teh form is redrawn from scratch.
+         if (YAHOO.env.ua.gecko == 1.8)
+         {
+            this.dialog.destroy();
+            this.dialog = null;
+         }
       },
 
       /**
@@ -291,6 +298,11 @@
        */
       onSuccess: function DLCF_onSuccess(response)
       {
+         // Success, so clear out old values
+         YAHOO.util.Dom.get(this.id + "-name").value = "";
+         YAHOO.util.Dom.get(this.id + "-title").value = "";
+         YAHOO.util.Dom.get(this.id + "-description").value = "";
+
          this.dialog.hide();
 
          if (!response)
@@ -302,11 +314,11 @@
          }
          else
          {
-            var folderName = response.config.dataObj.name;
+            var folder = response.json.results[0];
             // Invoke the callback if one was supplied
             if (typeof this.options.onSuccess.fn == "function")
             {
-               this.options.onSuccess.fn.call(this.options.onSuccess.scope, folderName, this.options.onSuccess.obj);
+               this.options.onSuccess.fn.call(this.options.onSuccess.scope, folder, this.options.onSuccess.obj);
             }
          }
       }

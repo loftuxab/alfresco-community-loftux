@@ -1,7 +1,8 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DocListTree("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]!""}"
+      siteId: "${page.url.args["site"]!""}",
+      containerId: "${args.container!"documentLibrary"}"
    }).setMessages(
       ${messages}
    );

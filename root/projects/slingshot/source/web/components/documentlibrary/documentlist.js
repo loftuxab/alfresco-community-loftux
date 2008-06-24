@@ -94,13 +94,13 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          siteId: "",
 
          /**
-          * ComponentId representing root container
+          * ContainerId representing root container
           *
-          * @property componentId
+          * @property containerId
           * @type string
           * @default "documentLibrary"
           */
-         componentId: "documentLibrary",
+         containerId: "documentLibrary",
 
          /**
           * Initial path to show on load.
@@ -215,6 +215,8 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          // Decoupled event listeners
          YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
          YAHOO.Bubbling.on("onDoclistRefresh", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("onFolderCreated", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("onFolderDeleted", this.onDoclistRefresh, this);
       
          // YUI History
          var bookmarkedPath = History.getBookmarkedState("path") || "";
@@ -314,7 +316,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                oColumn.width = 80;
                Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-               if (".doc.docx.xls.xlsx.ppt.pptx".indexOf(extn) != -1)
+               if (".docx.xlsx.pptx".indexOf(extn) != -1)
                {
                   elCell.innerHTML = '<span class="demo-thumbnail"></span>';
                }
@@ -371,6 +373,10 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                   {
                      desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
                   }
+               }
+               else
+               {
+                  desc += '<span>' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
                }
             }
             else
@@ -431,6 +437,13 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          {
             renderLoopSize: 8,
             initialRequest: this._buildDocListParams(this.currentPath)
+         });
+         
+         // Hook tableMsgShowEvent to clear out fixed-pixel width on <table> element (breaks resizer)
+         this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
+         {
+            // NOTE: Scope needs to be DataTable
+            this._elMsgTbody.parentNode.style.width = "";
          });
          
          // Custom error messages
@@ -692,41 +705,45 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       _onDeleteAssetConfirm: function DL__onDeleteAssetConfirm(record)
       {
          var me = this;
+         var fileType = record.getData("type");
          var obj =
          {
             successCallback:
             {
-               fn: function DL__onDeleteAssetConfirm_success()
+               fn: function DL__onDeleteAssetConfirm_success(data)
                {
                   // Fire the notification events
-                  if (record.getData("type") == "folder")
+                  if (fileType == "folder")
                   {
-                     YAHOO.Bubbling.fire("onFolderDeleted");
+                     YAHOO.Bubbling.fire("onFolderDeleted",
+                     {
+                        path: data.config.object.filePath
+                     });
                   }
                   YAHOO.Bubbling.fire("onDoclistRefresh");
                   
                   // Success confirmation message
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this._msg("message.delete.success", record.getData("name"))
+                     text: this._msg("message.delete.success", data.config.object.fileName)
                   });
                },
                scope: this
             },
             failureCallback:
             {
-               fn: function DL__onDeleteAssetConfirm_failure()
+               fn: function DL__onDeleteAssetConfirm_failure(data)
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
-                     text: this._msg("message.delete.failure", record.getData("name"))
+                     text: this._msg("message.delete.failure", data.config.object.fileName)
                   });
                },
                scope: this
             }
          }
          var action = new Alfresco.module.DoclibActions();
-         action.deleteFile(this.options.siteId, this.options.componentId, this.currentPath, record.getData("name"), obj);
+         action.deleteFile(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"), obj);
       },
 
 

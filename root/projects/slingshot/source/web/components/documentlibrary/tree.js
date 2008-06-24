@@ -71,7 +71,16 @@
           * @property siteId
           * @type string
           */
-         siteId: ""
+         siteId: "",
+
+         /**
+          * ContainerId representing root container
+          *
+          * @property containerId
+          * @type string
+          * @default "documentLibrary"
+          */
+         containerId: "documentLibrary"
       },
       
       /**
@@ -89,6 +98,14 @@
        * @type string
        */
       initialPath: null,
+
+      /**
+       * Current path being browsed.
+       * 
+       * @property currentPath
+       * @type string
+       */
+      currentPath: "",
 
       /**
        * The YUI TreeView widget.
@@ -257,6 +274,8 @@
                return;
             }
             
+            this.currentPath = obj.path;
+            
             // Search the tree to see if this path's node is expanded
             var node = this.treeview.getNodeByProperty("path", obj.path);
             if (node !== null)
@@ -305,8 +324,15 @@
       onFolderRenamed: function DLT_onFolderRenamed(layer, args)
       {
          var obj = args[1];
-         if ((obj !== null) && (obj.path !== null))
+         if ((obj !== null) && (obj.nodeRef !== null) && (obj.name !== null))
          {
+            var node = this.treeview.getNodeByProperty("nodeRef", obj.nodeRef);
+            if (node !== null)
+            {
+               // Node found, so rename it
+               node.label = obj.name;
+               this.treeview.draw();
+            }
          }
       },
 
@@ -321,6 +347,8 @@
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
+            var parentNode = this.treeview.getNodeByProperty("path", obj.parentPath);
+            this._sortNodeChildren(parentNode);
          }
       },
 
@@ -335,6 +363,13 @@
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
+            var node = this.treeview.getNodeByProperty("path", obj.path);
+            if (node !== null)
+            {
+               // Node found, so delete it
+               this.treeview.removeNode(node);
+               this.treeview.draw();
+            }
          }
       },
 
@@ -403,6 +438,112 @@
 
          // Render tree with this one top-level node
          tree.draw();
+      },
+
+      /**
+       * @method _sortNodeChildren
+       * @param node {object} Parent node
+       * @param onSortComplete {object} Optional callback object literal
+       * @private
+       */
+      _sortNodeChildren: function DLT__sortNodeChildren(node, onSortComplete)
+      {
+         // Get the path this node refers to
+         var nodePath = node.data.path;
+
+         // Prepare URI for XHR data request
+         var uri = Alfresco.constants.PROXY_URI + "slingshot/doclib/treenode?site=" + encodeURIComponent(this.options.siteId) + "&path=" + encodeURIComponent(nodePath);
+
+         // Prepare the XHR callback object
+         var callback =
+         {
+            success: function DLT_sNC_success(oResponse)
+            {
+               var results = YAHOO.lang.JSON.parse(oResponse.responseText);
+
+               if (results.treenode.items)
+               {
+                  var kids = oResponse.argument.node.children;
+                  var items = results.treenode.items;
+                  for (var i = 0, j = items.length; i < j; i++)
+                  {
+                     if ((kids.length <= i) || (kids[i].data.nodeRef != items[i].nodeRef))
+                     {
+                        // Node has moved - search for correct node for this position and swap if found
+                        var kidFound = false;
+                        for (var m = i, n = kids.length; m < n; m++)
+                        {
+                           if (kids[m].data.nodeRef == items[i].nodeRef)
+                           {
+                              var temp = kids[i];
+                              kids[i] = kids[m];
+                              kids[m] = temp;
+                              kidFound = true;
+                              break;
+                           }
+                        }
+                           
+                        // If we get here we couldn't find the node, so create one and insert it
+                        if (!kidFound)
+                        {
+                           var item = items[i];
+                           var tempNode = new YAHOO.widget.TextNode(
+                           {
+                              label: item.name,
+                              path: oResponse.argument.node.data.path + "/" + item.name,
+                              nodeRef: item.nodeRef,
+                              description: item.description
+                           });
+
+                           if (!item.hasChildren)
+                           {
+                              tempNode.isLeaf = true;
+                           }
+                           
+                           if (kids.length > i)
+                           {
+                              tempNode.insertBefore(kids[i]);
+                           }
+                           else
+                           {
+                              tempNode.insertAfter(kids[kids.length - 1]);
+                           }
+                        }
+                     }
+                  }
+                  
+                  // Update the tree
+                  this.treeview.draw();
+                  
+                  // Execute the onSortComplete callback
+                  var callback = oResponse.argument.onSortComplete;
+                  if (callback && typeof callback.fn == "function")
+                  {
+                     callback.fn.call(callback.scope ? callback.scope : this, callback.obj);
+                  }
+               }
+            },
+
+            // If the XHR call is not successful, no further processing - tree may not be sorted correctly
+            failure: function DLT_sNC_failure(oResponse)
+            {
+            },
+
+            // XHR response argument information
+            argument:
+            {
+               node: node,
+               onSortComplete: onSortComplete
+            },
+            
+            scope: this,
+
+            // Timeout -- abort the transaction after 7 seconds
+            timeout: 7000
+         };
+
+         // Make the XHR call using Connection Manager's asyncRequest method
+         YAHOO.util.Connect.asyncRequest('GET', uri, callback);
       }
 
    };
