@@ -32,8 +32,7 @@ import java.util.Map;
 
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.util.StringBuilderWriter;
-import org.json.JSONException;
-import org.json.JSONWriter;
+import org.alfresco.web.scripts.json.JSONWriter;
 
 /**
  * WebScript responsible for returning a JavaScript response containing a JavaScript
@@ -99,16 +98,15 @@ public class MessagesWebScript extends AbstractWebScript
                 JSONWriter out = new JSONWriter(writer);
                 try
                 {
-                    out.object();
+                    out.startObject();
                     Map<String, String> messages = I18NUtil.getAllMessages(I18NUtil.parseLocale(locale));
                     for (Map.Entry<String, String> entry : messages.entrySet())
                     {
-                        out.key(entry.getKey());
-                        out.value(entry.getValue());
+                        out.writeValue(entry.getKey(), entry.getValue());
                     }
                     out.endObject();
                 }
-                catch (JSONException jsonErr)
+                catch (IOException jsonErr)
                 {
                     throw new WebScriptException("Error building messages response.", jsonErr);
                 }

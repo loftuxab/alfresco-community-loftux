@@ -74,7 +74,7 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     {
         String id = null;
         
-        int x = storagePath.lastIndexOf(".");
+        int x = storagePath.lastIndexOf('.');
         if (x != -1)
         {
             id = storagePath.substring(0, x);
@@ -93,6 +93,6 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
      */
     public String idToPath(String objectId)
     {
-        return objectId + ".xml";
+        return new StringBuilder(objectId.length() + 4).append(objectId).append(".xml").toString();
     }
 }

@@ -44,10 +44,9 @@ import org.alfresco.config.TemplateConfigModel;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.util.StringBuilderWriter;
 import org.alfresco.web.scripts.json.JSONUtils;
+import org.alfresco.web.scripts.json.JSONWriter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.json.JSONException;
-import org.json.JSONWriter;
 
 
 /**
@@ -631,17 +630,16 @@ public abstract class AbstractWebScript implements WebScript
         JSONWriter out = new JSONWriter(buf);
         try
         {
-            out.object();
+            out.startObject();
             Enumeration<String> keys = resources.getKeys();
             while (keys.hasMoreElements())
             {
                 String key = keys.nextElement();
-                out.key(key);
-                out.value(resources.getString(key));
+                out.writeValue(key, resources.getString(key));
             }
             out.endObject();
         }
-        catch (JSONException jsonErr)
+        catch (IOException jsonErr)
         {
             throw new WebScriptException("Error rendering I18N resources.", jsonErr);
         }
