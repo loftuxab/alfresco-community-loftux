@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<page>
+   <id>wiki</id>
+   <title>Wiki</title>
+   <description>Page that displays the site wiki</description>
+   <template-instance>wiki</template-instance>
+   <authentication>user</authentication>
+</page>
