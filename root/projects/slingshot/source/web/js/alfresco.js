@@ -213,7 +213,8 @@ Alfresco.util.createYUIButton = function(p_scope, p_name, p_onclick, p_obj)
    // Default button parameters
    var obj =
    {
-      type: "button" 
+      type: "button",
+      disabled: false
    };
    
    // Any extra parameters?
@@ -599,7 +600,7 @@ Alfresco.util.PopupManager = function()
          text: null,
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
-         displayTime: 2.5,
+         displayTime: -1,
          modal: false
       },
 
@@ -617,7 +618,7 @@ Alfresco.util.PopupManager = function()
        *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when shpwing and hiding the message,
        *                                            // default is YAHOO.widget.ContainerEffect.FADE
        *    effectDuration: {int},  // time in seconds that the effect should be played, default is 0.5
-       *    displayTime: {int},     // time in seconds that the message will be displayed, default is 2.5
+       *    displayTime: {int},     // time in seconds that the message will be displayed, default 1.25
        *    modal: {true}           // if the message should modal (the background overlayed with a gray transparent layer), default is false
        * }
        */
@@ -629,7 +630,6 @@ Alfresco.util.PopupManager = function()
          {
             throw new Error("Property text in userConfig must be set");
          }
-
          // Construct the YUI Dialog that will display the message
          var message = new YAHOO.widget.Dialog("message",
          {
