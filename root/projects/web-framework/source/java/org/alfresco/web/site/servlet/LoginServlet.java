@@ -87,7 +87,7 @@ public class LoginServlet extends BaseServlet
         	}
         	else
         	{
-        		response.sendRedirect("/");
+        		response.sendRedirect(request.getContextPath());
         	}
         }
         else
@@ -98,7 +98,7 @@ public class LoginServlet extends BaseServlet
         	}
         	else
         	{
-        		response.sendRedirect("/");
+        		response.sendRedirect(request.getContextPath());
         	}
         }        
     }

@@ -15,7 +15,7 @@
       <span class="menu-item"><a href="#">${msg("link.help")}</a></span>
       <span class="menu-item"><a href="#">${msg("link.search")}</a></span>
       <span class="menu-item"><input type="text" name="search" value="${msg("label.searchTip")}" /></span>
-      <span class="menu-item"><a href="#">${msg("link.logout")}</a></span>
+      <span class="menu-item"><a href="${url.context}/logout">${msg("link.logout")}</a></span>
    </div>
 </div>
 <div class="clear"></div>

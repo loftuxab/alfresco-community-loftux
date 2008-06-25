@@ -30,25 +30,18 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.alfresco.web.site.UserFactory;
-
 /**
- * List for call from the web client to log the user out
- * from the current session.
+ * List for call from the web client to log the user out from the current session.
  * 
- * @author muzquiano
+ * @author kevinr
  */
 public class LogoutServlet extends BaseServlet
 {
-    public void init() throws ServletException
+    @Override
+    protected void service(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException
     {
-        super.init();
-    }
-
-    protected void service(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException
-    {
-    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_ID);
-    	request.getSession().removeAttribute(UserFactory.SESSION_ATTRIBUTE_KEY_USER_OBJECT);
+    	request.getSession().invalidate();
+        response.sendRedirect(request.getContextPath());
     }
 }
