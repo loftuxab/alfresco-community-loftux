@@ -1,0 +1,137 @@
+/* Style YUI components */
+
+/* Add spacing round header */
+.customise-dashlets h2
+{
+   margin-top: 10px;
+   margin-bottom:10px;
+}
+
+/* Style the lists containing dashlets */
+.customise-dashlets ul.dashletList,
+.customise-dashlets ul.columnList
+{
+   position: relative;
+   height: 210px;
+   background: #FFFFFF;
+   border: 1px solid gray;
+   list-style: none;
+   margin:0;
+   padding:1px;
+   text-align: center;
+}
+
+/* Center the available dashlet list, make it wide and ready to handle lots of dashlets*/
+.customise-dashlets ul.dashletList
+{
+   overflow-y: auto;
+   margin-left: auto;
+   margin-right: auto;
+   width: 624px;
+}
+
+/* Make the column dashlet list a bit thinner */
+.customise-dashlets ul.columnList
+{
+   width: 202px;
+}
+
+/* Make the dashlets 200 wide and let them flow if the column is wide enough */
+.customise-dashlets ul.dashletList li,
+.customise-dashlets ul.columnList li
+{
+   width: 200px;
+   float: left;
+}
+
+.dashlet-item,
+.dashlet-shadow
+{
+   margin: 1px;
+   background-color: #f7f7f7;
+   height: 40px;
+   text-align: center;
+}
+
+/*
+ * Since the a is the one that gets focus we use a transparent gif inside it
+ * to make sure IE displays a nice dottec line around the "link".
+ * Change the cursor to a move cursor on mouse over.
+ */
+.dashlet-item a img
+{
+   width: 100%;
+   height: 100%;
+   cursor: move;
+}
+
+/* Vertically center the text. */
+.dashlet-item span {
+   position:relative;
+   top:-30px;
+}
+
+/* Show the shadow as white. */
+.dashlet-shadow
+{
+   background-color: #FFFFFF;
+}
+
+/* Show dashlets as gray when they are focused. */
+.dashlet-item.focused
+{
+   background-color: #DDDDDD;
+}
+
+/* Center the available dashlets list */
+.customise-dashlets div.dashlets
+{
+   padding-bottom: 10px;
+   text-align: center;
+}
+
+/* Align the available dashlets section to left */
+.customise-dashlets div.addDashlet
+{
+   text-align: left;
+}
+
+/* Center the columns and buttons section */
+.customise-dashlets div.columns,
+.customise-dashlets div.buttons
+{
+   text-align: center;
+   padding-top: 20px;
+   padding-bottom:10px;
+}
+
+/* Vertically align the trash can */
+.customise-dashlets div.buttons img
+{
+   margin-bottom: -5px;
+   margin-left: 30px;
+}
+
+/* Center the column wrapper div */
+.customise-dashlets div.columns div
+{
+   margin-left: auto;
+   margin-right: auto;
+   width: 860px;
+}
+
+/* Make sure the columns are displayed on row even though they are block elements  */
+.customise-dashlets div.columns div div
+{
+   float: left;
+   width: 204px;
+   margin-left: 10px;
+}
+
+/*
+ * Stop the float: left from the columns and make sure the buttons are
+ * displayed on a new row.
+ */
+.customise-dashlets div.buttons{
+   clear: both;
+}

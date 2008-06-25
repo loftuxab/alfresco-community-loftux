@@ -366,7 +366,6 @@
       {
          // Remember the the label used by other components so we can reset it at close
          this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("label.noFiles", this.name);
 
          // Merge the supplied config with default config and check mandatory properties
          this.showConfig = YAHOO.lang.merge(this.defaultShowConfig, config);
@@ -438,10 +437,6 @@
           * at this moment. 
           */
          this.panel.render(document.body);
-
-         // Remember the label for empty data tables so we can reset it on close
-         this.previousFileListEmptyMessage = YAHOO.widget.DataTable.MSG_EMPTY;
-         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("label.noFiles", this.name);
 
          // Save a reference to the file row template that is hidden inside the markup
          this.fileItemTemplates.left = Dom.get(this.id + "-left-div");
@@ -1056,6 +1051,7 @@
           */
          YAHOO.widget.DataTable._bStylesheetFallback = !!YAHOO.env.ua.ie;
          var dataTableDiv = Dom.get(this.id + "-filelist-table");
+         YAHOO.widget.DataTable.MSG_EMPTY = Alfresco.util.message("label.noFiles", this.name);
          this.dataTable = new YAHOO.widget.DataTable(dataTableDiv, myColumnDefs, myDataSource,
          {
             scrollable: true,

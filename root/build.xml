@@ -561,6 +561,7 @@
              <include name="**/images/icons/close_panel.gif" />
              <include name="**/images/icons/project-icon-*.gif" />
              <include name="**/images/icons/space-icon-*.gif" />
+             <include name="**/images/icons/trashcan_large.gif" />
              <exclude name="**/images/icons/*16.gif" />
           </fileset>
        </copy>
