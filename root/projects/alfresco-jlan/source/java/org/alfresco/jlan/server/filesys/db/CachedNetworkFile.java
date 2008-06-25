@@ -550,6 +550,10 @@ public class CachedNetworkFile extends DBNetworkFile {
 					finfo.setAllocationSize(alloc);
 			}
 		}
+		
+		// Update the open file size
+		
+		setFileSize( siz);
 	}
 	
 	/**
