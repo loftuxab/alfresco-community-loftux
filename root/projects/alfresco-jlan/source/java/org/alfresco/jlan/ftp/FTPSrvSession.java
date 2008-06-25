@@ -2036,6 +2036,10 @@ public class FTPSrvSession extends SrvSession implements Runnable {
 				// Open or truncate the existing file
 
 				netFile = disk.openFile(this, tree, params);
+                
+                // Truncate the existing file
+                
+                netFile.truncateFile( 0L);
 			}
 			else {
 
