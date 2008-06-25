@@ -111,7 +111,7 @@
 	</target>
 
   <!-- Generate native code header files -->
-  <target name="generateNativeCodeHeaders">
+  <target name="generateNativeCodeHeaders" depends="createJar">
     <javah class="org.alfresco.jlan.netbios.win32.Win32NetBIOS" destdir="source/c/Win32NetBIOS" classpath="build/standalone"/>
     <javah class="org.alfresco.jlan.util.win32.Win32Utils" destdir="source/c/Win32Utils" classpath="build/standalone"/>
   </target>
