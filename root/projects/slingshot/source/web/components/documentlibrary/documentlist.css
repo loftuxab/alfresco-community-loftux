@@ -130,8 +130,25 @@
    margin: 30px 0 0 20px;
 }
 
+.doclist .documents h3.filename
+{
+   float: left;
+}
+
+.doclist .documents .rename-file
+{
+   background-color: #e8e8e8;
+   border: 1px solid #808080;
+   cursor: pointer;
+   float: left;
+   margin-left: 2em;
+   position: relative;
+   top: -2px;
+}
+
 .doclist .documents .detail
 {
+   clear: left;
 }
 
 .doclist .documents .detail span
@@ -150,11 +167,28 @@
 
 /* Actions */
 
+.doclist .yui-dt-col-actions span
+{
+   background-color: #ffffff;
+   display: block;
+   margin: 2px 0px;
+   padding: 4px 0px;
+}
+
+.doclist .action-link
+{
+   padding-left: 18px;
+   font-weight: bold;
+}
+
 .doclist .onDeleteAsset a
 {
    background: url(images/delete.gif) no-repeat;
-   padding-left: 16px;
-   font-weight: bold;
+}
+
+.doclist .onCheckoutAsset a
+{
+   background: url(images/checkout.gif) no-repeat;
 }
 
 

@@ -50,9 +50,9 @@
       Alfresco.util.YUILoaderHelper.require(["button", "menu", "container"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
-      YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
-      YAHOO.Bubbling.on("onFolderRenamed", this.onPathChanged, this);
-      YAHOO.Bubbling.on("onFileSelected", this.onFileSelected, this);
+      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
+      YAHOO.Bubbling.on("folderRenamed", this.onPathChanged, this);
+      YAHOO.Bubbling.on("fileSelected", this.onFileSelected, this);
    
       return this;
    }
@@ -223,7 +223,7 @@
                {
                   fn: function DLTB_onNewFolder_callback(folder)
                   {
-                     YAHOO.Bubbling.fire("onFolderCreated",
+                     YAHOO.Bubbling.fire("folderCreated",
                      {
                         name: folder.name,
                         parentPath: folder.parentPath,
@@ -302,7 +302,7 @@
       {
          var newPath = this.currentPath.substring(0, this.currentPath.lastIndexOf("/"));
 
-         YAHOO.Bubbling.fire("onPathChanged",
+         YAHOO.Bubbling.fire("pathChanged",
          {
             path: newPath
          });
@@ -325,14 +325,11 @@
       onPathChanged: function DLTB_onPathChanged(layer, args)
       {
          var obj = args[1];
-         if (obj !== null)
+         if ((obj !== null) && (obj.path !== null))
          {
             // Should be a path in the arguments
-            if (obj.path !== null)
-            {
-               this.currentPath = obj.path;
-               this._generateBreadcrumb();
-            }
+            this.currentPath = obj.path;
+            this._generateBreadcrumb();
          }
       },
 
@@ -401,7 +398,7 @@
                var newPath = paths.slice(0, i+1).join("/");
                eLink.on("click", function DLTB__gB_click(e, path)
                {
-                  YAHOO.Bubbling.fire("onPathChanged",
+                  YAHOO.Bubbling.fire("pathChanged",
                   {
                      path: path
                   });

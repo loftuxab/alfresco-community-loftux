@@ -49,11 +49,22 @@
       /* Load YUI Components */
       Alfresco.util.YUILoaderHelper.require([], this.onComponentsLoaded, this);
       
+      // Decoupled event listeners
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
+
       return this;
    }
    
    Alfresco.DocListFilter.prototype =
    {
+      /**
+       * Selected filter.
+       * 
+       * @property selectedFilter
+       * @type {element}
+       */
+      selectedFilter: null,
+
       /**
        * Fired by YUILoaderHelper when required component script files have
        * been loaded into the browser.
@@ -77,54 +88,68 @@
          
          YAHOO.Bubbling.addDefaultAction("filter-link", function DLF_filterAction(layer, args)
          {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "li");
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
             if (owner !== null)
             {
-               var action = owner.className;
-               if (typeof me[action] == "function")
+               var Dom = YAHOO.util.Dom;
+               var filter = owner.className;
+               YAHOO.Bubbling.fire("filterChanged",
                {
-                  me[action].call(me);
+                  filterId: filter,
+                  filterOwner: me.name
+               });
+               
+               // If a function has been provided which corresponds to the filter name, then call it
+               if (typeof me[filter] == "function")
+               {
+                  me[filter].call(me);
                }
+               
+               // Update the current selected filter highlight
+               if (me.selectedFilter !== null)
+               {
+                  Dom.removeClass(me.selectedFilter, "selected");
+               }
+               me.selectedFilter = owner.parentNode;
+               Dom.addClass(me.selectedFilter, "selected");
             }
       		 
             return true;
          });
       },
-      
-      /**
-       * Handler for Recently Modified filter.
-       *
-       * @method recentlyModified
-       */
-      recentlyModified: function()
-      {
-      },
+
 
       /**
-       * Handler for Recently Added filter.
-       *
-       * @method recentlyAdded
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
        */
-      recentlyAdded: function()
-      {
-      },
 
       /**
-       * Handler for I Am Editing filter.
-       *
-       * @method iAmEditing
+       * Fired when the currently active filter has changed
+       * @method onFilterChanged
+       * @param layer {string} the event source
+       * @param args {object} arguments object
        */
-      iAmEditing: function()
+      onFilterChanged: function DLF_onFilterChanged(layer, args)
       {
+         var obj = args[1];
+         if ((obj !== null) && (obj.filterId !== null))
+         {
+            var Dom = YAHOO.util.Dom;
+            if (this.selectedFilter !== null)
+            {
+               if (obj.filterOwner == this.name)
+               {
+                  // This component now owns the active filter
+                  Dom.addClass(this.selectedFilter, "selected");
+               }
+               else
+               {
+                  // Currently filtering by something other than this component
+                  Dom.removeClass(this.selectedFilter, "selected");
+               }
+            }
+         }
       },
-
-      /**
-       * Handler for Others Are Editing filter.
-       *
-       * @method othersAreEditing
-       */
-      othersAreEditing: function()
-      {
-      }
    };
 })();

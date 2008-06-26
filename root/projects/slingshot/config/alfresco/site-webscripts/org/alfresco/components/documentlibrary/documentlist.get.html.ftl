@@ -7,7 +7,12 @@
    {
       siteId: "${page.url.args["site"]!""}",
       containerId: "${args.container!"documentLibrary"}",
-      initialPath: "${page.url.args["path"]!""}"
+      initialPath: "${page.url.args["path"]!""}",
+      initialFilter:
+      {
+         filterId: "path",
+         filterOwner: "Alfresco.DocListTree"
+      }
    }).setMessages(
       ${messages}
    );
@@ -40,6 +45,7 @@
    
    <div id="${args.htmlid}-actionsBag" class="hiddenComponents">
       <div id="${args.htmlid}-actions-document">
+         <span class="onCheckoutAsset"><a href="#" class="action-link">Checkout Asset</a></span>
          <span class="onDeleteAsset"><a href="#" class="action-link">${msg("actions.document.delete")}</a></span>
       </div>
 

@@ -1,10 +1,3 @@
-/*
-
-YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
-
-*/
-
-
 /**
  * Copyright (C) 2005-2008 Alfresco Software Limited.
  *
@@ -108,7 +101,15 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
           * @property initialPath
           * @type string
           */
-         initialPath: ""
+         initialPath: "",
+
+         /**
+          * Initial filter to show on load.
+          * 
+          * @property initialFilter
+          * @type object
+          */
+         initialFilter: {}
       },
       
       /**
@@ -118,6 +119,14 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * @type string
        */
       currentPath: "",
+
+      /**
+       * Current filterId to filter document list.
+       * 
+       * @property currentFilterId
+       * @type string
+       */
+      currentFilterId: "",
 
       /**
        * FileUpload module instance.
@@ -213,10 +222,12 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          var me = this;
          
          // Decoupled event listeners
-         YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
-         YAHOO.Bubbling.on("onDoclistRefresh", this.onDoclistRefresh, this);
-         YAHOO.Bubbling.on("onFolderCreated", this.onDoclistRefresh, this);
-         YAHOO.Bubbling.on("onFolderDeleted", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
+         YAHOO.Bubbling.on("doclistRefresh", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("fileDeleted", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("folderCreated", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("folderDeleted", this.onDoclistRefresh, this);
+         YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
       
          // YUI History
          var bookmarkedPath = History.getBookmarkedState("path") || "";
@@ -324,7 +335,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                {
                   var newPath = me.currentPath + "/" + oRecord.getData("name");
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
-                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
+                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
                }
                else
                {
@@ -340,7 +351,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                {
                   var newPath = me.currentPath + "/" + oRecord.getData("name");
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
-                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'onPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
+                  elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
                }
                else
                {
@@ -366,9 +377,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                var newPath = me.currentPath + "/" + oRecord.getData("name");
 
                // TODO: *** Update the onclick to be logically-bound, not via HTML
-               desc = '<h3><a href="" onclick="YAHOO.Bubbling.fire(\'onPathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></h3>';
+               desc = '<h3 class="filename"><a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></h3>';
+
                if (me.options.detailedView)
                {
+                  desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
                   if (oRecord.getData("description").length > 0)
                   {
                      desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
@@ -376,14 +389,15 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                }
                else
                {
-                  desc += '<span>' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</div>';
                }
             }
             else
             {
-               desc = '<h3><a target="content" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("contentUrl") + '">' + oRecord.getData("name") + '</a></h3>';
+               desc = '<h3 class="filename"><a target="content" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("contentUrl") + '">' + oRecord.getData("name") + '</a></h3>';
                if (me.options.detailedView)
                {
+                  desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
                   desc += '<div class="detail"><span><b>Created on:</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   desc += '<span><b>Created by:</b> ' + oRecord.getData("createdBy") + '</span>';
                   desc += '<span><b>Version:</b> ' + oRecord.getData("version") + '</span></div>';
@@ -392,7 +406,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                }
                else
                {
-                  desc += '<span>' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</span>';
+                  desc += '<div class="detail">' + Alfresco.util.formatDate(oRecord.getData("modifiedOn"), "dd mmmm yyyy") + '</div>';
                }
             }
             elCell.innerHTML = desc;
@@ -461,7 +475,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
                }
                catch(e)
                {
-                  this._setDefaultDataTableErrors();
+                  me._setDefaultDataTableErrors();
                }
             }
             // Must return true to have the "Loading..." message replaced by the error message
@@ -480,11 +494,20 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
          
          // Fire disconnected event, but add "ignore" flag this time, due to initialRequest above
-         YAHOO.Bubbling.fire("onPathChanged",
+         YAHOO.Bubbling.fire("pathChanged",
          {
             doclistInitialNav: true,
             path: this.currentPath
          });
+         
+         // Set the default view filter to be "path" and the owner to be "Alfresco.DocListTree"
+         var filterObj = YAHOO.lang.merge(
+         {
+            filterId: "path",
+            filterOwner: "Alfresco.DocListTree"
+         }, this.options.initialFilter);
+
+         YAHOO.Bubbling.fire("filterChanged", filterObj);
 
          // Hook action events
          YAHOO.Bubbling.addDefaultAction("action-link", function DL_filterAction(layer, args)
@@ -530,7 +553,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.options.showFolders = !this.options.showFolders;
          p_obj.set("label", this._msg(this.options.showFolders ? "button.folders.hide" : "button.folders.show"));
 
-         YAHOO.Bubbling.fire("onDoclistRefresh");
+         YAHOO.Bubbling.fire("doclistRefresh");
          YAHOO.util.Event.preventDefault(e);
       },
       
@@ -546,7 +569,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          this.options.detailedView = !this.options.detailedView;
          p_obj.set("label", this._msg(this.options.detailedView ? "button.view.simple" : "button.view.detailed"));
 
-         YAHOO.Bubbling.fire("onDoclistRefresh");
+         YAHOO.Bubbling.fire("doclistRefresh");
          YAHOO.util.Event.preventDefault(e);
       },
       
@@ -563,7 +586,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          var domEvent = aArgs[0]
          var eventTarget = aArgs[1];
 
-         var checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.id);
+         var checks = YAHOO.util.Selector.query('input[type="checkbox"]', this.widgets.dataTable.getTbodyEl());
          var len = checks.length; 
 
          switch (eventTarget.value)
@@ -614,26 +637,29 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        */
       onEventHighlightRow: function DL_onEventHighlightRow(oArgs)
       {
-         var target = oArgs.target;
-         // activeId is the element id of the active table cell where we'll inject the actual links
-         var activeId = this.id + "-actions-" + target.yuiRecordId;
+         var Dom = YAHOO.util.Dom;
          
-         // Inject the correct action elements into the activeId element
-         var elActive = YAHOO.util.Dom.get(activeId);
-         if (elActive.firstChild === null)
+         var target = oArgs.target;
+         // elRename is the element id of the rename file link
+         var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
+         // elActions is the element id of the active table cell where we'll inject the actual links
+         var elActions = Dom.get(this.id + "-actions-" + target.yuiRecordId);
+
+         // Inject the correct action elements into the actionsId element
+         if (elActions.firstChild === null)
          {
             // Retrieve the actionType - currently keyed off folder or file type.
             // TODO (M): Data webscript to inject action type into data record
             // TODO (S): Cache the types for each recordId?
             var actionType = this.widgets.dataTable.getRecord(target).getData("type");
 
-            var elActions = YAHOO.util.Dom.get(this.id + "-actions-" + actionType);
-            var clone = elActions.cloneNode(true);
-            clone.id = activeId + "_a";
-            elActive.appendChild(clone);
+            var clone = Dom.get(this.id + "-actions-" + actionType).cloneNode(true);
+            clone.id = elActions.id + "_a";
+            elActions.appendChild(clone);
          }
          // Show the actions
-         YAHOO.util.Dom.removeClass(elActive, "hidden");
+         Dom.removeClass(elRename, "hidden");
+         Dom.removeClass(elActions, "hidden");
          
          // Call through to get the row highlighted by YUI
          this.widgets.dataTable.onEventHighlightRow.call(this.widgets.dataTable, oArgs);
@@ -649,9 +675,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
       onEventUnhighlightRow: function DL_onEventUnhighlightRow(oArgs)
       {
          var target = oArgs.target;
+         var renameId = this.id + "-rename-" + target.yuiRecordId;
          var actionsId = this.id + "-actions-" + target.yuiRecordId;
 
          // Just hide the action links
+         YAHOO.util.Dom.addClass(renameId, "hidden");
          YAHOO.util.Dom.addClass(actionsId, "hidden");
          
          // Call through to get the row unhighlighted by YUI
@@ -712,15 +740,11 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
             {
                fn: function DL__onDeleteAssetConfirm_success(data)
                {
-                  // Fire the notification events
-                  if (fileType == "folder")
+                  // Fire the notification event
+                  YAHOO.Bubbling.fire(fileType == "folder" ? "folderDeleted" : "fileDeleted",
                   {
-                     YAHOO.Bubbling.fire("onFolderDeleted",
-                     {
-                        path: data.config.object.filePath
-                     });
-                  }
-                  YAHOO.Bubbling.fire("onDoclistRefresh");
+                     path: data.config.object.filePath
+                  });
                   
                   // Success confirmation message
                   Alfresco.util.PopupManager.displayMessage(
@@ -745,6 +769,19 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
          var action = new Alfresco.module.DoclibActions();
          action.deleteFile(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"), obj);
       },
+
+      /**
+       * Checkout Asset.
+       *
+       * @method onCheckoutAsset
+       */
+      onCheckoutAsset: function DL_onCheckoutAsset(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row);
+         var action = new Alfresco.module.DoclibActions();
+         action.checkoutFile(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"));
+      },
+
 
 
       /**
@@ -791,12 +828,30 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
        * DocList Refresh Required event handler
        *
        * @method onDoclistRefresh
-       * @param layer {object} Event fired
-       * @param args {array} Event parameters (depends on event type)
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (unused)
        */
       onDoclistRefresh: function DL_onDoclistRefresh(layer, args)
       {
          this._updateDocList.call(this, this.currentPath);
+      },
+
+      /**
+       * DocList View Filter changed event handler
+       *
+       * @method onFilterChanged
+       * @param layer {object} Event fired (unused)
+       * @param args {array} Event parameters (new filterId)
+       */
+      onFilterChanged: function DL_onFilterChanged(layer, args)
+      {
+         var obj = args[1];
+         if ((obj !== null) && (obj.filterId !== null))
+         {
+            // Should be a filterId in the arguments
+            this.currentFilterId = obj.filterId;
+            this._updateDocList.call(this, this.currentPath);
+         }
       },
 
    
@@ -868,6 +923,7 @@ YAHOO.util.Dom.get("template.documentlist.documentlibrary-body").clientWidth
           var params = "path=" + encodeURIComponent(path);
           params += "&site=" + encodeURIComponent(this.options.siteId);
           params += this.options.showFolders ? "" : "&type=documents";
+          params += "&filter=" + encodeURIComponent(this.currentFilterId);
           return params;
        }
    };
