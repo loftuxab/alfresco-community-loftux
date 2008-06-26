@@ -27,17 +27,18 @@ package org.alfresco.web.framework;
 import java.io.Serializable;
 
 /**
- * The Class ModelObjectKey.
+ * The ModelObjectKey structure class holds the values that represent the binding
+ * of a model object instance to a persistance store and it's path in that store.
  * 
  * @author muzquiano
  */
-public class ModelObjectKey implements Serializable
+public final class ModelObjectKey implements Serializable
 {
     private String persisterId;
     private String storagePath;
     private String id;
     private boolean saved;
-        
+    
     /**
      * Instantiates a new model object key.
      * 
@@ -68,7 +69,7 @@ public class ModelObjectKey implements Serializable
      * 
      * @param storagePath
      */
-    protected void setStoragePath(String storagePath)
+    void setStoragePath(String storagePath)
     {
         this.storagePath = storagePath;
     }
@@ -88,7 +89,7 @@ public class ModelObjectKey implements Serializable
      * 
      * @param id
      */
-    protected void setId(String id)
+    void setId(String id)
     {
         this.id = id;
     }
@@ -118,7 +119,7 @@ public class ModelObjectKey implements Serializable
      * 
      * @param saved
      */
-    public void setSaved(boolean saved)
+    void setSaved(boolean saved)
     {
         this.saved = saved;
     }

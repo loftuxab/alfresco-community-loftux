@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page>
-  <id>slingshot-logout</id>
-  <page-type>logout</page-type>
   <title>Slingshot Logout Page</title>
   <template-instance>slingshot-logout</template-instance>
   <authentication>none</authentication>  
