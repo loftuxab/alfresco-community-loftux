@@ -957,6 +957,10 @@ Alfresco.util.Ajax = function()
                {
                   c.dataStr = YAHOO.lang.JSON.stringify(c.dataObj);
                }
+               else
+               {
+                  c.dataStr = "{}";
+               }
             }
          }
          else

@@ -142,7 +142,40 @@
          });
 
          return this._runAction(config, obj);
+      },
+      
+      /**
+       * ACTION: Checkout file.
+       * Checks out a working copy file from the component container, given filepath
+       *
+       * @method checkoutFile
+       * @param site {string} current site
+       * @param containerId {string} component container
+       * @param path {string} path where file is located
+       * @param file {string} file to be deleted
+       * @param obj {object} optional additional request configuration
+       * @return {boolean} false: module not ready
+       */
+      checkoutFile: function DLA_checkoutFile(site, containerId, path, file, obj)
+      {
+         var filePath =  path + "/" + file;
+         
+         var config = YAHOO.lang.merge(this.defaultConfig,
+         {
+            url: this.defaultConfig.url + "checkout/" + site + "/" + containerId + filePath,
+            method: Alfresco.util.Ajax.POST,
+            responseContentType: Alfresco.util.Ajax.JSON,
+            dataObj: {},
+            object:
+            {
+               filePath: filePath,
+               fileName: file
+            }
+         });
+
+         return this._runAction(config, obj);
       }
+      
    };
 })();
 

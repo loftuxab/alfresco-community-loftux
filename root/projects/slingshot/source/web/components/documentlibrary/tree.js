@@ -50,10 +50,11 @@
       Alfresco.util.YUILoaderHelper.require(["treeview"], this.onComponentsLoaded, this);
       
       // Decoupled event listeners
-      YAHOO.Bubbling.on("onPathChanged", this.onPathChanged, this);
-      YAHOO.Bubbling.on("onFolderRenamed", this.onFolderRenamed, this);
-      YAHOO.Bubbling.on("onFolderCreated", this.onFolderCreated, this);
-      YAHOO.Bubbling.on("onFolderDeleted", this.onFolderDeleted, this);
+      YAHOO.Bubbling.on("pathChanged", this.onPathChanged, this);
+      YAHOO.Bubbling.on("folderRenamed", this.onFolderRenamed, this);
+      YAHOO.Bubbling.on("folderCreated", this.onFolderCreated, this);
+      YAHOO.Bubbling.on("folderDeleted", this.onFolderDeleted, this);
+      YAHOO.Bubbling.on("filterChanged", this.onFilterChanged, this);
 
       return this;
    }
@@ -100,6 +101,14 @@
       initialPath: null,
 
       /**
+       * Initial filter on page load.
+       * 
+       * @property initialFilter
+       * @type string
+       */
+      initialFilter: null,
+
+      /**
        * Current path being browsed.
        * 
        * @property currentPath
@@ -122,6 +131,14 @@
        * @type array
        */
       pathsToExpand: [],
+
+      /**
+       * Selected tree node.
+       * 
+       * @property selectedNode
+       * @type {YAHOO.widget.Node}
+       */
+      selectedNode: null,
 
       /**
        * Set multiple initialization options at once.
@@ -245,8 +262,8 @@
          this.isReady = true;
          if (this.initialPath !== null)
          {
-            // We missed the onPathChanged event, so fake it here
-            this.onPathChanged("onPathChanged",
+            // We missed the pathChanged event, so fake it here
+            this.onPathChanged("pathChanged",
             [
                null,
                {
@@ -255,6 +272,83 @@
             ]);
          }
       },
+
+      /**
+       * Fired by YUI TreeView when a node has finished expanding
+       * @method onExpandComplete
+       * @param oNode {YAHOO.widget.Node} the node recently expanded
+       */
+      onExpandComplete: function DLT_onExpandComplete(oNode)
+      {
+         // Make sure the tree's Dom has been updated
+         this.treeview.draw();
+         
+         if (this.pathsToExpand.length > 0)
+         {
+            var node = this.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
+            if (node !== null)
+            {
+               if (node.data.path == this.currentPath)
+               {
+                  this.selectedNode = node;
+               }
+               node.expand();
+            }
+         }
+         else if (this.initialFilter !== null)
+         {
+            // We missed the filterChanged event, so fake it here
+            this.onFilterChanged("filterChanged",
+            [
+               null,
+               {
+                  filterId: this.initialFilter.filterId,
+                  filterOwner: this.initialFilter.filterOwner
+               }
+            ]);
+            this.initialFilter = null;
+         }
+      },
+
+      /**
+       * Fired by YUI TreeView when a node label is clicked
+       * @method onNodeClicked
+       * @param node {YAHOO.widget.Node} the node clicked
+       * @return allowExpand {boolean} allow or disallow node expansion
+       */
+      onNodeClicked: function DLT_onNodeClicked(node)
+      {
+         var Dom = YAHOO.util.Dom;
+
+         // Update the current selected node highlight
+         if (this.selectedNode !== null)
+         {
+            Dom.removeClass(this.selectedNode.getEl(), "selected");
+         }
+         this.selectedNode = node;
+         Dom.addClass(this.selectedNode.getEl(), "selected");
+         
+         // Fire the filter changed event
+         YAHOO.Bubbling.fire("filterChanged",
+         {
+            filterId: "path",
+            filterOwner: this.name
+         });
+         // Fire the path changed event
+         YAHOO.Bubbling.fire("pathChanged",
+         {
+            path: node.data.path
+         });
+         
+         // Prevent the tree node from expanding (TODO: user preference?)
+         return false;
+      },
+
+      
+      /**
+       * BUBBLING LIBRARY EVENT HANDLERS FOR PAGE EVENTS
+       * Disconnected event handlers for inter-component event notification
+       */
 
       /**
        * Fired when the path has changed
@@ -267,6 +361,11 @@
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
+            // ensure path starts with leading slash if not the root node
+            if ((obj.path != "") && (obj.path.substring(0, 1) != "/"))
+            {
+               obj.path = "/" + obj.path;
+            }
             // Defer if event received before we're ready
             if (!this.isReady)
             {
@@ -281,6 +380,7 @@
             if (node !== null)
             {
                // Node found
+               this.selectedNode = node;
                node.expand();
                while (node.parent !== null)
                {
@@ -307,6 +407,7 @@
                }
             }
             
+            // Kick off the expansion process by expanding the root node
             node = this.treeview.getNodeByProperty("path", "");
             if (node !== null)
             {
@@ -347,6 +448,11 @@
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
+            // ensure path starts with leading slash if not the root node
+            if ((obj.parentPath != "") && (obj.parentPath.substring(0, 1) != "/"))
+            {
+               obj.parentPath = "/" + obj.parentPath;
+            }
             var parentNode = this.treeview.getNodeByProperty("path", obj.parentPath);
             this._sortNodeChildren(parentNode);
          }
@@ -363,6 +469,11 @@
          var obj = args[1];
          if ((obj !== null) && (obj.path !== null))
          {
+            // ensure path starts with leading slash if not the root node
+            if ((obj.path != "") && (obj.path.substring(0, 1) != "/"))
+            {
+               obj.path = "/" + obj.path;
+            }
             var node = this.treeview.getNodeByProperty("path", obj.path);
             if (node !== null)
             {
@@ -374,39 +485,49 @@
       },
 
       /**
-       * Fired by YUI TreeView when a node has finished expanding
-       * @method onExpandComplete
-       * @param oNode {YAHOO.widget.Node} the node recently expanded
+       * Fired when the currently active filter has changed
+       * @method onFilterChanged
+       * @param layer {string} the event source
+       * @param args {object} arguments object
        */
-      onExpandComplete: function DLT_onExpandComplete(oNode)
+      onFilterChanged: function DLT_onFilterChanged(layer, args)
       {
-         if (this.pathsToExpand.length > 0)
+         var obj = args[1];
+         if ((obj !== null) && (obj.filterId !== null))
          {
-            var node = this.treeview.getNodeByProperty("path", this.pathsToExpand.shift());
-            if (node !== null)
+            // Defer if event received before we're ready
+            if (!this.isReady)
             {
-               node.expand();
+               this.initialFilter =
+               {
+                  filterId: obj.filterId,
+                  filterOwner: obj.filterOwner
+               };
+               return;
+            }
+
+            var Dom = YAHOO.util.Dom;
+            if (this.selectedNode !== null)
+            {
+               if (obj.filterOwner == this.name)
+               {
+                  // We're back filtering by path
+                  Dom.addClass(this.selectedNode.getEl(), "selected");
+               }
+               else
+               {
+                  // Currently filtering by something other than path
+                  Dom.removeClass(this.selectedNode.getEl(), "selected");
+               }
             }
          }
       },
 
+
       /**
-       * Fired by YUI TreeView when a node label is clicked
-       * @method onNodeClicked
-       * @param node {YAHOO.widget.Node} the node clicked
-       * @return allowExpand {boolean} allow or disallow node expansion
+       * PRIVATE FUNCTIONS
        */
-      onNodeClicked: function DLT_onNodeClicked(node)
-      {
-         YAHOO.Bubbling.fire('onPathChanged',
-         {
-            path: node.data.path
-         });
-         
-         // Prevent the tree node from expanding (TODO: user preference?)
-         return false;
-      },
-      
+
       /**
        * Creates the TreeView control and renders it to the parent element.
        * @method _buildTree
@@ -500,7 +621,11 @@
                               tempNode.isLeaf = true;
                            }
                            
-                           if (kids.length > i)
+                           if (kids.length == 0)
+                           {
+                              tempNode.appendTo(oResponse.argument.node);
+                           }
+                           else if (kids.length > i)
                            {
                               tempNode.insertBefore(kids[i]);
                            }

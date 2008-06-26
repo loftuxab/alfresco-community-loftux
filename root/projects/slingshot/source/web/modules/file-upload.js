@@ -777,12 +777,12 @@
             }
 
             // Tell the document list to refresh itself if present
-            YAHOO.Bubbling.fire("onDoclistRefresh", {currentPath: this.showConfig.path});
+            YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
          }
          else if (this.state === this.STATE_FINISHED)
          {
             // Tell the document list to refresh itself if present
-            YAHOO.Bubbling.fire("onDoclistRefresh", {currentPath: this.showConfig.path});
+            YAHOO.Bubbling.fire("doclistRefresh", {currentPath: this.showConfig.path});
          }
 
          // Reset the message for empty datatables for other components

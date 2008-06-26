@@ -1,10 +1,14 @@
 .filter ul
 {
-   margin-left: 20px;
    padding: 0.5em 0 1em;
 }
 
 .filter li
 {
-   
+   padding: 4px 0px 3px 20px;
+}
+
+.filter li.selected
+{
+   background-color: #d2e5f2;
 }

@@ -1,3 +1,17 @@
-.treeview
+.treeview .ygtvitem
 {
+   background-color: #ffffff;
+}
+
+.treeview .ygtvlabel,
+.treeview .ygtvlabel:link,
+.treeview .ygtvlabel:visited,
+.treeview .ygtvlabel:hover
+{
+   background: none;
+}
+
+.treeview .selected
+{
+   background-color: #d2e5f2;
 }

@@ -282,7 +282,7 @@
       {
          this.dialog.hide();
 
-         // Firefox 2 still has the hidden caret issue unless teh form is redrawn from scratch.
+         // Firefox 2 still has the hidden caret issue unless the form is redrawn from scratch.
          if (YAHOO.env.ua.gecko == 1.8)
          {
             this.dialog.destroy();
@@ -304,6 +304,13 @@
          YAHOO.util.Dom.get(this.id + "-description").value = "";
 
          this.dialog.hide();
+
+         // Firefox 2 still has the hidden caret issue unless the form is redrawn from scratch.
+         if (YAHOO.env.ua.gecko == 1.8)
+         {
+            this.dialog.destroy();
+            this.dialog = null;
+         }
 
          if (!response)
          {
