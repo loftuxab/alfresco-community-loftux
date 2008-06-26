@@ -1,0 +1,1 @@
+<script type="text/javascript" src="${page.url.context}/components/dashlets/user-calendar.js"></script>
