@@ -49,13 +49,6 @@ public interface ModelObject extends Serializable
     public String getId();
     
     /**
-     * Sets the id of this model object
-     * 
-     * @param id
-     */
-    public void setId(String id);
-    
-    /**
      * Returns the type id of the model object.
      * 
      * @return The type id

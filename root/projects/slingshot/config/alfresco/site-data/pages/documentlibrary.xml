@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <id>documentlibrary</id>
-   <page-type>doclib</page-type>
    <title>Document Library</title>
    <description>Document library with Tree view</description>
    <template-instance>documentlibrary</template-instance>

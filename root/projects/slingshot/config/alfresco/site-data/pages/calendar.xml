@@ -1,8 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <id>calendar</id>
-   <title>Calendar: Test Page</title>
-   <description>Test page for calendar component</description>
+   <title>Calendar</title>
+   <description>Site Calendar Component</description>
    <template-instance>calendar</template-instance>
    <authentication>user</authentication>
 </page>

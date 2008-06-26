@@ -53,12 +53,12 @@ public abstract class AbstractModelObject implements ModelObject
     public static String PROP_DESCRIPTION = "description";
     public static String CONTAINER_PROPERTIES = "properties";
     
-    protected Document document;
-    protected ModelObjectKey key;
+    protected final Document document;
+    protected final ModelObjectKey key;
+    protected final String id;
     
     protected long modificationTime;
     protected String modelVersion;
-    protected String id;
     
     protected Map<String, Serializable> modelProperties;    
     protected Map<String, Serializable> customProperties;
@@ -88,22 +88,31 @@ public abstract class AbstractModelObject implements ModelObject
          * "unknown" flag
          */
         this.modelVersion = getProperty("model-version");
-        if(this.modelVersion == null)
+        if (this.modelVersion == null)
         {
             // allow configuration to specify
             this.modelVersion = FrameworkHelper.getConfig().getTypeDescriptor(this.getTypeId()).getVersion();
-            if(this.modelVersion == null)
+            if (this.modelVersion == null)
             {
                 this.modelVersion = VERSION_UNKNOWN;
             }
         }        
     }
     
+    /**
+     * Constructor used by sentinel object
+     */
     protected AbstractModelObject()
     {
+        this.key = null;
+        this.document = null;
+        this.id = null;
     }
 
-    public ModelObjectKey getKey()
+    /**
+     * @return the key structure that represents this model object
+     */
+    public final ModelObjectKey getKey()
     {
         return this.key;
     }
@@ -111,7 +120,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getModelVersion()
      */
-    public String getModelVersion()
+    public final String getModelVersion()
     {
         return this.modelVersion;
     }
@@ -124,23 +133,15 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getId()
      */
-    public String getId()
+    public final String getId()
     {
         return this.id;
     }
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.site.model.ModelObject#setId(java.lang.String)
-     */    
-    public void setId(String id)
-    {
-        this.id = id;
-    }
-    
-    /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getTitle()
      */
-    public String getTitle()
+    public final String getTitle()
     {
         if (this.title == null)
         {
@@ -152,7 +153,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setTitle(java.lang.String)
      */
-    public void setTitle(String title)
+    public final void setTitle(String title)
     {
         setProperty(PROP_TITLE, title);
         this.title = title;
@@ -161,7 +162,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getDescription()
      */
-    public String getDescription()
+    public final String getDescription()
     {
         if (this.description == null)
         {
@@ -173,7 +174,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setDescription(java.lang.String)
      */
-    public void setDescription(String value)
+    public final void setDescription(String value)
     {
         setProperty(PROP_DESCRIPTION, value);
         this.description = value;
@@ -182,7 +183,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#isSaved()
      */
-    public boolean isSaved()
+    public final boolean isSaved()
     {
         return this.key.isSaved();
     }
@@ -195,7 +196,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getDocument()
      */
-    public Document getDocument()
+    public final Document getDocument()
     {
         return this.document;
     }
@@ -203,7 +204,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#toXML()
      */
-    public String toXML()
+    public final String toXML()
     {
         return XMLUtil.toXML(document, true);
     }
@@ -216,7 +217,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getBooleanProperty(java.lang.String)
      */
-    public boolean getBooleanProperty(String propertyName)
+    public final boolean getBooleanProperty(String propertyName)
     {
         String val = getProperty(propertyName);
         return Boolean.parseBoolean(val);
@@ -225,7 +226,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getProperty(java.lang.String)
      */
-    public String getProperty(String propertyName)
+    public final String getProperty(String propertyName)
     {
         if (isModelProperty(propertyName))
         {
@@ -240,7 +241,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setProperty(java.lang.String, java.lang.String)
      */
-    public void setProperty(String propertyName, String propertyValue)
+    public final void setProperty(String propertyName, String propertyValue)
     {
         if (isModelProperty(propertyName))
         {
@@ -255,7 +256,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#removeProperty(java.lang.String)
      */
-    public void removeProperty(String propertyName)
+    public final void removeProperty(String propertyName)
     {
         if (isModelProperty(propertyName))
         {
@@ -267,7 +268,6 @@ public abstract class AbstractModelObject implements ModelObject
         }
     }
     
-    
     /**
      * Uses reflection to determine whether the given property name
      * is a custom property.  A custom property is a non-model-specific
@@ -278,7 +278,7 @@ public abstract class AbstractModelObject implements ModelObject
      * 
      * @return true, if checks if is custom property
      */
-    protected boolean isCustomProperty(String propertyName)
+    protected final boolean isCustomProperty(String propertyName)
     {
         return (!isModelProperty(propertyName));        
     }
@@ -292,7 +292,7 @@ public abstract class AbstractModelObject implements ModelObject
      * 
      * @return true, if checks if is model property
      */
-    protected boolean isModelProperty(String propertyName)
+    protected final boolean isModelProperty(String propertyName)
     {
         return ModelHelper.isModelProperty(this, propertyName);
     }
@@ -305,7 +305,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getModelProperty(java.lang.String)
      */
-    public String getModelProperty(String propertyName)
+    public final String getModelProperty(String propertyName)
     {
         if (propertyName == null)
         {
@@ -318,7 +318,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setModelProperty(java.lang.String, java.lang.String)
      */
-    public void setModelProperty(String propertyName, String propertyValue)
+    public final void setModelProperty(String propertyName, String propertyValue)
     {
         if (propertyName == null)
         {
@@ -349,7 +349,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#removeModelProperty(java.lang.String)
      */
-    public void removeModelProperty(String propertyName)
+    public final void removeModelProperty(String propertyName)
     {
         if (propertyName == null)
         {
@@ -375,7 +375,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getCustomProperty(java.lang.String)
      */
-    public String getCustomProperty(String propertyName)
+    public final String getCustomProperty(String propertyName)
     {
         if (propertyName == null)
         {
@@ -388,7 +388,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setCustomProperty(java.lang.String, java.lang.String)
      */
-    public void setCustomProperty(String propertyName, String propertyValue)
+    public final void setCustomProperty(String propertyName, String propertyValue)
     {
         if (propertyName == null)
         {
@@ -425,7 +425,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#removeCustomProperty(java.lang.String)
      */
-    public void removeCustomProperty(String propertyName)
+    public final void removeCustomProperty(String propertyName)
     {
         if (propertyName == null)
         {
@@ -450,7 +450,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getProperties()
      */
-    public Map<String, Serializable> getProperties()
+    public final Map<String, Serializable> getProperties()
     {
         Map<String, Serializable> properties = new HashMap<String, Serializable>(16, 1.0f);
         properties.putAll(getModelProperties());
@@ -461,20 +461,20 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getModelProperties()
      */
-    public Map<String, Serializable> getModelProperties()
+    public final Map<String, Serializable> getModelProperties()
     {
     	if (this.modelProperties == null)
     	{
-    		modelProperties = new HashMap<String, Serializable>(8, 1.0f);
+    		this.modelProperties = new HashMap<String, Serializable>(8, 1.0f);
     		
     		List elements = getDocument().getRootElement().elements();
 	        for (int i = 0; i < elements.size(); i++)
 	        {
 	            Element el = (Element) elements.get(i);
 	            String elementName = el.getName();
-	            if(elementName != null)
+	            if (elementName != null)
 	            {
-	                if(!CONTAINER_PROPERTIES.equals(elementName))
+	                if (!CONTAINER_PROPERTIES.equals(elementName))
 	                {
 	                    String elementValue = el.getStringValue();
 	                    this.modelProperties.put(elementName, elementValue);
@@ -488,7 +488,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getCustomProperties()
      */
-    public Map<String, Serializable> getCustomProperties()
+    public final Map<String, Serializable> getCustomProperties()
     {
     	if (this.customProperties == null)
     	{
@@ -512,7 +512,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getModificationTime()
      */
-    public long getModificationTime()
+    public final long getModificationTime()
     {
         return this.modificationTime;
     }
@@ -520,7 +520,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#setModificationTime(long)
      */
-    public void setModificationTime(long modificationTime)
+    public final void setModificationTime(long modificationTime)
     {
         this.modificationTime = modificationTime;
     }
@@ -528,7 +528,7 @@ public abstract class AbstractModelObject implements ModelObject
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#touch()
      */
-    public void touch()
+    public final void touch()
     {
         setModificationTime(System.currentTimeMillis());
     }
@@ -551,7 +551,7 @@ public abstract class AbstractModelObject implements ModelObject
     /**
      * Returns the ModelObjectPersister id that this object is bound to
      */
-    public String getPersisterId()
+    public final String getPersisterId()
     {
         return this.key.getPersisterId();
     }
@@ -559,7 +559,7 @@ public abstract class AbstractModelObject implements ModelObject
     /**
      * Returns the persistence storage path of this object 
      */
-    public String getStoragePath()
+    public final String getStoragePath()
     {
         return this.key.getStoragePath();
     }

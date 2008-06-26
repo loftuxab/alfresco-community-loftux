@@ -58,7 +58,7 @@ public final class ScriptModelObject extends ScriptBase
 {
     // unmodifiable "system" properties
     private static final long serialVersionUID = -3378946227712939601L;
-    protected ModelObject modelObject;
+    private final ModelObject modelObject;
     
     /**
      * Instantiates a new script model object.
@@ -125,11 +125,6 @@ public final class ScriptModelObject extends ScriptBase
     public String getId()
     {
         return modelObject.getId();
-    }
-    
-    public void setId(String id)
-    {
-        modelObject.setId(id);
     }
     
     public String getTitle()

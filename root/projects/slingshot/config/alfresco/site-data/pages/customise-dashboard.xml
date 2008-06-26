@@ -1,7 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
-   <id>customise-dashboard</id>
-   <page-type>customise</page-type>
    <title>Customise Dashboard</title>
    <description>Customise dashboard layout and dashlets</description>
    <template-instance>page-1-column</template-instance>

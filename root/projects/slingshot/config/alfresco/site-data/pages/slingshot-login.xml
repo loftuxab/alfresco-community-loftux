@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <page>
-  <id>slingshot-login</id>
-  <page-type>login</page-type>
   <title>Slingshot Login Page</title>
   <template-instance>slingshot-login</template-instance>
   <authentication>none</authentication>  
