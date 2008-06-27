@@ -1,3 +1,4 @@
+<%@ page import="org.alfresco.web.framework.model.*"%>
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
 <%

@@ -189,9 +189,9 @@ public class DefaultModel extends AbstractModel
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#newComponent(java.lang.String)
      */
-    public Component newComponent(String typeId)
+    public Component newComponent(String objectId)
     {
-        return (Component) newObject(Component.TYPE_ID, typeId);
+        return (Component) newObject(Component.TYPE_ID, objectId);
     }
     
     /**
@@ -205,7 +205,13 @@ public class DefaultModel extends AbstractModel
     public Component newComponent(String scopeId, String regionId, String sourceId)
     {
         String componentId = Component.generateId(scopeId, regionId, sourceId);
-        return newComponent(componentId);
+        
+        Component component = newComponent(componentId);
+        component.setScope(scopeId);
+        component.setRegionId(regionId);
+        component.setSourceId(sourceId);
+        
+        return component;
     }
     
     /* (non-Javadoc)
@@ -625,21 +631,18 @@ public class DefaultModel extends AbstractModel
      */
     public Map<String, ModelObject> findPages()
     {
-        return findPages(null, null, null);
+        return findPages(null, null);
     }
 
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#findPages(java.lang.String, java.lang.String, java.lang.String)
      */
-    public Map<String, ModelObject> findPages(String templateId, String rootPage,
-            String pageTypeId)
+    public Map<String, ModelObject> findPages(String templateId, String pageTypeId)
     {
         // build property map
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
         addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
                 templateId);
-        addPropertyConstraint(propertyConstraintMap, Page.PROP_ROOT_PAGE,
-                rootPage);
         addPropertyConstraint(propertyConstraintMap, Page.PROP_PAGE_TYPE_ID,
                 pageTypeId);
 

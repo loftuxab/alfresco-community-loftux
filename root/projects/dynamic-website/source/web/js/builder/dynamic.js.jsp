@@ -1,6 +1,7 @@
 <%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.tools.*"%>
-<%@ page import="org.alfresco.web.site.model.*" %>
+<%@ page import="org.alfresco.web.framework.model.*" %>
+<%@ page import="org.alfresco.web.framework.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page buffer="16kb" contentType="text/html;charset=UTF-8" %>
@@ -59,7 +60,7 @@ function getServiceUri() {
 }
 function getStoreId() {
 <%
-	String storeId = context.getStoreId();
+	String storeId = (String) context.getModel().getObjectManager().getContext().getValue(ModelPersistenceContext.REPO_STOREID);
 	if(storeId == null) { 
 		%>return null;<%
 	}

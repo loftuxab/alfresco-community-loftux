@@ -2,7 +2,7 @@
 
 
 var pageId = wizard.request("pageId");
-var page = sitedata.getObject(pageId);
+var page = sitedata.getObject("page", pageId);
 
 wizard.addGridColumn("formatid", "Format");
 wizard.addGridColumn("templatename", "Template Name");

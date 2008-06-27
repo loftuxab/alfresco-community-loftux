@@ -10,7 +10,7 @@ function clearCurrentSite()
 	// note: we do not remove TemplateTypes or ComponentTypes
 	// since those are reusable
 	removeObjects(sitedata.getComponents());
-	//removeObjects(sitedata.getConfigurations()); // don't delete these
+	removeObjects(sitedata.getConfigurations());
 	removeObjects(sitedata.getContentAssociations());
 	removeObjects(sitedata.getPages());
 	removeObjects(sitedata.getPageAssociations());
@@ -46,7 +46,7 @@ function generateSite(siteType)
 
 function buildBasicPublicWebsite()
 {
-	var rootPage = sitedata.getRootPage();
+	var rootPage = sitedata.getRootPage();	
 	
 	// create root navigation nodes
 	var nd1 = newPage("Products", rootPage);
@@ -72,9 +72,12 @@ function buildBasicPublicWebsite()
 	associateTemplate(nd3, t5, "default");
 	associateTemplate(nd4, t2, "default");
 	
+
 	// associate content templates
-	associateContentType("article", t3, "default");
-	associateContentType("article", t4, "print");
+	var articleDefaultViewerPage = newPage("Article Default Viewer", null);
+	associateContentType("article", articleDefaultViewerPage.getId(), "default");
+	var articlePrintViewerPage = newPage("Article Print Viewer", null);
+	associateContentType("article", articlePrintViewerPage.getId(), "print");
 	
 	// set up site scoped components
 	var c1 = newImageComponent("Header", "/build/basic/images/header.jpg");
@@ -113,7 +116,7 @@ function buildBasicPublicWebsite()
 	var c31 = newWebScriptComponent("WebScript Sample 1", "/web/components/sample1");
 	var c32 = newWebScriptComponent("WebScript Sample 2", "/web/components/sample2");
 	associatePageComponent(c31, nd3, "content");
-	associateTemplateComponent(c32, t5, nd3, "leftNav");			
+	associateTemplateComponent(c32, t5, "leftNav");			
 	
 	// set up the content template (for item views)
 	var c91 = newItemComponent("Item Viewer", "current", null, "templateTitle", "article-full", "alfresco-webuser");
@@ -122,11 +125,7 @@ function buildBasicPublicWebsite()
 	associateTemplateComponent(c12, t3, "leftNav");	
 	
 	// set up the print template (for item views)
-	associateTemplateComponent(c91, t4, "contentitem");
-	
-	// build the default endpoints
-	var ep1 = newEndpoint("alfresco-system", "alfresco", "alf-ticket", "http://localhost:8080", "/alfresco/service", "specific", "admin", "admin");
-	var ep2 = newEndpoint("alfresco", "alfresco", "alf-ticket", "http://localhost:8080", "/alfresco/service", "current", null, null);
+	associateTemplateComponent(c91, t4, "contentitem");	
 }
 
 function buildGreenEnergy()

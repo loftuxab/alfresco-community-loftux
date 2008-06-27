@@ -31,9 +31,11 @@ for(var i = 0; i < templates.length; i++)
 	array[1] = templates[i].getId();
 	array[2] = "";
 	
-	var templateType = sitedata.getObject(templates[i].getProperty("template-type-id"));
+	var templateType = sitedata.getObject("template-type", templates[i].getProperty("template-type"));
 	if(templateType != null)
+	{
 		array[2] = templateType.getTitle();
+	}
 		
 	wizard.addGridData(array);
 }

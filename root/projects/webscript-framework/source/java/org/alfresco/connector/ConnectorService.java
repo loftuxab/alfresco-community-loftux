@@ -466,7 +466,7 @@ public class ConnectorService implements ApplicationListener
             vault = buildCredentialVault(userId, descriptor);
             if (vault == null)
             {
-                throw new RemoteConfigException("Unable to instantiate configured class: " + descriptor.getClass());
+                throw new RemoteConfigException("Unable to instantiate configured class: " + descriptor.getImplementationClass());
             }
             
             // place into cache and tell the vault to load (from persisted state - if any)

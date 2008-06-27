@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.alfresco.tools.ObjectGUID;
+import org.alfresco.web.framework.model.Component;
 import org.alfresco.web.site.FrameworkHelper;
 
 /**
@@ -146,5 +147,25 @@ public final class ModelHelper
     {
         ObjectGUID guid = new ObjectGUID();
         return guid.toString();
-    }    
+    }   
+    
+    /**
+     * Allows model object ids to be set manually
+     * 
+     * @param object
+     * @param id
+     */
+    public static void resetId(ModelObject object, String id)
+    {
+        if(object instanceof AbstractModelObject)
+        {
+            // not for components
+            if(object instanceof Component)
+            {
+                return;
+            }
+            
+            ((AbstractModelObject)object).id = id;
+        }        
+    }
 }

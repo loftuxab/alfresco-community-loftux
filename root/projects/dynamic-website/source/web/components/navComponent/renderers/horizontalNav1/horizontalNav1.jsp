@@ -1,5 +1,7 @@
+<%@ page import="org.alfresco.web.framework.model.*" %>
+<%@ page import="org.alfresco.web.framework.*" %>
 <%@ page import="org.alfresco.web.site.*" %>
-<%@ page import="org.alfresco.web.site.model.*" %>
+<%@ page import="org.alfresco.tools.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ page isELIgnored="false" %>
 <%!
@@ -9,7 +11,7 @@
 		if(context.getPage() != null)
 			currentPageId = context.getPage().getId();
 		
-		String id = context.getModel().newGUID();
+		String id = ModelHelper.newGUID();
 		String href = context.getLinkBuilder().page(context, page.getId(), context.getFormatId());
 		
 		boolean selected = false;
@@ -46,7 +48,7 @@
 			Page[] childPages = page.getChildPages(context);
 			if(childPages.length > 0)
 			{
-				String id2 = context.getModel().newGUID();
+				String id2 = ModelHelper.newGUID();
 				buffer.append("<div style='z-index: 1; position: absolute; visibility: hidden;' id='"+id2+"' class='yuimenu yui-module yui-overlay'>");
 				buffer.append("<div class='bd'>");
 				buffer.append("<ul>");

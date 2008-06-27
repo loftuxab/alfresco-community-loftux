@@ -53,9 +53,11 @@ public abstract class AbstractModelObject implements ModelObject
     public static String PROP_DESCRIPTION = "description";
     public static String CONTAINER_PROPERTIES = "properties";
     
-    protected final Document document;
-    protected final ModelObjectKey key;
-    protected final String id;
+    // Note: These should note be final, they could be replaced in overrides
+    // Specifically, the id is allowed to change
+    protected Document document;
+    protected ModelObjectKey key;
+    protected String id;
     
     protected long modificationTime;
     protected String modelVersion;
@@ -137,7 +139,7 @@ public abstract class AbstractModelObject implements ModelObject
     {
         return this.id;
     }
-    
+        
     /* (non-Javadoc)
      * @see org.alfresco.web.site.model.ModelObject#getTitle()
      */

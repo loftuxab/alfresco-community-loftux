@@ -28,6 +28,7 @@ import java.io.Serializable;
 import java.util.Iterator;
 
 import org.alfresco.util.ParameterCheck;
+import org.alfresco.web.framework.ModelHelper;
 import org.alfresco.web.framework.ModelObject;
 import org.alfresco.web.site.RequestContext;
 import org.mozilla.javascript.Scriptable;
@@ -125,6 +126,13 @@ public final class ScriptModelObject extends ScriptBase
     public String getId()
     {
         return modelObject.getId();
+    }
+    
+    // allows for the id to be changed
+    // this is essential for dynamic website
+    public void setId(String id)
+    {
+        ModelHelper.resetId(modelObject, id);        
     }
     
     public String getTitle()

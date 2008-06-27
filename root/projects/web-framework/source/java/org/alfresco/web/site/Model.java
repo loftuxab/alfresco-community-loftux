@@ -543,12 +543,11 @@ public interface Model
      * If an argument is null, it is not included in the filter. 
      * 
      * @param templateId the template id property
-     * @param rootPage the root page property
      * @param pageTypeId the page type property
      * 
      * @return a map of Page objects (keyed by object id)
      */
-    public Map<String, ModelObject> findPages(String templateId, String rootPage, String pageTypeId);
+    public Map<String, ModelObject> findPages(String templateId, String pageTypeId);
 
     
     

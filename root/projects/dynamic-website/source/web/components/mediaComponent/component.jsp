@@ -1,5 +1,6 @@
+<%@ page import="org.alfresco.web.framework.model.*"%>
 <%@ page import="org.alfresco.web.site.*" %>
-<%@ page import="org.alfresco.web.site.model.*" %>
+<%@ page import="org.alfresco.tools.*" %>
 <%@ page buffer="0kb" contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%@ page isELIgnored="false" %>

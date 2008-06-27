@@ -216,6 +216,9 @@ public final class ModelObjectManager
         {
             try
             {
+                if(logger.isDebugEnabled())
+                    logger.debug("Attempting to save object '" + object.getId() + "' to persister id: " + persister.getId()); 
+                
                 saved = persister.saveObject(this.context, object);
             }
             catch(ModelObjectPersisterException mope)

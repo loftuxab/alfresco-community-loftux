@@ -1,12 +1,10 @@
+<%@ page import="org.alfresco.web.framework.model.*"%>
 <%@ page import="org.alfresco.web.site.*" %>
-<%@ page import="org.alfresco.web.site.model.*" %>
+<%@ page import="org.alfresco.tools.*" %>
 <%@ page buffer="0kb" autoFlush="true" contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="/WEB-INF/tlds/alf.tld" prefix="alf" %>
 <%@ taglib uri="/WEB-INF/tlds/adw.tld" prefix="adw" %>
 <%@ page isELIgnored="false" %>
-<alf:require script="/yui/yahoo-dom-event/yahoo-dom-event.js"/>
-<alf:require script="/yui/container/container-min.js"/>
-<alf:require script="/yui/menu/menu.js"/>
 <%
 	// get the request context
 	RequestContext context = RequestUtil.getRequestContext(request);
