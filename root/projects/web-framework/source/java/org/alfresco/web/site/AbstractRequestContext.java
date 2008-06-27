@@ -95,16 +95,11 @@ public abstract class AbstractRequestContext implements RequestContext
      */
     public Configuration getSiteConfiguration()
     {
-        if(this.siteConfiguration == null)
-        {
-            // get the default site configuration
-            String defaultSiteConfigurationId = getConfig().getDefaultSiteConfigurationId();
-            this. siteConfiguration = getModel().getConfiguration(defaultSiteConfigurationId);
-        }
-        
-        return this.siteConfiguration;
+        // get the default site configuration
+        String defaultSiteConfigurationId = getConfig().getDefaultSiteConfigurationId();
+        return getModel().getConfiguration(defaultSiteConfigurationId);
     }
-
+    
     /**
      * Returns the title of the web site.  This is drawn from the
      * site configuration XML if available.
@@ -533,7 +528,6 @@ public abstract class AbstractRequestContext implements RequestContext
     protected User user;
     protected String id;
     protected String themeId;
-    protected Configuration siteConfiguration;
     protected Model model;
 
     // constants

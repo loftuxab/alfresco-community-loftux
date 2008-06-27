@@ -10,51 +10,51 @@ default xml namespace = "http://www.alfresco.org/adw/1.0";
 function save(modelObject)
 {
 	if(modelObject != null)
+	{
 		modelObject.save();
+	}
 }
 
 function remove(modelObject)
 {
 	if(modelObject != null)
+	{
 		modelObject.remove();
+	}
 }
 
 function removeObjects(array)
 {
-
-	if(array == null)
-		return;
-	for(var i = 0; i < array.length; i++)
-		remove(array[i]);
+	if(array != null)
+	{
+		for(var i = 0; i < array.length; i++)
+		{
+			remove(array[i]);
+		}
+	}
 }
 
 function assertSiteConfiguration(websiteName, websiteDescription)
 {
-	// ensure that we have a site configuration
-	var siteConfiguration = sitedata.getSiteConfiguration();
-	if(siteConfiguration == null)
-		siteConfiguration = sitedata.newConfiguration();
-	siteConfiguration.setTitle(websiteName);
-	siteConfiguration.setDescription(websiteDescription);
-	siteConfiguration.setProperty("source-id", "site");
-	siteConfiguration.save();
-
-	// ensure that we have a root page
-	var rootPage = sitedata.getRootPage();
-	if(rootPage == null)
-	{
-		rootPage = sitedata.newPage();
-		rootPage.setTitle("Home");
-		rootPage.setProperty("root-page", "true");
-	}
+	// create a new root page
+	var rootPage = sitedata.newPage();
+	rootPage.setTitle("Home");
 	rootPage.setProperty("description", "Home Page for '" + websiteName + "'");
 	rootPage.save();
+	
+	// create a new site configuration
+	var siteConfiguration = sitedata.newConfiguration("site");
+	siteConfiguration.setTitle(websiteName);
+	siteConfiguration.setDescription(websiteDescription);	
+	siteConfiguration.setProperty("root-page", rootPage.getId());
+	siteConfiguration.setId("dynamicwebsite.site.configuration");	
+	siteConfiguration.save();	
 }
 
 
 function assertPage(pageId, pageName, pageDescription)
 {
-	var page = sitedata.getObject(pageId);
+	var page = sitedata.getPage(pageId);
 	if(page != null)
 	{
 		page.setTitle(pageName);
@@ -84,13 +84,6 @@ function removeChildPage(parentPageId, childPageId, recurse)
 	sitedata.unassociatePage(parentPageId, childPageId);
 }
 
-/*
-function findEndpoint(endpointId)
-{
-	return sitedata.findEndpoint(endpointId);
-}
-*/
-
 function newPage(name, parentPage)
 {
 	var page = sitedata.newPage();
@@ -105,7 +98,7 @@ function newPage(name, parentPage)
 function newTemplate(name, templateTypeId)
 {
 	var template = null;
-	var templateType = sitedata.getObject(templateTypeId);
+	var templateType = sitedata.getTemplateType(templateTypeId);
 	if(templateType != null)
 	{
 		var template = sitedata.newTemplate();
@@ -158,17 +151,17 @@ function associateSiteComponent(component, regionId)
 
 function associateGlobalComponent(component, regionId)
 {
-	sitedata.associateComponent(component.getId(), "global", "global", regionId);
+	sitedata.bindComponent(component.getId(), "global", "global", regionId);
 }
 
 function associateTemplateComponent(component, template, regionId)
 {
-	sitedata.associateComponent(component.getId(), "template", template.getId(), regionId);
+	sitedata.bindComponent(component.getId(), "template", template.getId(), regionId);
 }
 
 function associatePageComponent(component, page, regionId)
 {	
-	sitedata.associateComponent(component.getId(), "page", page.getId(), regionId);
+	sitedata.bindComponent(component.getId(), "page", page.getId(), regionId);
 }
 
 function setConfig(o, propertyName, propertyValue)
@@ -232,29 +225,6 @@ function newWebScriptComponent(name, uri)
 	return c;
 }
 
-function newEndpoint(endpointId, connectorId, authId, endpointUrl, defaultUri, identity, username, password)
-{
-/*
-	var endpoint = sitedata.newEndpoint();
-	endpoint.setProperty("endpoint-id", endpointId);
-
-	endpoint.setProperty("connector-id", connectorId);
-	endpoint.setProperty("auth-id", authId);
-	endpoint.setProperty("endpoint-url", endpointUrl);
-	endpoint.setProperty("default-uri", defaultUri);
-	endpoint.setProperty("identity", identity);
-	
-	if(username != null)
-		endpoint.setProperty("username", username);
-	if(password != null)
-		endpoint.setProperty("password", password);
-
-	save(endpoint);
-
-	return endpoint;
-*/
-	return null;	
-}
 
 
 

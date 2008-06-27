@@ -89,6 +89,9 @@ public class Component extends AbstractModelObject
     {
         setProperty(PROP_REGION_ID, regionId);
         this.regionId = regionId;
+        
+        // regenerate the id for this component when the region id changes
+        regenerateId();
     }
 
     /**
@@ -114,6 +117,9 @@ public class Component extends AbstractModelObject
     {
         setProperty(PROP_SOURCE_ID, sourceId);
         this.sourceId = sourceId;
+        
+        // regenerate the id for this component when the source id changes
+        regenerateId();        
     }
 
     /**
@@ -139,6 +145,9 @@ public class Component extends AbstractModelObject
     {
         setProperty(PROP_SCOPE, scope);
         this.scope = scope;
+        
+        // regenerate the id for this component when the source changes
+        regenerateId();        
     }
 
     /**
@@ -274,5 +283,13 @@ public class Component extends AbstractModelObject
             id += "." + sourceId;
         }
         return id;        
+    }
+    
+    /**
+     * Regener
+     */
+    protected void regenerateId()
+    {
+        this.id = generateId(this.scope, this.regionId, this.sourceId);
     }
 }

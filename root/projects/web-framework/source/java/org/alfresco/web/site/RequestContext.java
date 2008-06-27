@@ -65,7 +65,7 @@ public interface RequestContext extends Serializable
      * @return Configuration instance for the site
      */
     public Configuration getSiteConfiguration();
-
+    
     /**
      * Returns the title of the web site.  This is drawn from the
      * site configuration XML if available.

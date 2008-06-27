@@ -1,5 +1,7 @@
-<%@ page import="org.alfresco.web.site.remote.*" %>
+<%@ page import="org.alfresco.web.framework.model.*"%>
+<%@ page import="org.alfresco.web.site.*" %>
 <%@ page import="org.alfresco.tools.*" %>
+<%@ page import="org.alfresco.web.site.remote.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="javax.xml.parsers.DocumentBuilder" %>

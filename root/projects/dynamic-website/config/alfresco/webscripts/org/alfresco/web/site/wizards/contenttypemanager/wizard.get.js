@@ -7,14 +7,14 @@
 wizard.addGridColumn("associationId", "Association ID");
 wizard.addGridColumn("xformtype", "Type");
 wizard.addGridColumn("formatId", "Format");
-wizard.addGridColumn("templateName", "Template");
-wizard.addGridColumn("templateId", "TemplateId");
+wizard.addGridColumn("pageName", "Page");
+wizard.addGridColumn("pageId", "PageId");
 
 wizard.addGridColumnFormat("associationId", 120, true);
 wizard.addGridColumnFormat("xformtype", 120, true);
 wizard.addGridColumnFormat("formatId", 60, false);
-wizard.addGridColumnFormat("templateName", 120, true);
-wizard.addGridColumnFormat("templateId", 120, true);
+wizard.addGridColumnFormat("pageName", 120, true);
+wizard.addGridColumnFormat("pageId", 120, true);
 
 wizard.addGridToolbar("add_content_template_association", "New Association", "New Association", "add");
 wizard.addGridToolbarSpacer();
@@ -35,17 +35,19 @@ for(var i = 0; i < associations.length; i++)
 
 		var destId = associations[i].getProperty("dest-id");
 		var pageName = "NOT FOUND";
-		var page = sitedata.getObject(destId);
+		var page = sitedata.getObject("page", destId);
 		if(page != null)
+		{
 			pageName = page.getTitle();
+		}
 
 		var array = new Array();
 		array[0] = associationId;
 		array[1] = sourceId;
 		array[2] = formatId;
-		array[3] = templateName;
-		array[4] = templateId;
-
+		array[3] = pageName;
+		array[4] = destId;
+		
 		wizard.addGridData(array);
 	}	
 }

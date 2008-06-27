@@ -205,14 +205,16 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 modelObject.getKey().setStoragePath(_path);
                 modelObject.getKey().setSaved(true);
                 
+                // CACHE: put object into cache
+                cachePut(context, _path, modelObject);
+                
                 // flag that the save was successful
                 saved = true;
             }
             else
             {
                 // object was already saved
-                // what we do in this case depends on whether the path changed
-                
+                // what we do in this case depends on whether the path changed                
                 if(!path.equals(_path))
                 {
                     // path has changed
@@ -248,6 +250,9 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                     
                     // make sure it is marked as saved
                     modelObject.getKey().setSaved(true);
+                    
+                    // CACHE: put object into cache
+                    cachePut(context, path, modelObject);
                     
                     // flag that the save was succesful
                     saved = true;

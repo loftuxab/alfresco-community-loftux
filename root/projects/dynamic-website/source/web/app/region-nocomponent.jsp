@@ -1,5 +1,5 @@
+<%@ page import="org.alfresco.web.framework.model.*"%>
 <%@ page import="org.alfresco.web.site.*"%>
-<%@ page import="org.alfresco.web.site.model.*"%>
 <%@ page import="org.alfresco.tools.*" %>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>

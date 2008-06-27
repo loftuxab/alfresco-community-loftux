@@ -54,7 +54,6 @@ import org.mozilla.javascript.Scriptable;
 public final class ScriptSiteData extends ScriptBase
 {
     protected ScriptFileSystem rootFileSystem;
-    protected ScriptFileSystem modelFileSystem;
 
     /**
      * Constructs a new ScriptSite object around the provided request context

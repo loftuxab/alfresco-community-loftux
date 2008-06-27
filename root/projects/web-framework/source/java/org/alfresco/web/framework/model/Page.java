@@ -49,7 +49,6 @@ public class Page extends AbstractModelObject
     public static String TYPE_ID = "page";
     public static String PROP_TEMPLATE_INSTANCE = "template-instance";
     public static String ATTR_FORMAT_ID = "format-id";
-    public static String PROP_ROOT_PAGE = "root-page";
     public static String PROP_PAGE_TYPE_ID = "page-type-id";
     public static String PROP_AUTHENTICATION = "authentication";
     public static String DEFAULT_PAGE_TYPE_ID = "generic";
@@ -217,26 +216,6 @@ public class Page extends AbstractModelObject
         }
 
         return map;
-    }
-
-    /**
-     * Gets the root page.
-     * 
-     * @return the root page
-     */
-    public boolean getRootPage()
-    {
-        return getBooleanProperty(PROP_ROOT_PAGE);
-    }
-
-    /**
-     * Sets the root page.
-     * 
-     * @param b the new root page
-     */
-    public void setRootPage(boolean b)
-    {
-        this.setProperty(PROP_ROOT_PAGE, (b ? "true" : "false"));
     }
 
     /**
