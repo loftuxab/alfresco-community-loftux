@@ -1,18 +1,11 @@
 /* Style YUI components */
 
-/* Add spacing round header */
-.customise-dashlets h2
-{
-   margin-top: 10px;
-   margin-bottom:10px;
-}
-
 /* Style the lists containing dashlets */
 .customise-dashlets ul.dashletList,
 .customise-dashlets ul.columnList
 {
    position: relative;
-   height: 210px;
+   height: 15.9em;
    background: #FFFFFF;
    border: 1px solid gray;
    list-style: none;
@@ -27,20 +20,20 @@
    overflow-y: auto;
    margin-left: auto;
    margin-right: auto;
-   width: 624px;
+   width: 53em;
 }
 
 /* Make the column dashlet list a bit thinner */
 .customise-dashlets ul.columnList
 {
-   width: 202px;
+   width: 17.2em;
 }
 
 /* Make the dashlets 200 wide and let them flow if the column is wide enough */
 .customise-dashlets ul.dashletList li,
 .customise-dashlets ul.columnList li
 {
-   width: 200px;
+   width: 17em;
    float: left;
 }
 
@@ -49,7 +42,7 @@
 {
    margin: 1px;
    background-color: #f7f7f7;
-   height: 40px;
+   height: 3em;
    text-align: center;
 }
 
@@ -68,7 +61,7 @@
 /* Vertically center the text. */
 .dashlet-item span {
    position:relative;
-   top:-30px;
+   top:-2.5em;
 }
 
 /* Show the shadow as white. */
@@ -83,49 +76,61 @@
    background-color: #DDDDDD;
 }
 
-/* Center the available dashlets list */
-.customise-dashlets div.dashlets
-{
-   padding-bottom: 10px;
-   text-align: center;
-}
-
-/* Align the available dashlets section to left */
-.customise-dashlets div.addDashlet
-{
-   text-align: left;
-}
-
-/* Center the columns and buttons section */
+/* Center the sections */
+.customise-dashlets div.instructions,
+.customise-dashlets div.dashlets,
 .customise-dashlets div.columns,
 .customise-dashlets div.buttons
 {
    text-align: center;
-   padding-top: 20px;
-   padding-bottom:10px;
-}
-
-/* Vertically align the trash can */
-.customise-dashlets div.buttons img
-{
-   margin-bottom: -5px;
-   margin-left: 30px;
+   padding-top:1em;
+   padding-bottom:1em;
 }
 
 /* Center the column wrapper div */
+.customise-dashlets div.instructions div,
+.customise-dashlets div.dashlets div,
 .customise-dashlets div.columns div
-{
+{  
+   width: 52em;   
    margin-left: auto;
    margin-right: auto;
-   width: 860px;
 }
+
+.customise-dashlets div.text
+{
+   padding-top: 1em;
+   padding-bottom: 1em;
+   text-align: left;
+}
+
+.customise-dashlets div.columns div.noOfColumns4
+{
+   width: 72em;
+}
+
+.customise-dashlets div.columns div.noOfColumns3
+{
+   width: 54em;
+}
+
+.customise-dashlets div.columns div.noOfColumns2
+{
+   width: 36em;
+}
+
+.customise-dashlets div.columns div.noOfColumns1
+{
+   width: 18em;
+}
+
 
 /* Make sure the columns are displayed on row even though they are block elements  */
 .customise-dashlets div.columns div div
 {
    float: left;
-   width: 204px;
-   margin-left: 10px;
+   width: 18em;
+   /*margin-left: 10px;*/
 }
 
 /*

@@ -1,0 +1,74 @@
+/* Style YUI components */
+
+/* Center the layouts and buttons section */
+.customise-layout div.currentLayout,
+.customise-layout div.layouts,
+.customise-layout clear
+{
+   text-align: center;
+   clear: both;
+}
+
+.customise-layout div.currentLayout,
+.customise-layout div.layouts
+{
+   width: 52em;
+   margin-left: auto;        
+   margin-right: auto;
+   padding-top: 1em;
+   padding-bottom: 1em;
+}
+
+.customise-layout div.text
+{
+   padding-top: 1em;
+   padding-bottom: 1em;
+   text-align: left;
+}
+
+/* Style the lists containing dashlets */
+.customise-layout ul
+{
+   position: relative;
+   list-style: none;
+   padding: 1em;
+   margin-left: auto;
+   margin-right: auto;
+}
+
+.customise-layout .currentLayout ul
+{
+   width: 25em;
+}
+
+.customise-layout .layouts ul
+{
+   width: 52em;
+}
+
+/* Set the layout width and let them flow in the list */
+.customise-layout ul li
+{
+   width: 25em;
+   float: left;
+   margin: 0.5em;
+   text-align: left;
+}
+
+.customise-layout .layoutDescription
+{
+   padding: 0em 0.5em 0.5em 1em;
+}
+
+.customise-layout .layoutBox 
+{
+   background-color: #f7f7f7;
+   text-align:center;
+}
+
+.customise-layout .layoutBox .layoutIcon
+{
+   padding:1em;
+   vertical-align:middle;
+   width:10em;
+}

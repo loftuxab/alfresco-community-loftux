@@ -13,7 +13,8 @@
       </div>
    </div>
    <div id="bd">
-      <@layout.grid gridColumns gridClass "component" />
+      <@region id="customise-layout" scope="page" protected=true />
+      <@region id="customise-dashlets" scope="page" protected=true />
    </div>
 </@>
 
