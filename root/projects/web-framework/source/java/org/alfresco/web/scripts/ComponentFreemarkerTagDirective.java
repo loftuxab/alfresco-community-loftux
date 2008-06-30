@@ -117,7 +117,6 @@ public class ComponentFreemarkerTagDirective extends FreemarkerTagSupportDirecti
         {
             String output = executeTag(tag);
             env.getOut().write(output);
-            env.getOut().flush();
         }
         catch(Exception ex)
         {

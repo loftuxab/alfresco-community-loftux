@@ -56,6 +56,9 @@ import org.dom4j.DocumentException;
  */
 public class StoreModelObjectPersister extends AbstractModelObjectPersister
 {
+    private static final Class[] MODELOBJECT_CLASSES = new Class[] {
+        String.class, ModelPersisterInfo.class, Document.class };
+
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
     
     protected final long delay;
@@ -134,11 +137,11 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                     String id = pathToId(storagePath);
                     if (id != null)
                     {                
-                        ModelObjectKey key = new ModelObjectKey(persisterId, storagePath, id, true);                
+                        ModelPersisterInfo info = new ModelPersisterInfo(persisterId, storagePath, true);                
                         String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
-                        obj = (ModelObject) ReflectionHelper.newObject(
-                                implClassName, new Class[] { ModelObjectKey.class, Document.class },
-                                new Object[] { key, document });
+                        obj = (ModelObject)ReflectionHelper.newObject(
+                                implClassName, MODELOBJECT_CLASSES,
+                                new Object[] { id, info, document });
                         
                         // if found, place the object into the cache
                         if (obj != null)
@@ -184,26 +187,26 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         
         String content = modelObject.toXML();
         
-        // the path to which we expect to save
-        // this is essentially the path against which we were instantiated
-        // or from which we were loaded
+        // the path to which we expect to save, this is essentially the path against
+        // which we were instantiated or from which we were loaded - this may change
+        // if the ID of the object has changed since creation - as objects are named
+        // by convention based on the ID
         String path = modelObject.getStoragePath();
         
         // now figure out what path we want to save to
-        String _path = this.idToPath(modelObject.getId());
+        String _path = idToPath(modelObject.getId());
         try
         {
             // if the object hasn't been saved yet
-            if(!modelObject.isSaved())
+            if (!modelObject.isSaved())
             {
                 // create the document
                 this.store.createDocument(_path, content);
                 
-                // adjust the key to reflect new storage state
-                String _id = pathToId(_path);                        
-                modelObject.getKey().setId(_id);
-                modelObject.getKey().setStoragePath(_path);
-                modelObject.getKey().setSaved(true);
+                // adjust the persister information to reflect new storage state
+                ModelPersisterInfo info = modelObject.getKey();
+                info.setStoragePath(_path);
+                info.setSaved(true);
                 
                 // CACHE: put object into cache
                 cachePut(context, _path, modelObject);
@@ -214,38 +217,36 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
             else
             {
                 // object was already saved
-                // what we do in this case depends on whether the path changed                
-                if(!path.equals(_path))
+                // what we do in this case depends on whether the path changed
+                if (!path.equals(_path))
                 {
-                    // path has changed
-                    
-                    // TODO: introduce move() mechanics into the store?
-                    
-                    // create the new object
+                    // path has changed, so first create the new object
                     this.store.createDocument(_path, content);
                     
-                    // adjust the key to reflect new storage state
-                    String _id = pathToId(_path);                        
-                    modelObject.getKey().setId(_id);
-                    modelObject.getKey().setStoragePath(_path);
-                    modelObject.getKey().setSaved(true);
-
-                    // CACHE: put object into new cache location
-                    cachePut(context, _path, modelObject);
-
-                    // remove the old object
-                    this.store.removeDocument(path);
+                    // adjust the persister information to reflect new storage state
+                    ModelPersisterInfo info = modelObject.getKey();
+                    info.setStoragePath(_path);
+                    info.setSaved(true);
                     
-                    // CACHE: remove oobject from old cache location
-                    cacheRemove(context, path);
+                    // lock against the cache so we can atomically perform put+remove
+                    synchronized (getCache(context))
+                    {
+                        // put object into new cache location
+                        cachePut(context, _path, modelObject);
+                        
+                        // remove old object from old cache location
+                        cacheRemove(context, path);
+                    }
+                    
+                    // remove the old object from the store
+                    this.store.removeDocument(path);
                     
                     // flag that the save was successful
                     saved = true;
                 }
                 else
                 {
-                    // file not moved
-                    // so just do an update
+                    // file not moved, so just do an update
                     this.store.updateDocument(path, content);
                     
                     // make sure it is marked as saved
@@ -298,7 +299,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
             {
                 removed = this.store.removeDocument(path);
                 
-                // CACHE: remove from cache
+                // remove from cache
                 cacheRemove(context, path);
             }
             catch(IOException ex)
@@ -324,24 +325,23 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         try
         {
             Document document = XMLUtil.parse(xml);
-            //XMLUtil.addChildValue(document.getRootElement(), "version", FrameworkHelper.getConfig().getTypeDescriptor(this.objectTypeId).getVersion());
             
-            String persisterId = this.getId();
-            String path = this.idToPath(objectId);
+            String persisterId = getId();
+            String path = idToPath(objectId);
             
             if (objectId != null)
             {            
-                ModelObjectKey key = new ModelObjectKey(persisterId, path, objectId, false);                
+                ModelPersisterInfo info = new ModelPersisterInfo(persisterId, path, false);                
                 String implClassName = FrameworkHelper.getConfig().getTypeDescriptor(objectTypeId).getImplementationClass();
-                obj = (ModelObject) ReflectionHelper.newObject(
-                        implClassName, new Class[] { ModelObjectKey.class, Document.class },
-                        new Object[] { key, document });
+                obj = (ModelObject)ReflectionHelper.newObject(
+                        implClassName, MODELOBJECT_CLASSES,
+                        new Object[] { objectId, info, document });
                 
+                // if constructed ok, place the object into the cache
                 if (obj != null)
                 {
                     obj.touch();
-
-                    // CACHE: add to cache
+                    
                     cachePut(context, path, obj);
                 }
                 else
@@ -353,8 +353,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
         catch (DocumentException de)
         {
             // something failed while trying to load the xml object
-            if (logger.isWarnEnabled())
-                logger.warn(de);
+            throw new ModelObjectPersisterException("Failed to load objectId: " + objectId, de);
         }
         
         return obj;
@@ -481,20 +480,8 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     protected ModelObject cacheGet(ModelPersistenceContext context, String path)
     {
-        ModelObject obj = getCache(context).get(path);
-        if (logger.isDebugEnabled())
-        {
-            if (obj != null)
-            {
-                logger.debug("Cache hit: " + path);
-            }
-            else
-            {
-                logger.debug("Cache miss: " + path);
-            }
-        }
-        return obj;
-    }   
+        return getCache(context).get(path);
+    }
     
     /**
      * Places an object into this persister's cache.

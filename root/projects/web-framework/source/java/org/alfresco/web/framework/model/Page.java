@@ -32,7 +32,7 @@ import java.util.Map;
 import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.AbstractModelObject;
 import org.alfresco.web.framework.ModelObject;
-import org.alfresco.web.framework.ModelObjectKey;
+import org.alfresco.web.framework.ModelPersisterInfo;
 import org.alfresco.web.scripts.Description.RequiredAuthentication;
 import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
@@ -58,9 +58,9 @@ public class Page extends AbstractModelObject
      * 
      * @param document the document
      */
-    public Page(ModelObjectKey key, Document document)
+    public Page(String id, ModelPersisterInfo key, Document document)
     {
-        super(key, document);
+        super(id, key, document);
         
         // default page type
         if(getPageTypeId() == null)

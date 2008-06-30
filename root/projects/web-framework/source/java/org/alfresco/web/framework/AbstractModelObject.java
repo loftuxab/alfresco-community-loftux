@@ -53,10 +53,8 @@ public abstract class AbstractModelObject implements ModelObject
     public static String PROP_DESCRIPTION = "description";
     public static String CONTAINER_PROPERTIES = "properties";
     
-    // Note: These should note be final, they could be replaced in overrides
-    // Specifically, the id is allowed to change
-    protected Document document;
-    protected ModelObjectKey key;
+    protected final Document document;
+    protected final ModelPersisterInfo info;
     protected String id;
     
     protected long modificationTime;
@@ -75,11 +73,11 @@ public abstract class AbstractModelObject implements ModelObject
      * 
      * @param document the document
      */
-    public AbstractModelObject(ModelObjectKey key, Document document)
+    public AbstractModelObject(String id, ModelPersisterInfo info, Document document)
     {
-        this.key = key;
+        this.info = info;
         this.document = document;
-        this.id = key.getId();
+        this.id = id;
 
         /**
          * The model version should be supplied with the serialized XML
@@ -106,17 +104,17 @@ public abstract class AbstractModelObject implements ModelObject
      */
     protected AbstractModelObject()
     {
-        this.key = null;
+        this.info = null;
         this.document = null;
         this.id = null;
     }
 
     /**
-     * @return the key structure that represents this model object
+     * @return the structure that represents the persistence information for this model object
      */
-    public final ModelObjectKey getKey()
+    public final ModelPersisterInfo getKey()
     {
-        return this.key;
+        return this.info;
     }
     
     /* (non-Javadoc)
@@ -187,7 +185,7 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public final boolean isSaved()
     {
-        return this.key.isSaved();
+        return this.info.isSaved();
     }
     
     
@@ -555,7 +553,7 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public final String getPersisterId()
     {
-        return this.key.getPersisterId();
+        return this.info.getPersisterId();
     }
     
     /**
@@ -563,6 +561,6 @@ public abstract class AbstractModelObject implements ModelObject
      */
     public final String getStoragePath()
     {
-        return this.key.getStoragePath();
+        return this.info.getStoragePath();
     }
 }

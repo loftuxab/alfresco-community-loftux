@@ -156,8 +156,9 @@ public class EndPointProxyServlet extends HttpServlet
             }
             else
             {
-                throw new AlfrescoRuntimeException("No USER_ID found in session and" +
-                        " requested 'endpoint' requires authentication.");
+                res.setStatus(HttpServletResponse.SC_UNAUTHORIZED,
+                        "No USER_ID found in session and requested endpoint requires authentication.");
+                return;
             }
             
             // build a connector context, stores information about how we will drive the remote client
