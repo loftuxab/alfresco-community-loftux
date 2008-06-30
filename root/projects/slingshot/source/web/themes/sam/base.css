@@ -173,3 +173,8 @@ span.navigation-separator
    padding: 0px 10px;
    text-align: center;
 }
+
+em
+{
+	font-style: italic;
+}

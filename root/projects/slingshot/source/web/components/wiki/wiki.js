@@ -88,6 +88,17 @@
 			{
 				type: "push"
 			});
+			
+			var pageText = document.getElementById("#page"); // Content area
+			if (pageText)
+			{
+				this.parser.URL = this._getAbsolutePath();
+				// Format any wiki markup
+				pageText.innerHTML = this.parser.parse(pageText.innerHTML);
+			}
+			
+			var Dom = YAHOO.util.Dom;
+			Dom.get(this.id + "-wikipage").style.visibility = "visible";
 		},
 		
 		/*
