@@ -282,7 +282,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "doclist.items",
-             fields: ["index", "nodeRef", "type", "icon32", "name", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl"]
+             fields: ["index", "nodeRef", "type", "icon32", "name", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
          };
          
          /**
@@ -292,21 +292,56 @@
           * These MUST be inline in order to have access to the Alfresco.DocumentList class (via the "me" variable).
           */
 
-          /**
-           * Selector custom datacell formatter
-           *
-           * @method renderCellSelected
-           * @param elCell {object}
-           * @param oRecord {object}
-           * @param oColumn {object}
-           * @param oData {object|string}
-           */
-          renderCellSelected = function DL_renderCellSelected(elCell, oRecord, oColumn, oData)
-          {
-             Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+         /**
+          * Selector custom datacell formatter
+          *
+          * @method renderCellSelected
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         renderCellSelected = function DL_renderCellSelected(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
 
-             elCell.innerHTML = '<input type="checkbox" name="fileChecked" value="'+ oData + '"' + (me.selectedFiles[oData] ? ' checked="checked">' : '>');
-          },
+            elCell.innerHTML = '<input type="checkbox" name="fileChecked" value="'+ oData + '"' + (me.selectedFiles[oData] ? ' checked="checked">' : '>');
+         },
+          
+         /**
+          * Status custom datacell formatter
+          *
+          * @method renderCellStatus
+          * @param elCell {object}
+          * @param oRecord {object}
+          * @param oColumn {object}
+          * @param oData {object|string}
+          */
+         renderCellStatus = function DL_renderCellStatus(elCell, oRecord, oColumn, oData)
+         {
+            Dom.setStyle(elCell.parentNode, "width", oColumn.width + "px");
+
+            var status = oRecord.getData("actionSet");
+            var lockType = "";
+            switch (status)
+            {
+               case "locked":
+                  lockType = "locked";
+                  break;
+               
+               case "workingCopyOwner":
+                  lockType = "editing";
+                  break;
+                  
+               case "lockOwner":
+                  lockType = "lock-owner";
+                  break;
+            }
+            if (lockType != "")
+            {
+               elCell.innerHTML = '<span class="locked-by"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '.gif" alt="' + lockType + '" /></span>'
+            }
+         },
           
          /**
           * Thumbnail custom datacell formatter
@@ -339,7 +374,7 @@
                }
                else
                {
-                  elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" /></span>';
+                  elCell.innerHTML = '<span class="demo-other"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
                }
             }
             else
@@ -355,7 +390,7 @@
                }
                else
                {
-                  elCell.innerHTML = '<span class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" /></span>';
+                  elCell.innerHTML = '<span class="demo-other-small"><img src="' + Alfresco.constants.URL_CONTEXT + oRecord.getData("icon32").substring(1) + '" alt="' + extn + '" /></span>';
                }
             }
          };
@@ -398,9 +433,11 @@
                if (me.options.detailedView)
                {
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
+                  desc += '<div class="detail"><span><b>Modified on:</b> ' + Alfresco.util.formatDate(oRecord.getData("modifiedOn")) + '</span>';
+                  desc += '<span><b>Modified by:</b> ' + oRecord.getData("modifiedBy") + '</span>';
+                  desc += '<span><b>Version:</b> ' + oRecord.getData("version") + '</span></div>';
                   desc += '<div class="detail"><span><b>Created on:</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   desc += '<span><b>Created by:</b> ' + oRecord.getData("createdBy") + '</span>';
-                  desc += '<span><b>Version:</b> ' + oRecord.getData("version") + '</span></div>';
                   desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
                   desc += '<div class="detail"><span><b>Comments:</b> 0</span></div>';
                }
@@ -436,13 +473,16 @@
             key: "index", label: "Select", sortable: false, formatter: renderCellSelected, width: 20
          },
          {
+            key: "status", label: "Status", sortable: false, formatter: renderCellStatus, width: 16
+         },
+         {
             key: "icon32", label: "Preview", sortable: false, formatter: renderCellThumbnail, width: 80
          },
          {
             key: "name", label: "Description", sortable: false, formatter: renderCellDescription
          },
          {
-            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 120
+            key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
          }];
 
          // DataTable definition
@@ -527,10 +567,6 @@
             return true;
          });
 
-         // Gather actions
-         this.actions["document"] = YAHOO.util.Dom.get(this.id + "-actions-document");
-         this.actions["folder"] = YAHOO.util.Dom.get(this.id + "-actions-folder");
-         
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
       },
@@ -651,9 +687,9 @@
             // Retrieve the actionType - currently keyed off folder or file type.
             // TODO (M): Data webscript to inject action type into data record
             // TODO (S): Cache the types for each recordId?
-            var actionType = this.widgets.dataTable.getRecord(target).getData("type");
+            var actionSet = this.widgets.dataTable.getRecord(target).getData("actionSet");
 
-            var clone = Dom.get(this.id + "-actions-" + actionType).cloneNode(true);
+            var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
             clone.id = elActions.id + "_a";
             elActions.appendChild(clone);
          }
@@ -695,9 +731,9 @@
       /**
        * Delete Asset.
        *
-       * @method onDeleteAsset
+       * @method onActionDeleteAsset
        */
-      onDeleteAsset: function DL_onDeleteAsset(row)
+      onActionDeleteAsset: function DL_onActionDeleteAsset(row)
       {
          var me = this;
          var record = this.widgets.dataTable.getRecord(row);
@@ -707,16 +743,16 @@
             buttons: [
             {
                text: "Delete",
-               handler: function DL_onDeleteAsset_delete()
+               handler: function DL_onActionDeleteAsset_delete()
                {
                   this.hide();
-                  me._onDeleteAssetConfirm.call(me, record);
+                  me._onActionDeleteAssetConfirm.call(me, record);
                },
                isDefault: true
             },
             {
                text: "Cancel",
-               handler: function DL_onDeleteAsset_cancel()
+               handler: function DL_onActionDeleteAsset_cancel()
                {
                   this.hide();
                }
@@ -727,10 +763,10 @@
       /**
        * Delete Asset confirmed.
        *
-       * @method _onDeleteAssetConfirm
+       * @method _onActionDeleteAssetConfirm
        * @private
        */
-      _onDeleteAssetConfirm: function DL__onDeleteAssetConfirm(record)
+      _onActionDeleteAssetConfirm: function DL__onActionDeleteAssetConfirm(record)
       {
          var me = this;
          var fileType = record.getData("type");
@@ -738,7 +774,7 @@
          {
             successCallback:
             {
-               fn: function DL__onDeleteAssetConfirm_success(data)
+               fn: function DL__onActionDeleteAssetConfirm_success(data)
                {
                   // Fire the notification event
                   YAHOO.Bubbling.fire(fileType == "folder" ? "folderDeleted" : "fileDeleted",
@@ -756,7 +792,7 @@
             },
             failureCallback:
             {
-               fn: function DL__onDeleteAssetConfirm_failure(data)
+               fn: function DL__onActionDeleteAssetConfirm_failure(data)
                {
                   Alfresco.util.PopupManager.displayMessage(
                   {
@@ -771,15 +807,44 @@
       },
 
       /**
-       * Checkout Asset.
+       * Edit Offline.
        *
-       * @method onCheckoutAsset
+       * @method onActionEditOffline
        */
-      onCheckoutAsset: function DL_onCheckoutAsset(row)
+      onActionEditOffline: function DL_onActionEditOffline(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
+         var obj =
+         {
+            successCallback:
+            {
+               fn: function DL_onActionEditOffline_success(data)
+               {
+                  // Fire the notification event
+                  YAHOO.Bubbling.fire("doclistRefresh");
+                  
+                  // Success confirmation message
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("message.edit-offline.success", data.config.object.fileName)
+                  });
+               },
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: function DL_onActionEditOffline_failure(data)
+               {
+                  Alfresco.util.PopupManager.displayMessage(
+                  {
+                     text: this._msg("message.edit-offline.failure", data.config.object.fileName)
+                  });
+               },
+               scope: this
+            }
+         }
          var action = new Alfresco.module.DoclibActions();
-         action.checkoutFile(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"));
+         action.editFileOffline(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"), obj);
       },
 
 
@@ -893,8 +958,6 @@
        */
       _updateDocList: function DL__updateDocList(path)
       {
-         Alfresco.logger.debug("DocList_updateDocList:", path);
-         
          // Reset the custom error messages
          this._setDefaultDataTableErrors();
          
@@ -904,10 +967,19 @@
             this.widgets.dataTable.onDataReturnInitializeTable.call(this.widgets.dataTable, sRequest, oResponse, oPayload);
          }
          
+         function failureHandler(sRequest, oResponse)
+         {
+            if (oResponse.status == 401)
+            {
+               // Our session has likely timed-out, so refresh to offer the login page
+               window.location.reload();
+            }
+         }
+         
          this.widgets.dataSource.sendRequest(this._buildDocListParams(path),
          {
                success: successHandler,
-               failure: null,
+               failure: failureHandler,
                scope: this
          });
       },

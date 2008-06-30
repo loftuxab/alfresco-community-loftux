@@ -18,7 +18,7 @@
    );
 //]]></script>
 <div id="${args.htmlid}-body" class="doclist">
-   <div id="${args.htmlid}-pagerBar" class="yui-gb pager-bar">
+   <div id="${args.htmlid}-doclistBar" class="yui-g doclist-bar">
       <div class="yui-u first">
          <div class="inline">
             <button id="${args.htmlid}-fileSelect-button" name="doclist-fileSelect-button">${msg("menu.select")}</button>
@@ -31,9 +31,6 @@
             </select>
          </div>
       </div>
-      <div class="yui-u align-center">
-         <span>&lt; 1 &gt;</span>
-      </div>
       <div class="yui-u align-right">
          <span><a href="#" id="${args.htmlid}-showFolders-button"></a></span>
          <span class="separator">|</span>
@@ -43,14 +40,34 @@
 
    <div id="${args.htmlid}-documents" class="documents"></div>
    
-   <div id="${args.htmlid}-actionsBag" class="hiddenComponents">
-      <div id="${args.htmlid}-actions-document">
-         <span class="onCheckoutAsset"><a href="#" class="action-link">Checkout Asset</a></span>
-         <span class="onDeleteAsset"><a href="#" class="action-link">${msg("actions.document.delete")}</a></span>
+   <div class="hiddenComponents">
+      <div id="${args.htmlid}-actionSet-empty">
       </div>
 
-      <div id="${args.htmlid}-actions-folder">
-         <span class="onDeleteAsset"><a href="#" class="action-link">${msg("actions.folder.delete")}</a></span>
+      <div id="${args.htmlid}-actionSet-document">
+         <span class="onActionEditOffline"><a href="#" class="action-link">${msg("actions.document.edit-offline")}</a></span>
+         <span class="onActionCopyTo"><a href="#" class="action-link">${msg("actions.document.copy-to")}</a></span>
+         <span class="onActionMoveTo"><a href="#" class="action-link">${msg("actions.document.move-to")}</a></span>
+         <span class="onActionDeleteAsset"><a href="#" class="action-link">${msg("actions.document.delete")}</a></span>
+      </div>
+
+      <div id="${args.htmlid}-actionSet-locked">
+         <span class="onActionUnlock"><a href="#" class="action-link">[Request Unlock]</a></span>
+      </div>
+
+      <div id="${args.htmlid}-actionSet-lockOwner">
+         <span class="onActionUnlock"><a href="#" class="action-link">[Unlock]</a></span>
+      </div>
+
+      <div id="${args.htmlid}-actionSet-workingCopyOwner">
+         <span class="onActionUploadNewVersion"><a href="#" class="action-link">${msg("actions.document.upload-new-version")}</a></span>
+         <span class="onActionCancelEditing"><a href="#" class="action-link">${msg("actions.document.cancel-editing")}</a></span>
+      </div>
+
+      <div id="${args.htmlid}-actionSet-folder">
+         <span class="onActionCopyTo"><a href="#" class="action-link">${msg("actions.folder.copy-to")}</a></span>
+         <span class="onActionMoveTo"><a href="#" class="action-link">${msg("actions.folder.move-to")}</a></span>
+         <span class="onActionDeleteAsset"><a href="#" class="action-link">${msg("actions.folder.delete")}</a></span>
       </div>
    </div>
 
