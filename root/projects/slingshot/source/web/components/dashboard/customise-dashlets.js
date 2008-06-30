@@ -52,7 +52,7 @@
       Alfresco.util.ComponentManager.register(this);
 
       // Load YUI Components
-      Alfresco.util.YUILoaderHelper.require(["button", "container", "datatable", "datasource", "dragdrop"], this.onComponentsLoaded, this);
+      Alfresco.util.YUILoaderHelper.require(["button", "container", "datasource", "dragdrop"], this.onComponentsLoaded, this);
 
       return this;
    }
@@ -161,11 +161,11 @@
 
          // Save a reference to the dashlet list and garbage can
          this.widgets.dashletListEl = Dom.get(this.id + "-column-ul-0");
-         this.widgets.trashcanListEl = Dom.get(this.id + "-trashcan-img");
+         //this.widgets.trashcanListEl = Dom.get(this.id + "-trashcan-img");
 
          // ... and create a delete drop target on them
          new YAHOO.util.DDTarget(this.widgets.dashletListEl, this.DND_GROUP_DELETE_DASHLET);
-         new YAHOO.util.DDTarget(this.widgets.trashcanListEl, this.DND_GROUP_DELETE_DASHLET);
+         //new YAHOO.util.DDTarget(this.widgets.trashcanListEl, this.DND_GROUP_DELETE_DASHLET);
 
          // Make all dashlets in all columns draggable
          var noOfColumns = i - 1;
@@ -184,6 +184,48 @@
             }
          }
 
+          YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
+
+      },
+
+      /**
+       * Fired when the number of columns has changed has changed
+       * @method onNoOfColumnsChanged
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onDashboardLayoutChanged: function DLT_onDashboardLayoutChanged(layer, args)
+      {
+         var newLayout = args[1].dashboardLayout;
+         var wrapper = Dom.get(this.id +"-wrapper-div");
+         if(newLayout)
+         {
+            for (var i = 1; true; i++)
+            {
+               var ul = Dom.get(this.id + "-column-div-" + i);
+               if(ul)
+               {
+                  if(i <= newLayout.noOfColumns)
+                  {
+                     Dom.setStyle(ul, "display", "");
+                  }
+                  else
+                  {
+                     Dom.setStyle(ul, "display", "none");
+                  }
+                  Dom.removeClass(wrapper, "noOfColumns" + i);
+               }
+               else
+               {
+                  break;
+               }
+            }
+            Dom.addClass(wrapper, "noOfColumns" + newLayout.noOfColumns);            
+         }
+         else
+         {
+            throw new Error("The argument for event 'onDashboardLayoutChanged' has changed.");
+         }
       },
 
       /**
@@ -691,16 +733,14 @@
       isAddTarget: function CD_isAddTarget(el)
       {
          // Either el is a column/ul ...
-         if (el === this.widgets.dashletListEl ||
-            el === this.widgets.trashcanListEl)
+         if (el === this.widgets.dashletListEl) // || el === this.widgets.trashcanListEl)
          {
             return false;
          }
          else if (el){
             // .. or it was a dashlet/li, then check its column/ul instead. 
             el = el.parentNode;
-            if(el === this.widgets.dashletListEl ||
-               el === this.widgets.trashcanListEl)
+            if(el === this.widgets.dashletListEl) // || el === this.widgets.trashcanListEl)
             {
                return false;
             }

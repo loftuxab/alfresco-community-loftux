@@ -2,6 +2,6 @@
 <page>
    <title>Customise Dashboard</title>
    <description>Customise dashboard layout and dashlets</description>
-   <template-instance>page-1-column</template-instance>
+   <template-instance>customise-dashboard</template-instance>
    <authentication>user</authentication>
 </page>

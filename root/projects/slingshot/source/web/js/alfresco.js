@@ -600,7 +600,7 @@ Alfresco.util.PopupManager = function()
          text: null,
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
-         displayTime: -1,
+         displayTime: 1.5,
          modal: false
       },
 
@@ -618,7 +618,7 @@ Alfresco.util.PopupManager = function()
        *    effect: {YAHOO.widget.ContainerEffect}, // the effect to use when shpwing and hiding the message,
        *                                            // default is YAHOO.widget.ContainerEffect.FADE
        *    effectDuration: {int},  // time in seconds that the effect should be played, default is 0.5
-       *    displayTime: {int},     // time in seconds that the message will be displayed, default 1.25
+       *    displayTime: {int},     // time in seconds that the message will be displayed, default 1.5
        *    modal: {true}           // if the message should modal (the background overlayed with a gray transparent layer), default is false
        * }
        */
