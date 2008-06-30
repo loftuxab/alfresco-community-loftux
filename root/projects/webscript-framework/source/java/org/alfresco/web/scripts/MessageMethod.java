@@ -100,6 +100,10 @@ public class MessageMethod implements TemplateMethodModelEx
                     {
                         result = I18NUtil.getMessage(id);
                     }
+                    if (result == null)
+                    {
+                    	result = id;
+                    }
                 }
                 else
                 {
@@ -147,6 +151,10 @@ public class MessageMethod implements TemplateMethodModelEx
                     if (msg != null)
                     {
                         result = MessageFormat.format(msg, params);
+                    }
+                    else
+                    {
+                    	result = id;
                     }
                 }
             }
