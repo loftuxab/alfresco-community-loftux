@@ -1,0 +1,58 @@
+.postview {
+	margin: 20px;
+}
+
+.commentFooter {
+	margin-top: 20px;
+}
+
+.comment {
+	border-top: 1px dashed #b1b1b1;
+	border-bottom: 1px solid transparent;
+	border-right: 1px solid transparent;
+	border-left: 1px solid transparent;
+	margin: 0 20px;
+}
+.comment.overNode {
+	border: 1px solid #5A7380;
+}
+.commentsListTitle {
+	font-size: 11pt;
+	background:transparent url(../images/tag.png) no-repeat scroll 20px 50%;
+	padding: 20px 0pt 20px 40px;
+}
+.comment.even {
+	background-color: #ffffff;
+}
+.comment.odd {
+	background-color: #fcfcf5;
+}
+
+#discussionsBlogHeader1 .configLink {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 11pt;
+	color: #333333;
+	background: transparent url(../images/star.png) no-repeat scroll 3px 5px;
+	padding-left: 19px;
+}
+
+/********
+ * FORM *
+*********/
+
+.submitCommentForm {
+	margin: 15px;
+	padding: 20px;
+	border-top: 1px solid #b1b1b1;
+	background-color: #fafafa;
+}
+
+.commentFormTitle {
+	font-size: 11pt;
+	margin-bottom: 15px;
+}
+
+.commentFormAction {
+	margin-top: 15px;
+}

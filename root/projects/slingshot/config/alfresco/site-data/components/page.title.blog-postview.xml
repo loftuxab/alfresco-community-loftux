@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<component>
+   <scope>page</scope>
+   <region-id>title</region-id>
+   <source-id>blog-postview</source-id>
+   <url>/components/title/collaboration-title</url>
+   <chrome>
+      <frame>none</frame>
+   </chrome>
+</component>

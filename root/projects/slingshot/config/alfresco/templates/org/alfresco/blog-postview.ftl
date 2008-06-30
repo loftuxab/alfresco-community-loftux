@@ -1,0 +1,25 @@
+<#import "import/alfresco-template.ftl" as template />
+<@template.header>
+   <link rel="stylesheet" type="text/css" href="${url.context}/components/discussions-blog-common.css" />
+   <link rel="stylesheet" type="text/css" href="${url.context}/components/blog/blog.css" />
+   <script type="text/javascript" src="${url.context}/templates/blog/blog-postview.js"></script>
+</@>
+
+<@template.body>
+   <div id="hd">
+      <@region id="header" scope="global" protected=true />
+      <@region id="title" scope="page" protected=true />
+      <@region id="navigation" scope="template" protected=true />
+   </div>
+   <div id="bd">
+       <@region id="postview" scope="template" protected=true />
+       <@region id="comments" scope="template" protected=true />
+       <@region id="createcomment" scope="template" protected=true />
+   </div>
+</@>
+
+<@template.footer>
+   <div id="ft">
+      <@region id="footer" scope="global" protected=true />
+   </div>
+</@>

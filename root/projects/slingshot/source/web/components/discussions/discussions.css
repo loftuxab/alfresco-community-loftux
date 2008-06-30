@@ -1,0 +1,11 @@
+/***********
+ * REPLIES *
+************/
+.reply .nodeFooter {
+	background:  transparent;
+	border: none;
+	margin-top: 5px;
+}
+.indented {
+	margin-left: 30px;
+}

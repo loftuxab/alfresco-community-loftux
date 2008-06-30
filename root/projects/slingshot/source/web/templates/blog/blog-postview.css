@@ -1,0 +1,69 @@
+/*
+.topic, .reply {
+	padding: 10px;
+}
+.topic:hover, .reply:hover {
+	background-color: #cef;
+}
+
+.hidden {
+	display: none;
+}
+
+.topicContent, .replyContent {
+	float: left;
+	width: 75%;
+	padding-right: 40px;
+}
+.active .topicContent, .active .replyContent {
+	border-right: thin dotted #000;
+}
+
+.authorPicture {
+	width: 100px;
+	float: left;
+	text-align: center;
+}
+.published {
+	margin: 5px 0 10px 0;
+}
+.extra {
+	margin-top: 10px;
+}
+
+.indented {
+	margin-left: 100px;
+}
+
+
+
+.topicEdit {
+	float: left;
+	margin-left: 15px;
+	width: 115px;
+	visibility: hidden;
+}
+
+.topicEdit div {
+	padding-left: 15px;
+	margin-bottom: 4px;
+	border: thin solid #fff;
+}
+.topicEdit div:hover {
+	border: thin solid #f00;
+}
+
+.topic:hover .topicEdit {
+	visibility: visible;
+}
+
+.topicEdit .edit {
+	background: #fff url(images/edit.png) no-repeat scroll 2px 5px;
+}
+.topicEdit .delete {
+	background: #fff url('images/delete.png') no-repeat scroll 2px 5px;
+}
+.topicEdit .publish {
+	background: #fff url(images/publish.png) no-repeat scroll 2px 5px;
+}
+*/

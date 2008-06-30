@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/blog-postlist</template-type>
+   <properties>
+      <!-- 
+      <hasBreadcrumb>true</hasBreadcrumb>
+      <hasTreeview>true</hasTreeview>
+      <hasPackager>true</hasPackager>
+       -->
+   </properties>
+</template-instance>

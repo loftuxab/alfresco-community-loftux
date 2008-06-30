@@ -1,0 +1,346 @@
+/*************
+ * LEFT MENU *
+*************/
+
+.menuTitle h2
+{
+   background: url(images/arrow-right.gif) no-repeat 0% 50%;
+   margin-top: 1em;
+   padding-left: 1em;
+}
+
+.filter ul
+{
+   margin-left: 20px;
+   padding: 0.5em 0 1em;
+}
+
+.filter li
+{
+   padding: 2px 0;
+}
+
+
+/*******************
+ * WYSIWYG CONTENT *
+********************/
+strong {
+	font-weight: bold;
+}
+em {
+	font-style: italic;	
+}
+ul, ol {
+	padding-left: 40px;
+}
+ul li {
+	list-style-type: disc; 
+}
+ol li {
+	list-style-type: decimal; 
+}
+
+/***********
+ * GENERAL *
+************/
+.hidden {
+	display: none;
+}
+.spacer {
+	margin: 0 7px;
+	color: #ccc;
+	font-size: 11pt;
+}
+
+/************
+ * LEFT NAV *
+*************/
+.nav-label {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	color: #999999;
+	line-height: 170%;
+}
+.nav-label a {
+	color: #333333;
+}
+
+
+/**********
+ * HEADER *
+***********/
+#discussionsBlogHeader1 .createNodeLink {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 11pt;
+	color: #333333;
+	background: transparent url(images/createtopic.png) no-repeat scroll 3px 3px;
+	padding: 0 5px 0 19px;
+	border-right: 1px solid #c6c6c6;
+}
+#discussionsBlogHeader1 .rssLink {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 11pt;
+	color: #333333;
+	background: transparent url(images/rss.png) no-repeat scroll 3px 5px;
+	padding-left: 19px;
+}
+#discussionsBlogHeader1 .detailList {
+	padding-right: 5px;
+	border-right: 1px solid #c6c6c6;
+} 
+.	detailList, .simpleList {
+	font-size: 10pt;
+}
+#discussionsBlogHeader2 .backLink {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 11pt;
+	color: #333333;
+	background: transparent url(images/back.png) no-repeat scroll 3px 3px;
+	padding: 0 5px 0 19px;
+}
+#discussionsBlogHeader2 .toolbarOption {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	color: #333333;
+}
+#discussionsBlogHeader2 .listTitle {
+	font-family: Helvetica, Trebuchet, sans-serif;
+	font-weight: normal;
+	font-size: 12pt;
+	color: #333333;
+}
+
+#discussionsBlogHeader1, #discussionsBlogHeader2 {
+	width: auto;
+	height: 30px;
+	background-color: #ebeff1;
+	border-bottom: thin solid #fff;
+	margin: 0 -10px;
+	padding-right: 10px;
+}
+#discussionsBlogHeader2 {
+	border-bottom: 2px solid #929292;
+}
+
+#topDiscussionsPagination {
+	padding: 3px 3px 30px;
+}
+#bottomDiscussionsPagination {
+	padding: 30px 3px 3px;
+}
+.leftDiscussionBlogHeader {
+	float: left;
+	padding: 4px 10px;
+}
+.rightDiscussionBlogHeader {
+	float: right;
+	text-align: right;
+	padding: 4px;
+}
+
+
+/****************
+ * NODE DETAIL *
+*****************/
+.topicview, postview {
+	background: #F8FAFB;
+	border: 1px solid #c6c6c6;
+	margin: 20px;
+}
+.node .authorPicture {
+	float: left;
+	text-align: center;
+	margin-right: 20px;
+}
+.topicview .nodeFooter,.postview .nodeFooter {
+	/* background:  #F8FAFB; */
+	background: transparent;
+	border: none;
+	margin-top: 5px;
+}
+
+
+/********
+ * NODE *
+*********/
+.node, .reply, .comment {
+	padding: 20px 10px;
+	border: 2px solid #fff;
+}
+.node table td,
+.reply table td,
+.comment table td {
+	vertical-align: top;
+}
+.node.simple{
+	padding: 5px;
+}
+.overNode {
+	background-color: #fffef5;
+	border: 2px solid #5A7380;
+}
+.node .published {
+	margin: 5px 0 10px 0;
+}
+
+.node .nodeTitle a {
+	font-family: Helvetica, Trebuchet, sans-serif;
+	font-weight: normal;
+	font-size: 13pt;
+	line-height: 130%;
+	color: #2b6eb5;
+}
+
+.node .nodeStatus {
+	font-family: Trebuchet, sans-serif;
+	font-weight: normal;
+	font-size: 13pt;
+	line-height: 130%;
+	color: #669966;
+}
+
+.nodeAttrLabel {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	line-height: 130%;
+	color: #606060;
+}
+.nodeAttrValue {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	line-height: 130%;
+	color: #333333;
+}
+.nodeAttrValue a {
+	color: #2b6eb5;
+}
+.node .userLink {
+	font-family: Arial, sans-serif;
+	font-weight: bold;
+	font-size: 10pt;
+	line-height: 150%;
+	color: #999999;
+}
+.node .userLink a {
+	color: #2b6eb5;
+}
+.nodeContent {
+	padding-right: 40px;
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	line-height: 150%;
+}
+.nodeFooter {
+	background-color: #f8f8f8;
+	border-top: 1px dashed #c6c6c6;
+	border-bottom: 1px solid #c6c6c6;
+	padding: 1px;
+}
+.nodeFooter .tag {
+	background:transparent url(images/tag.png) no-repeat scroll 0px 50%;
+	padding-left: 15px;
+}
+
+.replyTo {
+	background:transparent url(images/replyto.png) no-repeat scroll 0px 50%;
+	padding-left: 15px;
+}
+
+
+
+/*************
+ * EDIT BLOC *
+**************/
+.nodeEdit {
+	margin: 10px 0 0 15px;
+	visibility: hidden;
+}
+.showEditBloc {
+	visibility: visible;
+}
+.nodeEdit div, .replyEdit div {
+	padding: 2px 19px;
+	margin-bottom: 4px;
+}
+.node.simple .nodeEdit {
+	width: 200px;
+}
+.nodeEdit .action-link {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 9pt;
+	line-height: 150%;
+	color: #2B6EB5;
+}
+
+.nodeEdit .onViewNode {
+	background: url(images/replyto.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+.nodeEdit .onAddReply {
+	background: url(images/replyto.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+.nodeEdit .onEditNode,
+.nodeEdit .onEditReply,
+.nodeEdit .onEditComment {
+	background:url(images/edit.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+.nodeEdit .onDeleteNode,
+.nodeEdit .onDeleteReply,
+.nodeEdit .onDeleteComment {
+	background: url('images/delete.png') no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+.nodeEdit .onUpdateExternal {
+	background: url(images/updateext.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+.nodeEdit .onPublishExternal {
+	background: url(images/publishext.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+.nodeEdit .onUnpublishExternal {
+	background: url(images/unpublishext.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+
+/********
+ * FORM *
+*********/
+.editNodeForm {
+	margin: 4px;
+	border: thin solid #000;
+	padding: 4px;
+	background-color: #fff9ab;
+}
+.editNodeForm label {
+	width: 100px;
+	float: left;
+	text-align: right;
+	clear: left;
+	margin: 5px 15px 7px 0;
+}
+.editNodeForm input {
+	margin-bottom: 15px;
+}
+.editNodeForm .yui-editor-container {
+	margin: 5px 0 15px 114px;
+}
+.editNodeForm .suggestedTags li {
+	list-style-type: none;
+	float: left;
+	margin-right: 10px;
+}
+.editNodeForm .nodeFormAction {
+	margin: 15px 0 10px 115px;
+}

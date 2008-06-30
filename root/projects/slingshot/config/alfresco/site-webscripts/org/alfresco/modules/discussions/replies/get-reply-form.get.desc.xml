@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>get-reply-form</shortname>
+  <description>Get a create or edit reply form</description>
+  <url>/modules/discussions/replies/get-reply-form</url>
+  <format default="json"/>
+</webscript>

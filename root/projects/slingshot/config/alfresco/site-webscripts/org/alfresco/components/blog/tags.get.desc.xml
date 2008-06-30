@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>Blog Tags</shortname>
+  <description>Blog: Post List Tags Component</description>
+  <url>/components/blog/tags</url>
+</webscript>
