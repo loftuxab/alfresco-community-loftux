@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>Discussions posts and replies RSS</shortname>
+  <description>Discussions: RSS of all posts and replies of the forum</description>
+  <url>/components/discussions/rss/latestposts</url>
+  <format default="rss"/>
+</webscript>

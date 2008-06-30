@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<template-instance>
+   <template-type>org/alfresco/blog-postedit</template-type>
+   <properties>
+      <!-- This is the container where the blog posts are stored -->
+      <container>blog</container>
+   </properties>
+</template-instance>

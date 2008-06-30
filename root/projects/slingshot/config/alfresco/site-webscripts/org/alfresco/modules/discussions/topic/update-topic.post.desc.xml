@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>update-topic</shortname>
+  <description>Updates a topic</description>
+  <url>/modules/discussions/topic/update-topic</url>
+  <format default="json"/>
+</webscript>

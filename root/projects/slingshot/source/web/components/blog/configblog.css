@@ -1,0 +1,36 @@
+.config-blog
+{
+   text-align: left;
+   /*width: 30em;*/
+}
+
+.config-blog .yui-t1
+{
+   width: 450px;
+   min-width:450px;
+}
+
+.config-blog select,
+.config-blog input,
+.config-blog textarea
+{
+   border: 1px solid #C5D6E2;
+   padding: 2px;
+   font-weight: normal;
+   width: 150px;
+}
+
+.config-blog .yui-gd
+{
+   padding-bottom: 0.5em;
+}
+
+.config-blog .section-title
+{
+   padding-bottom: 0.5em;
+}
+.config-blog .section-buttons
+{
+   padding-top: 1.5em;   
+   text-align: center;
+}

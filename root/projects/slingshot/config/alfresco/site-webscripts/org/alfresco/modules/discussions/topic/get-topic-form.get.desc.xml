@@ -1,0 +1,6 @@
+<webscript>
+  <shortname>get-topic-form</shortname>
+  <description>Get a create or edit topic form</description>
+  <url>/modules/discussions/topic/get-topic-form</url>
+  <format default="json"/>
+</webscript>

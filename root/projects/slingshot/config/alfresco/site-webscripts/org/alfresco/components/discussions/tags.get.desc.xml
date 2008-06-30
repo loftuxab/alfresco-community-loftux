@@ -1,0 +1,5 @@
+<webscript>
+  <shortname>TopicList Tags</shortname>
+  <description>Discussions: Topic List Tags Component</description>
+  <url>/components/discussions/tags</url>
+</webscript>
