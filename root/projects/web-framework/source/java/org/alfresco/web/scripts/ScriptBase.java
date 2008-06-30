@@ -44,9 +44,6 @@ public abstract class ScriptBase implements Serializable
     protected RequestContext context;
     protected ScriptableMap<String, Serializable> properties;
 
-    protected Model model;
-    protected WebFrameworkConfigElement config;
-
     /**
      * Instantiates a new web framework script base
      * 
@@ -99,20 +96,12 @@ public abstract class ScriptBase implements Serializable
     
     public Model getModel()
     {
-        if(this.model == null)
-        {
-            this.model = context.getModel();
-        }
-        return this.model;
+        return context.getModel();
     }
     
     public WebFrameworkConfigElement getConfig()
     {
-        if(this.config == null)
-        {
-            this.config = context.getConfig();
-        }
-        return this.config;
+        return context.getConfig();
     }
 
     /* (non-Javadoc)

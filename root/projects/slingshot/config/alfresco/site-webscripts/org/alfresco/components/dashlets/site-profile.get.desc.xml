@@ -1,5 +1,6 @@
 <webscript>
    <shortname>Site Profile</shortname>
    <description>Site profile component used in the collaboration site</description>
+   <family>dashlet</family>
    <url>/components/dashlets/site-profile</url>
 </webscript>

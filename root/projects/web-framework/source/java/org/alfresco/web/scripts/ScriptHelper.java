@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.alfresco.web.framework.ModelObject;
-import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
@@ -40,7 +39,7 @@ import org.mozilla.javascript.Scriptable;
  * 
  * @author muzquiano
  */
-public abstract class ScriptHelper implements Serializable
+public final class ScriptHelper implements Serializable
 {
     /**
      * Creates a Scriptable Map for a given array of model objects

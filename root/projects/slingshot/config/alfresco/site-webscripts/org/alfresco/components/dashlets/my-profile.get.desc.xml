@@ -1,5 +1,6 @@
 <webscript>
    <shortname>My Profile Dashlet</shortname>
    <description>Component used to display current user</description>
+   <family>dashlet</family>
    <url>/components/dashlets/my-profile</url>
 </webscript>

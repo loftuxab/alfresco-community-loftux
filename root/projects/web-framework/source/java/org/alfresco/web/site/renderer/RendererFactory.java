@@ -45,6 +45,10 @@ import org.alfresco.web.site.exception.RendererNotFoundException;
  */
 public final class RendererFactory
 {
+    private static final String TEMPLATETYPE_FREEMARKER = "freemarker";
+
+    private static final String COMPONENTTYPE_WEBSCRIPT = "webscript";
+
     private static final String RENDERER_JSP = "org.alfresco.web.site.renderer.JSPRenderer";
     
     /** Renderers cache */
@@ -86,7 +90,7 @@ public final class RendererFactory
              * If it had a URI property, then we're assuming it is a
              * webscript component type.
              */
-            ComponentType componentType = context.getModel().getComponentType("webscript");
+            ComponentType componentType = context.getModel().getComponentType(COMPONENTTYPE_WEBSCRIPT);
             return _newRenderer(context, componentType.getRendererType(), uri);
         }
         
@@ -104,7 +108,7 @@ public final class RendererFactory
             if (testComponentType == null)
             {
                 // use a web script component
-                ComponentType componentType = context.getModel().getComponentType("webscript");
+                ComponentType componentType = context.getModel().getComponentType(COMPONENTTYPE_WEBSCRIPT);
                 return _newRenderer(context, componentType.getRendererType(), componentTypeId);                
             }
         }
@@ -160,7 +164,7 @@ public final class RendererFactory
             if (testTemplateType == null)
             {
                 // execute as a freemarker template type
-                TemplateType templateType = context.getModel().getTemplateType("freemarker");
+                TemplateType templateType = context.getModel().getTemplateType(TEMPLATETYPE_FREEMARKER);
                 return _newRenderer(context, templateType.getRendererType(), templateTypeId);
             }
         }

@@ -46,10 +46,6 @@ public class Component extends AbstractModelObject
     public static String PROP_CHROME = "chrome";    
     public static String PROP_URL = "url";
     
-    // TODO: Is this one really needed any more?
-    // Frame types are handled by chrome definitions
-    public static String PROP_FRAME_TYPE = "frame-type";
-    
     // cached values
     private String regionId = null;
     private String scope = null;
@@ -176,26 +172,6 @@ public class Component extends AbstractModelObject
     }
 
     /**
-     * Gets the frame type.
-     * 
-     * @return the frame type
-     */
-    public String getFrameType()
-    {
-        return getProperty(PROP_FRAME_TYPE);
-    }
-
-    /**
-     * Sets the frame type.
-     * 
-     * @param frameType the new frame type
-     */
-    public void setFrameType(String frameType)
-    {
-        setProperty(PROP_FRAME_TYPE, frameType);
-    }
-    
-    /**
      * Gets the chrome.
      * 
      * @return the chrome
@@ -273,7 +249,8 @@ public class Component extends AbstractModelObject
      * @param scopeId
      * @param regionId
      * @param sourceId
-     * @return
+     * 
+     * @return deterministic component id based on supplied values
      */
     public static String generateId(String scopeId, String regionId, String sourceId)
     {

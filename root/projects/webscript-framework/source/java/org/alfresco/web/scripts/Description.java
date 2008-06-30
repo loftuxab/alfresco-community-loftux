@@ -158,6 +158,11 @@ public interface Description
     public String getDescription();
     
     /**
+     * Gets the family of this service
+     */
+    public String getFamily();
+    
+    /**
      * Gets the required authentication level for execution of this service
      * 
      * @return  the required authentication level 

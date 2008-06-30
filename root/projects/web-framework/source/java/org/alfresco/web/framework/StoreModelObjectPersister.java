@@ -61,8 +61,8 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
 
     private static Log logger = LogFactory.getLog(StoreModelObjectPersister.class);
     
-    protected final long delay;
     protected String id;
+    protected final long delay;
     protected final Store store;
     protected final Map<String, ModelObjectCache> objectCaches;
 
@@ -208,7 +208,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                 info.setStoragePath(_path);
                 info.setSaved(true);
                 
-                // CACHE: put object into cache
+                // put object into cache
                 cachePut(context, _path, modelObject);
                 
                 // flag that the save was successful
@@ -252,7 +252,7 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
                     // make sure it is marked as saved
                     modelObject.getKey().setSaved(true);
                     
-                    // CACHE: put object into cache
+                    // put object into cache
                     cachePut(context, path, modelObject);
                     
                     // flag that the save was succesful
