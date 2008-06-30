@@ -25,7 +25,9 @@
 package org.alfresco.web.scripts;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.tools.EncodingUtil;
@@ -36,6 +38,7 @@ import org.alfresco.web.framework.model.Configuration;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.AuthenticationUtil;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.RequestContext;
 import org.mozilla.javascript.Scriptable;
 
@@ -524,6 +527,31 @@ public final class ScriptSiteData extends ScriptBase
     {
         Map<String, ModelObject> objects = getModel().findComponents(scope, regionId, sourceId, componentTypeId);
         return ScriptHelper.toScriptModelObjectArray(context, objects);
+    }
+    
+    /**
+     * Searchs for webscript components with the given family name.
+     * 
+     * @param family        the family
+     * 
+     * @return An array of webscripts that match the given family name
+     */
+    public Object[] findWebScripts(String family)
+    {
+        List<Description> values = new ArrayList<Description>(16);
+        if (family != null)
+        {
+            Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(
+                    "webframework.webscripts.registry");
+            for (WebScript webscript : registry.getWebScripts())
+            {
+                if (family.equals(webscript.getDescription().getFamily()))
+                {
+                    values.add(webscript.getDescription());
+                }
+            }
+        }
+        return values.toArray(new Object[values.size()]);
     }
 
     /**

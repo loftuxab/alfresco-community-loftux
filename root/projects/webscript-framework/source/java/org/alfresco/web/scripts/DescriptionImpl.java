@@ -44,6 +44,7 @@ public class DescriptionImpl implements Description
     private String kind;
     private String shortName;
     private String description;
+    private String family;
     private RequiredAuthentication requiredAuthentication;
     private RequiredTransaction requiredTransaction;
     private RequiredCache requiredCache;
@@ -66,7 +67,7 @@ public class DescriptionImpl implements Description
     }
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getStorePath()
+     * @see org.alfresco.web.scripts.Description#getStorePath()
      */
     public String getStorePath()
     {
@@ -84,7 +85,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getScriptPath()
+     * @see org.alfresco.web.scripts.Description#getScriptPath()
      */
     public String getScriptPath()
     {
@@ -102,7 +103,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getDescPath()
+     * @see org.alfresco.web.scripts.Description#getDescPath()
      */
     public String getDescPath()
     {
@@ -110,7 +111,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getDescDocument()
+     * @see org.alfresco.web.scripts.Description#getDescDocument()
      */
     public InputStream getDescDocument()
         throws IOException
@@ -129,7 +130,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getId()
+     * @see org.alfresco.web.scripts.Description#getId()
      */
     public String getId()
     {
@@ -165,7 +166,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getShortName()
+     * @see org.alfresco.web.scripts.Description#getShortName()
      */
     public String getShortName()
     {
@@ -183,11 +184,27 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getDescription()
+     * @see org.alfresco.web.scripts.Description#getDescription()
      */
     public String getDescription()
     {
         return this.description;
+    }
+
+    /**
+     * @param family the family to set
+     */
+    public void setFamily(String family)
+    {
+        this.family = family;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.Description#getFamily()
+     */
+    public String getFamily()
+    {
+        return this.family;
     }
 
     /**
@@ -201,7 +218,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getRequiredAuthentication()
+     * @see org.alfresco.web.scripts.Description#getRequiredAuthentication()
      */
     public RequiredAuthentication getRequiredAuthentication()
     {
@@ -219,7 +236,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getRequiredTransaction()
+     * @see org.alfresco.web.scripts.Description#getRequiredTransaction()
      */
     public RequiredTransaction getRequiredTransaction()
     {
@@ -237,7 +254,7 @@ public class DescriptionImpl implements Description
     }
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getRequiredCache()
+     * @see org.alfresco.web.scripts.Description#getRequiredCache()
      */
     public RequiredCache getRequiredCache()
     {
@@ -255,7 +272,7 @@ public class DescriptionImpl implements Description
     }
     
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getFormatStyle()
+     * @see org.alfresco.web.scripts.Description#getFormatStyle()
      */
     public FormatStyle getFormatStyle()
     {
@@ -273,7 +290,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getMethod()
+     * @see org.alfresco.web.scripts.Description#getMethod()
      */
     public String getMethod()
     {
@@ -291,7 +308,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getURIs()
+     * @see org.alfresco.web.scripts.Description#getURIs()
      */
     public String[] getURIs()
     {
@@ -309,7 +326,7 @@ public class DescriptionImpl implements Description
     }
 
     /* (non-Javadoc)
-     * @see org.alfresco.web.scripts.WebScriptDescription#getDefaultFormat()
+     * @see org.alfresco.web.scripts.Description#getDefaultFormat()
      */
     public String getDefaultFormat()
     {

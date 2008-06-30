@@ -456,6 +456,14 @@ public class DeclarativeRegistry
                 description = descriptionElement.getTextTrim();
             }
             
+            // retrieve family
+            String family = null;
+            Element familyElement = rootElement.element("family");
+            if (familyElement != null)
+            {
+                family = familyElement.getTextTrim();
+            }
+            
             // retrieve urls
             List urlElements = rootElement.elements("url");
             if (urlElements == null || urlElements.size() == 0)
@@ -625,6 +633,7 @@ public class DeclarativeRegistry
             serviceDesc.setKind(kind);
             serviceDesc.setShortName(shortName);
             serviceDesc.setDescription(description);
+            serviceDesc.setFamily(family);
             serviceDesc.setRequiredAuthentication(reqAuth);
             serviceDesc.setRequiredTransaction(reqTrx);
             serviceDesc.setRequiredCache(cache);

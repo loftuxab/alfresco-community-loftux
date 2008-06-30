@@ -159,9 +159,8 @@ public class HttpRequestContextFactory implements RequestContextFactory
         ModelObjectManager modelObjectService = FrameworkHelper.getWebFrameworkService().getObjectManager(mpc);
         
         // create a new model
-        // this model reflects the state of the objects as per the
-        // persistence context
-        Model model = new DefaultModel(modelObjectService);
+        // this model reflects the state of the objects as per the persistence context
+        Model model = new Model(modelObjectService);
         
         // place onto request context
         context.setModel(model);

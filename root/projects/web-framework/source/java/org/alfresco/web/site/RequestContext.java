@@ -234,8 +234,7 @@ public interface RequestContext extends Serializable
 
     /**
      * Returns the model.  The model allows object model manipulation
-     * and persistence.  Models are intended to be pluggable so that
-     * multiple implementations could be supported.
+     * and persistence.
      * 
      * @return
      */

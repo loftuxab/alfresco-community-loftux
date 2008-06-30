@@ -1,5 +1,33 @@
+/*
+ * Copyright (C) 2005-2008 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing"
+ */
 package org.alfresco.web.site;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.alfresco.web.framework.ModelObject;
@@ -17,662 +45,916 @@ import org.alfresco.web.framework.model.TemplateType;
 import org.alfresco.web.framework.model.Theme;
 
 /**
- * The primary interface used by the framework to retrieve objects from
- * the underlying storage mechanism.
+ * Default implementation of the model.
  * 
  * @author muzquiano
  */
-public interface Model
+public class Model
 {
-    /**
-     * Retrieves a Chrome object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */
-    public Chrome getChrome(String id);
-
-    /**
-     * Retrieves a Component object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public Component getComponent(String id);
-
-    /**
-     * Retrieves a Component object from storage
-     * 
-     * @param scopeId the scope
-     * @param regionId the region id
-     * @param sourceId the source id
-     * @return the object
-     */
-    public Component getComponent(String scopeId, String regionId, String sourceId);
+    private ModelObjectManager manager;
     
     /**
-     * Retrieves a ComponentType object from storage
+     * Instantiates a new default model.
      * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public ComponentType getComponentType(String id);
-
-    /**
-     * Retrieves a Configuration object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public Configuration getConfiguration(String id);
-
-    /**
-     * Retrieves a ContentAssociation object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public ContentAssociation getContentAssociation(String id);
-
-    /**
-     * Retrieves a Page object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public Page getPage(String id);
-    
-    /**
-     * Retrieves a PageType object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public PageType getPageType(String id);
-
-    /**
-     * Retrieves a PageAssociation object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public PageAssociation getPageAssociation(String id);
-
-    /**
-     * Retrieves a TemplateInstance object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public TemplateInstance getTemplate(String id);
-
-    /**
-     * Retrieves a TemplateType object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public TemplateType getTemplateType(String id);
-    
-    /**
-     * Retrieves a Theme object from storage
-     * 
-     * @param id the id of a the object to be retrieved
-     * @return the object
-     */    
-    public Theme getTheme(String id);
-
-    /**
-     * Creates a new Chrome object
-     * 
-     * @return the object
-     */   
-    public Chrome newChrome();
-
-    /**
-     * Creates a new Chrome object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
+     * @param manager the ModelObjectManager
      */
-    public Chrome newChrome(String objectId);
+    public Model(ModelObjectManager manager)
+    {
+        this.manager = manager;
+    }
+
+    /**
+     * @return the object responsible for managing persistence and caching of model objects
+     */
+    public final ModelObjectManager getObjectManager()
+    {
+        return this.manager;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getChrome(java.lang.String)
+     */
+    public Chrome getChrome(String objectId)
+    {
+        return (Chrome) getObject(Chrome.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getComponent(java.lang.String)
+     */
+    public Component getComponent(String objectId)
+    {
+        return (Component) getObject(Component.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getComponent(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public Component getComponent(String scope, String regionId, String sourceId)
+    {
+        String componentId = Component.generateId(scope, regionId, sourceId);
+        return getComponent(componentId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getComponentType(java.lang.String)
+     */
+    public ComponentType getComponentType(String objectId)
+    {
+        return (ComponentType) getObject(ComponentType.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getConfiguration(java.lang.String)
+     */
+    public Configuration getConfiguration(String objectId)
+    {
+        return (Configuration) getObject(Configuration.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getContentAssociation(java.lang.String)
+     */
+    public ContentAssociation getContentAssociation(String objectId)
+    {
+        return (ContentAssociation) getObject(ContentAssociation.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getPage(java.lang.String)
+     */
+    public Page getPage(String objectId)
+    {
+        return (Page) getObject(Page.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getPageType(java.lang.String)
+     */
+    public PageType getPageType(String objectId)
+    {
+        return (PageType) getObject(PageType.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getPageAssociation(java.lang.String)
+     */
+    public PageAssociation getPageAssociation(String objectId)
+    {
+        return (PageAssociation) getObject(PageAssociation.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getTemplate(java.lang.String)
+     */
+    public TemplateInstance getTemplate(String objectId)
+    {
+        return (TemplateInstance) getObject(TemplateInstance.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getTemplateType(java.lang.String)
+     */
+    public TemplateType getTemplateType(String objectId)
+    {
+        return (TemplateType) getObject(TemplateType.TYPE_ID, objectId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getTheme(java.lang.String)
+     */
+    public Theme getTheme(String objectId)
+    {
+        return (Theme) getObject(Theme.TYPE_ID, objectId);
+    }
+    
+    // instantiation
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newChrome()
+     */
+    public Chrome newChrome()
+    {
+        return (Chrome) newObject(Chrome.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newChrome(java.lang.String)
+     */
+    public Chrome newChrome(String objectId)
+    {
+        return (Chrome) newObject(Chrome.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newComponent()
+     */
+    public Component newComponent()
+    {
+        return (Component) newObject(Component.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newComponent(java.lang.String)
+     */
+    public Component newComponent(String objectId)
+    {
+        return (Component) newObject(Component.TYPE_ID, objectId);
+    }
     
     /**
      * Creates a new Component object
      * 
-     * @return the object
-     */
-    public Component newComponent();
-    
-    /**
-     * Creates a new Component object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */    
-    public Component newComponent(String objectId);
-
-    /**
-     * Creates a new Component object
-     * 
-     * @param scopeId the scope
+     * @param scope    the scope
      * @param regionId the region id
      * @param sourceId the source id
-     * @return the object
-     */
-    public Component newComponent(String scopeId, String regionId, String sourceId);
-    
-    /**
-     * Creates a new ComponentType object
-     * 
-     * @return the object
-     */       
-    public ComponentType newComponentType();
-
-    /**
-     * Creates a new ComponentType object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public ComponentType newComponentType(String objectId);
-
-    /**
-     * Creates a new Configuration object
-     * 
-     * @return the object
-     */       
-    public Configuration newConfiguration();
-    
-    /**
-     * Creates a new Configuration object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public Configuration newConfiguration(String objectId);
-
-    /**
-     * Creates a new ContentAssociation object
-     * 
-     * @return the object
-     */       
-    public ContentAssociation newContentAssociation();
-    
-    /**
-     * Creates a new ContentAssociation object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public ContentAssociation newContentAssociation(String objectId);
-
-    /**
-     * Creates a new Page object
-     * 
-     * @return the object
-     */       
-    public Page newPage();
-    
-    /**
-     * Creates a new Page object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public Page newPage(String objectId);
-    
-    /**
-     * Creates a new PageType object
-     * 
-     * @return the object
-     */       
-    public PageType newPageType();
-    
-    /**
-     * Creates a new PageType object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public PageType newPageType(String objectId);
-
-    /**
-     * Creates a new PageAssociation object
-     * 
-     * @return the object
-     */       
-    public PageAssociation newPageAssociation();
-    
-    /**
-     * Creates a new PageAssociation object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public PageAssociation newPageAssociation(String objectId);
-
-    /**
-     * Creates a new Template object
-     * 
-     * @return the object
-     */       
-    public TemplateInstance newTemplate();
-    
-    /**
-     * Creates a new TemplateInstance object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public TemplateInstance newTemplate(String objectId);
-
-    /**
-     * Creates a new TemplateType object
-     * 
-     * @return the object
-     */           
-    public TemplateType newTemplateType();
-    
-    /**
-     * Creates a new TemplateType object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public TemplateType newTemplateType(String objectId);
-    
-    /**
-     * Creates a new Theme object
-     * 
-     * @return the object
-     */           
-    public Theme newTheme();
-    
-    /**
-     * Creates a new Theme object with the given id
-     * 
-     * @param objectId the id to be assigned
-     * 
-     * @return the object
-     */        
-    public Theme newTheme(String objectId);
-
-    /**
-     * Saves a model object
-     * 
-     * @param object the object to be saved
-     * 
-     * @return true if the save completed successfully
-     */
-    public boolean saveObject(ModelObject object);
-
-    /**
-     * Retrieves a model object
-     * 
-     * @param objectTypeId the type id of the model object
-     * @param objectId the id of the model object
      * 
      * @return the object
      */
-    public ModelObject getObject(String objectTypeId, String objectId);
+    public Component newComponent(String scope, String regionId, String sourceId)
+    {
+        String componentId = Component.generateId(scope, regionId, sourceId);
+        
+        Component component = newComponent(componentId);
+        component.setScope(scope);
+        component.setRegionId(regionId);
+        component.setSourceId(sourceId);
+        
+        return component;
+    }
     
-    /**
-     * Removes a model object from storage
-     * 
-     * @param object the model object
-     * 
-     * @return true if the delete succeeded
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newComponentType()
      */
-    public boolean removeObject(ModelObject object);
+    public ComponentType newComponentType()
+    {
+        return (ComponentType) newObject(ComponentType.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newComponentType(java.lang.String)
+     */
+    public ComponentType newComponentType(String objectId)
+    {
+        return (ComponentType) newObject(ComponentType.TYPE_ID, objectId);
+    }
     
-    /**
-     * Removes a model object from storage
-     * 
-     * @param objectTypeId the type id of the model object
-     * @param objectId the id of the model object
-     * 
-     * @return
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newConfiguration()
      */
-    public boolean removeObject(String objectTypeId, String objectId);
+    public Configuration newConfiguration()
+    {
+        return (Configuration) newObject(Configuration.TYPE_ID);
+    }
 
-    /**
-     * Creates a new object
-     * 
-     * @param objectTypeId the type id of the model object to be created
-     * 
-     * @return the object
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newConfiguration(java.lang.String)
      */
-    public ModelObject newObject(String objectTypeId);
-
-    /**
-     * Retrieves all of the objects in storage of a given type
-     * 
-     * @param objectTypeId the type id of the model object
-     * 
-     * @return A map of the model objects (keyed by object id)
-     */
-    public Map<String, ModelObject> getAllObjects(String objectTypeId);
-
-    /**
-     * @return a map of all Chrome objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findChrome();   
-
-    /**
-     * @return a map of all ComponentType objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findComponentTypes();
-
-    /**
-     * @return a map of all Component objects (keyed by object id)
-     */    
-    public Map<String, ModelObject> findComponents();
-
-    /**
-     * @return a map of all Configuration objects (keyed by object id)
-     */        
-    public Map<String, ModelObject> findConfigurations();
-
-    /**
-     * @return a map of all ContentAssociation objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findContentAssociations();    
-
-    /**
-     * @return a map of all Template objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findTemplates();
-
-    /**
-     * @return a map of all TemplateType objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findTemplateTypes();    
-
-    /**
-     * @return a map of all Page objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findPages();
-
-    /**
-     * @return a map of all PageAssociation objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findPageAssociations();
+    public Configuration newConfiguration(String objectId)
+    {
+        return (Configuration) newObject(Configuration.TYPE_ID, objectId);
+    }
     
-    /**
-     * @return a map of all PageType objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findPageTypes();
-    
-    /**
-     * @return a map of all Theme objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findThemes();
-    
-    /**
-     * Performs a filtered lookup of Chrome objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
-     * 
-     * @param chromeType the chrome type
-     *  
-     * @return a map of Chrome objects (keyed by object id)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newContentAssociation()
      */
-    public Map<String, ModelObject> findChrome(String chromeType);    
+    public ContentAssociation newContentAssociation()
+    {
+        return (ContentAssociation) newObject(ContentAssociation.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newContentAssociation(java.lang.String)
+     */
+    public ContentAssociation newContentAssociation(String objectId)
+    {
+        return (ContentAssociation) newObject(ContentAssociation.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newPage()
+     */
+    public Page newPage()
+    {
+        return (Page) newObject(Page.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newPage(java.lang.String)
+     */
+    public Page newPage(String objectId)
+    {
+        return (Page) newObject(Page.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newPageType()
+     */
+    public PageType newPageType()
+    {
+        return (PageType) newObject(PageType.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newPageType(java.lang.String)
+     */
+    public PageType newPageType(String objectId)
+    {
+        return (PageType) newObject(PageType.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newPageAssociation()
+     */
+    public PageAssociation newPageAssociation()
+    {
+        return (PageAssociation) newObject(PageAssociation.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newPageAssociation(java.lang.String)
+     */
+    public PageAssociation newPageAssociation(String objectId)
+    {
+        return (PageAssociation) newObject(PageAssociation.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newTemplate()
+     */
+    public TemplateInstance newTemplate()
+    {
+        return (TemplateInstance) newObject(TemplateInstance.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newTemplate(java.lang.String)
+     */
+    public TemplateInstance newTemplate(String objectId)
+    {
+        return (TemplateInstance) newObject(TemplateInstance.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newTemplateType()
+     */
+    public TemplateType newTemplateType()
+    {
+        return (TemplateType) newObject(TemplateType.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newTemplateType(java.lang.String)
+     */
+    public TemplateType newTemplateType(String objectId)
+    {
+        return (TemplateType) newObject(TemplateType.TYPE_ID, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newTheme()
+     */
+    public Theme newTheme()
+    {
+        return (Theme) newObject(Theme.TYPE_ID);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newTheme(java.lang.String)
+     */
+    public Theme newTheme(String objectId)
+    {
+        return (Theme) newObject(Theme.TYPE_ID, objectId);
+    }
+    
+    // generics
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#saveObject(org.alfresco.web.framework.ModelObject)
+     */
+    public boolean saveObject(ModelObject object)
+    {
+        return this.getObjectManager().saveObject(object);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getObject(java.lang.String, java.lang.String)
+     */
+    public ModelObject getObject(String objectTypeId, String objectId)
+    {
+        return this.getObjectManager().getObject(objectTypeId, objectId);
+    }
+                
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#removeObject(org.alfresco.web.framework.ModelObject)
+     */
+    public boolean removeObject(ModelObject object)
+    {
+        return this.getObjectManager().removeObject(object);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#removeObject(java.lang.String, java.lang.String)
+     */
+    public boolean removeObject(String objectTypeId, String objectId)
+    {
+        return this.getObjectManager().removeObject(objectTypeId, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#newObject(java.lang.String)
+     */
+    public ModelObject newObject(String objectTypeId)
+    {
+        return this.getObjectManager().newObject(objectTypeId);
+    }
 
     /**
-     * Performs a filtered lookup of Configuration objects
+     * New object.
      * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
+     * @param objectTypeId the object type id
+     * @param objectId the object id
      * 
-     * @param sourceId the source id to which the configuration is bound
-     *  
-     * @return a map of Configuration objects (keyed by object id)
-     */    
-    public Map<String, ModelObject> findConfigurations(String sourceId);
+     * @return the model object
+     */
+    public ModelObject newObject(String objectTypeId, String objectId)
+    {
+        return this.getObjectManager().newObject(objectTypeId, objectId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#getAllObjects(java.lang.String)
+     */
+    public Map<String, ModelObject> getAllObjects(String objectTypeId)
+    {
+        return this.getObjectManager().getAllObjects(objectTypeId);
+    }
+    
+    
+    ///////////////////////////////////
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findChrome()
+     */
+    public Map<String, ModelObject> findChrome()
+    {
+        return findChrome(null);
+    }
 
-    /**
-     * Performs a filtered lookup of PageAssociation objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
-     * 
-     * @param sourceId the source id of the association
-     * @param destId the dest id of the association
-     * @param associationType the type of the association
-     *  
-     * @return a map of PageAssociation objects (keyed by object id)
-     */        
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findChrome(java.lang.String)
+     */
+    public Map<String, ModelObject> findChrome(String chromeType)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap, Chrome.PROP_CHROME_TYPE, chromeType);
+
+        // do the lookup
+        return findObjects(Chrome.TYPE_ID, propertyConstraintMap);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findConfigurations()
+     */
+    public Map<String, ModelObject> findConfigurations()
+    {
+        return findConfigurations(null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findConfigurations(java.lang.String)
+     */
+    public Map<String, ModelObject> findConfigurations(String sourceId)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap, Configuration.PROP_SOURCE_ID, sourceId);
+
+        // do the lookup
+        return findObjects(Configuration.TYPE_ID, propertyConstraintMap);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findPageAssociations()
+     */
+    public Map<String, ModelObject> findPageAssociations()
+    {
+        return findPageAssociations(null, null, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findPageAssociations(java.lang.String, java.lang.String, java.lang.String)
+     */
     public Map<String, ModelObject> findPageAssociations(String sourceId, 
-            String destId, String associationType);
+            String destId, String associationType)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap,
+                PageAssociation.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap,
+                PageAssociation.PROP_DEST_ID, destId);
+        addPropertyConstraint(propertyConstraintMap,
+                PageAssociation.PROP_ASSOC_TYPE, associationType);
+
+        // do the lookup
+        return findObjects(PageAssociation.TYPE_ID, propertyConstraintMap);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findContentAssociations()
+     */
+    public Map<String, ModelObject> findContentAssociations()
+    {
+        return findContentAssociations(null, null, null, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findContentAssociations(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public Map<String, ModelObject> findContentAssociations(
+            String sourceId, String destId, String assocType, 
+            String formatId)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap,
+                ContentAssociation.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap,
+                ContentAssociation.PROP_DEST_ID, destId);
+        addPropertyConstraint(propertyConstraintMap,
+                ContentAssociation.PROP_ASSOC_TYPE, assocType);
+        addPropertyConstraint(propertyConstraintMap,
+                ContentAssociation.PROP_FORMAT_ID, formatId);
+
+        // do the lookup
+        return findObjects(ContentAssociation.TYPE_ID, propertyConstraintMap);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findComponents()
+     */
+    public Map<String, ModelObject> findComponents()
+    {
+        return findComponents(null, null, null, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findComponents(java.lang.String)
+     */
+    public Map<String, ModelObject> findComponents(String componentTypeId)
+    {
+        return findComponents(null, null, null, componentTypeId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findComponents(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public Map<String, ModelObject> findComponents(
+            String scope, String regionId, String sourceId, String componentTypeId)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE, scope);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_REGION_ID, regionId);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_COMPONENT_TYPE_ID, componentTypeId);
+        
+        // do the lookup
+        return findObjects(Component.TYPE_ID, propertyConstraintMap);
+    }
+
+    // helpers (for non associations)
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findTemplates()
+     */
+    public Map<String, ModelObject> findTemplates()
+    {
+        return findTemplates(null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findTemplates(java.lang.String)
+     */
+    public Map<String, ModelObject> findTemplates(String templateType)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap,
+                TemplateInstance.PROP_TEMPLATE_TYPE, templateType);
+
+        // do the lookup
+        return findObjects(TemplateInstance.TYPE_ID, propertyConstraintMap);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findTemplateTypes()
+     */
+    public Map<String, ModelObject> findTemplateTypes()
+    {
+        return findTemplateTypes(null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findTemplateTypes(java.lang.String)
+     */
+    public Map<String, ModelObject> findTemplateTypes(String uri)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap, TemplateType.PROP_URI, uri);
+
+        // do the lookup
+        return findObjects(TemplateType.TYPE_ID, propertyConstraintMap);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findComponentTypes()
+     */
+    public Map<String, ModelObject> findComponentTypes()
+    {
+        return findComponentTypes(null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findComponentTypes(java.lang.String)
+     */
+    public Map<String, ModelObject> findComponentTypes(String uri)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap, ComponentType.PROP_URI,
+                uri);
+
+        // do the lookup
+        return findObjects(ComponentType.TYPE_ID, propertyConstraintMap);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findPages()
+     */
+    public Map<String, ModelObject> findPages()
+    {
+        return findPages(null, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findPages(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public Map<String, ModelObject> findPages(String templateId, String pageTypeId)
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_TEMPLATE_INSTANCE,
+                templateId);
+        addPropertyConstraint(propertyConstraintMap, Page.PROP_PAGE_TYPE_ID,
+                pageTypeId);
+
+        // do the lookup
+        return findObjects(Page.TYPE_ID, propertyConstraintMap);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findPageTypes()
+     */
+    public Map<String, ModelObject> findPageTypes()
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+
+        // do the lookup
+        return findObjects(PageType.TYPE_ID, propertyConstraintMap);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#findThemes()
+     */
+    public Map<String, ModelObject> findThemes()
+    {
+        // build property map
+        Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
+
+        // do the lookup
+        return findObjects(Theme.TYPE_ID, propertyConstraintMap);
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#associatePage(java.lang.String, java.lang.String)
+     */
+    public void associatePage(String sourceId, String destId)
+    {
+        associatePage(sourceId, destId, "child");
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#associatePage(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void associatePage(String sourceId, String destId, String associationType)
+    {
+        // first call unassociate just to be safe
+        unassociatePage(sourceId, destId, associationType);
+
+        // create a new template association
+        PageAssociation pageAssociation = newPageAssociation();
+        pageAssociation.setSourceId(sourceId);
+        pageAssociation.setDestId(destId);
+        pageAssociation.setAssociationType(associationType);
+
+        // save the object
+        saveObject(pageAssociation);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociatePage(java.lang.String, java.lang.String)
+     */
+    public void unassociatePage(String sourceId, String destId)
+    {
+        unassociatePage(sourceId, destId, "child");
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociatePage(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unassociatePage(String sourceId, String destId, String associationTypeId)
+    {
+        Map<String, ModelObject> objects = findPageAssociations(sourceId, destId, associationTypeId);
+        Iterator it = objects.keySet().iterator();
+        while(it.hasNext())
+        {
+            String pageAssociationId = (String) it.next();
+            unassociatePage(pageAssociationId);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociatePage(java.lang.String)
+     */
+    public void unassociatePage(String pageAssociationId)
+    {
+        removeObject(Page.TYPE_ID, pageAssociationId);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#associateContent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void associateContent(String sourceId, String destId, String assocType, String formatId)
+    {
+        // first call unassociate just to be safe
+        unassociateContent(sourceId, destId, assocType, formatId);
+
+        // create a new association
+        ContentAssociation association = newContentAssociation();
+        association.setSourceId(sourceId);
+        association.setDestId(destId);
+        association.setAssociationType(assocType);
+        association.setFormatId(formatId);
+
+        // save the object
+        saveObject(association);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociateContent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void unassociateContent(String sourceId, String destId, String assocType, String formatId)
+    {
+        Map<String, ModelObject> objects = findContentAssociations(sourceId, destId, assocType, formatId);
+        Iterator it = objects.keySet().iterator();
+        while(it.hasNext())
+        {
+            String associationId = (String) it.next();
+            unassociateContent(associationId);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociateContent(java.lang.String)
+     */
+    public void unassociateContent(String objectAssociationId)
+    {
+        removeObject(ContentAssociation.TYPE_ID, objectAssociationId);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#associateTemplate(java.lang.String, java.lang.String)
+     */
+    public void associateTemplate(String templateId, String pageId)
+    {
+        associateTemplate(templateId, pageId, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#associateTemplate(java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void associateTemplate(String templateId, String pageId, String formatId)
+    {
+        Page page = getPage(pageId);
+        page.setTemplateId(templateId, formatId);
+        saveObject(page);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociateTemplate(java.lang.String)
+     */
+    public void unassociateTemplate(String pageId)
+    {
+        unassociateTemplate(pageId, null);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unassociateTemplate(java.lang.String, java.lang.String)
+     */
+    public void unassociateTemplate(String pageId, String formatId)
+    {
+        Page page = getPage(pageId);
+        page.removeTemplateId(formatId);
+        saveObject(page);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#bindComponent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+     */
+    public void bindComponent(String componentId, String scope, String regionId, String sourceId)
+    {
+        // first unassociate any existing components with these bindings
+        Map<String, ModelObject> objects = findComponents(scope, regionId, sourceId, null);
+        Iterator it = objects.keySet().iterator();
+        while(it.hasNext())
+        {
+            String id = (String) it.next();
+            unbindComponent(id);
+        }
+        
+        // get the component
+        Component component = getComponent(componentId);
+
+        // bind it
+        component.setScope(scope);
+        component.setSourceId(sourceId);
+        component.setRegionId(regionId);
+
+        // save the object
+        saveObject(component);
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unbindComponent(java.lang.String)
+     */
+    public void unbindComponent(String componentId)
+    {
+        Component component = getComponent(componentId);
+        component.setScope("");
+        component.setSourceId("");
+        component.setRegionId("");
+        saveObject(component);
+    }
+    
+    /**
+     * Creates a new property constraint map.
+     * 
+     * The map describes property constraints that should be applied
+     * when filtering the resultset.
+     * 
+     * @return the map< string, object>
+     */
+    protected Map<String, Object> newPropertyConstraintMap()
+    {
+        return new HashMap<String, Object>(8, 1.0f);        
+    }
+    
+    /**
+     * Filtering function that looks up objects of a given type id
+     * and then applies the provided property constraint map.
+     * 
+     * @param typeName the type name
+     * @param propertyConstraintMap the property constraint map
+     * 
+     * @return the map
+     */
+    protected Map<String, ModelObject> findObjects(String objectTypeId, Map<String, Object> propertyConstraintMap)
+    {
+        Map<String, ModelObject> objectsMap = null;        
+        try
+        {
+            objectsMap = getAllObjects(objectTypeId);
+            
+            List<String> toRemove = new ArrayList<String>(16);
+
+            Iterator objectsIt = objectsMap.keySet().iterator();
+            while (objectsIt.hasNext())
+            {
+                boolean success = true;
+                
+                String objectKey = (String) objectsIt.next();
+                ModelObject object = (ModelObject) objectsMap.get(objectKey);
+
+                // walk the property map and make sure all matches are satisfied
+                if (propertyConstraintMap != null)
+                {
+                    Iterator it = propertyConstraintMap.keySet().iterator();
+                    while (it.hasNext())
+                    {
+                        String propertyName = (String) it.next();
+                        Object propertyValue = propertyConstraintMap.get(propertyName);
+                        if (propertyValue != null)
+                        {
+                            // constraints
+                            if (propertyValue instanceof String)
+                            {
+                                String currentValue = (String) object.getProperty(propertyName);
+                                if (!propertyValue.equals(currentValue))
+                                {
+                                    success = false;
+                                }
+                            }
+                            if (propertyValue instanceof Boolean)
+                            {
+                                boolean currentValue = object.getBooleanProperty(propertyName);
+                                if (currentValue != ((Boolean) propertyValue).booleanValue())
+                                {
+                                    success = false;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!success)
+                {
+                    toRemove.add(objectKey);
+                }
+            }
+            
+            // remove anything we no longer want to keep
+            for (int i = 0; i < toRemove.size(); i++)
+            {
+                String objectKey = (String) toRemove.get(i);
+                objectsMap.remove(objectKey);
+            }            
+        }
+        catch (Exception ex)
+        {
+            FrameworkHelper.getLogger().fatal(ex);
+        }
+        
+        return objectsMap;
+    }
 
     /**
-     * Performs a filtered lookup of ContentAssociation objects
+     * Adds the property constraint.
      * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
-     * 
-     * @param sourceId the source id of the association
-     * @param destId the dest id of the association
-     * @param assocType the type of the association
-     * @param formatId the format id of the association
-     *  
-     * @return a map of ContentAssociation objects (keyed by object id)
-     */            
-    public Map<String, ModelObject> findContentAssociations(String sourceId, String destId, String assocType, String formatId);
-
-    /**
-     * Performs a filtered lookup of Component objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
-     * 
-     * @param scope the scope binding of the component
-     * @param regionId the regionId binding of the component
-     * @param sourceId the sourceId binding of the component
-     * @param componentTypeId the component type id of the component
-     * 
-     * @return a map of Component objects (keyed by object id)
+     * @param propertyConstraintMap the property constraint map
+     * @param propertyName the property name
+     * @param propertyValue the property value
      */
-    public Map<String, ModelObject> findComponents(String scope, String regionId, String sourceId, String componentTypeId);
-    
-    /**
-     * Performs a filtered lookup of Component objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
-     *  
-     * @param componentTypeId the component type id of the component
-     * 
-     * @return a map of Component objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findComponents(String componentTypeId);
-    
-    /**
-     * Performs a filtered lookup of Template objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter.
-     * 
-     * @param templateType the template type id of the template
-     * 
-     * @return a map of Template objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findTemplates(String templateType);
-    
-    /**
-     * Performs a filtered lookup of TemplateType objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter. 
-     * 
-     * @param uri the uri property of the template type
-     * 
-     * @return a map of TemplateType objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findTemplateTypes(String uri);    
-    
-    /**
-     * Performs a filtered lookup of ComponentType objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter. 
-     * 
-     * @param uri the uri property of the component type
-     * 
-     * @return a map of ComponentType objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findComponentTypes(String uri);
-    
-    /**
-     * Performs a filtered lookup of Page objects
-     * 
-     * The resultset is filtered against the provided arguments.
-     * If an argument is null, it is not included in the filter. 
-     * 
-     * @param templateId the template id property
-     * @param pageTypeId the page type property
-     * 
-     * @return a map of Page objects (keyed by object id)
-     */
-    public Map<String, ModelObject> findPages(String templateId, String pageTypeId);
-
-    
-    
-    /**
-     * Associates a destination page to a source page
-     * The association type is assumed to be "child"
-     * 
-     * @param sourceId the id of the source (parent) page
-     * @param destId the id of the destination (child) page
-     */
-    public void associatePage(String sourceId, String destId);
-    
-    /**
-     * Associates a destination page to a source page
-     *  
-     * @param sourceId the id of the source page
-     * @param destId the id of the destination page
-     * @param associationType the association type (i.e. "child")
-     */
-    public void associatePage(String sourceId, String destId, String associationType);
-    
-    /**
-     * Unassociates a destination page from a source page
-     * The association type is assumed to be "child"
-     * 
-     * @param sourceId the id of the source page
-     * @param destId the id of the destination page
-     */
-    public void unassociatePage(String sourceId, String destId);
-    
-    /**
-     * Unassociates a destination page from a source page
-     * 
-     * @param sourceId the id of the source page
-     * @param destId the id of the destination page
-     * @param associationTypeId the association type (i.e. "child")
-     */
-    public void unassociatePage(String sourceId, String destId, String associationTypeId);
-    
-    /**
-     * Unassociates a destination page from a source page
-     * 
-     * @param pageAssociationId the id of the page association object
-     */
-    public void unassociatePage(String pageAssociationId);
-    
-    /**
-     * Associates a source content item to a destination page
-     *  
-     * @param sourceId the content item id
-     * @param destId the page id
-     * @param assocType the association type
-     * @param formatId the format id
-     */    
-    public void associateContent(String sourceId, String destId, String assocType, String formatId);
-    
-    /**
-     * Unassociates a source content item from a destination page
-     * 
-     * @param sourceId the content item id
-     * @param destId the page id
-     * @param assocType the association type
-     * @param formatId the format id
-     */
-    public void unassociateContent(String sourceId, String destId, String assocType, String formatId);
-    
-    /**
-     * Unassociates a source content item from a destination page
-     * 
-     * @param objectAssociationId the id of the content association object
-     */
-    public void unassociateContent(String objectAssociationId);
-    
-    /**
-     * Associates a template to a page using the default format
-     * 
-     * @param templateId the id of the template
-     * @param pageId the id of the page
-     */
-    public void associateTemplate(String templateId, String pageId);
-    
-    /**
-     * Associates a template to a page for a given format
-     * 
-     * @param templateId the id of the template
-     * @param pageId the id of the page
-     * @param formatId the id of the format
-     */
-    public void associateTemplate(String templateId, String pageId, String formatId);
-    
-    /**
-     * Unassociates a template from a page using the default format
-     * 
-     * @param pageId the id of the page
-     */
-    public void unassociateTemplate(String pageId);
-    
-    /**
-     * Unassociates a template from a page for a given format
-     * @param pageId
-     * @param formatId
-     */
-    public void unassociateTemplate(String pageId, String formatId);
-    
-    /**
-     * Binds a component into a page, template or site
-     * 
-     * @param componentId the component id
-     * @param scope the scope id
-     * @param sourceId the source id
-     * @param regionId the region id
-     */
-    public void bindComponent(String componentId, String scope, String sourceId, String regionId);
-    
-    /**
-     * Unbinds a component from a page, template or site
-     * 
-     * @param componentId the component id
-     */
-    public void unbindComponent(String componentId);
-    
-    /**
-     * Returns the model object manager instance that this model is using
-     * 
-     * @return
-     */
-    public ModelObjectManager getObjectManager();
+    protected void addPropertyConstraint(Map propertyConstraintMap,
+            String propertyName, Object propertyValue)
+    {
+        if (propertyValue != null)
+        {
+            propertyConstraintMap.put(propertyName, propertyValue);
+        }
+    }
 }
