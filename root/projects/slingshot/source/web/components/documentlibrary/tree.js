@@ -117,6 +117,14 @@
       currentPath: "",
 
       /**
+       * Tracks if this component is the active filter owner.
+       * 
+       * @property isFilterOwner
+       * @type boolean
+       */
+      isFilterOwner: false,
+
+      /**
        * The YUI TreeView widget.
        * 
        * @property treeview
@@ -227,7 +235,7 @@
                         }
                      }
                   }
-
+                  
                   /**
                   * Execute the node's loadComplete callback method which comes in via the argument
                   * in the response object
@@ -238,7 +246,11 @@
                // If the XHR call is not successful, fire the TreeView callback anyway
                failure: function DLT_lND_failure(oResponse)
                {
-                  oResponse.argument.fnLoadComplete();
+                  if (oResponse.status == 401)
+                  {
+                     // Our session has likely timed-out, so refresh to offer the login page
+                     window.location.reload();
+                  }
                },
 
                // XHR response argument information
@@ -282,6 +294,8 @@
       {
          // Make sure the tree's Dom has been updated
          this.treeview.draw();
+         // Redrawing the tree will clear the highlight
+         this._showHighlight(true);
          
          if (this.pathsToExpand.length > 0)
          {
@@ -290,7 +304,7 @@
             {
                if (node.data.path == this.currentPath)
                {
-                  this.selectedNode = node;
+                  this._updateSelectedNode(node);
                }
                node.expand();
             }
@@ -318,15 +332,7 @@
        */
       onNodeClicked: function DLT_onNodeClicked(node)
       {
-         var Dom = YAHOO.util.Dom;
-
-         // Update the current selected node highlight
-         if (this.selectedNode !== null)
-         {
-            Dom.removeClass(this.selectedNode.getEl(), "selected");
-         }
-         this.selectedNode = node;
-         Dom.addClass(this.selectedNode.getEl(), "selected");
+         this._updateSelectedNode(node);
          
          // Fire the filter changed event
          YAHOO.Bubbling.fire("filterChanged",
@@ -380,7 +386,7 @@
             if (node !== null)
             {
                // Node found
-               this.selectedNode = node;
+               this._updateSelectedNode(node);
                node.expand();
                while (node.parent !== null)
                {
@@ -433,6 +439,7 @@
                // Node found, so rename it
                node.label = obj.name;
                this.treeview.draw();
+               this._showHighlight(true);
             }
          }
       },
@@ -477,9 +484,19 @@
             var node = this.treeview.getNodeByProperty("path", obj.path);
             if (node !== null)
             {
+               var parentNode = node.parent;
                // Node found, so delete it
                this.treeview.removeNode(node);
+               // Have all the parent child nodes been removed now?
+               if (parentNode != null)
+               {
+                  if (!parentNode.hasChildren())
+                  {
+                     parentNode.isLeaf = true;
+                  }
+               }
                this.treeview.draw();
+               this._showHighlight(true);
             }
          }
       },
@@ -506,20 +523,8 @@
                return;
             }
 
-            var Dom = YAHOO.util.Dom;
-            if (this.selectedNode !== null)
-            {
-               if (obj.filterOwner == this.name)
-               {
-                  // We're back filtering by path
-                  Dom.addClass(this.selectedNode.getEl(), "selected");
-               }
-               else
-               {
-                  // Currently filtering by something other than path
-                  Dom.removeClass(this.selectedNode.getEl(), "selected");
-               }
-            }
+            this.isFilterOwner = (obj.filterOwner == this.name);
+            this._showHighlight(this.isFilterOwner);
          }
       },
 
@@ -623,7 +628,9 @@
                            
                            if (kids.length == 0)
                            {
-                              tempNode.appendTo(oResponse.argument.node);
+                              var parentNode = oResponse.argument.node;
+                              parentNode.isLeaf = false;
+                              tempNode.appendTo(parentNode);
                            }
                            else if (kids.length > i)
                            {
@@ -639,6 +646,7 @@
                   
                   // Update the tree
                   this.treeview.draw();
+                  this._showHighlight(true);
                   
                   // Execute the onSortComplete callback
                   var callback = oResponse.argument.onSortComplete;
@@ -669,6 +677,35 @@
 
          // Make the XHR call using Connection Manager's asyncRequest method
          YAHOO.util.Connect.asyncRequest('GET', uri, callback);
+      },
+
+      _showHighlight: function DLT__showHighlight(isVisible)
+      {
+         if (this.selectedNode !== null)
+         {
+            if (isVisible)
+            {
+               YAHOO.util.Dom.addClass(this.selectedNode.getEl(), "selected");
+            }
+            else
+            {
+               YAHOO.util.Dom.removeClass(this.selectedNode.getEl(), "selected");
+            }
+         }
+      },
+      
+      _updateSelectedNode: function DLT__updateSelectedNode(node)
+      {
+         if (this.isFilterOwner)
+         {
+            this._showHighlight(false);
+            this.selectedNode = node;
+            this._showHighlight(true);
+         }
+         else
+         {
+            this.selectedNode = node;
+         }
       }
 
    };

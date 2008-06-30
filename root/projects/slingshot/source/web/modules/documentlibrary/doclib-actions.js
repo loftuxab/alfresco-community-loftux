@@ -148,7 +148,7 @@
        * ACTION: Checkout file.
        * Checks out a working copy file from the component container, given filepath
        *
-       * @method checkoutFile
+       * @method editFileOffline
        * @param site {string} current site
        * @param containerId {string} component container
        * @param path {string} path where file is located
@@ -156,7 +156,7 @@
        * @param obj {object} optional additional request configuration
        * @return {boolean} false: module not ready
        */
-      checkoutFile: function DLA_checkoutFile(site, containerId, path, file, obj)
+      editFileOffline: function DLA_editFileOffline(site, containerId, path, file, obj)
       {
          var filePath =  path + "/" + file;
          
