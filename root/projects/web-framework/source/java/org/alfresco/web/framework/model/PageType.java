@@ -25,7 +25,7 @@
 package org.alfresco.web.framework.model;
 
 import org.alfresco.web.framework.AbstractModelObject;
-import org.alfresco.web.framework.ModelObjectKey;
+import org.alfresco.web.framework.ModelPersisterInfo;
 import org.dom4j.Document;
 
 /**
@@ -47,9 +47,9 @@ public class PageType extends AbstractModelObject
      * 
      * @param document the document
      */
-    public PageType(ModelObjectKey key, Document document)
+    public PageType(String id, ModelPersisterInfo key, Document document)
     {
-        super(key, document);
+        super(id, key, document);
     }
     
     /* (non-Javadoc)

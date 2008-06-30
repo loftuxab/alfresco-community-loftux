@@ -39,7 +39,7 @@ public interface ModelObject extends Serializable
      * 
      * @return
      */
-    public ModelObjectKey getKey();
+    public ModelPersisterInfo getKey();
     
 	/**
 	 * Returns the id of the model object.

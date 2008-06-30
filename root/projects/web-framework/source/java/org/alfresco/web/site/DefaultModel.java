@@ -81,9 +81,9 @@ public class DefaultModel extends AbstractModel
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#getComponent(java.lang.String, java.lang.String, java.lang.String)
      */
-    public Component getComponent(String scopeId, String regionId, String sourceId)
+    public Component getComponent(String scope, String regionId, String sourceId)
     {
-        String componentId = Component.generateId(scopeId, regionId, sourceId);
+        String componentId = Component.generateId(scope, regionId, sourceId);
         return getComponent(componentId);
     }
     
@@ -197,17 +197,18 @@ public class DefaultModel extends AbstractModel
     /**
      * Creates a new Component object
      * 
-     * @param scopeId the scope
+     * @param scope    the scope
      * @param regionId the region id
      * @param sourceId the source id
+     * 
      * @return the object
      */
-    public Component newComponent(String scopeId, String regionId, String sourceId)
+    public Component newComponent(String scope, String regionId, String sourceId)
     {
-        String componentId = Component.generateId(scopeId, regionId, sourceId);
+        String componentId = Component.generateId(scope, regionId, sourceId);
         
         Component component = newComponent(componentId);
-        component.setScope(scopeId);
+        component.setScope(scope);
         component.setRegionId(regionId);
         component.setSourceId(sourceId);
         
@@ -542,20 +543,16 @@ public class DefaultModel extends AbstractModel
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#findComponents(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
-    public Map<String, ModelObject> findComponents(String scope, String sourceId,
-            String regionId, String componentTypeId)
+    public Map<String, ModelObject> findComponents(
+            String scope, String regionId, String sourceId, String componentTypeId)
     {
         // build property map
         Map<String, Object> propertyConstraintMap = newPropertyConstraintMap();
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE,
-                scope);
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID,
-                sourceId);
-        addPropertyConstraint(propertyConstraintMap, Component.PROP_REGION_ID,
-                regionId);
-        addPropertyConstraint(propertyConstraintMap,
-                Component.PROP_COMPONENT_TYPE_ID, componentTypeId);
-
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_SCOPE, scope);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_REGION_ID, regionId);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_SOURCE_ID, sourceId);
+        addPropertyConstraint(propertyConstraintMap, Component.PROP_COMPONENT_TYPE_ID, componentTypeId);
+        
         // do the lookup
         return findObjects(Component.TYPE_ID, propertyConstraintMap);
     }
@@ -675,11 +672,6 @@ public class DefaultModel extends AbstractModel
     }
     
     
-    
-    
-    
-    
-
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#associatePage(java.lang.String, java.lang.String)
      */
@@ -816,10 +808,10 @@ public class DefaultModel extends AbstractModel
     /* (non-Javadoc)
      * @see org.alfresco.web.site.Model#bindComponent(java.lang.String, java.lang.String, java.lang.String, java.lang.String)
      */
-    public void bindComponent(String componentId, String scope, String sourceId, String regionId)
+    public void bindComponent(String componentId, String scope, String regionId, String sourceId)
     {
         // first unassociate any existing components with these bindings
-        Map<String, ModelObject> objects = findComponents(scope, sourceId, regionId, null);
+        Map<String, ModelObject> objects = findComponents(scope, regionId, sourceId, null);
         Iterator it = objects.keySet().iterator();
         while(it.hasNext())
         {

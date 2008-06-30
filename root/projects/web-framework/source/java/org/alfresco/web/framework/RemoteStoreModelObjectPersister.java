@@ -152,7 +152,7 @@ public class RemoteStoreModelObjectPersister extends StoreModelObjectPersister
             remoteStore.unbind();
         }
         
-        return obj;        
+        return obj;
     }
         
     /* (non-Javadoc)

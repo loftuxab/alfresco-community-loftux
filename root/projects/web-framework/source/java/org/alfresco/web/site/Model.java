@@ -480,13 +480,13 @@ public interface Model
      * If an argument is null, it is not included in the filter.
      * 
      * @param scope the scope binding of the component
-     * @param sourceId the sourceId binding of the component
      * @param regionId the regionId binding of the component
+     * @param sourceId the sourceId binding of the component
      * @param componentTypeId the component type id of the component
      * 
      * @return a map of Component objects (keyed by object id)
      */
-    public Map<String, ModelObject> findComponents(String scope, String sourceId, String regionId, String componentTypeId);
+    public Map<String, ModelObject> findComponents(String scope, String regionId, String sourceId, String componentTypeId);
     
     /**
      * Performs a filtered lookup of Component objects

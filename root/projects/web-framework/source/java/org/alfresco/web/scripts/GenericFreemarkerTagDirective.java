@@ -126,7 +126,6 @@ public final class GenericFreemarkerTagDirective extends FreemarkerTagSupportDir
         {
             String output = executeTag(tag, bodyContentString);
             env.getOut().write(output);
-            env.getOut().flush();
         }
         catch(Exception ex)
         {

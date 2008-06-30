@@ -154,7 +154,7 @@ public final class ModelObjectManager
         
         // get the default persister for this object type
         ModelObjectPersister persister = this.service.getDefaultPersister(objectTypeId);
-        if(persister != null)
+        if (persister != null)
         {
             try
             {
@@ -185,7 +185,7 @@ public final class ModelObjectManager
         
         // get the default persister for this object type
         ModelObjectPersister persister = this.service.getDefaultPersister(objectTypeId);        
-        if(persister != null)
+        if (persister != null)
         {
             String objectId = newGUID();
             try
@@ -212,7 +212,7 @@ public final class ModelObjectManager
         boolean saved = false;
         
         ModelObjectPersister persister = this.service.getPersisterById(object.getPersisterId());
-        if(persister != null)
+        if (persister != null)
         {
             try
             {

@@ -271,7 +271,7 @@ public final class ScriptSiteData extends ScriptBase
      * 
      * The id for the instance is generated using the Web Framework's Random
      * GUID generator. The scope, region and sourceId parameters should be
-     * explicitly set before the component is persisted.
+     * explicitly set before the component is persisted!
      * 
      * @return A ScriptModelObject representing the new instance
      */
@@ -286,7 +286,7 @@ public final class ScriptSiteData extends ScriptBase
      * 
      * The id for the instance is generated using the Web Framework's Random
      * GUID generator. The scope, region and sourceId parameters should be
-     * explicitly set before the component is persisted.
+     * explicitly set before the component is persisted!
      * 
      * @param componentTypeId   The id of the ComponentType which describes 
      *                          the type of this component
@@ -306,18 +306,22 @@ public final class ScriptSiteData extends ScriptBase
      * Creates a new Component instance of the given component type. The ID is
      * generated from the supplied scope, region and sourceId parameters.
      * 
-     * @param componentTypeId   The id of the ComponentType which describes 
-     *                          the type of this component.
+     * @param scope         Scope - one of "global", "template" or "page"
+     * @param regionId      The id of the region to bind too
+     * @param sourceId      The source ID for the given scope
      * 
      * @return A ScriptModelObject representing the new instance
      */    
-    public ScriptModelObject newComponent(String scope, String region, String sourceId)
+    public ScriptModelObject newComponent(String scope, String regionId, String sourceId)
     {
         ParameterCheck.mandatory("scope", scope);
-        ParameterCheck.mandatory("region", region);
+        ParameterCheck.mandatory("regionId", regionId);
         ParameterCheck.mandatory("sourceId", sourceId);
         
-        Component component = (Component) getModel().newComponent(scope, region, sourceId);
+        Component component = (Component) getModel().newComponent(scope, regionId, sourceId);
+        component.setScope(scope);
+        component.setRegionId(regionId);
+        component.setSourceId(sourceId);
         return ScriptHelper.toScriptModelObject(context, component);
     }
     
@@ -327,18 +331,24 @@ public final class ScriptSiteData extends ScriptBase
      * 
      * @param componentTypeId   The id of the ComponentType which describes 
      *                          the type of this component.
+     * @param scope         Scope - one of "global", "template" or "page"
+     * @param regionId      The id of the region to bind too
+     * @param sourceId      The source ID for the given scope
      * 
      * @return A ScriptModelObject representing the new instance
      */    
-    public ScriptModelObject newComponent(String componentTypeId, String scope, String region, String sourceId)
+    public ScriptModelObject newComponent(String componentTypeId, String scope, String regionId, String sourceId)
     {
         ParameterCheck.mandatory("componentTypeId", componentTypeId);
         ParameterCheck.mandatory("scope", scope);
-        ParameterCheck.mandatory("region", region);
+        ParameterCheck.mandatory("regionId", regionId);
         ParameterCheck.mandatory("sourceId", sourceId);
         
-        Component component = (Component) getModel().newComponent(scope, region, sourceId);
+        Component component = (Component) getModel().newComponent(scope, regionId, sourceId);
         component.setComponentTypeId(componentTypeId);
+        component.setScope(scope);
+        component.setRegionId(regionId);
+        component.setSourceId(sourceId);
         return ScriptHelper.toScriptModelObject(context, component);
     }
 
@@ -502,17 +512,17 @@ public final class ScriptSiteData extends ScriptBase
      * match the provided constraints.  If a constraint is set to null, 
      * it is not considered as part of the search.
      * 
-     * @param scopeId   The value of the "scopeId" property of the instance
+     * @param scope     The value of the "scope" property of the instance
+     * @param regionId  The value of the "region" property of the instance
      * @param sourceId  The value of the "sourceId" property of the instance
-     * @param regionId  The value of the "regionId" property of the instance
      * @param componentTypeId   The value of the "componentTypeId" property of the instance
      * 
      * @return  An array of ScriptModelObject instances that wrap the
      *          Component results of the search
      */
-    public Object[] findComponents(String scopeId, String sourceId, String regionId, String componentTypeId)
+    public Object[] findComponents(String scope, String regionId, String sourceId, String componentTypeId)
     {
-        Map<String, ModelObject> objects = getModel().findComponents(scopeId, sourceId, regionId, componentTypeId);
+        Map<String, ModelObject> objects = getModel().findComponents(scope, regionId, sourceId, componentTypeId);
         return ScriptHelper.toScriptModelObjectArray(context, objects);
     }
 
@@ -577,18 +587,17 @@ public final class ScriptSiteData extends ScriptBase
      * Provides a map of ScriptModelObjects that wrap Component instances.
      * The map is keyed by Component object id.
      * 
-     * @param scopeId   The value of the "sourceId" property of the instance 
+     * @param scope      The value of the "source" property of the instance 
+     * @param regionId   The value of the "regionId" property of the instance
      * @param sourceId   The value of the "sourceId" property of the instance
-     * @param regionId  The value of the "regionId" property of the instance
      * @param componentTypeId  The value of the "componentTypeId" property of the instance
      * 
      * @return  An array of ScriptModelObject instances that wrap the
      *          Component results of the search
      */            
-    public Scriptable findComponentsMap(String scopeId, String sourceId, String regionId, String componentTypeId)
+    public Scriptable findComponentsMap(String scope, String regionId, String sourceId, String componentTypeId)
     {
-        Map<String, ModelObject> objects = getModel().findComponents(scopeId,
-                sourceId, regionId, componentTypeId);
+        Map<String, ModelObject> objects = getModel().findComponents(scope, regionId, sourceId, componentTypeId);
         return ScriptHelper.toScriptableMap(context, objects);
     }
 
@@ -741,10 +750,9 @@ public final class ScriptSiteData extends ScriptBase
     
     // Create and Remove Associations
 
-    public void bindComponent(String componentId, String scopeId,
-            String sourceId, String regionId)
+    public void bindComponent(String componentId, String scope, String regionId, String sourceId)
     {
-        getModel().bindComponent(componentId, scopeId, sourceId, regionId);
+        getModel().bindComponent(componentId, scope, regionId, sourceId);
     }
 
     public void unbindComponent(String componentId)

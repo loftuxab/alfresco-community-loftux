@@ -25,7 +25,7 @@
 package org.alfresco.web.framework.model;
 
 import org.alfresco.web.framework.AbstractModelObject;
-import org.alfresco.web.framework.ModelObjectKey;
+import org.alfresco.web.framework.ModelPersisterInfo;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.WebFrameworkConstants;
@@ -61,9 +61,9 @@ public class Component extends AbstractModelObject
      * 
      * @param document the document
      */
-    public Component(ModelObjectKey key, Document document)
+    public Component(String id, ModelPersisterInfo key, Document document)
     {
-        super(key, document);
+        super(id, key, document);
     }
 
     /**
@@ -278,7 +278,7 @@ public class Component extends AbstractModelObject
     public static String generateId(String scopeId, String regionId, String sourceId)
     {
         String id = scopeId + "." + regionId;
-        if(!WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+        if (!WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
         {
             id += "." + sourceId;
         }
@@ -286,7 +286,7 @@ public class Component extends AbstractModelObject
     }
     
     /**
-     * Regener
+     * Regenerate the ID for this component
      */
     protected void regenerateId()
     {
