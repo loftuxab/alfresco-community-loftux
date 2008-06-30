@@ -1056,6 +1056,7 @@
          {
             scrollable: true,
             height: "1px",
+            width: "620px",
             renderLoopSize: 5
          });
          this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
