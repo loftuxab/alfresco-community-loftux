@@ -73,7 +73,7 @@ public class JSONReader implements FormatReader<Object>
         Object result = null;
         try
         {
-            String jsonString = req.getContent().getContent();
+            String jsonString = content.getContent();
             if (jsonString.startsWith("[") == true)
             {
                 result = new JSONArray(jsonString);
