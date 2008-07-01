@@ -136,7 +136,7 @@
          // we can directly go to alfresco for this
          Alfresco.util.Ajax.request(
 		   {
-		      url: Alfresco.constants.PROXY_URI + "forum/post/node/" + this.convertSaveToUrlRef(saveCommentRef),
+		      url: Alfresco.constants.PROXY_URI + "/comment/node/" + this.convertSaveToUrlRef(saveCommentRef),
 		      method: "DELETE",
 		      responseContentType : "application/json",
 		      successCallback:
