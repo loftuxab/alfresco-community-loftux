@@ -151,17 +151,17 @@ function associateSiteComponent(component, regionId)
 
 function associateGlobalComponent(component, regionId)
 {
-	sitedata.bindComponent(component.getId(), "global", "global", regionId);
+	sitedata.bindComponent(component.getId(), "global", regionId, "global");
 }
 
 function associateTemplateComponent(component, template, regionId)
 {
-	sitedata.bindComponent(component.getId(), "template", template.getId(), regionId);
+	sitedata.bindComponent(component.getId(), "template", regionId, template.getId());
 }
 
 function associatePageComponent(component, page, regionId)
 {	
-	sitedata.bindComponent(component.getId(), "page", page.getId(), regionId);
+	sitedata.bindComponent(component.getId(), "page", regionId, page.getId());
 }
 
 function setConfig(o, propertyName, propertyValue)

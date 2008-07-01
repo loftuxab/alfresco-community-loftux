@@ -37,8 +37,6 @@ import java.io.OutputStream;
  */
 public class DataUtil
 {
-    
-    /** The BUFFE r_ size. */
     public static int BUFFER_SIZE = 4 * 1024;
 
     /**

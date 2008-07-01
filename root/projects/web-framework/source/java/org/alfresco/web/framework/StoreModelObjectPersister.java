@@ -97,8 +97,13 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public ModelObject getObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
-        String path = idToPath(objectId);
-        return getObjectByPath(context, path);
+        ModelObject modelObject = null;
+        if(objectId != null)
+        {
+            String path = idToPath(objectId);
+            modelObject = getObjectByPath(context, path);
+        }
+        return modelObject;
     }
     
     /**
@@ -274,8 +279,15 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public boolean removeObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException    
     {
-        String path = this.idToPath(objectId);
-        return removeObjectByPath(context, path);
+        boolean removed = false;
+        
+        if(objectId != null)
+        {
+            String path = this.idToPath(objectId);
+            removed = removeObjectByPath(context, path);
+        }
+        
+        return removed;
     }
     
     /**
@@ -317,6 +329,11 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public ModelObject newObject(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
+        if(objectId == null)
+        {
+            throw new ModelObjectPersisterException("Cannot create object with null object id");
+        }
+        
         // create the minimum XML - nodes will be added using DOM methods to it
         String xml = "<" + this.objectTypeId + "></" + this.objectTypeId + ">";
         
@@ -364,8 +381,15 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
      */
     public boolean hasObject(ModelPersistenceContext context, String objectId)
     {
-        String path = this.idToPath(objectId);
-        return hasObjectByPath(context, path);
+        boolean has = false;
+        
+        if(objectId != null)
+        {
+            String path = this.idToPath(objectId);
+            has = hasObjectByPath(context, path);
+        }
+        
+        return has;
     }  
 
     /**
@@ -408,6 +432,11 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
     public long getTimestamp(ModelPersistenceContext context, String objectId)
         throws ModelObjectPersisterException
     {
+        if(objectId == null)
+        {
+            throw new ModelObjectPersisterException("Cannot check timestamp for null object id");
+        }
+        
         String path = this.idToPath(objectId);
         return getTimestampByPath(context, path);
     }

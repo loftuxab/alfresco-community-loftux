@@ -34,6 +34,7 @@ import org.alfresco.web.site.RequestContext;
 
 /**
  * Represents the credential vault to the script engine
+ * This exposes credentials from the vault which are "user" managed
  * 
  * @author muzquiano
  */
@@ -69,7 +70,7 @@ public final class ScriptCredentialVault extends ScriptBase
             for(int i = 0; i < ids.length; i++)
             {
                 Credentials credentials = this.vault.retrieve(ids[i]);
-                ScriptCredentials scriptCredentials = new ScriptCredentials(this.context, this.vault, credentials);
+                ScriptCredentials scriptCredentials = new ScriptCredentials(this.context, this.vault, credentials, true);
                 this.properties.put(ids[i], scriptCredentials);
             }
         }

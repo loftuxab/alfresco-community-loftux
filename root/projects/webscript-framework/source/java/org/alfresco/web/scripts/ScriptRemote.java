@@ -33,6 +33,8 @@ import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * Root-scope class that provides useful functions for working with endpoints,
@@ -181,73 +183,109 @@ public class ScriptRemote
     }
 
     /**
-     * Useful in a script should you wish to list the ids of available
-     * endpoints.
+     * Returns a list of the application endpoint ids
      * 
      * @return
      */
-    public String[] getEndpointIds()
+    public Scriptable getEndpointIds()
     {
-        String[] endpointIds = new String[] { };
+        Scriptable scriptable = null;
         
         RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
                 "Remote").getConfigElement("remote");
         if(remoteConfig != null)
         {
-            endpointIds = remoteConfig.getEndpointIds();
+            String[] endpointIds = remoteConfig.getEndpointIds();
+            scriptable = toScriptableArray(null, endpointIds);
         }
         
-        return endpointIds;
+        return scriptable;
     }
-
+    
     /**
-     * Useful in a script to retrieve the formal display name of a given
-     * endpoint.
+     * Returns the name of an endpoint
      * 
      * @param id
      * @return
      */
     public String getEndpointName(String id)
     {
+        String name = null;
+        
         RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
                 "Remote").getConfigElement("remote");
-        if (remoteConfig == null)
+        if(remoteConfig != null)
         {
-            return null;
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if(descriptor != null)
+            {
+                name = descriptor.getName();
+            }
         }
 
-        EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-        if (descriptor == null)
-        {
-            return null;
-        }
-
-        return descriptor.getName();
+        return name;
     }
 
     /**
-     * Useful in a script to retrieve the formal description of a given
-     * endpoint.
+     * Returns the description of an endpoint
      * 
      * @param id
      * @return
      */
     public String getEndpointDescription(String id)
     {
+        String description = null;
+        
         RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
                 "Remote").getConfigElement("remote");
-        if (remoteConfig == null)
+        if(remoteConfig != null)
         {
-            return null;
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if(descriptor != null)
+            {
+                description = descriptor.getDescription();
+            }
         }
 
-        EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-        if (descriptor == null)
+        return description;
+    }    
+
+    public boolean isEndpointPersistent(String id)
+    {
+        boolean persistent = false;
+        
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
+                "Remote").getConfigElement("remote");
+        if(remoteConfig != null)
         {
-            return null;
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if(descriptor != null)
+            {
+                persistent = descriptor.getPersistent();
+            }
         }
 
-        return descriptor.getDescription();
+        return persistent;
+    }    
+    
+    /**
+     * Converts a given array to a Scriptable array that can be traversed
+     * by the script and Freemarker engines
+     * 
+     * @param scope the scope
+     * @param elements the elements
+     * 
+     * @return the scriptable
+     */
+    protected static Scriptable toScriptableArray(Scriptable scope, String[] elements)
+    {
+        Object[] array = new Object[elements.length];
+        for (int i = 0; i < elements.length; i++)
+        {
+            array[i] = elements[i];
+        }
+
+        return Context.getCurrentContext().newArray(scope, array);
     }    
     
 }

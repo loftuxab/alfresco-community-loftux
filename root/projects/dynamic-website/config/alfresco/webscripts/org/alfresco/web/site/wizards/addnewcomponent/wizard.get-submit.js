@@ -34,7 +34,7 @@ save(component);
 // associate the component to the region
 //
 var componentId = component.getId();
-sitedata.associateComponent(componentId, regionScopeId, regionSourceId, regionId);
+sitedata.bindComponent(componentId, regionScopeId, regionId, regionSourceId);
 
 
 

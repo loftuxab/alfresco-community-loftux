@@ -84,7 +84,7 @@ if(proceed)
 	
 	if(component != null)
 	{
-		sitedata.associateComponent(componentId, regionScopeId, regionSourceId, regionId);		
+		sitedata.bindComponent(componentId, regionScopeId, regionId, regionSourceId);		
 	}
 }
 

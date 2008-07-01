@@ -79,4 +79,14 @@ public interface Credentials
      * @return array of property keys
      */
     public String[] getPropertyKeys();
+    
+    /**
+     * Returns whether this credential is persistent
+     * 
+     * A persistent credential is written to a persistent vault.
+     * A non-persistent credential is loaded into the vault but never stored
+     * 
+     * @return
+     */
+    public boolean isPersistent();    
 }

@@ -65,6 +65,7 @@ public final class FrameworkHelper
     private static UserFactory userFactory = null;
     private static RequestContextFactory requestContextFactory = null;
     private static boolean isInitialized = false;
+    private static String realPath;
     
     
     /**
@@ -97,6 +98,13 @@ public final class FrameworkHelper
             remoteConfig = (RemoteConfigElement)config.getConfigElement("remote");
             config = getConfigService().getConfig("WebFramework");
             webFrameworkConfig = (WebFrameworkConfigElement)config.getConfigElement("web-framework");
+            
+            // store the real path to the servlet context
+            realPath = servletContext.getRealPath("/");
+            if(realPath != null && realPath.endsWith(java.io.File.separator))
+            {
+                realPath = realPath.substring(0, realPath.length() - 1);
+            }
             
             
             /**
@@ -139,7 +147,7 @@ public final class FrameworkHelper
             {
                 throw new FrameworkInitializationException("RequestContextFactory failed.", re);
             }
-            
+                        
             
             isInitialized = true;
             logger.info("Successfully Initialized Web Framework");
@@ -180,6 +188,20 @@ public final class FrameworkHelper
     public static WebFrameworkService getWebFrameworkService()
     {
         return webFrameworkService;
+    }
+    
+    public static String getRealPath(String path)
+    {
+        String newPath = path;
+        if(realPath != null)
+        {
+            newPath = realPath + path;
+            
+            // clean up the paths
+            newPath = newPath.replace("/", java.io.File.separator);
+            newPath = newPath.replace("\\", java.io.File.separator);            
+        }
+        return newPath;
     }
         
     public static Log getLogger()
