@@ -167,7 +167,7 @@
          Alfresco.util.Ajax.request(
 		   {
 		       // PENDING: needs cleanup
-		      url: Alfresco.constants.PROXY_URI + "discussions/topic/site/" + this.options.siteId + "/discussions/" + this.options.topicId,
+		      url: Alfresco.constants.PROXY_URI + "/forum/post/site/" + this.options.siteId + "/discussions/" + this.options.topicId,
 		      method: "DELETE",
 		      responseContentType : "application/json",
 		      /*dataObj:
