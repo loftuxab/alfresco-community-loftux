@@ -45,10 +45,11 @@ import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
  */
 public class SimpleCredentialVault implements CredentialVault, Serializable
 {
-    public final Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(8, 1.0f);
+    public String id;
+    public Map<String, Credentials> credentialsMap = new HashMap<String, Credentials>(8, 1.0f);
+    
     public final CredentialVaultDescriptor descriptor;
-    public final String id;
-
+    
     /**
      * Instantiates a new simple credential vault.
      * 

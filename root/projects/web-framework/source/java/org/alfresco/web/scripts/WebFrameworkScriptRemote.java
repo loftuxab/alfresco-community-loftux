@@ -47,7 +47,7 @@ import org.apache.commons.logging.LogFactory;
  * 
  * @author muzquiano
  */
-public final class WebFrameworkScriptRemote
+public class WebFrameworkScriptRemote
 {
     private static final Log logger = LogFactory.getLog(WebFrameworkScriptRemote.class);
     
@@ -184,4 +184,91 @@ public final class WebFrameworkScriptRemote
     {
     	return this.connect().call(uri);
     }
+    
+    
+    
+    /**
+     * Returns a list of the application endpoint ids
+     * 
+     * @return
+     */
+    public String[] getEndpointIds()
+    {
+        String[] endpointIds = null;
+        
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
+                "Remote").getConfigElement("remote");
+        if(remoteConfig != null)
+        {
+            endpointIds = remoteConfig.getEndpointIds();
+        }
+        
+        return endpointIds;
+    }
+    
+    /**
+     * Returns the name of an endpoint
+     * 
+     * @param id
+     * @return
+     */
+    public String getEndpointName(String id)
+    {
+        String name = null;
+        
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
+                "Remote").getConfigElement("remote");
+        if(remoteConfig != null)
+        {
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if(descriptor != null)
+            {
+                name = descriptor.getName();
+            }
+        }
+
+        return name;
+    }
+
+    /**
+     * Returns the description of an endpoint
+     * 
+     * @param id
+     * @return
+     */
+    public String getEndpointDescription(String id)
+    {
+        String description = null;
+        
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
+                "Remote").getConfigElement("remote");
+        if(remoteConfig != null)
+        {
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if(descriptor != null)
+            {
+                description = descriptor.getDescription();
+            }
+        }
+
+        return description;
+    }    
+
+    public boolean isEndpointPersistent(String id)
+    {
+        boolean persistent = false;
+        
+        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
+                "Remote").getConfigElement("remote");
+        if(remoteConfig != null)
+        {
+            EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
+            if(descriptor != null)
+            {
+                persistent = descriptor.getPersistent();
+            }
+        }
+
+        return persistent;
+    }        
 }

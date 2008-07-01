@@ -281,7 +281,11 @@ public class ConnectorService implements ApplicationListener
                     // store credentials in vault if we persisting against a user session
                     if (session != null)
                     {
-                        getCredentialVault(session, username).store(credentials);
+                        CredentialVault v = getCredentialVault(session, username);
+                        if(v != null)
+                        {
+                            v.store(credentials);
+                        }
                     }
                 }
                 connector.setCredentials(credentials);

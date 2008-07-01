@@ -7,7 +7,7 @@ if(componentId != null)
 	var component = sitedata.getObject(componentId);
 	if(component != null)
 	{
-		sitedata.unassociateComponent(componentId);
+		sitedata.unbindComponent(componentId);
 	}
 }
 

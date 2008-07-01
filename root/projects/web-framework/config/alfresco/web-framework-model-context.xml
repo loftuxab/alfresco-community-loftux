@@ -16,7 +16,7 @@
    
    <bean id="webframework.localstore" class="org.alfresco.web.scripts.LocalFileSystemStore" abstract="true" init-method="init">
       <property name="root">
-         <value>/web-framework</value>
+         <value>./WEB-INF/classes/alfresco</value>
       </property>
    </bean>
    

@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.web.site.FrameworkHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -53,6 +54,15 @@ public class LocalFileSystemStore implements Store
     private String root;
     private String path;
     private File rootDir;
+    
+    protected File getRootDir()
+    {
+        if(rootDir == null && FrameworkHelper.isInitialized())
+        {
+            this.rootDir = new File(getBasePath());
+        }
+        return this.rootDir;
+    }
     
     /**
      * @param root      the root path
@@ -75,7 +85,6 @@ public class LocalFileSystemStore implements Store
      */
     public void init()
     {
-        this.rootDir = new File(getBasePath());
     }
     
     /* (non-Javadoc)
@@ -83,7 +92,11 @@ public class LocalFileSystemStore implements Store
      */
     public boolean exists()
     {
-        return this.rootDir.exists();
+        if(getRootDir() == null)
+        {
+            return true;
+        }
+        return getRootDir().exists();
     }
 
     /* (non-Javadoc)
@@ -180,13 +193,13 @@ public class LocalFileSystemStore implements Store
         List<String> list = new ArrayList<String>(256);
         
         // exhaustive traverse of absolute paths
-        gatherAbsolutePaths(rootDir.getAbsolutePath(), list);
+        gatherAbsolutePaths(getRootDir().getAbsolutePath(), list);
         
         // convert to array
         String[] array = list.toArray(new String[list.size()]);
         
         // down shift to relative paths
-        String absRootPath = rootDir.getAbsolutePath() + File.separatorChar;
+        String absRootPath = getRootDir().getAbsolutePath() + File.separatorChar;
         int absRootPathLen = absRootPath.length();
         for(int i = 0; i < array.length; i++)
         {
@@ -241,12 +254,18 @@ public class LocalFileSystemStore implements Store
      */
     public String getBasePath()
     {
-        return this.root + this.path;
+        String fullPath = this.path;
+        if(this.root != null && root.startsWith("."))
+        {
+            // make relative to the web app real path
+            fullPath = FrameworkHelper.getRealPath(this.root.substring(1)) + this.path;
+        }
+        return fullPath;
     }
     
     protected String toAbsolutePath(String documentPath)
     {
-        return rootDir.getAbsolutePath() + File.separatorChar + documentPath;
+        return getRootDir().getAbsolutePath() + File.separatorChar + documentPath;
     }
     
     protected void gatherAbsolutePaths(String absPath, List<String> list)

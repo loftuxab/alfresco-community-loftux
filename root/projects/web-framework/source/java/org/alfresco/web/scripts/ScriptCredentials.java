@@ -37,13 +37,20 @@ public final class ScriptCredentials extends ScriptBase
 {
     protected CredentialVault vault;
     protected Credentials credentials;
-    
+    protected boolean hideNonPersistent;
+
     public ScriptCredentials(RequestContext context, CredentialVault vault, Credentials credentials)
+    {
+        this(context, vault, credentials, false);
+    }
+    
+    public ScriptCredentials(RequestContext context, CredentialVault vault, Credentials credentials, boolean hideNonPersistent)
     {
         super(context);
         
         this.vault = vault;
         this.credentials = credentials;
+        this.hideNonPersistent = hideNonPersistent;
     }
 
     /* (non-Javadoc)
@@ -55,12 +62,17 @@ public final class ScriptCredentials extends ScriptBase
         {
             this.properties = new ScriptableMap<String, Serializable>();
             
-            // put credentials properties onto the map
-            String[] keys = this.credentials.getPropertyKeys();
-            for(int i = 0; i < keys.length; i++)
-            {
-                Object propertyValue = this.credentials.getProperty(keys[i]);
-                this.properties.put(keys[i], (Serializable)propertyValue);
+            // show either persistent credentials
+            // or non-persistent credentials (when persistentOnly = false)
+            if(!isHidden())
+            {            
+                // put credentials properties onto the map
+                String[] keys = this.credentials.getPropertyKeys();
+                for(int i = 0; i < keys.length; i++)
+                {
+                    Object propertyValue = this.credentials.getProperty(keys[i]);
+                    this.properties.put(keys[i], (Serializable)propertyValue);
+                }
             }
         }
         
@@ -69,7 +81,16 @@ public final class ScriptCredentials extends ScriptBase
     
     // --------------------------------------------------------------
     // JavaScript Properties
-    //    
+    //
+    public boolean isHidden()
+    {
+        return !isPersistent() && hideNonPersistent;
+    }
+    
+    public boolean isPersistent()
+    {
+        return credentials.isPersistent();
+    }
 
 }
 

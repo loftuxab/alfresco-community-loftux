@@ -21,7 +21,7 @@
 	ComponentType componentType = null;
 	if(componentId != null)
 	{
-		component = (Component) context.getModel().loadComponent(context, componentId);
+		component = (Component) context.getModel().getComponent(componentId);
 		componentType = (ComponentType) component.getComponentType(context);
 	}
 

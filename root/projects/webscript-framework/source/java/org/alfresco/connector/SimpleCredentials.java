@@ -42,6 +42,7 @@ import java.util.Iterator;
  */
 public class SimpleCredentials implements Credentials, Serializable
 {
+    protected boolean persistent;
     protected String endpointId;
     protected HashMap<String, Object> properties = new HashMap<String, Object>();
 
@@ -111,6 +112,14 @@ public class SimpleCredentials implements Credentials, Serializable
         }
         
         return keys;
+    }
+
+    /* (non-Javadoc)
+     * @see org.alfresco.connector.Credentials#isPersistent()
+     */    
+    public boolean isPersistent()
+    {
+        return this.persistent;       
     }
 
     /* (non-Javadoc)
