@@ -1,16 +1,6 @@
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/modules/discussions/topics.lib.js">
 <import resource="classpath:alfresco/site-webscripts/org/alfresco/paginationutils.js">
 
-function setHost()
-{
-    // PENDING: where to get this information?
-    var protocol = "http";
-    var hostname = "localhost";
-    var port = "8081";
-    var host = protocol + "://" + hostname + ":" + port;    
-    model.host = host;
-}
-
 function getLatestPostsRequestUrl(site, container, path)
 {
     var url = "/forum/site/" + site + "/" + container;
@@ -36,6 +26,7 @@ function main()
     var data = doGetCall(url);
     if (data != null)
     {
+        convertTopicsJSONData(data);
         applyDataToModel(data);
     }
 
@@ -43,7 +34,8 @@ function main()
     // PENDING: where to get this information?
     var lang = "en-us";
     model.lang = lang;
-    setHost();
+    model.site = site;
+    model.container = container;
 }
 
 main();
