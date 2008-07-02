@@ -7,8 +7,13 @@
 //]]></script>
 <div id="${args.htmlid}-wikipage" style="visibility: hidden;" class="yui-navset"> 
 	    <ul class="yui-nav"> 
-	        <li class="selected"><a href="#page"><em>Page</em></a></li> 
-	        <li><a href="#edit"><em>Edit</em></a></li>
+	    <#if page.url.args["action"]?exists && page.url.args["action"] == "edit">
+	      <li><a href="#page"><em>Page</em></a></li> 
+	      <li class="selected"><a href="#edit"><em>Edit</em></a></li>
+	    <#else>
+	      <li class="selected"><a href="#page"><em>Page</em></a></li> 
+	      <li><a href="#edit"><em>Edit</em></a></li>
+	    </#if>
 			<li><a href="#history"><em>History</em></a></li>
 	    </ul>             
 	    <div class="yui-content" style="background: #FFFFFF;"> 
