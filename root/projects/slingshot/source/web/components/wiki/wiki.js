@@ -122,6 +122,8 @@
 			}
 			
 			var URI = "/slingshot/wiki/page/" + this.siteId + "/" + this.pageTitle;
+			// Add the page context
+			URI += "?context=" + encodeURIComponent(this._getAbsolutePath() + this.pageTitle);
 			
 			// Submit PUT request 
 			Alfresco.util.Ajax.request(
