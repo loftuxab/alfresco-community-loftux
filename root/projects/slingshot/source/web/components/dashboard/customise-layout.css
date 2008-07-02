@@ -1,26 +1,35 @@
 /* Style YUI components */
 
-/* Center the layouts and buttons section */
+/* Add padding and make sure left: float doesn't place them in a row */
 .customise-layout div.currentLayout,
 .customise-layout div.layouts,
-.customise-layout clear
+.customise-layout div.buttons
 {
-   text-align: center;
+   padding-top: 1em;
+   padding-bottom: 1em;
    clear: both;
 }
 
-.customise-layout div.currentLayout,
-.customise-layout div.layouts
+/* Make sure left: float doesn't place them in a row */
+.customise-layout hr
 {
-   width: 52em;
-   margin-left: auto;        
-   margin-right: auto;
-   padding-top: 1em;
-   padding-bottom: 1em;
+   clear: both;
 }
 
-.customise-layout div.text
+/* Center the contents in the section */
+.customise-layout div.currentLayout div,
+.customise-layout div.layouts div
 {
+   text-align: center;
+}
+
+/* Center the contents in the sections */
+.customise-layout div.currentLayout div div.text,
+.customise-layout div.layouts div div.text
+{
+   width: 52em;
+   margin-left: auto;
+   margin-right: auto;
    padding-top: 1em;
    padding-bottom: 1em;
    text-align: left;
@@ -36,18 +45,15 @@
    margin-right: auto;
 }
 
-.customise-layout .currentLayout ul
-{
-   width: 25em;
-}
-
-.customise-layout .layouts ul
+/* Set width and height of the layouts list */
+.customise-layout div.layouts ul
 {
    width: 52em;
+   height: 30em;
 }
 
 /* Set the layout width and let them flow in the list */
-.customise-layout ul li
+.customise-layout div.layouts ul li
 {
    width: 25em;
    float: left;
@@ -55,20 +61,24 @@
    text-align: left;
 }
 
-.customise-layout .layoutDescription
+/* Align the layout description to the left */
+.customise-layout div.layouts ul li .layoutDescription
 {
+   text-align: left;
    padding: 0em 0.5em 0.5em 1em;
 }
 
-.customise-layout .layoutBox 
+/* Make the layout box gray and center it's content*/
+.customise-layout .layoutBox
 {
    background-color: #f7f7f7;
    text-align:center;
 }
 
-.customise-layout .layoutBox .layoutIcon
+/* Center the laout yimage */
+.customise-layout .layoutIcon
 {
    padding:1em;
    vertical-align:middle;
-   width:10em;
+   height:10em;
 }

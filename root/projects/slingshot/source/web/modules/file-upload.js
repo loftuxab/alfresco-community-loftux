@@ -1066,7 +1066,7 @@
             scrollable: true,
             height: "1px",
             width: "620px",
-            renderLoopSize: 5
+            renderLoopSize: 1
          });
          this.dataTable.subscribe("rowAddEvent", this.onRowAddEvent, this, true);
       },

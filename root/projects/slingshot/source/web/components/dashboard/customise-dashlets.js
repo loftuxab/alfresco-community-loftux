@@ -184,7 +184,9 @@
             }
          }
 
-          YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
+         YAHOO.Bubbling.on("onDashboardLayoutChanged", this.onDashboardLayoutChanged, this);
+         YAHOO.Bubbling.on("onDashboardLayoutsDisplayed", this.onDashboardLayoutsDisplayed, this);
+         YAHOO.Bubbling.on("onDashboardLayoutsHidden", this.onDashboardLayoutsHidden, this);
 
       },
 
@@ -229,6 +231,34 @@
       },
 
       /**
+       * Fired when the CusomiseLayout component displays the available layouts
+       *
+       * @method onDashboardLayoutsDisplayed
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onDashboardLayoutsDisplayed: function DLT_onDashboardLayoutsDisplayed(layer, args)
+      {
+         // Hide this component
+         var componentDiv = Dom.get(this.id);
+         Dom.setStyle(componentDiv, "display", "none");
+
+      },
+
+      /**
+       * Fired when the CusomiseLayout component hides the available layouts
+       * @method onDashboardLayoutsHidden
+       * @param layer {string} the event source
+       * @param args {object} arguments object
+       */
+      onDashboardLayoutsHidden: function DLT_onDashboardLayoutsHidden(layer, args)
+      {
+         // Show this component
+         var componentDiv = Dom.get(this.id);
+         Dom.setStyle(componentDiv, "display", "");
+      },
+
+      /**
        * Fired when the user clicks the Hide / Show dashlet button.
        * Hides or shows the dashlet list.
        *
@@ -238,15 +268,17 @@
       onToggleDashletsButtonClick: function CD_onToggleDashletsButtonClick(event)
       {
          var dashletListDiv = Dom.get(this.id + "-dashlets-div");
-         if(Dom.hasClass(dashletListDiv, "hiddenComponents"))
+         if(Dom.getStyle(dashletListDiv, "display") === "none")
          {
-            Dom.removeClass(dashletListDiv, "hiddenComponents")
+            // Show the available dashlets and change the button lanbel
+            Dom.setStyle(dashletListDiv, "display", "");
             this.widgets.toggleDashletsButton.set("label", Alfresco.util.message("button.hideDashlets", this.name));
          }
          else
          {
-            Dom.addClass(dashletListDiv, "hiddenComponents")            
-            this.widgets.toggleDashletsButton.set("label", Alfresco.util.message("button.showDashlets", this.name));            
+            // Hide the available dashlets and change the button lanbel
+            Dom.setStyle(dashletListDiv, "display", "none");
+            this.widgets.toggleDashletsButton.set("label", Alfresco.util.message("button.showDashlets", this.name));
          }
       },
 
@@ -783,6 +815,8 @@
       // Property to remember the element that the proxy was dropped on.
       this.droppedOnEl= null;
 
+      this.isOver = false;
+
       // Save a reference to the component.
       this.customiseDashletComponent = customiseDashletComponent;
 
@@ -1002,7 +1036,7 @@
                   // Refresh the drag n drop managers cache.
                   var destDD = DDM.getDDById(id);
                   destDD.isEmpty = false;
-                  DDM.refreshCache();
+                  //DDM.refreshCache();
                }
 
             }
@@ -1019,6 +1053,8 @@
        */
       onDragOut: function CD_onDragOut(event, id)
       {
+         this.isOver = false;
+
          // Reset the droppedOn proprerty
          this.droppedOnEl = null;
          
@@ -1065,6 +1101,8 @@
        */
       onDragOver: function CD_onDragOver(event, id)
       {
+         this.isOver = true;
+         
          // Get the element the proxy was dragged over
          var destEl = Dom.get(id);
 
@@ -1088,23 +1126,36 @@
                   // Hide the original dashlet since we are about to show it as a shadow somewhere else
                   if (srcElColumn > 0)
                   {
-                     Dom.setStyle(srcEl, "display", "none");
+                     //if(Dom.getStyle(srcEl, "display") === "")
+                     {
+                        Dom.setStyle(srcEl, "display", "none");
+                     }
                   }
 
                   // Show shadow instead of original dashlet next to its target
-                  Dom.setStyle(this.srcShadow, "display", "");
-                  var p = destEl.parentNode;
+                  if(Dom.getStyle(this.srcShadow, "display") === "none")
+                  {
+                     Dom.setStyle(this.srcShadow, "display", "");
+                  }
                   if (this.goingUp)
                   {
-                     // insert above
-                     p.insertBefore(this.srcShadow, destEl);
+                     // insert above (if its not already there)
+                     //if(this.srcShadow !== destEl.previousSibling)
+                     //{
+                        var p = destEl.parentNode;
+                        p.insertBefore(this.srcShadow, destEl);
+                     //}
                   }
                   else
                   {
-                     // insert below
-                     p.insertBefore(this.srcShadow, destEl.nextSibling);
+                     // insert below (if its not already there)
+                     //if(this.srcShadow !== destEl.nextSibling)
+                     //{
+                        var p = destEl.parentNode;
+                        p.insertBefore(this.srcShadow, destEl.nextSibling);
+                     //}
                   }
-                  DDM.refreshCache();
+                  //DDM.refreshCache();
                }
             }
          }

@@ -1,4 +1,4 @@
-// Load the config to know what viewer to use for each mimeType
+// Load the config to know what viewer to use for each mimetype
 var contentviewer =  new XML(config.script);
 
 // Check mandatory parameters
@@ -18,20 +18,20 @@ var node = eval('(' + json + ')');
  * If no viewer is configured for the nodes mime-type display
  * a fallback template with an explanation text
  */
-var viewer = "viewers/no- viewer-exist.ftl";
+var viewer = "viewers/no-viewer-exist.ftl";
 var preload = false;
 var contentData = null;
 
 var content = contentviewer.content.(@mimetype==node.mimetype);
 if(content.length() == 1)
 {
-   // Found a configured viewer for the mimeType
+   // Found a configured viewer for the mimetype
    viewer = content.@viewer.toString();
    preload = (content.@preload.toString() == "true");
 }
 else if(content.length() > 1)
 {
-   // Multiple viewers found for the same mimeType, throw an error
+   // Multiple viewers found for the same mimetype, throw an error
    status.code = 500;
    status.message = "Multiple viewers (" + content.@viewer.toString() + ") defined for the mime-type ${node.mimetype}";
    status.redirect = true;
