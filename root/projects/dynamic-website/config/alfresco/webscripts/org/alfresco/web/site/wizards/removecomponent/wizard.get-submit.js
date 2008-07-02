@@ -4,7 +4,7 @@
 var componentId = wizard.request("componentId");
 if(componentId != null)
 {
-	var component = sitedata.getObject(componentId);
+	var component = sitedata.getObject("component", componentId);
 	if(component != null)
 	{
 		sitedata.unbindComponent(componentId);

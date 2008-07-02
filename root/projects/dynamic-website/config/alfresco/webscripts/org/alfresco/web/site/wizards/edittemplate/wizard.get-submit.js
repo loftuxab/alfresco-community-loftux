@@ -2,7 +2,7 @@
 
 // get the existing template
 var completed = false;
-var template = sitedata.getObject(templateId);
+var template = sitedata.getObject("template-instance", templateId);
 if(template != null)
 {	
 	// do updates

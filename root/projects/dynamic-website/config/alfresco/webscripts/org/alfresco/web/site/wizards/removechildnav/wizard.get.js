@@ -7,7 +7,7 @@ var pageId = wizard.request("pageId");
 
 // objects
 var parentPage = sitedata.getObject(parentPageId);
-var page = sitedata.getObject(pageId);
+var page = sitedata.getObject("page", pageId);
 
 
 var html = "Are you sure that you would like to remove the following page:";

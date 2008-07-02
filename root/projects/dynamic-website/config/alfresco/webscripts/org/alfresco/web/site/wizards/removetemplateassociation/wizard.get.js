@@ -8,7 +8,7 @@ if(formatId == null)
 	formatId = "default"; // TODO CHANGE THIS
 
 // load the page
-var page = sitedata.getObject(pageId);
+var page = sitedata.getObject("page", pageId);
 
 // load the template
 var templatesMap = sitedata.findTemplatesMap(pageId);

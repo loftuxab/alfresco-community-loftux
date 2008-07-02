@@ -6,8 +6,8 @@
 // binding: templateTypeId
 
 
-var page = sitedata.getObject(pageId);
-var templateType = sitedata.getObject(templateTypeId);
+var page = sitedata.getObject("page", pageId);
+var templateType = sitedata.getObject("template-instance", templateTypeId);
 
 logger.log("pageId: " + pageId);
 logger.log("formatId: " + formatId);
