@@ -164,7 +164,7 @@
          });
 
          // Configure the forms runtime
-         var createSiteForm = new Alfresco.forms.Form(this.id + "-createSite-form");
+         var createSiteForm = new Alfresco.forms.Form(this.id + "-form");
 
          // Shortname is mandatory
          createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
@@ -188,9 +188,6 @@
          });
          createSiteForm.setSubmitAsJSON(true);
          createSiteForm.init();
-
-         // Firefox insertion caret fix
-         Alfresco.util.caretFix(this.id + "-createSite-form");
 
          // Show the panel
          this._showPanel();
@@ -239,11 +236,14 @@
        */
       _showPanel: function()
       {
-         // Set the focus on the first field
-         YAHOO.util.Dom.get(this.id + "-title").focus();
-
          // Show the upload panel
          this.panel.show();
+
+         // Firefox insertion caret fix
+         Alfresco.util.caretFix(this.id + "-form");
+
+         // Set the focus on the first field
+         YAHOO.util.Dom.get(this.id + "-title").focus();
       }
 
    };
