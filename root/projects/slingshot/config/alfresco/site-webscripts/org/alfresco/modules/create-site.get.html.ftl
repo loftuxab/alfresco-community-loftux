@@ -2,8 +2,7 @@
    <div class="hd">${msg("header.createSite")}</div>
    <div class="bd">
       <div class="yui-t1">
-
-         <form id="${args.htmlid}-createSite-form" action="${url.context}/proxy/alfresco/api/sites" method="POST">
+         <form id="${args.htmlid}-form" action="${url.context}/proxy/alfresco/api/sites" method="POST">
             <input type="hidden" id="${args.htmlid}-isPublic" name="isPublic" value="true"/>
 
             <div class="yui-g section-title">
@@ -42,8 +41,6 @@
             </div>
 
          </form>
-
       </div>
-
    </div>
 </div>
