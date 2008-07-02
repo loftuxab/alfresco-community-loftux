@@ -6,7 +6,8 @@ if (!page.url.args.title)
 }
 else
 {
-  	var result = remote.call("/slingshot/wiki/page/" + page.url.args.site + "/" + page.url.args.title);
+   var context = url.context + "/page/wiki?site=" + page.url.args.site + "&title=" + page.url.args.title;
+  	var result = remote.call("/slingshot/wiki/page/" + page.url.args.site + "/" + page.url.args.title + "?context=" + escape(context));
 
   	if (result)
   	{
