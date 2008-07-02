@@ -25,6 +25,8 @@
 package org.alfresco.web.scripts.servlet;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -76,13 +78,16 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class EndPointProxyServlet extends HttpServlet
 {
+    private static final String USER_ID = "USER_ID";
+    private static final String PARAM_ALF_TICKET = "alf_ticket";
+    
     private static Log logger = LogFactory.getLog(EndPointProxyServlet.class);
     
     private static final long serialVersionUID = -176412355613122789L;
-
+    
     protected RemoteConfigElement config;
     protected ConnectorService connectorService;
-
+    
     @Override
     public void init() throws ServletException
     {
@@ -139,16 +144,21 @@ public class EndPointProxyServlet extends HttpServlet
                 throw new AlfrescoRuntimeException("Invalid EndPoint Id: " + endpointId);
             }
             
+            // special case for Flash based apps - they pass in the alf_ticket directly as a parameter
+            // they do not share the same session (annoyingly) so we must apply the ticket directly
+            String ticket = req.getParameter(PARAM_ALF_TICKET);
+            
             // user id from session
             // TODO: this comes from the web-framework UserFactory - should it be moved down to this project?
             Connector connector;
-            String userId = (String)req.getSession().getAttribute("USER_ID");
+            String userId = (String)req.getSession().getAttribute(USER_ID);
             if (userId != null)
             {
                 // build an authenticated connector - as we have a userId
                 connector = this.connectorService.getConnector(endpointId, userId, req.getSession());
             }
-            else if (descriptor.getIdentity() == IdentityType.NONE ||
+            else if (ticket != null ||
+                     descriptor.getIdentity() == IdentityType.NONE ||
                      descriptor.getIdentity() == IdentityType.DECLARED)
             {
                 // build an unauthenticated/predeclared authentication connector
@@ -162,7 +172,18 @@ public class EndPointProxyServlet extends HttpServlet
             }
             
             // build a connector context, stores information about how we will drive the remote client
-            ConnectorContext context = new ConnectorContext();
+            ConnectorContext context;
+            if (ticket == null)
+            {
+                context = new ConnectorContext();
+            }
+            else
+            {
+                // special case for Flash apps - see above
+                Map<String, String> params = new HashMap<String, String>(1, 1.0f);
+                params.put(PARAM_ALF_TICKET, ticket);
+                context = new ConnectorContext(params, null);
+            }
             context.setContentType(req.getContentType());
             context.setMethod(HttpMethod.valueOf(req.getMethod().toUpperCase()));
             
