@@ -135,7 +135,7 @@
 
          // Save reference to buttons so we can change label and such later
          this.widgets.changeButton = Alfresco.util.createYUIButton(this, "change-button", this.onChangeButtonClick);
-         this.widgets.useCurrentButton = Alfresco.util.createYUIButton(this, "useCurrent-button", this.onUseCurrentButtonClick);
+         this.widgets.cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
 
          // Create the select buttons for all layouts
          this.widgets.selectButtons = [];
@@ -165,7 +165,7 @@
          var selectedLayoutId = buttonId.substring((this.id + "-select-button-").length);
 
          // Hide the div that displays the available layouts
-         Dom.addClass(layoutsDiv , "hiddenComponents");
+         Dom.setStyle(layoutsDiv, "display", "none");
          for (var layoutId in this.options.layouts)
          {
             var layoutLi = Dom.get(this.id + "-layout-li-" + layoutId);
@@ -176,10 +176,12 @@
                this.options.currentLayout = selectedLayout;
 
                // Hide the newly selected layout
-               Dom.addClass(layoutLi, "hiddenComponents");
-               var descriptionDiv = Dom.getElementsByClassName("layoutDescription", "div", currentLayoutDiv)[0];
-               descriptionDiv.innerHTML = selectedLayout.description;
-               var iconImg = Dom.getElementsByClassName("layoutIcon", "img", currentLayoutDiv)[0];
+               Dom.setStyle(layoutLi, "display", "none");
+
+               // Display the selected layout as the current one
+               var descriptionSpan = Dom.get(this.id + "-currentLayoutDescription-span");
+               descriptionSpan.innerHTML = selectedLayout.description;
+               var iconImg = Dom.get(this.id + "-currentLayoutIcon-img");
                iconImg.src = selectedLayout.icon;
 
                // Send out event to let other component know that the layout has changed
@@ -188,54 +190,61 @@
             else
             {
                // Show all the previous layout (should have been hidden)
-               if(Dom.hasClass(layoutLi, "hiddenComponents"))
-               {
-                  Dom.removeClass(layoutLi, "hiddenComponents");
-               }
+               Dom.setStyle(layoutLi, "display", "");
             }
+            // Send out event to let other component know that the should hide themselves
+            YAHOO.Bubbling.fire("onDashboardLayoutsHidden", {});
+
          }
          // Show the currently selected layout-div
-         Dom.removeClass(currentLayoutDiv, "hiddenComponents");
+         Dom.setStyle(currentLayoutDiv, "display", "");
+
+         // Show the change layout button
+         var changeButtonWrapperDiv = Dom.get(this.id + "-changeButtonWrapper-div");
+         Dom.setStyle(changeButtonWrapperDiv, "display", "");
       },
 
       /**
        * Fired when the user clicks change layout button.
-       * Hides or shows the layout list.
+       * Shows the layout list.
        *
        * @method changeLayoutButton
        * @param event {object} an "click" event
        */
       onChangeButtonClick: function CD_onChangeButtonClick(event)
       {
-         // Get references to the divs that should be shown or hidden
-         var layoutsDiv = Dom.get(this.id + "-layouts-div");
-         var currentLayoutDiv = Dom.get(this.id + "-currentLayout-div");
-
-         // Hide the available layouts-div
-         Dom.addClass(currentLayoutDiv, "hiddenComponents");
+         // Send out event to let other component know that the should hide themselves
+         YAHOO.Bubbling.fire("onDashboardLayoutsDisplayed", {});
 
          // Show the currently selected layout-div
-         Dom.removeClass(layoutsDiv , "hiddenComponents");
+         var layoutsDiv = Dom.get(this.id + "-layouts-div");
+         Dom.setStyle(layoutsDiv, "display", "");
+
+         // Hide the change button
+         var changeButtonWrapperDiv = Dom.get(this.id + "-changeButtonWrapper-div");
+         Dom.setStyle(changeButtonWrapperDiv, "display", "none");
+
       },
 
       /**
        * Fired when the user clicks cancel layout button.
        * Hides the layout list.
        *
-       * @method onUseCurrentButtonClick
+       * @method onCancelButtonClick
        * @param event {object} an "click" event
        */
-      onUseCurrentButtonClick: function CD_onUseCurrentButtonClick(event)
+      onCancelButtonClick: function CD_onCancelButtonClick(event)
       {
-         // Get references to the divs that should be shown or hidden
-         var layoutsDiv = Dom.get(this.id + "-layouts-div");
-         var currentLayoutDiv = Dom.get(this.id + "-currentLayout-div");
-
          // Hide the available layouts-div
-         Dom.addClass(layoutsDiv, "hiddenComponents");
+         var layoutsDiv = Dom.get(this.id + "-layouts-div");
+         Dom.setStyle(layoutsDiv, "display", "none");
 
-         // Show the currently selected layout-div
-         Dom.removeClass(currentLayoutDiv , "hiddenComponents");
+         // Send out event to let other component know that the should hide themselves
+         YAHOO.Bubbling.fire("onDashboardLayoutsHidden", {});
+
+         // Show the change button
+         var changeButtonWrapperDiv = Dom.get(this.id + "-changeButtonWrapper-div");
+         Dom.setStyle(changeButtonWrapperDiv, "display", "");
       }
 
    }

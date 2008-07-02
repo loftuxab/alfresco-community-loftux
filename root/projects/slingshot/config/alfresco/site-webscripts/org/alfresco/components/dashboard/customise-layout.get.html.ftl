@@ -1,4 +1,4 @@
-<div id="${args.htmlid}-dialog" class="customise-layout">
+<div id="${args.htmlid}" class="customise-layout">
 
    <script type="text/javascript">//<![CDATA[
    new Alfresco.CustomiseLayout("${args.htmlid}").setOptions(
@@ -10,37 +10,34 @@
    //]]></script>
 
 
-   <h2>${msg("header.layout")}</h2>
-
    <div id="${args.htmlid}-currentLayout-div" class="currentLayout">
 
+      <h2>${msg("section.currentLayout")}
+         <span id="${args.htmlid}-currentLayoutDescription-span">${currentLayout.description}</span>
+      </h2>
+      <hr/>
+
       <div>
-         <h3>${msg("section.currentLayout")}</h3>
-         <ul>                
-            <li>
-               <div class="layoutDescription">${currentLayout.description}</div>
-               <div class="layoutBox">
-                  <span>
-                     <img class="layoutIcon" src="${url.context}/components/dashboard/images/${currentLayout.id}.png"/>
-                     <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}"/>
-                  </span>
-               </div>
-            </li>
-         </ul>
+         <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon"
+              src="${url.context}/components/dashboard/images/${currentLayout.id}.png"/>
+         <div id="${args.htmlid}-changeButtonWrapper-div">
+            <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}"/>
+         </div>
       </div>
 
    </div>
 
-   <div id="${args.htmlid}-layouts-div" class="layouts hiddenComponents">
+   <div id="${args.htmlid}-layouts-div" class="layouts" style="display: none;">
+
+      <h2>${msg("section.selectNewLayout")}</h2>
+      <hr/>
 
       <div>
-         <h3>${msg("section.selectNewLayout")}</h3>
          <div class="text">${msg("label.layoutWarning")}</div>
-         <input id="${args.htmlid}-useCurrent-button" type="button" value="${msg("button.useCurrent")}"/>
 
          <ul>
          <#list layouts as layout>
-            <li id="${args.htmlid}-layout-li-${layout.id}" <#if (currentLayout.id == layout.id)>class="hiddenComponents"</#if>>
+            <li id="${args.htmlid}-layout-li-${layout.id}" <#if (currentLayout.id == layout.id)>style="display: none;"</#if>>
                <div class="layoutDescription">${layout.description}</div>               
                <div class="layoutBox">
                   <span>
@@ -53,8 +50,13 @@
          </ul>
       </div>
 
+      <hr/>
+
+      <div>
+         <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.useCurrent")}"/>
+      </div>
+      
    </div>
 
-   <div class="clear"></div>
 
 </div>
