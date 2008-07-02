@@ -170,7 +170,7 @@
        */
       addedFiles: {},
 
-   /**
+       /**
         * Shows uploader in single upload mode.
         *
         * @property MODE_SINGLE_UPLOAD
@@ -233,6 +233,16 @@
        */
       previousFileListEmptyMessage: null,
 
+      /**
+       * THe "Upload file(s)" button should only be visible when all selected
+       * files have been added to the datatable and datasource.
+       * noOfUnrenderedRows keeps track of how many of of the added files that
+       * has been rendered and properly added to the datasource.
+       *
+       * @property noOfUnrenderedRows
+       * @type int
+       */
+      noOfUnrenderedRows: 0,
 
       /**
        * Contains the upload gui
@@ -490,6 +500,11 @@
          // times we need to keep track of the selected files by our selves
          var uniqueFileToken = this._getUniqueFileToken(event.record.getData());
          this.addedFiles[uniqueFileToken] = event.record.getId();
+         this.noOfUnrenderedRows--;
+         if(this.noOfUnrenderedRows === 0)
+         {
+            this.widgets.uploadButton.set("disabled", false);
+         }
       },
 
       /**
@@ -510,15 +525,9 @@
             var data = YAHOO.widget.DataTable._cloneObject(event.fileList[i]);
             if (!this.addedFiles[this._getUniqueFileToken(data)])
             {
+               this.noOfUnrenderedRows++;
                this.dataTable.addRow(data, 0);
             }
-         }
-         // Enable the upload button if there are files in the list
-         // and it wasn't enabled already
-         if (this.dataTable.getRecordSet().getLength() > 0 &&
-             this.widgets.uploadButton.get("disabled"))
-         {
-            this.widgets.uploadButton.set("disabled", false);
          }
       },
 
@@ -1074,6 +1083,7 @@
          this.state = this.STATE_BROWSING;
          this.noOfFailedUploads = 0;
          this.noOfSuccessfulUploads = 0;
+         this.noOfUnrenderedRows = 0;
          this.statusText["innerHTML"] = "&nbsp;";
          this.widgets.uploadButton.set("label", Alfresco.util.message("button.upload", this.name));
          this.widgets.uploadButton.set("disabled", true);
@@ -1167,8 +1177,7 @@
 
                // The contentType that the file should be uploaded as.
                var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
-               //var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
-               var url = "http://localhost:8080/alfresco/service/api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
+               var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
                this.uploader.upload(flashId, url, "POST",
                {
                   path: this.showConfig.path,
