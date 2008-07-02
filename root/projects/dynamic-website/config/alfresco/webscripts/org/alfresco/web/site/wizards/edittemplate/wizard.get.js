@@ -8,7 +8,7 @@ if(templateId == "")
 	
 if(templateId != null)
 {
-	var template = sitedata.getObject(templateId);
+	var template = sitedata.getObject("template-instance", templateId);
 
 	// default values
 	var templateName = template.getTitle();

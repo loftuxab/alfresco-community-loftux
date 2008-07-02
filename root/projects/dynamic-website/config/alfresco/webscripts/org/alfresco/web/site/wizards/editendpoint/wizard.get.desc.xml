@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Edit Endpoint Wizard</shortname>
-  <description>Edit Endpoint Wizard</description>
-  <url>/wizard/editendpoint</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

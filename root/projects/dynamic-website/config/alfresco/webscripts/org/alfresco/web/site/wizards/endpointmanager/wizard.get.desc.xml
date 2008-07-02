@@ -1,8 +1,0 @@
-<webscript kind="wizard">
-  <shortname>Endpoint Manager</shortname>
-  <description>Endpoint Manager</description>
-  <url>/wizard/endpointmanager</url>
-  <format default="json">argument</format>
-  <authentication>user</authentication>
-  <transaction>required</transaction>
-</webscript>

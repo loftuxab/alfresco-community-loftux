@@ -3,7 +3,7 @@
 
 // inputs
 var pageId = wizard.request("pageId");
-var page = sitedata.getObject(pageId);
+var page = sitedata.getObject("page", pageId);
 
 
 var pageName = wizard.getSafeProperty(page, "title");

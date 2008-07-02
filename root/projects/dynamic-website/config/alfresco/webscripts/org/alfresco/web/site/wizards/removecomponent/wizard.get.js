@@ -5,7 +5,7 @@
 var componentId = wizard.request("componentId");
 if(componentId != null)
 {
-	var component = sitedata.getObject(componentId);
+	var component = sitedata.getObject("component", componentId);
 	if(component != null)
 	{	
 		// get the component name
