@@ -66,7 +66,7 @@ public final class ConnectorContext
      * @param parameters the parameters
      * @param headers the headers
      */
-    public ConnectorContext(Map parameters, Map headers)
+    public ConnectorContext(Map<String, String> parameters, Map<String, String> headers)
     {
         this(null, parameters, headers);
     }
@@ -78,7 +78,7 @@ public final class ConnectorContext
      * @param parameters the parameters
      * @param headers the headers
      */
-    public ConnectorContext(HttpMethod method, Map parameters, Map headers)
+    public ConnectorContext(HttpMethod method, Map<String, String> parameters, Map<String, String> headers)
     {
         if (method != null)
         {
@@ -101,7 +101,7 @@ public final class ConnectorContext
      * 
      * @return the parameters
      */
-    public Map getParameters()
+    public Map<String, String> getParameters()
     {
         return this.parameters;
     }
@@ -111,7 +111,7 @@ public final class ConnectorContext
      * 
      * @return the headers
      */
-    public Map getHeaders()
+    public Map<String, String> getHeaders()
     {
         return this.headers;
     }

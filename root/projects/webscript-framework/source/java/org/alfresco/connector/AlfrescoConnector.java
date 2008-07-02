@@ -58,20 +58,30 @@ public class AlfrescoConnector extends HttpConnector
     @Override
     protected void applyRequestAuthentication(RemoteClient remoteClient, ConnectorContext context)
     {
-        // support for Alfresco ticket-based authentication
+        // support for Alfresco ticket-based authentication - retrieving the ticket
+        // from the connector context is a special case for Flash based apps that do
+        // not share the same session and get at user connector session information
+        String alfTicket = null;
+        
+        if (context != null)
+        {
+            alfTicket = context.getParameters().get(PARAM_TICKETNAME_ALF_TICKET);
+        }
+        
         if (getCredentials() != null)
         {
             // if this connector is managing session info
             if (getConnectorSession() != null)
             {
-                // apply alfresco ticket
-                String alfTicket = (String) getConnectorSession().getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
-                if (alfTicket != null)
-                {
-                    remoteClient.setTicket(alfTicket);
-                    remoteClient.setTicketName(PARAM_TICKETNAME_ALF_TICKET);
-                }
+                // apply alfresco ticket from connector session - i.e. previous login attempt
+                alfTicket = (String)getConnectorSession().getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
             }
-        }        
-    }  
+        }
+        
+        if (alfTicket != null)
+        {
+            remoteClient.setTicket(alfTicket);
+            remoteClient.setTicketName(PARAM_TICKETNAME_ALF_TICKET);
+        }
+    }
 }
