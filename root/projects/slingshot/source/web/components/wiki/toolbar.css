@@ -1,0 +1,19 @@
+.toolbar 
+{
+   clear: both;
+   height: 2em;
+   margin: 0 -10px;
+   padding: 0.5em;
+   background-color: #e3eaec;
+   border-bottom: 2px solid #f0f3f4;
+} 
+
+/* Buttons */
+
+/*
+.toolbar .new-page button
+{
+   padding-left: 2.5em; 
+   background: url(images/new-folder.png) no-repeat 10% 50%; 
+}
+*/

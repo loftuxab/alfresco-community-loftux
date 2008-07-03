@@ -6,15 +6,16 @@
 	);
 //]]></script>
 <div id="${args.htmlid}-wikipage" style="visibility: hidden;" class="yui-navset"> 
+<h1>${page.url.args["title"]?replace("_", " ")}</h1>
 	    <ul class="yui-nav"> 
 	    <#if page.url.args["action"]?exists && page.url.args["action"] == "edit">
-	      <li><a href="#page"><em>Page</em></a></li> 
-	      <li class="selected"><a href="#edit"><em>Edit</em></a></li>
+	      <li><a href="#page"><em>${msg("tab.view")}</em></a></li> 
+	      <li class="selected"><a href="#edit"><em>${msg("tab.edit")}</em></a></li>
 	    <#else>
-	      <li class="selected"><a href="#page"><em>Page</em></a></li> 
-	      <li><a href="#edit"><em>Edit</em></a></li>
+	      <li class="selected"><a href="#page"><em>${msg("tab.view")}</em></a></li> 
+	      <li><a href="#edit"><em>${msg("tab.edit")}</em></a></li>
 	    </#if>
-			<li><a href="#history"><em>History</em></a></li>
+			<li><a href="#history"><em>${msg("tab.details")}</em></a></li>
 	    </ul>             
 	    <div class="yui-content" style="background: #FFFFFF;"> 
 	        <div id="#page"><#if result?exists>${result.pagetext}</#if></div> 
