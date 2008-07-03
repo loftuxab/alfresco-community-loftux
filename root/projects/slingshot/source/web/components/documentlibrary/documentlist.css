@@ -3,6 +3,11 @@
    visibility: hidden;
 }
 
+.doclist a:hover
+{
+   text-decoration: none;
+}
+
 .doclist .align-center
 {
    text-align: center;
@@ -47,6 +52,11 @@
    display: none;
 }
 
+.doclist .documents tbody
+{
+   outline: none;
+}
+
 .doclist .documents .yui-dt-bd table
 {
    border: none;
@@ -81,6 +91,12 @@
    font-weight: bold;
    margin: 1em auto;
    padding: 1em;
+}
+
+/* This rule is vital to workaround a Firefox mouseout bug */
+.doclist .yui-dt-col-4
+{
+   overflow: visible;
 }
 
 /* Cell Renderers */
@@ -167,28 +183,81 @@
 
 /* Actions */
 
-.doclist .yui-dt-col-actions span
+.doclist .action-set div
 {
-   background-color: #ffffff;
    display: block;
    margin: 2px 0px;
-   padding: 4px 0px;
+   padding: 1px 0px;
 }
 
-.doclist .action-link
+.doclist a.action-link
 {
-   padding-left: 18px;
-   font-weight: bold;
+   background-position: 2px 50%;
+   background-repeat: no-repeat;
+   display: block;
+   min-height: 16px;
+   padding-left: 24px;
 }
+
+.doclist a.show-more
+{
+   display: block;
+   font-weight: bold;
+   min-height: 16px;
+}
+
+.doclist .action-set a:hover
+{
+   background-color: #fff;
+}
+
+.doclist div.more-actions
+{
+   background-color: #d2e5f2;
+   border: 1px solid #808080;
+   position: absolute;
+   width: 168px;
+}
+
+/* Actions: Simple view */
+.doclist div.action-set.simple div
+{
+   float: left;
+}
+.doclist div.action-set.simple a.action-link span
+{
+   display: none;
+}
+.doclist div.action-set.simple div.more-actions a.action-link span
+{
+   display: block;
+}
+
+/* Actions: Icons */
 
 .doclist .onActionDeleteAsset a
 {
-   background: url(images/delete.gif) no-repeat;
+   background-image: url(images/delete.gif);
+}
+
+.doclist .onActionDownload a
+{
+   background-image: url(images/download.gif);
 }
 
 .doclist .onActionEditOffline a
 {
-   background: url(images/checkout.gif) no-repeat;
+   background-image: url(images/checkout.gif);
+}
+
+.doclist .onActionCopyTo a
+{
+   background-image: url(images/copy-to.gif);
+}
+
+.doclist .onActionMoveTo a
+{
+   background-image: url(images/move-to.gif);
 }
 
 
