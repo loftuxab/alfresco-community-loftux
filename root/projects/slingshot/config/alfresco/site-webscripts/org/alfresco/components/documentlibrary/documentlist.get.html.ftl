@@ -40,34 +40,38 @@
 
    <div id="${args.htmlid}-documents" class="documents"></div>
    
-   <div class="hiddenComponents">
-      <div id="${args.htmlid}-actionSet-empty">
+   <div style="display:none">
+      <div id="${args.htmlid}-actionSet-empty" class="action-set">
       </div>
 
-      <div id="${args.htmlid}-actionSet-document">
-         <span class="onActionEditOffline"><a href="#" class="action-link">${msg("actions.document.edit-offline")}</a></span>
-         <span class="onActionCopyTo"><a href="#" class="action-link">${msg("actions.document.copy-to")}</a></span>
-         <span class="onActionMoveTo"><a href="#" class="action-link">${msg("actions.document.move-to")}</a></span>
-         <span class="onActionDeleteAsset"><a href="#" class="action-link">${msg("actions.document.delete")}</a></span>
+      <div id="${args.htmlid}-actionSet-document" class="action-set">
+         <div class="onActionDownload"><a href="#" class="action-link"><span>${msg("actions.document.download")}</span></a></div>
+         <div class="onActionEditOffline"><a href="#" class="action-link"><span>${msg("actions.document.edit-offline")}</span></a></div>
+         <div class="onActionMoveTo"><a href="#" class="action-link"><span>${msg("actions.document.move-to")}</span></a></div>
+         <div class="onActionShowMore"><a href="#" class="show-more"><span>${msg("actions.more")}</span></a></div>
+         <div class="more-actions hidden">
+            <div class="onActionCopyTo"><a href="#" class="action-link"><span>${msg("actions.document.copy-to")}</span></a></div>
+            <div class="onActionDeleteAsset"><a href="#" class="action-link"><span>${msg("actions.document.delete")}</span></a></div>
+         </div>
       </div>
 
-      <div id="${args.htmlid}-actionSet-locked">
-         <span class="onActionUnlock"><a href="#" class="action-link">[Request Unlock]</a></span>
+      <div id="${args.htmlid}-actionSet-locked" class="action-set">
+         <div class="onActionUnlock"><a href="#" class="action-link"><span>[Request Unlock]</span></a></div>
       </div>
 
-      <div id="${args.htmlid}-actionSet-lockOwner">
-         <span class="onActionUnlock"><a href="#" class="action-link">[Unlock]</a></span>
+      <div id="${args.htmlid}-actionSet-lockOwner" class="action-set">
+         <div class="onActionUnlock"><a href="#" class="action-link"><span>[Unlock]</span></a></div>
       </div>
 
-      <div id="${args.htmlid}-actionSet-workingCopyOwner">
-         <span class="onActionUploadNewVersion"><a href="#" class="action-link">${msg("actions.document.upload-new-version")}</a></span>
-         <span class="onActionCancelEditing"><a href="#" class="action-link">${msg("actions.document.cancel-editing")}</a></span>
+      <div id="${args.htmlid}-actionSet-workingCopyOwner" class="action-set">
+         <div class="onActionUploadNewVersion"><a href="#" class="action-link"><span>${msg("actions.document.upload-new-version")}</span></a></div>
+         <div class="onActionCancelEditing"><a href="#" class="action-link"><span>${msg("actions.document.cancel-editing")}</span></a></div>
       </div>
 
-      <div id="${args.htmlid}-actionSet-folder">
-         <span class="onActionCopyTo"><a href="#" class="action-link">${msg("actions.folder.copy-to")}</a></span>
-         <span class="onActionMoveTo"><a href="#" class="action-link">${msg("actions.folder.move-to")}</a></span>
-         <span class="onActionDeleteAsset"><a href="#" class="action-link">${msg("actions.folder.delete")}</a></span>
+      <div id="${args.htmlid}-actionSet-folder" class="action-set">
+         <div class="onActionMoveTo"><a href="#" class="action-link"><span>${msg("actions.folder.move-to")}</span></a></div>
+         <div class="onActionCopyTo"><a href="#" class="action-link"><span>${msg("actions.folder.copy-to")}</span></a></div>
+         <div class="onActionDeleteAsset"><a href="#" class="action-link"><span>${msg("actions.folder.delete")}</span></a></div>
       </div>
    </div>
 

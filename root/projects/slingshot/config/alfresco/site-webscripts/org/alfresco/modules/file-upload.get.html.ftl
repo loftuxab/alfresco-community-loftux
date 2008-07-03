@@ -42,10 +42,10 @@
          <input id="${args.htmlid}-cancelOk-button" type="button" value="${msg("button.cancel")}" />
       </p>
 
-      <div class="hiddenComponents">
+      <div style="display:none">
          <div id="${args.htmlid}-left-div" class="fileupload-left-div">
-            <span class="fileupload-percentage-span hiddenComponents">&nbsp;</span>
-            <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hiddenComponents</#if>">
+            <span class="fileupload-percentage-span hidden">&nbsp;</span>
+            <select class="fileupload-contentType-menu <#if (contentTypes?size == 1)>hidden</#if>">
                <#if (contentTypes?size > 0)>
                   <#list contentTypes as contentType>
                      <option value="${contentType.id}">${contentType.value}</option>

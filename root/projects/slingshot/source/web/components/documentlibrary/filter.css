@@ -12,3 +12,8 @@
 {
    background-color: #d2e5f2;
 }
+
+.filter a:hover
+{
+   text-decoration: none;
+}

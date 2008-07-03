@@ -30,11 +30,6 @@ body
    color: #515D6B;
 }
 
-.hiddenComponents
-{
-   display: none;
-}
-
 .caret-fix
 {
    overflow-x: auto;

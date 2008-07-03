@@ -501,7 +501,7 @@
          var uniqueFileToken = this._getUniqueFileToken(event.record.getData());
          this.addedFiles[uniqueFileToken] = event.record.getId();
          this.noOfUnrenderedRows--;
-         if(this.noOfUnrenderedRows === 0)
+         if (this.noOfUnrenderedRows === 0)
          {
             this.widgets.uploadButton.set("disabled", false);
          }
@@ -545,17 +545,11 @@
          var fileInfo = this.fileStore[event["id"]];
 
          // Hide the contentType drop down if it wasn't hidden already
-         if (!Dom.hasClass(fileInfo.contentType, "hiddenComponents"))
-         {
-            Dom.addClass(fileInfo.contentType, "hiddenComponents");
-         }
+         Dom.addClass(fileInfo.contentType, "hidden");
 
          // Show the progress percentage if it wasn't visible already
          fileInfo.progressPercentage["innerHTML"] = "0%";
-         if (Dom.hasClass(fileInfo.progressPercentage, "hiddenComponents"))
-         {
-            Dom.removeClass(fileInfo.progressPercentage, "hiddenComponents");
-         }
+         Dom.removeClass(fileInfo.progressPercentage, "hidden");
 
          // Make sure we know we are in upload state
          fileInfo.state = this.STATE_UPLOADING;
@@ -860,15 +854,15 @@
 
          // Set the panel title
          var title;
-         if(this.showConfig.mode === this.MODE_SINGLE_UPLOAD)
+         if (this.showConfig.mode === this.MODE_SINGLE_UPLOAD)
          {
             title = Alfresco.util.message("header.singleUpload", this.name);
          }
-         else if(this.showConfig.mode === this.MODE_MULTI_UPLOAD)
+         else if (this.showConfig.mode === this.MODE_MULTI_UPLOAD)
          {
             title = Alfresco.util.message("header.multiUpload", this.name);
          }
-         else if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+         else if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
             title = Alfresco.util.message("header.singleUpdate", this.name);
          }
@@ -877,27 +871,18 @@
          if (this.showConfig.mode === this.MODE_SINGLE_UPDATE)
          {
             // Display the version input form
-            if(Dom.hasClass(this.versionSection, "hiddenComponents"))
-            {
-               Dom.removeClass(this.versionSection, "hiddenComponents");
-            }
+            Dom.removeClass(this.versionSection, "hidden");
          }
          else
          {
             // Hide the version input form
-            if(!Dom.hasClass(this.versionSection, "hiddenComponents"))
-            {
-               Dom.addClass(this.versionSection, "hiddenComponents");
-            }
+            Dom.addClass(this.versionSection, "hidden");
          }
 
-         if(this.showConfig.mode === this.MODE_MULTI_UPLOAD)
+         if (this.showConfig.mode === this.MODE_MULTI_UPLOAD)
          {
             // Show the help label for how to select multiple files
-            if(Dom.hasClass(this.multiSelectText, "hiddenComponents"))
-            {
-               Dom.removeClass(this.multiSelectText, "hiddenComponents");
-            }
+            Dom.removeClass(this.multiSelectText, "hidden");
 
             // Make the file list long
             this.dataTable.set("height", "204px");
@@ -905,10 +890,7 @@
          else
          {
             // Hide the help label for how to select multiple files
-            if(!Dom.hasClass(this.multiSelectText, "hiddenComponents"))
-            {
-               Dom.addClass(this.multiSelectText, "hiddenComponents");
-            }
+            Dom.addClass(this.multiSelectText, "hidden");
 
             // Make the file list short
             this.dataTable.set("height", "40px");
@@ -977,7 +959,7 @@
 
             // Set the state for this file(/row) if it hasn't been set
             var flashId = oRecord.getData()["id"];
-            if(!this.fileStore[flashId])
+            if (!this.fileStore[flashId])
             {
                this.fileStore[flashId] = { state: this.STATE_BROWSING };
             }
@@ -989,12 +971,12 @@
 
             // Save references to elements that will be updated during upload.
             var progress = Dom.getElementsByClassName("fileupload-progressSuccess-span", "span", templateInstance);
-            if(progress.length == 1)
+            if (progress.length == 1)
             {
                this.fileStore[flashId].progress = progress[0];
             }
             var progressInfo = Dom.getElementsByClassName("fileupload-progressInfo-span", "span", templateInstance);
-            if(progressInfo.length == 1)
+            if (progressInfo.length == 1)
             {
                // Display the file size in human readable format after the filename.
                var readableSize = new Number(oRecord.getData()["size"]);
@@ -1012,21 +994,21 @@
              * files contentType before upload.
              */
             var contentType = Dom.getElementsByClassName("fileupload-contentType-menu", "select", templateInstance);
-            if(contentType.length == 1)
+            if (contentType.length == 1)
             {
                this.fileStore[flashId].contentType = contentType[0];
             }
 
             // Save references to elements that will be updated during upload.
             var progressPercentage = Dom.getElementsByClassName("fileupload-percentage-span", "span", templateInstance);
-            if(progressPercentage.length == 1)
+            if (progressPercentage.length == 1)
             {
                this.fileStore[flashId].progressPercentage = progressPercentage[0];
             }
 
             // Create a yui button for the fileButton.
             var fButton = Dom.getElementsByClassName("fileupload-file-button", "button", templateInstance);
-            if(fButton.length == 1)
+            if (fButton.length == 1)
             {
                var fileButton = new YAHOO.widget.Button(fButton[0], {type: "button"});
                fileButton.subscribe("click", function(){ this._onFileButtonClickHandler(flashId, oRecord.getId()); }, this, true);

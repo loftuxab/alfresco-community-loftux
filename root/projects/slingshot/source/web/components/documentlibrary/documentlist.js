@@ -109,7 +109,16 @@
           * @property initialFilter
           * @type object
           */
-         initialFilter: {}
+         initialFilter: {},
+         
+         /**
+          * Delay time value for "More Actions" popup, in milliseconds
+          *
+          * @property actionsPopupTimeout
+          * @type int
+          * @default 500
+          */
+         actionsPopupTimeout: 500
       },
       
       /**
@@ -485,14 +494,19 @@
             key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
          }];
 
+         // Temporary blank "empty datatable" message
+         YAHOO.widget.DataTable.MSG_EMPTY = "";
+
          // DataTable definition
-         // initialRequest made here, otherwise YUI will make an automatic one with null arguments
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
             renderLoopSize: 8,
-            initialRequest: this._buildDocListParams(this.currentPath)
+            initialLoad: false
          });
          
+         // Custom error messages
+         this._setDefaultDataTableErrors();
+
          // Hook tableMsgShowEvent to clear out fixed-pixel width on <table> element (breaks resizer)
          this.widgets.dataTable.subscribe("tableMsgShowEvent", function(oArgs)
          {
@@ -500,9 +514,6 @@
             this._elMsgTbody.parentNode.style.width = "";
          });
          
-         // Custom error messages
-         this._setDefaultDataTableErrors();
-
          // Override abstract function within DataTable to set custom error message
          this.widgets.dataTable.doBeforeLoadData = function DL_doBeforeLoadData(sRequest, oResponse, oPayload)
          {
@@ -550,22 +561,24 @@
          YAHOO.Bubbling.fire("filterChanged", filterObj);
 
          // Hook action events
-         YAHOO.Bubbling.addDefaultAction("action-link", function DL_filterAction(layer, args)
+         var fnActionHandler = function DL_filterAction(layer, args)
          {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "span");
+            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
             if (owner !== null)
             {
                var action = owner.className;
                var target = args[1].target;
                if (typeof me[action] == "function")
                {
-                  me[action].call(me, target.offsetParent);
+                  me[action].call(me, target.offsetParent, owner);
                   args[1].stop = true;
                }
             }
       		 
             return true;
-         });
+         }
+         YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
+         YAHOO.Bubbling.addDefaultAction("show-more", fnActionHandler);
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -691,6 +704,7 @@
 
             var clone = Dom.get(this.id + "-actionSet-" + actionSet).cloneNode(true);
             clone.id = elActions.id + "_a";
+            Dom.addClass(clone, this.options.detailedView ? "detailed" : "simple");
             elActions.appendChild(clone);
          }
          // Show the actions
@@ -710,24 +724,81 @@
        */
       onEventUnhighlightRow: function DL_onEventUnhighlightRow(oArgs)
       {
+         var Dom = YAHOO.util.Dom;
+
          var target = oArgs.target;
          var renameId = this.id + "-rename-" + target.yuiRecordId;
          var actionsId = this.id + "-actions-" + target.yuiRecordId;
 
          // Just hide the action links
-         YAHOO.util.Dom.addClass(renameId, "hidden");
-         YAHOO.util.Dom.addClass(actionsId, "hidden");
+         Dom.addClass(renameId, "hidden");
+         Dom.addClass(actionsId, "hidden");
          
          // Call through to get the row unhighlighted by YUI
          this.widgets.dataTable.onEventUnhighlightRow.call(this.widgets.dataTable, oArgs);
       },
-
 
       /**
        * BUBBLING LIBRARY EVENT HANDLERS FOR ACTIONS
        * Disconnected event handlers for action event notification
        */
 
+      /**
+       * Show more actions pop-up.
+       *
+       * @method onActionShowMore
+       */
+      onActionShowMore: function DL_onActionShowMore(row, elMore)
+      {
+         var Dom = YAHOO.util.Dom;
+         var Event = YAHOO.util.Event;
+         var me = this;
+         
+         var elMoreActions = Dom.getNextSibling(elMore);
+         Dom.removeClass(elMoreActions, "hidden");
+         
+         // Mouse over handler - clear any registered hide timer
+         var onMouseOver = function DLSM_onMouseOver(e, obj)
+         {
+            // Clear any existing hide timer
+            if (obj.hideTimerId)
+            {
+               clearTimeout(elMoreActions.hideTimerId);
+               elMoreActions.hideTimerId = null;
+            }
+         }
+         
+         // Mouse out handler - register hide timer
+         var onMouseOut = function DLSM_onMouseOut(e, obj)
+         {
+            var elTarget = Event.getTarget(e);
+            var elTag = elTarget.nodeName.toLowerCase();
+            var related = e.relatedTarget;
+
+            // In some cases we should ignore this mouseout event
+            if ((related != obj) && (related.prefix != 'xul') && (!Dom.isAncestor(obj, related)))
+            {
+               if (obj.hideTimerId)
+               {
+                  clearTimeout(obj.hideTimerId);
+               }
+               obj.hideTimerId = setTimeout(function()
+               {
+                  Dom.addClass(obj, "hidden");
+                  Event.removeListener(obj, "mouseover");
+                  Event.removeListener(obj, "mouseout");
+               }, me.options.actionsPopupTimeout);
+            }
+            else
+            {
+               Alfresco.logger.debug("mouseout: ignored");
+            }
+         }
+         
+         Event.on(elMoreActions, "mouseover", onMouseOver, elMoreActions);
+         Event.on(elMoreActions, "mouseout", onMouseOut, elMoreActions);
+      },
+      
       /**
        * Delete Asset.
        *
