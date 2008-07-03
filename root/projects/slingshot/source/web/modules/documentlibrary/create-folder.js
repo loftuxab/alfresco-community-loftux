@@ -53,7 +53,7 @@
        * @property REST_API
        * @type string
        */
-      REST_API: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/{siteid}/{containerId}/{filepath}",
+      REST_API: Alfresco.constants.PROXY_URI + "slingshot/doclib/action/folder/site/{siteid}/{containerId}/{filepath}",
       
       /**
        * Dialog instance.

@@ -1123,7 +1123,7 @@ Alfresco.util.Ajax = function()
                config: config,
                json: json,
                serverResponse: serverResponse
-            }, callback.object);
+            }, callback.obj);
          }
          if (config.successMessage)
          {
@@ -1170,7 +1170,7 @@ Alfresco.util.Ajax = function()
                   config: config,
                   json: json,
                   serverResponse: serverResponse
-               }, callback.object);
+               }, callback.obj);
             }
             if (config.failureMessage)
             {
