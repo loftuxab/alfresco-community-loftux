@@ -114,6 +114,89 @@
       
       
       /**
+       * ACTION: Generic action.
+       * Generic DocLib action based on passed-in parameters
+       *
+       * @method genericAction
+       * @param action.success.event.name {string} Bubbling event to fire on success
+       * @param action.success.event.obj {object} Bubbling event success parameter object
+       * @param action.success.message {string} Timed message to display on success
+       * @param action.failure.event.name {string} Bubbling event to fire on failure
+       * @param action.failure.event.obj {object} Bubbling event failure parameter object
+       * @param action.failure.message {string} Timed message to display on failure
+       * @param action.webscript.name {string} data webscript URL name
+       * @param action.webscript.method {string} HTTP method to call the data webscript on
+       * @param action.params.siteId {string} current site
+       * @param action.params.containerId {string} component container
+       * @param action.params.path {string} path where file is located
+       * @param action.params.file {string} file to be deleted
+       * @param action.params.nodeRef {string} noderef instead of site, container, path, file
+       * @param obj {object} optional additional request configuration
+       * @return {boolean} false: module not ready
+       */
+      genericAction: function DLA_genericAction(action, obj)
+      {
+         var filePath = null;
+         var success = action.success;
+         var failure = action.failure;
+         var webscript = action.webscript;
+         var params = action.params;
+
+         var fnCallback = function DLA_genericAction_callback(data, obj)
+         {
+            // Check for notification event
+            if (obj && obj.event && obj.event.name)
+            {
+               YAHOO.Bubbling.fire(obj.event.name, obj.event.obj);
+            }
+         }
+         
+         var url = this.defaultConfig.url + webscript.name + "/";
+         if (params.nodeRef)
+         {
+            url += "node/" + params.nodeRef.replace(":/", "");
+         }
+         else
+         {
+            filePath = params.path + "/" + params.file;
+            url += "site/" + params.siteId + "/" + params.containerId + filePath;
+         }
+         
+         var config = YAHOO.lang.merge(this.defaultConfig,
+         {
+            successCallback:
+            {
+               fn: fnCallback,
+               scope: this,
+               obj: success
+            },
+            successMessage: (success && success.message) ? success.message : null,
+            failureCallback:
+            {
+               fn: fnCallback,
+               scope: this,
+               obj: failure
+            },
+            failureMessage: (failure && failure.message) ? failure.message : null,
+            url: url,
+            method: webscript.method,
+            responseContentType: Alfresco.util.Ajax.JSON,
+            object:
+            {
+               nodeRef: params.nodeRef,
+               siteId: params.siteId,
+               containerId: params.containerId,
+               path: params.path,
+               file: params.file,
+               filePath: filePath
+            }
+         });
+
+         return this._runAction(config, obj);
+      },
+   
+      
+      /**
        * ACTION: Delete file.
        * Deletes a file from the component container, given filepath
        *
@@ -131,7 +214,7 @@
          
          var config = YAHOO.lang.merge(this.defaultConfig,
          {
-            url: this.defaultConfig.url + "file/" + site + "/" + containerId + filePath,
+            url: this.defaultConfig.url + "file/site/" + site + "/" + containerId + filePath,
             method: Alfresco.util.Ajax.DELETE,
             responseContentType: Alfresco.util.Ajax.JSON,
             object:
@@ -162,7 +245,7 @@
          
          var config = YAHOO.lang.merge(this.defaultConfig,
          {
-            url: this.defaultConfig.url + "checkout/" + site + "/" + containerId + filePath,
+            url: this.defaultConfig.url + "checkout/site/" + site + "/" + containerId + filePath,
             method: Alfresco.util.Ajax.POST,
             responseContentType: Alfresco.util.Ajax.JSON,
             dataObj: {},

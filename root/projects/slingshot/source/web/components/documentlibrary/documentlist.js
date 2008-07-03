@@ -318,7 +318,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "doclist.items",
-             fields: ["index", "nodeRef", "type", "icon32", "name", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
+             fields: ["index", "nodeRef", "type", "icon32", "name", "parent", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
          };
          
          /**
@@ -376,6 +376,10 @@
             if (lockType != "")
             {
                elCell.innerHTML = '<span class="locked-by"><img src="' + Alfresco.constants.URL_CONTEXT + 'components/documentlibrary/images/' + lockType + '.gif" alt="' + lockType + '" /></span>'
+            }
+            else
+            {
+               elCell.innerHTML = '';
             }
          },
           
@@ -453,10 +457,16 @@
                if (me.options.detailedView)
                {
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.folder.rename") + '</div>';
+                  desc += '<div class="detail"><span><b>Created on:</b> ' + Alfresco.util.formatDate(oRecord.getData("createdOn")) + '</span>';
                   if (oRecord.getData("description").length > 0)
                   {
                      desc += '<div class="detail"><span><b>Description:</b> ' + oRecord.getData("description") + '</span></div>';
                   }
+                  else
+                  {
+                     desc += '<div class="detail">&nbsp;</div>';
+                  }
+                  desc += '<div class="detail">&nbsp;</div>';
                }
                else
                {
@@ -898,42 +908,41 @@
        */
       _onActionDeleteAssetConfirm: function DL__onActionDeleteAssetConfirm(record)
       {
-         var me = this;
          var fileType = record.getData("type");
-         var obj =
+         var fileName = record.getData("name");
+         var filePath = record.getData("parent") + "/" + fileName;
+         
+         new Alfresco.module.DoclibActions().genericAction(
          {
-            successCallback:
+            success:
             {
-               fn: function DL__onActionDeleteAssetConfirm_success(data)
+               event:
                {
-                  // Fire the notification event
-                  YAHOO.Bubbling.fire(fileType == "folder" ? "folderDeleted" : "fileDeleted",
+                  name: fileType == "folder" ? "folderDeleted" : "fileDeleted",
+                  obj:
                   {
-                     path: data.config.object.filePath
-                  });
-                  
-                  // Success confirmation message
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this._msg("message.delete.success", data.config.object.fileName)
-                  });
+                     path: filePath
+                  }
                },
-               scope: this
+               message: this._msg("message.delete.success", fileName)
             },
-            failureCallback:
+            failure:
             {
-               fn: function DL__onActionDeleteAssetConfirm_failure(data)
-               {
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this._msg("message.delete.failure", data.config.object.fileName)
-                  });
-               },
-               scope: this
+               message: this._msg("message.delete.failure", fileName)
+            },
+            webscript:
+            {
+               name: "file",
+               method: Alfresco.util.Ajax.DELETE
+            },
+            params:
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               file: fileName
             }
-         }
-         var action = new Alfresco.module.DoclibActions();
-         action.deleteFile(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"), obj);
+         });
       },
 
       /**
@@ -944,37 +953,72 @@
       onActionEditOffline: function DL_onActionEditOffline(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var obj =
+         var fileName = record.getData("name");
+
+         new Alfresco.module.DoclibActions().genericAction(
          {
-            successCallback:
+            success:
             {
-               fn: function DL_onActionEditOffline_success(data)
+               event:
                {
-                  // Fire the notification event
-                  YAHOO.Bubbling.fire("doclistRefresh");
-                  
-                  // Success confirmation message
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this._msg("message.edit-offline.success", data.config.object.fileName)
-                  });
+                  name: "doclistRefresh"
                },
-               scope: this
+               message: this._msg("message.edit-offline.success", fileName)
             },
-            failureCallback:
+            failure:
             {
-               fn: function DL_onActionEditOffline_failure(data)
-               {
-                  Alfresco.util.PopupManager.displayMessage(
-                  {
-                     text: this._msg("message.edit-offline.failure", data.config.object.fileName)
-                  });
-               },
-               scope: this
+               message: this._msg("message.edit-offline.failure", fileName)
+            },
+            webscript:
+            {
+               name: "checkout",
+               method: Alfresco.util.Ajax.POST
+            },
+            params:
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               path: this.currentPath,
+               file: fileName
             }
-         }
-         var action = new Alfresco.module.DoclibActions();
-         action.editFileOffline(this.options.siteId, this.options.containerId, this.currentPath, record.getData("name"), obj);
+         });
+      },
+      
+      /**
+       * Cancel editing.
+       *
+       * @method onActionCancelEditing
+       */
+      onActionCancelEditing: function DL_onActionCancelEditing(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row);
+         var fileName = record.getData("name");
+         var nodeRef = record.getData("nodeRef");
+
+         new Alfresco.module.DoclibActions().genericAction(
+         {
+            success:
+            {
+               event:
+               {
+                  name: "doclistRefresh"
+               },
+               message: this._msg("message.edit-cancel.success", fileName)
+            },
+            failure:
+            {
+               message: this._msg("message.edit-cancel.failure", fileName)
+            },
+            webscript:
+            {
+               name: "cancel-checkout",
+               method: Alfresco.util.Ajax.POST
+            },
+            params:
+            {
+               nodeRef: nodeRef
+            }
+         });
       },
 
 
