@@ -291,7 +291,7 @@
        */
       onCancelButtonClick: function CD_onCancelButtonClick(event)
       {
-         document.location.href = Alfresco.constants.URL_CONTEXT + "page/user-dashboard";
+         document.location.href = Alfresco.constants.URL_CONTEXT + "page/user/" + Alfresco.constants.USERNAME + "/user-dashboard";
       },
 
       /**

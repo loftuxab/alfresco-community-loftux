@@ -1,6 +1,6 @@
 <script type="text/javascript">//<![CDATA[
 	new Alfresco.Wiki("${args.htmlid}").setSiteId(
-		"${page.url.args["site"]}"
+		"${page.url.templateArgs.site}"
 	).setPageTitle(
 		"${page.url.args["title"]}"
 	);

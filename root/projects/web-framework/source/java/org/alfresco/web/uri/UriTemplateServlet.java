@@ -54,95 +54,95 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class UriTemplateServlet extends HttpServlet
 {
-   private static Log logger = LogFactory.getLog(UriTemplateServlet.class);
-   
-   public static final String CONFIG_ELEMENT = "UriTemplate";
-   
-   /** URI Template index - Application url mappings */
-   private UriTemplateIndex uriTemplateIndex;
-   
-   
-   /**
-    * @see javax.servlet.GenericServlet#init()
-    */
-   @Override
-   public void init() throws ServletException
-   {
-      super.init();
-      
-      // init required beans
-      ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
-      ConfigService configService = (ConfigService)context.getBean("web.config");
-      initUriIndex(configService);
-   }
-   
-   /**
-    * Initialise the list of URL Mapper objects for the PageRenderer
-    */
-   private void initUriIndex(ConfigService configService)
-   {
-      Config config = configService.getConfig(CONFIG_ELEMENT);
-      if (config == null)
-      {
-         throw new AlfrescoRuntimeException("Cannot find required config element 'UriTemplate'.");
-      }
-      ConfigElement uriConfig = config.getConfigElement("uri-mappings");
-      if (uriConfig == null)
-      {
-         throw new AlfrescoRuntimeException("Missing required config element 'uri-mappings' under 'UriTemplate'.");
-      }
-      this.uriTemplateIndex = new UriTemplateIndex(uriConfig);
-   }
-   
-   /**
-    * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
-    */
-   @Override
-   protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
-   {
-      String uri = req.getRequestURI();
-      String qs = req.getQueryString();
-      
-      // skip servlet context path and build the path to the resource we are looking for
-      uri = uri.substring(req.getContextPath().length());
-      
-      // validate and return the URI path - stripping the servlet context
-      StringTokenizer t = new StringTokenizer(uri, "/");
-      String servletName = t.nextToken();
-      if (!t.hasMoreTokens())
-      {
-         throw new AlfrescoRuntimeException("Invalid URL: " + uri);
-      }
-      
-      // build the uri ready for URI Template match
-      uri = uri.substring(servletName.length() + 1) + (qs != null ? ("?" + qs) : "");
-      
-      if (logger.isDebugEnabled())
-         logger.debug("Matching application URI template: " + uri);
-      
-      String resource = matchUriTemplate(uri);
-      
-      if (logger.isDebugEnabled())
-         logger.debug("Resolved uri template to resource: " + resource);
-      
-      // rebuild page servlet URL to perform forward too
-      req.getRequestDispatcher(resource).forward(req, res);
-   }
-   
-   /**
-    * Match the specified URI against the URI template index
-    * 
-    * @param uri to match
-    * 
-    * @return the resource URL to use
-    */
-   private String matchUriTemplate(String uri)
-   {
-      String resource = this.uriTemplateIndex.findMatch(uri);
-      if (resource == null)
-      {
-         resource = uri;
-      }
-      return resource;
-   }
+    private static Log logger = LogFactory.getLog(UriTemplateServlet.class);
+
+    public static final String CONFIG_ELEMENT = "UriTemplate";
+
+    /** URI Template index - Application url mappings */
+    private UriTemplateMappingIndex uriTemplateIndex;
+
+
+    /**
+     * @see javax.servlet.GenericServlet#init()
+     */
+    @Override
+    public void init() throws ServletException
+    {
+        super.init();
+
+        // init required beans
+        ApplicationContext context = WebApplicationContextUtils.getRequiredWebApplicationContext(getServletContext());
+        ConfigService configService = (ConfigService)context.getBean("web.config");
+        initUriIndex(configService);
+    }
+
+    /**
+     * Initialise the list of URL Mapper objects for the PageRenderer
+     */
+    private void initUriIndex(ConfigService configService)
+    {
+        Config config = configService.getConfig(CONFIG_ELEMENT);
+        if (config == null)
+        {
+            throw new AlfrescoRuntimeException("Cannot find required config element 'UriTemplate'.");
+        }
+        ConfigElement uriConfig = config.getConfigElement("uri-mappings");
+        if (uriConfig == null)
+        {
+            throw new AlfrescoRuntimeException("Missing required config element 'uri-mappings' under 'UriTemplate'.");
+        }
+        this.uriTemplateIndex = new UriTemplateMappingIndex(uriConfig);
+    }
+
+    /**
+     * @see javax.servlet.http.HttpServlet#service(javax.servlet.http.HttpServletRequest, javax.servlet.http.HttpServletResponse)
+     */
+    @Override
+    protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException
+    {
+        String uri = req.getRequestURI();
+        String qs = req.getQueryString();
+
+        // skip servlet context path and build the path to the resource we are looking for
+        uri = uri.substring(req.getContextPath().length());
+
+        // validate and return the URI path - stripping the servlet context
+        StringTokenizer t = new StringTokenizer(uri, "/");
+        String servletName = t.nextToken();
+        if (!t.hasMoreTokens())
+        {
+            throw new AlfrescoRuntimeException("Invalid URL: " + uri);
+        }
+
+        // build the uri ready for URI Template match
+        uri = uri.substring(servletName.length() + 1) + (qs != null ? ("?" + qs) : "");
+
+        if (logger.isDebugEnabled())
+            logger.debug("Matching application URI template: " + uri);
+
+        String resource = matchUriTemplate(uri);
+
+        if (logger.isDebugEnabled())
+            logger.debug("Resolved uri template to resource: " + resource);
+
+        // rebuild page servlet URL to perform forward too
+        req.getRequestDispatcher(resource).forward(req, res);
+    }
+
+    /**
+     * Match the specified URI against the URI template index
+     * 
+     * @param uri to match
+     * 
+     * @return the resource URL to use
+     */
+    private String matchUriTemplate(String uri)
+    {
+        String resource = this.uriTemplateIndex.findMatchAndReplace(uri);
+        if (resource == null)
+        {
+            resource = uri;
+        }
+        return resource;
+    }
 }

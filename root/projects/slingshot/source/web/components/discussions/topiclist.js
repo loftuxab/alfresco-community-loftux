@@ -322,7 +322,7 @@
       _gotoTopic: function DiscussionsTopicList__gotoTopic(topicId, isEdit)
       {
           var url = Alfresco.constants.URL_CONTEXT;
-          url += "page/discussions-topicview?site=" + this.options.siteId + "&topicId=" + topicId;
+          url += "page/site/" + this.options.siteId + "/discussions-topicview?topicId=" + topicId;
           if (isEdit)
           {
               url += "&edit=true";

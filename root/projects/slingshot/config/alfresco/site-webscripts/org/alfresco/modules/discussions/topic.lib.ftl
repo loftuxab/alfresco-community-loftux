@@ -23,7 +23,7 @@
   <td>
 	<div class="nodeContent">
 		<div class="nodeTitle">
-			<a href="discussions-topicview?site=${site}&topicId=${topic.name}">
+			<a href="discussions-topicview?topicId=${topic.name}">
 				${topic.title}
 			</a>
 			<#if topic.isUpdated><span class="nodeStatus">(${msg("topic.updated")})</span></#if>

@@ -10,7 +10,7 @@
 			<#list items as postdata>		
 			      <item>
 			         <title><#if postdata.isRootPost>New topic:<#else>Reply to topic:</#if> ${postdata.topicTitle?html}</title>
-			         <link>${absurl(url.context)}/page/discussions-topicview?site=${site}&amp;container=${container}&amp;topicId=${postdata.topicName}</link>
+			         <link>${absurl(url.context)}/page/site/${site}/discussions-topicview?container=${container}&amp;topicId=${postdata.topicName}</link>
 			         <description>${postdata.content?html}</description>
 			         <pubDate>${postdata.createdOn?datetime?string("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")}</pubDate>
 			      </item>

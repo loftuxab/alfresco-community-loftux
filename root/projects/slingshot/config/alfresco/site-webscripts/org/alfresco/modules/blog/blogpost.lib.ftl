@@ -13,7 +13,6 @@
 -->
 
 
-
 <#macro blogpostViewHTML post>
   <div id="${post.name}" class="node post postview">
   <table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -21,7 +20,7 @@
   <td>
 	<div class="nodeContent">
 		<div class="nodeTitle">
-			<a href="blog-postview?site=${site}&postId=${post.name}">
+			<a href="blog-postview?postId=${post.name}">
 				${post.title}
 			</a>
 			<#import "/org/alfresco/modules/blog/blogpostlist.lib.ftl" as blogpostlistLib/>

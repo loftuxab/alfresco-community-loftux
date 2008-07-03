@@ -25,6 +25,7 @@
 package org.alfresco.web.site;
 
 import java.io.File;
+import java.io.Serializable;
 import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
@@ -80,7 +81,7 @@ public class HttpRequestContextFactory implements RequestContextFactory
             {
                 String parameterName = (String) parameterNames.nextElement();
                 Object parameterValue = ((HttpServletRequest)request).getParameter(parameterName);
-                context.setValue(parameterName, parameterValue);
+                context.setValue(parameterName, (Serializable)parameterValue);
             }
             
             // Construct/load the user and place them onto the request context

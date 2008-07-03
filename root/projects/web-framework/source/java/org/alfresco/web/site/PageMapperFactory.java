@@ -30,14 +30,14 @@ import org.alfresco.web.site.exception.PageMapperException;
 /**
  * @author muzquiano
  */
-public class PageMapperFactory
+public final class PageMapperFactory
 {
     public static PageMapper newInstance(RequestContext context)
         throws PageMapperException
     {
         PageMapper pageMapper;
         
-        // check if there is a configured link builder id
+        // check if there is a configured page mapper id
         String pageMapperId = FrameworkHelper.getConfig().getDefaultPageMapperId();
         if (pageMapperId == null)
         {
@@ -46,8 +46,7 @@ public class PageMapperFactory
         }
         else
         {
-            // construct a page mapper
-            // TODO: Pool these?
+            // construct a new page mapper for this request instance
             String className = FrameworkHelper.getConfig().getPageMapperDescriptor(pageMapperId).getImplementationClass();
             pageMapper = (PageMapper) ReflectionHelper.newObject(className);
             if (pageMapper == null)

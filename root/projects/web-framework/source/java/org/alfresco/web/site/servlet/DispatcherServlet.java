@@ -298,9 +298,9 @@ public class DispatcherServlet extends BaseServlet
                                     args.put(name, request.getParameter(name));
                                 }
                                 // construct redirection url
-                                String redirectUrl = context.getLinkBuilder().page(
-                                        context, pageId, formatId, objectId, args);
-
+                                String redirectUrl = request.getRequestURI() + 
+                                    (request.getQueryString() != null ? request.getQueryString() : "");
+                                
                                 // set redirect url for use on login page template
                                 context.setValue(ALF_REDIRECT_URL, redirectUrl);
                                 

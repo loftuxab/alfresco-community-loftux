@@ -3,7 +3,7 @@
 function main()
 {
     // fetch required datadata
-    var site = page.url.args["site"];
+    var site = page.url.templateArgs.site;
     var container = template.properties["container"];
     if (container == undefined)
     {

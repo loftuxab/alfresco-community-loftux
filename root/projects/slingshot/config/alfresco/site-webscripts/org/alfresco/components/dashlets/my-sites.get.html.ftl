@@ -11,7 +11,7 @@
 <#if sites?exists>
    <#list sites as site>
       <div class="text-list-item">
-        <a href="${url.context}/page/collaboration-dashboard?site=${site.shortName}">${site.title}</a>
+        <a href="${url.context}/page/site/${site.shortName}/collaboration-dashboard">${site.title}</a>
       </div>
    </#list>
 <#else>
@@ -19,4 +19,3 @@
 </#if>
   </div>
 </div>
-

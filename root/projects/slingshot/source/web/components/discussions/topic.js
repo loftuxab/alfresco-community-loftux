@@ -190,7 +190,7 @@
          if (response.json.error == undefined)
          {
             // redirect to the list page
-            window.location = Alfresco.constants.URL_CONTEXT + "/page/discussions-topiclist?site=" + this.options.siteId;
+            window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/discussions-topiclist";
          }
          else
          {
@@ -389,8 +389,7 @@
             if (this.options.mode == "create")
             {
                 window.location =  Alfresco.constants.URL_CONTEXT +
-                                   "page/discussions-topicview?site=" +
-                                   this.options.siteId + "&topicId=" + response.json.topicId;
+                                   "page/site/" + this.options.siteId + "/discussions-topicview?topicId=" + response.json.topicId;
             }
             else if (this.options.mode == "edit")
             {

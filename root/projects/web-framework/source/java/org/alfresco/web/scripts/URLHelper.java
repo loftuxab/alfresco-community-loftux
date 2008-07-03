@@ -1,5 +1,7 @@
 package org.alfresco.web.scripts;
 
+import java.io.Serializable;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,15 +12,18 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * Class to represent the template model for a URL.
  * 
+ * This class is immutable.
+ * 
  * @author Kevin Roast
  */
-public class URLHelper
+public final class URLHelper implements Serializable
 {
-    String context;
-    String pageContext;
-    String uri;
-    String queryString;
-    Map<String, String> args;
+    private final String context;
+    private final String pageContext;
+    private final String uri;
+    private final String queryString;
+    private final Map<String, String> args;
+    private final Map<String, String> templateArgs = new HashMap<String, String>(4, 1.0f);
 
     /**
      * Construction
@@ -26,34 +31,6 @@ public class URLHelper
      * @param req       Servlet request to build URL model helper from
      */
     public URLHelper(HttpServletRequest req)
-    {
-        init(req);
-        Map<String, String> args = new HashMap<String, String>(req.getParameterMap().size());
-        Enumeration names = req.getParameterNames();
-        while (names.hasMoreElements())
-        {
-            String name = (String)names.nextElement();
-            args.put(name, req.getParameter(name));
-        }
-        this.args = args;
-    }
-    
-    /**
-     * Construction
-     * 
-     * @param req       Servlet request to build URL model helper from
-     */
-    public URLHelper(HttpServletRequest req, Map<String, String> reqArgs)
-    {
-        init(req);
-        if (reqArgs == null)
-        {
-            throw new IllegalArgumentException("Argument map is mandatory.");
-        }
-        this.args = reqArgs;
-    }
-    
-    private void init(HttpServletRequest req)
     {
         this.context = req.getContextPath();
         this.uri = req.getRequestURI();
@@ -68,8 +45,31 @@ public class URLHelper
             this.pageContext = this.context;
         }
         this.queryString = (req.getQueryString() != null ? req.getQueryString() : "");
+        
+        Map<String, String> args = new HashMap<String, String>(req.getParameterMap().size());
+        Enumeration names = req.getParameterNames();
+        while (names.hasMoreElements())
+        {
+            String name = (String)names.nextElement();
+            args.put(name, req.getParameter(name));
+        }
+        this.args = Collections.unmodifiableMap(args);
     }
-
+    
+    /**
+     * Construction
+     * 
+     * @param req       Servlet request to build URL model helper from
+     */
+    public URLHelper(HttpServletRequest req, Map<String, String> templateArgs)
+    {
+        this(req);
+        if (templateArgs != null)
+        {
+            this.templateArgs.putAll(templateArgs);
+        }
+    }
+    
     public String getContext()
     {
         return context;
@@ -98,5 +98,10 @@ public class URLHelper
     public Map<String, String> getArgs()
     {
         return this.args;
+    }
+    
+    public Map<String, String> getTemplateArgs()
+    {
+        return Collections.unmodifiableMap(this.templateArgs);
     }
 }

@@ -10,7 +10,7 @@
 			<#list items as post>
 			      <item>
 			         <title>${post.title?html}</title>
-			         <link>${absurl(url.context)}/page/blog-postview?site=${site}&amp;container=${container}&amp;postId=${post.name}</link>
+			         <link>${absurl(url.context)}/page/site/${site}/blog-postview?container=${container}&amp;postId=${post.name}</link>
 			         <description>${post.content?html}</description>
 			         <pubDate>${post.createdOn?datetime?string("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")}</pubDate>
 			      </item>

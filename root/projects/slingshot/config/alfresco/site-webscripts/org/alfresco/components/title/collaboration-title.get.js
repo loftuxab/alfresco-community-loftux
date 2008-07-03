@@ -1,5 +1,5 @@
 // Call the repository for the site profile
-var json = remote.call("/api/sites/" + page.url.args.site);
+var json = remote.call("/api/sites/" + page.url.templateArgs.site);
 
 var profile =
 {

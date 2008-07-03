@@ -24,17 +24,24 @@
  */
 package org.alfresco.web.site;
 
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
+import org.alfresco.config.Config;
+import org.alfresco.config.ConfigElement;
 import org.alfresco.connector.AlfrescoAuthenticator;
 import org.alfresco.connector.ConnectorSession;
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.scripts.ProcessorModelHelper;
+import org.alfresco.web.scripts.URLHelper;
 import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
+import org.alfresco.web.uri.UriTemplateListIndex;
 
 /**
  * This is a Page Mapper class which serves to interpret URLs at dispatch
@@ -66,6 +73,12 @@ import org.alfresco.web.site.exception.PageMapperException;
  */
 public class SlingshotPageMapper extends AbstractPageMapper
 {
+    private static final String URI_PAGEID = "pageid";
+    
+    /** URI Template index - page url mappings */
+    private static final UriTemplateListIndex uriTemplateIndex;
+    
+    
     /**
      * Empty constructor - for instantiation via reflection 
      */
@@ -73,7 +86,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
     {
         super();
     }
-
+    
     /**
      * Requests come in with the forms:
      * 
@@ -96,26 +109,36 @@ public class SlingshotPageMapper extends AbstractPageMapper
         // Strip off the webapp name (if any - may be ROOT i.e. "/")
         HttpServletRequest req = ((HttpServletRequest)request);
     	String requestURI = req.getRequestURI().substring(req.getContextPath().length());
-    	
-    	// Tokenizer and walk the string to figure out what kinds of
-    	// inputs we were given in the straight up URI
+        
+    	// Extract page Id from the rest of the URI
     	String pageId = null;
-    	StringTokenizer t = new StringTokenizer(requestURI, "/");
-		t.nextToken();        // skip servlet name
-		if (t.hasMoreTokens())
-		{
-			// ride out the rest to build the pageId
-            StringBuilder buf = new StringBuilder(64);
-            do
+        
+	    // strip servlet name and set remaining path as currently executing URI
+        Map<String, String> uriTokens = null;
+        int pathIndex = requestURI.indexOf('/', 1);
+        if (pathIndex != -1 && requestURI.length() > (pathIndex + 1))
+        {
+            pageId = requestURI.substring(pathIndex + 1);
+            context.setUri(pageId);
+            
+            // Perform match against URI templates - to resolve application wide uri template
+            // token values such as "site" i.e. /site/mysite/pageid/pageid
+            // where the uri template might be /site/{site}/{pageid}
+            uriTokens = matchUriTemplate(requestURI.substring(pathIndex));
+            
+            // if match our special "{pageid}" token - override pageId with the value
+            if (uriTokens != null)
             {
-                buf.append(t.nextToken());
-                if (t.hasMoreTokens())
+                if (uriTokens.containsKey(URI_PAGEID))
                 {
-                    buf.append('/');
+                    pageId = uriTokens.get(URI_PAGEID);
                 }
-            } while (t.hasMoreTokens());
-            pageId = buf.toString();
-		}
+            }
+        }
+        
+        // build a URLHelper object one time - it is immutable and can be reused
+        URLHelper urlHelper = new URLHelper(req, uriTokens);
+        context.setValue(ProcessorModelHelper.MODEL_URL, urlHelper);
     	
     	// Did we receive an "object" request parameter
     	String objectId = (String)request.getParameter("doc");
@@ -195,12 +218,12 @@ public class SlingshotPageMapper extends AbstractPageMapper
         	try
         	{
         		content = loadContent(context, objectId);
-	        	if(content != null)
+	        	if (content != null)
 	        	{
 	        		context.setCurrentObject(content);
 	        	}
         	}
-    		catch(ContentLoaderException cle)
+    		catch (ContentLoaderException cle)
     		{
     			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
     		}    		
@@ -213,7 +236,35 @@ public class SlingshotPageMapper extends AbstractPageMapper
         {
             // retrieve the alfTicket
             String ticket = (String)connectorSession.getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
-            context.setValue("alfTicket", ticket);
+            context.setValue(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET, ticket);
         }
+    }
+    
+    /**
+     * Match the page Id against the available URI templates. If a match is found then return
+     * the variables representing the tokens and the values extracted from the supplied page Id.
+     * 
+     * @param pageId    Page Id to match against
+     * 
+     * @return map of tokens to values or null if no match found 
+     */
+    private static Map<String, String> matchUriTemplate(String pageId)
+    {
+        return uriTemplateIndex.findMatch(pageId);
+    }
+    
+    static
+    {
+        Config config = FrameworkHelper.getConfigService().getConfig("UriTemplate");
+        if (config == null)
+        {
+            throw new AlfrescoRuntimeException("Cannot find required config element 'UriTemplate'.");
+        }
+        ConfigElement uriConfig = config.getConfigElement("uri-templates");
+        if (uriConfig == null)
+        {
+            throw new AlfrescoRuntimeException("Missing required config element 'uri-templates' under 'UriTemplate'.");
+        }
+        uriTemplateIndex = new UriTemplateListIndex(uriConfig);
     }
 }

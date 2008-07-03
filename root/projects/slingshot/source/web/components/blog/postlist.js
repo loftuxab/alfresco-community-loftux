@@ -277,13 +277,13 @@
        */
       onViewNode: function BlogPostList_onViewPost(id)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/blog-postview?site=" + this.options.siteId + "&postId=" + id;
+         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postview?postId=" + id;
          window.location = url;
       },
       
       onEditNode: function BlogPostList_onEditNode(id)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/blog-postedit?site=" + this.options.siteId + "&container=" + this.options.containerId + "&postId=" + id;
+         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit?container=" + this.options.containerId + "&postId=" + id;
          window.location = url;
       },
       

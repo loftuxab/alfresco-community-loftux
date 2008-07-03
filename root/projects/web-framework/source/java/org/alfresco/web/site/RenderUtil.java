@@ -53,14 +53,19 @@ import org.alfresco.web.site.renderer.RendererDescriptor;
 import org.alfresco.web.site.renderer.RendererFactory;
 
 /**
+ * Utility methods for rendering various pages, regions and components.
+ * 
  * @author muzquiano
+ * @author kevinr
  */
 public final class RenderUtil
 {
-    private static final String THEME = "theme";
     public static final String PASSIVE_MODE_MARKER = "passiveMode";
+    
+    private static final String THEME = "theme";
     private static final String NEWLINE = "\r\n";
 
+    
     /**
      * Renders a given JSP page.
      *
@@ -689,27 +694,35 @@ public final class RenderUtil
         return value;
     }
 
-    public static String getSourceId(RequestContext context, String scopeId)
+    /**
+     * Return the "source" ID for the given scopeId for the supplied context
+     * 
+     * @param context   Current RequestContext
+     * @param scopeId   {@link WebFrameworkConstants}
+     * 
+     * @return the source ID
+     */
+    private static String getSourceId(RequestContext context, String scopeId)
     {
-        // rendering objects
-        Page page = context.getPage();
-        TemplateInstance template = context.getTemplate();
-
-        // get the component association in that scope
         String sourceId = null;
+        
         if (WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
         {
             sourceId = WebFrameworkConstants.REGION_SCOPE_GLOBAL;
         }
-        if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
+        else if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
         {
-            sourceId = template.getId();
+            sourceId = context.getTemplate().getId();
         }
-        if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
+        else if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
         {
-            sourceId = page.getId();
+            sourceId = context.getPage().getId();
         }
-
+        else if (WebFrameworkConstants.REGION_SCOPE_URI.equalsIgnoreCase(scopeId))
+        {
+            sourceId = context.getUri();
+        }
+        
         return sourceId;
     }
 
@@ -732,13 +745,17 @@ public final class RenderUtil
         {
             obj = WebFrameworkConstants.REGION_SCOPE_GLOBAL;
         }
-        if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
+        else if (WebFrameworkConstants.REGION_SCOPE_TEMPLATE.equalsIgnoreCase(scopeId))
         {
             obj = context.getModel().getTemplate(sourceId);
         }
-        if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
+        else if (WebFrameworkConstants.REGION_SCOPE_PAGE.equalsIgnoreCase(scopeId))
         {
             obj = context.getModel().getPage(sourceId);
+        }
+        else if (WebFrameworkConstants.REGION_SCOPE_URI.equalsIgnoreCase(scopeId))
+        {
+            obj = context.getUri();
         }
         
         return obj;
@@ -1117,7 +1134,8 @@ public final class RenderUtil
                     renderer = config.getProperty("renderer");
 
                     // execute renderer
-                    String tags = RenderUtil.processRenderer(context, rendererContext.getRequest(), rendererContext.getResponse(), rendererType, renderer);
+                    String tags = RenderUtil.processRenderer(
+                            context, rendererContext.getRequest(), rendererContext.getResponse(), rendererType, renderer);
 
                     buf.append(tags);
                     buf.append(NEWLINE);
@@ -1125,7 +1143,8 @@ public final class RenderUtil
             }
             catch (Exception ex)
             {
-                throw new RendererExecutionException("Unable to render global include for renderer: " + renderer + " of type: " + rendererType, ex);
+                throw new RendererExecutionException("Unable to render global include for renderer: " +
+                        renderer + " of type: " + rendererType, ex);
             }
 
             // If the current renderer is rendering a TemplateInstance,
@@ -1145,33 +1164,39 @@ public final class RenderUtil
                             component = components[i];
 
                             // bind the component into context
-                            RendererContext componentRendererContext = RendererContextHelper.bind(context, component, rendererContext.getRequest(), rendererContext.getResponse());
-
-                            Renderable renderable = RendererFactory.newRenderer(context, component);
-                            String head = renderable.head(componentRendererContext);
-                            if (head != null)
+                            RendererContext componentRendererContext = RendererContextHelper.bind(
+                                    context, component, rendererContext.getRequest(), rendererContext.getResponse());
+                            
+                            try
                             {
-                                buf.append(head);
-                                buf.append(NEWLINE);
+                                Renderable renderable = RendererFactory.newRenderer(context, component);
+                                String head = renderable.head(componentRendererContext);
+                                if (head != null)
+                                {
+                                    buf.append(head);
+                                    buf.append(NEWLINE);
+                                }
                             }
-
-                            // unbind the component
-                            RendererContextHelper.unbind(context);
+                            finally
+                            {
+                                // unbind the component
+                                RendererContextHelper.unbind(context);
+                            }
                         }
                     }
                 }
                 catch (RendererNotFoundException rnfe)
                 {
-                    RendererContextHelper.unbind(context);
-                    throw new RendererExecutionException("HEAD Renderer not found for component: " + component.getId(), rnfe);
+                    throw new RendererExecutionException("HEAD Renderer not found for component: " +
+                            component.getId(), rnfe);
                 }
                 catch (RendererExecutionException ree)
                 {
-                    RendererContextHelper.unbind(context);
-                    throw new RendererExecutionException("HEAD Renderer failed to execute for component: " + component.getId(), ree);
+                    throw new RendererExecutionException("HEAD Renderer failed to execute for component: " +
+                            component.getId(), ree);
                 }
             }
-
+            
             // bind result into request context
             headTags = buf.toString();
             context.setValue(WebFrameworkConstants.PAGE_HEAD_DEPENDENCIES_STAMP, headTags);

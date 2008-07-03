@@ -148,7 +148,7 @@
 		 */
 		_getAbsolutePath: function()
 		{
-			return Alfresco.constants.URL_CONTEXT + "page/wiki?site=" + this.siteId + "&title=";	
+			return Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki?title=";	
 		},
 		
 		/*

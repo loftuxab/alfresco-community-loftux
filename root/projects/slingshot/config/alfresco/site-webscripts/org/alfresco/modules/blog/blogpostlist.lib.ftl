@@ -49,7 +49,7 @@
   <td width="80%">
 	<div class="nodeContent">
 		<span class="nodeTitle">
-			<a href="blog-postview?site=${site}&postId=${post.name}">
+			<a href="blog-postview?postId=${post.name}">
 				${post.title}
 			</a>
 			<@renderPostStatus post=post/>
@@ -102,7 +102,7 @@
   <div class="nodeFooter">
   	<span class="nodeFooterBloc">
 		<span class="nodeAttrLabel replyTo">${msg("post.footer.replies")}:</span><span class="nodeAttrValue"> (${post.commentCount})</span>
-		<span class="nodeAttrValue"><a href="blog-postview?site=${site}&postId=${post.name}">${msg("post.footer.read")}</a></span>
+		<span class="nodeAttrValue"><a href="blog-postview?postId=${post.name}">${msg("post.footer.read")}</a></span>
 	</span> 
 
 	<#if (post.tags?size > 0)>
@@ -127,7 +127,7 @@
   <td width="80%">
 	<div class="nodeContent">
 		<div class="nodeTitle">
-			<a href="blog-postview?site=${site}&postId=${post.name}">
+			<a href="blog-postview?postId=${post.name}">
 				${post.title}
 			</a>
 		</div>
@@ -145,7 +145,7 @@
 		
 		<#if (post.permissions.edit)>
 			<span class="onEditNode">
-				<a id="edit-${post.name}" class="editEventPost" href="blog-postview?site=${site}&postId=post-${post.name}&edit=true">
+				<a id="edit-${post.name}" class="editEventPost" href="site/${site}/blog-postview?postId=post-${post.name}&edit=true">
 					${msg("post.action.edit")}
 				</a>
 			</span>

@@ -1,6 +1,6 @@
 <script type="text/javascript">//<![CDATA[
    var view = new Alfresco.CalendarView("${args.htmlid}").setSiteId(
-	"${page.url.args["site"]!""}"
+	"${page.url.templateArgs.site!""}"
 	).setMessages(
 		${messages}
 	);

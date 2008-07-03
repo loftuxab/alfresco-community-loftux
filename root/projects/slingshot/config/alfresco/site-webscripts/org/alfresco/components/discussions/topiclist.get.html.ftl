@@ -4,7 +4,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DiscussionsTopicList("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]!""}"
+      siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
    );
@@ -13,18 +13,18 @@
 <div id="discussionsBlogHeader1">
 	<div class="leftDiscussionBlogHeader">
 		<span class="createNodeLink">
-		   <a href="${url.context}/page/discussions-createtopic?site=${page.url.args["site"]}">
+		   <a href="${url.context}/page/site/${page.url.templateArgs.site}/discussions-createtopic">
 		      ${msg("header.createTopic")}
 		   </a>
 		</span>
 		<span class="rssLink">
-		   <a href="${url.context}/service/components/discussions/rss?site=${page.url.args["site"]}">
+		   <a href="${url.context}/service/components/discussions/rss?site=${page.url.templateArgs.site}">
 	          ${msg("header.discussionsRSS")}
 	       </a>
 		</span>
 		
 		<span class="rssLink">
-		   <a href="${url.context}/service/components/discussions/rss/latestposts?site=${page.url.args["site"]}">
+		   <a href="${url.context}/service/components/discussions/rss/latestposts?site=${page.url.templateArgs.site}">
 	          ${msg("header.topicsAndRepliesRSS")}
 	       </a>
 		</span>

@@ -29,9 +29,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.alfresco.i18n.I18NUtil;
+import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RenderUtil;
@@ -46,6 +45,21 @@ import org.alfresco.web.site.renderer.RendererContext;
  */
 public final class ProcessorModelHelper
 {
+    public static final String MODEL_HEAD = "head";
+    public static final String MODEL_URL = "url";
+    public static final String MODEL_USER = "user";
+    public static final String MODEL_INSTANCE = "instance";
+    public static final String MODEL_CONTENT = "content";
+    public static final String MODEL_CONTEXT = "context";
+    public static final String MODEL_SITEDATA = "sitedata";
+    public static final String MODEL_LOCALE = "locale";
+    public static final String MODEL_TEMPLATE = "template";
+    public static final String MODEL_PAGE = "page";
+    public static final String MODEL_PROPERTIES = "properties";
+    public static final String MODEL_THEME = "theme";
+    public static final String MODEL_DESCRIPTION = "description";
+    public static final String MODEL_TITLE = "title";
+    public static final String MODEL_ID = "id";
     public static final String PROP_HTMLID = "htmlid";
     
     /**
@@ -91,33 +105,33 @@ public final class ProcessorModelHelper
         if (context.getPage() != null)
         {
             // "page" model object
+            Page page = context.getPage();
             Map<String, Object> pageModel = new HashMap<String, Object>(8, 1.0f);
             if (context instanceof HttpRequestContext)
             {
-                HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-                URLHelper urlHelper = new URLHelper(request);
-                pageModel.put("url", urlHelper);
+                URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
+                pageModel.put(MODEL_URL, urlHelper);
             }
-            pageModel.put("id", context.getPage().getId());
-            pageModel.put("title", context.getPage().getTitle());
-            pageModel.put("description", context.getPage().getDescription());
-            pageModel.put("theme", ThemeUtil.getCurrentThemeId(context));
+            pageModel.put(MODEL_ID, page.getId());
+            pageModel.put(MODEL_TITLE, page.getTitle());
+            pageModel.put(MODEL_DESCRIPTION, page.getDescription());
+            pageModel.put(MODEL_THEME, ThemeUtil.getCurrentThemeId(context));
             
             // custom page properties - add to model
             // use ${page.properties["abc"]}
-            if (context.getPage().getCustomProperties().size() != 0)
+            if (page.getCustomProperties().size() != 0)
             {
                 Map<String, Serializable> customProps = new HashMap<String, Serializable>(
-                        context.getPage().getCustomProperties().size());
-                customProps.putAll(context.getPage().getCustomProperties());
-                pageModel.put("properties", customProps);
+                        page.getCustomProperties().size());
+                customProps.putAll(page.getCustomProperties());
+                pageModel.put(MODEL_PROPERTIES, customProps);
             }
             else
             {
-                pageModel.put("properties", Collections.EMPTY_MAP);
+                pageModel.put(MODEL_PROPERTIES, Collections.EMPTY_MAP);
             }
             
-            model.put("page", pageModel);
+            model.put(MODEL_PAGE, pageModel);
         }
         
         // things from the current template
@@ -130,44 +144,44 @@ public final class ProcessorModelHelper
                 Map<String, Serializable> customProps = new HashMap<String, Serializable>(
                             context.getTemplate().getCustomProperties());
                 customProps.putAll(context.getTemplate().getCustomProperties());
-                templateModel.put("properties", customProps);
+                templateModel.put(MODEL_PROPERTIES, customProps);
             }
             else
             {
-                templateModel.put("properties", Collections.EMPTY_MAP);
+                templateModel.put(MODEL_PROPERTIES, Collections.EMPTY_MAP);
             }
             
-            model.put("template", templateModel);
+            model.put(MODEL_TEMPLATE, templateModel);
         }
         
         // the global app theme
-        model.put("theme", ThemeUtil.getCurrentThemeId(context));
+        model.put(MODEL_THEME, ThemeUtil.getCurrentThemeId(context));
         
         // locale for the current thread
-        model.put("locale", I18NUtil.getLocale().toString());
+        model.put(MODEL_LOCALE, I18NUtil.getLocale().toString());
         
         //
         // add in the root-scoped web framework script objects
         //
         ScriptSiteData scriptSiteData = new ScriptSiteData(context); 
-        model.put("sitedata", scriptSiteData);
+        model.put(MODEL_SITEDATA, scriptSiteData);
         
         ScriptRequestContext scriptRequestContext = new ScriptRequestContext(context);
-        model.put("context", scriptRequestContext);
+        model.put(MODEL_CONTEXT, scriptRequestContext);
         
         if (context.getCurrentObject() != null)
         {
             ScriptContentObject scriptContent = new ScriptContentObject(context, context.getCurrentObject());
-            model.put("content", scriptContent);
+            model.put(MODEL_CONTENT, scriptContent);
         }
         
         ScriptRenderingInstance scriptRenderer = new ScriptRenderingInstance(rendererContext);
-        model.put("instance", scriptRenderer);
+        model.put(MODEL_INSTANCE, scriptRenderer);
         
         if (context.getUser() != null)
         {
             ScriptUser scriptUser = new ScriptUser(context, context.getUser());
-            model.put("user", scriptUser);
+            model.put(MODEL_USER, scriptUser);
         }                        
 
         // we are also given the "rendering configuration" for the current
@@ -221,17 +235,15 @@ public final class ProcessorModelHelper
         {
             if (context instanceof HttpRequestContext)
             {
-                HttpServletRequest request = ((HttpRequestContext)context).getRequest();
-                
                 // provide the URL helper for the template
-                URLHelper urlHelper = new URLHelper(request);
-                model.put("url", urlHelper);
+                URLHelper urlHelper = (URLHelper)context.getValue(MODEL_URL);
+                model.put(MODEL_URL, urlHelper);
             }
             
             // add in the ${head} tag
             if (rendererContext.getObject() instanceof TemplateInstance)
             {               
-                model.put("head", RenderUtil.processHeader(rendererContext));
+                model.put(MODEL_HEAD, RenderUtil.processHeader(rendererContext));
             }
         }
         

@@ -56,8 +56,11 @@ import org.mozilla.javascript.Scriptable;
  */
 public final class ScriptSiteData extends ScriptBase
 {
+    private static final String WEBSCRIPTS_REGISTRY = "webframework.webscripts.registry";
+    
     protected ScriptFileSystem rootFileSystem;
 
+    
     /**
      * Constructs a new ScriptSite object around the provided request context
      * 
@@ -78,7 +81,6 @@ public final class ScriptSiteData extends ScriptBase
     // --------------------------------------------------------------
     // JavaScript Properties
     //
-
     
     /**
      * Provides access to the root page for the web application.  If no
@@ -123,7 +125,6 @@ public final class ScriptSiteData extends ScriptBase
     
     // --------------------------------------------------------------
     // JavaScript Functions
-    //
 
     /**
      * @return  An array of all Component instances in the web application
@@ -541,8 +542,7 @@ public final class ScriptSiteData extends ScriptBase
         List<Description> values = new ArrayList<Description>(16);
         if (family != null)
         {
-            Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(
-                    "webframework.webscripts.registry");
+            Registry registry = (Registry)FrameworkHelper.getApplicationContext().getBean(WEBSCRIPTS_REGISTRY);
             for (WebScript webscript : registry.getWebScripts())
             {
                 if (family.equals(webscript.getDescription().getFamily()))

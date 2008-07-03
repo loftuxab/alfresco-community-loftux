@@ -4,7 +4,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.BlogPostList("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]!""}"
+      siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
    );
@@ -13,7 +13,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.ConfigBlog("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]!""}"
+      siteId: "${page.url.templateArgs.site!""}"
    }).setMessages(
       ${messages}
    );;
@@ -22,12 +22,12 @@
 <div id="discussionsBlogHeader1">
 	<div class="leftDiscussionBlogHeader">
 		<span class="createNodeLink">
-		   <a href="${url.context}/page/blog-postedit?site=${page.url.args["site"]}">
+		   <a href="${url.context}/page/site/${page.url.templateArgs.site}/blog-postedit">
 		      ${msg("header.createPost")}
 		   </a>
 		</span>
 		<span class="rssLink">
-		   <a href="${url.context}/service/components/blog/rss?site=${page.url.args["site"]}">
+		   <a href="${url.context}/service/components/blog/rss?site=${page.url.templateArgs.site}">
 	          ${msg("header.blogRSS")}
 	       </a>
 		</span>
