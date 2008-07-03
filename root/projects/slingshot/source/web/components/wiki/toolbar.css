@@ -8,6 +8,16 @@
    border-bottom: 2px solid #f0f3f4;
 } 
 
+.toolbar .header div
+{
+   float: left;
+}
+
+.toolbar .separator
+{
+   padding: 0.4em;
+}
+
 /* Buttons */
 
 /*
