@@ -84,6 +84,11 @@
    vertical-align: middle;
 }
 
+.doclist .yui-dt-liner
+{
+   padding: 4px;
+}
+
 .doclist .yui-dt-error
 {
    background: red;
@@ -215,20 +220,25 @@
 {
    background-color: #d2e5f2;
    border: 1px solid #808080;
+   clear: left;
    position: absolute;
    width: 168px;
 }
 
 /* Actions: Simple view */
-.doclist div.action-set.simple div
+.doclist div.simple div
 {
    float: left;
 }
-.doclist div.action-set.simple a.action-link span
+.doclist div.simple a.action-link span
 {
    display: none;
 }
-.doclist div.action-set.simple div.more-actions a.action-link span
+.doclist div.simple div.more-actions div
+{
+   float: none;
+}
+.doclist div.simple div.more-actions a.action-link span
 {
    display: block;
 }

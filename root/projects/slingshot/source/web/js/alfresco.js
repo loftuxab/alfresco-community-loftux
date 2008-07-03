@@ -725,7 +725,7 @@ Alfresco.util.PopupManager = function()
        */
       displayPrompt: function(config)
       {
-         if(this.defaultDisplayPromptConfig.buttons[0].text === null)
+         if (this.defaultDisplayPromptConfig.buttons[0].text === null)
          {
             /**
              * This default value could not be set at instantion time since the
@@ -1038,7 +1038,7 @@ Alfresco.util.Ajax = function()
          var first = true;
          for (attr in obj)
          {
-            if(first)
+            if (first)
             {
                first = false;
             }
@@ -1125,11 +1125,10 @@ Alfresco.util.Ajax = function()
                serverResponse: serverResponse
             }, callback.object);
          }
-         else if (config.successMessage)
+         if (config.successMessage)
          {
             /**
-             * User did not provide a custom successHandler, instead
-             * display successMessage if it exits.
+             * User provided successMessage.
              */
             Alfresco.util.PopupManager.displayMessage(
             {
@@ -1156,31 +1155,34 @@ Alfresco.util.Ajax = function()
          // Get the config that was used in the request() method
          var config = serverResponse.argument.config;
          var callback = config.failureCallback;
-         if (callback && typeof callback.fn == "function")
+         if ((callback && typeof callback.fn == "function") || (config.failureMessage))
          {
-            // User provided a custom failureHandler
-            var json = null;
-            if (config.responseContentType === "application/json")
+            if (callback && typeof callback.fn == "function")
             {
-               json = Alfresco.util.parseJSON(serverResponse.responseText);
+               // User provided a custom failureHandler
+               var json = null;
+               if (config.responseContentType === "application/json")
+               {
+                  json = Alfresco.util.parseJSON(serverResponse.responseText);
+               }
+               callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
+               {
+                  config: config,
+                  json: json,
+                  serverResponse: serverResponse
+               }, callback.object);
             }
-            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this),
+            if (config.failureMessage)
             {
-               config: config,
-               json: json,
-               serverResponse: serverResponse
-            }, callback.object);
-         }
-         else if (config.failureMessage)
-         {
-            /**
-            * User did not provide a custom failureHandler, instead display
-            * the failureMessage if it exists
-            */
-            Alfresco.util.PopupManager.displayPrompt(
-            {
-               text: config.failureMessage
-            });
+               /**
+               * User did not provide a custom failureHandler, instead display
+               * the failureMessage if it exists
+               */
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  text: config.failureMessage
+               });
+            }
          }
          else
          {

@@ -178,6 +178,33 @@
       selectedFiles: [],
 
       /**
+       * Whether "More Actions" pop-up is currently visible.
+       * 
+       * @property showingMoreActions
+       * @type boolean
+       * @default false
+       */
+      showingMoreActions: false,
+
+      /**
+       * Deferred highlight row event when showing "More Actions".
+       * 
+       * @property deferHighlightRow
+       * @type object
+       * @default null
+       */
+      deferHighlightRow: null,
+
+      /**
+       * Deferred unhighlight row event when showing "More Actions".
+       * 
+       * @property deferUnhighlightRow
+       * @type object
+       * @default null
+       */
+      deferUnhighlightRow: null,
+
+      /**
        * Set multiple initialization options at once.
        *
        * @method setOptions
@@ -479,7 +506,7 @@
          // DataTable column defintions
          var columnDefinitions = [
          {
-            key: "index", label: "Select", sortable: false, formatter: renderCellSelected, width: 20
+            key: "index", label: "Select", sortable: false, formatter: renderCellSelected, width: 16
          },
          {
             key: "status", label: "Status", sortable: false, formatter: renderCellStatus, width: 16
@@ -688,6 +715,13 @@
       {
          var Dom = YAHOO.util.Dom;
          
+         // Drop out if More Actions pop-up active
+         if (this.showingMoreActions)
+         {
+            this.deferHighlightRow = oArgs;
+            return;
+         }
+         
          var target = oArgs.target;
          // elRename is the element id of the rename file link
          var elRename = Dom.get(this.id + "-rename-" + target.yuiRecordId);
@@ -726,6 +760,13 @@
       {
          var Dom = YAHOO.util.Dom;
 
+         // Drop out if More Actions pop-up active
+         if (this.showingMoreActions)
+         {
+            this.deferUnhighlightRow = oArgs;
+            return;
+         }
+         
          var target = oArgs.target;
          var renameId = this.id + "-rename-" + target.yuiRecordId;
          var actionsId = this.id + "-actions-" + target.yuiRecordId;
@@ -756,6 +797,7 @@
          
          var elMoreActions = Dom.getNextSibling(elMore);
          Dom.removeClass(elMoreActions, "hidden");
+         me.showingMoreActions = true;
          
          // Mouse over handler - clear any registered hide timer
          var onMouseOver = function DLSM_onMouseOver(e, obj)
@@ -776,7 +818,7 @@
             var related = e.relatedTarget;
 
             // In some cases we should ignore this mouseout event
-            if ((related != obj) && (related.prefix != 'xul') && (!Dom.isAncestor(obj, related)))
+            if ((related != obj) && (!Dom.isAncestor(obj, related)))
             {
                if (obj.hideTimerId)
                {
@@ -784,9 +826,26 @@
                }
                obj.hideTimerId = setTimeout(function()
                {
-                  Dom.addClass(obj, "hidden");
                   Event.removeListener(obj, "mouseover");
                   Event.removeListener(obj, "mouseout");
+                  Dom.addClass(obj, "hidden");
+                  me.showingMoreActions = false;
+                  // Did we defer highlight or unhighlight events?
+                  var high = me.deferHighlightRow;
+                  var unhigh = me.deferUnhighlightRow;
+                  if (unhigh)
+                  {
+                     if (!high || (high && high.target != unhigh.target))
+                     {
+                        me.onEventUnhighlightRow.call(me, unhigh);
+                     }
+                     me.deferUnhighlightRow = null;
+                  }
+                  if (high)
+                  {
+                     me.onEventHighlightRow.call(me, high);
+                     me.deferHighlightRow = null;
+                  }
                }, me.options.actionsPopupTimeout);
             }
             else
