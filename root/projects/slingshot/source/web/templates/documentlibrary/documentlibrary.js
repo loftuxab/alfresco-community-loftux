@@ -69,7 +69,7 @@
        * @property MAX_FILTER_PANEL_WIDTH
        * @type int
        */
-      MAX_FILTER_PANEL_WIDTH: 750,
+      MAX_FILTER_PANEL_WIDTH: 400,
       
       /**
        * Object container for storing YUI widget instances.
@@ -98,6 +98,8 @@
        */
       onReady: function DocumentLibrary_onReady()
       {
+         var Dom = YAHOO.util.Dom;
+         
          // Horizontal Resizer
          this.widgets.horizResize = new YAHOO.util.Resize("divDocLibraryFilters",
          {
