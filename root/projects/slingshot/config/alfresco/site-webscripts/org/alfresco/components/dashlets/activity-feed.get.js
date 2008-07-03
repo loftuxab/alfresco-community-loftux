@@ -1,7 +1,6 @@
-
 model.entries = [];
 
-var result = remote.call("/api/activities/feed/site/" + page.url.args.site + "?format=atomfeed");
+var result = remote.call("/api/activities/feed/site/" + page.url.templateArgs.site + "?format=atomfeed");
 var re = /<\?xml[^\?]*\?>/;
 
 if (result && re.test(result))
@@ -23,5 +22,4 @@ if (result && re.test(result))
 			"summary" : entry.summary.toString()
 		});
 	}
-	
 }

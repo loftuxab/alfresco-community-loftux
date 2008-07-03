@@ -7,10 +7,10 @@
 		<language>${lang}</language>
 
 		<#if (items?size > 0)>
-			<#list items as topic>		
+			<#list items as topic>
 			      <item>
 			         <title>${topic.title?html}</title>
-			         <link>${absurl(url.context)}/page/discussions-topicview?site=${site}&amp;container=${container}&amp;topicId=${topic.name}</link>
+			         <link>${absurl(url.context)}/page/site/${site}/discussions-topicview?container=${container}&amp;topicId=${topic.name}</link>
 			         <description>${topic.content?html}</description>
 			         <pubDate>${topic.createdOn?datetime?string("MMM dd yyyy HH:mm:ss 'GMT'Z '('zzz')'")}</pubDate>
 			      </item>

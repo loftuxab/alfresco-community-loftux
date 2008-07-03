@@ -4,7 +4,7 @@ var profile =
    description: "[Not found]"
 }
 
-var json = remote.call("/api/sites/" + page.url.args.site);
+var json = remote.call("/api/sites/" + page.url.templateArgs.site);
 if (json.status == 200)
 {
    // Create javascript object from the repo response
@@ -18,7 +18,7 @@ if (json.status == 200)
 // Find the manager for the site
 var sitemanagers = [{}];
 
-json = remote.call("/api/sites/" + page.url.args.site + "/memberships?rf=SiteManager");
+json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships?rf=SiteManager");
 if (json.status == 200)
 {
    var obj = eval('(' + json + ')');

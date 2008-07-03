@@ -119,7 +119,8 @@ public class UriTemplate
     }
 
     /**
-     * Determine if uri is matched by this uri template
+     * Determine if uri is matched by this uri template and return a map of variable
+     * values if it does.
      * 
      * @param uri  uri to match
      * @return  map of variable values (or null, if no match, or empty if no vars)
@@ -128,21 +129,28 @@ public class UriTemplate
     {
         Map<String, String> values = null;
 
-        if (uri != null && uri.length() > 0)
+        if (uri != null && uri.length() != 0)
         {
             Matcher m = regex.matcher(uri);
             if (m.matches())
             {
-                values = new HashMap<String, String>(m.groupCount());
+                values = new HashMap<String, String>(m.groupCount(), 1.0f);
                 for (int i = 0; i < m.groupCount(); i++)
                 {
                     String name = vars[i];
                     String value = m.group(i + 1);
+                    
+                    /**
+                     * To support the case where multiple tokens of the same name may appear in the url
+                     * there's only a match if the value provided for each instance of the token is the same
+                     * e.g.  /{a}/xyx/{a}  only matches  /fred/xyx/fred  not  /fred/xyx/bob
+                     */
                     String existingValue = values.get(name);
                     if (existingValue != null && !existingValue.equals(value))
                     {
                         return null;
                     }
+                    
                     values.put(vars[i], value);
                 }
             }

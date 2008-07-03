@@ -1,5 +1,5 @@
 // Call the repo for the site memberships
-var json = remote.call("/api/sites/" + page.url.args.site + "/memberships");
+var json = remote.call("/api/sites/" + page.url.templateArgs.site + "/memberships");
 
 var memberships = [];
 

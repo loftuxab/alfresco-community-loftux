@@ -1,1 +1,1 @@
-model.site = page.url.args["site"];
+model.site = page.url.templateArgs.site;

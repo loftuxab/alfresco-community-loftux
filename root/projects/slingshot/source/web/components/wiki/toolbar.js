@@ -174,7 +174,7 @@
 	         {
 	            title = title.replace(/\s+/g, "_");
 	            // Change the location bar
-   	         window.location = Alfresco.constants.URL_CONTEXT + "page/wiki?site=" + this.siteId + "&title=" + title;
+   	         window.location = Alfresco.constants.URL_CONTEXT + "site/" + this.siteId + "/page/wiki?title=" + title;
 	         } 
 	      } 
 	   },

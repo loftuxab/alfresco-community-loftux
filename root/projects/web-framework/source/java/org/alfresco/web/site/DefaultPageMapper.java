@@ -24,10 +24,15 @@
  */
 package org.alfresco.web.site;
 
+import java.util.StringTokenizer;
+
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.Theme;
+import org.alfresco.web.scripts.ProcessorModelHelper;
+import org.alfresco.web.scripts.URLHelper;
 import org.alfresco.web.site.exception.ContentLoaderException;
 import org.alfresco.web.site.exception.PageMapperException;
 
@@ -200,6 +205,26 @@ public class DefaultPageMapper extends AbstractPageMapper
             {
                 context.setPage(page);
             }
+        }
+        
+        /**
+         * Extract the request URI string.
+         */
+        if (request instanceof HttpServletRequest)
+        {
+            HttpServletRequest req = ((HttpServletRequest)request);
+            String requestURI = req.getRequestURI().substring(req.getContextPath().length());
+            
+            // strip servlet name and set as the currently executing URI
+            int pathIndex = requestURI.indexOf('/', 1);
+            if (pathIndex != -1 && requestURI.length() > (pathIndex + 1))
+            {
+                context.setUri(requestURI.substring(pathIndex + 1));
+            }
+            
+            // build a URLHelper object one time - it is immutable and can be reused
+            URLHelper urlHelper = new URLHelper(req);
+            context.setValue(ProcessorModelHelper.MODEL_URL, urlHelper);
         }
     }
 }

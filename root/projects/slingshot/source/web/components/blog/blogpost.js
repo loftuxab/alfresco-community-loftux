@@ -146,7 +146,7 @@
        */
       onEditNode: function BlogPostList_onEditNode(id)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/blog-postedit?site=" + this.options.siteId + "&container=" + this.options.containerId + "&postId=" + id;
+         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit?container=" + this.options.containerId + "&postId=" + id;
          window.location = url;
       },
       
@@ -174,7 +174,7 @@
 
       _onDeleted: function BlogPost__onDeleted(response)
       {
-         window.location = Alfresco.constants.URL_CONTEXT + "/page/blog-postlist?site=" + this.options.siteId;
+         window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postlist";
       },
 
       _getPublishingRestUrl: function Blog__getPublishingRestUrl(postId)
@@ -378,9 +378,8 @@
       onFormSubmitSuccess: function BlogPost_onFormSubmitSuccess(response)
       {
          // forward to the post view page
-         window.location =  Alfresco.constants.URL_CONTEXT + "page/blog-postview" +
-                            "?site=" + this.options.siteId +
-                            "&postId=" + response.json.item.name;
+         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postview" +
+                            "?postId=" + response.json.item.name;
       },
       
       onFormSubmitFailure: function BlogPost_onFormSubmitFailure(response)

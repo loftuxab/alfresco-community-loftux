@@ -9,39 +9,46 @@
    <config evaluator="string-compare" condition="UriTemplate">
       <!-- ordered list of URI Template mappings for application urls -->
       <!-- anything not matched is assumed to be a direct uri mapping -->
+      <!-- generally these URLs are exposed via the Shortcut URL Servlet i.e. /s/* -->
       <uri-mappings>
-         <!-- simple sample/test uri mapping -->
+         <!-- simple sample/test uri mapping
          <uri-mapping>
             <uri-template>/sample/{page}</uri-template>
             <url-entry>/page/test/{page}</url-entry>
          </uri-mapping>
-         <!-- common reusable pages - not user configurable directly - although no reason why
-              preferences couldn't be applied to components etc. -->
+         -->
+         <!-- common reusable pages examples - not user configurable directly - although no reason why
+              preferences couldn't be applied to components etc.
          <uri-mapping>
             <uri-template>/site/{site}/doclib</uri-template>
             <url-entry>/page/common/tools/documentlibrary?site={site}</url-entry>
          </uri-mapping>
-         <!-- simple mapping from a friendly url template to a similarly named url -->
+         -->
+         <!-- simple mapping from a friendly url template to a similarly named url
          <uri-mapping>
             <uri-template>/site/{site}/dashboard</uri-template>
             <url-entry>/page/sites/{site}/dashboard</url-entry>
          </uri-mapping>
-         <!-- multiple friendly uri templates can map to a single url entry -->
+         -->
+         <!-- multiple friendly uri templates can map to a single url entry
          <uri-mapping>
             <uri-template>/user/{user}/home</uri-template>
             <uri-template>/user/{user}/mydashboard</uri-template>
             <url-entry>/page/users/{user}/dashboard</url-entry>
          </uri-mapping>
-         <!-- reusable user tool page - note the arbitrary url path suffix mapped to an argument -->
+         -->
+         <!-- reusable user tool page - note the arbitrary url path suffix mapped to an argument
          <uri-mapping>
             <uri-template>/user/{user}/wiki/{path}</uri-template>
             <url-entry>/page/users/tools/wiki?user={user}&amp;article={path}</url-entry>
          </uri-mapping>
-         <!-- reusable user "tool" page -->
+         -->
+         <!-- reusable user "tool" page
          <uri-mapping>
             <uri-template>/user/{user}/{tool}</uri-template>
             <url-entry>/page/users/tools/{tool}?user={user}</url-entry>
          </uri-mapping>
+         -->
       </uri-mappings>
    </config>
 

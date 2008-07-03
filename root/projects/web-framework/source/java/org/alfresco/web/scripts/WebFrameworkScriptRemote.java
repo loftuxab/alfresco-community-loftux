@@ -185,8 +185,6 @@ public class WebFrameworkScriptRemote
     	return this.connect().call(uri);
     }
     
-    
-    
     /**
      * Returns a list of the application endpoint ids
      * 
@@ -196,9 +194,8 @@ public class WebFrameworkScriptRemote
     {
         String[] endpointIds = null;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if(remoteConfig != null)
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        if (remoteConfig != null)
         {
             endpointIds = remoteConfig.getEndpointIds();
         }
@@ -216,12 +213,11 @@ public class WebFrameworkScriptRemote
     {
         String name = null;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if(remoteConfig != null)
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        if (remoteConfig != null)
         {
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-            if(descriptor != null)
+            if (descriptor != null)
             {
                 name = descriptor.getName();
             }
@@ -240,12 +236,11 @@ public class WebFrameworkScriptRemote
     {
         String description = null;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if(remoteConfig != null)
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        if (remoteConfig != null)
         {
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-            if(descriptor != null)
+            if (descriptor != null)
             {
                 description = descriptor.getDescription();
             }
@@ -258,12 +253,11 @@ public class WebFrameworkScriptRemote
     {
         boolean persistent = false;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) FrameworkHelper.getConfigService().getConfig(
-                "Remote").getConfigElement("remote");
-        if(remoteConfig != null)
+        RemoteConfigElement remoteConfig = FrameworkHelper.getRemoteConfig();
+        if (remoteConfig != null)
         {
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
-            if(descriptor != null)
+            if (descriptor != null)
             {
                 persistent = descriptor.getPersistent();
             }

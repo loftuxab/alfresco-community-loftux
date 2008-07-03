@@ -191,7 +191,15 @@
             <uri-template>/site/{site}/documentlibrary</uri-template>
             <url-entry>/page/documentlibrary?site={site}</url-entry>
          </uri-mapping>
-      </uri-mappings>      
+      </uri-mappings>
+      
+      <!-- list of URI based page Id templates used by Slingshot -->
+      <!-- when pages are requested from the framework, matches are attempted
+           against each uri-template, and the token values returned if matched -->
+      <uri-templates>
+         <uri-template id="sitepage">/site/{site}/{pageid}</uri-template>
+         <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
+      </uri-templates>
    </config>
 
 </alfresco-config>

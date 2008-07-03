@@ -3,7 +3,7 @@
 function main()
 {
     // gather all required data
-    var site = page.url.args["site"];
+    var site = page.url.templateArgs.site;
     var container = "blog";
     // var path = "";
     var postId = page.url.args["postId"];
@@ -12,7 +12,7 @@ function main()
     fetchAndAssignPost(site, container, postId)
     
     // assign additional model data
-    model.site = page.url.args["site"];
+    model.site = page.url.templateArgs.site;
     model.editMode = ((page.url.args["edit"] != undefined) && (page.url.args["edit"] == "true"));
 }
 

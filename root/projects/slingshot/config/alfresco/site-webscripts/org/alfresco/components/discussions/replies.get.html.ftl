@@ -4,7 +4,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DiscussionsReplies("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]}",
+      siteId: "${page.url.templateArgs.site}",
       topicRef: "${topicRef}"
    }).setMessages(
       ${messages}

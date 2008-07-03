@@ -1,6 +1,6 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.WikiToolbar("${args.htmlid}").setSiteId(
-      "${page.url.args["site"]!""}"
+      "${page.url.templateArgs["site"]!""}"
    ).setTitle("${page.url.args["title"]!""}");
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar">

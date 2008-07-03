@@ -33,7 +33,7 @@
   <td width="80%">
 	<div class="nodeContent">
 		<span class="nodeTitle">
-			<a href="discussions-topicview?site=${site}&topicId=${topic.name}">
+			<a href="discussions-topicview?topicId=${topic.name}">
 				${topic.title}
 			</a>
 			<#if topic.isUpdated><span class="nodeStatus">(${msg("topic.updated")})</span></#if>
@@ -76,7 +76,7 @@
 	    </#if>
 	            
         <!--		<div><a id="reply-${topic.name}" class="addEventReply" href="">Reply</a></div>
-		<div><a id="edit-${topic.name}" class="editEventTopic" href="discussions-topicview?site=${site}&topicId=topic-${topic.name}&edit=true">Edit</a></div>
+		<div><a id="edit-${topic.name}" class="editEventTopic" href="site/${site}/discussions-topicview?topicId=topic-${topic.name}&edit=true">Edit</a></div>
 		<div><a id="delete-${topic.name}" class="deleteEventTopic" href="">Delete</a></div>-->
 	</div>
   </td>
@@ -86,7 +86,7 @@
   <div class="nodeFooter">
   	<span class="nodeFooterBloc">
 		<span class="nodeAttrLabel replyTo">${msg("topic.footer.replies")}:</span><span class="nodeAttrValue"> (${topic.totalReplyCount})</span>
-		<span class="nodeAttrValue"><a href="discussions-topicview?site=${site}&topicId=${topic.name}">${msg("topic.footer.read")}</a></span>
+		<span class="nodeAttrValue"><a href="discussions-topicview?topicId=${topic.name}">${msg("topic.footer.read")}</a></span>
 	</span> 
 	<span class="spacer"> | </span>
 <#--
@@ -116,7 +116,7 @@
   <td width="80%">
 	<div class="nodeContent">
 		<div class="nodeTitle">
-			<a href="discussions-topicview?site=${site}&topicId=${topic.name}">
+			<a href="discussions-topicview?topicId=${topic.name}">
 				${topic.title}
 			</a>
 		</div>
@@ -133,7 +133,7 @@
 		<span class="spacer"> | </span>
 		<#if (topic.permissions.edit)>
 			<span class="onEditNode">
-				<a id="edit-${topic.name}" class="editEventTopic" href="discussions-topicview?site=${site}&topicId=topic-${topic.name}&edit=true">
+				<a id="edit-${topic.name}" class="editEventTopic" href="site/${site}/discussions-topicview?topicId=topic-${topic.name}&edit=true">
 					${msg("topic.action.edit")}
 				</a>
 			</span>

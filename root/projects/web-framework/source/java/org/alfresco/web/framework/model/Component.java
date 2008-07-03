@@ -254,12 +254,13 @@ public class Component extends AbstractModelObject
      */
     public static String generateId(String scopeId, String regionId, String sourceId)
     {
-        String id = scopeId + "." + regionId;
+        StringBuilder id = new StringBuilder(64);
+        id.append(scopeId).append('.').append(regionId);
         if (!WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
         {
-            id += "." + sourceId;
+            id.append('.').append(sourceId.replace('/', '~'));
         }
-        return id;        
+        return id.toString();
     }
     
     /**

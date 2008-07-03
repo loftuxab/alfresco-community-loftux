@@ -3,7 +3,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DiscussionsTopic("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]}",
+      siteId: "${page.url.templateArgs.site}",
       mode: "<#if editMode>edit<#else>view</#if>",
       topicId: "${item.name}",
       topicRef: "${item.nodeRef}"
@@ -23,7 +23,7 @@
 <div id="discussionsBlogHeader2">
 	<div class="leftDiscussionBlogHeader listTitle">
 		<span class="backLink">
-			<a href="${url.context}/page/discussions-topiclist?site=${page.url.args.site}">
+			<a href="${url.context}/page/site/${page.url.templateArgs.site}/discussions-topiclist">
 				${msg("header.back")}
 			</a>
 		</span>

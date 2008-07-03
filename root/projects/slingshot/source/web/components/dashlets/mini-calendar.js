@@ -97,7 +97,7 @@
 					cal.addRenderer(selected, function(workingDate, cell) {
 						var date = new Date(workingDate);
 						var dateStr = date.getFullYear() + "/" + (date.getMonth()+1) + "/" + date.getDate();
-						cell.innerHTML = '<a href="calendar?site=' + site + '&date=' + dateStr + '">' + this.buildDayLabel(workingDate) + "</a>"; 
+						cell.innerHTML = '<a href="calendar?date=' + dateStr + '">' + this.buildDayLabel(workingDate) + "</a>"; 
 						YAHOO.util.Dom.addClass(cell, "highlight1"); 
 						return YAHOO.widget.Calendar.STOP_RENDER; 
 					});

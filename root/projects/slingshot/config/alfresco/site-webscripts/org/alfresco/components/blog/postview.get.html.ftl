@@ -3,7 +3,7 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.BlogPost("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.args["site"]}",
+      siteId: "${page.url.templateArgs.site}",
       mode: "<#if editMode>edit<#else>view</#if>",
       postId: "${page.url.args["postId"]}",
       postRef: "${item.nodeRef}"
@@ -15,7 +15,7 @@
 <div id="discussionsBlogHeader2">
 	<div class="leftDiscussionBlogHeader listTitle">
 		<span class="backLink">
-			<a href="${url.context}/page/blog-postlist?site=${page.url.args.site}">
+			<a href="${url.context}/page/site/${page.url.templateArgs.site}/blog-postlist">
 				${msg("header.back")}
 			</a>
 		</span>

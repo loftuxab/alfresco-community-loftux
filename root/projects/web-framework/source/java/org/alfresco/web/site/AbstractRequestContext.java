@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.site;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -142,7 +143,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * @param key
      * @param value
      */
-    public void setValue(String key, Object value)
+    public void setValue(String key, Serializable value)
     {
         if (key == null)
         {
@@ -157,7 +158,7 @@ public abstract class AbstractRequestContext implements RequestContext
      * @param key
      * @return
      */
-    public Object getValue(String key)
+    public Serializable getValue(String key)
     {
         if (key == null)
         {
@@ -205,6 +206,22 @@ public abstract class AbstractRequestContext implements RequestContext
     public Iterator keys()
     {
         return map.keySet().iterator();
+    }
+
+    /**
+     * @return the currently executing uri.
+     */
+    public String getUri()
+    {
+        return this.uri;
+    }
+
+    /**
+     * Sets the currently executing uri.
+     */
+    public void setUri(String uri)
+    {
+        this.uri = uri;
     }
 
     /**
@@ -518,7 +535,7 @@ public abstract class AbstractRequestContext implements RequestContext
     }
 
 
-    protected Map map;
+    protected Map<String, Serializable> map;
     protected Page currentPage;
     protected TemplateInstance currentTemplate;
     protected Content currentObject;
@@ -527,6 +544,7 @@ public abstract class AbstractRequestContext implements RequestContext
     protected String storeId;
     protected User user;
     protected String id;
+    protected String uri;
     protected String themeId;
     protected Model model;
 

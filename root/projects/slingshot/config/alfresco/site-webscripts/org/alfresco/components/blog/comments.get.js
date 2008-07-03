@@ -4,7 +4,7 @@
 function main()
 {
     // gather all required data
-    var site = page.url.args["site"];
+    var site = page.url.templateArgs.site;
     var container = "blog";
     // var path = "";
     var postId = page.url.args["postId"];

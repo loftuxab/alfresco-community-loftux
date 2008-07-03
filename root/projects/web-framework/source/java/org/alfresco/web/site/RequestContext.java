@@ -88,7 +88,7 @@ public interface RequestContext extends Serializable
      * @param key
      * @param value
      */
-    public void setValue(String key, Object value);
+    public void setValue(String key, Serializable value);
 
     /**
      * Retrieves a custom value from the request context
@@ -96,7 +96,7 @@ public interface RequestContext extends Serializable
      * @param key
      * @return
      */
-    public Object getValue(String key);
+    public Serializable getValue(String key);
 
     /**
      * Removes a custom value from the request context
@@ -121,6 +121,16 @@ public interface RequestContext extends Serializable
      */
     public Iterator<String> keys();
 
+    /**
+     * Sets the currently executing uri.
+     */
+    public void setUri(String uri);
+    
+    /**
+     * @return the currently executing uri.
+     */
+    public String getUri();
+    
     /**
      * If a page instance is currently executing, it can be retrieved
      * from the request context.

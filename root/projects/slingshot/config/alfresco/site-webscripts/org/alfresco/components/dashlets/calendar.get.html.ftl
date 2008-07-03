@@ -1,5 +1,5 @@
 <script type="text/javascript">//<![CDATA[
-   new Alfresco.MiniCalendar("${args.htmlid}").setSiteId("${page.url.args["site"]!""}");
+   new Alfresco.MiniCalendar("${args.htmlid}").setSiteId("${page.url.templateArgs.site!""}");
 //]]></script>
 
 <div class="dashlet">

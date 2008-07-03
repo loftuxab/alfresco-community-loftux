@@ -4,6 +4,6 @@
    <description>Slingshot Project</description>
    <source-id>site</source-id>
    <properties>
-      <root-page>user-dashboard</root-page>
+      <root-page>user/admin/user-dashboard</root-page>
    </properties>
 </configuration>

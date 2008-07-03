@@ -24,6 +24,7 @@
  */
 package org.alfresco.web.scripts;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -177,7 +178,7 @@ public class FreemarkerRenderer extends AbstractRenderer
                     // this removes the need to execute the script twice
                     if (context.hasValue(RenderUtil.PASSIVE_MODE_MARKER))
                     {
-                        context.setValue(SCRIPT_RESULTS, resultModel);
+                        context.setValue(SCRIPT_RESULTS, (Serializable)resultModel);
                     }
                 }
                 else

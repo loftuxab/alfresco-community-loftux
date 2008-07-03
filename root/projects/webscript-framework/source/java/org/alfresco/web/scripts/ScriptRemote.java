@@ -77,8 +77,7 @@ public class ScriptRemote
         ScriptRemoteConnector remoteConnector = null;
 
         // Check whether a remote configuration has been provided
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
-                "Remote").getConfigElement("remote");
+        RemoteConfigElement remoteConfig = getRemoteConfig();
         if (remoteConfig != null)
         {
             // See if we have a default endpoint id
@@ -105,9 +104,7 @@ public class ScriptRemote
     {
         ScriptRemoteConnector remoteConnector = null;
 
-        // Check whether a remote configuration has been provided
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
-                "Remote").getConfigElement("remote");
+        RemoteConfigElement remoteConfig = getRemoteConfig();
         if (remoteConfig != null)
         {
             // check whether we have a descriptor for this endpoint
@@ -191,8 +188,7 @@ public class ScriptRemote
     {
         Scriptable scriptable = null;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
-                "Remote").getConfigElement("remote");
+        RemoteConfigElement remoteConfig = getRemoteConfig();
         if(remoteConfig != null)
         {
             String[] endpointIds = remoteConfig.getEndpointIds();
@@ -212,8 +208,7 @@ public class ScriptRemote
     {
         String name = null;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
-                "Remote").getConfigElement("remote");
+        RemoteConfigElement remoteConfig = getRemoteConfig();
         if(remoteConfig != null)
         {
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
@@ -236,8 +231,7 @@ public class ScriptRemote
     {
         String description = null;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
-                "Remote").getConfigElement("remote");
+        RemoteConfigElement remoteConfig = getRemoteConfig();
         if(remoteConfig != null)
         {
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
@@ -254,8 +248,7 @@ public class ScriptRemote
     {
         boolean persistent = false;
         
-        RemoteConfigElement remoteConfig = (RemoteConfigElement) configService.getConfig(
-                "Remote").getConfigElement("remote");
+        RemoteConfigElement remoteConfig = getRemoteConfig();
         if(remoteConfig != null)
         {
             EndpointDescriptor descriptor = remoteConfig.getEndpointDescriptor(id);
@@ -284,8 +277,17 @@ public class ScriptRemote
         {
             array[i] = elements[i];
         }
-
+        
         return Context.getCurrentContext().newArray(scope, array);
-    }    
+    }
     
+    /**
+     * @return RemoteConfigElement
+     */
+    private RemoteConfigElement getRemoteConfig()
+    {
+        RemoteConfigElement remoteConfig = (RemoteConfigElement)configService.getConfig(
+                "Remote").getConfigElement("remote");
+        return remoteConfig;
+    }
 }
