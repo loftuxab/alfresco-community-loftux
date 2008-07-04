@@ -29,9 +29,12 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.alfresco.config.ScriptConfigModel;
+import org.alfresco.config.TemplateConfigModel;
 import org.alfresco.i18n.I18NUtil;
 import org.alfresco.web.framework.model.Page;
 import org.alfresco.web.framework.model.TemplateInstance;
+import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
@@ -45,6 +48,7 @@ import org.alfresco.web.site.renderer.RendererContext;
  */
 public final class ProcessorModelHelper
 {
+    public static final String MODEL_CONFIG = "config";
     public static final String MODEL_HEAD = "head";
     public static final String MODEL_URL = "url";
     public static final String MODEL_USER = "user";
@@ -94,8 +98,8 @@ public final class ProcessorModelHelper
     /**
      * Populates the common model for all processors
      * 
-     * @param rendererContext
-     * @param model
+     * @param rendererContext   current context
+     * @param model     to populate
      */
     private static void populateModel(RendererContext rendererContext, Map<String, Object> model)
     {
@@ -199,6 +203,12 @@ public final class ProcessorModelHelper
         }
     }
     
+    /**
+     * Populate the model for script processor.
+     * 
+     * @param rendererContext   current context
+     * @param model     to populate
+     */
     public static void populateScriptModel(RendererContext rendererContext, Map<String, Object> model)
     {
         if (model == null)
@@ -208,10 +218,20 @@ public final class ProcessorModelHelper
         
         // common population
         populateModel(rendererContext, model);
-
-        // no script specific model objects to add currently
+        
+        if (rendererContext.getObject() instanceof TemplateInstance)
+        {
+            // add in the config service accessor
+            model.put(MODEL_CONFIG, new ScriptConfigModel(FrameworkHelper.getConfigService(), null));
+        }
     }
     
+    /**
+     * Populate the model for template processor.
+     * 
+     * @param rendererContext   current context
+     * @param model     to populate
+     */
     public static void populateTemplateModel(RendererContext rendererContext, Map<String, Object> model)
         throws RendererExecutionException
     {
@@ -226,8 +246,7 @@ public final class ProcessorModelHelper
         populateModel(rendererContext, model);
 
         /**
-         * We add in the "url" object if we're processing against
-         * a TemplateInstance
+         * We add in the "url" object if we're processing against a TemplateInstance
          * 
          * If we're processing against a Web Script, it will already be there
          */
@@ -241,10 +260,10 @@ public final class ProcessorModelHelper
             }
             
             // add in the ${head} tag
-            if (rendererContext.getObject() instanceof TemplateInstance)
-            {               
-                model.put(MODEL_HEAD, RenderUtil.processHeader(rendererContext));
-            }
+            model.put(MODEL_HEAD, RenderUtil.processHeader(rendererContext));
+            
+            // add in the config service accessor
+            model.put(MODEL_CONFIG, new TemplateConfigModel(FrameworkHelper.getConfigService(), null));
         }
         
         /**
