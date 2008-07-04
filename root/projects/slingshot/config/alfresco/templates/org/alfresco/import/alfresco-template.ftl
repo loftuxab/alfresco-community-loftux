@@ -47,12 +47,14 @@
    <script type="text/javascript" src="${url.context}/js/bubbling.v1.5.0.js"></script>
    <script type="text/javascript" src="${url.context}/js/alfresco.js"></script>
    <script type="text/javascript" src="${url.context}/service/messages.js?locale=${locale}"></script>
+   <script type="text/javascript" src="${url.context}/service/utils/uri-template.js"></script>
    <script type="text/javascript" src="${url.context}/js/forms-runtime.js"></script>
    <script type="text/javascript">//<![CDATA[
       Alfresco.constants.DEBUG = ${DEBUG?string};
       Alfresco.constants.PROXY_URI = window.location.protocol + "//" + window.location.host + "${url.context}/proxy/alfresco/";
       Alfresco.constants.THEME = "${theme}";
       Alfresco.constants.URL_CONTEXT = "${url.context}/";
+      Alfresco.constants.URL_PAGECONTEXT = "${url.context}/page/";
       Alfresco.constants.URL_SERVICECONTEXT = "${url.context}/service/";
       Alfresco.constants.ALF_TICKET = "${context.properties.alfTicket!""}";
       Alfresco.constants.USERNAME = "${user.name!""}";
@@ -93,11 +95,9 @@ ${head}
 <#nested>
    </div>
 <#-- This function call MUST come after all other component includes. -->
-   <div class="hiddenComponents">
    <script type="text/javascript">//<![CDATA[
       Alfresco.util.YUILoaderHelper.loadComponents();
    //]]></script>
-   </div>
 </body>
 </html>
 </#macro>
