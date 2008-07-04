@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
-   <scope>page</scope>
+   <scope>uri</scope>
    <region-id>component-1-1</region-id>
-   <source-id>user-dashboard</source-id>
+   <source-id>user/admin/user-dashboard</source-id>
    <url>/components/dashlets/my-profile</url>
 </component>

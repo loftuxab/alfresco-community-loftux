@@ -4,9 +4,6 @@
    <region-id>header</region-id>
    <source-id>global</source-id>
    <url>/components/header</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
    <properties>
       <logo>/images/logo/AlfrescoLogo32.png</logo>
    </properties>

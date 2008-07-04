@@ -4,8 +4,4 @@
    <region-id>postview</region-id>
    <source-id>blog-postview</source-id>
    <url>/components/blog/postview</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>

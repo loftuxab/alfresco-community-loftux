@@ -4,8 +4,4 @@
    <region-id>createtopic</region-id>
    <source-id>discussions-createtopic</source-id>
    <url>/components/discussions/createtopic</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>

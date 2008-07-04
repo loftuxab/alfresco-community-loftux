@@ -4,8 +4,4 @@
    <region-id>createcomment</region-id>
    <source-id>blog-postview</source-id>
    <url>/components/blog/createcomment</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>

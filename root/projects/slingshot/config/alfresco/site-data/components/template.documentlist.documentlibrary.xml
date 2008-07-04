@@ -4,9 +4,6 @@
    <region-id>documentlist</region-id>
    <source-id>documentlibrary</source-id>
    <url>/components/documentlibrary/documentlist</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
    <properties>
       <container>documentLibrary</container>
    </properties>

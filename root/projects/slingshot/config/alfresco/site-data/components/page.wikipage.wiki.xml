@@ -4,7 +4,4 @@
    <region-id>wikipage</region-id>
    <source-id>wiki</source-id>
    <url>/components/wiki/page</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
 </component>
