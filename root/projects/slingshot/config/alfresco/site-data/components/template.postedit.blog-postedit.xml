@@ -4,9 +4,6 @@
    <region-id>createpost</region-id>
    <source-id>blog-postedit</source-id>
    <url>/components/blog/postedit</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
    <properties>
       <container>blog</container>
    </properties>

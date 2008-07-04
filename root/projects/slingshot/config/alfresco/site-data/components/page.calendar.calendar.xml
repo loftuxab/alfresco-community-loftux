@@ -4,7 +4,4 @@
    <region-id>calendar</region-id>
    <source-id>calendar</source-id>
    <url>/components/calendar/mycalendar</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
 </component>

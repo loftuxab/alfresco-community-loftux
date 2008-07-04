@@ -43,7 +43,7 @@ public class Component extends AbstractModelObject
     public static String PROP_SOURCE_ID = "source-id";
     public static String PROP_SCOPE = "scope";
     public static String PROP_COMPONENT_TYPE_ID = "component-type-id";
-    public static String PROP_CHROME = "chrome";    
+    public static String PROP_CHROME = "chrome";
     public static String PROP_URL = "url";
     
     // cached values

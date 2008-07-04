@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <component>
-   <scope>page</scope>
+   <scope>uri</scope>
    <region-id>component-2-2</region-id>
-   <source-id>collaboration-dashboard</source-id>
+   <source-id>site/default/collaboration-dashboard</source-id>
    <url>/components/dashlets/activityfeed</url>
 </component>

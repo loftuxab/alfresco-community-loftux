@@ -4,8 +4,4 @@
    <region-id>edittopic</region-id>
    <source-id>discussions-topicview</source-id>
    <url>/components/discussions/edittopic</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>

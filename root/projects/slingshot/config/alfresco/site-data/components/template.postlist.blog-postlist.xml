@@ -4,8 +4,4 @@
    <region-id>postlist</region-id>
    <source-id>blog-postlist</source-id>
    <url>/components/blog/postlist</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>

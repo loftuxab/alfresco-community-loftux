@@ -4,8 +4,4 @@
    <region-id>topic</region-id>
    <source-id>discussions-topicview</source-id>
    <url>/components/discussions/topic</url>
-   <chrome>
-      <frame>div</frame>
-   </chrome>
-   <properties></properties>
 </component>

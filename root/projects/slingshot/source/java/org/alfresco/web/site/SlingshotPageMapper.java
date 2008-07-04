@@ -25,7 +25,6 @@
 package org.alfresco.web.site;
 
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
@@ -47,9 +46,7 @@ import org.alfresco.web.uri.UriTemplateListIndex;
  * This is a Page Mapper class which serves to interpret URLs at dispatch
  * time for the Slingshot project.
  * 
- * Requests are received in the style defined for Slingshot.  This class
- * basically lets the generic dispatcher servlet emulate the input
- * structure that PageRendererServlet had been using.
+ * Requests are received in the style defined for Slingshot.
  * 
  * Requests arrive in the form:
  * 
@@ -58,7 +55,8 @@ import org.alfresco.web.uri.UriTemplateListIndex;
  * 		/page/<pageId>?<objArgument>=<objectId>
  * 		/page/<pageId>?<objArgument>=<objectId>&other arguments
  * 
- * The string is tokenized and things are picked off as shown above.
+ * Other forms may exists, they are matched against the configured uri templates.
+ * See web-framework-config-application.xml for available uri templates.
  * 
  * The <pageId> identifier could be the id of the page object.
  * It could also be a relative path to the page object:
@@ -88,13 +86,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
     }
     
     /**
-     * Requests come in with the forms:
-     * 
-     *		/page/pageId	
-     *		/page/pageId?doc=<docId>
-     *
-     * This is a pretty quick and dirty way to implement the
-     * interpretation
+     * Process a page request.
      */
     public void execute(RequestContext context, ServletRequest request)
     	throws PageMapperException
@@ -199,9 +191,7 @@ public class SlingshotPageMapper extends AbstractPageMapper
         }
         
         /**
-         * TODO:  At present, the Slingshot project doesn't seem to do
-         * much with formats, though this may change.  As such, we ignore
-         * formats though the RequestContext is capable of supporting them.  
+         * At present, the Slingshot project doesn't do much with formats.
          * 
          * Note that if we didn't set it, it would still automatically
          * pick up the default format.
@@ -228,13 +218,13 @@ public class SlingshotPageMapper extends AbstractPageMapper
     			throw new PageMapperException("Page Mapper was unable to load content for object id: " + objectId);
     		}    		
     	}
-
+    	
         // get the connector "session" to this endpoint (for this user)        
         ConnectorSession connectorSession =
             FrameworkHelper.getConnectorSession(context, AlfrescoUserFactory.ALFRESCO_ENDPOINT_ID);
         if (connectorSession != null)
         {
-            // retrieve the alfTicket
+            // retrieve the alfTicket - special case for Flash apps that do not share the user session
             String ticket = (String)connectorSession.getParameter(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET);
             context.setValue(AlfrescoAuthenticator.CS_PARAM_ALF_TICKET, ticket);
         }
