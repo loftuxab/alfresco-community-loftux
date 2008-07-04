@@ -24,9 +24,9 @@ function getPostsRequestUrlWithParams(site, container, path, filter, tag, fromDa
     if (filter != null && filter.length > 0)
     {
         // latest only
-        if (filter == "latest")
+        if (filter == "new")
         {
-            url += "/latest";
+            url += "/new";
         }
         else if (filter == "mydrafts")
         {
@@ -125,37 +125,4 @@ function createAndAssignPost(site, container, path, title, content)
     }
     convertPostJSONData(data.item);
     applyDataToModel(data);   
-}
-
-function getListTitle(filter, tag, fromDate, toDate)
-{
-    if (fromDate != null && fromDate.length > 0)
-    {
-        var date = new Date(parseInt(fromDate));
-        return "Posts for month " + date.getMonth();
-    }
-    if (filter == "latest")
-    {
-        return "Latest Posts";
-    }
-    else if (filter == "mydraft")
-    {
-        return "My Drafts";
-    }
-    else if (filter == "mypublished")
-    {
-        return "My Published";
-    }
-    else if (filter == "publishedext")
-    {
-        return "Published Externally";
-    }
-    else if (tag != null && tag.length > 0)
-    {
-        return "Posts with tag " + tag;
-    }
-    else // filter == null || filter.length < 1 || filter == "all"
-    {
-        return "All Posts";
-    }
 }

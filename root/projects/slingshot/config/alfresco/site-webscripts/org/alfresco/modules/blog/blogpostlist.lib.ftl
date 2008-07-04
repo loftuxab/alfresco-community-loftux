@@ -1,3 +1,31 @@
+
+<#--
+  Renders the title of the list
+-->
+<#macro postListTitle filter="" fromDate="" toDate="" tag="">
+   <#if (filter?length > 0 && filter != "all")>
+      <#if filter == "new">
+         New posts
+      <#elseif (filter == "mydrafts")>
+         My drafts posts
+      <#elseif (filter == "mypublished")>
+         My published posts
+      <#elseif (filter == "publishedext")>
+         Externally published posts
+      <#else>
+         Unknown filter!
+      </#if>
+   <#elseif (tag?length > 0)>
+     Posts with tag ${tag}
+   <#elseif (fromDate?is_date)>
+     Posts for month ${fromDate?datetime?string("MMMM")}
+   <#else>
+     All posts
+   </#if>
+</div>
+</#macro>
+
+
 <#--
    Renders the status of a post
 -->

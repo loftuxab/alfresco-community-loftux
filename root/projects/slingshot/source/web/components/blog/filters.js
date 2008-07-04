@@ -89,12 +89,12 @@
 
       showLatest: function BlogPostListFilters_showNewTopics()
       {
-      	YAHOO.Bubbling.fire('onSetBlogPostListParams', {filter : "latest"});
+      	YAHOO.Bubbling.fire('onSetBlogPostListParams', {filter : "new"});
       },
 
       showDraft: function BlogPostListFilters_showHotTopics()
       {
-      	YAHOO.Bubbling.fire('onSetBlogPostListParams', {filter : "mydraft"});
+      	YAHOO.Bubbling.fire('onSetBlogPostListParams', {filter : "mydrafts"});
       },
       
       showMyPublished: function BlogPostListFilters_showAllTopics()
@@ -104,7 +104,7 @@
       
       showPublishedExt: function BlogPostListFilters_showWatchingTopics()
       {
-      	YAHOO.Bubbling.fire('onSetBlogPostListParams', {filter : "publishedexternal"});
+      	YAHOO.Bubbling.fire('onSetBlogPostListParams', {filter : "publishedext"});
       }
 	};
    
