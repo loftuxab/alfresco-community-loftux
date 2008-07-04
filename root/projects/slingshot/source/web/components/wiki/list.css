@@ -1,0 +1,48 @@
+.wikipage
+{
+   margin: 0.5em;
+}
+
+.wikipage .pageTitle
+{
+   color: #2b6eb5;
+   font-size: 12pt;
+   line-height: 130%;
+   font-weight: normal;
+   font-family: Helvetica, Trebuchet, sans-serif;
+}
+
+.wikipage .pageCopy
+{
+   font-family: Arial, sans-serif;
+   font-weight: normal;
+   font-size: 13pt;
+   line-height: 150%;
+}
+
+.spacer {
+	margin: 0 7px;
+	color: #ccc;
+	font-size: 11pt;
+}
+
+.attrLabel {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	line-height: 130%;
+	color: #606060;
+}
+
+.attrValue {
+	font-family: Arial, sans-serif;
+	font-weight: normal;
+	font-size: 10pt;
+	line-height: 130%;
+	color: #333333;
+}
+
+.attrValue a {
+	color: #2b6eb5;
+}
+

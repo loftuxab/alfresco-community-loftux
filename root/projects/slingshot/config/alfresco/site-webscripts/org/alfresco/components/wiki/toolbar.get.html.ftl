@@ -1,7 +1,9 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.WikiToolbar("${args.htmlid}").setSiteId(
       "${page.url.templateArgs["site"]!""}"
-   ).setTitle("${page.url.args["title"]!""}");
+   ).setTitle("${page.url.args["title"]!""}").setMessages(
+      ${messages}
+   );
 //]]></script>
 <div id="${args.htmlid}-body" class="toolbar">
    <div class="header">

@@ -12,7 +12,8 @@
 		<div class="yui-u first">
    	</div>
 		<div class="yui-u">
-			 <@region id="pagelist" scope="page" protected=true />
+		    <@region id="toolbar" scope="template" protected=true />
+			 <@region id="wikipage" scope="page" protected=true />
    	</div>
  	</div>
 	</div>
