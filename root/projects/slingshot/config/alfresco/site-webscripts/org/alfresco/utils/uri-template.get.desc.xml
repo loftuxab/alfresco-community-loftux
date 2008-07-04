@@ -1,5 +1,0 @@
-<webscript>
-  <shortname>uri-template</shortname>
-  <description>Brings in uri-templates from server configuration</description>
-  <url>/utils/uri-template</url>
-</webscript>
