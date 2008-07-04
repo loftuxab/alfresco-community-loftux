@@ -385,6 +385,43 @@ Alfresco.util.parseJSON = function(jsonStr)
 }
 
 /**
+ * Returns a populated URI template, given a TemplateId and an object literal
+ * containing the tokens to be substituted
+ *
+ * @method Alfresco.util.uriTemplate
+ * @param templateId {string} URI TemplateId from web-framework configuration
+ * @param obj {object} The object literal containing the token values to substitute
+ * @param absolute {boolean} Whether the URL should include the protocol and host
+ * @return {string|null} The populated URI or null if templateId not found
+ * @static
+ */
+Alfresco.util.uriTemplate = function(templateId, obj, absolute)
+{
+   // Check we know about the templateId
+   if (!templateId in Alfresco.constants.URI_TEMPLATES)
+   {
+      return null;
+   }
+   
+   var uri = "";
+   var template = Alfresco.constants.URI_TEMPLATES[templateId];
+   
+   // Page context end with trailing "/", so remove any leading one from the URI template
+   if (template[0] == "/")
+   {
+      template = template.substring(1);
+   }
+   // Absolute URI needs current protocol and host
+   if (absolute)
+   {
+      uri = location.protocol + "//" + location.host;
+   }
+   uri += Alfresco.constants.URL_PAGECONTEXT + YAHOO.lang.substitute(template, obj);
+   
+   return uri;
+}
+
+/**
  * Wrapper for helping components specify their YUI components.
  * @class Alfresco.util.YUILoaderHelper
  */

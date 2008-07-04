@@ -121,6 +121,7 @@
             <prop key="portlet">text/html</prop>
             <prop key="fbml">text/html</prop>
             <prop key="php">text/htm</prop>
+            <prop key="js">text/javascript</prop>
          </props>
       </property>
    </bean>
