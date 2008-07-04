@@ -129,14 +129,14 @@
 		 * @method templateLoaded
 		 * @param response {object} DomEvent
 		 */
-      	templateLoaded: function(response)
-      	{
-			var div = document.getElementById("addEventPanel");
-         	div.innerHTML = response.serverResponse.responseText;
+       templateLoaded: function(response)
+       {
+		    var div = document.getElementById("addEventPanel");
+          div.innerHTML = response.serverResponse.responseText;
 
-         	this.panel = new YAHOO.widget.Panel(div,
-         	{
-		modal: true,
+          this.panel = new YAHOO.widget.Panel(div,
+             {
+		         modal: true,
             	fixedcenter: true,
             	visible: false,
             	constraintoviewport: true
@@ -154,8 +154,8 @@
 	
 				var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
 				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-	         	eventForm.setShowSubmitStateDynamically(true);
-		   		eventForm.setSubmitElements(okButton);
+	         eventForm.setShowSubmitStateDynamically(true);
+		   	eventForm.setSubmitElements(okButton);
 				eventForm.setAJAXSubmit(true,
 				{
 					successCallback:
@@ -164,7 +164,8 @@
 						scope: this
 					}
 				});
-	       		eventForm.init();
+			   eventForm.setSubmitAsJSON(true);
+	       	eventForm.init();
 	
 				// Initialise the start and end dates to today
 				var Dom = YAHOO.util.Dom;
