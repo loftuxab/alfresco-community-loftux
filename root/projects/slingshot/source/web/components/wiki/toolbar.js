@@ -39,6 +39,19 @@
    	   this.title = title;
    	   return this;
    	},
+   	
+   	/**
+       * Set messages for this component.
+       *
+       * @method setMessages
+       * @param obj {object} Object literal specifying a set of messages
+       * @return {Alfresco.DocListTree} returns 'this' for method chaining
+       */
+      setMessages: function(obj)
+      {
+         Alfresco.util.addMessages(obj, this.name);
+         return this;
+      },
    		
 	   /**
 		 * Fired by YUILoaderHelper when required component script files have
@@ -79,6 +92,11 @@
 	      	type: "push"
 	      });
 	      
+	      // Labels
+	      var yes = Alfresco.util.message("button.yes", this.name);
+	      var no = Alfresco.util.message("button.no", this.name);
+	      var confirmText = Alfresco.util.message("panel.confirm.delete-msg", this.name);
+	      
 	      this.deleteDialog = new YAHOO.widget.SimpleDialog("deleteDialog", 
 	      {
 	         width: "300px",
@@ -86,13 +104,14 @@
             visible: false,
             draggable: false,
             close: true,
-            text: "Are you sure you want to delete this page?",
+            text: confirmText,
             icon: YAHOO.widget.SimpleDialog.ICON_HELP,
             constraintoviewport: true,
-            buttons: [ { text:"Yes", handler: { fn: this.onConfirm, scope: this }, isDefault: true },
-            			{ text:"No",  handler: { fn: this.onCancel, scope: this } }]
+            buttons: [ { text: yes, handler: { fn: this.onConfirm, scope: this }, isDefault: true },
+            			{ text: no,  handler: { fn: this.onCancel, scope: this } }]
 	      });
-	      this.deleteDialog.setHeader("Are you sure?");
+	      var headerText = Alfresco.util.message("panel.confirm.header", this.name);
+	      this.deleteDialog.setHeader(headerText);
 	      this.deleteDialog.render(this.id + "-body");
 	   },
 	   
@@ -114,7 +133,7 @@
    			   fn: this.onPageDeleted,
    				scope: this
    			},
-   		   failureMessage: "Could not delete page"
+   		   failureMessage: Alfresco.util.message("load.fail", this.name)
    		});
 	   },
 	   
@@ -139,9 +158,9 @@
    	 */
 	   onPageDeleted: function(e)
 	   {
-	      // TODO: redirect to wiki landing page, when there is one
-	      alert("Page deleted");
 	      this.deleteDialog.hide();
+	      // Redirect to the wiki landing page
+         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki";
 	   },
 	   
 	   /**

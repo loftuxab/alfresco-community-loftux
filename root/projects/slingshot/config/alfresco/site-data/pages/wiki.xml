@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <page>
    <title>Wiki</title>
-   <description>Page that displays the site wiki</description>
+   <description>The landing page for the wiki</description>
    <template-instance>wiki</template-instance>
    <authentication>user</authentication>
 </page>
