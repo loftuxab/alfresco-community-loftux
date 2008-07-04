@@ -2,9 +2,6 @@
 <component>
    <scope>page</scope>
    <region-id>title</region-id>
-   <source-id>discussions-topiclist</source-id>
+   <source-id>discussions-createtopic</source-id>
    <url>/components/title/collaboration-title</url>
-   <chrome>
-      <frame>none</frame>
-   </chrome>
 </component>

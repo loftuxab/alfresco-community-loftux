@@ -15,12 +15,29 @@
 
 <#macro topicViewHTML topic>
   <div id="${topic.name}" class="node topic topicview">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-  <td width="100">
+
+  <div class="nodeEdit">
+    <#if (topic.permissions.reply)>
+          <div class="onAddReply" id="onAddReply-${topic.name}">
+             <a href="#" class="action-link-${topic.name}">${msg("topic.action.addReply")}</a>
+          </div>
+      </#if>
+    <#if (topic.permissions.edit)>
+          <div class="onEditNode" id="onEditNode-${topic.name}">
+             <a href="#" class="action-link-${topic.name}">${msg("topic.action.edit")}</a>
+          </div>
+      </#if>
+    <#if (topic.permissions.delete)>
+          <div class="onDeleteNode" id="onDeleteNode-${topic.name}">
+             <a href="#" class="action-link-${topic.name}">${msg("topic.action.delete")}</a>
+          </div>
+      </#if>
+  </div>
+
+  
 	<div class="authorPicture"><img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="photo" /></div>
-  </td>
-  <td>
+  
+  
 	<div class="nodeContent">
 		<div class="nodeTitle">
 			<a href="discussions-topicview?topicId=${topic.name}">
@@ -41,30 +58,10 @@
 		<div class="userLink"><a href="">${topic.author}</a> ${msg("topic.said")}:</div>
 		<div class="content">${topic.content}</div>
 	</div>
-	</td>
 	
-	<td width="150">
-	<div class="nodeEdit">
-		<#if (topic.permissions.reply)>
-	        <div class="onAddReply" id="onAddReply-${topic.name}">
-	           <a href="#" class="action-link-${topic.name}">${msg("topic.action.addReply")}</a>
-	        </div>
-	    </#if>
-		<#if (topic.permissions.edit)>
-	        <div class="onEditNode" id="onEditNode-${topic.name}">
-	           <a href="#" class="action-link-${topic.name}">${msg("topic.action.edit")}</a>
-	        </div>
-	    </#if>
-		<#if (topic.permissions.delete)>
-	        <div class="onDeleteNode" id="onDeleteNode-${topic.name}">
-	           <a href="#" class="action-link-${topic.name}">${msg("topic.action.delete")}</a>
-	        </div>
-	    </#if>
-	</div>
-	</td>
-	</tr>
-	</table>
 	
+	
+	<br clear="all" />
     <div class="nodeFooter">
 	  	<span class="nodeFooterBloc">
 			<span class="nodeAttrLabel replyTo">${msg("topic.footer.replies")}:</span><span class="nodeAttrValue"> (${topic.replyCount})</span>

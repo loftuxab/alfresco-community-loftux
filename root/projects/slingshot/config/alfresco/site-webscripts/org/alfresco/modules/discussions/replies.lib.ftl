@@ -39,61 +39,55 @@
 </#macro>
 
 <#macro replyHTMLContent htmlid reply>
-    <#assign replyRef=(reply.nodeRef?replace("://", "_"))?replace("/", "_") >
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-  <td width="100">
-	<div class="authorPicture"><img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="photo" /></div>
-  </td>
-  <td>
-	<div class="nodeContent">
-		<div class="userLink">
-			<a href="">${reply.author}</a> ${msg("replies.said")}:
-			<#if reply.isUpdated><span class="nodeStatus">(${msg("replies.updated")})</span></#if>
-		</div>
+  <#assign replyRef=(reply.nodeRef?replace("://", "_"))?replace("/", "_") >
+  <div class="nodeEdit">
+    <#if (reply.permissions.reply)>
+          <div class="onAddReply" id="onAddReply-${htmlid}-${replyRef}">
+             <a href="#" class="action-link-${htmlid}">${msg("replies.action.reply")}</a>
+          </div>
+      </#if>
+    <#if (reply.permissions.edit)>
+          <div class="onEditReply" id="onEditReply-${htmlid}-${replyRef}">
+             <a href="#" class="action-link-${htmlid}">${msg("replies.action.edit")}</a>
+          </div>
+      </#if>
+    <#if (reply.permissions.delete)>
+          <div class="onDeleteReply" id="onDeleteReply-${htmlid}-${replyRef}">
+             <a href="#" class="action-link-${htmlid}">${msg("replies.action.delete")}</a>
+          </div>
+      </#if>
+  </div>
+  
+  <div class="authorPicture"><img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="photo" /></div>
+  
+  <div class="nodeContent">
+    <div class="userLink">
+      <a href="">${reply.author}</a> ${msg("replies.said")}:
+      <#if reply.isUpdated><span class="nodeStatus">(${msg("replies.updated")})</span></#if>
+    </div>
 
-		<div class="content">${reply.content}</div>
-	</div>
-  </td>
+    <div class="content">${reply.content}</div>
+  </div>
+  <br clear="all" />
+  <div class="topicFooter">
+    <span class="nodeFooterBloc">
+      <span class="nodeAttrLabel replyTo">${msg("replies.footer.replies")}:</span><span class="nodeAttrValue">
+        (<#if reply.children??>${reply.children?size}<#else>0</#if>)
+      </span>
+      <#if (reply.replyCount > 0)>
+        <span class="nodeAttrValue">
+          <a href="#" id="showHideReply-${replyRef}" class="showHideReply">${msg("replies.footer.hide")}</a>
+        </span>
+      </#if>
+    </span>
+    <span class="spacer"> | </span>
+    <span class="nodeFooterBloc">
+      <span class="nodeAttrLabel">${msg("replies.footer.postedOn")}: ${reply.createdOn?datetime?string.medium_short}</span>
+    </span>
+  </div>
+  
 
-  <td width="150">
-	<div class="nodeEdit">
-		<#if (reply.permissions.reply)>
-	        <div class="onAddReply" id="onAddReply-${htmlid}-${replyRef}">
-	           <a href="#" class="action-link-${htmlid}">${msg("replies.action.reply")}</a>
-	        </div>
-	    </#if>
-		<#if (reply.permissions.edit)>
-	        <div class="onEditReply" id="onEditReply-${htmlid}-${replyRef}">
-	           <a href="#" class="action-link-${htmlid}">${msg("replies.action.edit")}</a>
-	        </div>
-	    </#if>
-		<#if (reply.permissions.delete)>
-	        <div class="onDeleteReply" id="onDeleteReply-${htmlid}-${replyRef}">
-	           <a href="#" class="action-link-${htmlid}">${msg("replies.action.delete")}</a>
-	        </div>
-	    </#if>
-	</div>
-  </td>
-  </tr>
-  </table>
-
-    <div class="topicFooter">
-	  	<span class="nodeFooterBloc">
-			<span class="nodeAttrLabel replyTo">${msg("replies.footer.replies")}:</span><span class="nodeAttrValue">
-				(<#if reply.children??>${reply.children?size}<#else>0</#if>)
-			</span>
-			<#if (reply.replyCount > 0)>
-				<span class="nodeAttrValue">
-					<a href="#" id="showHideReply-${replyRef}" class="showHideReply">${msg("replies.footer.hide")}</a>
-				</span>
-			</#if>
-		</span>
-		<span class="spacer"> | </span>
-		<span class="nodeFooterBloc">
-			<span class="nodeAttrLabel">${msg("replies.footer.postedOn")}: ${reply.createdOn?datetime?string.medium_short}</span>
-		</span>
-  	</div>
+    
 </#macro>
 
 <#--

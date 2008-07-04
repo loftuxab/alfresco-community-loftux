@@ -186,7 +186,7 @@
 		      {
 		         fn: this._onDeleted,
 		         scope: this,
-		         object: { replyRef : replyRef}
+		         obj: { replyRef : replyRef}
 		      },
 		      failureMessage: this._msg("replies.msg.failedDeleted2")
 		   });
@@ -233,7 +233,7 @@
 		      {
 		         fn: this._onFormLoaded,
 		         scope: this,
-		         object : { isEditReply : isEditReply, postRef : postRef }
+		         obj : { isEditReply : isEditReply, postRef : postRef }
 		      },
 		      failureMessage: this._msg("replies.msg.failedLoadTopicForm")
 		   });
@@ -345,7 +345,7 @@
             {
                fn: this.onFormSubmitSuccess,
                scope: this,
-               object: { replyRef : replyRef, isEditReply : isEditReply }
+               obj: { replyRef : replyRef, isEditReply : isEditReply }
             },
             failureCallback:
             {

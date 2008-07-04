@@ -4,7 +4,4 @@
    <region-id>title</region-id>
    <source-id>blog-postview</source-id>
    <url>/components/title/collaboration-title</url>
-   <chrome>
-      <frame>none</frame>
-   </chrome>
 </component>

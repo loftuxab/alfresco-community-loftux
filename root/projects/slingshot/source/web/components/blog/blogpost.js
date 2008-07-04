@@ -58,6 +58,13 @@
          mode: ""
       },
    	
+   	  postForm: null,
+   	  saveButton: null,
+   	  
+   	  /** If true, an external publish will be executed once the
+   	   * post has been saved
+   	   */
+   	  performExternalPublish: false,
       
       /**
        * Set multiple initialization options at once.
@@ -140,14 +147,186 @@
          }
       },
       
+      createSimpleEditor: function CreateComment_createSimpleEditor(textareaId)
+      {
+         // instantiate the simple editor we use for the form
+		 var editor = new YAHOO.widget.SimpleEditor(textareaId, {
+		     height: '300px',
+		     width: '538px',
+		     dompath: false, //Turns on the bar at the bottom
+		     animate: false, //Animates the opening, closing and moving of Editor windows
+		     toolbar: {
+		        titlebar: false,
+		        buttons: [
+		            { group: 'textstyle', label: this._msg("comments.form.font"),
+		                buttons: [
+				            { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
+				            { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
+				            { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
+		                    { type: 'separator' },
+		                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
+		                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
+		                ]
+		            },
+		            { type: 'separator' },
+				    { group: 'indentlist', label: this._msg("comments.form.lists"),
+				        buttons: [
+				            { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
+				            { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
+				        ]
+				    },
+				    { type: 'separator' },
+				    { group: 'insertitem', label: this._msg("comments.form.link"),
+				        buttons: [
+				            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
+				        ]
+				    }
+		        ]
+		    }
+		 });
+		 return editor;
+      },
+
+      /**
+       * Registers the form with the html (that should be available in the page)
+       * as well as the buttons that are part of the form.
+       */
+      _registerPostForm: function BlogPost__registerPostForm()
+      {   
+         // register the Button
+         var saveButtonId = this.id + "-save-button";
+         this.saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
+
+         // publishing of a draft post button
+         var publishButtonId = this.id + "-publish-button";
+         if (YAHOO.util.Dom.get(publishButtonId) != null)
+         {
+            var publishButton = new YAHOO.widget.Button(publishButtonId, {type: "button"});
+            publishButton.subscribe("click", this.onFormPublishButtonClick, this, true);
+         }
+         
+         // publishing external as well
+         var publishExternalButtonId = this.id + "-publishexternal-button";
+         if (YAHOO.util.Dom.get(publishExternalButtonId) != null)
+         {
+            var publishExternalButton = new YAHOO.widget.Button(publishExternalButtonId, {type: "button"});
+            publishExternalButton.subscribe("click", this.onFormPublishExternalButtonClick, this, true);
+         }
+                  
+         // register the cancel button
+         var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
+         cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
+         
+         // instantiate the simple editor we use for the form
+		 this.editor = this.createSimpleEditor(this.id + '-content')
+		 this.editor.render();
+         
+         // create the form that does the validation/submit
+         var postForm = new Alfresco.forms.Form(this.id + "-form");
+         postForm.setShowSubmitStateDynamically(true);
+         postForm.setSubmitElements(this.saveButton);
+         postForm.setAJAXSubmit(true,
+         {
+            successCallback:
+            {
+               fn: this.onFormSubmitSuccess,
+               scope: this
+            },
+            failureCallback:
+            {
+               fn: this.onFormSubmitFailure,
+               scope: this
+            }
+         });
+         if (this.options.mode != "create")
+         {
+             postForm.ajaxSubmitMethod = "PUT";
+         }
+         postForm.setSubmitAsJSON(true);
+          
+         postForm.doBeforeFormSubmit =
+        	{
+        	   fn: function(form, obj)
+        	   {
+			        //Put the HTML back into the text area
+					this.editor.saveHTML();
+        	   },
+        	   //obj: myArbitraryObject,
+        	   scope: this
+         	}
+         
+         postForm.init();
+         this.postForm = postForm;
+      },
+      
+      onFormPublishButtonClick: function BlogPost_onFormSaveButtonClick(type, args)
+      {
+          // make sure we set the draft flag to false
+          var draftElem = YAHOO.util.Dom.get(this.id + "-draft");
+          draftElem.value=false;
+          
+          // submit the form
+          this.saveButton.fireEvent("click");
+      },
+      
+      onFormPublishExternalButtonClick: function BlogPost_onFormSaveButtonClick(type, args)
+      {
+          // make sure we set the draft flag to false
+          var draftElem = YAHOO.util.Dom.get(this.id + "-draft");
+          draftElem.value=false;
+          
+          // make sure that the post gets also externally published
+          this.performExternalPublish = true;
+          
+          // submit the form
+          this.saveButton.fireEvent("click");
+      },
+      
+      onFormSubmitSuccess: function BlogPost_onFormSubmitSuccess(response)
+      {
+         // check whether we have to do an external publich
+         if (this.performExternalPublish)
+         {
+            //var nodeRef = response.json.item.nodeRef;    
+            var postId = response.json.item.name;
+            if (response.json.item.isPublished)
+            {
+                // perform an update
+                this.onUpdateExternal(postId);
+            }
+            else
+            {
+                // perform a publish
+                this.onPublishExternal(postId);
+            }
+         }
+         else
+         {
+             // simply show the view page
+             this._loadBlogPostViewPage(response.json.item.name);
+         }
+      },
+      
+      onFormSubmitFailure: function BlogPost_onFormSubmitFailure(response)
+      {
+         Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedSubmit")});
+      },
+      
+      onFormCancelButtonClick: function(type, args)
+      {
+         // redirect to the page we came from
+         history.go(-1);
+      },
+      
+      // Actions
+      
       /**
        * Loads the edit post form and displays it instead of the content
        * The div class should have the same name as the above function (onEditNode)
        */
       onEditNode: function BlogPostList_onEditNode(id)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit?container=" + this.options.containerId + "&postId=" + id;
-         window.location = url;
+         this._loadBlogPostEditPage(id);
       },
       
       /**
@@ -174,7 +353,7 @@
 
       _onDeleted: function BlogPost__onDeleted(response)
       {
-         window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postlist";
+         this._loadBlogPostListPage();
       },
 
       _getPublishingRestUrl: function Blog__getPublishingRestUrl(postId)
@@ -209,7 +388,7 @@
       _onPublished: function Blog__onPublished(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Published!"});
-          location.reload(true);
+          this._loadBlogPostViewPage(response.json.item.name);
       },
      
       onUpdateExternal: function Blog_onUpdateExternal(id)
@@ -237,7 +416,7 @@
       _onUpdated: function Blog__onUpdated(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Updated!"});
-          location.reload(true);
+          this._loadBlogPostViewPage(response.json.item.name);
       },    
 
       onUnpublishExternal: function Blog_onUnpublishExternal(id)
@@ -262,16 +441,39 @@
 		   });
       },
       
-      _onUnpublished: function Blog__onUnpublished(response)
+      _onUnpublished: function BlogPost__onUnpublished(response)
       {
           Alfresco.util.PopupManager.displayMessage({text: "Unpublished!"});
-          location.reload(true);
+          this._loadBlogPostViewPage(response.json.item.name);
       },
 
-
+      _loadBlogPostViewPage: function BlogPost_loadPostViewPage(postId)
+      {
+            window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postview" +
+                               "?container=" + this.options.containerId + 
+                               "&postId=" + postId;
+      },
+      
+      _loadBlogPostEditPage: function BlogPost_loadPostViewPage(postId)
+      {
+            window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit" +
+                               "?container=" + this.options.containerId + 
+                               "&postId=" + postId;
+      },
+      
+      _loadBlogPostListPage: function BlogPost__loadBlogPostListPage()
+      {
+            window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postlist";
+      },
+      
+      
+      // helper functions
+      
+      
       /**
        * Updates a div content and makes sure the div is displayed
        */
+       
       updateAndShowDiv: function BlogPost_updateAndShowDiv(divId, newHTML)
       {
           var elem = YAHOO.util.Dom.get(divId);
@@ -290,109 +492,6 @@
           var elem = YAHOO.util.Dom.get(divId);
 	      YAHOO.util.Dom.addClass(elem, "hidden");          
       },
-
-
-      /**
-       * Registers the form with the html (that should be available in the page)
-       * as well as the buttons that are part of the form.
-       */
-      _registerPostForm: function BlogPost__registerPostForm()
-      {
-         // register the okButton
-         var okButton = new YAHOO.widget.Button(this.id + "-ok-button", {type: "submit"});
-         
-         // register the cancel button
-         var cancelButton = new YAHOO.widget.Button(this.id + "-cancel-button", {type: "button"});
-         cancelButton.subscribe("click", this.onFormCancelButtonClick, this, true);
-         
-         // instantiate the simple editor we use for the form
-		 this.editor = new YAHOO.widget.SimpleEditor(this.id + '-content', {
-		     height: '300px',
-		     width: '538px',
-		     dompath: false, //Turns on the bar at the bottom
-		     animate: false, //Animates the opening, closing and moving of Editor windows
-		     toolbar: {
-		        titlebar: false,
-		        buttons: [
-		            { group: 'textstyle', label: this._msg("post.form.font"),
-		                buttons: [
-				            { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
-				            { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
-				            { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
-		                    { type: 'separator' },
-		                    { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
-		                    { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
-		                ]
-		            },
-		            { type: 'separator' },
-				    { group: 'indentlist', label: this._msg("post.form.list"),
-				        buttons: [
-				            { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
-				            { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
-				        ]
-				    },
-				    { type: 'separator' },
-				    { group: 'insertitem', label: this._msg("post.form.link"),
-				        buttons: [
-				            { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
-				        ]
-				    }
-		        ]
-		    }
-		 });
-		 this.editor.render();
-         
-         // create the form that does the validation/submit
-         var postForm = new Alfresco.forms.Form(this.id + "-form");
-         postForm.setShowSubmitStateDynamically(true);
-         postForm.setSubmitElements(okButton);
-         postForm.setAJAXSubmit(true,
-         {
-            successCallback:
-            {
-               fn: this.onFormSubmitSuccess,
-               scope: this
-            },
-            failureCallback:
-            {
-               fn: this.onFormSubmitFailure,
-               scope: this
-            }
-         });
-         postForm.setSubmitAsJSON(true);
-          
-         postForm.doBeforeFormSubmit =
-        	{
-        	   fn: function(form, obj)
-        	   {
-			        //Put the HTML back into the text area
-					this.editor.saveHTML();
-        	   },
-        	   //obj: myArbitraryObject,
-        	   scope: this
-         	}
-         
-         postForm.init();
-      },
-      
-      onFormSubmitSuccess: function BlogPost_onFormSubmitSuccess(response)
-      {
-         // forward to the post view page
-         window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postview" +
-                            "?postId=" + response.json.item.name;
-      },
-      
-      onFormSubmitFailure: function BlogPost_onFormSubmitFailure(response)
-      {
-         Alfresco.util.PopupManager.displayMessage({text: this._msg("post.msg.failedSubmit")});
-      },
-      
-      onFormCancelButtonClick: function(type, args)
-      {
-         // redirect to the page we came from
-         history.go(-1);
-      },
-      
       
       // mouse hover functionality
       

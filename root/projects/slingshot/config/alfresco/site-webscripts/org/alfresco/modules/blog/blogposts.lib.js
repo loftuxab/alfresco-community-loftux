@@ -23,17 +23,14 @@ function getPostsRequestUrlWithParams(site, container, path, filter, tag, fromDa
     // check whether we got a filter or not
     if (filter != null && filter.length > 0)
     {
+        // latest only
         if (filter == "latest")
         {
-            // the default returns all
+            url += "/latest";
         }
-        else if (filter == "drafts")
+        else if (filter == "mydrafts")
         {
-            url += "/drafts"
-        }
-        else if (filter == "mydraft")
-        {
-            url += "/mydraft"
+            url += "/mydrafts"
         }
         else if (filter == "mypublished")
         {

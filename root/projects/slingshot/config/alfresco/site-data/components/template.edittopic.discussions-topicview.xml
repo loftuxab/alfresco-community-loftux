@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>template</scope>
-   <region-id>edittopic</region-id>
-   <source-id>discussions-topicview</source-id>
-   <url>/components/discussions/edittopic</url>
-</component>

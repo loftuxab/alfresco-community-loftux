@@ -250,9 +250,6 @@
          configBlogForm.setSubmitAsJSON(true);
          configBlogForm.init();
 
-         // Firefox insertion caret fix
-         Alfresco.util.caretFix(this.id + "-configBlog-form");
-
          // Show the panel
          this._showPanel();
       },
@@ -291,12 +288,15 @@
        * @private
        */
       _showPanel: function()
-      {
-         // Set the focus on the first field
-         YAHOO.util.Dom.get(this.id + "-title").focus();
-
+      {         
          // Show the upload panel
          this.panel.show();
+
+         // Firefox insertion caret fix
+         Alfresco.util.caretFix(this.id + "-form");
+
+         // Set the focus on the first field
+         YAHOO.util.Dom.get(this.id + "-title").focus();
       },
 
 

@@ -4,4 +4,7 @@
    <region-id>createtopic</region-id>
    <source-id>discussions-createtopic</source-id>
    <url>/components/discussions/createtopic</url>
+   <properties>
+      <container>blog</container>
+   </properties>
 </component>

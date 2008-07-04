@@ -4,4 +4,7 @@
    <region-id>postview</region-id>
    <source-id>blog-postview</source-id>
    <url>/components/blog/postview</url>
+   <properties>
+      <container>blog</container>
+   </properties>
 </component>

@@ -143,7 +143,7 @@
 		      {
 		         fn: this._onDeleted,
 		         scope: this,
-		         object: { saveCommentRef : saveCommentRef}
+		         obj: { saveCommentRef : saveCommentRef}
 		      },
 		      failureMessage: this._msg("comments.msg.failedDeleted2")
 		   });
@@ -179,7 +179,7 @@
 		      {
 		         fn: this._onFormLoaded,
 		         scope: this,
-		         object : { saveCommentRef : saveCommentRef }
+		         obj : { saveCommentRef : saveCommentRef }
 		      },
 		      failureMessage: this._msg("comments.msg.failedLoadPostForm")
 		   });
@@ -278,7 +278,7 @@
             {
                fn: this.onEditFormSubmitSuccess,
                scope: this,
-               object: { saveCommentRef : saveCommentRef }
+               obj: { saveCommentRef : saveCommentRef }
             },
             failureCallback:
             {
