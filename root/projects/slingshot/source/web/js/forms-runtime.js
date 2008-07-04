@@ -26,6 +26,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
       this.submitElements = [];
       this.validations = [];
       this.ajaxSubmit = false;
+      this.ajaxSubmitMethod = "POST";
       this.errorContainer = "alert";
 
       return this;
@@ -114,6 +115,15 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
        * @type object
        */
       ajaxSubmitHandlers: null,
+      
+      /**
+       * String representing the http method to be used for the
+       * ajax call. Default is POST.
+       * 
+       * @property ajaxSubmitMethod
+       * @type String
+       */
+      ajaxSubmitMethod: null,
       
       /**
        * Flag to determine whether the form data should be submitted 
@@ -518,7 +528,7 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                   // create config object to pass to request helper
                   var config =
                   {
-                     method: "POST",
+                     method: this.ajaxSubmitMethod,
                      url: submitUrl
                   };
 

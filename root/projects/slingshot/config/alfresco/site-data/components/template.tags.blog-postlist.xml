@@ -4,4 +4,7 @@
    <region-id>tags</region-id>
    <source-id>blog-postlist</source-id>
    <url>/components/blog/tags</url>
+   <properties>
+      <container>blog</container>
+   </properties>
 </component>

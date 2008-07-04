@@ -11,6 +11,5 @@
    );
 //]]></script>
  
-<div class="indented">
-	<@repliesLib.repliesHTML htmlid=args.htmlid parentPostRef=topicRef replies=replies/>
-</div>
+
+<@repliesLib.repliesHTML htmlid=args.htmlid parentPostRef=topicRef replies=replies/>

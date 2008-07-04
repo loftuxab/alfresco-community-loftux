@@ -4,4 +4,7 @@
    <region-id>topic</region-id>
    <source-id>discussions-topicview</source-id>
    <url>/components/discussions/topic</url>
+   <properties>
+      <container>discussions</container>
+   </properties>
 </component>

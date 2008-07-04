@@ -34,6 +34,12 @@
 		
 		<span class="configLink">
 		   <a id="${args.htmlid}-config-blog-button" href="#">
+	          ${msg("header.configureBlog")}
+	       </a>
+		</span>
+		
+		<span class="configLink">
+		   <a id="${args.htmlid}-config-blog-button" href="#">
 	          Blog config
 	       </a>
 		</span>

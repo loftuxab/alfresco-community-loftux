@@ -7,14 +7,14 @@
 }
 
 .comment {
-	border-top: 1px dashed #b1b1b1;
-	border-bottom: 1px solid transparent;
-	border-right: 1px solid transparent;
-	border-left: 1px solid transparent;
+	border-top: 2px dashed #b1b1b1;
+	border-bottom: 2px solid transparent;
+	border-right: 2px solid transparent;
+	border-left: 2px solid transparent;
 	margin: 0 20px;
 }
 .comment.overNode {
-	border: 1px solid #5A7380;
+	border: 2px solid #5A7380;
 }
 .commentsListTitle {
 	font-size: 11pt;
@@ -55,4 +55,8 @@
 
 .commentFormAction {
 	margin-top: 15px;
+}
+
+.config-blog {
+  width: 350px;
 }

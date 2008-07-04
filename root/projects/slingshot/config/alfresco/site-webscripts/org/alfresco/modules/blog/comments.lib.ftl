@@ -35,12 +35,22 @@
 
 <#macro commentHTMLContent htmlid comment>
     <#assign commentRef=(comment.nodeRef?replace("://", "_"))?replace("/", "_") >
-  <table width="100%" border="0" cellspacing="0" cellpadding="0">
-  <tr>
-  <td width="100">
+  
+  <div class="nodeEdit">
+    <#if (comment.permissions.edit)>
+          <div class="onEditComment" id="onEditComment-${htmlid}-${commentRef}">
+             <a href="#" class="action-link-${htmlid}">${msg("comments.action.edit")}</a>
+          </div>
+      </#if>
+    <#if (comment.permissions.delete)>
+          <div class="onDeleteComment" id="onDeleteComment-${htmlid}-${commentRef}">
+             <a href="#" class="action-link-${htmlid}">${msg("comments.action.delete")}</a>
+          </div>
+      </#if>
+  </div>
+  
 	<div class="authorPicture"><img src="${url.context}/components/images/no-photo.png" width="64" height="64" alt="photo" /></div>
-  </td>
-  <td>
+  
 	<div class="nodeContent">
 		<div class="userLink">
 			<a href="">${comment.author}</a> ${msg("comments.said")}:
@@ -54,24 +64,9 @@
 			<span class="nodeAttrLabel">${msg("comments.footer.postedOn")}: ${comment.createdOn?datetime?string.medium_short}</span>
 		</span>
   	</div>
-  </td>
-
-  <td width="150">
-	<div class="nodeEdit">
-		<#if (comment.permissions.edit)>
-	        <div class="onEditComment" id="onEditComment-${htmlid}-${commentRef}">
-	           <a href="#" class="action-link-${htmlid}">${msg("comments.action.edit")}</a>
-	        </div>
-	    </#if>
-		<#if (comment.permissions.delete)>
-	        <div class="onDeleteComment" id="onDeleteComment-${htmlid}-${commentRef}">
-	           <a href="#" class="action-link-${htmlid}">${msg("comments.action.delete")}</a>
-	        </div>
-	    </#if>
-	</div>
-  </td>
-  </tr>
-  </table>
+  
+	
+  
 </#macro>
 
 

@@ -296,7 +296,7 @@
          // we can directly go to alfresco for this
          Alfresco.util.Ajax.request(
 		   {
-		      url: Alfresco.constants.PROXY_URI + "forum/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" /* ADD PATH */ + id,
+		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" /* ADD PATH */ + id,
 		      method: "DELETE",
 		      responseContentType : "application/json",
 		      /*dataObj:

@@ -1,4 +1,46 @@
 /**
+ * Returns a template config param or the passed default if not found.
+ * This method first checks in template.properties
+ */
+function getTemplateParam(paramName, defaultValue)
+{
+    if (template.properties[paramName] != undefined)
+    {
+        return template.properties[paramName];
+    }
+    else
+    {
+        return defaultValue;
+    }
+}
+
+/** Gets a param from a page request. */
+function getPageUrlParam(paramName, defaultValue)
+{
+    if (page.url.args[paramName] != undefined)
+    {
+        return page.url.args[paramName];
+    }
+    else
+    {
+        return defaultValue;
+    }
+}
+
+/** Gets a param from a webscript request. */
+function getRequestParam(paramName, defaultValue)
+{
+    if (args[paramName] != undefined)
+    {
+        return args[paramName];
+    }
+    else
+    {
+        return defaultValue;
+    }
+}
+
+/**
  * Adds a request parameter to a url
  * @return the new url
  */
