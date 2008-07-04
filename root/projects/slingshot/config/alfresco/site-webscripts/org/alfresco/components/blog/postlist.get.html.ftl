@@ -38,11 +38,6 @@
 	       </a>
 		</span>
 		
-		<span class="configLink">
-		   <a id="${args.htmlid}-config-blog-button" href="#">
-	          Blog config
-	       </a>
-		</span>
 	</div>
 	<div class="rightDiscussionBlogHeader">
 		<span class="toolbarOption detailList"><a href="#" id="detailed-list-view">${msg("header.detailList")}</a></span>
@@ -52,7 +47,7 @@
 
 <div id="discussionsBlogHeader2">
 	<div id="${args.htmlid}-listtitle" class="leftDiscussionBlogHeader listTitle">
-			${listTitle}
+		<@blogpostlistLib.postListTitle filter=filter fromDate=fromDate toDate=toDate tag=tag />
 	</div>
 	
 	<div class="rightDiscussionBlogHeader">
