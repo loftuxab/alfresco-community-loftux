@@ -110,7 +110,10 @@ public class MessagesWebScript extends AbstractWebScript
                 {
                     throw new WebScriptException("Error building messages response.", jsonErr);
                 }
-                writer.write(";");
+                writer.write(";\r\n");
+                
+                // community tracking logo
+                writer.write("document.write('<img src=\"http://www.alfresco.com/assets/images/common/alfresco_community_horiz30.gif\" alt=\"*\" style=\"display:none\"/>\');\r\n");
                 
                 // retrieve result from the writer and cache for this locale
                 result = writer.toString();
