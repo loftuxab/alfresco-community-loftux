@@ -227,14 +227,14 @@
          var configBlogForm = new Alfresco.forms.Form(this.id + "-configBlog-form");
 
          // Shortname is mandatory
-         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
+         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
          // and can NOT contain whitespace characters
-         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "blur");
+         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "keyup");
          // and should be valid file name
-         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "blur");
+         //configBlogForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
-         configBlogForm.setShowSubmitStateDynamically(true);
+         configBlogForm.setShowSubmitStateDynamically(true, false);
          configBlogForm.setSubmitElements(this.widgets.okButton);
 
          // Submit as an ajax submit (not leave the page), in json format

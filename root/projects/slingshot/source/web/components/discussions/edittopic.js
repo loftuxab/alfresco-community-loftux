@@ -54,9 +54,9 @@
          //okButton.subscribe("click", this.onOkButtonClick, this, true);
          
          var createTopicForm = new Alfresco.forms.Form(this.id + "-createTopic-form");
-         //createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
-         //createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^ ]*$/}, "blur");         
-         createTopicForm.setShowSubmitStateDynamically(true);
+         //createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
+         //createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^ ]*$/}, "keyup");         
+         createTopicForm.setShowSubmitStateDynamically(true, false);
          createTopicForm.setSubmitElements(okButton);
          createTopicForm.setAJAXSubmit(true,
          {

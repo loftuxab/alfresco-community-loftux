@@ -337,7 +337,7 @@
          
          // create the form that does the validation/submit
          var replyForm = new Alfresco.forms.Form(this.id + "-" + replyRef + "-form");
-         replyForm.setShowSubmitStateDynamically(true);
+         replyForm.setShowSubmitStateDynamically(true, false);
          replyForm.setSubmitElements(okButton);
          replyForm.setAJAXSubmit(true,
          {

@@ -153,8 +153,8 @@
 	         	});
 	
 				var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
-				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
-	         eventForm.setShowSubmitStateDynamically(true);
+				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
+	         eventForm.setShowSubmitStateDynamically(true, false);
 		   	eventForm.setSubmitElements(okButton);
 				eventForm.setAJAXSubmit(true,
 				{

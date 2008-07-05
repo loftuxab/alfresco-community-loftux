@@ -20,6 +20,7 @@
       <script type="text/javascript" src="../../build/assemble/yui/selector/selector-beta-min.js"></script>
       <script type="text/javascript" src="../../build/assemble/yui/yahoo-dom-event/yahoo-dom-event.js"></script>
       <script type="text/javascript" src="../../build/assemble/yui/calendar/calendar-min.js"></script>
+      
       <script type="text/javascript" src="../web/js/alfresco.js"></script>
       <script type="text/javascript" src="../web/js/forms-runtime.js"></script>
       
@@ -153,17 +154,17 @@
          regform.addValidation("gender", Alfresco.forms.validation.mandatory);
          regform.addValidation("email", Alfresco.forms.validation.email, null, "blur");
          //regform.setValidateOnSubmit(false);
-         //regform.setSubmitIds("submit");
-         regform.setErrorPosition("form-errors");
+         regform.setErrorContainer("form-errors");
+         //regform.setValidateAllOnSubmit(true);
          regform.init();
 
          // setup address form   
          var addrform = new Alfresco.forms.Form("addressform");
          addrform.addValidation("housenumber", Alfresco.forms.validation.mandatory, null, "keyup");
          addrform.addValidation("street", Alfresco.forms.validation.mandatory, null, "keyup");
-         addrform.addValidation("housenumber", Alfresco.forms.validation.number, null, "blur");
-         addrform.setShowSubmitStateDynamically(true);
-         addrform.setErrorPosition("form-errors");
+         addrform.addValidation("housenumber", Alfresco.forms.validation.number, null, "keyup");
+         addrform.setShowSubmitStateDynamically(true, true);
+         addrform.setErrorContainer("form-errors");
          addrform.init();
       </script>
       

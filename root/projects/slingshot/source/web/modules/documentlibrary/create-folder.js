@@ -255,7 +255,7 @@
          // Name: valid filename
          form.addValidation(this.id + "-name", Alfresco.forms.validation.nodeName, null, "keyup");
 
-         form.setShowSubmitStateDynamically(true);
+         form.setShowSubmitStateDynamically(true, false);
          form.setSubmitElements(this.widgets.okButton);
          form.setAJAXSubmit(true,
          {

@@ -258,7 +258,7 @@
 
          // Form definition
          var form = new Alfresco.forms.Form(this.id + "-form");
-         form.setShowSubmitStateDynamically(true);
+         form.setShowSubmitStateDynamically(true, false);
          form.setSubmitElements(this.widgets.okButton);
          form.setAJAXSubmit(true,
          {
