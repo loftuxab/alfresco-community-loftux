@@ -328,7 +328,7 @@
          
          // create the form that does the validation/submit
          var topicForm = new Alfresco.forms.Form(this.id + "-form");
-         topicForm.setShowSubmitStateDynamically(true);
+         topicForm.setShowSubmitStateDynamically(true, false);
          topicForm.setSubmitElements(okButton);
          topicForm.setAJAXSubmit(true,
          {

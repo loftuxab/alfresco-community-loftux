@@ -167,14 +167,14 @@
          var createSiteForm = new Alfresco.forms.Form(this.id + "-form");
 
          // Shortname is mandatory
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "blur");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.mandatory, null, "keyup");
          // and can NOT contain whitespace characters
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "blur");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.regexMatch, {pattern: /^[^\s]*$/}, "keyup");
          // and should be valid file name
-         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "blur");
+         createSiteForm.addValidation(this.id + "-shortName", Alfresco.forms.validation.nodeName, null, "keyup");
 
          // The ok button is the submit button, and it should be enabled when the form is ready
-         createSiteForm.setShowSubmitStateDynamically(true);
+         createSiteForm.setShowSubmitStateDynamically(true, false);
          createSiteForm.setSubmitElements(this.widgets.okButton);
 
          // Submit as an ajax submit (not leave the page), in json format

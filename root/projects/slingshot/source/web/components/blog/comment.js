@@ -270,7 +270,7 @@
          
          // create the form that does the validation/submit
          var commentForm = new Alfresco.forms.Form(formBaseId);
-         commentForm.setShowSubmitStateDynamically(true);
+         commentForm.setShowSubmitStateDynamically(true, false);
          commentForm.setSubmitElements(okButton);
          commentForm.setAJAXSubmit(true,
          {
