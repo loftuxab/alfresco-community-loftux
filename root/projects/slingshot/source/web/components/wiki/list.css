@@ -1,6 +1,7 @@
 .wikipage
 {
    margin: 0.5em;
+   border: 1px solid white;
 }
 
 .wikipage .pageTitle
@@ -44,5 +45,10 @@
 
 .attrValue a {
 	color: #2b6eb5;
+}
+
+.wikiPageSelected {
+/*   background-color: #FFFFCC; */
+   border: 1px solid black; 
 }
 

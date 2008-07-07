@@ -1,4 +1,8 @@
-
+<script type="text/javascript">//<![CDATA[
+   new Alfresco.WikiList("${args.htmlid}").setSiteId(
+      "${page.url.templateArgs["site"]!""}"
+   );
+//]]></script>
 <div id="${args.htmlid}-pagelist" class="yui-navset"> 
 <#if pageList.pages?size &gt; 0>
 <#list pageList.pages as p>

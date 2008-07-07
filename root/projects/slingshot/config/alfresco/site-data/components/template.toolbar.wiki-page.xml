@@ -2,6 +2,6 @@
 <component>
    <scope>template</scope>
    <region-id>toolbar</region-id>
-   <source-id>wiki</source-id>
+   <source-id>wiki-page</source-id>
    <url>/components/wiki/toolbar</url>
 </component>
