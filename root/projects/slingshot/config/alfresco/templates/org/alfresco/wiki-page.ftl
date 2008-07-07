@@ -4,7 +4,7 @@
 <@template.body>
    <div id="hd">
       <@region id="header" scope="global" protected=true />
-      <@region id="title" scope="page" protected=true />
+      <@region id="title" scope="template" protected=true />
       <@region id="navigation" scope="template" protected=true />
    </div>
    <div id="bd">
@@ -13,7 +13,7 @@
    	</div>
 		<div class="yui-u">
 		    <@region id="toolbar" scope="template" protected=true />
-			 <@region id="wikipage" scope="page" protected=true />
+			 <@region id="wikipage" scope="template" protected=true />
    	</div>
  	</div>
 	</div>

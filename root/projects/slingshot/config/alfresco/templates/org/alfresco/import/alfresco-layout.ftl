@@ -11,7 +11,7 @@
       <#list columns as column>
          <div class="yui-u<#if column_index == 0> first</#if>">
             <#list 1..column.components as component>
-               <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="uri" protected=true/>
+               <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="page" protected=true/>
             </#list>
          </div>
       </#list>
@@ -26,7 +26,7 @@
          </#if>
          <div class="yui-u<#if column_index%2 == 0> first</#if>">
             <#list 1..column.components as component>
-               <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="uri" protected=true/>
+               <@region id="${bindPrefix + '-' + (column_index + 1) + '-' + (component_index + 1)}" scope="page" protected=true/>
             </#list>
          </div>
          <#if (column_index % 2 == 1 || !column_has_next)>

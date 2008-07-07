@@ -184,7 +184,9 @@
       <!-- when pages are requested from the framework, matches are attempted
            against each uri-template, and the token values returned if matched -->
       <uri-templates>
+         <uri-template id="sitedashboardpage">/site/{site}/dashboard</uri-template>
          <uri-template id="sitepage">/site/{site}/{pageid}</uri-template>
+         <!--<uri-template id="userdashboardpage">/user/{userid}/dashboard</uri-template>-->
          <uri-template id="userpage">/user/{userid}/{pageid}</uri-template>
       </uri-templates>
    </config>

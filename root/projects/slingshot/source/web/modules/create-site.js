@@ -224,7 +224,7 @@
          else
          {
             // The site has been successfully created, redirect the user to it.
-            document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + response.json.shortName + "/collaboration-dashboard";
+            document.location.href = Alfresco.constants.URL_CONTEXT + "page/site/" + response.json.shortName + "/dashboard";
          }
       },
 

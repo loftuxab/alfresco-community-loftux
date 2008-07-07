@@ -6,7 +6,7 @@
       <img src="${url.context}${args.logo}" alt="Company Logo"/>
    </div>
    <div class="personal-menu">
-      <span class="menu-item"><a href="${url.context}/page/user/${user.name}/user-dashboard">${msg("link.myDashboard")}</a></span>
+      <span class="menu-item"><a href="${url.context}/page/user/${user.name}/dashboard">${msg("link.myDashboard")}</a></span>
       <span class="menu-item"><a href="${url.context}/page/user-profile">${msg("link.myProfile")}</a></span>
       <span class="menu-item"><a href="#">${msg("link.sites")}</a></span>
       <span class="menu-item"><a href="#">${msg("link.users")}</a></span>
