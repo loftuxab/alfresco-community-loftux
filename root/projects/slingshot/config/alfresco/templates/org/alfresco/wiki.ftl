@@ -12,6 +12,7 @@
 		<div class="yui-u first">
    	</div>
 		<div class="yui-u">
+		    <@region id="toolbar" scope="template" protected=true />
 			 <@region id="pagelist" scope="page" protected=true />
    	</div>
  	</div>
