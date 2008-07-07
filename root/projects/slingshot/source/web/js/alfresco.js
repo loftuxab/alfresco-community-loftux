@@ -1253,6 +1253,219 @@ Alfresco.util.Ajax = function()
    };
 }();
 
+/**
+ * Helper class for setting the user mouse cursor and making sure its used the
+ * same way in the whole application.
+ *
+ * Use setCursor with the predefined state constants to set the cursor.
+ * Each constant has a css selector in base.css where it can be styled
+ * differently if needed.
+ *
+ * @class Alfresco.util.Cursor
+ */
+Alfresco.util.Cursor = function()
+{
+   return {
+
+      /**
+       * Show cursor in state to indicate that the current element is draggable.
+       * Styled through css selector ".draggable" in base.css
+       *
+       * @property DRAGGABLE
+       * @type string
+       */
+      DRAGGABLE: "draggable",
+
+      /**
+       * Show cursor in state to indicate that the current element is dragged.
+       * Styled through css selector ".drag" in base.css
+       *
+       * @property DRAG
+       * @type string
+       */
+      DRAG: "drag",
+
+      /**
+       * Show cursor in state to indicate that the element dragged over IS a valid drop point.
+       * Styled through css selector ".dropValid" in base.css
+       *
+       * @property DROP_VALID
+       * @type string
+       */
+      DROP_VALID: "dropValid",
+
+      /**
+       * Show cursor in state to indicate that the element dragged over is NOT a valid drop point.
+       * Styled through css selector ".dropInvalid" in base.css
+       *
+       * @property DROP_INVALID
+       * @type string
+       */
+      DROP_INVALID: "dropInvalid",
+
+
+      /**
+       * @method setCursorState
+       * @param el {HTMLElement} Object that is dragged and who's style affects the cursor
+       * @param cursor {string} Predifined constant from Alfresco.util.CURSOR_XXX
+       */
+      setCursorState: function(el, cursorState)
+      {
+         var allStates = [this.DRAGGABLE, this.DRAG, this.DROP_VALID, this.DROP_INVALID];
+         for (var i = 0; i < allStates.length; i++)
+         {
+            var cs = allStates[i];
+            if(cs === cursorState)
+            {
+               YAHOO.util.Dom.addClass(el, cursorState);
+            }
+            else
+            {
+               YAHOO.util.Dom.removeClass(el, cs);
+            }
+         }
+      }
+
+   };
+}();
+
+/**
+ * Transition methods that handles browser limitations.
+ *
+ * @class Alfresco.util.Anim
+ */
+Alfresco.util.Anim = function()
+{
+   return {
+
+      /**
+       * The default attributes for a fadeIn or fadeOut call.
+       *
+       * @property fadeAttributes
+       * @type {object} An object literal of the following form:
+       * {
+       *    adjustDisplay: true, // Will handle style attribute "display" in
+       *                         // the appropriate way depending on if its
+       *                         // fadeIn or fadeOut, default is true.
+       *    callback: null,      // A function that will get called after the fade
+       *    scope: this,         // The scope the callback function will get called in
+       */
+      fadeAttributes: {
+         adjustDisplay: true,
+         callback: null,
+         scope: this
+      },
+
+      /**
+       * Displays an object with opacity 0, increases the opacity during
+       * 0.5 seconds for browsers supporting opcaity.
+       *
+       * (IE does not support opacity)
+       *
+       * @method fadeIn
+       * @param el {HTMLElement} element to fade in
+       * @param attributes
+       */
+      fadeIn: function A_fadeIn(el, attributes)
+      {
+         return this._fade(el, true, attributes);
+      },
+
+      /**
+       * Displays an object with opacity 1, decreases the opacity during
+       * 0.5 seconds for browsers supporting opacity and finally hides it.
+       *
+       * (IE does not support opacity)
+       *
+       * @method fadeOut
+       * @param el {HTMLElement} element to fade out
+       * @param attributes
+       */
+      fadeOut: function A_fadeOut(el, attributes)
+      {
+         return this._fade(el, false, attributes);
+      },
+
+      /**
+       * @method _fade
+       * @param el {HTMLElement} element to fade in
+       * @param fadeIn {boolean} true if fadeIn false if fadeOut
+       * @param attributes
+       */
+      _fade: function A__fade(el, fadeIn, attributes)
+      {
+         var Dom = YAHOO.util.Dom;
+         el = Dom.get(el);
+         // No manadatory elements in attributes, avoid null checks below though
+         attributes = YAHOO.lang.merge(this.fadeAttributes, attributes ? attributes : {});
+         var adjustDisplay = attributes.adjustDisplay;
+
+         // todo test against functionality instead of browser
+         var supportsOpacity = YAHOO.env.ua.ie === 0;
+
+         // Prepare el before fade
+         if(supportsOpacity)
+         {
+            Dom.setStyle(el, "opacity", fadeIn ? 0 : 1);
+         }
+
+         // Show the element, transparent if opacity supported,
+         // otherwise its visible and the "fade in" is finished
+         if(supportsOpacity)
+         {
+            Dom.setStyle(el, "visibility", "visible");
+         }
+         else
+         {
+            Dom.setStyle(el, "visibility", fadeIn ? "visible" : "hidden");
+         }
+
+         // Make sure element is displayed
+         if(adjustDisplay && Dom.getStyle(el, "display") === "none")
+         {
+            Dom.setStyle(el, "display", "");
+         }
+
+         // Put variables in scope so they can be used in the callback below
+         var fn = attributes.callback;
+         var scope = attributes.scope;
+         var myEl = el;
+         if(supportsOpacity)
+         {
+            // Do the fade (from value/opacity has already been set above)
+            var fade = new YAHOO.util.Anim(el, { opacity: { to: fadeIn ? 1 : 0 } }, 0.5);
+            fade.onComplete.subscribe(function(e) {
+               if(!fadeIn && adjustDisplay)
+               {
+                  // Hide element from Dom if its a fadeOut
+                  YAHOO.util.Dom.setStyle(myEl, "display", "none");
+               }
+               if(fn)
+               {
+                  // Call custom callback
+                  fn.call(scope ? scope : this);
+               }
+            });
+            fade.animate();
+         }
+         else
+         {
+            if(!fadeIn && adjustDisplay)
+            {
+               // Hide element from Dom if its a fadeOut
+               YAHOO.util.Dom.setStyle(myEl, "display", "none");
+            }
+            if(fn)
+            {
+               // Call custom callback
+               fn.call(scope ? scope : this);
+            }
+         }
+      }
+
+   };
+}();
+
 
 /**
  * @method Alfresco.logger.isDebugEnabled

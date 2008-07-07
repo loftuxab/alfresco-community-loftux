@@ -108,7 +108,38 @@
        * @type HTMLElement of type li
        */
       shadow: null,
-      
+
+
+      /**
+       * Object container for initialization options
+       *
+       * @property options
+       * @type object
+       */
+      options:
+      {
+         /**
+          * The current layouts number of column
+          *
+          * @property noOfColumns
+          * @type {int}
+          */
+         noOfColumns: -1
+      },
+
+      /**
+       * Set multiple initialization options at once.
+       *
+       * @method setOptions
+       * @param obj {object} Object literal specifying a set of options
+       * @return {Alfresco.CustomiseDashlets} returns 'this' for method chaining
+       */
+      setOptions: function DL_setOptions(obj)
+      {
+         this.options = YAHOO.lang.merge(this.options, obj);
+         return this;
+      },
+
       /**
        * Set messages for this module.
        *       
@@ -161,11 +192,9 @@
 
          // Save a reference to the dashlet list and garbage can
          this.widgets.dashletListEl = Dom.get(this.id + "-column-ul-0");
-         //this.widgets.trashcanListEl = Dom.get(this.id + "-trashcan-img");
 
          // ... and create a delete drop target on them
          new YAHOO.util.DDTarget(this.widgets.dashletListEl, this.DND_GROUP_DELETE_DASHLET);
-         //new YAHOO.util.DDTarget(this.widgets.trashcanListEl, this.DND_GROUP_DELETE_DASHLET);
 
          // Make all dashlets in all columns draggable
          var noOfColumns = i - 1;
@@ -188,6 +217,13 @@
          YAHOO.Bubbling.on("onDashboardLayoutsDisplayed", this.onDashboardLayoutsDisplayed, this);
          YAHOO.Bubbling.on("onDashboardLayoutsHidden", this.onDashboardLayoutsHidden, this);
 
+         var closeAddDashletsLink = document.getElementById(this.id + "-closeAddDashlets-link");
+         YAHOO.util.Event.addListener(closeAddDashletsLink, "click", this.onCloseAddDashletsLinkClick, this, true);
+
+         // Save references so available dashlet can be shown/hidden later
+         this.widgets.availableDiv = Dom.get(this.id + "-available-div");
+         this.widgets.toggleDashletsButtonWrapperDiv = Dom.get(this.id + "-toggleDashletsButtonWrapper-div");
+
       },
 
       /**
@@ -199,6 +235,7 @@
       onDashboardLayoutChanged: function DLT_onDashboardLayoutChanged(layer, args)
       {
          var newLayout = args[1].dashboardLayout;
+         this.options.noOfColumns = newLayout.noOfColumns;
          var wrapper = Dom.get(this.id +"-wrapper-div");
          if(newLayout)
          {
@@ -222,7 +259,7 @@
                   break;
                }
             }
-            Dom.addClass(wrapper, "noOfColumns" + newLayout.noOfColumns);            
+            Dom.addClass(wrapper, "noOfColumns" + newLayout.noOfColumns);
          }
          else
          {
@@ -240,13 +277,12 @@
       onDashboardLayoutsDisplayed: function DLT_onDashboardLayoutsDisplayed(layer, args)
       {
          // Hide this component
-         var componentDiv = Dom.get(this.id);
-         Dom.setStyle(componentDiv, "display", "none");
-
+         Dom.setStyle(this.id, "display", "none");
       },
 
       /**
        * Fired when the CusomiseLayout component hides the available layouts
+       *
        * @method onDashboardLayoutsHidden
        * @param layer {string} the event source
        * @param args {object} arguments object
@@ -254,8 +290,7 @@
       onDashboardLayoutsHidden: function DLT_onDashboardLayoutsHidden(layer, args)
       {
          // Show this component
-         var componentDiv = Dom.get(this.id);
-         Dom.setStyle(componentDiv, "display", "");
+         Dom.setStyle(this.id, "display", "");
       },
 
       /**
@@ -267,19 +302,16 @@
        */
       onToggleDashletsButtonClick: function CD_onToggleDashletsButtonClick(event)
       {
-         var dashletListDiv = Dom.get(this.id + "-dashlets-div");
-         if(Dom.getStyle(dashletListDiv, "display") === "none")
-         {
-            // Show the available dashlets and change the button lanbel
-            Dom.setStyle(dashletListDiv, "display", "");
-            this.widgets.toggleDashletsButton.set("label", Alfresco.util.message("button.hideDashlets", this.name));
-         }
-         else
-         {
-            // Hide the available dashlets and change the button lanbel
-            Dom.setStyle(dashletListDiv, "display", "none");
-            this.widgets.toggleDashletsButton.set("label", Alfresco.util.message("button.showDashlets", this.name));
-         }
+         // Hide add dashlets button and fade in available dashlets
+         YAHOO.util.Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "none");
+         Alfresco.util.Anim.fadeIn(this.widgets.availableDiv);
+      },
+
+      onCloseAddDashletsLinkClick: function CD_onCloseAddDashletsLinkClick(event)
+      {
+         // Show add dashlets button and hide available dashlets
+         YAHOO.util.Dom.setStyle(this.widgets.toggleDashletsButtonWrapperDiv, "display", "");
+         YAHOO.util.Dom.setStyle(this.widgets.availableDiv, "display", "none");
       },
 
       /**
@@ -291,6 +323,7 @@
        */
       onCancelButtonClick: function CD_onCancelButtonClick(event)
       {
+         // Send the user to this page again without saveing changes
          document.location.href = Alfresco.constants.URL_CONTEXT + "page/user/" + Alfresco.constants.USERNAME + "/dashboard";
       },
 
@@ -358,7 +391,8 @@
           * such as the document since several components that listens to key
           * events might live on the same page.
           */
-         var a = Dom.getFirstChild(li);
+         var a = new YAHOO.util.Element(li).getElementsByTagName("a")[0];
+
          var kl = this.keyListeners[li.id];
          if(kl === undefined)
          {
@@ -424,10 +458,10 @@
                   destColumn = Dom.get(this.id + "-column-ul-" + i);
                   if(destColumn)
                   {
-                     if(!this.isColumnFull(destColumn))
+                     if(i <= this.options.noOfColumns && !this.isColumnFull(destColumn))
                      {
                         /**
-                         * We have found an column with free space, make a copy
+                         * We have found a visible column with free space, make a copy
                          * of the dashlet and insert it in the first position.
                          */
                         var children = Dom.getChildrenBy(destColumn, this.isRealDashlet);
@@ -540,8 +574,9 @@
          d.addToGroup(this.DND_GROUP_DELETE_DASHLET);
 
          // Find hidden link to add tab support
-         var a = Dom.getFirstChild(li);
-         var aEl = new YAHOO.util.Element(a);
+         var a = new YAHOO.util.Element(li).getElementsByTagName("a")[0];
+         var aEl = new YAHOO.util.Element(a); 
+
          aEl.addListener("focus", this.onDashletFocus, li, this);
          aEl.addListener("blur", this.onDashletBlur, li, this);
 
@@ -571,7 +606,8 @@
           */
          var copy = document.createElement("li");
          copy.id = srcEl.id + Dom.generateId();
-         Dom.addClass(copy, "dashlet-item");
+         Dom.addClass(copy, "customisableDashlet");
+         Dom.addClass(copy, "used");
          copy.innerHTML = srcEl.innerHTML + "";
 
          // Make the dashlet draggable and selectable/focusable.
@@ -605,7 +641,7 @@
       focusDashletAfterDomChange: function CD_focusDashletAfterDomChange(li, focus)
       {
          var doFocus = focus;
-         var a = Dom.getFirstChild(li);
+         var a = new YAHOO.util.Element(li).getElementsByTagName("a")[0];
 
          // Don't call it directly, give the browser 50 ms to fix the Dom first.
          YAHOO.lang.later(50, a, function()
@@ -646,7 +682,7 @@
        */
       _getDashlet: function CD__getDashlet(ul, index)
       {
-         return Dom.getElementsByClassName("dashlet-item", "li", ul)[index];
+         return Dom.getElementsByClassName("customisableDashlet", "li", ul)[index];
       },
 
       /**
@@ -659,7 +695,7 @@
       _getDashletIndex: function CD__getDashletIndex(li)
       {
          var ul = li.parentNode;
-         var dashlets = Dom.getElementsByClassName("dashlet-item", "li", ul);
+         var dashlets = Dom.getElementsByClassName("customisableDashlet", "li", ul);
          for (var i = 0; i < dashlets.length; i++)
          {
             if (dashlets[i] === li)
@@ -674,19 +710,19 @@
        * Helper function to get the index of the dashlet's column.
        *
        * @method getColumnIndex
-       * @param li {HTMLElement} of type li (the dashlet)
+       * @param li {HTMLElement} of type li or ul (the dashlet)
        * @return {int} the column index
        */
-      getColumnIndex: function CD_getColumnIndex(li)
+      getColumnIndex: function CD_getColumnIndex(el)
       {
-         if (li.nodeName.toLowerCase() === "li")
+         if (el.nodeName.toLowerCase() === "li")
          {
-            var ul = li.parentNode;
-            if (ul.nodeName.toLocaleLowerCase() === "ul")
-            {
-               var column = ul.id.substr(ul.id.lastIndexOf("-") + 1);
-               return parseInt(column);
-            }
+            el = el.parentNode;
+         }
+         if (el.nodeName.toLocaleLowerCase() === "ul")
+         {
+            var column = el.id.substr(el.id.lastIndexOf("-") + 1);
+            return parseInt(column);
          }
          return -1;
       },
@@ -700,7 +736,7 @@
        */
       getNoOfDashlets: function CD_getNoOfDashlets(ul)
       {
-         var dashlets = Dom.getElementsByClassName("dashlet-item", "li", ul);
+         var dashlets = Dom.getElementsByClassName("customisableDashlet", "li", ul);
          return dashlets ? dashlets.length : 0;
       },
 
@@ -731,15 +767,15 @@
 
       /**
        * Helper function to determine if el is a dashlet.
-       * Checked performed by looking of it has class "dashlet-item".
+       * Checked performed by looking of it has class "customisableDashlet".
        *
        * @method isRealDashlet
        * @param el {HTMLElement} element to test
-       * @return {boolean} true if el has class "adshlet-item"
+       * @return {boolean} true if el has class "customisableDashlet"
        */
       isRealDashlet: function CD_isRealDashlet(el)
       {
-         return Dom.hasClass(el, "dashlet-item");
+         return Dom.hasClass(el, "customisableDashlet");
       },
 
       /**
@@ -765,14 +801,14 @@
       isAddTarget: function CD_isAddTarget(el)
       {
          // Either el is a column/ul ...
-         if (el === this.widgets.dashletListEl) // || el === this.widgets.trashcanListEl)
+         if (el === this.widgets.dashletListEl)
          {
             return false;
          }
          else if (el){
             // .. or it was a dashlet/li, then check its column/ul instead. 
             el = el.parentNode;
-            if(el === this.widgets.dashletListEl) // || el === this.widgets.trashcanListEl)
+            if(el === this.widgets.dashletListEl)
             {
                return false;
             }
@@ -848,13 +884,28 @@
          var dragEl = this.getDragEl();
          var srcEl = this.getEl();
          dragEl.innerHTML = srcEl.innerHTML;
-         Dom.addClass(dragEl, "dashlet-item");
+         Dom.addClass(dragEl, "customisableDashlet");
          Dom.addClass(dragEl, "focused");
 
-         // Since the proxy looks like the dashlet we can hide the actual dashlet
+         // Reset YUI default border style for dragged elements
+         Dom.setStyle(dragEl, "border-style", "");
+         Dom.setStyle(dragEl, "border-width", "");
+         Dom.setStyle(dragEl, "border-color", "");
+         
          if (this.customiseDashletComponent.getColumnIndex(srcEl) > 0)
          {
+            // A used dashlet was dragged, make sure it looks that way
+            Dom.removeClass(dragEl, "available");
+            Dom.addClass(dragEl, "used");
+
+            // Since the proxy looks like the dashlet we can hide the actual dashlet
             Dom.setStyle(srcEl, "visibility", "hidden");
+         }
+         else
+         {
+            // An available dashletwas dragged, make sure it looks that way
+            Dom.removeClass(dragEl, "used");
+            Dom.addClass(dragEl, "available");
          }
 
          // Prepare shadow for drag n drop session
@@ -897,15 +948,23 @@
          var srcEl = this.getEl();
          var proxy = this.getDragEl();
 
-         // Check if the dashlet should be deleted
+         // Check if the dashlet was dropped on at delete target and should be deleted
          if (!this.customiseDashletComponent.isAddTarget(this.droppedOnEl))
          {
-            // The proxy was dropped on a delete target
+            // Only delete the dashlet if its a "column dashlet"
             if (this.customiseDashletComponent.isColumnDashlet(srcEl))
             {
-               // Only delete the dashlet if its a "column dashlet"
+               // It was, delete it
                this.customiseDashletComponent.deleteDashlet(srcEl);
             }
+            // Make sure to remove delete indication from available dashlets column
+            var dropColumn = this.droppedOnEl;
+            if (this.customiseDashletComponent.isOfTagType(dropColumn, "li"))
+            {
+               dropColumn = dropColumn.parentNode;
+            }
+            Dom.removeClass(dropColumn, "deleteDrag");
+            
             // Return so we don't add the dashlet.
             return;
          }
@@ -988,10 +1047,11 @@
          // Find the drop target and save it for later.
          var destEl = Dom.get(id);
          this.droppedOnEl = destEl;
+
          if (!this.customiseDashletComponent.isAddTarget(this.droppedOnEl))
          {
-            // If it was
-            return
+            // If it wasn't a drop target do nothing...
+            return;
          }
 
          /**
@@ -1036,12 +1096,26 @@
                   // Refresh the drag n drop managers cache.
                   var destDD = DDM.getDDById(id);
                   destDD.isEmpty = false;
-                  //DDM.refreshCache();
                }
-
             }
 
          }
+      },
+
+       /**
+       * Changes the cursor to give indication to user if the dragged element
+       * can be dropped or not.
+       *
+       * @method _changeCursor
+       * @param cursorState {string} A state constant from Alfresco.util.Cursor
+       * @private
+       */
+      _changeCursor: function CD__changeCursor(cursorState)
+      {
+         var proxy = this.getDragEl();
+         var proxyEl = new YAHOO.util.Element(proxy, {});
+         var span = proxyEl.getElementsByTagName("div")[0];
+         Alfresco.util.Cursor.setCursorState(span, cursorState);
       },
 
       /**
@@ -1063,6 +1137,12 @@
          {
             // Place the shadow in the dashlets original position
             this._resetSrcShadow();
+            this._changeCursor(Alfresco.util.Cursor.DRAG);
+
+            if(this.customiseDashletComponent.getColumnIndex(prevDestEl) === 0)
+            {
+               Dom.removeClass(prevDestEl, "deleteDrag");
+            }
          }
       },
 
@@ -1105,6 +1185,9 @@
          
          // Get the element the proxy was dragged over
          var destEl = Dom.get(id);
+         var srcEl = this.getEl();
+         var srcElColumn = this.customiseDashletComponent.getColumnIndex(srcEl);
+         var destElColumn = this.customiseDashletComponent.getColumnIndex(destEl);
 
          // We are only concerned with list items, we ignore the dragover
          // notifications for the list since those are handled by onDragDrop().
@@ -1114,22 +1197,16 @@
              * Check what columns we dragged from and drag above and make sure
              * the dest columns isn't full.
              */
-            var srcEl = this.getEl();
-            var srcElColumn = this.customiseDashletComponent.getColumnIndex(srcEl);
-            var destElColumn = this.customiseDashletComponent.getColumnIndex(destEl);
             if (!this.customiseDashletComponent.isColumnFull(destEl.parentNode) ||
                 srcElColumn === destElColumn)
-            {
+            {               
                // Make sure we only add the shadow to a column and not the available dashlets
                if (destElColumn > 0)
                {
                   // Hide the original dashlet since we are about to show it as a shadow somewhere else
                   if (srcElColumn > 0)
                   {
-                     //if(Dom.getStyle(srcEl, "display") === "")
-                     {
-                        Dom.setStyle(srcEl, "display", "none");
-                     }
+                     Dom.setStyle(srcEl, "display", "none");
                   }
 
                   // Show shadow instead of original dashlet next to its target
@@ -1139,24 +1216,41 @@
                   }
                   if (this.goingUp)
                   {
-                     // insert above (if its not already there)
-                     //if(this.srcShadow !== destEl.previousSibling)
-                     //{
-                        var p = destEl.parentNode;
-                        p.insertBefore(this.srcShadow, destEl);
-                     //}
+                     // Insert shadow before hovered li
+                     var p = destEl.parentNode;
+                     p.insertBefore(this.srcShadow, destEl);
                   }
                   else
                   {
-                     // insert below (if its not already there)
-                     //if(this.srcShadow !== destEl.nextSibling)
-                     //{
-                        var p = destEl.parentNode;
-                        p.insertBefore(this.srcShadow, destEl.nextSibling);
-                     //}
+                     // Insert shadow after hovered li
+                     var p = destEl.parentNode;
+                     p.insertBefore(this.srcShadow, destEl.nextSibling);
                   }
-                  //DDM.refreshCache();
                }
+            }
+         }
+         else if (this.customiseDashletComponent.isOfTagType(destEl, "ul"))
+         {
+            var destElColumnIsFull = this.customiseDashletComponent.isColumnFull(destEl);
+            if((srcElColumn > 0 && destElColumn === 0) || // delete: from column over available.
+                  (destElColumn > 0 && (!destElColumnIsFull || srcElColumn === destElColumn)))
+            {
+               // Set the cursor to indicate that the user may drop the dashlet here.
+               this._changeCursor(Alfresco.util.Cursor.DROP_VALID);
+               if(destElColumn === 0)
+               {
+                  // Indicate that a drop means a delete
+                  Dom.addClass(destEl, "deleteDrag");
+               }
+            }
+            else if(destElColumn > 0 && destElColumnIsFull)
+            {
+               // Set the cursor to indicate that the user may NOT drop the dashlet here.
+               this._changeCursor(Alfresco.util.Cursor.DROP_INVALID);
+            }
+            else
+            {
+               // Cursor should be the drag cursor, keep it.
             }
          }
       }

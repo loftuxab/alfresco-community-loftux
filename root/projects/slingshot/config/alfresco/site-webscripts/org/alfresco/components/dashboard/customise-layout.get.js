@@ -1,6 +1,6 @@
 // Test data until proper service exists
 
-var currentLayout = {id: "dashboard-4-columns", noOfColumns: 4, description: "<b>Four</b> columns"};
+var currentLayout = {id: "dashboard-3-columns", noOfColumns: 3, description: "<b>Three</b> column: narrow left, wide centre, narrow right"};
 
 var layouts = [
    {id: "dashboard-1-column", noOfColumns: 1, description: "<b>One</b> column"},
