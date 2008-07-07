@@ -189,15 +189,15 @@
             }
             else
             {
-               // Show all the previous layout (should have been hidden)
+               // Show the previous layout (should have been hidden)
                Dom.setStyle(layoutLi, "display", "");
             }
             // Send out event to let other component know that the should hide themselves
-            YAHOO.Bubbling.fire("onDashboardLayoutsHidden", {});
 
          }
-         // Show the currently selected layout-div
-         Dom.setStyle(currentLayoutDiv, "display", "");
+
+         // Send out event to let other component know that the should show themselves
+         YAHOO.Bubbling.fire("onDashboardLayoutsHidden", {});
 
          // Show the change layout button
          var changeButtonWrapperDiv = Dom.get(this.id + "-changeButtonWrapper-div");
@@ -216,13 +216,10 @@
          // Send out event to let other component know that the should hide themselves
          YAHOO.Bubbling.fire("onDashboardLayoutsDisplayed", {});
 
-         // Show the currently selected layout-div
-         var layoutsDiv = Dom.get(this.id + "-layouts-div");
-         Dom.setStyle(layoutsDiv, "display", "");
-
-         // Hide the change button
+         // Hide the change button and show the layouts
          var changeButtonWrapperDiv = Dom.get(this.id + "-changeButtonWrapper-div");
          Dom.setStyle(changeButtonWrapperDiv, "display", "none");
+         Alfresco.util.Anim.fadeIn(this.id + "-layouts-div");
 
       },
 

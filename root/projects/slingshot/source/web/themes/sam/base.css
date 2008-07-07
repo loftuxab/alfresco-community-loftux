@@ -85,6 +85,7 @@ h3
 {
    font-weight: bold;
    font-size: 108%;
+   padding:0.5em;
 }
 
 h4
@@ -103,6 +104,10 @@ hr
    height: 1px;
    margin-top: 5px;
    margin-bottom: 8px;
+   border: 0;
+   width: 100%;
+   color: #E4E4E4;
+   background-color: #E4E4E4;
 }
 
 .label
@@ -172,4 +177,25 @@ span.navigation-separator
 em
 {
 	font-style: italic;
+}
+
+
+.draggable
+{
+   cursor: move;
+}
+
+.drag
+{
+   cursor: move;
+}
+
+.dropInvalid
+{
+   cursor: no-drop;
+}
+
+.dropValid
+{
+   cursor: pointer;
 }

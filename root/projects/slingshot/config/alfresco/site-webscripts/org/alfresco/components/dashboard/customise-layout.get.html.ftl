@@ -20,7 +20,7 @@
       <div>
          <img id="${args.htmlid}-currentLayoutIcon-img" class="layoutIcon"
               src="${url.context}/components/dashboard/images/${currentLayout.id}.png"/>
-         <div id="${args.htmlid}-changeButtonWrapper-div">
+         <div id="${args.htmlid}-changeButtonWrapper-div" class="buttons">
             <input id="${args.htmlid}-change-button" type="button" value="${msg("button.showLayouts")}"/>
          </div>
       </div>
@@ -53,7 +53,9 @@
       <hr/>
 
       <div>
-         <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.useCurrent")}"/>
+         <div class="buttons">
+            <input id="${args.htmlid}-cancel-button" type="button" value="${msg("button.useCurrent")}"/>
+         </div>
       </div>
       
    </div>

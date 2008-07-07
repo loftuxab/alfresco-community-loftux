@@ -1,10 +1,10 @@
 /* Style YUI components */
 
 /* Add padding and make sure left: float doesn't place them in a row */
+/*.customise-dashlets div.available,*/
 .customise-dashlets div.instructions,
-.customise-dashlets div.dashlets,
-.customise-dashlets div.columns,
-.customise-dashlets div.buttons
+.customise-dashlets div.used,
+.customise-dashlets div.actions
 {
    clear: both;
    padding-top: 1em;
@@ -17,32 +17,41 @@
    clear: both;
 }
 
-/* Center the contents in the section */
-.customise-dashlets div.instructions div,
-.customise-dashlets div.dashlets,
-.customise-dashlets div.columns div,
-.customise-dashlets div.buttons div  
-{
-   text-align: center;
-}
-
-/* Center the contents in the sections */
-.customise-dashlets div.text
+/* Marginise and align text and buttons */
+.customise-dashlets div.text,
+.customise-dashlets div.buttons
 {
    width: 52em;
    margin-left: auto;
    margin-right: auto;
    padding-top: 1em;
-   padding-bottom: 1em;
+}
+
+/* Left text */
+.customise-dashlets div.text
+{
    text-align: left;
 }
 
+/* Center buttons */
+.customise-dashlets div.buttons
+{
+   padding-bottom: 1em;
+   text-align: center;
+}
+
+.customise-dashlets a.closeLink
+{
+   float:right;
+   margin-right:1em;
+   margin-top:0.6em;
+}
+
 /* Style the lists containing dashlets */
-.customise-dashlets ul.dashletList,
-.customise-dashlets ul.columnList
+.customise-dashlets ul.availableList,
+.customise-dashlets ul.usedList
 {
    position: relative;
-   height: 15.9em;
    background: #FFFFFF;
    list-style: none;
    margin:0;
@@ -50,43 +59,85 @@
    text-align: center;
 }
 
-/* Only the dashlets in the columns should have border */
-.customise-dashlets ul.columnList
+.available
 {
-   border: 1px solid gray;   
+   /*height:25em;*/
+   /*height: 300px;
+   overflow: hidden;
+   */
+}
+
+/* Only the dashlets in the columns should have border */
+.customise-dashlets ul.usedList
+{
+   width: 17.5em;
+   height: 17em;
+   border: 1px solid #BFBFBF;
+   padding-top:0.2em;
 }
 
 /* Center the available dashlet list, make it wide and ready to handle lots of dashlets*/
-.customise-dashlets ul.dashletList
+.customise-dashlets ul.availableList
 {
+   width: 56em;
+   height: 17.5em;
    overflow-y: auto;
    margin-left: auto;
    margin-right: auto;
-   width: 53em;
+   border: 1px dashed #FFFFFF;
+
 }
 
-/* Make the column dashlet list a bit thinner */
-.customise-dashlets ul.columnList
+.customise-dashlets ul.availableList.deleteDrag
 {
-   width: 17.2em;
+   border-color: #BFBFBF;
+   background-color: #FEFEFE;
 }
 
 /* Set the dashlets width and let them flow if the column is wide enough */
+/*
 .customise-dashlets ul.dashletList li,
 .customise-dashlets ul.columnList li
 {
    width: 17em;
    float: left;
 }
+*/
 
 /* Style the dashlets */
-.dashlet-item,
-.dashlet-shadow
+.customisableDashlet
 {
-   margin: 1px;
-   background-color: #f7f7f7;
+   width: 17em;
+   float: left;
    height: 3em;
-   text-align: center;
+   text-align: left;
+   border-style: none;
+   border-width: 0;
+}
+
+.customisableDashlet.available
+{
+   margin: 0.5em;
+   background-color: #F7F7F7;
+   border: 1px dashed #C3C3C3 ;
+}
+
+.customisableDashlet.used
+{
+   margin: 0.2em;   
+   background-color: #F2F8F0;
+}
+
+/* Show dashlets a bit darker when they are focused. */
+.customisableDashlet.available.focused
+{
+   background-color: #E7E7E7;
+}
+
+/* Show dashlets a bit darker when they are focused. */
+.customisableDashlet.used.focused
+{
+   background-color: #E2E8E0;
 }
 
 /*
@@ -94,66 +145,76 @@
  * to make sure IE displays a nice dottec line around the "link".
  * Change the cursor to a move cursor on mouse over.
  */
-.dashlet-item a img
+.customisableDashlet a img
 {
    width: 100%;
    height: 100%;
-   cursor: move;
 }
 
 /* Vertically center the text. */
-.dashlet-item span {
+.customisableDashlet div {
+   background-color:#FFFFFF;
+   opacity:0.01;
+   filter:alpha(opacity=1);
+   height:3em;
    position:relative;
-   top:-2.5em;
-   cursor: move;   
+   top:-4.5em;
+   width:17em;
 }
 
+.customisableDashlet span {
+   position:relative;
+   top:-2.5em;
+   left:1em;  
+
+   opacity:1;
+   filter:alpha(opacity=100);
+}
+
+
 /* Show the shadow as white. */
-.dashlet-shadow
+.shadow
 {
+   width: 17em;
+   float: left;
+   height: 3em;
    background-color: #FFFFFF;
 }
 
-/* Show dashlets as gray when they are focused. */
-.dashlet-item.focused
-{
-   background-color: #DDDDDD;
-}
-
 /* Center the column wrapper div */
-.customise-dashlets div.columns div
+.customise-dashlets div.used div
 {
    margin-left: auto;
    margin-right: auto;
 }
 
 /* Must adjust the width to make the column list centered */
-.customise-dashlets div.columns div.noOfColumns4
+.customise-dashlets div.used div.noOfColumns4
 {
-   width: 72em;
+   width: 80em;
 }
 
 /* Must adjust the width to make the column list centered */
-.customise-dashlets div.columns div.noOfColumns3
+.customise-dashlets div.used div.noOfColumns3
 {
-   width: 54em;
+   width: 60em;
 }
 
 /* Must adjust the width to make the column list centered */
-.customise-dashlets div.columns div.noOfColumns2
+.customise-dashlets div.used div.noOfColumns2
 {
-   width: 36em;
+   width: 40em;
 }
 
 /* Must adjust the width to make the column list centered */
-.customise-dashlets div.columns div.noOfColumns1
+.customise-dashlets div.used div.noOfColumns1
 {
-   width: 18em;
+   width: 20em;
 }
 
 /* Make sure the columns are displayed on row even though they are block elements  */
-.customise-dashlets div.columns div div
+.customise-dashlets div.used div div.column
 {
    float: left;
-   width: 18em;
+   width: 20em;
 }

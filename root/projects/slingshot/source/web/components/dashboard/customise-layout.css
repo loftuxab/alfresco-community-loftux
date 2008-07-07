@@ -3,7 +3,6 @@
 /* Add padding and make sure left: float doesn't place them in a row */
 .customise-layout div.currentLayout,
 .customise-layout div.layouts,
-.customise-layout div.buttons
 {
    padding-top: 1em;
    padding-bottom: 1em;
@@ -23,16 +22,27 @@
    text-align: center;
 }
 
-/* Center the contents in the sections */
-.customise-layout div.currentLayout div div.text,
-.customise-layout div.layouts div div.text
+/* Marginise and align text and buttons */
+.customise-layout div.text,
+.customise-layout div.buttons
 {
    width: 52em;
    margin-left: auto;
    margin-right: auto;
    padding-top: 1em;
-   padding-bottom: 1em;
+}
+
+/* Left align text */
+.customise-layout div.text
+{
    text-align: left;
+}
+
+/* Center buttons */
+.customise-layout div.buttons
+{
+   padding-bottom: 1em;
+   text-align: center;
 }
 
 /* Style the lists containing dashlets */
@@ -48,8 +58,7 @@
 /* Set width and height of the layouts list */
 .customise-layout div.layouts ul
 {
-   width: 52em;
-   height: 30em;
+   width: 58em;
 }
 
 /* Set the layout width and let them flow in the list */
@@ -57,7 +66,7 @@
 {
    width: 25em;
    float: left;
-   margin: 0.5em;
+   margin:0em 2em 3em;
    text-align: left;
 }
 
@@ -75,10 +84,16 @@
    text-align:center;
 }
 
-/* Center the laout yimage */
+/* Center the layout image */
 .customise-layout .layoutIcon
 {
    padding:1em;
    vertical-align:middle;
    height:10em;
+}
+
+/* Add a bit of green around the current layout */
+.customise-layout div.currentLayout .layoutIcon
+{
+   background-color:#EDFAEB;
 }
