@@ -87,10 +87,16 @@
 	      });
 	      
 	      // Delete button
-	      var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick,
+	      var opts = {
+	         type: "push"
+	      };
+	      
+	      if (!this.title || this.title.length == 0)
 	      {
-	      	type: "push"
-	      });
+	         opts["disabled"] = true;
+	      }
+	      
+	      var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
 	      
 	      // Labels
 	      var yes = Alfresco.util.message("button.yes", this.name);
@@ -110,6 +116,7 @@
             buttons: [ { text: yes, handler: { fn: this.onConfirm, scope: this }, isDefault: true },
             			{ text: no,  handler: { fn: this.onCancel, scope: this } }]
 	      });
+	      
 	      var headerText = Alfresco.util.message("panel.confirm.header", this.name);
 	      this.deleteDialog.setHeader(headerText);
 	      this.deleteDialog.render(this.id + "-body");
@@ -124,6 +131,10 @@
 		 */
 	   onConfirm: function(e)
 	   {
+	      var params = {
+	         "context": Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + this.title
+	      };
+	      
 	      Alfresco.util.Ajax.request(
    		{
    		   method: Alfresco.util.Ajax.DELETE,
@@ -172,6 +183,13 @@
    	 */
 	   onCreateClick: function(e)
 	   {
+	      // Clear the text field any previously entered values
+	      var pageNameField = document.getElementById(this.id + "-title");
+	      if (pageNameField)
+	      {
+	         pageNameField.value = "";
+	      }
+	      
 	      this.panel.show();
 	   },
 	   
@@ -193,7 +211,7 @@
 	         {
 	            title = title.replace(/\s+/g, "_");
 	            // Change the location bar
-   	         window.location = Alfresco.constants.URL_CONTEXT + "site/" + this.siteId + "/page/wiki?title=" + title;
+   	         window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + title;
 	         } 
 	      } 
 	   },

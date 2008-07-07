@@ -4,4 +4,8 @@
    <region-id>toolbar</region-id>
    <source-id>wiki</source-id>
    <url>/components/wiki/toolbar</url>
+   <chrome>
+      <frame>div</frame>
+   </chrome>
+   <properties></properties>
 </component>
