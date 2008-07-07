@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<component>
-   <scope>uri</scope>
-   <region-id>component-1-2</region-id>
-   <source-id>site/default/collaboration-dashboard</source-id>
-   <url>/components/dashlets/calendar</url>
-</component>

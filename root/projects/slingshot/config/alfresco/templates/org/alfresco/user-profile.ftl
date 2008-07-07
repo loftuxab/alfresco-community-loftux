@@ -11,7 +11,7 @@
    </div>
    <div id="bd">
       <div class="site-content">
-      <@region id="user-profile-dashlet" scope="page" />
+      <@region id="user-profile-dashlet" scope="template" />
       </div>
    </div>
 </@>

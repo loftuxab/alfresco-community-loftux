@@ -7,12 +7,12 @@
 <@template.body>
 <div id="hd">
    <@region id="header" scope="global" protected=true />
-   <@region id="title" scope="page" protected=true />
+   <@region id="title" scope="template" protected=true />
    <h1 class="sub-title">${page.title}</h1>
 </div>
 <div id="bd">
-   <@region id="customise-layout" scope="page" protected=true />
-   <@region id="customise-dashlets" scope="page" protected=true />
+   <@region id="customise-layout" scope="template" protected=true />
+   <@region id="customise-dashlets" scope="template" protected=true />
 </div>
 </@>
 

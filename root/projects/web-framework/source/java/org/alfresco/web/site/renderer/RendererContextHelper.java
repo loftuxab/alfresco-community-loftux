@@ -288,18 +288,7 @@ public final class RendererContextHelper
         context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_REGION_ID, component.getRegionId());
         context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SOURCE_ID, component.getSourceId());
         context.put(WebFrameworkConstants.RENDER_DATA_COMPONENT_SCOPE_ID, component.getScope());
-
-        // construct the html binding id
-        // TODO: apply transformation
-        String htmlBindingId = component.getId();
-        /*
-        // properties about the html binding id
-        String htmlBindingId = component.getScope() + "." + component.getRegionId();
-        if (!component.getScope().equalsIgnoreCase(WebFrameworkConstants.REGION_SCOPE_GLOBAL))
-        {
-            htmlBindingId += "." + component.getSourceId();
-        }
-        */
-        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, htmlBindingId);
+        
+        context.put(WebFrameworkConstants.RENDER_DATA_HTML_BINDING_ID, component.getId());
     }    
 }

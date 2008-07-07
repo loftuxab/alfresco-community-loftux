@@ -365,8 +365,7 @@ public final class RenderUtil
                 boolean passiveMode = context.hasValue(PASSIVE_MODE_MARKER);
                 if (passiveMode)
                 {
-                    // we don't render the component, we just inform the current context
-                    // what our component is
+                    // don't render the component, just inform the current context what our component is
                     rendererContext.setRenderingComponent(component);
                 }
                 else

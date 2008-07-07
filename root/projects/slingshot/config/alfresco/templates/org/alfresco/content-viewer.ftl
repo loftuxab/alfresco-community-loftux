@@ -6,10 +6,10 @@
 <@template.body>
    <div id="hd">
       <@region id="header" scope="global" protected=true />
-      <@region id="title" scope="page" protected=true />
+      <@region id="title" scope="template" protected=true />
    </div>
    <div id="bd">
-      <@region id="content-viewer" scope="page" protected=true />
+      <@region id="content-viewer" scope="template" protected=true />
    </div>
 </@>
 

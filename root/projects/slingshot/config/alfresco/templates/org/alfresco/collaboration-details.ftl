@@ -9,7 +9,7 @@
    </div>
    <div id="bd">
       <div class="site-content">
-         <@region id="details" scope="page">
+         <@region id="details" scope="template">
            TODO: Bind details components
          </@region>
       </div>

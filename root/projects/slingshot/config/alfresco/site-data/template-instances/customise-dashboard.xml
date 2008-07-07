@@ -1,6 +1,4 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <template-instance>
     <template-type>org/alfresco/customise-dashboard</template-type>
-    <properties>
-    </properties>
-</template-instance> 
+</template-instance>
