@@ -1,0 +1,77 @@
+.taglibcontainer {
+	width: 470px;
+	margin-left: 100px;
+	margin-top: 50px;
+}
+.taglibcontainer .rel_left {
+	position: relative; float: left;
+}
+.taglibcontainer .title {
+	width: 70px;
+	padding-top: 7px;
+	font-weight: bold;
+}
+
+.taglibcontainer .tags {
+	width: 400px;
+}
+
+.tags .title {
+	width: auto;
+	white-space: nowrap;
+	padding-top: 20px;
+	padding-bottom: 10px;
+}
+
+.tags input {
+	border: 1px solid #000;
+	height: 18px;
+	margin-top: 1px;
+	padding: 1px;
+}
+
+.tags button {
+	border: 1px solid #939494;
+	background-color: #ededed;
+	padding-left: 20px;
+	padding-right: 20px;
+	height: 24px;
+	margin-left: 10px;
+}
+
+.bottom_taglist {
+	margin-top: 10px;
+}
+.tags_box li{
+	padding: 7px;
+	padding-left: 0px;
+	position: relative; float: left;
+	
+}
+
+.tags_box li a {
+	text-decoration: none;
+	white-space: nowrap;
+	padding: 7px;
+	padding-left: 20px;
+	background: URL('icon_tag.gif') no-repeat 3px 8px;
+}
+.tags_box li a .close {
+	visibility: hidden;
+}
+.tags_box li a .close img {
+	vertical-align: bottom;
+	vertical-align: middle;
+}
+.tags_box li a:link { color: #448; }
+.tags_box li a:visited { color: #667; }
+
+.tags_box li a:hover {
+	border-color: #FE3;
+	color: #FFF;
+	white-space: nowrap;
+	background: #939292 URL('icon_tag.gif') no-repeat 3px 8px;
+}
+.tags_box li a:hover .close {
+	visibility: visible;
+}

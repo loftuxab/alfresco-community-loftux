@@ -116,32 +116,40 @@
             action="${page.url.context}/proxy/alfresco/blog/site/${site}/${container}/posts" 
         </#if>
     >
-    	<input type="hidden" name="site" id="${htmlId}-site" value="${site}">
+    	<input type="hidden" name="site" id="${htmlId}-site" value="${site}" />
     	<input type="hidden" name="draft" id="${htmlId}-draft" value="<#if isDraft>true<#else>false</#if>">
 	    <#if editForm>
-	      <input type="hidden" name="postId" id="${htmlId}-postId" value="${post.name}" >
+	      <input type="hidden" name="postId" id="${htmlId}-postId" value="${post.name}" />
 	    </#if>
-	    
+        <span id="${htmlId}-tags-inputs">
+          <#if editForm>
+            <#list post.tags as tag>
+              <input type="hidden" name="tags[]" value="${tag}" />
+            </#list>
+          </#if>
+        </span>
+        	    
+   		<!-- title -->
 		<label>${msg("post.form.postTitle")}:</label>
 		<input type="text" value="<#if editForm>${post.title!''}</#if>"
 		       name="title" id="${htmlId}-title" size="80" />
+
+		<!-- content -->
 		<label>${msg("post.form.postText")}:</label>
-		<textarea rows="8" cols="80" name="content" id="${htmlId}-content"
-		   ><#if editForm>${post.content!''}</#if></textarea> 
-		<label>${msg("post.tags")}:</label>
-		<input type="text" name="tags" id="${htmlId}-tags" size="80" 
-		    <#if editForm && post.tags?has_content>value="${concatArray(post.tags)}"</#if> />
-		<label>${msg("post.form.suggested")}:</label>
-		<div class="suggestedTags">
-			<ul>
-				<li><a href="">ECM</a></li>
-				<li><a href="">Computer</a></li>
-				<li><a href="">Brand</a></li>
-				<li><a href="">Trend</a></li>
-			</ul>
-			<br />
-			<a href="">${msg("post.form.viewTagLibrary")}</a>
-		</div>
+		<textarea rows="8" cols="80" name="content" id="${htmlId}-content"><#if editForm>${post.content!''}</#if></textarea> 
+		
+		<!-- tags -->
+		<#if editForm>
+			<#assign tags=post.tags />
+		<#else>
+			<#assign tags=[] />
+		</#if>
+		<#import "/org/alfresco/modules/taglibrary/taglibrary.lib.ftl" as taglibraryLib/>
+		<!-- Render the tag inputs -->
+		<@taglibraryLib.renderTagInputs htmlid=htmlId tags=tags tagInputName="tags" />
+		<!-- Render the library component -->
+		<@taglibraryLib.renderTagLibrary htmlid=htmlId tags=tags />
+		 
 		<div class="nodeFormAction">
 			<input type="submit" id="${htmlId}-save-button" value="<#if editForm>${msg('post.form.update')}<#else>${msg('post.form.saveAsDraft')}</#if>" />			
 			<#if isDraft>
