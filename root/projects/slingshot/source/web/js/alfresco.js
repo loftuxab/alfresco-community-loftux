@@ -637,7 +637,7 @@ Alfresco.util.PopupManager = function()
          text: null,
          effect: YAHOO.widget.ContainerEffect.FADE,
          effectDuration: 0.5,
-         displayTime: 1.5,
+         displayTime: 2.5,
          modal: false
       },
 

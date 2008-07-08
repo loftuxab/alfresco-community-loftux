@@ -187,6 +187,16 @@
       showingMoreActions: false,
 
       /**
+       * Flag to indicate this HistoryManager event was expected.
+       * An unexpected event means the user has updated the URL hash manually.
+       * 
+       * @property expectedHistoryEvent
+       * @type boolean
+       * @default false
+       */
+      expectedHistoryEvent: false,
+
+      /**
        * Deferred highlight row event when showing "More Actions".
        * 
        * @property deferHighlightRow
@@ -278,7 +288,20 @@
          // Register History Manager path update callback
          History.register("path", "", function(newPath)
          {
-            this._updateDocList.call(this, (YAHOO.env.ua.gecko) ? decodeURIComponent(newPath) : newPath);
+            if (this.expectedHistoryEvent)
+            {
+               // Clear the flag and update the DocList
+               this.expectedHistoryEvent = false;
+               this._updateDocList.call(this, (YAHOO.env.ua.gecko) ? decodeURIComponent(newPath) : newPath);
+            }
+            else
+            {
+               // Unexpected navigation - source event needs to be pathChanged event handler
+               YAHOO.Bubbling.fire("pathChanged",
+               {
+                  path: newPath
+               })
+            }
          }, null, this);
 
          // Initialize the browser history management library
@@ -531,13 +554,13 @@
             key: "actions", label: "Actions", sortable: false, formatter: renderCellActions, width: 160
          }];
 
-         // Temporary blank "empty datatable" message
-         YAHOO.widget.DataTable.MSG_EMPTY = "";
+         // Temporary "empty datatable" message
+         YAHOO.widget.DataTable.MSG_EMPTY = this._msg("message.loading");
 
          // DataTable definition
          this.widgets.dataTable = new YAHOO.widget.DataTable(this.id + "-documents", columnDefinitions, this.widgets.dataSource,
          {
-            renderLoopSize: 8,
+            renderLoopSize: 50,
             initialLoad: false
          });
          
@@ -566,6 +589,10 @@
                   me._setDefaultDataTableErrors();
                }
             }
+            else if (oResponse.results)
+            {
+               this.renderLoopSize = oResponse.results.length >> 3;
+            }
             // Must return true to have the "Loading..." message replaced by the error message
             return true;
          }
@@ -581,7 +608,7 @@
          this.widgets.dataTable.subscribe("rowMouseoverEvent", this.onEventHighlightRow, this, true);
          this.widgets.dataTable.subscribe("rowMouseoutEvent", this.onEventUnhighlightRow, this, true);
          
-         // Fire disconnected event, but add "ignore" flag this time, due to initialRequest above
+         // Fire pathChanged event for first-time population
          YAHOO.Bubbling.fire("pathChanged",
          {
             doclistInitialNav: true,
@@ -616,6 +643,9 @@
          }
          YAHOO.Bubbling.addDefaultAction("action-link", fnActionHandler);
          YAHOO.Bubbling.addDefaultAction("show-more", fnActionHandler);
+         
+         // DocLib Actions module
+         this.modules.actions = new Alfresco.module.DoclibActions();
 
          // Finally show the component body here to prevent UI artifacts on YUI button decoration
          Dom.setStyle(this.id + "-body", "visibility", "visible");
@@ -858,10 +888,6 @@
                   }
                }, me.options.actionsPopupTimeout);
             }
-            else
-            {
-               Alfresco.logger.debug("mouseout: ignored");
-            }
          }
          
          Event.on(elMoreActions, "mouseover", onMouseOver, elMoreActions);
@@ -912,7 +938,7 @@
          var fileName = record.getData("name");
          var filePath = record.getData("parent") + "/" + fileName;
          
-         new Alfresco.module.DoclibActions().genericAction(
+         this.modules.actions.genericAction(
          {
             success:
             {
@@ -955,7 +981,7 @@
          var record = this.widgets.dataTable.getRecord(row);
          var fileName = record.getData("name");
 
-         new Alfresco.module.DoclibActions().genericAction(
+         this.modules.actions.genericAction(
          {
             success:
             {
@@ -995,7 +1021,7 @@
          var fileName = record.getData("name");
          var nodeRef = record.getData("nodeRef");
 
-         new Alfresco.module.DoclibActions().genericAction(
+         this.modules.actions.genericAction(
          {
             success:
             {
@@ -1040,24 +1066,29 @@
          var obj = args[1];
          if (obj !== null)
          {
-            // Was this our "first navigation" event?
-            if (!!obj.doclistInitialNav)
-            {
-               return;
-            }
-            
             // Should be a path in the arguments
             if (obj.path !== null)
             {
-               try
+               if (obj.doclistInitialNav)
                {
-                  // Update History Manager with new path. It will callback to update the doclist
-                  YAHOO.util.History.navigate("path", (YAHOO.env.ua.gecko) ? encodeURIComponent(obj.path) : obj.path);
+                  // HistoryManager won't fire for the initial navigation event
+                  this._updateDocList.call(this, obj.path);
                }
-               catch (e)
+               else
                {
-                  // Fallback for non-supported browsers, or hidden iframe loading delay
-                  this._updateDocList.call(this, this.currentPath);
+                  try
+                  {
+                     // Flag to indicate we're expecting the HistoryManager's event
+                     this.expectedHistoryEvent = true;
+
+                     // Update History Manager with new path. It will callback to update the doclist
+                     YAHOO.util.History.navigate("path", (YAHOO.env.ua.gecko) ? encodeURIComponent(obj.path) : obj.path);
+                  }
+                  catch (e)
+                  {
+                     // Fallback for non-supported browsers, or hidden iframe loading delay
+                     this._updateDocList.call(this, obj.path);
+                  }
                }
             }
          }
@@ -1089,7 +1120,11 @@
          {
             // Should be a filterId in the arguments
             this.currentFilterId = obj.filterId;
-            this._updateDocList.call(this, this.currentPath);
+            // Ignore if it's the path, as we'll update on the pathChanged event
+            if (obj.filterId != "path")
+            {
+               this._updateDocList.call(this, this.currentPath);
+            }
          }
       },
 

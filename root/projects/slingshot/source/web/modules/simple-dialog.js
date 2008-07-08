@@ -91,27 +91,38 @@
            *   fn: function, // The handler to call when the event fires.
            *   obj: object, // An object to pass back to the handler.
            *   scope: object // The object to use for the scope of the handler.
-           * @property onSuccess
+           *
+           * @property onSuccessCallback
            * @type object
            * @default null
            */
-          onSuccess:
+          onSuccessCallback:
           {
              fn: null,
              obj: null,
              scope: window
           },
 
+          /**
+           * Message to display on successful operation
+           *
+           * @property onSuccessMessage
+           * @type string
+           * @default ""
+           */
+          onSuccessMessage: "",
+          
           /**
            * Object literal representing callback upon failed operation.
            *   fn: function, // The handler to call when the event fires.
            *   obj: object, // An object to pass back to the handler.
            *   scope: object // The object to use for the scope of the handler.
-           * @property onFailure
+           *
+           * @property onFailureCallback
            * @type object
            * @default null
            */
-          onFailure:
+          onFailureCallback:
           {
              fn: null,
              obj: null,
@@ -119,10 +130,20 @@
           },
 
           /**
+           * Message to display on failed operation
+           *
+           * @property onFailureMessage
+           * @type string
+           * @default ""
+           */
+          onFailureMessage: "",
+          
+          /**
            * Object literal representing function to set forms validation.
            *   fn: function, // The handler to call when the event fires.
            *   obj: object, // An object to pass back to the handler.
            *   scope: object // The object to use for the scope of the handler.
+           *
            * @property doSetupFormsValidation
            * @type object
            * @default null

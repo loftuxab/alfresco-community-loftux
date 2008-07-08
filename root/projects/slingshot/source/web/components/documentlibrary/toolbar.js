@@ -82,7 +82,16 @@
           * @type string
           * @default "documentLibrary"
           */
-         containerId: "documentLibrary"
+         containerId: "documentLibrary",
+
+         /**
+          * Number of multi-file uploads before grouping the Activity Post
+          *
+          * @property groupUploadsAt
+          * @type int
+          * @default 5
+          */
+         groupUploadsAt: 5
       },
       
       /**
@@ -271,10 +280,70 @@
             containerId: this.options.containerId,
             path: this.currentPath,
             filter: [],
-            mode: this.fileUpload.MODE_MULTI_UPLOAD
+            mode: this.fileUpload.MODE_MULTI_UPLOAD,
+            onFileUploadComplete:
+            {
+               fn: this.onFileUploadComplete,
+               scope: this
+            }
          }
          this.fileUpload.show(multiUploadConfig);
          YAHOO.util.Event.preventDefault(e);
+      },
+      
+      onFileUploadComplete: function DLTB_onFileUploadComplete(complete)
+      {
+         var config =
+         {
+            method: "POST",
+            url: Alfresco.constants.PROXY_URI + "slingshot/doclib/activity",
+            dataObj:
+            {
+               siteId: this.options.siteId,
+               containerId: this.options.containerId,
+               browseURL: location.pathname + location.hash
+            },
+            successCallback: null,
+            successMessage: null,
+            failureCallback: null,
+            failureMessage: null,
+            object: null
+         };
+
+         var success = complete.successful.length;
+         if (success > 0)
+         {
+            if (success < this.options.groupUploadsAt)
+            {
+               // Below cutoff for grouping Activities into one
+               for (var i = 0; i < success; i++)
+               {
+                  config.dataObj.type = "file-added";
+                  config.dataObj.fileName = complete.successful[i].fileName;
+                  config.dataObj.contentURL = Alfresco.constants.PROXY_URL + "api/node/content/" + complete.successful[i].nodeRef.replace(":/", "");
+                  try
+                  {
+                     Alfresco.util.Ajax.jsonRequest(config);
+                  }
+                  catch (e)
+                  {
+                  }
+               }
+            }
+            else
+            {
+               // grouped into one message
+               config.dataObj.type = "files-added";
+               config.dataObj.fileCount = success;
+               try
+               {
+                  Alfresco.util.Ajax.jsonRequest(config);
+               }
+               catch (e)
+               {
+               }
+            }
+         }
       },
 
        /**
