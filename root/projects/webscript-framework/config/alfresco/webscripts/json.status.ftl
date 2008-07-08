@@ -8,8 +8,8 @@
   },  
   
   <#-- Exception details -->
-  "message" : "${status.message!""}",  
-  "exception" : "<#if status.exception?exists>${status.exception.class.name}<#if status.exception.message?exists> - ${status.exception.message}</#if></#if>",
+  "message" : "${status.message?j_string!""}",  
+  "exception" : "<#if status.exception?exists>${status.exception.class.name?j_string}<#if status.exception.message?exists> - ${status.exception.message?j_string}</#if></#if>",
   
   <#-- Exception call stack --> 
   "callstack" : 
@@ -29,12 +29,12 @@
       <@recursestack exception=exception.cause/>
    </#if>
    <#if exception.cause?exists == false>
-      ,"${exception}"
+      ,"${exception?j_string}"
       <#list exception.stackTrace as element>
-      ,"${element}"
+      ,"${element?j_string}"
       </#list>  
    <#else>
-      ,"${exception}"
-      ,"${exception.stackTrace[0]}"
+      ,"${exception?j_string}"
+      ,"${exception.stackTrace[0]?j_string}"
    </#if>
 </#macro>

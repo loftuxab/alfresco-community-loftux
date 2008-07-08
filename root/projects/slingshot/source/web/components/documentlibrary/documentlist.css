@@ -19,6 +19,13 @@
 }
 
 
+/* Popup Messages */
+#message .bd
+{
+   background-color: #ffff80;
+}
+
+
 /* Doclist bar */
 
 .doclist .doclist-bar
@@ -103,6 +110,7 @@
 {
    overflow: visible;
 }
+
 
 /* Cell Renderers */
 
@@ -222,7 +230,7 @@
    border: 1px solid #808080;
    clear: left;
    position: absolute;
-   width: 168px;
+   width: 160px;
 }
 
 /* Actions: Simple view */
@@ -260,6 +268,11 @@
    background-image: url(images/checkout.gif);
 }
 
+.doclist .onActionCancelEditing a
+{
+   background-image: url(images/cancel-editing.gif);
+}
+
 .doclist .onActionCopyTo a
 {
    background-image: url(images/copy-to.gif);
@@ -268,6 +281,21 @@
 .doclist .onActionMoveTo a
 {
    background-image: url(images/move-to.gif);
+}
+
+.doclist .onActionRequestUnlock a
+{
+   background-image: url(images/request-unlock.gif);
+}
+
+.doclist .onActionUnlock a
+{
+   background-image: url(images/unlock.gif);
+}
+
+.doclist .onActionUploadNewVersion a
+{
+   background-image: url(images/upload-new-version.gif);
 }
 
 

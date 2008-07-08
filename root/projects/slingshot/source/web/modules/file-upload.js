@@ -139,7 +139,9 @@
        *                                             // (state flow: STATE_BROWSING > STATE_UPLOADING > STATE_SUCCESS or STATE_FAILURE)
        *          progress: {HTMLElement},           // span that is the "progress bar" which is moved during progress
        *          progressInfo: {HTMLElement},       // span that displays the filename and the state
-       *          progressPercentage: {HTMLElement}  // span that displays the upload percentage for the individual file
+       *          progressPercentage: {HTMLElement}, // span that displays the upload percentage for the individual file
+       *          fileName: {string},                // filename
+       *          nodeRef: {string}                  // nodeRef if the file has been uploaded successfully
        *       }
        */
       fileStore: {},
@@ -205,12 +207,14 @@
        * @property defaultShowConfig
        * @type object
        */
-      defaultShowConfig: {
+      defaultShowConfig:
+      {
          siteId: null,
          containerId: null,
          path: null,
          mode: this.MODE_SINGLE_UPLOAD,
-         filter: []
+         filter: [],
+         onFileUploadComplete: null
       },
 
       /**
@@ -602,14 +606,18 @@
        */
       onUploadCompleteData: function FU_onUploadCompleteData(event)
       {
-         // todo: Check that the upload was succesful when a standardized
-         // json response is returned form the server
-
          // The individual file has been transfered completely
          // Now adjust the gui for the individual file row
          var fileInfo = this.fileStore[event["id"]];
          fileInfo.state = this.STATE_SUCCESS;
          fileInfo.fileButton.set("disabled", true);
+         
+         // Extract the nodeRef from the JSON response
+         var json = YAHOO.lang.JSON.parse(event.data);
+         if (json)
+         {
+            fileInfo.nodeRef = json.nodeRef;
+         }
 
          // Add the label "Successful" after the filename
          fileInfo.progressInfo["innerHTML"] = fileInfo.progressInfo["innerHTML"] +
@@ -961,7 +969,12 @@
             var flashId = oRecord.getData()["id"];
             if (!this.fileStore[flashId])
             {
-               this.fileStore[flashId] = { state: this.STATE_BROWSING };
+               this.fileStore[flashId] =
+               {
+                  state: this.STATE_BROWSING,
+                  fileName: oRecord.getData("name"),
+                  nodeRef: null
+               };
             }
 
             // create an instance from the template and give it a uniqueue id.
@@ -1119,19 +1132,52 @@
        */
       _adjustGuiIfFinished: function FU__adjustGuiIfFinished()
       {
+         var objComplete =
+         {
+            successful: [],
+            failed: []
+         };
+         var file = null;
+         
          // Go into finished state if all files are finished: successful or failures
          for (var i in this.fileStore)
          {
-            if (this.fileStore[i] &&
-               this.fileStore[i].state !== this.STATE_SUCCESS &&
-               this.fileStore[i].state !== this.STATE_FAILURE)
+            file = this.fileStore[i];
+            if (file)
             {
-               return;
+               if (file.state == this.STATE_SUCCESS)
+               {
+                  // Push successful file
+                  objComplete.successful.push(
+                  {
+                     fileName: file.fileName,
+                     nodeRef: file.nodeRef
+                  });
+               }
+               else if (file.state == this.STATE_FAILURE)
+               {
+                  // Push failed file
+                  objComplete.failed.push(
+                  {
+                     fileName: file.fileName
+                  });
+               }
+               else
+               {
+                  return;
+               }
             }
          }
          this.state = this.STATE_FINISHED;
          this.widgets.cancelOkButton.set("label", Alfresco.util.message("button.ok", this.name));
          this.widgets.uploadButton.set("disabled", true);
+         
+         var callback = this.showConfig.onFileUploadComplete;
+         if (callback && typeof callback.fn == "function")
+         {
+            // Call the onFileUploadComplete callback in the correct scope
+            callback.fn.call((typeof callback.scope == "object" ? callback.scope : this), objComplete, callback.obj);
+         }
       },
 
       /**
@@ -1142,8 +1188,8 @@
        * @param noOfUploadsToStart
        * @private
        */
-      _uploadFromQueue: function FU__uploadFromQueue(noOfUploadsToStart){
-
+      _uploadFromQueue: function FU__uploadFromQueue(noOfUploadsToStart)
+      {
          // Find files to upload
          var startedUploads = 0;
          var length = this.dataTable.getRecordSet().getLength();
