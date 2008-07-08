@@ -97,6 +97,7 @@
 	      }
 	      
 	      var deleteButton = Alfresco.util.createYUIButton(this, "delete-button", this.onDeleteClick, opts);
+	      var renameButton = Alfresco.util.createYUIButton(this, "rename-button", this.onRenameClick, opts);
 	      
 	      // Labels
 	      var yes = Alfresco.util.message("button.yes", this.name);
@@ -120,6 +121,15 @@
 	      var headerText = Alfresco.util.message("panel.confirm.header", this.name);
 	      this.deleteDialog.setHeader(headerText);
 	      this.deleteDialog.render(this.id + "-body");
+	      
+	      // Create the rename panel
+	      this.renamePanel = new YAHOO.widget.Panel(this.id + "-renamepanel", { width:"320px", visible:false, constraintoviewport:true } );
+	      this.renamePanel.render();
+	      
+	      var renameSaveButton = Alfresco.util.createYUIButton(this, "rename-save-button", this.onRenameSaveClick,
+	      {
+	      	type: "push"
+	      });
 	   },
 	   
 	   /**
@@ -215,6 +225,99 @@
 	         } 
 	      } 
 	   },
+	   
+	   /**
+       * Event handler for the rename button in the toolbar.
+       * Pops up the rename dialog.
+   	 *
+   	 * @method onRenameClick
+   	 * @param e {object} DomEvent
+   	 */
+	   onRenameClick: function(e)
+	   {
+         // Clear the text field any previously entered values
+         var newNameField = document.getElementById(this.id + "-newname");
+         if (newNameField)
+   	   {
+            newNameField.value = "";
+         }
+
+         this.renamePanel.show();
+	   },
+
+      /**
+   	 * Event handler for save button on the page rename panel.
+   	 * Submits the (new) name of the page to the repo.
+   	 *
+   	 * @method onRenameSaveClick
+   	 * @param e {object} DomEvent
+   	 */	   
+      onRenameSaveClick: function(e)
+      {
+			var data = {};
+		
+			var newNameField = document.getElementById(this.id + "-newname");
+			if (newNameField)
+			{
+			   data["name"] = newNameField.value.replace(/\s+/g, "_");
+			}
+			
+			// Submit PUT request 
+			Alfresco.util.Ajax.request(
+			{
+				method: Alfresco.util.Ajax.POST,
+		      url: Alfresco.constants.PROXY_URI + "/slingshot/wiki/page/" + this.siteId + "/" + this.title,
+				requestContentType: Alfresco.util.Ajax.JSON,
+				dataObj: data,
+				successCallback:
+				{
+					fn: this.onPageRenamed,
+					scope: this
+				},
+		      failureMessage: "Page update failed"
+		   });
+		   
+         this.renamePanel.hide();
+      },
+      
+      /**
+   	 * Gets called when a page is successfully renamed.
+   	 * Sets the window location to the URL of the new page.
+   	 *
+   	 * @method onPageRenamed
+   	 * @param e {object} DomEvent
+   	 */      
+      onPageRenamed: function(e)
+      {
+         var response = YAHOO.lang.JSON.parse(e.serverResponse.responseText);
+         if (response)
+         {
+            if (!YAHOO.lang.isUndefined(response.name))
+            {
+               // Change the location bar
+         	   window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + this.siteId + "/wiki-page?title=" + response.name;
+            } 
+            else
+            {
+               // A problem occurred
+               var errorMsg = "Rename failed: ";
+               if (!YAHOO.lang.isUndefined(response.error))
+               {
+                  errorMsg += response.error;
+               }
+               else
+               {
+                  errorMsg += "Unknown error occurred."
+               }
+               
+               Alfresco.util.PopupManager.displayPrompt(
+               {
+                  text: errorMsg
+               });
+            }
+           
+         }
+      },
 	   
       /**
        * Event handler for the delete button in the toolbar.
