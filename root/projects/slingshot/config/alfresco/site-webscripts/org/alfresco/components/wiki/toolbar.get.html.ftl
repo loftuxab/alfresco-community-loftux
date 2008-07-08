@@ -10,6 +10,8 @@
         <div class="new-page"><button id="${args.htmlid}-create-button">${msg("button.create")}</button></div>
         <div class="separator">|</div>
         <div class="delete-page"><button id="${args.htmlid}-delete-button">${msg("button.delete")}</button></div>
+        <div class="separator">|</div>
+        <div class="rename-page"><button id="${args.htmlid}-rename-button">${msg("button.rename")}</button></div>
    </div>
    <div id="${args.htmlid}-createpanel">
       <div class="hd">${msg("panel.create.title")}</div>
@@ -19,4 +21,12 @@
       </div>
       <div class="ft">${msg("panel.create.footer")}</div>
    </div>
+   <div id="${args.htmlid}-renamepanel">
+        <div class="hd">${msg("panel.rename.title")}</div>
+        <div class="bd">
+           <input type="text" id="${args.htmlid}-newname" name="name" value="" size="30"/>
+           <button id="${args.htmlid}-rename-save-button">${msg("button.save")}</button>
+        </div>
+        <div class="ft">${msg("panel.rename.footer")}</div>
+     </div>   
 </div>
