@@ -1,6 +1,6 @@
 <#import "/org/alfresco/modules/blog/blogpostlist.lib.ftl" as blogpostlistLib/>
 <#import "/org/alfresco/modules/paginator/paginator.lib.ftl" as paginatorLib/>
-<#assign listHtml><@blogpostlistLib.postListHTML posts=items viewmode=viewmode /></#assign>
+<#assign listHtml><@blogpostlistLib.postListHTML htmlid=htmlid posts=items viewmode=viewmode /></#assign>
 <#assign paginatorHtml><@paginatorLib.renderForumPaginator pdata=pdata /></#assign>
 <#assign listTitle><@blogpostlistLib.postListTitle filter=filter fromDate=fromDate toDate=toDate tag=tag /></#assign>
 {

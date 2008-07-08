@@ -59,5 +59,5 @@
 </div>
 
 <div id="${args.htmlid}-postlist">
-<@blogpostlistLib.postListHTML posts=items viewmode=viewmode />
+   <@blogpostlistLib.postListHTML htmlid=args.htmlid posts=items viewmode=viewmode />
 </div>

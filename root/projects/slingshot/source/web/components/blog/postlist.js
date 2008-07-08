@@ -72,6 +72,8 @@
          
          containerId: "blog",
          
+         path: "",
+         
          /**
           * Position inside the pages
           */
@@ -172,89 +174,18 @@
          });
          
          // Hook action events
-         YAHOO.Bubbling.addDefaultAction("action-link", function BlogPostList_filterAction(layer, args)
-         {
-            var owner = YAHOO.Bubbling.getOwnerByTagName(args[1].anchor, "div");
-            if (owner !== null)
-            {
-               var action = owner.className;
-               var target = args[1].target;
-               if (typeof me[action] == "function")
-               {
-                  // extract the id from the element
-                  var elemId = owner.id.substring((action + "-").length);
-                  me[action].call(me, elemId);
-                  args[1].stop = true;
-               }
-            }
-      		 
-            return true;
-         });
+         Alfresco.util.registerDefaultActionHandler(this.id, "action-link", "div", this);
          
-         // initialize the mouse over functionality for the list
-         this.initMouseOverListeners();
+         // initialize the mouse over listener
+         Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onListElementMouseEntered, this.onListElementMouseExited);
          
+         // as the list got already rendered on the server, already attach the listener to the rendered elements
+         Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
       },
       
       /**
-       * Attaches a listener to all passed elements.
+       * Called when the mouse enters into a list item.
        */
-      _attachRolloverListener: function(elem, mouseOverEventName, mouseOutEventName)
-      {  
-         var eventElem = elem;
-         
-         var mouseOverHandler = function(e)
-         {
-             // find out whether we actually moved inside the 
-             if (! e) var e = window.event;
-             var relTarg = e.relatedTarget || e.fromElement;
-             while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY') {
-                relTarg = relTarg.parentNode
-             }
-             if (relTarg == eventElem) return;
-             
-             // the mouse entered the element, fire an event to inform about it
-             YAHOO.Bubbling.fire(mouseOverEventName, {event : e, target : eventElem});
-         };
-         
-         var mouseOutHandler = function(e)
-         {
-             // find out whether we actually moved inside the 
-             if (! e) var e = window.event;
-             var relTarg = e.relatedTarget || e.toElement;
-             while (relTarg != null && relTarg != eventElem && relTarg.nodeName != 'BODY') {
-                relTarg = relTarg.parentNode
-             }
-             if (relTarg == eventElem) return;
-             
-             // the mouse exited the element, fire an event to inform about it
-             YAHOO.Bubbling.fire(mouseOutEventName, {event : e, target : eventElem});
-         };
-         
-         YAHOO.util.Event.addListener(elem, 'mouseover', mouseOverHandler);
-         YAHOO.util.Event.addListener(elem, 'mouseout', mouseOutHandler);
-      },
-      
-      firstMouseOverInit: true,
-      
-      initMouseOverListeners: function BlogPostList_initMouseOverListeners()
-      {
-         var mouseEnteredBubbleEventName = 'onPostListElementMouseEntered';
-         var mouseExitedBubbleEventName = 'onPostListElementMouseExited';
-         var divs = YAHOO.util.Dom.getElementsByClassName('post', 'div');
-         for (var x=0; x < divs.length; x++) {
-             this._attachRolloverListener(divs[x], mouseEnteredBubbleEventName, mouseExitedBubbleEventName);
-         }
-         
-         if (this.firstMouseOverInit) {
-            this.firstMouseOverInit = false;
-            // manage mouse hover/exit
-            YAHOO.Bubbling.on(mouseEnteredBubbleEventName, this.onListElementMouseEntered, this);
-            YAHOO.Bubbling.on(mouseExitedBubbleEventName, this.onListElementMouseExited, this);
-         }
-      },
-      
-      /** Called when the mouse enters into a list item. */
       onListElementMouseEntered: function BlogPostList_onListElementMouseEntered(layer, args)
       {
          var elem = args[1].target;
@@ -263,7 +194,9 @@
          YAHOO.util.Dom.addClass(editBloc, 'showEditBloc');
       },
       
-      /** Called whenever the mouse exits a list item. */
+      /**
+       * Called whenever the mouse exits a list item.
+       */
       onListElementMouseExited: function BlogPostList_onListElementMouseExited(layer, args)
       {
          var elem = args[1].target;
@@ -275,22 +208,20 @@
       /**
        * Action handler for the view action
        */
-      onViewNode: function BlogPostList_onViewPost(id)
+      onViewNode: function BlogPostList_onViewPost(htmlId, ownerId, postId)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postview?postId=" + id;
-         window.location = url;
+         Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, this.options.path, postId);
       },
       
-      onEditNode: function BlogPostList_onEditNode(id)
+      onEditNode: function BlogPostList_onEditNode(htmlId, ownerId, postId)
       {
-         var url = Alfresco.constants.URL_CONTEXT + "page/site/" + this.options.siteId + "/blog-postedit?container=" + this.options.containerId + "&postId=" + id;
-         window.location = url;
+         Alfresco.util.blog.loadBlogPostEditPage(this.options.siteId, this.options.containerId, this.options.path, postId);
       },
       
       /**
        * Deletes a post.
        */
-      onDeleteNode: function BlogPost_onDeletePost(id)
+      onDeleteNode: function BlogPost_onDeletePost(htmlId, ownerId, postId)
       {
          // make an ajax request to delete the post
          // we can directly go to alfresco for this
@@ -299,12 +230,6 @@
 		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" /* ADD PATH */ + id,
 		      method: "DELETE",
 		      responseContentType : "application/json",
-		      /*dataObj:
-		      {
-		         site   : this.options.siteId,
-		         container : "blog",
-		         path : this.options.postId
-		      },*/
 		      successCallback:
 		      {
 		         fn: this._onDeleted,
@@ -334,13 +259,13 @@
                     this.options.siteId + "/" + this.options.containerId + "/" + postId + "/publishing";
       },
       
-      onPublishExternal: function Blog_onPublishExternal(id)
+      onPublishExternal: function Blog_onPublishExternal(htmlId, ownerId, postId)
       {
          var me = this;
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: me._getPublishingRestUrl(id),
+		      url: me._getPublishingRestUrl(postId),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -363,12 +288,12 @@
           location.reload(true);
       },
      
-      onUpdateExternal: function Blog_onUpdateExternal(id)
+      onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, postId)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: this._getPublishingRestUrl(id),
+		      url: this._getPublishingRestUrl(postId),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -391,12 +316,12 @@
           location.reload(true);
       },    
 
-      onUnpublishExternal: function Blog_onUnpublishExternal(id)
+      onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, postId)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: this._getPublishingRestUrl(id),
+		      url: this._getPublishingRestUrl(postId),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -481,6 +406,7 @@
 		      dataObj:
 		      {
 		         site    : this.options.siteId,
+		         htmlid  : this.id,
 		         pos     : this.options.pos,
 		         size    : this.options.size,
 		         filter  : this.options.filter,
@@ -521,8 +447,8 @@
 	        // update list
 	        var elem = YAHOO.util.Dom.get(this.id + "-postlist");
             elem.innerHTML = response.json.listHtml;
-            this.initMouseOverListeners();
             
+            Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');            
 	     }
 	  },
 

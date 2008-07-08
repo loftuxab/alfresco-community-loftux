@@ -18,6 +18,7 @@ function main()
 
    // assignadditional model data
    model.site = site;
+   model.htmlid = args["htmlid"];
    model.viewmode = (args["viewmode"] != undefined) ? args["viewmode"] : "details";
    model.filter = filter;
    model.tag = tag;
