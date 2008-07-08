@@ -1,7 +1,7 @@
 <!-- Event Info Panel -->
 <div class="hd">Event Info</div>
 <div class="bd">
-      <div class="yui-t1">
+      <div class="yui-t1" style="width: 500px; min-width: 500px">
             <div class="yui-g">
                <h2>Details</h2>
                <hr/>
