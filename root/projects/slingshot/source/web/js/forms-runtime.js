@@ -667,7 +667,20 @@ Alfresco.forms.validation = Alfresco.forms.validation || {};
                var value = element.value;
                if (name)
                {
-                  formData[name] = value;
+                  // check whether the input element is an array value
+                  if ((name.length > 2) && (name.substring(name.length - 2) == '[]'))
+                  {
+                     name = name.substring(0, name.length - 2);
+                     if (formData[name] == undefined)
+                     {
+                        formData[name] = new Array();
+                     }
+                     formData[name].push(value);
+                  }
+                  else
+                  {
+                     formData[name] = value;
+                  }
                }
             }
             

@@ -60,6 +60,8 @@
    	
    	  postForm: null,
    	  saveButton: null,
+   	  /** Manages the tags of the form. */
+   	  tagLibraryListener: null,
    	  
    	  /** If true, an external publish will be executed once the
    	   * post has been saved
@@ -188,11 +190,14 @@
       },
 
       /**
-       * Registers the form with the html (that should be available in the page)
+       * Registers the form with the htl (that should be available in the page)
        * as well as the buttons that are part of the form.
        */
       _registerPostForm: function BlogPost__registerPostForm()
-      {   
+      {  
+         // register the tag listener
+         this.tagLibraryListener = new Alfresco.TagLibraryListener(this.id+"-form", "tags");
+          
          // register the Button
          var saveButtonId = this.id + "-save-button";
          this.saveButton = new YAHOO.widget.Button(saveButtonId, {type: "submit"});
@@ -250,6 +255,7 @@
         	   {
 			        //Put the HTML back into the text area
 					this.editor.saveHTML();
+					this.tagLibraryListener.updateForm();
         	   },
         	   //obj: myArbitraryObject,
         	   scope: this
