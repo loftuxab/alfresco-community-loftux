@@ -21,4 +21,17 @@
       </property-sheet>
    </config>
 
+	<config evaluator="string-compare" condition="Dashboards">
+      <!-- Dashboard layouts and available dashlets for the My Alfresco pages -->
+      <dashboards>
+         <layouts>
+         </layouts>
+         <dashlets>
+           	<dashlet id="search-knowledge-base" label="ASK Knowledge Base Search"
+                  description="Search Alfresco ASK Knowledge Base"
+                  jsp="/jsp/dashboards/dashlets/knowledge-base/search-knowledge-base-dashlet.jsp" allow-narrow="false" />
+            </dashlets>
+      </dashboards>
+   	</config>
+	
 </alfresco-config>

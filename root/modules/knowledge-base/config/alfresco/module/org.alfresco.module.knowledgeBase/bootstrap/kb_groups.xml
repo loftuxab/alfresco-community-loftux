@@ -19,29 +19,29 @@
         <view:associations></view:associations>
       </usr:authorityContainer>
       
-      <usr:authorityContainer view:childName="usr:GROUP_KnowledgeBase_Tier_1">
+      <usr:authorityContainer view:childName="usr:GROUP_KnowledgeBase_Customers">
         <view:aspects>
           <sys:referenceable></sys:referenceable>
         </view:aspects>
         <view:properties>
           <sys:store-protocol>user</sys:store-protocol>
-          <cm:name>GROUP_KnowledgeBase_Tier_1</cm:name>
-          <sys:node-uuid>GROUP_KnowledgeBase_Tier_1</sys:node-uuid>
-          <usr:authorityName>GROUP_KnowledgeBase_Tier_1</usr:authorityName>
+          <cm:name>GROUP_KnowledgeBase_Customers</cm:name>
+          <sys:node-uuid>GROUP_KnowledgeBase_Customers</sys:node-uuid>
+          <usr:authorityName>GROUP_KnowledgeBase_Customers</usr:authorityName>
           <sys:store-identifier>alfrescoUserStore</sys:store-identifier>
         </view:properties>
         <view:associations></view:associations>
       </usr:authorityContainer>
       
-      <usr:authorityContainer view:childName="usr:GROUP_KnowledgeBase_Tier_2">
+      <usr:authorityContainer view:childName="usr:GROUP_KnowledgeBase_Partners">
         <view:aspects>
           <sys:referenceable></sys:referenceable>
         </view:aspects>
         <view:properties>
           <sys:store-protocol>user</sys:store-protocol>
-          <cm:name>GROUP_KnowledgeBase_Tier_2</cm:name>
-          <sys:node-uuid>GROUP_KnowledgeBase_Tier_2</sys:node-uuid>
-          <usr:authorityName>GROUP_KnowledgeBase_Tier_2</usr:authorityName>
+          <cm:name>GROUP_KnowledgeBase_Partners</cm:name>
+          <sys:node-uuid>GROUP_KnowledgeBase_Partners</sys:node-uuid>
+          <usr:authorityName>GROUP_KnowledgeBase_Partners</usr:authorityName>
           <sys:store-identifier>alfrescoUserStore</sys:store-identifier>
         </view:properties>
         <view:associations></view:associations>
