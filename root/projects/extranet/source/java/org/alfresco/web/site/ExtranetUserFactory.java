@@ -27,7 +27,11 @@ package org.alfresco.web.site;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.User;
+import org.alfresco.extranet.UserService;
+import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.web.site.exception.UserFactoryException;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * This factory loads users from Alfresco, fetching their properties
@@ -43,7 +47,30 @@ public class ExtranetUserFactory extends AlfrescoUserFactory
     public User loadUser(RequestContext context, HttpServletRequest request, String userId)
         throws UserFactoryException
     {
-        return super.loadUser(context, request, userId);
+        User user = null;
+        
+        // get the Spring application context
+        ApplicationContext appContext = WebApplicationContextUtils.getRequiredWebApplicationContext(request.getSession().getServletContext());
+        if(appContext != null)
+        {
+            // get the user service
+            UserService userService = (UserService) appContext.getBean("extranet.service.user");
+            if(userService != null)
+            {
+                // get the user
+                DatabaseUser databaseUser = userService.getUser(userId);
+                if(databaseUser != null)
+                {
+                    user = new User(userId);
+                    user.setFirstName(databaseUser.getFirstName());
+                    user.setLastName(databaseUser.getLastName());
+                    user.setMiddleName(databaseUser.getMiddleName());
+                    user.setEmail(databaseUser.getEmail());
+                }
+            }
+        }
+        
+        return user;
     }
     
 }

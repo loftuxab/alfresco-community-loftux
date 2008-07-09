@@ -71,7 +71,7 @@
 				<username>extranet</username>
 				<password>(FILL IN)</password>
 				<unsecure>true</unsecure>
-				<storage>none</storage>
+				<persistent>false</persistent>
 			</endpoint>
 			
 			<endpoint>
@@ -81,7 +81,7 @@
 				<connector-id>alfresco</connector-id>
 				<endpoint-url>http://hosted13.alfresco.com/alfresco/service</endpoint-url>
 				<identity>user</identity>
-				<storage>none</storage>				
+				<persistent>false</persistent>				
 			</endpoint>
 
 			<endpoint>
@@ -91,7 +91,7 @@
 				<connector-id>http</connector-id>
 				<endpoint-url>http://blogs.alfresco.com</endpoint-url>
 				<identity>none</identity>
-				<storage>none</storage>
+				<persistent>false</persistent>
 			</endpoint>
 
 			<endpoint>
@@ -101,7 +101,7 @@
 				<connector-id>http</connector-id>
 				<endpoint-url>http://forums.alfresco.com</endpoint-url>
 				<identity>user</identity>
-				<storage>local</storage>
+				<persistent>true</persistent>
 			</endpoint>
 
 			<endpoint>
@@ -111,7 +111,7 @@
 				<connector-id>mediawiki</connector-id>
 				<endpoint-url>http://wiki.alfresco.com</endpoint-url>
 				<identity>user</identity>
-				<storage>local</storage>				
+				<persistent>true</persistent>				
 			</endpoint>
 
 			<endpoint>
@@ -121,7 +121,7 @@
 				<connector-id>http</connector-id>
 				<endpoint-url>http://issues.alfresco.com</endpoint-url>
 				<identity>user</identity>
-				<storage>local</storage>				
+				<persistent>true</persistent>				
 			</endpoint>
 
 			<endpoint>
@@ -131,7 +131,7 @@
 				<connector-id>webhelpdesk</connector-id>
 				<endpoint-url>http://support.alfresco.com</endpoint-url>
 				<identity>user</identity>
-				<storage>local</storage>				
+				<persistent>true</persistent>				
 			</endpoint>
 
 			<connector>
@@ -165,13 +165,13 @@
 			</authenticator>
 			
 			<credential-vault>
-				<id>xml</id>
-				<name>XML Credential Vault</name>
-				<description>XML Credential Vault</description>
-				<class>org.alfresco.connector.XMLCredentialVault</class>
+				<id>alfresco</id>
+				<name>Alfresco Credential Vault</name>
+				<description>Alfresco Credential Vault</description>
+				<class>org.alfresco.connector.AlfrescoCredentialVault</class>
 			</credential-vault>
 			
-			<default-credential-vault-id>xml</default-credential-vault-id>
+			<default-credential-vault-id>alfresco</default-credential-vault-id>
 		   
 		</remote>
 				

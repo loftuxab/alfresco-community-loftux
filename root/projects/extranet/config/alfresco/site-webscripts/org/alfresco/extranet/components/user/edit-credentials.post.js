@@ -2,10 +2,19 @@
 var vault = sitedata.credentialVault;
 model.vault = vault;
 
+// request arguments
+var endpointId = context.properties["endpointId"];
+model.endpointId = endpointId;
+
+// endpoint properties
+model.endpointName = remote.getEndpointName(endpointId);
+model.endpointDescription = remote.getEndpointDescription(endpointId);
+model.endpointPersistent = remote.isEndpointPersistent(endpointId);
+
 // handle the update
 if(args["command"] == "update")
 {
-	for (var key in args)
+	for (var key in context.properties)
 	{
 		if(key.substring(0,6) == "PARAM_")
 		{
@@ -17,7 +26,7 @@ if(args["command"] == "update")
 			{
 				var endpointId = param.substring(0, x);
 				var credentialKey = param.substring(x+1);
-
+				
 				var credentials = vault.properties[endpointId];
 				if(credentials == null)
 				{
@@ -30,4 +39,10 @@ if(args["command"] == "update")
 	}
 	
 	vault.save();
+	
+	model.nextUrl = args["successUrl"];
+}
+else
+{
+	model.nextUrl = args["failureUrl"];
 }

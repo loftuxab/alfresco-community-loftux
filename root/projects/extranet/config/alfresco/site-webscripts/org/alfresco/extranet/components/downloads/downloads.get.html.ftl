@@ -1,70 +1,138 @@
 <p align="center">
 
-Welcome to the Downloads Center.
-<br/>
-<br/>
-Your one stop shop for Alfresco products
+<form name="mainForm" id="mainForm">
 
-<br/>
-<br/>
+<table width="100%">
+<tr>
+	<td width="50%" valign="top">
+		<div id="releaseClassDiv">
 
+			<table>
+				<tr>
+					<td width="48px" align="center" valign="center">
+						<img src="/extranet/components/extranet/downloads/edit_32.gif"/>
+					</td>
+					<td valign="top">Which Alfresco product suite are you interested in?</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<div id="releaseClassControl">
 
-<form>
-What would you like to download?
-<br/>
-<select name="whattodownload">
-  <option value="1">WCM</option>
-  <option value="2">ECM</option>
-</select>
+							<table>
+						<#list productClasses as productClass>
+								<tr>
+									<td rowspan="2">
+										<input name="releaseClass" type="radio" value="${productClass.displayPath}/${productClass.name}" onclick="pickClass(this.value);" />
+									</td>
+									<td>
+										<B>${productClass.name}</B>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										${productClass.description}
+									</td>
+								</tr>
+						</#list>
+							</table>				
+						</div>	
+					</td>
+				</tr>
+			</table>
 
-<br/>
+		</div>
+		
+		<br/>
 
-What version?
-<br/>
-<select name="version">
-  <option value="2.0">2.0</option>
-  <option value="2.0.1">2.0.1</option>
-  <option value="2.0.2">2.0.2</option>
-  <option value="2.1">2.1</option>
-  <option value="2.1.1">2.1</option>
-  <option value="2.1.2">2.1.2</option>
-  <option value="2.1.3">2.1.3</option>
-  <option value="2.2">2.2</option>
-  <option value="2.2.1">2.2.1</option>
-</select>
+		<div id="releaseVersionDiv" style="display: none;">
 
-<br/>
+			<table>
+				<tr>
+					<td width="48px" align="center" valign="center">
+						<img src="/extranet/components/extranet/downloads/calc_32.gif"/>
+					</td>
+					<td valign="top">Which version of the product suite are you interested in?</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>
+						<div id="releaseVersionControl">
 
-What platform / format?
-<br/>
-<select name="platform">
-  <option value="win">Windows</option>
-  <option value="linux">Linux</option>
-  <option value="war">WAR file</option>
-</select>
+							<table>
+						<#list versions as version>
+								<tr>
+									<td rowspan="2">
+										<input name="releaseVersion" type="radio" value="${version.displayPath}/${version.name}" onclick="pickVersion(this.value);" />
+									</td>
+									<td>
+										<B>${version.name}</B>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										${version.description}
+									</td>
+								</tr>
+						</#list>
+							</table>				
+						</div>	
+					</td>
+				</tr>
+			</table>
 
-<br/>
+		</div>
+		
+		<br/>
 
-Select Components
-<br/>
+		<div id="releasePlatformDiv" style="display: none;">
 
-<input type="checkbox" name="components" value="1">Everything</input>
-<br/>
-<input type="checkbox" name="components" value="2">Installer (Executable)</input>
-<br/>
-<input type="checkbox" name="components" value="3">Everything</input>
-<br/>
-<input type="checkbox" name="components" value="4">Everything</input>
-<br/>
-<input type="checkbox" name="components" value="5">Everything</input>
-<br/>
-<input type="checkbox" name="components" value="6">Everything</input>
-<br/>
+			<table>
+				<tr>
+					<td width="48px" align="center" valign="center">
+						<img src="/extranet/components/extranet/downloads/smicn_32.gif">
+					</td>
+					<td valign="top">
+						Which platform interests you?
+					</td>
+				</tr>
+				<tr>
+					<td></td>					
+					<td>
+						<div id="releasePlatformControl">
 
-<br/>
-<input type="button" value="Next">Next</input>
+							<table>
+						<#list platforms as platform>
+								<tr>
+									<td rowspan="2">
+										<input name="releasePlatform" type="radio" value="${platform.displayPath}/${platform.name}" onclick="pickPlatform(this.value);" />
+									</td>
+									<td>
+										<B>${platform.name}</B>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										${platform.description}
+									</td>
+								</tr>
+						</#list>
+							</table>				
+						</div>	
+					</td>
+				</tr>
+			</table>
+		</div>
+	</td>
+	<td width="50%" nowrap valign="top">
+		<div id="fileListingDiv">
+		</div>
+	</td>
+</tr>
+</table>
+
+<script language="Javascript">
+init();
+</script>
 
 </form>
-
-
-</p>

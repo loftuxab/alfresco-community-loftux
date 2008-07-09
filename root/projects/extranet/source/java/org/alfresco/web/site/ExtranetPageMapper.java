@@ -24,10 +24,17 @@
  */
 package org.alfresco.web.site;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.alfresco.connector.User;
+import org.alfresco.extranet.ExtranetHelper;
+import org.alfresco.extranet.database.DatabaseGroup;
+import org.alfresco.extranet.database.DatabaseUser;
 import org.alfresco.web.site.exception.PageMapperException;
 
 /**
@@ -53,18 +60,33 @@ public class ExtranetPageMapper extends DefaultPageMapper
         if(user != null)
         {
             String userId = user.getId();
-            if("guest".equals(userId))
+            if(!"guest".equals(userId))
             {
-                // TODO: special handling for guest?
-            }
-            else
-            {
-                // TODO: change this
-                // just a test
-                // if the user is not the guest user, then we assume they are enterprise
-                // clearly, a weak assumption but it will do for now
-                ThemeUtil.setCurrentThemeId((HttpServletRequest)request, "enterprise");
-                context.setThemeId("enterprise");
+                // non-guest user
+                
+                // get the user's groups
+                List groupsList = ExtranetHelper.getGroupService((HttpServletRequest)request).getGroupsForUser(userId);
+                
+                // build a map
+                HashMap groupsMap = new HashMap<String, String>();
+                for(int i = 0; i < groupsList.size(); i++)
+                {
+                    DatabaseGroup dbGroup = (DatabaseGroup) groupsList.get(i);
+                    if(dbGroup != null)
+                    {
+                        groupsMap.put(dbGroup.getEntityId(), dbGroup.getName());
+                    }
+                } 
+                
+                // store the groups onto the request context
+                context.setValue("groups", groupsMap);
+                
+                if(groupsMap.get("enterprise") != null)
+                {
+                    // they are an enterprise user
+                    ThemeUtil.setCurrentThemeId((HttpServletRequest)request, "enterprise");
+                    context.setThemeId("enterprise");
+                }
             }
         }
     }    

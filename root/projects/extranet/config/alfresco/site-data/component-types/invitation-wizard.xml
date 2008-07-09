@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<title>Invitation Wizard</title>
+	<renderer-type>jsp</renderer-type>
+	<renderer>/components/extranet/invitation-wizard/component.jsp</renderer>
+</component-type>

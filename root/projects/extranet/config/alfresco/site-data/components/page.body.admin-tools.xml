@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component>
+  <component-type-id>admin-tools</component-type-id>
+  <title>Administration Tools</title>
+  <scope>page</scope>
+  <region-id>body</region-id>
+  <source-id>admin-tools</source-id>
+</component>

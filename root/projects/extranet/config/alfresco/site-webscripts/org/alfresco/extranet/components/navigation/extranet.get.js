@@ -10,10 +10,11 @@ var homePage = sitedata.rootPage;
 if(alfCommunity)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "community");
+	pageAssociations.sort(pageAssociationSort);
 	for(var i = 0; i < pageAssociations.length; i++)
 	{
 		var destId = pageAssociations[i].properties["dest-id"];
-		var page = sitedata.getPage(destId);
+		var page = sitedata.getPage(destId);		
 		model.pages[model.pages.length] = page;
 	}
 }
@@ -22,6 +23,7 @@ if(alfCommunity)
 if(alfRegistered)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "community-registered");
+	pageAssociations.sort(pageAssociationSort);
 	for(var i = 0; i < pageAssociations.length; i++)
 	{
 		var destId = pageAssociations[i].properties["dest-id"];
@@ -34,6 +36,7 @@ if(alfRegistered)
 if(alfEnterprise)
 {
 	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "enterprise");
+	pageAssociations.sort(pageAssociationSort);
 	for(var i = 0; i < pageAssociations.length; i++)
 	{
 		var destId = pageAssociations[i].properties["dest-id"];
@@ -43,10 +46,29 @@ if(alfEnterprise)
 }
 
 // add in the "final" pages
-var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "final");
-for(var i = 0; i < pageAssociations.length; i++)
+if(!alfEnterprise)
 {
-	var destId = pageAssociations[i].properties["dest-id"];
-	var page = sitedata.getPage(destId);
-	model.pages[model.pages.length] = page;
+	var pageAssociations = sitedata.findPageAssociations(homePage.id, null, "final");
+	pageAssociations.sort(pageAssociationSort);
+	for(var i = 0; i < pageAssociations.length; i++)
+	{
+		var destId = pageAssociations[i].properties["dest-id"];
+		var page = sitedata.getPage(destId);
+		model.pages[model.pages.length] = page;
+	}
+}
+
+function pageAssociationSort(a,b)
+{
+	var indexA = a.getProperty("sort-order");
+	var indexB = b.getProperty("sort-order");
+	
+	if(indexA == null && indexB == null)
+		return 0;
+	if(indexA == null && indexB != null)
+		return 1;
+	if(indexA != null && indexB == null)
+		return -1;
+		
+	return indexA - indexB;
 }

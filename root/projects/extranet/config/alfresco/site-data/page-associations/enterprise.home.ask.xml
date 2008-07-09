@@ -5,4 +5,9 @@
   <source-id>home</source-id>
   <dest-id>ask</dest-id>
   <assoc-type>enterprise</assoc-type>
+  
+  <properties>
+  	<sort-order>2</sort-order>
+  </properties>
+  
 </page-association>

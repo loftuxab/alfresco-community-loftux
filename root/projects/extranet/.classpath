@@ -6,5 +6,6 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/Core"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Web Framework"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/WebScript Framework"/>
+	<classpathentry kind="lib" path="source/web/WEB-INF/lib/spring-ldap-1.2.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

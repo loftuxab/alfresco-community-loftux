@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Apply Template Service</shortname>
+  <description>Apply Template</description>
+  <url>/webframework/applytemplate/{filename}</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

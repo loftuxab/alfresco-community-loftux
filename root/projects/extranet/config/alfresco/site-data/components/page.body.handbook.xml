@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<url>/components/extranet/iframeinclude</url>
+	
+	<!-- Binding --> 
+	<scope>page</scope>
+	<region-id>body</region-id>
+	<source-id>handbook</source-id>
+
+  	<properties>
+  		<content-path>/Network/Support/Handbook/handbook.pdf</content-path>
+  		<endpoint>alfresco</endpoint>
+  		<height>800px</height>
+  	</properties>
+
+</component>

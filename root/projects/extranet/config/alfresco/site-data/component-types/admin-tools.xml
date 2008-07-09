@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component-type>
+	<title>Admin Tools Component</title>
+	<renderer-type>jsp</renderer-type>
+	<renderer>/components/extranet/admin-tools/component.jsp</renderer>
+</component-type>

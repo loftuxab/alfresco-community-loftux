@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>HTML Include Component</shortname>
+   <description>Displays html from an endpoint and uri</description>
+   <url>/components/extranet/htmlinclude</url>
+</webscript>

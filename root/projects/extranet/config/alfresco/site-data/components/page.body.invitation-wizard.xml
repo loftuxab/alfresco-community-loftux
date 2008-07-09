@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component>
+  <component-type-id>invitation-wizard</component-type-id>
+  <title>Invitation Wizard</title>
+  <scope>page</scope>
+  <region-id>body</region-id>
+  <source-id>invitation-wizard</source-id>  
+</component>

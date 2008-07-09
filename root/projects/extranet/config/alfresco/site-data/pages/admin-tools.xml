@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<page>
+  <title>Admin Tools</title>
+  <template-instance>admin-tools</template-instance>
+  <authentication>admin</authentication>  
+</page>

@@ -1,0 +1,5 @@
+<webscript>
+   <shortname>Alfresco Network News Component</shortname>
+   <description>Displays Alfresco Network News</description>
+   <url>/components/extranet/networknews</url>
+</webscript>

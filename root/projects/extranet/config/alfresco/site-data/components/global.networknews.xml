@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<url>/components/extranet/networknews</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>networknews</region-id>
+	<source-id>global</source-id>
+  
+  	<properties>
+  		<rss-endpoint>alfresco</rss-endpoint>
+  		<rss-uri>/webframework/applytemplate/rss.xml?templatePath=/Data%20Dictionary/Presentation%20Templates/AlfrescoNetwork_RSS.ftl&amp;docPath=/Network/Support/News</rss-uri>
+  		<display-option>fourgrid</display-option>
+  	</properties>
+  
+</component>
+

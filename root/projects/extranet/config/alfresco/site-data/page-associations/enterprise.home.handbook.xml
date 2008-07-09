@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <page-association>
-  <title>Documentation</title>
+  <title>Support Handbook</title>
   <source-id>home</source-id>
-  <dest-id>documentation</dest-id>
+  <dest-id>handbook</dest-id>
   <assoc-type>enterprise</assoc-type>
+  
+  <properties>
+  	<sort-order>4</sort-order>
+  </properties>
+  
 </page-association>
