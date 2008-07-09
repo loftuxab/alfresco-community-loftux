@@ -11,6 +11,6 @@
       <li id="${args.htmlid}-showNewTopics" class="nav-label"><a href="" class="filter-link nav-link">${msg("menu.filter.new")}</a></li>
       <li id="${args.htmlid}-showHotTopics" class="nav-label"><a href="" class="filter-link nav-link">${msg("menu.filter.hot")}</a></li>
       <li id="${args.htmlid}-showAllTopics" class="nav-label"><a href="" class="filter-link nav-link">${msg("menu.filter.all")}</a></li>
-      <li id="${args.htmlid}-showWatchingTopics" class="nav-label"><a href="" class="filter-link nav-link">${msg("menu.filter.my")}</a></li>
+      <li id="${args.htmlid}-showMyTopics" class="nav-label"><a href="" class="filter-link nav-link">${msg("menu.filter.my")}</a></li>
    </ul>
 </div>

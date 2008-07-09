@@ -4,7 +4,9 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.DiscussionsTopicList("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!""}"
+      siteId: "${page.url.templateArgs.site!""}",
+      startIndex: "${pdata.startIndex}",
+      pageSize: "${pdata.pageSize}"
    }).setMessages(
       ${messages}
    );
@@ -37,17 +39,15 @@
 
 <div id="discussionsBlogHeader2">
 	<div id="${args.htmlid}-listtitle" class="leftDiscussionBlogHeader listTitle">
-			${listTitle}
+			<@topiclistLib.topicListTitle filter=filter tag=tag />
 	</div>
 	
 	<div class="rightDiscussionBlogHeader">
-		<div id="${args.htmlid}-paginator" class="toolbarOption">
-			<@paginatorLib.renderForumPaginator pdata=pdata />
-		</div>
+		<@paginatorLib.renderPaginatorModule htmlid=args.htmlid pdata=pdata />
 	</div>
 	
 </div>
 
 <div id="${args.htmlid}-topiclist">
-<@topiclistLib.topicListHTML topics=items viewmode=viewmode />
+<@topiclistLib.topicListHTML htmlid=args.htmlid topics=items viewmode=viewmode />
 </div>
