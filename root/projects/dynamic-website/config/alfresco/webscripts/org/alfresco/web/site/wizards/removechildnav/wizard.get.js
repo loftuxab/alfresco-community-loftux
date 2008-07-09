@@ -6,7 +6,7 @@ var parentPageId = wizard.request("parentPageId");
 var pageId = wizard.request("pageId");
 
 // objects
-var parentPage = sitedata.getObject(parentPageId);
+var parentPage = sitedata.getObject("page", parentPageId);
 var page = sitedata.getObject("page", pageId);
 
 

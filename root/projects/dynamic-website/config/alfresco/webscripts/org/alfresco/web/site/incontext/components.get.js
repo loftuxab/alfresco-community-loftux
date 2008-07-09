@@ -11,7 +11,9 @@ function pushComponentSettings(component)
 			var settingName = argName.substring(1, argName.length);			
 			var argValue = args[argName];
 			if(argValue != null)
+			{
 				component.setProperty(settingName, argValue);
+			}
 		}
 	}
 }
@@ -47,45 +49,22 @@ if(regionScopeId == null)
 if(proceed)
 {
 	var component = null;
-	/*
-	if(componentId != null && componentTypeId == null)
-	{
-		//
-		// binding a component
-		//
-		component = sitedata.getObject(componentId);
-		componentTypeId = component.getProperty("component-type-id");
-		json["componentId"] = componentId;
-		json["componentId"] = componentTypeId;		
-	}
-	*/
 	if(componentId == null && componentTypeId != null)
-	{
-		//
-		// binding a component type
-		//
-		
+	{	
 		// build the component
-		component = sitedata.newComponent();
-		component.setProperty("component-type-id", componentTypeId);
-		save(component);
+		component = sitedata.newComponent(componentTypeId);
 	
+		// push any arguments for prepopulation	
+		pushComponentSettings(component);
+
+		// bind the component
+		sitedata.bindComponent(component, regionScopeId, regionId, regionSourceId);
+
 		// assign component id onto json return
 		componentId = component.getId();
 		json["componentId"] = componentId;
 		json["componentTypeId"] = componentTypeId;
-
-		// push any arguments for prepopulation	
-		pushComponentSettings(component);
-		
-		// save again
-		save(component);
-	}
-	
-	if(component != null)
-	{
-		sitedata.bindComponent(componentId, regionScopeId, regionId, regionSourceId);		
-	}
+	}	
 }
 
 // format the json	

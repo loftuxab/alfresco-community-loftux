@@ -10,7 +10,7 @@ var json = new Array();
 
 // get children of this node
 var ctr = 0;
-var page = sitedata.getObject(pageId);
+var page = sitedata.getObject("page", pageId);
 var associations = sitedata.findChildPageAssociations(pageId, null);
 for(var i = 0; i < associations.length; i++)
 {
@@ -25,7 +25,7 @@ for(var i = 0; i < associations.length; i++)
 	if("child" == associationType)
 	{
 		// get the child node
-		var childNode = sitedata.getObject(destId);
+		var childNode = sitedata.getObject("page", destId);
 		if(childNode != null)
 		{
 			json[ctr] = { };

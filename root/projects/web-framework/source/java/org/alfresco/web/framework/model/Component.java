@@ -25,6 +25,7 @@
 package org.alfresco.web.framework.model;
 
 import org.alfresco.web.framework.AbstractModelObject;
+import org.alfresco.web.framework.ModelHelper;
 import org.alfresco.web.framework.ModelPersisterInfo;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
@@ -45,6 +46,7 @@ public class Component extends AbstractModelObject
     public static String PROP_COMPONENT_TYPE_ID = "component-type-id";
     public static String PROP_CHROME = "chrome";
     public static String PROP_URL = "url";
+    public static String PROP_GUID = "guid";
     
     // cached values
     private String regionId = null;
@@ -60,6 +62,7 @@ public class Component extends AbstractModelObject
     public Component(String id, ModelPersisterInfo key, Document document)
     {
         super(id, key, document);
+        setGUID(id);        
     }
 
     /**
@@ -210,6 +213,26 @@ public class Component extends AbstractModelObject
     {
         setProperty(PROP_URL, url);
     }
+    
+    /**
+     * Gets the GUID.
+     * 
+     * @return the GUID
+     */
+    public String getGUID()
+    {
+        return getProperty(PROP_GUID);
+    }
+    
+    /**
+     * Sets the GUID.
+     * 
+     * @param guid the new GUID
+     */
+    public void setGUID(String guid)
+    {
+        setProperty(PROP_GUID, guid);
+    }
 
     /**
      * Gets the source object.
@@ -254,13 +277,20 @@ public class Component extends AbstractModelObject
      */
     public static String generateId(String scopeId, String regionId, String sourceId)
     {
-        StringBuilder id = new StringBuilder(64);
-        id.append(scopeId).append('.').append(regionId);
-        if (!WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+        String generatedId = null;
+        
+        if(scopeId != null && regionId != null)
         {
-            id.append('.').append(sourceId.replace('/', '~'));
+            StringBuilder id = new StringBuilder(64);
+            id.append(scopeId).append('.').append(regionId);
+            if (sourceId != null && !WebFrameworkConstants.REGION_SCOPE_GLOBAL.equalsIgnoreCase(scopeId))
+            {
+                id.append('.').append(sourceId.replace('/', '~'));
+            }
+            generatedId = id.toString();
         }
-        return id.toString();
+        
+        return generatedId;
     }
     
     /**
@@ -269,5 +299,14 @@ public class Component extends AbstractModelObject
     protected void regenerateId()
     {
         this.id = generateId(this.scope, this.regionId, this.sourceId);
+        if(this.id == null)
+        {
+            this.id = getGUID();
+            if(this.id == null)
+            {
+                this.id = ModelHelper.newGUID();
+                setGUID(id);                
+            }
+        }
     }
 }

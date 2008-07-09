@@ -782,6 +782,12 @@ public final class ScriptSiteData extends ScriptBase
     {
         getModel().bindComponent(componentId, scope, regionId, sourceId);
     }
+    
+    public void bindComponent(ScriptModelObject componentObject, String scope, String regionId, String sourceId)
+    {
+        Component component = (Component) componentObject.getModelObject();
+        getModel().bindComponent(component, scope, regionId, sourceId);
+    }
 
     public void unbindComponent(String componentId)
     {

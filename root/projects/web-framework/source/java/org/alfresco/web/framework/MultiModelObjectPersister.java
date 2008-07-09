@@ -153,7 +153,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     public boolean removeObject(ModelPersistenceContext context, ModelObject object)
         throws ModelObjectPersisterException    
     {
-        return removeObject(context, object.getPersisterId());
+        return removeObject(context, object.getId());
     }
     
     /* (non-Javadoc)
@@ -173,6 +173,9 @@ public class MultiModelObjectPersister implements ModelObjectPersister
             
             if (persister.hasObject(context, objectId))
             {
+                if (logger.isDebugEnabled())
+                    logger.debug("removeObject attempting to remove '" + objectId + "' from persister: " + persisterId); 
+                
                 removed = persister.removeObject(context, objectId);
                 
                 if(logger.isDebugEnabled())
@@ -190,7 +193,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
      */
     public boolean hasObject(ModelPersistenceContext context, ModelObject object)
     {
-        return hasObject(context, object.getStoragePath());
+        return hasObject(context, object.getId());
     }
     
     /* (non-Javadoc)

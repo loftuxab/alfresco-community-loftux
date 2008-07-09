@@ -356,7 +356,6 @@ public final class RenderUtil
                 {
                     component = theme.getDefaultComponent(context, regionId);
                 }
-
             }
             if (component != null)
             {
