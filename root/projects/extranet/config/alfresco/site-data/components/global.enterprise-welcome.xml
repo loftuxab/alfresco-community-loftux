@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component> 
+
+	<url>/components/extranet/htmlinclude</url>
+	
+	<!-- Binding --> 
+	<scope>global</scope>
+	<region-id>enterprise-welcome</region-id>
+	<source-id>global</source-id>
+  
+  	<properties>
+  		<endpoint>alfresco</endpoint>
+  		<content-path>/Network/Enterprise/welcome.html</content-path>
+  	</properties>
+  
+</component>
+

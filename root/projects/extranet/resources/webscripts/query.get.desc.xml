@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Query Service</shortname>
+  <description>Query</description>
+  <url>/webframework/query</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

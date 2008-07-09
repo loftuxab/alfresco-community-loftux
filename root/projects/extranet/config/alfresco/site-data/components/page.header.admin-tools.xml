@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<component> 
+
+	<url>/components/extranet/header/admin-tools</url>
+	
+	<!-- Binding --> 
+	<scope>page</scope>
+	<region-id>header</region-id>
+	<source-id>admin-tools</source-id>
+  
+</component>

@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Categories Metadata Retrieval Service</shortname>
+  <description>Categories Metadata Retrieval Service</description>
+  <url>/webframework/categories/metadata</url>
+  <format default="html">argument</format>
+  <authentication>user</authentication>
+  <transaction>required</transaction>
+</webscript>

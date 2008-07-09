@@ -60,6 +60,19 @@ a:hover {
 	color: #060;
 	font: 11px/14px 'Trebuchet MS', Arial, sans-serif;
 }
+#top-links2 {
+	padding: 0.300em 0 0.224em;
+	float: right;
+}
+#top-links2 li {
+	float: left;
+	padding-left: 0.769em;
+}
+#top-links2 a {
+	color: #060;
+	font: 11px/14px 'Trebuchet MS', Arial, sans-serif;
+}
+
 .search {
 	float: right;
 	clear: right;

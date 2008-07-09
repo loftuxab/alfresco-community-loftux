@@ -3,19 +3,48 @@
 
 <#if user.id == "guest">	
 	<ul id="top-links">
-		<li><a href="?pt=login">Sign In</a></li>
-		<li><a href="?pt=register">Register</a></li>
-		<li><a href="#">Contact Us</a></li>
+		<li>
+			<img src="${url.context}/images/extranet/login_16.gif"/>
+			<a href="?pt=login">Sign In</a>
+		</li>
+		<li>
+			<img src="${url.context}/images/extranet/register_16.gif"/>
+			<a href="?pt=register">Register</a>
+		</li>
+		<li>
+			<img src="${url.context}/images/extranet/contact_us_16.gif"/>
+			<a href="#">Contact Us</a>
+		</li>
 	</ul>
 <#else>
-	<ul id="top-links">
-		<li align="right" style="font: 11px/14px 'Trebuchet MS', Arial, sans-serif">Welcome, <b>${user.fullName}</b></li>
-		<li><a href="?pt=logout">Log out</a></li>
-		<li><a href="?pt=viewprofile">My Account</a></li>
-		<li><a href="#">Contact Us</a></li>
+	<p style="padding: 0.300em 0 0.224em; float:right;font: 12px/14px 'Trebuchet MS', Arial, sans-serif;">
+	You are logged in as 
+	
+	<img src="${url.context}/images/extranet/user_16.gif"/>
+	&nbsp;<b>${user.fullName}</b> ( <b>${user.id}</b> )
+	
+	</p>
+	<br/>
+	
+	<ul id="top-links2">
+		<li>
+			<img src="${url.context}/images/extranet/logout_16.gif"/>
+			<a href="?pt=logout">Log out</a>
+		</li>
+		<li>
+			<img src="${url.context}/images/extranet/my_account_16.gif"/>
+			<a href="?pt=viewprofile">My Account</a>
+		</li>
+		<li>
+			<img src="${url.context}/images/extranet/contact_us_16.gif"/>
+			<a href="#">Contact Us</a>
+		</li>
 	</ul>
+	<br/>
+	<br/>
 </#if>
 
+	<!--
 	<form action="#" class="search">
 		Search
 		<select>
@@ -25,4 +54,5 @@
 		<input type="text" class="text" />
 		<input type="submit" class="button" value="Go" />
 	</form>
+	-->
 </div>

@@ -29,12 +29,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
 import org.alfresco.tools.XMLUtil;
 import org.alfresco.web.config.RemoteConfigElement.CredentialVaultDescriptor;
+import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
+import org.alfresco.web.site.FrameworkHelper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.dom4j.Document;
@@ -51,12 +52,12 @@ import org.dom4j.Element;
  * 
  * @author muzquiano
  */
-public class XMLCredentialVault extends SimpleCredentialVault
+public class XMLCredentialVault extends PersistentCredentialVault
 {
     private static Log logger = LogFactory.getLog(XMLCredentialVault.class);
     
     /**
-     * Instantiates a new xML credential vault.
+     * Instantiates a new XML credential vault.
      * 
      * @param id the id
      * @param descriptor the descriptor
@@ -65,28 +66,7 @@ public class XMLCredentialVault extends SimpleCredentialVault
     {
         super(id, descriptor);
     }
-        
-    /**
-     * Gets the location.
-     * 
-     * @return the location
-     */
-    public String getLocation()
-    {
-        String location = null;
-        
-        if(this.descriptor != null)
-        {
-            location = (String) this.descriptor.getProperty("location");
-        }
-        if(location == null)
-        {
-            location = "/vault";
-        }
-        
-        return location;
-    }
-        
+                
     /* (non-Javadoc)
      * @see org.alfresco.connector.CredentialVault#load()
      */
@@ -168,6 +148,27 @@ public class XMLCredentialVault extends SimpleCredentialVault
     }
     
     /**
+     * Gets the location.
+     * 
+     * @return the location
+     */
+    protected String getLocation()
+    {
+        String location = null;
+        
+        if(this.descriptor != null)
+        {
+            location = (String) this.descriptor.getProperty("location");
+        }
+        if(location == null)
+        {
+            location = "/vault";
+        }
+        
+        return location;
+    }
+    
+    /**
      * Serialize.
      * 
      * @return the string
@@ -185,19 +186,25 @@ public class XMLCredentialVault extends SimpleCredentialVault
         {
             String endpointId = (String) it.next();
             
-            Element endpointElement = rootElement.addElement("endpoint");
-            endpointElement.addAttribute("id", endpointId);
-                        
-            Credentials credentials = retrieve(endpointId);
-
-            String[] keys = credentials.getPropertyKeys();
-            for(int i = 0; i < keys.length; i++)
-            {
-                String value = (String) credentials.getProperty(keys[i]);
-                
-                Element credentialElement = endpointElement.addElement("credential");
-                credentialElement.addAttribute("id", keys[i]);
-                credentialElement.setText(value);
+            // check whether this endpoint id is a persistent one
+            EndpointDescriptor descriptor = FrameworkHelper.getEndpoint(endpointId);
+            if(descriptor.getPersistent())
+            {    
+                // store it
+                Element endpointElement = rootElement.addElement("endpoint");
+                endpointElement.addAttribute("id", endpointId);
+                            
+                Credentials credentials = retrieve(endpointId);
+    
+                String[] keys = credentials.getPropertyKeys();
+                for(int i = 0; i < keys.length; i++)
+                {
+                    String value = (String) credentials.getProperty(keys[i]);
+                    
+                    Element credentialElement = endpointElement.addElement("credential");
+                    credentialElement.addAttribute("id", keys[i]);
+                    credentialElement.setText(value);
+                }
             }
         }
 
@@ -212,7 +219,7 @@ public class XMLCredentialVault extends SimpleCredentialVault
     protected void deserialize(String xml)
     {
         // reset the map
-        credentialsMap = new HashMap<String, Credentials>(16, 1.0f);
+        //credentialsMap = new HashMap<String, Credentials>(16, 1.0f);
         
         // doc
         Document d = null;
@@ -229,23 +236,28 @@ public class XMLCredentialVault extends SimpleCredentialVault
                 Element endpointElement = (Element) endpoints.get(i);
                 String endpointId = endpointElement.attributeValue("id");
                 
-                // create the credentials object
-                Credentials credz = new SimpleCredentials(endpointId);
+                // check whether this endpoint id is a persistent one
+                EndpointDescriptor descriptor = FrameworkHelper.getEndpoint(endpointId);
+                if(descriptor.getPersistent())
+                {                
+                    // create the credentials object
+                    Credentials credz = newCredentials(endpointId);
+                    
+                    // populate
+                    List credentialsList = endpointElement.elements("credential");
+                    for(int k = 0; k < credentialsList.size(); k++)
+                    {
+                        Element credential = (Element) credentialsList.get(k);
+                        
+                        String credentialId = credential.attributeValue("id");
+                        String credentialValue = credential.getTextTrim();
+                        
+                        credz.setProperty(credentialId, credentialValue);
+                    }
                 
-                // populate
-                List credentialsList = endpointElement.elements("credential");
-                for(int k = 0; k < credentialsList.size(); k++)
-                {
-                    Element credential = (Element) credentialsList.get(k);
-                    
-                    String credentialId = credential.attributeValue("id");
-                    String credentialValue = credential.getTextTrim();
-                    
-                    credz.setProperty(credentialId, credentialValue);
+                    // set onto map
+                    store(credz);
                 }
-                
-                // set onto map
-                store(credz);
             }
         }
         catch(Exception ex)

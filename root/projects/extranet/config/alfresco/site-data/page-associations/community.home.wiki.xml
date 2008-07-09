@@ -5,4 +5,9 @@
   <source-id>home</source-id>
   <dest-id>wiki</dest-id>
   <assoc-type>community</assoc-type>
+  
+  <properties>
+  	<sort-order>3</sort-order>
+  </properties>
+  
 </page-association>

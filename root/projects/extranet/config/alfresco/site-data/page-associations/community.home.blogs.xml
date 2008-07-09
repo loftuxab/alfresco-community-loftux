@@ -5,4 +5,9 @@
   <source-id>home</source-id>
   <dest-id>blogs</dest-id>
   <assoc-type>community</assoc-type>
+  
+  <properties>
+  	<sort-order>1</sort-order>
+  </properties>
+  
 </page-association>

@@ -1,43 +1,56 @@
+<#assign endpointImage = "/images/extranet/user_credentials_32.gif">
+
+<#assign cleartextUsername = "">
+<#assign cleartextPassword = "">
+
+<#if vault.properties[endpointId]?exists>
+	<#assign credentials = vault.properties[endpointId]>
+	<#assign cleartextUsername = credentials.properties["cleartextUsername"]>
+	<#assign cleartextPassword = credentials.properties["cleartextPassword"]>	
+</#if>
+
 <p align="center">
 <br/>
 <br/>
 
 
-View Credentials for ${user.fullName}
+Editing Credentials '${endpointId}' for '${user.fullName}'
 <br/>
 <br/>
 
 <form action="${url.full}" method="POST">
 
-<#list vault.properties?keys as endpointId>
-
-	<table border="1">
+	<table border="0">
 		<tr>
+			<td><img src="${url.context}${endpointImage}"/></td>
 			<td colspan="2">
-				<b>${endpointId}</b>
+				<b>${endpointName}</b>
+				<br/>
+				<i>${endpointDescription}</i>
 			</td>
 		</tr>
-	<#assign credentials = vault.properties[endpointId]>
-	<#list credentials.properties?keys as propertyKey>
-
-		<#assign propertyValue = credentials.properties[propertyKey]>
-		
 		<tr>
-			<td>${propertyKey}</td>
+			<td></td>
+			<td>User ID</td>
 			<td>
-				<input name="PARAM_${endpointId}_${propertyKey}" value="${propertyValue}"/>
+				<input name="PARAM_${endpointId}_cleartextUsername" value="${cleartextUsername}"/>
 			</td>
 		</tr>
-		
-	</#list>
+		<tr>
+			<td></td>
+			<td>Password</td>
+			<td>
+				<input name="PARAM_${endpointId}_cleartextPassword" type="password" value="${cleartextPassword}"/>
+			</td>
+		</tr>
 	</table>
 	
 	<hr/>
-</#list>
 
+<input type="hidden" name="endpointId" value="${endpointId}"/>
 <input type="hidden" name="command" value="update"/>
-<input type="hidden" name="successUrl" value='<@link pageType="viewcredentials"/>'/>
-<input type="hidden" name="failureUrl" value='<@link pageType="editcredentials"/>'/>
+<input type="hidden" name="successUrl" value='${url.context}<@link pageType="viewcredentials"/>'/>
+<input type="hidden" name="failureUrl" value='${url.context}<@link pageType="editcredentials"/>&endpointId=${endpointId}'/>
 <input type="submit" value="Save" />
 
 </form>

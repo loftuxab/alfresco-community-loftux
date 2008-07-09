@@ -1,0 +1,8 @@
+<webscript>
+  <shortname>Release Management</shortname>
+  <description>Release Management</description>
+  <url>/releasemgmt</url>
+  <format default="html">argument</format>
+  <authentication>admin</authentication>
+  <transaction>required</transaction>
+</webscript>

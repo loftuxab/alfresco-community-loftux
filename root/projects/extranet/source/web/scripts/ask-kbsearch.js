@@ -128,11 +128,29 @@
 			 var icon = dataArray[i].getElementsByTagName('icon');
 			 var url = 'http://hosted13.alfresco.com';
 			
+			
+			 // Changed by Uzi:  Build a link that proxies through the endpoint servlet
+			 //swfHyperLink = link[0].attributes.getNamedItem("href").nodeValue;
+			 //swfHyperLink = 'http://hosted13.alfresco.com' + explodeDomainName(swfHyperLink);
 			 swfHyperLink = link[0].attributes.getNamedItem("href").nodeValue;
-			 swfHyperLink = 'http://hosted13.alfresco.com' + explodeDomainName(swfHyperLink);
+			 var y = swfHyperLink.indexOf("/d/a");
+			 if(y > -1)
+			 {
+				swfHyperLink = '/extranet/proxy/alfresco/api/node/content' + swfHyperLink.substring(y+4);
+			 }
 			 
+			 // Changed by Uzi:  Build a link that proxies through the endpoint servlet			 
+			//pdfHyperLink = originallink[0].attributes.getNamedItem("href").nodeValue;
+			//pdfHyperLink = 'http://hosted13.alfresco.com' + explodeDomainName(pdfHyperLink);
 			pdfHyperLink = originallink[0].attributes.getNamedItem("href").nodeValue;
-			pdfHyperLink = 'http://hosted13.alfresco.com' + explodeDomainName(pdfHyperLink);
+			var x = pdfHyperLink.indexOf("/d/a");
+			if(x > -1)
+			{
+				pdfHyperLink = '/extranet/proxy/alfresco/api/node/content' + pdfHyperLink.substring(x+4);
+			}
+
+
+			//http://hosted13.alfresco.com/alfresco/service/api/path/content/workspace/SpacesStore/Company%20Home/Alfresco/AlfrescoPhonelist.pdf
 
 			iconLink = icon[0].firstChild.data;
 			iconLink = 'http://hosted13.alfresco.com' + explodeDomainName(iconLink)
