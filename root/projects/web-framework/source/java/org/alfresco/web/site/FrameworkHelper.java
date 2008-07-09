@@ -39,7 +39,8 @@ import org.alfresco.util.ReflectionHelper;
 import org.alfresco.web.config.RemoteConfigElement;
 import org.alfresco.web.config.WebFrameworkConfigElement;
 import org.alfresco.web.config.RemoteConfigElement.EndpointDescriptor;
-import org.alfresco.web.framework.WebFrameworkService;
+import org.alfresco.web.framework.PresetsManager;
+import org.alfresco.web.framework.WebFrameworkManager;
 import org.alfresco.web.site.exception.FrameworkInitializationException;
 import org.alfresco.web.site.exception.RequestContextException;
 import org.apache.commons.logging.Log;
@@ -53,13 +54,18 @@ import org.springframework.context.ApplicationContext;
  */
 public final class FrameworkHelper
 {
+    private static final String WEB_CONFIG_ID = "web.config";
+    private static final String WEBFRAMEWORK_MANAGER_ID = "webframework.manager";
     private static final String CONNECTOR_SERVICE_ID = "connector.service";
+    private static final String PRESETS_MANAGER_ID = "webframework.presets.manager";
     
     private static Log logger = LogFactory.getLog(FrameworkHelper.class);
     
     private static ApplicationContext applicationContext = null;
-    private static WebFrameworkService webFrameworkService = null;
+    private static WebFrameworkManager webFrameworkManager = null;
     private static ConnectorService connectorService = null;
+    private static PresetsManager presetManager = null;
+    private static ConfigService configService = null;
     private static RemoteConfigElement remoteConfig = null;
     private static WebFrameworkConfigElement webFrameworkConfig = null;
     private static UserFactory userFactory = null;
@@ -88,16 +94,18 @@ public final class FrameworkHelper
         	
             
             // Get the WebFramework spring bean services
-            webFrameworkService = (WebFrameworkService)getApplicationContext().getBean("webframework.service");
-            connectorService = (ConnectorService)getApplicationContext().getBean(CONNECTOR_SERVICE_ID);
+            webFrameworkManager = (WebFrameworkManager)applicationContext.getBean(WEBFRAMEWORK_MANAGER_ID);
+            connectorService = (ConnectorService)applicationContext.getBean(CONNECTOR_SERVICE_ID);
+            presetManager = (PresetsManager)applicationContext.getBean(PRESETS_MANAGER_ID);
             
             
             // init config caches
-            ConfigService configService = (ConfigService) applicationContext.getBean("web.config");
+            configService = (ConfigService)applicationContext.getBean(WEB_CONFIG_ID);
             Config config = configService.getConfig("Remote");
             remoteConfig = (RemoteConfigElement)config.getConfigElement("remote");
-            config = getConfigService().getConfig("WebFramework");
+            config = configService.getConfig("WebFramework");
             webFrameworkConfig = (WebFrameworkConfigElement)config.getConfigElement("web-framework");
+            
             
             // store the real path to the servlet context
             realPath = servletContext.getRealPath("/");
@@ -113,16 +121,16 @@ public final class FrameworkHelper
             String className = "org.alfresco.web.site.DefaultUserFactory";
             
             // check the config for an override
-            String defaultId = getConfig().getDefaultUserFactoryId();
+            String defaultId = webFrameworkConfig.getDefaultUserFactoryId();
             if (defaultId != null)
             {
-                String _className = getConfig().getUserFactoryDescriptor(defaultId).getImplementationClass();
+                String _className = webFrameworkConfig.getUserFactoryDescriptor(defaultId).getImplementationClass();
                 if (_className != null)
                 {
                     className = _className;
                 }
             }
-            UserFactory factory = (UserFactory) ReflectionHelper.newObject(className);
+            UserFactory factory = (UserFactory)ReflectionHelper.newObject(className);
             if (factory == null)
             {
                 throw new FrameworkInitializationException(
@@ -185,9 +193,9 @@ public final class FrameworkHelper
         return isInitialized;
     }
     
-    public static WebFrameworkService getWebFrameworkService()
+    public static WebFrameworkManager getWebFrameworkManager()
     {
-        return webFrameworkService;
+        return webFrameworkManager;
     }
     
     public static String getRealPath(String path)
@@ -203,7 +211,7 @@ public final class FrameworkHelper
         }
         return newPath;
     }
-        
+    
     public static Log getLogger()
     {
         return logger;
@@ -221,17 +229,22 @@ public final class FrameworkHelper
     
     public static ConfigService getConfigService()
     {
-    	return (ConfigService)applicationContext.getBean("web.config");
+    	return configService;
     }
     
     public static ApplicationContext getApplicationContext()
     {
     	return applicationContext;
     }
-        
+    
     public static ConnectorService getConnectorService()
     {
         return connectorService;
+    }
+    
+    public static PresetsManager getPresetsManager()
+    {
+        return presetManager;
     }
     
     public static EndpointDescriptor getEndpoint(String endpointId)

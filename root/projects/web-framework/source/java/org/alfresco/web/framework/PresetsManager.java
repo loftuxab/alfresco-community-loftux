@@ -1,0 +1,282 @@
+/*
+ * Copyright (C) 2005-2007 Alfresco Software Limited.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+
+ * As a special exception to the terms and conditions of version 2.0 of 
+ * the GPL, you may redistribute this Program in connection with Free/Libre 
+ * and Open Source Software ("FLOSS") applications as described in Alfresco's 
+ * FLOSS exception.  You should have recieved a copy of the text describing 
+ * the FLOSS exception, and it is also available here: 
+ * http://www.alfresco.com/legal/licensing
+ */
+package org.alfresco.web.framework;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.alfresco.error.AlfrescoRuntimeException;
+import org.alfresco.tools.XMLUtil;
+import org.alfresco.web.framework.model.Component;
+import org.alfresco.web.framework.model.Page;
+import org.alfresco.web.scripts.SearchPath;
+import org.alfresco.web.scripts.Store;
+import org.alfresco.web.site.Model;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
+
+/**
+ * Spring util bean responsible for preset model object generation.
+ * 
+ * Presets are defined a XML snippets representing the page and component bindings
+ * for a given set.
+ * 
+ * Each preset supports any number of "token" name/value pair replacements. For example
+ * <pre>
+ *     <preset id="site-dashboard">
+ *         <components>
+ *             <component>
+ *                 <scope>${scope}</scope>
+ *                 <region-id>title</region-id>
+ *                 <source-id>site/${siteid}/dashboard</source-id>
+ *                 <url>/components/title/collaboration-title</url>
+ *             </component>
+ *             ...
+ * </pre>
+ * where the values of "${scope}" and "${siteid}" would be replaced if supplied in token map.
+ * 
+ * @author Kevin Roast
+ */
+public class PresetsManager implements ApplicationListener
+{
+    private SearchPath searchPath;
+    private List<String> files;
+    
+    private Document[] documents;
+    
+    
+    /**
+     * @param searchPath        the SearchPath to set
+     */
+    public void setSearchPath(SearchPath searchPath)
+    {
+        this.searchPath = searchPath;
+    }
+
+    /**
+     * @param files             the preset files list to set
+     */
+    public void setFiles(List<String> files)
+    {
+        this.files = files;
+    }
+    
+    
+    /* (non-Javadoc)
+     * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
+     */
+    public void onApplicationEvent(ApplicationEvent event)
+    {
+        if (event instanceof ContextRefreshedEvent)
+        {
+            ApplicationContext refreshContext = ((ContextRefreshedEvent)event).getApplicationContext();
+            if (refreshContext != null)
+            {
+                init();
+            }
+        }
+    }
+    
+    /**
+     * Initialise the presets manager
+     */
+    public void init()
+    {
+        if (this.searchPath == null || this.files == null)
+        {
+            throw new IllegalArgumentException("SearchPath and Files list are mandatory.");
+        }
+        
+        // search for our preset XML descriptor documents
+        List<Document> docs = new ArrayList<Document>(4);
+        for (Store store : this.searchPath.getStores())
+        {
+            for (String file : this.files)
+            {
+                if (store.hasDocument(file))
+                {
+                    try
+                    {
+                        docs.add(XMLUtil.parse(store.getDocument(file)));
+                    }
+                    catch (IOException ioe)
+                    {
+                        throw new AlfrescoRuntimeException("Error loading presets XML file: " +
+                                file + " in store: " + store.toString(), ioe);
+                    }
+                    catch (DocumentException de)
+                    {
+                        throw new AlfrescoRuntimeException("Error processing presets XML file: " +
+                                file + " in store: " + store.toString(), de);
+                    }
+                }
+            }
+        }
+        this.documents = docs.toArray(new Document[docs.size()]);
+    }
+    
+    /**
+     * Construct the model objects for a given preset.
+     * Objects persist to the default store for the appropriate object type.
+     * 
+     * @param id        Preset ID to use
+     * @param tokens    Name value pair tokens to replace in preset definition
+     */
+    public void constructPreset(Model model, String id, Map<String, String> tokens)
+    {
+        if (id == null)
+        {
+            throw new IllegalArgumentException("Preset ID is mandatory.");
+        }
+        
+        for (Document doc : this.documents)
+        {
+            for (Element preset : (List<Element>)doc.getRootElement().elements("preset"))
+            {
+                // found preset with matching id?
+                if (id.equals(preset.attributeValue("id")))
+                {
+                    // any components in the preset?
+                    Element components = preset.element("components");
+                    if (components != null)
+                    {
+                        for (Element c : (List<Element>)components.elements("component"))
+                        {
+                            // apply token replacement to each value as it is retrieved
+                            String title = replace(c.elementTextTrim(Component.PROP_TITLE), tokens);
+                            String description = replace(c.elementTextTrim(Component.PROP_DESCRIPTION), tokens);
+                            String typeId = replace(c.elementTextTrim(Component.PROP_COMPONENT_TYPE_ID), tokens);
+                            String scope = replace(c.elementTextTrim(Component.PROP_SCOPE), tokens);
+                            String regionId = replace(c.elementTextTrim(Component.PROP_REGION_ID), tokens);
+                            String sourceId = replace(c.elementTextTrim(Component.PROP_SOURCE_ID), tokens);
+                            String url = replace(c.elementTextTrim(Component.PROP_URL), tokens);
+                            String chrome = replace(c.elementTextTrim(Component.PROP_CHROME), tokens);
+                            
+                            // validate mandatory values
+                            if (scope == null || scope.length() == 0)
+                            {
+                                throw new IllegalArgumentException("Scope is a mandatory property for a component preset.");
+                            }
+                            if (regionId == null || regionId.length() == 0)
+                            {
+                                throw new IllegalArgumentException("RegionID is a mandatory property for a component preset.");
+                            }
+                            if (sourceId == null || sourceId.length() == 0)
+                            {
+                                throw new IllegalArgumentException("SourceID is a mandatory property for a component preset.");
+                            }
+                            
+                            // generate component
+                            Component component = model.newComponent(scope, regionId, sourceId);
+                            component.setComponentTypeId(typeId);
+                            component.setTitle(title);
+                            component.setDescription(description);
+                            component.setURL(url);
+                            component.setChrome(chrome);
+                            
+                            // persist the object
+                            model.saveObject(component);
+                        }
+                    }
+                    
+                    // any pages in the preset?
+                    Element pages = preset.element("pages");
+                    if (pages != null)
+                    {
+                        for (Element p : (List<Element>)pages.elements("page"))
+                        {
+                            // apply token replacement to each value as it is retrieved
+                            String pageId = replace(p.attributeValue(Page.PROP_ID), tokens);
+                            String title = replace(p.elementTextTrim(Page.PROP_TITLE), tokens);
+                            String description = replace(p.elementTextTrim(Page.PROP_DESCRIPTION), tokens);
+                            String typeId = replace(p.elementTextTrim(Page.PROP_PAGE_TYPE_ID), tokens);
+                            String auth = replace(p.elementTextTrim(Page.PROP_AUTHENTICATION), tokens);
+                            String template = replace(p.elementTextTrim(Page.PROP_TEMPLATE_INSTANCE), tokens);
+                            
+                            // validate mandatory values
+                            if (pageId == null || pageId.length() == 0)
+                            {
+                                throw new IllegalArgumentException("PageID is a mandatory property for a page preset.");
+                            }
+                            if (template == null || template.length() == 0)
+                            {
+                                throw new IllegalArgumentException("Template is a mandatory property for a page preset.");
+                            }
+                            
+                            // generate page
+                            Page page = model.newPage(pageId);
+                            page.setPageTypeId(typeId);
+                            page.setTitle(title);
+                            page.setDescription(description);
+                            page.setAuthentication(auth);
+                            page.setTemplateId(template);
+                            
+                            // persist the object
+                            model.saveObject(page);
+                        }
+                    }
+                    
+                    // TODO: any template instances in the preset?
+                    // TODO: any chrome, associations, types, themes etc. in the preset...
+                    
+                    // found our preset - no need to process further
+                    break;
+                }
+            }
+        }
+    }
+    
+    
+    /**
+     * Replace token strings - marked by ${...} in the given string with
+     * the supplied tokens.
+     * 
+     * @param s         String to process (can be null - will return null)
+     * @param tokens    Token map (can be null - will return original string)
+     * 
+     * @return replaced string or null if input is null or original string if tokens is null
+     */
+    private static String replace(String s, Map<String, String> tokens)
+    {
+        if (s != null && tokens != null)
+        {
+            for (Entry<String, String> entry : tokens.entrySet())
+            {
+                String key = "${" + entry.getKey() + "}";
+                s = s.replace(key, entry.getValue());
+            }
+        }
+        
+        return s;
+    }
+}

@@ -135,9 +135,37 @@
    <bean id="webscript.wizard" parent="webscript" class="org.alfresco.web.scripts.DeclarativeSiteWizardWebScript" singleton="false" />
 
 
-   <!--  Web Framework Service -->
-   <bean id="webframework.service" class="org.alfresco.web.framework.WebFrameworkService" init-method="init">
+   <!--  Web Framework Manager -->
+   <bean id="webframework.manager" class="org.alfresco.web.framework.WebFrameworkManager" init-method="init">
       <property name="configService" ref="web.config" />
+   </bean>
+   
+   
+   <!-- Stores containing presets for pre-generated pages and component bindings -->
+   <bean id="webframework.remotestore.presets" parent="webframework.remotestore">
+      <property name="path"><value>/site-data/presets</value></property>
+   </bean>
+   <bean id="webframework.classpathstore.presets" parent="webframework.classpathstore">
+      <property name="mustExist"><value>false</value></property>   
+      <property name="classPath"><value>alfresco/site-data/presets</value></property>
+   </bean>
+   <bean id="webframework.presets.searchpath" class="org.alfresco.web.scripts.SearchPath">
+      <property name="searchPath">
+         <list>
+            <ref bean="webframework.remotestore.presets" />
+            <ref bean="webframework.classpathstore.presets" />
+         </list>
+      </property>
+   </bean>
+   
+   <!-- Presets manager - should be configured to walk a search path for preset definition files -->
+   <bean id="webframework.presets.manager" class="org.alfresco.web.framework.PresetsManager">
+      <property name="searchPath" ref="webframework.presets.searchpath" />
+      <property name="files">
+         <list>
+            <value>presets.xml</value>
+         </list>
+      </property>
    </bean>
    
 </beans>

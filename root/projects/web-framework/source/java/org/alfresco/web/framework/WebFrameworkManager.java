@@ -44,14 +44,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 /**
- * The Class WebFrameworkService.
+ * WebFramework general manager. Responsible for loading of the beans to persist model
+ * objects in the system. Also deals with supplying persister objects for a given type.
+ * Initialised via the FrameworkHelper during main webframework initialisation.
  * 
  * @author muzquiano
+ * @author kevinr
  */
-public class WebFrameworkService
-    implements ApplicationContextAware
+public class WebFrameworkManager implements ApplicationContextAware
 {
-    private static final Log logger = LogFactory.getLog(WebFrameworkService.class);
+    private static final Log logger = LogFactory.getLog(WebFrameworkManager.class);
         
     /** The application context. */
     private ApplicationContext applicationContext;
@@ -70,6 +72,7 @@ public class WebFrameworkService
 
     /** A map of persister ids to Persister implementations. */
     private Map<String, ModelObjectPersister> persisterIdToPersisterMap;
+    
     
     /* (non-Javadoc)
      * @see org.springframework.context.ApplicationContextAware#setApplicationContext(org.springframework.context.ApplicationContext)

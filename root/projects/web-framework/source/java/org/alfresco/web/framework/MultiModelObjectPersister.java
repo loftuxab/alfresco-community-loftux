@@ -42,7 +42,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
     private static Log logger = LogFactory.getLog(MultiModelObjectPersister.class);
     private String persisterId;
     private String objectTypeId;
-    private WebFrameworkService service;    
+    private WebFrameworkManager service;    
     private Map<String, ModelObjectPersister> persisters = null;
     
     /**
@@ -52,7 +52,7 @@ public class MultiModelObjectPersister implements ModelObjectPersister
      * @param service the service
      * @param persisters the persisters
      */
-    public MultiModelObjectPersister(String objectTypeId, WebFrameworkService service, Map<String, ModelObjectPersister> persisters)
+    public MultiModelObjectPersister(String objectTypeId, WebFrameworkManager service, Map<String, ModelObjectPersister> persisters)
     {
         this.persisterId = "MultiModelObjectPersister_" + objectTypeId;
         this.objectTypeId = objectTypeId;

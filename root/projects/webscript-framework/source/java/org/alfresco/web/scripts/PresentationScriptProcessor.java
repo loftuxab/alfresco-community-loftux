@@ -59,9 +59,9 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
 {
     private static final Log logger = LogFactory.getLog(PresentationScriptProcessor.class);
     private static WrapFactory wrapFactory = new PresentationWrapFactory(); 
-    
+
     private static final String PATH_CLASSPATH = "classpath:";
-    
+
     protected SearchPath searchPath;
     protected ScriptLoader scriptLoader;
 
@@ -102,7 +102,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
     public Object executeScript(ScriptContent location, Map<String, Object> model)
     {
         // TODO: script caching (compiled version)
-        
+
         // read script content from location
         try
         {   
@@ -111,14 +111,14 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             byte[] bytes = os.toByteArray();
             String script = new String(bytes, "UTF-8");
             return executeScriptImpl(
-                  ScriptResourceHelper.resolveScriptImports(script, this, logger), model, location.isSecure());
+                    ScriptResourceHelper.resolveScriptImports(script, this, logger), model, location.isSecure());
         }
         catch (Throwable e)
         {
             throw new WebScriptException("Failed to load script '" + location.toString() + "': " + e.getMessage(), e);
         }
     }
-    
+
     /**
      * Load a script content from the specific resource path.
      *  
@@ -175,7 +175,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             }
         }
     }
-    
+
     /**
      * Execute the supplied script content.
      * 
@@ -195,7 +195,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         {
             startTime = System.nanoTime();
         }
-        
+
         Context cx = Context.enter();
         try
         {
@@ -227,7 +227,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
                     ScriptableObject.putProperty(scope, key, obj);
                 }
             }
-            
+
             // execute the script
             Object result = cx.evaluateString(scope, script, "AlfrescoScript", 1, null);
             return result;
@@ -239,7 +239,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         finally
         {
             Context.exit();
-            
+
             if (logger.isDebugEnabled())
             {
                 long endTime = System.nanoTime();
@@ -258,8 +258,8 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
      * 
      * @return unwrapped and converted value.
      */
-	 public Object unwrapValue(Object value)
-	 {
+    public Object unwrapValue(Object value)
+    {
         if (value == null)
         {
             return null;
@@ -275,37 +275,52 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             // a scriptable object will probably indicate a multi-value property
             // set using a JavaScript Array object
             ScriptableObject values = (ScriptableObject)value;
-            
+
             if (value instanceof IdScriptableObject)
             {
                 if ("Date".equals(((IdScriptableObject)value).getClassName()))
                 {
-                    Object javaObj = Context.jsToJava(value, Date.class);
-                    if (javaObj instanceof Serializable)
-                    {
-                        value = (Serializable)javaObj;
-                    }
+                    value = Context.jsToJava(value, Date.class);
                 }
                 else if (value instanceof NativeArray)
                 {
-                    // convert JavaScript array of values to a List of objects
+                    // convert JavaScript array of values to a List of Serializable objects
                     Object[] propIds = values.getIds();
-                    List<Object> propValues = new ArrayList<Object>(propIds.length);
-                    for (int i=0; i<propIds.length; i++)
-                    {
-                        // work on each key in turn
-                        Object propId = propIds[i];
-                        
-                        // we are only interested in keys that indicate a list of values
-                        if (propId instanceof Integer)
+                    if (isArray(propIds) == true)
+                    {                    
+                        List<Object> propValues = new ArrayList<Object>(propIds.length);
+                        for (int i=0; i<propIds.length; i++)
                         {
-                            // get the value out for the specified key
-                            Object val = values.get((Integer)propId, values);
-                            // recursively call this method to convert the value
-                            propValues.add(unwrapValue(val));
+                            // work on each key in turn
+                            Object propId = propIds[i];
+                            
+                            // we are only interested in keys that indicate a list of values
+                            if (propId instanceof Integer)
+                            {
+                                // get the value out for the specified key
+                                Object val = values.get((Integer)propId, values);
+                                // recursively call this method to convert the value
+                                propValues.add(unwrapValue(val));
+                            }
                         }
+
+                        value = propValues;
                     }
-                    value = propValues;
+                    else
+                    {
+                        Map<String, Object> propValues = new HashMap<String, Object>(propIds.length);
+                        for (Object propId : propIds)
+                        {
+                            if (propId instanceof String)
+                            {
+                                // Get the value and add to the map
+                                Object val = values.get((String)propId, values);
+                                propValues.put((String)propId, unwrapValue(val));
+                            }
+                        }
+                        
+                        value = propValues;
+                    }
                 }
                 else
                 {
@@ -316,7 +331,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
                     {
                         // work on each key in turn
                         Object propId = propIds[i];
-                        
+
                         // we are only interested in keys that indicate a list of values
                         if (propId instanceof String)
                         {
@@ -342,16 +357,36 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
             value = list;
         }
         return value;
-	 }
+    }
+    
+    /**
+     * Look at the id's of a native array and try to determine whether it's actually an Array or a Hashmap
+     * 
+     * @param ids       id's of the native array
+     * @return boolean  true if it's an array, false otherwise (ie it's a map)
+     */
+    private boolean isArray(Object[] ids)
+    {
+        boolean result = true;
+        for (int i=0; i<ids.length; i++)
+        {
+            if (ids[i] instanceof Integer == false)
+            {
+               result = false;
+               break;
+            }
+        }
+        return result;
+    }
 
-	/* (non-Javadoc)
-	 * @see org.alfresco.web.scripts.ScriptProcessor#reset()
-	 */
+    /* (non-Javadoc)
+     * @see org.alfresco.web.scripts.ScriptProcessor#reset()
+     */
     public void reset()
     {
         init();
     }
-    
+
 
     /**
      * Register script loader from each Web Script Store with Script Processor
@@ -371,7 +406,7 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         scriptLoader = new MultiScriptLoader(loaders.toArray(new ScriptLoader[loaders.size()]));
     }
 
-    
+
     /**
      * Wrap Factory for Rhino Script Engine
      * 
@@ -379,9 +414,9 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
      */
     public static class PresentationWrapFactory extends WrapFactory
     {
-    	/* (non-Javadoc)
-    	 * @see org.mozilla.javascript.WrapFactory#wrapAsJavaObject(org.mozilla.javascript.Context, org.mozilla.javascript.Scriptable, java.lang.Object, java.lang.Class)
-    	 */
+        /* (non-Javadoc)
+         * @see org.mozilla.javascript.WrapFactory#wrapAsJavaObject(org.mozilla.javascript.Context, org.mozilla.javascript.Scriptable, java.lang.Object, java.lang.Class)
+         */
         public Scriptable wrapAsJavaObject(Context cx, Scriptable scope, Object javaObject, Class staticType)
         {
             if (javaObject instanceof Map)
@@ -392,5 +427,4 @@ public class PresentationScriptProcessor implements ScriptProcessor, ScriptResou
         }
 
     }
-
 }

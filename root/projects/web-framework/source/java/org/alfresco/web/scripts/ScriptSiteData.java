@@ -299,7 +299,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newComponent(String componentTypeId)
     {
-        ParameterCheck.mandatory("componentTypeId", componentTypeId);
+        ParameterCheck.mandatoryString("componentTypeId", componentTypeId);
 
         Component component = (Component) getModel().newComponent();
         component.setComponentTypeId(componentTypeId);
@@ -318,9 +318,9 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newComponent(String scope, String regionId, String sourceId)
     {
-        ParameterCheck.mandatory("scope", scope);
-        ParameterCheck.mandatory("regionId", regionId);
-        ParameterCheck.mandatory("sourceId", sourceId);
+        ParameterCheck.mandatoryString("scope", scope);
+        ParameterCheck.mandatoryString("regionId", regionId);
+        ParameterCheck.mandatoryString("sourceId", sourceId);
         
         Component component = (Component) getModel().newComponent(scope, regionId, sourceId);
         component.setScope(scope);
@@ -343,10 +343,10 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newComponent(String componentTypeId, String scope, String regionId, String sourceId)
     {
-        ParameterCheck.mandatory("componentTypeId", componentTypeId);
-        ParameterCheck.mandatory("scope", scope);
-        ParameterCheck.mandatory("regionId", regionId);
-        ParameterCheck.mandatory("sourceId", sourceId);
+        ParameterCheck.mandatoryString("componentTypeId", componentTypeId);
+        ParameterCheck.mandatoryString("scope", scope);
+        ParameterCheck.mandatoryString("regionId", regionId);
+        ParameterCheck.mandatoryString("sourceId", sourceId);
         
         Component component = (Component) getModel().newComponent(scope, regionId, sourceId);
         component.setComponentTypeId(componentTypeId);
@@ -396,7 +396,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newConfiguration(String sourceId)
     {
-        ParameterCheck.mandatory("sourceId", sourceId);
+        ParameterCheck.mandatoryString("sourceId", sourceId);
 
         Configuration configuration = (Configuration) getModel().newConfiguration();
         configuration.setSourceId(sourceId);
@@ -426,7 +426,7 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newPage(String id)
     {
-        ParameterCheck.mandatory("id", id);
+        ParameterCheck.mandatoryString("id", id);
         Page page = (Page) getModel().newPage(id);
         return ScriptHelper.toScriptModelObject(context, page);
     }
@@ -442,9 +442,9 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newPage(String id, String title, String description)
     {
-        ParameterCheck.mandatory("id", id);
-        ParameterCheck.mandatory("title", title);
-        ParameterCheck.mandatory("description", description);
+        ParameterCheck.mandatoryString("id", id);
+        ParameterCheck.mandatoryString("title", title);
+        ParameterCheck.mandatoryString("description", description);
         
         Page page = (Page) getModel().newPage(id);
         page.setTitle(title);
@@ -479,7 +479,7 @@ public final class ScriptSiteData extends ScriptBase
      */
     public ScriptModelObject newTemplate(String templateTypeId)
     {
-        ParameterCheck.mandatory("templateTypeId", templateTypeId);
+        ParameterCheck.mandatoryString("templateTypeId", templateTypeId);
         TemplateInstance template = (TemplateInstance) getModel().newTemplate();
         template.setTemplateType(templateTypeId);
         return ScriptHelper.toScriptModelObject(context, template);
@@ -500,15 +500,35 @@ public final class ScriptSiteData extends ScriptBase
      */    
     public ScriptModelObject newTemplate(String templateTypeId, String title, String description)
     {
-        ParameterCheck.mandatory("templateTypeId", templateTypeId);
-        ParameterCheck.mandatory("title", title);
-        ParameterCheck.mandatory("description", description);
+        ParameterCheck.mandatoryString("templateTypeId", templateTypeId);
+        ParameterCheck.mandatoryString("title", title);
+        ParameterCheck.mandatoryString("description", description);
         
         TemplateInstance template = (TemplateInstance) getModel().newTemplate();
         template.setTemplateType(templateTypeId);
         template.setTitle(title);
         template.setDescription(description);
         return ScriptHelper.toScriptModelObject(context, template);
+    }
+    
+    /**
+     * Creates model objects based on a given preset id. The preset is looked up and
+     * processed by the PresetManager bean. The various objects found in the preset
+     * will be generated using the supplied name/value map of tokens.
+     * 
+     * @param presetId  ID of the preset to generate
+     * @param tokens    Token name/value map
+     */
+    public void newPreset(String presetId, Scriptable tokens)
+    {
+        ParameterCheck.mandatoryString("presetId", presetId);
+        Map<String, String> t = null;
+        Object val = getScriptProcessor().unwrapValue(tokens);
+        if (val instanceof Map)
+        {
+            t = (Map)val;
+        }
+        FrameworkHelper.getPresetsManager().constructPreset(context.getModel(), presetId, t);
     }
 
     /**
@@ -953,5 +973,10 @@ public final class ScriptSiteData extends ScriptBase
     {
         ModelObject obj = getModel().getTheme(objectId);
         return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    private static ScriptProcessor getScriptProcessor()
+    {
+        return (ScriptProcessor)FrameworkHelper.getApplicationContext().getBean("webframework.scriptprocessor");
     }
 }
