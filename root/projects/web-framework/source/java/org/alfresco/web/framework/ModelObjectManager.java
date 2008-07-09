@@ -240,7 +240,26 @@ public final class ModelObjectManager
      */
     public boolean removeObject(ModelObject object)
     {
-        return removeObject(object.getTypeId(), object.getPersisterId());
+        boolean removed = false;
+        
+        ModelObjectPersister persister = this.service.getPersisterById(object.getPersisterId());
+        if(persister != null)
+        {
+            try
+            {
+                if(logger.isDebugEnabled())
+                    logger.debug("Attempting to remove object '" + object.getId() + "' to persister id: " + persister.getId()); 
+                
+                removed = persister.removeObject(this.context, object.getId());
+            }
+            catch(ModelObjectPersisterException mope)
+            {
+                if(logger.isDebugEnabled())
+                    logger.debug("Unable to remove object: " + object.getId() + " of type " + object.getTypeId() + " from storage: " + persister.getId());                 
+            }            
+        }
+        
+        return removed;
     }
     
     /**

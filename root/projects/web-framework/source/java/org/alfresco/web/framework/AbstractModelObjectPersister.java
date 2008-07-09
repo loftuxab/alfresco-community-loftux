@@ -48,10 +48,10 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
     /* (non-Javadoc)
      * @see org.alfresco.web.framework.ModelObjectPersister#removeObject(org.alfresco.web.framework.ModelPersistenceContext, org.alfresco.web.framework.ModelObject)
      */
-    public boolean removeObject(ModelPersistenceContext context, ModelObject modelObject)
+    public boolean removeObject(ModelPersistenceContext context, ModelObject object)
         throws ModelObjectPersisterException    
     {
-        return removeObject(context, modelObject.getPersisterId());
+        return removeObject(context, object.getId());
     }
     
     /* (non-Javadoc)
@@ -59,7 +59,7 @@ public abstract class AbstractModelObjectPersister implements ModelObjectPersist
      */
     public boolean hasObject(ModelPersistenceContext context, ModelObject object)
     {
-        return hasObject(context, object.getPersisterId());
+        return hasObject(context, object.getId());
     }
     
     /**

@@ -818,23 +818,25 @@ public class Model
      */
     public void bindComponent(String componentId, String scope, String regionId, String sourceId)
     {
-        // first unassociate any existing components with these bindings
-        Map<String, ModelObject> objects = findComponents(scope, regionId, sourceId, null);
-        Iterator it = objects.keySet().iterator();
-        while(it.hasNext())
+        // get the component to bind in
+        Component component = getComponent(componentId);
+        bindComponent(component, scope, regionId, sourceId);        
+    }
+    
+    public void bindComponent(Component component, String scope, String regionId, String sourceId)
+    {
+        // remove any existing bound components
+        Component existingComponent = this.getComponent(scope, regionId, sourceId);
+        if(existingComponent != null)
         {
-            String id = (String) it.next();
-            unbindComponent(id);
+            removeObject(existingComponent);
         }
         
-        // get the component
-        Component component = getComponent(componentId);
-
         // bind it
         component.setScope(scope);
         component.setSourceId(sourceId);
         component.setRegionId(regionId);
-
+        
         // save the object
         saveObject(component);
     }
@@ -844,11 +846,11 @@ public class Model
      */
     public void unbindComponent(String componentId)
     {
-        Component component = getComponent(componentId);
-        component.setScope("");
-        component.setSourceId("");
-        component.setRegionId("");
-        saveObject(component);
+        Component existingComponent = getComponent(componentId);
+        if(existingComponent != null)
+        {
+            removeObject(existingComponent);
+        }
     }
     
     /**

@@ -291,4 +291,14 @@ public final class ScriptModelObject extends ScriptBase
         ParameterCheck.mandatory("propertyName", propertyName);
         modelObject.removeProperty(propertyName);
     }    
+    
+    /**
+     * Returns the model object
+     * 
+     * @return
+     */
+    public ModelObject getModelObject()
+    {
+        return this.modelObject;
+    }
 }
