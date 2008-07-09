@@ -52,3 +52,23 @@
    border: 1px solid black; 
 }
 
+.actionPanel {
+   float: right;
+   visibility: hidden;
+}
+
+.actionPanel .editPage {
+   background:url(../images/edit.png) no-repeat scroll 2px 5px;
+	padding-left: 20px;
+}
+
+.actionPanel .deletePage {
+   background:url(../images/delete.png) no-repeat scroll 2px 5px;
+  	padding-left: 20px;
+}
+ 
+.actionPanel .detailsPage {
+   background:url(../images/createtopic.png) no-repeat scroll 2px 5px;
+  	padding-left: 20px;
+}
+

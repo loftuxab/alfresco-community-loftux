@@ -7,6 +7,11 @@
 <#if pageList.pages?size &gt; 0>
 <#list pageList.pages as p>
    <div class="wikipage">
+   <div class="actionPanel">
+      <div class="editPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name}&action=edit">Edit</a></div>
+      <div class="detailsPage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name}">Details</a></div>
+      <div class="deletePage"><a href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name}">Delete</a></div>
+   </div>
    <div class="pageTitle"><a class="pageTitle" href="${url.context}/page/site/${page.url.templateArgs.site}/wiki-page?title=${p.name}">${p.title}</a></div>
    <div class="publishedDetails">
          <span class="attrLabel">Created by:</span> <span class="attrValue"><a href="">${p.createdBy}</a></span>
@@ -18,7 +23,7 @@
 			<span class="attrLabel">Modified on:</span> <span class="attrValue">${p.modifiedOn}</span>
 	</div>
    <div class="pageCopy">${p.text}</div>
-   </div>
+   </div><#-- End of wikipage -->
 </#list>
 <#else>
 There are currently no pages to display.
