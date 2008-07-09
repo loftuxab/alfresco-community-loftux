@@ -30,9 +30,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.alfresco.error.AlfrescoRuntimeException;
 import org.alfresco.tools.ObjectGUID;
 import org.alfresco.web.framework.model.Component;
-import org.alfresco.web.site.FrameworkHelper;
 
 /**
  * Static Utility class that provides reflection against the public
@@ -89,6 +89,8 @@ public final class ModelHelper
         
         // grab the cache of property keys
         Set<String> propertyMap;
+        // NOTE: synchronizing on a static object! this is bad!
+        // TODO: refactor this - should not require sync on static object
         synchronized (classMap)
         {
             propertyMap = classMap.get(modelClass.getName());
@@ -123,19 +125,14 @@ public final class ModelHelper
                 }
                 catch (IllegalAccessException iae)
                 {
-                	FrameworkHelper.getLogger().error(iae);
+                	throw new AlfrescoRuntimeException("Unable to inspect properties on model object class: " +
+                            modelClass.getName());
                 }
             }
         }
         
         // look up property in property map cache
-        if (propertyMap != null)
-        {
-            // glean what kind of property it is from the cache
-            return propertyMap.contains(propertyName);
-        }
-        
-        return false;
+        return propertyMap.contains(propertyName);
     }
 
     /**
@@ -145,8 +142,7 @@ public final class ModelHelper
      */
     public static String newGUID()
     {
-        ObjectGUID guid = new ObjectGUID();
-        return guid.toString();
+        return new ObjectGUID().toString();
     }   
     
     /**
@@ -157,10 +153,10 @@ public final class ModelHelper
      */
     public static void resetId(ModelObject object, String id)
     {
-        if(object instanceof AbstractModelObject)
+        if (object instanceof AbstractModelObject)
         {
             // not for components
-            if(object instanceof Component)
+            if (object instanceof Component)
             {
                 return;
             }

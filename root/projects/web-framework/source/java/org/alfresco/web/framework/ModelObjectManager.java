@@ -28,8 +28,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.alfresco.error.AlfrescoRuntimeException;
-import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.alfresco.web.framework.exception.ModelObjectManagerException;
+import org.alfresco.web.framework.exception.ModelObjectPersisterException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -54,7 +54,7 @@ public final class ModelObjectManager
 {
     private static final Log logger = LogFactory.getLog(ModelObjectManager.class);
 
-    private WebFrameworkService service;
+    private WebFrameworkManager service;
     private ModelPersistenceContext context;
     
     
@@ -68,7 +68,7 @@ public final class ModelObjectManager
      * @param service
      * @param context
      */
-    private ModelObjectManager(WebFrameworkService service, ModelPersistenceContext context)
+    private ModelObjectManager(WebFrameworkManager service, ModelPersistenceContext context)
     {
         this.service = service;
         this.context = context;
@@ -87,17 +87,17 @@ public final class ModelObjectManager
     /**
      * Static instantiator of ModelObjectServices
      * 
-     * @param service a valid WebFrameworkService instance
+     * @param service a valid WebFrameworkManager instance
      * @param context a valid PersisterContext instance
      * @return
      * @throws ModelObjectManagerException
      */
-    static ModelObjectManager newInstance(WebFrameworkService service, ModelPersistenceContext context)
+    static ModelObjectManager newInstance(WebFrameworkManager service, ModelPersistenceContext context)
         throws ModelObjectManagerException, IllegalArgumentException
     {
         if (service == null)
         {
-            throw new IllegalArgumentException("WebFrameworkService is null");
+            throw new IllegalArgumentException("WebFrameworkManager is null");
         }
         if (context == null)
         {
@@ -160,9 +160,9 @@ public final class ModelObjectManager
             {
                 obj = persister.newObject(this.context, objectId);
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Unable to create object: " + objectId + " of type " + objectTypeId, mope);
                 
                 // allow null to be returned
@@ -192,9 +192,9 @@ public final class ModelObjectManager
             {
                 obj = persister.newObject(this.context, objectId);
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Unable to create object: " + objectId + " of type " + objectTypeId, mope);
             }                
         }
@@ -216,14 +216,14 @@ public final class ModelObjectManager
         {
             try
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Attempting to save object '" + object.getId() + "' to persister id: " + persister.getId()); 
                 
                 saved = persister.saveObject(this.context, object);
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Unable to save object: " + object.getId() + " of type " + object.getTypeId() + " to storage: " + persister.getId()); 
             }                                
         }
@@ -240,26 +240,7 @@ public final class ModelObjectManager
      */
     public boolean removeObject(ModelObject object)
     {
-        boolean removed = false;
-        
-        ModelObjectPersister persister = this.service.getPersisterById(object.getPersisterId());
-        if(persister != null)
-        {
-            try
-            {
-                if(logger.isDebugEnabled())
-                    logger.debug("Attempting to remove object '" + object.getId() + "' to persister id: " + persister.getId()); 
-                
-                removed = persister.removeObject(this.context, object.getId());
-            }
-            catch(ModelObjectPersisterException mope)
-            {
-                if(logger.isDebugEnabled())
-                    logger.debug("Unable to remove object: " + object.getId() + " of type " + object.getTypeId() + " from storage: " + persister.getId());                 
-            }            
-        }
-        
-        return removed;
+        return removeObject(object.getTypeId(), object.getId());
     }
     
     /**
@@ -275,23 +256,20 @@ public final class ModelObjectManager
         boolean removed = false;
         
         ModelObjectPersister persister = this.service.getPersister(objectTypeId);
-        if(persister != null)
+        if (persister != null)
         {
-            boolean x = false;
             try
             {
-                x = persister.removeObject(this.context, objectId);
+                if (logger.isDebugEnabled())
+                    logger.debug("Attempting to remove object '" + objectId + "' from persister id: " + persister.getId()); 
+                
+                removed = persister.removeObject(this.context, objectId);
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("Unable to remove object: " + objectId + " of type " + objectTypeId, mope);
             }                
-
-            if(x)
-            {
-                removed = true;
-            }
         }
         
         return removed;
@@ -309,16 +287,15 @@ public final class ModelObjectManager
         Map<String, ModelObject> objects = new HashMap<String, ModelObject>(256, 1.0f);
 
         ModelObjectPersister persister = this.service.getPersister(objectTypeId);
-        if(persister != null)
+        if (persister != null)
         {
             try
             {
-                Map<String, ModelObject> persisterObjects = persister.getAllObjects(this.context);
-                objects.putAll(persisterObjects);
+                objects.putAll(persister.getAllObjects(this.context));
             }
-            catch(ModelObjectPersisterException mope)
+            catch (ModelObjectPersisterException mope)
             {
-                if(logger.isDebugEnabled())
+                if (logger.isDebugEnabled())
                     logger.debug("ModelObjectService unable to retrieve all objects", mope);                
             }
         }
