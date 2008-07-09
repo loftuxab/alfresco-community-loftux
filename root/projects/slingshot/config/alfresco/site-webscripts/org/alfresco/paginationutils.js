@@ -66,25 +66,25 @@ function getValidPageRange(data)
  * Fetches pagination params from the request
  * Note: Use this function for webscripts that are called in a page context
  */
-function fetchPaginationDataFromPageRequest(defaultPos, defaultSize)
+function fetchPaginationDataFromPageRequest(defaultStartIndex, defaultPageSize)
 {
     // create data object initialized with default values
     var paginationData = {
-        startIndex: defaultPos,
-        pageSize: defaultSize
+        startIndex: defaultStartIndex,
+        pageSize: defaultPageSize
     };
     
     // check what variables we can find in the page request
-    if (page.url.args["pos"] != undefined)
+    if (page.url.args["startIndex"] != undefined)
     {
-        paginationData.startIndex = parseInt(page.url.args["pos"]);
+        paginationData.startIndex = parseInt(page.url.args["startIndex"]);
     }
-    if (page.url.args["size"] != undefined)
+    if (page.url.args["pageSize"] != undefined)
     {
-        paginationData.pageSize = parseInt(page.url.args["size"]);
+        paginationData.pageSize = parseInt(page.url.args["pageSize"]);
     }
 
-    return paginationData;   
+    return sanityCheckData(paginationData);
 }
 
 /**
@@ -92,24 +92,40 @@ function fetchPaginationDataFromPageRequest(defaultPos, defaultSize)
  * 
  * Note: Use this function for directly called webscripts
  */
-function fetchPaginationDataFromRequest(defaultPos, defaultSize)
+function fetchPaginationDataFromRequest(defaultStartIndex, defaultPageSize)
 {
     // create data object initialized with default values
     var paginationData = {
-        startIndex: defaultPos,
-        pageSize: defaultSize
+        startIndex: defaultStartIndex,
+        pageSize: defaultPageSize
     };
 
     // check what variables we can find in the request
-    if (args["pos"] != undefined)
+    if (args["startIndex"] != undefined)
     {
-        paginationData.startIndex = parseInt(args["pos"]);
+        paginationData.startIndex = parseInt(args["startIndex"]);
     }
-    if (args["size"] != undefined)
+    if (args["pageSize"] != undefined)
     {
-        paginationData.pageSize = parseInt(args["size"]);
+        paginationData.pageSize = parseInt(args["pageSize"]);
     }
     
+    return sanityCheckData(paginationData);
+}
+
+/**
+ * Ensures that startIndex and pageSize have reasonable values
+ */
+function sanityCheckData(paginationData)
+{
+    if (paginationData.pageSize == undefined || paginationData.pageSize == null || paginationData.pageSize < 1)
+    {
+        paginationData.pageSize = 10;
+    }
+    if (paginationData.startIndex == undefined || paginationData.startIndex == null || paginationData.startIndex < 0)
+    {
+        paginationData.startIndex = 0;
+    }
     return paginationData;
 }
 

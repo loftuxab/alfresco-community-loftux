@@ -75,14 +75,14 @@
          path: "",
          
          /**
-          * Position inside the pages
+          * Position of the first displayed element
           */
-         pos: 0,
+         startIndex: 0,
          
          /**
           * Size of elements to show
           */
-         size: 10,
+         pageSize: 10,
          
          filter: "",
          
@@ -133,9 +133,6 @@
        */
       onReady: function BlogPostList_onReady()
       {
-         // used by the filter, tag and view buttons to set options
-         YAHOO.Bubbling.on("onSetBlogPostListParams", this.onSetPostListParams, this);
-
          // Links - PENDING: this should be done in a more generic way
          YAHOO.util.Event.addListener("simple-list-view", "click",
             function simpleListViewClicked(e) {
@@ -149,32 +146,16 @@
                return true;
             }
          ); 
-          
-         // Event on Paginator
-         var me = this;
-         YAHOO.Bubbling.addDefaultAction("pagerItem", function Blog_onPostPaginationClicked(layer, args)
-         {
-         	// TODO: Changer filter to use current filter-
-            //var owner = YAHOO.Bubbling.fire('onSetPostListParams', {page : args[1].el.id, filter : 'new'});
-            //return true;
-            var elem = args[1].anchor;
-            if (elem.id.substring(0, "GoToPrevious".length) == "GoToPrevious") {
-                me.options.pos = me.options.pos - me.options.size;
-                me._reloadData();
-            }
-            else if (elem.id.substring(0, "GoToNext".length) == "GoToNext") {
-                me.options.pos = me.options.pos + me.options.size;
-                me._reloadData();
-            }
-            else if (elem.id.substring(0, "GoToPage-".length) == "GoToPage-") {
-                var page = elem.id.substring("GoToPage-".length);
-                me.options.pos = (page-1) * me.options.size;
-                me._reloadData();
-            }
-         });
+
+         // used by the filter, tag and view buttons to set options
+         YAHOO.Bubbling.on("onSetBlogPostListParams", this.onSetPostListParams, this);
+
+         // catch paginator events
+         YAHOO.Bubbling.on("onStartIndexChanged", this.onStartIndexChanged, this);
          
          // Hook action events
-         Alfresco.util.registerDefaultActionHandler(this.id, "action-link", "div", this);
+         Alfresco.util.registerDefaultActionHandler(this.id, "action-link-div", "div", this);
+         Alfresco.util.registerDefaultActionHandler(this.id, "action-link-span", "span", this);
          
          // initialize the mouse over listener
          Alfresco.util.rollover.registerHandlerFunctions(this.id, this.onListElementMouseEntered, this.onListElementMouseExited);
@@ -208,26 +189,26 @@
       /**
        * Action handler for the view action
        */
-      onViewNode: function BlogPostList_onViewPost(htmlId, ownerId, postId)
+      onViewNode: function BlogPostList_onViewPost(htmlId, ownerId, param)
       {
-         Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, this.options.path, postId);
+         Alfresco.util.blog.loadBlogPostViewPage(this.options.siteId, this.options.containerId, this.options.path, param);
       },
       
-      onEditNode: function BlogPostList_onEditNode(htmlId, ownerId, postId)
+      onEditNode: function BlogPostList_onEditNode(htmlId, ownerId, param)
       {
-         Alfresco.util.blog.loadBlogPostEditPage(this.options.siteId, this.options.containerId, this.options.path, postId);
+         Alfresco.util.blog.loadBlogPostEditPage(this.options.siteId, this.options.containerId, this.options.path, param);
       },
       
       /**
        * Deletes a post.
        */
-      onDeleteNode: function BlogPost_onDeletePost(htmlId, ownerId, postId)
+      onDeleteNode: function BlogPost_onDeletePost(htmlId, ownerId, param)
       {
          // make an ajax request to delete the post
          // we can directly go to alfresco for this
          Alfresco.util.Ajax.request(
 		   {
-		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" /* ADD PATH */ + id,
+		      url: Alfresco.constants.PROXY_URI + "blog/post/site/" + this.options.siteId + "/" + this.options.containerId + "/" /* ADD PATH */ + param,
 		      method: "DELETE",
 		      responseContentType : "application/json",
 		      successCallback:
@@ -259,13 +240,13 @@
                     this.options.siteId + "/" + this.options.containerId + "/" + postId + "/publishing";
       },
       
-      onPublishExternal: function Blog_onPublishExternal(htmlId, ownerId, postId)
+      onPublishExternal: function Blog_onPublishExternal(htmlId, ownerId, param)
       {
          var me = this;
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: me._getPublishingRestUrl(postId),
+		      url: me._getPublishingRestUrl(param),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -288,12 +269,12 @@
           location.reload(true);
       },
      
-      onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, postId)
+      onUpdateExternal: function Blog_onUpdateExternal(htmlId, ownerId, param)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: this._getPublishingRestUrl(postId),
+		      url: this._getPublishingRestUrl(param),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -316,12 +297,12 @@
           location.reload(true);
       },    
 
-      onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, postId)
+      onUnpublishExternal: function Blog_onUnpublishExternal(htmlId, ownerId, param)
       {
          // make an ajax request to publish the post
          Alfresco.util.Ajax.request(
 		   {
-		      url: this._getPublishingRestUrl(postId),
+		      url: this._getPublishingRestUrl(param),
 		      method: "POST",
 		      requestContentType : "application/json",
 		      responseContentType : "application/json",
@@ -396,6 +377,16 @@
          // reload the table
          this._reloadData();
 	  },
+	  
+	  /**
+	   * Handles paginator events
+	   */
+	  onStartIndexChanged: function BlogPostList_onPageIndexChanged(layer, args)
+	  {
+	     this.options.pageSize = args[1].pageSize;
+	     this.options.startIndex = args[1].startIndex;
+	     this._reloadData();
+	  },
       
       _reloadData: function Blog__reloadData() 
       {
@@ -407,8 +398,8 @@
 		      {
 		         site    : this.options.siteId,
 		         htmlid  : this.id,
-		         pos     : this.options.pos,
-		         size    : this.options.size,
+		         startIndex : this.options.startIndex,
+		         pageSize : this.options.pageSize,
 		         filter  : this.options.filter,
 		         tag     : this.options.tag,
 		         viewmode: this.options.viewmode,
@@ -433,12 +424,13 @@
 	     }
 	     else
 	     {
-	        // update paginator
-  	        var elem = YAHOO.util.Dom.get(this.id + "-paginator");
-            elem.innerHTML = response.json.paginatorHtml;
+	        // update the paginator
+	        var paginatorData = response.json.paginatorData;
+	        this._updatePaginator(paginatorData);
 	        
-	        // update the internal position counter
-	        this.options.pos = response.json.startIndex;
+	        // update the internal position fields
+	        this.options.startIndex = paginatorData.startIndex;
+	        this.options.pageSize = paginatorData.pageSize;
 	         
 	        // update title
 	        var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
@@ -448,9 +440,18 @@
 	        var elem = YAHOO.util.Dom.get(this.id + "-postlist");
             elem.innerHTML = response.json.listHtml;
             
-            Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');            
+            Alfresco.util.rollover.registerListenersByClassName(this.id, 'post', 'div');
 	     }
 	  },
+
+      _updatePaginator: function BlogPostList__updatePaginator(paginatorData)
+      {
+         YAHOO.Bubbling.fire('onPagingDataChanged',
+            {
+               data: paginatorData
+            }
+         );
+      },
 
       /**
        * Gets a custom message

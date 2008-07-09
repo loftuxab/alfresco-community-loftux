@@ -97,9 +97,9 @@
       	YAHOO.Bubbling.fire('onSetTopicListParams', {filter : "all"});
       },
       
-      showWatchingTopics: function DiscussionsTopicListFilters_showWatchingTopics()
+      showMyTopics: function DiscussionsTopicListFilters_showWatchingTopics()
       {
-      	YAHOO.Bubbling.fire('onSetTopicListParams', {filter : "watching"});
+      	YAHOO.Bubbling.fire('onSetTopicListParams', {filter : "mine"});
       }
 	};
    

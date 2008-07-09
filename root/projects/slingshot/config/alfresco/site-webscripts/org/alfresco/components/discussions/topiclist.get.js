@@ -20,7 +20,8 @@ function main()
     // assignadditional model data
     model.site = site;
     model.viewmode = (page.url.args["viewmode"] != undefined) ? page.url.args["viewmode"] : "details";
-    model.listTitle = getListTitle(filter, tag);
+    model.filter = filter;
+    model.tag = tag;
 }
 
 main();

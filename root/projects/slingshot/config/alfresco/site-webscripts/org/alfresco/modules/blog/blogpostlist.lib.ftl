@@ -81,7 +81,7 @@
    <div class="nodeEdit">
       <#if (post.permissions.edit)>
       <div class="onEditNode" id="${htmlid}-onEditNode-${post.name}">
-         <a href="#" class="action-link">${msg("post.action.edit")}</a>
+         <a href="#" class="action-link-div">${msg("post.action.edit")}</a>
       </div>
       </#if>
         
@@ -89,23 +89,23 @@
          <#if post.isPublished>
             <#if post.outOfDate>
             <div class="onUpdateExternal" id="${htmlid}-onUpdateExternal-${post.name}">
-               <a href="#" class="action-link">${msg("post.action.updateexternal")}</a>
+               <a href="#" class="action-link-div">${msg("post.action.updateexternal")}</a>
             </div>
             </#if>
             
             <div class="onUnpublishExternal" id="${htmlid}-onUnpublishExternal-${post.name}">
-               <a href="#" class="action-link">${msg("post.action.unpublishexternal")}</a>
+               <a href="#" class="action-link-div">${msg("post.action.unpublishexternal")}</a>
             </div>
          <#else>
          <div class="onPublishExternal" id="${htmlid}-onPublishExternal-${post.name}">
-            <a href="#" class="action-link">${msg("post.action.publishexternal")}</a>
+            <a href="#" class="action-link-div">${msg("post.action.publishexternal")}</a>
          </div>
          </#if>
       </#if>
         
       <#if (post.permissions.delete)>
       <div class="onDeleteNode" id="${htmlid}-onDeleteNode-${post.name}">
-         <a href="#" class="action-link">${msg("post.action.delete")}</a>
+         <a href="#" class="action-link-div">${msg("post.action.delete")}</a>
       </div>
       </#if>
    </div>
@@ -154,31 +154,31 @@
    
       <#if (post.permissions.edit)>
       <span class="onEditNode" id="${htmlid}-onEditNode-${post.name}">
-         <a href="#" class="action-link">${msg("post.action.edit")}</a>
+         <a href="#" class="action-link-span">${msg("post.action.edit")}</a>
       </span>
       </#if>
        
       <#if (post.permissions.publishExt && ! post.isDraft)>
          <#if post.isPublished>
             <#if post.outOfDate>
-            <span> class="onUpdateExternal" id="${htmlid}-onUpdateExternal-${post.name}">
-               <a href="#" class="action-link">${msg("post.action.updateexternal")}</a>
+            <span class="onUpdateExternal" id="${htmlid}-onUpdateExternal-${post.name}">
+               <a href="#" class="action-link-span">${msg("post.action.updateexternal")}</a>
             </span>
             </#if>
             
             <span class="onUnpublishExternal" id="${htmlid}-onUnpublishExternal-${post.name}">
-               <a href="#" class="action-link">${msg("post.action.unpublishexternal")}</a>
+               <a href="#" class="action-link-span">${msg("post.action.unpublishexternal")}</a>
             </span>
          <#else>
          <span class="onPublishExternal" id="${htmlid}-onPublishExternal-${post.name}">
-            <a href="#" class="action-link">${msg("post.action.publishexternal")}</a>
+            <a href="#" class="action-link-span">${msg("post.action.publishexternal")}</a>
          </span>
          </#if>
       </#if>
        
       <#if (post.permissions.delete)>
          <span class="onDeleteNode" id="${htmlid}-onDeleteNode-${post.name}">
-            <a href="#" class="action-link">${msg("post.action.delete")}</a>
+            <a href="#" class="action-link-span">${msg("post.action.delete")}</a>
          </span>
       </#if>
    </div>

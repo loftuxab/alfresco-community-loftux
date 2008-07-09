@@ -4,7 +4,9 @@
 <script type="text/javascript">//<![CDATA[
    new Alfresco.BlogPostList("${args.htmlid}").setOptions(
    {
-      siteId: "${page.url.templateArgs.site!""}"
+      siteId: "${page.url.templateArgs.site!""}",
+      startIndex: "${pdata.startIndex}",
+      pageSize: "${pdata.pageSize}"
    }).setMessages(
       ${messages}
    );
@@ -51,9 +53,7 @@
 	</div>
 	
 	<div class="rightDiscussionBlogHeader">
-		<div id="${args.htmlid}-paginator" class="toolbarOption">
-			<@paginatorLib.renderForumPaginator pdata=pdata />
-		</div>
+		<@paginatorLib.renderPaginatorModule htmlid=args.htmlid pdata=pdata />
 	</div>
 	
 </div>

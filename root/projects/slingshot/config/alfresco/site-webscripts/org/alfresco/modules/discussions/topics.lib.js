@@ -37,6 +37,10 @@ function getTopicsRequestUrlWithParams(site, container, path, filter, tag, pagin
         {
             url += "/hot";
         }
+        else if (filter == "mine")
+        {
+            url += "/myposts";
+        }
     }
     
     // add the contentFormat
