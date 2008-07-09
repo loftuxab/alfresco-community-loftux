@@ -92,9 +92,9 @@
 		 *
 		 * @method show
 		 */
-	   	show: function(uri)
-      	{
-			var args = {
+       show: function(uri)
+       {
+          var args = {
 				"htmlid": this.id,
 				"site": this.siteId
 			}
@@ -131,30 +131,39 @@
 		 */
        templateLoaded: function(response)
        {
-		    var div = document.getElementById("addEventPanel");
+          var Dom = YAHOO.util.Dom;
+          
+		    var div = Dom.get("addEventPanel");
           div.innerHTML = response.serverResponse.responseText;
 
-          this.panel = new YAHOO.widget.Panel(div,
+          this.panel = new YAHOO.widget.Panel(div, 
              {
-		         modal: true,
-            	fixedcenter: true,
-            	visible: false,
-            	constraintoviewport: true
+		          modal: true,
+            	 fixedcenter: true,
+            	 visible: false,
+            	 constraintoviewport: true
          	});
 
 		 	this.panel.render(document.body);
+		 	
+		 	// "All day" check box
+		 	var allDay = Dom.get(this.id + "-allday");
+		 	if (allDay)
+		 	{
+		 	   YAHOO.util.Event.addListener(allDay, "click", this.onAllDaySelect, this, true);
+		 	}
 
 			if (!this.eventURI) // Create
 			{
 				// OK Button
 				var okButton = Alfresco.util.createYUIButton(this, "ok-button", null,
-	         	{
-	            	type: "submit"
-	         	});
+	         {
+	            type: "submit"
+	         });
 	
 				var eventForm = new Alfresco.forms.Form(this.id + "-addEvent-form");
-				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "keyup");
-	         eventForm.setShowSubmitStateDynamically(true, false);
+				eventForm.addValidation(this.id + "-title", Alfresco.forms.validation.mandatory, null, "blur");
+	         eventForm.setShowSubmitStateDynamically(true);
 		   	eventForm.setSubmitElements(okButton);
 				eventForm.setAJAXSubmit(true,
 				{
@@ -168,7 +177,6 @@
 	       	eventForm.init();
 	
 				// Initialise the start and end dates to today
-				var Dom = YAHOO.util.Dom;
 				var today = new Date();
 
 				var dateStr = Alfresco.util.formatDate(today, "dddd, d mmmm yyyy");
@@ -179,13 +187,23 @@
 				Dom.get("from").value = ansiDate;
 				Dom.get("to").value = ansiDate;
 			}
-			else 
+			else  // Event Edit
 			{
-				// OK Button
 				var okButton = Alfresco.util.createYUIButton(this, "ok-button", this.onOKSelect,
-	         	{
-	            	type: "push"
-	         	});
+	         {
+	            type: "push"
+	         });
+	         
+	         // Is this an all day event?
+	         var startTime = Dom.get(this.id + "-start");
+	         var endTime = Dom.get(this.id + "-end");
+	         
+	         // TODO: perhaps "allday" property to calendar event
+	         if (startTime.value === "00:00" && (startTime.value === endTime.value))
+	         {
+	            allDay.setAttribute("checked", "checked");
+	            this._displayTimeFields(false);
+	         }
 			}
 			
 			var cancelButton = Alfresco.util.createYUIButton(this, "cancel-button", this.onCancelButtonClick);
@@ -212,6 +230,48 @@
 			this.panel.show();
 		},
 		
+		/**
+		 * Event handler that gets called when the user clicks on the "All day" event
+		 * checkbox in the event create / edit form. If selected, hides the time fields
+		 * from view.
+		 *
+		 * @method onAllDaySelect
+		 * @param e {object} DomEvent
+		 */
+		onAllDaySelect: function(e)
+		{
+		  var checkbox = e.target;
+		  var display = true; // Time fields are enabled by default
+		  
+		  if (checkbox.checked)
+		  {
+		     display = false;
+		  } 
+		  
+		 this._displayTimeFields(display);
+		},
+		
+      /**
+       * If the user selectes the "All day" event option, then the start and end
+       * time fields are hidden from view. The date field remains active.
+       *
+       * @method _displayTimeFields
+       * @param display {Boolean} if true, displays the start / end time fields
+       */	
+		_displayTimeFields: function(display)
+		{
+		  var ids = [this.id + "-starttime", this.id + "-endtime"];
+		  var elem;
+		  for (var i=0; i < ids.length; i++)
+		  {
+		     elem = document.getElementById(ids[i]);
+		     if (elem)
+		     {
+		       elem.style.display = (display ? "inline" : "none");
+		     }
+		  } 
+		},
+		
 		onOKSelect: function(e)
 		{
 			if (this.eventURI)
@@ -219,25 +279,29 @@
 				// TODO: this exists in the forms runtime, currently private
 				var form = document.getElementById(this.id + "-addEvent-form");
 				if (form)
-		        {
-		        	var formData = {};
-		            var length = form.elements.length;
-		            for (var i = 0; i < length; i++)
+		      {
+		         var formData = {};
+		         var length = form.elements.length;
+		         for (var i = 0; i < length; i++)
+		         {
+		            var element = form.elements[i];
+		            var name = element.name;
+		            var value = element.value;
+		            var type = element.type;
+		            if (name)
 		            {
-		               var element = form.elements[i];
-		               var name = element.name;
-		               var value = element.value;
-		               if (name)
+		               if (!(type === "checkbox" && !element.checked)) 
 		               {
 		                  formData[name] = value;
 		               }
 		            }
+		         }
 		
 					// Submit PUT request 
 					Alfresco.util.Ajax.request(
 					{
 						method: Alfresco.util.Ajax.PUT,
-				      	url: Alfresco.constants.PROXY_URI + this.eventURI,
+				      url: Alfresco.constants.PROXY_URI + this.eventURI,
 						requestContentType: Alfresco.util.Ajax.JSON,
 						dataObj: formData,
 						successCallback:
@@ -245,7 +309,7 @@
 							fn: this.onEventUpdated,
 							scope: this
 						},
-				      	failureMessage: "Update event failed"
+				      failureMessage: "Update event failed"
 				   });
 		      	}
 			}
