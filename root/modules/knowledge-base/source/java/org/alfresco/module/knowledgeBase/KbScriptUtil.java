@@ -56,7 +56,7 @@ public class KbScriptUtil extends BaseProcessorExtension implements KbModel
             {
                 result = VISIBILITY_INTERNAL.getId();
             }
-            else if (authroities.contains(GROUP_TIER_1) == true)
+            else if (authroities.contains(GROUP_TIER_1) == true) 
             {
                 result = VISIBILITY_TIER_1.getId();
             }

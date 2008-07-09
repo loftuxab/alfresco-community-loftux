@@ -36,7 +36,7 @@
 		           </cm:category>
 		       </cm:subcategories>
 		   </cm:category>
-		   
+		    
 		   <cm:category>
 		       <cm:name>Article Status</cm:name>
 		       <sys:node-uuid>kb:article-status-root</sys:node-uuid>
@@ -92,16 +92,16 @@
 		               <sys:node-uuid>kb:visibility-internal</sys:node-uuid>
 		           </cm:category>
 		           <cm:category>
-		               <cm:name>Tier 1</cm:name>
-		               <sys:node-uuid>kb:visibility-tier-one</sys:node-uuid>
+		               <cm:name>Partners</cm:name>
+		               <sys:node-uuid>kb:visibility-partners</sys:node-uuid>
 		           </cm:category>
 		           <cm:category>
-		               <cm:name>Tier 2</cm:name>
-		               <sys:node-uuid>kb:visibility-tier-two</sys:node-uuid>
+		               <cm:name>Customers</cm:name>
+		               <sys:node-uuid>kb:visibility-customers</sys:node-uuid>
 		           </cm:category>
 		           <cm:category>
-		               <cm:name>Tier 3</cm:name>
-		               <sys:node-uuid>kb:visibility-tier-three</sys:node-uuid>
+		               <cm:name>Community</cm:name>
+		               <sys:node-uuid>kb:visibility-community</sys:node-uuid>
 		           </cm:category>
 
 		       </cm:subcategories>

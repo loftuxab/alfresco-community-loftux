@@ -10,7 +10,7 @@
         <view:permission>Coordinator</view:permission>
       </view:ace>
       <view:ace view:access="ALLOWED">
-        <view:authority>GROUP_KnowledgeBase_Tier_1</view:authority>
+        <view:authority>GROUP_KnowledgeBase_Partners</view:authority>
         <view:permission>Contributor</view:permission>
       </view:ace>
     </view:acl>

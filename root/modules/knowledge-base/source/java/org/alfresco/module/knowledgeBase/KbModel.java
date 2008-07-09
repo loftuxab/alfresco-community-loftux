@@ -52,8 +52,8 @@ public interface KbModel
     
     // Group names
     public static final String GROUP_INTERNAL = "GROUP_KnowledgeBase_Internal";
-    public static final String GROUP_TIER_1 = "GROUP_KnowledgeBase_Tier_1";
-    public static final String GROUP_TIER_2 = "GROUP_KnowledgeBase_Tier_2";
+    public static final String GROUP_TIER_1 = "GROUP_KnowledgeBase_Partners";
+    public static final String GROUP_TIER_2 = "GROUP_KnowledgeBase_Customers";
     
     // Categories
     public static final NodeRef STATUS_DRAFT = new NodeRef(SPACES_STORE, "kb:status-draft");
@@ -62,8 +62,8 @@ public interface KbModel
     public static final NodeRef STATUS_ARCHIVED = new NodeRef(SPACES_STORE, "kb:status-archived");
     
     // Visibility
-    public static final NodeRef VISIBILITY_INTERNAL = new NodeRef(SPACES_STORE, "kb:visibility-internal");
-    public static final NodeRef VISIBILITY_TIER_1 = new NodeRef(SPACES_STORE, "kb:visibility-tier-one");
-    public static final NodeRef VISIBILITY_TIER_2 = new NodeRef(SPACES_STORE, "kb:visibility-tier-two");
-    public static final NodeRef VISIBILITY_TIER_3 = new NodeRef(SPACES_STORE, "kb:visibility-tier-three");
+    public static final NodeRef VISIBILITY_INTERNAL = new NodeRef(SPACES_STORE, "kb:visibility-internal"); 
+    public static final NodeRef VISIBILITY_TIER_1 = new NodeRef(SPACES_STORE, "kb:visibility-partners");
+    public static final NodeRef VISIBILITY_TIER_2 = new NodeRef(SPACES_STORE, "kb:visibility-customers");
+    public static final NodeRef VISIBILITY_TIER_3 = new NodeRef(SPACES_STORE, "kb:visibility-community");
 }
