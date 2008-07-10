@@ -131,22 +131,29 @@
 		 */
        templateLoaded: function(response)
        {
+
+          // Inject the template from the XHR request into a new DIV element
+          var containerDiv = document.createElement("div");
+          containerDiv.innerHTML = response.serverResponse.responseText;
+
+          // The panel is created from the HTML returned in the XHR request, not the container
+          var panelDiv = YAHOO.util.Dom.getFirstChild(containerDiv);
+
+          this.panel = new YAHOO.widget.Panel(panelDiv,
+          {
+             modal: true,
+             draggable: false,
+             fixedcenter: true,
+             close: false,
+             visible: false
+          });
+
+          // Add it to the Dom
+          this.panel.render(document.body);
+
           var Dom = YAHOO.util.Dom;
-          
-		    var div = Dom.get("addEventPanel");
-          div.innerHTML = response.serverResponse.responseText;
 
-          this.panel = new YAHOO.widget.Panel(div, 
-             {
-		          modal: true,
-            	 fixedcenter: true,
-            	 visible: false,
-            	 constraintoviewport: true
-         	});
-
-		 	this.panel.render(document.body);
-		 	
-		 	// "All day" check box
+          // "All day" check box
 		 	var allDay = Dom.get(this.id + "-allday");
 		 	if (allDay)
 		 	{

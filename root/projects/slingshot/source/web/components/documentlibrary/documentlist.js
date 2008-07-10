@@ -341,7 +341,7 @@
          this.widgets.dataSource.responseSchema =
          {
              resultsList: "doclist.items",
-             fields: ["index", "nodeRef", "type", "icon32", "name", "parent", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
+             fields: ["index", "nodeRef", "type", "icon32", "displayName", "actualName", "parent", "status", "lockedBy", "title", "description", "createdOn", "createdBy", "modifiedOn", "modifiedBy", "version", "contentUrl", "actionSet"]
          };
          
          /**
@@ -417,7 +417,7 @@
           */
          renderCellThumbnail = function DL_renderCellThumbnail(elCell, oRecord, oColumn, oData)
          {
-            var name = oRecord.getData("name");
+            var name = oRecord.getData("displayName");
             var extn = name.substring(name.lastIndexOf("."));
 
             if (me.options.detailedView)
@@ -431,7 +431,7 @@
                }
                else if (oRecord.getData("type") == "folder")
                {
-                  var newPath = me.currentPath + "/" + oRecord.getData("name");
+                  var newPath = me.currentPath + "/" + oRecord.getData("displayName");
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
                   elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder"></span></a>';
                }
@@ -447,7 +447,7 @@
 
                if (oRecord.getData("type") == "folder")
                {
-                  var newPath = me.currentPath + "/" + oRecord.getData("name");
+                  var newPath = me.currentPath + "/" + oRecord.getData("displayName");
                   // TODO: *** Update the onclick to be logically-bound, not via HTML
                   elCell.innerHTML = '<a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><span class="demo-folder-small"></span></a>';
                }
@@ -472,10 +472,10 @@
             var desc = "";
             if (oRecord.getData("type") == "folder")
             {
-               var newPath = me.currentPath + "/" + oRecord.getData("name");
+               var newPath = me.currentPath + "/" + oRecord.getData("displayName");
 
                // TODO: *** Update the onclick to be logically-bound, not via HTML
-               desc = '<h3 class="filename"><a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("name") + '</b></a></h3>';
+               desc = '<h3 class="filename"><a href="" onclick="YAHOO.Bubbling.fire(\'pathChanged\', {path: \'' + newPath.replace(/[']/g, "\\'") + '\'}); return false;"><b>' + oRecord.getData("displayName") + '</b></a></h3>';
 
                if (me.options.detailedView)
                {
@@ -498,7 +498,7 @@
             }
             else
             {
-               desc = '<h3 class="filename"><a target="content" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("contentUrl") + '">' + oRecord.getData("name") + '</a></h3>';
+               desc = '<h3 class="filename"><a target="content" href="' + Alfresco.constants.PROXY_URI + oRecord.getData("contentUrl") + '">' + oRecord.getData("displayName") + '</a></h3>';
                if (me.options.detailedView)
                {
                   desc += '<div id="' + me.id + '-rename-' + oRecord.getId() + '" class="rename-file hidden">' + me._msg("actions.document.rename") + '</div>';
@@ -905,7 +905,7 @@
          var record = this.widgets.dataTable.getRecord(row);
          Alfresco.util.PopupManager.displayPrompt(
          {
-            text: "Are you sure you want to delete '" + record.getData("name") + "'?",
+            text: "Are you sure you want to delete '" + record.getData("displayName") + "'?",
             buttons: [
             {
                text: "Delete",
@@ -935,7 +935,7 @@
       _onActionDeleteAssetConfirm: function DL__onActionDeleteAssetConfirm(record)
       {
          var fileType = record.getData("type");
-         var fileName = record.getData("name");
+         var fileName = record.getData("displayName");
          var filePath = record.getData("parent") + "/" + fileName;
          
          this.modules.actions.genericAction(
@@ -979,7 +979,7 @@
       onActionEditOffline: function DL_onActionEditOffline(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("name");
+         var fileName = record.getData("displayName");
 
          this.modules.actions.genericAction(
          {
@@ -1009,7 +1009,55 @@
             }
          });
       },
-      
+
+
+      /**
+       * Upload new version.
+       *
+       * @method onActionUploadNewVersion
+       */
+      onActionUploadNewVersion: function DL_onActionUploadNewVersion(row)
+      {
+         var record = this.widgets.dataTable.getRecord(row);
+         var fileName = record.getData("actualName");
+
+         if (this.fileUpload === null)
+         {
+            this.fileUpload = Alfresco.module.getFileUploadInstance(); //new Alfresco.module.FileUpload(this.id + "-fileUpload");
+         }
+
+         // Show uploader for multiple files
+
+         var description = Alfresco.util.message("label.filterDescription", this.name);
+         description = YAHOO.lang.substitute(description, {"0": record.getData("displayName")});
+         var extensions = "*" + fileName.substring(fileName.lastIndexOf("."));
+         var singleUpdateConfig =
+         {
+            siteId: this.options.siteId,
+            containerId: this.options.containerId,
+            path: this.currentPath + fileName,
+            filter: [{description: description, extensions: extensions}],
+            mode: this.fileUpload.MODE_SINGLE_UPDATE,
+            onFileUploadComplete:
+            {
+               fn: this.onFileUploadComplete,
+               scope: this
+            }
+         }
+         this.fileUpload.show(singleUpdateConfig);
+         YAHOO.util.Event.preventDefault(e);
+      },
+
+      /**
+       * Called from the uploader component after a the new version has been uploaded.
+       *
+       * @method onNewVersionUploadComplete
+       */
+      onNewVersionUploadComplete: function DL_onNewVersionUploadComplete()
+      {
+         // Do something after the new version is iuploaded
+      },
+
       /**
        * Cancel editing.
        *
@@ -1018,7 +1066,7 @@
       onActionCancelEditing: function DL_onActionCancelEditing(row)
       {
          var record = this.widgets.dataTable.getRecord(row);
-         var fileName = record.getData("name");
+         var fileName = record.getData("displayName");
          var nodeRef = record.getData("nodeRef");
 
          this.modules.actions.genericAction(

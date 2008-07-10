@@ -10,14 +10,15 @@
       <p>
          <span id="${args.htmlid}-status-span"></span>
       </p>
-      <div id="${args.htmlid}-flashuploader-div" style="width:0px;height:0px">
+      <#-- Increase width and height and remove display:none to see flash debug info -->
+      <div id="${args.htmlid}-flashuploader-div" style="width:0px;height:0px; padding: 0;">
          ${msg("label.noFlash")}
       </div>
 
       <div id="${args.htmlid}-filelist-table" class="fileUpload-filelist-table"></div>
 
       <div id="${args.htmlid}-versionSection-div">
-         <div class="yui-g section-title">
+         <div class="yui-g">
             <h2>${msg("section.version")}</h2>
          </div>
          <div class="yui-gd">
@@ -25,23 +26,27 @@
                ${msg("label.version")}
             </div>
             <div class="yui-u">
-               Minor changes: <input id="${args.htmlid}-minorChanges" type="radio" name="newVersion" value="1.1" checked="checked"/><br>
-               Major changes: <input id="${args.htmlid}-majorChanges" type="radio" name="newVersion" value="2.0"/>
+               <input id="${args.htmlid}-minorVersion-radioButton" type="radio" name="majorVersion" checked="true"/> ${msg("label.minorVersion")}
             </div>
-            <div class="yui-u first">
-               Comments:
+         </div>
+         <div class="yui-gd">
+            <div class="yui-u first">&nbsp;
             </div>
             <div class="yui-u">
-               <textarea rows="4"></textarea>
+               <input id="${args.htmlid}-majorVersion-radioButton" type="radio" name="majorVersion"/> ${msg("label.majorVersion")}
+            </div>
+         </div>
+         <div class="yui-gd">
+            <div class="yui-u first">
+               ${msg("label.comments")}
+            </div>
+            <div class="yui-u">
+               <textarea id="${args.htmlid}-description-textarea" name="description" rows="4"></textarea>
             </div>
          </div>
       </div>
 
-      <p>
-         <input id="${args.htmlid}-upload-button" type="button" value="${msg("button.upload")}" />
-         <input id="${args.htmlid}-cancelOk-button" type="button" value="${msg("button.cancel")}" />
-      </p>
-
+      <!-- Templates for a file row -->
       <div style="display:none">
          <div id="${args.htmlid}-left-div" class="fileupload-left-div">
             <span class="fileupload-percentage-span hidden">&nbsp;</span>
@@ -64,6 +69,10 @@
             </span>
          </div>
       </div>
+         <div class="bdft">
+            <input id="${args.htmlid}-upload-button" type="button" value="${msg("button.upload")}" />
+            <input id="${args.htmlid}-cancelOk-button" type="button" value="${msg("button.cancel")}" />
+         </div>
    </div>
 </div>
 

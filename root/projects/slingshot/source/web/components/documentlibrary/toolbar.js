@@ -270,7 +270,7 @@
       {
          if (this.fileUpload === null)
          {
-            this.fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
+            this.fileUpload = Alfresco.module.getFileUploadInstance(); //new Alfresco.module.FileUpload(this.id + "-fileUpload");
          }
          
          // Show uploader for multiple files
