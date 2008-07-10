@@ -20,6 +20,9 @@
       <br/>
       <span class="title">Index</span>
       <table>
+         <#if failures?size &gt; 0>
+         <tr><td><a href="${url.serviceContext}/index/failures">Browse failed Web Scripts</a></td></tr>
+         </#if>
          <tr><td><a href="${url.serviceContext}/index/all">Browse all Web Scripts</a></td></tr>
          <tr><td><a href="${url.serviceContext}/index/uri/">Browse by Web Script URL</a></td></tr>
          <tr><td><a href="${url.serviceContext}/index/package/">Browse by Web Script Package</a></td></tr>
