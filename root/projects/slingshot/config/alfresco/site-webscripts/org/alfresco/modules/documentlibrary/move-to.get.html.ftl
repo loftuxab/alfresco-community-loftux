@@ -2,7 +2,7 @@
    <div class="hd">${msg("title")}</div>
    <div class="bd">
       <form id="${args.htmlid}-form" action="" method="post">
-         <div class="yui-g section-title">
+         <div class="yui-g">
             <h2>${msg("header")}:</h2>
          </div>
          <div>

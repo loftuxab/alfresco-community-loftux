@@ -20,28 +20,3 @@
 }
 
 
-/* Create Folder */
-
-.create-folder
-{
-   text-align: left;
-   width: 30em;
-}
-
-.create-folder input,
-.create-folder textarea
-{
-   border: 1px solid #C5D6E2;
-   padding: 2px;
-   font-weight: normal;
-}
-
-.create-folder .yui-gd
-{
-   padding-bottom: 0.5em;
-}
-
-.create-folder .section-title
-{
-   padding-bottom: 0.5em;
-}

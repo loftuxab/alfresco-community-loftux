@@ -1,19 +1,5 @@
 /* Style YUI components */
 
-/* Width of the panel, IE doesn't fill out the header othwerwise. */
-.file-upload .hd
-{
-   width: 620px;
-   text-align: center;
-}
-
-/* Width of the panel. */
-.file-upload .bd
-{
-   width: 620px;
-   text-align: left; /* If not present IE7 puts the table outside the panel */
-}
-
 .file-upload .hidden
 {
    display: none;
@@ -23,6 +9,18 @@
 .file-upload p
 {
    text-align: center;
+}
+
+/* Add som padding to the file list so it looks centered */
+.yui-skin-default .yui-panel .bd .fileUpload-filelist-table
+{
+   padding: 0.8em;
+}
+
+/* Remove the padding inherited from the panel for divs in the file list */
+.yui-skin-default .yui-panel .bd .fileUpload-filelist-table div
+{
+   padding: 0;
 }
 
 /* Create a visible gray line beneath each row */
@@ -183,22 +181,17 @@
 
 /* General styling */
 
-.file-upload select,
-.file-upload input,
+.file-upload
+{
+   width: 640px;
+}
+
+.file-upload .yui-gd div.first
+{
+   width: 10.5em;   
+}
+
 .file-upload textarea
 {
-   border: 1px solid #C5D6E2;
-   padding: 2px;
-   font-weight: normal;
-   width: 150px;
-}
-
-.file-upload .yui-gd
-{
-   padding-bottom: 0.5em;
-}
-
-.file-upload .section-title
-{
-   padding-bottom: 0.5em;
+   width: 30em;
 }

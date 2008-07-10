@@ -23,6 +23,7 @@
  * http://www.alfresco.com/legal/licensing
  */
 
+
 /**
  * FileUpload component.
  *
@@ -32,7 +33,7 @@
  *
  * A multi file upload scenario could look like:
  *
- * var fileUpload = new Alfresco.module.FileUpload(this.id + "-fileUpload");
+ * var fileUpload = Alfresco.module.getFileUploadInstance();
  * var multiUploadConfig =
  * {
  *    siteId: siteId,
@@ -48,18 +49,30 @@
  */
 (function()
 {
+
    /**
     * FileUpload constructor.
+    *
+    * FileUpload is considered a singleton so constructor should be treated as private,
+    * please use Alfresco.module.getFileUploadInstance() instead.
     *
     * @param {string} htmlId The HTML id of the parent element
     * @return {Alfresco.module.FileUpload} The new FileUpload instance
     * @constructor
+    * @private
     */
    Alfresco.module.FileUpload = function(containerId)
    {
       this.name = "Alfresco.module.FileUpload";
-      this.id = containerId;      
+      this.id = containerId;
       this.swf = Alfresco.constants.URL_CONTEXT + "yui/uploader/assets/uploader.swf";
+
+      var instance = Alfresco.util.ComponentManager.find({id: this.id});
+      if(instance !== undefined && instance.length > 0)
+      {
+         throw new Error("An instance of Alfresco.module.FileUpload already exists.");
+      }
+
 
       /* Register this component */
       Alfresco.util.ComponentManager.register(this);
@@ -214,7 +227,8 @@
          path: null,
          mode: this.MODE_SINGLE_UPLOAD,
          filter: [],
-         onFileUploadComplete: null
+         onFileUploadComplete: null,
+         overwrite: false
       },
 
       /**
@@ -374,6 +388,11 @@
        *    path: {string},         // path inside the component to upload file(s) to
        *    mode: {int},            // MODE_SINGLE_UPLOAD, MODE_MULTI_UPLOAD or MODE_SINGLE_UPDATE
        *    filter: {array},        // limits what kind of files the user can select in the OS file selector
+       *    onFileUploadComplete: null, // Callback after upload
+       *    overwrite: false        // If true and in mode MODE_XXX_UPLOAD it tells
+       *                            // the backend to overwrite a file with the existing name
+       *                            // If false and in mode MODE_XXX_UPLOAD it tells
+       *                            // the backend to append a number to the filename to avoid an overwrite 
        * }
        */
       show: function FU_show(config)
@@ -783,7 +802,7 @@
             }
             if (noOfUploadedFiles > 0)
             {
-               message = Alfresco.util.message("label.cancelStatus", this.name);
+               message = Alfresco.util.message("message.cancelStatus", this.name);
                message = YAHOO.lang.substitute(message, {"0": noOfUploadedFiles});
             }
 
@@ -1206,13 +1225,24 @@
                // The contentType that the file should be uploaded as.
                var contentType = fileInfo.contentType.options[fileInfo.contentType.selectedIndex].value;
                var url = Alfresco.constants.PROXY_URI + "api/upload?alf_ticket=" + Alfresco.constants.ALF_TICKET;
-               this.uploader.upload(flashId, url, "POST",
-               {
+               var attributes = {
                   path: this.showConfig.path,
                   siteId: this.showConfig.siteId,
                   containerId: this.showConfig.containerId,
                   contentType: contentType
-               }, "filedata");
+               }
+               if(this.showConfig.mode === this.MODE_SINGLE_UPDATE)
+               {
+                  var majorVersion = YAHOO.util.Dom.get(this.id + "-majorVersion-radioButton").checked;
+                  attributes.majorVersion = majorVersion;
+                  var description = YAHOO.util.Dom.get(this.id + "-description-textarea").value;
+                  attributes.description = description;
+               }
+               else
+               {
+                  attributes.overwrite = this.showConfig.overwrite;                  
+               }
+               this.uploader.upload(flashId, url, "POST", attributes, "filedata");
                startedUploads++;
             }
          }
@@ -1259,5 +1289,21 @@
 
 })();
 
-/* Dummy instance to load optional YUI components early */
-new Alfresco.module.FileUpload(null);
+
+Alfresco.module.getFileUploadInstance = function()
+{
+   var instanceId = "alfresco-upload-instance";
+   var instance = Alfresco.util.ComponentManager.find({id: instanceId});
+   if(instance !== undefined && instance.length > 0)
+   {
+      instance = instance[0];
+   }
+   else
+   {
+      instance = new Alfresco.module.FileUpload(instanceId);
+   }
+   return instance;
+}
+
+/* Create the instance to load optional YUI components and SWF early */
+new Alfresco.module.getFileUploadInstance();

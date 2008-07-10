@@ -1,36 +1,5 @@
 .create-site
 {
-   text-align: left;
-   /*width: 30em;*/
+   width: 40em;
 }
 
-.create-site .yui-t1
-{
-   width: 450px;
-   min-width:450px;
-}
-
-.create-site select,
-.create-site input,
-.create-site textarea
-{
-   border: 1px solid #C5D6E2;
-   padding: 2px;
-   font-weight: normal;
-   width: 150px;
-}
-
-.create-site .yui-gd
-{
-   padding-bottom: 0.5em;
-}
-
-.create-site .section-title
-{
-   padding-bottom: 0.5em;
-}
-.create-site .section-buttons
-{
-   padding-top: 1.5em;   
-   text-align: center;
-}
