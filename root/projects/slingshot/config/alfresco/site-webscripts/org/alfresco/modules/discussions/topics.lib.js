@@ -82,12 +82,13 @@ function fetchAndAssignTopics(site, container, path, filter, tag, paginationData
 }
 
 
-function createAndAssignTopic(site, container, path, title, content)
+function createAndAssignTopic(site, container, path, title, content, tags)
 {
     // fetch the information required to create the topic
     var params = {
         title : title,
-        content : content
+        content : content,
+        tags : tags
     };
     var jsonParams = jsonUtils.toJSONString(params);
     var url  = getTopicsRequestUrl(site, container, path);

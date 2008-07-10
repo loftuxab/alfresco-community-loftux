@@ -73,6 +73,7 @@
          <ul id="${htmlid}-popular-tags">
          </ul>
       </div>
+      <br clear="all" />
    </div>
 </div>
 </#macro>

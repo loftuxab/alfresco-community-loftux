@@ -54,7 +54,7 @@
    
    Alfresco.DiscussionsTopicList.prototype =
    {
-   	  /**
+      /**
        * Object container for initialization options
        *
        * @property options
@@ -90,7 +90,7 @@
          
          viewmode: ""
       },
-   	
+      
       
       /**
        * Set multiple initialization options at once.
@@ -160,6 +160,168 @@
          Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
       },
       
+      
+      // Action handlers
+
+      /**
+       * Action handler for the view action
+       */
+      onViewNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
+      {
+         Alfresco.util.discussions.loadForumPostViewPage(this.options.siteId, this.options.containerId, this.options.path, topicId);
+      },
+      
+      /**
+       * Action handler for the edit action
+       */
+      onEditNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
+      {
+         Alfresco.util.discussions.loadForumPostEditPage(this.options.siteId, this.options.containerId, this.options.path, topicId);             
+      },
+      
+      /**
+       * Action handler for the delete action
+       */
+      onDeleteNode: function DiscussionsTopic_onDeleteTopic(htmlId, ownerId, param)
+      {
+         // make an ajax request to delete the topic
+         // we can directly go to alfresco for this
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.util.discussions.getTopicRestUrl(this.options.siteId,
+                        this.options.containerId, this.options.path, param),
+            method: "DELETE",
+            responseContentType : "application/json",
+            successCallback:
+            {
+               fn: this._onDeleted,
+               scope: this
+            },
+            failureMessage: this._msg("topic.msg.failedDelete")
+         });
+      },
+
+      _onDeleted: function DiscussionsTopic__onDeleted(response)
+      {
+         if (response.json.error == undefined)
+         {
+            // reload the list
+            this._reloadData();
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.deleted")});
+         }
+         else
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete") + response.json.error});
+         }
+      },
+      
+      
+      // List event handlers
+      
+      /**
+       * Handles paginator events
+       */
+      onStartIndexChanged: function Discussions_onPageIndexChanged(layer, args)
+      {
+         this.options.pageSize = args[1].pageSize;
+         this.options.startIndex = args[1].startIndex;
+         this._reloadData();
+      },
+
+      /**
+       * Updates the filter and reloads the page
+       */ 
+      onSetTopicListParams: function Discussions_onTopicCategoryChange(layer, args)
+      {
+         // check the filter or tag
+         if (args[1].filter != undefined)
+         {
+            this.options.filter = args[1].filter;
+            this.options.tag = "";
+         }
+         else if (args[1].tag != undefined)
+         {
+            this.options.tag = args[1].tag;
+            this.options.filter = "";
+         }
+         
+         // check the viewmode param
+         if (args[1].viewmode != undefined)
+         {
+             this.options.viewmode = args[1].viewmode;
+         }
+         
+         // reload the table
+         this._reloadData();
+      },
+      
+      _reloadData: function Discussions__reloadData() 
+      {
+         Alfresco.util.Ajax.request(
+         {
+            url: Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topiclist/get-topics",
+            responseContentType : "application/json",
+            dataObj:
+            {
+               site    : this.options.siteId,
+               htmlid : this.id,
+               startIndex : this.options.startIndex,
+               pageSize    : this.options.pageSize,
+               filter  : this.options.filter,
+               tag     : this.options.tag,
+               viewmode: this.options.viewmode
+            },
+            successCallback:
+            {
+               fn: this._processData,
+               scope: this
+            },
+            failureMessage: this._msg("topic.msg.failedLoad1")
+         });
+      },
+      
+      _processData: function Discussions__processData(response)
+      {
+         // first check whether we got an error back
+         if (response.json.error != undefined)
+         {
+            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.failedLoadData") + response.json.error});
+         }
+         else
+         {
+            // update the paginator
+            var paginatorData = response.json.paginatorData;
+            this._updatePaginator(paginatorData);
+           
+            // update the internal position fields
+            this.options.startIndex = paginatorData.startIndex;
+            this.options.pageSize = paginatorData.pageSize;
+            
+            // update title
+            var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
+            elem.innerHTML = response.json.listTitle;
+            
+            // update list
+            var elem = YAHOO.util.Dom.get(this.id + "-topiclist");
+            elem.innerHTML = response.json.listHtml;
+            
+            // init mouse over events
+            Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
+         }
+      },
+
+      _updatePaginator: function Discussions__updatePaginator(paginatorData)
+      {
+         YAHOO.Bubbling.fire('onPagingDataChanged',
+            {
+               data: paginatorData
+            }
+         );
+      },
+      
+      
+      // Rollover effect
+      
       /**
        * Called when the mouse enters into a list item.
        */
@@ -181,188 +343,7 @@
          var editBloc = YAHOO.util.Dom.getElementsByClassName( 'nodeEdit' , null , elem , null );
          YAHOO.util.Dom.removeClass(editBloc, 'showEditBloc');
       },
-
-      /**
-       * Sends the user to the topic view page.
-       */
-      _gotoTopic: function DiscussionsTopicList__gotoTopic(topicId, isEdit)
-      {
-          var url = Alfresco.constants.URL_CONTEXT;
-          url += "page/site/" + this.options.siteId + "/discussions-topicview?topicId=" + topicId;
-          if (isEdit)
-          {
-              url += "&edit=true";
-          }
-          window.location = url;
-      },
-
-      /**
-       * Get the rest api url for a topic
-       */
-      _getTopicUrl: function DiscussionsTopicList__getTopicUrl(site, container, path, topicId)
-      {
-         var url = Alfresco.constants.PROXY_URI + "forum/post/site/" + site + "/" +
-                   container + "/";
-         if (path != undefined && path.length > 0)
-         {
-            url += path + "/";
-         }
-         url += topicId;
-         return url
-      },
-
-      /**
-       * Action handler for the view action
-       */
-      onViewNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
-      {
-          this._gotoTopic(param, false);
-      },
       
-      /**
-       * Action handler for the edit action
-       */
-      onEditNode: function DiscussionsTopicList_onViewTopic(htmlId, ownerId, param)
-      {
-          this._gotoTopic(param, true);
-      },
-      
-      /**
-       * Action handler for the delete action
-       */
-      onDeleteNode: function DiscussionsTopic_onDeleteTopic(htmlId, ownerId, param)
-      {
-         // make an ajax request to delete the topic
-         // we can directly go to alfresco for this
-         Alfresco.util.Ajax.request(
-		   {
-		      url: this._getTopicUrl(this.options.siteId, this.options.containerId, this.options.path, param),
-		      method: "DELETE",
-		      responseContentType : "application/json",
-		      successCallback:
-		      {
-		         fn: this._onDeleted,
-		         scope: this
-		      },
-		      failureMessage: this._msg("topic.msg.failedDelete")
-		   });
-      },
-
-      _onDeleted: function DiscussionsTopic__onDeleted(response)
-      {
-         if (response.json.error == undefined)
-         {
-            // reload the list
-            this._reloadData();
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.deleted")});
-         }
-         else
-         {
-            Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.unableDelete") + response.json.error});
-         }
-      },
-      
-      /**
-	   * Handles paginator events
-	   */
-	  onStartIndexChanged: function Discussions_onPageIndexChanged(layer, args)
-	  {
-	     this.options.pageSize = args[1].pageSize;
-	     this.options.startIndex = args[1].startIndex;
-	     this._reloadData();
-	  },
-
-	  /**
-	   * Updates the filter and reloads the page
-	   */ 
-	  onSetTopicListParams: function Discussions_onTopicCategoryChange(layer, args)
-	  {
-         // check the filter or tag
-         if (args[1].filter != undefined)
-         {
-            this.options.filter = args[1].filter;
-            this.options.tag = "";
-         }
-         else if (args[1].tag != undefined)
-         {
-            this.options.tag = args[1].tag;
-            this.options.filter = "";
-         }
-         
-         // check the viewmode param
-         if (args[1].viewmode != undefined)
-         {
-             this.options.viewmode = args[1].viewmode;
-         }
-         
-         // reload the table
-         this._reloadData();
-	  },
-      
-      _reloadData: function Discussions__reloadData() 
-      {
-      	Alfresco.util.Ajax.request(
-		   {
-		      url: Alfresco.constants.URL_SERVICECONTEXT + "modules/discussions/topiclist/get-topics",
-		      responseContentType : "application/json",
-		      dataObj:
-		      {
-		         site    : this.options.siteId,
-		         htmlid : this.id,
-		         startIndex : this.options.startIndex,
-		         pageSize    : this.options.pageSize,
-		         filter  : this.options.filter,
-		         tag     : this.options.tag,
-		         viewmode: this.options.viewmode
-		      },
-		      successCallback:
-		      {
-		         fn: this._processData,
-		         scope: this
-		      },
-		      failureMessage: this._msg("topic.msg.failedLoad1")
-		   });
-      },
-      
-      _processData: function Discussions__processData(response)
-	  {
-	     // first check whether we got an error back
-	     if (response.json.error != undefined)
-	     {
-	        Alfresco.util.PopupManager.displayMessage({text: this._msg("topic.msg.failedLoadData") + response.json.error});
-	     }
-	     else
-	     {
-	        // update the paginator
-	        var paginatorData = response.json.paginatorData;
-	        this._updatePaginator(paginatorData);
-	        
-	        // update the internal position fields
-	        this.options.startIndex = paginatorData.startIndex;
-	        this.options.pageSize = paginatorData.pageSize;
-	         
-	        // update title
-	        var elem = YAHOO.util.Dom.get(this.id + "-listtitle");
-            elem.innerHTML = response.json.listTitle;
-	         
-	        // update list
-	        var elem = YAHOO.util.Dom.get(this.id + "-topiclist");
-            elem.innerHTML = response.json.listHtml;
-            
-            // init mouse over events
-            Alfresco.util.rollover.registerListenersByClassName(this.id, 'topic', 'div');
-            
-	     }
-	  },
-
-      _updatePaginator: function Discussions__updatePaginator(paginatorData)
-      {
-         YAHOO.Bubbling.fire('onPagingDataChanged',
-            {
-               data: paginatorData
-            }
-         );
-      },
       
       /**
        * Gets a custom message

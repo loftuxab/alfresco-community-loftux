@@ -4,40 +4,41 @@
  */
 function getTemplateParam(paramName, defaultValue)
 {
-    if (template.properties[paramName] != undefined)
-    {
-        return template.properties[paramName];
-    }
-    else
-    {
-        return defaultValue;
-    }
+   if (template.properties[paramName] != undefined)
+   {
+      return template.properties[paramName];
+   }
+   else
+   {
+      return defaultValue;
+   }
 }
+
 
 /** Gets a param from a page request. */
 function getPageUrlParam(paramName, defaultValue)
 {
-    if (page.url.args[paramName] != undefined)
-    {
-        return page.url.args[paramName];
-    }
-    else
-    {
-        return defaultValue;
-    }
+   if (page.url.args[paramName] != undefined)
+   {
+      return page.url.args[paramName];
+   }
+   else
+   {
+      return defaultValue;
+   }
 }
 
 /** Gets a param from a webscript request. */
 function getRequestParam(paramName, defaultValue)
 {
-    if (args[paramName] != undefined)
-    {
-        return args[paramName];
-    }
-    else
-    {
-        return defaultValue;
-    }
+   if (args[paramName] != undefined)
+   {
+      return args[paramName];
+   }
+   else
+   {
+      return defaultValue;
+   }
 }
 
 /**
@@ -46,14 +47,14 @@ function getRequestParam(paramName, defaultValue)
  */
 function addParamToUrl(url, paramName, paramValue)
 {
-    if (url.indexOf('?') > -1)
-    {
-        return url += "&" + paramName + "=" + paramValue;
-    }
-    else
-    {
-        return url += "?" + paramName + "=" + paramValue;
-    }
+   if (url.indexOf('?') > -1)
+   {
+      return url += "&" + paramName + "=" + paramValue;
+   }
+   else
+   {
+      return url += "?" + paramName + "=" + paramValue;
+   }
 }
 
 /** Adds a path element to a url.
@@ -63,12 +64,11 @@ function addParamToUrl(url, paramName, paramValue)
  */
 function addUrlPathElement(url, elem)
 {
-    elem = "" + elem; // make sure we use a javascript string
-    if (elem != undefined && elem.length > 0)
-    {
-        url += "/" + elem;
-    }
-    return url;
+   if (elem != undefined && elem.length > 0)
+   {
+      url += "/" + elem;
+   }
+   return url;
 }
 
 /** 
@@ -76,10 +76,10 @@ function addUrlPathElement(url, elem)
  */
 function copyDataToObject(data, target)
 {
-    for (n in data)
-    {
-        target[n] = data[n];
-    }
+   for (n in data)
+   {
+      target[n] = data[n];
+   }
 }
 
 /** 
@@ -87,7 +87,7 @@ function copyDataToObject(data, target)
  */
 function applyDataToModel(data)
 {
-    copyDataToObject(data, model);
+   copyDataToObject(data, model);
 }
 
 
@@ -96,15 +96,15 @@ function applyDataToModel(data)
  */
 function doPostCall(url, paramsJSON)
 {
-    var connector = remote.connect("alfresco");
-    var result = connector.post(url, paramsJSON, "application/json");
-    if (result.status != status.STATUS_OK)
-    {
-        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
-                       "status: " + result.status + ", response: " + result.response);
-        return null;
-    }
-    return eval('(' + result.response + ')');
+   var connector = remote.connect("alfresco");
+   var result = connector.post(url, paramsJSON, "application/json");
+   if (result.status != status.STATUS_OK)
+   {
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
+                     "status: " + result.status + ", response: " + result.response);
+      return null;
+   }
+   return eval('(' + result.response + ')');
 }
 
 
@@ -113,15 +113,15 @@ function doPostCall(url, paramsJSON)
  */
 function doPutCall(url, paramsJSON)
 {
-    var connector = remote.connect("alfresco");
-    var result = connector.put(url, paramsJSON, "application/json");
-    if (result.status != status.STATUS_OK)
-    {
-        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
-                       "status: " + result.status + ", response: " + result.response);
-        return null;
-    }
-    return eval('(' + result.response + ')');
+   var connector = remote.connect("alfresco");
+   var result = connector.put(url, paramsJSON, "application/json");
+   if (result.status != status.STATUS_OK)
+   {
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
+                     "status: " + result.status + ", response: " + result.response);
+      return null;
+   }
+   return eval('(' + result.response + ')');
 }
 
 
@@ -130,15 +130,13 @@ function doPutCall(url, paramsJSON)
  */
 function doGetCall(url)
 {
-    var connector = remote.connect("alfresco");
-    var result = connector.get(url);
-    if (result.status != status.STATUS_OK)
-    {
-        status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
-                       "status: " + result.status + ", response: " + result.response);
-        return null;
-    }
-    return eval('(' + result.response + ')');
+   var connector = remote.connect("alfresco");
+   var result = connector.get(url);
+   if (result.status != status.STATUS_OK)
+   {
+      status.setCode(status.STATUS_INTERNAL_SERVER_ERROR, "Unable to do backend call. " +
+                     "status: " + result.status + ", response: " + result.response);
+      return null;
+   }
+   return eval('(' + result.response + ')');
 }
-
-

@@ -31,12 +31,13 @@ function fetchAndAssignTopic(site, container, path, topicId)
     applyDataToModel(data);
 }
 
-function updateAndAssignTopic(site, container, path, topicId, title, content)
+function updateAndAssignTopic(site, container, path, topicId, title, content, tags)
 {
     // fetch the information required to create the topic
     var params = {
         title : title,
-        content : content
+        content : content,
+        tags : tags
     };
     var jsonParams = jsonUtils.toJSONString(params);
     var url = getTopicRequestUrl(site, container, path, topicId);
