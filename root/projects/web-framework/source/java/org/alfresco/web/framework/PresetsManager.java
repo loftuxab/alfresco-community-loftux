@@ -40,10 +40,6 @@ import org.alfresco.web.site.Model;
 import org.dom4j.Document;
 import org.dom4j.DocumentException;
 import org.dom4j.Element;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 
 /**
  * Spring util bean responsible for preset model object generation.
@@ -67,7 +63,7 @@ import org.springframework.context.event.ContextRefreshedEvent;
  * 
  * @author Kevin Roast
  */
-public class PresetsManager implements ApplicationListener
+public class PresetsManager
 {
     private SearchPath searchPath;
     private List<String> files;
@@ -92,25 +88,10 @@ public class PresetsManager implements ApplicationListener
     }
     
     
-    /* (non-Javadoc)
-     * @see org.springframework.context.ApplicationListener#onApplicationEvent(org.springframework.context.ApplicationEvent)
-     */
-    public void onApplicationEvent(ApplicationEvent event)
-    {
-        if (event instanceof ContextRefreshedEvent)
-        {
-            ApplicationContext refreshContext = ((ContextRefreshedEvent)event).getApplicationContext();
-            if (refreshContext != null)
-            {
-                init();
-            }
-        }
-    }
-    
     /**
      * Initialise the presets manager
      */
-    public void init()
+    private void init()
     {
         if (this.searchPath == null || this.files == null)
         {
@@ -157,6 +138,16 @@ public class PresetsManager implements ApplicationListener
         if (id == null)
         {
             throw new IllegalArgumentException("Preset ID is mandatory.");
+        }
+        
+        // perform one time init - this cannot be perform in an app handler or by the
+        // framework init - as it requires the Alfresco server to be started...
+        synchronized (this)
+        {
+            if (this.documents == null)
+            {
+                init();
+            }
         }
         
         for (Document doc : this.documents)
