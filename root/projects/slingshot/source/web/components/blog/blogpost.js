@@ -255,6 +255,7 @@
         	   {
 			        //Put the HTML back into the text area
 					this.editor.saveHTML();
+					// update the tags set in the form
 					this.tagLibraryListener.updateForm();
         	   },
         	   //obj: myArbitraryObject,

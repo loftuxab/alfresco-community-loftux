@@ -32,10 +32,10 @@
 
 <div id="${args.htmlid}-topic">
    <div id="${args.htmlid}-viewDiv" <#if editMode>class="hidden"</#if> >
-      <@topicLib.topicViewHTML topic=item/>
+      <@topicLib.topicViewHTML htmlid=args.htmlid topic=item/>
    </div>
    <div id="${args.htmlid}-formDiv" <#if ! editMode>class="hidden"</#if> >
       <#-- only render form if the page is loaded in edit mode -->
-      <#if editMode><@topicLib.topicFormHTML htmlId="${args.htmlid}" topic=item/></#if>
+      <#if editMode><@topicLib.topicFormHTML htmlid=args.htmlid topic=item/></#if>
    </div>
 </div>

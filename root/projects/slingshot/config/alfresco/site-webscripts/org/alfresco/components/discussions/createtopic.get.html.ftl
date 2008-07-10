@@ -14,6 +14,6 @@
    <div id="${args.htmlid}-viewDiv">
    </div>
    <div id="${args.htmlid}-formDiv">
-     <@topicLib.topicFormHTML htmlId="${args.htmlid}"/>
+     <@topicLib.topicFormHTML htmlid="${args.htmlid}"/>
    </div>
 </div>

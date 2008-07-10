@@ -23,6 +23,69 @@
  * http://www.alfresco.com/legal/licensing
  */
 
+Alfresco.util.dom = {};
+
+/**
+ * Updates a div content and makes sure the div is displayed
+ */
+Alfresco.util.dom.updateAndShowDiv = function(divId, newHTML)
+{
+   var elem = YAHOO.util.Dom.get(divId);
+   elem.innerHTML = newHTML;
+   YAHOO.util.Dom.removeClass(elem, "hidden");
+};
+     
+Alfresco.util.dom.showDiv = function(divId)
+{
+   var elem = YAHOO.util.Dom.get(divId);
+   YAHOO.util.Dom.removeClass(elem, "hidden");
+};
+      
+Alfresco.util.dom.hideDiv = function(divId)
+{
+   var elem = YAHOO.util.Dom.get(divId);
+   YAHOO.util.Dom.addClass(elem, "hidden");          
+};
+
+
+Alfresco.util.editor = {};
+
+Alfresco.util.editor.getTextOnlyToolbarConfig = function(msg)
+{
+   var toolbar = {
+      titlebar: false,
+      buttons: [
+         { group: 'textstyle', label: msg("comments.form.font"),
+            buttons: [
+               { type: 'push', label: 'Bold CTRL + SHIFT + B', value: 'bold' },
+               { type: 'push', label: 'Italic CTRL + SHIFT + I', value: 'italic' },
+               { type: 'push', label: 'Underline CTRL + SHIFT + U', value: 'underline' },
+               { type: 'separator' },
+               { type: 'color', label: 'Font Color', value: 'forecolor', disabled: true },
+               { type: 'color', label: 'Background Color', value: 'backcolor', disabled: true }
+            ]
+         },
+         { type: 'separator' },
+         { group: 'indentlist', label: msg("comments.form.lists"),
+            buttons: [
+               { type: 'push', label: 'Create an Unordered List', value: 'insertunorderedlist' },
+               { type: 'push', label: 'Create an Ordered List', value: 'insertorderedlist' }
+            ]
+         },
+         { type: 'separator' },
+         { group: 'insertitem', label: msg("comments.form.link"),
+            buttons: [
+              { type: 'push', label: 'HTML Link CTRL + SHIFT + L', value: 'createlink', disabled: true }
+            ]
+        }
+      ]
+   };
+   return toolbar
+}
+
+
+
+
 Alfresco.util.blog = {};
 
 /**
@@ -32,7 +95,8 @@ Alfresco.util.blog.loadBlogPostViewPage = function(site, container, path, postId
 {
    window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/blog-postview" +
                       "?container=" + container + 
-                      "&postId=" + post;
+                      "&path=" + path +
+                      "&postId=" + postId;
 }
 
 /**
@@ -57,6 +121,55 @@ Alfresco.util.blog.loadBlogPostListPage = function(site, container, path)
 }
      
 
+Alfresco.util.discussions = {};
+
+/**
+ * Redirects to the view page of a forum post
+ */
+Alfresco.util.discussions.loadForumPostViewPage = function(site, container, path, postId)
+{
+   window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/discussions-topicview" +
+                     "?container=" + container + 
+                     "&path=" + path +
+                     "&topicId=" + postId;
+}
+
+/**
+ * Redirects to the EDIT page of a forum post
+ */
+Alfresco.util.discussions.loadForumPostEditPage = function(site, container, path, postId)
+{
+   window.location = Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/discussions-topicview" +
+                     "?container=" + container + 
+                     "&path=" + path +
+                     "&topicId=" + postId +
+                     "&edit=true";
+}
+
+/**
+ * Redirects to the forum listing page
+ */
+Alfresco.util.discussions.loadForumPostListPage = function(site, container, path)
+{
+   window.location =  Alfresco.constants.URL_CONTEXT + "page/site/" + site + "/discussions-topiclist" +
+                      "?container=" + container +
+                      "&path=" + path;
+};
+
+/**
+ * Get the rest api url for a topic
+ */
+Alfresco.util.discussions.getTopicRestUrl = function(site, container, path, topicId)
+{
+   var url = Alfresco.constants.PROXY_URI + "forum/post/site/" + site + "/" +
+            container + "/";
+   if (path != undefined && path.length > 0)
+   {
+      url += path + "/";
+   }
+   url += topicId;
+   return url;
+};
 
 
 Alfresco.util.rollover = {}
@@ -146,7 +259,6 @@ Alfresco.util.rollover.registerHandlerFunctions = function(htmlId, mouseEnteredF
 
 
 
-
 /**
  * Register a default action handler for a given set
  * of elements described by their class name.
@@ -192,4 +304,44 @@ Alfresco.util.registerDefaultActionHandler = function(htmlId, className, ownerTa
          return true;
       }
    );
+}
+
+
+
+Alfresco.util.ajaxtools = {};
+
+/**
+ * Extracts all the javascript parts from the the
+ * html and returns both of them as an array
+ * 
+ * @return all js snippets concatenated or null if none could be found
+ */
+Alfresco.util.ajaxtools.extractScripts = function(html)
+{
+   var scripts = [];
+   var script = null;
+   var regexp = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+   while ((script = regexp.exec(html)))
+   {
+      scripts.push(script[1]);
+   }
+   if (scripts.length > 0)
+   {
+      return scripts.join("\n");
+   }
+   else
+   {
+      return null;
+   }
+}
+
+Alfresco.util.ajaxtools.removeScripts = function(html)
+{
+   var regexp = /<script[^>]*>([\s\S]*?)<\/script>/gi;
+   return html.replace(regexp, '');
+}
+
+Alfresco.util.ajaxtools.loadJSCode = function(jscode)
+{
+   window.setTimeout(jscode, 0);
 }
