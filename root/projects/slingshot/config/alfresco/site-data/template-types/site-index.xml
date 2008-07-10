@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template-type>
+	<id>site-index</id>
+	<title>Site index landing page template type</title>
+	<description>Site index landing page JSP Template Type</description>
+	<renderer>/site-index.jsp</renderer>
+	<renderer-type>jsp</renderer-type>
+</template-type>

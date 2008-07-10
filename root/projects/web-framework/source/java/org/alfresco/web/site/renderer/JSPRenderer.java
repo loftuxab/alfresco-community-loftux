@@ -27,9 +27,11 @@ package org.alfresco.web.site.renderer;
 import java.net.URL;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.alfresco.web.framework.model.TemplateInstance;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
 import org.alfresco.web.site.RequestUtil;
@@ -60,8 +62,8 @@ public class JSPRenderer extends AbstractRenderer
         {
             if(headRenderer != null)
             {
-                int x = headRenderer.lastIndexOf(".");
-                if(x > -1)
+                int x = headRenderer.lastIndexOf('.');
+                if (x != -1)
                 {
                     headRenderer = headRenderer.substring(0,x) + ".head." + renderer.substring(x+1, renderer.length());
                 }
@@ -99,24 +101,18 @@ public class JSPRenderer extends AbstractRenderer
     public void execute(RendererContext rendererContext)
             throws RendererExecutionException
     {
-        /**
-         * Get the JSP file to be included
-         */
+        // Get the JSP file to be included
         String renderer = this.getRenderer();
         try
         {
-            /**
-             * Place the JSP file path onto the render data.
-             * This allows it to be retrieved within the JSP page.
-             */
+            // Place the JSP file path onto the render data.
+            // This allows it to be retrieved within the JSP page.
             rendererContext.put(JSP_FILE_URI, renderer);
-
-            /**
-             * Place the JSP file's parent folder path onto the render data.
-             * This allows it to be retrieved within the JSP page.
-             */
-            int x = renderer.lastIndexOf("/");
-            if(x > -1)
+            
+            // Place the JSP file's parent folder path onto the render data.
+            // This allows it to be retrieved within the JSP page.
+            int x = renderer.lastIndexOf('/');
+            if (x != -1)
             {
                 String pathUri = renderer.substring(0, x);
                 rendererContext.put(JSP_PATH_URI, pathUri);
@@ -125,14 +121,23 @@ public class JSPRenderer extends AbstractRenderer
             {
                 rendererContext.put(JSP_PATH_URI, "/");
             }
-
-            /**
-             * Do the include via the request dispatcher
-             */
-            RequestUtil.include(rendererContext.getRequest(), 
-                    rendererContext.getResponse(), renderer);
+            
+            // Do the forward/include via the request dispatcher.
+            // If the renderer is handling a full page template we can perform
+            // a forward and use an include for components etc.
+            // So operations such as sendRedirect() will work in the JSP template.
+            if (rendererContext.getObject() instanceof TemplateInstance)
+            {
+                RequestUtil.forward(rendererContext.getRequest(), 
+                        rendererContext.getResponse(), renderer);
+            }
+            else
+            {
+                RequestUtil.include(rendererContext.getRequest(), 
+                        rendererContext.getResponse(), renderer);
+            }
         }
-        catch (Exception ex)
+        catch (ServletException ex)
         {
             throw new RendererExecutionException("Unable to execute JSP include: " + renderer, ex);
         }

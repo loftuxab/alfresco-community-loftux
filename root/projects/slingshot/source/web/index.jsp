@@ -1,8 +1,7 @@
 <%
-  response.sendRedirect(request.getContextPath() + "/page/user/admin/dashboard");
+  response.sendRedirect(request.getContextPath() + "/page/site-index");
 %>
 <html>
-   <head><title>Welcome</title></head>
-   <body>
-   </body>
-</html>
+   <head><title>Alfresco</title></head>
+   <body></body>
+</html>
