@@ -3,8 +3,25 @@
    <script type="text/javascript">//<![CDATA[
    new Alfresco.CustomiseLayout("${args.htmlid}").setOptions(
    {
-      currentLayout: {id: "${currentLayout.id}", noOfColumns: ${currentLayout.noOfColumns}, description: "${currentLayout.description}", icon: "${url.context}/components/dashboard/images/${currentLayout.id}.png"},
-      layouts: {<#list layouts as layout>"${layout.id}": { id: "${layout.id}", noOfColumns: ${layout.noOfColumns}, description: "${layout.description}", icon: "${url.context}/components/dashboard/images/${layout.id}.png"}<#if (layout_has_next)>, </#if></#list>}
+      currentLayout:
+      {
+         id: "${currentLayout.id}",
+         noOfColumns: ${currentLayout.noOfColumns},
+         description: "${currentLayout.description}",
+         icon: "${url.context}/components/dashboard/images/${currentLayout.id}.png"
+      },
+      layouts:
+      {
+<#list layouts as layout>
+         "${layout.id}":
+         {
+            id: "${layout.id}",
+            noOfColumns: ${layout.noOfColumns},
+            description: "${layout.description}",
+            icon: "${url.context}/components/dashboard/images/${layout.id}.png"
+         }<#if (layout_has_next)>,</#if>
+</#list>
+      }
    }
    ).setMessages(${messages});
    //]]></script>

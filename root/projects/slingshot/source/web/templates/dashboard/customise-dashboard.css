@@ -4,6 +4,11 @@ h1.sub-title
    padding-bottom: 1em;
 }
 
+h3.padded
+{
+   padding: 0.5em;
+}
+
 #bd
 {
    width: 1000px;
