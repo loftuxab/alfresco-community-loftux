@@ -813,6 +813,11 @@ public final class ScriptSiteData extends ScriptBase
     {
         getModel().unbindComponent(componentId);
     }
+    
+    public void unbindComponent(String scope, String regionId, String sourceId)
+    {
+        getModel().unbindComponent(scope, regionId, sourceId);
+    }
 
     public void associateTemplate(String templateId, String pageId)
     {
@@ -918,6 +923,12 @@ public final class ScriptSiteData extends ScriptBase
     public ScriptModelObject getComponent(String objectId)
     {
         ModelObject obj = getModel().getComponent(objectId);
+        return ScriptHelper.toScriptModelObject(context, obj);
+    }
+    
+    public ScriptModelObject getComponent(String scope, String regionId, String sourceId)
+    {
+        ModelObject obj = getModel().getComponent(scope, regionId, sourceId);
         return ScriptHelper.toScriptModelObject(context, obj);
     }
     
