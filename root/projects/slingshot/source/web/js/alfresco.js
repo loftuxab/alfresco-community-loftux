@@ -1114,6 +1114,9 @@ Alfresco.util.Ajax = function()
                scripts.push(script[1]);
             }
             scripts = scripts.join("\n");
+            
+            // Remove the script from the responseText so it doesn't get executed twice
+            serverResponse.responseText = serverResponse.responseText.replace(regexp, "");
 
             // Use setTimeout to execute the script. Note scope will always be "window"
             window.setTimeout(scripts, 0);
