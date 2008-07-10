@@ -827,7 +827,7 @@ public class Model
     {
         // remove any existing bound components
         Component existingComponent = this.getComponent(scope, regionId, sourceId);
-        if(existingComponent != null)
+        if (existingComponent != null)
         {
             removeObject(existingComponent);
         }
@@ -847,7 +847,19 @@ public class Model
     public void unbindComponent(String componentId)
     {
         Component existingComponent = getComponent(componentId);
-        if(existingComponent != null)
+        if (existingComponent != null)
+        {
+            removeObject(existingComponent);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.alfresco.web.site.Model#unbindComponent(java.lang.String)
+     */
+    public void unbindComponent(String scope, String regionId, String sourceId)
+    {
+        Component existingComponent = getComponent(scope, regionId, sourceId);
+        if (existingComponent != null)
         {
             removeObject(existingComponent);
         }
