@@ -371,7 +371,10 @@ public class FakeHttpServletResponse implements HttpServletResponse
             throw new IllegalStateException(
                     "Cannot reset buffer - response is already committed");
         }
-        content.reset();
+        if (content != null)
+        {
+            content.reset();
+        }
     }
 
     /* (non-Javadoc)

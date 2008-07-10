@@ -38,7 +38,6 @@ import org.alfresco.web.site.FrameworkHelper;
 import org.alfresco.web.site.HttpRequestContext;
 import org.alfresco.web.site.RenderUtil;
 import org.alfresco.web.site.RequestContext;
-import org.alfresco.web.site.ThemeUtil;
 import org.alfresco.web.site.WebFrameworkConstants;
 import org.alfresco.web.site.exception.RendererExecutionException;
 import org.alfresco.web.site.renderer.RendererContext;
@@ -119,7 +118,7 @@ public final class ProcessorModelHelper
             pageModel.put(MODEL_ID, page.getId());
             pageModel.put(MODEL_TITLE, page.getTitle());
             pageModel.put(MODEL_DESCRIPTION, page.getDescription());
-            pageModel.put(MODEL_THEME, ThemeUtil.getCurrentThemeId(context));
+            pageModel.put(MODEL_THEME, context.getThemeId());
             
             // custom page properties - add to model
             // use ${page.properties["abc"]}
@@ -159,7 +158,7 @@ public final class ProcessorModelHelper
         }
         
         // the global app theme
-        model.put(MODEL_THEME, ThemeUtil.getCurrentThemeId(context));
+        model.put(MODEL_THEME, context.getThemeId());
         
         // locale for the current thread
         model.put(MODEL_LOCALE, I18NUtil.getLocale().toString());
