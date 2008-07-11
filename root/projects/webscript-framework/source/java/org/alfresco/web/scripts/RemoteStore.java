@@ -262,7 +262,7 @@ public class RemoteStore implements Store
             StringTokenizer t = new StringTokenizer(res.getResponse(), "\n");
             while (t.hasMoreTokens())
             {
-                list.add(t.nextToken());
+                list.add(t.nextToken().substring(path.length()));
             }
             return list.toArray(new String[list.size()]);
         }

@@ -420,7 +420,10 @@ public class StoreModelObjectPersister extends AbstractModelObjectPersister
             ModelObject object = getObjectByPath(context, docPaths[i]);
             
             // place into collected map
-            objects.put(object.getId(), object);
+            if (object != null)
+            {
+                objects.put(object.getId(), object);
+            }
         }
         
         return objects;
